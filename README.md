@@ -1,6 +1,13 @@
 cjay
 ====
 
+#How to build project#
+
+* Get the latest code from this repository
+* Clean/Build/Import/Create project from source...
+* @nmthan please help us complete this, thanks :+1:
+* For my environment, I imported from existing source these projects and it gives build errors. Thanks +1:
+
 #List of open source plugins#
 
 * [FunDapter](https://github.com/amigold/FunDapter)
