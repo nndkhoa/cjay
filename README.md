@@ -1,11 +1,12 @@
 cjay
 ====
 
-#How to build project#
+## How to build project
 
 Visit [**documentation**](https://github.com/tieubao/cjay/wiki/How-to-build-project).
 
-#List of open source plugins#
+
+## List of open source plugins
 
 * [FunDapter](https://github.com/amigold/FunDapter)
 * [Android Annotation](https://github.com/excilys/androidannotations/)
