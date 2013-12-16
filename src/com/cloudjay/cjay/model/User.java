@@ -24,8 +24,20 @@ public class User {
 	@DatabaseField(columnName = "last_name")
 	private String mLastName;
 
+	@DatabaseField(columnName = "role_name")
+	private String mRoleName;
+
 	@DatabaseField(columnName = "role")
-	private String mRole;
+	private int mRole;
+
+	@DatabaseField(columnName = "avatar_url")
+	private String mAvatar;
+
+	@DatabaseField(columnName = "dialing_code")
+	private String mDialingCode;
+
+	@DatabaseField(columnName = "phone")
+	private int mPhone;
 
 	public String getAccessToken() {
 		return mAccessToken;

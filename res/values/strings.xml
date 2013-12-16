@@ -3,5 +3,6 @@
 	<string name="app_name">CJay</string>
 	<string name="hello_world">Hello world!</string>
 	<string name="menu_settings">Settings</string>
+	<string name="btn_login">Đăng nhập</string>
 
 </resources>
