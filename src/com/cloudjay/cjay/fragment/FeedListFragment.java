@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,21 +11,23 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Container;
+import com.googlecode.androidannotations.annotations.EFragment;
 
+@EFragment(R.layout.fragment_feeds)
 public class FeedListFragment extends SherlockDialogFragment implements
 		OnItemClickListener {
-	
+
 	private ListView mFeedListView;
 	private ArrayAdapter<Container> mAdapter;
-	
+
 	private ArrayList<Container> mFeeds;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -37,19 +38,26 @@ public class FeedListFragment extends SherlockDialogFragment implements
 		mFeeds = new ArrayList<Container>();
 		for (int i = 0; i < 100; i++) {
 			Container container = new Container();
+			container.setContainerId("No " + i);
 			mFeeds.add(container);
 		}
 
 		mAdapter = new ArrayAdapter<Container>(getActivity(),
-				android.R.layout.simple_list_item_1, mFeeds);
-
+				android.R.layout.simple_list_item_1, android.R.id.text1, mFeeds) {
+			@Override
+			public View getView(int position, View convertView, ViewGroup parent) {
+			    View view = super.getView(position, convertView, parent);
+			    TextView text1 = (TextView) view.findViewById(android.R.id.text1);
+			    text1.setText(mFeeds.get(position).getContainerId());
+			    return view;
+			}
+		};
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_feeds, container,
-				false);
+		View view = inflater.inflate(R.layout.fragment_feeds, container, false);
 
 		mFeedListView = (ListView) view.findViewById(R.id.feeds);
 		mFeedListView.setOnItemClickListener(this);
@@ -57,7 +65,7 @@ public class FeedListFragment extends SherlockDialogFragment implements
 
 		return view;
 	}
-	
+
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		Dialog dialog = super.onCreateDialog(savedInstanceState);
@@ -68,7 +76,7 @@ public class FeedListFragment extends SherlockDialogFragment implements
 
 		return dialog;
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
