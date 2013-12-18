@@ -52,8 +52,8 @@
         </activity>
         <activity
             android:name="com.cloudjay.cjay.LoginActivity"
-            android:label="@string/title_activity_login"
-            android:windowSoftInputMode="adjustResize|stateVisible" >
+            android:windowSoftInputMode="adjustResize|stateVisible" 
+            android:theme="@style/AppTheme.NoTitleBar">
         </activity>
     </application>
 
