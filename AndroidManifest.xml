@@ -51,7 +51,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.cloudjay.cjay.LoginActivity"
+            android:name="com.cloudjay.cjay.LoginActivity_"
             android:windowSoftInputMode="adjustResize|stateVisible" 
             android:theme="@style/AppTheme.NoTitleBar">
         </activity>
