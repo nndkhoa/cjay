@@ -13,7 +13,7 @@ import android.content.Intent;
 public class SplashScreenActivity extends Activity {
 
 	ImageView backgroundImageView = null;
-	Boolean isSignedIn = false;
+	Boolean isSignedIn = true;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
