@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2013 Chris Banes
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="Theme.CJay" parent="Theme.Sherlock">
+        <item name="actionBarItemBackground">@drawable/selectable_background_photup</item>
+        <item name="popupMenuStyle">@style/photup_PopupMenu</item>
+        <item name="dropDownListViewStyle">@style/photup_DropDownListView</item>
+        <item name="actionBarTabStyle">@style/photup_ActionBarTabStyle</item>
+        <item name="actionDropDownStyle">@style/photup_DropDownNav</item>
+        <item name="actionBarStyle">@style/photup_solid_ActionBar</item>
+        <item name="android:actionBarItemBackground">@drawable/selectable_background_photup</item>
+        <item name="android:popupMenuStyle">@style/photup_PopupMenu</item>
+        <item name="android:dropDownListViewStyle">@style/photup_DropDownListView</item>
+        <item name="android:actionBarTabStyle">@style/photup_ActionBarTabStyle</item>
+        <item name="android:actionDropDownStyle">@style/photup_DropDownNav</item>
+        <item name="android:actionBarStyle">@style/photup_solid_ActionBar</item>
+        <item name="android:panelBackground">@drawable/menu_hardkey_panel_photup</item>
+    </style>
+
+    <style name="Theme.FullscreenOverlay" parent="Theme.Sherlock">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="windowActionBarOverlay">true</item>
+        <item name="actionBarStyle">@style/photup_translucent_ActionBar</item>
+        <item name="android:actionBarStyle">@style/photup_translucent_ActionBar</item>
+    </style>
+
+    <style name="Theme.CJay.Fullscreen" parent="Theme.CJay">
+        <item name="android:windowFullscreen">true</item>
+    </style>
+    
+    <style name="Theme.CJay.NoTitleBar" parent="Theme.CJay">
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+</resources>

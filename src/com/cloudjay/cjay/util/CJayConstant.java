@@ -68,7 +68,6 @@ public final class CJayConstant {
 
 	/**
 	 * Color
-	 * 
 	 */
 	public static final String COLOR_RED = "#ffe51a1d";
 	public static final String COLOR_BLUE = "#ff377db8";
@@ -78,4 +77,9 @@ public final class CJayConstant {
 	public static final String COLOR_YELLOW = "#ffffff33";
 	public static final String COLOR_BROWN = "#ffa5562f";
 	public static final String COLOR_PINK = "#fff781be";
+	
+	/**
+	 * Splash Screen
+	 */
+	public static final int SPLASH_TIME_OUT = 3000;
 }

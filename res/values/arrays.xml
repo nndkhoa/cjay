@@ -2,10 +2,9 @@
 <resources>
 
 	<string-array name="locations">
-		<item>Home</item>
-		<item>Email</item>
-		<item>Calendar</item>
-		<item>Browser</item>
+		<item>Container Nhập</item>
+		<item>Container Xuất</item>
+		<item>Quá trình tải lên</item>
 	</string-array>
 
 </resources>
