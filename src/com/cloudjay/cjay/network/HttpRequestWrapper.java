@@ -31,6 +31,7 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
+import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.util.Logger;
 
 public class HttpRequestWrapper implements IHttpRequestWrapper {

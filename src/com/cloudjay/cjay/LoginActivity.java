@@ -1,24 +1,31 @@
 package com.cloudjay.cjay;
 
+import org.json.JSONException;
+
+import com.aerilys.helpers.android.NetworkHelper;
+import com.aerilys.helpers.android.UIHelper;
+import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.DisplayHelper;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Click;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.Extra;
-import com.googlecode.androidannotations.annotations.NoTitle;
+import com.googlecode.androidannotations.annotations.SystemService;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -35,7 +42,7 @@ public class LoginActivity extends Activity {
 	/**
 	 * The default email to populate the email field with.
 	 */
-	public static final String EXTRA_EMAIL = "com.example.android.authenticatordemo.extra.EMAIL";
+	public static final String EXTRA_EMAIL = "com.cloudjay.cjay.extra.EMAIL";
 
 	/**
 	 * Keep track of the login task to ensure we can cancel it if requested.
@@ -43,10 +50,10 @@ public class LoginActivity extends Activity {
 	private UserLoginTask mAuthTask = null;
 
 	// Values for email and password at the time of the login attempt.
-	private String mPassword;
+	private String mPassword = "123456";
 
 	@Extra(EXTRA_EMAIL)
-	String mEmail;
+	String mEmail = "giamdinhcong@test.com";
 
 	// UI references.
 	@ViewById(R.id.email)
@@ -67,6 +74,9 @@ public class LoginActivity extends Activity {
 	@ViewById(R.id.sign_in_button)
 	Button loginButton;
 
+	@SystemService
+	InputMethodManager inputMethodManager;
+
 	@Click(R.id.sign_in_button)
 	void loginButtonClicked() {
 		attemptLogin();
@@ -74,7 +84,10 @@ public class LoginActivity extends Activity {
 
 	@AfterViews
 	void init() {
+
 		mEmailView.setText(mEmail);
+		mPasswordView.setText(mPassword);
+
 		mPasswordView
 				.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 					@Override
@@ -95,6 +108,7 @@ public class LoginActivity extends Activity {
 	 * errors are presented and no actual login attempt is made.
 	 */
 	public void attemptLogin() {
+
 		if (mAuthTask != null) {
 			return;
 		}
@@ -192,26 +206,46 @@ public class LoginActivity extends Activity {
 	 * the user.
 	 */
 	public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+
 		@Override
 		protected Boolean doInBackground(Void... params) {
-			// TODO: attempt authentication against a network service.
-
+			// attempt authentication against a network service.
 			try {
-				// Simulate network access.
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				return false;
-			}
+				String userToken = "";
+				Context ctx = LoginActivity.this;
 
-			for (String credential : DUMMY_CREDENTIALS) {
-				String[] pieces = credential.split(":");
-				if (pieces[0].equals(mEmail)) {
-					// Account exists, return true if the password matches.
-					return pieces[1].equals(mPassword);
+				if (NetworkHelper.isConnected(getApplicationContext())) {
+					userToken = CJayClient.getInstance().getUserToken(mEmail,
+							mPassword, LoginActivity.this);
+				} else {
+					UIHelper.toast(ctx,
+							ctx.getString(R.string.alert_no_network));
 				}
+
+				if (TextUtils.isEmpty(userToken)) {
+					// Wrong credential
+					return false;
+				} else {
+					// Time to get data from Server and save to database
+
+					User currentUser;
+					if (NetworkHelper.isConnected(ctx)) {
+						currentUser = CJayClient.getInstance().getCurrentUser(
+								userToken, LoginActivity.this);
+						currentUser.setAccessToken(userToken);
+						currentUser.setMainAccount(true);
+
+					} else {
+						UIHelper.toast(ctx,
+								ctx.getString(R.string.alert_no_network));
+					}
+
+					return true;
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
 			}
 
-			// TODO: register the new account here.
 			return true;
 		}
 
@@ -221,11 +255,13 @@ public class LoginActivity extends Activity {
 			showProgress(false);
 
 			if (success) {
+				// Navigate user to Main Activity based on user role
+
 				finish();
 			} else {
 				mPasswordView
 						.setError(getString(R.string.error_incorrect_password));
-				mPasswordView.requestFocus();
+				// mPasswordView.requestFocus();
 			}
 		}
 
