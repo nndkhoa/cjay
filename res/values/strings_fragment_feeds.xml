@@ -1,0 +1,8 @@
+<resources>
+    
+    <!-- Strings related to feeds -->
+    <string name="container_id">Container ID:</string>
+    <string name="container_owner">Hãng tàu:</string>
+    <string name="container_import_date">Ngày nhập:</string>
+
+</resources>
