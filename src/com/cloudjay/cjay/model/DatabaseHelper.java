@@ -6,7 +6,7 @@ import com.cloudjay.cjay.model.Team;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.Flags;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
-import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
@@ -29,12 +29,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	public static final String DATABASE_NAME = "cjay.db";
 	private static final int DATABASE_VERSION = 1;
 
-	// the DAO object we use to access the PhotoUpload table
-	// private Dao<PhotoUpload, String> mPhotoUploadDao = null;
-	private Dao<Container, String> mContainerDao = null;
-	private Dao<Issue, String> mIssueDao = null;
-	private Dao<Team, String> mTeamDao = null;
-	private Dao<User, Integer> mUserDao = null;
+	UserDaoImpl userDaoImpl = null;
 
 	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -84,50 +79,21 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		}
 	}
 
-	// public Dao<PhotoUpload, String> getPhotoUploadDao() throws SQLException {
-	// if (mPhotoUploadDao == null) {
-	// mPhotoUploadDao = getDao(PhotoUpload.class);
-	// }
-	// return mPhotoUploadDao;
-	// }
-
-	public Dao<Container, String> getContainerDao() throws SQLException {
-		if (mContainerDao == null) {
-			mContainerDao = getDao(Container.class);
-		}
-		return mContainerDao;
-	}
-
-	public Dao<Issue, String> getIssueDao() throws SQLException {
-		if (mIssueDao == null) {
-			mIssueDao = getDao(Issue.class);
-		}
-		return mIssueDao;
-	}
-
-	public Dao<Team, String> getTeamDao() throws SQLException {
-		if (mTeamDao == null) {
-			mTeamDao = getDao(Team.class);
-		}
-		return mTeamDao;
-	}
-
-	public Dao<User, Integer> getUserDao() throws SQLException {
-		if (mUserDao == null) {
-			mUserDao = getDao(User.class);
-		}
-		return mUserDao;
-	}
-
 	/**
 	 * Close the database connections and clear any cached DAOs.
 	 */
 	@Override
 	public void close() {
-		// mPhotoUploadDao = null;
-		mContainerDao = null;
-		mTeamDao = null;
-		mIssueDao = null;
+		userDaoImpl = null;
 		super.close();
 	}
+
+	public UserDaoImpl getUserImpl() throws java.sql.SQLException {
+		if (userDaoImpl == null) {
+			userDaoImpl = DaoManager.createDao(this.getConnectionSource(),
+					User.class);
+		}
+		return userDaoImpl;
+	}
+
 }

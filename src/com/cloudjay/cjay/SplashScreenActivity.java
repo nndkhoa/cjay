@@ -3,6 +3,7 @@ package com.cloudjay.cjay;
 import java.util.Calendar;
 
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Session;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,12 +38,14 @@ public class SplashScreenActivity extends Activity {
 		new Handler().postDelayed(new Runnable() {
 			public void run() {
 
-				if (isSignedIn) {
-					startActivity(new Intent(SplashScreenActivity.this,
-							MainActivity_.class));
-				} else {
+				Session session = Session.restore(getApplicationContext());
+				if (null == session) {
 					startActivity(new Intent(SplashScreenActivity.this,
 							LoginActivity_.class));
+				} else {
+					session.
+					startActivity(new Intent(SplashScreenActivity.this,
+							MainActivity_.class));
 				}
 
 				finish();

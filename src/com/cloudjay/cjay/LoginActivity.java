@@ -1,9 +1,13 @@
 package com.cloudjay.cjay;
 
+import java.sql.SQLException;
+
 import org.json.JSONException;
 
 import com.aerilys.helpers.android.NetworkHelper;
 import com.aerilys.helpers.android.UIHelper;
+import com.cloudjay.cjay.model.IDatabaseManager;
+import com.cloudjay.cjay.model.IUserDao;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DisplayHelper;
@@ -19,6 +23,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.text.TextUtils;
@@ -38,6 +43,10 @@ public class LoginActivity extends Activity {
 	 */
 	private static final String[] DUMMY_CREDENTIALS = new String[] {
 			"foo@example.com:hello", "bar@example.com:world" };
+
+	private IDatabaseManager databaseManager;
+	private IUserDao userDao;
+	private User currentUser;
 
 	/**
 	 * The default email to populate the email field with.
@@ -74,9 +83,6 @@ public class LoginActivity extends Activity {
 	@ViewById(R.id.sign_in_button)
 	Button loginButton;
 
-	@SystemService
-	InputMethodManager inputMethodManager;
-
 	@Click(R.id.sign_in_button)
 	void loginButtonClicked() {
 		attemptLogin();
@@ -100,6 +106,15 @@ public class LoginActivity extends Activity {
 						return false;
 					}
 				});
+
+		databaseManager = CJayClient.getInstance().getDatabaseManager();
+
+		try {
+			userDao = databaseManager.getHelper(getApplicationContext())
+					.getUserImpl();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -223,26 +238,26 @@ public class LoginActivity extends Activity {
 				}
 
 				if (TextUtils.isEmpty(userToken)) {
-					// Wrong credential
+					// Wrong credential --> return and display error alert
 					return false;
 				} else {
 					// Time to get data from Server and save to database
-
-					User currentUser;
 					if (NetworkHelper.isConnected(ctx)) {
 						currentUser = CJayClient.getInstance().getCurrentUser(
 								userToken, LoginActivity.this);
 						currentUser.setAccessToken(userToken);
 						currentUser.setMainAccount(true);
 
+						userDao.addUser(currentUser);
 					} else {
 						UIHelper.toast(ctx,
 								ctx.getString(R.string.alert_no_network));
 					}
-
 					return true;
 				}
 			} catch (JSONException e) {
+				e.printStackTrace();
+			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 
@@ -257,11 +272,30 @@ public class LoginActivity extends Activity {
 			if (success) {
 				// Navigate user to Main Activity based on user role
 
+				int userRole = currentUser.getRole();
+				switch (userRole) {
+				case 1: // Giám định
+
+					break;
+
+				case 4: // Sửa chữa
+					break;
+
+				case 6: // Cổng
+				default:
+
+					break;
+				}
+
+				Intent intent = new Intent(LoginActivity.this,
+						MainActivity_.class);
+				startActivity(intent);
+
 				finish();
 			} else {
 				mPasswordView
 						.setError(getString(R.string.error_incorrect_password));
-				// mPasswordView.requestFocus();
+				mPasswordView.requestFocus();
 			}
 		}
 

@@ -1,12 +1,23 @@
 package com.cloudjay.cjay.model;
 
-import android.R.integer;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.concurrent.Callable;
 
+import android.R.integer;
+import android.content.Context;
+import android.util.Log;
+
+import com.cloudjay.cjay.util.Flags;
+import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "user")
 public class User {
+
+	static final String LOG_TAG = "User";
 
 	@DatabaseField(id = true, columnName = "id")
 	private int id;
@@ -46,6 +57,17 @@ public class User {
 
 	@DatabaseField(columnName = "phone")
 	private int phone;
+
+	@DatabaseField(columnName = "expire_in")
+	private int expire_in;
+
+	public int getExpire() {
+		return expire_in;
+	}
+
+	public void setExpire(int day) {
+		this.expire_in = day;
+	}
 
 	public String getAccessToken() {
 		return access_token;
@@ -117,6 +139,14 @@ public class User {
 
 	public void setRoleName(String roleName) {
 		this.role_name = roleName;
+	}
+
+	public int getRole() {
+		return role;
+	}
+
+	public void setRole(int role) {
+		this.role = role;
 	}
 
 	public int getDialingCode() {
