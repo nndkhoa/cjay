@@ -4,5 +4,6 @@
     <string name="container_id">Container ID:</string>
     <string name="container_owner">Hãng tàu:</string>
     <string name="container_import_date">Ngày nhập:</string>
+    <string name="container_search">Tìm container</string>
 
 </resources>

@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import com.cloudjay.cjay.SampleFragment_;
 import com.cloudjay.cjay.fragment.FeedListFragment;
+import com.cloudjay.cjay.fragment.GateHomeExportListFragment;
 
 public class ViewPagerAdapter
     extends FragmentPagerAdapter
@@ -29,6 +30,8 @@ public class ViewPagerAdapter
     		Fragment importFeedFragment = new FeedListFragment();
     		return importFeedFragment;
     	case 1:
+    		Fragment exportFeedFragment = new GateHomeExportListFragment();
+    		return exportFeedFragment;
     	default:
     		Fragment fragment = new SampleFragment_();
     	    Bundle bundle = new Bundle();
