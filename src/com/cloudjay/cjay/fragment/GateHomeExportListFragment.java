@@ -4,16 +4,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import android.app.Dialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
@@ -21,20 +18,16 @@ import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
-import com.ami.fundapter.interfaces.StaticImageLoader;
-import com.cloudjay.cjay.CameraActivity_;
+import com.ami.fundapter.interfaces.DynamicImageLoader;
+import com.ami.fundapter.interfaces.ItemClickListener;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.googlecode.androidannotations.annotations.EFragment;
 
-@EFragment(R.layout.fragment_feeds)
-public class FeedListFragment extends SherlockDialogFragment implements
-		OnClickListener, OnItemClickListener {
-
-	private final static String TAG = "FeedListFragment";
-
-	private Button mAddNewBtn;
+@EFragment(R.layout.fragment_gate_export)
+public class GateHomeExportListFragment extends SherlockDialogFragment
+		implements OnItemClickListener {
 
 	private ListView mFeedListView;
 
@@ -45,8 +38,7 @@ public class FeedListFragment extends SherlockDialogFragment implements
 		super.onCreate(savedInstanceState);
 
 		// Hector: test only
-		mFeeds = new ArrayList<ContainerSession>();
-
+		// mFeeds = new ArrayList<Container>();
 		// for (int i = 0; i < 100; i++) {
 		// Container container = new Container();
 		// container.setContainerId("6280541");
@@ -58,13 +50,11 @@ public class FeedListFragment extends SherlockDialogFragment implements
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_feeds, container, false);
+		View view = inflater.inflate(R.layout.fragment_gate_export, container,
+				false);
 
-		mAddNewBtn = (Button) view.findViewById(R.id.btn_add_new);
-		mAddNewBtn.setOnClickListener(this);
+		mFeedListView = (ListView) view.findViewById(R.id.container_list);
 
-		mFeedListView = (ListView) view.findViewById(R.id.feeds);
-		mFeedListView.setOnItemClickListener(this);
 		initFunDapter(mFeeds);
 
 		return view;
@@ -82,16 +72,16 @@ public class FeedListFragment extends SherlockDialogFragment implements
 	}
 
 	@Override
-	public void onClick(View view) {
-		Intent intent = new Intent(getActivity(), CameraActivity_.class);
-		startActivity(intent);
+	public void onResume() {
+		super.onResume();
+
+		// Hector: will update UI here
 	}
 
 	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position,
-			long id) {
+	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+		// TODO Auto-generated method stub
 		// Hector: go to details from here
-		android.util.Log.d(TAG, "Show item at position: " + position);
 	}
 
 	private void initFunDapter(ArrayList<ContainerSession> containers) {
@@ -120,6 +110,7 @@ public class FeedListFragment extends SherlockDialogFragment implements
 
 		feedsDict.addStringField(R.id.feed_item_container_import_date,
 				new StringExtractor<ContainerSession>() {
+
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
@@ -129,16 +120,29 @@ public class FeedListFragment extends SherlockDialogFragment implements
 					}
 				});
 
-		feedsDict.addStaticImageField(R.id.feed_item_picture,
-				new StaticImageLoader<ContainerSession>() {
+		feedsDict.addDynamicImageField(R.id.feed_item_picture,
+				new StringExtractor<ContainerSession>() {
 
 					@Override
-					public void loadImage(ContainerSession item,
-							ImageView imageView, int position) {
-						// TODO Auto-generated method stub
+					public String getStringValue(ContainerSession item,
+							int position) {
+						return item.getContainerId();
+					}
+				}, new DynamicImageLoader() {
+
+					@Override
+					public void loadImage(String stringColor, ImageView view) {
+						view.setImageResource(R.drawable.ic_logo);
 
 					}
-				});
+				}).onClick(new ItemClickListener<ContainerSession>() {
+
+			@Override
+			public void onClick(ContainerSession item, int position, View view) {
+				// TODO Auto-generated method stub
+
+			}
+		});
 
 		FunDapter<ContainerSession> adapter = new FunDapter<ContainerSession>(
 				getActivity(), containers, R.layout.feed_item, feedsDict);

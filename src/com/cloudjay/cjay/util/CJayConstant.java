@@ -59,4 +59,11 @@ public final class CJayConstant {
 	 * Splash Screen
 	 */
 	public static final int SPLASH_TIME_OUT = 3000;
+	
+	/**
+	 * CJay Code
+	 */
+	public static final int MEDIA_TYPE_IMAGE = 1;
+	public static final int CAPTURE_REQUEST = 100;
+	public static final int SELECT_PHOTO = 101;
 }

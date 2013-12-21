@@ -33,5 +33,8 @@
     <color name="crop_rectangle_line">@android:color/white</color>
     <color name="crop_rectangle_area">@color/translucent_grey</color>
     <color name="selected_fragment_bg">@color/blue_v_dark</color>
+    
+    <!-- Camera Colours -->
+    <color name="camera_background_transparent">#66747474</color>
 
 </resources>

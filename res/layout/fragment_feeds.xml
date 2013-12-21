@@ -3,10 +3,21 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent" >
 
+    <Button 
+        android:id="@+id/btn_add_new"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:paddingBottom="12dp"
+        android:paddingLeft="18dp"
+        android:paddingRight="18dp"
+        android:paddingTop="12dp" />
+    
     <ListView
         android:id="@+id/feeds"
     	android:layout_width="match_parent"
     	android:layout_height="match_parent"
+    	android:layout_below="@id/btn_add_new"
    	 	android:textAppearance="?android:attr/textAppearanceListItem"
    	 	android:minHeight="260dp" />
     
