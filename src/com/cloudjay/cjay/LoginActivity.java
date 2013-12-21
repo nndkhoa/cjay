@@ -291,6 +291,7 @@ public class LoginActivity extends Activity {
 				startActivity(intent);
 				finish();
 			} else {
+				Logger.Log(LOG_TAG, "Incorrect Username|Password");
 				mPasswordView
 						.setError(getString(R.string.error_incorrect_password));
 				mPasswordView.requestFocus();

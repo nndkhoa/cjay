@@ -10,24 +10,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.AdapterView.OnItemClickListener;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
-import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.ami.fundapter.interfaces.ItemClickListener;
+import com.ami.fundapter.interfaces.StaticImageLoader;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Container;
 import com.googlecode.androidannotations.annotations.EFragment;
+import com.j256.ormlite.logger.Log;
 
 @EFragment(R.layout.fragment_feeds)
-public class FeedListFragment extends SherlockDialogFragment implements
-		OnItemClickListener {
-
+public class FeedListFragment extends SherlockDialogFragment implements OnItemClickListener {
+	
+	private final static String TAG = "FeedListFragment";
+	
 	private ListView mFeedListView;
 	private ArrayList<Container> mFeeds;
 
@@ -52,6 +53,7 @@ public class FeedListFragment extends SherlockDialogFragment implements
 
 		mFeedListView = (ListView) view.findViewById(R.id.feeds);
 
+		mFeedListView.setOnItemClickListener(this);
 		initFunDapter(mFeeds);
 
 		return view;
@@ -76,9 +78,10 @@ public class FeedListFragment extends SherlockDialogFragment implements
 	}
 
 	@Override
-	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		// TODO Auto-generated method stub
 		// Hector: go to details from here
+		android.util.Log.d(TAG, "Show item at position: " + position);
 	}
 
 	private void initFunDapter(ArrayList<Container> containers) {
@@ -103,37 +106,22 @@ public class FeedListFragment extends SherlockDialogFragment implements
 					}
 				});
 
-		feedsDict.addStringField(R.id.feed_item_container_import_date,
+		feedsDict.addStringField(R.id.feed_item_container_import_date, 
 				new StringExtractor<Container>() {
-
-					@Override
-					public String getStringValue(Container item, int position) {
-						// TODO Auto-generated method stub
-						return java.text.DateFormat.getDateTimeInstance()
-								.format(Calendar.getInstance().getTime());
-					}
-				});
-
-		feedsDict.addDynamicImageField(R.id.feed_item_picture,
-				new StringExtractor<Container>() {
-
-					@Override
-					public String getStringValue(Container item, int position) {
-						return item.getContainerId();
-					}
-				}, new DynamicImageLoader() {
-
-					@Override
-					public void loadImage(String stringColor, ImageView view) {
-						view.setImageResource(R.drawable.ic_logo);
-
-					}
-				}).onClick(new ItemClickListener<Container>() {
+			@Override
+			public String getStringValue(Container item, int position) {
+				// TODO Auto-generated method stub
+				return java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
+			}
+		});
+		
+		feedsDict.addStaticImageField(R.id.feed_item_picture, new StaticImageLoader<Container>() {
 
 			@Override
-			public void onClick(Container item, int position, View view) {
+			public void loadImage(Container item, ImageView imageView,
+					int position) {
 				// TODO Auto-generated method stub
-
+				
 			}
 		});
 
