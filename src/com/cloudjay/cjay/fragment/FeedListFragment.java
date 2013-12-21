@@ -29,7 +29,6 @@ public class FeedListFragment extends SherlockDialogFragment implements
 		OnItemClickListener {
 
 	private ListView mFeedListView;
-
 	private ArrayList<Container> mFeeds;
 
 	@Override
