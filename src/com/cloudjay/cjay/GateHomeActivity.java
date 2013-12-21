@@ -13,8 +13,8 @@ import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.ViewById;
 
-@EActivity(R.layout.activity_main)
-public class MainActivity extends SherlockFragmentActivity implements
+@EActivity(R.layout.activity_gate_home)
+public class GateHomeActivity extends SherlockFragmentActivity implements
 		OnPageChangeListener, TabListener {
 
 	private String[] locations;

@@ -3,15 +3,19 @@ package com.cloudjay.cjay;
 import java.util.Calendar;
 
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Session;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.ImageView;
 import android.app.Activity;
 import android.content.Intent;
 
 public class SplashScreenActivity extends Activity {
+
+	private static final String LOG_TAG = "SplashScreenActivity";
 
 	ImageView backgroundImageView = null;
 	Boolean isSignedIn = true;
@@ -28,9 +32,11 @@ public class SplashScreenActivity extends Activity {
 		Boolean isNight = hour < 6 || hour > 18;
 
 		if (isNight) {
+			Logger.Log(LOG_TAG, "at Night");
 			backgroundImageView
 					.setBackgroundResource(R.drawable.container_terminal_night);
 		} else {
+			Logger.Log(LOG_TAG, "at Daytime");
 			backgroundImageView
 					.setBackgroundResource(R.drawable.container_terminal_day);
 		}
@@ -42,13 +48,15 @@ public class SplashScreenActivity extends Activity {
 				Session session = Session.restore(getApplicationContext());
 				if (null == session) {
 					// user did not sign in
+					Logger.Log(LOG_TAG, "session == null");
 					startActivity(new Intent(SplashScreenActivity.this,
 							LoginActivity_.class));
 				} else {
 					// user signed in
+					Logger.Log(LOG_TAG, "User signed in");
 					session.extendAccessTokenIfNeeded(getApplicationContext());
 					startActivity(new Intent(SplashScreenActivity.this,
-							MainActivity_.class));
+							GateHomeActivity_.class));
 				}
 
 				finish();

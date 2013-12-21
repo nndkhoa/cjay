@@ -35,6 +35,8 @@ import android.widget.TextView;
 
 @EActivity(R.layout.activity_login)
 public class LoginActivity extends Activity {
+
+	private static final String LOG_TAG = "LoginActivity";
 	private IDatabaseManager databaseManager;
 	private IUserDao userDao;
 	private User currentUser;
@@ -81,7 +83,6 @@ public class LoginActivity extends Activity {
 
 	@AfterViews
 	void init() {
-
 		mEmailView.setText(mEmail);
 		mPasswordView.setText(mPassword);
 
@@ -114,6 +115,8 @@ public class LoginActivity extends Activity {
 	 * errors are presented and no actual login attempt is made.
 	 */
 	public void attemptLogin() {
+
+		Logger.Log(LOG_TAG, "trying to login ... ");
 
 		if (mAuthTask != null) {
 			return;
@@ -156,6 +159,7 @@ public class LoginActivity extends Activity {
 			// There was an error; don't attempt login and focus the first
 			// form field with an error.
 			focusView.requestFocus();
+
 		} else {
 			// Show a progress spinner, and kick off a background task to
 			// perform the user login attempt.
@@ -262,28 +266,29 @@ public class LoginActivity extends Activity {
 
 			if (success) {
 				// Navigate user to Main Activity based on user role
+				Logger.Log(LOG_TAG, "Login successfully");
+				Logger.Log(LOG_TAG, "User role: " + currentUser.getRoleName());
 
-				Logger.Log(currentUser.getRoleName());
+				Intent intent = null;
 				int userRole = currentUser.getRole();
 				switch (userRole) {
 				case 1: // Giám định
-
+					intent = new Intent(LoginActivity.this,
+							AuditorHomeActivity_.class);
 					break;
 
 				case 4: // Sửa chữa
-
+					intent = new Intent(LoginActivity.this,
+							RepairTeamHomeActivity_.class);
 					break;
 
 				case 6: // Cổng
 				default:
-
+					intent = new Intent(LoginActivity.this,
+							GateHomeActivity_.class);
 					break;
 				}
-
-				Intent intent = new Intent(LoginActivity.this,
-						MainActivity_.class);
 				startActivity(intent);
-
 				finish();
 			} else {
 				mPasswordView

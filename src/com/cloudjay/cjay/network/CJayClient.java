@@ -89,6 +89,9 @@ public class CJayClient implements ICJayClient {
 	@Override
 	public String getUserToken(String username, String password, Context ctx)
 			throws JSONException {
+
+		Logger.Log("getting User Token ... ");
+
 		JSONObject requestPacket = new JSONObject();
 		requestPacket.put("username", username);
 		requestPacket.put("password", password);
@@ -173,14 +176,14 @@ public class CJayClient implements ICJayClient {
 
 	@Override
 	public User getCurrentUser(String token, Context ctx) {
-		HashMap<String, String> headers = new HashMap<String, String>();
+		Logger.Log("getting Current User ...");
 
+		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("Authorization", "Token " + token);
 		String response = requestWrapper.sendGet(CJayConstant.CURRENT_USER,
 				headers);
 
 		Logger.Log(response);
-
 		Gson gson = new Gson();
 		Type userType = new TypeToken<User>() {
 		}.getType();

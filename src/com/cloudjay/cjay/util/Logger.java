@@ -20,15 +20,15 @@ public final class Logger {
 	public static boolean PRODUCTION_MODE = true;
 	public static final String CJAY_TAG = "CJAY";
 
-	public static void Log(String content) {
+	public static void Log(String tag, String content) {
 		if (PRODUCTION_MODE == false) {
-			Log.w("CJAY_INFO", content);
+			Log.w(tag, content);
 		}
 	}
 
-	public static void Log(String tag, String content) {
+	public static void Log(String content) {
 		if (PRODUCTION_MODE == false) {
-			Log.d(tag, content);
+			Log.w("CJAY_INFO", content);
 		}
 	}
 

@@ -30,7 +30,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.cloudjay.cjay.MainActivity_"
+            android:name="com.cloudjay.cjay.GateHomeActivity_"
             android:label="@string/app_name" >
         </activity>
         <activity
@@ -38,7 +38,7 @@
             android:label="@string/title_activity_settings" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.cloudjay.cjay.MainActivity_" />
+                android:value="com.cloudjay.cjay.GateHomeActivity_" />
         </activity>
         <activity
             android:name="com.cloudjay.cjay.SplashScreenActivity"

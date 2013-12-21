@@ -15,6 +15,7 @@ import android.content.Context;
 
 public class Session {
 
+	private static final String LOG_TAG = "Session";
 	private static IDatabaseManager databaseManager;
 	private static IUserDao userDao;
 	private User currentUser;
