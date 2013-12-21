@@ -14,7 +14,7 @@ import android.content.Intent;
 public class SplashScreenActivity extends Activity {
 
 	ImageView backgroundImageView = null;
-	Boolean isSignedIn = false;
+	Boolean isSignedIn = true;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +41,6 @@ public class SplashScreenActivity extends Activity {
 				// restore Session
 				Session session = Session.restore(getApplicationContext());
 				if (null == session) {
-
 					// user did not sign in
 					startActivity(new Intent(SplashScreenActivity.this,
 							LoginActivity_.class));

@@ -1,12 +1,12 @@
 package com.cloudjay.cjay;
 
 import android.app.Application;
+import android.content.Context;
 import android.graphics.Bitmap;
 
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
-
 import com.cloudjay.cjay.model.DatabaseManager;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.network.HttpRequestWrapper;
@@ -20,6 +20,10 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
 @ReportsCrashes(formKey = "", formUri = "https://cloudjay-web.appspot.com/acra/", mode = ReportingInteractionMode.TOAST, resToastText = R.string.crash_toast_text, resDialogText = R.string.crash_dialog_text, resDialogIcon = android.R.drawable.ic_dialog_info, resDialogTitle = R.string.crash_dialog_title, resDialogCommentPrompt = R.string.crash_dialog_comment_prompt, resDialogOkToast = R.string.crash_dialog_ok_toast)
 public class CJayApplication extends Application {
+
+	public static CJayApplication getApplication(Context context) {
+		return (CJayApplication) context.getApplicationContext();
+	}
 
 	@Override
 	public void onCreate() {
@@ -42,7 +46,7 @@ public class CJayApplication extends Application {
 		ACRA.init(CJayApplication.this);
 		ACRA.getErrorReporter().checkReportsOnApplicationStart();
 		ImageLoader.getInstance().init(config);
-		
+
 		CJayClient.getInstance().init(new HttpRequestWrapper(),
 				new DatabaseManager());
 
@@ -55,5 +59,4 @@ public class CJayApplication extends Application {
 		// Configure Logger
 		Logger.PRODUCTION_MODE = false;
 	}
-
 }
