@@ -6,6 +6,7 @@ import org.acra.annotation.ReportsCrashes;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 
 import com.cloudjay.cjay.model.DatabaseManager;
@@ -24,6 +25,27 @@ public class CJayApplication extends Application {
 
 	public static CJayApplication getApplication(Context context) {
 		return (CJayApplication) context.getApplicationContext();
+	}
+
+	public static void startCJayHomeActivity(Context context) {
+		int userRole = ((CJayActivity) context).getCurrentUser().getRole();
+
+		Intent intent = null;
+		switch (userRole) {
+		case 1: // Giám định
+			intent = new Intent(context, AuditorHomeActivity_.class);
+			break;
+
+		case 4: // Sửa chữa
+			intent = new Intent(context, RepairTeamHomeActivity_.class);
+			break;
+
+		case 6: // Cổng
+		default:
+			intent = new Intent(context, GateHomeActivity_.class);
+			break;
+		}
+		context.startActivity(intent);
 	}
 
 	@Override

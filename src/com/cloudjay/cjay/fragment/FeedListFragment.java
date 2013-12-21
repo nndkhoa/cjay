@@ -21,29 +21,33 @@ import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.StaticImageLoader;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Container;
+import com.cloudjay.cjay.model.ContainerSession;
 import com.googlecode.androidannotations.annotations.EFragment;
 import com.j256.ormlite.logger.Log;
 
 @EFragment(R.layout.fragment_feeds)
-public class FeedListFragment extends SherlockDialogFragment implements OnItemClickListener {
-	
+public class FeedListFragment extends SherlockDialogFragment implements
+		OnItemClickListener {
+
 	private final static String TAG = "FeedListFragment";
-	
+
 	private ListView mFeedListView;
-	private ArrayList<Container> mFeeds;
+
+	private ArrayList<ContainerSession> mFeeds;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		// Hector: test only
-		mFeeds = new ArrayList<Container>();
-		for (int i = 0; i < 100; i++) {
-			Container container = new Container();
-			container.setContainerId("6280541");
-			container.setOwnerName("CBHU");
-			mFeeds.add(container);
-		}
+		mFeeds = new ArrayList<ContainerSession>();
+
+		// for (int i = 0; i < 100; i++) {
+		// Container container = new Container();
+		// container.setContainerId("6280541");
+		// container.setOwnerName("CBHU");
+		// mFeeds.add(container);
+		// }
 	}
 
 	@Override
@@ -78,55 +82,61 @@ public class FeedListFragment extends SherlockDialogFragment implements OnItemCl
 	}
 
 	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
 		// TODO Auto-generated method stub
 		// Hector: go to details from here
 		android.util.Log.d(TAG, "Show item at position: " + position);
 	}
 
-	private void initFunDapter(ArrayList<Container> containers) {
+	private void initFunDapter(ArrayList<ContainerSession> containers) {
 
-		BindDictionary<Container> feedsDict = new BindDictionary<Container>();
+		BindDictionary<ContainerSession> feedsDict = new BindDictionary<ContainerSession>();
 		feedsDict.addStringField(R.id.feed_item_container_id,
-				new StringExtractor<Container>() {
+				new StringExtractor<ContainerSession>() {
 
 					@Override
-					public String getStringValue(Container item, int position) {
+					public String getStringValue(ContainerSession item,
+							int position) {
 						return item.getContainerId();
 					}
 				});
 
 		feedsDict.addStringField(R.id.feed_item_container_owner,
-				new StringExtractor<Container>() {
+				new StringExtractor<ContainerSession>() {
 
 					@Override
-					public String getStringValue(Container item, int position) {
+					public String getStringValue(ContainerSession item,
+							int position) {
 						// TODO Auto-generated method stub
-						return item.getOwnerName();
+						return item.getOperatorName();
 					}
 				});
 
-		feedsDict.addStringField(R.id.feed_item_container_import_date, 
-				new StringExtractor<Container>() {
-			@Override
-			public String getStringValue(Container item, int position) {
-				// TODO Auto-generated method stub
-				return java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
-			}
-		});
-		
-		feedsDict.addStaticImageField(R.id.feed_item_picture, new StaticImageLoader<Container>() {
+		feedsDict.addStringField(R.id.feed_item_container_import_date,
+				new StringExtractor<ContainerSession>() {
+					@Override
+					public String getStringValue(ContainerSession item,
+							int position) {
+						// TODO Auto-generated method stub
+						return java.text.DateFormat.getDateTimeInstance()
+								.format(Calendar.getInstance().getTime());
+					}
+				});
 
-			@Override
-			public void loadImage(Container item, ImageView imageView,
-					int position) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
+		feedsDict.addStaticImageField(R.id.feed_item_picture,
+				new StaticImageLoader<ContainerSession>() {
 
-		FunDapter<Container> adapter = new FunDapter<Container>(getActivity(),
-				containers, R.layout.feed_item, feedsDict);
+					@Override
+					public void loadImage(ContainerSession item,
+							ImageView imageView, int position) {
+						// TODO Auto-generated method stub
+
+					}
+				});
+
+		FunDapter<ContainerSession> adapter = new FunDapter<ContainerSession>(
+				getActivity(), containers, R.layout.feed_item, feedsDict);
 
 		mFeedListView.setAdapter(adapter);
 

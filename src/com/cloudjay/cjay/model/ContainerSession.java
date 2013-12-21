@@ -2,6 +2,7 @@ package com.cloudjay.cjay.model;
 
 import java.util.Date;
 
+import com.cloudjay.cjay.util.StringHelper;
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
@@ -50,4 +51,24 @@ public class ContainerSession {
 	//
 	@ForeignCollectionField(eager = true)
 	private ForeignCollection<Issue> issues;
+
+	public String getOperatorName() {
+		return container.getOperator().getName();
+	}
+
+	public String getContainerId() {
+		return container.getContainerId();
+	}
+
+	public String getCheckInTime() {
+		return StringHelper.getRelativeDate(check_in_time.toString());
+	}
+
+	public String getCheckOutTime() {
+		return StringHelper.getRelativeDate(check_out_time.toString());
+	}
+
+	public String getImage() {
+		return image_id_path;
+	}
 }

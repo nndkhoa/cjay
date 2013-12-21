@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import android.app.Activity;
 import android.content.Intent;
 
-public class SplashScreenActivity extends Activity {
+public class SplashScreenActivity extends CJayActivity {
 
 	private static final String LOG_TAG = "SplashScreenActivity";
 
@@ -45,8 +45,8 @@ public class SplashScreenActivity extends Activity {
 			public void run() {
 
 				// restore Session
-				Session session = Session.restore(getApplicationContext());
-				if (null == session) {
+				Session session = getSession();
+				if (null == getSession()) {
 					// user did not sign in
 					Logger.Log(LOG_TAG, "session == null");
 					startActivity(new Intent(SplashScreenActivity.this,
@@ -54,9 +54,11 @@ public class SplashScreenActivity extends Activity {
 				} else {
 					// user signed in
 					Logger.Log(LOG_TAG, "User signed in");
+					Logger.Log(LOG_TAG, "Fetching data from server ...");
 					session.extendAccessTokenIfNeeded(getApplicationContext());
-					startActivity(new Intent(SplashScreenActivity.this,
-							GateHomeActivity_.class));
+
+					CJayApplication
+							.startCJayHomeActivity(SplashScreenActivity.this);
 				}
 
 				finish();

@@ -6,8 +6,8 @@ package com.cloudjay.cjay.util;
 
 import java.sql.SQLException;
 
+import com.cloudjay.cjay.dao.IUserDao;
 import com.cloudjay.cjay.model.IDatabaseManager;
-import com.cloudjay.cjay.model.IUserDao;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 
@@ -19,6 +19,10 @@ public class Session {
 	private static IDatabaseManager databaseManager;
 	private static IUserDao userDao;
 	private User currentUser;
+
+	public User getCurrentUser() {
+		return currentUser;
+	}
 
 	public Session(User user) {
 		currentUser = user;

@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.model;
 
 import java.sql.Date;
+import java.util.Collection;
 
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
@@ -25,37 +26,32 @@ public class Container {
 	@ForeignCollectionField(eager = true)
 	private ForeignCollection<ContainerSession> containerSessions;
 
-	public String toString() {
+	public String getContainerId() {
 		return operator.getId() + container_id;
 	}
 
-	// TODO: cần edit -> ContainerSession
-	private String containerId;
-	private String ownerName;
-	private Date date;
-
-	public String getContainerId() {
-		return containerId;
-	}
-
 	public void setContainerId(String containerId) {
-		this.containerId = containerId;
+		this.container_id = containerId;
 	}
 
-	public Date getDate() {
-		return date;
+	public Operator getOperator() {
+		return operator;
 	}
 
-	public void setDate(Date date) {
-		this.date = date;
+	public void setOperator(Operator operator) {
+		this.operator = operator;
 	}
 
-	public String getOwnerName() {
-		return ownerName;
+	public Collection<ContainerSession> getContainerSessions() {
+		return containerSessions;
 	}
 
-	public void setOwnerName(String ownerName) {
-		this.ownerName = ownerName;
+	public void setContainerSessions(Collection<ContainerSession> newSessions) {
+		this.containerSessions = (ForeignCollection<ContainerSession>) newSessions;
+	}
+
+	public String toString() {
+		return operator.getId() + container_id;
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.cloudjay.cjay.model;
 
+import com.cloudjay.cjay.dao.UserDaoImpl;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.Flags;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;

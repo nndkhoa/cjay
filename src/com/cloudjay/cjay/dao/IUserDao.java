@@ -1,14 +1,16 @@
-package com.cloudjay.cjay.model;
+package com.cloudjay.cjay.dao;
 
 import java.sql.SQLException;
 import java.util.List;
 
+import com.cloudjay.cjay.model.User;
 import com.j256.ormlite.dao.Dao;
 
 /**
- * Created by Huy Do on 15/10/13.
+ * 
+ * @author tieubao
+ * 
  */
-
 public interface IUserDao extends Dao<User, Integer> {
 	List<User> getAllUsers() throws SQLException;
 

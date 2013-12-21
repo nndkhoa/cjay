@@ -6,11 +6,12 @@ import org.json.JSONException;
 
 import com.aerilys.helpers.android.NetworkHelper;
 import com.aerilys.helpers.android.UIHelper;
+import com.cloudjay.cjay.dao.IUserDao;
 import com.cloudjay.cjay.model.IDatabaseManager;
-import com.cloudjay.cjay.model.IUserDao;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Session;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Click;
 import com.googlecode.androidannotations.annotations.EActivity;
@@ -34,7 +35,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 @EActivity(R.layout.activity_login)
-public class LoginActivity extends Activity {
+public class LoginActivity extends CJayActivity {
 
 	private static final String LOG_TAG = "LoginActivity";
 	private IDatabaseManager databaseManager;
@@ -242,7 +243,6 @@ public class LoginActivity extends Activity {
 								userToken, LoginActivity.this);
 						currentUser.setAccessToken(userToken);
 						currentUser.setMainAccount(true);
-
 						userDao.addUser(currentUser);
 					} else {
 						UIHelper.toast(ctx,
@@ -269,26 +269,7 @@ public class LoginActivity extends Activity {
 				Logger.Log(LOG_TAG, "Login successfully");
 				Logger.Log(LOG_TAG, "User role: " + currentUser.getRoleName());
 
-				Intent intent = null;
-				int userRole = currentUser.getRole();
-				switch (userRole) {
-				case 1: // Giám định
-					intent = new Intent(LoginActivity.this,
-							AuditorHomeActivity_.class);
-					break;
-
-				case 4: // Sửa chữa
-					intent = new Intent(LoginActivity.this,
-							RepairTeamHomeActivity_.class);
-					break;
-
-				case 6: // Cổng
-				default:
-					intent = new Intent(LoginActivity.this,
-							GateHomeActivity_.class);
-					break;
-				}
-				startActivity(intent);
+				CJayApplication.startCJayHomeActivity(LoginActivity.this);
 				finish();
 			} else {
 				Logger.Log(LOG_TAG, "Incorrect Username|Password");

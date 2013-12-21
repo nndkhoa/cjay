@@ -1,12 +1,14 @@
 package com.cloudjay.cjay.model;
 
+import java.util.Collection;
+
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /**
- * Danh sách hãng tàu. Dùng để load list lúc tạo Container.
+ * Danh sách hãng tàu. Dùng để load list operators lúc tạo Container.
  * 
  * @author tieubao
  * 
@@ -15,30 +17,50 @@ import com.j256.ormlite.table.DatabaseTable;
 public class Operator {
 
 	private static final String ID = "id";
-	private static final String NAME = "name";
+	private static final String CODE = "operator_code";
+	private static final String NAME = "operator_name";
 
 	@DatabaseField(id = true, columnName = ID)
-	private String id;
+	private int id;
+
+	@DatabaseField(columnName = CODE)
+	private String operator_code;
 
 	@DatabaseField(columnName = NAME)
-	private String name;
+	private String operator_name;
 
 	@ForeignCollectionField(eager = true)
 	private ForeignCollection<Container> containers;
 
 	public String getName() {
-		return name;
+		return operator_name;
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.operator_name = name;
 	}
 
-	public String getId() {
+	public String getCode() {
+		return operator_code;
+	}
+
+	public void setCode(String code) {
+		this.operator_code = code;
+	}
+
+	public int getId() {
 		return id;
 	}
 
-	public void setId(String operatorId) {
+	public void setId(int operatorId) {
 		this.id = operatorId;
+	}
+
+	public void setContainers(Collection<Container> listContainers) {
+		this.containers = (ForeignCollection<Container>) listContainers;
+	}
+
+	public Collection<Container> getContainers() {
+		return containers;
 	}
 }
