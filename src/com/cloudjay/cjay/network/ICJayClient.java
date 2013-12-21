@@ -1,7 +1,10 @@
 package com.cloudjay.cjay.network;
 
+import java.util.List;
+
 import org.json.JSONException;
 
+import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.User;
 
 import android.content.Context;
@@ -13,11 +16,15 @@ public interface ICJayClient {
 
 	String getGoogleCloudToken(String token);
 
+	void addGCMDevice(String regid, Context ctx) throws JSONException;
+
 	// List<ItemModel> getNewItems(Context ctx);
 	//
 	// ItemTeamResultModel getNewItemsByTeam(Context ctx, UserModel currentUser,
 	// int page);
 	//
+
+	List<Operator> getOperators(String token, Context ctx);
 
 	User getCurrentUser(String token, Context ctx);
 
@@ -26,8 +33,6 @@ public interface ICJayClient {
 	// throws SQLException;
 	//
 	// ItemModel getItemModel(Context ctx, UserModel currentUser, int itemId);
-
-	void addGCMDevice(String regid, Context ctx) throws JSONException;
 
 	// void uploadItem(Context ctx, ItemModel item);
 }

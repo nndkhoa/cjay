@@ -2,6 +2,7 @@ package com.cloudjay.cjay.network;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import org.json.JSONException;
@@ -12,6 +13,7 @@ import android.provider.Settings.Secure;
 import android.util.Log;
 
 import com.cloudjay.cjay.model.IDatabaseManager;
+import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CredentialManager;
@@ -259,4 +261,17 @@ public class CJayClient implements ICJayClient {
 	// // TODO Auto-generated method stub
 	// return null;
 	// }
+
+	@Override
+	public List<Operator> getOperators(String token, Context ctx) {
+		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
+		String response = requestWrapper.sendGet(CJayConstant.LIST_OPERATORS,
+				headers);
+		Gson gson = new Gson();
+		Type listType = new TypeToken<List<Operator>>() {
+		}.getType();
+
+		List<Operator> items = gson.fromJson(response, listType);
+		return items;
+	}
 }

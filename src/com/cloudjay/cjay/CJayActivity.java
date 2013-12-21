@@ -5,12 +5,14 @@ import android.os.Bundle;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Session;
 
 public class CJayActivity extends SherlockFragmentActivity implements
 		ICJayActivity {
 
 	private Session session;
+	DataCenter dataCenter;
 
 	public Session getSession() {
 		return session;

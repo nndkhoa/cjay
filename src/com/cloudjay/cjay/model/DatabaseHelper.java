@@ -1,5 +1,6 @@
 package com.cloudjay.cjay.model;
 
+import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.dao.UserDaoImpl;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.Flags;
@@ -21,12 +22,16 @@ import java.sql.SQLException;
  */
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
-	private static final Class<?>[] DATA_CLASSES = { User.class };
+	private static final Class<?>[] DATA_CLASSES = { Depot.class, User.class,
+			Operator.class, Container.class, ContainerSession.class,
+			Issue.class, CJayImage.class, DamageCode.class, LocationCode.class,
+			RepairCode.class };
 
 	public static final String DATABASE_NAME = "cjay.db";
 	private static final int DATABASE_VERSION = 1;
 
 	UserDaoImpl userDaoImpl = null;
+	OperatorDaoImpl operatorDaoImpl = null;
 
 	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -82,15 +87,24 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	@Override
 	public void close() {
 		userDaoImpl = null;
+		operatorDaoImpl = null;
 		super.close();
 	}
 
-	public UserDaoImpl getUserImpl() throws java.sql.SQLException {
+	public UserDaoImpl getUserDaoImpl() throws java.sql.SQLException {
 		if (userDaoImpl == null) {
 			userDaoImpl = DaoManager.createDao(this.getConnectionSource(),
 					User.class);
 		}
 		return userDaoImpl;
+	}
+
+	public OperatorDaoImpl getOperatorDaoImpl() throws SQLException {
+		if (null == operatorDaoImpl) {
+			operatorDaoImpl = DaoManager.createDao(this.getConnectionSource(),
+					Operator.class);
+		}
+		return operatorDaoImpl;
 	}
 
 }

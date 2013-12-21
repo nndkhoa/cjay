@@ -10,6 +10,7 @@ import com.cloudjay.cjay.dao.IUserDao;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Session;
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -104,7 +105,7 @@ public class LoginActivity extends CJayActivity {
 
 		try {
 			userDao = databaseManager.getHelper(getApplicationContext())
-					.getUserImpl();
+					.getUserDaoImpl();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -244,6 +245,8 @@ public class LoginActivity extends CJayActivity {
 						currentUser.setAccessToken(userToken);
 						currentUser.setMainAccount(true);
 						userDao.addUser(currentUser);
+
+						DataCenter.initialize();
 					} else {
 						UIHelper.toast(ctx,
 								ctx.getString(R.string.alert_no_network));

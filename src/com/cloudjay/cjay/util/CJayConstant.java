@@ -32,7 +32,9 @@ public final class CJayConstant {
 
 	public static final String CURRENT_USER = API_ROOT + "cjay/current-user";
 	public static final String ALL_USERS = API_ROOT + "auth/jayusers";
-	
+	public static final String LIST_OPERATORS = API_ROOT
+			+ "cjay/container-operators";
+
 	/**
 	 * File path
 	 */
@@ -54,12 +56,12 @@ public final class CJayConstant {
 	 */
 	public static final float ACTION_MOVE_DELTA_THRESHOLD = 3.0f;
 	public static final long LONG_CLICK_THRESHOLD = 1000;
-	
+
 	/**
 	 * Splash Screen
 	 */
 	public static final int SPLASH_TIME_OUT = 3000;
-	
+
 	/**
 	 * CJay Code
 	 */
