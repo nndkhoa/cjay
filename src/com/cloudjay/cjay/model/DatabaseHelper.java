@@ -1,8 +1,5 @@
 package com.cloudjay.cjay.model;
 
-import com.cloudjay.cjay.model.Container;
-import com.cloudjay.cjay.model.Issue;
-import com.cloudjay.cjay.model.Team;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.Flags;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
@@ -23,8 +20,7 @@ import java.sql.SQLException;
  */
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
-	private static final Class<?>[] DATA_CLASSES = { Container.class,
-			Issue.class, Team.class, User.class };
+	private static final Class<?>[] DATA_CLASSES = { User.class };
 
 	public static final String DATABASE_NAME = "cjay.db";
 	private static final int DATABASE_VERSION = 1;

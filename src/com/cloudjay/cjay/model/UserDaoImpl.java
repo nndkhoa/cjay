@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
-import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
 
 public class UserDaoImpl extends BaseDaoImpl<User, Integer> implements IUserDao {
@@ -40,9 +39,9 @@ public class UserDaoImpl extends BaseDaoImpl<User, Integer> implements IUserDao 
 
 	@Override
 	public User getMainUser() throws SQLException {
-
-		User user = (User) this.query(this.queryBuilder().where().prepare());
-		
-		return null;
+		User user = null;
+		user = (User) this.query(this.queryBuilder().where()
+				.eq(User.IS_MAIN_ACCOUNT, true).prepare());
+		return user;
 	}
 }

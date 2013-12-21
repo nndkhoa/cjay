@@ -1,2 +1,6 @@
 eclipse.preferences.version=1
 encoding//src/com/cloudjay/cjay/LoginActivity.java=UTF-8
+encoding//src/com/cloudjay/cjay/model/DamageCode.java=UTF-8
+encoding//src/com/cloudjay/cjay/model/LocationCode.java=UTF-8
+encoding//src/com/cloudjay/cjay/model/Operator.java=UTF-8
+encoding//src/com/cloudjay/cjay/model/RepairCode.java=UTF-8

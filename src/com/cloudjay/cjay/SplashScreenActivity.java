@@ -38,12 +38,16 @@ public class SplashScreenActivity extends Activity {
 		new Handler().postDelayed(new Runnable() {
 			public void run() {
 
+				// restore Session
 				Session session = Session.restore(getApplicationContext());
 				if (null == session) {
+
+					// user did not sign in
 					startActivity(new Intent(SplashScreenActivity.this,
 							LoginActivity_.class));
 				} else {
-					session.
+					// user signed in
+					session.extendAccessTokenIfNeeded(getApplicationContext());
 					startActivity(new Intent(SplashScreenActivity.this,
 							MainActivity_.class));
 				}

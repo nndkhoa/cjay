@@ -1,8 +1,5 @@
 package com.cloudjay.cjay.network;
 
-import java.sql.SQLException;
-import java.util.List;
-
 import org.json.JSONException;
 
 import com.cloudjay.cjay.model.User;

@@ -1,10 +1,7 @@
 package com.cloudjay.cjay.network;
 
 import java.lang.reflect.Type;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 
 import org.json.JSONException;
@@ -14,10 +11,6 @@ import android.content.Context;
 import android.provider.Settings.Secure;
 import android.util.Log;
 
-import com.aerilys.helpers.android.NetworkHelper;
-import com.aerilys.helpers.android.UIHelper;
-import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.CJayConstant;

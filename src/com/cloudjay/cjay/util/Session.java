@@ -12,7 +12,6 @@ import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 public class Session {
 
@@ -29,9 +28,7 @@ public class Session {
 	}
 
 	public static Session restore(Context context) {
-
 		databaseManager = CJayClient.getInstance().getDatabaseManager();
-
 		try {
 			userDao = databaseManager.getHelper(context).getUserImpl();
 			User user = userDao.getMainUser();
@@ -45,5 +42,10 @@ public class Session {
 		}
 
 		return null;
+	}
+
+	public void extendAccessTokenIfNeeded(Context applicationContext) {
+		// TODO: extend access token expire
+
 	}
 }

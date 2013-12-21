@@ -1,64 +1,66 @@
 package com.cloudjay.cjay.model;
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.concurrent.Callable;
-
-import android.R.integer;
-import android.content.Context;
-import android.util.Log;
-
-import com.cloudjay.cjay.util.Flags;
-import com.j256.ormlite.android.apptools.OpenHelperManager;
-import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-@DatabaseTable(tableName = "user")
+@DatabaseTable(tableName = "user", daoClass = UserDaoImpl.class)
 public class User {
 
-	static final String LOG_TAG = "User";
+	public static final String ID = "id";
+	public static final String USERNAME = "username";
+	public static final String EMAIL = "email";
+	public static final String IS_MAIN_ACCOUNT = "is_main_account";
+	public static final String ACCESS_TOKEN = "access_token";
+	public static final String FIRST_NAME = "first_name";
+	public static final String LAST_NAME = "last_name";
+	public static final String FULL_NAME = "full_name";
+	public static final String ROLE_NAME = "role_name";
+	public static final String ROLE = "role";
+	public static final String AVATAR_URL = "avatar_url";
+	public static final String DIALING_CODE = "dialing_code";
+	public static final String PHONE = "phone";
+	public static final String EXPIRE = "expire_in";
 
-	@DatabaseField(id = true, columnName = "id")
+	@DatabaseField(id = true, columnName = ID)
 	private int id;
 
-	@DatabaseField(columnName = "username")
+	@DatabaseField(columnName = USERNAME)
 	private String username;
 
-	@DatabaseField(columnName = "email")
+	@DatabaseField(columnName = EMAIL)
 	private String email;
 
-	@DatabaseField(columnName = "is_main_account", defaultValue = "0")
+	@DatabaseField(columnName = IS_MAIN_ACCOUNT, defaultValue = "0")
 	private boolean is_main_account;
 
-	@DatabaseField(columnName = "access_token")
+	@DatabaseField(columnName = ACCESS_TOKEN)
 	private String access_token;
 
-	@DatabaseField(columnName = "first_name")
+	@DatabaseField(columnName = FIRST_NAME)
 	private String first_name;
 
-	@DatabaseField(columnName = "last_name")
+	@DatabaseField(columnName = LAST_NAME)
 	private String last_name;
 
-	@DatabaseField(columnName = "full_name")
+	@DatabaseField(columnName = FULL_NAME)
 	private String full_name;
 
-	@DatabaseField(columnName = "role_name")
+	@DatabaseField(columnName = ROLE_NAME)
 	private String role_name;
 
-	@DatabaseField(columnName = "role", canBeNull = false)
+	@DatabaseField(columnName = ROLE, canBeNull = false)
 	private int role;
 
-	@DatabaseField(columnName = "avatar_url")
+	@DatabaseField(columnName = AVATAR_URL)
 	private String avatar_url;
 
-	@DatabaseField(columnName = "dialing_code")
+	@DatabaseField(columnName = DIALING_CODE)
 	private int dialing_code;
 
-	@DatabaseField(columnName = "phone")
+	@DatabaseField(columnName = PHONE)
 	private int phone;
 
-	@DatabaseField(columnName = "expire_in")
+	@DatabaseField(columnName = EXPIRE)
 	private int expire_in;
 
 	public int getExpire() {

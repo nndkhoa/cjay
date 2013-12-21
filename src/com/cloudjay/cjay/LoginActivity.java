@@ -10,12 +10,11 @@ import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.IUserDao;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
-import com.cloudjay.cjay.util.DisplayHelper;
+import com.cloudjay.cjay.util.Logger;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Click;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.Extra;
-import com.googlecode.androidannotations.annotations.SystemService;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 import android.animation.Animator;
@@ -30,20 +29,12 @@ import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 @EActivity(R.layout.activity_login)
 public class LoginActivity extends Activity {
-	/**
-	 * A dummy authentication store containing known user names and passwords.
-	 * TODO: remove after connecting to a real authentication system.
-	 */
-	private static final String[] DUMMY_CREDENTIALS = new String[] {
-			"foo@example.com:hello", "bar@example.com:world" };
-
 	private IDatabaseManager databaseManager;
 	private IUserDao userDao;
 	private User currentUser;
@@ -272,6 +263,7 @@ public class LoginActivity extends Activity {
 			if (success) {
 				// Navigate user to Main Activity based on user role
 
+				Logger.Log(currentUser.getRoleName());
 				int userRole = currentUser.getRole();
 				switch (userRole) {
 				case 1: // Giám định
@@ -279,6 +271,7 @@ public class LoginActivity extends Activity {
 					break;
 
 				case 4: // Sửa chữa
+
 					break;
 
 				case 6: // Cổng
