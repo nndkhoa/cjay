@@ -3,14 +3,15 @@ package com.cloudjay.cjay.fragment;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -42,17 +43,6 @@ public class FeedListFragment extends SherlockDialogFragment implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		// Hector: test only
-		// mFeeds = (ArrayList<ContainerSession>) DataCenter
-		// .getListContainerSessions(getActivity());
-
-		// for (int i = 0; i < 100; i++) {
-		// Container container = new Container();
-		// container.setContainerId("6280541");
-		// container.setOwnerName("CBHU");
-		// mFeeds.add(container);
-		// }
 	}
 
 	@Override
@@ -71,20 +61,33 @@ public class FeedListFragment extends SherlockDialogFragment implements
 	}
 
 	@Override
-	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		Dialog dialog = super.onCreateDialog(savedInstanceState);
-
-		// Set Soft Input mode so it's always visible
-		dialog.getWindow().setSoftInputMode(
-				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-
-		return dialog;
-	}
-
-	@Override
 	public void onClick(View view) {
-		Intent intent = new Intent(getActivity(), CameraActivity_.class);
-		startActivity(intent);
+		// Show Dialog
+		LayoutInflater factory = LayoutInflater.from(getActivity());
+		final View newContainerView = factory.inflate(
+				R.layout.dialog_new_container, null);
+
+		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(
+				getActivity())
+				.setTitle(getString(R.string.dialog_new_container))
+				.setView(newContainerView)
+				.setPositiveButton(R.string.dialog_container_ok,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+								Intent intent = new Intent(getActivity(),
+										CameraActivity_.class);
+								startActivity(intent);
+							}
+						})
+				.setNegativeButton(R.string.dialog_container_cancel,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+
+							}
+						});
+		dialogBuilder.create().show();
 	}
 
 	@Override

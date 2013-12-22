@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+        	<TextView
+		        android:layout_width="0dp"
+		        android:layout_height="fill_parent"
+	        	android:layout_weight="1"
+	        	android:gravity="center_vertical"
+		        android:text="@string/dialog_container_id"
+		        android:textStyle="bold" />
+       	 	<EditText
+		        android:id="@+id/dialog_new_container_id"
+		        android:layout_width="0dp"
+		        android:layout_height="fill_parent"
+		        android:layout_weight="1"
+		        android:hint="@string/dialog_container_id" />
+    </LinearLayout>
+    
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+        	<TextView
+		        android:layout_width="0dp"
+		        android:layout_height="fill_parent"
+	        	android:layout_weight="1"
+	        	android:gravity="center_vertical"
+		        android:text="@string/dialog_container_owner"
+		        android:textStyle="bold" />     
+		    <EditText
+		        android:id="@+id/dialog_new_container_owner"
+		        android:layout_width="0dp"
+		        android:layout_height="fill_parent"
+		        android:layout_weight="1"
+		        android:hint="@string/dialog_container_owner" />       
+    </LinearLayout>
+
+</LinearLayout>

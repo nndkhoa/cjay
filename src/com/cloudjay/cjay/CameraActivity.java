@@ -30,6 +30,7 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -81,8 +82,8 @@ public class CameraActivity extends Activity {
 	@ViewById(R.id.btn_capture)
 	ImageButton captureButton;
 
-	@ViewById(R.id.btn_from_file)
-	ImageButton loadButton;
+	@ViewById(R.id.btn_camera_done)
+	Button doneButton;
 
 	@SystemService
 	AudioManager audioManager;
@@ -628,14 +629,10 @@ public class CameraActivity extends Activity {
 			Logger.Log("rawCallback");
 		}
 	};
-
-	@Click(R.id.btn_from_file)
-	void loadButtonClicked() {
-		Logger.Log("loadButtonClicked()");
-
-		Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-		photoPickerIntent.setType("image/*");
-		startActivityForResult(photoPickerIntent, CJayConstant.SELECT_PHOTO);
+	
+	@Click(R.id.btn_camera_done)
+	void doneButtonClicked() {
+		this.onBackPressed();
 	}
 
 	// endregion
