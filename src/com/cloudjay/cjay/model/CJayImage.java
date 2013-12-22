@@ -1,9 +1,10 @@
 package com.cloudjay.cjay.model;
 
+import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-@DatabaseTable(tableName = "cjay_image")
+@DatabaseTable(tableName = "cjay_image", daoClass = CJayImageDaoImpl.class)
 public class CJayImage {
 
 	private static final String ID = "id";

@@ -1,6 +1,13 @@
 package com.cloudjay.cjay.model;
 
+import com.cloudjay.cjay.dao.CJayImageDaoImpl;
+import com.cloudjay.cjay.dao.ContainerDaoImpl;
+import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
+import com.cloudjay.cjay.dao.DepotDaoImpl;
+import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
+import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.cloudjay.cjay.dao.UserDaoImpl;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.Flags;
@@ -32,6 +39,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 	UserDaoImpl userDaoImpl = null;
 	OperatorDaoImpl operatorDaoImpl = null;
+	IssueDaoImpl issueDaoImpl = null;
+	CJayImageDaoImpl cJayImageDaoImpl = null;
+	ContainerDaoImpl containerDaoImpl = null;
+	ContainerSessionDaoImpl containerSessionDaoImpl = null;
+	DamageCodeDaoImpl damageCodeDaoImpl = null;
+	DepotDaoImpl depotDaoImpl = null;
+	RepairCodeDaoImpl repairCodeDaoImpl = null;
 
 	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -91,7 +105,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		super.close();
 	}
 
-	public UserDaoImpl getUserDaoImpl() throws java.sql.SQLException {
+	public UserDaoImpl getUserDaoImpl() throws SQLException {
 		if (userDaoImpl == null) {
 			userDaoImpl = DaoManager.createDao(this.getConnectionSource(),
 					User.class);
@@ -107,4 +121,60 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		return operatorDaoImpl;
 	}
 
+	public CJayImageDaoImpl getCJayImageDaoImpl() throws SQLException {
+		if (null == cJayImageDaoImpl) {
+			cJayImageDaoImpl = DaoManager.createDao(this.getConnectionSource(),
+					CJayImage.class);
+		}
+		return cJayImageDaoImpl;
+	}
+
+	public ContainerDaoImpl getContainerDaoImpl() throws SQLException {
+		if (null == containerDaoImpl) {
+			containerDaoImpl = DaoManager.createDao(this.getConnectionSource(),
+					Container.class);
+		}
+		return containerDaoImpl;
+	}
+
+	public ContainerSessionDaoImpl getContainerSessionDaoImpl()
+			throws SQLException {
+		if (null == containerSessionDaoImpl) {
+			containerSessionDaoImpl = DaoManager.createDao(
+					this.getConnectionSource(), ContainerSession.class);
+		}
+		return containerSessionDaoImpl;
+	}
+
+	public DamageCodeDaoImpl getDamageCodeDaoImpl() throws SQLException {
+		if (null == damageCodeDaoImpl) {
+			damageCodeDaoImpl = DaoManager.createDao(
+					this.getConnectionSource(), DamageCode.class);
+		}
+		return damageCodeDaoImpl;
+	}
+
+	public DepotDaoImpl getDepotDaoImpl() throws SQLException {
+		if (null == depotDaoImpl) {
+			depotDaoImpl = DaoManager.createDao(this.getConnectionSource(),
+					Depot.class);
+		}
+		return depotDaoImpl;
+	}
+
+	public IssueDaoImpl getIssueDaoImpl() throws SQLException {
+		if (null == issueDaoImpl) {
+			issueDaoImpl = DaoManager.createDao(this.getConnectionSource(),
+					Issue.class);
+		}
+		return issueDaoImpl;
+	}
+
+	public RepairCodeDaoImpl getRepairCodeDaoImpl() throws SQLException {
+		if (null == repairCodeDaoImpl) {
+			repairCodeDaoImpl = DaoManager.createDao(
+					this.getConnectionSource(), RepairCode.class);
+		}
+		return repairCodeDaoImpl;
+	}
 }

@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.network;
 
 import java.lang.reflect.Type;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -327,5 +328,22 @@ public class CJayClient implements ICJayClient {
 
 		List<ContainerSession> items = gson.fromJson(response, listType);
 		return items;
+	}
+
+	@Override
+	public List<Operator> getOperators(Context ctx, Date date) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Operator> getOperators(Context ctx, String date) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean checkIfServerHasNewMetadata() {
+		return false;
 	}
 }

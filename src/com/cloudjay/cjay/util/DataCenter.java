@@ -47,8 +47,20 @@ public class DataCenter {
 
 	}
 
+	/**
+	 * Get data from server
+	 */
 	public static void fetchData() {
+
+		// 1. fetch `new ISO code` from the `last time`
 		Logger.Log(LOG_TAG, "fetching data ...");
+
+		if (CJayClient.getInstance().checkIfServerHasNewMetadata()) {
+
+		}
+
+
+		// 2.
 
 	}
 

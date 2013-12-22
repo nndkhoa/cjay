@@ -41,4 +41,12 @@ public class OperatorDaoImpl extends BaseDaoImpl<Operator, Integer> implements
 		}
 	}
 
+	@Override
+	public boolean isEmpty() throws SQLException {
+		Operator operator = this.queryForFirst(null);
+		if (null == operator)
+			return true;
+
+		return false;
+	}
 }

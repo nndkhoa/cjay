@@ -18,4 +18,6 @@ public interface IOperatorDao extends Dao<Operator, Integer> {
 	void addOperator(Operator operator) throws SQLException;
 
 	void deleteAllOperators() throws SQLException;
+
+	boolean isEmpty() throws SQLException;
 }
