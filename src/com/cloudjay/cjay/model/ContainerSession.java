@@ -3,8 +3,6 @@ package com.cloudjay.cjay.model;
 import java.util.Collection;
 import java.util.Date;
 
-import android.provider.MediaStore.Video;
-
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.util.StringHelper;
 import com.j256.ormlite.dao.ForeignCollection;

@@ -3,7 +3,7 @@ package com.cloudjay.cjay.model;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-@DatabaseTable(tableName = "issue")
+@DatabaseTable(tableName = "cjay_image")
 public class CJayImage {
 
 	private static final String ID = "id";
