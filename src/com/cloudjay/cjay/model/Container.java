@@ -1,14 +1,14 @@
 package com.cloudjay.cjay.model;
 
-import java.sql.Date;
 import java.util.Collection;
 
+import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
-@DatabaseTable(tableName = "container")
+@DatabaseTable(tableName = "container", daoClass = ContainerDaoImpl.class)
 public class Container {
 
 	private static final String ID = "id";

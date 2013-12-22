@@ -35,7 +35,10 @@ public class DamageCodeDaoImpl extends BaseDaoImpl<DamageCode, Integer>
 
 	@Override
 	public void deleteAllDamageCodes() throws SQLException {
-		this.deleteAllDamageCodes();
+		List<DamageCode> damageCodes = getAllDamageCodes();
+		for (DamageCode damageCode : damageCodes) {
+			this.delete(damageCode);
+		}
 	}
 
 }

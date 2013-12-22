@@ -59,6 +59,6 @@ public class DataCenter {
 
 	public static List<ContainerSession> getListContainerSessions(
 			Context context) {
-		return new ArrayList<ContainerSession>();
+		return CJayClient.getInstance().getContainerSessions(context);
 	}
 }

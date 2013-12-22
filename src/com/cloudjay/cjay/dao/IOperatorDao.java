@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.cloudjay.cjay.model.Operator;
-import com.cloudjay.cjay.model.User;
 import com.j256.ormlite.dao.Dao;
 
 /**

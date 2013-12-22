@@ -1,8 +1,7 @@
 package com.cloudjay.cjay.model;
 
-import com.j256.ormlite.dao.ForeignCollection;
+import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /**
@@ -11,7 +10,7 @@ import com.j256.ormlite.table.DatabaseTable;
  * @author tieubao
  * 
  */
-@DatabaseTable(tableName = "damage_code")
+@DatabaseTable(tableName = "damage_code", daoClass = DamageCodeDaoImpl.class)
 public class DamageCode {
 
 	private static final String ID = "id";

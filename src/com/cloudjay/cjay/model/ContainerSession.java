@@ -1,7 +1,11 @@
 package com.cloudjay.cjay.model;
 
+import java.util.Collection;
 import java.util.Date;
 
+import android.provider.MediaStore.Video;
+
+import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.util.StringHelper;
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
@@ -19,7 +23,7 @@ import com.j256.ormlite.table.DatabaseTable;
  * 
  */
 
-@DatabaseTable(tableName = "container_session")
+@DatabaseTable(tableName = "container_session", daoClass = ContainerSessionDaoImpl.class)
 public class ContainerSession {
 
 	private static final String CHECK_OUT_TIME = "check_out_time";
@@ -48,9 +52,25 @@ public class ContainerSession {
 	@ForeignCollectionField(eager = true)
 	private ForeignCollection<CJayImage> cJayImages;
 
+	public void setCJayImages(Collection<CJayImage> cJayImages) {
+		this.cJayImages = (ForeignCollection<CJayImage>) cJayImages;
+	}
+
+	public ForeignCollection<CJayImage> getCJayImages() {
+		return cJayImages;
+	}
+
 	//
 	@ForeignCollectionField(eager = true)
 	private ForeignCollection<Issue> issues;
+
+	public void setIssues(Collection<Issue> issues) {
+		this.issues = (ForeignCollection<Issue>) issues;
+	}
+
+	public ForeignCollection<Issue> getIssues() {
+		return issues;
+	}
 
 	public String getOperatorName() {
 		return container.getOperator().getName();

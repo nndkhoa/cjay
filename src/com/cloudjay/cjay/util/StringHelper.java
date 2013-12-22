@@ -1,17 +1,11 @@
 package com.cloudjay.cjay.util;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.location.Address;
-import android.location.Geocoder;
 import android.text.format.DateUtils;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 public class StringHelper {
 	public static boolean isNullOrEmpty(String input) {

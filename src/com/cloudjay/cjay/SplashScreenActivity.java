@@ -9,9 +9,7 @@ import com.cloudjay.cjay.util.Session;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.ImageView;
-import android.app.Activity;
 import android.content.Intent;
 
 public class SplashScreenActivity extends CJayActivity {

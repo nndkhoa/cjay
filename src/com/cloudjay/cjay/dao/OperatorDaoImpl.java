@@ -1,12 +1,9 @@
 package com.cloudjay.cjay.dao;
 
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import com.cloudjay.cjay.model.Operator;
-import com.cloudjay.cjay.model.User;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
@@ -38,7 +35,10 @@ public class OperatorDaoImpl extends BaseDaoImpl<Operator, Integer> implements
 
 	@Override
 	public void deleteAllOperators() throws SQLException {
-		this.deleteAllOperators();
+		List<Operator> operators = getAllOperators();
+		for (Operator operator : operators) {
+			this.delete(operator);
+		}
 	}
 
 }
