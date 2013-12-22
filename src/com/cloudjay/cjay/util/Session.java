@@ -35,7 +35,7 @@ public class Session {
 	public static Session restore(Context context) {
 		databaseManager = CJayClient.getInstance().getDatabaseManager();
 		try {
-			userDao = databaseManager.getHelper(context).getUserImpl();
+			userDao = databaseManager.getHelper(context).getUserDaoImpl();
 			User user = userDao.getMainUser();
 
 			if (null != user) {
