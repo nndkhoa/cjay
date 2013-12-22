@@ -26,6 +26,7 @@ import com.cloudjay.cjay.CameraActivity_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.util.DataCenter;
 import com.googlecode.androidannotations.annotations.EFragment;
 
 @EFragment(R.layout.fragment_feeds)
@@ -45,7 +46,8 @@ public class FeedListFragment extends SherlockDialogFragment implements
 		super.onCreate(savedInstanceState);
 
 		// Hector: test only
-		mFeeds = new ArrayList<ContainerSession>();
+		// mFeeds = (ArrayList<ContainerSession>) DataCenter
+		// .getListContainerSessions(getActivity());
 
 		// for (int i = 0; i < 100; i++) {
 		// Container container = new Container();

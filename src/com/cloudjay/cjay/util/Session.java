@@ -51,7 +51,6 @@ public class Session {
 	}
 
 	public void extendAccessTokenIfNeeded(Context applicationContext) {
-		// TODO: extend access token expire
-
+		Logger.Log(LOG_TAG, "extending user access token ...");
 	}
 }

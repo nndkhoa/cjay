@@ -12,8 +12,11 @@ import android.content.Context;
 import android.provider.Settings.Secure;
 import android.util.Log;
 
+import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CredentialManager;
@@ -24,7 +27,16 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
+/**
+ * 
+ * CJay Network module
+ * 
+ * @author tieubao
+ * 
+ */
 public class CJayClient implements ICJayClient {
+
+	private static final String LOG_TAG = "CJayClient";
 	public static String BASE_URL = "https://cloudjay-web.appspot.com/api/jaypix/";
 
 	private IHttpRequestWrapper requestWrapper;
@@ -263,7 +275,7 @@ public class CJayClient implements ICJayClient {
 	// }
 
 	@Override
-	public List<Operator> getOperators(String token, Context ctx) {
+	public List<Operator> getOperators(Context ctx) {
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 		String response = requestWrapper.sendGet(CJayConstant.LIST_OPERATORS,
 				headers);
@@ -272,6 +284,48 @@ public class CJayClient implements ICJayClient {
 		}.getType();
 
 		List<Operator> items = gson.fromJson(response, listType);
+		return items;
+	}
+
+	@Override
+	public List<DamageCode> getDamageCodes(Context ctx) {
+		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
+		String response = requestWrapper.sendGet(
+				CJayConstant.LIST_DAMAGE_CODES, headers);
+		Gson gson = new Gson();
+		Type listType = new TypeToken<List<DamageCode>>() {
+		}.getType();
+
+		List<DamageCode> items = gson.fromJson(response, listType);
+		return items;
+	}
+
+	@Override
+	public List<RepairCode> getRepairCodes(Context ctx) {
+		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
+		String response = requestWrapper.sendGet(CJayConstant.LIST_OPERATORS,
+				headers);
+		Gson gson = new Gson();
+		Type listType = new TypeToken<List<RepairCode>>() {
+		}.getType();
+
+		List<RepairCode> items = gson.fromJson(response, listType);
+		return items;
+	}
+
+	@Override
+	public List<ContainerSession> getContainerSessions(Context ctx) {
+		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
+		String response = requestWrapper.sendGet(CJayConstant.LIST_OPERATORS,
+				headers);
+
+		Logger.Log(response);
+
+		Gson gson = new Gson();
+		Type listType = new TypeToken<List<ContainerSession>>() {
+		}.getType();
+
+		List<ContainerSession> items = gson.fromJson(response, listType);
 		return items;
 	}
 }

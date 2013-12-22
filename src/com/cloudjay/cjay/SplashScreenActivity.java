@@ -3,6 +3,7 @@ package com.cloudjay.cjay;
 import java.util.Calendar;
 
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Session;
 
@@ -55,8 +56,10 @@ public class SplashScreenActivity extends CJayActivity {
 					// user signed in
 					Logger.Log(LOG_TAG, "User signed in");
 					Logger.Log(LOG_TAG, "Fetching data from server ...");
-					session.extendAccessTokenIfNeeded(getApplicationContext());
 
+					session.extendAccessTokenIfNeeded(getApplicationContext());
+					
+					DataCenter.fetchData();
 					CJayApplication
 							.startCJayHomeActivity(SplashScreenActivity.this);
 				}

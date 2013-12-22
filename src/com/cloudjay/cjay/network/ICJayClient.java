@@ -4,7 +4,10 @@ import java.util.List;
 
 import org.json.JSONException;
 
+import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.model.User;
 
 import android.content.Context;
@@ -18,17 +21,22 @@ public interface ICJayClient {
 
 	void addGCMDevice(String regid, Context ctx) throws JSONException;
 
+	User getCurrentUser(String token, Context ctx);
+
+	List<Operator> getOperators(Context ctx);
+
+	List<DamageCode> getDamageCodes(Context ctx);
+
+	List<RepairCode> getRepairCodes(Context ctx);
+
+	List<ContainerSession> getContainerSessions(Context ctx);
+
 	// List<ItemModel> getNewItems(Context ctx);
 	//
 	// ItemTeamResultModel getNewItemsByTeam(Context ctx, UserModel currentUser,
 	// int page);
 	//
 
-	List<Operator> getOperators(String token, Context ctx);
-
-	User getCurrentUser(String token, Context ctx);
-
-	//
 	// List<UserModel> getTeamMembers(UserModel currentUser, Context ctx)
 	// throws SQLException;
 	//

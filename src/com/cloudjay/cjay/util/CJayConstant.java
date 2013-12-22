@@ -39,6 +39,9 @@ public final class CJayConstant {
 	public static final String LIST_REPAIR_CODES = API_ROOT
 			+ "cjay/repair-codes";
 
+	public static final String LIST_CONTAINER_SESSIONS = API_ROOT
+			+ "cjay/container-sessions";
+
 	/**
 	 * File path
 	 */

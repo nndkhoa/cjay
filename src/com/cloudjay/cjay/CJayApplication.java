@@ -13,6 +13,7 @@ import com.cloudjay.cjay.model.DatabaseManager;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.network.HttpRequestWrapper;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -72,6 +73,8 @@ public class CJayApplication extends Application {
 
 		CJayClient.getInstance().init(new HttpRequestWrapper(),
 				new DatabaseManager());
+
+		DataCenter.initialize();
 
 		if (!CJayConstant.APP_DIRECTORY_FILE.exists())
 			CJayConstant.APP_DIRECTORY_FILE.mkdir();

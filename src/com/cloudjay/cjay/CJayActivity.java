@@ -36,4 +36,10 @@ public class CJayActivity extends SherlockFragmentActivity implements
 		return this;
 	}
 
+	@Override
+	protected void onResume() {
+		DataCenter.reload();
+		super.onResume();
+	}
+
 }

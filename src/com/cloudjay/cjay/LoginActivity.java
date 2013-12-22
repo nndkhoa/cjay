@@ -245,8 +245,8 @@ public class LoginActivity extends CJayActivity {
 						currentUser.setAccessToken(userToken);
 						currentUser.setMainAccount(true);
 						userDao.addUser(currentUser);
+						DataCenter.fetchData();
 
-						DataCenter.initialize();
 					} else {
 						UIHelper.toast(ctx,
 								ctx.getString(R.string.alert_no_network));
