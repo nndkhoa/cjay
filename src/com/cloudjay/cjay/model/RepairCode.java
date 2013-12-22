@@ -16,6 +16,7 @@ public class RepairCode {
 
 	private static final String ID = "id";
 	private static final String NAME = "name";
+	private static final String CODE = "code";
 
 	@DatabaseField(id = true, columnName = ID)
 	private String id;
@@ -23,8 +24,11 @@ public class RepairCode {
 	@DatabaseField(columnName = NAME)
 	private String name;
 
-	@ForeignCollectionField(eager = true)
-	private ForeignCollection<Issue> issues;
+	@DatabaseField(columnName = CODE)
+	private String code;
+
+	// @ForeignCollectionField(eager = true)
+	// private ForeignCollection<Issue> issues;
 
 	public String getName() {
 		return name;
@@ -32,6 +36,14 @@ public class RepairCode {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public String getId() {

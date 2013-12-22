@@ -34,12 +34,17 @@ public final class CJayConstant {
 	public static final String ALL_USERS = API_ROOT + "auth/jayusers";
 	public static final String LIST_OPERATORS = API_ROOT
 			+ "cjay/container-operators";
+	public static final String LIST_DAMAGE_CODES = API_ROOT
+			+ "cjay/damage-codes";
+	public static final String LIST_REPAIR_CODES = API_ROOT
+			+ "cjay/repair-codes";
 
 	/**
 	 * File path
 	 */
 	public static final String APP_DIRECTORY = "DCIM/CJay";
-	public static final String HIDDEN_APP_DIRECTORY = "Pictures/.CJay";
+	public static final String HIDDEN_APP_DIRECTORY = "Pictures/.CJay"; // for
+																		// temporary
 
 	// `/sdcard/DCMI/CJay/`
 	public static final File APP_DIRECTORY_FILE = new File(

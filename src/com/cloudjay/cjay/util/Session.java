@@ -33,6 +33,7 @@ public class Session {
 	}
 
 	public static Session restore(Context context) {
+		Logger.Log(LOG_TAG, "restoring session ... ");
 		databaseManager = CJayClient.getInstance().getDatabaseManager();
 		try {
 			userDao = databaseManager.getHelper(context).getUserDaoImpl();

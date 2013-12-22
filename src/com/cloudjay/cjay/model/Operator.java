@@ -2,6 +2,8 @@ package com.cloudjay.cjay.model;
 
 import java.util.Collection;
 
+import com.cloudjay.cjay.dao.OperatorDaoImpl;
+import com.cloudjay.cjay.dao.UserDaoImpl;
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
@@ -13,7 +15,7 @@ import com.j256.ormlite.table.DatabaseTable;
  * @author tieubao
  * 
  */
-@DatabaseTable(tableName = "operator")
+@DatabaseTable(tableName = "operator", daoClass = OperatorDaoImpl.class)
 public class Operator {
 
 	private static final String ID = "id";
@@ -29,8 +31,8 @@ public class Operator {
 	@DatabaseField(columnName = NAME)
 	private String operator_name;
 
-	@ForeignCollectionField(eager = true)
-	private ForeignCollection<Container> containers;
+	// @ForeignCollectionField(eager = true)
+	// private ForeignCollection<Container> containers;
 
 	public String getName() {
 		return operator_name;
@@ -56,11 +58,11 @@ public class Operator {
 		this.id = operatorId;
 	}
 
-	public void setContainers(Collection<Container> listContainers) {
-		this.containers = (ForeignCollection<Container>) listContainers;
-	}
-
-	public Collection<Container> getContainers() {
-		return containers;
-	}
+	// public void setContainers(Collection<Container> listContainers) {
+	// this.containers = (ForeignCollection<Container>) listContainers;
+	// }
+	//
+	// public Collection<Container> getContainers() {
+	// return containers;
+	// }
 }
