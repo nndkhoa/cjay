@@ -15,7 +15,7 @@ import android.content.Context;
 
 public interface ICJayClient {
 
-	boolean checkIfServerHasNewMetadata();
+	boolean hasNewMetadata();
 
 	String getUserToken(String username, String password, Context ctx)
 			throws JSONException;

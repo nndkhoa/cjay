@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.RepairCode;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
@@ -40,6 +41,15 @@ public class ContainerSessionDaoImpl extends
 		for (ContainerSession containerSession : containerSessions) {
 			this.delete(containerSession);
 		}
+	}
+
+	@Override
+	public boolean isEmpty() throws SQLException {
+		ContainerSession containerSession = this.queryForFirst(null);
+		if (null == containerSession)
+			return true;
+
+		return false;
 	}
 
 }

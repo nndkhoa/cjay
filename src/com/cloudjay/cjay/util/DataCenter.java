@@ -1,10 +1,12 @@
 package com.cloudjay.cjay.util;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import android.content.Context;
 
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.network.CJayClient;
 
@@ -27,9 +29,9 @@ public class DataCenter {
 	private static final String LOG_TAG = "DataCenter";
 
 	public static DataCenter instance = null;
+	private static IDatabaseManager databaseManager;
 
 	public DataCenter() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public DataCenter getInstance() {
@@ -39,8 +41,8 @@ public class DataCenter {
 		return instance;
 	}
 
-	public static void initialize() {
-
+	public static void initialize(IDatabaseManager databaseManager) {
+		DataCenter.databaseManager = databaseManager;
 	}
 
 	public static void reload() {
@@ -51,17 +53,7 @@ public class DataCenter {
 	 * Get data from server
 	 */
 	public static void fetchData() {
-
-		// 1. fetch `new ISO code` from the `last time`
 		Logger.Log(LOG_TAG, "fetching data ...");
-
-		if (CJayClient.getInstance().checkIfServerHasNewMetadata()) {
-
-		}
-
-
-		// 2.
-
 	}
 
 	public static List<Operator> getListOperators(Context context) {
@@ -70,6 +62,13 @@ public class DataCenter {
 
 	public static List<ContainerSession> getListContainerSessions(
 			Context context) {
-		return CJayClient.getInstance().getContainerSessions(context);
+
+		try {
+			return databaseManager.getHelper(context)
+					.getContainerSessionDaoImpl().getAllContainerSessions();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

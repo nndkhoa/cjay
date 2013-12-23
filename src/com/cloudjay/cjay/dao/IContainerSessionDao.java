@@ -20,4 +20,6 @@ public interface IContainerSessionDao extends Dao<ContainerSession, Integer> {
 			throws SQLException;
 
 	void deleteAllContainerSessions() throws SQLException;
+
+	boolean isEmpty() throws SQLException;
 }

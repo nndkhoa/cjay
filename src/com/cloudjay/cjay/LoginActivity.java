@@ -242,7 +242,7 @@ public class LoginActivity extends CJayActivity {
 						currentUser.setAccessToken(userToken);
 						currentUser.setMainAccount(true);
 						userDao.addUser(currentUser);
-						DataCenter.fetchData();
+						CJayClient.getInstance().fetchData(ctx);
 
 					} else {
 						UIHelper.toast(ctx,

@@ -18,4 +18,6 @@ public interface IRepairCodeDao extends Dao<RepairCode, Integer> {
 	void addRepairCode(RepairCode repairCode) throws SQLException;
 
 	void deleteAllRepairCodes() throws SQLException;
+
+	boolean isEmpty() throws SQLException;
 }

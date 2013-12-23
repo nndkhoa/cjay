@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.cloudjay.cjay.model.DamageCode;
+import com.cloudjay.cjay.model.Operator;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
@@ -41,4 +42,12 @@ public class DamageCodeDaoImpl extends BaseDaoImpl<DamageCode, Integer>
 		}
 	}
 
+	@Override
+	public boolean isEmpty() throws SQLException {
+		DamageCode damageCode = this.queryForFirst(null);
+		if (null == damageCode)
+			return true;
+
+		return false;
+	}
 }

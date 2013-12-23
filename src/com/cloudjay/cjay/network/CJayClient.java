@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.network;
 
 import java.lang.reflect.Type;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +14,10 @@ import android.content.Context;
 import android.provider.Settings.Secure;
 import android.util.Log;
 
+import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
+import com.cloudjay.cjay.dao.OperatorDaoImpl;
+import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.IDatabaseManager;
@@ -99,6 +104,53 @@ public class CJayClient implements ICJayClient {
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("Authorization", "Token " + token);
 		return headers;
+	}
+
+	public void fetchData(Context ctx) {
+		Logger.Log(LOG_TAG, "fetching data ...");
+
+		try {
+			// 1. fetch
+			if (hasNewMetadata()) {
+
+			}
+
+			// 2. no record found
+			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx)
+					.getOperatorDaoImpl();
+			DamageCodeDaoImpl damageCodeDaoImpl = databaseManager
+					.getHelper(ctx).getDamageCodeDaoImpl();
+			RepairCodeDaoImpl repairCodeDaoImpl = databaseManager
+					.getHelper(ctx).getRepairCodeDaoImpl();
+
+			if (operatorDaoImpl.isEmpty()) {
+				List<Operator> operators = getOperators(ctx);
+				operatorDaoImpl.addListOperators(operators);
+			}
+
+			if (damageCodeDaoImpl.isEmpty()) {
+				List<DamageCode> damageCodes = getDamageCodes(ctx);
+				damageCodeDaoImpl.addListDamageCodes(damageCodes);
+			}
+
+			if (repairCodeDaoImpl.isEmpty()) {
+				List<RepairCode> repairCodes = getRepairCodes(ctx);
+				repairCodeDaoImpl.addListRepairCodes(repairCodes);
+			}
+
+			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
+					.getHelper(ctx).getContainerSessionDaoImpl();
+
+			// Update list ContainerSessions
+			if (containerSessionDaoImpl.isEmpty()) { // temporary
+				List<ContainerSession> containerSessions = getContainerSessions(ctx);
+				containerSessionDaoImpl
+						.addListContainerSessions(containerSessions);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -332,18 +384,16 @@ public class CJayClient implements ICJayClient {
 
 	@Override
 	public List<Operator> getOperators(Context ctx, Date date) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<Operator> getOperators(Context ctx, String date) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public boolean checkIfServerHasNewMetadata() {
+	public boolean hasNewMetadata() {
 		return false;
 	}
 }

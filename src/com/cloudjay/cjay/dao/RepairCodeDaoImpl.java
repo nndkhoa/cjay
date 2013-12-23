@@ -3,6 +3,7 @@ package com.cloudjay.cjay.dao;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.RepairCode;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
@@ -39,6 +40,15 @@ public class RepairCodeDaoImpl extends BaseDaoImpl<RepairCode, Integer>
 		for (RepairCode repairCode : repairCodes) {
 			this.delete(repairCode);
 		}
+	}
+
+	@Override
+	public boolean isEmpty() throws SQLException {
+		RepairCode repairCode = this.queryForFirst(null);
+		if (null == repairCode)
+			return true;
+
+		return false;
 	}
 
 }

@@ -74,7 +74,7 @@ public class CJayApplication extends Application {
 		CJayClient.getInstance().init(new HttpRequestWrapper(),
 				new DatabaseManager());
 
-		DataCenter.initialize();
+		DataCenter.initialize(new DatabaseManager());
 
 		if (!CJayConstant.APP_DIRECTORY_FILE.exists())
 			CJayConstant.APP_DIRECTORY_FILE.mkdir();
