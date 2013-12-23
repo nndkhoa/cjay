@@ -1,5 +1,10 @@
 package com.cloudjay.cjay;
 
+//import android.app.FragmentManager;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -8,7 +13,6 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
-import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.ViewById;
@@ -23,14 +27,13 @@ public class AuditorHomeActivity extends SherlockFragmentActivity implements
 
 	@AfterViews
 	void afterViews() {
-		locations = getResources().getStringArray(R.array.locations);
+		locations = getResources().getStringArray(R.array.auditor_home_tabs);
 		configureViewPager();
 		configureActionBar();
 	}
 
 	private void configureViewPager() {
-		ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(
-				getSupportFragmentManager(), locations);
+		AuditorHomeTabPageAdaptor viewPagerAdapter = new AuditorHomeTabPageAdaptor(getSupportFragmentManager(), locations);
 		pager.setAdapter(viewPagerAdapter);
 		pager.setOnPageChangeListener(this);
 	}
@@ -77,5 +80,39 @@ public class AuditorHomeActivity extends SherlockFragmentActivity implements
 
 	@Override
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
+	}
+
+	
+	public class AuditorHomeTabPageAdaptor extends FragmentPagerAdapter {
+	    private String[] locations;
+
+	    public AuditorHomeTabPageAdaptor(FragmentManager fm, String[] locations) {
+	        super(fm);
+	        this.locations = locations;
+	    }
+
+	    public int getCount() {
+	        return locations.length;
+	    }
+
+	    public Fragment getItem(int position) {
+    		Fragment fragment = new SampleFragment_();
+    	    Bundle bundle = new Bundle();
+	    	switch (position) {
+	    	case 0:
+	    	    bundle.putString("label", locations[position]);
+	    	    fragment.setArguments(bundle);
+	    	    return fragment;
+	    	case 1:
+	    	    bundle.putString("label", locations[position]);
+	    	    fragment.setArguments(bundle);
+	    	    return fragment;
+	    	default:
+	    	    bundle.putString("label", locations[position]);
+	    	    fragment.setArguments(bundle);
+	    	    return fragment;
+	    	}
+	    }
+
 	}
 }

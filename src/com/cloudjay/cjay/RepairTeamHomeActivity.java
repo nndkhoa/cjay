@@ -23,7 +23,7 @@ public class RepairTeamHomeActivity extends SherlockFragmentActivity implements
 
 	@AfterViews
 	void afterViews() {
-		locations = getResources().getStringArray(R.array.locations);
+		locations = getResources().getStringArray(R.array.repair_team_home_tabs);
 		configureViewPager();
 		configureActionBar();
 	}

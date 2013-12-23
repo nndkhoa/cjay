@@ -23,7 +23,7 @@ public class GateHomeActivity extends SherlockFragmentActivity implements
 
 	@AfterViews
 	void afterViews() {
-		locations = getResources().getStringArray(R.array.locations);
+		locations = getResources().getStringArray(R.array.gate_home_tabs);
 		configureViewPager();
 		configureActionBar();
 	}

@@ -4,7 +4,13 @@
     <string name="container_id">Container ID:</string>
     <string name="container_owner">Hãng tàu:</string>
     <string name="container_import_date">Ngày nhập:</string>
+    <string name="container_export_date">Ngày xuất:</string>
     <string name="container_search">Tìm container</string>
     <string name="container_add">Thêm</string>
+    <string name="damage_location_code">CODE vị trí:</string>
+    <string name="damage_damage_code">CODE hư hỏng:</string>
+    <string name="damage_repair_code">CODE sửa chữa:</string>
+    <string name="damage_dimension">Kích thước:</string>
+    <string name="damage_quantity">Số lượng:</string>
     
 </resources>
