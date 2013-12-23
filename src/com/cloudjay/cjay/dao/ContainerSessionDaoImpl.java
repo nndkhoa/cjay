@@ -11,9 +11,9 @@ import com.j256.ormlite.support.ConnectionSource;
 public class ContainerSessionDaoImpl extends
 		BaseDaoImpl<ContainerSession, Integer> implements IContainerSessionDao {
 
-	protected ContainerSessionDaoImpl(ConnectionSource connectionSource,
-			Class<ContainerSession> dataClass) throws SQLException {
-		super(connectionSource, dataClass);
+	public ContainerSessionDaoImpl(ConnectionSource connectionSource)
+			throws SQLException {
+		super(connectionSource, ContainerSession.class);
 	}
 
 	@Override

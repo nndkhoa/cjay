@@ -10,9 +10,9 @@ import com.j256.ormlite.support.ConnectionSource;
 public class OperatorDaoImpl extends BaseDaoImpl<Operator, Integer> implements
 		IOperatorDao {
 
-	protected OperatorDaoImpl(ConnectionSource connectionSource,
-			Class<Operator> dataClass) throws SQLException {
-		super(connectionSource, dataClass);
+	public OperatorDaoImpl(ConnectionSource connectionSource)
+			throws SQLException {
+		super(connectionSource, Operator.class);
 	}
 
 	@Override

@@ -10,9 +10,9 @@ import com.j256.ormlite.support.ConnectionSource;
 public class ContainerDaoImpl extends BaseDaoImpl<Container, Integer> implements
 		IContainerDao {
 
-	protected ContainerDaoImpl(ConnectionSource connectionSource,
-			Class<Container> dataClass) throws SQLException {
-		super(connectionSource, dataClass);
+	public ContainerDaoImpl(ConnectionSource connectionSource)
+			throws SQLException {
+		super(connectionSource, Container.class);
 	}
 
 	@Override

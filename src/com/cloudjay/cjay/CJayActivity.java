@@ -12,7 +12,15 @@ public class CJayActivity extends SherlockFragmentActivity implements
 		ICJayActivity {
 
 	private Session session;
-	DataCenter dataCenter;
+	private DataCenter dataCenter;
+
+	public DataCenter getDataCenter() {
+		return dataCenter;
+	}
+
+	public void setDataCenter(DataCenter dataCenter) {
+		this.dataCenter = dataCenter;
+	}
 
 	public Session getSession() {
 		return session;
@@ -38,7 +46,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 	@Override
 	protected void onResume() {
-		DataCenter.reload();
+		DataCenter.reload(getApplicationContext());
 		super.onResume();
 	}
 

@@ -10,8 +10,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 
 import com.cloudjay.cjay.model.DatabaseManager;
+import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.network.HttpRequestWrapper;
+import com.cloudjay.cjay.network.IHttpRequestWrapper;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
@@ -23,6 +25,9 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
 @ReportsCrashes(formKey = "", formUri = "https://cloudjay-web.appspot.com/acra/", mode = ReportingInteractionMode.TOAST, resToastText = R.string.crash_toast_text, resDialogText = R.string.crash_dialog_text, resDialogIcon = android.R.drawable.ic_dialog_info, resDialogTitle = R.string.crash_dialog_title, resDialogCommentPrompt = R.string.crash_dialog_comment_prompt, resDialogOkToast = R.string.crash_dialog_ok_toast)
 public class CJayApplication extends Application {
+
+	IDatabaseManager databaseManager = null;
+	IHttpRequestWrapper httpRequestWrapper = null;
 
 	public static CJayApplication getApplication(Context context) {
 		return (CJayApplication) context.getApplicationContext();
@@ -53,6 +58,9 @@ public class CJayApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 
+		databaseManager = new DatabaseManager();
+		httpRequestWrapper = new HttpRequestWrapper();
+
 		DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
 				.cacheInMemory(true).cacheOnDisc(true)
 				.bitmapConfig(Bitmap.Config.RGB_565)
@@ -69,12 +77,10 @@ public class CJayApplication extends Application {
 
 		ACRA.init(CJayApplication.this);
 		ACRA.getErrorReporter().checkReportsOnApplicationStart();
+
 		ImageLoader.getInstance().init(config);
-
-		CJayClient.getInstance().init(new HttpRequestWrapper(),
-				new DatabaseManager());
-
-		DataCenter.initialize(new DatabaseManager());
+		CJayClient.getInstance().init(httpRequestWrapper, databaseManager);
+		DataCenter.initialize(databaseManager);
 
 		if (!CJayConstant.APP_DIRECTORY_FILE.exists())
 			CJayConstant.APP_DIRECTORY_FILE.mkdir();

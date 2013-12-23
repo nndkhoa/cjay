@@ -11,9 +11,9 @@ import com.j256.ormlite.support.ConnectionSource;
 public class RepairCodeDaoImpl extends BaseDaoImpl<RepairCode, Integer>
 		implements IRepairCodeDao {
 
-	protected RepairCodeDaoImpl(ConnectionSource connectionSource,
-			Class<RepairCode> dataClass) throws SQLException {
-		super(connectionSource, dataClass);
+	public RepairCodeDaoImpl(ConnectionSource connectionSource)
+			throws SQLException {
+		super(connectionSource, RepairCode.class);
 	}
 
 	@Override

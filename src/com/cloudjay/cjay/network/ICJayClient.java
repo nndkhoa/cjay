@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.json.JSONException;
 
+import com.cloudjay.cjay.model.CJayResourceStatus;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Operator;
@@ -15,7 +16,7 @@ import android.content.Context;
 
 public interface ICJayClient {
 
-	boolean hasNewMetadata();
+	boolean hasNewMetadata(Context ctx);
 
 	String getUserToken(String username, String password, Context ctx)
 			throws JSONException;
@@ -37,6 +38,12 @@ public interface ICJayClient {
 	List<RepairCode> getRepairCodes(Context ctx);
 
 	List<ContainerSession> getContainerSessions(Context ctx);
+
+	List<ContainerSession> getContainerSessions(Context ctx, Date date);
+
+	List<ContainerSession> getContainerSessions(Context ctx, String date);
+
+	List<CJayResourceStatus> getCJayResourceStatus(Context ctx);
 
 	// List<ItemModel> getNewItems(Context ctx);
 	//

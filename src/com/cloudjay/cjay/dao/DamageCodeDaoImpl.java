@@ -11,9 +11,9 @@ import com.j256.ormlite.support.ConnectionSource;
 public class DamageCodeDaoImpl extends BaseDaoImpl<DamageCode, Integer>
 		implements IDamageCodeDao {
 
-	protected DamageCodeDaoImpl(ConnectionSource connectionSource,
-			Class<DamageCode> dataClass) throws SQLException {
-		super(connectionSource, dataClass);
+	public DamageCodeDaoImpl(ConnectionSource connectionSource)
+			throws SQLException {
+		super(connectionSource, DamageCode.class);
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package com.cloudjay.cjay.model;
 
+import java.util.Set;
+
 import com.cloudjay.cjay.dao.UserDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -24,6 +26,9 @@ public class User {
 
 	@DatabaseField(id = true, columnName = ID)
 	private int id;
+
+	@DatabaseField
+	private Depot working_depot;
 
 	@DatabaseField(columnName = USERNAME)
 	private String username;
@@ -63,6 +68,14 @@ public class User {
 
 	@DatabaseField(columnName = EXPIRE)
 	private int expire_in;
+
+	public Depot getDepot() {
+		return working_depot;
+	}
+
+	public void setDepot(Depot depot) {
+		this.working_depot = depot;
+	}
 
 	public int getExpire() {
 		return expire_in;

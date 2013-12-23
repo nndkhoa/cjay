@@ -10,9 +10,8 @@ import com.j256.ormlite.support.ConnectionSource;
 public class DepotDaoImpl extends BaseDaoImpl<Depot, Integer> implements
 		IDepotDao {
 
-	protected DepotDaoImpl(ConnectionSource connectionSource,
-			Class<Depot> dataClass) throws SQLException {
-		super(connectionSource, dataClass);
+	public DepotDaoImpl(ConnectionSource connectionSource) throws SQLException {
+		super(connectionSource, Depot.class);
 	}
 
 	@Override

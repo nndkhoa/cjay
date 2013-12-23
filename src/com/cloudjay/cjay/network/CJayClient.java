@@ -2,6 +2,8 @@ package com.cloudjay.cjay.network;
 
 import java.lang.reflect.Type;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -10,14 +12,17 @@ import java.util.UUID;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
+import com.cloudjay.cjay.model.CJayResourceStatus;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.IDatabaseManager;
@@ -25,8 +30,9 @@ import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.CredentialManager;
+import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Session;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -40,6 +46,7 @@ import com.google.gson.reflect.TypeToken;
  * @author tieubao
  * 
  */
+@SuppressLint("SimpleDateFormat")
 public class CJayClient implements ICJayClient {
 
 	private static final String LOG_TAG = "CJayClient";
@@ -89,10 +96,7 @@ public class CJayClient implements ICJayClient {
 	private HashMap<String, String> prepareHeadersWithToken(Context ctx) {
 
 		User currentUser = null;
-		Gson gson = new Gson();
-		currentUser = gson.fromJson(
-				CredentialManager.getPrefsValue(ctx, CredentialManager.USER),
-				User.class);
+		currentUser = Session.restore(ctx).getCurrentUser();
 
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("Authorization", "Token " + currentUser.getAccessToken());
@@ -110,12 +114,16 @@ public class CJayClient implements ICJayClient {
 		Logger.Log(LOG_TAG, "fetching data ...");
 
 		try {
-			// 1. fetch
-			if (hasNewMetadata()) {
 
-			}
+			Date now = new Date();
 
-			// 2. no record found
+			// 2013-11-10T21:05:24+08:00
+			SimpleDateFormat dateFormat = new SimpleDateFormat(
+					"yyyy-MM-dd'T'HH:mm:ssZZ");
+			String nowString = dateFormat.format(now);
+
+			// 1. chưa có data
+			Logger.Log(LOG_TAG, "no iso code");
 			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx)
 					.getOperatorDaoImpl();
 			DamageCodeDaoImpl damageCodeDaoImpl = databaseManager
@@ -124,18 +132,32 @@ public class CJayClient implements ICJayClient {
 					.getHelper(ctx).getRepairCodeDaoImpl();
 
 			if (operatorDaoImpl.isEmpty()) {
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.RESOURCE_OPERATOR_LAST_UPDATE,
+						nowString);
+
 				List<Operator> operators = getOperators(ctx);
 				operatorDaoImpl.addListOperators(operators);
 			}
 
 			if (damageCodeDaoImpl.isEmpty()) {
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.RESOURCE_DAMAGE_LAST_UPDATE, nowString);
 				List<DamageCode> damageCodes = getDamageCodes(ctx);
 				damageCodeDaoImpl.addListDamageCodes(damageCodes);
 			}
 
 			if (repairCodeDaoImpl.isEmpty()) {
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.RESOURCE_REPAIR_LAST_UPDATE, nowString);
 				List<RepairCode> repairCodes = getRepairCodes(ctx);
 				repairCodeDaoImpl.addListRepairCodes(repairCodes);
+			}
+
+			// 2. fetch ISO CODE
+			if (hasNewMetadata(ctx)) {
+				Logger.Log(LOG_TAG, "fetch iso code");
+
 			}
 
 			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
@@ -146,6 +168,9 @@ public class CJayClient implements ICJayClient {
 				List<ContainerSession> containerSessions = getContainerSessions(ctx);
 				containerSessionDaoImpl
 						.addListContainerSessions(containerSessions);
+			} else {
+				// List<ContainerSession> containerSessions = getClass()
+
 			}
 
 		} catch (SQLException e) {
@@ -393,7 +418,40 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public boolean hasNewMetadata() {
+	public boolean hasNewMetadata(Context ctx) {
+
+		// List<CJayResourceStatus> cJayResourceStatus =
+		// getCJayResourceStatus(ctx);
+		// for (CJayResourceStatus item : cJayResourceStatus) {
+		//
+		// }
+
 		return false;
+	}
+
+	@Override
+	public List<ContainerSession> getContainerSessions(Context ctx, Date date) {
+
+		return null;
+	}
+
+	@Override
+	public List<ContainerSession> getContainerSessions(Context ctx, String date) {
+
+		return null;
+	}
+
+	@Override
+	public List<CJayResourceStatus> getCJayResourceStatus(Context ctx) {
+		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
+		String response = requestWrapper.sendGet(
+				CJayConstant.CJAY_RESOURCE_STATUS, headers);
+
+		Gson gson = new Gson();
+		Type listType = new TypeToken<List<CJayResourceStatus>>() {
+		}.getType();
+
+		List<CJayResourceStatus> items = gson.fromJson(response, listType);
+		return items;
 	}
 }

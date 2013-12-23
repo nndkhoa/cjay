@@ -42,27 +42,38 @@ public class DataCenter {
 	}
 
 	public static void initialize(IDatabaseManager databaseManager) {
+		Logger.Log(LOG_TAG, "initialize");
 		DataCenter.databaseManager = databaseManager;
 	}
 
-	public static void reload() {
-
+	public static void reload(Context context) {
+		Logger.Log(LOG_TAG, "reload");
+		CJayClient.getInstance().fetchData(context);
 	}
 
 	/**
 	 * Get data from server
 	 */
-	public static void fetchData() {
+	public static void fetchData(Context context) {
 		Logger.Log(LOG_TAG, "fetching data ...");
+		CJayClient.getInstance().fetchData(context);
 	}
 
 	public static List<Operator> getListOperators(Context context) {
-		return CJayClient.getInstance().getOperators(context);
+		Logger.Log(LOG_TAG, "get list Operators");
+
+		try {
+			return databaseManager.getHelper(context).getOperatorDaoImpl()
+					.getAllOperators();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static List<ContainerSession> getListContainerSessions(
 			Context context) {
-
+		Logger.Log(LOG_TAG, "get list Container sessions");
 		try {
 			return databaseManager.getHelper(context)
 					.getContainerSessionDaoImpl().getAllContainerSessions();

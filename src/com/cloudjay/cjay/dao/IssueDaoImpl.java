@@ -10,9 +10,8 @@ import com.j256.ormlite.support.ConnectionSource;
 public class IssueDaoImpl extends BaseDaoImpl<Issue, Integer> implements
 		IIssueDao {
 
-	protected IssueDaoImpl(ConnectionSource connectionSource,
-			Class<Issue> dataClass) throws SQLException {
-		super(connectionSource, dataClass);
+	public IssueDaoImpl(ConnectionSource connectionSource) throws SQLException {
+		super(connectionSource, Issue.class);
 	}
 
 	@Override
