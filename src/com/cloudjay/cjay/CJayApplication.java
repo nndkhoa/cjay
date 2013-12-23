@@ -4,6 +4,7 @@ import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 
+import android.R.integer;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;

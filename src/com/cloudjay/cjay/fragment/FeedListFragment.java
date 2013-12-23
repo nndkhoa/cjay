@@ -158,7 +158,7 @@ public class FeedListFragment extends SherlockDialogFragment implements
 				});
 
 		FunDapter<ContainerSession> adapter = new FunDapter<ContainerSession>(
-				getActivity(), containers, R.layout.feed_item, feedsDict);
+				getActivity(), containers, R.layout.list_item_container, feedsDict);
 
 		mFeedListView.setAdapter(adapter);
 

@@ -25,17 +25,14 @@ import com.cloudjay.cjay.model.ContainerSession;
 import com.googlecode.androidannotations.annotations.EFragment;
 
 @EFragment(R.layout.fragment_gate_export)
-public class GateHomeExportListFragment extends SherlockDialogFragment
-		implements OnItemClickListener {
+public class GateExportListFragment extends SherlockDialogFragment implements OnItemClickListener {
 
 	private ListView mFeedListView;
-
 	private ArrayList<ContainerSession> mFeeds;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		// Hector: test only
 		// mFeeds = new ArrayList<Container>();
 		// for (int i = 0; i < 100; i++) {
@@ -47,33 +44,24 @@ public class GateHomeExportListFragment extends SherlockDialogFragment
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_gate_export, container,
-				false);
-
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View view = inflater.inflate(R.layout.fragment_gate_export, container, false);
 		mFeedListView = (ListView) view.findViewById(R.id.container_list);
-
 		initFunDapter(mFeeds);
-
 		return view;
 	}
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		Dialog dialog = super.onCreateDialog(savedInstanceState);
-
 		// Set Soft Input mode so it's always visible
-		dialog.getWindow().setSoftInputMode(
-				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-
+		dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		return dialog;
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-
 		// Hector: will update UI here
 	}
 
@@ -84,69 +72,38 @@ public class GateHomeExportListFragment extends SherlockDialogFragment
 	}
 
 	private void initFunDapter(ArrayList<ContainerSession> containers) {
-
 		BindDictionary<ContainerSession> feedsDict = new BindDictionary<ContainerSession>();
 		feedsDict.addStringField(R.id.feed_item_container_id,
 				new StringExtractor<ContainerSession>() {
-
 					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return item.getContainerId();
-					}
+					public String getStringValue(ContainerSession item,	int position) {	return item.getContainerId(); }
 				});
-
 		feedsDict.addStringField(R.id.feed_item_container_owner,
 				new StringExtractor<ContainerSession>() {
-
 					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						// TODO Auto-generated method stub
-						return item.getOperatorName();
-					}
+					public String getStringValue(ContainerSession item, int position) {	return item.getOperatorName(); }
 				});
-
 		feedsDict.addStringField(R.id.feed_item_container_import_date,
 				new StringExtractor<ContainerSession>() {
-
 					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						// TODO Auto-generated method stub
-						return java.text.DateFormat.getDateTimeInstance()
-								.format(Calendar.getInstance().getTime());
+					public String getStringValue(ContainerSession item, int position) {
+						return java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
 					}
 				});
-
 		feedsDict.addDynamicImageField(R.id.feed_item_picture,
 				new StringExtractor<ContainerSession>() {
-
 					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return item.getContainerId();
-					}
+					public String getStringValue(ContainerSession item, int position) {	return item.getContainerId(); }
 				}, new DynamicImageLoader() {
-
 					@Override
-					public void loadImage(String stringColor, ImageView view) {
-						view.setImageResource(R.drawable.ic_logo);
-
-					}
+					public void loadImage(String stringColor, ImageView view) {	view.setImageResource(R.drawable.ic_logo); }
 				}).onClick(new ItemClickListener<ContainerSession>() {
-
-			@Override
-			public void onClick(ContainerSession item, int position, View view) {
-				// TODO Auto-generated method stub
-
-			}
+						@Override
+						public void onClick(ContainerSession item, int position, View view) {
+							// TODO Auto-generated method stub
+						}
 		});
-
-		FunDapter<ContainerSession> adapter = new FunDapter<ContainerSession>(
-				getActivity(), containers, R.layout.feed_item, feedsDict);
-
+		FunDapter<ContainerSession> adapter = new FunDapter<ContainerSession>(getActivity(), containers, R.layout.list_item_container, feedsDict);
 		mFeedListView.setAdapter(adapter);
-
 	}
 }
