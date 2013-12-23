@@ -1,0 +1,10 @@
+<resources>
+    
+    <!-- Strings related to dialog -->
+    <string name="dialog_new_container">Tạo Container</string>
+    <string name="dialog_container_id">Container ID</string>
+    <string name="dialog_container_owner">Hãng tàu</string>
+    <string name="dialog_container_cancel">Cancel</string>
+    <string name="dialog_container_ok">OK</string>
+    
+</resources>
