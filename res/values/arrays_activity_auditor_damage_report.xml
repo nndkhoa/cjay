@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+        
+    <string-array name="damage_location_code_1">
+		<item>R</item>
+		<item>L</item>
+		<item>T</item>
+		<item>B</item>
+		<item>F</item>
+		<item>D</item>
+		<item>U</item>
+		<item>X</item>
+		<item>I</item>
+		<item>E</item>
+	</string-array>
+    <string-array name="damage_location_code_2">
+        <item>H</item>
+        <item>G</item>
+        <item>T</item>
+        <item>B</item>
+        <item>L</item>
+        <item>R</item>
+		<item>X</item>
+	</string-array>
+    <string-array name="damage_location_code_3">
+		<item>1</item>
+		<item>2</item>
+		<item>3</item>
+		<item>4</item>
+		<item>5</item>
+		<item>6</item>
+		<item>7</item>
+		<item>8</item>
+		<item>9</item>
+		<item>0</item>
+	</string-array>
+	<string-array name="damage_location_code_4">
+		<item>1</item>
+		<item>2</item>
+		<item>3</item>
+		<item>4</item>
+		<item>5</item>
+		<item>X</item>
+		<item>6</item>
+		<item>7</item>
+		<item>8</item>
+		<item>9</item>
+		<item>0</item>
+		<item>N</item>
+	</string-array>
+	<string-array name="damage_damage_code">
+		<item>BW</item>
+		<item>CO</item>
+		<item>BR</item>
+		<item>BT</item>
+		<item>MS</item>
+		<item>CU</item>
+	</string-array>
+	<string-array name="damage_repair_code">
+		<item>GS</item>
+		<item>WD</item>
+		<item>RP</item>
+		<item>GW</item>
+		<item>WW</item>
+		<item>RE</item>
+	</string-array>	
+</resources>

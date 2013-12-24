@@ -25,7 +25,7 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.StaticImageLoader;
-import com.cloudjay.cjay.CameraActivity_;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.R;
 
 import com.cloudjay.cjay.model.ContainerSession;
@@ -75,8 +75,8 @@ public class FeedListFragment extends SherlockDialogFragment implements
 		final View newContainerView = factory.inflate(
 				R.layout.dialog_new_container, null);
 		
-		EditText newContainerIdEditText = (EditText) view.findViewById(R.id.dialog_new_container_id);
-		Spinner newContainerOwnerSpinner = (Spinner) view.findViewById(R.id.dialog_new_container_owner);
+		EditText newContainerIdEditText = (EditText) newContainerView.findViewById(R.id.dialog_new_container_id);
+		Spinner newContainerOwnerSpinner = (Spinner) newContainerView.findViewById(R.id.dialog_new_container_owner);
 		
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
 		        R.array.dialog_container_owner_list, android.R.layout.simple_spinner_item);
