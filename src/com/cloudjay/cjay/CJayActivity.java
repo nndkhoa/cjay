@@ -36,7 +36,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	@Override
 	protected void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
-		// session = Session.restore(getApplicationContext());
+		session = Session.restore(getApplicationContext());
 	}
 
 	@Override
@@ -47,10 +47,8 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	@Override
 	protected void onResume() {
 
-		// dataCenter = DataCenter.getInstance();
-		// if (dataCenter.getDatabaseManager() != null) {
-		// DataCenter.reload(getApplicationContext());
-		// }
+		if (null != session)
+			DataCenter.reload(getApplicationContext());
 
 		super.onResume();
 	}

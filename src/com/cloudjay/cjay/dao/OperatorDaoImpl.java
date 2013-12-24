@@ -25,7 +25,6 @@ public class OperatorDaoImpl extends BaseDaoImpl<Operator, Integer> implements
 		for (Operator operator : operators) {
 			this.createOrUpdate(operator);
 		}
-
 	}
 
 	@Override
@@ -44,6 +43,7 @@ public class OperatorDaoImpl extends BaseDaoImpl<Operator, Integer> implements
 	@Override
 	public boolean isEmpty() throws SQLException {
 		Operator operator = this.queryForFirst(null);
+		// this.queryBuilder().prepare()
 		if (null == operator)
 			return true;
 
