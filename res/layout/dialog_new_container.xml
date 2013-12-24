@@ -34,12 +34,11 @@
 	        	android:gravity="center_vertical"
 		        android:text="@string/dialog_container_owner"
 		        android:textStyle="bold" />     
-		    <EditText
+		    <Spinner
 		        android:id="@+id/dialog_new_container_owner"
 		        android:layout_width="0dp"
 		        android:layout_height="fill_parent"
-		        android:layout_weight="1"
-		        android:hint="@string/dialog_container_owner" />       
+		        android:layout_weight="1"/>       
     </LinearLayout>
 
 </LinearLayout>
