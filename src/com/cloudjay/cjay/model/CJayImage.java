@@ -72,4 +72,12 @@ public class CJayImage {
 		this.type = type;
 	}
 
+	public ContainerSession getContainerSession() {
+		return containerSession;
+	}
+
+	public void setContainerSession(ContainerSession containerSession) {
+		this.containerSession = containerSession;
+	}
+
 }

@@ -13,11 +13,11 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "operator", daoClass = OperatorDaoImpl.class)
 public class Operator {
 
-	private static final String ID = "id";
-	private static final String CODE = "operator_code";
-	private static final String NAME = "operator_name";
+	public static final String ID = "id";
+	public static final String CODE = "operator_code";
+	public static final String NAME = "operator_name";
 
-	@DatabaseField(id = true, columnName = ID)
+	@DatabaseField(id = true, columnName = ID, generatedId = true, allowGeneratedIdInsert = true)
 	private int id;
 
 	@DatabaseField(columnName = CODE)

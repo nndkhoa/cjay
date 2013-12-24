@@ -18,6 +18,9 @@ public class Container {
 		this.container_id = container_id;
 	}
 
+	public Container() {
+	}
+
 	@DatabaseField(id = true, columnName = ID, generatedId = true, allowGeneratedIdInsert = true)
 	private int id;
 

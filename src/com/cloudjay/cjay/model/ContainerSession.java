@@ -71,26 +71,58 @@ public class ContainerSession {
 	}
 
 	public String getOperatorName() {
-		return container.getOperator().getName();
+		return getContainer().getOperator().getName();
 	}
 
 	public String getContainerId() {
-		return container.getContainerId();
+		return getContainer().getContainerId();
 	}
 
-	public String getCheckInTime() {
-		return StringHelper.getRelativeDate(check_in_time.toString());
-	}
+	// public String getCheckInTime() {
+	// return StringHelper.getRelativeDate(check_in_time.toString());
+	// }
+	//
+	// public String getCheckOutTime() {
+	// return StringHelper.getRelativeDate(check_out_time.toString());
+	// }
 
-	public String getCheckOutTime() {
-		return StringHelper.getRelativeDate(check_out_time.toString());
-	}
-
-	public String getIdImagePath() {
+	public String getImageIdPath() {
 		return image_id_path;
 	}
 
-	public void setIdImagePath(String path) {
-		this.image_id_path = path;
+	public void setImageIdPath(String image_id_path) {
+		this.image_id_path = image_id_path;
+	}
+
+	public Date getCheckInTime() {
+		return check_in_time;
+	}
+
+	public void setCheckInTime(Date check_in_time) {
+		this.check_in_time = check_in_time;
+	}
+
+	public Date getCheckOutTime() {
+		return check_out_time;
+	}
+
+	public void setCheckOutTime(Date check_out_time) {
+		this.check_out_time = check_out_time;
+	}
+
+	public Container getContainer() {
+		return container;
+	}
+
+	public void setContainer(Container container) {
+		this.container = container;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }

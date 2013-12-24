@@ -11,11 +11,11 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "depot", daoClass = DepotDaoImpl.class)
 public class Depot {
 
-	private static final String ID = "id";
-	private static final String DEPOT_CODE = "depot_code";
-	private static final String DEPOT_NAME = "depot_name";
+	public static final String ID = "id";
+	public static final String DEPOT_CODE = "depot_code";
+	public static final String DEPOT_NAME = "depot_name";
 
-	@DatabaseField(id = true, columnName = ID)
+	@DatabaseField(id = true, columnName = ID, generatedId = true, allowGeneratedIdInsert = true)
 	private int id;
 
 	@DatabaseField(columnName = DEPOT_CODE)

@@ -19,9 +19,11 @@ import android.util.Log;
 
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.LoginActivity;
+import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
+import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.cloudjay.cjay.model.AuditReportItem;
@@ -30,6 +32,7 @@ import com.cloudjay.cjay.model.CJayResourceStatus;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.DamageCode;
+import com.cloudjay.cjay.model.Depot;
 import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.Operator;
@@ -427,26 +430,72 @@ public class CJayClient implements ICJayClient {
 				response, listType);
 
 		// Parse to `ContainerSession`
-		List<ContainerSession> items = null;
+		List<ContainerSession> items = new ArrayList<ContainerSession>();
 		try {
 			ContainerDaoImpl containerDaoImpl = databaseManager.getHelper(ctx)
 					.getContainerDaoImpl();
+			DepotDaoImpl depotDaoImpl = databaseManager.getHelper(ctx)
+					.getDepotDaoImpl();
+			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx)
+					.getOperatorDaoImpl();
+			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
+					.getHelper(ctx).getContainerSessionDaoImpl();
+			CJayImageDaoImpl cJayImageDaoImpl = databaseManager.getHelper(ctx)
+					.getCJayImageDaoImpl();
 
 			for (TmpContainerSession tmpSession : tmpContainerSessions) {
 
-				// Create container session object
+				// Create `operator` object if needed
+				Operator operator = null;
+				List<Operator> listOperators = operatorDaoImpl.queryForEq(
+						Operator.CODE, tmpSession.getOperatorCode());
 
-				ContainerSession containerSession;
-				Container container;
-				List<CJayImage> listImages = new ArrayList<CJayImage>();
+				if (listOperators.isEmpty()) {
+					operator = new Operator();
+					operator.setCode(tmpSession.getOperatorCode());
+					operator.setName(tmpSession.getOperatorCode());
+					operatorDaoImpl.addOperator(operator);
+				}
 
+				// Create `depot` object if needed
+				Depot depot = null;
+				List<Depot> listDepots = depotDaoImpl.queryForEq(
+						Depot.DEPOT_CODE, tmpSession.getDepotCode());
+				if (listDepots.isEmpty()) {
+					depot = new Depot();
+					depot.setDepotCode(tmpSession.getDepotCode());
+					depot.setDepotName(tmpSession.getDepotCode());
+					depotDaoImpl.addDepot(depot);
+				}
+
+				// Create `container` object if needed
+				Container container = null;
 				List<Container> list = containerDaoImpl.queryForEq(
 						Container.CONTAINER_ID, tmpSession.getContainerId());
-
 				if (list.isEmpty()) {
-					container = new Container(tmpSession.getContainerId());
+					container = new Container();
+					container.setContainerId(tmpSession.getContainerId());
+					if (null != operator)
+						container.setOperator(operator);
+
+					if (null != depot)
+						container.setDepot(depot);
+
 					containerDaoImpl.addContainer(container);
 				}
+
+				// Create `container session` object
+				ContainerSession containerSession = new ContainerSession();
+				containerSession.setId(tmpSession.getId());
+				containerSession.setCheckInTime(tmpSession.getCheckInTime());
+				containerSession.setCheckOutTime(tmpSession.getCheckOutTime());
+				containerSession.setImageIdPath(tmpSession.getImageIdPath());
+				if (null != container)
+					containerSession.setContainer(container);
+
+				containerSessionDaoImpl.addContainerSessions(containerSession);
+
+				// process audit report item
 
 				for (AuditReportItem auditReportItem : tmpSession
 						.getAuditReportItems()) {
@@ -454,14 +503,30 @@ public class CJayClient implements ICJayClient {
 				}
 
 				// process gate report images
+				List<CJayImage> listImages = new ArrayList<CJayImage>();
 				for (GateReportImage gateReportImage : tmpSession
 						.getGateReportImages()) {
-					listImages.add(new CJayImage(gateReportImage.getId(),
-							gateReportImage.getType(), gateReportImage
-									.getTimePosted(), gateReportImage
-									.getImageName()));
+
+					CJayImage image = new CJayImage(gateReportImage.getId(),
+							gateReportImage.getType(),
+							gateReportImage.getTimePosted(),
+							gateReportImage.getImageName());
+
+					if (null != image)
+						image.setContainerSession(containerSession);
+
+					cJayImageDaoImpl.addCJayImage(image);
+
+					// data for returning
+					listImages.add(image);
 				}
+
+				containerSession.setCJayImages(listImages);
+
+				// data for returning
+				items.add(containerSession);
 			}
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
