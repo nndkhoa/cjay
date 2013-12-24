@@ -43,7 +43,8 @@ public class DamageCodeDaoImpl extends BaseDaoImpl<DamageCode, Integer>
 
 	@Override
 	public boolean isEmpty() throws SQLException {
-		DamageCode damageCode = this.queryForFirst(null);
+		DamageCode damageCode = this.queryForFirst(this.queryBuilder()
+				.prepare());
 		if (null == damageCode)
 			return true;
 

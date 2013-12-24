@@ -43,7 +43,7 @@ public class RepairCodeDaoImpl extends BaseDaoImpl<RepairCode, Integer>
 
 	@Override
 	public boolean isEmpty() throws SQLException {
-		RepairCode repairCode = this.queryForFirst(null);
+		RepairCode repairCode = this.queryForFirst(this.queryBuilder().prepare());
 		if (null == repairCode)
 			return true;
 

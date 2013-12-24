@@ -44,7 +44,8 @@ public class ContainerSessionDaoImpl extends
 
 	@Override
 	public boolean isEmpty() throws SQLException {
-		ContainerSession containerSession = this.queryForFirst(null);
+		ContainerSession containerSession = this.queryForFirst(this
+				.queryBuilder().prepare());
 		if (null == containerSession)
 			return true;
 

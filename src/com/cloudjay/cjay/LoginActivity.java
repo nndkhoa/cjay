@@ -240,6 +240,8 @@ public class LoginActivity extends CJayActivity {
 								userToken, LoginActivity.this);
 						currentUser.setAccessToken(userToken);
 						currentUser.setMainAccount(true);
+
+						Logger.Log(LOG_TAG, "saving User to db");
 						userDao.addUser(currentUser);
 						CJayClient.getInstance().fetchData(ctx);
 
