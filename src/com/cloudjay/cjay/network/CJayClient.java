@@ -16,6 +16,8 @@ import android.content.Context;
 import android.provider.Settings.Secure;
 import android.util.Log;
 
+import com.cloudjay.cjay.CJayActivity;
+import com.cloudjay.cjay.LoginActivity;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
@@ -26,6 +28,7 @@ import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.RepairCode;
+import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -93,9 +96,10 @@ public class CJayClient implements ICJayClient {
 
 	private HashMap<String, String> prepareHeadersWithToken(Context ctx) {
 
-		User currentUser = null;
-		currentUser = Session.restore(ctx).getCurrentUser();
+		// User currentUser = null;
+		// currentUser = Session.restore(ctx).getCurrentUser();
 
+		User currentUser = ((CJayActivity) ctx).getCurrentUser();
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("Authorization", "Token " + currentUser.getAccessToken());
 		return headers;
@@ -164,6 +168,7 @@ public class CJayClient implements ICJayClient {
 					.getHelper(ctx).getContainerSessionDaoImpl();
 
 			// Update list ContainerSessions
+			Logger.Log(LOG_TAG, "get list container sessions");
 			if (containerSessionDaoImpl.isEmpty()) { // temporary
 				List<ContainerSession> containerSessions = getContainerSessions(ctx);
 				containerSessionDaoImpl
@@ -354,9 +359,18 @@ public class CJayClient implements ICJayClient {
 
 	@Override
 	public List<Operator> getOperators(Context ctx) {
-		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
-		String response = requestWrapper.sendGet(CJayConstant.LIST_OPERATORS,
-				headers);
+		HashMap<String, String> headers = null;
+		String response = null;
+
+		try {
+			headers = prepareHeadersWithToken(ctx);
+			response = requestWrapper.sendGet(CJayConstant.LIST_OPERATORS,
+					headers);
+		} catch (Exception e) {
+			// Logout User then back to Login Activity
+
+		}
+
 		Gson gson = new Gson();
 		Type listType = new TypeToken<List<Operator>>() {
 		}.getType();
@@ -394,16 +408,25 @@ public class CJayClient implements ICJayClient {
 	@Override
 	public List<ContainerSession> getContainerSessions(Context ctx) {
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
-		String response = requestWrapper.sendGet(CJayConstant.LIST_OPERATORS,
-				headers);
+		String response = requestWrapper.sendGet(
+				CJayConstant.LIST_CONTAINER_SESSIONS, headers);
 
-		Logger.Log(response);
+		Logger.Log(LOG_TAG, response);
 
 		Gson gson = new Gson();
-		Type listType = new TypeToken<List<ContainerSession>>() {
+		Type listType = new TypeToken<List<TmpContainerSession>>() {
 		}.getType();
 
-		List<ContainerSession> items = gson.fromJson(response, listType);
+		List<TmpContainerSession> tmpContainerSessions = gson.fromJson(
+				response, listType);
+
+		// Parse to `ContainerSession`
+		List<ContainerSession> items = null;
+
+		for (TmpContainerSession tmpSession : tmpContainerSessions) {
+			
+		}
+
 		return items;
 	}
 
