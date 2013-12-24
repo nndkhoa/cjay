@@ -29,7 +29,7 @@ public class ContainerSession {
 	private static final String IMAGE_ID_PATH = "image_id_path";
 	private static final String ID = "id";
 
-	@DatabaseField(id = true, columnName = ID)
+	@DatabaseField(id = true, columnName = ID, generatedId = true, allowGeneratedIdInsert = true)
 	private int id;
 
 	@DatabaseField(columnName = IMAGE_ID_PATH)
@@ -86,7 +86,11 @@ public class ContainerSession {
 		return StringHelper.getRelativeDate(check_out_time.toString());
 	}
 
-	public String getImage() {
+	public String getIdImagePath() {
 		return image_id_path;
+	}
+
+	public void setIdImagePath(String path) {
+		this.image_id_path = path;
 	}
 }

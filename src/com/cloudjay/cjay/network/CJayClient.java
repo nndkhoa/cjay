@@ -3,6 +3,7 @@ package com.cloudjay.cjay.network;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -18,13 +19,18 @@ import android.util.Log;
 
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.LoginActivity;
+import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
+import com.cloudjay.cjay.model.AuditReportItem;
+import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.CJayResourceStatus;
+import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.DamageCode;
+import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.RepairCode;
@@ -422,9 +428,42 @@ public class CJayClient implements ICJayClient {
 
 		// Parse to `ContainerSession`
 		List<ContainerSession> items = null;
+		try {
+			ContainerDaoImpl containerDaoImpl = databaseManager.getHelper(ctx)
+					.getContainerDaoImpl();
 
-		for (TmpContainerSession tmpSession : tmpContainerSessions) {
-			
+			for (TmpContainerSession tmpSession : tmpContainerSessions) {
+
+				// Create container session object
+
+				ContainerSession containerSession;
+				Container container;
+				List<CJayImage> listImages = new ArrayList<CJayImage>();
+
+				List<Container> list = containerDaoImpl.queryForEq(
+						Container.CONTAINER_ID, tmpSession.getContainerId());
+
+				if (list.isEmpty()) {
+					container = new Container(tmpSession.getContainerId());
+					containerDaoImpl.addContainer(container);
+				}
+
+				for (AuditReportItem auditReportItem : tmpSession
+						.getAuditReportItems()) {
+
+				}
+
+				// process gate report images
+				for (GateReportImage gateReportImage : tmpSession
+						.getGateReportImages()) {
+					listImages.add(new CJayImage(gateReportImage.getId(),
+							gateReportImage.getType(), gateReportImage
+									.getTimePosted(), gateReportImage
+									.getImageName()));
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 
 		return items;

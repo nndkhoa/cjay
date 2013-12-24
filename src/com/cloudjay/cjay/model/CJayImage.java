@@ -2,6 +2,8 @@ package com.cloudjay.cjay.model;
 
 import java.util.Date;
 
+import android.R.integer;
+
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -14,6 +16,13 @@ public class CJayImage {
 	private static final String LOCAL_URL = "local_url";
 	private static final String TYPE = "type";
 	private static final String TIME_POSTED = "time_posted";
+
+	public CJayImage(int id, int type, Date date, String image_name) {
+		this.id = id;
+		this.setType(type);
+		this.image_name = image_name;
+		this.time_posted = date;
+	}
 
 	@DatabaseField(id = true, columnName = ID)
 	private int id;
@@ -31,7 +40,7 @@ public class CJayImage {
 	 * TYPE include: in | out | issue | repaired
 	 */
 	@DatabaseField(columnName = TYPE)
-	private String type;
+	private int type;
 
 	@DatabaseField(canBeNull = false, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	private ContainerSession containerSession;
@@ -53,6 +62,14 @@ public class CJayImage {
 
 	public void setTimePosted(Date time_posted) {
 		this.time_posted = time_posted;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
 	}
 
 }

@@ -11,10 +11,14 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "container", daoClass = ContainerDaoImpl.class)
 public class Container {
 
-	private static final String ID = "id";
-	private static final String CONTAINER_ID = "container_id";
+	public static final String ID = "id";
+	public static final String CONTAINER_ID = "container_id";
 
-	@DatabaseField(id = true, columnName = ID)
+	public Container(String container_id) {
+		this.container_id = container_id;
+	}
+
+	@DatabaseField(id = true, columnName = ID, generatedId = true, allowGeneratedIdInsert = true)
 	private int id;
 
 	@DatabaseField(columnName = CONTAINER_ID)
@@ -26,17 +30,16 @@ public class Container {
 	@ForeignCollectionField(eager = true)
 	private ForeignCollection<ContainerSession> containerSessions;
 
-	// @DatabaseField(canBeNull = false, foreign = true, foreignAutoCreate =
-	// true, foreignAutoRefresh = true)
-	// private Depot depot;
-	//
-	// public Depot getDepot() {
-	// return depot;
-	// }
-	//
-	// public void setDepot(Depot depot) {
-	// this.depot = depot;
-	// }
+	@DatabaseField(canBeNull = false, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
+	private Depot depot;
+
+	public Depot getDepot() {
+		return depot;
+	}
+
+	public void setDepot(Depot depot) {
+		this.depot = depot;
+	}
 
 	public String getContainerId() {
 		return operator.getId() + container_id;
