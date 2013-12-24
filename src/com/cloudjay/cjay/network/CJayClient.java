@@ -130,6 +130,7 @@ public class CJayClient implements ICJayClient {
 					.getHelper(ctx).getRepairCodeDaoImpl();
 
 			if (operatorDaoImpl.isEmpty()) {
+				Logger.Log(LOG_TAG, "get list operators");
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.RESOURCE_OPERATOR_LAST_UPDATE,
 						nowString);
@@ -139,6 +140,7 @@ public class CJayClient implements ICJayClient {
 			}
 
 			if (damageCodeDaoImpl.isEmpty()) {
+				Logger.Log(LOG_TAG, "get list damage codes");
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.RESOURCE_DAMAGE_LAST_UPDATE, nowString);
 				List<DamageCode> damageCodes = getDamageCodes(ctx);
@@ -146,6 +148,7 @@ public class CJayClient implements ICJayClient {
 			}
 
 			if (repairCodeDaoImpl.isEmpty()) {
+				Logger.Log(LOG_TAG, "get list repair codes");
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.RESOURCE_REPAIR_LAST_UPDATE, nowString);
 				List<RepairCode> repairCodes = getRepairCodes(ctx);
@@ -155,7 +158,6 @@ public class CJayClient implements ICJayClient {
 			// 2. fetch ISO CODE
 			if (hasNewMetadata(ctx)) {
 				Logger.Log(LOG_TAG, "fetch iso code");
-
 			}
 
 			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager

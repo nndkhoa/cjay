@@ -21,14 +21,14 @@ public class Depot {
 	@DatabaseField(columnName = DEPOT_CODE)
 	private String depot_code;
 
-	@DatabaseField(columnName = DEPOT_NAME)
+	@DatabaseField(columnName = DEPOT_NAME, defaultValue = "")
 	private String depot_name;
 
-	@ForeignCollectionField(eager = true)
-	private ForeignCollection<Container> containers;
-
-	@ForeignCollectionField(eager = true)
-	private ForeignCollection<User> users;
+	// @ForeignCollectionField(eager = true)
+	// private ForeignCollection<Container> containers;
+	//
+	// @ForeignCollectionField(eager = true)
+	// private ForeignCollection<User> users;
 
 	public void setDepotCode(String depotCode) {
 		this.depot_code = depotCode;
@@ -54,19 +54,19 @@ public class Depot {
 		return id;
 	}
 
-	public void setContainers(Collection<Container> containers) {
-		this.containers = (ForeignCollection<Container>) containers;
-	}
-
-	public ForeignCollection<Container> getContainers() {
-		return this.containers;
-	}
-
-	public ForeignCollection<User> getUsers() {
-		return users;
-	}
-
-	public void setUsers(ForeignCollection<User> users) {
-		this.users = users;
-	}
+	// public void setContainers(Collection<Container> containers) {
+	// this.containers = (ForeignCollection<Container>) containers;
+	// }
+	//
+	// public ForeignCollection<Container> getContainers() {
+	// return this.containers;
+	// }
+	//
+	// public ForeignCollection<User> getUsers() {
+	// return users;
+	// }
+	//
+	// public void setUsers(ForeignCollection<User> users) {
+	// this.users = users;
+	// }
 }

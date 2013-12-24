@@ -4,10 +4,13 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.util.Logger;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
 public class UserDaoImpl extends BaseDaoImpl<User, Integer> implements IUserDao {
+
+	public static final String LOG_TAG = "UserDaoImpl";
 
 	public UserDaoImpl(ConnectionSource connectionSource) throws SQLException {
 		super(connectionSource, User.class);
@@ -27,6 +30,7 @@ public class UserDaoImpl extends BaseDaoImpl<User, Integer> implements IUserDao 
 
 	@Override
 	public void addUser(User user) throws SQLException {
+		Logger.Log(LOG_TAG, "add User");
 		this.createOrUpdate(user);
 	}
 
