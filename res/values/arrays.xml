@@ -16,7 +16,7 @@
 		<item>Đã sửa chữa</item>
 		<item>Quá trình tải lên</item>
 	</string-array>
-	<string-array name="container_damage_details_report_tabs">
+	<string-array name="auditor_damage_report_tabs">
 		<item>CODE vị trí</item>
 		<item>CODE hư hỏng</item>
 		<item>CODE sửa chữa</item>

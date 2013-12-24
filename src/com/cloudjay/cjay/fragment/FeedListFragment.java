@@ -33,8 +33,7 @@ import com.cloudjay.cjay.util.DataCenter;
 import com.googlecode.androidannotations.annotations.EFragment;
 
 @EFragment(R.layout.fragment_feeds)
-public class FeedListFragment extends SherlockDialogFragment implements
-		OnClickListener, OnItemClickListener {
+public class FeedListFragment extends SherlockDialogFragment implements	OnClickListener, OnItemClickListener {
 
 	private final static String TAG = "FeedListFragment";
 

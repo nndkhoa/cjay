@@ -113,6 +113,5 @@ public class AuditorHomeActivity extends SherlockFragmentActivity implements
 	    	    return fragment;
 	    	}
 	    }
-
 	}
 }
