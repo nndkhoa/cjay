@@ -13,9 +13,12 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Spinner;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.ami.fundapter.BindDictionary;
@@ -48,13 +51,6 @@ public class FeedListFragment extends SherlockDialogFragment implements
 		// Hector: test only
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListContainerSessions(getActivity());
-
-		// for (int i = 0; i < 100; i++) {
-		// Container container = new Container();
-		// container.setContainerId("6280541");
-		// container.setOwnerName("CBHU");
-		// mFeeds.add(container);
-		// }
 	}
 
 	@Override
@@ -78,6 +74,14 @@ public class FeedListFragment extends SherlockDialogFragment implements
 		LayoutInflater factory = LayoutInflater.from(getActivity());
 		final View newContainerView = factory.inflate(
 				R.layout.dialog_new_container, null);
+		
+		EditText newContainerIdEditText = (EditText) view.findViewById(R.id.dialog_new_container_id);
+		Spinner newContainerOwnerSpinner = (Spinner) view.findViewById(R.id.dialog_new_container_owner);
+		
+		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+		        R.array.dialog_container_owner_list, android.R.layout.simple_spinner_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		newContainerOwnerSpinner.setAdapter(adapter);
 
 		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(
 				getActivity())
