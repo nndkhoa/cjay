@@ -17,7 +17,7 @@ import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.ViewById;
 
-@EActivity(R.layout.activity_gate_home)
+@EActivity(R.layout.activity_auditor_home)
 public class AuditorHomeActivity extends SherlockFragmentActivity implements
 		OnPageChangeListener, TabListener {
 
