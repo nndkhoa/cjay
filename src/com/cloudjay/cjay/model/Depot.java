@@ -27,6 +27,9 @@ public class Depot {
 	@ForeignCollectionField(eager = true)
 	private ForeignCollection<Container> containers;
 
+	@ForeignCollectionField(eager = true)
+	private ForeignCollection<User> users;
+
 	public void setDepotCode(String depotCode) {
 		this.depot_code = depotCode;
 	}
@@ -57,5 +60,13 @@ public class Depot {
 
 	public ForeignCollection<Container> getContainers() {
 		return this.containers;
+	}
+
+	public ForeignCollection<User> getUsers() {
+		return users;
+	}
+
+	public void setUsers(ForeignCollection<User> users) {
+		this.users = users;
 	}
 }

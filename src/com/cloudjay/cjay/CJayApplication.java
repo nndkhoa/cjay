@@ -4,7 +4,6 @@ import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 
-import android.R.integer;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -81,7 +80,8 @@ public class CJayApplication extends Application {
 
 		ImageLoader.getInstance().init(config);
 		CJayClient.getInstance().init(httpRequestWrapper, databaseManager);
-		DataCenter.initialize(databaseManager);
+		DataCenter.getInstance().initialize(databaseManager);
+		databaseManager.getHelper(getApplicationContext());
 
 		if (!CJayConstant.APP_DIRECTORY_FILE.exists())
 			CJayConstant.APP_DIRECTORY_FILE.mkdir();

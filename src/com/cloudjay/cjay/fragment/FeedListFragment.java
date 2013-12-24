@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,11 +22,10 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.StaticImageLoader;
-import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.CameraActivity_;
+import com.cloudjay.cjay.R;
 
 import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DataCenter;
 import com.googlecode.androidannotations.annotations.EFragment;
 
@@ -48,7 +46,7 @@ public class FeedListFragment extends SherlockDialogFragment implements
 		super.onCreate(savedInstanceState);
 
 		// Hector: test only
-		mFeeds = (ArrayList<ContainerSession>) DataCenter
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListContainerSessions(getActivity());
 
 		// for (int i = 0; i < 100; i++) {
@@ -158,7 +156,8 @@ public class FeedListFragment extends SherlockDialogFragment implements
 				});
 
 		FunDapter<ContainerSession> adapter = new FunDapter<ContainerSession>(
-				getActivity(), containers, R.layout.list_item_container, feedsDict);
+				getActivity(), containers, R.layout.list_item_container,
+				feedsDict);
 
 		mFeedListView.setAdapter(adapter);
 

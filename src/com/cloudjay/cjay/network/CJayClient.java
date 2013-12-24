@@ -2,7 +2,6 @@ package com.cloudjay.cjay.network;
 
 import java.lang.reflect.Type;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,7 +14,6 @@ import org.json.JSONObject;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
-import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;

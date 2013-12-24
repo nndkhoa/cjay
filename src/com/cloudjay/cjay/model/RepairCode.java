@@ -1,6 +1,9 @@
 package com.cloudjay.cjay.model;
 
+import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /**
@@ -9,7 +12,7 @@ import com.j256.ormlite.table.DatabaseTable;
  * @author tieubao
  * 
  */
-@DatabaseTable(tableName = "repair_code")
+@DatabaseTable(tableName = "repair_code", daoClass = RepairCodeDaoImpl.class)
 public class RepairCode {
 
 	private static final String ID = "id";
@@ -25,8 +28,8 @@ public class RepairCode {
 	@DatabaseField(columnName = CODE)
 	private String code;
 
-	// @ForeignCollectionField(eager = true)
-	// private ForeignCollection<Issue> issues;
+	@ForeignCollectionField(eager = true)
+	private ForeignCollection<Issue> issues;
 
 	public String getName() {
 		return name;

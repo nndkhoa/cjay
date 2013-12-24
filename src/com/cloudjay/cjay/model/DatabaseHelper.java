@@ -30,7 +30,7 @@ import java.sql.SQLException;
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 	private static final Class<?>[] DATA_CLASSES = { DamageCode.class,
-			LocationCode.class, RepairCode.class, User.class, Depot.class,
+			LocationCode.class, RepairCode.class, Depot.class, User.class,
 			Operator.class, Container.class, ContainerSession.class,
 			Issue.class, CJayImage.class };
 
@@ -100,8 +100,17 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	 */
 	@Override
 	public void close() {
+
 		userDaoImpl = null;
 		operatorDaoImpl = null;
+		issueDaoImpl = null;
+		cJayImageDaoImpl = null;
+		containerDaoImpl = null;
+		containerSessionDaoImpl = null;
+		damageCodeDaoImpl = null;
+		depotDaoImpl = null;
+		repairCodeDaoImpl = null;
+
 		super.close();
 	}
 

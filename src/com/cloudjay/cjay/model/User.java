@@ -1,7 +1,5 @@
 package com.cloudjay.cjay.model;
 
-import java.util.Set;
-
 import com.cloudjay.cjay.dao.UserDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -27,7 +25,7 @@ public class User {
 	@DatabaseField(id = true, columnName = ID)
 	private int id;
 
-	@DatabaseField
+	@DatabaseField(canBeNull = false, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	private Depot working_depot;
 
 	@DatabaseField(columnName = USERNAME)

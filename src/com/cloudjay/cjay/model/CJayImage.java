@@ -30,4 +30,15 @@ public class CJayImage {
 	@DatabaseField(canBeNull = false, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	private ContainerSession containerSession;
 
+	@DatabaseField(canBeNull = false, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
+	private Issue issue;
+
+	public Issue getIssue() {
+		return issue;
+	}
+
+	public void setIssue(Issue issue) {
+		this.issue = issue;
+	}
+
 }

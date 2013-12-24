@@ -1,6 +1,8 @@
 package com.cloudjay.cjay.model;
 
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /**
@@ -24,9 +26,9 @@ public class LocationCode {
 
 	@DatabaseField(columnName = CODE)
 	private String code;
-	
-	// @ForeignCollectionField(eager = true)
-	// private ForeignCollection<Issue> issues;
+
+	@ForeignCollectionField(eager = true)
+	private ForeignCollection<Issue> issues;
 
 	public String getName() {
 		return name;
@@ -43,7 +45,7 @@ public class LocationCode {
 	public void setId(String operatorId) {
 		this.id = operatorId;
 	}
-	
+
 	public String getCode() {
 		return code;
 	}

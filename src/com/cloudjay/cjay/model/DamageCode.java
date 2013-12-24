@@ -1,7 +1,9 @@
 package com.cloudjay.cjay.model;
 
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /**
@@ -26,8 +28,8 @@ public class DamageCode {
 	@DatabaseField(columnName = CODE)
 	private String code;
 
-	// @ForeignCollectionField(eager = true)
-	// private ForeignCollection<Issue> issues;
+	@ForeignCollectionField(eager = true)
+	private ForeignCollection<Issue> issues;
 
 	public String getName() {
 		return name;

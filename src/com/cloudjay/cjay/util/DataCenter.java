@@ -28,22 +28,22 @@ public class DataCenter {
 
 	private static final String LOG_TAG = "DataCenter";
 
-	public static DataCenter instance = null;
-	private static IDatabaseManager databaseManager;
+	private static DataCenter instance = null;
+	private IDatabaseManager databaseManager = null;
 
 	public DataCenter() {
 	}
 
-	public DataCenter getInstance() {
+	public static DataCenter getInstance() {
 		if (null == instance) {
 			instance = new DataCenter();
 		}
 		return instance;
 	}
 
-	public static void initialize(IDatabaseManager databaseManager) {
+	public void initialize(IDatabaseManager databaseManager) {
 		Logger.Log(LOG_TAG, "initialize");
-		DataCenter.databaseManager = databaseManager;
+		this.databaseManager = databaseManager;
 	}
 
 	public static void reload(Context context) {
@@ -59,11 +59,11 @@ public class DataCenter {
 		CJayClient.getInstance().fetchData(context);
 	}
 
-	public static List<Operator> getListOperators(Context context) {
+	public List<Operator> getListOperators(Context context) {
 		Logger.Log(LOG_TAG, "get list Operators");
 
 		try {
-			return databaseManager.getHelper(context).getOperatorDaoImpl()
+			return getDatabaseManager().getHelper(context).getOperatorDaoImpl()
 					.getAllOperators();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -71,15 +71,22 @@ public class DataCenter {
 		return null;
 	}
 
-	public static List<ContainerSession> getListContainerSessions(
-			Context context) {
+	public List<ContainerSession> getListContainerSessions(Context context) {
 		Logger.Log(LOG_TAG, "get list Container sessions");
 		try {
-			return databaseManager.getHelper(context)
+			return getDatabaseManager().getHelper(context)
 					.getContainerSessionDaoImpl().getAllContainerSessions();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public IDatabaseManager getDatabaseManager() {
+		return databaseManager;
+	}
+
+	public void setDatabaseManager(IDatabaseManager databaseManager) {
+		this.databaseManager = databaseManager;
 	}
 }

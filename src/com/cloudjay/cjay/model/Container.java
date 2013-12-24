@@ -26,6 +26,17 @@ public class Container {
 	@ForeignCollectionField(eager = true)
 	private ForeignCollection<ContainerSession> containerSessions;
 
+	@DatabaseField(canBeNull = false, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
+	private Depot depot;
+
+	public Depot getDepot() {
+		return depot;
+	}
+
+	public void setDepot(Depot depot) {
+		this.depot = depot;
+	}
+
 	public String getContainerId() {
 		return operator.getId() + container_id;
 	}
