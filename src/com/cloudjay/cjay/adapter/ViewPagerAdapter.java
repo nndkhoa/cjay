@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import com.cloudjay.cjay.SampleFragment_;
 import com.cloudjay.cjay.fragment.FeedListFragment;
-import com.cloudjay.cjay.fragment.GateExportListFragment;
+import com.cloudjay.cjay.fragment.GateExportListFragment_;
 
 public class ViewPagerAdapter
     extends FragmentPagerAdapter
@@ -30,7 +30,7 @@ public class ViewPagerAdapter
     		Fragment importFeedFragment = new FeedListFragment();
     		return importFeedFragment;
     	case 1:
-    		Fragment exportFeedFragment = new GateExportListFragment();
+    		Fragment exportFeedFragment = new GateExportListFragment_();
     		return exportFeedFragment;
     	default:
     		Fragment fragment = new SampleFragment_();

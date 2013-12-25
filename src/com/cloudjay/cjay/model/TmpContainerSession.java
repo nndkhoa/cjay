@@ -1,8 +1,13 @@
 package com.cloudjay.cjay.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.cloudjay.cjay.util.Logger;
+
 public class TmpContainerSession {
+
+	private static final String TAG = "TmpContainerSession";
 
 	private int id;
 	private String container_id;
@@ -13,6 +18,11 @@ public class TmpContainerSession {
 	private String depot_code;
 	private List<AuditReportItem> audit_report_items;
 	private List<GateReportImage> gate_report_images;
+	
+	public TmpContainerSession() {
+		audit_report_items = new ArrayList<AuditReportItem>();
+		gate_report_images = new ArrayList<GateReportImage>();
+	}
 
 	public int getId() {
 		return id;
@@ -84,6 +94,12 @@ public class TmpContainerSession {
 
 	public void setGateReportImages(List<GateReportImage> gate_report_images) {
 		this.gate_report_images = gate_report_images;
+	}
+
+	public void printMe() {
+		Logger.Log(TAG, "CId: " + getContainerId() + " - OpCode: " + getOperatorCode()
+				+ " - Depot Code: " + getDepotCode() + " - Time In: " + getCheckInTime()
+				+ " - Time Out: " + getCheckOutTime());
 	}
 
 }

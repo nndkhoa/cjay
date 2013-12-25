@@ -3,6 +3,8 @@ package com.cloudjay.cjay;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,11 +37,12 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.aerilys.helpers.android.UIHelper;
-import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.model.GateReportImage;
+import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Mapper;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Background;
 import com.googlecode.androidannotations.annotations.Click;
@@ -64,6 +67,8 @@ public class CameraActivity extends Activity {
 	String itemId;
 	String flashMode;
 	int cameraMode;
+	
+	private List<String> photos;
 
 	private static final int PICTURE_SIZE_MAX_WIDTH = 1920;
 	private static final int PREVIEW_SIZE_MAX_WIDTH = 1920;
@@ -168,6 +173,8 @@ public class CameraActivity extends Activity {
 		// Restore camera state from database or somewhere else
 		flashMode = Camera.Parameters.FLASH_MODE_OFF;
 		cameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
+		
+		photos = new ArrayList<String>();
 	}
 
 	private void initPreview(int width, int height) {
@@ -340,6 +347,9 @@ public class CameraActivity extends Activity {
 			out.close();
 
 			Logger.Log("Path: " + filename.getAbsolutePath());
+			
+			photos.add(filename.getAbsolutePath());
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -350,19 +360,14 @@ public class CameraActivity extends Activity {
 	void savePhoto(byte[] data) {
 		// Convert rotated byte[] to Bitmap
 		Bitmap capturedBitmap = saveToBitmap(data);
-
-		// Save to Database
-		DataCenter.getInstance().savePhoto(capturedBitmap, null);
 				
 		// Save Bitmap to Files
 		String uuid = UUID.randomUUID().toString();
 		String fileName = uuid + ".jpg";
 		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
-		File photoTmp = new File(CJayConstant.HIDDEN_APP_DIRECTORY_FILE, fileName);
 		
 		// Save Bitmap to JPEG
 		saveBitmap(capturedBitmap, photo);
-		saveBitmap(capturedBitmap, photoTmp);
 
 		if (capturedBitmap != null) {
 			capturedBitmap.recycle();
@@ -591,6 +596,12 @@ public class CameraActivity extends Activity {
 	
 	@Click(R.id.btn_camera_done)
 	void doneButtonClicked() {
+		
+		// TODO: this is the list
+		for (String photo : photos) {
+			// TODO: do something
+		}
+		
 		this.onBackPressed();
 	}
 

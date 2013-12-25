@@ -2,17 +2,20 @@ package com.cloudjay.cjay.fragment;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.ami.fundapter.BindDictionary;
@@ -22,25 +25,33 @@ import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.ami.fundapter.interfaces.ItemClickListener;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.util.DataCenter;
+import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.ItemClick;
+import com.googlecode.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_gate_export)
-public class GateExportListFragment extends SherlockDialogFragment implements OnItemClickListener {
+public class GateExportListFragment extends SherlockDialogFragment {
 
-	private ListView mFeedListView;
 	private ArrayList<ContainerSession> mFeeds;
+	private FunDapter<ContainerSession> mAdapter;
+	
+	@ViewById(R.id.container_list) ListView mFeedListView;
+	@ViewById(R.id.search_textfield) EditText mSearchEditText;
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-	}
-
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_gate_export, container, false);
-		mFeedListView = (ListView) view.findViewById(R.id.container_list);
+	@AfterViews
+	void afterViews() {
+		mSearchEditText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				search(arg0.toString());				
+			}
+	        public void beforeTextChanged(CharSequence s, int start, int count, int after){}
+	        public void onTextChanged(CharSequence s, int start, int before, int count){}
+	    });
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListContainerSessions(getActivity());
 		initFunDapter(mFeeds);
-		return view;
 	}
 
 	@Override
@@ -57,10 +68,24 @@ public class GateExportListFragment extends SherlockDialogFragment implements On
 		// Hector: will update UI here
 	}
 
-	@Override
-	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-		// TODO Auto-generated method stub
+	@ItemClick(R.id.container_list)
+	void containerItemClick(int position) {
 		// Hector: go to details from here
+	}
+	
+	private void search(String searchText) {
+		if (searchText.equals("")) {
+			mAdapter.updateData(mFeeds);
+		} else {
+			ArrayList<ContainerSession> searchFeeds = new ArrayList<ContainerSession>();
+			for (ContainerSession containerSession : mFeeds) {
+				if (containerSession.getContainerId().contains(searchText)) {
+					searchFeeds.add(containerSession);
+				}
+			}
+			// refresh list
+			mAdapter.updateData(searchFeeds);
+		}
 	}
 
 	private void initFunDapter(ArrayList<ContainerSession> containers) {
@@ -95,7 +120,7 @@ public class GateExportListFragment extends SherlockDialogFragment implements On
 							// TODO Auto-generated method stub
 						}
 		});
-		FunDapter<ContainerSession> adapter = new FunDapter<ContainerSession>(getActivity(), containers, R.layout.list_item_container, feedsDict);
-		mFeedListView.setAdapter(adapter);
+		mAdapter = new FunDapter<ContainerSession>(getActivity(), containers, R.layout.list_item_container, feedsDict);
+		mFeedListView.setAdapter(mAdapter);
 	}
 }

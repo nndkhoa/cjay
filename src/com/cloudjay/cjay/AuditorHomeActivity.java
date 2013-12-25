@@ -13,6 +13,7 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
+import com.cloudjay.cjay.fragment.*;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.ViewById;
@@ -100,13 +101,11 @@ public class AuditorHomeActivity extends SherlockFragmentActivity implements
     	    Bundle bundle = new Bundle();
 	    	switch (position) {
 	    	case 0:
-	    	    bundle.putString("label", locations[position]);
-	    	    fragment.setArguments(bundle);
-	    	    return fragment;
+	    		Fragment reportingListFragment_ = new AuditorReportingListFragment_(); 
+	    	    return reportingListFragment_;
 	    	case 1:
-	    	    bundle.putString("label", locations[position]);
-	    	    fragment.setArguments(bundle);
-	    	    return fragment;
+	    		Fragment reportedListFragment_ = new AuditorReportedListFragment_(); 
+	    	    return reportedListFragment_;
 	    	default:
 	    	    bundle.putString("label", locations[position]);
 	    	    fragment.setArguments(bundle);
