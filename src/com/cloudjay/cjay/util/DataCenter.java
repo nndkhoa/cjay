@@ -7,10 +7,15 @@ import java.util.List;
 import android.content.Context;
 import android.graphics.Bitmap;
 
+import com.cloudjay.cjay.LoginActivity;
+import com.cloudjay.cjay.dao.DepotDaoImpl;
+import com.cloudjay.cjay.dao.UserDaoImpl;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.Depot;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.TmpContainerSession;
+import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 
 /**
@@ -63,15 +68,15 @@ public class DataCenter {
 	public void setCurrentSession(ContainerSession session) {
 		currentSession = session;
 	}
-	
+
 	public ContainerSession getCurrentSession() {
 		return currentSession;
 	}
-	
+
 	public void setTmpCurrentSession(TmpContainerSession session) {
 		tmpContainerSession = session;
 	}
-	
+
 	public TmpContainerSession getTmpCurrentSession() {
 		return tmpContainerSession;
 	}
@@ -93,6 +98,49 @@ public class DataCenter {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return null;
+	}
+
+	public User saveCredential(Context context, String token) {
+		try {
+
+			User currentUser = CJayClient.getInstance().getCurrentUser(token,
+					context);
+			currentUser.setAccessToken(token);
+			currentUser.setMainAccount(true);
+
+			Logger.Log(LOG_TAG, "User role: " + currentUser.getRoleName());
+
+			DepotDaoImpl depotDaoImpl;
+
+			depotDaoImpl = getDatabaseManager().getHelper(context)
+					.getDepotDaoImpl();
+
+			UserDaoImpl userDaoImpl = getDatabaseManager().getHelper(context)
+					.getUserDaoImpl();
+
+			List<Depot> depots = depotDaoImpl.queryForEq(Depot.DEPOT_CODE,
+					currentUser.getDepotCode());
+
+			if (null != depots && !depots.isEmpty()) {
+
+			} else {
+				Depot depot = new Depot();
+				depot.setDepotCode(currentUser.getDepotCode());
+				depot.setDepotName(currentUser.getDepotCode());
+				depotDaoImpl.addDepot(depot);
+				currentUser.setDepot(depot);
+			}
+
+			userDaoImpl.addUser(currentUser);
+
+			return currentUser;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		return null;
 	}
 

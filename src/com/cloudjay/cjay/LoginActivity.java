@@ -10,6 +10,7 @@ import com.cloudjay.cjay.dao.IUserDao;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Click;
@@ -35,9 +36,6 @@ import android.widget.TextView;
 public class LoginActivity extends CJayActivity {
 
 	private static final String LOG_TAG = "LoginActivity";
-	private IDatabaseManager databaseManager;
-	private IUserDao userDao;
-	private User currentUser;
 
 	/**
 	 * The default email to populate the email field with.
@@ -96,15 +94,6 @@ public class LoginActivity extends CJayActivity {
 						return false;
 					}
 				});
-
-		databaseManager = CJayClient.getInstance().getDatabaseManager();
-
-		try {
-			userDao = databaseManager.getHelper(getApplicationContext())
-					.getUserDaoImpl();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**
@@ -236,15 +225,12 @@ public class LoginActivity extends CJayActivity {
 				} else {
 					// Time to get data from Server and save to database
 					if (NetworkHelper.isConnected(ctx)) {
-						currentUser = CJayClient.getInstance().getCurrentUser(
-								userToken, LoginActivity.this);
-						currentUser.setAccessToken(userToken);
-						currentUser.setMainAccount(true);
+						DataCenter.getInstance().saveCredential(
+								LoginActivity.this, userToken);
+						DataCenter.fetchData(LoginActivity.this);
 
-						Logger.Log(LOG_TAG, "saving User to db");
-						userDao.addUser(currentUser);
+						// CJayClient.getInstance().fetchData(LoginActivity.this);
 
-						CJayClient.getInstance().fetchData(LoginActivity.this);
 					} else {
 						UIHelper.toast(ctx,
 								ctx.getString(R.string.alert_no_network));
@@ -252,8 +238,6 @@ public class LoginActivity extends CJayActivity {
 					return true;
 				}
 			} catch (JSONException e) {
-				e.printStackTrace();
-			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 
@@ -268,7 +252,6 @@ public class LoginActivity extends CJayActivity {
 			if (success) {
 				// Navigate user to Main Activity based on user role
 				Logger.Log(LOG_TAG, "Login successfully");
-				Logger.Log(LOG_TAG, "User role: " + currentUser.getRoleName());
 
 				CJayApplication.startCJayHomeActivity(LoginActivity.this);
 				finish();

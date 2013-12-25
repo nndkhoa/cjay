@@ -64,6 +64,12 @@ public class User {
 	@DatabaseField(columnName = EXPIRE)
 	private int expire_in;
 
+	private String depot_code;
+
+	public String getDepotCode() {
+		return depot_code;
+	}
+
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	private Depot depot;
 

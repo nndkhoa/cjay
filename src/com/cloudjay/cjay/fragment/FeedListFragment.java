@@ -13,6 +13,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,8 +26,8 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.StaticImageLoader;
-import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.CameraActivity_;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -37,7 +38,7 @@ import com.googlecode.androidannotations.annotations.EFragment;
 
 @EFragment(R.layout.fragment_feeds)
 public class FeedListFragment extends SherlockDialogFragment implements
-		OnClickListener, OnItemClickListener {
+		OnClickListener, OnItemClickListener, OnItemLongClickListener {
 
 	private final static String TAG = "FeedListFragment";
 
@@ -157,13 +158,6 @@ public class FeedListFragment extends SherlockDialogFragment implements
 		dialogBuilder.create().show();
 	}
 
-	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position,
-			long id) {
-		// Hector: go to details from here
-		android.util.Log.d(TAG, "Show item at position: " + position);
-	}
-
 	private void initFunDapter(ArrayList<ContainerSession> containers) {
 
 		BindDictionary<ContainerSession> feedsDict = new BindDictionary<ContainerSession>();
@@ -225,5 +219,23 @@ public class FeedListFragment extends SherlockDialogFragment implements
 
 		mFeedListView.setAdapter(adapter);
 
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		// Hector: go to details from here
+		// TODO: open new Intent to show CJayImages
+		android.util.Log.d(TAG, "Show item at position: " + position);
+
+	}
+
+	@Override
+	public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2,
+			long arg3) {
+
+		// TODO: display menu item
+
+		return false;
 	}
 }

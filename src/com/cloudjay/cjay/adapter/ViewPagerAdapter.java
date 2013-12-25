@@ -1,4 +1,3 @@
-
 package com.cloudjay.cjay.adapter;
 
 import android.os.Bundle;
@@ -9,36 +8,34 @@ import com.cloudjay.cjay.SampleFragment_;
 import com.cloudjay.cjay.fragment.FeedListFragment;
 import com.cloudjay.cjay.fragment.GateExportListFragment_;
 
-public class ViewPagerAdapter
-    extends FragmentPagerAdapter
-{
+public class ViewPagerAdapter extends FragmentPagerAdapter {
 
-    private String[] locations;
+	private String[] locations;
 
-    public ViewPagerAdapter(FragmentManager fm, String[] locations) {
-        super(fm);
-        this.locations = locations;
-    }
+	public ViewPagerAdapter(FragmentManager fm, String[] locations) {
+		super(fm);
+		this.locations = locations;
+	}
 
-    public int getCount() {
-        return locations.length;
-    }
+	public int getCount() {
+		return locations.length;
+	}
 
-    public Fragment getItem(int position) {
-    	switch (position) {
-    	case 0:
-    		Fragment importFeedFragment = new FeedListFragment();
-    		return importFeedFragment;
-    	case 1:
-    		Fragment exportFeedFragment = new GateExportListFragment_();
-    		return exportFeedFragment;
-    	default:
-    		Fragment fragment = new SampleFragment_();
-    	    Bundle bundle = new Bundle();
-    	    bundle.putString("label", locations[position]);
-    	    fragment.setArguments(bundle);
-    	    return fragment;
-    	}
-    }
+	public Fragment getItem(int position) {
+		switch (position) {
+		case 0:
+			Fragment importFeedFragment = new FeedListFragment();
+			return importFeedFragment;
+		case 1:
+			Fragment exportFeedFragment = new GateExportListFragment_();
+			return exportFeedFragment;
+		default:
+			Fragment fragment = new SampleFragment_();
+			Bundle bundle = new Bundle();
+			bundle.putString("label", locations[position]);
+			fragment.setArguments(bundle);
+			return fragment;
+		}
+	}
 
 }
