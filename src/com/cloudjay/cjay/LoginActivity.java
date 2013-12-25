@@ -243,7 +243,6 @@ public class LoginActivity extends CJayActivity {
 
 						Logger.Log(LOG_TAG, "saving User to db");
 						userDao.addUser(currentUser);
-						CJayClient.getInstance().fetchData(ctx);
 
 					} else {
 						UIHelper.toast(ctx,
@@ -269,7 +268,7 @@ public class LoginActivity extends CJayActivity {
 				// Navigate user to Main Activity based on user role
 				Logger.Log(LOG_TAG, "Login successfully");
 				Logger.Log(LOG_TAG, "User role: " + currentUser.getRoleName());
-
+				// CJayClient.getInstance().fetchData(LoginActivity.this);
 				CJayApplication.startCJayHomeActivity(LoginActivity.this);
 				finish();
 			} else {
