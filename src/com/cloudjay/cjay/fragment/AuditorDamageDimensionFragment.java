@@ -1,37 +1,57 @@
 package com.cloudjay.cjay.fragment;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.View.OnClickListener;
+import android.app.Activity;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.listener.OnReportPageCompleted;
+import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_damage_dimension)
-public class AuditorDamageDimensionFragment extends SherlockDialogFragment implements OnClickListener {
+public class AuditorDamageDimensionFragment extends SherlockDialogFragment {
+	private double mLength, mHeight;
+	private OnReportPageCompleted mCallback;
 	
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	@ViewById(R.id.length) EditText mLengthEditText;
+	@ViewById(R.id.height) EditText mHeightEditText;
+	
+	@AfterViews
+	void afterViews() {
+		mHeightEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView textView, int id,
+					KeyEvent keyEvent) {
+				if (id == EditorInfo.IME_ACTION_DONE) {
+					handleReportPageCompleted();
+					return true;
+				}
+				return false;
+			}
+		});
+		mLengthEditText.requestFocus();
+		mLength = 0f;
+		mHeight = 0f;
 	}
 	
-	@Override
-	public void onResume() {
-		super.onResume();
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mCallback = (OnReportPageCompleted) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnReportPageCompleted");
+        }
+    }
+    
+	private void handleReportPageCompleted() {
+		// Send code to activity, and move to next tab
+		String[] vals = {String.valueOf(mLength), String.valueOf(mHeight)};
+		mCallback.onReportPageCompleted(OnReportPageCompleted.TAB_DAMAGE_DIMENSION, vals);
 	}
-	
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_damage_dimension, container, false);
-		return view;
-	}
-	
-	@Override
-	public void onClick(View v) {
-		// TODO Auto-generated method stub
-	}
-
 }

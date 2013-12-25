@@ -1,40 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
         
-    <string-array name="damage_location_code_1">
+    <string-array name="damage_location_code_0">
 		<item>R</item>
 		<item>L</item>
 		<item>T</item>
 		<item>B</item>
 		<item>F</item>
+		<item></item>
 		<item>D</item>
 		<item>U</item>
 		<item>X</item>
 		<item>I</item>
 		<item>E</item>
+		<item></item>
 	</string-array>
-    <string-array name="damage_location_code_2">
+    <string-array name="damage_location_code_1">
         <item>H</item>
         <item>G</item>
         <item>T</item>
         <item>B</item>
         <item>L</item>
+		<item></item>
+		<item></item>
         <item>R</item>
+		<item></item>
 		<item>X</item>
+		<item></item>
+		<item></item>
 	</string-array>
-    <string-array name="damage_location_code_3">
+    <string-array name="damage_location_code_2">
 		<item>1</item>
 		<item>2</item>
 		<item>3</item>
 		<item>4</item>
 		<item>5</item>
+		<item></item>
 		<item>6</item>
 		<item>7</item>
 		<item>8</item>
 		<item>9</item>
 		<item>0</item>
+		<item></item>
 	</string-array>
-	<string-array name="damage_location_code_4">
+	<string-array name="damage_location_code_3">
 		<item>1</item>
 		<item>2</item>
 		<item>3</item>

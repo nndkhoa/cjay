@@ -10,13 +10,8 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.cloudjay.cjay.fragment.AuditorDamageDamageFragment;
-import com.cloudjay.cjay.fragment.AuditorDamageDimensionFragment;
-import com.cloudjay.cjay.fragment.AuditorDamageLocationFragment;
-import com.cloudjay.cjay.fragment.AuditorDamageQuantityFragment;
-import com.cloudjay.cjay.fragment.AuditorDamageRepairFragment;
-import com.cloudjay.cjay.fragment.FeedListFragment;
-import com.cloudjay.cjay.fragment.GateExportListFragment;
+import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.listener.OnReportPageCompleted;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EActivity;
 // slide 20
@@ -24,14 +19,15 @@ import com.googlecode.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_auditor_damage_report)
 public class AuditorDamageReportActivity extends SherlockFragmentActivity implements
-	OnPageChangeListener, TabListener {
+	OnPageChangeListener, TabListener, OnReportPageCompleted {
 	
 	private String[] locations;
+	
 	@ViewById
 	ViewPager pager;
 
 	@AfterViews
-	void afterViews() {
+	void afterViews() {		
 		locations = getResources().getStringArray(R.array.auditor_damage_report_tabs);
 		configureViewPager();
 		configureActionBar();
@@ -71,6 +67,7 @@ public class AuditorDamageReportActivity extends SherlockFragmentActivity implem
 	
 	private void configureViewPager() {
 		AuditorDamageReportTabPageAdaptor viewPagerAdapter = new AuditorDamageReportTabPageAdaptor(getSupportFragmentManager(), locations);
+		pager.setOffscreenPageLimit(5);
 		pager.setAdapter(viewPagerAdapter);
 		pager.setOnPageChangeListener(this);
 	}
@@ -82,6 +79,31 @@ public class AuditorDamageReportActivity extends SherlockFragmentActivity implem
 			tab.setText(location);
 			tab.setTabListener(this);
 			getSupportActionBar().addTab(tab);
+		}
+	}
+
+	@Override
+	public void onReportPageCompleted(int page, String[] vals) {
+		switch (page) {
+		case OnReportPageCompleted.TAB_DAMAGE_LOCATION:
+			
+			break;
+		case OnReportPageCompleted.TAB_DAMAGE_DAMAGE:
+			
+			break;
+		case OnReportPageCompleted.TAB_DAMAGE_REPAIR:
+			
+			break;
+		case OnReportPageCompleted.TAB_DAMAGE_DIMENSION:
+			
+			break;
+		case OnReportPageCompleted.TAB_DAMAGE_QUANTITY:
+			
+			break;
+		}
+		int currPosition = getSupportActionBar().getSelectedNavigationIndex();
+		if (currPosition < getSupportActionBar().getTabCount() - 1) {
+			getSupportActionBar().selectTab(getSupportActionBar().getTabAt(++currPosition));
 		}
 	}
 
@@ -100,15 +122,15 @@ public class AuditorDamageReportActivity extends SherlockFragmentActivity implem
 	    public Fragment getItem(int position) {
 	    	switch (position) {
 	    	case 0:
-	    		return new AuditorDamageLocationFragment();
+	    		return new AuditorDamageLocationFragment_();
 	    	case 1:
-	    		return new AuditorDamageDamageFragment();
+	    		return new AuditorDamageDamageFragment_();
 	    	case 2:
-	    		return new AuditorDamageRepairFragment();
+	    		return new AuditorDamageRepairFragment_();
 	    	case 3:
-	    		return new AuditorDamageDimensionFragment();
+	    		return new AuditorDamageDimensionFragment_();
 	    	default:
-	    		return new AuditorDamageQuantityFragment();
+	    		return new AuditorDamageQuantityFragment_();
 	    	}
 	    }
 	}
