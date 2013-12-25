@@ -38,13 +38,13 @@ public class AuditorContainerActivity extends SherlockFragmentActivity {
 	@ViewById(R.id.feeds) ListView mFeedListView;
 	
 	@AfterViews
-	void AfterViews() {
+	void afterViews() {
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListContainerSessions(this);
 		initFunDapter(mFeeds);
 	}
 	
 	@ItemClick(R.id.feeds)
-	void onItemClick(int position) {
+	void containerItemClicked(int position) {
 		// Hector: go to details from here
 		android.util.Log.d(TAG, "Show item at position: " + position);
 	}
