@@ -30,9 +30,9 @@ import java.sql.SQLException;
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 	private static final Class<?>[] DATA_CLASSES = { DamageCode.class,
-			LocationCode.class, RepairCode.class, Depot.class, User.class,
-			Operator.class, Container.class, ContainerSession.class,
-			Issue.class, CJayImage.class };
+			LocationCode.class, RepairCode.class, Operator.class, User.class,
+			Depot.class, Container.class, ContainerSession.class, Issue.class,
+			CJayImage.class };
 
 	public static final String DATABASE_NAME = "cjay.db";
 	private static final int DATABASE_VERSION = 1;

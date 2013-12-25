@@ -15,8 +15,8 @@ public class Depot {
 	public static final String DEPOT_CODE = "depot_code";
 	public static final String DEPOT_NAME = "depot_name";
 
-	@DatabaseField(id = true, columnName = ID, generatedId = true, allowGeneratedIdInsert = true)
-	private int id;
+	@DatabaseField(columnName = ID, generatedId = true, allowGeneratedIdInsert = true)
+	private Integer id;
 
 	@DatabaseField(columnName = DEPOT_CODE)
 	private String depot_code;
@@ -54,8 +54,8 @@ public class Depot {
 		return id;
 	}
 
-	public void setContainers(Collection<Container> containers) {
-		this.containers = (ForeignCollection<Container>) containers;
+	public void setContainers(ForeignCollection<Container> containers) {
+		this.containers = containers;
 	}
 
 	public ForeignCollection<Container> getContainers() {

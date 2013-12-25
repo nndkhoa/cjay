@@ -2,15 +2,18 @@ package com.cloudjay.cjay;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Session;
 
 public class CJayActivity extends SherlockFragmentActivity implements
 		ICJayActivity {
 
+	private static final String LOG_TAG = "CJayActivity";
 	private Session session;
 	private DataCenter dataCenter;
 
@@ -37,6 +40,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	protected void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
 		session = Session.restore(getApplicationContext());
+
 	}
 
 	@Override

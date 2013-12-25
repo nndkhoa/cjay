@@ -64,15 +64,15 @@ public class User {
 	@DatabaseField(columnName = EXPIRE)
 	private int expire_in;
 
-	@DatabaseField(canBeNull = false, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
-	private Depot working_depot;
+	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
+	private Depot depot;
 
 	public Depot getDepot() {
-		return working_depot;
+		return depot;
 	}
 
 	public void setDepot(Depot depot) {
-		this.working_depot = depot;
+		this.depot = depot;
 	}
 
 	public int getExpire() {

@@ -21,7 +21,7 @@ public class Container {
 	public Container() {
 	}
 
-	@DatabaseField(id = true, columnName = ID, generatedId = true, allowGeneratedIdInsert = true)
+	@DatabaseField(columnName = ID, generatedId = true, allowGeneratedIdInsert = true)
 	private int id;
 
 	@DatabaseField(columnName = CONTAINER_ID)
@@ -33,7 +33,7 @@ public class Container {
 	@ForeignCollectionField(eager = true)
 	private ForeignCollection<ContainerSession> containerSessions;
 
-	@DatabaseField(canBeNull = false, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
+	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	private Depot depot;
 
 	public Depot getDepot() {

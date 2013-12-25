@@ -15,6 +15,10 @@ public class CJayImage {
 	private static final String TYPE = "type";
 	private static final String TIME_POSTED = "time_posted";
 
+	public CJayImage() {
+
+	}
+
 	public CJayImage(int id, int type, Date date, String image_name) {
 		this.id = id;
 		this.setType(type);
@@ -40,7 +44,7 @@ public class CJayImage {
 	@DatabaseField(columnName = TYPE)
 	private int type;
 
-	@DatabaseField(canBeNull = false, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
+	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	private ContainerSession containerSession;
 
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)

@@ -28,7 +28,7 @@ public class ContainerSession {
 	private static final String IMAGE_ID_PATH = "image_id_path";
 	private static final String ID = "id";
 
-	@DatabaseField(id = true, columnName = ID, generatedId = true, allowGeneratedIdInsert = true)
+	@DatabaseField(id = true, columnName = ID)
 	private int id;
 
 	@DatabaseField(columnName = IMAGE_ID_PATH)
@@ -42,7 +42,7 @@ public class ContainerSession {
 
 	// container_id
 	// operator_code
-	@DatabaseField(canBeNull = false, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
+	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	private Container container;
 
 	// gate_report_images where type = 0 (check in) | 1 (check out)

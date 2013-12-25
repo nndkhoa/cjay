@@ -17,7 +17,7 @@ public class Operator {
 	public static final String CODE = "operator_code";
 	public static final String NAME = "operator_name";
 
-	@DatabaseField(id = true, columnName = ID, generatedId = true, allowGeneratedIdInsert = true)
+	@DatabaseField(id = true, columnName = ID)
 	private int id;
 
 	@DatabaseField(columnName = CODE)

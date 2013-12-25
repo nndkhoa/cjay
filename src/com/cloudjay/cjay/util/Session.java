@@ -7,6 +7,7 @@ package com.cloudjay.cjay.util;
 import java.sql.SQLException;
 
 import com.cloudjay.cjay.dao.IUserDao;
+import com.cloudjay.cjay.model.DatabaseHelper;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
@@ -36,7 +37,9 @@ public class Session {
 		Logger.Log(LOG_TAG, "restoring session ... ");
 		databaseManager = CJayClient.getInstance().getDatabaseManager();
 		try {
-			userDao = databaseManager.getHelper(context).getUserDaoImpl();
+			DatabaseHelper helper = databaseManager.getHelper(context);
+			userDao = helper.getUserDaoImpl();
+
 			User user = userDao.getMainUser();
 
 			if (null != user) {
