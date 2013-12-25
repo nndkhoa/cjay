@@ -25,11 +25,14 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.StaticImageLoader;
-import com.cloudjay.cjay.*;
-
+import com.cloudjay.cjay.CameraActivity_;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.model.TmpContainerSession;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Mapper;
+import com.cloudjay.cjay.util.StringHelper;
 import com.googlecode.androidannotations.annotations.EFragment;
 
 @EFragment(R.layout.fragment_feeds)
@@ -73,22 +76,25 @@ public class FeedListFragment extends SherlockDialogFragment implements
 		final View newContainerView = factory.inflate(
 				R.layout.dialog_new_container, null);
 
-		Spinner newContainerOwnerSpinner = (Spinner) newContainerView
+		final EditText newContainerIdEditText = (EditText) newContainerView
+				.findViewById(R.id.dialog_new_container_id);
+		final Spinner newContainerOwnerSpinner = (Spinner) newContainerView
 				.findViewById(R.id.dialog_new_container_owner);
 
 		ArrayList<String> listOperator = (ArrayList<String>) DataCenter
 				.getInstance().getListOperatorNames(getActivity());
-		
-		
+
 		if (!listOperator.isEmpty()) {
 			ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-					getActivity(), android.R.layout.simple_spinner_dropdown_item,
-					listOperator);
+					getActivity(),
+					android.R.layout.simple_spinner_dropdown_item, listOperator);
 			newContainerOwnerSpinner.setAdapter(adapter);
-			
+
 		} else {
-			ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
-			        R.array.dialog_container_owner_list, android.R.layout.simple_spinner_item);
+			ArrayAdapter<CharSequence> adapter = ArrayAdapter
+					.createFromResource(getActivity(),
+							R.array.dialog_container_owner_list,
+							android.R.layout.simple_spinner_item);
 			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 			newContainerOwnerSpinner.setAdapter(adapter);
 		}
@@ -101,9 +107,35 @@ public class FeedListFragment extends SherlockDialogFragment implements
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
+
+								// Get the container id and container operator code
+								String containerId = newContainerIdEditText
+										.getText().toString();
+								String operatorCode = newContainerOwnerSpinner
+										.getSelectedItem().toString();
+
+								// Create a tmp Container Session
+								TmpContainerSession newTmpContainer = new TmpContainerSession();
+								newTmpContainer.setContainerId(containerId);
+								newTmpContainer.setOperatorCode(operatorCode);
+								newTmpContainer.setCheckInTime(StringHelper
+										.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT));
+								newTmpContainer.setDepotCode("phuoc-long-icd1"); // TODO: FIX ME
+								newTmpContainer.printMe();
+
+								// Save the current temp Container Session
+								DataCenter.getInstance().setTmpCurrentSession(
+										newTmpContainer);
+
+								// Create a Container Session
+								ContainerSession newContainer = Mapper.toContainerSession(newTmpContainer,
+										getActivity()); 
+								newContainer.printMe();
 								
-								// TODO: create new Container here
-								
+								// Save the current Container Session from the temp Container Session
+								DataCenter.getInstance().setCurrentSession(newContainer);
+
+								// Then start showing the Camera
 								Intent intent = new Intent(getActivity(),
 										CameraActivity_.class);
 								startActivity(intent);

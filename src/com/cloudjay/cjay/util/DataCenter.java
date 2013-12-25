@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 
 /**
@@ -33,6 +34,7 @@ public class DataCenter {
 	private static DataCenter instance = null;
 	private IDatabaseManager databaseManager = null;
 
+	private TmpContainerSession tmpContainerSession = null;
 	private ContainerSession currentSession = null;
 
 	public DataCenter() {
@@ -61,14 +63,17 @@ public class DataCenter {
 	public void setCurrentSession(ContainerSession session) {
 		currentSession = session;
 	}
-
-	public void savePhoto(Bitmap bitmap, ContainerSession session) {
-		if (session != null && currentSession != null
-				&& session.getId() == currentSession.getId()) {
-			currentSession = session;
-		}
-
-		// TODO: save the bitmap into the Container Session
+	
+	public ContainerSession getCurrentSession() {
+		return currentSession;
+	}
+	
+	public void setTmpCurrentSession(TmpContainerSession session) {
+		tmpContainerSession = session;
+	}
+	
+	public TmpContainerSession getTmpCurrentSession() {
+		return tmpContainerSession;
 	}
 
 	/**

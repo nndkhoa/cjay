@@ -2,6 +2,7 @@ package com.cloudjay.cjay.model;
 
 import java.util.Collection;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.util.Logger;
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
@@ -25,6 +26,8 @@ public class ContainerSession {
 	private static final String CHECK_IN_TIME = "check_in_time";
 	private static final String IMAGE_ID_PATH = "image_id_path";
 	private static final String ID = "id";
+
+	private static final String TAG = "ContainerSession";
 
 	@DatabaseField(id = true, columnName = ID)
 	private int id;
@@ -122,5 +125,11 @@ public class ContainerSession {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public void printMe() {
+		Logger.Log(TAG, "CId: " + getContainerId() + " - OpCode: "
+				+ getOperatorName() + " - TimeIn: " + getCheckInTime()
+				+ " - TimeOut: " + getCheckOutTime());
 	}
 }
