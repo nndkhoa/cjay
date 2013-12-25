@@ -33,14 +33,6 @@ public class GateExportListFragment extends SherlockDialogFragment implements On
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// Hector: test only
-		// mFeeds = new ArrayList<Container>();
-		// for (int i = 0; i < 100; i++) {
-		// Container container = new Container();
-		// container.setContainerId("6280541");
-		// container.setOwnerName("CBHU");
-		// mFeeds.add(container);
-		// }
 	}
 
 	@Override
