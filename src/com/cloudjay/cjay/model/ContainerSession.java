@@ -45,25 +45,25 @@ public class ContainerSession {
 
 	// gate_report_images where type = 0 (check in) | 1 (check out)
 	@ForeignCollectionField(eager = true)
-	private ForeignCollection<CJayImage> cJayImages;
+	private Collection<CJayImage> cJayImages;
 
 	public void setCJayImages(Collection<CJayImage> cJayImages) {
-		this.cJayImages = (ForeignCollection<CJayImage>) cJayImages;
+		this.cJayImages = cJayImages;
 	}
 
-	public ForeignCollection<CJayImage> getCJayImages() {
+	public Collection<CJayImage> getCJayImages() {
 		return cJayImages;
 	}
 
 	//
 	@ForeignCollectionField(eager = true)
-	private ForeignCollection<Issue> issues;
+	private Collection<Issue> issues;
 
 	public void setIssues(Collection<Issue> issues) {
-		this.issues = (ForeignCollection<Issue>) issues;
+		this.issues = issues;
 	}
 
-	public ForeignCollection<Issue> getIssues() {
+	public Collection<Issue> getIssues() {
 		return issues;
 	}
 

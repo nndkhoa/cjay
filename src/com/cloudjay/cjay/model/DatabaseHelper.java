@@ -11,6 +11,7 @@ import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.cloudjay.cjay.dao.UserDaoImpl;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.Flags;
+import com.cloudjay.cjay.util.Logger;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
@@ -62,6 +63,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			if (Flags.DEBUG) {
 				Log.i(DatabaseHelper.class.getName(), "onCreate");
 			}
+			Logger.Log("onCreate DB");
 			for (Class<?> dataClass : DATA_CLASSES) {
 				TableUtils.createTable(connectionSource, dataClass);
 			}

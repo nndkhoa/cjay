@@ -244,6 +244,7 @@ public class LoginActivity extends CJayActivity {
 						Logger.Log(LOG_TAG, "saving User to db");
 						userDao.addUser(currentUser);
 
+						CJayClient.getInstance().fetchData(LoginActivity.this);
 					} else {
 						UIHelper.toast(ctx,
 								ctx.getString(R.string.alert_no_network));
@@ -268,7 +269,7 @@ public class LoginActivity extends CJayActivity {
 				// Navigate user to Main Activity based on user role
 				Logger.Log(LOG_TAG, "Login successfully");
 				Logger.Log(LOG_TAG, "User role: " + currentUser.getRoleName());
-				// CJayClient.getInstance().fetchData(LoginActivity.this);
+
 				CJayApplication.startCJayHomeActivity(LoginActivity.this);
 				finish();
 			} else {
