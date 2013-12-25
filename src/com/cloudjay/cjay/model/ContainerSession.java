@@ -35,10 +35,10 @@ public class ContainerSession {
 	private String image_id_path;
 
 	@DatabaseField(columnName = CHECK_IN_TIME)
-	private Date check_in_time;
+	private String check_in_time;
 
 	@DatabaseField(columnName = CHECK_OUT_TIME)
-	private Date check_out_time;
+	private String check_out_time;
 
 	// container_id
 	// operator_code
@@ -93,19 +93,20 @@ public class ContainerSession {
 		this.image_id_path = image_id_path;
 	}
 
-	public Date getCheckInTime() {
+	public String getCheckInTime() {
 		return check_in_time;
 	}
 
-	public void setCheckInTime(Date check_in_time) {
+	public void setCheckInTime(String check_in_time) {
+
 		this.check_in_time = check_in_time;
 	}
 
-	public Date getCheckOutTime() {
+	public String getCheckOutTime() {
 		return check_out_time;
 	}
 
-	public void setCheckOutTime(Date check_out_time) {
+	public void setCheckOutTime(String check_out_time) {
 		this.check_out_time = check_out_time;
 	}
 

@@ -33,7 +33,8 @@ import com.cloudjay.cjay.util.DataCenter;
 import com.googlecode.androidannotations.annotations.EFragment;
 
 @EFragment(R.layout.fragment_feeds)
-public class FeedListFragment extends SherlockDialogFragment implements	OnClickListener, OnItemClickListener {
+public class FeedListFragment extends SherlockDialogFragment implements
+		OnClickListener, OnItemClickListener {
 
 	private final static String TAG = "FeedListFragment";
 
@@ -46,8 +47,6 @@ public class FeedListFragment extends SherlockDialogFragment implements	OnClickL
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		// Hector: test only
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListContainerSessions(getActivity());
 	}
@@ -73,12 +72,15 @@ public class FeedListFragment extends SherlockDialogFragment implements	OnClickL
 		LayoutInflater factory = LayoutInflater.from(getActivity());
 		final View newContainerView = factory.inflate(
 				R.layout.dialog_new_container, null);
-		
-		EditText newContainerIdEditText = (EditText) newContainerView.findViewById(R.id.dialog_new_container_id);
-		Spinner newContainerOwnerSpinner = (Spinner) newContainerView.findViewById(R.id.dialog_new_container_owner);
-		
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
-		        R.array.dialog_container_owner_list, android.R.layout.simple_spinner_item);
+
+		EditText newContainerIdEditText = (EditText) newContainerView
+				.findViewById(R.id.dialog_new_container_id);
+		Spinner newContainerOwnerSpinner = (Spinner) newContainerView
+				.findViewById(R.id.dialog_new_container_owner);
+
+		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+				getActivity(), R.array.dialog_container_owner_list,
+				android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		newContainerOwnerSpinner.setAdapter(adapter);
 

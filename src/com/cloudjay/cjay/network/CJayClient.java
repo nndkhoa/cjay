@@ -2,6 +2,7 @@ package com.cloudjay.cjay.network;
 
 import java.lang.reflect.Type;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,7 +35,9 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Mapper;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.StringHelper;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
@@ -166,16 +169,16 @@ public class CJayClient implements ICJayClient {
 			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
 					.getHelper(ctx).getContainerSessionDaoImpl();
 
-			// Update list ContainerSessions
+			// 3. Update list ContainerSessions
 			Logger.Log(LOG_TAG, "get list container sessions");
+			List<ContainerSession> containerSessions = null;
 			if (containerSessionDaoImpl.isEmpty()) { // temporary
-				List<ContainerSession> containerSessions = getContainerSessions(ctx);
-				containerSessionDaoImpl
-						.addListContainerSessions(containerSessions);
+				containerSessions = getContainerSessions(ctx);
 			} else {
-				// List<ContainerSession> containerSessions = getClass()
-
+				Date date = new Date();
+				containerSessions = getContainerSessions(ctx, date);
 			}
+			containerSessionDaoImpl.addListContainerSessions(containerSessions);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -406,12 +409,74 @@ public class CJayClient implements ICJayClient {
 
 		Logger.Log(LOG_TAG, response);
 
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder().setDateFormat(
+				CJayConstant.CJAY_DATETIME_FORMAT).create();
+
 		Type listType = new TypeToken<List<TmpContainerSession>>() {
 		}.getType();
 
-		List<TmpContainerSession> tmpContainerSessions = gson.fromJson(
-				response, listType);
+		List<TmpContainerSession> tmpContainerSessions = null;
+		try {
+			tmpContainerSessions = gson.fromJson(response, listType);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// Parse to `ContainerSession`
+		List<ContainerSession> items = new ArrayList<ContainerSession>();
+		try {
+			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
+					.getHelper(ctx).getContainerSessionDaoImpl();
+
+			for (TmpContainerSession tmpSession : tmpContainerSessions) {
+				ContainerSession containerSession = Mapper.toContainerSession(
+						tmpSession, ctx);
+
+				if (null != containerSession) {
+					containerSessionDaoImpl
+							.addContainerSessions(containerSession);
+					items.add(containerSession);
+				}
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return items;
+	}
+
+	@Override
+	public List<ContainerSession> getContainerSessions(Context ctx, Date date) {
+		List<ContainerSession> items = new ArrayList<ContainerSession>();
+		String formatedDate = StringHelper.getTimestamp(
+				CJayConstant.CJAY_DATETIME_FORMAT, date);
+		items = getContainerSessions(ctx, formatedDate);
+		return items;
+	}
+
+	@Override
+	public List<ContainerSession> getContainerSessions(Context ctx, String date) {
+
+		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
+
+		String response = requestWrapper.sendGet(String.format(
+				CJayConstant.LIST_CONTAINER_SESSIONS_WITH_DATETIME, date),
+				headers);
+
+		Gson gson = new GsonBuilder().setDateFormat(
+				CJayConstant.CJAY_DATETIME_FORMAT).create();
+
+		Type listType = new TypeToken<List<TmpContainerSession>>() {
+		}.getType();
+
+		List<TmpContainerSession> tmpContainerSessions = null;
+		try {
+			tmpContainerSessions = gson.fromJson(response, listType);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		// Parse to `ContainerSession`
 		List<ContainerSession> items = new ArrayList<ContainerSession>();
@@ -450,16 +515,6 @@ public class CJayClient implements ICJayClient {
 	@Override
 	public boolean hasNewMetadata(Context ctx) {
 		return false;
-	}
-
-	@Override
-	public List<ContainerSession> getContainerSessions(Context ctx, Date date) {
-		return null;
-	}
-
-	@Override
-	public List<ContainerSession> getContainerSessions(Context ctx, String date) {
-		return null;
 	}
 
 	@Override

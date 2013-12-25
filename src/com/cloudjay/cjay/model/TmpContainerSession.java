@@ -9,8 +9,8 @@ public class TmpContainerSession {
 	private String container_id;
 	private String image_id_path;
 	private String operator_code;
-	private Date check_in_time;
-	private Date check_out_time;
+	private String check_in_time;
+	private String check_out_time;
 	private String depot_code;
 	private List<AuditReportItem> audit_report_items;
 	private List<GateReportImage> gate_report_images;
@@ -47,19 +47,19 @@ public class TmpContainerSession {
 		this.operator_code = operator_code;
 	}
 
-	public Date getCheckInTime() {
+	public String getCheckInTime() {
 		return check_in_time;
 	}
 
-	public void setCheckInTime(Date check_in_time) {
+	public void setCheckInTime(String check_in_time) {
 		this.check_in_time = check_in_time;
 	}
 
-	public Date getCheckOutTime() {
+	public String getCheckOutTime() {
 		return check_out_time;
 	}
 
-	public void setCheckOutTime(Date check_out_time) {
+	public void setCheckOutTime(String check_out_time) {
 		this.check_out_time = check_out_time;
 	}
 

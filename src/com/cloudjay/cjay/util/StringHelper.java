@@ -27,11 +27,17 @@ public class StringHelper {
 	}
 
 	@SuppressLint("SimpleDateFormat")
-	public static String getCurrentTimestamp() {
+	public static String getTimestamp(String format, Date date) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+		String timeStamp = dateFormat.format(date);
+		return timeStamp;
+	}
+
+	@SuppressLint("SimpleDateFormat")
+	public static String getCurrentTimestamp(String format) {
 		String timeStamp = "";
 
-		SimpleDateFormat dateFormat = new SimpleDateFormat(
-				"yyyy-MM-dd-HH-mm-ss");
+		SimpleDateFormat dateFormat = new SimpleDateFormat(format);
 		Date date = new Date();
 		timeStamp = dateFormat.format(date);
 

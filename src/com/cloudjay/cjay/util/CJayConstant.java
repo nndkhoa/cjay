@@ -44,6 +44,9 @@ public final class CJayConstant {
 	public static final String LIST_CONTAINER_SESSIONS = API_ROOT
 			+ "cjay/container-sessions";
 
+	public static final String LIST_CONTAINER_SESSIONS_WITH_DATETIME = API_ROOT
+			+ "cjay/container-sessions.json?created_after=%s";
+
 	/**
 	 * File path
 	 */
@@ -78,4 +81,6 @@ public final class CJayConstant {
 	public static final int MEDIA_TYPE_IMAGE = 1;
 	public static final int CAPTURE_REQUEST = 100;
 	public static final int SELECT_PHOTO = 101;
+
+	public static final String CJAY_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
 }
