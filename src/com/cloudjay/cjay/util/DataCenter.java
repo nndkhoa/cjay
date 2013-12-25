@@ -111,7 +111,9 @@ public class DataCenter {
 		List<Operator> operators = this.getListOperators(context);
 		List<String> operatorNames = new ArrayList<String>();
 		for (Operator operator : operators) {
-			operatorNames.add(operator.getName());
+			if (operator.getName().length() > 0) {
+				operatorNames.add(operator.getName());
+			}
 		}
 		return operatorNames;
 	}
