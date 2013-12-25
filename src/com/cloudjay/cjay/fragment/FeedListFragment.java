@@ -188,8 +188,17 @@ public class FeedListFragment extends SherlockDialogFragment implements
 					public String getStringValue(ContainerSession item,
 							int position) {
 						// TODO Auto-generated method stub
-						return java.text.DateFormat.getDateTimeInstance()
-								.format(Calendar.getInstance().getTime());
+						return item.getCheckInTime();
+					}
+				});
+		
+		feedsDict.addStringField(R.id.feed_item_container_export_date,
+				new StringExtractor<ContainerSession>() {
+					@Override
+					public String getStringValue(ContainerSession item,
+							int position) {
+						// TODO Auto-generated method stub
+						return item.getCheckOutTime();
 					}
 				});
 
