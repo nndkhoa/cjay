@@ -37,7 +37,7 @@ public class AuditorReportingListFragment extends SherlockDialogFragment {
 		initFunDapter(mFeeds);
 	}
 	
-	@ItemClick(R.id.feeds)
+	@ItemClick(R.id.container_list)
 	void containerItemClicked(int position) {
 		// Hector: go to details from here
 		android.util.Log.d(TAG, "Show item at position: " + position);

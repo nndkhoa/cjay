@@ -101,10 +101,10 @@ public class AuditorHomeActivity extends SherlockFragmentActivity implements
     	    Bundle bundle = new Bundle();
 	    	switch (position) {
 	    	case 0:
-	    	    AuditorReportingListFragment_ reportingListFragment_ = new AuditorReportingListFragment_(); 
+	    		Fragment reportingListFragment_ = new AuditorReportingListFragment_(); 
 	    	    return reportingListFragment_;
 	    	case 1:
-	    		AuditorReportedListFragment_ reportedListFragment_ = new AuditorReportedListFragment_(); 
+	    		Fragment reportedListFragment_ = new AuditorReportedListFragment_(); 
 	    	    return reportedListFragment_;
 	    	default:
 	    	    bundle.putString("label", locations[position]);

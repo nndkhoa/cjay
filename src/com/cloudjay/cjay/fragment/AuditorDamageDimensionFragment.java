@@ -25,8 +25,7 @@ public class AuditorDamageDimensionFragment extends SherlockDialogFragment {
 	void afterViews() {
 		mHeightEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
-			public boolean onEditorAction(TextView textView, int id,
-					KeyEvent keyEvent) {
+			public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
 				if (id == EditorInfo.IME_ACTION_DONE) {
 					handleReportPageCompleted();
 					return true;
