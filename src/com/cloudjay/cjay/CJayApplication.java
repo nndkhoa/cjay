@@ -1,5 +1,7 @@
 package com.cloudjay.cjay;
 
+import java.util.concurrent.ExecutorService;
+
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
@@ -29,8 +31,17 @@ public class CJayApplication extends Application {
 	IDatabaseManager databaseManager = null;
 	IHttpRequestWrapper httpRequestWrapper = null;
 
+	private ExecutorService mMultiThreadExecutor, mSingleThreadExecutor,
+			mDatabaseThreadExecutor;
+
+	private PhotoUploadController mPhotoController;
+
 	public static CJayApplication getApplication(Context context) {
 		return (CJayApplication) context.getApplicationContext();
+	}
+
+	public PhotoUploadController getPhotoUploadController() {
+		return mPhotoController;
 	}
 
 	public static void startCJayHomeActivity(Context context) {
@@ -60,6 +71,7 @@ public class CJayApplication extends Application {
 
 		databaseManager = new DatabaseManager();
 		httpRequestWrapper = new HttpRequestWrapper();
+		mPhotoController = new PhotoUploadController(this);
 
 		DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
 				.cacheInMemory(true).cacheOnDisc(true)

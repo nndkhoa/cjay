@@ -124,6 +124,7 @@ public class Mapper {
 				listImages.add(image);
 			}
 
+			// TODO: ??
 			// containerSession.setCJayImages(listImages);
 
 			return containerSession;
