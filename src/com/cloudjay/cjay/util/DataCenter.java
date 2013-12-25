@@ -1,9 +1,11 @@
 package com.cloudjay.cjay.util;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.IDatabaseManager;
@@ -31,6 +33,8 @@ public class DataCenter {
 	private static DataCenter instance = null;
 	private IDatabaseManager databaseManager = null;
 
+	private ContainerSession currentSession = null;
+
 	public DataCenter() {
 	}
 
@@ -49,6 +53,22 @@ public class DataCenter {
 	public static void reload(Context context) {
 		Logger.Log(LOG_TAG, "reload");
 		CJayClient.getInstance().fetchData(context);
+	}
+
+	/**
+	 * Save data to server
+	 */
+	public void setCurrentSession(ContainerSession session) {
+		currentSession = session;
+	}
+
+	public void savePhoto(Bitmap bitmap, ContainerSession session) {
+		if (session != null && currentSession != null
+				&& session.getId() == currentSession.getId()) {
+			currentSession = session;
+		}
+
+		// TODO: save the bitmap into the Container Session
 	}
 
 	/**
@@ -80,6 +100,15 @@ public class DataCenter {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public List<String> getListOperatorNames(Context context) {
+		List<Operator> operators = this.getListOperators(context);
+		List<String> operatorNames = new ArrayList<String>();
+		for (Operator operator : operators) {
+			operatorNames.add(operator.getName());
+		}
+		return operatorNames;
 	}
 
 	public IDatabaseManager getDatabaseManager() {

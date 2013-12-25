@@ -35,7 +35,10 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.aerilys.helpers.android.UIHelper;
+import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Background;
@@ -56,7 +59,7 @@ public class CameraActivity extends Activity {
 	private SurfaceHolder previewHolder = null;
 	private boolean inPreview = false;
 	private boolean cameraConfigured = false;
-
+	
 	String itemUri;
 	String itemId;
 	String flashMode;
@@ -122,8 +125,8 @@ public class CameraActivity extends Activity {
 			Logger.Log("onPictureTaken");
 			savePhoto(data);
 
-			// camera.startPreview();
-			// inPreview = true;
+			camera.startPreview();
+			inPreview = true;
 		}
 	};
 
@@ -345,22 +348,18 @@ public class CameraActivity extends Activity {
 
 	@Background
 	void savePhoto(byte[] data) {
-		// String username = getCurrentUser().getUsername();
-
-		String uuid = UUID.randomUUID().toString().toUpperCase();
-		// String timestamp = StringHelper.getCurrentTimestamp();
-
-		// JP_IMG_<username>_<2013-11-01-04-08-20>_<uuid>.jpg
-		// String fileName = String.format("JP_IMG_%s_%s_%s.jpg", username,
-		// timestamp, uuid);
-		String fileName = uuid + ".jpg";
-		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
-		File photoTmp = new File(CJayConstant.HIDDEN_APP_DIRECTORY_FILE,
-				fileName);
-
 		// Convert rotated byte[] to Bitmap
 		Bitmap capturedBitmap = saveToBitmap(data);
 
+		// Save to Database
+		DataCenter.getInstance().savePhoto(capturedBitmap, null);
+				
+		// Save Bitmap to Files
+		String uuid = UUID.randomUUID().toString();
+		String fileName = uuid + ".jpg";
+		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
+		File photoTmp = new File(CJayConstant.HIDDEN_APP_DIRECTORY_FILE, fileName);
+		
 		// Save Bitmap to JPEG
 		saveBitmap(capturedBitmap, photo);
 		saveBitmap(capturedBitmap, photoTmp);
@@ -370,46 +369,7 @@ public class CameraActivity extends Activity {
 			capturedBitmap = null;
 			System.gc();
 		}
-
-		itemUri = "file://" + photoTmp.getAbsolutePath();
-//		uploadImage(uuid, fileName);
-
 	}
-
-//	void uploadImage(String uuid, String filename) {
-//		itemId = uuid;
-//
-//		// TODO: Impletement Current Selection Team --> Huy Do do this
-//		// String teamCode = getCurrentUser().getTeams().get(0).getTeamCode();
-//		String teamCode = getCurrentTeam().getTeamCode();
-//		String finalURL = String.format("jaypix/%s/%s", teamCode, filename);
-//
-//		// Create Database Entity Object
-//		UploadItem uploadItem = new UploadItem();
-//
-//		// Set Uploading Status
-//		uploadItem.setUploadStatus(0);
-//		uploadItem.setUUID(uuid);
-//		uploadItem.setTmpImgUri(itemUri);
-//		uploadItem.setNoteStatus(false);
-//		uploadItem.setImageURL(finalURL);
-//		try {
-//			UploadItemDaoImpl uploadList = JayPixClient.getInstance()
-//					.getDatabaseManager().getHelper(getApplicationContext())
-//					.getUploadItemImpl();
-//			uploadList.addItem(uploadItem);
-//
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//
-//		Intent uploadIntent = new Intent(this, UploadIntentService.class);
-//		uploadIntent.putExtra("token", getCurrentUser().getToken());
-//		uploadIntent.putExtra("uuid", uuid);
-//		uploadIntent.putExtra("tmpImgUri", itemUri);
-//		startService(uploadIntent);
-//
-//	}
 
 	// region Override Activity
 
@@ -623,7 +583,6 @@ public class CameraActivity extends Activity {
 	}
 
 	PictureCallback rawCallback = new PictureCallback() {
-
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
 			Logger.Log("rawCallback");

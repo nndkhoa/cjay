@@ -26,9 +26,9 @@ import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.StaticImageLoader;
 import com.cloudjay.cjay.*;
-import com.cloudjay.cjay.R;
 
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.util.DataCenter;
 import com.googlecode.androidannotations.annotations.EFragment;
 
@@ -73,16 +73,25 @@ public class FeedListFragment extends SherlockDialogFragment implements
 		final View newContainerView = factory.inflate(
 				R.layout.dialog_new_container, null);
 
-		EditText newContainerIdEditText = (EditText) newContainerView
-				.findViewById(R.id.dialog_new_container_id);
 		Spinner newContainerOwnerSpinner = (Spinner) newContainerView
 				.findViewById(R.id.dialog_new_container_owner);
 
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-				getActivity(), R.array.dialog_container_owner_list,
-				android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		newContainerOwnerSpinner.setAdapter(adapter);
+		ArrayList<String> listOperator = (ArrayList<String>) DataCenter
+				.getInstance().getListOperatorNames(getActivity());
+		
+		
+		if (!listOperator.isEmpty()) {
+			ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+					getActivity(), android.R.layout.simple_spinner_dropdown_item,
+					listOperator);
+			newContainerOwnerSpinner.setAdapter(adapter);
+			
+		} else {
+			ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+			        R.array.dialog_container_owner_list, android.R.layout.simple_spinner_item);
+			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+			newContainerOwnerSpinner.setAdapter(adapter);
+		}
 
 		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(
 				getActivity())
@@ -92,6 +101,9 @@ public class FeedListFragment extends SherlockDialogFragment implements
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
+								
+								// TODO: create new Container here
+								
 								Intent intent = new Intent(getActivity(),
 										CameraActivity_.class);
 								startActivity(intent);

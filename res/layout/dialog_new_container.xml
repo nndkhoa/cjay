@@ -14,7 +14,10 @@
 	        	android:layout_weight="1"
 	        	android:gravity="center_vertical"
 		        android:text="@string/dialog_container_id"
-		        android:textStyle="bold" />
+		        android:paddingBottom="12dp"
+            	android:paddingLeft="18dp"
+            	android:paddingRight="18dp"
+            	android:paddingTop="12dp" />
        	 	<EditText
 		        android:id="@+id/dialog_new_container_id"
 		        android:layout_width="0dp"
@@ -33,7 +36,10 @@
 	        	android:layout_weight="1"
 	        	android:gravity="center_vertical"
 		        android:text="@string/dialog_container_owner"
-		        android:textStyle="bold" />     
+		        android:paddingBottom="12dp"
+            	android:paddingLeft="18dp"
+            	android:paddingRight="18dp"
+            	android:paddingTop="12dp" />     
 		    <Spinner
 		        android:id="@+id/dialog_new_container_owner"
 		        android:layout_width="0dp"
