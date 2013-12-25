@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.util;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
@@ -80,6 +81,15 @@ public class DataCenter {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public List<String> getListOperatorNames(Context context) {
+		List<Operator> operators = this.getListOperators(context);
+		List<String> operatorNames = new ArrayList<String>();
+		for (Operator operator : operators) {
+			operatorNames.add(operator.getName());
+		}
+		return operatorNames;
 	}
 
 	public IDatabaseManager getDatabaseManager() {
