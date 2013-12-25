@@ -2,7 +2,6 @@ package com.cloudjay.cjay.network;
 
 import java.lang.reflect.Type;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -142,7 +141,8 @@ public class CJayClient implements ICJayClient {
 						nowString);
 
 				List<Operator> operators = getOperators(ctx);
-				operatorDaoImpl.addListOperators(operators);
+				if (!operators.isEmpty())
+					operatorDaoImpl.addListOperators(operators);
 			}
 
 			if (damageCodeDaoImpl.isEmpty()) {
@@ -150,7 +150,8 @@ public class CJayClient implements ICJayClient {
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.RESOURCE_DAMAGE_LAST_UPDATE, nowString);
 				List<DamageCode> damageCodes = getDamageCodes(ctx);
-				damageCodeDaoImpl.addListDamageCodes(damageCodes);
+				if (!damageCodes.isEmpty())
+					damageCodeDaoImpl.addListDamageCodes(damageCodes);
 			}
 
 			if (repairCodeDaoImpl.isEmpty()) {
@@ -158,7 +159,8 @@ public class CJayClient implements ICJayClient {
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.RESOURCE_REPAIR_LAST_UPDATE, nowString);
 				List<RepairCode> repairCodes = getRepairCodes(ctx);
-				repairCodeDaoImpl.addListRepairCodes(repairCodes);
+				if (!repairCodes.isEmpty())
+					repairCodeDaoImpl.addListRepairCodes(repairCodes);
 			}
 
 			// 2. fetch ISO CODE
@@ -172,7 +174,7 @@ public class CJayClient implements ICJayClient {
 			// 3. Update list ContainerSessions
 			Logger.Log(LOG_TAG, "get list container sessions");
 			List<ContainerSession> containerSessions = null;
-			if (containerSessionDaoImpl.isEmpty()) { // temporary
+			if (containerSessionDaoImpl.isEmpty()) {
 				containerSessions = getContainerSessions(ctx);
 			} else {
 				Date date = new Date();
@@ -362,8 +364,8 @@ public class CJayClient implements ICJayClient {
 			headers = prepareHeadersWithToken(ctx);
 			response = requestWrapper.sendGet(CJayConstant.LIST_OPERATORS,
 					headers);
+			Logger.Log(LOG_TAG, response);
 		} catch (Exception e) {
-			// Logout User then back to Login Activity
 
 		}
 

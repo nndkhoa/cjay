@@ -1,6 +1,5 @@
 package com.cloudjay.cjay.model;
 
-import java.util.Date;
 import java.util.List;
 
 public class TmpContainerSession {
