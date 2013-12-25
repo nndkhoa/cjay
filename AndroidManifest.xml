@@ -47,10 +47,6 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="com.cloudjay.cjay.AuditorDamageDetailsReportActivity_"
-            android:label="@string/app_name" >
-        </activity>
-        <activity
             android:name="com.cloudjay.cjay.RepairTeamHomeActivity_"
             android:label="@string/app_name" >
         </activity>
