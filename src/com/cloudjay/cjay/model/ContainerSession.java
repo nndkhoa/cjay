@@ -25,7 +25,22 @@ public class ContainerSession {
 	private static final String CHECK_OUT_TIME = "check_out_time";
 	private static final String CHECK_IN_TIME = "check_in_time";
 	private static final String IMAGE_ID_PATH = "image_id_path";
+	public static final String FIELD_STATE = "state";
 	private static final String ID = "id";
+
+	public static final int STATE_UPLOAD_COMPLETED = 5;
+	public static final int STATE_UPLOAD_ERROR = 4;
+	public static final int STATE_UPLOAD_IN_PROGRESS = 3;
+	public static final int STATE_UPLOAD_WAITING = 2;
+	public static final int STATE_SELECTED = 1;
+	public static final int STATE_NONE = 0;
+
+	public int getUploadState() {
+		return mState;
+	}
+
+	@DatabaseField(columnName = FIELD_STATE)
+	private int mState;
 
 	private static final String TAG = "ContainerSession";
 

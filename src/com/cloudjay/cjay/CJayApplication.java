@@ -1,23 +1,32 @@
 package com.cloudjay.cjay;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 
 import android.app.Application;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.cloudjay.cjay.model.DatabaseManager;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.network.HttpRequestWrapper;
 import com.cloudjay.cjay.network.IHttpRequestWrapper;
+import com.cloudjay.cjay.receivers.InstantUploadReceiver;
+import com.cloudjay.cjay.task.PhotupThreadFactory;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Logger;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -28,6 +37,10 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 @ReportsCrashes(formKey = "", formUri = "https://cloudjay-web.appspot.com/acra/", mode = ReportingInteractionMode.TOAST, resToastText = R.string.crash_toast_text, resDialogText = R.string.crash_dialog_text, resDialogIcon = android.R.drawable.ic_dialog_info, resDialogTitle = R.string.crash_dialog_title, resDialogCommentPrompt = R.string.crash_dialog_comment_prompt, resDialogOkToast = R.string.crash_dialog_ok_toast)
 public class CJayApplication extends Application {
 
+	private final String LOG_TAG = "CJayApplication";
+	static final float EXECUTOR_POOL_SIZE_PER_CORE = 1.5f;
+	public static final String THREAD_FILTERS = "filters_thread";
+
 	IDatabaseManager databaseManager = null;
 	IHttpRequestWrapper httpRequestWrapper = null;
 
@@ -35,6 +48,41 @@ public class CJayApplication extends Application {
 			mDatabaseThreadExecutor;
 
 	private PhotoUploadController mPhotoController;
+
+	public ExecutorService getMultiThreadExecutorService() {
+		if (null == mMultiThreadExecutor || mMultiThreadExecutor.isShutdown()) {
+			final int numThreads = Math.round(Runtime.getRuntime()
+					.availableProcessors() * EXECUTOR_POOL_SIZE_PER_CORE);
+			mMultiThreadExecutor = Executors.newFixedThreadPool(numThreads,
+					new PhotupThreadFactory());
+
+			if (Flags.DEBUG) {
+				Log.d(LOG_TAG, "MultiThreadExecutor created with " + numThreads
+						+ " threads");
+			}
+		}
+		return mMultiThreadExecutor;
+	}
+
+	public ExecutorService getPhotoFilterThreadExecutorService() {
+		if (null == mSingleThreadExecutor || mSingleThreadExecutor.isShutdown()) {
+			mSingleThreadExecutor = Executors
+					.newSingleThreadExecutor(new PhotupThreadFactory(
+							THREAD_FILTERS));
+		}
+		return mSingleThreadExecutor;
+	}
+
+	public ExecutorService getDatabaseThreadExecutorService() {
+
+		if (null == mDatabaseThreadExecutor
+				|| mDatabaseThreadExecutor.isShutdown()) {
+			mDatabaseThreadExecutor = Executors
+					.newSingleThreadExecutor(new PhotupThreadFactory());
+		}
+
+		return mDatabaseThreadExecutor;
+	}
 
 	public static CJayApplication getApplication(Context context) {
 		return (CJayApplication) context.getApplicationContext();
@@ -71,7 +119,6 @@ public class CJayApplication extends Application {
 
 		databaseManager = new DatabaseManager();
 		httpRequestWrapper = new HttpRequestWrapper();
-		mPhotoController = new PhotoUploadController(this);
 
 		DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
 				.cacheInMemory(true).cacheOnDisc(true)
@@ -103,5 +150,44 @@ public class CJayApplication extends Application {
 
 		// Configure Logger
 		Logger.PRODUCTION_MODE = false;
+
+		checkInstantUploadReceiverState();
+		mPhotoController = new PhotoUploadController(this);
+	}
+
+	public void checkInstantUploadReceiverState() {
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		final boolean enabled = prefs.getBoolean(
+				CJayConstant.PREF_INSTANT_UPLOAD_ENABLED, false);
+
+		final ComponentName component = new ComponentName(this,
+				InstantUploadReceiver.class);
+		final PackageManager pkgMgr = getPackageManager();
+
+		switch (pkgMgr.getComponentEnabledSetting(component)) {
+		case PackageManager.COMPONENT_ENABLED_STATE_DISABLED:
+			if (enabled) {
+				pkgMgr.setComponentEnabledSetting(component,
+						PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+						PackageManager.DONT_KILL_APP);
+				if (Flags.DEBUG) {
+					Log.d(LOG_TAG, "Enabled Instant Upload Receiver");
+				}
+			}
+			break;
+
+		case PackageManager.COMPONENT_ENABLED_STATE_DEFAULT:
+		case PackageManager.COMPONENT_ENABLED_STATE_ENABLED:
+			if (!enabled) {
+				pkgMgr.setComponentEnabledSetting(component,
+						PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+						PackageManager.DONT_KILL_APP);
+				if (Flags.DEBUG) {
+					Log.d(LOG_TAG, "Disabled Instant Upload Receiver");
+				}
+			}
+			break;
+		}
 	}
 }

@@ -83,4 +83,11 @@ public final class CJayConstant {
 	public static final int SELECT_PHOTO = 101;
 
 	public static final String CJAY_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
+
+	public static final long SCALE_ANIMATION_DURATION_FULL_DISTANCE = 800;
+	public static final String PREF_UPLOADS_PAUSED = "pref_uploads_paused";
+	public static final String PREF_INSTANT_UPLOAD_ENABLED = "pref_instant_upload_enabled";
+	public static final String INTENT_SERVICE_UPLOAD_ALL = "cjay.intent.action.UPLOAD_ALL";
+	public static final String PREF_INSTANT_UPLOAD_IF_ROAMING = "pref_instant_upload_roaming_enabled";
+	public static final String PREF_INSTANT_UPLOAD_WIFI_ONLY = "pref_instant_upload_wifi_only";
 }

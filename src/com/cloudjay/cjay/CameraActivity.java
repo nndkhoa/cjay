@@ -54,7 +54,7 @@ import com.googlecode.androidannotations.annotations.ViewById;
 @EActivity(R.layout.activity_camera)
 @NoTitle
 public class CameraActivity extends Activity {
-	
+
 	public static CameraActivity instance = null;
 
 	Camera camera = null;
@@ -62,12 +62,12 @@ public class CameraActivity extends Activity {
 	private SurfaceHolder previewHolder = null;
 	private boolean inPreview = false;
 	private boolean cameraConfigured = false;
-	
+
 	String itemUri;
 	String itemId;
 	String flashMode;
 	int cameraMode;
-	
+
 	private List<String> photos;
 
 	private static final int PICTURE_SIZE_MAX_WIDTH = 1920;
@@ -173,7 +173,7 @@ public class CameraActivity extends Activity {
 		// Restore camera state from database or somewhere else
 		flashMode = Camera.Parameters.FLASH_MODE_OFF;
 		cameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
-		
+
 		photos = new ArrayList<String>();
 	}
 
@@ -347,9 +347,9 @@ public class CameraActivity extends Activity {
 			out.close();
 
 			Logger.Log("Path: " + filename.getAbsolutePath());
-			
+
 			photos.add(filename.getAbsolutePath());
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -360,12 +360,12 @@ public class CameraActivity extends Activity {
 	void savePhoto(byte[] data) {
 		// Convert rotated byte[] to Bitmap
 		Bitmap capturedBitmap = saveToBitmap(data);
-				
+
 		// Save Bitmap to Files
 		String uuid = UUID.randomUUID().toString();
 		String fileName = uuid + ".jpg";
 		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
-		
+
 		// Save Bitmap to JPEG
 		saveBitmap(capturedBitmap, photo);
 
@@ -470,7 +470,7 @@ public class CameraActivity extends Activity {
 				String uuid = UUID.randomUUID().toString();
 
 				// Save to database
-//				uploadImage(uuid, itemUri);
+				// uploadImage(uuid, itemUri);
 			}
 		}
 	}
@@ -546,17 +546,17 @@ public class CameraActivity extends Activity {
 
 			if (flashMode.equalsIgnoreCase(Parameters.FLASH_MODE_OFF)) {
 
-//				toggleFlashButton.setImageResource(R.drawable.ic_flash_auto);
+				// toggleFlashButton.setImageResource(R.drawable.ic_flash_auto);
 				params.setFlashMode(Parameters.FLASH_MODE_AUTO);
 
 			} else if (flashMode.equalsIgnoreCase(Parameters.FLASH_MODE_AUTO)) {
 
-//				toggleFlashButton.setImageResource(R.drawable.ic_flash_on);
+				// toggleFlashButton.setImageResource(R.drawable.ic_flash_on);
 				params.setFlashMode(Parameters.FLASH_MODE_ON);
 
 			} else if (flashMode.equalsIgnoreCase(Parameters.FLASH_MODE_ON)) {
 
-//				toggleFlashButton.setImageResource(R.drawable.ic_flash_off);
+				// toggleFlashButton.setImageResource(R.drawable.ic_flash_off);
 				params.setFlashMode(Parameters.FLASH_MODE_OFF);
 
 			} else {
@@ -593,15 +593,15 @@ public class CameraActivity extends Activity {
 			Logger.Log("rawCallback");
 		}
 	};
-	
+
 	@Click(R.id.btn_camera_done)
 	void doneButtonClicked() {
-		
+
 		// TODO: this is the list
 		for (String photo : photos) {
 			// TODO: do something
 		}
-		
+
 		this.onBackPressed();
 	}
 

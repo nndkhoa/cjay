@@ -1,6 +1,7 @@
 package com.cloudjay.cjay;
 
 import java.util.ArrayList;
+
 import com.cloudjay.cjay.model.ContainerSession;
 import android.content.Context;
 
@@ -17,5 +18,19 @@ public class PhotoUploadController {
 		mUploadingList = new ArrayList<ContainerSession>();
 
 		// populateFromDatabase();
+	}
+
+	public static PhotoUploadController getFromContext(Context context) {
+		return CJayApplication.getApplication(context)
+				.getPhotoUploadController();
+	}
+
+	public synchronized boolean hasWaitingUploads() {
+		for (ContainerSession upload : mUploadingList) {
+			if (upload.getUploadState() == ContainerSession.STATE_UPLOAD_WAITING) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

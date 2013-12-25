@@ -34,7 +34,8 @@ public class AuditorHomeActivity extends SherlockFragmentActivity implements
 	}
 
 	private void configureViewPager() {
-		AuditorHomeTabPageAdaptor viewPagerAdapter = new AuditorHomeTabPageAdaptor(getSupportFragmentManager(), locations);
+		AuditorHomeTabPageAdaptor viewPagerAdapter = new AuditorHomeTabPageAdaptor(
+				getSupportFragmentManager(), locations);
 		pager.setAdapter(viewPagerAdapter);
 		pager.setOnPageChangeListener(this);
 	}
@@ -83,34 +84,33 @@ public class AuditorHomeActivity extends SherlockFragmentActivity implements
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
 	}
 
-	
 	public class AuditorHomeTabPageAdaptor extends FragmentPagerAdapter {
-	    private String[] locations;
+		private String[] locations;
 
-	    public AuditorHomeTabPageAdaptor(FragmentManager fm, String[] locations) {
-	        super(fm);
-	        this.locations = locations;
-	    }
+		public AuditorHomeTabPageAdaptor(FragmentManager fm, String[] locations) {
+			super(fm);
+			this.locations = locations;
+		}
 
-	    public int getCount() {
-	        return locations.length;
-	    }
+		public int getCount() {
+			return locations.length;
+		}
 
-	    public Fragment getItem(int position) {
-    		Fragment fragment = new SampleFragment_();
-    	    Bundle bundle = new Bundle();
-	    	switch (position) {
-	    	case 0:
-	    		Fragment reportingListFragment_ = new AuditorReportingListFragment_(); 
-	    	    return reportingListFragment_;
-	    	case 1:
-	    		Fragment reportedListFragment_ = new AuditorReportedListFragment_(); 
-	    	    return reportedListFragment_;
-	    	default:
-	    	    bundle.putString("label", locations[position]);
-	    	    fragment.setArguments(bundle);
-	    	    return fragment;
-	    	}
-	    }
+		public Fragment getItem(int position) {
+			Fragment fragment = new SampleFragment_();
+			Bundle bundle = new Bundle();
+			switch (position) {
+			case 0:
+				Fragment reportingListFragment_ = new AuditorReportingListFragment_();
+				return reportingListFragment_;
+			case 1:
+				Fragment reportedListFragment_ = new AuditorReportedListFragment_();
+				return reportedListFragment_;
+			default:
+				bundle.putString("label", locations[position]);
+				fragment.setArguments(bundle);
+				return fragment;
+			}
+		}
 	}
 }

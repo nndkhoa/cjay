@@ -25,8 +25,8 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.StaticImageLoader;
-import com.cloudjay.cjay.CameraActivity_;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.CameraActivity_;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -108,7 +108,8 @@ public class FeedListFragment extends SherlockDialogFragment implements
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
 
-								// Get the container id and container operator code
+								// Get the container id and container operator
+								// code
 								String containerId = newContainerIdEditText
 										.getText().toString();
 								String operatorCode = newContainerOwnerSpinner
@@ -120,7 +121,9 @@ public class FeedListFragment extends SherlockDialogFragment implements
 								newTmpContainer.setOperatorCode(operatorCode);
 								newTmpContainer.setCheckInTime(StringHelper
 										.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT));
-								newTmpContainer.setDepotCode("phuoc-long-icd1"); // TODO: FIX ME
+								newTmpContainer.setDepotCode("phuoc-long-icd1"); // TODO:
+																					// FIX
+																					// ME
 								newTmpContainer.printMe();
 
 								// Save the current temp Container Session
@@ -128,12 +131,15 @@ public class FeedListFragment extends SherlockDialogFragment implements
 										newTmpContainer);
 
 								// Create a Container Session
-								ContainerSession newContainer = Mapper.toContainerSession(newTmpContainer,
-										getActivity()); 
+								ContainerSession newContainer = Mapper
+										.toContainerSession(newTmpContainer,
+												getActivity());
 								newContainer.printMe();
-								
-								// Save the current Container Session from the temp Container Session
-								DataCenter.getInstance().setCurrentSession(newContainer);
+
+								// Save the current Container Session from the
+								// temp Container Session
+								DataCenter.getInstance().setCurrentSession(
+										newContainer);
 
 								// Then start showing the Camera
 								Intent intent = new Intent(getActivity(),
@@ -191,7 +197,7 @@ public class FeedListFragment extends SherlockDialogFragment implements
 						return item.getCheckInTime();
 					}
 				});
-		
+
 		feedsDict.addStringField(R.id.feed_item_container_export_date,
 				new StringExtractor<ContainerSession>() {
 					@Override
