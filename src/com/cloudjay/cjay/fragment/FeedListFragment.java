@@ -72,17 +72,14 @@ public class FeedListFragment extends SherlockDialogFragment implements
 		LayoutInflater factory = LayoutInflater.from(getActivity());
 		final View newContainerView = factory.inflate(
 				R.layout.dialog_new_container, null);
-
-		EditText newContainerIdEditText = (EditText) newContainerView
-				.findViewById(R.id.dialog_new_container_id);
-		Spinner newContainerOwnerSpinner = (Spinner) newContainerView
-				.findViewById(R.id.dialog_new_container_owner);
-
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-				getActivity(), R.array.dialog_container_owner_list,
-				android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		newContainerOwnerSpinner.setAdapter(adapter);
+		
+		EditText newContainerIdEditText = (EditText) view.findViewById(R.id.dialog_new_container_id);
+		Spinner newContainerOwnerSpinner = (Spinner) view.findViewById(R.id.dialog_new_container_owner);
+		
+//		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+//		        R.array.dialog_container_owner_list, android.R.layout.simple_spinner_item);
+//		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//		newContainerOwnerSpinner.setAdapter(adapter);
 
 		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(
 				getActivity())
