@@ -18,32 +18,22 @@ import android.provider.Settings.Secure;
 import android.util.Log;
 
 import com.cloudjay.cjay.CJayActivity;
-import com.cloudjay.cjay.LoginActivity;
-import com.cloudjay.cjay.dao.CJayImageDaoImpl;
-import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
-import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
-import com.cloudjay.cjay.model.AuditReportItem;
-import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.CJayResourceStatus;
-import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.DamageCode;
-import com.cloudjay.cjay.model.Depot;
-import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Mapper;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.Session;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -298,6 +288,7 @@ public class CJayClient implements ICJayClient {
 		return user;
 	}
 
+	//
 	// @Override
 	// public List<UserModel> getTeamMembers(UserModel currentUser, Context ctx)
 	// throws SQLException {
@@ -357,13 +348,6 @@ public class CJayClient implements ICJayClient {
 	// e.printStackTrace();
 	// }
 	//
-	// }
-	//
-	// @Override
-	// public ItemModel getItemModel(Context ctx, UserModel currentUser, int
-	// itemId) {
-	// // TODO Auto-generated method stub
-	// return null;
 	// }
 
 	@Override
@@ -432,99 +416,18 @@ public class CJayClient implements ICJayClient {
 		// Parse to `ContainerSession`
 		List<ContainerSession> items = new ArrayList<ContainerSession>();
 		try {
-			ContainerDaoImpl containerDaoImpl = databaseManager.getHelper(ctx)
-					.getContainerDaoImpl();
-			DepotDaoImpl depotDaoImpl = databaseManager.getHelper(ctx)
-					.getDepotDaoImpl();
-			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx)
-					.getOperatorDaoImpl();
 			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
 					.getHelper(ctx).getContainerSessionDaoImpl();
-			CJayImageDaoImpl cJayImageDaoImpl = databaseManager.getHelper(ctx)
-					.getCJayImageDaoImpl();
 
 			for (TmpContainerSession tmpSession : tmpContainerSessions) {
+				ContainerSession containerSession = Mapper.toContainerSession(
+						tmpSession, ctx);
 
-				// Create `operator` object if needed
-				Operator operator = null;
-				List<Operator> listOperators = operatorDaoImpl.queryForEq(
-						Operator.CODE, tmpSession.getOperatorCode());
-
-				if (listOperators.isEmpty()) {
-					operator = new Operator();
-					operator.setCode(tmpSession.getOperatorCode());
-					operator.setName(tmpSession.getOperatorCode());
-					operatorDaoImpl.addOperator(operator);
+				if (null != containerSession) {
+					containerSessionDaoImpl
+							.addContainerSessions(containerSession);
+					items.add(containerSession);
 				}
-
-				// Create `depot` object if needed
-				Depot depot = null;
-				List<Depot> listDepots = depotDaoImpl.queryForEq(
-						Depot.DEPOT_CODE, tmpSession.getDepotCode());
-				if (listDepots.isEmpty()) {
-					depot = new Depot();
-					depot.setDepotCode(tmpSession.getDepotCode());
-					depot.setDepotName(tmpSession.getDepotCode());
-					depotDaoImpl.addDepot(depot);
-				}
-
-				// Create `container` object if needed
-				Container container = null;
-				List<Container> list = containerDaoImpl.queryForEq(
-						Container.CONTAINER_ID, tmpSession.getContainerId());
-				if (list.isEmpty()) {
-					container = new Container();
-					container.setContainerId(tmpSession.getContainerId());
-					if (null != operator)
-						container.setOperator(operator);
-
-					if (null != depot)
-						container.setDepot(depot);
-
-					containerDaoImpl.addContainer(container);
-				}
-
-				// Create `container session` object
-				ContainerSession containerSession = new ContainerSession();
-				containerSession.setId(tmpSession.getId());
-				containerSession.setCheckInTime(tmpSession.getCheckInTime());
-				containerSession.setCheckOutTime(tmpSession.getCheckOutTime());
-				containerSession.setImageIdPath(tmpSession.getImageIdPath());
-				if (null != container)
-					containerSession.setContainer(container);
-
-				containerSessionDaoImpl.addContainerSessions(containerSession);
-
-				// process audit report item
-
-				for (AuditReportItem auditReportItem : tmpSession
-						.getAuditReportItems()) {
-
-				}
-
-				// process gate report images
-				List<CJayImage> listImages = new ArrayList<CJayImage>();
-				for (GateReportImage gateReportImage : tmpSession
-						.getGateReportImages()) {
-
-					CJayImage image = new CJayImage(gateReportImage.getId(),
-							gateReportImage.getType(),
-							gateReportImage.getTimePosted(),
-							gateReportImage.getImageName());
-
-					if (null != image)
-						image.setContainerSession(containerSession);
-
-					cJayImageDaoImpl.addCJayImage(image);
-
-					// data for returning
-					listImages.add(image);
-				}
-
-				containerSession.setCJayImages(listImages);
-
-				// data for returning
-				items.add(containerSession);
 			}
 
 		} catch (SQLException e) {
@@ -546,25 +449,16 @@ public class CJayClient implements ICJayClient {
 
 	@Override
 	public boolean hasNewMetadata(Context ctx) {
-
-		// List<CJayResourceStatus> cJayResourceStatus =
-		// getCJayResourceStatus(ctx);
-		// for (CJayResourceStatus item : cJayResourceStatus) {
-		//
-		// }
-
 		return false;
 	}
 
 	@Override
 	public List<ContainerSession> getContainerSessions(Context ctx, Date date) {
-
 		return null;
 	}
 
 	@Override
 	public List<ContainerSession> getContainerSessions(Context ctx, String date) {
-
 		return null;
 	}
 

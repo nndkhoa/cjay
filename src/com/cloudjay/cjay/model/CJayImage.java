@@ -2,8 +2,6 @@ package com.cloudjay.cjay.model;
 
 import java.util.Date;
 
-import android.R.integer;
-
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
