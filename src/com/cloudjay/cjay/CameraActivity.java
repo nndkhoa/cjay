@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import android.R.integer;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -47,7 +46,6 @@ import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.network.UploadIntentService;
 import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Mapper;
 import com.cloudjay.cjay.util.StringHelper;
@@ -65,6 +63,7 @@ import com.googlecode.androidannotations.annotations.ViewById;
 public class CameraActivity extends Activity {
 
 	public static CameraActivity instance = null;
+	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
 
 	Camera camera = null;
 	MediaPlayer shootMediaPlayer = null;
@@ -105,7 +104,7 @@ public class CameraActivity extends Activity {
 	@SystemService
 	AudioManager audioManager;
 
-	@Extra("cjay_container_session")
+	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
 	TmpContainerSession tmpContainerSession;
 
 	@Extra("type")

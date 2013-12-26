@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -23,9 +24,12 @@ import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.ami.fundapter.interfaces.ItemClickListener;
+import com.cloudjay.cjay.CameraActivity_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Mapper;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ItemClick;
@@ -50,12 +54,10 @@ public class GateExportListFragment extends SherlockDialogFragment {
 				search(arg0.toString());
 			}
 
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
+			public void beforeTextChanged(CharSequence s, int start, int count,	int after) {
 			}
 
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
 			}
 		});
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
@@ -80,7 +82,16 @@ public class GateExportListFragment extends SherlockDialogFragment {
 
 	@ItemClick(R.id.container_list)
 	void containerItemClick(int position) {
-		// Hector: go to details from here
+		ContainerSession containerSession = mAdapter.getItem(position);
+//		TmpContainerSession tmpContainerSession = Mapper.toContainerSession(tmpSession, ctx)
+		// Pass tmpContainerSession away
+		// Then start showing the Camera
+//		Intent intent = new Intent(getActivity(),
+//				CameraActivity_.class);
+//		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+//				newTmpContainer);
+//		intent.putExtra("type", 0); // in
+//		startActivity(intent);
 	}
 
 	private void search(String searchText) {
