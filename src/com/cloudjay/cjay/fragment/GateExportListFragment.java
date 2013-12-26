@@ -1,17 +1,21 @@
 package com.cloudjay.cjay.fragment;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.TextureView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.actionbarsherlock.view.Menu;
@@ -42,10 +46,10 @@ public class GateExportListFragment extends SherlockDialogFragment {
 	
 	private ContainerSession mSelectedContainerSession;
 
-	@ViewById(R.id.container_list)
-	ListView mFeedListView;
-	@ViewById(R.id.search_textfield)
-	EditText mSearchEditText;
+	@ViewById(R.id.container_list) ListView mFeedListView;
+	@ViewById(R.id.search_edittext)	EditText mSearchEditText;
+	@ViewById(R.id.add_button) Button mAddButton;
+	@ViewById(R.id.notfound_textview) TextView mNotfoundTextView;
 
 	@AfterViews
 	void afterViews() {
@@ -64,6 +68,7 @@ public class GateExportListFragment extends SherlockDialogFragment {
 			}
 		});
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListContainerSessions(getActivity());
+		configureControls(mFeeds);
 		initFunDapter(mFeeds);
 	}
 	
@@ -88,7 +93,7 @@ public class GateExportListFragment extends SherlockDialogFragment {
 		Intent intent = new Intent(getActivity(), CameraActivity_.class);
 		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
 				tmpContainerSession);
-		intent.putExtra("type", 1); // in
+		intent.putExtra("type", 1); // out
 		startActivity(intent);
 	}
 	
@@ -122,16 +127,31 @@ public class GateExportListFragment extends SherlockDialogFragment {
 
 	private void search(String searchText) {
 		if (searchText.equals("")) {
+			configureControls(mFeeds);
 			mFeedsAdapter.updateData(mFeeds);
 		} else {
 			ArrayList<ContainerSession> searchFeeds = new ArrayList<ContainerSession>();
 			for (ContainerSession containerSession : mFeeds) {
-				if (containerSession.getContainerId().contains(searchText)) {
+				if (containerSession.getContainerId().toLowerCase(Locale.US).contains(searchText.toLowerCase(Locale.US))) {
 					searchFeeds.add(containerSession);
 				}
 			}
 			// refresh list
+			configureControls(searchFeeds);
 			mFeedsAdapter.updateData(searchFeeds);
+		}
+	}
+	
+	private void configureControls(ArrayList<ContainerSession> list) {
+		boolean hasContainers = list.size() > 0;
+		if (hasContainers) {
+			mFeedListView.setVisibility(View.VISIBLE);
+			mAddButton.setVisibility(View.INVISIBLE);
+			mNotfoundTextView.setVisibility(View.INVISIBLE);
+		} else {
+			mFeedListView.setVisibility(View.INVISIBLE);
+			mAddButton.setVisibility(View.VISIBLE);
+			mNotfoundTextView.setVisibility(View.VISIBLE);			
 		}
 	}
 

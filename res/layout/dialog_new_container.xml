@@ -23,6 +23,9 @@
 		        android:layout_width="0dp"
 		        android:layout_height="fill_parent"
 		        android:layout_weight="1"
+		        android:imeOptions="actionNext"
+		        android:singleLine="true"
+		        android:selectAllOnFocus="true"
 		        android:hint="@string/dialog_container_id" />
     </LinearLayout>
     
@@ -40,11 +43,17 @@
             	android:paddingLeft="18dp"
             	android:paddingRight="18dp"
             	android:paddingTop="12dp" />     
-		    <Spinner
+<!-- 		    <Spinner
 		        android:id="@+id/dialog_new_container_owner"
 		        android:layout_width="0dp"
 		        android:layout_height="fill_parent"
-		        android:layout_weight="1"/>       
+		        android:layout_weight="1"/>     -->  
+			<EditText
+		        android:id="@+id/dialog_new_container_owner"
+		        android:layout_width="0dp"
+		        android:layout_height="fill_parent"
+		        android:layout_weight="1"
+		        android:hint="@string/dialog_container_owner" /> 
     </LinearLayout>
 
 </LinearLayout>
