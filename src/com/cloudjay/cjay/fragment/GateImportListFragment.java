@@ -1,6 +1,11 @@
 package com.cloudjay.cjay.fragment;
 
 import java.util.ArrayList;
+<<<<<<< HEAD
+=======
+import java.util.Calendar;
+import java.util.Currency;
+>>>>>>> 167bdbed24977708610b3f08657cf04ecc4d5e6f
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -30,8 +35,14 @@ import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.TmpContainerSession;
+import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
+<<<<<<< HEAD
+=======
+import com.cloudjay.cjay.util.Mapper;
+import com.cloudjay.cjay.util.Session;
+>>>>>>> 167bdbed24977708610b3f08657cf04ecc4d5e6f
 import com.cloudjay.cjay.util.StringHelper;
 import com.googlecode.androidannotations.annotations.EFragment;
 
@@ -122,10 +133,11 @@ public class GateImportListFragment extends SherlockDialogFragment implements
 								newTmpContainer.setCheckInTime(StringHelper
 										.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT));
 
-								newTmpContainer
-										.setDepotCode(((CJayActivity) getActivity())
-												.getCurrentUser()
-												.getDepotCode());
+								User currentUser = Session.restore(
+										getActivity()).getCurrentUser();
+
+								newTmpContainer.setDepotCode(currentUser
+										.getDepot().getDepotCode());
 								newTmpContainer.printMe();
 
 								// Save the current temp Container Session
