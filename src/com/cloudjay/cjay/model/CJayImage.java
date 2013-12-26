@@ -3,6 +3,8 @@ package com.cloudjay.cjay.model;
 import java.util.Date;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
+import android.text.TextUtils;
 
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
@@ -24,6 +26,7 @@ public class CJayImage {
 	private static final String TIME_POSTED = "time_posted";
 	private static final String FIELD_STATE = "state";
 	private static final String FIELD_URI = "uri";
+	private static final String UUID = "uuid";
 
 	public CJayImage() {
 
@@ -51,8 +54,12 @@ public class CJayImage {
 		}
 	}
 
+	private Uri mFullUri;
 	private int mProgress;
 	private Bitmap mBigPictureNotificationBmp;
+
+	@DatabaseField(columnName = FIELD_URI, id = true)
+	private String mFullUriString;
 
 	@DatabaseField(columnName = FIELD_STATE)
 	private int mState;
@@ -66,7 +73,7 @@ public class CJayImage {
 	@DatabaseField(columnName = TIME_POSTED)
 	private String time_posted;
 
-	@DatabaseField
+	@DatabaseField(columnName = UUID)
 	private String uuid;
 
 	/**
@@ -87,6 +94,13 @@ public class CJayImage {
 
 	public void setIssue(Issue issue) {
 		this.issue = issue;
+	}
+
+	public Uri getOriginalPhotoUri() {
+		if (null == mFullUri && !TextUtils.isEmpty(mFullUriString)) {
+			mFullUri = Uri.parse(mFullUriString);
+		}
+		return mFullUri;
 	}
 
 	public String getTimePosted() {
