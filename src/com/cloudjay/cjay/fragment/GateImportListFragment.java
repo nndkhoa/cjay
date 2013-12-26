@@ -1,11 +1,8 @@
 package com.cloudjay.cjay.fragment;
 
 import java.util.ArrayList;
-<<<<<<< HEAD
-=======
 import java.util.Calendar;
 import java.util.Currency;
->>>>>>> 167bdbed24977708610b3f08657cf04ecc4d5e6f
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -38,11 +35,9 @@ import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
-<<<<<<< HEAD
-=======
+
 import com.cloudjay.cjay.util.Mapper;
 import com.cloudjay.cjay.util.Session;
->>>>>>> 167bdbed24977708610b3f08657cf04ecc4d5e6f
 import com.cloudjay.cjay.util.StringHelper;
 import com.googlecode.androidannotations.annotations.EFragment;
 
@@ -174,7 +169,8 @@ public class GateImportListFragment extends SherlockDialogFragment implements
 								// Then start showing the Camera
 								Intent intent = new Intent(getActivity(),
 										CameraActivity_.class);
-								intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+								intent.putExtra(
+										CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
 										newTmpContainer);
 								intent.putExtra("type", 0); // in
 								startActivity(intent);

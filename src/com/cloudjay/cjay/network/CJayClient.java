@@ -179,8 +179,10 @@ public class CJayClient implements ICJayClient {
 			Logger.Log(LOG_TAG, "get list container sessions");
 			List<ContainerSession> containerSessions = null;
 			if (containerSessionDaoImpl.isEmpty()) {
+				Logger.Log(LOG_TAG, "get new list container sessions");
 				containerSessions = getContainerSessions(ctx);
 			} else {
+				Logger.Log(LOG_TAG, "get updated list container sessions");
 				Date date = new Date();
 				containerSessions = getContainerSessions(ctx, date);
 			}
@@ -539,7 +541,7 @@ public class CJayClient implements ICJayClient {
 		List<CJayResourceStatus> items = gson.fromJson(response, listType);
 		return items;
 	}
-	
+
 	@Override
 	public void uploadItem(Context ctx, TmpContainerSession item) {
 
