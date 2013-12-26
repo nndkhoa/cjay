@@ -3,7 +3,6 @@ package com.cloudjay.cjay.fragment;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Currency;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,8 +26,7 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.StaticImageLoader;
-import com.cloudjay.cjay.CJayActivity;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.CameraActivity_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.TmpContainerSession;

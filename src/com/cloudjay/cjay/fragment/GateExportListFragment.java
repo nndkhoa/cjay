@@ -1,22 +1,16 @@
 package com.cloudjay.cjay.fragment;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
 
 import android.app.Dialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.ami.fundapter.BindDictionary;
@@ -24,12 +18,9 @@ import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.ami.fundapter.interfaces.ItemClickListener;
-import com.cloudjay.cjay.CameraActivity_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.util.DataCenter;
-import com.cloudjay.cjay.util.Mapper;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ItemClick;
