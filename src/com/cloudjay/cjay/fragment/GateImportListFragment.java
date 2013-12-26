@@ -1,11 +1,6 @@
 package com.cloudjay.cjay.fragment;
 
 import java.util.ArrayList;
-<<<<<<< HEAD
-=======
-import java.util.Calendar;
-import java.util.Currency;
->>>>>>> 167bdbed24977708610b3f08657cf04ecc4d5e6f
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -30,19 +25,14 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.StaticImageLoader;
-import com.cloudjay.cjay.CJayActivity;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.CameraActivity_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
-<<<<<<< HEAD
-=======
-import com.cloudjay.cjay.util.Mapper;
 import com.cloudjay.cjay.util.Session;
->>>>>>> 167bdbed24977708610b3f08657cf04ecc4d5e6f
 import com.cloudjay.cjay.util.StringHelper;
 import com.googlecode.androidannotations.annotations.EFragment;
 
