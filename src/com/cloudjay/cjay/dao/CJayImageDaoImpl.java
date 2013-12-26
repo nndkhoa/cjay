@@ -40,4 +40,14 @@ public class CJayImageDaoImpl extends BaseDaoImpl<CJayImage, Integer> implements
 			this.delete(cJayImage);
 		}
 	}
+
+	@Override
+	public CJayImage findByUuid(String uuid) throws SQLException {
+		List<CJayImage> result = this.queryForEq("uuid", uuid);
+		if (result != null) {
+			return result.get(0);
+		}
+
+		return null;
+	}
 }

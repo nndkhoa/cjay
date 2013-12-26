@@ -1,14 +1,8 @@
 package com.cloudjay.cjay.model;
 
-import java.util.ArrayList;
-import java.util.Date;
-
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.j256.ormlite.field.DatabaseField;
-
 import de.greenrobot.event.EventBus;
-
-import android.R.integer;
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Parcel;

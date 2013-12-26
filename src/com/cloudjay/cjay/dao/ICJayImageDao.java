@@ -15,4 +15,5 @@ public interface ICJayImageDao extends Dao<CJayImage, Integer> {
 
 	void deleteAllCJayImages() throws SQLException;
 
+	CJayImage findByUuid(String uuid) throws SQLException;
 }

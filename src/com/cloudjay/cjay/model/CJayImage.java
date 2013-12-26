@@ -2,6 +2,8 @@ package com.cloudjay.cjay.model;
 
 import java.util.Date;
 
+import android.graphics.Bitmap;
+
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -9,11 +11,19 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "cjay_image", daoClass = CJayImageDaoImpl.class)
 public class CJayImage {
 
+	public static final int STATE_UPLOAD_COMPLETED = 5;
+	public static final int STATE_UPLOAD_ERROR = 4;
+	public static final int STATE_UPLOAD_IN_PROGRESS = 3;
+	public static final int STATE_UPLOAD_WAITING = 2;
+	public static final int STATE_SELECTED = 1;
+	public static final int STATE_NONE = 0;
+
 	private static final String ID = "id";
 	private static final String IMAGE_NAME = "image_name";
-	private static final String LOCAL_URL = "local_url";
 	private static final String TYPE = "type";
 	private static final String TIME_POSTED = "time_posted";
+	private static final String FIELD_STATE = "state";
+	private static final String FIELD_URI = "uri";
 
 	public CJayImage() {
 
@@ -26,17 +36,38 @@ public class CJayImage {
 		this.time_posted = time_posted;
 	}
 
+	public int getUploadState() {
+		return mState;
+	}
+
+	public int getUploadProgress() {
+		return mProgress;
+	}
+
+	public void setUploadProgress(int progress) {
+		if (progress != mProgress) {
+			mProgress = progress;
+			// notifyUploadStateListener();
+		}
+	}
+
+	private int mProgress;
+	private Bitmap mBigPictureNotificationBmp;
+
+	@DatabaseField(columnName = FIELD_STATE)
+	private int mState;
+
 	@DatabaseField(id = true, columnName = ID)
 	private int id;
 
 	@DatabaseField(columnName = IMAGE_NAME)
 	private String image_name;
 
-	@DatabaseField(columnName = LOCAL_URL)
-	private String local_url;
-
 	@DatabaseField(columnName = TIME_POSTED)
 	private String time_posted;
+
+	@DatabaseField
+	private String uuid;
 
 	/**
 	 * TYPE include: in | out | issue | repaired
@@ -88,6 +119,14 @@ public class CJayImage {
 
 	public void setImageName(String image_name) {
 		this.image_name = image_name;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
 }
