@@ -26,8 +26,9 @@ import android.support.v4.view.ViewPager;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 
-import com.cloudjay.cjay.adapter.UserPhotosViewPagerAdapter;
+import com.cloudjay.cjay.adapter.SelectedPhotosViewPagerAdapter;
 import com.cloudjay.cjay.base.PhotupFragmentActivity;
+import com.cloudjay.cjay.listener.OnSingleTapListener;
 import com.cloudjay.cjay.model.PhotoUpload;
 import com.cloudjay.cjay.util.CursorPagerAdapter;
 import com.cloudjay.cjay.util.MediaStoreCursorHelper;
@@ -103,8 +104,13 @@ public class PhotoViewerActivity extends PhotupFragmentActivity implements Loade
 		mViewPager.setPageMargin(getResources().getDimensionPixelSize(
 				R.dimen.viewpager_margin));
 
-		mAdapter = new UserPhotosViewPagerAdapter(this);
-		getSupportLoaderManager().initLoader(0, null, this);
+		mAdapter = new SelectedPhotosViewPagerAdapter(this, new OnSingleTapListener() {
+				@Override
+				public boolean onSingleTap() {
+					// TODO Auto-generated method stub
+					return false;
+				}
+			});
 
 		mViewPager.setAdapter(mAdapter);
 
