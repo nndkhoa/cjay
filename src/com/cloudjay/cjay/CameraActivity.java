@@ -39,6 +39,7 @@ import android.widget.Toast;
 import com.aerilys.helpers.android.UIHelper;
 import com.cloudjay.cjay.dao.UploadItem;
 import com.cloudjay.cjay.dao.UploadItemDaoImpl;
+import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.network.UploadIntentService;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -48,6 +49,7 @@ import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Background;
 import com.googlecode.androidannotations.annotations.Click;
 import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.Extra;
 import com.googlecode.androidannotations.annotations.NoTitle;
 import com.googlecode.androidannotations.annotations.SystemService;
 import com.googlecode.androidannotations.annotations.ViewById;
@@ -96,6 +98,9 @@ public class CameraActivity extends Activity {
 
 	@SystemService
 	AudioManager audioManager;
+
+	@Extra("cjay_container_session")
+	TmpContainerSession tmpContainerSession;
 
 	// endregion
 
@@ -369,10 +374,10 @@ public class CameraActivity extends Activity {
 
 		// Save Bitmap to JPEG
 		saveBitmap(capturedBitmap, photo);
-		
+
 		// Upload image
 		uploadImage(uuid, photo.getAbsolutePath());
-		
+
 		if (capturedBitmap != null) {
 			capturedBitmap.recycle();
 			capturedBitmap = null;
@@ -612,9 +617,12 @@ public class CameraActivity extends Activity {
 	void uploadImage(String uuid, String filename) {
 		itemId = uuid;
 
-		String depotCode = com.cloudjay.cjay.util.Session.restore(this).getCurrentUser().getDepotCode();
-		String time = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_UPLOAD_DATETIME_FORMAT);
-		String finalURL = String.format("gate-in-%s-%s-%s.jpg", depotCode, time, uuid);
+		String depotCode = com.cloudjay.cjay.util.Session.restore(this)
+				.getCurrentUser().getDepotCode();
+		String time = StringHelper
+				.getCurrentTimestamp(CJayConstant.CJAY_UPLOAD_DATETIME_FORMAT);
+		String finalURL = String.format("gate-in-%s-%s-%s.jpg", depotCode,
+				time, uuid);
 
 		// Create Database Entity Object
 		UploadItem uploadItem = new UploadItem();
@@ -641,6 +649,7 @@ public class CameraActivity extends Activity {
 		startService(uploadIntent);
 
 	}
+
 	// endregion
 
 	// region Camera Support method

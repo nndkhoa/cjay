@@ -1,5 +1,6 @@
 package com.cloudjay.cjay.fragment;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -27,7 +28,7 @@ import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.StaticImageLoader;
 import com.cloudjay.cjay.*;
-import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -122,29 +123,49 @@ public class GateImportListFragment extends SherlockDialogFragment implements
 								newTmpContainer.setOperatorCode(operatorCode);
 								newTmpContainer.setCheckInTime(StringHelper
 										.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT));
-								newTmpContainer.setDepotCode("phuoc-long-icd1"); // TODO:
-																					// FIX
-																					// ME
+
+								newTmpContainer
+										.setDepotCode(((CJayActivity) getActivity())
+												.getCurrentUser()
+												.getDepotCode());
 								newTmpContainer.printMe();
 
 								// Save the current temp Container Session
 								DataCenter.getInstance().setTmpCurrentSession(
 										newTmpContainer);
 
-								// Create a Container Session
-								ContainerSession newContainer = Mapper
-										.toContainerSession(newTmpContainer,
-												getActivity());
-								newContainer.printMe();
+								// // Create a Container Session
+								// ContainerSession newContainer = Mapper
+								// .toContainerSession(newTmpContainer,
+								// getActivity());
+								//
+								// newContainer.printMe();
+								//
+								// try {
+								// ContainerSessionDaoImpl
+								// containerSessionDaoImpl = DataCenter
+								// .getInstance().getDatabaseManager()
+								// .getHelper(getActivity())
+								// .getContainerSessionDaoImpl();
+								//
+								// containerSessionDaoImpl
+								// .addContainerSessions(newContainer);
+								// } catch (SQLException e) {
+								// e.printStackTrace();
+								// }
 
-								// Save the current Container Session from the
-								// temp Container Session
-								DataCenter.getInstance().setCurrentSession(
-										newContainer);
+								// // Save the current Container Session from
+								// the
+								// // temp Container Session
+								// DataCenter.getInstance().setCurrentSession(
+								// newContainer);
 
+								// Pass tmpContainerSession away
 								// Then start showing the Camera
 								Intent intent = new Intent(getActivity(),
 										CameraActivity_.class);
+								intent.putExtra("cjay_container_session",
+										newTmpContainer);
 								startActivity(intent);
 							}
 						})

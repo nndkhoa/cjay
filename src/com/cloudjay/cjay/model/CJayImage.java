@@ -19,11 +19,11 @@ public class CJayImage {
 
 	}
 
-	public CJayImage(int id, int type, Date date, String image_name) {
+	public CJayImage(int id, int type, String time_posted, String image_name) {
 		this.id = id;
 		this.setType(type);
 		this.image_name = image_name;
-		this.time_posted = date;
+		this.time_posted = time_posted;
 	}
 
 	@DatabaseField(id = true, columnName = ID)
@@ -36,7 +36,7 @@ public class CJayImage {
 	private String local_url;
 
 	@DatabaseField(columnName = TIME_POSTED)
-	private Date time_posted;
+	private String time_posted;
 
 	/**
 	 * TYPE include: in | out | issue | repaired
@@ -58,11 +58,11 @@ public class CJayImage {
 		this.issue = issue;
 	}
 
-	public Date getTimePosted() {
+	public String getTimePosted() {
 		return time_posted;
 	}
 
-	public void setTimePosted(Date time_posted) {
+	public void setTimePosted(String time_posted) {
 		this.time_posted = time_posted;
 	}
 
