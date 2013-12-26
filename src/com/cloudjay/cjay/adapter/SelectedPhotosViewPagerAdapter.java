@@ -25,7 +25,7 @@ import android.view.View;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.PhotoUploadController;
 import com.cloudjay.cjay.listener.OnSingleTapListener;
-import com.cloudjay.cjay.model.PhotoUpload;
+import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.view.MultiTouchImageView;
 import com.cloudjay.cjay.view.PhotoTagItemLayout;
 
@@ -35,7 +35,7 @@ public class SelectedPhotosViewPagerAdapter extends PagerAdapter {
 	private final PhotoUploadController mController;
 	private final OnSingleTapListener mTapListener;
 
-	private List<PhotoUpload> mItems;
+	private List<TmpContainerSession> mItems;
 
 	public SelectedPhotosViewPagerAdapter(Context context, OnSingleTapListener tapListener) {
 		mContext = context;
@@ -66,7 +66,7 @@ public class SelectedPhotosViewPagerAdapter extends PagerAdapter {
 		return POSITION_NONE;
 	}
 
-	public PhotoUpload getItem(int position) {
+	public TmpContainerSession getItem(int position) {
 		if (position >= 0 && position < getCount()) {
 			return mItems.get(position);
 		}
@@ -75,7 +75,7 @@ public class SelectedPhotosViewPagerAdapter extends PagerAdapter {
 
 	@Override
 	public Object instantiateItem(View container, int position) {
-		PhotoUpload upload = mItems.get(position);
+		TmpContainerSession upload = mItems.get(position);
 
 		PhotoTagItemLayout view = new PhotoTagItemLayout(mContext, mController, upload);
 		view.setPosition(position);

@@ -29,7 +29,7 @@ import java.lang.ref.WeakReference;
 import java.util.concurrent.Future;
 
 import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.model.PhotoUpload;
+import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.task.PhotupThreadRunnable;
 import com.cloudjay.cjay.util.Flags;
 
@@ -47,12 +47,12 @@ public class PhotupImageView extends CacheableImageView {
 	static final class PhotoLoadRunnable extends PhotupThreadRunnable {
 
 		private final WeakReference<PhotupImageView> mImageView;
-		private final PhotoUpload mUpload;
+		private final TmpContainerSession mUpload;
 		private final boolean mFullSize;
 		private final BitmapLruCache mCache;
 		private final OnPhotoLoadListener mListener;
 
-		public PhotoLoadRunnable(PhotupImageView imageView, PhotoUpload upload,
+		public PhotoLoadRunnable(PhotupImageView imageView, TmpContainerSession upload,
 				BitmapLruCache cache, final boolean fullSize,
 				final OnPhotoLoadListener listener) {
 			mImageView = new WeakReference<PhotupImageView>(imageView);
@@ -68,39 +68,39 @@ public class PhotupImageView extends CacheableImageView {
 				return;
 			}
 
-			final Context context = imageView.getContext();
-			final CacheableBitmapWrapper wrapper;
-
-			final Bitmap bitmap = mFullSize ? mUpload.getDisplayImage(context)
-					: mUpload.getThumbnailImage(context);
-
-			if (null != bitmap) {
-				final String key = mFullSize ? mUpload.getDisplayImageKey()
-						: mUpload.getThumbnailImageKey();
-				wrapper = new CacheableBitmapWrapper(key, bitmap);
-			} else {
-				wrapper = null;
-			}
-
-			// If we're interrupted, just update the cache and return
-			if (isInterrupted()) {
-				mCache.put(wrapper);
-				return;
-			}
-
-			// If we're still running, update the Views
-			if (null != wrapper) {
-				imageView.post(new Runnable() {
-					public void run() {
-						imageView.setImageCachedBitmap(wrapper);
-						mCache.put(wrapper);
-
-						if (null != mListener) {
-							mListener.onPhotoLoadFinished(wrapper.getBitmap());
-						}
-					}
-				});
-			}
+//			final Context context = imageView.getContext();
+//			final CacheableBitmapWrapper wrapper;
+//
+//			final Bitmap bitmap = mFullSize ? mUpload.getDisplayImage(context)
+//					: mUpload.getThumbnailImage(context);
+//
+//			if (null != bitmap) {
+//				final String key = mFullSize ? mUpload.getDisplayImageKey()
+//						: mUpload.getThumbnailImageKey();
+//				wrapper = new CacheableBitmapWrapper(key, bitmap);
+//			} else {
+//				wrapper = null;
+//			}
+//
+//			// If we're interrupted, just update the cache and return
+//			if (isInterrupted()) {
+//				mCache.put(wrapper);
+//				return;
+//			}
+//
+//			// If we're still running, update the Views
+//			if (null != wrapper) {
+//				imageView.post(new Runnable() {
+//					public void run() {
+//						imageView.setImageCachedBitmap(wrapper);
+//						mCache.put(wrapper);
+//
+//						if (null != mListener) {
+//							mListener.onPhotoLoadFinished(wrapper.getBitmap());
+//						}
+//					}
+//				});
+//			}
 		}
 	}
 
@@ -142,34 +142,34 @@ public class PhotupImageView extends CacheableImageView {
 		}
 	}
 
-	public void requestFullSize(final PhotoUpload upload,
+	public void requestFullSize(final TmpContainerSession upload,
 			final boolean honourFilter, final boolean clearDrawableOnLoad,
 			final OnPhotoLoadListener listener) {
 		resetForRequest(clearDrawableOnLoad);
 
 		// Show thumbnail if it's in the cache
-		BitmapLruCache cache = CJayApplication.getApplication(
-				getContext()).getImageCache();
-		CacheableBitmapWrapper thumbWrapper = cache.get(upload
-				.getThumbnailImageKey());
-		if (null != thumbWrapper && thumbWrapper.hasValidBitmap()) {
-			if (Flags.DEBUG) {
-				Log.d("requestFullSize", "Got Cached Thumbnail");
-			}
-			setImageCachedBitmap(thumbWrapper);
-		} else {
-			setImageDrawable(null);
-		}
-
-		requestImage(upload, true, listener);
+//		BitmapLruCache cache = CJayApplication.getApplication(
+//				getContext()).getImageCache();
+//		CacheableBitmapWrapper thumbWrapper = cache.get(upload
+//				.getThumbnailImageKey());
+//		if (null != thumbWrapper && thumbWrapper.hasValidBitmap()) {
+//			if (Flags.DEBUG) {
+//				Log.d("requestFullSize", "Got Cached Thumbnail");
+//			}
+//			setImageCachedBitmap(thumbWrapper);
+//		} else {
+//			setImageDrawable(null);
+//		}
+//
+//		requestImage(upload, true, listener);
 	}
 
-	public void requestFullSize(final PhotoUpload upload,
+	public void requestFullSize(final TmpContainerSession upload,
 			final boolean honourFilter, final OnPhotoLoadListener listener) {
 		requestFullSize(upload, honourFilter, true, listener);
 	}
 
-	public void requestThumbnail(final PhotoUpload upload,
+	public void requestThumbnail(final TmpContainerSession upload,
 			final boolean honourFilter) {
 		resetForRequest(true);
 		requestImage(upload, false, null);
@@ -197,30 +197,30 @@ public class PhotupImageView extends CacheableImageView {
 		}
 	}
 
-	private void requestImage(final PhotoUpload upload, final boolean fullSize,
+	private void requestImage(final TmpContainerSession upload, final boolean fullSize,
 			final OnPhotoLoadListener listener) {
-		final String key = fullSize ? upload.getDisplayImageKey() : upload
-				.getThumbnailImageKey();
-		BitmapLruCache cache = CJayApplication.getApplication(getContext())
-				.getImageCache();
-		final CacheableBitmapWrapper cached = cache.get(key);
-
-		if (null != cached && cached.hasValidBitmap()) {
-			setImageCachedBitmap(cached);
-			if (null != listener) {
-				listener.onPhotoLoadFinished(cached.getBitmap());
-			}
-		} else {
-			// Means we have an object with an invalid bitmap so remove it
-			if (null != cached) {
-				cache.remove(key);
-			}
-
-			CJayApplication app = CJayApplication.getApplication(getContext());
-			mCurrentRunnable = app.getMultiThreadExecutorService().submit(
-					new PhotoLoadRunnable(this, upload, cache, fullSize,
-							listener));
-		}
+//		final String key = fullSize ? upload.getDisplayImageKey() : upload
+//				.getThumbnailImageKey();
+//		BitmapLruCache cache = CJayApplication.getApplication(getContext())
+//				.getImageCache();
+//		final CacheableBitmapWrapper cached = cache.get(key);
+//
+//		if (null != cached && cached.hasValidBitmap()) {
+//			setImageCachedBitmap(cached);
+//			if (null != listener) {
+//				listener.onPhotoLoadFinished(cached.getBitmap());
+//			}
+//		} else {
+//			// Means we have an object with an invalid bitmap so remove it
+//			if (null != cached) {
+//				cache.remove(key);
+//			}
+//
+//			CJayApplication app = CJayApplication.getApplication(getContext());
+//			mCurrentRunnable = app.getMultiThreadExecutorService().submit(
+//					new PhotoLoadRunnable(this, upload, cache, fullSize,
+//							listener));
+//		}
 	}
 
 	private void resetForRequest(final boolean clearDrawable) {

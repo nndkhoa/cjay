@@ -30,7 +30,7 @@ import com.cloudjay.cjay.PhotoUploadController;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadsListBaseAdapter;
 import com.cloudjay.cjay.events.PhotoSelectionRemovedEvent;
-import com.cloudjay.cjay.model.PhotoUpload;
+import com.cloudjay.cjay.model.TmpContainerSession;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener.OnDismissCallback;
 
@@ -103,9 +103,9 @@ public class UploadsFragment extends SherlockFragment implements
 //	}
 
 	public void onItemClick(AdapterView<?> l, View view, int position, long id) {
-		PhotoUpload upload = (PhotoUpload) l.getItemAtPosition(position);
+		TmpContainerSession upload = (TmpContainerSession) l.getItemAtPosition(position);
 		if (null != upload
-				&& upload.getUploadState() == PhotoUpload.STATE_UPLOAD_COMPLETED) {
+				&& upload.getUploadState() == TmpContainerSession.STATE_UPLOAD_COMPLETED) {
 
 //			String postId = upload.getResultPostId();
 //			if (null != postId) {
@@ -146,7 +146,7 @@ public class UploadsFragment extends SherlockFragment implements
 	public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
 		try {
 			for (int i = 0, z = reverseSortedPositions.length; i < z; i++) {
-				PhotoUpload upload = (PhotoUpload) listView
+				TmpContainerSession upload = (TmpContainerSession) listView
 						.getItemAtPosition(reverseSortedPositions[i]);
 				mPhotoSelectionController.removeUpload(upload);
 			}
@@ -158,9 +158,9 @@ public class UploadsFragment extends SherlockFragment implements
 
 	public boolean canDismiss(AbsListView listView, int position) {
 		try {
-			PhotoUpload upload = (PhotoUpload) listView
+			TmpContainerSession upload = (TmpContainerSession) listView
 					.getItemAtPosition(position);
-			return upload.getUploadState() != PhotoUpload.STATE_UPLOAD_IN_PROGRESS;
+			return upload.getUploadState() != TmpContainerSession.STATE_UPLOAD_IN_PROGRESS;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

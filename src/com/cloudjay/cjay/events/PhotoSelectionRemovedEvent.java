@@ -18,26 +18,26 @@ package com.cloudjay.cjay.events;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cloudjay.cjay.model.PhotoUpload;
+import com.cloudjay.cjay.model.TmpContainerSession;
 
 public class PhotoSelectionRemovedEvent {
 
-	private final List<PhotoUpload> mUploads;
+	private final List<TmpContainerSession> mUploads;
 
-	public PhotoSelectionRemovedEvent(List<PhotoUpload> uploads) {
+	public PhotoSelectionRemovedEvent(List<TmpContainerSession> uploads) {
 		mUploads = uploads;
 	}
 
-	public PhotoSelectionRemovedEvent(PhotoUpload upload) {
-		mUploads = new ArrayList<PhotoUpload>();
+	public PhotoSelectionRemovedEvent(TmpContainerSession upload) {
+		mUploads = new ArrayList<TmpContainerSession>();
 		mUploads.add(upload);
 	}
 
-	public List<PhotoUpload> getTargets() {
+	public List<TmpContainerSession> getTargets() {
 		return mUploads;
 	}
 
-	public PhotoUpload getTarget() {
+	public TmpContainerSession getTarget() {
 		if (isSingleChange()) {
 			return mUploads.get(0);
 		} else {

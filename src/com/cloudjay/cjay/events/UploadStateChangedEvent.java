@@ -15,17 +15,17 @@
  */
 package com.cloudjay.cjay.events;
 
-import com.cloudjay.cjay.model.PhotoUpload;
+import com.cloudjay.cjay.model.TmpContainerSession;
 
 public class UploadStateChangedEvent {
 
-	 private final PhotoUpload mUpload;
+	 private final TmpContainerSession mUpload;
 	
-	 public UploadStateChangedEvent(PhotoUpload upload) {
+	 public UploadStateChangedEvent(TmpContainerSession upload) {
 	 mUpload = upload;
 	 }
 	
-	 public PhotoUpload getUpload() {
+	 public TmpContainerSession getUpload() {
 	 return mUpload;
 	 }
 

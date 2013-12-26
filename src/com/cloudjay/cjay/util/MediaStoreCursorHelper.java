@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.HashSet;
 
 import com.cloudjay.cjay.model.MediaStoreBucket;
-import com.cloudjay.cjay.model.PhotoUpload;
+import com.cloudjay.cjay.model.TmpContainerSession;
 
 public class MediaStoreCursorHelper {
 
@@ -39,11 +39,11 @@ public class MediaStoreCursorHelper {
 
 	public static final Uri MEDIA_STORE_CONTENT_URI = Images.Media.EXTERNAL_CONTENT_URI;
 
-	public static ArrayList<PhotoUpload> photosCursorToSelectionList(
+	public static ArrayList<TmpContainerSession> photosCursorToSelectionList(
 			Uri contentUri, Cursor cursor) {
-		ArrayList<PhotoUpload> items = new ArrayList<PhotoUpload>(
+		ArrayList<TmpContainerSession> items = new ArrayList<TmpContainerSession>(
 				cursor.getCount());
-		PhotoUpload item;
+		TmpContainerSession item;
 
 		if (cursor.moveToFirst()) {
 			do {
@@ -64,17 +64,17 @@ public class MediaStoreCursorHelper {
 		return items;
 	}
 
-	public static PhotoUpload photosCursorToSelection(Uri contentUri,
+	public static TmpContainerSession photosCursorToSelection(Uri contentUri,
 			Cursor cursor) {
-		PhotoUpload item = null;
+		TmpContainerSession item = null;
 
 		try {
 			File file = new File(cursor.getString(cursor
 					.getColumnIndexOrThrow(ImageColumns.DATA)));
 			if (file.exists()) {
-				item = PhotoUpload
-						.getSelection(contentUri, cursor.getInt(cursor
-								.getColumnIndexOrThrow(ImageColumns._ID)));
+//				item = TmpContainerSession
+//						.getSelection(contentUri, cursor.getInt(cursor
+//								.getColumnIndexOrThrow(ImageColumns._ID)));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

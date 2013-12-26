@@ -29,7 +29,7 @@ import android.view.animation.Animation;
 import com.cloudjay.cjay.adapter.SelectedPhotosViewPagerAdapter;
 import com.cloudjay.cjay.base.PhotupFragmentActivity;
 import com.cloudjay.cjay.listener.OnSingleTapListener;
-import com.cloudjay.cjay.model.PhotoUpload;
+import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.util.CursorPagerAdapter;
 import com.cloudjay.cjay.util.MediaStoreCursorHelper;
 import com.cloudjay.cjay.util.PhotupCursorLoader;
@@ -64,9 +64,9 @@ public class PhotoViewerActivity extends PhotupFragmentActivity implements Loade
 
 	private void resetCurrentPhoto() {
 		PhotoTagItemLayout currentView = getCurrentView();
-		PhotoUpload upload = currentView.getPhotoSelection();
+		TmpContainerSession upload = currentView.getPhotoSelection();
 
-		upload.reset();
+//		upload.reset();
 		reloadView(currentView);
 	}
 
@@ -74,7 +74,7 @@ public class PhotoViewerActivity extends PhotupFragmentActivity implements Loade
 		PhotoTagItemLayout currentView = getCurrentView();
 
 		if (null != currentView) {
-			PhotoUpload upload = currentView.getPhotoSelection();
+			TmpContainerSession upload = currentView.getPhotoSelection();
 
 			if (null != upload) {
 				getSupportActionBar().setTitle(upload.toString());
@@ -171,7 +171,7 @@ public class PhotoViewerActivity extends PhotupFragmentActivity implements Loade
 	private void reloadView(PhotoTagItemLayout currentView) {
 		if (null != currentView) {
 			MultiTouchImageView imageView = currentView.getImageView();
-			PhotoUpload selection = currentView.getPhotoSelection();
+			TmpContainerSession selection = currentView.getPhotoSelection();
 			imageView.requestFullSize(selection, true, false, null);
 		}
 	}

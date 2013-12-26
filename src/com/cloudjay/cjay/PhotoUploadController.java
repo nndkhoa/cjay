@@ -4,21 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.model.PhotoUpload;
+import com.cloudjay.cjay.model.TmpContainerSession;
 
 import android.content.Context;
 
 public class PhotoUploadController {
 
-	private final Context mContext;
-	private final ArrayList<PhotoUpload> mSelectedPhotoList;
-	private final ArrayList<PhotoUpload> mUploadingList;
+	private final ArrayList<TmpContainerSession> mUploadingList;
 
 	PhotoUploadController(Context context) {
-		mContext = context;
-
-		mSelectedPhotoList = new ArrayList<PhotoUpload>();
-		mUploadingList = new ArrayList<PhotoUpload>();
+		mUploadingList = new ArrayList<TmpContainerSession>();
 
 		// populateFromDatabase();
 	}
@@ -29,7 +24,7 @@ public class PhotoUploadController {
 	}
 
 	public synchronized boolean hasWaitingUploads() {
-		for (PhotoUpload upload : mUploadingList) {
+		for (TmpContainerSession upload : mUploadingList) {
 			if (upload.getUploadState() == ContainerSession.STATE_UPLOAD_WAITING) {
 				return true;
 			}
@@ -37,11 +32,11 @@ public class PhotoUploadController {
 		return false;
 	}
 	
-	public void removeUpload(final PhotoUpload selection) {
+	public void removeUpload(final TmpContainerSession selection) {
 		//TODO: FIX ME
 	}
 	
-	public synchronized List<PhotoUpload> getUploadingUploads() {
-		return new ArrayList<PhotoUpload>(mUploadingList);
+	public synchronized List<TmpContainerSession> getUploadingUploads() {
+		return new ArrayList<TmpContainerSession>(mUploadingList);
 	}
 }
