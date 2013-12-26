@@ -36,5 +36,6 @@
     <string name="logout_static">Logout</string>
     <string name="logout">Logout %1$s</string>
     <string name="logout_prompt_title">Are you sure?</string>
+    <string name="album_all">All Photos</string>
 
 </resources>

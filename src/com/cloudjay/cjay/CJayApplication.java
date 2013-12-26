@@ -7,6 +7,8 @@ import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 
+import uk.co.senab.bitmapcache.BitmapLruCache;
+
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
@@ -16,6 +18,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
 
 import com.cloudjay.cjay.model.DatabaseManager;
 import com.cloudjay.cjay.model.IDatabaseManager;
@@ -40,6 +44,9 @@ public class CJayApplication extends Application {
 	private final String LOG_TAG = "CJayApplication";
 	static final float EXECUTOR_POOL_SIZE_PER_CORE = 1.5f;
 	public static final String THREAD_FILTERS = "filters_thread";
+
+	private BitmapLruCache mImageCache;
+	public static final float IMAGE_CACHE_HEAP_PERCENTAGE = 1f / 6f;
 
 	IDatabaseManager databaseManager = null;
 	IHttpRequestWrapper httpRequestWrapper = null;
@@ -189,5 +196,19 @@ public class CJayApplication extends Application {
 			}
 			break;
 		}
+	}
+	
+	@SuppressWarnings("deprecation")
+	public int getSmallestScreenDimension() {
+		WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+		Display display = wm.getDefaultDisplay();
+		return Math.min(display.getHeight(), display.getWidth());
+	}
+	
+	public BitmapLruCache getImageCache() {
+		if (null == mImageCache) {
+			mImageCache = new BitmapLruCache(this, IMAGE_CACHE_HEAP_PERCENTAGE);
+		}
+		return mImageCache;
 	}
 }

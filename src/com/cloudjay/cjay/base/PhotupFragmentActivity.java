@@ -13,20 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.cloudjay.cjay.events;
+package com.cloudjay.cjay.base;
 
-import com.cloudjay.cjay.model.PhotoUpload;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 
-public class UploadStateChangedEvent {
+public class PhotupFragmentActivity extends SherlockFragmentActivity {
 
-	 private final PhotoUpload mUpload;
-	
-	 public UploadStateChangedEvent(PhotoUpload upload) {
-	 mUpload = upload;
-	 }
-	
-	 public PhotoUpload getUpload() {
-	 return mUpload;
-	 }
+	@Override
+	protected void onStart() {
+		super.onStart();
+//		Analytics.onStartSession(this);
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+//		Analytics.onEndSession(this);
+	}
 
 }
