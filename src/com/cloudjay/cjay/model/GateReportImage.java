@@ -3,17 +3,58 @@ package com.cloudjay.cjay.model;
 import java.util.ArrayList;
 import java.util.Date;
 
+import com.cloudjay.cjay.events.UploadStateChangedEvent;
+import com.j256.ormlite.field.DatabaseField;
+
+import de.greenrobot.event.EventBus;
+
 import android.R.integer;
 import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 @SuppressLint("ParcelCreator")
 public class GateReportImage implements Parcelable {
+
+	public static final int STATE_UPLOAD_COMPLETED = 5;
+	public static final int STATE_UPLOAD_ERROR = 4;
+	public static final int STATE_UPLOAD_IN_PROGRESS = 3;
+	public static final int STATE_UPLOAD_WAITING = 2;
+	public static final int STATE_SELECTED = 1;
+	public static final int STATE_NONE = 0;
+
+	public static final String FIELD_STATE = "state";
+	static final String FIELD_URI = "uri";
+
 	private int id;
 	private int type;
 	private String time_posted;
 	private String image_name;
+	@DatabaseField(columnName = FIELD_STATE)
+	private int mState;
+
+	private int mProgress;
+	private Bitmap mBigPictureNotificationBmp;
+
+	public int getUploadState() {
+		return mState;
+	}
+
+	public int getUploadProgress() {
+		return mProgress;
+	}
+
+	public void setUploadProgress(int progress) {
+		if (progress != mProgress) {
+			mProgress = progress;
+			notifyUploadStateListener();
+		}
+	}
+
+	private void notifyUploadStateListener() {
+		EventBus.getDefault().post(new UploadStateChangedEvent(this));
+	}
 
 	public GateReportImage() {
 

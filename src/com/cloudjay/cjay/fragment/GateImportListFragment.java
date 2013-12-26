@@ -50,6 +50,7 @@ public class GateImportListFragment extends SherlockDialogFragment implements
 	private ListView mFeedListView;
 
 	private ArrayList<ContainerSession> mFeeds;
+	private FunDapter<ContainerSession> mAdapter;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -71,6 +72,14 @@ public class GateImportListFragment extends SherlockDialogFragment implements
 		initFunDapter(mFeeds);
 
 		return view;
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListContainerSessions(getActivity());
+		mAdapter.updateData(mFeeds);
 	}
 
 	@Override
@@ -239,11 +248,11 @@ public class GateImportListFragment extends SherlockDialogFragment implements
 					}
 				});
 
-		FunDapter<ContainerSession> adapter = new FunDapter<ContainerSession>(
+		mAdapter = new FunDapter<ContainerSession>(
 				getActivity(), containers, R.layout.list_item_container,
 				feedsDict);
 
-		mFeedListView.setAdapter(adapter);
+		mFeedListView.setAdapter(mAdapter);
 
 	}
 

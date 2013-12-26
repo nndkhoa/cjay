@@ -57,8 +57,7 @@ public class GateExportListFragment extends SherlockDialogFragment {
 					int count) {
 			}
 		});
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListContainerSessions(getActivity());
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListContainerSessions(getActivity());
 		initFunDapter(mFeeds);
 	}
 

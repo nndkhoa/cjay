@@ -15,18 +15,19 @@
  */
 package com.cloudjay.cjay.events;
 
+import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.model.TmpContainerSession;
 
 public class UploadStateChangedEvent {
 
-	 private final TmpContainerSession mUpload;
-	
-	 public UploadStateChangedEvent(TmpContainerSession upload) {
-	 mUpload = upload;
-	 }
-	
-	 public TmpContainerSession getUpload() {
-	 return mUpload;
-	 }
+	private final GateReportImage mUpload;
+
+	public UploadStateChangedEvent(GateReportImage upload) {
+		mUpload = upload;
+	}
+
+	public GateReportImage getUpload() {
+		return mUpload;
+	}
 
 }

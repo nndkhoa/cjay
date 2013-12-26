@@ -30,6 +30,7 @@ import com.cloudjay.cjay.PhotoUploadController;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadsListBaseAdapter;
 import com.cloudjay.cjay.events.PhotoSelectionRemovedEvent;
+import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener.OnDismissCallback;
@@ -94,48 +95,49 @@ public class UploadsFragment extends SherlockFragment implements
 		}
 	}
 
-//	private void openFacebookProgressDialog() {
-//		closeFacebookProgressDialog();
-//
-//		mOpeningFacebookDialog = new ProgressDialog(getActivity());
-//		mOpeningFacebookDialog.setMessage(getString(R.string.opening_app));
-//		mOpeningFacebookDialog.show();
-//	}
+	// private void openFacebookProgressDialog() {
+	// closeFacebookProgressDialog();
+	//
+	// mOpeningFacebookDialog = new ProgressDialog(getActivity());
+	// mOpeningFacebookDialog.setMessage(getString(R.string.opening_app));
+	// mOpeningFacebookDialog.show();
+	// }
 
 	public void onItemClick(AdapterView<?> l, View view, int position, long id) {
-		TmpContainerSession upload = (TmpContainerSession) l.getItemAtPosition(position);
+		TmpContainerSession upload = (TmpContainerSession) l
+				.getItemAtPosition(position);
 		if (null != upload
 				&& upload.getUploadState() == TmpContainerSession.STATE_UPLOAD_COMPLETED) {
 
-//			String postId = upload.getResultPostId();
-//			if (null != postId) {
-//				final Intent intent = new Intent(Intent.ACTION_VIEW);
-//
-//				try {
-//					intent.setData(Uri.parse("fb://post/" + postId));
-//					startActivity(intent);
-////					openFacebookProgressDialog();
-//					return;
-//				} catch (Exception e) {
-//					// Facebook not installed
-//				}
-//
-//				try {
-//					intent.setData(Uri.parse("fplusfree://post?id=" + postId));
-//					startActivity(intent);
-//					return;
-//				} catch (Exception e) {
-//					// Friendcaster Free not installed
-//				}
-//
-//				try {
-//					intent.setData(Uri.parse("fplus://post?id=" + postId));
-//					startActivity(intent);
-//					return;
-//				} catch (Exception e) {
-//					// Friendcaster Pro not installed
-//				}
-//			}
+			// String postId = upload.getResultPostId();
+			// if (null != postId) {
+			// final Intent intent = new Intent(Intent.ACTION_VIEW);
+			//
+			// try {
+			// intent.setData(Uri.parse("fb://post/" + postId));
+			// startActivity(intent);
+			// // openFacebookProgressDialog();
+			// return;
+			// } catch (Exception e) {
+			// // Facebook not installed
+			// }
+			//
+			// try {
+			// intent.setData(Uri.parse("fplusfree://post?id=" + postId));
+			// startActivity(intent);
+			// return;
+			// } catch (Exception e) {
+			// // Friendcaster Free not installed
+			// }
+			//
+			// try {
+			// intent.setData(Uri.parse("fplus://post?id=" + postId));
+			// startActivity(intent);
+			// return;
+			// } catch (Exception e) {
+			// // Friendcaster Pro not installed
+			// }
+			// }
 		}
 	}
 
@@ -146,7 +148,7 @@ public class UploadsFragment extends SherlockFragment implements
 	public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
 		try {
 			for (int i = 0, z = reverseSortedPositions.length; i < z; i++) {
-				TmpContainerSession upload = (TmpContainerSession) listView
+				GateReportImage upload = (GateReportImage) listView
 						.getItemAtPosition(reverseSortedPositions[i]);
 				mPhotoSelectionController.removeUpload(upload);
 			}
@@ -158,9 +160,9 @@ public class UploadsFragment extends SherlockFragment implements
 
 	public boolean canDismiss(AbsListView listView, int position) {
 		try {
-			TmpContainerSession upload = (TmpContainerSession) listView
+			GateReportImage upload = (GateReportImage) listView
 					.getItemAtPosition(position);
-			return upload.getUploadState() != TmpContainerSession.STATE_UPLOAD_IN_PROGRESS;
+			return upload.getUploadState() != GateReportImage.STATE_UPLOAD_IN_PROGRESS;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

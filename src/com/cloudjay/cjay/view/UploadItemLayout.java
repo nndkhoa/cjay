@@ -25,13 +25,14 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
+import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.model.TmpContainerSession;
 
 import de.greenrobot.event.EventBus;
 
 public class UploadItemLayout extends LinearLayout {
 
-	private TmpContainerSession mSelection;
+	private GateReportImage mSelection;
 
 	public UploadItemLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -73,19 +74,19 @@ public class UploadItemLayout extends LinearLayout {
 		ImageView resultIv = getResultImageView();
 
 		switch (mSelection.getUploadState()) {
-		case TmpContainerSession.STATE_UPLOAD_COMPLETED:
+		case GateReportImage.STATE_UPLOAD_COMPLETED:
 			pb.setVisibility(View.GONE);
 			resultIv.setImageResource(R.drawable.ic_success);
 			resultIv.setVisibility(View.VISIBLE);
 			break;
 
-		case TmpContainerSession.STATE_UPLOAD_ERROR:
+		case GateReportImage.STATE_UPLOAD_ERROR:
 			pb.setVisibility(View.GONE);
 			resultIv.setImageResource(R.drawable.ic_error);
 			resultIv.setVisibility(View.VISIBLE);
 			break;
 
-		case TmpContainerSession.STATE_UPLOAD_IN_PROGRESS:
+		case GateReportImage.STATE_UPLOAD_IN_PROGRESS:
 			pb.setVisibility(View.VISIBLE);
 			resultIv.setVisibility(View.GONE);
 
@@ -98,7 +99,7 @@ public class UploadItemLayout extends LinearLayout {
 			}
 			break;
 
-		case TmpContainerSession.STATE_UPLOAD_WAITING:
+		case GateReportImage.STATE_UPLOAD_WAITING:
 			pb.setVisibility(View.VISIBLE);
 			resultIv.setVisibility(View.GONE);
 			pb.setIndeterminate(true);
@@ -108,7 +109,7 @@ public class UploadItemLayout extends LinearLayout {
 		requestLayout();
 	}
 
-	public void setPhotoSelection(TmpContainerSession selection) {
+	public void setPhotoSelection(GateReportImage selection) {
 		mSelection = selection;
 
 		/**
