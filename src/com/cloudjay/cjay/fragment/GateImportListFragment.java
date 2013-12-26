@@ -6,18 +6,14 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,6 +22,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
+import com.actionbarsherlock.view.Menu;
 import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
@@ -40,17 +37,24 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Session;
 import com.cloudjay.cjay.util.StringHelper;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Click;
 import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.ItemClick;
+import com.googlecode.androidannotations.annotations.ItemLongClick;
+import com.googlecode.androidannotations.annotations.OptionsItem;
+import com.googlecode.androidannotations.annotations.OptionsMenu;
+import com.googlecode.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_gate_import)
-public class GateImportListFragment extends SherlockDialogFragment implements
-		OnClickListener, OnItemClickListener, OnItemLongClickListener {
+@OptionsMenu(R.menu.menu_gate_import)
+public class GateImportListFragment extends SherlockDialogFragment {
 
 	private final static String TAG = "GateImportListFragment";
 
-	private Button mAddNewBtn;
-
-	private ListView mFeedListView;
+	@ViewById(R.id.btn_add_new) Button mAddNewBtn;
+	@ViewById(R.id.feeds) ListView mFeedListView;
+	
 	private ListView mOperatorListView;
 	private EditText mOperatorEditText;
 	
@@ -64,29 +68,63 @@ public class GateImportListFragment extends SherlockDialogFragment implements
 	
 	private Dialog mNewContainerDialog;
 	private Dialog mSearchOperatorDialog;
+	
+	private ContainerSession mSelectedContainerSession;
+	
+	@OptionsItem(R.id.menu_camera)
+	void cameraMenuItemSelected() {
+		// TODO
+	}
+	
+	@OptionsItem(R.id.menu_edit_container)
+	void editMenuItemSelected() {
+		// TODO
+	}
+	
+	@OptionsItem(R.id.menu_upload)
+	void uploadMenuItemSelected() {
+		// TODO
+	}
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	@AfterViews
+	void afterViews() {
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListContainerSessions(getActivity());
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
 				.getListOperators(getActivity()); 
-	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_gate_import, container, false);
-
-		mAddNewBtn = (Button) view.findViewById(R.id.btn_add_new);
-		mAddNewBtn.setOnClickListener(this);
-
-		mFeedListView = (ListView) view.findViewById(R.id.feeds);
-		mFeedListView.setOnItemClickListener(this);
 		initContainerFeedAdapter(mFeeds);
-
-		return view;
+		
+		mSelectedContainerSession = null;
+	}
+	
+	@Click(R.id.btn_add_new)
+	void addContainerClicked() {
+		showDialogNewContainer();		
+	}
+	
+	@ItemClick(R.id.feeds)
+	void listItemClicked(int position) {
+		// clear current selection
+		mSelectedContainerSession = null;
+		getActivity().invalidateOptionsMenu();
+		
+		android.util.Log.d(TAG, "Show item at position: " + position);
+	}
+	
+	@ItemLongClick(R.id.feeds)
+	void listItemLongClicked(int position) {
+		// refresh menu
+		mSelectedContainerSession = mFeedsAdapter.getItem(position);
+		getActivity().invalidateOptionsMenu();
+	}
+	
+	@Override
+	public void onPrepareOptionsMenu(Menu menu) {
+		boolean isDisplayed = !(mSelectedContainerSession == null);
+		menu.findItem(R.id.menu_camera).setVisible(isDisplayed);
+		menu.findItem(R.id.menu_edit_container).setVisible(isDisplayed);
+		menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
 	}
 	
 	@Override
@@ -95,11 +133,6 @@ public class GateImportListFragment extends SherlockDialogFragment implements
 		
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListContainerSessions(getActivity());
 		mFeedsAdapter.updateData(mFeeds);
-	}
-
-	@Override
-	public void onClick(View view) {
-		showDialogNewContainer();
 	}
 	
 	private void showDialogNewContainer() {
@@ -224,7 +257,12 @@ public class GateImportListFragment extends SherlockDialogFragment implements
 		
 		mOperatorEditText = (EditText) searchOperatorView.findViewById(R.id.dialog_operator_name);
 		mOperatorListView = (ListView) searchOperatorView.findViewById(R.id.dialog_operator_list);
-		mOperatorListView.setOnItemClickListener(this);
+		mOperatorListView.setOnItemClickListener(new OnItemClickListener() {
+			public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
+				operatorName = mOperators.get(position).getName();
+				mOperatorEditText.setText(operatorName);
+			}
+		});
 		initContainerOperatorAdapter(mOperators);
 		
 		if (operatorName != null) {
@@ -345,25 +383,5 @@ public class GateImportListFragment extends SherlockDialogFragment implements
 
 		mFeedListView.setAdapter(mFeedsAdapter);
 
-	}
-
-	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position,
-			long id) {
-		if (view == mFeedListView) {
-			android.util.Log.d(TAG, "Show item at position: " + position);
-		} else {
-			operatorName = mOperators.get(position).getName();
-			mOperatorEditText.setText(operatorName);
-		}
-	}
-
-	@Override
-	public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2,
-			long arg3) {
-
-		// TODO: display menu item
-
-		return false;
 	}
 }

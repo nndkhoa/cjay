@@ -14,13 +14,13 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
+import com.actionbarsherlock.view.Menu;
 import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.ami.fundapter.interfaces.ItemClickListener;
 import com.cloudjay.cjay.*;
-import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.util.DataCenter;
@@ -28,13 +28,19 @@ import com.cloudjay.cjay.util.Mapper;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ItemClick;
+import com.googlecode.androidannotations.annotations.ItemLongClick;
+import com.googlecode.androidannotations.annotations.OptionsItem;
+import com.googlecode.androidannotations.annotations.OptionsMenu;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_gate_export)
+@OptionsMenu(R.menu.menu_gate_export)
 public class GateExportListFragment extends SherlockDialogFragment {
 
 	private ArrayList<ContainerSession> mFeeds;
-	private FunDapter<ContainerSession> mAdapter;
+	private FunDapter<ContainerSession> mFeedsAdapter;
+	
+	private ContainerSession mSelectedContainerSession;
 
 	@ViewById(R.id.container_list)
 	ListView mFeedListView;
@@ -60,6 +66,44 @@ public class GateExportListFragment extends SherlockDialogFragment {
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListContainerSessions(getActivity());
 		initFunDapter(mFeeds);
 	}
+	
+	@OptionsItem(R.id.menu_upload)
+	void uploadMenuItemSelected() {
+		// TODO
+	}
+
+	@ItemClick(R.id.container_list)
+	void listItemClicked(int position) {
+		// clear current selection
+		mSelectedContainerSession = null;
+		getActivity().invalidateOptionsMenu();
+		
+		// get the selected container session
+		ContainerSession containerSession = mFeedsAdapter.getItem(position);
+		TmpContainerSession tmpContainerSession = Mapper.toTmpContainerSession(
+				containerSession, getActivity());
+
+		// Pass tmpContainerSession away
+		// Then start showing the Camera
+		Intent intent = new Intent(getActivity(), CameraActivity_.class);
+		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+				tmpContainerSession);
+		intent.putExtra("type", 1); // in
+		startActivity(intent);
+	}
+	
+	@ItemLongClick(R.id.container_list)
+	void listItemLongClicked(int position) {
+		// refresh menu
+		mSelectedContainerSession = mFeedsAdapter.getItem(position);
+		getActivity().invalidateOptionsMenu();
+	}
+	
+	@Override
+	public void onPrepareOptionsMenu(Menu menu) {
+		boolean isDisplayed = !(mSelectedContainerSession == null);
+		menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
+	}
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -76,25 +120,9 @@ public class GateExportListFragment extends SherlockDialogFragment {
 		// Hector: will update UI here
 	}
 
-	@ItemClick(R.id.container_list)
-	void containerItemClick(int position) {
-		ContainerSession containerSession = mAdapter.getItem(position);
-
-		TmpContainerSession tmpContainerSession = Mapper.toTmpContainerSession(
-				containerSession, getActivity());
-
-		// Pass tmpContainerSession away
-		// Then start showing the Camera
-		Intent intent = new Intent(getActivity(), CameraActivity_.class);
-		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-				tmpContainerSession);
-		intent.putExtra("type", 1); // in
-		startActivity(intent);
-	}
-
 	private void search(String searchText) {
 		if (searchText.equals("")) {
-			mAdapter.updateData(mFeeds);
+			mFeedsAdapter.updateData(mFeeds);
 		} else {
 			ArrayList<ContainerSession> searchFeeds = new ArrayList<ContainerSession>();
 			for (ContainerSession containerSession : mFeeds) {
@@ -103,7 +131,7 @@ public class GateExportListFragment extends SherlockDialogFragment {
 				}
 			}
 			// refresh list
-			mAdapter.updateData(searchFeeds);
+			mFeedsAdapter.updateData(searchFeeds);
 		}
 	}
 
@@ -151,8 +179,8 @@ public class GateExportListFragment extends SherlockDialogFragment {
 				// TODO Auto-generated method stub
 			}
 		});
-		mAdapter = new FunDapter<ContainerSession>(getActivity(), containers,
+		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(), containers,
 				R.layout.list_item_container, feedsDict);
-		mFeedListView.setAdapter(mAdapter);
+		mFeedListView.setAdapter(mFeedsAdapter);
 	}
 }

@@ -19,7 +19,6 @@
     <string name="alert_no_network">Hãy bật kết nối mạng</string>
 
     <!--  -->
-
     <string name="stop_uploads">Stop Uploading</string>
     <string name="start_uploads">Start Uploading</string>
     <string name="stopped_uploads">Uploading is Disabled</string>
@@ -37,5 +36,9 @@
     <string name="logout">Logout %1$s</string>
     <string name="logout_prompt_title">Are you sure?</string>
     <string name="album_all">All Photos</string>
-
+    
+    <!-- menu titles -->
+	<string name="menu_camera_title">Chụp hình</string>
+	<string name="menu_edit_container_title">Sửa thông tin container</string>
+	<string name="menu_upload_title">Tải lên</string>
 </resources>
