@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import android.R.integer;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -37,13 +38,18 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.aerilys.helpers.android.UIHelper;
+import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.UploadItem;
 import com.cloudjay.cjay.dao.UploadItemDaoImpl;
+import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.network.UploadIntentService;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Mapper;
 import com.cloudjay.cjay.util.StringHelper;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Background;
@@ -101,6 +107,9 @@ public class CameraActivity extends Activity {
 
 	@Extra("cjay_container_session")
 	TmpContainerSession tmpContainerSession;
+
+	@Extra("type")
+	int type = 0;
 
 	// endregion
 
@@ -607,8 +616,34 @@ public class CameraActivity extends Activity {
 	void doneButtonClicked() {
 
 		// TODO: this is the list
+
+		List<GateReportImage> gateReportImages = new ArrayList<GateReportImage>();
 		for (String photo : photos) {
 			// TODO: do something
+
+			GateReportImage tmp = new GateReportImage(
+					type,
+					StringHelper
+							.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT),
+					photo);
+
+			gateReportImages.add(tmp);
+		}
+
+		tmpContainerSession.setGateReportImages(gateReportImages);
+
+		ContainerSession containerSession = Mapper.toContainerSession(
+				tmpContainerSession, CameraActivity.this);
+
+		try {
+			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
+					.getInstance().getDatabaseManager().getHelper(this)
+					.getContainerSessionDaoImpl();
+			containerSessionDaoImpl.addContainerSessions(containerSession);
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		this.onBackPressed();

@@ -3,6 +3,7 @@ package com.cloudjay.cjay.model;
 import java.util.ArrayList;
 import java.util.Date;
 
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -13,6 +14,24 @@ public class GateReportImage implements Parcelable {
 	private int type;
 	private String time_posted;
 	private String image_name;
+
+	public GateReportImage() {
+
+	}
+
+	public GateReportImage(int id, int type, String time_posted,
+			String image_name) {
+		this.id = id;
+		this.type = type;
+		this.time_posted = time_posted;
+		this.image_name = image_name;
+	}
+
+	public GateReportImage(int type, String time_posted, String image_name) {
+		this.type = type;
+		this.time_posted = time_posted;
+		this.image_name = image_name;
+	}
 
 	public int getId() {
 		return id;

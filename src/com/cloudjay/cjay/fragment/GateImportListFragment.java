@@ -166,6 +166,7 @@ public class GateImportListFragment extends SherlockDialogFragment implements
 										CameraActivity_.class);
 								intent.putExtra("cjay_container_session",
 										newTmpContainer);
+								intent.putExtra("type", 0); // in
 								startActivity(intent);
 							}
 						})
