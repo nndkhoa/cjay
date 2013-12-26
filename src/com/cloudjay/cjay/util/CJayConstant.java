@@ -43,6 +43,9 @@ public final class CJayConstant {
 
 	public static final String LIST_CONTAINER_SESSIONS = API_ROOT
 			+ "cjay/container-sessions";
+	
+	public static final String CJAY_ITEMS = API_ROOT
+			+ "cjay/container-items.json";
 
 	public static final String LIST_CONTAINER_SESSIONS_WITH_DATETIME = API_ROOT
 			+ "cjay/container-sessions.json?created_after=%s";
@@ -83,6 +86,7 @@ public final class CJayConstant {
 	public static final int SELECT_PHOTO = 101;
 
 	public static final String CJAY_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
+	public static final String CJAY_UPLOAD_DATETIME_FORMAT = "yyyy-MM-dd";
 
 	public static final long SCALE_ANIMATION_DURATION_FULL_DISTANCE = 800;
 	public static final String PREF_UPLOADS_PAUSED = "pref_uploads_paused";

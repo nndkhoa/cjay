@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Upload Image -->
+    <string name="lbl_confirm_reupload_delete">Do you want to Re-upload or Delete this?</string>
+    <string name="btn_reupload">Re-upload</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_delete">Delete</string>
+    <string name="btn_retry_message">Click Re-upload to retry, Delete to remove and Cancel to decice later.</string>
+    <string name="upload_complete_title">Upload complete</string>
+    <string name="upload_complete_msg">Click to see detail.</string>
+    <string name="upload_completing_title">Completing</string>
+    <string name="upload_completing_msg">Please wait a little bit.</string>
+    <string name="upload_failed_title">Upload failed. Click to Try again or Delete!</string>
+    <string name="upload_failed_msg">Upload failed. Click to Try again or Delete!</string>
+    <string name="upload_processing_title">Picture Uploading</string>
+    <string name="upload_processing_msg">Upload in Progress</string>
+</resources>

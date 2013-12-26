@@ -3,8 +3,8 @@ package com.cloudjay.cjay;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,12 +37,13 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.aerilys.helpers.android.UIHelper;
-import com.cloudjay.cjay.model.GateReportImage;
-import com.cloudjay.cjay.model.TmpContainerSession;
+import com.cloudjay.cjay.dao.UploadItem;
+import com.cloudjay.cjay.dao.UploadItemDaoImpl;
+import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.network.UploadIntentService;
 import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.Mapper;
+import com.cloudjay.cjay.util.StringHelper;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Background;
 import com.googlecode.androidannotations.annotations.Click;
@@ -368,7 +369,10 @@ public class CameraActivity extends Activity {
 
 		// Save Bitmap to JPEG
 		saveBitmap(capturedBitmap, photo);
-
+		
+		// Upload image
+		uploadImage(uuid, photo.getAbsolutePath());
+		
 		if (capturedBitmap != null) {
 			capturedBitmap.recycle();
 			capturedBitmap = null;
@@ -605,6 +609,38 @@ public class CameraActivity extends Activity {
 		this.onBackPressed();
 	}
 
+	void uploadImage(String uuid, String filename) {
+		itemId = uuid;
+
+		String depotCode = com.cloudjay.cjay.util.Session.restore(this).getCurrentUser().getDepotCode();
+		String time = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_UPLOAD_DATETIME_FORMAT);
+		String finalURL = String.format("gate-in-%s-%s-%s.jpg", depotCode, time, uuid);
+
+		// Create Database Entity Object
+		UploadItem uploadItem = new UploadItem();
+
+		// Set Uploading Status
+		uploadItem.setUploadStatus(0);
+		uploadItem.setUUID(uuid);
+		uploadItem.setTmpImgUri(itemUri);
+		uploadItem.setNoteStatus(false);
+		uploadItem.setImageURL(finalURL);
+		try {
+			UploadItemDaoImpl uploadList = CJayClient.getInstance()
+					.getDatabaseManager().getHelper(getApplicationContext())
+					.getUploadItemImpl();
+			uploadList.addItem(uploadItem);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		Intent uploadIntent = new Intent(this, UploadIntentService.class);
+		uploadIntent.putExtra("uuid", uuid);
+		uploadIntent.putExtra("tmpImgUri", itemUri);
+		startService(uploadIntent);
+
+	}
 	// endregion
 
 	// region Camera Support method

@@ -17,12 +17,12 @@ import android.content.Context;
 import android.provider.Settings.Secure;
 import android.util.Log;
 
-import com.cloudjay.cjay.CJayActivity;
+import com.aerilys.helpers.android.NetworkHelper;
+import com.aerilys.helpers.android.UIHelper;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
-import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.CJayResourceStatus;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.DamageCode;
@@ -32,9 +32,9 @@ import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Mapper;
 import com.cloudjay.cjay.util.PreferencesUtil;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Session;
 import com.cloudjay.cjay.util.StringHelper;
 import com.google.gson.Gson;
@@ -42,7 +42,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
-import com.j256.ormlite.dao.ForeignCollection;
 
 /**
  * 
@@ -539,5 +538,25 @@ public class CJayClient implements ICJayClient {
 
 		List<CJayResourceStatus> items = gson.fromJson(response, listType);
 		return items;
+	}
+	
+	@Override
+	public void uploadItem(Context ctx, TmpContainerSession item) {
+
+		try {
+			if (NetworkHelper.isConnected(ctx)) {
+				HashMap<String, String> headers = prepareHeadersWithToken(ctx);
+				Gson gson = new Gson();
+				String data = gson.toJson(item);
+				String url = CJayConstant.CJAY_ITEMS;
+				requestWrapper.sendPost(url, data, "application/json", headers);
+			} else {
+				Logger.Log("Network is not available");
+				UIHelper.toast(ctx, "Network is not available");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 }

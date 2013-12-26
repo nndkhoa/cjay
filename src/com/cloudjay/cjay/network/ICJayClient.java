@@ -5,14 +5,15 @@ import java.util.List;
 
 import org.json.JSONException;
 
+import android.content.Context;
+
 import com.cloudjay.cjay.model.CJayResourceStatus;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.RepairCode;
+import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.model.User;
-
-import android.content.Context;
 
 public interface ICJayClient {
 
@@ -56,5 +57,5 @@ public interface ICJayClient {
 	//
 	// ItemModel getItemModel(Context ctx, UserModel currentUser, int itemId);
 
-	// void uploadItem(Context ctx, ItemModel item);
+	void uploadItem(Context ctx, TmpContainerSession item);
 }

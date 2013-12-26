@@ -1,5 +1,11 @@
 package com.cloudjay.cjay.model;
 
+import java.sql.SQLException;
+
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -8,20 +14,15 @@ import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
+import com.cloudjay.cjay.dao.UploadItem;
+import com.cloudjay.cjay.dao.UploadItemDaoImpl;
 import com.cloudjay.cjay.dao.UserDaoImpl;
-import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Logger;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
-
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
-
-import java.sql.SQLException;
 
 /**
  * Database helper class used to manage the creation and upgrading of your
@@ -47,6 +48,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	DamageCodeDaoImpl damageCodeDaoImpl = null;
 	DepotDaoImpl depotDaoImpl = null;
 	RepairCodeDaoImpl repairCodeDaoImpl = null;
+	UploadItemDaoImpl uploadItemDeoImpl = null;
 
 	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -187,5 +189,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 					this.getConnectionSource(), RepairCode.class);
 		}
 		return repairCodeDaoImpl;
+	}
+
+	public UploadItemDaoImpl getUploadItemImpl() throws SQLException {
+		if (null == uploadItemDeoImpl) {
+			uploadItemDeoImpl = DaoManager.createDao(
+					this.getConnectionSource(), UploadItem.class);
+		}
+		return uploadItemDeoImpl;
 	}
 }
