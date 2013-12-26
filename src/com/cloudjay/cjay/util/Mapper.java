@@ -28,6 +28,38 @@ public class Mapper {
 
 	private static IDatabaseManager databaseManager = null;
 
+	public static TmpContainerSession toTmpContainerSession(
+			ContainerSession containerSession, Context ctx) {
+
+		TmpContainerSession tmpContainerSession = new TmpContainerSession();
+
+		tmpContainerSession.setOperatorCode(containerSession.getOperatorName());
+		tmpContainerSession.setDepotCode(containerSession.getContainer()
+				.getDepot().getDepotCode());
+		tmpContainerSession.setContainerId(containerSession.getContainerId());
+		tmpContainerSession.setCheckInTime(containerSession.getCheckInTime());
+		tmpContainerSession.setCheckOutTime(StringHelper
+				.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT));
+
+		List<CJayImage> cJayImages = (List<CJayImage>) containerSession
+				.getCJayImages();
+
+		List<GateReportImage> gateReportImages = new ArrayList<GateReportImage>();
+
+		for (CJayImage cJayImage : cJayImages) {
+			gateReportImages.add(new GateReportImage(cJayImage.getType(),
+					cJayImage.getTimePosted(), cJayImage.getImageName()));
+		}
+
+		tmpContainerSession.setGateReportImages(gateReportImages);
+
+		if (gateReportImages.isEmpty() == false)
+			tmpContainerSession.setImageIdPath(gateReportImages.get(0)
+					.getImageName());
+
+		return tmpContainerSession;
+	}
+
 	public static ContainerSession toContainerSession(
 			TmpContainerSession tmpSession, Context ctx) {
 

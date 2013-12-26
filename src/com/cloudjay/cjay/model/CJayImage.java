@@ -22,7 +22,7 @@ public class CJayImage {
 	public CJayImage(int id, int type, String time_posted, String image_name) {
 		this.id = id;
 		this.setType(type);
-		this.image_name = image_name;
+		this.setImageName(image_name);
 		this.time_posted = time_posted;
 	}
 
@@ -80,6 +80,14 @@ public class CJayImage {
 
 	public void setContainerSession(ContainerSession containerSession) {
 		this.containerSession = containerSession;
+	}
+
+	public String getImageName() {
+		return image_name;
+	}
+
+	public void setImageName(String image_name) {
+		this.image_name = image_name;
 	}
 
 }

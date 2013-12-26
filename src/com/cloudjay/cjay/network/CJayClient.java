@@ -185,6 +185,10 @@ public class CJayClient implements ICJayClient {
 				Logger.Log(LOG_TAG, "get updated list container sessions");
 				Date date = new Date();
 				containerSessions = getContainerSessions(ctx, date);
+
+				if (containerSessions == null) {
+					Logger.Log(LOG_TAG, "No new container session");
+				}
 			}
 			containerSessionDaoImpl.addListContainerSessions(containerSessions);
 
