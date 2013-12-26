@@ -47,6 +47,10 @@ public class StringHelper {
 	@SuppressLint("SimpleDateFormat")
 	public static String getRelativeDate(String date) {
 
+		if (date == "") {
+			return "";
+		}
+
 		Date now = new Date();
 
 		// 2013-11-10T21:05:24+08:00
@@ -57,7 +61,8 @@ public class StringHelper {
 		try {
 			convertedDate = dateFormat.parse(date);
 		} catch (ParseException e) {
-			e.printStackTrace();
+			// e.printStackTrace();
+			return "";
 		}
 
 		String timeString = DateUtils.getRelativeTimeSpanString(

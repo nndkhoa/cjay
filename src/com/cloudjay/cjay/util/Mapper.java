@@ -110,6 +110,8 @@ public class Mapper {
 			for (GateReportImage gateReportImage : tmpSession
 					.getGateReportImages()) {
 
+				Logger.Log(Integer.toString(gateReportImage.getId()));
+
 				CJayImage image = new CJayImage(gateReportImage.getId(),
 						gateReportImage.getType(),
 						gateReportImage.getTimePosted(),

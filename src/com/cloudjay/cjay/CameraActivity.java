@@ -77,6 +77,8 @@ public class CameraActivity extends Activity {
 	String flashMode;
 	int cameraMode;
 
+	private final String LOG_TAG = "CameraActivity";
+
 	private List<String> photos;
 
 	private static final int PICTURE_SIZE_MAX_WIDTH = 1920;
@@ -362,7 +364,6 @@ public class CameraActivity extends Activity {
 			out.close();
 
 			Logger.Log("Path: " + filename.getAbsolutePath());
-
 			photos.add(filename.getAbsolutePath());
 
 		} catch (Exception e) {
@@ -378,14 +379,30 @@ public class CameraActivity extends Activity {
 
 		// Save Bitmap to Files
 		String uuid = UUID.randomUUID().toString();
-		String fileName = uuid + ".jpg";
+		// gate-in-[depot-id]-2013-12-19-[UUID].jpg
+
+		String imageType;
+		switch (type) {
+		case 0:
+			imageType = "in";
+			break;
+		case 1:
+		default:
+			imageType = "out";
+			break;
+		}
+
+		String fileName = "gate-" + imageType + "-"
+				+ tmpContainerSession.getDepotCode()
+				+ StringHelper.getCurrentTimestamp("yyyy-mm-dd") + "-" + uuid
+				+ ".jpg";
 		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
 
 		// Save Bitmap to JPEG
 		saveBitmap(capturedBitmap, photo);
 
 		// Upload image
-		uploadImage(uuid, photo.getAbsolutePath());
+		// uploadImage(uuid, photo.getAbsolutePath());
 
 		if (capturedBitmap != null) {
 			capturedBitmap.recycle();
@@ -615,7 +632,7 @@ public class CameraActivity extends Activity {
 	@Click(R.id.btn_camera_done)
 	void doneButtonClicked() {
 
-		// TODO: this is the list
+		Logger.Log(LOG_TAG, "doneButtonClicked()");
 
 		List<GateReportImage> gateReportImages = new ArrayList<GateReportImage>();
 		for (String photo : photos) {
