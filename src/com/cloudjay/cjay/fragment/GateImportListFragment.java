@@ -24,7 +24,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.ami.fundapter.BindDictionary;
@@ -43,11 +42,11 @@ import com.cloudjay.cjay.util.Session;
 import com.cloudjay.cjay.util.StringHelper;
 import com.googlecode.androidannotations.annotations.EFragment;
 
-@EFragment(R.layout.fragment_feeds)
+@EFragment(R.layout.fragment_gate_import)
 public class GateImportListFragment extends SherlockDialogFragment implements
 		OnClickListener, OnItemClickListener, OnItemLongClickListener {
 
-	private final static String TAG = "FeedListFragment";
+	private final static String TAG = "GateImportListFragment";
 
 	private Button mAddNewBtn;
 
@@ -78,7 +77,7 @@ public class GateImportListFragment extends SherlockDialogFragment implements
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_feeds, container, false);
+		View view = inflater.inflate(R.layout.fragment_gate_import, container, false);
 
 		mAddNewBtn = (Button) view.findViewById(R.id.btn_add_new);
 		mAddNewBtn.setOnClickListener(this);
