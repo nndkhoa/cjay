@@ -122,7 +122,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	
 	@Click(R.id.btn_add_new)
 	void addContainerClicked() {
-		showContainerDialog(CONTAINER_DIALOG_ADD);		
+		handleAddContainer();	
 	}
 	
 	@ItemClick(R.id.feeds)
@@ -155,6 +155,10 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListContainerSessions(getActivity());
 		mFeedsAdapter.updateData(mFeeds);
+	}
+	
+	public void handleAddContainer() {
+		showContainerDialog(CONTAINER_DIALOG_ADD);
 	}
 	
 	private void showContainerDialog(int mode) {
@@ -307,7 +311,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 				mOperatorEditText.setText(mOperatorName);
 				
 				// Go back
-				mSearchOperatorDialog.cancel();
+				mSearchOperatorDialog.dismiss();
 				showContainerDialog(dialogMode);
 			}
 		});

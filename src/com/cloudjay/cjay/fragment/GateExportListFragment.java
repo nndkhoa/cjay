@@ -3,12 +3,12 @@ package com.cloudjay.cjay.fragment;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.TextureView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -24,12 +24,15 @@ import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.ami.fundapter.interfaces.ItemClickListener;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.CameraActivity_;
+import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.listener.OnContainerAddRequestListener;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Mapper;
 import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Click;
 import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ItemClick;
 import com.googlecode.androidannotations.annotations.ItemLongClick;
@@ -40,7 +43,7 @@ import com.googlecode.androidannotations.annotations.ViewById;
 @EFragment(R.layout.fragment_gate_export)
 @OptionsMenu(R.menu.menu_gate_export)
 public class GateExportListFragment extends SherlockDialogFragment {
-
+	private OnContainerAddRequestListener mCallback;
 	private ArrayList<ContainerSession> mFeeds;
 	private FunDapter<ContainerSession> mFeedsAdapter;
 	
@@ -75,6 +78,11 @@ public class GateExportListFragment extends SherlockDialogFragment {
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 		// TODO
+	}
+	
+	@Click(R.id.add_button)
+	void addButtonClicked() {
+		mCallback.OnContainerAddRequested();
 	}
 
 	@ItemClick(R.id.container_list)
@@ -119,6 +127,16 @@ public class GateExportListFragment extends SherlockDialogFragment {
 		return dialog;
 	}
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mCallback = (OnContainerAddRequestListener)activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnContainerAddRequestListener");
+        }
+    }
+    
 	@Override
 	public void onResume() {
 		super.onResume();

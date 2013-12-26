@@ -9,15 +9,19 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
+import com.cloudjay.cjay.fragment.GateImportListFragment;
+import com.cloudjay.cjay.listener.OnContainerAddRequestListener;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_gate_home)
 public class GateHomeActivity extends CJayActivity implements
-		OnPageChangeListener, TabListener {
+		OnPageChangeListener, TabListener, OnContainerAddRequestListener {
 
 	private String[] locations;
+	private ViewPagerAdapter mPagerAdapter;
+	
 	@ViewById
 	ViewPager pager;
 
@@ -29,9 +33,9 @@ public class GateHomeActivity extends CJayActivity implements
 	}
 
 	private void configureViewPager() {
-		ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(
+		mPagerAdapter = new ViewPagerAdapter(
 				getSupportFragmentManager(), locations);
-		pager.setAdapter(viewPagerAdapter);
+		pager.setAdapter(mPagerAdapter);
 		pager.setOnPageChangeListener(this);
 	}
 
@@ -63,19 +67,36 @@ public class GateHomeActivity extends CJayActivity implements
 	}
 
 	@Override
-	public void onPageScrollStateChanged(int position) {
-	}
-
-	@Override
-	public void onPageScrolled(int position, float positionOffset,
-			int positionOffsetPixels) {
+	public void OnContainerAddRequested() {
+		// go to import tab
+		getSupportActionBar().selectTab(getSupportActionBar().getTabAt(0));
+		
+		// show add container dialog
+		GateImportListFragment importListFragment = (GateImportListFragment) mPagerAdapter.instantiateItem(pager, 0);
+		importListFragment.handleAddContainer();
 	}
 
 	@Override
 	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onPageScrollStateChanged(int arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onPageScrolled(int arg0, float arg1, int arg2) {
+		// TODO Auto-generated method stub
+		
 	}
 }
