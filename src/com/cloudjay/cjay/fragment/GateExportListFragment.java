@@ -36,21 +36,30 @@ public class GateExportListFragment extends SherlockDialogFragment {
 
 	private ArrayList<ContainerSession> mFeeds;
 	private FunDapter<ContainerSession> mAdapter;
-	
-	@ViewById(R.id.container_list) ListView mFeedListView;
-	@ViewById(R.id.search_textfield) EditText mSearchEditText;
+
+	@ViewById(R.id.container_list)
+	ListView mFeedListView;
+	@ViewById(R.id.search_textfield)
+	EditText mSearchEditText;
 
 	@AfterViews
 	void afterViews() {
 		mSearchEditText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable arg0) {
-				search(arg0.toString());				
+				search(arg0.toString());
 			}
-	        public void beforeTextChanged(CharSequence s, int start, int count, int after){}
-	        public void onTextChanged(CharSequence s, int start, int before, int count){}
-	    });
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListContainerSessions(getActivity());
+
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+			}
+
+			public void onTextChanged(CharSequence s, int start, int before,
+					int count) {
+			}
+		});
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+				.getListContainerSessions(getActivity());
 		initFunDapter(mFeeds);
 	}
 
@@ -58,7 +67,8 @@ public class GateExportListFragment extends SherlockDialogFragment {
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		Dialog dialog = super.onCreateDialog(savedInstanceState);
 		// Set Soft Input mode so it's always visible
-		dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+		dialog.getWindow().setSoftInputMode(
+				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		return dialog;
 	}
 
@@ -72,7 +82,7 @@ public class GateExportListFragment extends SherlockDialogFragment {
 	void containerItemClick(int position) {
 		// Hector: go to details from here
 	}
-	
+
 	private void search(String searchText) {
 		if (searchText.equals("")) {
 			mAdapter.updateData(mFeeds);
@@ -93,34 +103,47 @@ public class GateExportListFragment extends SherlockDialogFragment {
 		feedsDict.addStringField(R.id.feed_item_container_id,
 				new StringExtractor<ContainerSession>() {
 					@Override
-					public String getStringValue(ContainerSession item,	int position) {	return item.getContainerId(); }
+					public String getStringValue(ContainerSession item,
+							int position) {
+						return item.getContainerId();
+					}
 				});
 		feedsDict.addStringField(R.id.feed_item_container_owner,
 				new StringExtractor<ContainerSession>() {
 					@Override
-					public String getStringValue(ContainerSession item, int position) {	return item.getOperatorName(); }
+					public String getStringValue(ContainerSession item,
+							int position) {
+						return item.getOperatorName();
+					}
 				});
 		feedsDict.addStringField(R.id.feed_item_container_import_date,
 				new StringExtractor<ContainerSession>() {
 					@Override
-					public String getStringValue(ContainerSession item, int position) {
-						return java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
+					public String getStringValue(ContainerSession item,
+							int position) {
+						return item.getCheckInTime();
 					}
 				});
 		feedsDict.addDynamicImageField(R.id.feed_item_picture,
 				new StringExtractor<ContainerSession>() {
 					@Override
-					public String getStringValue(ContainerSession item, int position) {	return item.getContainerId(); }
+					public String getStringValue(ContainerSession item,
+							int position) {
+						return item.getContainerId();
+					}
 				}, new DynamicImageLoader() {
 					@Override
-					public void loadImage(String stringColor, ImageView view) {	view.setImageResource(R.drawable.ic_logo); }
+					public void loadImage(String stringColor, ImageView view) {
+						view.setImageResource(R.drawable.ic_logo);
+					}
 				}).onClick(new ItemClickListener<ContainerSession>() {
-						@Override
-						public void onClick(ContainerSession item, int position, View view) {
-							// TODO Auto-generated method stub
-						}
+			@Override
+			public void onClick(ContainerSession item, int position, View view) {
+				// TODO Auto-generated method stub
+			}
 		});
-		mAdapter = new FunDapter<ContainerSession>(getActivity(), containers, R.layout.list_item_container, feedsDict);
+		mAdapter = new FunDapter<ContainerSession>(getActivity(), containers,
+				R.layout.list_item_container, feedsDict);
 		mFeedListView.setAdapter(mAdapter);
 	}
 }

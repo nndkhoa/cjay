@@ -37,7 +37,7 @@ import com.cloudjay.cjay.util.StringHelper;
 import com.googlecode.androidannotations.annotations.EFragment;
 
 @EFragment(R.layout.fragment_feeds)
-public class FeedListFragment extends SherlockDialogFragment implements
+public class GateImportListFragment extends SherlockDialogFragment implements
 		OnClickListener, OnItemClickListener, OnItemLongClickListener {
 
 	private final static String TAG = "FeedListFragment";

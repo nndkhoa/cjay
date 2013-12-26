@@ -3,6 +3,7 @@ package com.cloudjay.cjay.model;
 import java.util.Collection;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.StringHelper;
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
@@ -50,10 +51,10 @@ public class ContainerSession {
 	@DatabaseField(columnName = IMAGE_ID_PATH)
 	private String image_id_path;
 
-	@DatabaseField(columnName = CHECK_IN_TIME)
+	@DatabaseField(columnName = CHECK_IN_TIME, defaultValue = "")
 	private String check_in_time;
 
-	@DatabaseField(columnName = CHECK_OUT_TIME)
+	@DatabaseField(columnName = CHECK_OUT_TIME, defaultValue = "")
 	private String check_out_time;
 
 	// container_id
@@ -86,20 +87,21 @@ public class ContainerSession {
 	}
 
 	public String getOperatorName() {
-		return getContainer().getOperator().getName();
+		return getContainer().getOperator().getCode();
 	}
 
 	public String getContainerId() {
 		return getContainer().getContainerId();
 	}
 
-	// public String getCheckInTime() {
-	// return StringHelper.getRelativeDate(check_in_time.toString());
-	// }
-	//
-	// public String getCheckOutTime() {
-	// return StringHelper.getRelativeDate(check_out_time.toString());
-	// }
+	public String getCheckInTime() {
+		return StringHelper.getRelativeDate(check_in_time.toString());
+	}
+
+	public String getCheckOutTime() {
+
+		return StringHelper.getRelativeDate(check_out_time.toString());
+	}
 
 	public String getImageIdPath() {
 		return image_id_path;
@@ -109,18 +111,18 @@ public class ContainerSession {
 		this.image_id_path = image_id_path;
 	}
 
-	public String getCheckInTime() {
-		return check_in_time;
-	}
+	// public String getCheckInTime() {
+	// return check_in_time;
+	// }
 
 	public void setCheckInTime(String check_in_time) {
 
 		this.check_in_time = check_in_time;
 	}
 
-	public String getCheckOutTime() {
-		return check_out_time;
-	}
+	// public String getCheckOutTime() {
+	// return check_out_time;
+	// }
 
 	public void setCheckOutTime(String check_out_time) {
 		this.check_out_time = check_out_time;

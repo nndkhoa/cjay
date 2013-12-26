@@ -5,7 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import com.cloudjay.cjay.SampleFragment_;
-import com.cloudjay.cjay.fragment.FeedListFragment;
+import com.cloudjay.cjay.fragment.GateImportListFragment;
 import com.cloudjay.cjay.fragment.GateExportListFragment_;
 
 public class ViewPagerAdapter extends FragmentPagerAdapter {
@@ -24,7 +24,7 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
 	public Fragment getItem(int position) {
 		switch (position) {
 		case 0:
-			Fragment importFeedFragment = new FeedListFragment();
+			Fragment importFeedFragment = new GateImportListFragment();
 			return importFeedFragment;
 		case 1:
 			Fragment exportFeedFragment = new GateExportListFragment_();
