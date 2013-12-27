@@ -11,7 +11,7 @@ import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.cloudjay.cjay.fragment.*;
-import com.cloudjay.cjay.listener.OnReportPageCompleted;
+import com.cloudjay.cjay.listener.OnReportPageCompleteListener;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EActivity;
 // slide 20
@@ -19,7 +19,7 @@ import com.googlecode.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_auditor_damage_report)
 public class AuditorDamageReportActivity extends SherlockFragmentActivity implements
-	OnPageChangeListener, TabListener, OnReportPageCompleted {
+	OnPageChangeListener, TabListener, OnReportPageCompleteListener {
 	
 	private String[] locations;
 	
@@ -85,19 +85,19 @@ public class AuditorDamageReportActivity extends SherlockFragmentActivity implem
 	@Override
 	public void onReportPageCompleted(int page, String[] vals) {
 		switch (page) {
-		case OnReportPageCompleted.TAB_DAMAGE_LOCATION:
+		case OnReportPageCompleteListener.TAB_DAMAGE_LOCATION:
 			
 			break;
-		case OnReportPageCompleted.TAB_DAMAGE_DAMAGE:
+		case OnReportPageCompleteListener.TAB_DAMAGE_DAMAGE:
 			
 			break;
-		case OnReportPageCompleted.TAB_DAMAGE_REPAIR:
+		case OnReportPageCompleteListener.TAB_DAMAGE_REPAIR:
 			
 			break;
-		case OnReportPageCompleted.TAB_DAMAGE_DIMENSION:
+		case OnReportPageCompleteListener.TAB_DAMAGE_DIMENSION:
 			
 			break;
-		case OnReportPageCompleted.TAB_DAMAGE_QUANTITY:
+		case OnReportPageCompleteListener.TAB_DAMAGE_QUANTITY:
 			
 			break;
 		}

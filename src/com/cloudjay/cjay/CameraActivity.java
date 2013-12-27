@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import android.R.integer;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -37,9 +38,11 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.aerilys.helpers.android.UIHelper;
+import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.UploadItem;
 import com.cloudjay.cjay.dao.UploadItemDaoImpl;
+import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.model.TmpContainerSession;
@@ -392,7 +395,7 @@ public class CameraActivity extends Activity {
 		}
 
 		String fileName = "gate-" + imageType + "-"
-				+ tmpContainerSession.getDepotCode()
+				+ tmpContainerSession.getDepotCode() + "-"
 				+ StringHelper.getCurrentTimestamp("yyyy-mm-dd") + "-" + uuid
 				+ ".jpg";
 		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
@@ -401,7 +404,7 @@ public class CameraActivity extends Activity {
 		saveBitmap(capturedBitmap, photo);
 
 		// Upload image
-		// uploadImage(uuid, photo.getAbsolutePath());
+		uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
 
 		if (capturedBitmap != null) {
 			capturedBitmap.recycle();
@@ -665,39 +668,36 @@ public class CameraActivity extends Activity {
 		this.onBackPressed();
 	}
 
-	void uploadImage(String uuid, String filename) {
+	void uploadImage(String uuid, String uri, String image_name) {
 		itemId = uuid;
 
-		String depotCode = com.cloudjay.cjay.util.Session.restore(this)
-				.getCurrentUser().getDepotCode();
-		String time = StringHelper
-				.getCurrentTimestamp(CJayConstant.CJAY_UPLOAD_DATETIME_FORMAT);
-		String finalURL = String.format("gate-in-%s-%s-%s.jpg", depotCode,
-				time, uuid);
-
 		// Create Database Entity Object
-		UploadItem uploadItem = new UploadItem();
+		CJayImage uploadItem = new CJayImage();
 
 		// Set Uploading Status
-		uploadItem.setUploadStatus(0);
-		uploadItem.setUUID(uuid);
-		uploadItem.setTmpImgUri(itemUri);
-		uploadItem.setNoteStatus(false);
-		uploadItem.setImageURL(finalURL);
+		uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
+		uploadItem.setUuid(uuid);
+		uploadItem.setUri(uri);
+		uploadItem.setImageName(image_name);
+
 		try {
-			UploadItemDaoImpl uploadList = CJayClient.getInstance()
+			CJayImageDaoImpl uploadList = CJayClient.getInstance()
 					.getDatabaseManager().getHelper(getApplicationContext())
-					.getUploadItemImpl();
-			uploadList.addItem(uploadItem);
+					.getCJayImageDaoImpl();
+
+			// TODO: bug
+			List<CJayImage> tmp = uploadList.getAllCJayImages();
+			uploadList.addCJayImage(uploadItem);
+			tmp = uploadList.getAllCJayImages();
+			Integer a = 0;
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
-		Intent uploadIntent = new Intent(this, UploadIntentService.class);
-		uploadIntent.putExtra("uuid", uuid);
-		uploadIntent.putExtra("tmpImgUri", itemUri);
-		startService(uploadIntent);
+		// Intent uploadIntent = new Intent(this, UploadIntentService.class);
+		// uploadIntent.putExtra("uuid", uuid);
+		// startService(uploadIntent);
 
 	}
 

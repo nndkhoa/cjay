@@ -4,7 +4,6 @@ package com.cloudjay.cjay.network;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Random;
 
 import javax.net.ssl.HostnameVerifier;
@@ -21,12 +20,11 @@ import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
 
-import android.R.integer;
 import android.app.ActivityManager;
-import android.app.ActivityManager.RunningServiceInfo;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -47,7 +45,7 @@ import com.google.gson.Gson;
 //import android.util.Log;
 //import android.widget.Toast;
 
-public class UploadIntentService extends IntentService implements CountingInputStreamEntity.UploadListener  {
+public class QueueIntentService extends IntentService implements CountingInputStreamEntity.UploadListener  {
 
 	// Notification Upload Status
 	private NotificationManager nm;
@@ -57,52 +55,26 @@ public class UploadIntentService extends IntentService implements CountingInputS
 	//private final Calendar time = Calendar.getInstance();
 	private String uuid;
 	
-		
-		
-	public UploadIntentService() {
-		super("UploadIntentService");
+	private boolean isUploadIntentServiceRunning() {
+	    ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);	    
+	    for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+	        if ("com.cloudjay.cjay.network.UploadIntentService".equals(service.service.getClassName())) {
+	        	return true;
+	        }
+	    }	    	
+	    return false;
+	}
+	
+	public QueueIntentService() {
+		super("QueueIntentService");
 	}
 
-	
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		if (intent == null) {
-			return;
+		if (isUploadIntentServiceRunning() == false) {
+			Intent uploadIntent = new Intent(this, UploadIntentService.class);
+			startService(uploadIntent);
 		}
-		try {
-			uploadList = CJayClient.getInstance()
-					.getDatabaseManager().getHelper(getApplicationContext())
-					.getCJayImageDaoImpl();
-			
-			List<CJayImage> tmp = uploadList.getAllCJayImages();
-			CJayImage uploadItem = uploadList.getNextWaiting();
-			if (uploadItem != null) {
-				doFileUpload(uploadItem);
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
-		//uuid = intent.getExtras().getString("uuid");
-		
-//		Intent newAlertIntent = new Intent(this,
-//				UploadAlertDialogActivity.class);
-//		newAlertIntent.putExtra("uuid", uuid);
-//		newAlertIntent.putExtra("tmpImgUri", tmpImgUri);
-
-//		Random randomGenerator = new Random();
-//
-//		int requestCode = randomGenerator.nextInt();
-//		// Generate Request Code until not duplicate
-//		while (PendingIntent.getActivity(this, requestCode, newAlertIntent,
-//				PendingIntent.FLAG_NO_CREATE) != null) {
-//			requestCode = randomGenerator.nextInt();
-//		}
-//		alertIntent = PendingIntent.getActivity(this, requestCode,
-//				newAlertIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-		
 	}
 
 	@Override
@@ -157,11 +129,15 @@ public class UploadIntentService extends IntentService implements CountingInputS
 		}
 	}
 	
-	public void doFileUpload(CJayImage uploadItem) {
+	public void doFileUpload() {
 		try {			
 			// Try New Upload Method
 						
-						
+			uploadList = CJayClient.getInstance()
+					.getDatabaseManager().getHelper(getApplicationContext())
+					.getCJayImageDaoImpl();
+			
+			CJayImage uploadItem = uploadList.findByUuid(uuid);
 			uploadItem.setUploadState(CJayImage.STATE_UPLOAD_IN_PROGRESS);
 			// Set Status to Uploading						
 			uploadList.update(uploadItem);
@@ -201,7 +177,7 @@ public class UploadIntentService extends IntentService implements CountingInputS
 			ParcelFileDescriptor fileDescriptor = getContentResolver().openFileDescriptor(Uri.parse(uploadItem.getUri()), "r");
 			InputStream in = getContentResolver().openInputStream(Uri.parse(uploadItem.getUri()));
 			CountingInputStreamEntity entity = new CountingInputStreamEntity(in, fileDescriptor.getStatSize());
-			entity.setUploadListener(UploadIntentService.this);
+			entity.setUploadListener(QueueIntentService.this);
 			entity.setContentType("image/jpeg");
 			post.setEntity(entity);
 			
@@ -257,24 +233,24 @@ public class UploadIntentService extends IntentService implements CountingInputS
 		} catch (IOException e) {				
 			// Set Status Failed
 			
-//			CJayImage uploadItem;
-//			try {
-//				uploadItem = uploadList.findByUuid(uuid);
-//				uploadItem.setUploadState(CJayImage.STATE_UPLOAD_ERROR);
-//				uploadList.update(uploadItem);
-//				
-//				mBuilder.setContentIntent(alertIntent);
-//				
-//				mBuilder.setContentText(getResources().getString(R.string.upload_failed_msg))
-//						.setContentTitle(getResources().getString(R.string.upload_failed_title))
-//						// Removes the progress bar
-//						.setProgress(0, 0, false).setOngoing(true);
-//
-//				nm.notify(uuid, NOTIFICATION_ID, mBuilder.build());
-//			} catch (SQLException ee) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
+			CJayImage uploadItem;
+			try {
+				uploadItem = uploadList.findByUuid(uuid);
+				uploadItem.setUploadState(CJayImage.STATE_UPLOAD_ERROR);
+				uploadList.update(uploadItem);
+				
+				mBuilder.setContentIntent(alertIntent);
+				
+				mBuilder.setContentText(getResources().getString(R.string.upload_failed_msg))
+						.setContentTitle(getResources().getString(R.string.upload_failed_title))
+						// Removes the progress bar
+						.setProgress(0, 0, false).setOngoing(true);
+
+				nm.notify(uuid, NOTIFICATION_ID, mBuilder.build());
+			} catch (SQLException ee) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			e.printStackTrace();
 		}
 	}

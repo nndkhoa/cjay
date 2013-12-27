@@ -1,6 +1,6 @@
 package com.cloudjay.cjay.listener;
 
-public interface OnReportPageCompleted {
+public interface OnReportPageCompleteListener {
 	public static final int TAB_DAMAGE_LOCATION = 0;
 	public static final int TAB_DAMAGE_DAMAGE = 1;
 	public static final int TAB_DAMAGE_REPAIR = 2;
