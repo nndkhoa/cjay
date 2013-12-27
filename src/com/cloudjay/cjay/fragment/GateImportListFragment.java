@@ -28,7 +28,7 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.StaticImageLoader;
-import com.cloudjay.cjay.CameraActivity_;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -57,12 +57,14 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	private final static int CONTAINER_DIALOG_ADD = 0;
 	private final static int CONTAINER_DIALOG_EDIT = 1;
 
-	@ViewById(R.id.btn_add_new) Button mAddNewBtn;
-	@ViewById(R.id.feeds) ListView mFeedListView;
-	
+	@ViewById(R.id.btn_add_new)
+	Button mAddNewBtn;
+	@ViewById(R.id.feeds)
+	ListView mFeedListView;
+
 	private ListView mOperatorListView;
 	private EditText mOperatorEditText;
-	
+
 	private String mContainerName;
 	private String mOperatorName;
 
@@ -70,14 +72,14 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	private FunDapter<ContainerSession> mFeedsAdapter;
 	private ArrayList<Operator> mOperators;
 	private FunDapter<Operator> mOperatorsAdapter;
-	
+
 	private Dialog mNewContainerDialog;
 	private Dialog mSearchOperatorDialog;
-	
+
 	private InputMethodManager mImm;
-	
+
 	private ContainerSession mSelectedContainerSession;
-	
+
 	@OptionsItem(R.id.menu_camera)
 	void cameraMenuItemSelected() {
 		// get tmpContainerSession of the selected container session
@@ -92,7 +94,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		intent.putExtra("type", 0); // in
 		startActivity(intent);
 	}
-	
+
 	@OptionsItem(R.id.menu_edit_container)
 	void editMenuItemSelected() {
 		// Open dialog for editing details
@@ -100,7 +102,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		mOperatorName = mSelectedContainerSession.getOperatorName();
 		showContainerDialog(CONTAINER_DIALOG_EDIT);
 	}
-	
+
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 		// TODO
@@ -111,20 +113,21 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListContainerSessions(getActivity());
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
-				.getListOperators(getActivity()); 
+				.getListOperators(getActivity());
 
 		initContainerFeedAdapter(mFeeds);
-		
-		mImm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-		
+
+		mImm = (InputMethodManager) getActivity().getSystemService(
+				Context.INPUT_METHOD_SERVICE);
+
 		mSelectedContainerSession = null;
 	}
-	
+
 	@Click(R.id.btn_add_new)
 	void addContainerClicked() {
-		handleAddContainer();	
+		handleAddContainer();
 	}
-	
+
 	@ItemClick(R.id.feeds)
 	void listItemClicked(int position) {
 		// refresh highlighting
@@ -133,10 +136,10 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		// clear current selection
 		mSelectedContainerSession = null;
 		getActivity().invalidateOptionsMenu();
-		
+
 		android.util.Log.d(TAG, "Show item at position: " + position);
 	}
-	
+
 	@ItemLongClick(R.id.feeds)
 	void listItemLongClicked(int position) {
 		// refresh highlighting
@@ -146,7 +149,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		mSelectedContainerSession = mFeedsAdapter.getItem(position);
 		getActivity().invalidateOptionsMenu();
 	}
-	
+
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
 		boolean isDisplayed = !(mSelectedContainerSession == null);
@@ -154,89 +157,102 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		menu.findItem(R.id.menu_edit_container).setVisible(isDisplayed);
 		menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
-		
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListContainerSessions(getActivity());
+
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+				.getListContainerSessions(getActivity());
 		mFeedsAdapter.updateData(mFeeds);
 	}
-	
+
 	public void handleAddContainer() {
 		showContainerDialog(CONTAINER_DIALOG_ADD);
 	}
-	
+
 	private void showContainerDialog(int mode) {
 		LayoutInflater factory = LayoutInflater.from(getActivity());
-		final View newContainerView = factory.inflate(R.layout.dialog_new_container, null);
-		final EditText newContainerIdEditText = (EditText)newContainerView.findViewById(R.id.dialog_new_container_id);
-		final EditText newContainerOwnerEditText = (EditText)newContainerView.findViewById(R.id.dialog_new_container_owner);
+		final View newContainerView = factory.inflate(
+				R.layout.dialog_new_container, null);
+		final EditText newContainerIdEditText = (EditText) newContainerView
+				.findViewById(R.id.dialog_new_container_id);
+		final EditText newContainerOwnerEditText = (EditText) newContainerView
+				.findViewById(R.id.dialog_new_container_owner);
 		final int dialogMode = mode;
 
 		if (mContainerName == null) {
-			mContainerName = getResources().getString(R.string.default_container_id);
+			mContainerName = getResources().getString(
+					R.string.default_container_id);
 		}
 		newContainerIdEditText.setText(mContainerName);
-		
+
 		if (mOperatorName != null) {
 			newContainerOwnerEditText.setText(mOperatorName);
 		}
-			
-		newContainerOwnerEditText.setOnFocusChangeListener(new OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					hideKeyboard();
-		        	mContainerName = newContainerIdEditText.getText().toString();
-		        	mNewContainerDialog.dismiss();
-		            showDialogSearchOperator(dialogMode);
-				}
-			}
-		});
+
+		newContainerOwnerEditText
+				.setOnFocusChangeListener(new OnFocusChangeListener() {
+					@Override
+					public void onFocusChange(View v, boolean hasFocus) {
+						if (hasFocus) {
+							hideKeyboard();
+							mContainerName = newContainerIdEditText.getText()
+									.toString();
+							mNewContainerDialog.dismiss();
+							showDialogSearchOperator(dialogMode);
+						}
+					}
+				});
 
 		newContainerOwnerEditText.setOnTouchListener(new OnTouchListener() {
 			@Override
 			public boolean onTouch(View view, MotionEvent event) {
-		        if (event.getAction() == MotionEvent.ACTION_UP) {
-		        	hideKeyboard();
-		        	mContainerName = newContainerIdEditText.getText().toString();
-		        	mNewContainerDialog.dismiss();
-		            showDialogSearchOperator(dialogMode);
-		        }
-		        return true;
-			}
-		});
-		
-		newContainerOwnerEditText.setOnKeyListener(new OnKeyListener() {
-			@Override
-			public boolean onKey(View view, int keyCode, KeyEvent event) {
-		        if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
-		        	hideKeyboard();
-		        	mContainerName = newContainerIdEditText.getText().toString();
-		        	mNewContainerDialog.dismiss();
-		            showDialogSearchOperator(dialogMode);
-		            return true;
-		        } else {
-		            return false;
-		        }
+				if (event.getAction() == MotionEvent.ACTION_UP) {
+					hideKeyboard();
+					mContainerName = newContainerIdEditText.getText()
+							.toString();
+					mNewContainerDialog.dismiss();
+					showDialogSearchOperator(dialogMode);
+				}
+				return true;
 			}
 		});
 
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity())
+		newContainerOwnerEditText.setOnKeyListener(new OnKeyListener() {
+			@Override
+			public boolean onKey(View view, int keyCode, KeyEvent event) {
+				if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
+					hideKeyboard();
+					mContainerName = newContainerIdEditText.getText()
+							.toString();
+					mNewContainerDialog.dismiss();
+					showDialogSearchOperator(dialogMode);
+					return true;
+				} else {
+					return false;
+				}
+			}
+		});
+
+		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(
+				getActivity())
 				.setTitle(getString(R.string.dialog_new_container))
 				.setView(newContainerView)
 				.setPositiveButton(R.string.dialog_container_ok,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
-								
+
 								hideKeyboard();
 								mContainerName = null;
-								
-								// Get the container id and container operator code
-								String containerId = newContainerIdEditText.getText().toString();
-								String operatorName = newContainerOwnerEditText.getText().toString();
+
+								// Get the container id and container operator
+								// code
+								String containerId = newContainerIdEditText
+										.getText().toString();
+								String operatorName = newContainerOwnerEditText
+										.getText().toString();
 								String operatorCode = "";
 								int operatorId = 0;
 								for (Operator operator : mOperators) {
@@ -246,13 +262,14 @@ public class GateImportListFragment extends SherlockDialogFragment {
 										break;
 									}
 								}
-								
+
 								switch (dialogMode) {
 								case CONTAINER_DIALOG_ADD:
 									// Create a tmp Container Session
 									TmpContainerSession newTmpContainer = new TmpContainerSession();
 									newTmpContainer.setContainerId(containerId);
-									newTmpContainer.setOperatorCode(operatorCode);
+									newTmpContainer
+											.setOperatorCode(operatorCode);
 									newTmpContainer.setCheckInTime(StringHelper
 											.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT));
 
@@ -264,8 +281,9 @@ public class GateImportListFragment extends SherlockDialogFragment {
 									newTmpContainer.printMe();
 
 									// Save the current temp Container Session
-									DataCenter.getInstance().setTmpCurrentSession(
-											newTmpContainer);
+									DataCenter.getInstance()
+											.setTmpCurrentSession(
+													newTmpContainer);
 
 									// Pass tmpContainerSession away
 									// Then start showing the Camera
@@ -279,7 +297,8 @@ public class GateImportListFragment extends SherlockDialogFragment {
 									break;
 
 								case CONTAINER_DIALOG_EDIT:
-									Container container = mSelectedContainerSession.getContainer();
+									Container container = mSelectedContainerSession
+											.getContainer();
 									Operator operator = container.getOperator();
 									container.setContainerId(containerId);
 									operator.setCode(operatorCode);
@@ -299,37 +318,40 @@ public class GateImportListFragment extends SherlockDialogFragment {
 						});
 		mNewContainerDialog = dialogBuilder.create();
 		mNewContainerDialog.show();
-		
+
 		// Show keyboard
 		newContainerIdEditText.requestFocus();
 		showKeyboard();
 	}
-	
+
 	private void showDialogSearchOperator(int mode) {
 		LayoutInflater factory = LayoutInflater.from(getActivity());
 		final View searchOperatorView = factory.inflate(
 				R.layout.dialog_select_operator, null);
 		final int dialogMode = mode;
-		
-		mOperatorEditText = (EditText) searchOperatorView.findViewById(R.id.dialog_operator_name);
-		mOperatorListView = (ListView) searchOperatorView.findViewById(R.id.dialog_operator_list);
+
+		mOperatorEditText = (EditText) searchOperatorView
+				.findViewById(R.id.dialog_operator_name);
+		mOperatorListView = (ListView) searchOperatorView
+				.findViewById(R.id.dialog_operator_list);
 		mOperatorListView.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> parent, View view, int position,	long id) {
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
 				// Select operator
 				mOperatorName = mOperators.get(position).getName();
 				mOperatorEditText.setText(mOperatorName);
-				
+
 				// Go back
 				mSearchOperatorDialog.dismiss();
 				showContainerDialog(dialogMode);
 			}
 		});
 		initContainerOperatorAdapter(mOperators);
-		
+
 		if (mOperatorName != null) {
 			mOperatorEditText.setText(mOperatorName);
 		}
-		
+
 		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(
 				getActivity())
 				.setTitle(getString(R.string.dialog_container_owner))
@@ -338,7 +360,8 @@ public class GateImportListFragment extends SherlockDialogFragment {
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
-								mOperatorName = mOperatorEditText.getText().toString();
+								mOperatorName = mOperatorEditText.getText()
+										.toString();
 								showContainerDialog(dialogMode);
 							}
 						})
@@ -352,15 +375,14 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		mSearchOperatorDialog = dialogBuilder.create();
 		mSearchOperatorDialog.show();
 	}
-	
+
 	private void initContainerOperatorAdapter(ArrayList<Operator> operators) {
 		BindDictionary<Operator> operatorsDict = new BindDictionary<Operator>();
 		operatorsDict.addStringField(R.id.operator_name,
 				new StringExtractor<Operator>() {
 
 					@Override
-					public String getStringValue(Operator item,
-							int position) {
+					public String getStringValue(Operator item, int position) {
 						return item.getName();
 					}
 				});
@@ -369,16 +391,14 @@ public class GateImportListFragment extends SherlockDialogFragment {
 				new StringExtractor<Operator>() {
 
 					@Override
-					public String getStringValue(Operator item,
-							int position) {
+					public String getStringValue(Operator item, int position) {
 						// TODO Auto-generated method stub
 						return item.getCode();
 					}
 				});
-		
-		mOperatorsAdapter = new FunDapter<Operator>(
-				getActivity(), operators, R.layout.list_item_operator,
-				operatorsDict);
+
+		mOperatorsAdapter = new FunDapter<Operator>(getActivity(), operators,
+				R.layout.list_item_operator, operatorsDict);
 
 		mOperatorListView.setAdapter(mOperatorsAdapter);
 	}
@@ -425,16 +445,15 @@ public class GateImportListFragment extends SherlockDialogFragment {
 						// TODO Auto-generated method stub
 					}
 				});
-		mFeedsAdapter = new FunDapter<ContainerSession>(
-				getActivity(), containers, R.layout.list_item_container,
-				feedsDict);
+		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(),
+				containers, R.layout.list_item_container, feedsDict);
 		mFeedListView.setAdapter(mFeedsAdapter);
 	}
-	
+
 	private void hideKeyboard() {
 		mImm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
 	}
-	
+
 	private void showKeyboard() {
 		mImm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 	}

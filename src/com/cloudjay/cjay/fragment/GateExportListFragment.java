@@ -24,7 +24,7 @@ import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.ami.fundapter.interfaces.ItemClickListener;
-import com.cloudjay.cjay.CameraActivity_;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.listener.OnContainerAddRequestListener;
 import com.cloudjay.cjay.model.ContainerSession;
