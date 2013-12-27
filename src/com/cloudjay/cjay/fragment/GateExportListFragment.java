@@ -87,6 +87,9 @@ public class GateExportListFragment extends SherlockDialogFragment {
 
 	@ItemClick(R.id.container_list)
 	void listItemClicked(int position) {
+		// refresh highlighting
+		mFeedListView.setItemChecked(position, false);
+		
 		// clear current selection
 		mSelectedContainerSession = null;
 		getActivity().invalidateOptionsMenu();
@@ -107,6 +110,9 @@ public class GateExportListFragment extends SherlockDialogFragment {
 	
 	@ItemLongClick(R.id.container_list)
 	void listItemLongClicked(int position) {
+		// refresh highlighting
+		mFeedListView.setItemChecked(position, true);
+		
 		// refresh menu
 		mSelectedContainerSession = mFeedsAdapter.getItem(position);
 		getActivity().invalidateOptionsMenu();
@@ -180,7 +186,7 @@ public class GateExportListFragment extends SherlockDialogFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getContainerId();
+						return item.getFullContainerId();
 					}
 				});
 		feedsDict.addStringField(R.id.feed_item_container_owner,
@@ -204,7 +210,7 @@ public class GateExportListFragment extends SherlockDialogFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getContainerId();
+						return item.getFullContainerId();
 					}
 				}, new DynamicImageLoader() {
 					@Override

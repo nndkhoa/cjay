@@ -88,9 +88,13 @@ public class ContainerSession {
 	public String getOperatorName() {
 		return getContainer().getOperator().getCode();
 	}
-
+	
 	public String getContainerId() {
 		return getContainer().getContainerId();
+	}
+
+	public String getFullContainerId() {
+		return getContainer().getFullContainerId();
 	}
 
 	public String getCheckInTime() {
@@ -144,7 +148,7 @@ public class ContainerSession {
 	}
 
 	public void printMe() {
-		Logger.Log(TAG, "CId: " + getContainerId() + " - OpCode: "
+		Logger.Log(TAG, "CId: " + getFullContainerId() + " - OpCode: "
 				+ getOperatorName() + " - TimeIn: " + getCheckInTime()
 				+ " - TimeOut: " + getCheckOutTime());
 	}
