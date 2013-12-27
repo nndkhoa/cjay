@@ -1,5 +1,9 @@
 package com.cloudjay.cjay.model;
 
+import java.util.Collection;
+
+import org.parceler.Parcel;
+
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
@@ -13,6 +17,7 @@ import com.j256.ormlite.table.DatabaseTable;
  * 
  */
 @DatabaseTable(tableName = "repair_code", daoClass = RepairCodeDaoImpl.class)
+@Parcel
 public class RepairCode {
 
 	private static final String ID = "id";
@@ -20,16 +25,16 @@ public class RepairCode {
 	private static final String CODE = "code";
 
 	@DatabaseField(id = true, columnName = ID)
-	private String id;
+	int id;
 
 	@DatabaseField(columnName = NAME)
-	private String name;
+	String name;
 
 	@DatabaseField(columnName = CODE)
-	private String code;
+	String code;
 
 	@ForeignCollectionField(eager = true)
-	private ForeignCollection<Issue> issues;
+	Collection<Issue> issues;
 
 	public String getName() {
 		return name;
@@ -47,11 +52,11 @@ public class RepairCode {
 		this.code = code;
 	}
 
-	public String getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(String operatorId) {
+	public void setId(int operatorId) {
 		this.id = operatorId;
 	}
 }

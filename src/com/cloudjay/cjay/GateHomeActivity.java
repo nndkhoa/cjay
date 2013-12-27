@@ -21,7 +21,7 @@ public class GateHomeActivity extends CJayActivity implements
 
 	private String[] locations;
 	private ViewPagerAdapter mPagerAdapter;
-	
+
 	@ViewById
 	ViewPager pager;
 
@@ -33,8 +33,8 @@ public class GateHomeActivity extends CJayActivity implements
 	}
 
 	private void configureViewPager() {
-		mPagerAdapter = new ViewPagerAdapter(
-				getSupportFragmentManager(), locations);
+		mPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(),
+				locations);
 		pager.setAdapter(mPagerAdapter);
 		pager.setOnPageChangeListener(this);
 	}
@@ -70,33 +70,30 @@ public class GateHomeActivity extends CJayActivity implements
 	public void OnContainerAddRequested() {
 		// go to import tab
 		getSupportActionBar().selectTab(getSupportActionBar().getTabAt(0));
-		
+
 		// show add container dialog
-		GateImportListFragment importListFragment = (GateImportListFragment) mPagerAdapter.instantiateItem(pager, 0);
+		GateImportListFragment importListFragment = (GateImportListFragment) mPagerAdapter
+				.instantiateItem(pager, 0);
 		importListFragment.handleAddContainer();
 	}
 
 	@Override
 	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onPageScrollStateChanged(int arg0) {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onPageScrolled(int arg0, float arg1, int arg2) {
-		// TODO Auto-generated method stub
-		
+
 	}
 }

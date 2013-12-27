@@ -8,9 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import android.R.integer;
 import android.app.Activity;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources.NotFoundException;
 import android.database.Cursor;
@@ -40,17 +38,13 @@ import android.widget.Toast;
 import com.aerilys.helpers.android.UIHelper;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
-import com.cloudjay.cjay.dao.UploadItem;
-import com.cloudjay.cjay.dao.UploadItemDaoImpl;
+import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.GateReportImage;
-import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
-import com.cloudjay.cjay.network.UploadIntentService;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.Mapper;
 import com.cloudjay.cjay.util.StringHelper;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Background;
@@ -61,11 +55,29 @@ import com.googlecode.androidannotations.annotations.NoTitle;
 import com.googlecode.androidannotations.annotations.SystemService;
 import com.googlecode.androidannotations.annotations.ViewById;
 
+/**
+ * Input:
+ * 
+ * - type: chỉ định đang mở Camera ở in | out | audit | repair
+ * 
+ * - tmpContainerSession: object lưu trữ container session
+ * 
+ * 
+ * Output:
+ * 
+ * - Mỗi lần chụp hình thực hiện tạo Object `GateReportImage` |
+ * `AuditReportItem` phụ thuộc vào type ban đầu truyền vào và add vào
+ * tmpContainerSession. Tạo con CJayImage để upload lên server.
+ * 
+ * 
+ * - Sau khi click Done >> Convert tmpContainerSession > ContainerSession và
+ * thực hiện enqueue (save to db)
+ * 
+ */
 @EActivity(R.layout.activity_camera)
 @NoTitle
 public class CameraActivity extends Activity {
 
-	public static CameraActivity instance = null;
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
 
 	Camera camera = null;
@@ -73,13 +85,15 @@ public class CameraActivity extends Activity {
 	private SurfaceHolder previewHolder = null;
 	private boolean inPreview = false;
 	private boolean cameraConfigured = false;
-	
+
 	String flashMode;
 	int cameraMode;
 
 	private final String LOG_TAG = "CameraActivity";
 
-	private List<String> photos;
+	List<GateReportImage> gateReportImages = new ArrayList<GateReportImage>();
+	List<AuditReportItem> auditReportItems = new ArrayList<AuditReportItem>();
+	List<CJayImage> cJayImages = new ArrayList<CJayImage>();
 
 	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
 	private static final int PREVIEW_SIZE_MAX_WIDTH = 1280;
@@ -108,7 +122,7 @@ public class CameraActivity extends Activity {
 	AudioManager audioManager;
 
 	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
-	TmpContainerSession tmpContainerSession;
+	ContainerSession containerSession;
 
 	@Extra("type")
 	int type = 0;
@@ -176,9 +190,6 @@ public class CameraActivity extends Activity {
 	@SuppressWarnings("deprecation")
 	@AfterViews
 	void initCamera() {
-
-		instance = this;
-
 		Logger.Log("initCamera(), addSurfaceCallback");
 
 		// WARNING: this block should be run before onResume()
@@ -191,7 +202,6 @@ public class CameraActivity extends Activity {
 		flashMode = Camera.Parameters.FLASH_MODE_OFF;
 		cameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
 
-		photos = new ArrayList<String>();
 	}
 
 	private void initPreview(int width, int height) {
@@ -364,7 +374,6 @@ public class CameraActivity extends Activity {
 			out.close();
 
 			Logger.Log("Path: " + filename.getAbsolutePath());
-			photos.add(filename.getAbsolutePath());
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -379,7 +388,6 @@ public class CameraActivity extends Activity {
 
 		// Save Bitmap to Files
 		String uuid = UUID.randomUUID().toString();
-		// gate-in-[depot-id]-2013-12-19-[UUID].jpg
 
 		String imageType;
 		switch (type) {
@@ -392,11 +400,15 @@ public class CameraActivity extends Activity {
 			break;
 		}
 
+		// gate-in-[depot-id]-2013-12-19-[UUID].jpg
 		String fileName = "gate-" + imageType + "-"
-				+ tmpContainerSession.getDepotCode() + "-"
-				+ StringHelper.getCurrentTimestamp("yyyy-mm-dd") + "-" + uuid
-				+ ".jpg";
+				+ containerSession.getContainer().getDepot().getDepotCode()
+				+ "-" + StringHelper.getCurrentTimestamp("yyyy-mm-dd") + "-"
+				+ uuid + ".jpg";
+
 		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
+
+		// photos.add(photo.getAbsolutePath());
 
 		// Save Bitmap to JPEG
 		saveBitmap(capturedBitmap, photo);
@@ -408,6 +420,57 @@ public class CameraActivity extends Activity {
 			capturedBitmap.recycle();
 			capturedBitmap = null;
 			System.gc();
+		}
+	}
+
+	@Click(R.id.btn_camera_done)
+	void doneButtonClicked() {
+		Logger.Log(LOG_TAG, "doneButtonClicked()");
+
+		try {
+			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
+					.getInstance().getDatabaseManager().getHelper(this)
+					.getContainerSessionDaoImpl();
+			containerSessionDaoImpl.addContainerSessions(containerSession);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		this.onBackPressed();
+	}
+
+	void uploadImage(String uuid, String uri, String image_name) {
+
+		// GateReportImage tmp = new GateReportImage(
+		// type,
+		// StringHelper
+		// .getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT),
+		// image_name);
+		// gateReportImages.add(tmp);
+
+		// Create Database Entity Object
+		CJayImage uploadItem = new CJayImage();
+
+		// Set Uploading Status
+		uploadItem.setType(type);
+		uploadItem.setTimePosted(StringHelper
+				.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT));
+		uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
+		uploadItem.setUuid(uuid);
+		uploadItem.setUri(uri);
+		uploadItem.setImageName(image_name);
+
+		try {
+			CJayImageDaoImpl uploadList = CJayClient.getInstance()
+					.getDatabaseManager().getHelper(getApplicationContext())
+					.getCJayImageDaoImpl();
+
+			cJayImages.add(uploadItem);
+			uploadList.addCJayImage(uploadItem);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -474,45 +537,6 @@ public class CameraActivity extends Activity {
 	protected void onPause() {
 		releaseCamera();
 		super.onPause();
-	}
-
-	
-	// TODO: TIEUBAO - Hai cai bien nay voi cai doan o duoi de lam gi vay, thay lung tung qua, check roi xoa di
-	String itemUri;
-	String itemId;
-	
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode,
-			Intent imageReturnedIntent) {
-
-		super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
-
-		switch (requestCode) {
-		case CJayConstant.SELECT_PHOTO:
-			if (resultCode == RESULT_OK) {
-				String selectedImagePath;
-				String fileManagerString;
-
-				// Retrieve imageUri and update local variable
-				Uri selectedImage = imageReturnedIntent.getData();
-
-				// OI FILE Manager
-				fileManagerString = selectedImage.getPath();
-
-				// MEDIA GALLERY
-				selectedImagePath = getPath(selectedImage);
-
-				if (selectedImagePath != null)
-					itemUri = selectedImagePath;
-				else
-					itemUri = fileManagerString;
-
-				String uuid = UUID.randomUUID().toString();
-
-				// Save to database
-				// uploadImage(uuid, itemUri);
-			}
-		}
 	}
 
 	@SuppressWarnings("deprecation")
@@ -634,68 +658,6 @@ public class CameraActivity extends Activity {
 		}
 	};
 
-	@Click(R.id.btn_camera_done)
-	void doneButtonClicked() {
-
-		Logger.Log(LOG_TAG, "doneButtonClicked()");
-
-		List<GateReportImage> gateReportImages = new ArrayList<GateReportImage>();
-		for (String photo : photos) {
-			// TODO: do something
-
-			GateReportImage tmp = new GateReportImage(
-					type,
-					StringHelper
-							.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT),
-					photo);
-
-			gateReportImages.add(tmp);
-		}
-
-		tmpContainerSession.setGateReportImages(gateReportImages);
-
-		ContainerSession containerSession = Mapper.toContainerSession(
-				tmpContainerSession, CameraActivity.this);
-
-		try {
-			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-					.getInstance().getDatabaseManager().getHelper(this)
-					.getContainerSessionDaoImpl();
-			containerSessionDaoImpl.addContainerSessions(containerSession);
-
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		this.onBackPressed();
-	}
-
-	void uploadImage(String uuid, String uri, String image_name) {				
-		// Create Database Entity Object
-		CJayImage uploadItem = new CJayImage();
-
-		// Set Uploading Status
-		uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
-		uploadItem.setUuid(uuid);
-		uploadItem.setUri(uri);
-		uploadItem.setImageName(image_name);
-
-		try {
-			CJayImageDaoImpl uploadList = CJayClient.getInstance()
-					.getDatabaseManager().getHelper(getApplicationContext())
-					.getCJayImageDaoImpl();
-
-			// TODO: TIEUBAO - Em Gan ngay cai CJayImage nay vao danh sach cua ContainerSession hien tai de con upload sau nay 
-			
-			uploadList.addCJayImage(uploadItem);			
-			
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
 	// endregion
 
 	// region Camera Support method
@@ -737,91 +699,6 @@ public class CameraActivity extends Activity {
 		camera.setDisplayOrientation(result);
 	}
 
-	private Camera.Size getBestPreviewSize(int width, int height,
-			Camera.Parameters parameters) {
-		Camera.Size result = null;
-
-		for (Camera.Size size : parameters.getSupportedPreviewSizes()) {
-
-			if ((size.width <= width && size.height <= height)
-					|| (size.width <= height && size.height <= width)) {
-				if (result == null) {
-					result = size;
-				} else {
-					int resultArea = result.width * result.height;
-					int newArea = size.width * size.height;
-
-					if (newArea > resultArea) {
-						result = size;
-					}
-				}
-			}
-		}
-
-		return (result);
-	}
-
-	private Camera.Size getSmallestPictureSize(Camera.Parameters parameters) {
-		Camera.Size result = null;
-
-		for (Camera.Size size : parameters.getSupportedPictureSizes()) {
-			if (result == null) {
-				result = size;
-			} else {
-				int resultArea = result.width * result.height;
-				int newArea = size.width * size.height;
-
-				if (newArea < resultArea) {
-					result = size;
-				}
-			}
-		}
-
-		return (result);
-	}
-
-	private Camera.Size getBestPictureSize(Camera.Parameters parameters) {
-
-		for (Camera.Size size : parameters.getSupportedPictureSizes()) {
-
-		}
-
-		Camera.Size result = null;
-
-		List<Size> sizes = parameters.getSupportedPictureSizes();
-		int index = 2;
-		if (sizes.size() > index) {
-			Camera.Size first = sizes.get(sizes.size() - index - 1);
-			Camera.Size second = sizes.get(index);
-
-			int firstArea = first.width * first.height;
-			int secondArea = second.width * second.height;
-
-			if (firstArea < secondArea)
-				result = second;
-			else
-				result = first;
-
-		} else {
-			result = sizes.get(sizes.size() - 1);
-		}
-		return (result);
-
-		// for (Camera.Size size : parameters.getSupportedPictureSizes()) {
-		// if (result == null) {
-		// result = size;
-		// } else {
-		// int resultArea = result.width * result.height;
-		// int newArea = size.width * size.height;
-		//
-		// if (newArea > resultArea) {
-		// result = size;
-		// }
-		// }
-		// }
-		// return (result);
-	}
-
 	private Size determineBestPreviewSize(Camera.Parameters parameters) {
 		List<Size> sizes = parameters.getSupportedPreviewSizes();
 
@@ -849,42 +726,4 @@ public class CameraActivity extends Activity {
 
 		return bestSize;
 	}
-
-	// // TODO: for FOCUS modes
-	// private Rect calculateFocusArea(float x, float y) {
-	// int left = clamp(
-	// Float.valueOf((x / getSurfaceView().getWidth()) * 2000 - 1000)
-	// .intValue(), focusAreaSize);
-	// int top = clamp(
-	// Float.valueOf((y / getSurfaceView().getHeight()) * 2000 - 1000)
-	// .intValue(), focusAreaSize);
-	//
-	// return new Rect(left, top, left + focusAreaSize, top + focusAreaSize);
-	// }
-	//
-	// protected void focusOnTouch(MotionEvent event) {
-	// if (camera != null) {
-	//
-	// camera.cancelAutoFocus();
-	// Rect focusRect = calculateTapArea(event.getX(), event.getY(), 1f);
-	// Rect meteringRect = calculateTapArea(event.getX(), event.getY(),
-	// 1.5f);
-	//
-	// Parameters parameters = camera.getParameters();
-	// parameters.setFocusMode(Parameters.FOCUS_MODE_AUTO);
-	// parameters.setFocusAreas(Lists.newArrayList(new Camera.Area(
-	// focusRect, 1000)));
-	//
-	// if (meteringAreaSupported) {
-	// parameters.setMeteringAreas(Lists.newArrayList(new Camera.Area(
-	// meteringRect, 1000)));
-	// }
-	//
-	// camera.setParameters(parameters);
-	// camera.autoFocus(this);
-	// }
-	// }
-	//
-	//
-	// endregion
 }

@@ -23,48 +23,48 @@ public class User {
 	public static final String EXPIRE = "expire_in";
 
 	@DatabaseField(id = true, columnName = ID)
-	private int id;
+	int id;
 
 	@DatabaseField(columnName = USERNAME)
-	private String username;
+	String username;
 
 	@DatabaseField(columnName = EMAIL)
-	private String email;
+	String email;
 
 	@DatabaseField(columnName = IS_MAIN_ACCOUNT, defaultValue = "0")
-	private boolean is_main_account;
+	boolean is_main_account;
 
 	@DatabaseField(columnName = ACCESS_TOKEN)
-	private String access_token;
+	String access_token;
 
 	@DatabaseField(columnName = FIRST_NAME)
-	private String first_name;
+	String first_name;
 
 	@DatabaseField(columnName = LAST_NAME)
-	private String last_name;
+	String last_name;
 
 	@DatabaseField(columnName = FULL_NAME)
-	private String full_name;
+	String full_name;
 
 	@DatabaseField(columnName = ROLE_NAME)
-	private String role_name;
+	String role_name;
 
 	@DatabaseField(columnName = ROLE, canBeNull = false)
-	private int role;
+	int role;
 
 	@DatabaseField(columnName = AVATAR_URL)
-	private String avatar_url;
+	String avatar_url;
 
 	@DatabaseField(columnName = DIALING_CODE)
-	private int dialing_code;
+	int dialing_code;
 
 	@DatabaseField(columnName = PHONE)
-	private int phone;
+	int phone;
 
 	@DatabaseField(columnName = EXPIRE)
-	private int expire_in;
+	int expire_in;
 
-	private String depot_code;
+	String depot_code;
 
 	public String getDepotCode() {
 		return depot_code;

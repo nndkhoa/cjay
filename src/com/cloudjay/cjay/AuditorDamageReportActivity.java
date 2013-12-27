@@ -18,21 +18,23 @@ import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_auditor_damage_report)
-public class AuditorDamageReportActivity extends SherlockFragmentActivity implements
-	OnPageChangeListener, TabListener, OnReportPageCompleteListener {
-	
+public class AuditorDamageReportActivity extends SherlockFragmentActivity
+		implements OnPageChangeListener, TabListener,
+		OnReportPageCompleteListener {
+
 	private String[] locations;
-	
+
 	@ViewById
 	ViewPager pager;
 
 	@AfterViews
-	void afterViews() {		
-		locations = getResources().getStringArray(R.array.auditor_damage_report_tabs);
+	void afterViews() {
+		locations = getResources().getStringArray(
+				R.array.auditor_damage_report_tabs);
 		configureViewPager();
 		configureActionBar();
 	}
-	
+
 	@Override
 	public void onTabSelected(Tab tab, FragmentTransaction ft) {
 		int position = tab.getPosition();
@@ -41,22 +43,18 @@ public class AuditorDamageReportActivity extends SherlockFragmentActivity implem
 
 	@Override
 	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void onPageScrollStateChanged(int arg0) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void onPageScrolled(int arg0, float arg1, int arg2) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -64,9 +62,10 @@ public class AuditorDamageReportActivity extends SherlockFragmentActivity implem
 		Tab tab = getSupportActionBar().getTabAt(position);
 		getSupportActionBar().selectTab(tab);
 	}
-	
+
 	private void configureViewPager() {
-		AuditorDamageReportTabPageAdaptor viewPagerAdapter = new AuditorDamageReportTabPageAdaptor(getSupportFragmentManager(), locations);
+		AuditorDamageReportTabPageAdaptor viewPagerAdapter = new AuditorDamageReportTabPageAdaptor(
+				getSupportFragmentManager(), locations);
 		pager.setOffscreenPageLimit(5);
 		pager.setAdapter(viewPagerAdapter);
 		pager.setOnPageChangeListener(this);
@@ -86,52 +85,54 @@ public class AuditorDamageReportActivity extends SherlockFragmentActivity implem
 	public void onReportPageCompleted(int page, String[] vals) {
 		switch (page) {
 		case OnReportPageCompleteListener.TAB_DAMAGE_LOCATION:
-			
+
 			break;
 		case OnReportPageCompleteListener.TAB_DAMAGE_DAMAGE:
-			
+
 			break;
 		case OnReportPageCompleteListener.TAB_DAMAGE_REPAIR:
-			
+
 			break;
 		case OnReportPageCompleteListener.TAB_DAMAGE_DIMENSION:
-			
+
 			break;
 		case OnReportPageCompleteListener.TAB_DAMAGE_QUANTITY:
-			
+
 			break;
 		}
 		int currPosition = getSupportActionBar().getSelectedNavigationIndex();
 		if (currPosition < getSupportActionBar().getTabCount() - 1) {
-			getSupportActionBar().selectTab(getSupportActionBar().getTabAt(++currPosition));
+			getSupportActionBar().selectTab(
+					getSupportActionBar().getTabAt(++currPosition));
 		}
 	}
 
 	public class AuditorDamageReportTabPageAdaptor extends FragmentPagerAdapter {
-	    private String[] locations;
+		private String[] locations;
 
-	    public AuditorDamageReportTabPageAdaptor(FragmentManager fm, String[] locations) {
-	        super(fm);
-	        this.locations = locations;
-	    }
+		public AuditorDamageReportTabPageAdaptor(FragmentManager fm,
+				String[] locations) {
+			super(fm);
+			this.locations = locations;
+		}
 
-	    public int getCount() {
-	        return locations.length;
-	    }
+		public int getCount() {
+			return locations.length;
+		}
 
-	    public Fragment getItem(int position) {
-	    	switch (position) {
-	    	case 0:
-	    		return new AuditorDamageLocationFragment_();
-	    	case 1:
-	    		return new AuditorDamageDamageFragment_();
-	    	case 2:
-	    		return new AuditorDamageRepairFragment_();
-	    	case 3:
-	    		return new AuditorDamageDimensionFragment_();
-	    	default:
-	    		return new AuditorDamageQuantityFragment_();
-	    	}
-	    }
+		public Fragment getItem(int position) {
+			switch (position) {
+			case 0:
+				return new AuditorDamageLocationFragment_();
+			case 1:
+				return new AuditorDamageDamageFragment_();
+			case 2:
+				return new AuditorDamageRepairFragment_();
+			case 3:
+				return new AuditorDamageDimensionFragment_();
+			default:
+				return new AuditorDamageQuantityFragment_();
+			}
+		}
 	}
 }

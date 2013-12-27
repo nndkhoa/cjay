@@ -1,5 +1,9 @@
 package com.cloudjay.cjay.model;
 
+import java.util.Collection;
+
+import org.parceler.Parcel;
+
 import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
@@ -7,6 +11,7 @@ import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "depot", daoClass = DepotDaoImpl.class)
+@Parcel
 public class Depot {
 
 	public static final String ID = "id";
@@ -14,19 +19,19 @@ public class Depot {
 	public static final String DEPOT_NAME = "depot_name";
 
 	@DatabaseField(columnName = ID, generatedId = true, allowGeneratedIdInsert = true)
-	private Integer id;
+	Integer id;
 
 	@DatabaseField(columnName = DEPOT_CODE)
-	private String depot_code;
+	String depot_code;
 
 	@DatabaseField(columnName = DEPOT_NAME, defaultValue = "")
-	private String depot_name;
+	String depot_name;
 
 	@ForeignCollectionField(eager = true)
-	private ForeignCollection<Container> containers;
+	Collection<Container> containers;
 
 	@ForeignCollectionField(eager = true)
-	private ForeignCollection<User> users;
+	Collection<User> users;
 
 	public void setDepotCode(String depotCode) {
 		this.depot_code = depotCode;
@@ -52,19 +57,19 @@ public class Depot {
 		return id;
 	}
 
-	public void setContainers(ForeignCollection<Container> containers) {
+	public void setContainers(Collection<Container> containers) {
 		this.containers = containers;
 	}
 
-	public ForeignCollection<Container> getContainers() {
+	public Collection<Container> getContainers() {
 		return this.containers;
 	}
 
-	public ForeignCollection<User> getUsers() {
+	public Collection<User> getUsers() {
 		return users;
 	}
 
-	public void setUsers(ForeignCollection<User> users) {
+	public void setUsers(Collection<User> users) {
 		this.users = users;
 	}
 }

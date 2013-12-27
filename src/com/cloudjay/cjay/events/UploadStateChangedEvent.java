@@ -16,7 +16,6 @@
 package com.cloudjay.cjay.events;
 
 import com.cloudjay.cjay.model.GateReportImage;
-import com.cloudjay.cjay.model.TmpContainerSession;
 
 public class UploadStateChangedEvent {
 

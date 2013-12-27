@@ -1,5 +1,7 @@
 package com.cloudjay.cjay.model;
 
+import org.parceler.Parcel;
+
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -11,6 +13,7 @@ import com.j256.ormlite.table.DatabaseTable;
  * 
  */
 @DatabaseTable(tableName = "operator", daoClass = OperatorDaoImpl.class)
+@Parcel
 public class Operator {
 
 	public static final String ID = "id";
@@ -18,13 +21,13 @@ public class Operator {
 	public static final String NAME = "operator_name";
 
 	@DatabaseField(id = true, columnName = ID)
-	private int id;
+	int id;
 
 	@DatabaseField(columnName = CODE)
-	private String operator_code;
+	String operator_code;
 
 	@DatabaseField(columnName = NAME)
-	private String operator_name;
+	String operator_name;
 
 	// @ForeignCollectionField(eager = true)
 	// private ForeignCollection<Container> containers;

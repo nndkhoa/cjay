@@ -1,14 +1,9 @@
 package com.cloudjay.cjay;
 
-import java.sql.SQLException;
-
 import org.json.JSONException;
 
 import com.aerilys.helpers.android.NetworkHelper;
 import com.aerilys.helpers.android.UIHelper;
-import com.cloudjay.cjay.dao.IUserDao;
-import com.cloudjay.cjay.model.IDatabaseManager;
-import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;

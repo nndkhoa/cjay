@@ -23,19 +23,13 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.util.AttributeSet;
-import android.util.Log;
-
 import java.lang.ref.WeakReference;
 import java.util.concurrent.Future;
 
-import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.task.PhotupThreadRunnable;
-import com.cloudjay.cjay.util.Flags;
-
 import uk.co.senab.bitmapcache.BitmapLruCache;
-import uk.co.senab.bitmapcache.CacheableBitmapWrapper;
 import uk.co.senab.bitmapcache.CacheableImageView;
 
 public class PhotupImageView extends CacheableImageView {

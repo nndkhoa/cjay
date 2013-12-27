@@ -38,7 +38,8 @@ import com.cloudjay.cjay.view.PhotoTagItemLayout;
 
 import de.greenrobot.event.EventBus;
 
-public class PhotoViewerActivity extends PhotupFragmentActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class PhotoViewerActivity extends PhotupFragmentActivity implements
+		LoaderManager.LoaderCallbacks<Cursor> {
 
 	public static final String EXTRA_POSITION = "extra_position";
 	public static final String EXTRA_MODE = "extra_mode";
@@ -66,7 +67,7 @@ public class PhotoViewerActivity extends PhotupFragmentActivity implements Loade
 		PhotoTagItemLayout currentView = getCurrentView();
 		TmpContainerSession upload = currentView.getPhotoSelection();
 
-//		upload.reset();
+		// upload.reset();
 		reloadView(currentView);
 	}
 
@@ -104,13 +105,13 @@ public class PhotoViewerActivity extends PhotupFragmentActivity implements Loade
 		mViewPager.setPageMargin(getResources().getDimensionPixelSize(
 				R.dimen.viewpager_margin));
 
-		mAdapter = new SelectedPhotosViewPagerAdapter(this, new OnSingleTapListener() {
-				@Override
-				public boolean onSingleTap() {
-					// TODO Auto-generated method stub
-					return false;
-				}
-			});
+		mAdapter = new SelectedPhotosViewPagerAdapter(this,
+				new OnSingleTapListener() {
+					@Override
+					public boolean onSingleTap() {
+						return false;
+					}
+				});
 
 		mViewPager.setAdapter(mAdapter);
 
@@ -122,37 +123,38 @@ public class PhotoViewerActivity extends PhotupFragmentActivity implements Loade
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setTitle(" ");
 
-//		/**
-//		 * Nasty hack, basically we need to know when the ViewPager is laid out,
-//		 * we then manually call onPageSelected. This is to fix onPageSelected
-//		 * not being called on the first item.
-//		 */
-//		mViewPager.getViewTreeObserver().addOnGlobalLayoutListener(
-//				new OnGlobalLayoutListener() {
-//					@SuppressWarnings("deprecation")
-//					public void onGlobalLayout() {
-//						mViewPager.getViewTreeObserver()
-//								.removeGlobalOnLayoutListener(this);
-//						onPageSelected(mViewPager.getCurrentItem());
-//						showTapToTagPrompt();
-//					}
-//				});
+		// /**
+		// * Nasty hack, basically we need to know when the ViewPager is laid
+		// out,
+		// * we then manually call onPageSelected. This is to fix onPageSelected
+		// * not being called on the first item.
+		// */
+		// mViewPager.getViewTreeObserver().addOnGlobalLayoutListener(
+		// new OnGlobalLayoutListener() {
+		// @SuppressWarnings("deprecation")
+		// public void onGlobalLayout() {
+		// mViewPager.getViewTreeObserver()
+		// .removeGlobalOnLayoutListener(this);
+		// onPageSelected(mViewPager.getCurrentItem());
+		// showTapToTagPrompt();
+		// }
+		// });
 	}
 
 	@Override
 	protected void onDestroy() {
 		EventBus.getDefault().unregister(this);
-//		mController.updateDatabase();
+		// mController.updateDatabase();
 		super.onDestroy();
 	}
 
-//	private PhotoUpload getCurrentUpload() {
-//		PhotoTagItemLayout view = getCurrentView();
-//		if (null != view) {
-//			return view.getPhotoSelection();
-//		}
-//		return null;
-//	}
+	// private PhotoUpload getCurrentUpload() {
+	// PhotoTagItemLayout view = getCurrentView();
+	// if (null != view) {
+	// return view.getPhotoSelection();
+	// }
+	// return null;
+	// }
 
 	private PhotoTagItemLayout getCurrentView() {
 		final int currentPos = mViewPager.getCurrentItem();
@@ -175,7 +177,7 @@ public class PhotoViewerActivity extends PhotupFragmentActivity implements Loade
 			imageView.requestFullSize(selection, true, false, null);
 		}
 	}
-	
+
 	public void onPhotoLoadStatusChanged(boolean finished) {
 		// TODO Fix this setProgressBarIndeterminateVisibility(!finished);
 	}

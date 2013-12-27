@@ -160,9 +160,11 @@ public class UploadsFragment extends SherlockFragment implements
 
 	public boolean canDismiss(AbsListView listView, int position) {
 		try {
-			GateReportImage upload = (GateReportImage) listView
-					.getItemAtPosition(position);
-			return upload.getUploadState() != GateReportImage.STATE_UPLOAD_IN_PROGRESS;
+			// TODO:
+			// GateReportImage upload = (GateReportImage) listView
+			// .getItemAtPosition(position);
+			// return upload.getUploadState() !=
+			// GateReportImage.STATE_UPLOAD_IN_PROGRESS;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
