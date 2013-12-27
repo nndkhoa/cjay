@@ -1,5 +1,6 @@
 package com.cloudjay.cjay;
 
+import java.util.Calendar;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -9,7 +10,10 @@ import org.acra.annotation.ReportsCrashes;
 
 import uk.co.senab.bitmapcache.BitmapLruCache;
 
+import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.Application;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -26,6 +30,8 @@ import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.network.HttpRequestWrapper;
 import com.cloudjay.cjay.network.IHttpRequestWrapper;
+import com.cloudjay.cjay.network.QueueIntentService;
+import com.cloudjay.cjay.network.UploadIntentService;
 import com.cloudjay.cjay.receivers.InstantUploadReceiver;
 import com.cloudjay.cjay.task.PhotupThreadFactory;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -160,6 +166,12 @@ public class CJayApplication extends Application {
 
 		checkInstantUploadReceiverState();
 		mPhotoController = new PhotoUploadController(this);
+		Intent intent = new Intent(this, QueueIntentService.class);
+		PendingIntent pintent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		Calendar current = Calendar.getInstance();
+		AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+		// Start every 30 seconds
+		alarm.setRepeating(AlarmManager.RTC_WAKEUP, current.getTimeInMillis(), 10*1000, pintent);		
 	}
 
 	public void checkInstantUploadReceiverState() {

@@ -3,6 +3,8 @@ package com.cloudjay.cjay.dao;
 import java.sql.SQLException;
 import java.util.List;
 
+import android.R.anim;
+
 import com.cloudjay.cjay.model.CJayImage;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
@@ -30,7 +32,7 @@ public class CJayImageDaoImpl extends BaseDaoImpl<CJayImage, Integer> implements
 
 	@Override
 	public void addCJayImage(CJayImage cJayImage) throws SQLException {
-		this.createOrUpdate(cJayImage);
+		this.create(cJayImage);
 	}
 
 	@Override
@@ -41,6 +43,17 @@ public class CJayImageDaoImpl extends BaseDaoImpl<CJayImage, Integer> implements
 		}
 	}
 
+	@Override
+	public CJayImage getNextWaiting() throws SQLException {
+		List<CJayImage> result = this.queryForEq("state", CJayImage.STATE_UPLOAD_WAITING);
+		
+		if (result != null && result.size() > 0) {
+			return result.get(0);
+		}
+
+		return null;
+	}
+	
 	@Override
 	public CJayImage findByUuid(String uuid) throws SQLException {
 		List<CJayImage> result = this.queryForEq("uuid", uuid);

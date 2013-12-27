@@ -11,11 +11,10 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "cjay_image", daoClass = CJayImageDaoImpl.class)
 public class CJayImage {
 
-	public static final int STATE_UPLOAD_COMPLETED = 5;
-	public static final int STATE_UPLOAD_ERROR = 4;
-	public static final int STATE_UPLOAD_IN_PROGRESS = 3;
-	public static final int STATE_UPLOAD_WAITING = 2;
-	public static final int STATE_SELECTED = 1;
+	public static final int STATE_UPLOAD_COMPLETED = 4;
+	public static final int STATE_UPLOAD_ERROR = 3;
+	public static final int STATE_UPLOAD_IN_PROGRESS = 2;
+	public static final int STATE_UPLOAD_WAITING = 1;	
 	public static final int STATE_NONE = 0;
 
 	private static final String ID = "id";
@@ -24,7 +23,9 @@ public class CJayImage {
 	private static final String TIME_POSTED = "time_posted";
 	private static final String FIELD_STATE = "state";
 	private static final String FIELD_URI = "uri";
-
+	private static final String FIELD_UUID = "uuid";
+	
+	
 	public CJayImage() {
 
 	}
@@ -38,6 +39,18 @@ public class CJayImage {
 
 	public int getUploadState() {
 		return mState;
+	}
+	
+	public void setUploadState(int state) {
+		mState = state;
+	}
+	
+	public String getUri() {
+		return mUri;
+	}
+		
+	public void setUri(String uri) {
+		mUri = uri;
 	}
 
 	public int getUploadProgress() {
@@ -56,8 +69,11 @@ public class CJayImage {
 
 	@DatabaseField(columnName = FIELD_STATE)
 	private int mState;
+	
+	@DatabaseField(columnName = FIELD_URI)
+	private String mUri;
 
-	@DatabaseField(id = true, columnName = ID)
+	@DatabaseField(columnName = ID)
 	private int id;
 
 	@DatabaseField(columnName = IMAGE_NAME)
@@ -66,7 +82,7 @@ public class CJayImage {
 	@DatabaseField(columnName = TIME_POSTED)
 	private String time_posted;
 
-	@DatabaseField
+	@DatabaseField(columnName = FIELD_UUID)
 	private String uuid;
 
 	/**
