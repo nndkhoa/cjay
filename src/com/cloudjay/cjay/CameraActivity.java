@@ -83,8 +83,8 @@ public class CameraActivity extends Activity {
 
 	private List<String> photos;
 
-	private static final int PICTURE_SIZE_MAX_WIDTH = 1920;
-	private static final int PREVIEW_SIZE_MAX_WIDTH = 1920;
+	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
+	private static final int PREVIEW_SIZE_MAX_WIDTH = 1280;
 
 	// region GetViewById
 	@ViewById(R.id.camera_preview)
