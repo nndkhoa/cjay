@@ -3,10 +3,10 @@ package com.cloudjay.cjay.fragment;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -25,12 +25,16 @@ import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.ami.fundapter.interfaces.ItemClickListener;
 import com.cloudjay.cjay.*;
-import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.listener.OnContainerAddRequestListener;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.TmpContainerSession;
+import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Mapper;
+import com.cloudjay.cjay.util.Session;
+import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.view.AddContainerDialog;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Click;
 import com.googlecode.androidannotations.annotations.EFragment;
@@ -43,11 +47,13 @@ import com.googlecode.androidannotations.annotations.ViewById;
 @EFragment(R.layout.fragment_gate_export)
 @OptionsMenu(R.menu.menu_gate_export)
 public class GateExportListFragment extends SherlockDialogFragment {
-	private OnContainerAddRequestListener mCallback;
+	
+	private ArrayList<Operator> mOperators;
 	private ArrayList<ContainerSession> mFeeds;
 	private FunDapter<ContainerSession> mFeedsAdapter;
 	
-	private ContainerSession mSelectedContainerSession;
+	private ContainerSession mSelectedContainerSession;	
+	private boolean mDirty;
 
 	@ViewById(R.id.container_list) ListView mFeedListView;
 	@ViewById(R.id.search_edittext)	EditText mSearchEditText;
@@ -71,8 +77,11 @@ public class GateExportListFragment extends SherlockDialogFragment {
 			}
 		});
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListContainerSessions(getActivity());
+		mOperators = (ArrayList<Operator>) DataCenter.getInstance().getListOperators(getActivity());
 		configureControls(mFeeds);
-		initFunDapter(mFeeds);
+		initFunDapter(mFeeds);		
+
+		mDirty = false;
 	}
 	
 	@OptionsItem(R.id.menu_upload)
@@ -82,7 +91,8 @@ public class GateExportListFragment extends SherlockDialogFragment {
 	
 	@Click(R.id.add_button)
 	void addButtonClicked() {
-		mCallback.OnContainerAddRequested();
+		// show add container dialog
+		showContainerDetailDialog(getResources().getString(R.string.default_container_id), "", AddContainerDialog.CONTAINER_DIALOG_ADD);
 	}
 
 	@ItemClick(R.id.container_list)
@@ -132,21 +142,71 @@ public class GateExportListFragment extends SherlockDialogFragment {
 				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		return dialog;
 	}
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mCallback = (OnContainerAddRequestListener)activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnContainerAddRequestListener");
-        }
-    }
     
 	@Override
 	public void onResume() {
 		super.onResume();
-		// Hector: will update UI here
+		
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+				.getListContainerSessions(getActivity());
+		mSearchEditText.setText(""); // this will refresh the list
+	}
+	public void showContainerDetailDialog(String containerId, String operatorName, int mode) {
+		FragmentManager fm = getActivity().getSupportFragmentManager();
+        AddContainerDialog addContainerDialog = new AddContainerDialog();
+        addContainerDialog.setContainerId(containerId);
+        addContainerDialog.setOperatorName(operatorName);
+        addContainerDialog.setMode(mode);
+        addContainerDialog.setParent(this);
+        addContainerDialog.show(fm, "add_container_dialog");
+	}
+	
+	public void OnOperatorSelected(String containerId, String operatorName, int mode) {
+		showContainerDetailDialog(containerId, operatorName, mode);
+	}
+	
+	public void OnContainerInputCompleted(String containerId, String operatorName, int mode) {
+		// Get the container id and container operator code
+		String operatorCode = "";
+		for (Operator operator : mOperators) {
+			if (operator.getName().equals(operatorName)) {
+				operatorCode = operator.getCode();
+				break;
+			}
+		}
+		
+		switch (mode) {
+		case AddContainerDialog.CONTAINER_DIALOG_ADD:
+			// Create a tmp Container Session
+			TmpContainerSession newTmpContainer = new TmpContainerSession();
+			newTmpContainer.setContainerId(containerId);
+			newTmpContainer.setOperatorCode(operatorCode);
+			newTmpContainer.setCheckInTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT));
+
+			User currentUser = Session.restore(getActivity()).getCurrentUser();
+
+			newTmpContainer.setDepotCode(currentUser.getDepot().getDepotCode());
+			newTmpContainer.printMe();
+
+			// Save the current temp Container Session
+			DataCenter.getInstance()
+					.setTmpCurrentSession(
+							newTmpContainer);
+
+			// Pass tmpContainerSession away
+			// Then start showing the Camera
+			Intent intent = new Intent(getActivity(),
+					CameraActivity_.class);
+			intent.putExtra(
+					CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+					newTmpContainer);
+			intent.putExtra("type", 1); // out
+			startActivity(intent);
+			break;
+
+		}
+
+		mDirty = true;
 	}
 
 	private void search(String searchText) {
