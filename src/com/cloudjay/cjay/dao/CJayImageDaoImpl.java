@@ -3,8 +3,6 @@ package com.cloudjay.cjay.dao;
 import java.sql.SQLException;
 import java.util.List;
 
-import android.R.anim;
-
 import com.cloudjay.cjay.model.CJayImage;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;

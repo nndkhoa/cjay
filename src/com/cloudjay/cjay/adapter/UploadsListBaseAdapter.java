@@ -27,7 +27,6 @@ import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.PhotoUploadController;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.GateReportImage;
-import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.view.UploadItemLayout;
 
 public class UploadsListBaseAdapter extends BaseAdapter {

@@ -82,8 +82,7 @@ public class UploadIntentService extends IntentService implements CountingInputS
 	
 	private void doFileUpload(CJayImage uploadItem) {
 		try {			
-			// Try New Upload Method
-			
+			// Try New Upload Method			
 			uploadItem.setUploadState(CJayImage.STATE_UPLOAD_IN_PROGRESS);
 			// Set Status to Uploading
 			uploadList.update(uploadItem);	
@@ -134,8 +133,26 @@ public class UploadIntentService extends IntentService implements CountingInputS
 				e.printStackTrace();	
 			}
 		} catch (SQLException e) {
+			// Set Status to Uploading
+			try {
+				// THIS IS SQL ERROR --> NO REPEAT
+				uploadItem.setUploadState(CJayImage.STATE_UPLOAD_ERROR);
+				uploadList.update(uploadItem);
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}			
 			e.printStackTrace();
-		} catch (IOException e) {				
+		} catch (IOException e) {
+			
+			// Set Status to Uploading
+			try {
+				uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
+				uploadList.update(uploadItem);
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			e.printStackTrace();
 		}
 	}

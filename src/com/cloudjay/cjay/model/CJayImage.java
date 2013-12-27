@@ -1,8 +1,7 @@
 package com.cloudjay.cjay.model;
 
-import java.util.Date;
+import org.parceler.Parcel;
 
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.text.TextUtils;
 
@@ -10,6 +9,7 @@ import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+@Parcel
 @DatabaseTable(tableName = "cjay_image", daoClass = CJayImageDaoImpl.class)
 public class CJayImage {
 
@@ -38,66 +38,37 @@ public class CJayImage {
 		this.time_posted = time_posted;
 	}
 
-	public int getUploadState() {
-		return mState;
-	}
-
-	public void setUploadState(int state) {
-		mState = state;
-	}
-
-	public String getUri() {
-		return mUri;
-	}
-
-	public void setUri(String uri) {
-		mUri = uri;
-	}
-
-	public int getUploadProgress() {
-		return mProgress;
-	}
-
-	public void setUploadProgress(int progress) {
-		if (progress != mProgress) {
-			mProgress = progress;
-			// notifyUploadStateListener();
-		}
-	}
-
-	private Uri mFullUri;
-	private int mProgress;
-	private Bitmap mBigPictureNotificationBmp;
-
-	@DatabaseField(columnName = FIELD_STATE)
-	private int mState;
-
-	@DatabaseField(columnName = FIELD_URI, id = true)
-	private String mUri;
-
 	@DatabaseField(columnName = ID)
-	private int id;
+	int id;
 
 	@DatabaseField(columnName = IMAGE_NAME)
-	private String image_name;
+	String image_name;
 
 	@DatabaseField(columnName = TIME_POSTED)
-	private String time_posted;
+	String time_posted;
 
 	@DatabaseField(columnName = FIELD_UUID)
-	private String uuid;
+	String uuid;
 
 	/**
 	 * TYPE include: in | out | issue | repaired
 	 */
 	@DatabaseField(columnName = TYPE)
-	private int type;
+	int type;
+
+	@DatabaseField(columnName = FIELD_STATE)
+	int mState;
+
+	@DatabaseField(columnName = FIELD_URI, id = true)
+	String mUri;
+
+	Uri mFullUri;
 
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
-	private ContainerSession containerSession;
+	ContainerSession containerSession;
 
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
-	private Issue issue;
+	Issue issue;
 
 	public Issue getIssue() {
 		return issue;
@@ -154,4 +125,19 @@ public class CJayImage {
 		this.uuid = uuid;
 	}
 
+	public int getUploadState() {
+		return mState;
+	}
+
+	public void setUploadState(int state) {
+		mState = state;
+	}
+
+	public String getUri() {
+		return mUri;
+	}
+
+	public void setUri(String uri) {
+		mUri = uri;
+	}
 }

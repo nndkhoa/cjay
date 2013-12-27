@@ -2,13 +2,15 @@ package com.cloudjay.cjay.model;
 
 import java.util.Collection;
 
+import org.parceler.Parcel;
+
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
-import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "container", daoClass = ContainerDaoImpl.class)
+@Parcel
 public class Container {
 
 	public static final String ID = "id";
@@ -22,19 +24,19 @@ public class Container {
 	}
 
 	@DatabaseField(columnName = ID, generatedId = true, allowGeneratedIdInsert = true)
-	private int id;
+	int id;
 
 	@DatabaseField(columnName = CONTAINER_ID)
-	private String container_id;
+	String container_id;
 
 	@DatabaseField(canBeNull = false, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
-	private Operator operator;
+	Operator operator;
 
 	@ForeignCollectionField(eager = true)
-	private ForeignCollection<ContainerSession> containerSessions;
+	Collection<ContainerSession> containerSessions;
 
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
-	private Depot depot;
+	Depot depot;
 
 	public Depot getDepot() {
 		return depot;
@@ -47,7 +49,7 @@ public class Container {
 	public String getFullContainerId() {
 		return operator.getId() + container_id;
 	}
-	
+
 	public String getContainerId() {
 		return container_id;
 	}
@@ -69,7 +71,7 @@ public class Container {
 	}
 
 	public void setContainerSessions(Collection<ContainerSession> newSessions) {
-		this.containerSessions = (ForeignCollection<ContainerSession>) newSessions;
+		this.containerSessions = newSessions;
 	}
 
 	public String toString() {

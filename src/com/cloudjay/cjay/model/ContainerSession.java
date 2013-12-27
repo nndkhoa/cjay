@@ -1,6 +1,9 @@
 package com.cloudjay.cjay.model;
 
 import java.util.Collection;
+
+import org.parceler.Parcel;
+
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
@@ -20,7 +23,10 @@ import com.j256.ormlite.table.DatabaseTable;
  */
 
 @DatabaseTable(tableName = "container_session", daoClass = ContainerSessionDaoImpl.class)
+@Parcel
 public class ContainerSession {
+
+	private static final String TAG = "ContainerSession";
 
 	private static final String CHECK_OUT_TIME = "check_out_time";
 	private static final String CHECK_IN_TIME = "check_in_time";
@@ -35,47 +41,37 @@ public class ContainerSession {
 	public static final int STATE_SELECTED = 1;
 	public static final int STATE_NONE = 0;
 
-	public int getUploadState() {
-		return mState;
-	}
-
-	@DatabaseField(columnName = FIELD_STATE)
-	private int mState;
-
-	private static final String TAG = "ContainerSession";
-
 	@DatabaseField(id = true, columnName = ID)
-	private int id;
+	int id;
 
 	@DatabaseField(columnName = IMAGE_ID_PATH)
-	private String image_id_path;
+	String image_id_path;
 
 	@DatabaseField(columnName = CHECK_IN_TIME, defaultValue = "")
-	private String check_in_time;
+	String check_in_time;
 
 	@DatabaseField(columnName = CHECK_OUT_TIME, defaultValue = "")
-	private String check_out_time;
+	String check_out_time;
+
+	@DatabaseField(columnName = FIELD_STATE)
+	int mState;
 
 	// container_id
 	// operator_code
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
-	private Container container;
+	Container container;
 
 	// gate_report_images where type = 0 (check in) | 1 (check out)
+	// audit_report_items too
 	@ForeignCollectionField(eager = true)
-	private Collection<CJayImage> cJayImages;
+	Collection<CJayImage> cJayImages;
 
-	public void setCJayImages(Collection<CJayImage> cJayImages) {
-		this.cJayImages = cJayImages;
-	}
-
-	public Collection<CJayImage> getCJayImages() {
-		return cJayImages;
-	}
-
-	//
 	@ForeignCollectionField(eager = true)
-	private Collection<Issue> issues;
+	Collection<Issue> issues;
+
+	public int getUploadState() {
+		return mState;
+	}
 
 	public void setIssues(Collection<Issue> issues) {
 		this.issues = issues;
@@ -85,10 +81,18 @@ public class ContainerSession {
 		return issues;
 	}
 
+	public void setCJayImages(Collection<CJayImage> cJayImages) {
+		this.cJayImages = cJayImages;
+	}
+
+	public Collection<CJayImage> getCJayImages() {
+		return cJayImages;
+	}
+
 	public String getOperatorName() {
 		return getContainer().getOperator().getCode();
 	}
-	
+
 	public String getContainerId() {
 		return getContainer().getContainerId();
 	}
@@ -114,18 +118,10 @@ public class ContainerSession {
 		this.image_id_path = image_id_path;
 	}
 
-	// public String getCheckInTime() {
-	// return check_in_time;
-	// }
-
 	public void setCheckInTime(String check_in_time) {
 
 		this.check_in_time = check_in_time;
 	}
-
-	// public String getCheckOutTime() {
-	// return check_out_time;
-	// }
 
 	public void setCheckOutTime(String check_out_time) {
 		this.check_out_time = check_out_time;
@@ -152,4 +148,5 @@ public class ContainerSession {
 				+ getOperatorName() + " - TimeIn: " + getCheckInTime()
 				+ " - TimeOut: " + getCheckOutTime());
 	}
+
 }

@@ -3,10 +3,7 @@ package com.cloudjay.cjay;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.GateReportImage;
-import com.cloudjay.cjay.model.TmpContainerSession;
-
 import android.content.Context;
 
 public class PhotoUploadController {
@@ -26,9 +23,10 @@ public class PhotoUploadController {
 
 	public synchronized boolean hasWaitingUploads() {
 		for (GateReportImage upload : mUploadingList) {
-			if (upload.getUploadState() == ContainerSession.STATE_UPLOAD_WAITING) {
-				return true;
-			}
+			// if (upload.getUploadState() ==
+			// ContainerSession.STATE_UPLOAD_WAITING) {
+			// return true;
+			// }
 		}
 		return false;
 	}
