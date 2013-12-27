@@ -44,8 +44,12 @@ public class Container {
 		this.depot = depot;
 	}
 
-	public String getContainerId() {
+	public String getFullContainerId() {
 		return operator.getId() + container_id;
+	}
+	
+	public String getContainerId() {
+		return container_id;
 	}
 
 	public void setContainerId(String containerId) {

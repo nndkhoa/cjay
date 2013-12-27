@@ -11,7 +11,6 @@ import org.acra.annotation.ReportsCrashes;
 import uk.co.senab.bitmapcache.BitmapLruCache;
 
 import android.app.AlarmManager;
-import android.app.AlertDialog;
 import android.app.Application;
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -31,7 +30,6 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.network.HttpRequestWrapper;
 import com.cloudjay.cjay.network.IHttpRequestWrapper;
 import com.cloudjay.cjay.network.QueueIntentService;
-import com.cloudjay.cjay.network.UploadIntentService;
 import com.cloudjay.cjay.receivers.InstantUploadReceiver;
 import com.cloudjay.cjay.task.PhotupThreadFactory;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -166,6 +164,8 @@ public class CJayApplication extends Application {
 
 		checkInstantUploadReceiverState();
 		mPhotoController = new PhotoUploadController(this);
+		
+		// Making Alarm for Queue Worker
 		Intent intent = new Intent(this, QueueIntentService.class);
 		PendingIntent pintent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		Calendar current = Calendar.getInstance();

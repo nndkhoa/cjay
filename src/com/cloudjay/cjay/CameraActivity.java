@@ -73,9 +73,7 @@ public class CameraActivity extends Activity {
 	private SurfaceHolder previewHolder = null;
 	private boolean inPreview = false;
 	private boolean cameraConfigured = false;
-
-	String itemUri;
-	String itemId;
+	
 	String flashMode;
 	int cameraMode;
 
@@ -478,6 +476,11 @@ public class CameraActivity extends Activity {
 		super.onPause();
 	}
 
+	
+	// TODO: TIEUBAO - Hai cai bien nay voi cai doan o duoi de lam gi vay, thay lung tung qua, check roi xoa di
+	String itemUri;
+	String itemId;
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode,
 			Intent imageReturnedIntent) {
@@ -668,9 +671,7 @@ public class CameraActivity extends Activity {
 		this.onBackPressed();
 	}
 
-	void uploadImage(String uuid, String uri, String image_name) {
-		itemId = uuid;
-
+	void uploadImage(String uuid, String uri, String image_name) {				
 		// Create Database Entity Object
 		CJayImage uploadItem = new CJayImage();
 
@@ -685,20 +686,14 @@ public class CameraActivity extends Activity {
 					.getDatabaseManager().getHelper(getApplicationContext())
 					.getCJayImageDaoImpl();
 
-			// TODO: bug
-			List<CJayImage> tmp = uploadList.getAllCJayImages();
-			uploadList.addCJayImage(uploadItem);
-			tmp = uploadList.getAllCJayImages();
-			Integer a = 0;
+			// TODO: TIEUBAO - Em Gan ngay cai CJayImage nay vao danh sach cua ContainerSession hien tai de con upload sau nay 
+			
+			uploadList.addCJayImage(uploadItem);			
+			
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
-		// Intent uploadIntent = new Intent(this, UploadIntentService.class);
-		// uploadIntent.putExtra("uuid", uuid);
-		// startService(uploadIntent);
-
 	}
 
 	// endregion

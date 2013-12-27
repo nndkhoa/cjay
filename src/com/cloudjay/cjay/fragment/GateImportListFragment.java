@@ -130,6 +130,9 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 	@ItemClick(R.id.feeds)
 	void listItemClicked(int position) {
+		// refresh highlighting
+		mFeedListView.setItemChecked(position, false);
+		
 		// clear current selection
 		mSelectedContainerSession = null;
 		getActivity().invalidateOptionsMenu();
@@ -139,6 +142,9 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 	@ItemLongClick(R.id.feeds)
 	void listItemLongClicked(int position) {
+		// refresh highlighting
+		mFeedListView.setItemChecked(position, true);
+		
 		// refresh menu
 		mSelectedContainerSession = mFeedsAdapter.getItem(position);
 		getActivity().invalidateOptionsMenu();
@@ -248,9 +254,11 @@ public class GateImportListFragment extends SherlockDialogFragment {
 								String operatorName = newContainerOwnerEditText
 										.getText().toString();
 								String operatorCode = "";
+								int operatorId = 0;
 								for (Operator operator : mOperators) {
 									if (operator.getName().equals(operatorName)) {
 										operatorCode = operator.getCode();
+										operatorId = operator.getId();
 										break;
 									}
 								}
@@ -295,6 +303,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 									container.setContainerId(containerId);
 									operator.setCode(operatorCode);
 									operator.setName(operatorName);
+									operator.setId(operatorId);
 									break;
 								}
 							}
@@ -401,7 +410,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getContainerId();
+						return item.getFullContainerId();
 					}
 				});
 		feedsDict.addStringField(R.id.feed_item_container_owner,
