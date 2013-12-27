@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.listener.OnReportPageCompleted;
+import com.cloudjay.cjay.listener.OnReportPageCompleteListener;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ViewById;
@@ -16,7 +16,7 @@ import com.googlecode.androidannotations.annotations.ViewById;
 @EFragment(R.layout.fragment_damage_dimension)
 public class AuditorDamageDimensionFragment extends SherlockDialogFragment {
 	private double mLength, mHeight;
-	private OnReportPageCompleted mCallback;
+	private OnReportPageCompleteListener mCallback;
 	
 	@ViewById(R.id.length) EditText mLengthEditText;
 	@ViewById(R.id.height) EditText mHeightEditText;
@@ -42,7 +42,7 @@ public class AuditorDamageDimensionFragment extends SherlockDialogFragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mCallback = (OnReportPageCompleted) activity;
+            mCallback = (OnReportPageCompleteListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement OnReportPageCompleted");
         }
@@ -51,6 +51,6 @@ public class AuditorDamageDimensionFragment extends SherlockDialogFragment {
 	private void handleReportPageCompleted() {
 		// Send code to activity, and move to next tab
 		String[] vals = {String.valueOf(mLength), String.valueOf(mHeight)};
-		mCallback.onReportPageCompleted(OnReportPageCompleted.TAB_DAMAGE_DIMENSION, vals);
+		mCallback.onReportPageCompleted(OnReportPageCompleteListener.TAB_DAMAGE_DIMENSION, vals);
 	}
 }

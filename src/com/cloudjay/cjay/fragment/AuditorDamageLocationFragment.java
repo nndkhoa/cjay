@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.listener.OnReportPageCompleted;
+import com.cloudjay.cjay.listener.OnReportPageCompleteListener;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ViewById;
@@ -19,7 +19,7 @@ import com.googlecode.androidannotations.annotations.ViewById;
 @EFragment(R.layout.fragment_damage_location_code)
 public class AuditorDamageLocationFragment extends SherlockDialogFragment implements OnFocusChangeListener, OnClickListener {
 	private String mLocationCodes[], mCodes[][];
-	private OnReportPageCompleted mCallback;
+	private OnReportPageCompleteListener mCallback;
 	private Button mCodeButtons[];
 	private EditText mCodeEditTexts[];
 	private EditText mFocusedEditText;
@@ -88,7 +88,7 @@ public class AuditorDamageLocationFragment extends SherlockDialogFragment implem
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mCallback = (OnReportPageCompleted) activity;
+            mCallback = (OnReportPageCompleteListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement OnHeadlineSelectedListener");
         }
@@ -144,7 +144,7 @@ public class AuditorDamageLocationFragment extends SherlockDialogFragment implem
 			// move to the next tab
 			String locationCode = new StringBuilder().append(mCodes[0]).append(mCodes[1]).append(mCodes[2]).append(mCodes[3]).toString();
 			String[] vals = {locationCode};
-			mCallback.onReportPageCompleted(OnReportPageCompleted.TAB_DAMAGE_LOCATION, vals);
+			mCallback.onReportPageCompleted(OnReportPageCompleteListener.TAB_DAMAGE_LOCATION, vals);
 		}
 	}
 }

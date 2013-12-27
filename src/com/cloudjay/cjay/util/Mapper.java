@@ -3,7 +3,6 @@ package com.cloudjay.cjay.util;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import android.content.Context;
@@ -12,7 +11,6 @@ import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
-import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -22,7 +20,6 @@ import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
-import com.j256.ormlite.dao.ForeignCollection;
 
 public class Mapper {
 
@@ -41,8 +38,7 @@ public class Mapper {
 		tmpContainerSession.setCheckOutTime(StringHelper
 				.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT));
 
-		List<CJayImage> cJayImages = (List<CJayImage>) containerSession
-				.getCJayImages();
+		Collection<CJayImage> cJayImages = containerSession.getCJayImages();
 
 		List<GateReportImage> gateReportImages = new ArrayList<GateReportImage>();
 

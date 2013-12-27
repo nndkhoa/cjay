@@ -2,7 +2,6 @@ package com.cloudjay.cjay;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -10,7 +9,6 @@ import com.actionbarsherlock.view.MenuItem;
 import com.cloudjay.cjay.events.UploadingPausedStateChangedEvent;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.DataCenter;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Session;
 import com.cloudjay.cjay.util.Utils;
 
