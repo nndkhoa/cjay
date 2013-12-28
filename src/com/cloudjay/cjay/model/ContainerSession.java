@@ -1,9 +1,12 @@
 package com.cloudjay.cjay.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
-import org.parceler.Parcel;
-
+import android.annotation.SuppressLint;
+import android.os.Parcel;
+import android.os.Parcelable;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
@@ -22,9 +25,9 @@ import com.j256.ormlite.table.DatabaseTable;
  * 
  */
 
+@SuppressLint("ParcelCreator")
 @DatabaseTable(tableName = "container_session", daoClass = ContainerSessionDaoImpl.class)
-@Parcel
-public class ContainerSession {
+public class ContainerSession implements Parcelable {
 
 	private static final String TAG = "ContainerSession";
 
@@ -147,6 +150,82 @@ public class ContainerSession {
 		Logger.Log(TAG, "CId: " + getFullContainerId() + " - OpCode: "
 				+ getOperatorName() + " - TimeIn: " + getCheckInTime()
 				+ " - TimeOut: " + getCheckOutTime());
+	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeInt(id);
+		dest.writeString(image_id_path);
+		dest.writeString(check_in_time);
+		dest.writeString(check_out_time);
+		dest.writeInt(mState);
+
+		try {
+			dest.writeParcelable(container, flags);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		parcelCollection(dest, cJayImages);
+		parcelCollection(dest, issues);
+	}
+
+	private void readFromParcel(Parcel in) {
+
+		this.id = in.readInt();
+		this.image_id_path = in.readString();
+		this.check_in_time = in.readString();
+		this.check_out_time = in.readString();
+		this.mState = in.readInt();
+		in.readParcelable(Container.class.getClassLoader());
+		this.cJayImages = unparcelCollection(in, CJayImage.CREATOR);
+		this.issues = unparcelCollection(in, Issue.CREATOR);
+	}
+
+	public static final Parcelable.Creator<ContainerSession> CREATOR = new Parcelable.Creator<ContainerSession>() {
+
+		public ContainerSession createFromParcel(Parcel source) {
+			return new ContainerSession(source);
+		}
+
+		public ContainerSession[] newArray(int size) {
+			return new ContainerSession[size];
+		}
+	};
+
+	public ContainerSession(Parcel in) {
+		readFromParcel(in);
+	}
+
+	public ContainerSession() {
+	}
+
+	<T extends Parcelable> void parcelCollection(final Parcel out,
+			final Collection<T> collection) {
+		if (collection != null) {
+			out.writeInt(collection.size());
+			out.writeTypedList(new ArrayList<T>(collection));
+		} else {
+			out.writeInt(-1);
+		}
+	}
+
+	<T extends Parcelable> Collection<T> unparcelCollection(final Parcel in,
+			final Creator<T> creator) {
+		final int size = in.readInt();
+
+		if (size >= 0) {
+			final List<T> list = new ArrayList<T>(size);
+			in.readTypedList(list, creator);
+			return list;
+		} else {
+			return null;
+		}
 	}
 
 }

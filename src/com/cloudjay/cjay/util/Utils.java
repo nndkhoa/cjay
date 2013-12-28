@@ -1,6 +1,9 @@
 package com.cloudjay.cjay.util;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import com.cloudjay.cjay.service.PhotoUploadService;
 
@@ -12,6 +15,9 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.Parcelable.Creator;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -21,6 +27,29 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.ScaleAnimation;
 
 public class Utils {
+
+	protected final static <T extends Parcelable> void parcelCollection(
+			final Parcel out, final Collection<T> collection) {
+		if (collection != null) {
+			out.writeInt(collection.size());
+			out.writeTypedList(new ArrayList<T>(collection));
+		} else {
+			out.writeInt(-1);
+		}
+	}
+
+	protected final static <T extends Parcelable> Collection<T> unparcelCollection(
+			final Parcel in, final Creator<T> creator) {
+		final int size = in.readInt();
+
+		if (size >= 0) {
+			final List<T> list = new ArrayList<T>(size);
+			in.readTypedList(list, creator);
+			return list;
+		} else {
+			return null;
+		}
+	}
 
 	public static Animation createScaleAnimation(View view, int parentWidth,
 			int parentHeight, int toX, int toY) {
@@ -61,7 +90,7 @@ public class Utils {
 		intent.setAction(CJayConstant.INTENT_SERVICE_UPLOAD_ALL);
 		return intent;
 	}
-	
+
 	public static Bitmap decodeImage(final ContentResolver resolver,
 			final Uri uri, final int MAX_DIM) throws FileNotFoundException {
 
@@ -114,7 +143,7 @@ public class Utils {
 
 		return bitmap;
 	}
-	
+
 	// And to convert the image URI to the direct file system path of the image
 	// file
 	public static String getPathFromContentUri(ContentResolver cr,

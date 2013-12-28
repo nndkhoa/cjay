@@ -7,7 +7,6 @@ import java.util.concurrent.Executors;
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
-
 import uk.co.senab.bitmapcache.BitmapLruCache;
 
 import android.app.AlarmManager;
@@ -164,14 +163,16 @@ public class CJayApplication extends Application {
 
 		checkInstantUploadReceiverState();
 		mPhotoController = new PhotoUploadController(this);
-		
+
 		// Making Alarm for Queue Worker
 		Intent intent = new Intent(this, QueueIntentService.class);
-		PendingIntent pintent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pintent = PendingIntent.getService(this, 0, intent,
+				PendingIntent.FLAG_UPDATE_CURRENT);
 		Calendar current = Calendar.getInstance();
-		AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+		AlarmManager alarm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 		// Start every 30 seconds
-		alarm.setRepeating(AlarmManager.RTC_WAKEUP, current.getTimeInMillis(), 10*1000, pintent);		
+		alarm.setRepeating(AlarmManager.RTC_WAKEUP, current.getTimeInMillis(),
+				10 * 1000, pintent);
 	}
 
 	public void checkInstantUploadReceiverState() {
@@ -209,14 +210,14 @@ public class CJayApplication extends Application {
 			break;
 		}
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	public int getSmallestScreenDimension() {
 		WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
 		Display display = wm.getDefaultDisplay();
 		return Math.min(display.getHeight(), display.getWidth());
 	}
-	
+
 	public BitmapLruCache getImageCache() {
 		if (null == mImageCache) {
 			mImageCache = new BitmapLruCache(this, IMAGE_CACHE_HEAP_PERCENTAGE);

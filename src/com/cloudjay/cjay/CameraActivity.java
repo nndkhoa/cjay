@@ -42,6 +42,7 @@ import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.GateReportImage;
+import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -122,7 +123,7 @@ public class CameraActivity extends Activity {
 	AudioManager audioManager;
 
 	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
-	ContainerSession containerSession;
+	TmpContainerSession tmpContainerSession;
 
 	@Extra("type")
 	int type = 0;
@@ -187,7 +188,7 @@ public class CameraActivity extends Activity {
 		}
 	};
 
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings({ "deprecation", "unchecked" })
 	@AfterViews
 	void initCamera() {
 		Logger.Log("initCamera(), addSurfaceCallback");
@@ -402,9 +403,9 @@ public class CameraActivity extends Activity {
 
 		// gate-in-[depot-id]-2013-12-19-[UUID].jpg
 		String fileName = "gate-" + imageType + "-"
-				+ containerSession.getContainer().getDepot().getDepotCode()
-				+ "-" + StringHelper.getCurrentTimestamp("yyyy-mm-dd") + "-"
-				+ uuid + ".jpg";
+				+ tmpContainerSession.getDepotCode() + "-"
+				+ StringHelper.getCurrentTimestamp("yyyy-mm-dd") + "-" + uuid
+				+ ".jpg";
 
 		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
 
@@ -427,15 +428,16 @@ public class CameraActivity extends Activity {
 	void doneButtonClicked() {
 		Logger.Log(LOG_TAG, "doneButtonClicked()");
 
-		try {
-			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-					.getInstance().getDatabaseManager().getHelper(this)
-					.getContainerSessionDaoImpl();
-			containerSessionDaoImpl.addContainerSessions(containerSession);
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		// try {
+		//
+		// ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
+		// .getInstance().getDatabaseManager().getHelper(this)
+		// .getContainerSessionDaoImpl();
+		// containerSessionDaoImpl.addContainerSessions(tmpContainerSession);
+		//
+		// } catch (SQLException e) {
+		// e.printStackTrace();
+		// }
 
 		this.onBackPressed();
 	}

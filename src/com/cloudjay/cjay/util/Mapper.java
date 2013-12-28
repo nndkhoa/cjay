@@ -33,7 +33,8 @@ public class Mapper {
 		tmpContainerSession.setOperatorCode(containerSession.getOperatorName());
 		tmpContainerSession.setDepotCode(containerSession.getContainer()
 				.getDepot().getDepotCode());
-		tmpContainerSession.setContainerId(containerSession.getFullContainerId());
+		tmpContainerSession.setContainerId(containerSession
+				.getFullContainerId());
 		tmpContainerSession.setCheckInTime(containerSession.getCheckInTime());
 		tmpContainerSession.setCheckOutTime(StringHelper
 				.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT));

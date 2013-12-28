@@ -29,7 +29,6 @@ import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.StaticImageLoader;
 import com.cloudjay.cjay.*;
-import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
@@ -89,9 +88,11 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		// Pass tmpContainerSession away
 		// Then start showing the Camera
 		Intent intent = new Intent(getActivity(), CameraActivity_.class);
+
 		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
 				tmpContainerSession);
 		intent.putExtra("type", 0); // in
+
 		startActivity(intent);
 	}
 
@@ -265,7 +266,10 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 								switch (dialogMode) {
 								case CONTAINER_DIALOG_ADD:
+
 									// Create a tmp Container Session
+									ContainerSession containerSession = new ContainerSession();
+
 									TmpContainerSession newTmpContainer = new TmpContainerSession();
 									newTmpContainer.setContainerId(containerId);
 									newTmpContainer
@@ -287,6 +291,10 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 									// Pass tmpContainerSession away
 									// Then start showing the Camera
+
+									// Parcelable parcelable =
+									// Parcels.wrap(mSelectedContainerSession);
+
 									Intent intent = new Intent(getActivity(),
 											CameraActivity_.class);
 									intent.putExtra(

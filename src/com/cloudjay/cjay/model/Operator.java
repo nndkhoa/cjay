@@ -1,6 +1,8 @@
 package com.cloudjay.cjay.model;
 
-import org.parceler.Parcel;
+import android.annotation.SuppressLint;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
@@ -12,9 +14,9 @@ import com.j256.ormlite.table.DatabaseTable;
  * @author tieubao
  * 
  */
+@SuppressLint("ParcelCreator")
 @DatabaseTable(tableName = "operator", daoClass = OperatorDaoImpl.class)
-@Parcel
-public class Operator {
+public class Operator implements Parcelable {
 
 	public static final String ID = "id";
 	public static final String CODE = "operator_code";
@@ -54,6 +56,44 @@ public class Operator {
 
 	public void setId(int operatorId) {
 		this.id = operatorId;
+	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeInt(id);
+		dest.writeString(operator_code);
+		dest.writeString(operator_name);
+	}
+
+	private void readFromParcel(Parcel in) {
+		this.id = in.readInt();
+		this.operator_code = in.readString();
+		this.operator_name = in.readString();
+	}
+
+	public static final Parcelable.Creator<Operator> CREATOR = new Parcelable.Creator<Operator>() {
+
+		public Operator createFromParcel(Parcel source) {
+			return new Operator(source);
+		}
+
+		public Operator[] newArray(int size) {
+			return new Operator[size];
+		}
+	};
+
+	public Operator(Parcel in) {
+
+		readFromParcel(in);
+	}
+
+	public Operator() {
+
 	}
 
 	// public void setContainers(Collection<Container> listContainers) {
