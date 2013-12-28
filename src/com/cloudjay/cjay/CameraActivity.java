@@ -42,7 +42,6 @@ import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.GateReportImage;
-import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -61,7 +60,9 @@ import com.googlecode.androidannotations.annotations.ViewById;
  * 
  * - type: chỉ định đang mở Camera ở in | out | audit | repair
  * 
- * - tmpContainerSession: object lưu trữ container session
+ * - uuid: container session uuid --> use to load object from db
+ * 
+ * // - tmpContainerSession: object lưu trữ container session
  * 
  * 
  * Output:
@@ -498,16 +499,16 @@ public class CameraActivity extends Activity {
 	void doneButtonClicked() {
 		Logger.Log(LOG_TAG, "doneButtonClicked()");
 
-		// try {
-		//
-		// ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-		// .getInstance().getDatabaseManager().getHelper(this)
-		// .getContainerSessionDaoImpl();
-		// containerSessionDaoImpl.addContainerSessions(tmpContainerSession);
-		//
-		// } catch (SQLException e) {
-		// e.printStackTrace();
-		// }
+		try {
+
+			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
+					.getInstance().getDatabaseManager().getHelper(this)
+					.getContainerSessionDaoImpl();
+			containerSessionDaoImpl.addContainerSessions(containerSession);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
 		this.onBackPressed();
 	}
