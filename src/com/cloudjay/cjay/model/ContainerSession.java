@@ -1,13 +1,22 @@
 package com.cloudjay.cjay.model;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.cloudjay.cjay.dao.CJayImageDaoImpl;
+import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.dao.DepotDaoImpl;
+import com.cloudjay.cjay.dao.OperatorDaoImpl;
+import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
 import com.j256.ormlite.field.DatabaseField;
@@ -218,6 +227,76 @@ public class ContainerSession implements Parcelable {
 	}
 
 	public ContainerSession() {
+	}
+
+	public ContainerSession(Context ctx, String containerId,
+			String operatorCode, String checkInTime, String depotCode) {
+
+		IDatabaseManager databaseManager = CJayClient.getInstance()
+				.getDatabaseManager();
+
+		DepotDaoImpl depotDaoImpl;
+		try {
+			depotDaoImpl = databaseManager.getHelper(ctx).getDepotDaoImpl();
+			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx)
+					.getOperatorDaoImpl();
+			ContainerDaoImpl containerDaoImpl = databaseManager.getHelper(ctx)
+					.getContainerDaoImpl();
+
+			Operator operator = null;
+			List<Operator> listOperators = operatorDaoImpl.queryForEq(
+					Operator.CODE, operatorCode);
+
+			if (listOperators.isEmpty()) {
+				operator = new Operator();
+				operator.setCode(operatorCode);
+				operator.setName(operatorCode);
+				operatorDaoImpl.addOperator(operator);
+			} else {
+				operator = listOperators.get(0);
+			}
+
+			// Create `depot` object if needed
+			Depot depot = null;
+			List<Depot> listDepots = depotDaoImpl.queryForEq(Depot.DEPOT_CODE,
+					depotCode);
+			if (listDepots.isEmpty()) {
+				depot = new Depot();
+				depot.setDepotCode(depotCode);
+				depot.setDepotName(depotCode);
+				depotDaoImpl.addDepot(depot);
+			} else {
+				depot = listDepots.get(0);
+			}
+
+			// Create `container` object if needed
+			Container container = null;
+			List<Container> listContainers = containerDaoImpl.queryForEq(
+					Container.CONTAINER_ID, containerId);
+			if (listContainers.isEmpty()) {
+				container = new Container();
+				container.setContainerId(containerId);
+				if (null != operator)
+					container.setOperator(operator);
+
+				if (null != depot)
+					container.setDepot(depot);
+
+				containerDaoImpl.addContainer(container);
+			} else {
+				container = listContainers.get(0);
+			}
+
+			// Create `container session` object
+			// UUID is primary key
+			String uuid = UUID.randomUUID().toString();
+			this.setCheckInTime(checkInTime);
+			this.setUuid(uuid);
+			if (null != container)
+				this.setContainer(container);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	<T extends Parcelable> void parcelCollection(final Parcel out,

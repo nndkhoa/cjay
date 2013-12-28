@@ -122,8 +122,13 @@ public class CameraActivity extends Activity {
 	@SystemService
 	AudioManager audioManager;
 
+	// @Extra(CJAY_CONTAINER_SESSION_EXTRA)
+	// TmpContainerSession tmpContainerSession;
+
+	ContainerSession containerSession = null;
+
 	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
-	TmpContainerSession tmpContainerSession;
+	String containerSessionUUID = "";
 
 	@Extra("type")
 	int type = 0;
@@ -191,7 +196,7 @@ public class CameraActivity extends Activity {
 	@SuppressWarnings({ "deprecation", "unchecked" })
 	@AfterViews
 	void initCamera() {
-		Logger.Log("initCamera(), addSurfaceCallback");
+		Logger.Log(LOG_TAG, "initCamera(), addSurfaceCallback");
 
 		// WARNING: this block should be run before onResume()
 		// Setup Surface Holder
@@ -202,6 +207,31 @@ public class CameraActivity extends Activity {
 		// Restore camera state from database or somewhere else
 		flashMode = Camera.Parameters.FLASH_MODE_OFF;
 		cameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
+
+	}
+
+	@AfterViews
+	void initContainerSession() {
+		Logger.Log(LOG_TAG, "initContainerSession()");
+
+		try {
+			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
+					.getInstance().getDatabaseManager().getHelper(this)
+					.getContainerSessionDaoImpl();
+
+			containerSession = containerSessionDaoImpl
+					.queryForId(containerSessionUUID);
+
+			// TODO: xử lý container session
+			if (null != containerSession) {
+
+			} else {
+
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
 	}
 
@@ -401,11 +431,16 @@ public class CameraActivity extends Activity {
 			break;
 		}
 
-		// gate-in-[depot-id]-2013-12-19-[UUID].jpg
+		// filename sample: gate-in-[depot-id]-2013-12-19-[UUID].jpg
+		// String fileName = "gate-" + imageType + "-"
+		// + tmpContainerSession.getDepotCode() + "-"
+		// + StringHelper.getCurrentTimestamp("yyyy-mm-dd") + "-" + uuid
+		// + ".jpg";
+
 		String fileName = "gate-" + imageType + "-"
-				+ tmpContainerSession.getDepotCode() + "-"
-				+ StringHelper.getCurrentTimestamp("yyyy-mm-dd") + "-" + uuid
-				+ ".jpg";
+				+ containerSession.getContainer().getDepot().getDepotCode()
+				+ "-" + StringHelper.getCurrentTimestamp("yyyy-mm-dd") + "-"
+				+ uuid + ".jpg";
 
 		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
 
@@ -442,6 +477,9 @@ public class CameraActivity extends Activity {
 		uploadItem.setUuid(uuid);
 		uploadItem.setUri(uri);
 		uploadItem.setImageName(image_name);
+
+		// Add by tieubao: add foreign key
+		uploadItem.setContainerSession(containerSession);
 
 		try {
 			CJayImageDaoImpl uploadList = CJayClient.getInstance()
