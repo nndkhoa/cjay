@@ -1,6 +1,7 @@
 <resources>
     
     <!-- Strings related to dialog -->
+    <string name="dialog_new_container_title">Thông tin Container</string>
     <string name="dialog_new_container">Tạo Container</string>
     <string name="dialog_container_id">Container ID</string>
     <string name="dialog_container_owner">Hãng tàu</string>
