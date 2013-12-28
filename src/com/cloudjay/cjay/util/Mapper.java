@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import android.content.Context;
 
@@ -11,6 +12,7 @@ import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
+import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -120,39 +122,53 @@ public class Mapper {
 			}
 
 			// Create `container session` object
+
+			String uuid = UUID.randomUUID().toString();
+
+			// UUID is primary key
 			ContainerSession containerSession = new ContainerSession();
 			containerSession.setId(tmpSession.getId());
 			containerSession.setCheckInTime(tmpSession.getCheckInTime());
 			containerSession.setCheckOutTime(tmpSession.getCheckOutTime());
 			containerSession.setImageIdPath(tmpSession.getImageIdPath());
+			containerSession.setUuid(uuid);
+
 			if (null != container)
 				containerSession.setContainer(container);
 
+			List<CJayImage> listImages = new ArrayList<CJayImage>();
+
 			// process audit report item
-			// for (AuditReportItem auditReportItem : tmpSession
-			// .getAuditReportItems()) {
-			//
-			// }
+			List<AuditReportItem> auditReportItems = tmpSession
+					.getAuditReportItems();
+			if (null != auditReportItems) {
+				for (AuditReportItem auditReportItem : auditReportItems) {
+
+				}
+			}
 
 			// process gate report images
-			List<CJayImage> listImages = new ArrayList<CJayImage>();
-			for (GateReportImage gateReportImage : tmpSession
-					.getGateReportImages()) {
 
-				Logger.Log(Integer.toString(gateReportImage.getId()));
+			List<GateReportImage> gateReportImages = tmpSession
+					.getGateReportImages();
+			if (null != gateReportImages) {
+				for (GateReportImage gateReportImage : gateReportImages) {
 
-				CJayImage image = new CJayImage(gateReportImage.getId(),
-						gateReportImage.getType(),
-						gateReportImage.getTimePosted(),
-						gateReportImage.getImageName());
+					Logger.Log(Integer.toString(gateReportImage.getId()));
 
-				if (null != image)
-					image.setContainerSession(containerSession);
+					CJayImage image = new CJayImage(gateReportImage.getId(),
+							gateReportImage.getType(),
+							gateReportImage.getTimePosted(),
+							gateReportImage.getImageName());
 
-				cJayImageDaoImpl.addCJayImage(image);
+					if (null != image)
+						image.setContainerSession(containerSession);
 
-				// data for returning
-				listImages.add(image);
+					cJayImageDaoImpl.addCJayImage(image);
+
+					// data for returning
+					listImages.add(image);
+				}
 			}
 
 			// TODO: ??

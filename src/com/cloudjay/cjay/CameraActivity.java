@@ -160,8 +160,8 @@ public class CameraActivity extends Activity {
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
 			Logger.Log("onPictureTaken");
-			savePhoto(data);
 
+			savePhoto(data);
 			camera.startPreview();
 			inPreview = true;
 		}
@@ -409,8 +409,6 @@ public class CameraActivity extends Activity {
 
 		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
 
-		// photos.add(photo.getAbsolutePath());
-
 		// Save Bitmap to JPEG
 		saveBitmap(capturedBitmap, photo);
 
@@ -422,24 +420,6 @@ public class CameraActivity extends Activity {
 			capturedBitmap = null;
 			System.gc();
 		}
-	}
-
-	@Click(R.id.btn_camera_done)
-	void doneButtonClicked() {
-		Logger.Log(LOG_TAG, "doneButtonClicked()");
-
-		// try {
-		//
-		// ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-		// .getInstance().getDatabaseManager().getHelper(this)
-		// .getContainerSessionDaoImpl();
-		// containerSessionDaoImpl.addContainerSessions(tmpContainerSession);
-		//
-		// } catch (SQLException e) {
-		// e.printStackTrace();
-		// }
-
-		this.onBackPressed();
 	}
 
 	void uploadImage(String uuid, String uri, String image_name) {
@@ -474,6 +454,24 @@ public class CameraActivity extends Activity {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Click(R.id.btn_camera_done)
+	void doneButtonClicked() {
+		Logger.Log(LOG_TAG, "doneButtonClicked()");
+
+		// try {
+		//
+		// ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
+		// .getInstance().getDatabaseManager().getHelper(this)
+		// .getContainerSessionDaoImpl();
+		// containerSessionDaoImpl.addContainerSessions(tmpContainerSession);
+		//
+		// } catch (SQLException e) {
+		// e.printStackTrace();
+		// }
+
+		this.onBackPressed();
 	}
 
 	// region Override Activity

@@ -36,16 +36,19 @@ public class ContainerSession implements Parcelable {
 	private static final String IMAGE_ID_PATH = "image_id_path";
 	public static final String FIELD_STATE = "state";
 	private static final String ID = "id";
+	private static final String FIELD_UUID = "uuid";
 
-	public static final int STATE_UPLOAD_COMPLETED = 5;
-	public static final int STATE_UPLOAD_ERROR = 4;
-	public static final int STATE_UPLOAD_IN_PROGRESS = 3;
-	public static final int STATE_UPLOAD_WAITING = 2;
-	public static final int STATE_SELECTED = 1;
+	public static final int STATE_UPLOAD_COMPLETED = 4;
+	public static final int STATE_UPLOAD_ERROR = 3;
+	public static final int STATE_UPLOAD_IN_PROGRESS = 2;
+	public static final int STATE_UPLOAD_WAITING = 1;
 	public static final int STATE_NONE = 0;
 
-	@DatabaseField(id = true, columnName = ID)
+	@DatabaseField(columnName = ID)
 	int id;
+
+	@DatabaseField(columnName = FIELD_UUID, id = true)
+	String uuid;
 
 	@DatabaseField(columnName = IMAGE_ID_PATH)
 	String image_id_path;
@@ -72,8 +75,20 @@ public class ContainerSession implements Parcelable {
 	@ForeignCollectionField(eager = true)
 	Collection<Issue> issues;
 
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
 	public int getUploadState() {
 		return mState;
+	}
+
+	public void setUploadState(int state) {
+		mState = state;
 	}
 
 	public void setIssues(Collection<Issue> issues) {

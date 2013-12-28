@@ -56,7 +56,7 @@ public class CJayImageDaoImpl extends BaseDaoImpl<CJayImage, String> implements
 	@Override
 	public CJayImage findByUuid(String uuid) throws SQLException {
 		List<CJayImage> result = this.queryForEq("uuid", uuid);
-		if (result != null) {
+		if (result != null && result.size() > 0) {
 			return result.get(0);
 		}
 

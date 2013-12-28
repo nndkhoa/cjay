@@ -3,12 +3,13 @@ package com.cloudjay.cjay.dao;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
 public class ContainerSessionDaoImpl extends
-		BaseDaoImpl<ContainerSession, Integer> implements IContainerSessionDao {
+		BaseDaoImpl<ContainerSession, String> implements IContainerSessionDao {
 
 	public ContainerSessionDaoImpl(ConnectionSource connectionSource)
 			throws SQLException {
@@ -50,6 +51,28 @@ public class ContainerSessionDaoImpl extends
 			return true;
 
 		return false;
+	}
+
+	@Override
+	public ContainerSession findByUuid(String uuid) throws SQLException {
+		List<ContainerSession> result = this.queryForEq("uuid", uuid);
+		if (result != null && result.size() > 0) {
+			return result.get(0);
+		}
+
+		return null;
+	}
+
+	@Override
+	public ContainerSession getNextWaiting() throws SQLException {
+		List<ContainerSession> result = this.queryForEq("state",
+				ContainerSession.STATE_UPLOAD_WAITING);
+
+		if (result != null && result.size() > 0) {
+			return result.get(0);
+		}
+
+		return null;
 	}
 
 }
