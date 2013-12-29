@@ -14,6 +14,7 @@ import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
+import com.google.gson.Gson;
 
 /**
  * 
@@ -165,9 +166,15 @@ public class DataCenter {
 
 	public List<ContainerSession> getListUploadContainerSessions(Context context) {
 		try {
-			return getDatabaseManager().getHelper(context)
-					.getContainerSessionDaoImpl()
+
+			List<ContainerSession> result = getDatabaseManager()
+					.getHelper(context).getContainerSessionDaoImpl()
 					.getListUploadContainerSessions();
+
+			Gson gson = new Gson();
+			Logger.Log(LOG_TAG, gson.toJson(result));
+
+			return result;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
