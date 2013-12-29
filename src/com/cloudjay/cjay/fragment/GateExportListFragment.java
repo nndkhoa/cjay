@@ -25,6 +25,7 @@ import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.ami.fundapter.interfaces.ItemClickListener;
 import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.TmpContainerSession;
@@ -102,7 +103,7 @@ public class GateExportListFragment extends SherlockDialogFragment {
 		
 		// clear current selection
 		mSelectedContainerSession = null;
-		getActivity().invalidateOptionsMenu();
+		getActivity().supportInvalidateOptionsMenu();
 		
 		// get the selected container session
 		ContainerSession containerSession = mFeedsAdapter.getItem(position);
@@ -125,11 +126,13 @@ public class GateExportListFragment extends SherlockDialogFragment {
 		
 		// refresh menu
 		mSelectedContainerSession = mFeedsAdapter.getItem(position);
-		getActivity().invalidateOptionsMenu();
+		getActivity().supportInvalidateOptionsMenu();
 	}
 	
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
+		super.onPrepareOptionsMenu(menu);
+		
 		boolean isDisplayed = !(mSelectedContainerSession == null);
 		menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
 	}

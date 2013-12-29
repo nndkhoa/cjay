@@ -4,11 +4,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.fragment.GateExportListFragment;
 import com.cloudjay.cjay.fragment.GateImportListFragment;
@@ -24,6 +26,10 @@ public class GateHomeActivity extends CJayActivity implements
 		AddContainerDialog.AddContainerDialogListener, 
 		SearchOperatorDialog.SearchOperatorDialogListener {
 
+	public static final int TAB_IMPORT = 0;
+	public static final int TAB_EXPORT = 1;
+	public static final int TAB_UPLOAD = 2;
+	
 	private String[] locations;
 	private ViewPagerAdapter mPagerAdapter;
 
@@ -66,12 +72,6 @@ public class GateHomeActivity extends CJayActivity implements
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getSupportMenuInflater();
-		return true;
-	}
-
-	@Override
 	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 
 	}
@@ -89,6 +89,25 @@ public class GateHomeActivity extends CJayActivity implements
 	@Override
 	public void onPageScrolled(int arg0, float arg1, int arg2) {
 
+	}
+	
+ 	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getSupportMenuInflater();
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_logout:
+			Toast toast = Toast.makeText(getApplicationContext(), "LOG OUT", Toast.LENGTH_SHORT);
+			toast.show();
+//			finish();
+			return true;
+		}
+
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
