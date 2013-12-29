@@ -53,34 +53,7 @@ public class CJayApplication extends Application {
 	IDatabaseManager databaseManager = null;
 	IHttpRequestWrapper httpRequestWrapper = null;
 
-	private ExecutorService mMultiThreadExecutor, mSingleThreadExecutor,
-			mDatabaseThreadExecutor;
-
-	private PhotoUploadController mPhotoController;
-
-	public ExecutorService getMultiThreadExecutorService() {
-		if (null == mMultiThreadExecutor || mMultiThreadExecutor.isShutdown()) {
-			final int numThreads = Math.round(Runtime.getRuntime()
-					.availableProcessors() * EXECUTOR_POOL_SIZE_PER_CORE);
-			mMultiThreadExecutor = Executors.newFixedThreadPool(numThreads,
-					new PhotupThreadFactory());
-
-			if (Flags.DEBUG) {
-				Log.d(LOG_TAG, "MultiThreadExecutor created with " + numThreads
-						+ " threads");
-			}
-		}
-		return mMultiThreadExecutor;
-	}
-
-	public ExecutorService getPhotoFilterThreadExecutorService() {
-		if (null == mSingleThreadExecutor || mSingleThreadExecutor.isShutdown()) {
-			mSingleThreadExecutor = Executors
-					.newSingleThreadExecutor(new PhotupThreadFactory(
-							THREAD_FILTERS));
-		}
-		return mSingleThreadExecutor;
-	}
+	private ExecutorService mDatabaseThreadExecutor;
 
 	public ExecutorService getDatabaseThreadExecutorService() {
 
@@ -95,10 +68,6 @@ public class CJayApplication extends Application {
 
 	public static CJayApplication getApplication(Context context) {
 		return (CJayApplication) context.getApplicationContext();
-	}
-
-	public PhotoUploadController getPhotoUploadController() {
-		return mPhotoController;
 	}
 
 	public static void startCJayHomeActivity(Context context) {
@@ -161,7 +130,6 @@ public class CJayApplication extends Application {
 		Logger.PRODUCTION_MODE = false;
 
 		// checkInstantUploadReceiverState();
-		mPhotoController = new PhotoUploadController(this);
 
 		// Making Alarm for Queue Worker
 		Intent intent = new Intent(this, QueueIntentService.class);

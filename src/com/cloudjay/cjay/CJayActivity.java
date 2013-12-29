@@ -11,7 +11,6 @@ import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Session;
 import com.cloudjay.cjay.util.Utils;
 
-import de.greenrobot.event.EventBus;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
@@ -21,7 +20,6 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	private static final String LOG_TAG = "CJayActivity";
 	private Session session;
 	private DataCenter dataCenter;
-	protected PhotoUploadController mPhotoController;
 
 	public DataCenter getDataCenter() {
 		return dataCenter;
@@ -46,8 +44,6 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	protected void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
 		session = Session.restore(getApplicationContext());
-
-		mPhotoController = PhotoUploadController.getFromContext(this);
 
 		if (Utils.isUploadingPaused(this)) {
 			showUploadingDisabledCrouton();

@@ -15,7 +15,6 @@
  */
 package com.cloudjay.cjay.fragment;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,21 +25,17 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.cloudjay.cjay.PhotoUploadController;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadsListBaseAdapter;
+import com.cloudjay.cjay.events.ContainerSessionAddedEvent;
 import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.model.TmpContainerSession;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener.OnDismissCallback;
-import com.googlecode.androidannotations.annotations.EFragment;
-
 import de.greenrobot.event.EventBus;
 
 public class UploadsFragment extends SherlockFragment implements
 		OnDismissCallback, OnItemClickListener {
 
-	private PhotoUploadController mPhotoSelectionController;
 	private UploadsListBaseAdapter mAdapter;
 
 	@Override
@@ -49,8 +44,6 @@ public class UploadsFragment extends SherlockFragment implements
 		EventBus.getDefault().register(this);
 
 		mAdapter = new UploadsListBaseAdapter(getActivity());
-		mPhotoSelectionController = PhotoUploadController
-				.getFromContext(getActivity());
 	}
 
 	@Override
@@ -88,16 +81,16 @@ public class UploadsFragment extends SherlockFragment implements
 
 	}
 
-	// public void onEvent(PhotoSelectionRemovedEvent event) {
-	// mAdapter.notifyDataSetChanged();
-	// }
+	public void onEvent(ContainerSessionAddedEvent event) {
+		mAdapter.notifyDataSetChanged();
+	}
 
 	public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
 		try {
 			for (int i = 0, z = reverseSortedPositions.length; i < z; i++) {
-				ContainerSession upload = (ContainerSession) listView
+				ContainerSession item = (ContainerSession) listView
 						.getItemAtPosition(reverseSortedPositions[i]);
-				mPhotoSelectionController.removeUpload(upload);
+				item.setCleared(true);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -107,7 +100,6 @@ public class UploadsFragment extends SherlockFragment implements
 
 	public boolean canDismiss(AbsListView listView, int position) {
 		try {
-			// TODO:
 			ContainerSession upload = (ContainerSession) listView
 					.getItemAtPosition(position);
 			return upload.getUploadState() != ContainerSession.STATE_UPLOAD_IN_PROGRESS;

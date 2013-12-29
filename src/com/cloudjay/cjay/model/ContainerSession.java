@@ -61,6 +61,7 @@ public class ContainerSession implements Parcelable {
 	private static final String ID = "id";
 	private static final String FIELD_UUID = "uuid";
 	private static final String FIELD_UPLOAD_CONFIRMATION = "upload_confirmation";
+	private static final String FIELD_CLEARED = "cleared";
 
 	public static final int STATE_UPLOAD_COMPLETED = 4;
 	public static final int STATE_UPLOAD_ERROR = 3;
@@ -78,6 +79,9 @@ public class ContainerSession implements Parcelable {
 
 	@DatabaseField(columnName = FIELD_UUID, id = true)
 	String uuid;
+
+	@DatabaseField(columnName = FIELD_CLEARED, defaultValue = "false")
+	private boolean cleared;
 
 	@DatabaseField(columnName = IMAGE_ID_PATH, defaultValue = "")
 	String image_id_path;
@@ -463,5 +467,13 @@ public class ContainerSession implements Parcelable {
 			mFullUri = Uri.parse(image_id_path);
 		}
 		return mFullUri;
+	}
+
+	public boolean isCleared() {
+		return cleared;
+	}
+
+	public void setCleared(boolean cleared) {
+		this.cleared = cleared;
 	}
 }

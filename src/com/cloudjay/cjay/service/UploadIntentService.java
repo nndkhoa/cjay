@@ -1,18 +1,9 @@
 package com.cloudjay.cjay.service;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.ref.WeakReference;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 
@@ -26,33 +17,20 @@ import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
-import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
-import android.text.TextUtils;
 import android.util.Log;
 
-import com.actionbarsherlock.internal.widget.ActionBarView.HomeView;
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.GateHomeActivity;
-import com.cloudjay.cjay.GateHomeActivity_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.SplashScreenActivity;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
@@ -63,11 +41,8 @@ import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.task.PhotupThreadRunnable;
 import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.ConnectionUtils;
 import com.cloudjay.cjay.util.CountingInputStreamEntity;
-import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Mapper;
-import com.cloudjay.cjay.util.Session;
 
 public class UploadIntentService extends IntentService implements
 		CountingInputStreamEntity.UploadListener {
@@ -114,7 +89,6 @@ public class UploadIntentService extends IntentService implements
 				if (null != containerSession) {
 
 					// trigger event to display in UploadsFragment
-					
 
 					startForeground();
 					trimCache();
@@ -203,6 +177,8 @@ public class UploadIntentService extends IntentService implements
 	 * @param containerSession
 	 */
 	private void doUploadContainer(ContainerSession containerSession) {
+
+		// post UploadStateChangedEvent
 		containerSession
 				.setUploadState(ContainerSession.STATE_UPLOAD_IN_PROGRESS);
 
@@ -229,6 +205,14 @@ public class UploadIntentService extends IntentService implements
 
 	@Override
 	public void onDestroy() {
+
+		try {
+			stopForeground(true);
+			finishedNotification();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		super.onDestroy();
 	}
 
@@ -236,6 +220,23 @@ public class UploadIntentService extends IntentService implements
 	public int onStartCommand(Intent intent, int flags, int startId) {
 
 		return super.onStartCommand(intent, flags, startId);
+	}
+
+	void finishedNotification() {
+		if (null != mNotificationBuilder) {
+			String text = getResources().getQuantityString(
+					R.plurals.notification_uploaded_photo, mNumberUploaded,
+					mNumberUploaded);
+
+			mNotificationBuilder.setOngoing(false);
+			mNotificationBuilder.setProgress(0, 0, false);
+			mNotificationBuilder.setWhen(System.currentTimeMillis());
+			mNotificationBuilder.setContentTitle(text);
+			mNotificationBuilder.setTicker(text);
+
+			mNotificationMgr.notify(NOTIFICATION_ID,
+					mNotificationBuilder.build());
+		}
 	}
 
 	private CJayImageDaoImpl cJayImageDaoImpl;

@@ -1,11 +1,9 @@
 package com.cloudjay.cjay.adapter;
 
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.cloudjay.cjay.SampleFragment_;
 import com.cloudjay.cjay.fragment.GateExportListFragment_;
 import com.cloudjay.cjay.fragment.GateImportListFragment_;
 import com.cloudjay.cjay.fragment.UploadsFragment;

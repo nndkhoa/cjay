@@ -17,6 +17,7 @@ import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.StaticImageLoader;
 import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.events.ContainerSessionAddedEvent;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
@@ -35,6 +36,8 @@ import com.googlecode.androidannotations.annotations.ItemLongClick;
 import com.googlecode.androidannotations.annotations.OptionsItem;
 import com.googlecode.androidannotations.annotations.OptionsMenu;
 import com.googlecode.androidannotations.annotations.ViewById;
+
+import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_gate_import)
 @OptionsMenu(R.menu.menu_gate_import)
@@ -77,9 +80,14 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 		// User confirm upload
 		mSelectedContainerSession.setUploadConfirmation(true);
+
+		// this will call EventBus.post(`UploadsModifiedEvent`)
 		mSelectedContainerSession
 				.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
 
+		// It will trigger `UploadsFragment` Adapter notifyDataSetChanged
+		EventBus.getDefault().post(
+				new ContainerSessionAddedEvent(mSelectedContainerSession));
 	}
 
 	@AfterViews

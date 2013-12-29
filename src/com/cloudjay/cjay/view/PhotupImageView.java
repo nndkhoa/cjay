@@ -27,7 +27,6 @@ import java.lang.ref.WeakReference;
 import java.util.concurrent.Future;
 
 import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.task.PhotupThreadRunnable;
 import uk.co.senab.bitmapcache.BitmapLruCache;
 import uk.co.senab.bitmapcache.CacheableImageView;
