@@ -44,10 +44,6 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	protected void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
 		session = Session.restore(getApplicationContext());
-
-		if (Utils.isUploadingPaused(this)) {
-			showUploadingDisabledCrouton();
-		}
 	}
 
 	@Override

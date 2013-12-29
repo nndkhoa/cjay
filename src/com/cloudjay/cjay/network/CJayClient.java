@@ -116,6 +116,16 @@ public class CJayClient implements ICJayClient {
 		return headers;
 	}
 
+	/**
+	 * 
+	 * fetch data based on current user role
+	 * 
+	 * - GATE: no need to GET ContainerSession from Server
+	 * 
+	 * - AUDITOR:
+	 * 
+	 * @param ctx
+	 */
 	public void fetchData(Context ctx) {
 		Logger.Log(LOG_TAG, "fetching data ...");
 

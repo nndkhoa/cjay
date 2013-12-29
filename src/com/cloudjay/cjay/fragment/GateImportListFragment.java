@@ -111,7 +111,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	@AfterViews
 	void afterViews() {
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListContainerSessions(getActivity());
+				.getListLocalContainerSessions(getActivity());
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
 				.getListOperators(getActivity());
 
@@ -215,6 +215,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 					currentUser.getDepot().getDepotCode());
 
 			containerSession.setUploadConfirmation(false);
+			containerSession.setOnLocal(true);
 			containerSession.setUploadState(ContainerSession.STATE_NONE);
 
 			try {

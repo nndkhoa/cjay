@@ -124,4 +124,11 @@ public class ContainerSessionDaoImpl extends
 		return containerSessions;
 
 	}
+
+	@Override
+	public List<ContainerSession> getLocalContainerSessions()
+			throws SQLException {
+		Logger.Log(LOG_TAG, "getListUploadContainerSessions()");
+		return this.queryForEq(ContainerSession.FIELD_LOCAL, true);
+	}
 }

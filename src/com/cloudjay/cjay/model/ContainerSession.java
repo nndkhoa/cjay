@@ -63,6 +63,7 @@ public class ContainerSession implements Parcelable {
 	public static final String FIELD_UUID = "uuid";
 	public static final String FIELD_UPLOAD_CONFIRMATION = "upload_confirmation";
 	public static final String FIELD_CLEARED = "cleared";
+	public static final String FIELD_LOCAL = "on_local";
 
 	public static final int STATE_UPLOAD_COMPLETED = 4;
 	public static final int STATE_UPLOAD_ERROR = 3;
@@ -83,6 +84,9 @@ public class ContainerSession implements Parcelable {
 
 	@DatabaseField(columnName = FIELD_CLEARED, defaultValue = "false")
 	private boolean cleared;
+
+	@DatabaseField(columnName = FIELD_LOCAL, defaultValue = "false")
+	private boolean onLocal;
 
 	@DatabaseField(columnName = IMAGE_ID_PATH, defaultValue = "")
 	String image_id_path;
@@ -503,5 +507,13 @@ public class ContainerSession implements Parcelable {
 
 	public String getThumbnailImageKey() {
 		return "thumb_" + getOriginalPhotoUri();
+	}
+
+	public boolean isOnLocal() {
+		return onLocal;
+	}
+
+	public void setOnLocal(boolean onLocal) {
+		this.onLocal = onLocal;
 	}
 }

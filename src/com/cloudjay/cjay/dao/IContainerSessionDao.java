@@ -13,6 +13,8 @@ import com.j256.ormlite.dao.Dao;
 public interface IContainerSessionDao extends Dao<ContainerSession, String> {
 	List<ContainerSession> getAllContainerSessions() throws SQLException;
 
+	List<ContainerSession> getLocalContainerSessions() throws SQLException;
+
 	void addListContainerSessions(List<ContainerSession> containerSessions)
 			throws SQLException;
 
@@ -28,4 +30,5 @@ public interface IContainerSessionDao extends Dao<ContainerSession, String> {
 	ContainerSession getNextWaiting() throws SQLException;
 
 	List<ContainerSession> getListUploadContainerSessions() throws SQLException;
+
 }

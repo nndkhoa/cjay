@@ -174,6 +174,16 @@ public class DataCenter {
 		return null;
 	}
 
+	public List<ContainerSession> getListLocalContainerSessions(Context context) {
+		try {
+			return getDatabaseManager().getHelper(context)
+					.getContainerSessionDaoImpl().getLocalContainerSessions();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	public IDatabaseManager getDatabaseManager() {
 		return databaseManager;
 	}
