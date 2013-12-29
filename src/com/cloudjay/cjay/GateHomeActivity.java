@@ -20,8 +20,8 @@ import com.googlecode.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_gate_home)
 public class GateHomeActivity extends CJayActivity implements
-		OnPageChangeListener, TabListener, 
-		AddContainerDialog.AddContainerDialogListener, 
+		OnPageChangeListener, TabListener,
+		AddContainerDialog.AddContainerDialogListener,
 		SearchOperatorDialog.SearchOperatorDialogListener {
 
 	private String[] locations;
@@ -92,12 +92,14 @@ public class GateHomeActivity extends CJayActivity implements
 	}
 
 	@Override
-	public void OnOperatorSelected(Fragment parent, String containerId, String operatorName,
-			int mode) {
+	public void OnOperatorSelected(Fragment parent, String containerId,
+			String operatorName, int mode) {
 		if (parent instanceof GateImportListFragment) {
-			((GateImportListFragment)parent).OnOperatorSelected(containerId, operatorName, mode);
+			((GateImportListFragment) parent).OnOperatorSelected(containerId,
+					operatorName, mode);
 		} else if (parent instanceof GateExportListFragment) {
-			((GateExportListFragment)parent).OnOperatorSelected(containerId, operatorName, mode);
+			((GateExportListFragment) parent).OnOperatorSelected(containerId,
+					operatorName, mode);
 		}
 	}
 
@@ -105,9 +107,11 @@ public class GateHomeActivity extends CJayActivity implements
 	public void OnContainerInputCompleted(Fragment parent, String containerId,
 			String operatorName, int mode) {
 		if (parent instanceof GateImportListFragment) {
-			((GateImportListFragment)parent).OnContainerInputCompleted(containerId, operatorName, mode);
+			((GateImportListFragment) parent).OnContainerInputCompleted(
+					containerId, operatorName, mode);
 		} else if (parent instanceof GateExportListFragment) {
-			((GateExportListFragment)parent).OnContainerInputCompleted(containerId, operatorName, mode);
+			((GateExportListFragment) parent).OnContainerInputCompleted(
+					containerId, operatorName, mode);
 		}
 	}
 }

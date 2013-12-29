@@ -55,6 +55,8 @@ import com.googlecode.androidannotations.annotations.NoTitle;
 import com.googlecode.androidannotations.annotations.SystemService;
 import com.googlecode.androidannotations.annotations.ViewById;
 
+import de.greenrobot.event.EventBus;
+
 /**
  * Input:
  * 
@@ -209,6 +211,7 @@ public class CameraActivity extends Activity {
 		flashMode = Camera.Parameters.FLASH_MODE_OFF;
 		cameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
 
+		EventBus.getDefault().register(this);
 	}
 
 	@AfterViews

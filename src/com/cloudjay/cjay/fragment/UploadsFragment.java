@@ -34,6 +34,7 @@ import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener.OnDismissCallback;
+import com.googlecode.androidannotations.annotations.EFragment;
 
 import de.greenrobot.event.EventBus;
 
@@ -43,7 +44,7 @@ public class UploadsFragment extends SherlockFragment implements
 	private PhotoUploadController mPhotoSelectionController;
 	private UploadsListBaseAdapter mAdapter;
 
-	private ProgressDialog mOpeningFacebookDialog;
+	// private ProgressDialog mOpeningFacebookDialog;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -79,7 +80,7 @@ public class UploadsFragment extends SherlockFragment implements
 	@Override
 	public void onStop() {
 		super.onStop();
-		closeFacebookProgressDialog();
+		// closeFacebookProgressDialog();
 	}
 
 	@Override
@@ -88,12 +89,12 @@ public class UploadsFragment extends SherlockFragment implements
 		EventBus.getDefault().unregister(this);
 	}
 
-	private void closeFacebookProgressDialog() {
-		if (null != mOpeningFacebookDialog) {
-			mOpeningFacebookDialog.dismiss();
-			mOpeningFacebookDialog = null;
-		}
-	}
+	// private void closeFacebookProgressDialog() {
+	// if (null != mOpeningFacebookDialog) {
+	// mOpeningFacebookDialog.dismiss();
+	// mOpeningFacebookDialog = null;
+	// }
+	// }
 
 	// private void openFacebookProgressDialog() {
 	// closeFacebookProgressDialog();
