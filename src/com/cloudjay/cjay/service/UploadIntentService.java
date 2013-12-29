@@ -17,6 +17,7 @@ import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
+
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -35,6 +36,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.SplashScreenActivity;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.TmpContainerSession;
@@ -42,6 +44,8 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.task.PhotupThreadRunnable;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CountingInputStreamEntity;
+import com.cloudjay.cjay.util.Flags;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Mapper;
 
 public class UploadIntentService extends IntentService implements
@@ -172,6 +176,35 @@ public class UploadIntentService extends IntentService implements
 		startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
 	}
 
+	public void onEventMainThread(UploadStateChangedEvent event) {
+		ContainerSession upload = event.getContainerSession();
+
+		switch (upload.getUploadState()) {
+		case ContainerSession.STATE_UPLOAD_IN_PROGRESS:
+			updateNotification(upload);
+			break;
+
+		case ContainerSession.STATE_UPLOAD_COMPLETED:
+			mNumberUploaded++;
+			// Fall through...
+
+			// case ContainerSession.STATE_UPLOAD_ERROR:
+			// startNextUploadOrFinish();
+			// // Fall through...
+
+		case ContainerSession.STATE_UPLOAD_WAITING:
+			if (Flags.ENABLE_DB_PERSISTENCE) {
+				try {
+					Logger.Log("onEventMainThread(UploadStateChangedEvent event)");
+					containerSessionDaoImpl.update(upload);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			break;
+		}
+	}
+
 	/**
 	 * Upload ContainerSession to server
 	 * 
@@ -203,6 +236,24 @@ public class UploadIntentService extends IntentService implements
 
 	@Override
 	public void onCreate() {
+
+		try {
+			if (null == containerSessionDaoImpl)
+				containerSessionDaoImpl = CJayClient.getInstance()
+						.getDatabaseManager()
+						.getHelper(getApplicationContext())
+						.getContainerSessionDaoImpl();
+
+			if (null == cJayImageDaoImpl)
+				cJayImageDaoImpl = CJayClient.getInstance()
+						.getDatabaseManager()
+						.getHelper(getApplicationContext())
+						.getCJayImageDaoImpl();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
 		super.onCreate();
 	}
 

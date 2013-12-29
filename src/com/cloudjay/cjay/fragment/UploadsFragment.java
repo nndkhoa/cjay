@@ -15,6 +15,8 @@
  */
 package com.cloudjay.cjay.fragment;
 
+import java.sql.SQLException;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,8 +29,10 @@ import android.widget.ListView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadsListBaseAdapter;
+import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionAddedEvent;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.network.CJayClient;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener.OnDismissCallback;
 import de.greenrobot.event.EventBus;
@@ -37,11 +41,21 @@ public class UploadsFragment extends SherlockFragment implements
 		OnDismissCallback, OnItemClickListener {
 
 	private UploadsListBaseAdapter mAdapter;
+	ContainerSessionDaoImpl containerSessionDaoImpl = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		EventBus.getDefault().register(this);
+
+		try {
+			if (null == containerSessionDaoImpl)
+				containerSessionDaoImpl = CJayClient.getInstance()
+						.getDatabaseManager().getHelper(getActivity())
+						.getContainerSessionDaoImpl();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
 		mAdapter = new UploadsListBaseAdapter(getActivity());
 	}
@@ -93,6 +107,7 @@ public class UploadsFragment extends SherlockFragment implements
 
 				// remove from Upload Fragment
 				item.setCleared(true);
+				containerSessionDaoImpl.update(item);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

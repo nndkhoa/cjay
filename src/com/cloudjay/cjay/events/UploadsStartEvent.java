@@ -1,9 +1,9 @@
 package com.cloudjay.cjay.events;
 
 /**
- * Gọi khi user bấm vào menu item `Upload`
+ * Trigger when user click Upload, use it to change selected Tab
  * 
- * @author apple
+ * @author tieubao
  * 
  */
 public class UploadsStartEvent {

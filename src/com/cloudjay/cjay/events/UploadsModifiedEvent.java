@@ -15,6 +15,13 @@
  */
 package com.cloudjay.cjay.events;
 
+/**
+ * Trigger when Upload State of ContainerSession changed to
+ * STATE_UPLOAD_COMPLETED
+ * 
+ * @author tieubao
+ * 
+ */
 public class UploadsModifiedEvent {
 
 }

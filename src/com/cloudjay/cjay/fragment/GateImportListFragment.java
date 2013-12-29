@@ -25,6 +25,7 @@ import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Session;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.view.AddContainerDialog;
@@ -43,7 +44,7 @@ import de.greenrobot.event.EventBus;
 @OptionsMenu(R.menu.menu_gate_import)
 public class GateImportListFragment extends SherlockDialogFragment {
 
-	private final static String TAG = "GateImportListFragment";
+	private final static String LOG_TAG = "GateImportListFragment";
 
 	@ViewById(R.id.btn_add_new)
 	Button mAddNewBtn;
@@ -60,6 +61,8 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 	@OptionsItem(R.id.menu_camera)
 	void cameraMenuItemSelected() {
+		Logger.Log(LOG_TAG, "Menu camera item clicked");
+
 		String uuid = mSelectedContainerSession.getUuid();
 		Intent intent = new Intent(getActivity(), CameraActivity_.class);
 		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA, uuid);
@@ -69,6 +72,8 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 	@OptionsItem(R.id.menu_edit_container)
 	void editMenuItemSelected() {
+		Logger.Log(LOG_TAG, "Menu edit item clicked");
+
 		// Open dialog for editing details
 		showContainerDetailDialog(mSelectedContainerSession.getContainerId(),
 				mSelectedContainerSession.getOperatorName(),
@@ -76,18 +81,31 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	}
 
 	@OptionsItem(R.id.menu_upload)
-	public void uploadMenuItemSelected() {
+	void uploadMenuItemSelected() {
+		try {
 
-		// User confirm upload
-		mSelectedContainerSession.setUploadConfirmation(true);
+			Logger.Log(LOG_TAG, "Menu upload item clicked");
 
-		// this will call EventBus.post(`UploadsModifiedEvent`)
-		mSelectedContainerSession
-				.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
+					.getInstance().getDatabaseManager()
+					.getHelper(getActivity()).getContainerSessionDaoImpl();
 
-		// It will trigger `UploadsFragment` Adapter notifyDataSetChanged
-		EventBus.getDefault().post(
-				new ContainerSessionAddedEvent(mSelectedContainerSession));
+			// User confirm upload
+			mSelectedContainerSession.setUploadConfirmation(true);
+
+			// this will call EventBus.post(`UploadsModifiedEvent`)
+			mSelectedContainerSession
+					.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+
+			containerSessionDaoImpl.update(mSelectedContainerSession);
+
+			// It will trigger `UploadsFragment` Adapter notifyDataSetChanged
+			EventBus.getDefault().post(
+					new ContainerSessionAddedEvent(mSelectedContainerSession));
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@AfterViews
@@ -119,7 +137,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		mSelectedContainerSession = null;
 		getActivity().supportInvalidateOptionsMenu();
 
-		android.util.Log.d(TAG, "Show item at position: " + position);
+		android.util.Log.d(LOG_TAG, "Show item at position: " + position);
 	}
 
 	@ItemLongClick(R.id.feeds)
