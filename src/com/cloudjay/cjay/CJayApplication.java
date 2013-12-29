@@ -144,8 +144,6 @@ public class CJayApplication extends Application {
 		// Configure Logger
 		Logger.PRODUCTION_MODE = false;
 
-		// checkInstantUploadReceiverState();
-
 		// Making Alarm for Queue Worker
 		Intent intent = new Intent(this, QueueIntentService.class);
 		PendingIntent pintent = PendingIntent.getService(this, 0, intent,

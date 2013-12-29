@@ -15,7 +15,7 @@ import de.greenrobot.event.EventBus;
 
 public class UploadItemLayout extends LinearLayout {
 
-	private ContainerSession mSelection;
+	private ContainerSession mContainerSession;
 
 	public UploadItemLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -26,8 +26,8 @@ public class UploadItemLayout extends LinearLayout {
 		return (TextView) findViewById(R.id.tv_photo_caption);
 	}
 
-	public PhotupImageView getImageView() {
-		return (PhotupImageView) findViewById(R.id.iv_photo);
+	public ImageView getImageView() {
+		return (ImageView) findViewById(R.id.iv_photo);
 	}
 
 	public ProgressBar getProgressBar() {
@@ -43,20 +43,20 @@ public class UploadItemLayout extends LinearLayout {
 	}
 
 	public void onEventMainThread(UploadStateChangedEvent event) {
-		if (mSelection == event.getContainerSession()) {
+		if (mContainerSession == event.getContainerSession()) {
 			refreshUploadUi();
 		}
 	}
 
 	public void refreshUploadUi() {
-		if (null == mSelection) {
+		if (null == mContainerSession) {
 			return;
 		}
 
 		ProgressBar pb = getProgressBar();
 		ImageView resultIv = getResultImageView();
 
-		switch (mSelection.getUploadState()) {
+		switch (mContainerSession.getUploadState()) {
 		case ContainerSession.STATE_UPLOAD_COMPLETED:
 			pb.setVisibility(View.GONE);
 			resultIv.setImageResource(R.drawable.ic_success);
@@ -73,7 +73,7 @@ public class UploadItemLayout extends LinearLayout {
 			pb.setVisibility(View.VISIBLE);
 			resultIv.setVisibility(View.GONE);
 
-			final int progress = mSelection.getUploadProgress();
+			final int progress = mContainerSession.getUploadProgress();
 			if (progress <= 0) {
 				pb.setIndeterminate(true);
 			} else {
@@ -92,15 +92,15 @@ public class UploadItemLayout extends LinearLayout {
 		requestLayout();
 	}
 
-	public void setPhotoSelection(ContainerSession selection) {
-		mSelection = selection;
+	public void setContainerSession(ContainerSession selection) {
+		mContainerSession = selection;
 
 		/**
 		 * Initial UI Update
 		 */
-		PhotupImageView iv = getImageView();
+		ImageView iv = getImageView();
 		if (null != iv) {
-			iv.requestThumbnail(mSelection, false);
+			// iv.requestThumbnail(mSelection, false);
 		}
 
 		/**

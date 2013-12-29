@@ -48,18 +48,22 @@ import com.googlecode.androidannotations.annotations.ViewById;
 @EFragment(R.layout.fragment_gate_export)
 @OptionsMenu(R.menu.menu_gate_export)
 public class GateExportListFragment extends SherlockDialogFragment {
-	
+
 	private ArrayList<Operator> mOperators;
 	private ArrayList<ContainerSession> mFeeds;
 	private FunDapter<ContainerSession> mFeedsAdapter;
-	
-	private ContainerSession mSelectedContainerSession;	
+
+	private ContainerSession mSelectedContainerSession;
 	private boolean mDirty;
 
-	@ViewById(R.id.container_list) ListView mFeedListView;
-	@ViewById(R.id.search_edittext)	EditText mSearchEditText;
-	@ViewById(R.id.add_button) Button mAddButton;
-	@ViewById(R.id.notfound_textview) TextView mNotfoundTextView;
+	@ViewById(R.id.container_list)
+	ListView mFeedListView;
+	@ViewById(R.id.search_edittext)
+	EditText mSearchEditText;
+	@ViewById(R.id.add_button)
+	Button mAddButton;
+	@ViewById(R.id.notfound_textview)
+	TextView mNotfoundTextView;
 
 	@AfterViews
 	void afterViews() {
@@ -77,34 +81,38 @@ public class GateExportListFragment extends SherlockDialogFragment {
 					int count) {
 			}
 		});
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListContainerSessions(getActivity());
-		mOperators = (ArrayList<Operator>) DataCenter.getInstance().getListOperators(getActivity());
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+				.getListContainerSessions(getActivity());
+		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
+				.getListOperators(getActivity());
 		configureControls(mFeeds);
-		initFunDapter(mFeeds);		
+		initFunDapter(mFeeds);
 
 		mDirty = false;
 	}
-	
+
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 		// TODO
 	}
-	
+
 	@Click(R.id.add_button)
 	void addButtonClicked() {
 		// show add container dialog
-		showContainerDetailDialog(getResources().getString(R.string.default_container_id), "", AddContainerDialog.CONTAINER_DIALOG_ADD);
+		showContainerDetailDialog(
+				getResources().getString(R.string.default_container_id), "",
+				AddContainerDialog.CONTAINER_DIALOG_ADD);
 	}
 
 	@ItemClick(R.id.container_list)
 	void listItemClicked(int position) {
 		// refresh highlighting
 		mFeedListView.setItemChecked(position, false);
-		
+
 		// clear current selection
 		mSelectedContainerSession = null;
 		getActivity().supportInvalidateOptionsMenu();
-		
+
 		// get the selected container session
 		ContainerSession containerSession = mFeedsAdapter.getItem(position);
 		TmpContainerSession tmpContainerSession = Mapper.toTmpContainerSession(
@@ -118,21 +126,21 @@ public class GateExportListFragment extends SherlockDialogFragment {
 		intent.putExtra("type", 1); // out
 		startActivity(intent);
 	}
-	
+
 	@ItemLongClick(R.id.container_list)
 	void listItemLongClicked(int position) {
 		// refresh highlighting
 		mFeedListView.setItemChecked(position, true);
-		
+
 		// refresh menu
 		mSelectedContainerSession = mFeedsAdapter.getItem(position);
 		getActivity().supportInvalidateOptionsMenu();
 	}
-	
+
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
-		
+
 		boolean isDisplayed = !(mSelectedContainerSession == null);
 		menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
 	}
@@ -145,30 +153,34 @@ public class GateExportListFragment extends SherlockDialogFragment {
 				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		return dialog;
 	}
-    
+
 	@Override
 	public void onResume() {
 		super.onResume();
-		
+
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListContainerSessions(getActivity());
 		mSearchEditText.setText(""); // this will refresh the list
 	}
-	public void showContainerDetailDialog(String containerId, String operatorName, int mode) {
+
+	public void showContainerDetailDialog(String containerId,
+			String operatorName, int mode) {
 		FragmentManager fm = getActivity().getSupportFragmentManager();
-        AddContainerDialog addContainerDialog = new AddContainerDialog();
-        addContainerDialog.setContainerId(containerId);
-        addContainerDialog.setOperatorName(operatorName);
-        addContainerDialog.setMode(mode);
-        addContainerDialog.setParent(this);
-        addContainerDialog.show(fm, "add_container_dialog");
+		AddContainerDialog addContainerDialog = new AddContainerDialog();
+		addContainerDialog.setContainerId(containerId);
+		addContainerDialog.setOperatorName(operatorName);
+		addContainerDialog.setMode(mode);
+		addContainerDialog.setParent(this);
+		addContainerDialog.show(fm, "add_container_dialog");
 	}
-	
-	public void OnOperatorSelected(String containerId, String operatorName, int mode) {
+
+	public void OnOperatorSelected(String containerId, String operatorName,
+			int mode) {
 		showContainerDetailDialog(containerId, operatorName, mode);
 	}
-	
-	public void OnContainerInputCompleted(String containerId, String operatorName, int mode) {
+
+	public void OnContainerInputCompleted(String containerId,
+			String operatorName, int mode) {
 		// Get the container id and container operator code
 		String operatorCode = "";
 		for (Operator operator : mOperators) {
@@ -177,14 +189,15 @@ public class GateExportListFragment extends SherlockDialogFragment {
 				break;
 			}
 		}
-		
+
 		switch (mode) {
 		case AddContainerDialog.CONTAINER_DIALOG_ADD:
 			// Create a tmp Container Session
 			TmpContainerSession newTmpContainer = new TmpContainerSession();
 			newTmpContainer.setContainerId(containerId);
 			newTmpContainer.setOperatorCode(operatorCode);
-			newTmpContainer.setCheckInTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT));
+			newTmpContainer.setCheckInTime(StringHelper
+					.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT));
 
 			User currentUser = Session.restore(getActivity()).getCurrentUser();
 
@@ -192,16 +205,12 @@ public class GateExportListFragment extends SherlockDialogFragment {
 			newTmpContainer.printMe();
 
 			// Save the current temp Container Session
-			DataCenter.getInstance()
-					.setTmpCurrentSession(
-							newTmpContainer);
+			DataCenter.getInstance().setTmpCurrentSession(newTmpContainer);
 
 			// Pass tmpContainerSession away
 			// Then start showing the Camera
-			Intent intent = new Intent(getActivity(),
-					CameraActivity_.class);
-			intent.putExtra(
-					CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+			Intent intent = new Intent(getActivity(), CameraActivity_.class);
+			intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
 					newTmpContainer);
 			intent.putExtra("type", 1); // out
 			startActivity(intent);
@@ -219,7 +228,8 @@ public class GateExportListFragment extends SherlockDialogFragment {
 		} else {
 			ArrayList<ContainerSession> searchFeeds = new ArrayList<ContainerSession>();
 			for (ContainerSession containerSession : mFeeds) {
-				if (containerSession.getContainerId().toLowerCase(Locale.US).contains(searchText.toLowerCase(Locale.US))) {
+				if (containerSession.getContainerId().toLowerCase(Locale.US)
+						.contains(searchText.toLowerCase(Locale.US))) {
 					searchFeeds.add(containerSession);
 				}
 			}
@@ -228,7 +238,7 @@ public class GateExportListFragment extends SherlockDialogFragment {
 			mFeedsAdapter.updateData(searchFeeds);
 		}
 	}
-	
+
 	private void configureControls(ArrayList<ContainerSession> list) {
 		boolean hasContainers = list.size() > 0;
 		if (hasContainers) {
@@ -238,7 +248,7 @@ public class GateExportListFragment extends SherlockDialogFragment {
 		} else {
 			mFeedListView.setVisibility(View.INVISIBLE);
 			mAddButton.setVisibility(View.VISIBLE);
-			mNotfoundTextView.setVisibility(View.VISIBLE);			
+			mNotfoundTextView.setVisibility(View.VISIBLE);
 		}
 	}
 
@@ -278,7 +288,7 @@ public class GateExportListFragment extends SherlockDialogFragment {
 				}, new DynamicImageLoader() {
 					@Override
 					public void loadImage(String stringColor, ImageView view) {
-						view.setImageResource(R.drawable.ic_logo);
+						view.setImageResource(R.drawable.ic_app);
 					}
 				}).onClick(new ItemClickListener<ContainerSession>() {
 			@Override
@@ -286,8 +296,8 @@ public class GateExportListFragment extends SherlockDialogFragment {
 				// TODO Auto-generated method stub
 			}
 		});
-		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(), containers,
-				R.layout.list_item_container, feedsDict);
+		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(),
+				containers, R.layout.list_item_container, feedsDict);
 		mFeedListView.setAdapter(mFeedsAdapter);
 	}
 }

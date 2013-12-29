@@ -47,7 +47,7 @@ public class UploadsListBaseAdapter extends BaseAdapter {
 		}
 
 		UploadItemLayout layout = (UploadItemLayout) view;
-		layout.setPhotoSelection(getItem(position));
+		layout.setContainerSession(getItem(position));
 
 		return view;
 	}
