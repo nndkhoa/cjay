@@ -90,6 +90,8 @@ public class UploadsFragment extends SherlockFragment implements
 			for (int i = 0, z = reverseSortedPositions.length; i < z; i++) {
 				ContainerSession item = (ContainerSession) listView
 						.getItemAtPosition(reverseSortedPositions[i]);
+
+				// remove from Upload Fragment
 				item.setCleared(true);
 			}
 		} catch (Exception e) {

@@ -8,6 +8,8 @@ import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 
 public class ContainerSessionDaoImpl extends
@@ -70,8 +72,14 @@ public class ContainerSessionDaoImpl extends
 
 		ContainerSession result = null;
 
-		List<ContainerSession> containerSessions = this.queryForEq("state",
-				ContainerSession.STATE_UPLOAD_WAITING);
+		List<ContainerSession> containerSessions = this
+				.query(this
+						.queryBuilder()
+						.where()
+						.eq(ContainerSession.FIELD_STATE,
+								ContainerSession.STATE_UPLOAD_WAITING).and()
+						.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, true)
+						.prepare());
 
 		// Filter by CJayImage UploadState
 		CJayImageDaoImpl cJayImageDaoImpl = DaoManager.createDao(
@@ -95,5 +103,23 @@ public class ContainerSessionDaoImpl extends
 		}
 
 		return result;
+	}
+
+	/**
+	 * Get all container session items should be show on Upload Fragment.
+	 * 
+	 * @return
+	 * @throws SQLException
+	 */
+	public List<ContainerSession> getListUploadContainerSessions()
+			throws SQLException {
+
+		List<ContainerSession> containerSessions = this.query(this
+				.queryBuilder().where()
+				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, true).and()
+				.eq(ContainerSession.FIELD_CLEARED, false).prepare());
+
+		return containerSessions;
+
 	}
 }

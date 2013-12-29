@@ -26,4 +26,6 @@ public interface IContainerSessionDao extends Dao<ContainerSession, String> {
 	ContainerSession findByUuid(String uuid) throws SQLException;
 
 	ContainerSession getNextWaiting() throws SQLException;
+
+	List<ContainerSession> getListUploadContainerSessions() throws SQLException;
 }

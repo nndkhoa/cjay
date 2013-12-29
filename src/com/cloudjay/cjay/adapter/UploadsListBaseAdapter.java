@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.view.UploadItemLayout;
 
 public class UploadsListBaseAdapter extends BaseAdapter {
@@ -23,8 +24,8 @@ public class UploadsListBaseAdapter extends BaseAdapter {
 		mContext = context;
 		mLayoutInflater = LayoutInflater.from(mContext);
 
-		// TODO: TIEUBAO query for list item
-		// mItems = mController.getUploadingUploads();
+		// query for list item
+		mItems = DataCenter.getInstance().getListContainerSessions(mContext);
 	}
 
 	public int getCount() {
@@ -54,8 +55,10 @@ public class UploadsListBaseAdapter extends BaseAdapter {
 	@Override
 	public void notifyDataSetChanged() {
 
-		// TODO: TIEUBAO Update list items
-		// mItems = mController.getUploadingUploads();
+		// Update list items
+		if (null != mContext)
+			mItems = DataCenter.getInstance().getListUploadContainerSessions(
+					mContext);
 
 		super.notifyDataSetChanged();
 	}

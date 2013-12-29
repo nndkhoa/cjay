@@ -69,17 +69,6 @@ public class CJayActivity extends SherlockFragmentActivity implements
 		super.onDestroy();
 	}
 
-	private void setupPauseUploadingMenuItems(Menu menu) {
-
-		MenuItem pauseItem = menu.findItem(R.id.menu_uploading_stop);
-		MenuItem startItem = menu.findItem(R.id.menu_uploading_start);
-
-		if (null != pauseItem && null != startItem) {
-			startItem.setVisible(Utils.isUploadingPaused(this));
-			pauseItem.setVisible(!startItem.isVisible());
-		}
-	}
-
 	protected final void showUploadingDisabledCrouton() {
 		Crouton.cancelAllCroutons();
 		Crouton.showText(this, R.string.stopped_uploads, Style.ALERT);
@@ -90,38 +79,4 @@ public class CJayActivity extends SherlockFragmentActivity implements
 		Crouton.showText(this, R.string.started_uploads, Style.CONFIRM);
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		// TODO: xử lý start/pause upload
-
-		// case R.id.menu_uploading_stop:
-		// Utils.setUploadingPaused(this, true);
-		// EventBus.getDefault().post(new UploadingPausedStateChangedEvent());
-		// return true;
-		//
-		// case R.id.menu_uploading_start:
-		// Utils.setUploadingPaused(this, false);
-		// EventBus.getDefault().post(new UploadingPausedStateChangedEvent());
-		// startService(Utils.getUploadAllIntent(this));
-		// return true;
-
-		case R.id.menu_retry_failed:
-			// TODO: menu_retry_failed
-			// mPhotoController.moveFailedToSelected();
-			return true;
-		}
-
-		return super.onOptionsItemSelected(item);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		if (menu.size() == 0) {
-			getSupportMenuInflater().inflate(R.menu.menu_photo_grid_uploads,
-					menu);
-			setupPauseUploadingMenuItems(menu);
-		}
-		return super.onCreateOptionsMenu(menu);
-	}
 }

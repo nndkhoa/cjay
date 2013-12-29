@@ -13,14 +13,14 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  -->
+-->
 
 <uk.co.senab.photup.views.UploadItemLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="4dp">
+    android:padding="4dp" >
 
     <uk.co.senab.photup.views.PhotupImageView
         android:id="@+id/iv_photo"
@@ -35,7 +35,7 @@
         android:layout_weight="1"
         android:gravity="center_vertical"
         android:orientation="vertical"
-        android:padding="@dimen/half_spacing">
+        android:padding="@dimen/half_spacing" >
 
         <TextView
             android:id="@+id/tv_photo_caption"

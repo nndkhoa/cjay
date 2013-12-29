@@ -54,14 +54,14 @@ public class ContainerSession implements Parcelable {
 
 	private static final String TAG = "ContainerSession";
 
-	private static final String CHECK_OUT_TIME = "check_out_time";
-	private static final String CHECK_IN_TIME = "check_in_time";
-	private static final String IMAGE_ID_PATH = "image_id_path";
+	public static final String CHECK_OUT_TIME = "check_out_time";
+	public static final String CHECK_IN_TIME = "check_in_time";
+	public static final String IMAGE_ID_PATH = "image_id_path";
 	public static final String FIELD_STATE = "state";
-	private static final String ID = "id";
-	private static final String FIELD_UUID = "uuid";
-	private static final String FIELD_UPLOAD_CONFIRMATION = "upload_confirmation";
-	private static final String FIELD_CLEARED = "cleared";
+	public static final String ID = "id";
+	public static final String FIELD_UUID = "uuid";
+	public static final String FIELD_UPLOAD_CONFIRMATION = "upload_confirmation";
+	public static final String FIELD_CLEARED = "cleared";
 
 	public static final int STATE_UPLOAD_COMPLETED = 4;
 	public static final int STATE_UPLOAD_ERROR = 3;

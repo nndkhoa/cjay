@@ -83,6 +83,7 @@ public class UploadIntentService extends IntentService implements
 						.getHelper(getApplicationContext())
 						.getContainerSessionDaoImpl();
 
+				// It will return container with `upload confirmation = true`
 				ContainerSession containerSession = containerSessionDaoImpl
 						.getNextWaiting();
 
@@ -191,9 +192,11 @@ public class UploadIntentService extends IntentService implements
 			CJayClient.getInstance().postContainerSession(
 					getApplicationContext(), uploadItem);
 
+			containerSession
+					.setUploadState(ContainerSession.STATE_UPLOAD_COMPLETED);
 		} catch (Exception e) {
 			containerSession
-					.setUploadState(ContainerSession.STATE_UPLOAD_ERROR);
+					.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
 		}
 
 	}

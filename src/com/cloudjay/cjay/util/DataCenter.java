@@ -163,6 +163,17 @@ public class DataCenter {
 		return operatorNames;
 	}
 
+	public List<ContainerSession> getListUploadContainerSessions(Context context) {
+		try {
+			return getDatabaseManager().getHelper(context)
+					.getContainerSessionDaoImpl()
+					.getListUploadContainerSessions();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	public IDatabaseManager getDatabaseManager() {
 		return databaseManager;
 	}
