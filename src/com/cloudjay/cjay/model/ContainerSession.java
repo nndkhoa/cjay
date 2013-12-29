@@ -59,7 +59,7 @@ public class ContainerSession implements Parcelable {
 	@DatabaseField(columnName = FIELD_UUID, id = true)
 	String uuid;
 
-	@DatabaseField(columnName = IMAGE_ID_PATH)
+	@DatabaseField(columnName = IMAGE_ID_PATH, defaultValue = "")
 	String image_id_path;
 
 	@DatabaseField(columnName = CHECK_IN_TIME, defaultValue = "")

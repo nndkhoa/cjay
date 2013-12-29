@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import com.cloudjay.cjay.SampleFragment_;
 import com.cloudjay.cjay.fragment.GateExportListFragment_;
 import com.cloudjay.cjay.fragment.GateImportListFragment_;
+import com.cloudjay.cjay.fragment.UploadsFragment;
 
 public class ViewPagerAdapter extends FragmentPagerAdapter {
 
@@ -30,12 +31,17 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
 		case 1:
 			Fragment exportFeedFragment = new GateExportListFragment_();
 			return exportFeedFragment;
+		case 2:
 		default:
-			Fragment fragment = new SampleFragment_();
-			Bundle bundle = new Bundle();
-			bundle.putString("label", locations[position]);
-			fragment.setArguments(bundle);
-			return fragment;
+
+			Fragment uploadFragment = new UploadsFragment();
+			return uploadFragment;
+
+			// Fragment fragment = new SampleFragment_();
+			// Bundle bundle = new Bundle();
+			// bundle.putString("label", locations[position]);
+			// fragment.setArguments(bundle);
+			// return fragment;
 		}
 	}
 

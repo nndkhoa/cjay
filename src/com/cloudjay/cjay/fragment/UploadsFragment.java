@@ -29,7 +29,6 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.cloudjay.cjay.PhotoUploadController;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadsListBaseAdapter;
-import com.cloudjay.cjay.events.PhotoSelectionRemovedEvent;
 import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener;
@@ -43,8 +42,6 @@ public class UploadsFragment extends SherlockFragment implements
 
 	private PhotoUploadController mPhotoSelectionController;
 	private UploadsListBaseAdapter mAdapter;
-
-	// private ProgressDialog mOpeningFacebookDialog;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -80,7 +77,6 @@ public class UploadsFragment extends SherlockFragment implements
 	@Override
 	public void onStop() {
 		super.onStop();
-		// closeFacebookProgressDialog();
 	}
 
 	@Override
@@ -88,21 +84,6 @@ public class UploadsFragment extends SherlockFragment implements
 		super.onDestroy();
 		EventBus.getDefault().unregister(this);
 	}
-
-	// private void closeFacebookProgressDialog() {
-	// if (null != mOpeningFacebookDialog) {
-	// mOpeningFacebookDialog.dismiss();
-	// mOpeningFacebookDialog = null;
-	// }
-	// }
-
-	// private void openFacebookProgressDialog() {
-	// closeFacebookProgressDialog();
-	//
-	// mOpeningFacebookDialog = new ProgressDialog(getActivity());
-	// mOpeningFacebookDialog.setMessage(getString(R.string.opening_app));
-	// mOpeningFacebookDialog.show();
-	// }
 
 	public void onItemClick(AdapterView<?> l, View view, int position, long id) {
 		TmpContainerSession upload = (TmpContainerSession) l
@@ -142,9 +123,9 @@ public class UploadsFragment extends SherlockFragment implements
 		}
 	}
 
-	public void onEvent(PhotoSelectionRemovedEvent event) {
-		mAdapter.notifyDataSetChanged();
-	}
+	// public void onEvent(PhotoSelectionRemovedEvent event) {
+	// mAdapter.notifyDataSetChanged();
+	// }
 
 	public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
 		try {

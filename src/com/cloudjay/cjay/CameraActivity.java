@@ -429,11 +429,6 @@ public class CameraActivity extends Activity {
 		}
 
 		// filename sample: gate-in-[depot-id]-2013-12-19-[UUID].jpg
-		// String fileName = "gate-" + imageType + "-"
-		// + tmpContainerSession.getDepotCode() + "-"
-		// + StringHelper.getCurrentTimestamp("yyyy-mm-dd") + "-" + uuid
-		// + ".jpg";
-
 		String fileName = "gate-" + imageType + "-"
 				+ containerSession.getContainer().getDepot().getDepotCode()
 				+ "-" + StringHelper.getCurrentTimestamp("yyyy-mm-dd") + "-"
@@ -456,13 +451,6 @@ public class CameraActivity extends Activity {
 
 	void uploadImage(String uuid, String uri, String image_name) {
 
-		// GateReportImage tmp = new GateReportImage(
-		// type,
-		// StringHelper
-		// .getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT),
-		// image_name);
-		// gateReportImages.add(tmp);
-
 		// Create Database Entity Object
 		CJayImage uploadItem = new CJayImage();
 
@@ -474,9 +462,11 @@ public class CameraActivity extends Activity {
 		uploadItem.setUuid(uuid);
 		uploadItem.setUri(uri);
 		uploadItem.setImageName(image_name);
-
-		// Add by tieubao: add foreign key
 		uploadItem.setContainerSession(containerSession);
+
+		if (containerSession.getImageIdPath() == "") {
+			containerSession.setImageIdPath(uri);
+		}
 
 		try {
 			CJayImageDaoImpl uploadList = CJayClient.getInstance()

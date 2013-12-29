@@ -6,7 +6,6 @@ import android.os.Bundle;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.cloudjay.cjay.events.UploadingPausedStateChangedEvent;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Session;
@@ -49,7 +48,6 @@ public class CJayActivity extends SherlockFragmentActivity implements
 		session = Session.restore(getApplicationContext());
 
 		mPhotoController = PhotoUploadController.getFromContext(this);
-		EventBus.getDefault().register(this);
 
 		if (Utils.isUploadingPaused(this)) {
 			showUploadingDisabledCrouton();
@@ -72,7 +70,6 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 	@Override
 	protected void onDestroy() {
-		EventBus.getDefault().unregister(this);
 		super.onDestroy();
 	}
 
@@ -84,18 +81,6 @@ public class CJayActivity extends SherlockFragmentActivity implements
 		if (null != pauseItem && null != startItem) {
 			startItem.setVisible(Utils.isUploadingPaused(this));
 			pauseItem.setVisible(!startItem.isVisible());
-		}
-	}
-
-	public void onEvent(UploadingPausedStateChangedEvent event) {
-		// TODO Should probably check whether we're showing the pause/resume
-		// items before invalidating
-		supportInvalidateOptionsMenu();
-
-		if (Utils.isUploadingPaused(this)) {
-			showUploadingDisabledCrouton();
-		} else {
-			showUploadingEnabledCrouton();
 		}
 	}
 
@@ -112,16 +97,18 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_uploading_stop:
-			Utils.setUploadingPaused(this, true);
-			EventBus.getDefault().post(new UploadingPausedStateChangedEvent());
-			return true;
+		// TODO: xử lý start/pause upload
 
-		case R.id.menu_uploading_start:
-			Utils.setUploadingPaused(this, false);
-			EventBus.getDefault().post(new UploadingPausedStateChangedEvent());
-			startService(Utils.getUploadAllIntent(this));
-			return true;
+		// case R.id.menu_uploading_stop:
+		// Utils.setUploadingPaused(this, true);
+		// EventBus.getDefault().post(new UploadingPausedStateChangedEvent());
+		// return true;
+		//
+		// case R.id.menu_uploading_start:
+		// Utils.setUploadingPaused(this, false);
+		// EventBus.getDefault().post(new UploadingPausedStateChangedEvent());
+		// startService(Utils.getUploadAllIntent(this));
+		// return true;
 
 		case R.id.menu_retry_failed:
 			// TODO: menu_retry_failed
