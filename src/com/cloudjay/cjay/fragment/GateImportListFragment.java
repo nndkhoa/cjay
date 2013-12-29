@@ -73,7 +73,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	}
 
 	@OptionsItem(R.id.menu_upload)
-	void uploadMenuItemSelected() {
+	public void uploadMenuItemSelected() {
 		// TODO
 	}
 
@@ -104,7 +104,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 		// clear current selection
 		mSelectedContainerSession = null;
-		getActivity().invalidateOptionsMenu();
+		getActivity().supportInvalidateOptionsMenu();
 
 		android.util.Log.d(TAG, "Show item at position: " + position);
 	}
@@ -116,11 +116,13 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 		// refresh menu
 		mSelectedContainerSession = mFeedsAdapter.getItem(position);
-		getActivity().invalidateOptionsMenu();
+		getActivity().supportInvalidateOptionsMenu();
 	}
 
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
+		super.onPrepareOptionsMenu(menu);
+
 		boolean isDisplayed = !(mSelectedContainerSession == null);
 		menu.findItem(R.id.menu_camera).setVisible(isDisplayed);
 		menu.findItem(R.id.menu_edit_container).setVisible(isDisplayed);
