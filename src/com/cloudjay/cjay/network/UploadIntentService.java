@@ -44,6 +44,7 @@ public class UploadIntentService extends IntentService implements
 			uploadList = CJayClient.getInstance().getDatabaseManager()
 					.getHelper(getApplicationContext()).getCJayImageDaoImpl();
 			CJayImage uploadItem = uploadList.getNextWaiting();
+
 			if (uploadItem != null) {
 				doFileUpload(uploadItem);
 			}

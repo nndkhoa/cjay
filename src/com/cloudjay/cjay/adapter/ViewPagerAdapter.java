@@ -33,15 +33,8 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
 			return exportFeedFragment;
 		case 2:
 		default:
-
 			Fragment uploadFragment = new UploadsFragment();
 			return uploadFragment;
-
-			// Fragment fragment = new SampleFragment_();
-			// Bundle bundle = new Bundle();
-			// bundle.putString("label", locations[position]);
-			// fragment.setArguments(bundle);
-			// return fragment;
 		}
 	}
 

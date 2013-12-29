@@ -26,12 +26,12 @@ import java.util.List;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.PhotoUploadController;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.model.GateReportImage;
+import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.view.UploadItemLayout;
 
 public class UploadsListBaseAdapter extends BaseAdapter {
 
-	private List<GateReportImage> mItems;
+	private List<ContainerSession> mItems;
 
 	private final Context mContext;
 	private final LayoutInflater mLayoutInflater;
@@ -54,7 +54,7 @@ public class UploadsListBaseAdapter extends BaseAdapter {
 		return position;
 	}
 
-	public GateReportImage getItem(int position) {
+	public ContainerSession getItem(int position) {
 		return mItems.get(position);
 	}
 

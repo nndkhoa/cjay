@@ -26,7 +26,7 @@ import android.util.AttributeSet;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.Future;
 
-import com.cloudjay.cjay.model.GateReportImage;
+import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.task.PhotupThreadRunnable;
 import uk.co.senab.bitmapcache.BitmapLruCache;
@@ -42,13 +42,13 @@ public class PhotupImageView extends CacheableImageView {
 	static final class PhotoLoadRunnable extends PhotupThreadRunnable {
 
 		private final WeakReference<PhotupImageView> mImageView;
-		private final GateReportImage mUpload;
+		private final ContainerSession mUpload;
 		private final boolean mFullSize;
 		private final BitmapLruCache mCache;
 		private final OnPhotoLoadListener mListener;
 
 		public PhotoLoadRunnable(PhotupImageView imageView,
-				GateReportImage upload, BitmapLruCache cache,
+				ContainerSession upload, BitmapLruCache cache,
 				final boolean fullSize, final OnPhotoLoadListener listener) {
 			mImageView = new WeakReference<PhotupImageView>(imageView);
 			mUpload = upload;
@@ -138,7 +138,7 @@ public class PhotupImageView extends CacheableImageView {
 		}
 	}
 
-	public void requestFullSize(final TmpContainerSession upload,
+	public void requestFullSize(final ContainerSession upload,
 			final boolean honourFilter, final boolean clearDrawableOnLoad,
 			final OnPhotoLoadListener listener) {
 		resetForRequest(clearDrawableOnLoad);
@@ -160,12 +160,12 @@ public class PhotupImageView extends CacheableImageView {
 		// requestImage(upload, true, listener);
 	}
 
-	public void requestFullSize(final TmpContainerSession upload,
+	public void requestFullSize(final ContainerSession upload,
 			final boolean honourFilter, final OnPhotoLoadListener listener) {
 		requestFullSize(upload, honourFilter, true, listener);
 	}
 
-	public void requestThumbnail(final GateReportImage upload,
+	public void requestThumbnail(final ContainerSession upload,
 			final boolean honourFilter) {
 		resetForRequest(true);
 		requestImage(upload, false, null);
@@ -193,7 +193,7 @@ public class PhotupImageView extends CacheableImageView {
 		}
 	}
 
-	private void requestImage(final GateReportImage upload,
+	private void requestImage(final ContainerSession upload,
 			final boolean fullSize, final OnPhotoLoadListener listener) {
 		// final String key = fullSize ? upload.getDisplayImageKey() : upload
 		// .getThumbnailImageKey();

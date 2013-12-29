@@ -24,12 +24,13 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
+import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.GateReportImage;
 import de.greenrobot.event.EventBus;
 
 public class UploadItemLayout extends LinearLayout {
 
-	private GateReportImage mSelection;
+	private ContainerSession mSelection;
 
 	public UploadItemLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -57,9 +58,9 @@ public class UploadItemLayout extends LinearLayout {
 	}
 
 	public void onEventMainThread(UploadStateChangedEvent event) {
-		if (mSelection == event.getUpload()) {
-			refreshUploadUi();
-		}
+		// if (mSelection == event.getUpload()) {
+		// refreshUploadUi();
+		// }
 	}
 
 	public void refreshUploadUi() {
@@ -106,7 +107,7 @@ public class UploadItemLayout extends LinearLayout {
 		// requestLayout();
 	}
 
-	public void setPhotoSelection(GateReportImage selection) {
+	public void setPhotoSelection(ContainerSession selection) {
 		mSelection = selection;
 
 		/**

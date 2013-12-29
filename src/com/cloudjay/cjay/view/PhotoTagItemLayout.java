@@ -21,7 +21,7 @@ import android.widget.AbsoluteLayout;
 import android.widget.FrameLayout;
 
 import com.cloudjay.cjay.PhotoUploadController;
-import com.cloudjay.cjay.model.TmpContainerSession;
+import com.cloudjay.cjay.model.ContainerSession;
 
 @SuppressLint("ViewConstructor")
 @SuppressWarnings("deprecation")
@@ -34,9 +34,9 @@ public class PhotoTagItemLayout extends FrameLayout {
 	private final AbsoluteLayout mTagLayout;
 
 	private int mPosition;
-	private final TmpContainerSession mUpload;
+	private final ContainerSession mUpload;
 
-	public PhotoTagItemLayout(Context context, PhotoUploadController controller, TmpContainerSession upload) {
+	public PhotoTagItemLayout(Context context, PhotoUploadController controller, ContainerSession upload) {
 		super(context);
 		
 		mImageView = new MultiTouchImageView(context);
@@ -58,7 +58,7 @@ public class PhotoTagItemLayout extends FrameLayout {
 		return mImageView;
 	}
 
-	public TmpContainerSession getPhotoSelection() {
+	public ContainerSession getPhotoSelection() {
 		return mUpload;
 	}
 

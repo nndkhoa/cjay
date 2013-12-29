@@ -74,7 +74,12 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 	@OptionsItem(R.id.menu_upload)
 	public void uploadMenuItemSelected() {
-		// TODO
+
+		// User confirm upload
+		mSelectedContainerSession.setUploadConfirmation(true);
+		mSelectedContainerSession
+				.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+
 	}
 
 	@AfterViews
@@ -182,6 +187,9 @@ public class GateImportListFragment extends SherlockDialogFragment {
 					StringHelper
 							.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT),
 					currentUser.getDepot().getDepotCode());
+
+			containerSession.setUploadConfirmation(false);
+			containerSession.setUploadState(ContainerSession.STATE_NONE);
 
 			try {
 				ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient

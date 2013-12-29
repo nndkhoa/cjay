@@ -68,7 +68,7 @@ public class ContainerSession implements Parcelable {
 	@DatabaseField(columnName = CHECK_OUT_TIME, defaultValue = "")
 	String check_out_time;
 
-	@DatabaseField(columnName = FIELD_STATE)
+	@DatabaseField(columnName = FIELD_STATE, defaultValue = "0")
 	int mState;
 
 	@DatabaseField(columnName = FIELD_UPLOAD_CONFIRMATION, defaultValue = "false")

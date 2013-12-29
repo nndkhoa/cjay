@@ -3,15 +3,15 @@ package com.cloudjay.cjay;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cloudjay.cjay.model.GateReportImage;
+import com.cloudjay.cjay.model.ContainerSession;
 import android.content.Context;
 
 public class PhotoUploadController {
 
-	private final ArrayList<GateReportImage> mUploadingList;
+	private final ArrayList<ContainerSession> mUploadingList;
 
 	PhotoUploadController(Context context) {
-		mUploadingList = new ArrayList<GateReportImage>();
+		mUploadingList = new ArrayList<ContainerSession>();
 
 		// populateFromDatabase();
 	}
@@ -22,7 +22,7 @@ public class PhotoUploadController {
 	}
 
 	public synchronized boolean hasWaitingUploads() {
-		for (GateReportImage upload : mUploadingList) {
+		for (ContainerSession upload : mUploadingList) {
 			// if (upload.getUploadState() ==
 			// ContainerSession.STATE_UPLOAD_WAITING) {
 			// return true;
@@ -31,11 +31,11 @@ public class PhotoUploadController {
 		return false;
 	}
 
-	public void removeUpload(final GateReportImage selection) {
+	public void removeUpload(final ContainerSession selection) {
 		// TODO: FIX ME
 	}
 
-	public synchronized List<GateReportImage> getUploadingUploads() {
-		return new ArrayList<GateReportImage>(mUploadingList);
+	public synchronized List<ContainerSession> getUploadingUploads() {
+		return new ArrayList<ContainerSession>(mUploadingList);
 	}
 }

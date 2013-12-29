@@ -29,7 +29,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.cloudjay.cjay.PhotoUploadController;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadsListBaseAdapter;
-import com.cloudjay.cjay.model.GateReportImage;
+import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener.OnDismissCallback;
@@ -130,7 +130,7 @@ public class UploadsFragment extends SherlockFragment implements
 	public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
 		try {
 			for (int i = 0, z = reverseSortedPositions.length; i < z; i++) {
-				GateReportImage upload = (GateReportImage) listView
+				ContainerSession upload = (ContainerSession) listView
 						.getItemAtPosition(reverseSortedPositions[i]);
 				mPhotoSelectionController.removeUpload(upload);
 			}
@@ -143,10 +143,10 @@ public class UploadsFragment extends SherlockFragment implements
 	public boolean canDismiss(AbsListView listView, int position) {
 		try {
 			// TODO:
-			// GateReportImage upload = (GateReportImage) listView
+			// ContainerSession upload = (ContainerSession) listView
 			// .getItemAtPosition(position);
 			// return upload.getUploadState() !=
-			// GateReportImage.STATE_UPLOAD_IN_PROGRESS;
+			// ContainerSession.STATE_UPLOAD_IN_PROGRESS;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
