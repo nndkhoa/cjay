@@ -250,41 +250,6 @@ public class CJayClient implements ICJayClient {
 		Log.i("GCM", response);
 	}
 
-	// @Override
-	// public List<ItemModel> getNewItems(Context ctx) {
-	// HashMap<String, String> headers = prepareHeadersWithToken(ctx);
-	// String response = requestWrapper.sendGet(
-	// "https://cloudjay-web.appspot.com/api/jaypix/jaypix-items",
-	// headers);
-	//
-	// Gson gson = new Gson();
-	// Type listType = new TypeToken<List<ItemModel>>() {
-	// }.getType();
-	// List<ItemModel> items = gson.fromJson(response, listType);
-	// return items;
-	// }
-	//
-	// @Override
-	// public ItemTeamResultModel getNewItemsByTeam(Context ctx,
-	// UserModel currentUser, int page) {
-	// HashMap<String, String> headers = prepareHeadersWithToken(ctx);
-	// String formatStr =
-	// "https://cloudjay-web.appspot.com/api/jaypix/jaypix-items-by-team?team_id=%s&page=%s";
-	// String url = String.format(formatStr, currentUser.getTeams().get(0)
-	// .getId(), page);
-	// String response = requestWrapper.sendGet(url, headers);
-	//
-	// Gson gson = new Gson();
-	// Type listType = new TypeToken<ItemTeamResultModel>() {
-	// }.getType();
-	// ItemTeamResultModel result = gson.fromJson(response, listType);
-	// for (ItemModel item : result.getResults()) {
-	// String imageUrl = item.getImageUrl();
-	// item.setImageUrl(StringHelper.addThumbExtensionUrl(imageUrl));
-	// }
-	// return result;
-	// }
-
 	@Override
 	public User getCurrentUser(String token, Context ctx) {
 		Logger.Log("getting Current User ...");
@@ -302,68 +267,6 @@ public class CJayClient implements ICJayClient {
 		User user = gson.fromJson(response, userType);
 		return user;
 	}
-
-	//
-	// @Override
-	// public List<UserModel> getTeamMembers(UserModel currentUser, Context ctx)
-	// throws SQLException {
-	// ITeamDao teamDaoImpl = databaseManager.getHelper(ctx).getTeamImpl();
-	// IUserDao userDaoImpl = databaseManager.getHelper(ctx).getUserImpl();
-	// teamDaoImpl.deleteAllTeams();
-	//
-	// HashMap<String, String> headers = new HashMap<String, String>();
-	// headers.put("Authorization", "Token " + currentUser.getToken());
-	//
-	// List<UserModel> teamMembers = new ArrayList<UserModel>();
-	// List<TeamModel> teams = currentUser.getTeams();
-	// for (TeamModel teamModel : teams) {
-	// String url =
-	// "https://cloudjay-web.appspot.com/api/jaypix/jaypix-users-by-team.json?team_id="
-	// + teamModel.getId();
-	// String response = requestWrapper.sendGet(url, headers);
-	// Gson gson = new Gson();
-	// Type userListType = new TypeToken<List<UserModel>>() {
-	// }.getType();
-	// List<UserModel> tempTeamMembers = gson.fromJson(response,
-	// userListType);
-	// teamMembers.addAll(tempTeamMembers);
-	//
-	// Team team = new Team();
-	// team.setId(teamModel.getId());
-	// team.setTeam_code(teamModel.getTeamCode());
-	// team.setTeam_name(teamModel.getTeamName());
-	// teamDaoImpl.addTeam(team);
-	//
-	// for (UserModel userModel : tempTeamMembers) {
-	// User user = MapperUtils.ToUser(userModel);
-	// user.setTeam(team);
-	// userDaoImpl.addUser(user);
-	// }
-	// System.out.println();
-	// }
-	// currentUser.setSameTeamMembers(teamMembers);
-	// return teamMembers;
-	// }
-	//
-	// @Override
-	// public void uploadItem(Context ctx, ItemModel item) {
-	//
-	// try {
-	// if (NetworkHelper.isConnected(ctx)) {
-	// HashMap<String, String> headers = prepareHeadersWithToken(ctx);
-	// Gson gson = new Gson();
-	// String data = gson.toJson(item);
-	// String url = JayPixMetaData.JAYPIX_ITEMS;
-	// requestWrapper.sendPost(url, data, "application/json", headers);
-	// } else {
-	// Logger.Log("Network is not available");
-	// UIHelper.toast(ctx, "Network is not available");
-	// }
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// }
-	//
-	// }
 
 	@Override
 	public List<Operator> getOperators(Context ctx) {
@@ -547,7 +450,7 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public void uploadItem(Context ctx, TmpContainerSession item) {
+	public void postContainerSession(Context ctx, TmpContainerSession item) {
 
 		try {
 			if (NetworkHelper.isConnected(ctx)) {

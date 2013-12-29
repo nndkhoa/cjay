@@ -1,10 +1,14 @@
 package com.cloudjay.cjay.dao;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 
+import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.j256.ormlite.dao.BaseDaoImpl;
+import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 
 public class ContainerSessionDaoImpl extends
@@ -64,14 +68,33 @@ public class ContainerSessionDaoImpl extends
 
 	@Override
 	public ContainerSession getNextWaiting() throws SQLException {
-		List<ContainerSession> result = this.queryForEq("state",
+
+		ContainerSession result = null;
+
+		List<ContainerSession> containerSessions = this.queryForEq("state",
 				ContainerSession.STATE_UPLOAD_WAITING);
 
-		if (result != null && result.size() > 0) {
-			return result.get(0);
+		// Filter by CJayImage UploadState
+		CJayImageDaoImpl cJayImageDaoImpl = DaoManager.createDao(
+				this.getConnectionSource(), ContainerSession.class);
+
+		for (ContainerSession containerSession : containerSessions) {
+
+			boolean flag = true;
+			Collection<CJayImage> cJayImages = containerSession.getCJayImages();
+
+			for (CJayImage cJayImage : containerSession.getCJayImages()) {
+				if (cJayImage.getUploadState() != CJayImage.STATE_UPLOAD_COMPLETED) {
+					flag = false;
+					break;
+				}
+			}
+
+			if (flag == true) {
+				result = containerSession;
+			}
 		}
 
-		return null;
+		return result;
 	}
-
 }

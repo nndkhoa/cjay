@@ -25,8 +25,13 @@ import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
+import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.model.CJayImage;
+import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.TmpContainerSession;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CountingInputStreamEntity;
+import com.cloudjay.cjay.util.Mapper;
 
 public class UploadIntentService extends IntentService implements
 		CountingInputStreamEntity.UploadListener {
@@ -41,19 +46,23 @@ public class UploadIntentService extends IntentService implements
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		try {
-			uploadList = CJayClient.getInstance().getDatabaseManager()
+			cJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager()
 					.getHelper(getApplicationContext()).getCJayImageDaoImpl();
-			CJayImage uploadItem = uploadList.getNextWaiting();
+			CJayImage uploadItem = cJayImageDaoImpl.getNextWaiting();
 
 			if (uploadItem != null) {
 				doFileUpload(uploadItem);
 			}
 
-			// TODO: TIEUBAO - Em POP Queue ContainerSession Nhung cai dang cho
-			// ra roi viet ham xu ly Queue Item o duoi
-			// Cach lam la em filter ra nhung thang co tat ca hinh anh STATUS la
-			// done de up. Lay mot thang ra de lam thoi.
-			doUploadContainer();
+			containerSessionDaoImpl = CJayClient.getInstance()
+					.getDatabaseManager().getHelper(getApplicationContext())
+					.getContainerSessionDaoImpl();
+
+			ContainerSession containerSession = containerSessionDaoImpl
+					.getNextWaiting();
+
+			if (null != containerSession)
+				doUploadContainer(containerSession);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -61,8 +70,23 @@ public class UploadIntentService extends IntentService implements
 
 	}
 
-	private void doUploadContainer() {
-		// TODO: TIEUBAO - Viet Ham xu ly Queue Item
+	/**
+	 * Upload ContainerSession to server
+	 * 
+	 * @param containerSession
+	 */
+	private void doUploadContainer(ContainerSession containerSession) {
+		containerSession
+				.setUploadState(ContainerSession.STATE_UPLOAD_IN_PROGRESS);
+
+		// Convert ContainerSession to TmpContainerSession for uploading
+		TmpContainerSession uploadItem = Mapper.toTmpContainerSession(
+				containerSession, getApplicationContext());
+
+		// Post to Server and notify event to UploadFragment
+		CJayClient.getInstance()
+				.postContainerSession(getApplicationContext(), uploadItem);
+
 	}
 
 	@Override
@@ -75,7 +99,8 @@ public class UploadIntentService extends IntentService implements
 		super.onDestroy();
 	}
 
-	private CJayImageDaoImpl uploadList;
+	private CJayImageDaoImpl cJayImageDaoImpl;
+	private ContainerSessionDaoImpl containerSessionDaoImpl;
 
 	@Override
 	public void onChange(int progress) {
@@ -86,11 +111,10 @@ public class UploadIntentService extends IntentService implements
 			// Try New Upload Method
 			uploadItem.setUploadState(CJayImage.STATE_UPLOAD_IN_PROGRESS);
 			// Set Status to Uploading
-			uploadList.update(uploadItem);
+			cJayImageDaoImpl.update(uploadItem);
 
-			String uploadUrl = String
-					.format("https://www.googleapis.com/upload/storage/v1beta2/b/cjaytmp/o?uploadType=media&name=%s",
-							uploadItem.getImageName());
+			String uploadUrl = String.format(CJayConstant.CJAY_TMP_STORAGE,
+					uploadItem.getImageName());
 
 			final HttpResponse resp;
 
@@ -134,7 +158,7 @@ public class UploadIntentService extends IntentService implements
 						|| resp.getStatusLine().getStatusCode() == HttpStatus.SC_ACCEPTED) {
 					// Set Status Success
 					uploadItem.setUploadState(CJayImage.STATE_UPLOAD_COMPLETED);
-					uploadList.update(uploadItem);
+					cJayImageDaoImpl.update(uploadItem);
 				} else {
 					Log.i("FOO", "Screw up with http - "
 							+ resp.getStatusLine().getStatusCode());
@@ -148,7 +172,7 @@ public class UploadIntentService extends IntentService implements
 			try {
 				// THIS IS SQL ERROR --> NO REPEAT
 				uploadItem.setUploadState(CJayImage.STATE_UPLOAD_ERROR);
-				uploadList.update(uploadItem);
+				cJayImageDaoImpl.update(uploadItem);
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -159,7 +183,7 @@ public class UploadIntentService extends IntentService implements
 			// Set Status to Uploading
 			try {
 				uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
-				uploadList.update(uploadItem);
+				cJayImageDaoImpl.update(uploadItem);
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

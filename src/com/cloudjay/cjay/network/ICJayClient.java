@@ -46,16 +46,6 @@ public interface ICJayClient {
 
 	List<CJayResourceStatus> getCJayResourceStatus(Context ctx);
 
-	// List<ItemModel> getNewItems(Context ctx);
-	//
-	// ItemTeamResultModel getNewItemsByTeam(Context ctx, UserModel currentUser,
-	// int page);
-	//
+	void postContainerSession(Context ctx, TmpContainerSession item);
 
-	// List<UserModel> getTeamMembers(UserModel currentUser, Context ctx)
-	// throws SQLException;
-	//
-	// ItemModel getItemModel(Context ctx, UserModel currentUser, int itemId);
-
-	void uploadItem(Context ctx, TmpContainerSession item);
 }
