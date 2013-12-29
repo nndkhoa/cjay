@@ -6,7 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.cloudjay.cjay.network.UploadIntentService;
+import com.cloudjay.cjay.service.UploadIntentService;
 
 public class UploadAlertDialogActivity extends CJayActivity {
 	private NotificationManager nm;

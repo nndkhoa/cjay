@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.network;
+package com.cloudjay.cjay.service;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -60,6 +60,7 @@ import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.TmpContainerSession;
+import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.task.PhotupThreadRunnable;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.ConnectionUtils;
@@ -111,6 +112,10 @@ public class UploadIntentService extends IntentService implements
 						.getNextWaiting();
 
 				if (null != containerSession) {
+
+					// trigger event to display in UploadsFragment
+					
+
 					startForeground();
 					trimCache();
 

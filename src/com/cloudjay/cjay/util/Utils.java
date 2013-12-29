@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.service.PhotoUploadService;
+import com.cloudjay.cjay.service.UploadIntentService;
 import com.lightbox.android.photoprocessing.PhotoProcessing;
 
 import android.app.ActivityManager;
@@ -106,8 +106,8 @@ public class Utils {
 		editor.commit();
 	}
 
-	public static Intent getUploadAllIntent(Context context) {
-		Intent intent = new Intent(context, PhotoUploadService.class);
+	public static Intent getUploadIntent(Context context) {
+		Intent intent = new Intent(context, UploadIntentService.class);
 		intent.setAction(CJayConstant.INTENT_SERVICE_UPLOAD_ALL);
 		return intent;
 	}

@@ -63,7 +63,7 @@ public class InstantUploadReceiver extends BroadcastReceiver {
 			if (Flags.DEBUG) {
 				Log.d(LOG_TAG, "Starting Service for Instant Upload.");
 			}
-			ctx.startService(Utils.getUploadAllIntent(ctx));
+			ctx.startService(Utils.getUploadIntent(ctx));
 		}
 	}
 

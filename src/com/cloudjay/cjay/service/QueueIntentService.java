@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.network;
+package com.cloudjay.cjay.service;
 
 import android.app.ActivityManager;
 import android.app.IntentService;

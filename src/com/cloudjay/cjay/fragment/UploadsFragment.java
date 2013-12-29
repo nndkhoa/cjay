@@ -68,7 +68,6 @@ public class UploadsFragment extends SherlockFragment implements
 		listView.setOnScrollListener(swipeListener.makeScrollListener());
 		listView.setSelector(R.drawable.selectable_background_photup);
 		listView.setAdapter(mAdapter);
-
 		listView.setEmptyView(view.findViewById(android.R.id.empty));
 
 		return view;
@@ -86,41 +85,7 @@ public class UploadsFragment extends SherlockFragment implements
 	}
 
 	public void onItemClick(AdapterView<?> l, View view, int position, long id) {
-		TmpContainerSession upload = (TmpContainerSession) l
-				.getItemAtPosition(position);
-		if (null != upload
-				&& upload.getUploadState() == TmpContainerSession.STATE_UPLOAD_COMPLETED) {
 
-			// String postId = upload.getResultPostId();
-			// if (null != postId) {
-			// final Intent intent = new Intent(Intent.ACTION_VIEW);
-			//
-			// try {
-			// intent.setData(Uri.parse("fb://post/" + postId));
-			// startActivity(intent);
-			// // openFacebookProgressDialog();
-			// return;
-			// } catch (Exception e) {
-			// // Facebook not installed
-			// }
-			//
-			// try {
-			// intent.setData(Uri.parse("fplusfree://post?id=" + postId));
-			// startActivity(intent);
-			// return;
-			// } catch (Exception e) {
-			// // Friendcaster Free not installed
-			// }
-			//
-			// try {
-			// intent.setData(Uri.parse("fplus://post?id=" + postId));
-			// startActivity(intent);
-			// return;
-			// } catch (Exception e) {
-			// // Friendcaster Pro not installed
-			// }
-			// }
-		}
 	}
 
 	// public void onEvent(PhotoSelectionRemovedEvent event) {
@@ -143,14 +108,12 @@ public class UploadsFragment extends SherlockFragment implements
 	public boolean canDismiss(AbsListView listView, int position) {
 		try {
 			// TODO:
-			// ContainerSession upload = (ContainerSession) listView
-			// .getItemAtPosition(position);
-			// return upload.getUploadState() !=
-			// ContainerSession.STATE_UPLOAD_IN_PROGRESS;
+			ContainerSession upload = (ContainerSession) listView
+					.getItemAtPosition(position);
+			return upload.getUploadState() != ContainerSession.STATE_UPLOAD_IN_PROGRESS;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return false;
 	}
-
 }
