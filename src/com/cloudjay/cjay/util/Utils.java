@@ -5,8 +5,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.service.PhotoUploadService;
+import com.lightbox.android.photoprocessing.PhotoProcessing;
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +18,8 @@ import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -25,10 +31,25 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.ScaleAnimation;
+import android.widget.Toast;
 
 public class Utils {
 
-	protected final static <T extends Parcelable> void parcelCollection(
+	public static void isStillRunning(Context ctx, String packageName) {
+
+		ActivityManager activityManager = (ActivityManager) ctx
+				.getSystemService(Context.ACTIVITY_SERVICE);
+		List<RunningAppProcessInfo> procInfos = activityManager
+				.getRunningAppProcesses();
+		for (int i = 0; i < procInfos.size(); i++) {
+			if (procInfos.get(i).processName.equals(packageName)) {
+				Toast.makeText(ctx, packageName + "is running",
+						Toast.LENGTH_LONG).show();
+			}
+		}
+	}
+
+	public final static <T extends Parcelable> void parcelCollection(
 			final Parcel out, final Collection<T> collection) {
 		if (collection != null) {
 			out.writeInt(collection.size());
@@ -38,7 +59,7 @@ public class Utils {
 		}
 	}
 
-	protected final static <T extends Parcelable> Collection<T> unparcelCollection(
+	public final static <T extends Parcelable> Collection<T> unparcelCollection(
 			final Parcel in, final Creator<T> creator) {
 		final int size = in.readInt();
 
@@ -172,5 +193,62 @@ public class Utils {
 		}
 
 		return returnValue;
+	}
+
+	public static Bitmap rotate(Bitmap original, final int angle) {
+		if ((angle % 360) == 0) {
+			return original;
+		}
+
+		final boolean dimensionsChanged = angle == 90 || angle == 270;
+		final int oldWidth = original.getWidth();
+		final int oldHeight = original.getHeight();
+		final int newWidth = dimensionsChanged ? oldHeight : oldWidth;
+		final int newHeight = dimensionsChanged ? oldWidth : oldHeight;
+
+		Bitmap bitmap = Bitmap.createBitmap(newWidth, newHeight,
+				original.getConfig());
+		Canvas canvas = new Canvas(bitmap);
+
+		Matrix matrix = new Matrix();
+		matrix.preTranslate((newWidth - oldWidth) / 2f,
+				(newHeight - oldHeight) / 2f);
+		matrix.postRotate(angle, bitmap.getWidth() / 2f, bitmap.getHeight() / 2);
+		canvas.drawBitmap(original, matrix, null);
+
+		original.recycle();
+
+		return bitmap;
+	}
+
+	public static Bitmap fineResizePhoto(final Bitmap bitmap,
+			final int maxDimension) {
+		Utils.checkPhotoProcessingThread();
+
+		final int width = bitmap.getWidth();
+		final int height = bitmap.getHeight();
+		final int biggestDimension = Math.max(width, height);
+
+		if (biggestDimension <= maxDimension) {
+			return bitmap;
+		}
+
+		final float ratio = maxDimension / (float) biggestDimension;
+		Bitmap resized = PhotoProcessing.resize(bitmap,
+				Math.round(width * ratio), Math.round(height * ratio));
+		if (Flags.DEBUG) {
+			Log.d("PhotoUpload", "Finely resized to: " + resized.getWidth()
+					+ "x" + resized.getHeight());
+		}
+
+		return resized;
+	}
+
+	public static void checkPhotoProcessingThread() {
+		if (!CJayApplication.THREAD_FILTERS.equals(Thread.currentThread()
+				.getName())) {
+			throw new IllegalStateException(
+					"PhotoProcessing should be done on corrent thread!");
+		}
 	}
 }

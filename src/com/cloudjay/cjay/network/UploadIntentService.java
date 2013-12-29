@@ -1,8 +1,17 @@
 package com.cloudjay.cjay.network;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -17,27 +26,62 @@ import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.IntentService;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
+import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.actionbarsherlock.internal.widget.ActionBarView.HomeView;
+import com.aerilys.helpers.android.NetworkHelper;
+import com.cloudjay.cjay.CJayApplication;
+import com.cloudjay.cjay.GateHomeActivity;
+import com.cloudjay.cjay.GateHomeActivity_;
+import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.SplashScreenActivity;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.TmpContainerSession;
+import com.cloudjay.cjay.task.PhotupThreadRunnable;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.ConnectionUtils;
 import com.cloudjay.cjay.util.CountingInputStreamEntity;
+import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Mapper;
+import com.cloudjay.cjay.util.Session;
 
 public class UploadIntentService extends IntentService implements
 		CountingInputStreamEntity.UploadListener {
 
 	int increment = 10;
 	int targetProgressBar = 0;
+	static final int NOTIFICATION_ID = 1000;
+
+	private NotificationManager mNotificationMgr;
+	private NotificationCompat.Builder mNotificationBuilder;
+	private NotificationCompat.BigPictureStyle mBigPicStyle;
+	private String mNotificationSubtitle;
+	private int mNumberUploaded = 0;
+
+	private ExecutorService mExecutor;
 
 	public UploadIntentService() {
 		super("UploadIntentService");
@@ -45,29 +89,107 @@ public class UploadIntentService extends IntentService implements
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		try {
-			cJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager()
-					.getHelper(getApplicationContext()).getCJayImageDaoImpl();
-			CJayImage uploadItem = cJayImageDaoImpl.getNextWaiting();
 
-			if (uploadItem != null) {
-				doFileUpload(uploadItem);
+		if (NetworkHelper.isConnected(getApplicationContext())) {
+			try {
+				cJayImageDaoImpl = CJayClient.getInstance()
+						.getDatabaseManager()
+						.getHelper(getApplicationContext())
+						.getCJayImageDaoImpl();
+				CJayImage uploadItem = cJayImageDaoImpl.getNextWaiting();
+
+				if (uploadItem != null) {
+					doFileUpload(uploadItem);
+				}
+
+				containerSessionDaoImpl = CJayClient.getInstance()
+						.getDatabaseManager()
+						.getHelper(getApplicationContext())
+						.getContainerSessionDaoImpl();
+
+				ContainerSession containerSession = containerSessionDaoImpl
+						.getNextWaiting();
+
+				if (null != containerSession) {
+					startForeground();
+					trimCache();
+
+					// Photup implementation
+					updateNotification(containerSession);
+
+					// Self-implementation
+					doUploadContainer(containerSession);
+
+				}
+
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
+		}
+	}
 
-			containerSessionDaoImpl = CJayClient.getInstance()
-					.getDatabaseManager().getHelper(getApplicationContext())
-					.getContainerSessionDaoImpl();
+	void updateNotification(final ContainerSession upload) {
+		String text;
 
-			ContainerSession containerSession = containerSessionDaoImpl
-					.getNextWaiting();
+		if (VERSION.SDK_INT >= VERSION_CODES.ICE_CREAM_SANDWICH) {
+			final Bitmap uploadBigPic = upload.getBigPictureNotificationBmp();
 
-			if (null != containerSession)
-				doUploadContainer(containerSession);
-
-		} catch (SQLException e) {
-			e.printStackTrace();
+			if (null == uploadBigPic) {
+				mExecutor.submit(new UpdateBigPictureStyleRunnable(upload));
+			}
+			mBigPicStyle.bigPicture(uploadBigPic);
 		}
 
+		switch (upload.getUploadState()) {
+		case ContainerSession.STATE_UPLOAD_WAITING:
+			text = getString(R.string.notification_uploading_photo,
+					mNumberUploaded + 1);
+			mNotificationBuilder.setContentTitle(text);
+			mNotificationBuilder.setTicker(text);
+			mNotificationBuilder.setProgress(0, 0, true);
+			mNotificationBuilder.setWhen(System.currentTimeMillis());
+			break;
+
+		case ContainerSession.STATE_UPLOAD_IN_PROGRESS:
+			if (upload.getUploadProgress() >= 0) {
+				text = getString(
+						R.string.notification_uploading_photo_progress,
+						mNumberUploaded + 1, upload.getUploadProgress());
+				mNotificationBuilder.setContentTitle(text);
+				mNotificationBuilder.setProgress(100,
+						upload.getUploadProgress(), false);
+			}
+			break;
+		}
+
+		mBigPicStyle.setSummaryText(mNotificationSubtitle);
+		mNotificationMgr.notify(NOTIFICATION_ID, mBigPicStyle.build());
+	}
+
+	private void trimCache() {
+		CJayApplication.getApplication(this).getImageCache().trimMemory();
+	}
+
+	private void startForeground() {
+		if (null == mNotificationBuilder) {
+			mNotificationBuilder = new NotificationCompat.Builder(this);
+			mNotificationBuilder.setSmallIcon(R.drawable.ic_stat_upload);
+			mNotificationBuilder.setContentTitle(getString(R.string.app_name));
+			mNotificationBuilder.setOngoing(true);
+			mNotificationBuilder.setWhen(System.currentTimeMillis());
+
+			PendingIntent intent = PendingIntent.getActivity(this, 0,
+					new Intent(this, SplashScreenActivity.class), 0);
+
+			mNotificationBuilder.setContentIntent(intent);
+		}
+
+		if (null == mBigPicStyle) {
+			mBigPicStyle = new NotificationCompat.BigPictureStyle(
+					mNotificationBuilder);
+		}
+
+		startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
 	}
 
 	/**
@@ -79,13 +201,19 @@ public class UploadIntentService extends IntentService implements
 		containerSession
 				.setUploadState(ContainerSession.STATE_UPLOAD_IN_PROGRESS);
 
-		// Convert ContainerSession to TmpContainerSession for uploading
-		TmpContainerSession uploadItem = Mapper.toTmpContainerSession(
-				containerSession, getApplicationContext());
+		try {
+			// Convert ContainerSession to TmpContainerSession for uploading
+			TmpContainerSession uploadItem = Mapper.toTmpContainerSession(
+					containerSession, getApplicationContext());
 
-		// Post to Server and notify event to UploadFragment
-		CJayClient.getInstance()
-				.postContainerSession(getApplicationContext(), uploadItem);
+			// Post to Server and notify event to UploadFragment
+			CJayClient.getInstance().postContainerSession(
+					getApplicationContext(), uploadItem);
+
+		} catch (Exception e) {
+			containerSession
+					.setUploadState(ContainerSession.STATE_UPLOAD_ERROR);
+		}
 
 	}
 
@@ -97,6 +225,12 @@ public class UploadIntentService extends IntentService implements
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+	}
+
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+
+		return super.onStartCommand(intent, flags, startId);
 	}
 
 	private CJayImageDaoImpl cJayImageDaoImpl;
@@ -174,7 +308,6 @@ public class UploadIntentService extends IntentService implements
 				uploadItem.setUploadState(CJayImage.STATE_UPLOAD_ERROR);
 				cJayImageDaoImpl.update(uploadItem);
 			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			e.printStackTrace();
@@ -185,10 +318,24 @@ public class UploadIntentService extends IntentService implements
 				uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
 				cJayImageDaoImpl.update(uploadItem);
 			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			e.printStackTrace();
+		}
+	}
+
+	private class UpdateBigPictureStyleRunnable extends PhotupThreadRunnable {
+
+		private final ContainerSession mSelection;
+
+		public UpdateBigPictureStyleRunnable(ContainerSession selection) {
+			mSelection = selection;
+		}
+
+		public void runImpl() {
+			mSelection.setBigPictureNotificationBmp(UploadIntentService.this,
+					mSelection.getThumbnailImage(UploadIntentService.this));
+			updateNotification(mSelection);
 		}
 	}
 }

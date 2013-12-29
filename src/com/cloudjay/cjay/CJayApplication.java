@@ -49,7 +49,6 @@ public class CJayApplication extends Application {
 	public static final String THREAD_FILTERS = "filters_thread";
 
 	private BitmapLruCache mImageCache;
-	public static final float IMAGE_CACHE_HEAP_PERCENTAGE = 1f / 6f;
 
 	IDatabaseManager databaseManager = null;
 	IHttpRequestWrapper httpRequestWrapper = null;
@@ -161,7 +160,7 @@ public class CJayApplication extends Application {
 		// Configure Logger
 		Logger.PRODUCTION_MODE = false;
 
-		checkInstantUploadReceiverState();
+		// checkInstantUploadReceiverState();
 		mPhotoController = new PhotoUploadController(this);
 
 		// Making Alarm for Queue Worker
@@ -220,7 +219,8 @@ public class CJayApplication extends Application {
 
 	public BitmapLruCache getImageCache() {
 		if (null == mImageCache) {
-			mImageCache = new BitmapLruCache(this, IMAGE_CACHE_HEAP_PERCENTAGE);
+			mImageCache = new BitmapLruCache(this,
+					CJayConstant.IMAGE_CACHE_HEAP_PERCENTAGE);
 		}
 		return mImageCache;
 	}

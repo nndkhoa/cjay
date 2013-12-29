@@ -38,13 +38,16 @@
     <string name="logout">Logout %1$s</string>
     <string name="logout_prompt_title">Are you sure?</string>
     <string name="album_all">All Photos</string>
-    
+
     <!-- menu titles -->
-	<string name="menu_camera_title">Chụp hình</string>
-	<string name="menu_edit_container_title">Sửa thông tin container</string>
-	<string name="menu_upload_title">Tải lên</string>
-	<string name="menu_logout_title">Đăng xuất</string>
-	<string name="menu_more_title">Thêm</string>
-	<string name="menu_clear_uploaded_title"></string>
-	
+    <string name="menu_camera_title">Chụp hình</string>
+    <string name="menu_edit_container_title">Sửa thông tin container</string>
+    <string name="menu_upload_title">Tải lên</string>
+    <string name="menu_logout_title">Đăng xuất</string>
+    <string name="menu_more_title">Thêm</string>
+    <string name="menu_clear_uploaded_title"></string>
+    
+    <string name="notification_uploading_photo">Uploading Photo %1$s</string>
+    <string name="notification_uploading_photo_progress">Uploading Photo %1$d %2$d%%</string>
+
 </resources>

@@ -1,5 +1,6 @@
 package com.cloudjay.cjay.model;
 
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,20 +8,34 @@ import java.util.List;
 import java.util.UUID;
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.MediaStore.Images.Thumbnails;
+import android.text.TextUtils;
 
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
+import com.cloudjay.cjay.events.UploadStateChangedEvent;
+import com.cloudjay.cjay.events.UploadsModifiedEvent;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.Utils;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * { "container_id": "abcdef12313", "image_id_path": "abcdef12313.jpg",
@@ -52,6 +67,11 @@ public class ContainerSession implements Parcelable {
 	public static final int STATE_UPLOAD_IN_PROGRESS = 2;
 	public static final int STATE_UPLOAD_WAITING = 1;
 	public static final int STATE_NONE = 0;
+
+	static final int MINI_THUMBNAIL_SIZE = 300;
+	static final int MICRO_THUMBNAIL_SIZE = 96;
+
+	private Uri mFullUri;
 
 	@DatabaseField(columnName = ID)
 	int id;
@@ -86,6 +106,23 @@ public class ContainerSession implements Parcelable {
 
 	@ForeignCollectionField(eager = true)
 	Collection<Issue> issues;
+
+	private int mProgress;
+	private Bitmap mBigPictureNotificationBmp;
+
+	public Bitmap getBigPictureNotificationBmp() {
+		return mBigPictureNotificationBmp;
+	}
+
+	public void setBigPictureNotificationBmp(Context context,
+			Bitmap bigPictureNotificationBmp) {
+		if (null == bigPictureNotificationBmp) {
+			mBigPictureNotificationBmp = BitmapFactory.decodeResource(
+					context.getResources(), R.drawable.ic_logo);
+		} else {
+			mBigPictureNotificationBmp = bigPictureNotificationBmp;
+		}
+	}
 
 	public ContainerSession() {
 	}
@@ -173,7 +210,34 @@ public class ContainerSession implements Parcelable {
 	}
 
 	public void setUploadState(int state) {
-		mState = state;
+
+		if (mState != state) {
+			mState = state;
+
+			switch (state) {
+			case STATE_UPLOAD_ERROR:
+			case STATE_UPLOAD_COMPLETED:
+				mBigPictureNotificationBmp = null;
+				EventBus.getDefault().post(new UploadsModifiedEvent());
+				break;
+			case STATE_UPLOAD_WAITING:
+				mProgress = -1;
+				break;
+			}
+
+			notifyUploadStateListener();
+		}
+	}
+
+	public void setUploadProgress(int progress) {
+		if (progress != mProgress) {
+			mProgress = progress;
+			notifyUploadStateListener();
+		}
+	}
+
+	public int getUploadProgress() {
+		return mProgress;
 	}
 
 	public void setIssues(Collection<Issue> issues) {
@@ -333,4 +397,71 @@ public class ContainerSession implements Parcelable {
 		this.uploadConfirmation = uploadConfirmation;
 	}
 
+	private void notifyUploadStateListener() {
+		EventBus.getDefault().post(new UploadStateChangedEvent(this));
+	}
+
+	public Bitmap getThumbnailImage(Context context) {
+		if (ContentResolver.SCHEME_CONTENT.equals(getOriginalPhotoUri()
+				.getScheme())) {
+			return getThumbnailImageFromMediaStore(context);
+		}
+
+		final Resources res = context.getResources();
+		int size = res.getBoolean(R.bool.load_mini_thumbnails) ? MINI_THUMBNAIL_SIZE
+				: MICRO_THUMBNAIL_SIZE;
+		if (size == MINI_THUMBNAIL_SIZE
+				&& res.getBoolean(R.bool.sample_mini_thumbnails)) {
+			size /= 2;
+		}
+
+		try {
+			Bitmap bitmap = Utils.decodeImage(context.getContentResolver(),
+					getOriginalPhotoUri(), size);
+
+			return bitmap;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	private Bitmap getThumbnailImageFromMediaStore(Context context) {
+		Resources res = context.getResources();
+
+		final int kind = res.getBoolean(R.bool.load_mini_thumbnails) ? Thumbnails.MINI_KIND
+				: Thumbnails.MICRO_KIND;
+
+		BitmapFactory.Options opts = null;
+		if (kind == Thumbnails.MINI_KIND
+				&& res.getBoolean(R.bool.sample_mini_thumbnails)) {
+			opts = new BitmapFactory.Options();
+			opts.inSampleSize = 2;
+		}
+
+		try {
+			final long id = Long.parseLong(getOriginalPhotoUri()
+					.getLastPathSegment());
+
+			Bitmap bitmap = Thumbnails.getThumbnail(
+					context.getContentResolver(), id, kind, opts);
+
+			return bitmap;
+		} catch (Exception e) {
+			if (Flags.DEBUG) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+	}
+
+	public Uri getOriginalPhotoUri() {
+
+		Logger.Log(TAG, "getOriginalPhotoUri from: " + image_id_path);
+
+		if (null == mFullUri && !TextUtils.isEmpty(image_id_path)) {
+			mFullUri = Uri.parse(image_id_path);
+		}
+		return mFullUri;
+	}
 }
