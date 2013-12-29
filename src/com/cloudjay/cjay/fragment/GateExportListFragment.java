@@ -25,7 +25,6 @@ import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.ami.fundapter.interfaces.ItemClickListener;
 import com.cloudjay.cjay.*;
-import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.TmpContainerSession;
@@ -276,6 +275,14 @@ public class GateExportListFragment extends SherlockDialogFragment {
 					public String getStringValue(ContainerSession item,
 							int position) {
 						return item.getCheckInTime();
+					}
+				});
+		feedsDict.addStringField(R.id.feed_item_container_export_date,
+				new StringExtractor<ContainerSession>() {
+					@Override
+					public String getStringValue(ContainerSession item,
+							int position) {
+						return item.getCheckOutTime();
 					}
 				});
 		feedsDict.addDynamicImageField(R.id.feed_item_picture,

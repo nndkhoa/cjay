@@ -23,9 +23,8 @@ public class UploadsListBaseAdapter extends BaseAdapter {
 	public UploadsListBaseAdapter(Context context) {
 		mContext = context;
 		mLayoutInflater = LayoutInflater.from(mContext);
-
-		// query for list item
-		mItems = DataCenter.getInstance().getListContainerSessions(mContext);
+		mItems = DataCenter.getInstance().getListUploadContainerSessions(
+				mContext);
 	}
 
 	public int getCount() {

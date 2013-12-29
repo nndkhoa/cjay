@@ -14,6 +14,7 @@ import com.actionbarsherlock.view.Menu;
 import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
+import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.ami.fundapter.interfaces.StaticImageLoader;
 import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -284,12 +285,17 @@ public class GateImportListFragment extends SherlockDialogFragment {
 						return item.getCheckOutTime();
 					}
 				});
-		feedsDict.addStaticImageField(R.id.feed_item_picture,
-				new StaticImageLoader<ContainerSession>() {
+		feedsDict.addDynamicImageField(R.id.feed_item_picture,
+				new StringExtractor<ContainerSession>() {
 					@Override
-					public void loadImage(ContainerSession item,
-							ImageView imageView, int position) {
-						// TODO Auto-generated method stub
+					public String getStringValue(ContainerSession item,
+							int position) {
+						return item.getFullContainerId();
+					}
+				}, new DynamicImageLoader() {
+					@Override
+					public void loadImage(String stringColor, ImageView view) {
+						view.setImageResource(R.drawable.ic_app);
 					}
 				});
 		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(),

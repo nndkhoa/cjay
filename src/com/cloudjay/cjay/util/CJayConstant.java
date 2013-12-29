@@ -78,7 +78,7 @@ public final class CJayConstant {
 	/**
 	 * Splash Screen
 	 */
-	public static final int SPLASH_TIME_OUT = 3000;
+	public static final int SPLASH_TIME_OUT = 2000;
 
 	/**
 	 * CJay Code
