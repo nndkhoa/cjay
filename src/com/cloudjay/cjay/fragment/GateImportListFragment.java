@@ -15,8 +15,7 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.StaticImageLoader;
-import com.cloudjay.cjay.CameraActivity_;
-import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -58,20 +57,6 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 	@OptionsItem(R.id.menu_camera)
 	void cameraMenuItemSelected() {
-		// get tmpContainerSession of the selected container session
-		// TmpContainerSession tmpContainerSession =
-		// Mapper.toTmpContainerSession(
-		// mSelectedContainerSession, getActivity());
-		//
-		// // Pass tmpContainerSession away
-		// // Then start showing the Camera
-		// Intent intent = new Intent(getActivity(), CameraActivity_.class);
-		// intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-		// tmpContainerSession);
-		// intent.putExtra("type", 0); // in
-		// startActivity(intent);
-
-		// Edit by tieubao
 		String uuid = mSelectedContainerSession.getUuid();
 		Intent intent = new Intent(getActivity(), CameraActivity_.class);
 		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA, uuid);
@@ -212,26 +197,6 @@ public class GateImportListFragment extends SherlockDialogFragment {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-
-			// // Create a tmp Container Session
-			// TmpContainerSession newTmpContainer = new TmpContainerSession();
-			// newTmpContainer.setContainerId(containerId);
-			// newTmpContainer.setOperatorCode(operatorCode);
-			// newTmpContainer.setCheckInTime(StringHelper
-			// .getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT));
-			// newTmpContainer.setDepotCode(currentUser.getDepot().getDepotCode());
-			// newTmpContainer.printMe();
-
-			// // Save the current temp Container Session
-			// DataCenter.getInstance().setTmpCurrentSession(newTmpContainer);
-
-			// // Pass tmpContainerSession away
-			// // Then start showing the Camera
-			// Intent intent = new Intent(getActivity(), CameraActivity_.class);
-			// intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-			// newTmpContainer);
-			// intent.putExtra("type", 0); // in
-			// startActivity(intent);
 
 			break;
 

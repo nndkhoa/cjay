@@ -55,17 +55,12 @@ import com.googlecode.androidannotations.annotations.NoTitle;
 import com.googlecode.androidannotations.annotations.SystemService;
 import com.googlecode.androidannotations.annotations.ViewById;
 
-import de.greenrobot.event.EventBus;
-
 /**
  * Input:
  * 
  * - type: chỉ định đang mở Camera ở in | out | audit | repair
  * 
  * - uuid: container session uuid --> use to load object from db
- * 
- * // - tmpContainerSession: object lưu trữ container session
- * 
  * 
  * Output:
  * 
@@ -210,8 +205,6 @@ public class CameraActivity extends Activity {
 		// Restore camera state from database or somewhere else
 		flashMode = Camera.Parameters.FLASH_MODE_OFF;
 		cameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
-
-		EventBus.getDefault().register(this);
 	}
 
 	@AfterViews

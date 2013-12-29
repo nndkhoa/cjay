@@ -45,6 +45,7 @@ public class ContainerSession implements Parcelable {
 	public static final String FIELD_STATE = "state";
 	private static final String ID = "id";
 	private static final String FIELD_UUID = "uuid";
+	private static final String FIELD_UPLOAD_CONFIRMATION = "upload_confirmation";
 
 	public static final int STATE_UPLOAD_COMPLETED = 4;
 	public static final int STATE_UPLOAD_ERROR = 3;
@@ -70,6 +71,9 @@ public class ContainerSession implements Parcelable {
 	@DatabaseField(columnName = FIELD_STATE)
 	int mState;
 
+	@DatabaseField(columnName = FIELD_UPLOAD_CONFIRMATION, defaultValue = "false")
+	private boolean uploadConfirmation;
+
 	// container_id
 	// operator_code
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
@@ -82,6 +86,79 @@ public class ContainerSession implements Parcelable {
 
 	@ForeignCollectionField(eager = true)
 	Collection<Issue> issues;
+
+	public ContainerSession() {
+	}
+
+	public ContainerSession(Context ctx, String containerId,
+			String operatorCode, String checkInTime, String depotCode) {
+
+		IDatabaseManager databaseManager = CJayClient.getInstance()
+				.getDatabaseManager();
+
+		DepotDaoImpl depotDaoImpl;
+		try {
+			depotDaoImpl = databaseManager.getHelper(ctx).getDepotDaoImpl();
+			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx)
+					.getOperatorDaoImpl();
+			ContainerDaoImpl containerDaoImpl = databaseManager.getHelper(ctx)
+					.getContainerDaoImpl();
+
+			Operator operator = null;
+			List<Operator> listOperators = operatorDaoImpl.queryForEq(
+					Operator.CODE, operatorCode);
+
+			if (listOperators.isEmpty()) {
+				operator = new Operator();
+				operator.setCode(operatorCode);
+				operator.setName(operatorCode);
+				operatorDaoImpl.addOperator(operator);
+			} else {
+				operator = listOperators.get(0);
+			}
+
+			// Create `depot` object if needed
+			Depot depot = null;
+			List<Depot> listDepots = depotDaoImpl.queryForEq(Depot.DEPOT_CODE,
+					depotCode);
+			if (listDepots.isEmpty()) {
+				depot = new Depot();
+				depot.setDepotCode(depotCode);
+				depot.setDepotName(depotCode);
+				depotDaoImpl.addDepot(depot);
+			} else {
+				depot = listDepots.get(0);
+			}
+
+			// Create `container` object if needed
+			Container container = null;
+			List<Container> listContainers = containerDaoImpl.queryForEq(
+					Container.CONTAINER_ID, containerId);
+			if (listContainers.isEmpty()) {
+				container = new Container();
+				container.setContainerId(containerId);
+				if (null != operator)
+					container.setOperator(operator);
+
+				if (null != depot)
+					container.setDepot(depot);
+
+				containerDaoImpl.addContainer(container);
+			} else {
+				container = listContainers.get(0);
+			}
+
+			// Create `container session` object
+			// UUID is primary key
+			String uuid = UUID.randomUUID().toString();
+			this.setCheckInTime(checkInTime);
+			this.setUuid(uuid);
+			if (null != container)
+				this.setContainer(container);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public String getUuid() {
 		return uuid;
@@ -225,79 +302,6 @@ public class ContainerSession implements Parcelable {
 		readFromParcel(in);
 	}
 
-	public ContainerSession() {
-	}
-
-	public ContainerSession(Context ctx, String containerId,
-			String operatorCode, String checkInTime, String depotCode) {
-
-		IDatabaseManager databaseManager = CJayClient.getInstance()
-				.getDatabaseManager();
-
-		DepotDaoImpl depotDaoImpl;
-		try {
-			depotDaoImpl = databaseManager.getHelper(ctx).getDepotDaoImpl();
-			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx)
-					.getOperatorDaoImpl();
-			ContainerDaoImpl containerDaoImpl = databaseManager.getHelper(ctx)
-					.getContainerDaoImpl();
-
-			Operator operator = null;
-			List<Operator> listOperators = operatorDaoImpl.queryForEq(
-					Operator.CODE, operatorCode);
-
-			if (listOperators.isEmpty()) {
-				operator = new Operator();
-				operator.setCode(operatorCode);
-				operator.setName(operatorCode);
-				operatorDaoImpl.addOperator(operator);
-			} else {
-				operator = listOperators.get(0);
-			}
-
-			// Create `depot` object if needed
-			Depot depot = null;
-			List<Depot> listDepots = depotDaoImpl.queryForEq(Depot.DEPOT_CODE,
-					depotCode);
-			if (listDepots.isEmpty()) {
-				depot = new Depot();
-				depot.setDepotCode(depotCode);
-				depot.setDepotName(depotCode);
-				depotDaoImpl.addDepot(depot);
-			} else {
-				depot = listDepots.get(0);
-			}
-
-			// Create `container` object if needed
-			Container container = null;
-			List<Container> listContainers = containerDaoImpl.queryForEq(
-					Container.CONTAINER_ID, containerId);
-			if (listContainers.isEmpty()) {
-				container = new Container();
-				container.setContainerId(containerId);
-				if (null != operator)
-					container.setOperator(operator);
-
-				if (null != depot)
-					container.setDepot(depot);
-
-				containerDaoImpl.addContainer(container);
-			} else {
-				container = listContainers.get(0);
-			}
-
-			// Create `container session` object
-			// UUID is primary key
-			String uuid = UUID.randomUUID().toString();
-			this.setCheckInTime(checkInTime);
-			this.setUuid(uuid);
-			if (null != container)
-				this.setContainer(container);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
 	<T extends Parcelable> void parcelCollection(final Parcel out,
 			final Collection<T> collection) {
 		if (collection != null) {
@@ -319,6 +323,14 @@ public class ContainerSession implements Parcelable {
 		} else {
 			return null;
 		}
+	}
+
+	public boolean hasUploadConfirmed() {
+		return uploadConfirmation;
+	}
+
+	public void setUploadConfirmation(boolean uploadConfirmation) {
+		this.uploadConfirmation = uploadConfirmation;
 	}
 
 }
