@@ -166,7 +166,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 		if (mDirty) {
 			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-					.getListContainerSessions(getActivity());
+					.getListLocalContainerSessions(getActivity());
 			mFeedsAdapter.updateData(mFeeds);
 		}
 	}

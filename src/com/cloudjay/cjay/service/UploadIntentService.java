@@ -95,7 +95,7 @@ public class UploadIntentService extends IntentService implements
 					trimCache();
 
 					// Photup implementation
-					updateNotification(containerSession);
+					// updateNotification(containerSession);
 
 					// Self-implementation
 					doUploadContainer(containerSession);
