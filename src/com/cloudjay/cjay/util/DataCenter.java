@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
+
 import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.UserDaoImpl;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -171,8 +173,12 @@ public class DataCenter {
 					.getHelper(context).getContainerSessionDaoImpl()
 					.getListUploadContainerSessions();
 
-			Gson gson = new Gson();
-			Logger.Log(LOG_TAG, gson.toJson(result));
+			if (result != null) {
+				Logger.Log(
+						LOG_TAG,
+						"Upload list number of items: "
+								+ Integer.toString(result.size()));
+			}
 
 			return result;
 		} catch (SQLException e) {

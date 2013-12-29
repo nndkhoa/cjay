@@ -91,8 +91,8 @@ public class UploadIntentService extends IntentService implements
 
 					// trigger event to display in UploadsFragment
 
-					startForeground();
-					trimCache();
+					// startForeground();
+					// trimCache();
 
 					// Photup implementation
 					// updateNotification(containerSession);
@@ -220,10 +220,11 @@ public class UploadIntentService extends IntentService implements
 				"doUploadContainer: " + containerSession.getContainerId());
 
 		// post UploadStateChangedEvent
-		containerSession
-				.setUploadState(ContainerSession.STATE_UPLOAD_IN_PROGRESS);
 
 		try {
+			containerSession
+					.setUploadState(ContainerSession.STATE_UPLOAD_IN_PROGRESS);
+			containerSessionDaoImpl.update(containerSession);
 			// Convert ContainerSession to TmpContainerSession for uploading
 			TmpContainerSession uploadItem = Mapper.toTmpContainerSession(
 					containerSession, getApplicationContext());
@@ -234,6 +235,10 @@ public class UploadIntentService extends IntentService implements
 
 			containerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_COMPLETED);
+			containerSessionDaoImpl.update(containerSession);
+
+		} catch (SQLException e1) {
+			e1.printStackTrace();
 		} catch (Exception e) {
 			containerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
