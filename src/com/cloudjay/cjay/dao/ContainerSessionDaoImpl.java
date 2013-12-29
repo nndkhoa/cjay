@@ -74,8 +74,8 @@ public class ContainerSessionDaoImpl extends
 	public ContainerSession getNextWaiting() throws SQLException {
 
 		Logger.Log(LOG_TAG, "getNextWaiting() at ContainerSessionDaoImpl");
-		ContainerSession result = null;
 
+		ContainerSession result = null;
 		List<ContainerSession> containerSessions = this
 				.query(this
 						.queryBuilder()
