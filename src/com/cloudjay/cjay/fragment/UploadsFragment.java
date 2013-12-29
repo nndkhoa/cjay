@@ -33,12 +33,15 @@ import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionAddedEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.Logger;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener.OnDismissCallback;
 import de.greenrobot.event.EventBus;
 
 public class UploadsFragment extends SherlockFragment implements
 		OnDismissCallback, OnItemClickListener {
+
+	private static final String LOG_TAG = "UploadsFragment";
 
 	private UploadsListBaseAdapter mAdapter;
 	ContainerSessionDaoImpl containerSessionDaoImpl = null;
@@ -92,14 +95,19 @@ public class UploadsFragment extends SherlockFragment implements
 	}
 
 	public void onItemClick(AdapterView<?> l, View view, int position, long id) {
-
+		Logger.Log(LOG_TAG,
+				"onItemClick at index: " + Integer.toString(position));
 	}
 
 	public void onEvent(ContainerSessionAddedEvent event) {
+		Logger.Log(LOG_TAG, "onEvent ContainerSessionAddedEvent");
 		mAdapter.notifyDataSetChanged();
 	}
 
 	public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
+		Logger.Log(LOG_TAG, "onSwipeDismiss");
+
+		// set item Cleared = true then notifyDataSetChanged
 		try {
 			for (int i = 0, z = reverseSortedPositions.length; i < z; i++) {
 				ContainerSession item = (ContainerSession) listView
@@ -112,6 +120,7 @@ public class UploadsFragment extends SherlockFragment implements
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		mAdapter.notifyDataSetChanged();
 	}
 

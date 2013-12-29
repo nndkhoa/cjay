@@ -19,6 +19,7 @@ import android.os.Parcelable;
 import android.provider.MediaStore.Images.Thumbnails;
 import android.text.TextUtils;
 
+import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -475,5 +476,32 @@ public class ContainerSession implements Parcelable {
 
 	public void setCleared(boolean cleared) {
 		this.cleared = cleared;
+	}
+
+	public String getDisplayImageKey() {
+		return "dsply_" + getOriginalPhotoUri();
+	}
+
+	public Bitmap getDisplayImage(Context context) {
+		try {
+			final int size = CJayApplication.getApplication(context)
+					.getSmallestScreenDimension();
+			Bitmap bitmap = Utils.decodeImage(context.getContentResolver(),
+					getOriginalPhotoUri(), size);
+			bitmap = Utils.rotate(bitmap, getExifRotation(context));
+			return bitmap;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public int getExifRotation(Context context) {
+		return Utils.getOrientationFromContentUri(context.getContentResolver(),
+				getOriginalPhotoUri());
+	}
+
+	public String getThumbnailImageKey() {
+		return "thumb_" + getOriginalPhotoUri();
 	}
 }

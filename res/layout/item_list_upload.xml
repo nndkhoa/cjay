@@ -15,14 +15,14 @@
   ~ limitations under the License.
 -->
 
-<uk.co.senab.photup.views.UploadItemLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.cloudjay.cjay.view.UploadItemLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:padding="4dp" >
 
-    <uk.co.senab.photup.views.PhotupImageView
+    <com.cloudjay.cjay.view.PhotupImageView
         android:id="@+id/iv_photo"
         android:layout_width="@dimen/listview_item_dimension"
         android:layout_height="@dimen/listview_item_dimension"
@@ -68,4 +68,4 @@
         android:paddingRight="@dimen/spacing"
         android:visibility="gone" />
 
-</uk.co.senab.photup.views.UploadItemLayout>
+</com.cloudjay.cjay.view.UploadItemLayout>

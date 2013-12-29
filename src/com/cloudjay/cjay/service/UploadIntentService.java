@@ -51,6 +51,7 @@ import com.cloudjay.cjay.util.Mapper;
 public class UploadIntentService extends IntentService implements
 		CountingInputStreamEntity.UploadListener {
 
+	private static final String LOG_TAG = "UploadIntentService";
 	int increment = 10;
 	int targetProgressBar = 0;
 	static final int NOTIFICATION_ID = 1000;
@@ -67,25 +68,20 @@ public class UploadIntentService extends IntentService implements
 		super("UploadIntentService");
 	}
 
+	/**
+	 * Main method, it called from QueueIntentService
+	 */
 	@Override
 	protected void onHandleIntent(Intent intent) {
+		Logger.Log(LOG_TAG, "onHandleIntent");
 
 		if (NetworkHelper.isConnected(getApplicationContext())) {
 			try {
-				cJayImageDaoImpl = CJayClient.getInstance()
-						.getDatabaseManager()
-						.getHelper(getApplicationContext())
-						.getCJayImageDaoImpl();
 				CJayImage uploadItem = cJayImageDaoImpl.getNextWaiting();
 
 				if (uploadItem != null) {
 					doFileUpload(uploadItem);
 				}
-
-				containerSessionDaoImpl = CJayClient.getInstance()
-						.getDatabaseManager()
-						.getHelper(getApplicationContext())
-						.getContainerSessionDaoImpl();
 
 				// It will return container with `upload confirmation = true`
 				ContainerSession containerSession = containerSessionDaoImpl
@@ -113,6 +109,9 @@ public class UploadIntentService extends IntentService implements
 	}
 
 	void updateNotification(final ContainerSession upload) {
+
+		Logger.Log(LOG_TAG, "updateNotification: " + upload.getContainerId());
+
 		String text;
 
 		if (VERSION.SDK_INT >= VERSION_CODES.ICE_CREAM_SANDWICH) {
@@ -155,6 +154,9 @@ public class UploadIntentService extends IntentService implements
 	}
 
 	private void startForeground() {
+
+		Logger.Log(LOG_TAG, "startForeground");
+
 		if (null == mNotificationBuilder) {
 			mNotificationBuilder = new NotificationCompat.Builder(this);
 			mNotificationBuilder.setSmallIcon(R.drawable.ic_stat_upload);
@@ -177,6 +179,8 @@ public class UploadIntentService extends IntentService implements
 	}
 
 	public void onEventMainThread(UploadStateChangedEvent event) {
+		Logger.Log(LOG_TAG, "onEventMainThread UploadStateChangedEvent");
+
 		ContainerSession upload = event.getContainerSession();
 
 		switch (upload.getUploadState()) {
@@ -211,6 +215,9 @@ public class UploadIntentService extends IntentService implements
 	 * @param containerSession
 	 */
 	private void doUploadContainer(ContainerSession containerSession) {
+
+		Logger.Log(LOG_TAG,
+				"doUploadContainer: " + containerSession.getContainerId());
 
 		// post UploadStateChangedEvent
 		containerSession
@@ -277,6 +284,8 @@ public class UploadIntentService extends IntentService implements
 	}
 
 	void finishedNotification() {
+		Logger.Log(LOG_TAG, "finishedNotification");
+
 		if (null != mNotificationBuilder) {
 			String text = getResources().getQuantityString(
 					R.plurals.notification_uploaded_photo, mNumberUploaded,
@@ -301,6 +310,9 @@ public class UploadIntentService extends IntentService implements
 	}
 
 	private void doFileUpload(CJayImage uploadItem) {
+
+		Logger.Log(LOG_TAG, "doFileUpload: " + uploadItem.getImageName());
+
 		try {
 			// Try New Upload Method
 			uploadItem.setUploadState(CJayImage.STATE_UPLOAD_IN_PROGRESS);

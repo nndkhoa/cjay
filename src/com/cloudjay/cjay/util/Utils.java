@@ -8,6 +8,7 @@ import java.util.List;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.service.UploadIntentService;
 import com.lightbox.android.photoprocessing.PhotoProcessing;
+import com.lightbox.android.photoprocessing.utils.MediaUtils;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
@@ -70,6 +71,30 @@ public class Utils {
 		} else {
 			return null;
 		}
+	}
+
+	public static int getOrientationFromContentUri(ContentResolver cr,
+			Uri contentUri) {
+		int returnValue = 0;
+
+		if (ContentResolver.SCHEME_CONTENT.equals(contentUri.getScheme())) {
+			// can post image
+			String[] proj = { MediaStore.Images.Media.ORIENTATION };
+			Cursor cursor = cr.query(contentUri, proj, null, null, null);
+
+			if (null != cursor) {
+				if (cursor.moveToFirst()) {
+					returnValue = cursor
+							.getInt(cursor
+									.getColumnIndexOrThrow(MediaStore.Images.Media.ORIENTATION));
+				}
+				cursor.close();
+			}
+		} else if (ContentResolver.SCHEME_FILE.equals(contentUri.getScheme())) {
+			returnValue = MediaUtils.getExifOrientation(contentUri.getPath());
+		}
+
+		return returnValue;
 	}
 
 	public static Animation createScaleAnimation(View view, int parentWidth,

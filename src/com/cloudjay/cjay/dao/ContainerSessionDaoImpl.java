@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.util.Logger;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.stmt.PreparedQuery;
@@ -14,6 +15,8 @@ import com.j256.ormlite.support.ConnectionSource;
 
 public class ContainerSessionDaoImpl extends
 		BaseDaoImpl<ContainerSession, String> implements IContainerSessionDao {
+
+	private static final String LOG_TAG = "ContainerSessionDaoImpl";
 
 	public ContainerSessionDaoImpl(ConnectionSource connectionSource)
 			throws SQLException {
@@ -70,6 +73,7 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public ContainerSession getNextWaiting() throws SQLException {
 
+		Logger.Log(LOG_TAG, "getNextWaiting() at ContainerSessionDaoImpl");
 		ContainerSession result = null;
 
 		List<ContainerSession> containerSessions = this
@@ -81,16 +85,12 @@ public class ContainerSessionDaoImpl extends
 						.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, true)
 						.prepare());
 
-		// Filter by CJayImage UploadState
-		CJayImageDaoImpl cJayImageDaoImpl = DaoManager.createDao(
-				this.getConnectionSource(), ContainerSession.class);
-
 		for (ContainerSession containerSession : containerSessions) {
 
 			boolean flag = true;
 			Collection<CJayImage> cJayImages = containerSession.getCJayImages();
 
-			for (CJayImage cJayImage : containerSession.getCJayImages()) {
+			for (CJayImage cJayImage : cJayImages) {
 				if (cJayImage.getUploadState() != CJayImage.STATE_UPLOAD_COMPLETED) {
 					flag = false;
 					break;
@@ -113,6 +113,8 @@ public class ContainerSessionDaoImpl extends
 	 */
 	public List<ContainerSession> getListUploadContainerSessions()
 			throws SQLException {
+
+		Logger.Log(LOG_TAG, "getListUploadContainerSessions()");
 
 		List<ContainerSession> containerSessions = this.query(this
 				.queryBuilder().where()
