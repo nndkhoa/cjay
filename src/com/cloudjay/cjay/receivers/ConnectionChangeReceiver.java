@@ -27,5 +27,7 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
 					"Mobile Network Type : " + mobNetInfo.getTypeName(),
 					Toast.LENGTH_SHORT).show();
 		}
+
+		
 	}
 }

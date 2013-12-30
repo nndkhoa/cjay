@@ -68,7 +68,7 @@ public class StringHelper {
 	}
 
 	@SuppressLint("SimpleDateFormat")
-	public static String getRelativeDate(String date) {
+	public static String getRelativeDate(String format, String date) {
 
 		if (date == "") {
 			return "";
@@ -77,14 +77,13 @@ public class StringHelper {
 		Date now = new Date();
 
 		// 2013-11-10T21:05:24+08:00
-		SimpleDateFormat dateFormat = new SimpleDateFormat(
-				"yyyy-MM-dd'T'HH:mm:ssZZ");
+		SimpleDateFormat dateFormat = new SimpleDateFormat(format);
 
 		Date convertedDate = new Date();
 		try {
 			convertedDate = dateFormat.parse(date);
 		} catch (ParseException e) {
-			// e.printStackTrace();
+			e.printStackTrace();
 			return "";
 		}
 

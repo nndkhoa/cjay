@@ -279,7 +279,9 @@ public class ContainerSession implements Parcelable {
 	}
 
 	public String getCheckInTime() {
-		return StringHelper.getRelativeDate(check_in_time.toString());
+		return StringHelper.getRelativeDate(
+				CJayConstant.CJAY_SERVER_DATETIME_FORMAT,
+				check_in_time.toString());
 	}
 
 	public String getRawCheckInTime() {
@@ -299,7 +301,9 @@ public class ContainerSession implements Parcelable {
 
 	public String getCheckOutTime() {
 
-		return StringHelper.getRelativeDate(check_out_time.toString());
+		return StringHelper.getRelativeDate(
+				CJayConstant.CJAY_SERVER_DATETIME_FORMAT,
+				check_out_time.toString());
 	}
 
 	public String getRawCheckOutTime() {

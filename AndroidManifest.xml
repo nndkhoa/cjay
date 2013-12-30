@@ -88,6 +88,11 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
+        <receiver android:name="com.cloudjay.cjay.receivers.AutoStartReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
         <receiver android:name="com.cloudjay.cjay.receivers.InstantUploadReceiver" >
             <intent-filter>
                 <action android:name="com.android.camera.NEW_PICTURE" />
