@@ -6,22 +6,21 @@ import java.util.List;
 import com.cloudjay.cjay.model.ContainerSession;
 
 /**
- * 
- * Trigger when user add container session to queue (upload confirmation = true)
+ * Trigger when Upload State of ContainerSession changed to
+ * STATE_UPLOAD_COMPLETED
  * 
  * @author tieubao
  * 
  */
-
-public class ContainerSessionAddedEvent {
+public class ContainerSessionUploadedEvent {
 
 	private final List<ContainerSession> listContainerSessions;
 
-	public ContainerSessionAddedEvent(List<ContainerSession> uploads) {
+	public ContainerSessionUploadedEvent(List<ContainerSession> uploads) {
 		listContainerSessions = uploads;
 	}
 
-	public ContainerSessionAddedEvent(ContainerSession upload) {
+	public ContainerSessionUploadedEvent(ContainerSession upload) {
 		listContainerSessions = new ArrayList<ContainerSession>();
 		listContainerSessions.add(upload);
 	}

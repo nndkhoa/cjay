@@ -5,18 +5,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.actionbarsherlock.view.Menu;
 import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.CameraActivity_;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
@@ -24,7 +26,6 @@ import com.cloudjay.cjay.events.ContainerSessionAddedEvent;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.DatabaseHelper;
-import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
@@ -47,7 +48,7 @@ import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_gate_import)
 @OptionsMenu(R.menu.menu_gate_import)
-public class GateImportListFragment extends SherlockFragment {
+public class GateImportListFragment extends SherlockDialogFragment {
 
 	private final static String LOG_TAG = "GateImportListFragment";
 
@@ -98,7 +99,6 @@ public class GateImportListFragment extends SherlockFragment {
 			// User confirm upload
 			mSelectedContainerSession.setUploadConfirmation(true);
 
-			// this will call EventBus.post(`UploadsModifiedEvent`)
 			mSelectedContainerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
 
@@ -145,8 +145,8 @@ public class GateImportListFragment extends SherlockFragment {
 		android.util.Log.d(LOG_TAG, "Show item at position: " + position);
 
 		// open photo viewer
-//		Intent intent = new Intent(getActivity(), PhotoViewerActivity.class);
-//		startActivity(intent);
+		// Intent intent = new Intent(getActivity(), PhotoViewerActivity.class);
+		// startActivity(intent);
 	}
 
 	@ItemLongClick(R.id.feeds)
@@ -177,7 +177,7 @@ public class GateImportListFragment extends SherlockFragment {
 			refresh();
 		}
 	}
-	
+
 	public void refresh() {
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListLocalContainerSessions(getActivity());
@@ -255,12 +255,12 @@ public class GateImportListFragment extends SherlockFragment {
 				OperatorDaoImpl operatorDaoImpl = databaseHelper.getOperatorDaoImpl();
 				ContainerDaoImpl containerDaoImpl = databaseHelper.getContainerDaoImpl();
 				ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper.getContainerSessionDaoImpl();
-				
+
 				// find operator
 				Operator operator = null;
 				List<Operator> listOperators = operatorDaoImpl.queryForEq(
 						Operator.CODE, operatorCode);
-	
+
 				if (listOperators.isEmpty()) {
 					operator = new Operator();
 					operator.setCode(operatorCode);
@@ -269,7 +269,7 @@ public class GateImportListFragment extends SherlockFragment {
 				} else {
 					operator = listOperators.get(0);
 				}
-				
+
 				// update container details
 				Container container = mSelectedContainerSession.getContainer();
 				container.setContainerId(containerId);
@@ -285,7 +285,7 @@ public class GateImportListFragment extends SherlockFragment {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			
+
 			// refresh list view
 			refresh();
 			break;
@@ -343,5 +343,28 @@ public class GateImportListFragment extends SherlockFragment {
 		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(),
 				containers, R.layout.list_item_container, feedsDict);
 		mFeedListView.setAdapter(mFeedsAdapter);
+	}
+
+	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+
+		EventBus.getDefault().register(this);
+		super.onCreate(savedInstanceState);
+	}
+
+	public void onEvent(ContainerSessionAddedEvent event) {
+		Logger.Log(LOG_TAG, "onEvent ContainerSessionAddedEvent");
+
+		if (mDirty) {
+			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+					.getListLocalContainerSessions(getActivity());
+			mFeedsAdapter.updateData(mFeeds);
+		}
 	}
 }
