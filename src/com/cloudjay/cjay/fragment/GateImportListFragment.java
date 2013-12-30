@@ -17,11 +17,13 @@ import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionAddedEvent;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.DatabaseHelper;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.User;
@@ -249,11 +251,12 @@ public class GateImportListFragment extends SherlockFragment {
 
 		case AddContainerDialog.CONTAINER_DIALOG_EDIT:
 			try {
+				DatabaseHelper databaseHelper = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity());
+				OperatorDaoImpl operatorDaoImpl = databaseHelper.getOperatorDaoImpl();
+				ContainerDaoImpl containerDaoImpl = databaseHelper.getContainerDaoImpl();
+				ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper.getContainerSessionDaoImpl();
+				
 				// find operator
-				IDatabaseManager databaseManager = CJayClient.getInstance()
-						.getDatabaseManager();
-				OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(getActivity())
-						.getOperatorDaoImpl();
 				Operator operator = null;
 				List<Operator> listOperators = operatorDaoImpl.queryForEq(
 						Operator.CODE, operatorCode);
@@ -273,9 +276,11 @@ public class GateImportListFragment extends SherlockFragment {
 				container.setOperator(operator);
 
 				// save container details
-				ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
-						.getHelper(getActivity()).getContainerSessionDaoImpl();
 				containerSessionDaoImpl.addContainerSessions(mSelectedContainerSession);
+				
+				// update database
+				containerDaoImpl.update(container);
+				containerSessionDaoImpl.update(mSelectedContainerSession);
 
 			} catch (SQLException e) {
 				e.printStackTrace();
