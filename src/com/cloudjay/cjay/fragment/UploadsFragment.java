@@ -21,6 +21,7 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.Logger;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener.OnDismissCallback;
+
 import de.greenrobot.event.EventBus;
 
 public class UploadsFragment extends SherlockFragment implements

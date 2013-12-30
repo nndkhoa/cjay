@@ -3,28 +3,26 @@ package com.cloudjay.cjay.fragment;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import android.app.Dialog;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockDialogFragment;
+import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.ami.fundapter.interfaces.ItemClickListener;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.CameraActivity_;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.TmpContainerSession;
@@ -46,7 +44,7 @@ import com.googlecode.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_gate_export)
 @OptionsMenu(R.menu.menu_gate_export)
-public class GateExportListFragment extends SherlockDialogFragment {
+public class GateExportListFragment extends SherlockFragment {
 
 	private ArrayList<Operator> mOperators;
 	private ArrayList<ContainerSession> mFeeds;
@@ -142,15 +140,6 @@ public class GateExportListFragment extends SherlockDialogFragment {
 
 		boolean isDisplayed = !(mSelectedContainerSession == null);
 		menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
-	}
-
-	@Override
-	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		Dialog dialog = super.onCreateDialog(savedInstanceState);
-		// Set Soft Input mode so it's always visible
-		dialog.getWindow().setSoftInputMode(
-				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-		return dialog;
 	}
 
 	@Override

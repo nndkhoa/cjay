@@ -8,7 +8,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockDialogFragment;
+import com.actionbarsherlock.app.SherlockFragment;
 import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
@@ -23,7 +23,7 @@ import com.googlecode.androidannotations.annotations.ItemClick;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_auditor_reporting)
-public class AuditorReportingListFragment extends SherlockDialogFragment {
+public class AuditorReportingListFragment extends SherlockFragment {
 
 	private final static String TAG = "AuditorReportingListFragment";
 	private ArrayList<ContainerSession> mFeeds;

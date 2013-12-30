@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-import com.actionbarsherlock.app.SherlockDialogFragment;
+import com.actionbarsherlock.app.SherlockFragment;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.listener.OnReportPageCompleteListener;
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -14,7 +14,7 @@ import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_damage_repair_code)
-public class AuditorDamageRepairFragment extends SherlockDialogFragment implements OnClickListener {
+public class AuditorDamageRepairFragment extends SherlockFragment implements OnClickListener {
 	private String mRepairCode;
 	private OnReportPageCompleteListener mCallback;
 	private Button mCodeButtons[];

@@ -9,7 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import com.actionbarsherlock.app.SherlockDialogFragment;
+import com.actionbarsherlock.app.SherlockFragment;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.listener.OnReportPageCompleteListener;
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -17,7 +17,7 @@ import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_damage_location_code)
-public class AuditorDamageLocationFragment extends SherlockDialogFragment implements OnFocusChangeListener, OnClickListener {
+public class AuditorDamageLocationFragment extends SherlockFragment implements OnFocusChangeListener, OnClickListener {
 	private String mLocationCodes[], mCodes[][];
 	private OnReportPageCompleteListener mCallback;
 	private Button mCodeButtons[];
