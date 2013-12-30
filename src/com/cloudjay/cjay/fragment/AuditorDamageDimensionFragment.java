@@ -6,7 +6,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockDialogFragment;
+import com.actionbarsherlock.app.SherlockFragment;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.listener.OnReportPageCompleteListener;
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -14,7 +14,7 @@ import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_damage_dimension)
-public class AuditorDamageDimensionFragment extends SherlockDialogFragment {
+public class AuditorDamageDimensionFragment extends SherlockFragment {
 	private double mLength, mHeight;
 	private OnReportPageCompleteListener mCallback;
 	

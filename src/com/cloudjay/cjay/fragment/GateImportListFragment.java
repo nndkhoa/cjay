@@ -9,14 +9,15 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockDialogFragment;
+import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.ami.fundapter.interfaces.StaticImageLoader;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.CameraActivity_;
+import com.cloudjay.cjay.PhotoViewerActivity;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionAddedEvent;
 import com.cloudjay.cjay.model.Container;
@@ -43,7 +44,7 @@ import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_gate_import)
 @OptionsMenu(R.menu.menu_gate_import)
-public class GateImportListFragment extends SherlockDialogFragment {
+public class GateImportListFragment extends SherlockFragment {
 
 	private final static String LOG_TAG = "GateImportListFragment";
 
@@ -137,6 +138,10 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		// clear current selection
 		mSelectedContainerSession = null;
 		getActivity().supportInvalidateOptionsMenu();
+		
+		// open photo viewer
+		Intent intent = new Intent(getActivity(), PhotoViewerActivity.class);
+		startActivity(intent);
 
 		android.util.Log.d(LOG_TAG, "Show item at position: " + position);
 	}
