@@ -102,7 +102,7 @@ public class AddContainerDialog extends SherlockDialogFragment {
 			@Override
 			public void onClick(View v) {
 				mCallback = (AddContainerDialogListener)getActivity();
-				mCallback.OnContainerInputCompleted(mParent, mContainerId, mOperatorName, mMode);
+				mCallback.OnContainerInputCompleted(mParent, mContainerEditText.getText().toString(), mOperatorEditText.getText().toString(), mMode);
 				dismiss();
 			}
 		});
