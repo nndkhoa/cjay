@@ -21,7 +21,7 @@ import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.ami.fundapter.interfaces.ItemClickListener;
-import com.cloudjay.cjay.CameraActivity_;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
@@ -248,7 +248,7 @@ public class GateExportListFragment extends SherlockFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getFullContainerId();
+						return item.getContainerId();
 					}
 				});
 		feedsDict.addStringField(R.id.feed_item_container_owner,

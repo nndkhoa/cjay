@@ -2,6 +2,7 @@ package com.cloudjay.cjay.fragment;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,9 +20,11 @@ import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.ami.fundapter.interfaces.StaticImageLoader;
 import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionAddedEvent;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
@@ -139,6 +142,10 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		getActivity().supportInvalidateOptionsMenu();
 
 		android.util.Log.d(LOG_TAG, "Show item at position: " + position);
+
+		// open photo viewer
+		// Intent intent = new Intent(getActivity(), PhotoViewerActivity.class);
+		// startActivity(intent);
 	}
 
 	@ItemLongClick(R.id.feeds)
@@ -166,10 +173,14 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		super.onResume();
 
 		if (mDirty) {
-			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-					.getListLocalContainerSessions(getActivity());
-			mFeedsAdapter.updateData(mFeeds);
+			refresh();
 		}
+	}
+
+	public void refresh() {
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+				.getListLocalContainerSessions(getActivity());
+		mFeedsAdapter.updateData(mFeeds);
 	}
 
 	public void showContainerDetailDialog(String containerId,
@@ -192,11 +203,9 @@ public class GateImportListFragment extends SherlockDialogFragment {
 			String operatorName, int mode) {
 		// Get the container id and container operator code
 		String operatorCode = "";
-		int operatorId = 0;
 		for (Operator operator : mOperators) {
 			if (operator.getName().equals(operatorName)) {
 				operatorCode = operator.getCode();
-				operatorId = operator.getId();
 				break;
 			}
 		}
@@ -236,19 +245,51 @@ public class GateImportListFragment extends SherlockDialogFragment {
 				e.printStackTrace();
 			}
 
+			mDirty = true;
 			break;
 
 		case AddContainerDialog.CONTAINER_DIALOG_EDIT:
-			Container container = mSelectedContainerSession.getContainer();
-			Operator operator = container.getOperator();
-			container.setContainerId(containerId);
-			operator.setCode(operatorCode);
-			operator.setName(operatorName);
-			operator.setId(operatorId);
+			try {
+				// find operator
+				IDatabaseManager databaseManager = CJayClient.getInstance()
+						.getDatabaseManager();
+
+				OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(
+						getActivity()).getOperatorDaoImpl();
+
+				Operator operator = null;
+				List<Operator> listOperators = operatorDaoImpl.queryForEq(
+						Operator.CODE, operatorCode);
+
+				if (listOperators.isEmpty()) {
+					operator = new Operator();
+					operator.setCode(operatorCode);
+					operator.setName(operatorCode);
+					operatorDaoImpl.addOperator(operator);
+				} else {
+					operator = listOperators.get(0);
+				}
+
+				// update container details
+				Container container = mSelectedContainerSession.getContainer();
+				container.setContainerId(containerId);
+				container.setOperator(operator);
+
+				// save container details
+				ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
+						.getHelper(getActivity()).getContainerSessionDaoImpl();
+				containerSessionDaoImpl
+						.addContainerSessions(mSelectedContainerSession);
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			// refresh list view
+			refresh();
 			break;
 		}
 
-		mDirty = true;
 	}
 
 	private void initContainerFeedAdapter(ArrayList<ContainerSession> containers) {
@@ -258,7 +299,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getFullContainerId();
+						return item.getContainerId();
 					}
 				});
 		feedsDict.addStringField(R.id.feed_item_container_owner,
