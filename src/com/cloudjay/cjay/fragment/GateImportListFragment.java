@@ -18,6 +18,7 @@ import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.CameraActivity_;
+import com.cloudjay.cjay.PhotoViewerActivity_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -145,8 +146,10 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		android.util.Log.d(LOG_TAG, "Show item at position: " + position);
 
 		// open photo viewer
-		// Intent intent = new Intent(getActivity(), PhotoViewerActivity.class);
-		// startActivity(intent);
+//		Intent intent = new Intent(getActivity(), PhotoViewerActivity_.class);
+//		intent.putExtra(PhotoViewerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+//				mFeedsAdapter.getItem(position).getUuid());
+//		startActivity(intent);
 	}
 
 	@ItemLongClick(R.id.feeds)
