@@ -37,9 +37,10 @@ public class Mapper {
 				.getDepot().getDepotCode());
 		tmpContainerSession.setContainerId(containerSession
 				.getFullContainerId());
-		tmpContainerSession.setCheckInTime(containerSession.getCheckInTime());
-		tmpContainerSession.setCheckOutTime(StringHelper
-				.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT));
+		tmpContainerSession
+				.setCheckInTime(containerSession.getRawCheckInTime());
+		tmpContainerSession.setCheckOutTime(containerSession
+				.getRawCheckOutTime());
 
 		Collection<CJayImage> cJayImages = containerSession.getCJayImages();
 

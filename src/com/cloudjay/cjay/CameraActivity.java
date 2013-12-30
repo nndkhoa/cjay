@@ -457,7 +457,7 @@ public class CameraActivity extends Activity {
 		// Set Uploading Status
 		uploadItem.setType(type);
 		uploadItem.setTimePosted(StringHelper
-				.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT));
+				.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT));
 		uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
 		uploadItem.setUuid(uuid);
 		uploadItem.setUri(uri);

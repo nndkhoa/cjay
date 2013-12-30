@@ -233,13 +233,13 @@ public class CJayClient implements ICJayClient {
 		return token;
 	}
 
-	@Override
-	public String getGoogleCloudToken(String token) {
-		HashMap<String, String> headers = prepareHeadersWithToken(token);
-		String response = requestWrapper.sendGet(
-				CJayConstant.API_GOOGLE_CLOUD_STORAGE_TOKEN, headers);
-		return response;
-	}
+	// @Override
+	// public String getGoogleCloudToken(String token) {
+	// HashMap<String, String> headers = prepareHeadersWithToken(token);
+	// String response = requestWrapper.sendGet(
+	// CJayConstant.API_GOOGLE_CLOUD_STORAGE_TOKEN, headers);
+	// return response;
+	// }
 
 	@Override
 	public void addGCMDevice(String regid, Context ctx) throws JSONException {

@@ -85,6 +85,11 @@ public class ContainerSessionDaoImpl extends
 						.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, true)
 						.prepare());
 
+		Logger.Log(
+				LOG_TAG,
+				"getNextWaiting with "
+						+ Integer.toString(containerSessions.size()) + " items");
+
 		for (ContainerSession containerSession : containerSessions) {
 
 			boolean flag = true;

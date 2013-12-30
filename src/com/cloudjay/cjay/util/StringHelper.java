@@ -34,6 +34,29 @@ public class StringHelper {
 	}
 
 	@SuppressLint("SimpleDateFormat")
+	public static String getTimestamp(String oldFormat, String newFormat,
+			String date) {
+
+		if (date == "") {
+			return "";
+		}
+
+		Logger.Log(oldFormat);
+		Logger.Log(newFormat);
+		Logger.Log(date);
+
+		try {
+			Date tmp = new SimpleDateFormat(oldFormat).parse(date);
+			SimpleDateFormat formatter = new SimpleDateFormat(newFormat);
+			String timeStamp = formatter.format(date);
+			return timeStamp;
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
+
+	@SuppressLint("SimpleDateFormat")
 	public static String getCurrentTimestamp(String format) {
 		String timeStamp = "";
 
@@ -72,34 +95,5 @@ public class StringHelper {
 		return timeString;
 
 	}
-	//
-	// public static String getLocation(Context context) {
-	// String cityName = "";
-	// LocationInfo latestInfo = new LocationInfo(context);
-	//
-	// Logger.Log("Long: " + Float.toString(latestInfo.lastLat) + "/ Lat: "
-	// + Float.toString(latestInfo.lastLong));
-	//
-	// Geocoder gcd = new Geocoder(context, Locale.getDefault());
-	// List<Address> addresses;
-	// try {
-	// addresses = gcd.getFromLocation(latestInfo.lastLat,
-	// latestInfo.lastLong, 1);
-	// if (addresses.size() > 0) {
-	//
-	// Logger.Log(addresses.get(0).getFeatureName() + ", "
-	// + addresses.get(0).getLocality() + ", "
-	// + addresses.get(0).getAdminArea() + ", "
-	// + addresses.get(0).getCountryName());
-	//
-	// cityName = addresses.get(0).getAdminArea() + ", "
-	// + addresses.get(0).getCountryName();
-	// } else {
-	// Logger.Log("Cannot detect current location.");
-	// }
-	// } catch (IOException e) {
-	// e.printStackTrace();
-	// }
-	// return cityName;
-	// }
+
 }

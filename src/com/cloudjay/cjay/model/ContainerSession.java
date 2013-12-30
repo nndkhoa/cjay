@@ -28,6 +28,7 @@ import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.events.UploadsModifiedEvent;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
@@ -281,9 +282,28 @@ public class ContainerSession implements Parcelable {
 		return StringHelper.getRelativeDate(check_in_time.toString());
 	}
 
+	public String getRawCheckInTime() {
+		return check_in_time;
+	}
+
+	public String getFormattedCheckInTime() {
+		return StringHelper.getTimestamp(CJayConstant.CJAY_DATETIME_FORMAT,
+				CJayConstant.CJAY_SERVER_DATETIME_FORMAT, check_in_time);
+	}
+
+	public String getFormattedCheckOutTime() {
+		return StringHelper.getTimestamp(CJayConstant.CJAY_DATETIME_FORMAT,
+				CJayConstant.CJAY_SERVER_DATETIME_FORMAT, check_out_time);
+
+	}
+
 	public String getCheckOutTime() {
 
 		return StringHelper.getRelativeDate(check_out_time.toString());
+	}
+
+	public String getRawCheckOutTime() {
+		return check_out_time;
 	}
 
 	public String getImageIdPath() {

@@ -22,7 +22,7 @@ public interface ICJayClient {
 	String getUserToken(String username, String password, Context ctx)
 			throws JSONException;
 
-	String getGoogleCloudToken(String token);
+	// String getGoogleCloudToken(String token);
 
 	void addGCMDevice(String regid, Context ctx) throws JSONException;
 

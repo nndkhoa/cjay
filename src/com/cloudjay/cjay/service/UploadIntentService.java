@@ -83,25 +83,25 @@ public class UploadIntentService extends IntentService implements
 					doFileUpload(uploadItem);
 				}
 
-				// TODO: FIX BUG SIEU KHUNG
 				// // It will return container with `upload confirmation = true`
-				// ContainerSession containerSession = containerSessionDaoImpl
-				// .getNextWaiting();
+				ContainerSession containerSession = containerSessionDaoImpl
+						.getNextWaiting();
 				//
-				// if (null != containerSession) {
-				//
-				// // trigger event to display in UploadsFragment
-				//
-				// // startForeground();
-				// // trimCache();
-				//
-				// // Photup implementation
-				// // updateNotification(containerSession);
-				//
-				// // Self-implementation
-				// doUploadContainer(containerSession);
-				//
-				// }
+				if (null != containerSession) {
+					//
+					// // trigger event to display in UploadsFragment
+					//
+					// // startForeground();
+					// // trimCache();
+					//
+					// // Photup implementation
+					// // updateNotification(containerSession);
+					//
+					// // Self-implementation
+
+					doUploadContainer(containerSession);
+					//
+				}
 
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -241,6 +241,7 @@ public class UploadIntentService extends IntentService implements
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		} catch (Exception e) {
+			e.printStackTrace();
 			containerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
 		}

@@ -195,8 +195,9 @@ public class GateExportListFragment extends SherlockDialogFragment {
 			TmpContainerSession newTmpContainer = new TmpContainerSession();
 			newTmpContainer.setContainerId(containerId);
 			newTmpContainer.setOperatorCode(operatorCode);
-			newTmpContainer.setCheckInTime(StringHelper
-					.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT));
+			newTmpContainer
+					.setCheckInTime(StringHelper
+							.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT));
 
 			User currentUser = Session.restore(getActivity()).getCurrentUser();
 

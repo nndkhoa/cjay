@@ -212,7 +212,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 					containerId,
 					operatorCode,
 					StringHelper
-							.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT),
+							.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT),
 					currentUser.getDepot().getDepotCode());
 
 			containerSession.setUploadConfirmation(false);

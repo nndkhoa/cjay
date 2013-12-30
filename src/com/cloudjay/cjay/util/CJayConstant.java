@@ -27,8 +27,8 @@ public final class CJayConstant {
 
 	public static final String API_ADD_GCM_DEVICE = API_ROOT
 			+ "mobile/gcm-devices.json";
-	public static final String API_GOOGLE_CLOUD_STORAGE_TOKEN = API_ROOT
-			+ "auth/get-google-cloud-storage-token/";
+	// public static final String API_GOOGLE_CLOUD_STORAGE_TOKEN = API_ROOT
+	// + "auth/get-google-cloud-storage-token/";
 
 	public static final String CURRENT_USER = API_ROOT + "cjay/current-user";
 	public static final String ALL_USERS = API_ROOT + "auth/jayusers";
@@ -45,7 +45,7 @@ public final class CJayConstant {
 			+ "cjay/container-sessions";
 
 	public static final String CJAY_ITEMS = API_ROOT
-			+ "cjay/container-items.json";
+			+ "cjay/container-sessions.json";
 
 	public static final String LIST_CONTAINER_SESSIONS_WITH_DATETIME = API_ROOT
 			+ "cjay/container-sessions.json?created_after=%s";
@@ -89,6 +89,7 @@ public final class CJayConstant {
 	public static final float IMAGE_CACHE_HEAP_PERCENTAGE = 1f / 6f;
 
 	public static final String CJAY_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
+	public static final String CJAY_SERVER_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 	public static final String CJAY_UPLOAD_DATETIME_FORMAT = "yyyy-MM-dd";
 
 	public static final long SCALE_ANIMATION_DURATION_FULL_DISTANCE = 800;
