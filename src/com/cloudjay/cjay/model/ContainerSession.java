@@ -25,8 +25,9 @@ import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
+import com.cloudjay.cjay.events.ContainerSessionAddedEvent;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
-import com.cloudjay.cjay.events.UploadsModifiedEvent;
+import com.cloudjay.cjay.events.ContainerSessionUploadedEvent;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Flags;
@@ -226,9 +227,13 @@ public class ContainerSession implements Parcelable {
 
 			switch (state) {
 			case STATE_UPLOAD_ERROR:
+
+				break;
 			case STATE_UPLOAD_COMPLETED:
 				mBigPictureNotificationBmp = null;
-				EventBus.getDefault().post(new UploadsModifiedEvent());
+				EventBus.getDefault().post(
+						new ContainerSessionUploadedEvent(this));
+
 				break;
 			case STATE_UPLOAD_WAITING:
 				mProgress = -1;

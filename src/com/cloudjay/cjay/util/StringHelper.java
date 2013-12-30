@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.util;
 
 import android.annotation.SuppressLint;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 
 import java.text.ParseException;
@@ -37,7 +38,7 @@ public class StringHelper {
 	public static String getTimestamp(String oldFormat, String newFormat,
 			String date) {
 
-		if (date == "") {
+		if (TextUtils.isEmpty(date)) {
 			return "";
 		}
 
@@ -70,7 +71,7 @@ public class StringHelper {
 	@SuppressLint("SimpleDateFormat")
 	public static String getRelativeDate(String format, String date) {
 
-		if (date == "") {
+		if (TextUtils.isEmpty(date)) {
 			return "";
 		}
 
