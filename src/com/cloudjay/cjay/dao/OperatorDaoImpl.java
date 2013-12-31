@@ -1,6 +1,8 @@
 package com.cloudjay.cjay.dao;
 
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import com.cloudjay.cjay.model.Operator;
@@ -17,7 +19,16 @@ public class OperatorDaoImpl extends BaseDaoImpl<Operator, Integer> implements
 
 	@Override
 	public List<Operator> getAllOperators() throws SQLException {
-		return this.queryForAll();
+		List<Operator> operators = this.queryForAll();
+
+		Collections.sort(operators, new Comparator<Operator>() {
+			@Override
+			public int compare(Operator lhs, Operator rhs) {
+				return lhs.getCode().compareToIgnoreCase(rhs.getCode());
+			}
+		});
+
+		return operators;
 	}
 
 	@Override

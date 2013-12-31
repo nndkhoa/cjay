@@ -276,9 +276,11 @@ public class GateImportListFragment extends SherlockDialogFragment {
 					// trigger update container lists
 					EventBus.getDefault().post(new ContainerEditedEvent(mSelectedContainerSession));
 				}
+				
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
+			
 			break;
 		}
 
