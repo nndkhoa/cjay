@@ -144,8 +144,10 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		android.util.Log.d(LOG_TAG, "Show item at position: " + position);
 
 		// open photo viewer
-		// Intent intent = new Intent(getActivity(), PhotoViewerActivity.class);
-		// startActivity(intent);
+//		Intent intent = new Intent(getActivity(), PhotoViewerActivity_.class);
+//		intent.putExtra(PhotoViewerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+//				mFeedsAdapter.getItem(position).getUuid());
+//		startActivity(intent);
 	}
 
 	@ItemLongClick(R.id.feeds)
