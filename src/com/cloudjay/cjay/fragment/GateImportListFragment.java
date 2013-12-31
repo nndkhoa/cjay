@@ -17,8 +17,7 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.CameraActivity_;
-import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
@@ -251,10 +250,14 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 		case AddContainerDialog.CONTAINER_DIALOG_EDIT:
 			try {
-				DatabaseHelper databaseHelper = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity());
-				OperatorDaoImpl operatorDaoImpl = databaseHelper.getOperatorDaoImpl();
-				ContainerDaoImpl containerDaoImpl = databaseHelper.getContainerDaoImpl();
-				ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper.getContainerSessionDaoImpl();
+				DatabaseHelper databaseHelper = CJayClient.getInstance()
+						.getDatabaseManager().getHelper(getActivity());
+				OperatorDaoImpl operatorDaoImpl = databaseHelper
+						.getOperatorDaoImpl();
+				ContainerDaoImpl containerDaoImpl = databaseHelper
+						.getContainerDaoImpl();
+				ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper
+						.getContainerSessionDaoImpl();
 
 				// find operator
 				Operator operator = null;
@@ -276,8 +279,9 @@ public class GateImportListFragment extends SherlockDialogFragment {
 				container.setOperator(operator);
 
 				// save container details
-				containerSessionDaoImpl.addContainerSessions(mSelectedContainerSession);
-				
+				containerSessionDaoImpl
+						.addContainerSessions(mSelectedContainerSession);
+
 				// update database
 				containerDaoImpl.update(container);
 				containerSessionDaoImpl.update(mSelectedContainerSession);
