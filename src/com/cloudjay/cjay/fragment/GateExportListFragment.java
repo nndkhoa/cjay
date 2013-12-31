@@ -1,9 +1,11 @@
 package com.cloudjay.cjay.fragment;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Locale;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,15 +22,19 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.ami.fundapter.interfaces.ItemClickListener;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.CameraActivity_;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.events.ContainerCreatedEvent;
+import com.cloudjay.cjay.events.ContainerEditedEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Mapper;
 import com.cloudjay.cjay.util.Session;
 import com.cloudjay.cjay.util.StringHelper;
@@ -42,25 +48,24 @@ import com.googlecode.androidannotations.annotations.OptionsItem;
 import com.googlecode.androidannotations.annotations.OptionsMenu;
 import com.googlecode.androidannotations.annotations.ViewById;
 
+import de.greenrobot.event.EventBus;
+
 @EFragment(R.layout.fragment_gate_export)
 @OptionsMenu(R.menu.menu_gate_export)
 public class GateExportListFragment extends SherlockFragment {
+	
+	private final static String LOG_TAG = "GateExportListFragment";
 
 	private ArrayList<Operator> mOperators;
 	private ArrayList<ContainerSession> mFeeds;
 	private FunDapter<ContainerSession> mFeedsAdapter;
 
 	private ContainerSession mSelectedContainerSession;
-	private boolean mDirty;
 
-	@ViewById(R.id.container_list)
-	ListView mFeedListView;
-	@ViewById(R.id.search_edittext)
-	EditText mSearchEditText;
-	@ViewById(R.id.add_button)
-	Button mAddButton;
-	@ViewById(R.id.notfound_textview)
-	TextView mNotfoundTextView;
+	@ViewById(R.id.container_list) 		ListView mFeedListView;
+	@ViewById(R.id.search_edittext)		EditText mSearchEditText;
+	@ViewById(R.id.add_button)			Button mAddButton;
+	@ViewById(R.id.notfound_textview)	TextView mNotfoundTextView;
 
 	@AfterViews
 	void afterViews() {
@@ -79,13 +84,11 @@ public class GateExportListFragment extends SherlockFragment {
 			}
 		});
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListContainerSessions(getActivity());
+				.getListLocalContainerSessions(getActivity());
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
 				.getListOperators(getActivity());
 		configureControls(mFeeds);
-		initFunDapter(mFeeds);
-
-		mDirty = false;
+		initContainerFeedAdapter(mFeeds);
 	}
 
 	@OptionsItem(R.id.menu_upload)
@@ -141,16 +144,19 @@ public class GateExportListFragment extends SherlockFragment {
 		boolean isDisplayed = !(mSelectedContainerSession == null);
 		menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
 	}
-
+	
 	@Override
-	public void onResume() {
-		super.onResume();
-
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListContainerSessions(getActivity());
-		mSearchEditText.setText(""); // this will refresh the list
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
 	}
 
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		EventBus.getDefault().register(this);
+		super.onCreate(savedInstanceState);
+	}
+	
 	public void showContainerDetailDialog(String containerId,
 			String operatorName, int mode) {
 		FragmentManager fm = getActivity().getSupportFragmentManager();
@@ -180,34 +186,41 @@ public class GateExportListFragment extends SherlockFragment {
 
 		switch (mode) {
 		case AddContainerDialog.CONTAINER_DIALOG_ADD:
-			// Create a tmp Container Session
-			TmpContainerSession newTmpContainer = new TmpContainerSession();
-			newTmpContainer.setContainerId(containerId);
-			newTmpContainer.setOperatorCode(operatorCode);
-			newTmpContainer
-					.setCheckInTime(StringHelper
-							.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT));
-
+			// Create Container Session object
 			User currentUser = Session.restore(getActivity()).getCurrentUser();
+			ContainerSession containerSession = new ContainerSession(
+					getActivity(),
+					containerId,
+					operatorCode,
+					StringHelper
+							.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT),
+					currentUser.getDepot().getDepotCode());
 
-			newTmpContainer.setDepotCode(currentUser.getDepot().getDepotCode());
-			newTmpContainer.printMe();
+			containerSession.setUploadConfirmation(false);
+			containerSession.setOnLocal(true);
+			containerSession.setUploadState(ContainerSession.STATE_NONE);
 
-			// Save the current temp Container Session
-			DataCenter.getInstance().setTmpCurrentSession(newTmpContainer);
+			try {
+				ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
+						.getInstance().getDatabaseManager()
+						.getHelper(getActivity()).getContainerSessionDaoImpl();
 
-			// Pass tmpContainerSession away
-			// Then start showing the Camera
-			Intent intent = new Intent(getActivity(), CameraActivity_.class);
-			intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-					newTmpContainer);
-			intent.putExtra("type", 1); // out
-			startActivity(intent);
+				containerSessionDaoImpl.addContainerSessions(containerSession);
+				
+				// trigger update container lists
+				EventBus.getDefault().post(new ContainerCreatedEvent(containerSession));
+
+				Intent intent = new Intent(getActivity(), CameraActivity_.class);
+				intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+						containerSession.getUuid());
+				intent.putExtra("type", 1); // in
+				startActivity(intent);
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 			break;
-
 		}
-
-		mDirty = true;
 	}
 
 	private void search(String searchText) {
@@ -241,7 +254,7 @@ public class GateExportListFragment extends SherlockFragment {
 		}
 	}
 
-	private void initFunDapter(ArrayList<ContainerSession> containers) {
+	private void initContainerFeedAdapter(ArrayList<ContainerSession> containers) {
 		BindDictionary<ContainerSession> feedsDict = new BindDictionary<ContainerSession>();
 		feedsDict.addStringField(R.id.feed_item_container_id,
 				new StringExtractor<ContainerSession>() {
@@ -287,14 +300,25 @@ public class GateExportListFragment extends SherlockFragment {
 					public void loadImage(String stringColor, ImageView view) {
 						view.setImageResource(R.drawable.ic_app);
 					}
-				}).onClick(new ItemClickListener<ContainerSession>() {
-			@Override
-			public void onClick(ContainerSession item, int position, View view) {
-				// TODO Auto-generated method stub
-			}
-		});
+				});
 		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(),
 				containers, R.layout.list_item_container, feedsDict);
 		mFeedListView.setAdapter(mFeedsAdapter);
+	}
+	
+	public void onEvent(ContainerCreatedEvent event) {
+		Logger.Log(LOG_TAG, "onEvent ContainerCreatedEvent");
+		refresh();
+	}
+
+	public void onEvent(ContainerEditedEvent event) {
+		Logger.Log(LOG_TAG, "onEvent ContainerEditedEvent");
+		refresh();
+	}
+	
+	public void refresh() {
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+				.getListLocalContainerSessions(getActivity());
+		mSearchEditText.setText(""); // this will refresh the list
 	}
 }

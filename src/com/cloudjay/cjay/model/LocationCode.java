@@ -6,8 +6,8 @@ import java.util.List;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /**
@@ -32,8 +32,8 @@ public class LocationCode implements Parcelable {
 	@DatabaseField(columnName = CODE)
 	String code;
 
-	@ForeignCollectionField(eager = true)
-	Collection<Issue> issues;
+//	@ForeignCollectionField(eager = true)
+//	Collection<Issue> issues;
 
 	public String getName() {
 		return name;
@@ -70,7 +70,7 @@ public class LocationCode implements Parcelable {
 		dest.writeInt(id);
 		dest.writeString(name);
 		dest.writeString(code);
-		parcelCollection(dest, issues);
+//		parcelCollection(dest, issues);
 		// dest.writeTypedList((List<Issue>) issues);
 	}
 
@@ -78,7 +78,7 @@ public class LocationCode implements Parcelable {
 		this.id = in.readInt();
 		this.name = in.readString();
 		this.code = in.readString();
-		this.issues = unparcelCollection(in, Issue.CREATOR);
+//		this.issues = unparcelCollection(in, Issue.CREATOR);
 		// in.readTypedList(issues, Issue.CREATOR);
 	}
 

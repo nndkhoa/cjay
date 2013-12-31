@@ -77,7 +77,6 @@ public class Operator implements Parcelable {
 	}
 
 	public static final Parcelable.Creator<Operator> CREATOR = new Parcelable.Creator<Operator>() {
-
 		public Operator createFromParcel(Parcel source) {
 			return new Operator(source);
 		}
@@ -88,12 +87,16 @@ public class Operator implements Parcelable {
 	};
 
 	public Operator(Parcel in) {
-
 		readFromParcel(in);
 	}
 
 	public Operator() {
 
+	}
+	
+	public Operator(String operatorCode, String operatorName) {
+		this.operator_code = operatorCode;
+		this.operator_name = operatorName;
 	}
 
 	// public void setContainers(Collection<Container> listContainers) {

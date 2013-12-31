@@ -15,7 +15,7 @@
 		        android:layout_height="wrap_content"
 	        	android:layout_weight="1"
 	        	android:gravity="right"
-		        android:text="@string/damage_length"
+		        android:text="@string/label_issue_length"
 		        android:textStyle="bold" />
        	 	<EditText
 		        android:id="@+id/length"
@@ -34,7 +34,7 @@
 		        android:layout_height="wrap_content"
 	        	android:layout_weight="1"
 	        	android:gravity="right"
-		        android:text="@string/damage_height"
+		        android:text="@string/label_issue_height"
 		        android:textStyle="bold" />   
        	 	<EditText
 		        android:id="@+id/height"

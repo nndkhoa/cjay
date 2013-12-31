@@ -21,19 +21,19 @@ public final class Logger {
 	public static final String CJAY_TAG = "CJAY";
 
 	public static void Log(String tag, String content) {
-		if (PRODUCTION_MODE == false) {
+		if (PRODUCTION_MODE == false && content != null) {
 			Log.w(tag, content);
 		}
 	}
 
 	public static void Log(String content) {
-		if (PRODUCTION_MODE == false) {
+		if (PRODUCTION_MODE == false && content != null) {
 			Log.w("CJAY_INFO", content);
 		}
 	}
 
 	public static void Log(String tag, String content, int mode) {
-		if (PRODUCTION_MODE == false) {
+		if (PRODUCTION_MODE == false && content != null) {
 			switch (mode) {
 			case Log.DEBUG:
 				Log.d(tag, content);

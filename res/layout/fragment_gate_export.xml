@@ -21,13 +21,8 @@
 
     <TextView
         android:id="@+id/notfound_textview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:layout_below="@+id/search_edittext"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:text="@string/container_not_found"
-        android:textSize="20sp" />
+		style="@style/NotFoundTextViewStyle" />
 
     <Button
         android:id="@+id/add_button"

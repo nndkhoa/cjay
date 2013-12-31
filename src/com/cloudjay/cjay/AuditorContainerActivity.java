@@ -1,21 +1,15 @@
 package com.cloudjay.cjay;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
-import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
-import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.ami.fundapter.interfaces.ItemClickListener;
-import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.model.CJayImage;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.ItemClick;
@@ -27,7 +21,7 @@ import com.googlecode.androidannotations.annotations.ViewById;
 public class AuditorContainerActivity extends SherlockFragmentActivity {
 
 	private final static String TAG = "AuditorContainerActivity";
-	private ArrayList<ContainerSession> mFeeds;
+	private ArrayList<CJayImage> mFeeds;
 
 	@ViewById(R.id.btn_add_new)
 	Button mAddButton;
@@ -36,9 +30,9 @@ public class AuditorContainerActivity extends SherlockFragmentActivity {
 
 	@AfterViews
 	void afterViews() {
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListContainerSessions(this);
-		initFunDapter(mFeeds);
+//		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+//				.getListContainerSessions(this);
+		initImageFeedAdapter(mFeeds);
 	}
 
 	@ItemClick(R.id.feeds)
@@ -47,53 +41,83 @@ public class AuditorContainerActivity extends SherlockFragmentActivity {
 		android.util.Log.d(TAG, "Show item at position: " + position);
 	}
 
-	private void initFunDapter(ArrayList<ContainerSession> containers) {
-		BindDictionary<ContainerSession> feedsDict = new BindDictionary<ContainerSession>();
-		feedsDict.addStringField(R.id.feed_item_container_id,
-				new StringExtractor<ContainerSession>() {
+	private void initImageFeedAdapter(ArrayList<CJayImage> containers) {
+		BindDictionary<CJayImage> feedsDict = new BindDictionary<CJayImage>();
+		feedsDict.addStringField(R.id.issue_location_code,
+				new StringExtractor<CJayImage>() {
 					@Override
-					public String getStringValue(ContainerSession item,
+					public String getStringValue(CJayImage item,
 							int position) {
-						return item.getFullContainerId();
+						return item.getIssue().getLocationCode();
 					}
 				});
-		feedsDict.addStringField(R.id.feed_item_container_owner,
-				new StringExtractor<ContainerSession>() {
+		feedsDict.addStringField(R.id.issue_damage_code,
+				new StringExtractor<CJayImage>() {
 					@Override
-					public String getStringValue(ContainerSession item,
+					public String getStringValue(CJayImage item,
 							int position) {
-						return item.getOperatorName();
+						return item.getIssue().getDamageCode().getCode();
 					}
 				});
-		feedsDict.addStringField(R.id.feed_item_container_import_date,
-				new StringExtractor<ContainerSession>() {
+		feedsDict.addStringField(R.id.issue_repair_code,
+				new StringExtractor<CJayImage>() {
 					@Override
-					public String getStringValue(ContainerSession item,
+					public String getStringValue(CJayImage item,
 							int position) {
-						return java.text.DateFormat.getDateTimeInstance()
-								.format(Calendar.getInstance().getTime());
+						return item.getIssue().getRepairCode().getCode();
 					}
 				});
-		feedsDict.addDynamicImageField(R.id.feed_item_picture,
-				new StringExtractor<ContainerSession>() {
+		feedsDict.addStringField(R.id.issue_component_code,
+				new StringExtractor<CJayImage>() {
 					@Override
-					public String getStringValue(ContainerSession item,
+					public String getStringValue(CJayImage item,
 							int position) {
-						return item.getFullContainerId();
+//						return item.getIssue().getDamageCode().getCode();
+						// TODO
+						return "";
 					}
-				}, new DynamicImageLoader() {
+				});
+		feedsDict.addStringField(R.id.issue_quantity,
+				new StringExtractor<CJayImage>() {
 					@Override
-					public void loadImage(String stringColor, ImageView view) {
-						view.setImageResource(R.drawable.ic_logo);
+					public String getStringValue(CJayImage item,
+							int position) {
+						return String.valueOf(item.getIssue().getQuantity());
 					}
-				}).onClick(new ItemClickListener<ContainerSession>() {
-			@Override
-			public void onClick(ContainerSession item, int position, View view) {
-
-			}
-		});
-		FunDapter<ContainerSession> adapter = new FunDapter<ContainerSession>(
-				this, containers, R.layout.list_item_damage, feedsDict);
+				});
+		feedsDict.addStringField(R.id.issue_dimension,
+				new StringExtractor<CJayImage>() {
+					@Override
+					public String getStringValue(CJayImage item,
+							int position) {
+						return new StringBuilder()
+							.append(getResources().getString(R.string.label_issue_length))
+							.append(item.getIssue().getLength())
+							.append(getResources().getString(R.string.label_issue_height))
+							.append(item.getIssue().getHeight())							
+							.toString();
+					}
+				});
+//		feedsDict.addDynamicImageField(R.id.feed_item_picture,
+//				new StringExtractor<ContainerSession>() {
+//					@Override
+//					public String getStringValue(ContainerSession item,
+//							int position) {
+//						return item.getFullContainerId();
+//					}
+//				}, new DynamicImageLoader() {
+//					@Override
+//					public void loadImage(String stringColor, ImageView view) {
+//						view.setImageResource(R.drawable.ic_logo);
+//					}
+//				}).onClick(new ItemClickListener<ContainerSession>() {
+//			@Override
+//			public void onClick(ContainerSession item, int position, View view) {
+//
+//			}
+//		});
+		FunDapter<CJayImage> adapter = new FunDapter<CJayImage>(
+				this, containers, R.layout.list_item_issue, feedsDict);
 		mFeedListView.setAdapter(adapter);
 	}
 }

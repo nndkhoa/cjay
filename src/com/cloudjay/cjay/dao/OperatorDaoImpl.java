@@ -48,4 +48,14 @@ public class OperatorDaoImpl extends BaseDaoImpl<Operator, Integer> implements
 
 		return false;
 	}
+	
+	public Operator findOperator(String operatorCode) throws SQLException {
+		List<Operator> listOperators = queryForEq(Operator.CODE, operatorCode);
+		
+		if (listOperators.isEmpty()) {
+			return null;
+		} else {
+			return listOperators.get(0);
+		}
+	}
 }
