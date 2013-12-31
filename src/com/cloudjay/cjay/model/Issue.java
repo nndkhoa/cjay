@@ -67,12 +67,28 @@ public class Issue implements Parcelable {
 		return this.repairCode;
 	}
 	
+	public String getRepairCodeString() {
+		if (this.repairCode != null) {
+			return this.repairCode.getCode();
+		} else {
+			return null;
+		}
+	}
+	
 	public void setDamageCode(DamageCode damageCode) {
 		this.damageCode = damageCode;
 	}
 	
 	public DamageCode getDamageCode() {
 		return this.damageCode;
+	}
+	
+	public String getDamageCodeString() {
+		if (this.damageCode != null) {
+			return this.damageCode.getCode();
+		} else {
+			return null;
+		}
 	}
 	
 	public void setLength(double length) {

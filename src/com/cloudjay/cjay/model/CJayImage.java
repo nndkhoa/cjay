@@ -17,14 +17,19 @@ public class CJayImage implements Parcelable {
 	public static final int STATE_UPLOAD_IN_PROGRESS = 2;
 	public static final int STATE_UPLOAD_WAITING = 1;
 	public static final int STATE_NONE = 0;
+	
+	public static final int TYPE_IMPORT = 0;
+	public static final int TYPE_EXPORT = 1;
+	public static final int TYPE_REPORT = 2;
+	public static final int TYPE_REPAIRED = 3;
 
-	private static final String ID = "id";
-	private static final String IMAGE_NAME = "image_name";
-	private static final String TYPE = "type";
-	private static final String TIME_POSTED = "time_posted";
-	private static final String FIELD_STATE = "state";
-	private static final String FIELD_URI = "uri";
-	private static final String FIELD_UUID = "uuid";
+	public static final String ID = "id";
+	public static final String FIELD_IMAGE_NAME = "image_name";
+	public static final String FIELD_TYPE = "type";
+	public static final String FIELD_TIME_POSTED = "time_posted";
+	public static final String FIELD_STATE = "state";
+	public static final String FIELD_URI = "uri";
+	public static final String FIELD_UUID = "uuid";
 
 	public CJayImage() {
 
@@ -40,10 +45,10 @@ public class CJayImage implements Parcelable {
 	@DatabaseField(columnName = ID)
 	int id;
 
-	@DatabaseField(columnName = IMAGE_NAME)
+	@DatabaseField(columnName = FIELD_IMAGE_NAME)
 	String image_name;
 
-	@DatabaseField(columnName = TIME_POSTED)
+	@DatabaseField(columnName = FIELD_TIME_POSTED)
 	String time_posted;
 
 	@DatabaseField(columnName = FIELD_UUID)
@@ -52,7 +57,7 @@ public class CJayImage implements Parcelable {
 	/**
 	 * TYPE include: in | out | issue | repaired
 	 */
-	@DatabaseField(columnName = TYPE)
+	@DatabaseField(columnName = FIELD_TYPE)
 	int type;
 
 	@DatabaseField(columnName = FIELD_STATE)
@@ -75,6 +80,34 @@ public class CJayImage implements Parcelable {
 
 	public void setIssue(Issue issue) {
 		this.issue = issue;
+	}
+	
+	public String getIssueLocationCode() {
+		if (issue != null) {
+			return issue.getLocationCode();
+		}
+		return null;
+	}
+	
+	public String getIssueRepairCode() {
+		if (issue != null) {
+			return issue.getRepairCodeString();
+		} 
+		return null;
+	}
+	
+	public String getIssueDamageCode() {
+		if (issue != null) {
+			return issue.getDamageCodeString();
+		} 
+		return null;
+	}
+	
+	public String getIssueQuantity() {
+		if (issue != null) {
+			return String.valueOf(issue.getQuantity());
+		}
+		return null;
 	}
 
 	public Uri getOriginalPhotoUri() {

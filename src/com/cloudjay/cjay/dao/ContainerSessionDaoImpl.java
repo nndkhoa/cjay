@@ -8,9 +8,6 @@ import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.util.Logger;
 import com.j256.ormlite.dao.BaseDaoImpl;
-import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.stmt.PreparedQuery;
-import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 
 public class ContainerSessionDaoImpl extends
@@ -138,12 +135,10 @@ public class ContainerSessionDaoImpl extends
 		List<ContainerSession> containerSessions = this.query(this
 				.queryBuilder()
 				.where()
-				.eq(ContainerSession.FIELD_LOCAL, true)
-				.and()
-				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
-				.and()
-				.ne(ContainerSession.FIELD_STATE,
-						ContainerSession.STATE_UPLOAD_COMPLETED).prepare());
+				.eq(ContainerSession.FIELD_LOCAL, true).and()
+				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false).and()
+				.ne(ContainerSession.FIELD_STATE, ContainerSession.STATE_UPLOAD_COMPLETED)
+				.prepare());
 
 		return containerSessions;
 	}

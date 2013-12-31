@@ -27,6 +27,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerCreatedEvent;
 import com.cloudjay.cjay.events.ContainerEditedEvent;
+import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.TmpContainerSession;
@@ -123,7 +124,7 @@ public class GateExportListFragment extends SherlockFragment {
 		Intent intent = new Intent(getActivity(), CameraActivity_.class);
 		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
 				tmpContainerSession);
-		intent.putExtra("type", 1); // out
+		intent.putExtra("type", CJayImage.TYPE_EXPORT); // out
 		startActivity(intent);
 	}
 
@@ -293,7 +294,7 @@ public class GateExportListFragment extends SherlockFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getFullContainerId();
+						return item.getContainerId();
 					}
 				}, new DynamicImageLoader() {
 					@Override

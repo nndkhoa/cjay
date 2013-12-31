@@ -9,7 +9,7 @@ import com.j256.ormlite.support.ConnectionSource;
 
 public class CJayImageDaoImpl extends BaseDaoImpl<CJayImage, String> implements
 		ICJayImageDao {
-
+	
 	public CJayImageDaoImpl(ConnectionSource connectionSource)
 			throws SQLException {
 		super(connectionSource, CJayImage.class);

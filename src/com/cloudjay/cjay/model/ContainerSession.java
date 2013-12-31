@@ -261,6 +261,10 @@ public class ContainerSession implements Parcelable {
 	public Collection<Issue> getIssues() {
 		return issues;
 	}
+	
+	public String getIssueCount() {
+		return String.valueOf(getIssues().size());
+	}
 
 	public void setCJayImages(Collection<CJayImage> cJayImages) {
 		this.cJayImages = cJayImages;

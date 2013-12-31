@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.UserDaoImpl;
@@ -16,7 +15,6 @@ import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
-import com.google.gson.Gson;
 
 /**
  * 

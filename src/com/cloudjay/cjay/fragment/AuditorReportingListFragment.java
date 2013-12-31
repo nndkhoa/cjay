@@ -1,11 +1,12 @@
 package com.cloudjay.cjay.fragment;
 
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Locale;
 
 import android.content.Intent;
-import android.os.Bundle;
+import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -22,6 +23,7 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
+import com.cloudjay.cjay.AuditorContainerActivity_;
 import com.cloudjay.cjay.CameraActivity_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
@@ -39,6 +41,7 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Session;
 import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Click;
@@ -54,8 +57,6 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.fragment_auditor_reporting)
 @OptionsMenu(R.menu.menu_auditor_reporting)
 public class AuditorReportingListFragment extends SherlockFragment {
-
-//	private final static String LOG_TAG = "AuditorReportingListFragment";
 
 	private ArrayList<Operator> mOperators;
 	private ArrayList<ContainerSession> mFeeds;
@@ -85,7 +86,7 @@ public class AuditorReportingListFragment extends SherlockFragment {
 			}
 		});
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListLocalContainerSessions(getActivity());
+				.getListContainerSessions(getActivity());
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
 				.getListOperators(getActivity());
 		configureControls(mFeeds);
@@ -119,7 +120,9 @@ public class AuditorReportingListFragment extends SherlockFragment {
 		mSelectedContainerSession = null;
 		getActivity().supportInvalidateOptionsMenu();
 		
-		
+		Intent intent = new Intent(getActivity(), AuditorContainerActivity_.class);
+		intent.putExtra(AuditorContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA, mFeedsAdapter.getItem(position).getUuid());
+		startActivity(intent);
 	}
 
 	@ItemLongClick(R.id.container_list)
@@ -139,18 +142,6 @@ public class AuditorReportingListFragment extends SherlockFragment {
 		boolean isDisplayed = !(mSelectedContainerSession == null);
 		menu.findItem(R.id.menu_edit_container).setVisible(isDisplayed);
 		menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
-	}
-	
-	@Override
-	public void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		EventBus.getDefault().register(this);
-		super.onCreate(savedInstanceState);
 	}
 	
 	public void showContainerDetailDialog(String containerId,
@@ -288,56 +279,57 @@ public class AuditorReportingListFragment extends SherlockFragment {
 		feedsDict.addStringField(R.id.feed_item_container_id,
 				new StringExtractor<ContainerSession>() {
 					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
+					public String getStringValue(ContainerSession item, int position) {
 						return item.getContainerId();
 					}
 				});
 		feedsDict.addStringField(R.id.feed_item_container_owner,
 				new StringExtractor<ContainerSession>() {
 					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
+					public String getStringValue(ContainerSession item, int position) {
 						return item.getOperatorName();
 					}
 				});
 		feedsDict.addStringField(R.id.feed_item_container_import_date,
 				new StringExtractor<ContainerSession>() {
 					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
+					public String getStringValue(ContainerSession item, int position) {
 						return item.getCheckInTime();
 					}
 				});
 		feedsDict.addStringField(R.id.feed_item_container_issues,
 				new StringExtractor<ContainerSession>() {
 					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return String.valueOf(item.getIssues().size());
+					public String getStringValue(ContainerSession item, int position) {
+						return item.getIssueCount();
 					}
 				});
 		feedsDict.addDynamicImageField(R.id.feed_item_picture,
 				new StringExtractor<ContainerSession>() {
 					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return item.getFullContainerId();
+					public String getStringValue(ContainerSession item, int position) {
+						return item.getOriginalPhotoUri().toString();
 					}
 				}, new DynamicImageLoader() {
 					@Override
-					public void loadImage(String stringColor, ImageView view) {
-						view.setImageResource(R.drawable.ic_app);
+					public void loadImage(String url, ImageView view) {
+						if (url != null) {
+							try {
+								view.setImageBitmap(Utils.decodeImage(getActivity().getContentResolver(), Uri.parse(url), Utils.MINI_THUMBNAIL_SIZE));
+							} catch (FileNotFoundException e) {
+								e.printStackTrace();
+							}
+						}
 					}
 				});
 		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(),
-				containers, R.layout.list_item_container, feedsDict);
+				containers, R.layout.list_item_audit_container, feedsDict);
 		mFeedListView.setAdapter(mFeedsAdapter);
 	}
 
 	public void refresh() {
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListLocalContainerSessions(getActivity());
+				.getListContainerSessions(getActivity());
 		mFeedsAdapter.updateData(mFeeds);
 	}
 }

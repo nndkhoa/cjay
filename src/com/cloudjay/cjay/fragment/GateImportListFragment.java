@@ -24,6 +24,7 @@ import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.events.ContainerCreatedEvent;
 import com.cloudjay.cjay.events.ContainerSessionAddedEvent;
 import com.cloudjay.cjay.events.ContainerEditedEvent;
+import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.DatabaseHelper;
@@ -83,7 +84,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		String uuid = mSelectedContainerSession.getUuid();
 		Intent intent = new Intent(getActivity(), CameraActivity_.class);
 		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA, uuid);
-		intent.putExtra("type", 0); // in
+		intent.putExtra("type", CJayImage.TYPE_IMPORT); // in
 		startActivity(intent);
 	}
 
@@ -325,7 +326,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getFullContainerId();
+						return item.getContainerId();
 					}
 				}, new DynamicImageLoader() {
 					@Override

@@ -26,4 +26,9 @@
     <string name="issue_dimension">Kích thước:</string>
     <string name="issue_quantity">Số lượng:</string>
     
+    <string name="dialog_report_message">Lỗi này đã được báo cáo?</string>
+    <string name="dialog_report_title">Báo cáo lỗi</string>
+    <string name="dialog_report_yes">Có</string>
+    <string name="dialog_report_no">Không</string>
+    
 </resources>
