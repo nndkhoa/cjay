@@ -3,21 +3,22 @@
 
     <item
         android:id="@+id/menu_camera"
-        android:icon="@drawable/icon_menu_camera2x"
+        android:icon="@drawable/icon_menu_camera"
         android:showAsAction="always"
         android:title="@string/menu_camera_title"/>
     <item
         android:id="@+id/menu_edit_container"
-        android:icon="@drawable/icon_menu_edit2x"
+        android:icon="@drawable/icon_menu_edit"
         android:showAsAction="always"
         android:title="@string/menu_edit_container_title"/>
     <item
         android:id="@+id/menu_upload"
-        android:icon="@drawable/icon_menu_upload2x"
+        android:icon="@drawable/ic_action_upload"
         android:showAsAction="always"
         android:title="@string/menu_upload_title"/>
-	<item
-	    android:id="@+id/menu_logout"
-		android:showAsAction="never"
-	    android:title="@string/menu_logout_title" />
+    <item
+        android:id="@+id/menu_logout"
+        android:showAsAction="never"
+        android:title="@string/menu_logout_title"/>
+
 </menu>
