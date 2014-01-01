@@ -376,8 +376,10 @@ public class GateImportListFragment extends SherlockDialogFragment {
 						}
 					}
 				});
+
 		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(),
 				containers, R.layout.list_item_container, feedsDict);
+
 		mFeedListView.setAdapter(mFeedsAdapter);
 	}
 
@@ -397,4 +399,14 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		mFeedsAdapter.updateData(mFeeds);
 	}
 
+	@Override
+	public void onResume() {
+		if (mFeedsAdapter != null) {
+			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+					.getListLocalContainerSessions(getActivity());
+			mFeedsAdapter.updateData(mFeeds);
+		}
+
+		super.onResume();
+	}
 }

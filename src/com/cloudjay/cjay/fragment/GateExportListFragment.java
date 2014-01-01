@@ -340,4 +340,16 @@ public class GateExportListFragment extends SherlockFragment {
 				.getListLocalContainerSessions(getActivity());
 		mSearchEditText.setText(""); // this will refresh the list
 	}
+
+	@Override
+	public void onResume() {
+
+		if (mFeedsAdapter != null) {
+			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+					.getListLocalContainerSessions(getActivity());
+			mFeedsAdapter.updateData(mFeeds);
+		}
+
+		super.onResume();
+	}
 }

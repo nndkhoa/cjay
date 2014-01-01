@@ -39,6 +39,7 @@ import android.widget.Toast;
 import com.aerilys.helpers.android.UIHelper;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.events.ContainerEditedEvent;
 import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -55,6 +56,8 @@ import com.googlecode.androidannotations.annotations.Extra;
 import com.googlecode.androidannotations.annotations.NoTitle;
 import com.googlecode.androidannotations.annotations.SystemService;
 import com.googlecode.androidannotations.annotations.ViewById;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Input:

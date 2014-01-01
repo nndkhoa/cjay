@@ -1,5 +1,4 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:layout_centerVertical="true"
@@ -7,73 +6,83 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin" >
 
-	<LinearLayout
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:orientation="horizontal">
-    	<TextView
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:gravity="center_vertical"
-			android:text="@string/dialog_container_id"
-			android:paddingBottom="12dp"
-			android:paddingLeft="18dp"
-			android:paddingRight="18dp"
-			android:paddingTop="12dp" />
-   	 	<EditText
-			android:id="@+id/dialog_new_container_id"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:imeOptions="actionNext"
-			android:singleLine="true"
-			android:selectAllOnFocus="true"
-			android:hint="@string/dialog_container_id" />
-	</LinearLayout>
-	    
     <LinearLayout
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:orientation="horizontal">
-       	<TextView
-	        android:layout_width="0dp"
-	        android:layout_height="wrap_content"
-        	android:layout_weight="1"
-        	android:gravity="center_vertical"
-	        android:text="@string/dialog_container_owner"
-	        android:paddingBottom="12dp"
-           	android:paddingLeft="18dp"
-           	android:paddingRight="18dp"
-           	android:paddingTop="12dp" />     
-	<!-- 		    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:paddingBottom="12dp"
+            android:paddingLeft="18dp"
+            android:paddingRight="18dp"
+            android:paddingTop="12dp"
+            android:text="@string/dialog_container_id"
+            android:textAllCaps="true" />
+
+        <EditText
+            android:id="@+id/dialog_new_container_id"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/dialog_container_id"
+            android:imeOptions="actionNext"
+            android:selectAllOnFocus="true"
+            android:singleLine="true" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:paddingBottom="12dp"
+            android:paddingLeft="18dp"
+            android:paddingRight="18dp"
+            android:paddingTop="12dp"
+            android:text="@string/dialog_container_owner" />
+        <!--
+         		    <Spinner
 	      android:id="@+id/dialog_new_container_owner"
 	      android:layout_width="0dp"
 	      android:layout_height="fill_parent"
-	      android:layout_weight="1"/>     -->  
-		<EditText
-			android:id="@+id/dialog_new_container_owner"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:hint="@string/dialog_container_owner" /> 
-	 </LinearLayout>
-	 
-	 <LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:orientation="horizontal">
-		<Button
-			android:id="@+id/dialog_new_container_cancel"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:text="@string/dialog_container_cancel" />
-     	<Button
-			android:id="@+id/dialog_new_container_ok"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:text="@string/dialog_container_ok" />
-	</LinearLayout>
- </LinearLayout>
+	      android:layout_weight="1"/>
+        -->
+
+        <EditText
+            android:id="@+id/dialog_new_container_owner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/dialog_container_owner" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/dialog_new_container_cancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/dialog_container_cancel" />
+
+        <Button
+            android:id="@+id/dialog_new_container_ok"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/dialog_container_ok" />
+    </LinearLayout>
+
+</LinearLayout>
