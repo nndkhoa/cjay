@@ -189,9 +189,10 @@ public class AuditorContainerActivity extends CJayActivity {
 						if (item.getIssue() != null) {
 							return new StringBuilder()
 								.append(getResources().getString(R.string.label_issue_length))
-								.append(item.getIssue().getLength())
+								.append(": ").append(item.getIssue().getLength())
+								.append(" - ")
 								.append(getResources().getString(R.string.label_issue_height))
-								.append(item.getIssue().getHeight())							
+								.append(": ").append(item.getIssue().getHeight())							
 								.toString();
 						} else {
 							return null;

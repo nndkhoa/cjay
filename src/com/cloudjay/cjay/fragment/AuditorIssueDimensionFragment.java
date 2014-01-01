@@ -1,11 +1,11 @@
 package com.cloudjay.cjay.fragment;
 
 import android.app.Activity;
-import android.view.View;
-import android.view.View.OnFocusChangeListener;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.Issue;
@@ -14,8 +14,7 @@ import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_issue_dimension)
-public class AuditorDamageDimensionFragment extends SherlockFragment {
-	private double mLength, mHeight;
+public class AuditorIssueDimensionFragment extends AuditorIssueReportFragment  {
 	private AuditorIssueReportListener mCallback;
 	private Issue mIssue;
 	
@@ -24,17 +23,26 @@ public class AuditorDamageDimensionFragment extends SherlockFragment {
 	
 	@AfterViews
 	void afterViews() {
-		mHeightEditText.setOnFocusChangeListener(new OnFocusChangeListener() {
+		mHeightEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (!hasFocus) {
-					handleReportPageCompleted();
+			public boolean onEditorAction(TextView textView, int id,
+					KeyEvent keyEvent) {
+				if (id == EditorInfo.IME_ACTION_DONE) {
+					// move to next tab
+					mCallback.onReportPageCompleted(AuditorIssueReportListener.TAB_ISSUE_DIMENSION);
+					return true;
 				}
+				return false;
 			}
 		});
+		
+		// initialize with issue
+		if (mIssue != null) {
+			mLengthEditText.setText(mIssue.getLength());
+			mHeightEditText.setText(mIssue.getHeight());
+		}
+		
 		mLengthEditText.requestFocus();
-		mLength = 0f;
-		mHeight = 0f;
 	}
 	
     @Override
@@ -47,13 +55,15 @@ public class AuditorDamageDimensionFragment extends SherlockFragment {
         }
     }
 	
+	@Override
 	public void setIssue(Issue issue) {
 		mIssue = issue;
 	}
-    
-	private void handleReportPageCompleted() {
-		// Send code to activity, and move to next tab
-		String[] vals = {String.valueOf(mLength), String.valueOf(mHeight)};
-		mCallback.onReportPageCompleted(AuditorIssueReportListener.TAB_DAMAGE_DIMENSION);
+
+	@Override
+	public void validateAndSaveData() {
+		// save data
+		mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_LENGTH, mLengthEditText.getText().toString());
+		mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_HEIGHT, mHeightEditText.getText().toString());
 	}
 }

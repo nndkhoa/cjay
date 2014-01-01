@@ -9,7 +9,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.Issue;
@@ -18,7 +17,8 @@ import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_issue_location_code)
-public class AuditorDamageLocationFragment extends SherlockFragment implements OnFocusChangeListener, OnClickListener {
+public class AuditorIssueLocationFragment extends AuditorIssueReportFragment 
+		implements OnFocusChangeListener, OnClickListener {
 	private String mLocationCodes[], mCodes[][];
 	private AuditorIssueReportListener mCallback;
 	private Button mCodeButtons[];
@@ -83,6 +83,16 @@ public class AuditorDamageLocationFragment extends SherlockFragment implements O
 		mCurrentStep = -1;
 		mLocationCodes = new String[4];
 		
+		// initialize with issue
+		if (mIssue != null) {
+			if (mIssue.getLocationCode() != null && mIssue.getLocationCode().length() == 4) {
+				for (int i = 0; i < mLocationCodes.length; i++) {
+					mLocationCodes[i] = mIssue.getLocationCode().substring(i, i+1);
+					mCodeEditTexts[i].setText(mLocationCodes[i]);
+				}
+			}
+		}
+		
 		mCode1EditText.requestFocus();
 	}
 	
@@ -111,12 +121,25 @@ public class AuditorDamageLocationFragment extends SherlockFragment implements O
 		String code = (String)btn.getText();
 		if (mFocusedEditText != null && !code.equals("")) {
 			mFocusedEditText.setText(code);
+			mLocationCodes[mCurrentStep] = code;
 			goToNextInput(mCurrentStep, code);
 		}
 	}
 	
+	@Override
 	public void setIssue(Issue issue) {
 		mIssue = issue;
+	}
+
+	@Override
+	public void validateAndSaveData() {
+		// save location code
+		String locationCode = new StringBuilder()
+			.append(mLocationCodes[0]).append(mLocationCodes[1])
+			.append(mLocationCodes[2]).append(mLocationCodes[3]).toString();
+		if (locationCode.length() == 4) {
+			mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_LOCATION_CODE, locationCode);			
+		}	
 	}
 	
 	private void configureControls(int step) {
@@ -143,19 +166,12 @@ public class AuditorDamageLocationFragment extends SherlockFragment implements O
 	}
 	
 	private void goToNextInput(int step, String code) {
-		mLocationCodes[mCurrentStep] = code;
 		if (step < mCodeEditTexts.length - 1) {
 			// move to the next edit text
 			mCodeEditTexts[step + 1].requestFocus();
 		} else if (step == mCodeEditTexts.length - 1) {
 			// move to the next tab
-			String locationCode = new StringBuilder()
-					.append(mLocationCodes[0])
-					.append(mLocationCodes[1])
-					.append(mLocationCodes[2])
-					.append(mLocationCodes[3]).toString();
-			mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_LOCATION_CODE, locationCode);
-			mCallback.onReportPageCompleted(AuditorIssueReportListener.TAB_DAMAGE_LOCATION);
+			mCallback.onReportPageCompleted(AuditorIssueReportListener.TAB_ISSUE_LOCATION);
 		}
 	}
 }
