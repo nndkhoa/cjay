@@ -121,9 +121,24 @@ public class CJayClient implements ICJayClient {
 	 * 
 	 * fetch data based on current user role
 	 * 
-	 * - GATE: no need to GET ContainerSession from Server
+	 * - Giám định cổng:
 	 * 
-	 * - AUDITOR:
+	 * 1. In: Hiển thị list container ở local và chưa được upload
+	 * (upload_confirmation = false).
+	 * 
+	 * 2. Out: Hiện thị list container ở local + server, chưa xuất
+	 * (check_out_time = null), chưa upload.
+	 * 
+	 * - Giám định sửa chữa:
+	 * 
+	 * 1. Chưa sửa chữa: hiển thị các container có các `CJayImage` chưa điền đầy
+	 * đủ thông tin `Issue`
+	 * 
+	 * 2. Đã sửa chữa: hiển thị các container có đầy đủ thông tin về `Issue`
+	 * 
+	 * - Giám định sau sửa chữa:
+	 * 
+	 * 1.
 	 * 
 	 * @param ctx
 	 */
