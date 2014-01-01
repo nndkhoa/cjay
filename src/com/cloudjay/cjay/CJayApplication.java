@@ -100,8 +100,7 @@ public class CJayApplication extends Application {
 
 		case 6: // Cổng
 		default:
-//			intent = new Intent(context, GateHomeActivity_.class);
-			intent = new Intent(context, AuditorHomeActivity_.class);
+			intent = new Intent(context, GateHomeActivity_.class);
 			break;
 		}
 		context.startActivity(intent);
