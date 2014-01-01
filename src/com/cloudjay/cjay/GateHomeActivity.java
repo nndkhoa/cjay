@@ -1,10 +1,14 @@
 package com.cloudjay.cjay;
 
+import java.lang.reflect.Field;
+
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.view.ViewConfiguration;
+
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
@@ -138,4 +142,6 @@ public class GateHomeActivity extends CJayActivity implements
 					containerId, operatorName, mode);
 		}
 	}
+
+
 }

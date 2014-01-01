@@ -27,6 +27,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -137,23 +138,23 @@ public class CameraActivity extends Activity {
 
 		public void surfaceCreated(SurfaceHolder holder) {
 			// no-op -- wait until surfaceChanged()
-			Logger.Log("onSurfaceCreated");
+			Logger.Log(LOG_TAG, "onSurfaceCreated");
 		}
 
 		public void surfaceChanged(SurfaceHolder holder, int format, int width,
 				int height) {
 
-			Logger.Log("onSurfaceChanged");
+			Logger.Log(LOG_TAG, "onSurfaceChanged");
 
 			initPreview(width, height);
 			startPreview();
 
-			Logger.Log("endSurfaceChanged");
+			Logger.Log(LOG_TAG, "endSurfaceChanged");
 		}
 
 		public void surfaceDestroyed(SurfaceHolder holder) {
 			// no-op
-			Logger.Log("onSurfaceDestroyed");
+			Logger.Log(LOG_TAG, "onSurfaceDestroyed");
 
 		}
 	};
@@ -162,7 +163,7 @@ public class CameraActivity extends Activity {
 
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
-			Logger.Log("onPictureTaken");
+			Logger.Log(LOG_TAG, "onPictureTaken");
 
 			savePhoto(data);
 			camera.startPreview();
@@ -187,7 +188,7 @@ public class CameraActivity extends Activity {
 					shootMediaPlayer.start();
 			}
 
-			Logger.Log("onShutter");
+			Logger.Log(LOG_TAG, "onShutter");
 		}
 	};
 
@@ -233,11 +234,11 @@ public class CameraActivity extends Activity {
 	}
 
 	private void initPreview(int width, int height) {
-		Logger.Log("initPreview()");
+		Logger.Log(LOG_TAG, "initPreview()");
 
 		if (camera != null && previewHolder.getSurface() != null) {
 			try {
-				Logger.Log("setPreviewDisplay");
+				Logger.Log(LOG_TAG, "setPreviewDisplay");
 				camera.setPreviewDisplay(previewHolder);
 				// camera.setPreviewCallback(null);
 				// camera.setOneShotPreviewCallback(null);
@@ -251,7 +252,7 @@ public class CameraActivity extends Activity {
 
 			if (!cameraConfigured) {
 
-				Logger.Log("config Camera");
+				Logger.Log(LOG_TAG, "config Camera");
 
 				Camera.Parameters parameters = camera.getParameters();
 
@@ -262,12 +263,13 @@ public class CameraActivity extends Activity {
 				Camera.Size size = determineBestPreviewSize(parameters);
 				Camera.Size pictureSize = determineBestPictureSize(parameters);
 
-				Logger.Log("PreviewSize: " + Integer.toString(size.width) + "/"
-						+ Integer.toString(size.height));
+				Logger.Log(LOG_TAG,
+						"PreviewSize: " + Integer.toString(size.width) + "/"
+								+ Integer.toString(size.height));
 
-				Logger.Log("PictureSize: "
-						+ Integer.toString(pictureSize.width) + "/"
-						+ Integer.toString(pictureSize.height));
+				Logger.Log(LOG_TAG,
+						"PictureSize: " + Integer.toString(pictureSize.width)
+								+ "/" + Integer.toString(pictureSize.height));
 
 				try {
 					if (size != null && pictureSize != null) {
@@ -283,7 +285,7 @@ public class CameraActivity extends Activity {
 								.getSupportedFocusModes();
 
 						for (String string : modes) {
-							Logger.Log(string);
+							Logger.Log(LOG_TAG, string);
 						}
 
 						// parameters
@@ -300,10 +302,10 @@ public class CameraActivity extends Activity {
 	}
 
 	private void startPreview() {
-		Logger.Log("startPreview");
+		Logger.Log(LOG_TAG, "startPreview");
 
 		if (cameraConfigured && camera != null) {
-			Logger.Log("cameraConfigured and camera != null");
+			Logger.Log(LOG_TAG, "cameraConfigured and camera != null");
 
 			camera.startPreview();
 			inPreview = true;
@@ -348,6 +350,12 @@ public class CameraActivity extends Activity {
 		return null;
 	}
 
+	/**
+	 * save byte array to Bitmap
+	 * 
+	 * @param data
+	 * @return
+	 */
 	Bitmap saveToBitmap(byte[] data) {
 
 		BitmapFactory.Options options = new BitmapFactory.Options();
@@ -359,9 +367,11 @@ public class CameraActivity extends Activity {
 				Bitmap bm = BitmapFactory.decodeByteArray(data, 0,
 						(data != null) ? data.length : 0);
 
-				Logger.Log("Captured bitmap size: "
-						+ Integer.toString(bm.getWidth()) + "/"
-						+ Integer.toString(bm.getHeight()));
+				Logger.Log(
+						LOG_TAG,
+						"Captured bitmap size: "
+								+ Integer.toString(bm.getWidth()) + "/"
+								+ Integer.toString(bm.getHeight()));
 
 				Matrix mtx = new Matrix();
 				mtx.postRotate(90);
@@ -391,9 +401,10 @@ public class CameraActivity extends Activity {
 
 	void saveBitmap(Bitmap bitmap, File filename) {
 
-		Logger.Log("===== On SaveBitmap =====");
-		Logger.Log("Width/Height: " + Integer.toString(bitmap.getWidth()) + "/"
-				+ Integer.toString(bitmap.getHeight()));
+		Logger.Log(LOG_TAG, "===== On SaveBitmap =====");
+		Logger.Log(LOG_TAG,
+				"Width/Height: " + Integer.toString(bitmap.getWidth()) + "/"
+						+ Integer.toString(bitmap.getHeight()));
 
 		try {
 			FileOutputStream out = new FileOutputStream(filename);
@@ -401,7 +412,7 @@ public class CameraActivity extends Activity {
 			out.flush();
 			out.close();
 
-			Logger.Log("Path: " + filename.getAbsolutePath());
+			Logger.Log(LOG_TAG, "Path: " + filename.getAbsolutePath());
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -419,12 +430,21 @@ public class CameraActivity extends Activity {
 
 		String imageType;
 		switch (type) {
-		case 0:
+		case CJayImage.TYPE_IMPORT:
 			imageType = "in";
 			break;
-		case 1:
-		default:
+
+		case CJayImage.TYPE_EXPORT:
 			imageType = "out";
+			break;
+
+		case CJayImage.TYPE_REPORT:
+			imageType = "report";
+			break;
+
+		case CJayImage.TYPE_REPAIRED:
+		default:
+			imageType = "repair";
 			break;
 		}
 
@@ -464,7 +484,8 @@ public class CameraActivity extends Activity {
 		uploadItem.setImageName(image_name);
 		uploadItem.setContainerSession(containerSession);
 
-		if (containerSession.getImageIdPath() == "") {
+		if (TextUtils.isEmpty(containerSession.getImageIdPath())) {
+			Logger.Log(LOG_TAG, "image_id_path: " + uri);
 			containerSession.setImageIdPath(uri);
 		}
 
@@ -503,7 +524,7 @@ public class CameraActivity extends Activity {
 
 	@Override
 	protected void onResume() {
-		Logger.Log("onResume()");
+		Logger.Log(LOG_TAG, "onResume()");
 		super.onResume();
 		openCamera();
 		setContentView(R.layout.activity_camera);
@@ -517,7 +538,7 @@ public class CameraActivity extends Activity {
 
 				Camera.getCameraInfo(i, info);
 				if (info.facing == cameraMode) {
-					Logger.Log("inside onResume: camera != null");
+					Logger.Log(LOG_TAG, "inside onResume: camera != null");
 
 					camera = Camera.open(i);
 					setCameraDisplayOrientation(this, cameraMode, camera);
@@ -528,7 +549,7 @@ public class CameraActivity extends Activity {
 
 		if (camera == null) {
 
-			Logger.Log("inside onResume: camera == null");
+			Logger.Log(LOG_TAG, "inside onResume: camera == null");
 			camera = Camera.open(cameraMode);
 		}
 
@@ -538,10 +559,10 @@ public class CameraActivity extends Activity {
 	void releaseCamera() {
 		if (camera != null) {
 
-			Logger.Log("Release camera ... ");
+			Logger.Log(LOG_TAG, "Release camera ... ");
 
 			if (inPreview) {
-				Logger.Log("Stop Preview ... ");
+				Logger.Log(LOG_TAG, "Stop Preview ... ");
 				camera.stopPreview();
 				// preview.getHolder().removeCallback(null);
 			}
@@ -554,7 +575,7 @@ public class CameraActivity extends Activity {
 			inPreview = false;
 			cameraConfigured = false;
 
-			Logger.Log("Release camera complete");
+			Logger.Log(LOG_TAG, "Release camera complete");
 		}
 	}
 
@@ -590,7 +611,7 @@ public class CameraActivity extends Activity {
 	@Click(R.id.btn_switch_camera)
 	void switchCameraButtonClicked() {
 
-		Logger.Log("switchCameraButtonClicked()");
+		Logger.Log(LOG_TAG, "switchCameraButtonClicked()");
 		if (inPreview && camera != null) {
 			if (Camera.getNumberOfCameras() > 1) {
 
@@ -601,10 +622,10 @@ public class CameraActivity extends Activity {
 
 				if (cameraMode == CameraInfo.CAMERA_FACING_BACK) {
 					cameraMode = CameraInfo.CAMERA_FACING_FRONT;
-					Logger.Log("CameraInfo.CAMERA_FACING_FRONT");
+					Logger.Log(LOG_TAG, "CameraInfo.CAMERA_FACING_FRONT");
 				} else {
 					cameraMode = CameraInfo.CAMERA_FACING_BACK;
-					Logger.Log("CameraInfo.CAMERA_FACING_BACK");
+					Logger.Log(LOG_TAG, "CameraInfo.CAMERA_FACING_BACK");
 				}
 
 				camera = Camera.open(cameraMode);
@@ -627,7 +648,7 @@ public class CameraActivity extends Activity {
 	@Click(R.id.btn_toggle_flash)
 	void toggleFlashButtonClicked() {
 
-		Logger.Log("toggleFlashButtonClicked()");
+		Logger.Log(LOG_TAG, "toggleFlashButtonClicked()");
 
 		if (inPreview && camera != null) {
 			Parameters params = camera.getParameters();
@@ -656,20 +677,20 @@ public class CameraActivity extends Activity {
 			camera.setParameters(params);
 			flashMode = params.getFlashMode();
 		} else {
-			Logger.Log("Camera does not open");
+			Logger.Log(LOG_TAG, "Camera does not open");
 		}
 	}
 
 	@Click(R.id.btn_capture)
 	void captureButtonClicked() {
-		Logger.Log("captureButtonClicked()");
+		Logger.Log(LOG_TAG, "captureButtonClicked()");
 		takePicture();
 	}
 
 	@Background
 	void takePicture() {
 		if (inPreview) {
-			Logger.Log("Prepare to take picture");
+			Logger.Log(LOG_TAG, "Prepare to take picture");
 
 			camera.takePicture(shutterCallback, null, photoCallback);
 			inPreview = false;
@@ -679,7 +700,7 @@ public class CameraActivity extends Activity {
 	PictureCallback rawCallback = new PictureCallback() {
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
-			Logger.Log("rawCallback");
+			Logger.Log(LOG_TAG, "rawCallback");
 		}
 	};
 

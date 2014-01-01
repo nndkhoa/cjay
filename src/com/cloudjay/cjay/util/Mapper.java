@@ -35,8 +35,7 @@ public class Mapper {
 		tmpContainerSession.setOperatorCode(containerSession.getOperatorName());
 		tmpContainerSession.setDepotCode(containerSession.getContainer()
 				.getDepot().getDepotCode());
-		tmpContainerSession.setContainerId(containerSession
-				.getContainerId());
+		tmpContainerSession.setContainerId(containerSession.getContainerId());
 		tmpContainerSession
 				.setCheckInTime(containerSession.getRawCheckInTime());
 		tmpContainerSession.setCheckOutTime(containerSession
@@ -155,7 +154,7 @@ public class Mapper {
 			if (null != gateReportImages) {
 				for (GateReportImage gateReportImage : gateReportImages) {
 
-					Logger.Log(Integer.toString(gateReportImage.getId()));
+					// Logger.Log(Integer.toString(gateReportImage.getId()));
 
 					CJayImage image = new CJayImage(gateReportImage.getId(),
 							gateReportImage.getType(),

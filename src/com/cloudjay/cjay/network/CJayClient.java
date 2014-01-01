@@ -326,7 +326,8 @@ public class CJayClient implements ICJayClient {
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 		String response = requestWrapper.sendGet(
 				CJayConstant.LIST_CONTAINER_SESSIONS, headers);
-		
+
+		Logger.Log(LOG_TAG, "getContainerSessions(Context ctx)");
 		Logger.Log(LOG_TAG, response);
 
 		Gson gson = new GsonBuilder().setDateFormat(
@@ -373,6 +374,9 @@ public class CJayClient implements ICJayClient {
 
 	@Override
 	public List<ContainerSession> getContainerSessions(Context ctx, Date date) {
+
+		Logger.Log(LOG_TAG, "getContainerSessions(Context ctx, Date date)");
+
 		List<ContainerSession> items = new ArrayList<ContainerSession>();
 		String formatedDate = StringHelper.getTimestamp(
 				CJayConstant.CJAY_DATETIME_FORMAT, date);
@@ -385,14 +389,14 @@ public class CJayClient implements ICJayClient {
 	@Override
 	public List<ContainerSession> getContainerSessions(Context ctx, String date) {
 
+		Logger.Log(LOG_TAG, "getContainerSessions(Context ctx, String date)");
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 
 		String response = requestWrapper.sendGet(String.format(
 				CJayConstant.LIST_CONTAINER_SESSIONS_WITH_DATETIME, date),
 				headers);
 
-		if (TextUtils.isEmpty(response))
-			Logger.Log(LOG_TAG, response);
+		Logger.Log(LOG_TAG, response);
 
 		Gson gson = new GsonBuilder().setDateFormat(
 				CJayConstant.CJAY_DATETIME_FORMAT).create();

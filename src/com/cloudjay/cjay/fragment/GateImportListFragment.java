@@ -1,11 +1,13 @@
 package com.cloudjay.cjay.fragment;
 
+import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.view.ViewConfiguration;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -97,6 +99,11 @@ public class GateImportListFragment extends SherlockDialogFragment {
 				AddContainerDialog.CONTAINER_DIALOG_EDIT);
 	}
 
+	void hideMenuItems() {
+		mSelectedContainerSession = null;
+		getActivity().supportInvalidateOptionsMenu();
+	}
+
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 		try {
@@ -119,6 +126,8 @@ public class GateImportListFragment extends SherlockDialogFragment {
 			EventBus.getDefault().post(
 					new ContainerSessionAddedEvent(mSelectedContainerSession));
 
+			hideMenuItems();
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -140,7 +149,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		mSelectedContainerSession = null;
 		getActivity().supportInvalidateOptionsMenu();
 
-		android.util.Log.d(LOG_TAG, "Show item at position: " + position);
+		Logger.Log(LOG_TAG, "Show item at position: " + position);
 
 		// open photo viewer
 		// Intent intent = new Intent(getActivity(),
@@ -162,6 +171,8 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
+
+		Logger.Log(LOG_TAG, "onPrepareOptionsMenu");
 		super.onPrepareOptionsMenu(menu);
 
 		boolean isDisplayed = !(mSelectedContainerSession == null);
@@ -367,4 +378,5 @@ public class GateImportListFragment extends SherlockDialogFragment {
 				.getListLocalContainerSessions(getActivity());
 		mFeedsAdapter.updateData(mFeeds);
 	}
+
 }

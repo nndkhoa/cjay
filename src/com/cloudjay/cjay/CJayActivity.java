@@ -6,6 +6,7 @@ import android.os.Bundle;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Session;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
@@ -50,8 +51,10 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	@Override
 	protected void onResume() {
 
-		if (null != session)
+		if (null != session) {
+			Logger.Log(LOG_TAG, "DataCenter.reload onResume");
 			DataCenter.reload(getApplicationContext());
+		}
 
 		super.onResume();
 	}

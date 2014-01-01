@@ -14,7 +14,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
         </android.view.SurfaceView>
-        
     </FrameLayout>
 
     <LinearLayout
@@ -35,8 +34,7 @@
             android:paddingLeft="18dp"
             android:paddingRight="18dp"
             android:paddingTop="12dp"
-            android:src="@drawable/ic_back"
-             />
+            android:src="@drawable/ic_back" />
 
         <RelativeLayout
             android:layout_width="0dp"
@@ -72,7 +70,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@color/camera_background_transparent"
+        android:background="@drawable/camera_option_background_selector"
         android:orientation="horizontal" >
 
         <ImageView
@@ -80,22 +78,27 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:background="@drawable/camera_option_background_selector"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:background="@drawable/camera_option_background_selector" />
 
         <ImageButton
             android:id="@+id/btn_capture"
             android:layout_width="0dp"
             android:layout_height="fill_parent"
+            android:layout_weight="1"
             android:background="@drawable/camera_option_background_selector"
-            android:src="@drawable/ic_capture"
-            android:layout_weight="1" />
+            android:src="@drawable/ic_capture" />
 
         <Button
             android:id="@+id/btn_camera_done"
+            style="@style/StyledButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_weight="1"
+            android:background="@drawable/btn_blue"
+            android:minHeight="40dp"
+            android:shadowDx="1"
             android:text="@string/camera_done" />
     </LinearLayout>
 
