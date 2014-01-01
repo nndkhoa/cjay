@@ -8,7 +8,8 @@ import android.widget.Button;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.listener.OnReportPageCompleteListener;
+import com.cloudjay.cjay.listener.AuditorIssueReportListener;
+import com.cloudjay.cjay.model.Issue;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ViewById;
@@ -16,9 +17,10 @@ import com.googlecode.androidannotations.annotations.ViewById;
 @EFragment(R.layout.fragment_issue_repair_code)
 public class AuditorDamageRepairFragment extends SherlockFragment implements OnClickListener {
 	private String mRepairCode;
-	private OnReportPageCompleteListener mCallback;
+	private AuditorIssueReportListener mCallback;
 	private Button mCodeButtons[];
 	private Drawable mDefaultBackground;
+	private Issue mIssue;
 	
 	@ViewById(R.id.btnCode0) Button mCode0Button;
 	@ViewById(R.id.btnCode1) Button mCode1Button;
@@ -47,7 +49,7 @@ public class AuditorDamageRepairFragment extends SherlockFragment implements OnC
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mCallback = (OnReportPageCompleteListener) activity;
+            mCallback = (AuditorIssueReportListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement OnHeadlineSelectedListener");
         }
@@ -65,9 +67,13 @@ public class AuditorDamageRepairFragment extends SherlockFragment implements OnC
 		handleReportPageCompleted();
 	}
 	
+	public void setIssue(Issue issue) {
+		mIssue = issue;
+	}
+	
 	private void handleReportPageCompleted() {
 		// Send code to activity, and move to next tab
 		String[] vals = {mRepairCode};
-		mCallback.onReportPageCompleted(OnReportPageCompleteListener.TAB_DAMAGE_REPAIR, vals);
+		mCallback.onReportPageCompleted(AuditorIssueReportListener.TAB_DAMAGE_REPAIR);
 	}
 }

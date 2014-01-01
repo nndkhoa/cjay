@@ -50,4 +50,13 @@ public class RepairCodeDaoImpl extends BaseDaoImpl<RepairCode, Integer>
 		return false;
 	}
 
+	public RepairCode findRepairCode(String repairCode) throws SQLException {
+		List<RepairCode> listRepairCodes = queryForEq(RepairCode.CODE, repairCode);
+		
+		if (listRepairCodes.isEmpty()) {
+			return null;
+		} else {
+			return listRepairCodes.get(0);
+		}
+	}
 }

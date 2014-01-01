@@ -50,4 +50,14 @@ public class DamageCodeDaoImpl extends BaseDaoImpl<DamageCode, Integer>
 
 		return false;
 	}
+	
+	public DamageCode findDamageCode(String damageCode) throws SQLException {
+		List<DamageCode> listDamageCodes = queryForEq(DamageCode.CODE, damageCode);
+		
+		if (listDamageCodes.isEmpty()) {
+			return null;
+		} else {
+			return listDamageCodes.get(0);
+		}
+	}
 }

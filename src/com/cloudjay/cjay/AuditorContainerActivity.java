@@ -117,13 +117,15 @@ public class AuditorContainerActivity extends CJayActivity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this)
 				.setMessage(R.string.dialog_report_message)
 				.setTitle(R.string.dialog_report_title)
-				.setPositiveButton(R.string.dialog_report_yes, new DialogInterface.OnClickListener() {
+				.setPositiveButton(R.string.dialog_report_no, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
+						// Issue not reported, report issue
 						showIssueReport();
 					}
 				})
-				.setNegativeButton(R.string.dialog_report_no, new DialogInterface.OnClickListener() {
+				.setNegativeButton(R.string.dialog_report_yes, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
+						// The issue already reported, assign this image to that issue
 						showIssueAssigment();
 					}
 				});

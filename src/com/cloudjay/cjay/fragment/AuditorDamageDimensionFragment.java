@@ -1,14 +1,14 @@
 package com.cloudjay.cjay.fragment;
 
 import android.app.Activity;
-import android.view.KeyEvent;
-import android.view.inputmethod.EditorInfo;
+import android.view.View;
+import android.view.View.OnFocusChangeListener;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.listener.OnReportPageCompleteListener;
+import com.cloudjay.cjay.listener.AuditorIssueReportListener;
+import com.cloudjay.cjay.model.Issue;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ViewById;
@@ -16,21 +16,20 @@ import com.googlecode.androidannotations.annotations.ViewById;
 @EFragment(R.layout.fragment_issue_dimension)
 public class AuditorDamageDimensionFragment extends SherlockFragment {
 	private double mLength, mHeight;
-	private OnReportPageCompleteListener mCallback;
+	private AuditorIssueReportListener mCallback;
+	private Issue mIssue;
 	
 	@ViewById(R.id.length) EditText mLengthEditText;
 	@ViewById(R.id.height) EditText mHeightEditText;
 	
 	@AfterViews
 	void afterViews() {
-		mHeightEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+		mHeightEditText.setOnFocusChangeListener(new OnFocusChangeListener() {
 			@Override
-			public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-				if (id == EditorInfo.IME_ACTION_DONE) {
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (!hasFocus) {
 					handleReportPageCompleted();
-					return true;
 				}
-				return false;
 			}
 		});
 		mLengthEditText.requestFocus();
@@ -42,15 +41,19 @@ public class AuditorDamageDimensionFragment extends SherlockFragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mCallback = (OnReportPageCompleteListener) activity;
+            mCallback = (AuditorIssueReportListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement OnReportPageCompleted");
         }
     }
+	
+	public void setIssue(Issue issue) {
+		mIssue = issue;
+	}
     
 	private void handleReportPageCompleted() {
 		// Send code to activity, and move to next tab
 		String[] vals = {String.valueOf(mLength), String.valueOf(mHeight)};
-		mCallback.onReportPageCompleted(OnReportPageCompleteListener.TAB_DAMAGE_DIMENSION, vals);
+		mCallback.onReportPageCompleted(AuditorIssueReportListener.TAB_DAMAGE_DIMENSION);
 	}
 }

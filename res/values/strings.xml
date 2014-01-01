@@ -47,6 +47,7 @@
     <string name="menu_logout_title">Đăng xuất</string>
     <string name="menu_more_title">Thêm</string>
     <string name="menu_clear_uploaded_title"></string>
+    <string name="menu_issue_report_check_title">Báo cáo xong</string>
     
     <string name="notification_uploading_photo">Uploading Photo %1$s</string>
     <string name="notification_uploading_photo_progress">Uploading Photo %1$d %2$d%%</string>

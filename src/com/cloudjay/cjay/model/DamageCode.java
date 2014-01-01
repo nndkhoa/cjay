@@ -20,9 +20,9 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "damage_code", daoClass = DamageCodeDaoImpl.class)
 public class DamageCode implements Parcelable {
 
-	private static final String ID = "id";
-	private static final String NAME = "name";
-	private static final String CODE = "code";
+	public static final String ID = "id";
+	public static final String NAME = "name";
+	public static final String CODE = "code";
 
 	@DatabaseField(id = true, columnName = ID)
 	int id;
