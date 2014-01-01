@@ -6,15 +6,7 @@
         
    	<TextView
         android:id="@+id/container_id_textview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:textColor="@android:color/white"
-        android:background="@color/blue_dark"
-        android:padding="8dp"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        style="@style/ContainerIDTitle" />
    	
    	<ImageButton
         android:id="@+id/btn_add_new"

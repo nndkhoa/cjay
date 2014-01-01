@@ -16,7 +16,6 @@ import android.widget.ImageView;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
@@ -37,7 +36,7 @@ import com.googlecode.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_auditor_issue_report)
 @OptionsMenu(R.menu.menu_audit_issue_report)
-public class AuditorIssueReportActivity extends SherlockFragmentActivity
+public class AuditorIssueReportActivity extends CJayActivity
 		implements OnPageChangeListener, TabListener,
 		AuditorIssueReportListener {
 
@@ -47,8 +46,7 @@ public class AuditorIssueReportActivity extends SherlockFragmentActivity
 	private String[] locations;
 	private CJayImage mCJayImage;
 
-	@Extra(CJAY_IMAGE_EXTRA)
-	String mCJayImageUUID = "";
+	@Extra(CJAY_IMAGE_EXTRA)		String mCJayImageUUID = "";
 	
 	@ViewById(R.id.pager)			ViewPager pager;
 	@ViewById(R.id.item_picture)	ImageView imageView;
@@ -59,7 +57,9 @@ public class AuditorIssueReportActivity extends SherlockFragmentActivity
 			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
 			mCJayImage = cJayImageDaoImpl.findByUuid(mCJayImageUUID);
 			if (mCJayImage.getIssue() == null) {
-				mCJayImage.setIssue(new Issue());
+				Issue issue = new Issue();
+				issue.setContainerSession(mCJayImage.getContainerSession());
+				mCJayImage.setIssue(issue);
 			}
 
 			imageView.setImageBitmap(Utils.decodeImage(getContentResolver(), mCJayImage.getOriginalPhotoUri(), Utils.MINI_THUMBNAIL_SIZE));
@@ -78,7 +78,25 @@ public class AuditorIssueReportActivity extends SherlockFragmentActivity
 	@OptionsItem(R.id.menu_check)
 	void checkMenuItemClicked() {
 		// save data
-		saveData();
+		for (int i = 0; i < mViewPagerAdapter.getCount(); i++) {
+			AuditorIssueReportFragment fragment = (AuditorIssueReportFragment) mViewPagerAdapter.getRegisteredFragment(i);
+			if (fragment != null) {
+				fragment.validateAndSaveData();
+			}
+		}
+		
+		// save db records
+		try {
+			IssueDaoImpl issueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getIssueDaoImpl();
+			issueDaoImpl.createOrUpdate(mCJayImage.getIssue());
+			issueDaoImpl.update(mCJayImage.getIssue());
+			
+			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
+			cJayImageDaoImpl.createOrUpdate(mCJayImage);
+			cJayImageDaoImpl.update(mCJayImage);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		
 		// go back
 		this.onBackPressed();
@@ -129,29 +147,6 @@ public class AuditorIssueReportActivity extends SherlockFragmentActivity
 		}
 	}
 	
-	private void saveData() {
-		// save data
-		for (int i = 0; i < mViewPagerAdapter.getCount(); i++) {
-			AuditorIssueReportFragment fragment = (AuditorIssueReportFragment) mViewPagerAdapter.getRegisteredFragment(i);
-			if (fragment != null) {
-				fragment.validateAndSaveData();
-			}
-		}
-		
-		// save db records
-		try {
-			IssueDaoImpl issueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getIssueDaoImpl();
-			issueDaoImpl.createOrUpdate(mCJayImage.getIssue());
-			issueDaoImpl.update(mCJayImage.getIssue());
-			
-			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
-			cJayImageDaoImpl.createOrUpdate(mCJayImage);
-			cJayImageDaoImpl.update(mCJayImage);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
 	@Override
 	public void onReportPageCompleted(int page) {
 		// go to next tab

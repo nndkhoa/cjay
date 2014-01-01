@@ -7,7 +7,7 @@ import com.cloudjay.cjay.model.Issue;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
-public class IssueDaoImpl extends BaseDaoImpl<Issue, Integer> implements
+public class IssueDaoImpl extends BaseDaoImpl<Issue, String> implements
 		IIssueDao {
 
 	public IssueDaoImpl(ConnectionSource connectionSource) throws SQLException {
