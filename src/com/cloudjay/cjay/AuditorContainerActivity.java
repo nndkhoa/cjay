@@ -46,8 +46,7 @@ public class AuditorContainerActivity extends CJayActivity {
 	@ViewById(R.id.feeds)					ListView mFeedListView;
 	@ViewById(R.id.container_id_textview)	TextView containerIdTextView;
 	
-	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
-	String mContainerSessionUUID = "";
+	@Extra(CJAY_CONTAINER_SESSION_EXTRA)	String mContainerSessionUUID = "";
 
 	@AfterViews
 	void afterViews() {
@@ -71,7 +70,13 @@ public class AuditorContainerActivity extends CJayActivity {
 	@ItemClick(R.id.feeds)
 	void containerItemClicked(int position) {
 		mSelectedCJayImage = mFeedsAdapter.getItem(position);
-		showReportDialog();
+		if (mSelectedCJayImage.getIssue() != null) {
+			// Already has issue, display that issue
+			showIssueReport();
+		} else {
+			// Don't have issue, ask to whether create new issue, or assign an issue
+			showReportDialog();	
+		}
 	}
 	
 	@Click(R.id.btn_add_new)
@@ -140,7 +145,9 @@ public class AuditorContainerActivity extends CJayActivity {
 	}
 	
 	private void showIssueAssigment() {
-		
+		Intent intent = new Intent(this, AuditorIssueAssigmentActivity_.class);
+		intent.putExtra(AuditorIssueAssigmentActivity_.CJAY_IMAGE_EXTRA, mSelectedCJayImage.getUuid());
+		startActivity(intent);
 	}
 
 	private void initImageFeedAdapter(ArrayList<CJayImage> containers) {
@@ -149,54 +156,51 @@ public class AuditorContainerActivity extends CJayActivity {
 				new StringExtractor<CJayImage>() {
 					@Override
 					public String getStringValue(CJayImage item, int position) {
-						return item.getIssueLocationCode();
+						return Utils.stripNull(item.getIssueLocationCode());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_damage_code,
 				new StringExtractor<CJayImage>() {
 					@Override
 					public String getStringValue(CJayImage item, int position) {
-						return item.getIssueDamageCode();
+						return Utils.stripNull(item.getIssueDamageCode());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_repair_code,
 				new StringExtractor<CJayImage>() {
 					@Override
 					public String getStringValue(CJayImage item, int position) {
-						return item.getIssueRepairCode();
+						return Utils.stripNull(item.getIssueRepairCode());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_component_code,
 				new StringExtractor<CJayImage>() {
 					@Override
 					public String getStringValue(CJayImage item, int position) {
-//						return item.getIssue().getDamageCode().getCode();
+//						return Utils.stripNull(item.getIssue().getDamageCode().getCode();
 						// TODO
-						return null;
+						return Utils.stripNull(null);
 					}
 				});
 		feedsDict.addStringField(R.id.issue_quantity,
 				new StringExtractor<CJayImage>() {
 					@Override
 					public String getStringValue(CJayImage item, int position) {
-						return item.getIssueQuantity();
+						return Utils.stripNull(item.getIssueQuantity());
 					}
 				});
-		feedsDict.addStringField(R.id.issue_dimension,
+		feedsDict.addStringField(R.id.issue_length,
 				new StringExtractor<CJayImage>() {
 					@Override
 					public String getStringValue(CJayImage item, int position) {
-						if (item.getIssue() != null) {
-							return new StringBuilder()
-								.append(getResources().getString(R.string.label_issue_length))
-								.append(": ").append(item.getIssue().getLength())
-								.append(" - ")
-								.append(getResources().getString(R.string.label_issue_height))
-								.append(": ").append(item.getIssue().getHeight())							
-								.toString();
-						} else {
-							return null;
-						}
+						return Utils.stripNull(item.getIssueLength());
+					}
+				});
+		feedsDict.addStringField(R.id.issue_height,
+				new StringExtractor<CJayImage>() {
+					@Override
+					public String getStringValue(CJayImage item, int position) {
+						return Utils.stripNull(item.getIssueHeight());
 					}
 				});
 		feedsDict.addDynamicImageField(R.id.issue_picture,

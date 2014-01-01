@@ -279,4 +279,8 @@ public class Utils {
 					"PhotoProcessing should be done on corrent thread!");
 		}
 	}
+	
+	public static String stripNull(String in) {
+		return (in == null || in.equals("") ? " " : in);
+	}
 }

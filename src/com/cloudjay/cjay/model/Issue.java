@@ -3,6 +3,7 @@ package com.cloudjay.cjay.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -14,10 +15,14 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "issue", daoClass = IssueDaoImpl.class)
 public class Issue implements Parcelable {
 
-	private static final String ID = "id";
-
-	@DatabaseField(id = true, columnName = ID)
+	public static final String ID = "id";
+	public static final String FIELD_UUID = "uuid";
+	
+	@DatabaseField(columnName = ID)
 	int id;
+	
+	@DatabaseField(columnName = FIELD_UUID, id = true)
+	String uuid;
 
 	@DatabaseField(canBeNull = true)
 	String locationCode;
@@ -48,7 +53,15 @@ public class Issue implements Parcelable {
 	}
 
 	public Issue() {
-
+		this.setUUID(UUID.randomUUID().toString());
+	}
+	
+	public void setUUID(String uuid) {
+		this.uuid = uuid;
+	}
+	
+	public String getUUID() {
+		return this.uuid;
 	}
 	
 	public void setLocationCode(String locationCode) {

@@ -109,6 +109,20 @@ public class CJayImage implements Parcelable {
 		}
 		return null;
 	}
+	
+	public String getIssueLength() {
+		if (issue != null) {
+			return String.valueOf(issue.getLength());
+		}
+		return null;
+	}
+	
+	public String getIssueHeight() {
+		if (issue != null) {
+			return String.valueOf(issue.getHeight());
+		}
+		return null;
+	}
 
 	public Uri getOriginalPhotoUri() {
 		if (null == mFullUri && !TextUtils.isEmpty(mUri)) {

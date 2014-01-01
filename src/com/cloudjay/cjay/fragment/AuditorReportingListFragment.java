@@ -147,6 +147,15 @@ public class AuditorReportingListFragment extends SherlockFragment {
 		menu.findItem(R.id.menu_edit_container).setVisible(isDisplayed);
 		menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
 	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+				.getListContainerSessions(getActivity());
+		mSearchEditText.setText(""); // this will refresh the list
+	}
 
 	public void showContainerDetailDialog(String containerId,
 			String operatorName, int mode) {
@@ -298,7 +307,7 @@ public class AuditorReportingListFragment extends SherlockFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getContainerId();
+						return Utils.stripNull(item.getContainerId());
 					}
 				});
 		feedsDict.addStringField(R.id.feed_item_container_owner,
@@ -306,7 +315,7 @@ public class AuditorReportingListFragment extends SherlockFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getOperatorName();
+						return Utils.stripNull(item.getOperatorName());
 					}
 				});
 		feedsDict.addStringField(R.id.feed_item_container_import_date,
@@ -314,7 +323,7 @@ public class AuditorReportingListFragment extends SherlockFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getCheckInTime();
+						return Utils.stripNull(item.getCheckInTime());
 					}
 				});
 		feedsDict.addStringField(R.id.feed_item_container_issues,
@@ -322,7 +331,7 @@ public class AuditorReportingListFragment extends SherlockFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getIssueCount();
+						return Utils.stripNull(item.getIssueCount());
 					}
 				});
 		feedsDict.addDynamicImageField(R.id.feed_item_picture,

@@ -9,7 +9,7 @@
         android:id="@+id/issue_picture"
         android:layout_width="0dp"
         android:layout_height="fill_parent"
-        android:layout_weight="2"
+        android:layout_weight="1"
         android:layout_margin="3dp"
         android:padding="3dp"
         android:scaleType="centerCrop"
@@ -19,7 +19,7 @@
         android:id="@+id/feed_item_descriptions"
         android:layout_width="0dp"
         android:layout_height="fill_parent"
-        android:layout_weight="4"
+        android:layout_weight="2"
         android:layout_margin="3dp"
         android:padding="3dp"
         android:orientation="vertical">
@@ -82,10 +82,23 @@
 	        android:layout_weight="1"
 	        android:orientation="horizontal">
 	        <TextView
-		        android:text="@string/issue_dimension"
+		        android:text="@string/issue_length"
+		        android:layout_weight="1.5"
 		        style="@style/ListItemIssueLabel" />
 	        <TextView
-		        android:id="@+id/issue_dimension"
+		        android:id="@+id/issue_length"
+		        android:layout_weight="1.5"
+		        style="@style/ListItemIssueValue" />
+	        <TextView
+		        android:layout_weight="1"
+		        style="@style/ListItemIssueLabel" />
+	        <TextView
+		        android:text="@string/issue_height"
+		        android:layout_weight="1.5"
+		        style="@style/ListItemIssueLabel" />
+	        <TextView
+		        android:id="@+id/issue_height"
+		        android:layout_weight="1.5"
 		        style="@style/ListItemIssueValue" />
         </LinearLayout>
         

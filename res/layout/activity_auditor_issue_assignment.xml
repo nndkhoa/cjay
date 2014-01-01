@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical" >
+        
+   	<TextView
+        android:id="@+id/container_id_textview"
+        style="@style/ContainerIDTitle" />
+   	
+	<ImageView
+        android:id="@+id/item_picture"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:contentDescription="@string/container_id"
+        android:src="@drawable/ic_app"
+        android:scaleType="fitCenter" />
+	
+   	<TextView
+   	    android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        android:text="@string/activity_select_issue_message"
+       	android:padding="8dp"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+   	
+	<ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:src="@color/blue_dark"
+        android:scaleType="fitCenter" />
+   	
+    <ListView
+        android:id="@+id/feeds"
+    	android:layout_width="match_parent"
+    	android:layout_height="0dp"
+        android:layout_weight="1"
+        android:choiceMode="singleChoice"
+        android:listSelector="@android:color/black"
+   	 	android:textAppearance="?android:attr/textAppearanceListItem"
+   	 	android:minHeight="260dp" />
+    
+</LinearLayout>

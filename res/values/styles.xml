@@ -83,14 +83,26 @@
     <style name="ListItemIssueLabel">
 		<item name="android:layout_width">0dp</item>
 		<item name="android:layout_height">match_parent</item>
-		<item name="android:layout_weight">1.5</item>
+		<item name="android:layout_weight">4</item>
 	</style>
     
     <style name="ListItemIssueValue">
 		<item name="android:layout_width">0dp</item>
 		<item name="android:layout_height">fill_parent</item>
-		<item name="android:layout_weight">1</item>
+		<item name="android:layout_weight">3</item>
 		<item name="android:gravity">right</item>
 		<item name="android:textColor">@color/blue_light</item>
 	</style>
+	
+    <style name="ContainerIDTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:background">@color/blue_dark</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>
