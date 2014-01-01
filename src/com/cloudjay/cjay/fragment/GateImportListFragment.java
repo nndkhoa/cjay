@@ -4,9 +4,12 @@ import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import android.R.integer;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.text.TextUtils;
 import android.view.ViewConfiguration;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -46,6 +49,9 @@ import com.googlecode.androidannotations.annotations.ItemLongClick;
 import com.googlecode.androidannotations.annotations.OptionsItem;
 import com.googlecode.androidannotations.annotations.OptionsMenu;
 import com.googlecode.androidannotations.annotations.ViewById;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
 import de.greenrobot.event.EventBus;
 
@@ -64,18 +70,22 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	private ArrayList<ContainerSession> mFeeds;
 	private FunDapter<ContainerSession> mFeedsAdapter;
 
+	private ImageLoader imageLoader;
+
 	private ContainerSession mSelectedContainerSession;
 
 	@AfterViews
 	void afterViews() {
+		imageLoader = ImageLoader.getInstance();
+
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListLocalContainerSessions(getActivity());
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
 				.getListOperators(getActivity());
 
 		initContainerFeedAdapter(mFeeds);
-
 		mSelectedContainerSession = null;
+
 	}
 
 	@OptionsItem(R.id.menu_camera)
@@ -345,17 +355,25 @@ public class GateImportListFragment extends SherlockDialogFragment {
 						return item.getCheckOutTime();
 					}
 				});
+
 		feedsDict.addDynamicImageField(R.id.feed_item_picture,
 				new StringExtractor<ContainerSession>() {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getContainerId();
+						return item.getImageIdPath();
 					}
 				}, new DynamicImageLoader() {
 					@Override
-					public void loadImage(String stringColor, ImageView view) {
-						view.setImageResource(R.drawable.ic_app);
+					public void loadImage(String url, ImageView view) {
+
+						Logger.Log(LOG_TAG, "Album cover url: " + url);
+
+						if (TextUtils.isEmpty(url)) {
+							view.setImageResource(R.drawable.ic_app);
+						} else {
+							imageLoader.displayImage(url, view);
+						}
 					}
 				});
 		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(),

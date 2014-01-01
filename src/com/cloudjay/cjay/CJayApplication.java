@@ -100,7 +100,6 @@ public class CJayApplication extends Application {
 
 		case 6: // Cổng
 		default:
-//			intent = new Intent(context, AuditorHomeActivity_.class);
 			intent = new Intent(context, GateHomeActivity_.class);
 			break;
 		}
@@ -151,7 +150,8 @@ public class CJayApplication extends Application {
 				PendingIntent.FLAG_UPDATE_CURRENT);
 		Calendar current = Calendar.getInstance();
 		AlarmManager alarm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-		// Start every 30 seconds
+
+		// Start every 10 seconds
 		alarm.setRepeating(AlarmManager.RTC_WAKEUP, current.getTimeInMillis(),
 				10 * 1000, pintent);
 	}

@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
@@ -47,6 +48,7 @@ import com.googlecode.androidannotations.annotations.ItemLongClick;
 import com.googlecode.androidannotations.annotations.OptionsItem;
 import com.googlecode.androidannotations.annotations.OptionsMenu;
 import com.googlecode.androidannotations.annotations.ViewById;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import de.greenrobot.event.EventBus;
 
@@ -61,6 +63,7 @@ public class GateExportListFragment extends SherlockFragment {
 	private FunDapter<ContainerSession> mFeedsAdapter;
 
 	private ContainerSession mSelectedContainerSession;
+	private ImageLoader imageLoader;
 
 	@ViewById(R.id.container_list)
 	ListView mFeedListView;
@@ -87,12 +90,15 @@ public class GateExportListFragment extends SherlockFragment {
 					int count) {
 			}
 		});
+
+		imageLoader = ImageLoader.getInstance();
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListLocalContainerSessions(getActivity());
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
 				.getListOperators(getActivity());
 		configureControls(mFeeds);
 		initContainerFeedAdapter(mFeeds);
+
 	}
 
 	@OptionsItem(R.id.menu_upload)
@@ -298,13 +304,21 @@ public class GateExportListFragment extends SherlockFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getContainerId();
+						return item.getImageIdPath();
 					}
 				}, new DynamicImageLoader() {
 					@Override
-					public void loadImage(String stringColor, ImageView view) {
-						view.setImageResource(R.drawable.ic_app);
+					public void loadImage(String url, ImageView view) {
+
+						Logger.Log(LOG_TAG, "Album cover url: " + url);
+
+						if (TextUtils.isEmpty(url)) {
+							view.setImageResource(R.drawable.ic_app);
+						} else {
+							imageLoader.displayImage(url, view);
+						}
 					}
+
 				});
 		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(),
 				containers, R.layout.list_item_container, feedsDict);
