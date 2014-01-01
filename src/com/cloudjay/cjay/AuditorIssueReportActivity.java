@@ -9,6 +9,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.SparseArray;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.actionbarsherlock.app.ActionBar.Tab;
@@ -41,6 +43,7 @@ public class AuditorIssueReportActivity extends SherlockFragmentActivity
 
 	public static final String CJAY_IMAGE_EXTRA = "cjay_image";
 	
+	private AuditorIssueReportTabPageAdaptor mViewPagerAdapter;
 	private String[] locations;
 	private CJayImage mCJayImage;
 
@@ -75,17 +78,7 @@ public class AuditorIssueReportActivity extends SherlockFragmentActivity
 	@OptionsItem(R.id.menu_check)
 	void checkMenuItemClicked() {
 		// save data
-		try {
-			IssueDaoImpl issueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getIssueDaoImpl();
-			issueDaoImpl.createOrUpdate(mCJayImage.getIssue());
-			issueDaoImpl.update(mCJayImage.getIssue());
-			
-			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
-			cJayImageDaoImpl.createOrUpdate(mCJayImage);
-			cJayImageDaoImpl.update(mCJayImage);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		saveData();
 		
 		// go back
 		this.onBackPressed();
@@ -120,9 +113,9 @@ public class AuditorIssueReportActivity extends SherlockFragmentActivity
 	}
 
 	private void configureViewPager() {
-		AuditorDamageReportTabPageAdaptor viewPagerAdapter = new AuditorDamageReportTabPageAdaptor(getSupportFragmentManager(), locations);
+		mViewPagerAdapter = new AuditorIssueReportTabPageAdaptor(getSupportFragmentManager(), locations);
 		pager.setOffscreenPageLimit(5);
-		pager.setAdapter(viewPagerAdapter);
+		pager.setAdapter(mViewPagerAdapter);
 		pager.setOnPageChangeListener(this);
 	}
 
@@ -135,26 +128,32 @@ public class AuditorIssueReportActivity extends SherlockFragmentActivity
 			getSupportActionBar().addTab(tab);
 		}
 	}
+	
+	private void saveData() {
+		// save data
+		for (int i = 0; i < mViewPagerAdapter.getCount(); i++) {
+			AuditorIssueReportFragment fragment = (AuditorIssueReportFragment) mViewPagerAdapter.getRegisteredFragment(i);
+			if (fragment != null) {
+				fragment.validateAndSaveData();
+			}
+		}
+		
+		// save db records
+		try {
+			IssueDaoImpl issueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getIssueDaoImpl();
+			issueDaoImpl.createOrUpdate(mCJayImage.getIssue());
+			issueDaoImpl.update(mCJayImage.getIssue());
+			
+			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
+			cJayImageDaoImpl.createOrUpdate(mCJayImage);
+			cJayImageDaoImpl.update(mCJayImage);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
 	@Override
 	public void onReportPageCompleted(int page) {
-		switch (page) {
-		case AuditorIssueReportListener.TAB_DAMAGE_LOCATION:
-			break;
-			
-		case AuditorIssueReportListener.TAB_DAMAGE_DAMAGE:
-			break;
-			
-		case AuditorIssueReportListener.TAB_DAMAGE_REPAIR:
-			break;
-			
-		case AuditorIssueReportListener.TAB_DAMAGE_DIMENSION:
-			break;
-			
-		case AuditorIssueReportListener.TAB_DAMAGE_QUANTITY:
-			break;
-		}
-		
 		// go to next tab
 		int currPosition = getSupportActionBar().getSelectedNavigationIndex();
 		if (currPosition < getSupportActionBar().getTabCount() - 1) {
@@ -171,15 +170,15 @@ public class AuditorIssueReportActivity extends SherlockFragmentActivity
 			
 			break;
 		case AuditorIssueReportListener.TYPE_LENGTH:
-			mCJayImage.getIssue().setLength(Double.parseDouble(val));
+			mCJayImage.getIssue().setLength(val);
 			
 			break;
 		case AuditorIssueReportListener.TYPE_HEIGHT:
-			mCJayImage.getIssue().setHeight(Double.parseDouble(val));
+			mCJayImage.getIssue().setHeight(val);
 			
 			break;
 		case AuditorIssueReportListener.TYPE_QUANTITY:
-			mCJayImage.getIssue().setQuantity(Integer.parseInt(val));
+			mCJayImage.getIssue().setQuantity(val);
 			
 			break;
 		case AuditorIssueReportListener.TYPE_DAMAGE_CODE:
@@ -204,10 +203,11 @@ public class AuditorIssueReportActivity extends SherlockFragmentActivity
 		
 	}
 
-	public class AuditorDamageReportTabPageAdaptor extends FragmentPagerAdapter {
+	public class AuditorIssueReportTabPageAdaptor extends FragmentPagerAdapter {
 		private String[] locations;
+		SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
 
-		public AuditorDamageReportTabPageAdaptor(FragmentManager fm,
+		public AuditorIssueReportTabPageAdaptor(FragmentManager fm,
 				String[] locations) {
 			super(fm);
 			this.locations = locations;
@@ -218,27 +218,45 @@ public class AuditorIssueReportActivity extends SherlockFragmentActivity
 		}
 
 		public Fragment getItem(int position) {
-			Fragment fragment;
+			AuditorIssueReportFragment fragment;
 			
 			switch (position) {
 			case 0:
-				fragment = new AuditorDamageLocationFragment_();
-				((AuditorDamageLocationFragment_)fragment).setIssue(mCJayImage.getIssue());
+				fragment = new AuditorIssueLocationFragment_();
+				break;
 			case 1:
-				fragment = new AuditorDamageDamageFragment_();
-				((AuditorDamageDamageFragment_)fragment).setIssue(mCJayImage.getIssue());
+				fragment = new AuditorIssueDamageFragment_();
+				break;
 			case 2:
-				fragment = new AuditorDamageRepairFragment_();
-				((AuditorDamageRepairFragment_)fragment).setIssue(mCJayImage.getIssue());
+				fragment = new AuditorIssueRepairFragment_();
+				break;
 			case 3:
-				fragment = new AuditorDamageDimensionFragment_();
-				((AuditorDamageDimensionFragment_)fragment).setIssue(mCJayImage.getIssue());
+				fragment = new AuditorIssueDimensionFragment_();
+				break;
 			default:
-				fragment = new AuditorDamageQuantityFragment_();
-				((AuditorDamageQuantityFragment_)fragment).setIssue(mCJayImage.getIssue());
+				fragment = new AuditorIssueQuantityFragment_();
+				break;
 			}
-			
+
+			fragment.setIssue(mCJayImage.getIssue());
 			return fragment;
 		}
+		
+	    @Override
+	    public Object instantiateItem(ViewGroup container, int position) {
+	        Fragment fragment = (Fragment) super.instantiateItem(container, position);
+	        registeredFragments.put(position, fragment);
+	        return fragment;
+	    }
+
+	    @Override
+	    public void destroyItem(ViewGroup container, int position, Object object) {
+	        registeredFragments.remove(position);
+	        super.destroyItem(container, position, object);
+	    }
+
+	    public Fragment getRegisteredFragment(int position) {
+	        return registeredFragments.get(position);
+	    }
 	}
 }

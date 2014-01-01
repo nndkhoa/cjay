@@ -19,7 +19,7 @@
         android:id="@+id/feed_item_descriptions"
         android:layout_width="0dp"
         android:layout_height="fill_parent"
-        android:layout_weight="3"
+        android:layout_weight="4"
         android:layout_margin="3dp"
         android:padding="3dp"
         android:orientation="vertical">
@@ -30,19 +30,11 @@
 	        android:layout_weight="1"
 	        android:orientation="horizontal">
 	        <TextView
-		        android:layout_width="0dp"
-		        android:layout_height="fill_parent"
-	        	android:layout_weight="1.5"
 		        android:text="@string/issue_location_code"
-		        android:textStyle="bold" />
+		        style="@style/ListItemIssueLabel" />
 	        <TextView
 		        android:id="@+id/issue_location_code"
-		        android:layout_width="0dp"
-		        android:layout_height="fill_parent"
-	        	android:layout_weight="1"
-		        android:gravity="right"
-		        android:textColor="@color/blue_light"
-		        android:textStyle="bold" />
+		        style="@style/ListItemIssueValue" />
         </LinearLayout>
         
         <LinearLayout
@@ -51,19 +43,11 @@
 	        android:layout_weight="1"
 	        android:orientation="horizontal">
 	        <TextView
-		        android:layout_width="0dp"
-		        android:layout_height="fill_parent"
-	        	android:layout_weight="1.5"
 		        android:text="@string/issue_damage_code"
-		        android:textStyle="bold" />
+		        style="@style/ListItemIssueLabel" />
 	        <TextView
 		        android:id="@+id/issue_damage_code"
-		        android:layout_width="0dp"
-		        android:layout_height="fill_parent"
-	        	android:layout_weight="1"
-		        android:gravity="right"
-		        android:textColor="@color/blue_light"
-		        android:textStyle="bold" />
+		        style="@style/ListItemIssueValue" />
         </LinearLayout>
         
         <LinearLayout
@@ -72,19 +56,11 @@
 	        android:layout_weight="1"
 	        android:orientation="horizontal">
 	        <TextView
-		        android:layout_width="0dp"
-		        android:layout_height="fill_parent"
-	        	android:layout_weight="1.5"
 		        android:text="@string/issue_repair_code"
-		        android:textStyle="bold" />
+		        style="@style/ListItemIssueLabel" />
 	        <TextView
 		        android:id="@+id/issue_repair_code"
-		        android:layout_width="0dp"
-		        android:layout_height="fill_parent"
-	        	android:layout_weight="1"
-		        android:gravity="right"
-		        android:textColor="@color/blue_light"
-		        android:textStyle="bold" />
+		        style="@style/ListItemIssueValue" />
         </LinearLayout>
         
         <LinearLayout
@@ -93,19 +69,11 @@
 	        android:layout_weight="1"
 	        android:orientation="horizontal">
 	        <TextView
-		        android:layout_width="0dp"
-		        android:layout_height="fill_parent"
-	        	android:layout_weight="1.5"
 		        android:text="@string/issue_component_code"
-		        android:textStyle="bold" />
+		        style="@style/ListItemIssueLabel" />
 	        <TextView
 		        android:id="@+id/issue_component_code"
-		        android:layout_width="0dp"
-		        android:layout_height="fill_parent"
-	        	android:layout_weight="1"
-		        android:gravity="right"
-		        android:textColor="@color/blue_light"
-		        android:textStyle="bold" />
+		        style="@style/ListItemIssueValue" />
         </LinearLayout>
         
         <LinearLayout
@@ -114,19 +82,11 @@
 	        android:layout_weight="1"
 	        android:orientation="horizontal">
 	        <TextView
-		        android:layout_width="0dp"
-		        android:layout_height="fill_parent"
-	        	android:layout_weight="1.5"
 		        android:text="@string/issue_dimension"
-		        android:textStyle="bold" />
+		        style="@style/ListItemIssueLabel" />
 	        <TextView
 		        android:id="@+id/issue_dimension"
-		        android:layout_width="0dp"
-		        android:layout_height="fill_parent"
-	        	android:layout_weight="1"
-		        android:gravity="right"
-		        android:textColor="@color/blue_light"
-		        android:textStyle="bold" />
+		        style="@style/ListItemIssueValue" />
         </LinearLayout>
         
         <LinearLayout
@@ -135,19 +95,11 @@
 	        android:layout_weight="1"
 	        android:orientation="horizontal">
 	        <TextView
-		        android:layout_width="0dp"
-		        android:layout_height="fill_parent"
-	        	android:layout_weight="1.5"
 		        android:text="@string/issue_quantity"
-		        android:textStyle="bold" />
+		        style="@style/ListItemIssueLabel" />
 	        <TextView
 		        android:id="@+id/issue_quantity"
-		        android:layout_width="0dp"
-		        android:layout_height="fill_parent"
-	        	android:layout_weight="1"
-		        android:gravity="right"
-		        android:textColor="@color/blue_light"
-		        android:textStyle="bold" />
+		        style="@style/ListItemIssueValue" />
         </LinearLayout>
         
     </LinearLayout>

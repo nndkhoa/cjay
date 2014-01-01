@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.Issue;
@@ -15,7 +14,7 @@ import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_issue_repair_code)
-public class AuditorDamageRepairFragment extends SherlockFragment implements OnClickListener {
+public class AuditorIssueRepairFragment extends AuditorIssueReportFragment implements OnClickListener {
 	private String mRepairCode;
 	private AuditorIssueReportListener mCallback;
 	private Button mCodeButtons[];
@@ -43,6 +42,22 @@ public class AuditorDamageRepairFragment extends SherlockFragment implements OnC
 		}
 		mDefaultBackground = mCode0Button.getBackground();
 		mRepairCode = "";
+		
+		// initialize with issue
+		if (mIssue != null) {
+			Button selectedBtn = null;
+			mRepairCode = mIssue.getRepairCodeString();
+			
+			for (Button btn : mCodeButtons) {
+				if (btn.getText().toString().equals(mRepairCode)) {
+					selectedBtn = btn;
+					break;
+				}
+			}
+			if (selectedBtn != null) {
+				highlightButton(selectedBtn);				
+			}
+		}
 	}
 	
     @Override
@@ -58,22 +73,25 @@ public class AuditorDamageRepairFragment extends SherlockFragment implements OnC
 	@Override
 	public void onClick(View v) {
 		Button btnCode = (Button)v;
-		for (int i = 0; i < mCodeButtons.length; i++) {
-			mCodeButtons[i].setBackgroundDrawable(mDefaultBackground);
-		}
-		btnCode.setBackgroundResource(R.drawable.btn_code_selected);
-		
-		mRepairCode = (String)btnCode.getText();		
-		handleReportPageCompleted();
+		highlightButton(btnCode);		
+		mRepairCode = (String)btnCode.getText();
+		mCallback.onReportPageCompleted(AuditorIssueReportListener.TAB_ISSUE_REPAIR);
 	}
 	
+	@Override
 	public void setIssue(Issue issue) {
 		mIssue = issue;
 	}
+
+	@Override
+	public void validateAndSaveData() {
+		mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_REPAIR_CODE, mRepairCode);
+	}
 	
-	private void handleReportPageCompleted() {
-		// Send code to activity, and move to next tab
-		String[] vals = {mRepairCode};
-		mCallback.onReportPageCompleted(AuditorIssueReportListener.TAB_DAMAGE_REPAIR);
+	private void highlightButton(Button btn) {
+		for (int i = 0; i < mCodeButtons.length; i++) {
+			mCodeButtons[i].setBackgroundDrawable(mDefaultBackground);
+		}
+		btn.setBackgroundResource(R.drawable.btn_code_selected);
 	}
 }

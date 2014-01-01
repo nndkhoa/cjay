@@ -29,13 +29,13 @@ public class Issue implements Parcelable {
 	RepairCode repairCode;
 
 	@DatabaseField(canBeNull = true)
-	double length;
+	String length;
 	
 	@DatabaseField(canBeNull = true)
-	double height;
+	String height;
 	
 	@DatabaseField(canBeNull = true)
-	int quantity;
+	String quantity;
 	
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	ContainerSession containerSession;
@@ -91,27 +91,27 @@ public class Issue implements Parcelable {
 		}
 	}
 	
-	public void setLength(double length) {
+	public void setLength(String length) {
 		this.length = length;
 	}
 	
-	public double getLength() {
+	public String getLength() {
 		return this.length;
 	}
 	
-	public void setHeight(double height) {
+	public void setHeight(String height) {
 		this.height = height;
 	}
 	
-	public double getHeight() {
+	public String getHeight() {
 		return this.height;
 	}
 	
-	public void setQuantity(int quantity) {
+	public void setQuantity(String quantity) {
 		this.quantity = quantity;
 	}
 	
-	public int getQuantity() {
+	public String getQuantity() {
 		return this.quantity;
 	}
 	
@@ -143,9 +143,9 @@ public class Issue implements Parcelable {
 		dest.writeString(locationCode);
 		dest.writeParcelable(damageCode, 0);
 		dest.writeParcelable(repairCode, 0);
-		dest.writeDouble(length);
-		dest.writeDouble(height);
-		dest.writeInt(quantity);
+		dest.writeString(length);
+		dest.writeString(height);
+		dest.writeString(quantity);
 		dest.writeParcelable(containerSession, 0);
 		parcelCollection(dest, cJayImages);
 		// dest.writeTypedList((List<CJayImage>) cJayImages);
@@ -156,9 +156,9 @@ public class Issue implements Parcelable {
 		this.locationCode = in.readString();
 		in.readParcelable(DamageCode.class.getClassLoader());
 		in.readParcelable(RepairCode.class.getClassLoader());
-		this.length = in.readDouble();
-		this.height = in.readDouble();
-		this.quantity = in.readInt();
+		this.length = in.readString();
+		this.height = in.readString();
+		this.quantity = in.readString();
 		cJayImages = unparcelCollection(in, CJayImage.CREATOR);
 		// in.readTypedList(cJayImages, CJayImage.CREATOR);
 	}
