@@ -31,7 +31,6 @@ public final class Logger {
 	}
 
 	public static void Log(String content) {
-
 		String tag = "CJAY_INFO";
 		if (null != content) {
 			if (PRODUCTION_MODE == false) {

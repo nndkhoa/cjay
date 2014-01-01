@@ -135,12 +135,10 @@ public class ContainerSessionDaoImpl extends
 		List<ContainerSession> containerSessions = this.query(this
 				.queryBuilder()
 				.where()
-				.eq(ContainerSession.FIELD_LOCAL, true)
-				.and()
-				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
-				.and()
-				.ne(ContainerSession.FIELD_STATE,
-						ContainerSession.STATE_UPLOAD_COMPLETED).prepare());
+				.eq(ContainerSession.FIELD_LOCAL, true).and()
+				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false).and()
+				.ne(ContainerSession.FIELD_STATE, ContainerSession.STATE_UPLOAD_COMPLETED)
+				.prepare());
 
 		return containerSessions;
 	}

@@ -2,7 +2,6 @@ package com.cloudjay.cjay.fragment;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,7 +20,10 @@ import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
+import com.cloudjay.cjay.events.ContainerCreatedEvent;
 import com.cloudjay.cjay.events.ContainerSessionAddedEvent;
+import com.cloudjay.cjay.events.ContainerEditedEvent;
+import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.DatabaseHelper;
@@ -60,9 +62,19 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	private ArrayList<ContainerSession> mFeeds;
 	private FunDapter<ContainerSession> mFeedsAdapter;
 
-	private boolean mDirty;
-
 	private ContainerSession mSelectedContainerSession;
+
+	@AfterViews
+	void afterViews() {
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+				.getListLocalContainerSessions(getActivity());
+		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
+				.getListOperators(getActivity());
+
+		initContainerFeedAdapter(mFeeds);
+
+		mSelectedContainerSession = null;
+	}
 
 	@OptionsItem(R.id.menu_camera)
 	void cameraMenuItemSelected() {
@@ -71,7 +83,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		String uuid = mSelectedContainerSession.getUuid();
 		Intent intent = new Intent(getActivity(), CameraActivity_.class);
 		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA, uuid);
-		intent.putExtra("type", 0); // in
+		intent.putExtra("type", CJayImage.TYPE_IMPORT); // in
 		startActivity(intent);
 	}
 
@@ -112,19 +124,6 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		}
 	}
 
-	@AfterViews
-	void afterViews() {
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListLocalContainerSessions(getActivity());
-		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
-				.getListOperators(getActivity());
-
-		initContainerFeedAdapter(mFeeds);
-
-		mSelectedContainerSession = null;
-		mDirty = false;
-	}
-
 	@Click(R.id.btn_add_new)
 	void addContainerClicked() {
 		showContainerDetailDialog(
@@ -144,10 +143,11 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		android.util.Log.d(LOG_TAG, "Show item at position: " + position);
 
 		// open photo viewer
-//		Intent intent = new Intent(getActivity(), PhotoViewerActivity_.class);
-//		intent.putExtra(PhotoViewerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-//				mFeedsAdapter.getItem(position).getUuid());
-//		startActivity(intent);
+		// Intent intent = new Intent(getActivity(),
+		// PhotoViewerActivity_.class);
+		// intent.putExtra(PhotoViewerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+		// mFeedsAdapter.getItem(position).getUuid());
+		// startActivity(intent);
 	}
 
 	@ItemLongClick(R.id.feeds)
@@ -171,18 +171,15 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	}
 
 	@Override
-	public void onResume() {
-		super.onResume();
-
-		if (mDirty) {
-			refresh();
-		}
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
 	}
 
-	public void refresh() {
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListLocalContainerSessions(getActivity());
-		mFeedsAdapter.updateData(mFeeds);
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		EventBus.getDefault().register(this);
+		super.onCreate(savedInstanceState);
 	}
 
 	public void showContainerDetailDialog(String containerId,
@@ -237,6 +234,10 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 				containerSessionDaoImpl.addContainerSessions(containerSession);
 
+				// trigger update container lists
+				EventBus.getDefault().post(
+						new ContainerCreatedEvent(containerSession));
+
 				Intent intent = new Intent(getActivity(), CameraActivity_.class);
 				intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
 						containerSession.getUuid());
@@ -247,53 +248,53 @@ public class GateImportListFragment extends SherlockDialogFragment {
 				e.printStackTrace();
 			}
 
-			mDirty = true;
 			break;
 
 		case AddContainerDialog.CONTAINER_DIALOG_EDIT:
 			try {
-				DatabaseHelper databaseHelper = CJayClient.getInstance()
-						.getDatabaseManager().getHelper(getActivity());
-				OperatorDaoImpl operatorDaoImpl = databaseHelper
-						.getOperatorDaoImpl();
-				ContainerDaoImpl containerDaoImpl = databaseHelper
-						.getContainerDaoImpl();
-				ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper
-						.getContainerSessionDaoImpl();
-
-				// find operator
-				Operator operator = null;
-				List<Operator> listOperators = operatorDaoImpl.queryForEq(
-						Operator.CODE, operatorCode);
-
-				if (listOperators.isEmpty()) {
-					operator = new Operator();
-					operator.setCode(operatorCode);
-					operator.setName(operatorCode);
-					operatorDaoImpl.addOperator(operator);
+				if (mSelectedContainerSession.getContainerId().equals(
+						containerId)
+						&& mSelectedContainerSession.getOperatorName().equals(
+								operatorName)) {
+					// do nothing
 				} else {
-					operator = listOperators.get(0);
+					DatabaseHelper databaseHelper = CJayClient.getInstance()
+							.getDatabaseManager().getHelper(getActivity());
+					OperatorDaoImpl operatorDaoImpl = databaseHelper
+							.getOperatorDaoImpl();
+					ContainerDaoImpl containerDaoImpl = databaseHelper
+							.getContainerDaoImpl();
+					ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper
+							.getContainerSessionDaoImpl();
+
+					// find operator
+					Operator operator = operatorDaoImpl
+							.findOperator(operatorCode);
+
+					// update container details
+					Container container = mSelectedContainerSession
+							.getContainer();
+					container.setContainerId(containerId);
+					container.setOperator(operator);
+
+					// save container details
+					containerSessionDaoImpl
+							.addContainerSessions(mSelectedContainerSession);
+
+					// update database
+					containerDaoImpl.update(container);
+					containerSessionDaoImpl.update(mSelectedContainerSession);
+
+					// trigger update container lists
+					EventBus.getDefault()
+							.post(new ContainerEditedEvent(
+									mSelectedContainerSession));
 				}
-
-				// update container details
-				Container container = mSelectedContainerSession.getContainer();
-				container.setContainerId(containerId);
-				container.setOperator(operator);
-
-				// save container details
-				containerSessionDaoImpl
-						.addContainerSessions(mSelectedContainerSession);
-
-				// update database
-				containerDaoImpl.update(container);
-				containerSessionDaoImpl.update(mSelectedContainerSession);
 
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 
-			// refresh list view
-			refresh();
 			break;
 		}
 
@@ -338,7 +339,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getFullContainerId();
+						return item.getContainerId();
 					}
 				}, new DynamicImageLoader() {
 					@Override
@@ -351,26 +352,19 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		mFeedListView.setAdapter(mFeedsAdapter);
 	}
 
-	@Override
-	public void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
+	public void onEvent(ContainerCreatedEvent event) {
+		Logger.Log(LOG_TAG, "onEvent ContainerCreatedEvent");
+		refresh();
 	}
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-
-		EventBus.getDefault().register(this);
-		super.onCreate(savedInstanceState);
+	public void onEvent(ContainerEditedEvent event) {
+		Logger.Log(LOG_TAG, "onEvent ContainerEditedEvent");
+		refresh();
 	}
 
-	public void onEvent(ContainerSessionAddedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerSessionAddedEvent");
-
-		if (mDirty) {
-			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-					.getListLocalContainerSessions(getActivity());
-			mFeedsAdapter.updateData(mFeeds);
-		}
+	public void refresh() {
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+				.getListLocalContainerSessions(getActivity());
+		mFeedsAdapter.updateData(mFeeds);
 	}
 }

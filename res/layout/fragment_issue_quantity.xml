@@ -11,7 +11,7 @@
 		android:layout_height="wrap_content"
 		android:layout_weight="1.5"
 		android:gravity="right"
-		android:text="@string/damage_quantity"
+		android:text="@string/label_issue_quantity"
 		android:textStyle="bold" />
 	<EditText
 		android:id="@+id/quantity"

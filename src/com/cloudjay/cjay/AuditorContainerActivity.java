@@ -1,99 +1,219 @@
 package com.cloudjay.cjay;
 
+import java.io.FileNotFoundException;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Calendar;
 
-import android.view.View;
-import android.widget.Button;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.ami.fundapter.interfaces.ItemClickListener;
+import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.Utils;
 import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Click;
 import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.Extra;
 import com.googlecode.androidannotations.annotations.ItemClick;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 //slide 15
 
 @EActivity(R.layout.activity_auditor_container)
-public class AuditorContainerActivity extends SherlockFragmentActivity {
+public class AuditorContainerActivity extends CJayActivity {
 
-	private final static String TAG = "AuditorContainerActivity";
-	private ArrayList<ContainerSession> mFeeds;
+	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
+//	private static final String TAG = "AuditorContainerActivity";
+	
+	private ArrayList<CJayImage> mFeeds;
+	private FunDapter<CJayImage> mFeedsAdapter;
+	private ContainerSession mContainerSession;
+	private CJayImage mSelectedCJayImage;
 
-	@ViewById(R.id.btn_add_new)
-	Button mAddButton;
-	@ViewById(R.id.feeds)
-	ListView mFeedListView;
+	@ViewById(R.id.btn_add_new)				ImageButton mAddButton;
+	@ViewById(R.id.feeds)					ListView mFeedListView;
+	@ViewById(R.id.container_id_textview)	TextView containerIdTextView;
+	
+	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
+	String mContainerSessionUUID = "";
 
 	@AfterViews
 	void afterViews() {
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListContainerSessions(this);
-		initFunDapter(mFeeds);
+		try {
+			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
+					.getInstance().getDatabaseManager().getHelper(this)
+					.getContainerSessionDaoImpl();
+			mContainerSession = containerSessionDaoImpl.queryForId(mContainerSessionUUID);
+
+			if (null != mContainerSession) {
+				containerIdTextView.setText(mContainerSession.getContainerId());
+				populateCjayImages();
+				initImageFeedAdapter(mFeeds);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@ItemClick(R.id.feeds)
 	void containerItemClicked(int position) {
-		// Hector: go to details from here
-		android.util.Log.d(TAG, "Show item at position: " + position);
+		mSelectedCJayImage = mFeedsAdapter.getItem(position);
+		showReportDialog();
+	}
+	
+	@Click(R.id.btn_add_new)
+	void cameraClicked() {
+		Intent intent = new Intent(this, CameraActivity_.class);
+		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA, mContainerSession.getUuid());
+		intent.putExtra("type", CJayImage.TYPE_REPORT);
+		startActivity(intent);
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		refresh();
+	}
+	
+	public void refresh() {
+		populateCjayImages();
+		mFeedsAdapter.updateData(mFeeds);
+	}
+	
+	private void populateCjayImages() {
+		mFeeds = new ArrayList<CJayImage>();
+		try {
+			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
+					.getInstance().getDatabaseManager().getHelper(this)
+					.getContainerSessionDaoImpl();
+			mContainerSession = containerSessionDaoImpl.queryForId(mContainerSessionUUID);
+
+			if (null != mContainerSession) {
+				for (CJayImage cJayImage : mContainerSession.getCJayImages()) {
+					if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
+						mFeeds.add(cJayImage);
+					}
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void showReportDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this)
+				.setMessage(R.string.dialog_report_message)
+				.setTitle(R.string.dialog_report_title)
+				.setPositiveButton(R.string.dialog_report_yes, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						showIssueReport();
+					}
+				})
+				.setNegativeButton(R.string.dialog_report_no, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						showIssueAssigment();
+					}
+				});
+
+		builder.show();
+	}
+	
+	private void showIssueReport() {
+		Intent intent = new Intent(this, AuditorIssueReportActivity_.class);
+		intent.putExtra(AuditorIssueReportActivity_.CJAY_IMAGE_EXTRA, mSelectedCJayImage.getUuid());
+		startActivity(intent);
+	}
+	
+	private void showIssueAssigment() {
+		
 	}
 
-	private void initFunDapter(ArrayList<ContainerSession> containers) {
-		BindDictionary<ContainerSession> feedsDict = new BindDictionary<ContainerSession>();
-		feedsDict.addStringField(R.id.feed_item_container_id,
-				new StringExtractor<ContainerSession>() {
+	private void initImageFeedAdapter(ArrayList<CJayImage> containers) {
+		BindDictionary<CJayImage> feedsDict = new BindDictionary<CJayImage>();
+		feedsDict.addStringField(R.id.issue_location_code,
+				new StringExtractor<CJayImage>() {
 					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return item.getFullContainerId();
+					public String getStringValue(CJayImage item, int position) {
+						return item.getIssueLocationCode();
 					}
 				});
-		feedsDict.addStringField(R.id.feed_item_container_owner,
-				new StringExtractor<ContainerSession>() {
+		feedsDict.addStringField(R.id.issue_damage_code,
+				new StringExtractor<CJayImage>() {
 					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return item.getOperatorName();
+					public String getStringValue(CJayImage item, int position) {
+						return item.getIssueDamageCode();
 					}
 				});
-		feedsDict.addStringField(R.id.feed_item_container_import_date,
-				new StringExtractor<ContainerSession>() {
+		feedsDict.addStringField(R.id.issue_repair_code,
+				new StringExtractor<CJayImage>() {
 					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return java.text.DateFormat.getDateTimeInstance()
-								.format(Calendar.getInstance().getTime());
+					public String getStringValue(CJayImage item, int position) {
+						return item.getIssueRepairCode();
 					}
 				});
-		feedsDict.addDynamicImageField(R.id.feed_item_picture,
-				new StringExtractor<ContainerSession>() {
+		feedsDict.addStringField(R.id.issue_component_code,
+				new StringExtractor<CJayImage>() {
 					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return item.getFullContainerId();
+					public String getStringValue(CJayImage item, int position) {
+//						return item.getIssue().getDamageCode().getCode();
+						// TODO
+						return null;
+					}
+				});
+		feedsDict.addStringField(R.id.issue_quantity,
+				new StringExtractor<CJayImage>() {
+					@Override
+					public String getStringValue(CJayImage item, int position) {
+						return item.getIssueQuantity();
+					}
+				});
+		feedsDict.addStringField(R.id.issue_dimension,
+				new StringExtractor<CJayImage>() {
+					@Override
+					public String getStringValue(CJayImage item, int position) {
+						if (item.getIssue() != null) {
+							return new StringBuilder()
+								.append(getResources().getString(R.string.label_issue_length))
+								.append(item.getIssue().getLength())
+								.append(getResources().getString(R.string.label_issue_height))
+								.append(item.getIssue().getHeight())							
+								.toString();
+						} else {
+							return null;
+						}
+					}
+				});
+		feedsDict.addDynamicImageField(R.id.issue_picture,
+				new StringExtractor<CJayImage>() {
+					@Override
+					public String getStringValue(CJayImage item, int position) {
+						return item.getUri();
 					}
 				}, new DynamicImageLoader() {
 					@Override
-					public void loadImage(String stringColor, ImageView view) {
-						view.setImageResource(R.drawable.ic_logo);
+					public void loadImage(String url, ImageView view) {
+						try {
+							view.setImageBitmap(Utils.decodeImage(getContentResolver(), Uri.parse(url), Utils.MINI_THUMBNAIL_SIZE));
+						} catch (FileNotFoundException e) {
+							e.printStackTrace();
+						}
 					}
-				}).onClick(new ItemClickListener<ContainerSession>() {
-			@Override
-			public void onClick(ContainerSession item, int position, View view) {
-
-			}
-		});
-		FunDapter<ContainerSession> adapter = new FunDapter<ContainerSession>(
-				this, containers, R.layout.list_item_damage, feedsDict);
-		mFeedListView.setAdapter(adapter);
+				});
+		mFeedsAdapter = new FunDapter<CJayImage>(
+				this, containers, R.layout.list_item_issue, feedsDict);
+		mFeedListView.setAdapter(mFeedsAdapter);
 	}
 }

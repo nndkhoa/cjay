@@ -13,7 +13,7 @@ import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ViewById;
 
-@EFragment(R.layout.fragment_damage_quantity)
+@EFragment(R.layout.fragment_issue_quantity)
 public class AuditorDamageQuantityFragment extends SherlockFragment {
 	private int mQuantity;
 	private OnReportPageCompleteListener mCallback;

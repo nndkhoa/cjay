@@ -326,6 +326,8 @@ public class CJayClient implements ICJayClient {
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 		String response = requestWrapper.sendGet(
 				CJayConstant.LIST_CONTAINER_SESSIONS, headers);
+		
+		Logger.Log(LOG_TAG, response);
 
 		Gson gson = new GsonBuilder().setDateFormat(
 				CJayConstant.CJAY_DATETIME_FORMAT).create();

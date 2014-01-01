@@ -16,7 +16,7 @@ import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ViewById;
 
-@EFragment(R.layout.fragment_damage_location_code)
+@EFragment(R.layout.fragment_issue_location_code)
 public class AuditorDamageLocationFragment extends SherlockFragment implements OnFocusChangeListener, OnClickListener {
 	private String mLocationCodes[], mCodes[][];
 	private OnReportPageCompleteListener mCallback;

@@ -19,8 +19,8 @@ public class Issue implements Parcelable {
 	@DatabaseField(id = true, columnName = ID)
 	int id;
 
-	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
-	LocationCode locationCode;
+	@DatabaseField(canBeNull = true)
+	String locationCode;
 
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	DamageCode damageCode;
@@ -28,12 +28,101 @@ public class Issue implements Parcelable {
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	RepairCode repairCode;
 
+	@DatabaseField(canBeNull = true)
+	double length;
+	
+	@DatabaseField(canBeNull = true)
+	double height;
+	
+	@DatabaseField(canBeNull = true)
+	int quantity;
+	
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	ContainerSession containerSession;
 
 	@ForeignCollectionField(eager = true)
 	Collection<CJayImage> cJayImages;
 
+	public Issue(Parcel in) {
+		readFromParcel(in);
+	}
+
+	public Issue() {
+
+	}
+	
+	public void setLocationCode(String locationCode) {
+		this.locationCode = locationCode;
+	}
+	
+	public String getLocationCode() {
+		return this.locationCode;
+	}
+	
+	public void setRepairCode(RepairCode repairCode) {
+		this.repairCode = repairCode;
+	}
+	
+	public RepairCode getRepairCode() {
+		return this.repairCode;
+	}
+	
+	public String getRepairCodeString() {
+		if (this.repairCode != null) {
+			return this.repairCode.getCode();
+		} else {
+			return null;
+		}
+	}
+	
+	public void setDamageCode(DamageCode damageCode) {
+		this.damageCode = damageCode;
+	}
+	
+	public DamageCode getDamageCode() {
+		return this.damageCode;
+	}
+	
+	public String getDamageCodeString() {
+		if (this.damageCode != null) {
+			return this.damageCode.getCode();
+		} else {
+			return null;
+		}
+	}
+	
+	public void setLength(double length) {
+		this.length = length;
+	}
+	
+	public double getLength() {
+		return this.length;
+	}
+	
+	public void setHeight(double height) {
+		this.height = height;
+	}
+	
+	public double getHeight() {
+		return this.height;
+	}
+	
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
+	
+	public int getQuantity() {
+		return this.quantity;
+	}
+	
+	public void setContainerSession(ContainerSession containerSession) {
+		this.containerSession = containerSession;
+	}
+	
+	public ContainerSession getContainerSession() {
+		return this.containerSession;
+	}
+	
 	public void setCJayImages(Collection<CJayImage> cJayImages) {
 		this.cJayImages = cJayImages;
 	}
@@ -51,9 +140,12 @@ public class Issue implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(id);
-		dest.writeParcelable(locationCode, 0);
+		dest.writeString(locationCode);
 		dest.writeParcelable(damageCode, 0);
 		dest.writeParcelable(repairCode, 0);
+		dest.writeDouble(length);
+		dest.writeDouble(height);
+		dest.writeInt(quantity);
 		dest.writeParcelable(containerSession, 0);
 		parcelCollection(dest, cJayImages);
 		// dest.writeTypedList((List<CJayImage>) cJayImages);
@@ -61,9 +153,12 @@ public class Issue implements Parcelable {
 
 	private void readFromParcel(Parcel in) {
 		this.id = in.readInt();
-		in.readParcelable(LocationCode.class.getClassLoader());
+		this.locationCode = in.readString();
 		in.readParcelable(DamageCode.class.getClassLoader());
 		in.readParcelable(RepairCode.class.getClassLoader());
+		this.length = in.readDouble();
+		this.height = in.readDouble();
+		this.quantity = in.readInt();
 		cJayImages = unparcelCollection(in, CJayImage.CREATOR);
 		// in.readTypedList(cJayImages, CJayImage.CREATOR);
 	}
@@ -78,15 +173,6 @@ public class Issue implements Parcelable {
 			return new Issue[size];
 		}
 	};
-
-	public Issue(Parcel in) {
-
-		readFromParcel(in);
-	}
-
-	public Issue() {
-
-	}
 
 	void parcelCollection(final Parcel out,
 			final Collection<CJayImage> collection) {

@@ -1,36 +1,64 @@
 package com.cloudjay.cjay;
 
+import java.io.FileNotFoundException;
+import java.sql.SQLException;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.widget.ImageView;
+
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.listener.OnReportPageCompleteListener;
+import com.cloudjay.cjay.model.CJayImage;
+import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.Utils;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.Extra;
 // slide 20
 import com.googlecode.androidannotations.annotations.ViewById;
 
-@EActivity(R.layout.activity_auditor_damage_report)
-public class AuditorDamageReportActivity extends SherlockFragmentActivity
+@EActivity(R.layout.activity_auditor_issue_report)
+public class AuditorIssueReportActivity extends SherlockFragmentActivity
 		implements OnPageChangeListener, TabListener,
 		OnReportPageCompleteListener {
 
+	public static final String CJAY_IMAGE_EXTRA = "cjay_image";
+	
 	private String[] locations;
+	private CJayImage mCJayImage;
 
-	@ViewById
-	ViewPager pager;
+	@Extra(CJAY_IMAGE_EXTRA)
+	String mCJayImageUUID = "";
+	
+	@ViewById(R.id.pager)			ViewPager pager;
+	@ViewById(R.id.item_picture)	ImageView imageView;
 
 	@AfterViews
 	void afterViews() {
-		locations = getResources().getStringArray(
-				R.array.auditor_damage_report_tabs);
+		try {
+			CJayImageDaoImpl cJayImageDaoImpl = CJayClient
+					.getInstance().getDatabaseManager().getHelper(this)
+					.getCJayImageDaoImpl();
+			mCJayImage = cJayImageDaoImpl.findByUuid(mCJayImageUUID);
+			imageView.setImageBitmap(Utils.decodeImage(getContentResolver(), mCJayImage.getOriginalPhotoUri(), Utils.MINI_THUMBNAIL_SIZE));
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e){
+			e.printStackTrace();
+		}
+		
+		locations = getResources().getStringArray(R.array.auditor_damage_report_tabs);
 		configureViewPager();
 		configureActionBar();
 	}

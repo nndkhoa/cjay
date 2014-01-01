@@ -45,7 +45,7 @@ public class AuditorReportedListFragment extends SherlockFragment {
 		feedsDict.addStringField(R.id.feed_item_container_id,
 				new StringExtractor<ContainerSession>() {
 					@Override
-					public String getStringValue(ContainerSession item,	int position) {	return item.getFullContainerId(); }
+					public String getStringValue(ContainerSession item,	int position) {	return item.getContainerId(); }
 				});
 		feedsDict.addStringField(R.id.feed_item_container_owner,
 				new StringExtractor<ContainerSession>() {
@@ -62,7 +62,7 @@ public class AuditorReportedListFragment extends SherlockFragment {
 		feedsDict.addDynamicImageField(R.id.feed_item_picture,
 				new StringExtractor<ContainerSession>() {
 					@Override
-					public String getStringValue(ContainerSession item, int position) {	return item.getFullContainerId(); }
+					public String getStringValue(ContainerSession item, int position) {	return item.getContainerId(); }
 				}, new DynamicImageLoader() {
 					@Override
 					public void loadImage(String stringColor, ImageView view) {	view.setImageResource(R.drawable.ic_logo); }

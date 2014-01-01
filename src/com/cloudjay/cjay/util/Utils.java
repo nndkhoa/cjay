@@ -36,6 +36,9 @@ import android.widget.Toast;
 
 public class Utils {
 
+	public static final int MINI_THUMBNAIL_SIZE = 300;
+	public static final int MICRO_THUMBNAIL_SIZE = 96;
+	
 	public static void isStillRunning(Context ctx, String packageName) {
 
 		ActivityManager activityManager = (ActivityManager) ctx
