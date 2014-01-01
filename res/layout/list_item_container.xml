@@ -15,7 +15,8 @@
         android:layout_weight="1"
         android:contentDescription="@string/container_id"
         android:padding="3dp"
-        android:scaleType="centerCrop" />
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_app" />
 
     <LinearLayout
         android:id="@+id/feed_item_descriptions"

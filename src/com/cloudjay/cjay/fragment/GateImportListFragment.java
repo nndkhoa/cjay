@@ -367,8 +367,6 @@ public class GateImportListFragment extends SherlockDialogFragment {
 					@Override
 					public void loadImage(String url, ImageView view) {
 
-						Logger.Log(LOG_TAG, "Album cover url: " + url);
-
 						if (TextUtils.isEmpty(url)) {
 							view.setImageResource(R.drawable.ic_app);
 						} else {
