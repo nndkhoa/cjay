@@ -86,6 +86,12 @@ public class UploadsFragment extends SherlockFragment implements
 				"onItemClick at index: " + Integer.toString(position));
 	}
 
+	/**
+	 * Lẽ ra nên update list items bằng cách pop up từ event.getTargets() rồi
+	 * append vào list.
+	 * 
+	 * @param event
+	 */
 	public void onEvent(ContainerSessionAddedEvent event) {
 		Logger.Log(LOG_TAG, "onEvent ContainerSessionAddedEvent");
 		mAdapter.notifyDataSetChanged();
@@ -93,6 +99,7 @@ public class UploadsFragment extends SherlockFragment implements
 
 	public void onEvent(ContainerSessionUploadedEvent event) {
 		Logger.Log(LOG_TAG, "onEvent ContainerSessionUploadedEvent");
+		mAdapter.notifyDataSetChanged();
 	}
 
 	public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {

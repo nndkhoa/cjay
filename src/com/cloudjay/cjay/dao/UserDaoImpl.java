@@ -44,6 +44,7 @@ public class UserDaoImpl extends BaseDaoImpl<User, Integer> implements IUserDao 
 
 	@Override
 	public User getMainUser() throws SQLException {
+		
 		User user = null;
 		List<User> users = this.query(this.queryBuilder().where()
 				.eq(User.IS_MAIN_ACCOUNT, true).prepare());

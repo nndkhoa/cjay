@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.aerilys.helpers.android.NetworkHelper;
@@ -217,8 +218,6 @@ public class CJayClient implements ICJayClient {
 		requestPacket.put("username", username);
 		requestPacket.put("password", password);
 
-		Logger.Log(CJayConstant.TOKEN);
-
 		String tokenResponseString = requestWrapper.sendJSONPost(
 				CJayConstant.TOKEN, requestPacket);
 
@@ -286,7 +285,7 @@ public class CJayClient implements ICJayClient {
 				headers);
 
 		response = requestWrapper.sendGet(CJayConstant.LIST_OPERATORS, headers);
-		Logger.Log(LOG_TAG, response);
+		// Logger.Log(LOG_TAG, response);
 
 		Gson gson = new Gson();
 		Type listType = new TypeToken<List<Operator>>() {
@@ -328,8 +327,6 @@ public class CJayClient implements ICJayClient {
 		String response = requestWrapper.sendGet(
 				CJayConstant.LIST_CONTAINER_SESSIONS, headers);
 
-		// Logger.Log(LOG_TAG, response);
-
 		Gson gson = new GsonBuilder().setDateFormat(
 				CJayConstant.CJAY_DATETIME_FORMAT).create();
 
@@ -361,7 +358,7 @@ public class CJayClient implements ICJayClient {
 						items.add(containerSession);
 					}
 
-					Logger.Log(LOG_TAG, containerSession.toString());
+					// Logger.Log(LOG_TAG, containerSession.toString());
 				}
 			}
 
@@ -377,6 +374,8 @@ public class CJayClient implements ICJayClient {
 		List<ContainerSession> items = new ArrayList<ContainerSession>();
 		String formatedDate = StringHelper.getTimestamp(
 				CJayConstant.CJAY_DATETIME_FORMAT, date);
+
+		// TODO: tieubao fix bug
 		items = getContainerSessions(ctx, formatedDate);
 		return items;
 	}
@@ -390,12 +389,16 @@ public class CJayClient implements ICJayClient {
 				CJayConstant.LIST_CONTAINER_SESSIONS_WITH_DATETIME, date),
 				headers);
 
+		if (TextUtils.isEmpty(response))
+			Logger.Log(LOG_TAG, response);
+
 		Gson gson = new GsonBuilder().setDateFormat(
 				CJayConstant.CJAY_DATETIME_FORMAT).create();
 
 		Type listType = new TypeToken<List<TmpContainerSession>>() {
 		}.getType();
 
+		// TODO: tieubao fix bug
 		List<TmpContainerSession> tmpContainerSessions = null;
 		try {
 			tmpContainerSessions = gson.fromJson(response, listType);

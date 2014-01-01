@@ -1,11 +1,10 @@
 package com.cloudjay.cjay;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.widget.Toast;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
@@ -14,6 +13,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.fragment.GateExportListFragment;
 import com.cloudjay.cjay.fragment.GateImportListFragment;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -29,7 +29,9 @@ public class GateHomeActivity extends CJayActivity implements
 	public static final int TAB_IMPORT = 0;
 	public static final int TAB_EXPORT = 1;
 	public static final int TAB_UPLOAD = 2;
-	
+
+	private static final String LOG_TAG = "GateHomeActivity";
+
 	private String[] locations;
 	private ViewPagerAdapter mPagerAdapter;
 
@@ -90,20 +92,23 @@ public class GateHomeActivity extends CJayActivity implements
 	public void onPageScrolled(int arg0, float arg1, int arg2) {
 
 	}
-	
- 	@Override
+
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getSupportMenuInflater();
 		return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_logout:
-			Toast toast = Toast.makeText(getApplicationContext(), "LOG OUT", Toast.LENGTH_SHORT);
-			toast.show();
-//			finish();
+			Logger.Log(LOG_TAG, "Logout");
+
+			getSession().deleteSession(getApplicationContext());
+			startActivity(new Intent(this, LoginActivity_.class));
+
+			finish();
 			return true;
 		}
 

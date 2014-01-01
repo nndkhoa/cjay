@@ -4,13 +4,9 @@ import android.content.Context;
 import android.os.Bundle;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Session;
-import com.cloudjay.cjay.util.Utils;
-
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 

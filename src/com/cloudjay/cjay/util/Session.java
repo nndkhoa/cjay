@@ -53,6 +53,33 @@ public class Session {
 		return null;
 	}
 
+	public boolean deleteSession(Context context) {
+		Logger.Log(LOG_TAG, "deleting session ...");
+
+		databaseManager = CJayClient.getInstance().getDatabaseManager();
+		try {
+			DatabaseHelper helper = databaseManager.getHelper(context);
+			userDao = helper.getUserDaoImpl();
+
+			User user = userDao.getMainUser();
+
+			if (null != user) {
+				user.setMainAccount(false);
+				user.setAccessToken("");
+				userDao.update(user);
+
+				this.currentUser = null;
+				return true;
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		return false;
+	}
+
 	public void extendAccessTokenIfNeeded(Context applicationContext) {
 		Logger.Log(LOG_TAG, "extending user access token ...");
 	}
