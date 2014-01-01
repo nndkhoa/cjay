@@ -20,8 +20,7 @@
             android:paddingLeft="18dp"
             android:paddingRight="18dp"
             android:paddingTop="12dp"
-            android:text="@string/dialog_container_id"
-            android:textAllCaps="true" />
+            android:text="@string/dialog_container_id" />
 
         <EditText
             android:id="@+id/dialog_new_container_id"
@@ -30,8 +29,10 @@
             android:layout_weight="1"
             android:hint="@string/dialog_container_id"
             android:imeOptions="actionNext"
+            android:inputType="textCapCharacters"
             android:selectAllOnFocus="true"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:textAllCaps="true" />
     </LinearLayout>
 
     <LinearLayout
