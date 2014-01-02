@@ -27,6 +27,7 @@ import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerCreatedEvent;
 import com.cloudjay.cjay.events.ContainerEditedEvent;
+import com.cloudjay.cjay.events.ContainerSessionAddedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
@@ -104,7 +105,33 @@ public class GateExportListFragment extends SherlockFragment {
 
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
-		// TODO
+		try {
+
+			Logger.Log(LOG_TAG, "Menu upload item clicked");
+
+			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
+					.getInstance().getDatabaseManager()
+					.getHelper(getActivity()).getContainerSessionDaoImpl();
+
+			// User confirm upload
+			mSelectedContainerSession.setUploadConfirmation(true);
+
+			mSelectedContainerSession
+					.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+
+			mSelectedContainerSession
+					.setCheckOutTime(StringHelper
+							.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT));
+
+			containerSessionDaoImpl.update(mSelectedContainerSession);
+
+			// It will trigger `UploadsFragment` Adapter notifyDataSetChanged
+			EventBus.getDefault().post(
+					new ContainerSessionAddedEvent(mSelectedContainerSession));
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Click(R.id.add_button)
