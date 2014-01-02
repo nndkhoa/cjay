@@ -14,6 +14,8 @@ public class PreferencesUtil {
 	public static String RESOURCE_DAMAGE_LAST_UPDATE = "resource_damage_last_update";
 	public static String RESOURCE_REPAIR_LAST_UPDATE = "resource_repair_last_update";
 	public static String RESOURCE_OPERATOR_LAST_UPDATE = "resource_operator_last_update";
+	public static String RESOURCE_COMPONENT_LAST_UPDATE = "resource_component_last_update";
+	public static String CONTAINER_SESSION_LAST_UPDATE = "container_session_last_update";
 
 	public static void storePrefsValue(Context context, String key,
 			String content) {

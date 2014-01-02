@@ -204,16 +204,30 @@ public class CJayClient implements ICJayClient {
 			// 3. Update list ContainerSessions
 			Logger.Log(LOG_TAG, "get list container sessions");
 			List<ContainerSession> containerSessions = null;
+
 			if (containerSessionDaoImpl.isEmpty()) {
+
 				Logger.Log(LOG_TAG, "get new list container sessions");
 				containerSessions = getContainerSessions(ctx);
+
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE,
+						nowString);
+
 			} else {
 				Logger.Log(LOG_TAG, "get updated list container sessions");
-				Date date = new Date();
+
+				String date = PreferencesUtil.getPrefsValue(ctx,
+						PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE);
+
 				containerSessions = getContainerSessions(ctx, date);
 
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE,
+						nowString);
+
 				if (containerSessions == null) {
-					Logger.Log(LOG_TAG, "No new container session");
+					Logger.Log(LOG_TAG, "No new container sessions");
 				}
 			}
 			containerSessionDaoImpl.addListContainerSessions(containerSessions);
@@ -246,14 +260,6 @@ public class CJayClient implements ICJayClient {
 		}
 		return token;
 	}
-
-	// @Override
-	// public String getGoogleCloudToken(String token) {
-	// HashMap<String, String> headers = prepareHeadersWithToken(token);
-	// String response = requestWrapper.sendGet(
-	// CJayConstant.API_GOOGLE_CLOUD_STORAGE_TOKEN, headers);
-	// return response;
-	// }
 
 	@Override
 	public void addGCMDevice(String regid, Context ctx) throws JSONException {
@@ -375,8 +381,6 @@ public class CJayClient implements ICJayClient {
 								.addContainerSessions(containerSession);
 						items.add(containerSession);
 					}
-
-					// Logger.Log(LOG_TAG, containerSession.toString());
 				}
 			}
 
@@ -396,7 +400,6 @@ public class CJayClient implements ICJayClient {
 		String formatedDate = StringHelper.getTimestamp(
 				CJayConstant.CJAY_DATETIME_FORMAT, date);
 
-		// TODO: tieubao fix bug
 		items = getContainerSessions(ctx, formatedDate);
 		return items;
 	}
@@ -411,47 +414,52 @@ public class CJayClient implements ICJayClient {
 				CJayConstant.LIST_CONTAINER_SESSIONS_WITH_DATETIME, date),
 				headers);
 
-		Logger.Log(LOG_TAG, response);
+		if (TextUtils.isEmpty(response)) {
+			Logger.Log(LOG_TAG, "No new items from " + date);
+		} else {
+			Logger.Log(LOG_TAG, response);
 
-		Gson gson = new GsonBuilder().setDateFormat(
-				CJayConstant.CJAY_DATETIME_FORMAT).create();
+			Gson gson = new GsonBuilder().setDateFormat(
+					CJayConstant.CJAY_DATETIME_FORMAT).create();
 
-		Type listType = new TypeToken<List<TmpContainerSession>>() {
-		}.getType();
+			Type listType = new TypeToken<List<TmpContainerSession>>() {
+			}.getType();
 
-		// TODO: tieubao fix bug
-		List<TmpContainerSession> tmpContainerSessions = null;
-		try {
-			tmpContainerSessions = gson.fromJson(response, listType);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		// Parse to `ContainerSession`
-		List<ContainerSession> items = new ArrayList<ContainerSession>();
-		try {
-			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
-					.getHelper(ctx).getContainerSessionDaoImpl();
-
-			if (tmpContainerSessions != null) {
-				for (TmpContainerSession tmpSession : tmpContainerSessions) {
-					ContainerSession containerSession = Mapper
-							.toContainerSession(tmpSession, ctx);
-
-					if (null != containerSession) {
-						containerSessionDaoImpl
-								.addContainerSessions(containerSession);
-						items.add(containerSession);
-					}
-				}
-
+			List<TmpContainerSession> tmpContainerSessions = null;
+			try {
+				tmpContainerSessions = gson.fromJson(response, listType);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 
-		} catch (SQLException e) {
-			e.printStackTrace();
+			// Parse to `ContainerSession`
+			List<ContainerSession> items = new ArrayList<ContainerSession>();
+			try {
+				ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
+						.getHelper(ctx).getContainerSessionDaoImpl();
+
+				if (tmpContainerSessions != null) {
+					for (TmpContainerSession tmpSession : tmpContainerSessions) {
+						ContainerSession containerSession = Mapper
+								.toContainerSession(tmpSession, ctx);
+
+						if (null != containerSession) {
+							containerSessionDaoImpl
+									.addContainerSessions(containerSession);
+							items.add(containerSession);
+						}
+					}
+
+				}
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			return items;
 		}
 
-		return items;
+		return null;
 	}
 
 	@Override

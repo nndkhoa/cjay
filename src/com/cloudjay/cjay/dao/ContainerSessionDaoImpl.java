@@ -28,22 +28,29 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public void addListContainerSessions(
 			List<ContainerSession> containerSessions) throws SQLException {
-		for (ContainerSession containerSession : containerSessions) {
-			this.createOrUpdate(containerSession);
+		if (containerSessions != null) {
+			for (ContainerSession containerSession : containerSessions) {
+				this.createOrUpdate(containerSession);
+			}
 		}
 	}
 
 	@Override
 	public void addContainerSessions(ContainerSession containerSession)
 			throws SQLException {
-		this.createOrUpdate(containerSession);
+		if (containerSession != null) {
+			this.createOrUpdate(containerSession);
+		}
 	}
 
 	@Override
 	public void deleteAllContainerSessions() throws SQLException {
 		List<ContainerSession> containerSessions = getAllContainerSessions();
-		for (ContainerSession containerSession : containerSessions) {
-			this.delete(containerSession);
+
+		if (containerSessions != null) {
+			for (ContainerSession containerSession : containerSessions) {
+				this.delete(containerSession);
+			}
 		}
 	}
 
@@ -110,6 +117,10 @@ public class ContainerSessionDaoImpl extends
 	/**
 	 * Get all container session items should be show on Upload Fragment.
 	 * 
+	 * - Have uploaded
+	 * 
+	 * - Clear state = false
+	 * 
 	 * @return
 	 * @throws SQLException
 	 */
@@ -127,10 +138,19 @@ public class ContainerSessionDaoImpl extends
 
 	}
 
+	/**
+	 * Get all containers which available on Import Fragment.
+	 * 
+	 * - Upload confirmation = false
+	 * 
+	 * - Upload state <> complete
+	 * 
+	 * - Local = true
+	 */
 	@Override
 	public List<ContainerSession> getLocalContainerSessions()
 			throws SQLException {
-		Logger.Log(LOG_TAG, "getListUploadContainerSessions()");
+		Logger.Log(LOG_TAG, "getLocalContainerSessions()");
 
 		List<ContainerSession> containerSessions = this.query(this
 				.queryBuilder()
@@ -143,5 +163,21 @@ public class ContainerSessionDaoImpl extends
 						ContainerSession.STATE_UPLOAD_COMPLETED).prepare());
 
 		return containerSessions;
+	}
+
+	/**
+	 * Get all containers that have not uploaded yet
+	 * 
+	 * - check_out_time = null
+	 * 
+	 * -
+	 */
+	@Override
+	public List<ContainerSession> getListCheckOutContainerSessions()
+			throws SQLException {
+
+		Logger.Log(LOG_TAG, "getListCheckOutContainerSessions()");
+
+		return null;
 	}
 }

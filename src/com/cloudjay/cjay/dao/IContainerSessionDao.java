@@ -15,6 +15,11 @@ public interface IContainerSessionDao extends Dao<ContainerSession, String> {
 
 	List<ContainerSession> getLocalContainerSessions() throws SQLException;
 
+	List<ContainerSession> getListUploadContainerSessions() throws SQLException;
+
+	List<ContainerSession> getListCheckOutContainerSessions()
+			throws SQLException;
+
 	void addListContainerSessions(List<ContainerSession> containerSessions)
 			throws SQLException;
 
@@ -28,7 +33,5 @@ public interface IContainerSessionDao extends Dao<ContainerSession, String> {
 	ContainerSession findByUuid(String uuid) throws SQLException;
 
 	ContainerSession getNextWaiting() throws SQLException;
-
-	List<ContainerSession> getListUploadContainerSessions() throws SQLException;
 
 }
