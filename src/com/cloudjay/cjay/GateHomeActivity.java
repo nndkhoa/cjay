@@ -139,5 +139,4 @@ public class GateHomeActivity extends CJayActivity implements
 		}
 	}
 
-
 }

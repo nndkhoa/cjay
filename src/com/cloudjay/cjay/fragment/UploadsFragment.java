@@ -12,6 +12,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadsListBaseAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -23,11 +24,13 @@ import com.cloudjay.cjay.util.Logger;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener.OnDismissCallback;
 import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.OptionsMenu;
 import com.googlecode.androidannotations.annotations.UiThread;
 
 import de.greenrobot.event.EventBus;
 
 @EFragment
+@OptionsMenu(R.menu.menu_upload)
 public class UploadsFragment extends SherlockFragment implements
 		OnDismissCallback, OnItemClickListener {
 
@@ -109,6 +112,12 @@ public class UploadsFragment extends SherlockFragment implements
 	void updateUI() {
 		mAdapter.notifyDataSetChanged();
 	}
+
+	// @Override
+	// public void onPrepareOptionsMenu(Menu menu) {
+	//
+	// super.onPrepareOptionsMenu(menu);
+	// }
 
 	public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
 		Logger.Log(LOG_TAG, "onSwipeDismiss");

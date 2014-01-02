@@ -1,6 +1,8 @@
 package com.cloudjay.cjay;
 
 //import android.app.FragmentManager;
+import java.lang.reflect.Field;
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -8,6 +10,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.view.ViewConfiguration;
+
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
@@ -29,6 +33,24 @@ public class AuditorHomeActivity extends SherlockFragmentActivity implements
 	private String[] locations;
 	@ViewById
 	ViewPager pager;
+
+	@Override
+	protected void onCreate(Bundle arg0) {
+
+		// Below code to show `More Action` item on menu
+		try {
+			ViewConfiguration config = ViewConfiguration.get(this);
+			Field menuKeyField = ViewConfiguration.class
+					.getDeclaredField("sHasPermanentMenuKey");
+			if (menuKeyField != null) {
+				menuKeyField.setAccessible(true);
+				menuKeyField.setBoolean(config, false);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		super.onCreate(arg0);
+	}
 
 	@AfterViews
 	void afterViews() {

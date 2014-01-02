@@ -112,35 +112,38 @@ public class GateExportListFragment extends SherlockFragment {
 
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
-		try {
+		if (null != mSelectedContainerSession) {
+			try {
 
-			Logger.Log(LOG_TAG, "Menu upload item clicked");
+				Logger.Log(LOG_TAG, "Menu upload item clicked");
 
-			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-					.getInstance().getDatabaseManager()
-					.getHelper(getActivity()).getContainerSessionDaoImpl();
+				ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
+						.getInstance().getDatabaseManager()
+						.getHelper(getActivity()).getContainerSessionDaoImpl();
 
-			// User confirm upload
-			mSelectedContainerSession.setUploadConfirmation(true);
+				// User confirm upload
+				mSelectedContainerSession.setUploadConfirmation(true);
 
-			mSelectedContainerSession
-					.setCheckOutTime(StringHelper
-							.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT));
+				mSelectedContainerSession
+						.setCheckOutTime(StringHelper
+								.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT));
 
-			mSelectedContainerSession
-					.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+				mSelectedContainerSession
+						.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
 
-			containerSessionDaoImpl.update(mSelectedContainerSession);
+				containerSessionDaoImpl.update(mSelectedContainerSession);
 
-			// It will trigger `UploadsFragment` Adapter notifyDataSetChanged
-			EventBus.getDefault()
-					.post(new ContainerSessionEnqueueEvent(
-							mSelectedContainerSession));
+				// It will trigger `UploadsFragment` Adapter
+				// notifyDataSetChanged
+				EventBus.getDefault().post(
+						new ContainerSessionEnqueueEvent(
+								mSelectedContainerSession));
 
-			hideMenuItems();
+				hideMenuItems();
 
-		} catch (SQLException e) {
-			e.printStackTrace();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

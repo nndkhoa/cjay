@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.fragment;
 
 import java.io.FileNotFoundException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import android.net.Uri;
@@ -14,8 +15,14 @@ import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EFragment;
@@ -25,14 +32,15 @@ import com.googlecode.androidannotations.annotations.OptionsMenu;
 import com.googlecode.androidannotations.annotations.ViewById;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import de.greenrobot.event.EventBus;
+
 @EFragment(R.layout.fragment_auditor_reported)
 @OptionsMenu(R.menu.menu_auditor_reported)
 public class AuditorReportedListFragment extends SherlockFragment {
-	// private final static String TAG = "AuditorReportedListFragment";
 
+	private final static String LOG_TAG = "AuditorReportedListFragment";
 	private ArrayList<ContainerSession> mFeeds;
 	private FunDapter<ContainerSession> mFeedsAdapter;
-
 	private ContainerSession mSelectedContainerSession;
 
 	@ViewById(R.id.container_list)
@@ -65,8 +73,39 @@ public class AuditorReportedListFragment extends SherlockFragment {
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 		if (mSelectedContainerSession != null) {
-			// TODO
+			try {
+
+				Logger.Log(LOG_TAG, "Menu upload item clicked");
+
+				ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
+						.getInstance().getDatabaseManager()
+						.getHelper(getActivity()).getContainerSessionDaoImpl();
+
+				// User confirm upload
+				mSelectedContainerSession.setUploadConfirmation(true);
+
+				mSelectedContainerSession
+						.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+
+				containerSessionDaoImpl.update(mSelectedContainerSession);
+
+				// It will trigger `UploadsFragment` Adapter
+				// notifyDataSetChanged
+				EventBus.getDefault().post(
+						new ContainerSessionEnqueueEvent(
+								mSelectedContainerSession));
+
+				hideMenuItems();
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
+	}
+
+	void hideMenuItems() {
+		mSelectedContainerSession = null;
+		getActivity().supportInvalidateOptionsMenu();
 	}
 
 	@Override
