@@ -16,6 +16,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
+import android.graphics.Rect;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.CameraInfo;
@@ -77,8 +78,9 @@ import com.googlecode.androidannotations.annotations.ViewById;
  */
 @EActivity(R.layout.activity_camera)
 @NoTitle
-public class CameraActivity extends Activity {
+public class CameraActivity extends Activity implements AutoFocusCallback {
 
+	private static final String TAG = "CameraActivity";
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
 
 	Camera camera = null;
@@ -551,7 +553,6 @@ public class CameraActivity extends Activity {
 		}
 
 		if (camera == null) {
-
 			Logger.Log(LOG_TAG, "inside onResume: camera == null");
 			camera = Camera.open(cameraMode);
 		}
@@ -692,12 +693,17 @@ public class CameraActivity extends Activity {
 
 	@Background
 	void takePicture() {
-		if (inPreview) {
-			Logger.Log(LOG_TAG, "Prepare to take picture");
+//		if (inPreview) {
+		Logger.Log(LOG_TAG, "Prepare to take picture");
+		
+        int width = preview.getWidth();
+        int height = preview.getHeight();
 
-			camera.takePicture(shutterCallback, null, photoCallback);
-			inPreview = false;
-		}
+        Rect touchRect = new Rect((width-100)/2, (height-100)/2, 100, 100);
+        this.submitFocusAreaRect(touchRect);
+
+		inPreview = false;
+//		}
 	}
 
 	PictureCallback rawCallback = new PictureCallback() {
@@ -706,11 +712,20 @@ public class CameraActivity extends Activity {
 			Logger.Log(LOG_TAG, "rawCallback");
 		}
 	};
+	
+	private void submitFocusAreaRect(final Rect touchRect)
+	{
+	    Camera.Parameters cameraParameters = camera.getParameters();
 
-	// endregion
+	    // Submit focus area to camera
+	    ArrayList<Camera.Area> focusAreas = new ArrayList<Camera.Area>();
+	    focusAreas.add(new Camera.Area(touchRect, 1000));
 
-	// region Camera Support method
-	// endregion
+	    cameraParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+	    cameraParameters.setFocusAreas(focusAreas);
+	    camera.setParameters(cameraParameters);
+	    camera.autoFocus(this);
+	}
 
 	public static void setCameraDisplayOrientation(Activity activity,
 
@@ -774,5 +789,11 @@ public class CameraActivity extends Activity {
 		}
 
 		return bestSize;
+	}
+
+	@Override
+	public void onAutoFocus(boolean arg0, Camera arg1) {
+		Logger.Log(TAG, "Auto focus");
+		camera.takePicture(shutterCallback, null, photoCallback);
 	}
 }
