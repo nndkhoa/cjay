@@ -8,6 +8,7 @@ import org.json.JSONException;
 import android.content.Context;
 
 import com.cloudjay.cjay.model.CJayResourceStatus;
+import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Operator;
@@ -37,6 +38,8 @@ public interface ICJayClient {
 	List<DamageCode> getDamageCodes(Context ctx);
 
 	List<RepairCode> getRepairCodes(Context ctx);
+
+	List<ComponentCode> getComponentCodes(Context ctx);
 
 	List<ContainerSession> getContainerSessions(Context ctx);
 

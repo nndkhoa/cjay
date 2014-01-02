@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
+import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
@@ -48,6 +49,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	DamageCodeDaoImpl damageCodeDaoImpl = null;
 	DepotDaoImpl depotDaoImpl = null;
 	RepairCodeDaoImpl repairCodeDaoImpl = null;
+	ComponentCodeDaoImpl componentCodeDaoImpl = null;
 	UploadItemDaoImpl uploadItemDeoImpl = null;
 
 	public DatabaseHelper(Context context) {
@@ -114,6 +116,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		damageCodeDaoImpl = null;
 		depotDaoImpl = null;
 		repairCodeDaoImpl = null;
+		componentCodeDaoImpl = null;
 
 		super.close();
 	}
@@ -189,6 +192,14 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 					this.getConnectionSource(), RepairCode.class);
 		}
 		return repairCodeDaoImpl;
+	}
+
+	public ComponentCodeDaoImpl getComponentCodeDaoImpl() throws SQLException {
+		if (null == componentCodeDaoImpl) {
+			componentCodeDaoImpl = DaoManager.createDao(
+					this.getConnectionSource(), ComponentCode.class);
+		}
+		return componentCodeDaoImpl;
 	}
 
 	public UploadItemDaoImpl getUploadItemImpl() throws SQLException {

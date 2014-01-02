@@ -20,11 +20,13 @@ import android.util.Log;
 
 import com.aerilys.helpers.android.NetworkHelper;
 import com.aerilys.helpers.android.UIHelper;
+import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.cloudjay.cjay.model.CJayResourceStatus;
+import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.IDatabaseManager;
@@ -162,6 +164,8 @@ public class CJayClient implements ICJayClient {
 					.getHelper(ctx).getDamageCodeDaoImpl();
 			RepairCodeDaoImpl repairCodeDaoImpl = databaseManager
 					.getHelper(ctx).getRepairCodeDaoImpl();
+			ComponentCodeDaoImpl componentCodeDaoImpl = databaseManager
+					.getHelper(ctx).getComponentCodeDaoImpl();
 
 			if (operatorDaoImpl.isEmpty()) {
 				Logger.Log(LOG_TAG, "get list operators");
@@ -191,6 +195,19 @@ public class CJayClient implements ICJayClient {
 				List<RepairCode> repairCodes = getRepairCodes(ctx);
 				if (null != repairCodes)
 					repairCodeDaoImpl.addListRepairCodes(repairCodes);
+			}
+
+			if (componentCodeDaoImpl.isEmpty()) {
+				Logger.Log(LOG_TAG, "get list of component codes");
+
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.RESOURCE_COMPONENT_LAST_UPDATE,
+						nowString);
+
+				List<ComponentCode> componentCodes = getComponentCodes(ctx);
+				if (null != componentCodes)
+					componentCodeDaoImpl.addListComponentCodes(componentCodes);
+
 			}
 
 			// 2. fetch ISO CODE
@@ -339,6 +356,19 @@ public class CJayClient implements ICJayClient {
 		}.getType();
 
 		List<RepairCode> items = gson.fromJson(response, listType);
+		return items;
+	}
+
+	@Override
+	public List<ComponentCode> getComponentCodes(Context ctx) {
+		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
+		String response = requestWrapper.sendGet(
+				CJayConstant.LIST_COMPONENT_CODES, headers);
+		Gson gson = new Gson();
+		Type listType = new TypeToken<List<ComponentCode>>() {
+		}.getType();
+
+		List<ComponentCode> items = gson.fromJson(response, listType);
 		return items;
 	}
 

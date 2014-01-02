@@ -51,6 +51,17 @@ public class ComponentCodeDaoImpl extends BaseDaoImpl<ComponentCode, Integer>
 	}
 
 	@Override
+	public boolean isEmpty() throws SQLException {
+		ComponentCode componentCode = this.queryForFirst(this.queryBuilder()
+				.prepare());
+
+		if (null == componentCode)
+			return true;
+
+		return false;
+	}
+
+	@Override
 	public ComponentCode findComponentCode(String componentCode)
 			throws SQLException {
 		List<ComponentCode> listComponentCodes = queryForEq(ComponentCode.CODE,
