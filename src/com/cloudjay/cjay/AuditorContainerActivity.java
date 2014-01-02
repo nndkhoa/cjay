@@ -13,13 +13,18 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.actionbarsherlock.view.Menu;
 import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
+import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.DatabaseHelper;
+import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.Utils;
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -27,11 +32,15 @@ import com.googlecode.androidannotations.annotations.Click;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.Extra;
 import com.googlecode.androidannotations.annotations.ItemClick;
+import com.googlecode.androidannotations.annotations.ItemLongClick;
+import com.googlecode.androidannotations.annotations.OptionsItem;
+import com.googlecode.androidannotations.annotations.OptionsMenu;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 //slide 15
 
 @EActivity(R.layout.activity_auditor_container)
+@OptionsMenu(R.menu.menu_auditor_container)
 public class AuditorContainerActivity extends CJayActivity {
 
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
@@ -41,6 +50,7 @@ public class AuditorContainerActivity extends CJayActivity {
 	private FunDapter<CJayImage> mFeedsAdapter;
 	private ContainerSession mContainerSession;
 	private CJayImage mSelectedCJayImage;
+	private CJayImage mLongClickedCJayImage;
 
 	@ViewById(R.id.btn_add_new)				ImageButton mAddButton;
 	@ViewById(R.id.feeds)					ListView mFeedListView;
@@ -68,7 +78,14 @@ public class AuditorContainerActivity extends CJayActivity {
 	}
 
 	@ItemClick(R.id.feeds)
-	void containerItemClicked(int position) {
+	void imageItemClicked(int position) {
+		// refresh highlighting
+		mFeedListView.setItemChecked(position, false);
+
+		// clear current selection
+		mLongClickedCJayImage = null;
+		supportInvalidateOptionsMenu();
+		
 		mSelectedCJayImage = mFeedsAdapter.getItem(position);
 		if (mSelectedCJayImage.getIssue() != null) {
 			// Already has issue, display that issue
@@ -79,12 +96,75 @@ public class AuditorContainerActivity extends CJayActivity {
 		}
 	}
 	
+	@ItemLongClick(R.id.feeds)
+	void imageItemLongClicked(int position) {
+		// refresh highlighting
+		mFeedListView.setItemChecked(position, true);
+		
+		// refresh menu
+		mLongClickedCJayImage = mFeedsAdapter.getItem(position);
+		supportInvalidateOptionsMenu();
+	}
+	
 	@Click(R.id.btn_add_new)
 	void cameraClicked() {
 		Intent intent = new Intent(this, CameraActivity_.class);
 		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA, mContainerSession.getUuid());
 		intent.putExtra("type", CJayImage.TYPE_REPORT);
 		startActivity(intent);
+	}
+	
+	@OptionsItem(R.id.menu_trash)
+	void trashMenuItemClicked() {
+		if (mLongClickedCJayImage != null) {
+			boolean issueDeleted = false;
+			
+			// delete image from container session
+			if (mContainerSession.getCJayImages().contains(mLongClickedCJayImage)) {
+				mContainerSession.getCJayImages().remove(mLongClickedCJayImage);				
+			}
+
+			// delete image from issue
+			Issue issue = mLongClickedCJayImage.getIssue();
+			if (issue != null && issue.getCJayImages().contains(mLongClickedCJayImage)) {
+				issue.getCJayImages().remove(mLongClickedCJayImage);
+				// if issue has no image then delete the issue
+				if (issue.getCJayImages().size() == 0 && mContainerSession.getIssues().contains(issue)) {
+					mContainerSession.getIssues().remove(issue);
+					issueDeleted = true;
+				}
+			}
+			
+			// update records in db
+			try {
+				DatabaseHelper databaseHelper = CJayClient.getInstance().getDatabaseManager().getHelper(this);
+				ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper.getContainerSessionDaoImpl();
+				CJayImageDaoImpl cJayImageDaoImpl = databaseHelper.getCJayImageDaoImpl();
+				IssueDaoImpl issueDaoImpl = databaseHelper.getIssueDaoImpl();
+				
+				containerSessionDaoImpl.update(mContainerSession);
+				if (issueDeleted) {
+					issueDaoImpl.delete(issue);
+				} else {
+					issueDaoImpl.update(issue);
+				}
+				cJayImageDaoImpl.delete(mLongClickedCJayImage);
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			
+			// refresh image list
+			refresh();
+		}
+	}
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		boolean isDisplayed = !(mLongClickedCJayImage == null);
+		menu.findItem(R.id.menu_trash).setVisible(isDisplayed);
+		
+		return super.onPrepareOptionsMenu(menu);
 	}
 	
 	@Override

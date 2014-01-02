@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.dao;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -124,8 +125,7 @@ public class ContainerSessionDaoImpl extends
 	 * @return
 	 * @throws SQLException
 	 */
-	public List<ContainerSession> getListUploadContainerSessions()
-			throws SQLException {
+	public List<ContainerSession> getListUploadContainerSessions() throws SQLException {
 
 		Logger.Log(LOG_TAG, "getListUploadContainerSessions()");
 
@@ -148,8 +148,7 @@ public class ContainerSessionDaoImpl extends
 	 * - Local = true
 	 */
 	@Override
-	public List<ContainerSession> getLocalContainerSessions()
-			throws SQLException {
+	public List<ContainerSession> getLocalContainerSessions() throws SQLException {
 		Logger.Log(LOG_TAG, "getLocalContainerSessions()");
 
 		List<ContainerSession> containerSessions = this.query(this
@@ -159,8 +158,7 @@ public class ContainerSessionDaoImpl extends
 				.and()
 				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
 				.and()
-				.ne(ContainerSession.FIELD_STATE,
-						ContainerSession.STATE_UPLOAD_COMPLETED).prepare());
+				.ne(ContainerSession.FIELD_STATE, ContainerSession.STATE_UPLOAD_COMPLETED).prepare());
 
 		return containerSessions;
 	}
@@ -173,8 +171,7 @@ public class ContainerSessionDaoImpl extends
 	 * -
 	 */
 	@Override
-	public List<ContainerSession> getListCheckOutContainerSessions()
-			throws SQLException {
+	public List<ContainerSession> getListCheckOutContainerSessions() throws SQLException {
 
 		Logger.Log(LOG_TAG, "getListCheckOutContainerSessions()");
 
@@ -183,5 +180,59 @@ public class ContainerSessionDaoImpl extends
 				.eq(ContainerSession.FIELD_CHECK_OUT_TIME, "").prepare());
 
 		return containerSessions;
+	}
+	
+	@Override
+	public List<ContainerSession> getListReportedContainerSessions() throws SQLException {
+		Logger.Log(LOG_TAG, "getListReportedContainerSessions()");
+		
+		List<ContainerSession> containerSessions = getAllContainerSessions();
+		List<ContainerSession> reportedContainerSessions = new ArrayList<ContainerSession>();
+		
+		for (ContainerSession containerSession : containerSessions) {
+			boolean hasReportTypeImages = false;
+			boolean hasUnreportedImages = false;
+			for (CJayImage cJayImage : containerSession.getCJayImages()) {
+				if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
+					hasReportTypeImages = true;
+					if (cJayImage.getIssue() == null) {
+						hasUnreportedImages = true;
+						break;
+					}
+				}
+			}
+			if (hasReportTypeImages && !hasUnreportedImages) {
+				reportedContainerSessions.add(containerSession);
+			}
+		}
+		
+		return reportedContainerSessions;
+	}
+
+	@Override
+	public List<ContainerSession> getListReportingContainerSessions() throws SQLException {
+		Logger.Log(LOG_TAG, "getListReportingContainerSessions()");
+		
+		List<ContainerSession> containerSessions = getAllContainerSessions();
+		List<ContainerSession> reportingContainerSessions = new ArrayList<ContainerSession>();
+		
+		for (ContainerSession containerSession : containerSessions) {
+			boolean hasReportTypeImages = false;
+			boolean hasUnreportedImages = false;
+			for (CJayImage cJayImage : containerSession.getCJayImages()) {
+				if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
+					hasReportTypeImages = true;
+					if (cJayImage.getIssue() == null) {
+						hasUnreportedImages = true;
+						break;
+					}
+				}
+			}
+			if (!hasReportTypeImages || (hasReportTypeImages && hasUnreportedImages)) {
+				reportingContainerSessions.add(containerSession);
+			}
+		}
+		
+		return reportingContainerSessions;
 	}
 }

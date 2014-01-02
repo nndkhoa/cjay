@@ -77,7 +77,6 @@ public class AuditorIssueAssigmentActivity extends CJayActivity {
 		// save db records
 		try {			
 			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
-			cJayImageDaoImpl.createOrUpdate(mCJayImage);
 			cJayImageDaoImpl.update(mCJayImage);
 		} catch (SQLException e) {
 			e.printStackTrace();

@@ -29,6 +29,7 @@ import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.events.ContainerEditedEvent;
 import com.cloudjay.cjay.events.ContainerSessionAddedEvent;
+import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.DatabaseHelper;
@@ -87,10 +88,9 @@ public class AuditorReportingListFragment extends SherlockFragment {
 					int count) {
 			}
 		});
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListContainerSessions(getActivity());
-		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
-				.getListOperators(getActivity());
+
+		mOperators = (ArrayList<Operator>) DataCenter.getInstance().getListOperators(getActivity());
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListReportingContainerSessions(getActivity());
 		configureControls(mFeeds);
 		initContainerFeedAdapter(mFeeds);
 
@@ -122,10 +122,8 @@ public class AuditorReportingListFragment extends SherlockFragment {
 		mSelectedContainerSession = null;
 		getActivity().supportInvalidateOptionsMenu();
 
-		Intent intent = new Intent(getActivity(),
-				AuditorContainerActivity_.class);
-		intent.putExtra(AuditorContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-				mFeedsAdapter.getItem(position).getUuid());
+		Intent intent = new Intent(getActivity(), AuditorContainerActivity_.class);
+		intent.putExtra(AuditorContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA,	mFeedsAdapter.getItem(position).getUuid());
 		startActivity(intent);
 	}
 
@@ -145,15 +143,13 @@ public class AuditorReportingListFragment extends SherlockFragment {
 
 		boolean isDisplayed = !(mSelectedContainerSession == null);
 		menu.findItem(R.id.menu_edit_container).setVisible(isDisplayed);
-		menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
 	}
 	
 	@Override
 	public void onResume() {
 		super.onResume();
 
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListContainerSessions(getActivity());
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListReportingContainerSessions(getActivity());
 		mSearchEditText.setText(""); // this will refresh the list
 	}
 
@@ -212,9 +208,8 @@ public class AuditorReportingListFragment extends SherlockFragment {
 						new ContainerSessionAddedEvent(containerSession));
 
 				Intent intent = new Intent(getActivity(), CameraActivity_.class);
-				intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-						containerSession.getUuid());
-				intent.putExtra("type", 1); // in
+				intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA, containerSession.getUuid());
+				intent.putExtra("type", CJayImage.TYPE_REPORT); 
 				startActivity(intent);
 
 			} catch (SQLException e) {
@@ -230,14 +225,10 @@ public class AuditorReportingListFragment extends SherlockFragment {
 								operatorName)) {
 					// do nothing
 				} else {
-					DatabaseHelper databaseHelper = CJayClient.getInstance()
-							.getDatabaseManager().getHelper(getActivity());
-					OperatorDaoImpl operatorDaoImpl = databaseHelper
-							.getOperatorDaoImpl();
-					ContainerDaoImpl containerDaoImpl = databaseHelper
-							.getContainerDaoImpl();
-					ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper
-							.getContainerSessionDaoImpl();
+					DatabaseHelper databaseHelper = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity());
+					OperatorDaoImpl operatorDaoImpl = databaseHelper.getOperatorDaoImpl();
+					ContainerDaoImpl containerDaoImpl = databaseHelper.getContainerDaoImpl();
+					ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper.getContainerSessionDaoImpl();
 
 					// find operator
 					Operator operator = operatorDaoImpl
