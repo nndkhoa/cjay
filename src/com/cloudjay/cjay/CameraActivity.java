@@ -17,6 +17,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.hardware.Camera;
+import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
@@ -280,6 +281,7 @@ public class CameraActivity extends Activity {
 
 						parameters.setPictureFormat(ImageFormat.JPEG);
 						parameters.setFlashMode(flashMode);
+						parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
 
 						List<String> modes = parameters
 								.getSupportedFocusModes();
@@ -289,7 +291,7 @@ public class CameraActivity extends Activity {
 						}
 
 						// parameters
-						// .setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+						// setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
 
 						camera.setParameters(parameters);
 						cameraConfigured = true;
