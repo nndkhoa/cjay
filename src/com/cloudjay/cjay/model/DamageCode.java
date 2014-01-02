@@ -21,14 +21,14 @@ import com.j256.ormlite.table.DatabaseTable;
 public class DamageCode implements Parcelable {
 
 	public static final String ID = "id";
-	public static final String NAME = "name";
+	public static final String DISPLAY_NAME = "display_name";
 	public static final String CODE = "code";
 
 	@DatabaseField(id = true, columnName = ID)
 	int id;
 
-	@DatabaseField(columnName = NAME)
-	String name;
+	@DatabaseField(columnName = DISPLAY_NAME)
+	String display_name;
 
 	@DatabaseField(columnName = CODE)
 	String code;
@@ -37,11 +37,11 @@ public class DamageCode implements Parcelable {
 	Collection<Issue> issues;
 
 	public String getName() {
-		return name;
+		return display_name;
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.display_name = name;
 	}
 
 	public String getCode() {
@@ -62,21 +62,20 @@ public class DamageCode implements Parcelable {
 
 	@Override
 	public int describeContents() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(id);
-		dest.writeString(name);
+		dest.writeString(display_name);
 		dest.writeString(code);
 		parcelCollection(dest, issues);
 	}
 
 	private void readFromParcel(Parcel in) {
 		this.id = in.readInt();
-		this.name = in.readString();
+		this.display_name = in.readString();
 		this.code = in.readString();
 		this.issues = unparcelCollection(in, Issue.CREATOR);
 	}

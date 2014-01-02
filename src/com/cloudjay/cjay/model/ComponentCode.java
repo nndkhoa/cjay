@@ -8,39 +8,40 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /**
- * Danh sách vị trí.
+ * Danh sách components.
  * 
  * @author tieubao
  * 
  */
-@DatabaseTable(tableName = "location_code")
-public class LocationCode implements Parcelable {
+@DatabaseTable(tableName = "component_code")
+public class ComponentCode implements Parcelable {
 
 	private static final String ID = "id";
-	private static final String NAME = "name";
-	private static final String CODE = "code";
+	public static final String DISPLAY_NAME = "display_name";
+	public static final String CODE = "code";
 
 	@DatabaseField(id = true, columnName = ID)
 	int id;
 
-	@DatabaseField(columnName = NAME)
-	String name;
+	@DatabaseField(columnName = DISPLAY_NAME)
+	String display_name;
 
 	@DatabaseField(columnName = CODE)
 	String code;
 
-//	@ForeignCollectionField(eager = true)
-//	Collection<Issue> issues;
+	@ForeignCollectionField(eager = true)
+	Collection<Issue> issues;
 
 	public String getName() {
-		return name;
+		return display_name;
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.display_name = name;
 	}
 
 	public int getId() {
@@ -68,36 +69,36 @@ public class LocationCode implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(id);
-		dest.writeString(name);
+		dest.writeString(display_name);
 		dest.writeString(code);
-//		parcelCollection(dest, issues);
+		// parcelCollection(dest, issues);
 		// dest.writeTypedList((List<Issue>) issues);
 	}
 
 	private void readFromParcel(Parcel in) {
 		this.id = in.readInt();
-		this.name = in.readString();
+		this.display_name = in.readString();
 		this.code = in.readString();
-//		this.issues = unparcelCollection(in, Issue.CREATOR);
+		// this.issues = unparcelCollection(in, Issue.CREATOR);
 		// in.readTypedList(issues, Issue.CREATOR);
 	}
 
-	public static final Parcelable.Creator<LocationCode> CREATOR = new Parcelable.Creator<LocationCode>() {
+	public static final Parcelable.Creator<ComponentCode> CREATOR = new Parcelable.Creator<ComponentCode>() {
 
-		public LocationCode createFromParcel(Parcel source) {
-			return new LocationCode(source);
+		public ComponentCode createFromParcel(Parcel source) {
+			return new ComponentCode(source);
 		}
 
-		public LocationCode[] newArray(int size) {
-			return new LocationCode[size];
+		public ComponentCode[] newArray(int size) {
+			return new ComponentCode[size];
 		}
 	};
 
-	public LocationCode() {
+	public ComponentCode() {
 
 	}
 
-	public LocationCode(Parcel in) {
+	public ComponentCode(Parcel in) {
 
 		readFromParcel(in);
 	}

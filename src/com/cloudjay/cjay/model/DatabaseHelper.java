@@ -32,7 +32,7 @@ import com.j256.ormlite.table.TableUtils;
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 	private static final Class<?>[] DATA_CLASSES = { DamageCode.class,
-			LocationCode.class, RepairCode.class, Operator.class, User.class,
+			ComponentCode.class, RepairCode.class, Operator.class, User.class,
 			Depot.class, Container.class, ContainerSession.class, Issue.class,
 			CJayImage.class };
 

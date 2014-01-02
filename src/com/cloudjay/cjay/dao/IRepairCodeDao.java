@@ -20,4 +20,6 @@ public interface IRepairCodeDao extends Dao<RepairCode, Integer> {
 	void deleteAllRepairCodes() throws SQLException;
 
 	boolean isEmpty() throws SQLException;
+
+	RepairCode findRepairCode(String repairCode) throws SQLException;
 }
