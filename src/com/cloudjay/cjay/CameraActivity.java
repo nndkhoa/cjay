@@ -455,8 +455,8 @@ public class CameraActivity extends Activity {
 		// filename sample:
 		// [depot-code]-2013-12-19-[gate-in|gate-out|report]-[UUID].jpg
 		String fileName = depotCode + "-"
-				+ StringHelper.getCurrentTimestamp("yyyy-mm-dd") + imageType
-				+ "-" + uuid + ".jpg";
+				+ StringHelper.getCurrentTimestamp("yyyy-mm-dd") + "-"
+				+ imageType + "-" + uuid + ".jpg";
 
 		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
 

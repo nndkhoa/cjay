@@ -24,7 +24,7 @@ import com.googlecode.androidannotations.annotations.ViewById;
 public class AuditorHomeActivity extends SherlockFragmentActivity implements
 		OnPageChangeListener, TabListener,
 		AddContainerDialog.AddContainerDialogListener,
-		SearchOperatorDialog.SearchOperatorDialogListener  {
+		SearchOperatorDialog.SearchOperatorDialogListener {
 
 	private String[] locations;
 	@ViewById
@@ -87,13 +87,13 @@ public class AuditorHomeActivity extends SherlockFragmentActivity implements
 	@Override
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
 	}
-	
+
 	@Override
 	public void OnOperatorSelected(Fragment parent, String containerId,
 			String operatorName, int mode) {
 		if (parent instanceof AuditorReportingListFragment) {
-			((AuditorReportingListFragment) parent).OnOperatorSelected(containerId,
-					operatorName, mode);
+			((AuditorReportingListFragment) parent).OnOperatorSelected(
+					containerId, operatorName, mode);
 		}
 	}
 
@@ -105,7 +105,7 @@ public class AuditorHomeActivity extends SherlockFragmentActivity implements
 					containerId, operatorName, mode);
 		}
 	}
-	
+
 	public class AuditorHomeTabPageAdaptor extends FragmentPagerAdapter {
 		private String[] locations;
 
@@ -119,8 +119,6 @@ public class AuditorHomeActivity extends SherlockFragmentActivity implements
 		}
 
 		public Fragment getItem(int position) {
-			Fragment fragment = new SampleFragment_();
-			Bundle bundle = new Bundle();
 			switch (position) {
 			case 0:
 				Fragment reportingListFragment_ = new AuditorReportingListFragment_();
@@ -128,10 +126,11 @@ public class AuditorHomeActivity extends SherlockFragmentActivity implements
 			case 1:
 				Fragment reportedListFragment_ = new AuditorReportedListFragment_();
 				return reportedListFragment_;
+
+			case 2:
 			default:
-				bundle.putString("label", locations[position]);
-				fragment.setArguments(bundle);
-				return fragment;
+				Fragment uploadFragment = new UploadsFragment_();
+				return uploadFragment;
 			}
 		}
 	}

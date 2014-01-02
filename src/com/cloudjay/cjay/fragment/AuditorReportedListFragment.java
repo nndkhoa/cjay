@@ -23,28 +23,35 @@ import com.googlecode.androidannotations.annotations.ItemLongClick;
 import com.googlecode.androidannotations.annotations.OptionsItem;
 import com.googlecode.androidannotations.annotations.OptionsMenu;
 import com.googlecode.androidannotations.annotations.ViewById;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 @EFragment(R.layout.fragment_auditor_reported)
 @OptionsMenu(R.menu.menu_auditor_reported)
 public class AuditorReportedListFragment extends SherlockFragment {
-//	private final static String TAG = "AuditorReportedListFragment";
-	
+	// private final static String TAG = "AuditorReportedListFragment";
+
 	private ArrayList<ContainerSession> mFeeds;
 	private FunDapter<ContainerSession> mFeedsAdapter;
 
 	private ContainerSession mSelectedContainerSession;
-	
-	@ViewById(R.id.container_list) ListView mFeedListView;
-	
+
+	@ViewById(R.id.container_list)
+	ListView mFeedListView;
+
+	private ImageLoader imageLoader;
+
 	@AfterViews
 	void afterViews() {
+		imageLoader = ImageLoader.getInstance();
+
 		// load list data
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListReportedContainerSessions(getActivity());
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+				.getListReportedContainerSessions(getActivity());
 		initContainerFeedAdapter(mFeeds);
-		
+
 		mSelectedContainerSession = null;
 	}
-	
+
 	@ItemLongClick(R.id.container_list)
 	void listItemLongClicked(int position) {
 		// refresh highlighting
@@ -54,14 +61,14 @@ public class AuditorReportedListFragment extends SherlockFragment {
 		mSelectedContainerSession = mFeedsAdapter.getItem(position);
 		getActivity().supportInvalidateOptionsMenu();
 	}
-	
+
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 		if (mSelectedContainerSession != null) {
-			// TODO			
+			// TODO
 		}
 	}
-	
+
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
@@ -69,16 +76,17 @@ public class AuditorReportedListFragment extends SherlockFragment {
 		boolean isDisplayed = !(mSelectedContainerSession == null);
 		menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
-		
+
 		// refresh list
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListReportedContainerSessions(getActivity());
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+				.getListReportedContainerSessions(getActivity());
 		mFeedsAdapter.updateData(mFeeds);
 	}
-	
+
 	private void initContainerFeedAdapter(ArrayList<ContainerSession> containers) {
 		BindDictionary<ContainerSession> feedsDict = new BindDictionary<ContainerSession>();
 		feedsDict.addStringField(R.id.feed_item_container_id,
@@ -124,14 +132,17 @@ public class AuditorReportedListFragment extends SherlockFragment {
 					@Override
 					public void loadImage(String url, ImageView view) {
 						if (url != null) {
-							try {
-								view.setImageBitmap(Utils.decodeImage(
-										getActivity().getContentResolver(),
-										Uri.parse(url),
-										Utils.MINI_THUMBNAIL_SIZE));
-							} catch (FileNotFoundException e) {
-								e.printStackTrace();
-							}
+
+							imageLoader.displayImage(url, view);
+
+							// try {
+							// view.setImageBitmap(Utils.decodeImage(
+							// getActivity().getContentResolver(),
+							// Uri.parse(url),
+							// Utils.MINI_THUMBNAIL_SIZE));
+							// } catch (FileNotFoundException e) {
+							// e.printStackTrace();
+							// }
 						}
 					}
 				});

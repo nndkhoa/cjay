@@ -26,66 +26,79 @@ import com.googlecode.androidannotations.annotations.ItemClick;
 import com.googlecode.androidannotations.annotations.OptionsItem;
 import com.googlecode.androidannotations.annotations.OptionsMenu;
 import com.googlecode.androidannotations.annotations.ViewById;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 @EActivity(R.layout.activity_auditor_issue_assignment)
 @OptionsMenu(R.menu.menu_audit_issue_report)
 public class AuditorIssueAssigmentActivity extends CJayActivity {
 
 	public static final String CJAY_IMAGE_EXTRA = "cjay_image";
-	
+
 	private ArrayList<Issue> mFeeds;
 	private FunDapter<Issue> mFeedsAdapter;
 	private ContainerSession mContainerSession;
 	private CJayImage mCJayImage;
 	private Issue mSelectedIssue;
+	private ImageLoader imageLoader;
 
-	@Extra(CJAY_IMAGE_EXTRA)		String mCJayImageUUID = "";
+	@Extra(CJAY_IMAGE_EXTRA)
+	String mCJayImageUUID = "";
 
-	@ViewById(R.id.item_picture)	ImageView imageView;
-	@ViewById(R.id.feeds)			ListView mFeedListView;
-	
+	@ViewById(R.id.item_picture)
+	ImageView imageView;
+	@ViewById(R.id.feeds)
+	ListView mFeedListView;
+
 	@AfterViews
 	void afterViews() {
 		try {
-			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
+			imageLoader = ImageLoader.getInstance();
+
+			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance()
+					.getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
 			mCJayImage = cJayImageDaoImpl.findByUuid(mCJayImageUUID);
 
 			if (mCJayImage != null) {
-				imageView.setImageBitmap(Utils.decodeImage(getContentResolver(), mCJayImage.getOriginalPhotoUri(), Utils.MINI_THUMBNAIL_SIZE));
+
+				imageLoader.displayImage(mCJayImage.getUri(), imageView);
+
+				// imageView.setImageBitmap(Utils.decodeImage(
+				// getContentResolver(), mCJayImage.getOriginalPhotoUri(),
+				// Utils.MINI_THUMBNAIL_SIZE));
+
 				mContainerSession = mCJayImage.getContainerSession();
 			}
-			
+
 			if (mContainerSession != null) {
 				mFeeds = new ArrayList<Issue>(mContainerSession.getIssues());
 				initImageFeedAdapter(mFeeds);
 			}
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} catch (FileNotFoundException e){
-			e.printStackTrace();
 		}
-		
+
 		mSelectedIssue = null;
 	}
-	
+
 	@OptionsItem(R.id.menu_check)
 	void checkMenuItemClicked() {
 		// assign issue to image
 		mCJayImage.setIssue(mSelectedIssue);
-		
+
 		// save db records
-		try {			
-			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
+		try {
+			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance()
+					.getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
 			cJayImageDaoImpl.update(mCJayImage);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		// go back
 		this.onBackPressed();
 	}
-	
+
 	@ItemClick(R.id.feeds)
 	void issueItemClicked(int position) {
 		mSelectedIssue = mFeedsAdapter.getItem(position);
@@ -93,15 +106,15 @@ public class AuditorIssueAssigmentActivity extends CJayActivity {
 		// refresh menu
 		supportInvalidateOptionsMenu();
 	}
-	
+
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		boolean isDisplayed = !(mSelectedIssue == null);
 		menu.findItem(R.id.menu_check).setVisible(isDisplayed);
-		
+
 		return super.onPrepareOptionsMenu(menu);
 	}
-	
+
 	private void initImageFeedAdapter(ArrayList<Issue> containers) {
 		BindDictionary<Issue> feedsDict = new BindDictionary<Issue>();
 		feedsDict.addStringField(R.id.issue_location_code,
@@ -165,14 +178,19 @@ public class AuditorIssueAssigmentActivity extends CJayActivity {
 				}, new DynamicImageLoader() {
 					@Override
 					public void loadImage(String url, ImageView view) {
-						try {
-							view.setImageBitmap(Utils.decodeImage(getContentResolver(), Uri.parse(url), Utils.MINI_THUMBNAIL_SIZE));
-						} catch (FileNotFoundException e) {
-							e.printStackTrace();
-						}
+						imageLoader.displayImage(url, view);
+						
+						// try {
+						// view.setImageBitmap(Utils.decodeImage(
+						// getContentResolver(), Uri.parse(url),
+						// Utils.MINI_THUMBNAIL_SIZE));
+						// } catch (FileNotFoundException e) {
+						// e.printStackTrace();
+						// }
 					}
 				});
-		mFeedsAdapter = new FunDapter<Issue>(this, containers, R.layout.list_item_issue, feedsDict);
+		mFeedsAdapter = new FunDapter<Issue>(this, containers,
+				R.layout.list_item_issue, feedsDict);
 		mFeedListView.setAdapter(mFeedsAdapter);
 	}
 }

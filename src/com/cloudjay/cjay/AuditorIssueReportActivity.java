@@ -34,28 +34,35 @@ import com.googlecode.androidannotations.annotations.OptionsItem;
 import com.googlecode.androidannotations.annotations.OptionsMenu;
 // slide 20
 import com.googlecode.androidannotations.annotations.ViewById;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 @EActivity(R.layout.activity_auditor_issue_report)
 @OptionsMenu(R.menu.menu_audit_issue_report)
-public class AuditorIssueReportActivity extends CJayActivity
-		implements OnPageChangeListener, TabListener,
-		AuditorIssueReportListener {
+public class AuditorIssueReportActivity extends CJayActivity implements
+		OnPageChangeListener, TabListener, AuditorIssueReportListener {
 
 	public static final String CJAY_IMAGE_EXTRA = "cjay_image";
-	
+
 	private AuditorIssueReportTabPageAdaptor mViewPagerAdapter;
 	private String[] locations;
 	private CJayImage mCJayImage;
+	private ImageLoader imageLoader;
 
-	@Extra(CJAY_IMAGE_EXTRA)		String mCJayImageUUID = "";
-	
-	@ViewById(R.id.pager)			ViewPager pager;
-	@ViewById(R.id.item_picture)	ImageView imageView;
+	@Extra(CJAY_IMAGE_EXTRA)
+	String mCJayImageUUID = "";
+
+	@ViewById(R.id.pager)
+	ViewPager pager;
+	@ViewById(R.id.item_picture)
+	ImageView imageView;
 
 	@AfterViews
 	void afterViews() {
 		try {
-			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
+			imageLoader = ImageLoader.getInstance();
+
+			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance()
+					.getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
 			mCJayImage = cJayImageDaoImpl.findByUuid(mCJayImageUUID);
 			if (mCJayImage.getIssue() == null) {
 				Issue issue = new Issue();
@@ -63,40 +70,47 @@ public class AuditorIssueReportActivity extends CJayActivity
 				mCJayImage.setIssue(issue);
 			}
 
-			imageView.setImageBitmap(Utils.decodeImage(getContentResolver(), mCJayImage.getOriginalPhotoUri(), Utils.MINI_THUMBNAIL_SIZE));
-			
+			// imageView.setImageBitmap(Utils
+			// .decodeImage(getContentResolver(),
+			// mCJayImage.getOriginalPhotoUri(),
+			// Utils.MINI_THUMBNAIL_SIZE));
+
+			imageLoader.displayImage(mCJayImage.getUri(), imageView);
+
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} catch (FileNotFoundException e){
-			e.printStackTrace();
 		}
-		
-		locations = getResources().getStringArray(R.array.auditor_damage_report_tabs);
+
+		locations = getResources().getStringArray(
+				R.array.auditor_damage_report_tabs);
 		configureViewPager();
 		configureActionBar();
 	}
-	
+
 	@OptionsItem(R.id.menu_check)
 	void checkMenuItemClicked() {
 		// save data
 		for (int i = 0; i < mViewPagerAdapter.getCount(); i++) {
-			IssueReportFragment fragment = (IssueReportFragment) mViewPagerAdapter.getRegisteredFragment(i);
+			IssueReportFragment fragment = (IssueReportFragment) mViewPagerAdapter
+					.getRegisteredFragment(i);
 			if (fragment != null) {
 				fragment.validateAndSaveData();
 			}
 		}
-		
+
 		// save db records
 		try {
-			IssueDaoImpl issueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getIssueDaoImpl();
+			IssueDaoImpl issueDaoImpl = CJayClient.getInstance()
+					.getDatabaseManager().getHelper(this).getIssueDaoImpl();
 			issueDaoImpl.createOrUpdate(mCJayImage.getIssue());
-			
-			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
+
+			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance()
+					.getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
 			cJayImageDaoImpl.createOrUpdate(mCJayImage);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		// go back
 		this.onBackPressed();
 	}
@@ -130,7 +144,8 @@ public class AuditorIssueReportActivity extends CJayActivity
 	}
 
 	private void configureViewPager() {
-		mViewPagerAdapter = new AuditorIssueReportTabPageAdaptor(getSupportFragmentManager(), locations);
+		mViewPagerAdapter = new AuditorIssueReportTabPageAdaptor(
+				getSupportFragmentManager(), locations);
 		pager.setOffscreenPageLimit(5);
 		pager.setAdapter(mViewPagerAdapter);
 		pager.setOnPageChangeListener(this);
@@ -145,13 +160,14 @@ public class AuditorIssueReportActivity extends CJayActivity
 			getSupportActionBar().addTab(tab);
 		}
 	}
-	
+
 	@Override
 	public void onReportPageCompleted(int page) {
 		// go to next tab
 		int currPosition = getSupportActionBar().getSelectedNavigationIndex();
 		if (currPosition < getSupportActionBar().getTabCount() - 1) {
-			getSupportActionBar().selectTab(getSupportActionBar().getTabAt(++currPosition));
+			getSupportActionBar().selectTab(
+					getSupportActionBar().getTabAt(++currPosition));
 		}
 	}
 
@@ -161,49 +177,58 @@ public class AuditorIssueReportActivity extends CJayActivity
 		switch (type) {
 		case TYPE_LOCATION_CODE:
 			mCJayImage.getIssue().setLocationCode(val);
-			
+
 			break;
 		case TYPE_LENGTH:
 			mCJayImage.getIssue().setLength(val);
-			
+
 			break;
 		case TYPE_HEIGHT:
 			mCJayImage.getIssue().setHeight(val);
-			
+
 			break;
 		case TYPE_QUANTITY:
 			mCJayImage.getIssue().setQuantity(val);
-			
+
 			break;
 		case TYPE_DAMAGE_CODE:
 			try {
-				DamageCodeDaoImpl damageCodeDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getDamageCodeDaoImpl();
-				mCJayImage.getIssue().setDamageCode(damageCodeDaoImpl.findDamageCode(val));
+				DamageCodeDaoImpl damageCodeDaoImpl = CJayClient.getInstance()
+						.getDatabaseManager().getHelper(this)
+						.getDamageCodeDaoImpl();
+				mCJayImage.getIssue().setDamageCode(
+						damageCodeDaoImpl.findDamageCode(val));
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			
+
 			break;
 		case TYPE_REPAIR_CODE:
 			try {
-				RepairCodeDaoImpl repairCodeDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getRepairCodeDaoImpl();
-				mCJayImage.getIssue().setRepairCode(repairCodeDaoImpl.findRepairCode(val));
+				RepairCodeDaoImpl repairCodeDaoImpl = CJayClient.getInstance()
+						.getDatabaseManager().getHelper(this)
+						.getRepairCodeDaoImpl();
+				mCJayImage.getIssue().setRepairCode(
+						repairCodeDaoImpl.findRepairCode(val));
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			
+
 			break;
 		case TYPE_COMPONENT_CODE:
 			try {
-				ComponentCodeDaoImpl componentCodeDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getComponentCodeDaoImpl();
-				mCJayImage.getIssue().setComponentCode(componentCodeDaoImpl.findComponentCode(val));
+				ComponentCodeDaoImpl componentCodeDaoImpl = CJayClient
+						.getInstance().getDatabaseManager().getHelper(this)
+						.getComponentCodeDaoImpl();
+				mCJayImage.getIssue().setComponentCode(
+						componentCodeDaoImpl.findComponentCode(val));
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			
+
 			break;
 		}
-		
+
 	}
 
 	public class AuditorIssueReportTabPageAdaptor extends FragmentPagerAdapter {
@@ -222,7 +247,7 @@ public class AuditorIssueReportActivity extends CJayActivity
 
 		public Fragment getItem(int position) {
 			IssueReportFragment fragment;
-			
+
 			switch (position) {
 			case TAB_ISSUE_LOCATION:
 				fragment = new IssueReportLocationFragment_();
@@ -248,22 +273,23 @@ public class AuditorIssueReportActivity extends CJayActivity
 			fragment.setIssue(mCJayImage.getIssue());
 			return fragment;
 		}
-		
-	    @Override
-	    public Object instantiateItem(ViewGroup container, int position) {
-	        Fragment fragment = (Fragment) super.instantiateItem(container, position);
-	        registeredFragments.put(position, fragment);
-	        return fragment;
-	    }
 
-	    @Override
-	    public void destroyItem(ViewGroup container, int position, Object object) {
-	        registeredFragments.remove(position);
-	        super.destroyItem(container, position, object);
-	    }
+		@Override
+		public Object instantiateItem(ViewGroup container, int position) {
+			Fragment fragment = (Fragment) super.instantiateItem(container,
+					position);
+			registeredFragments.put(position, fragment);
+			return fragment;
+		}
 
-	    public Fragment getRegisteredFragment(int position) {
-	        return registeredFragments.get(position);
-	    }
+		@Override
+		public void destroyItem(ViewGroup container, int position, Object object) {
+			registeredFragments.remove(position);
+			super.destroyItem(container, position, object);
+		}
+
+		public Fragment getRegisteredFragment(int position) {
+			return registeredFragments.get(position);
+		}
 	}
 }

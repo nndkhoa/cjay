@@ -50,6 +50,7 @@ import com.googlecode.androidannotations.annotations.ItemLongClick;
 import com.googlecode.androidannotations.annotations.OptionsItem;
 import com.googlecode.androidannotations.annotations.OptionsMenu;
 import com.googlecode.androidannotations.annotations.ViewById;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import de.greenrobot.event.EventBus;
 
@@ -63,6 +64,8 @@ public class AuditorReportingListFragment extends SherlockFragment {
 
 	private ContainerSession mSelectedContainerSession;
 
+	private ImageLoader imageLoader;
+
 	@ViewById(R.id.container_list)
 	ListView mFeedListView;
 	@ViewById(R.id.search_edittext)
@@ -74,6 +77,8 @@ public class AuditorReportingListFragment extends SherlockFragment {
 
 	@AfterViews
 	void afterViews() {
+		imageLoader = ImageLoader.getInstance();
+
 		mSearchEditText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable arg0) {
@@ -89,8 +94,10 @@ public class AuditorReportingListFragment extends SherlockFragment {
 			}
 		});
 
-		mOperators = (ArrayList<Operator>) DataCenter.getInstance().getListOperators(getActivity());
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListReportingContainerSessions(getActivity());
+		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
+				.getListOperators(getActivity());
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+				.getListReportingContainerSessions(getActivity());
 		configureControls(mFeeds);
 		initContainerFeedAdapter(mFeeds);
 
@@ -122,8 +129,10 @@ public class AuditorReportingListFragment extends SherlockFragment {
 		mSelectedContainerSession = null;
 		getActivity().supportInvalidateOptionsMenu();
 
-		Intent intent = new Intent(getActivity(), AuditorContainerActivity_.class);
-		intent.putExtra(AuditorContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA,	mFeedsAdapter.getItem(position).getUuid());
+		Intent intent = new Intent(getActivity(),
+				AuditorContainerActivity_.class);
+		intent.putExtra(AuditorContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+				mFeedsAdapter.getItem(position).getUuid());
 		startActivity(intent);
 	}
 
@@ -144,12 +153,13 @@ public class AuditorReportingListFragment extends SherlockFragment {
 		boolean isDisplayed = !(mSelectedContainerSession == null);
 		menu.findItem(R.id.menu_edit_container).setVisible(isDisplayed);
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
 
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListReportingContainerSessions(getActivity());
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+				.getListReportingContainerSessions(getActivity());
 		mSearchEditText.setText(""); // this will refresh the list
 	}
 
@@ -208,8 +218,9 @@ public class AuditorReportingListFragment extends SherlockFragment {
 						new ContainerSessionEnqueueEvent(containerSession));
 
 				Intent intent = new Intent(getActivity(), CameraActivity_.class);
-				intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA, containerSession.getUuid());
-				intent.putExtra("type", CJayImage.TYPE_REPORT); 
+				intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+						containerSession.getUuid());
+				intent.putExtra("type", CJayImage.TYPE_REPORT);
 				startActivity(intent);
 
 			} catch (SQLException e) {
@@ -225,10 +236,14 @@ public class AuditorReportingListFragment extends SherlockFragment {
 								operatorName)) {
 					// do nothing
 				} else {
-					DatabaseHelper databaseHelper = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity());
-					OperatorDaoImpl operatorDaoImpl = databaseHelper.getOperatorDaoImpl();
-					ContainerDaoImpl containerDaoImpl = databaseHelper.getContainerDaoImpl();
-					ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper.getContainerSessionDaoImpl();
+					DatabaseHelper databaseHelper = CJayClient.getInstance()
+							.getDatabaseManager().getHelper(getActivity());
+					OperatorDaoImpl operatorDaoImpl = databaseHelper
+							.getOperatorDaoImpl();
+					ContainerDaoImpl containerDaoImpl = databaseHelper
+							.getContainerDaoImpl();
+					ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper
+							.getContainerSessionDaoImpl();
 
 					// find operator
 					Operator operator = operatorDaoImpl
@@ -336,14 +351,18 @@ public class AuditorReportingListFragment extends SherlockFragment {
 					@Override
 					public void loadImage(String url, ImageView view) {
 						if (url != null) {
-							try {
-								view.setImageBitmap(Utils.decodeImage(
-										getActivity().getContentResolver(),
-										Uri.parse(url),
-										Utils.MINI_THUMBNAIL_SIZE));
-							} catch (FileNotFoundException e) {
-								e.printStackTrace();
-							}
+
+							imageLoader.displayImage(url, view);
+
+							// try {
+							// view.setImageBitmap(Utils.decodeImage(
+							// getActivity().getContentResolver(),
+							// Uri.parse(url),
+							// Utils.MINI_THUMBNAIL_SIZE));
+							//
+							// } catch (FileNotFoundException e) {
+							// e.printStackTrace();
+							// }
 						}
 					}
 				});

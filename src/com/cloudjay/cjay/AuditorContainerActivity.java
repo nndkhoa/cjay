@@ -36,6 +36,7 @@ import com.googlecode.androidannotations.annotations.ItemLongClick;
 import com.googlecode.androidannotations.annotations.OptionsItem;
 import com.googlecode.androidannotations.annotations.OptionsMenu;
 import com.googlecode.androidannotations.annotations.ViewById;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 //slide 15
 
@@ -44,27 +45,35 @@ import com.googlecode.androidannotations.annotations.ViewById;
 public class AuditorContainerActivity extends CJayActivity {
 
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
-//	private static final String TAG = "AuditorContainerActivity";
-	
+	// private static final String TAG = "AuditorContainerActivity";
+
 	private ArrayList<CJayImage> mFeeds;
 	private FunDapter<CJayImage> mFeedsAdapter;
 	private ContainerSession mContainerSession;
 	private CJayImage mSelectedCJayImage;
 	private CJayImage mLongClickedCJayImage;
+	private ImageLoader imageLoader;
 
-	@ViewById(R.id.btn_add_new)				ImageButton mAddButton;
-	@ViewById(R.id.feeds)					ListView mFeedListView;
-	@ViewById(R.id.container_id_textview)	TextView containerIdTextView;
-	
-	@Extra(CJAY_CONTAINER_SESSION_EXTRA)	String mContainerSessionUUID = "";
+	@ViewById(R.id.btn_add_new)
+	ImageButton mAddButton;
+	@ViewById(R.id.feeds)
+	ListView mFeedListView;
+	@ViewById(R.id.container_id_textview)
+	TextView containerIdTextView;
+
+	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
+	String mContainerSessionUUID = "";
 
 	@AfterViews
 	void afterViews() {
 		try {
+			imageLoader = ImageLoader.getInstance();
+
 			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
 					.getInstance().getDatabaseManager().getHelper(this)
 					.getContainerSessionDaoImpl();
-			mContainerSession = containerSessionDaoImpl.queryForId(mContainerSessionUUID);
+			mContainerSession = containerSessionDaoImpl
+					.queryForId(mContainerSessionUUID);
 
 			if (null != mContainerSession) {
 				containerIdTextView.setText(mContainerSession.getContainerId());
@@ -85,63 +94,71 @@ public class AuditorContainerActivity extends CJayActivity {
 		// clear current selection
 		mLongClickedCJayImage = null;
 		supportInvalidateOptionsMenu();
-		
+
 		mSelectedCJayImage = mFeedsAdapter.getItem(position);
 		if (mSelectedCJayImage.getIssue() != null) {
 			// Already has issue, display that issue
 			showIssueReport();
 		} else {
-			// Don't have issue, ask to whether create new issue, or assign an issue
-			showReportDialog();	
+			// Don't have issue, ask to whether create new issue, or assign an
+			// issue
+			showReportDialog();
 		}
 	}
-	
+
 	@ItemLongClick(R.id.feeds)
 	void imageItemLongClicked(int position) {
 		// refresh highlighting
 		mFeedListView.setItemChecked(position, true);
-		
+
 		// refresh menu
 		mLongClickedCJayImage = mFeedsAdapter.getItem(position);
 		supportInvalidateOptionsMenu();
 	}
-	
+
 	@Click(R.id.btn_add_new)
 	void cameraClicked() {
 		Intent intent = new Intent(this, CameraActivity_.class);
-		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA, mContainerSession.getUuid());
+		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+				mContainerSession.getUuid());
 		intent.putExtra("type", CJayImage.TYPE_REPORT);
 		startActivity(intent);
 	}
-	
+
 	@OptionsItem(R.id.menu_trash)
 	void trashMenuItemClicked() {
 		if (mLongClickedCJayImage != null) {
 			boolean issueDeleted = false;
-			
+
 			// delete image from container session
-			if (mContainerSession.getCJayImages().contains(mLongClickedCJayImage)) {
-				mContainerSession.getCJayImages().remove(mLongClickedCJayImage);				
+			if (mContainerSession.getCJayImages().contains(
+					mLongClickedCJayImage)) {
+				mContainerSession.getCJayImages().remove(mLongClickedCJayImage);
 			}
 
 			// delete image from issue
 			Issue issue = mLongClickedCJayImage.getIssue();
-			if (issue != null && issue.getCJayImages().contains(mLongClickedCJayImage)) {
+			if (issue != null
+					&& issue.getCJayImages().contains(mLongClickedCJayImage)) {
 				issue.getCJayImages().remove(mLongClickedCJayImage);
 				// if issue has no image then delete the issue
-				if (issue.getCJayImages().size() == 0 && mContainerSession.getIssues().contains(issue)) {
+				if (issue.getCJayImages().size() == 0
+						&& mContainerSession.getIssues().contains(issue)) {
 					mContainerSession.getIssues().remove(issue);
 					issueDeleted = true;
 				}
 			}
-			
+
 			// update records in db
 			try {
-				DatabaseHelper databaseHelper = CJayClient.getInstance().getDatabaseManager().getHelper(this);
-				ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper.getContainerSessionDaoImpl();
-				CJayImageDaoImpl cJayImageDaoImpl = databaseHelper.getCJayImageDaoImpl();
+				DatabaseHelper databaseHelper = CJayClient.getInstance()
+						.getDatabaseManager().getHelper(this);
+				ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper
+						.getContainerSessionDaoImpl();
+				CJayImageDaoImpl cJayImageDaoImpl = databaseHelper
+						.getCJayImageDaoImpl();
 				IssueDaoImpl issueDaoImpl = databaseHelper.getIssueDaoImpl();
-				
+
 				containerSessionDaoImpl.update(mContainerSession);
 				if (issueDeleted) {
 					issueDaoImpl.delete(issue);
@@ -149,42 +166,43 @@ public class AuditorContainerActivity extends CJayActivity {
 					issueDaoImpl.update(issue);
 				}
 				cJayImageDaoImpl.delete(mLongClickedCJayImage);
-				
+
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			
+
 			// refresh image list
 			refresh();
 		}
 	}
-	
+
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		boolean isDisplayed = !(mLongClickedCJayImage == null);
 		menu.findItem(R.id.menu_trash).setVisible(isDisplayed);
-		
+
 		return super.onPrepareOptionsMenu(menu);
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
 		refresh();
 	}
-	
+
 	public void refresh() {
 		populateCjayImages();
 		mFeedsAdapter.updateData(mFeeds);
 	}
-	
+
 	private void populateCjayImages() {
 		mFeeds = new ArrayList<CJayImage>();
 		try {
 			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
 					.getInstance().getDatabaseManager().getHelper(this)
 					.getContainerSessionDaoImpl();
-			mContainerSession = containerSessionDaoImpl.queryForId(mContainerSessionUUID);
+			mContainerSession = containerSessionDaoImpl
+					.queryForId(mContainerSessionUUID);
 
 			if (null != mContainerSession) {
 				for (CJayImage cJayImage : mContainerSession.getCJayImages()) {
@@ -197,36 +215,41 @@ public class AuditorContainerActivity extends CJayActivity {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void showReportDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this)
 				.setMessage(R.string.dialog_report_message)
 				.setTitle(R.string.dialog_report_title)
-				.setPositiveButton(R.string.dialog_report_no, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						// Issue not reported, report issue
-						showIssueReport();
-					}
-				})
-				.setNegativeButton(R.string.dialog_report_yes, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						// The issue already reported, assign this image to that issue
-						showIssueAssigment();
-					}
-				});
+				.setPositiveButton(R.string.dialog_report_no,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								// Issue not reported, report issue
+								showIssueReport();
+							}
+						})
+				.setNegativeButton(R.string.dialog_report_yes,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								// The issue already reported, assign this image
+								// to that issue
+								showIssueAssigment();
+							}
+						});
 
 		builder.show();
 	}
-	
+
 	private void showIssueReport() {
 		Intent intent = new Intent(this, AuditorIssueReportActivity_.class);
-		intent.putExtra(AuditorIssueReportActivity_.CJAY_IMAGE_EXTRA, mSelectedCJayImage.getUuid());
+		intent.putExtra(AuditorIssueReportActivity_.CJAY_IMAGE_EXTRA,
+				mSelectedCJayImage.getUuid());
 		startActivity(intent);
 	}
-	
+
 	private void showIssueAssigment() {
 		Intent intent = new Intent(this, AuditorIssueAssigmentActivity_.class);
-		intent.putExtra(AuditorIssueAssigmentActivity_.CJAY_IMAGE_EXTRA, mSelectedCJayImage.getUuid());
+		intent.putExtra(AuditorIssueAssigmentActivity_.CJAY_IMAGE_EXTRA,
+				mSelectedCJayImage.getUuid());
 		startActivity(intent);
 	}
 
@@ -290,15 +313,19 @@ public class AuditorContainerActivity extends CJayActivity {
 				}, new DynamicImageLoader() {
 					@Override
 					public void loadImage(String url, ImageView view) {
-						try {
-							view.setImageBitmap(Utils.decodeImage(getContentResolver(), Uri.parse(url), Utils.MINI_THUMBNAIL_SIZE));
-						} catch (FileNotFoundException e) {
-							e.printStackTrace();
-						}
+
+						imageLoader.displayImage(url, view);
+
+						// try {
+						// view.setImageBitmap(Utils.decodeImage(getContentResolver(),
+						// Uri.parse(url), Utils.MINI_THUMBNAIL_SIZE));
+						// } catch (FileNotFoundException e) {
+						// e.printStackTrace();
+						// }
 					}
 				});
-		mFeedsAdapter = new FunDapter<CJayImage>(
-				this, containers, R.layout.list_item_issue, feedsDict);
+		mFeedsAdapter = new FunDapter<CJayImage>(this, containers,
+				R.layout.list_item_issue, feedsDict);
 		mFeedListView.setAdapter(mFeedsAdapter);
 	}
 }
