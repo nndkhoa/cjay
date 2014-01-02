@@ -14,7 +14,7 @@ import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_issue_repair_code)
-public class AuditorIssueRepairFragment extends AuditorIssueReportFragment implements OnClickListener {
+public class IssueReportRepairFragment extends IssueReportFragment implements OnClickListener {
 	private String mRepairCode;
 	private AuditorIssueReportListener mCallback;
 	private Button mCodeButtons[];

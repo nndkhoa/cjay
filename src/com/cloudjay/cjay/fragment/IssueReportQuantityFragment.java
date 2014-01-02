@@ -1,8 +1,10 @@
 package com.cloudjay.cjay.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -13,23 +15,26 @@ import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ViewById;
 
-@EFragment(R.layout.fragment_issue_dimension)
-public class AuditorIssueDimensionFragment extends AuditorIssueReportFragment  {
+@EFragment(R.layout.fragment_issue_quantity)
+public class IssueReportQuantityFragment extends IssueReportFragment  {
 	private AuditorIssueReportListener mCallback;
 	private Issue mIssue;
 	
-	@ViewById(R.id.length) EditText mLengthEditText;
-	@ViewById(R.id.height) EditText mHeightEditText;
+	@ViewById(R.id.quantity) EditText mQuantityEditText;
 	
 	@AfterViews
 	void afterViews() {
-		mHeightEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+		mQuantityEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView textView, int id,
 					KeyEvent keyEvent) {
 				if (id == EditorInfo.IME_ACTION_DONE) {
 					// move to next tab
-					mCallback.onReportPageCompleted(AuditorIssueReportListener.TAB_ISSUE_DIMENSION);
+					mCallback.onReportPageCompleted(AuditorIssueReportListener.TAB_ISSUE_QUANTITY);
+					
+					// hide keyboard
+					InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+					imm.hideSoftInputFromWindow(mQuantityEditText.getWindowToken(), 0);
 					return true;
 				}
 				return false;
@@ -38,11 +43,10 @@ public class AuditorIssueDimensionFragment extends AuditorIssueReportFragment  {
 		
 		// initialize with issue
 		if (mIssue != null) {
-			mLengthEditText.setText(mIssue.getLength());
-			mHeightEditText.setText(mIssue.getHeight());
+			mQuantityEditText.setText(mIssue.getQuantity());
 		}
 		
-		mLengthEditText.requestFocus();
+		mQuantityEditText.requestFocus();
 	}
 	
     @Override
@@ -63,7 +67,6 @@ public class AuditorIssueDimensionFragment extends AuditorIssueReportFragment  {
 	@Override
 	public void validateAndSaveData() {
 		// save data
-		mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_LENGTH, mLengthEditText.getText().toString());
-		mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_HEIGHT, mHeightEditText.getText().toString());
+		mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_QUANTITY, mQuantityEditText.getText().toString());		
 	}
 }
