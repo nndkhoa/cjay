@@ -120,10 +120,13 @@ public class AuditorReportedListFragment extends SherlockFragment {
 	public void onResume() {
 		super.onResume();
 
-		// refresh list
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListReportedContainerSessions(getActivity());
-		mFeedsAdapter.updateData(mFeeds);
+		if (null != mFeedsAdapter) {
+			// refresh list
+			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+					.getListReportedContainerSessions(getActivity());
+			mFeedsAdapter.updateData(mFeeds);
+
+		}
 	}
 
 	private void initContainerFeedAdapter(ArrayList<ContainerSession> containers) {
@@ -188,6 +191,11 @@ public class AuditorReportedListFragment extends SherlockFragment {
 		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(),
 				containers, R.layout.list_item_audit_container, feedsDict);
 		mFeedListView.setAdapter(mFeedsAdapter);
+	}
+
+	public void onEvent(ContainerSessionEnqueueEvent event) {
+		Logger.Log(LOG_TAG, "onEvent ContainerSessionEnqueueEvent");
+		refresh();
 	}
 
 	public void refresh() {

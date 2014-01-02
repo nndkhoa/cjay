@@ -160,7 +160,9 @@ public class AuditorReportingListFragment extends SherlockFragment {
 
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListReportingContainerSessions(getActivity());
-		mSearchEditText.setText(""); // this will refresh the list
+		if (null != mSearchEditText) {
+			mSearchEditText.setText(""); // this will refresh the list
+		}
 	}
 
 	public void showContainerDetailDialog(String containerId,
