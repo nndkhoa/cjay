@@ -162,14 +162,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		return containerSessionDaoImpl;
 	}
 
-	public DamageCodeDaoImpl getDamageCodeDaoImpl() throws SQLException {
-		if (null == damageCodeDaoImpl) {
-			damageCodeDaoImpl = DaoManager.createDao(
-					this.getConnectionSource(), DamageCode.class);
-		}
-		return damageCodeDaoImpl;
-	}
-
 	public DepotDaoImpl getDepotDaoImpl() throws SQLException {
 		if (null == depotDaoImpl) {
 			depotDaoImpl = DaoManager.createDao(this.getConnectionSource(),
@@ -192,6 +184,14 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 					this.getConnectionSource(), RepairCode.class);
 		}
 		return repairCodeDaoImpl;
+	}
+
+	public DamageCodeDaoImpl getDamageCodeDaoImpl() throws SQLException {
+		if (null == damageCodeDaoImpl) {
+			damageCodeDaoImpl = DaoManager.createDao(
+					this.getConnectionSource(), DamageCode.class);
+		}
+		return damageCodeDaoImpl;
 	}
 
 	public ComponentCodeDaoImpl getComponentCodeDaoImpl() throws SQLException {

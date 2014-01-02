@@ -17,10 +17,10 @@ public class Issue implements Parcelable {
 
 	public static final String ID = "id";
 	public static final String FIELD_UUID = "uuid";
-	
+
 	@DatabaseField(columnName = ID)
 	int id;
-	
+
 	@DatabaseField(columnName = FIELD_UUID, id = true)
 	String uuid;
 
@@ -33,15 +33,18 @@ public class Issue implements Parcelable {
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	RepairCode repairCode;
 
+	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
+	ComponentCode componentCode;
+
 	@DatabaseField(canBeNull = true)
 	String length;
-	
+
 	@DatabaseField(canBeNull = true)
 	String height;
-	
+
 	@DatabaseField(canBeNull = true)
 	String quantity;
-	
+
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	ContainerSession containerSession;
 
@@ -55,31 +58,39 @@ public class Issue implements Parcelable {
 	public Issue() {
 		this.setUUID(UUID.randomUUID().toString());
 	}
-	
+
 	public void setUUID(String uuid) {
 		this.uuid = uuid;
 	}
-	
+
 	public String getUUID() {
 		return this.uuid;
 	}
-	
+
 	public void setLocationCode(String locationCode) {
 		this.locationCode = locationCode;
 	}
-	
+
 	public String getLocationCode() {
 		return this.locationCode;
 	}
-	
+
 	public void setRepairCode(RepairCode repairCode) {
 		this.repairCode = repairCode;
 	}
-	
+
 	public RepairCode getRepairCode() {
 		return this.repairCode;
 	}
-	
+
+	public void setComponentCode(ComponentCode componentCode) {
+		this.componentCode = componentCode;
+	}
+
+	public ComponentCode getComponentCode() {
+		return this.componentCode;
+	}
+
 	public String getRepairCodeString() {
 		if (this.repairCode != null) {
 			return this.repairCode.getCode();
@@ -87,15 +98,15 @@ public class Issue implements Parcelable {
 			return null;
 		}
 	}
-	
+
 	public void setDamageCode(DamageCode damageCode) {
 		this.damageCode = damageCode;
 	}
-	
+
 	public DamageCode getDamageCode() {
 		return this.damageCode;
 	}
-	
+
 	public String getDamageCodeString() {
 		if (this.damageCode != null) {
 			return this.damageCode.getCode();
@@ -103,39 +114,39 @@ public class Issue implements Parcelable {
 			return null;
 		}
 	}
-	
+
 	public void setLength(String length) {
 		this.length = length;
 	}
-	
+
 	public String getLength() {
 		return this.length;
 	}
-	
+
 	public void setHeight(String height) {
 		this.height = height;
 	}
-	
+
 	public String getHeight() {
 		return this.height;
 	}
-	
+
 	public void setQuantity(String quantity) {
 		this.quantity = quantity;
 	}
-	
+
 	public String getQuantity() {
 		return this.quantity;
 	}
-	
+
 	public void setContainerSession(ContainerSession containerSession) {
 		this.containerSession = containerSession;
 	}
-	
+
 	public ContainerSession getContainerSession() {
 		return this.containerSession;
 	}
-	
+
 	public void setCJayImages(Collection<CJayImage> cJayImages) {
 		this.cJayImages = cJayImages;
 	}

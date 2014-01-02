@@ -7,6 +7,7 @@ import java.util.List;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -17,7 +18,7 @@ import com.j256.ormlite.table.DatabaseTable;
  * @author tieubao
  * 
  */
-@DatabaseTable(tableName = "component_code")
+@DatabaseTable(tableName = "component_code", daoClass = ComponentCodeDaoImpl.class)
 public class ComponentCode implements Parcelable {
 
 	private static final String ID = "id";
