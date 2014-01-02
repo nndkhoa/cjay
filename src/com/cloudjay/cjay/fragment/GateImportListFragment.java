@@ -266,6 +266,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 		case AddContainerDialog.CONTAINER_DIALOG_EDIT:
 			try {
+
 				if (mSelectedContainerSession.getContainerId().equals(
 						containerId)
 						&& mSelectedContainerSession.getOperatorName().equals(
@@ -304,6 +305,8 @@ public class GateImportListFragment extends SherlockDialogFragment {
 							.post(new ContainerEditedEvent(
 									mSelectedContainerSession));
 				}
+
+				hideMenuItems();
 
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -385,6 +388,9 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	}
 
 	public void refresh() {
+
+		Logger.Log(LOG_TAG, "onRefresh");
+
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListLocalContainerSessions(getActivity());
 		mFeedsAdapter.updateData(mFeeds);

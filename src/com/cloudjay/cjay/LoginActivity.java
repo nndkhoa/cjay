@@ -46,7 +46,7 @@ public class LoginActivity extends CJayActivity {
 	private String mPassword = "123456";
 
 	@Extra(EXTRA_EMAIL)
-	String mEmail = "giamdinhcong_icd1@pip.com.vn";
+	String mEmail = "giamdinhcong1.icd1@pip.com.vn";
 
 	// UI references.
 	@ViewById(R.id.email)

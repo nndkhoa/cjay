@@ -21,9 +21,10 @@ import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.util.DataCenter;
 
 public class SearchOperatorDialog extends SherlockDialogFragment {
-	
+
 	public interface SearchOperatorDialogListener {
-		public void OnOperatorSelected(Fragment parent, String containerId, String operatorName, int mode);
+		public void OnOperatorSelected(Fragment parent, String containerId,
+				String operatorName, int mode);
 	}
 
 	private SearchOperatorDialogListener mCallback;
@@ -32,55 +33,61 @@ public class SearchOperatorDialog extends SherlockDialogFragment {
 	private String mContainerId;
 	private int mMode;
 	private Fragment mParent;
-	
+
 	private ArrayList<Operator> mOperators;
 	private FunDapter<Operator> mOperatorsAdapter;
-	
+
 	EditText mOperatorEditText;
 	ListView mOperatorListView;
-	
+
 	public void setContainerId(String containerId) {
 		mContainerId = containerId;
 	}
-	
+
 	public void setOperatorName(String operatorName) {
 		mOperatorName = operatorName;
 	}
-	
+
 	public void setMode(int mode) {
 		mMode = mode;
 	}
-	
+
 	public void setParent(Fragment parent) {
 		mParent = parent;
 	}
-	
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    	View view = inflater.inflate(R.layout.dialog_select_operator, container);
-    	mOperatorEditText = (EditText)view.findViewById(R.id.dialog_operator_name);
-    	mOperatorListView = (ListView)view.findViewById(R.id.dialog_operator_list);
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		View view = inflater
+				.inflate(R.layout.dialog_select_operator, container);
+		mOperatorEditText = (EditText) view
+				.findViewById(R.id.dialog_operator_name);
+		mOperatorListView = (ListView) view
+				.findViewById(R.id.dialog_operator_list);
 
 		if (mOperatorName != null) {
 			mOperatorEditText.setText(mOperatorName);
 		}
-		
+
 		mOperatorListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position,
-					long id) {
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
 				dismiss();
 				// Select operator
 				mOperatorName = mOperators.get(position).getName();
 				mOperatorEditText.setText(mOperatorName);
-				mCallback = (SearchOperatorDialogListener)getActivity();
-				mCallback.OnOperatorSelected(mParent, mContainerId, mOperatorName, mMode);
+				mCallback = (SearchOperatorDialogListener) getActivity();
+				mCallback.OnOperatorSelected(mParent, mContainerId,
+						mOperatorName, mMode);
 			}
 		});
-		
-		mOperators = (ArrayList<Operator>) DataCenter.getInstance().getListOperators(getActivity());
+
+		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
+				.getListOperators(getActivity());
 		initContainerOperatorAdapter(mOperators);
-		
+
 		return view;
 	}
 

@@ -431,11 +431,11 @@ public class CameraActivity extends Activity {
 		String imageType;
 		switch (type) {
 		case CJayImage.TYPE_IMPORT:
-			imageType = "in";
+			imageType = "gate-in";
 			break;
 
 		case CJayImage.TYPE_EXPORT:
-			imageType = "out";
+			imageType = "gate-out";
 			break;
 
 		case CJayImage.TYPE_REPORT:
@@ -447,12 +447,13 @@ public class CameraActivity extends Activity {
 			imageType = "repair";
 			break;
 		}
+		String depotCode = containerSession.getContainer().getDepot()
+				.getDepotCode();
 
 		// filename sample: gate-in-[depot-id]-2013-12-19-[UUID].jpg
-		String fileName = "gate-" + imageType + "-"
-				+ containerSession.getContainer().getDepot().getDepotCode()
-				+ "-" + StringHelper.getCurrentTimestamp("yyyy-mm-dd") + "-"
-				+ uuid + ".jpg";
+		String fileName = depotCode + "-"
+				+ StringHelper.getCurrentTimestamp("yyyy-mm-dd") + imageType
+				+ "-" + uuid + ".jpg";
 
 		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
 

@@ -98,8 +98,10 @@ public class UploadsFragment extends SherlockFragment implements
 	}
 
 	public void onEvent(ContainerSessionUploadedEvent event) {
+
 		Logger.Log(LOG_TAG, "onEvent ContainerSessionUploadedEvent");
 		mAdapter.notifyDataSetChanged();
+
 	}
 
 	public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {

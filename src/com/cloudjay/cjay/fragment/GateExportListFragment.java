@@ -101,6 +101,13 @@ public class GateExportListFragment extends SherlockFragment {
 		configureControls(mFeeds);
 		initContainerFeedAdapter(mFeeds);
 
+		mSelectedContainerSession = null;
+
+	}
+
+	void hideMenuItems() {
+		mSelectedContainerSession = null;
+		getActivity().supportInvalidateOptionsMenu();
 	}
 
 	@OptionsItem(R.id.menu_upload)
@@ -117,17 +124,19 @@ public class GateExportListFragment extends SherlockFragment {
 			mSelectedContainerSession.setUploadConfirmation(true);
 
 			mSelectedContainerSession
-					.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
-
-			mSelectedContainerSession
 					.setCheckOutTime(StringHelper
 							.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT));
+
+			mSelectedContainerSession
+					.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
 
 			containerSessionDaoImpl.update(mSelectedContainerSession);
 
 			// It will trigger `UploadsFragment` Adapter notifyDataSetChanged
 			EventBus.getDefault().post(
 					new ContainerSessionAddedEvent(mSelectedContainerSession));
+
+			hideMenuItems();
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -361,8 +370,12 @@ public class GateExportListFragment extends SherlockFragment {
 	}
 
 	public void refresh() {
+
+		Logger.Log(LOG_TAG, "onRefresh");
+
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListCheckOutContainerSessions(getActivity());
+
 		mSearchEditText.setText(""); // this will refresh the list
 	}
 
