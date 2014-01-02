@@ -2,19 +2,19 @@
 <resources>
 
 	<string-array name="gate_home_tabs">
-		<item>Container Nhập</item>
-		<item>Container Xuất</item>
-		<item>Quá trình tải lên</item>
+		<item>Nhập</item>
+		<item>Xuất</item>
+		<item>Tải lên</item>
 	</string-array>
 	<string-array name="auditor_home_tabs">
 		<item>Chưa báo cáo</item>
 		<item>Đã báo cáo</item>
-		<item>Quá trình tải lên</item>
+		<item>Tải lên</item>
 	</string-array>
 	<string-array name="repair_team_home_tabs">
 		<item>Chưa sửa chữa</item>
 		<item>Đã sửa chữa</item>
-		<item>Quá trình tải lên</item>
+		<item>Tải lên</item>
 	</string-array>
 	<string-array name="auditor_damage_report_tabs">
 		<item>CODE vị trí</item>
