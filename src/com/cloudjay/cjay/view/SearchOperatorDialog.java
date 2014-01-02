@@ -1,9 +1,12 @@
 package com.cloudjay.cjay.view;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +22,7 @@ import com.ami.fundapter.extractors.StringExtractor;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Utils;
 
 public class SearchOperatorDialog extends SherlockDialogFragment {
 	
@@ -61,9 +65,24 @@ public class SearchOperatorDialog extends SherlockDialogFragment {
     	mOperatorEditText = (EditText)view.findViewById(R.id.dialog_operator_name);
     	mOperatorListView = (ListView)view.findViewById(R.id.dialog_operator_list);
 
-		if (mOperatorName != null) {
-			mOperatorEditText.setText(mOperatorName);
-		}
+//		if (mOperatorName != null) {
+//			mOperatorEditText.setText(mOperatorName);
+//		}
+		
+		mOperatorEditText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				search(arg0.toString());
+			}
+
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+			}
+
+			public void onTextChanged(CharSequence s, int start, int before,
+					int count) {
+			}
+		});
 		
 		mOperatorListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -71,8 +90,8 @@ public class SearchOperatorDialog extends SherlockDialogFragment {
 					long id) {
 				dismiss();
 				// Select operator
-				mOperatorName = mOperators.get(position).getName();
-				mOperatorEditText.setText(mOperatorName);
+				mOperatorName = mOperatorsAdapter.getItem(position).getName();
+//				mOperatorEditText.setText(mOperatorName); // Don't set text because it will trigger searching
 				mCallback = (SearchOperatorDialogListener)getActivity();
 				mCallback.OnOperatorSelected(mParent, mContainerId, mOperatorName, mMode);
 			}
@@ -81,7 +100,26 @@ public class SearchOperatorDialog extends SherlockDialogFragment {
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance().getListOperators(getActivity());
 		initContainerOperatorAdapter(mOperators);
 		
+		getDialog().setTitle(getResources().getString(R.string.dialog_operator_title));
+		
 		return view;
+	}
+    
+	private void search(String searchText) {
+		if (searchText.equals("")) {
+			mOperatorsAdapter.updateData(mOperators);
+		} else {
+			ArrayList<Operator> searchFeeds = new ArrayList<Operator>();
+			for (Operator operator : mOperators) {
+				if (operator.getName().toLowerCase(Locale.US).contains(searchText.toLowerCase(Locale.US)) ||
+					operator.getCode().toLowerCase(Locale.US).contains(searchText.toLowerCase(Locale.US))) {
+					
+					searchFeeds.add(operator);
+				}
+			}
+			// refresh list
+			mOperatorsAdapter.updateData(searchFeeds);
+		}
 	}
 
 	private void initContainerOperatorAdapter(ArrayList<Operator> operators) {
@@ -90,14 +128,14 @@ public class SearchOperatorDialog extends SherlockDialogFragment {
 				new StringExtractor<Operator>() {
 					@Override
 					public String getStringValue(Operator item, int position) {
-						return item.getName();
+						return Utils.stripNull(item.getName());
 					}
 				});
 		operatorsDict.addStringField(R.id.operator_code,
 				new StringExtractor<Operator>() {
 					@Override
 					public String getStringValue(Operator item, int position) {
-						return item.getCode();
+						return Utils.stripNull(item.getCode());
 					}
 				});
 		mOperatorsAdapter = new FunDapter<Operator>(getActivity(), operators,
