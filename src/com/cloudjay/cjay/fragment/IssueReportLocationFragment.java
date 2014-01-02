@@ -17,7 +17,7 @@ import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_issue_location_code)
-public class AuditorIssueLocationFragment extends AuditorIssueReportFragment 
+public class IssueReportLocationFragment extends IssueReportFragment 
 		implements OnFocusChangeListener, OnClickListener {
 	private String mLocationCodes[], mCodes[][];
 	private AuditorIssueReportListener mCallback;

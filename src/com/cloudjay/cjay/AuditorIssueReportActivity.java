@@ -79,7 +79,7 @@ public class AuditorIssueReportActivity extends CJayActivity
 	void checkMenuItemClicked() {
 		// save data
 		for (int i = 0; i < mViewPagerAdapter.getCount(); i++) {
-			AuditorIssueReportFragment fragment = (AuditorIssueReportFragment) mViewPagerAdapter.getRegisteredFragment(i);
+			IssueReportFragment fragment = (IssueReportFragment) mViewPagerAdapter.getRegisteredFragment(i);
 			if (fragment != null) {
 				fragment.validateAndSaveData();
 			}
@@ -211,23 +211,23 @@ public class AuditorIssueReportActivity extends CJayActivity
 		}
 
 		public Fragment getItem(int position) {
-			AuditorIssueReportFragment fragment;
+			IssueReportFragment fragment;
 			
 			switch (position) {
 			case 0:
-				fragment = new AuditorIssueLocationFragment_();
+				fragment = new IssueReportLocationFragment_();
 				break;
 			case 1:
-				fragment = new AuditorIssueDamageFragment_();
+				fragment = new IssueReportDamageFragment_();
 				break;
 			case 2:
-				fragment = new AuditorIssueRepairFragment_();
+				fragment = new IssueReportRepairFragment_();
 				break;
 			case 3:
-				fragment = new AuditorIssueDimensionFragment_();
+				fragment = new IssueReportDimensionFragment_();
 				break;
 			default:
-				fragment = new AuditorIssueQuantityFragment_();
+				fragment = new IssueReportQuantityFragment_();
 				break;
 			}
 
