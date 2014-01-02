@@ -89,11 +89,9 @@ public class AuditorIssueReportActivity extends CJayActivity
 		try {
 			IssueDaoImpl issueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getIssueDaoImpl();
 			issueDaoImpl.createOrUpdate(mCJayImage.getIssue());
-			issueDaoImpl.update(mCJayImage.getIssue());
 			
 			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
 			cJayImageDaoImpl.createOrUpdate(mCJayImage);
-			cJayImageDaoImpl.update(mCJayImage);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
