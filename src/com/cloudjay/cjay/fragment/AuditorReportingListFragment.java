@@ -90,7 +90,7 @@ public class AuditorReportingListFragment extends SherlockFragment {
 		});
 
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance().getListOperators(getActivity());
-		populateUnreportedContainerFeeds();
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListReportingContainerSessions(getActivity());
 		configureControls(mFeeds);
 		initContainerFeedAdapter(mFeeds);
 
@@ -149,25 +149,8 @@ public class AuditorReportingListFragment extends SherlockFragment {
 	public void onResume() {
 		super.onResume();
 
-		populateUnreportedContainerFeeds();
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListReportingContainerSessions(getActivity());
 		mSearchEditText.setText(""); // this will refresh the list
-	}
-	
-	private void populateUnreportedContainerFeeds() {
-		ArrayList<ContainerSession> containerSessions = (ArrayList<ContainerSession>) DataCenter.getInstance().getListContainerSessions(getActivity());
-		mFeeds = new ArrayList<ContainerSession>();
-		for (ContainerSession containerSession : containerSessions) {
-			boolean reported = (containerSession.getCJayImages().size() > 0); // if has no images then not reported
-			for (CJayImage cJayImage : containerSession.getCJayImages()) {
-				if (cJayImage.getIssue() == null) {
-					reported = false;
-					break;
-				}
-			}
-			if (!reported) {
-				mFeeds.add(containerSession);
-			}
-		}
 	}
 
 	public void showContainerDetailDialog(String containerId,

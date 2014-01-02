@@ -14,10 +14,8 @@ import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.util.DataCenter;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EFragment;
@@ -29,7 +27,7 @@ import com.googlecode.androidannotations.annotations.ViewById;
 @EFragment(R.layout.fragment_auditor_reported)
 @OptionsMenu(R.menu.menu_auditor_reported)
 public class AuditorReportedListFragment extends SherlockFragment {
-	private final static String TAG = "AuditorReportedListFragment";
+//	private final static String TAG = "AuditorReportedListFragment";
 	
 	private ArrayList<ContainerSession> mFeeds;
 	private FunDapter<ContainerSession> mFeedsAdapter;
@@ -41,7 +39,7 @@ public class AuditorReportedListFragment extends SherlockFragment {
 	@AfterViews
 	void afterViews() {
 		// load list data
-		populateReportedContainerFeeds();
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListReportedContainerSessions(getActivity());
 		initContainerFeedAdapter(mFeeds);
 		
 		mSelectedContainerSession = null;
@@ -77,26 +75,8 @@ public class AuditorReportedListFragment extends SherlockFragment {
 		super.onResume();
 		
 		// refresh list
-		populateReportedContainerFeeds();
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListReportedContainerSessions(getActivity());
 		mFeedsAdapter.updateData(mFeeds);
-	}
-	
-	private void populateReportedContainerFeeds() {
-		ArrayList<ContainerSession> containerSessions = (ArrayList<ContainerSession>) DataCenter.getInstance().getListContainerSessions(getActivity());
-		mFeeds = new ArrayList<ContainerSession>();
-		for (ContainerSession containerSession : containerSessions) {
-			Logger.Log(TAG, containerSession.getContainerId() + " - " + containerSession.getCJayImages().size());
-			boolean reported = (containerSession.getCJayImages().size() > 0); // if has no images then not reported
-			for (CJayImage cJayImage : containerSession.getCJayImages()) {
-				if (cJayImage.getIssue() == null) {
-					reported = false;
-					break;
-				}
-			}
-			if (reported) {
-				mFeeds.add(containerSession);
-			}
-		}
 	}
 	
 	private void initContainerFeedAdapter(ArrayList<ContainerSession> containers) {

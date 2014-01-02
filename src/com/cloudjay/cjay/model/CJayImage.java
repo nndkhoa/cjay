@@ -30,6 +30,8 @@ public class CJayImage implements Parcelable {
 	public static final String FIELD_STATE = "state";
 	public static final String FIELD_URI = "uri";
 	public static final String FIELD_UUID = "uuid";
+	public static final String FIELD_ISSUE = "issue";
+	public static final String FIELD_CONTAINER_SESSION = "containerSession";
 
 	public CJayImage() {
 
@@ -68,10 +70,10 @@ public class CJayImage implements Parcelable {
 
 	Uri mFullUri;
 
-	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
+	@DatabaseField(columnName = FIELD_CONTAINER_SESSION, canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	ContainerSession containerSession;
 
-	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
+	@DatabaseField(columnName = FIELD_ISSUE, canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	Issue issue;
 
 	public Issue getIssue() {

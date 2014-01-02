@@ -17,14 +17,15 @@ public interface IContainerSessionDao extends Dao<ContainerSession, String> {
 
 	List<ContainerSession> getListUploadContainerSessions() throws SQLException;
 
-	List<ContainerSession> getListCheckOutContainerSessions()
-			throws SQLException;
+	List<ContainerSession> getListCheckOutContainerSessions() throws SQLException;
+	
+	List<ContainerSession> getListReportedContainerSessions() throws SQLException;
+	
+	List<ContainerSession> getListReportingContainerSessions() throws SQLException;
 
-	void addListContainerSessions(List<ContainerSession> containerSessions)
-			throws SQLException;
+	void addListContainerSessions(List<ContainerSession> containerSessions) throws SQLException;
 
-	void addContainerSessions(ContainerSession containerSession)
-			throws SQLException;
+	void addContainerSessions(ContainerSession containerSession) throws SQLException;
 
 	void deleteAllContainerSessions() throws SQLException;
 

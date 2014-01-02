@@ -164,6 +164,26 @@ public class DataCenter {
 		}
 		return null;
 	}
+	
+	public List<ContainerSession> getListReportedContainerSessions(Context context) {
+		Logger.Log(LOG_TAG, "get list reported Container sessions");
+		try {
+			return getDatabaseManager().getHelper(context).getContainerSessionDaoImpl().getListReportedContainerSessions();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public List<ContainerSession> getListReportingContainerSessions(Context context) {
+		Logger.Log(LOG_TAG, "get list reporting Container sessions");
+		try {
+			return getDatabaseManager().getHelper(context).getContainerSessionDaoImpl().getListReportingContainerSessions();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	public List<String> getListOperatorNames(Context context) {
 		List<Operator> operators = this.getListOperators(context);
