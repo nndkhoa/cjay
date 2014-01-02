@@ -22,7 +22,7 @@ import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.events.ContainerCreatedEvent;
-import com.cloudjay.cjay.events.ContainerSessionAddedEvent;
+import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.events.ContainerEditedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Container;
@@ -126,8 +126,9 @@ public class GateImportListFragment extends SherlockDialogFragment {
 			containerSessionDaoImpl.update(mSelectedContainerSession);
 
 			// It will trigger `UploadsFragment` Adapter notifyDataSetChanged
-			EventBus.getDefault().post(
-					new ContainerSessionAddedEvent(mSelectedContainerSession));
+			EventBus.getDefault()
+					.post(new ContainerSessionEnqueueEvent(
+							mSelectedContainerSession));
 
 			hideMenuItems();
 
@@ -384,6 +385,11 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 	public void onEvent(ContainerEditedEvent event) {
 		Logger.Log(LOG_TAG, "onEvent ContainerEditedEvent");
+		refresh();
+	}
+
+	public void onEvent(ContainerSessionEnqueueEvent event) {
+		Logger.Log(LOG_TAG, "onEvent ContainerSessionEnqueueEvent");
 		refresh();
 	}
 

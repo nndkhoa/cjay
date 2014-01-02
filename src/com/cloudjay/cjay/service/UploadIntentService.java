@@ -36,6 +36,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.SplashScreenActivity;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.events.ContainerSessionUploadedEvent;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -47,6 +48,8 @@ import com.cloudjay.cjay.util.CountingInputStreamEntity;
 import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Mapper;
+
+import de.greenrobot.event.EventBus;
 
 public class UploadIntentService extends IntentService implements
 		CountingInputStreamEntity.UploadListener {
@@ -83,7 +86,7 @@ public class UploadIntentService extends IntentService implements
 					doFileUpload(uploadItem);
 				}
 
-				// // It will return container with `upload confirmation = true`
+				// It will return container which `upload confirmation = true`
 				ContainerSession containerSession = containerSessionDaoImpl
 						.getNextWaiting();
 				//
@@ -226,6 +229,7 @@ public class UploadIntentService extends IntentService implements
 			containerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_IN_PROGRESS);
 			containerSessionDaoImpl.update(containerSession);
+
 			// Convert ContainerSession to TmpContainerSession for uploading
 			TmpContainerSession uploadItem = Mapper.toTmpContainerSession(
 					containerSession, getApplicationContext());
@@ -237,6 +241,9 @@ public class UploadIntentService extends IntentService implements
 			containerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_COMPLETED);
 			containerSessionDaoImpl.update(containerSession);
+
+			EventBus.getDefault().post(
+					new ContainerSessionUploadedEvent(containerSession));
 
 		} catch (SQLException e1) {
 			e1.printStackTrace();

@@ -93,7 +93,7 @@ public class Operator implements Parcelable {
 	public Operator() {
 
 	}
-	
+
 	public Operator(String operatorCode, String operatorName) {
 		this.operator_code = operatorCode;
 		this.operator_name = operatorName;

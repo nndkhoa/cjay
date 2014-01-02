@@ -28,7 +28,7 @@ import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.events.ContainerEditedEvent;
-import com.cloudjay.cjay.events.ContainerSessionAddedEvent;
+import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -205,7 +205,7 @@ public class AuditorReportingListFragment extends SherlockFragment {
 
 				// trigger update container lists
 				EventBus.getDefault().post(
-						new ContainerSessionAddedEvent(containerSession));
+						new ContainerSessionEnqueueEvent(containerSession));
 
 				Intent intent = new Intent(getActivity(), CameraActivity_.class);
 				intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA, containerSession.getUuid());

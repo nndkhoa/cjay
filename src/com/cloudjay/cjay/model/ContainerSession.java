@@ -226,12 +226,13 @@ public class ContainerSession implements Parcelable {
 
 			switch (state) {
 			case STATE_UPLOAD_ERROR:
-
 				break;
+
 			case STATE_UPLOAD_COMPLETED:
 				mBigPictureNotificationBmp = null;
-				EventBus.getDefault().post(
-						new ContainerSessionUploadedEvent(this));
+
+				// EventBus.getDefault().post(
+				// new ContainerSessionUploadedEvent(this));
 
 				break;
 			case STATE_UPLOAD_WAITING:

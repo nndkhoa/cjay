@@ -15,7 +15,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadsListBaseAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
-import com.cloudjay.cjay.events.ContainerSessionAddedEvent;
+import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.events.ContainerSessionUploadedEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
@@ -92,16 +92,14 @@ public class UploadsFragment extends SherlockFragment implements
 	 * 
 	 * @param event
 	 */
-	public void onEvent(ContainerSessionAddedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerSessionAddedEvent");
+	public void onEvent(ContainerSessionEnqueueEvent event) {
+		Logger.Log(LOG_TAG, "onEvent ContainerSessionEnqueueEvent");
 		mAdapter.notifyDataSetChanged();
 	}
 
 	public void onEvent(ContainerSessionUploadedEvent event) {
-
 		Logger.Log(LOG_TAG, "onEvent ContainerSessionUploadedEvent");
 		mAdapter.notifyDataSetChanged();
-
 	}
 
 	public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {

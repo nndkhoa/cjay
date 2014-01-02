@@ -13,15 +13,15 @@ import com.cloudjay.cjay.model.ContainerSession;
  * 
  */
 
-public class ContainerSessionAddedEvent {
+public class ContainerSessionEnqueueEvent {
 
 	private final List<ContainerSession> listContainerSessions;
 
-	public ContainerSessionAddedEvent(List<ContainerSession> uploads) {
+	public ContainerSessionEnqueueEvent(List<ContainerSession> uploads) {
 		listContainerSessions = uploads;
 	}
 
-	public ContainerSessionAddedEvent(ContainerSession upload) {
+	public ContainerSessionEnqueueEvent(ContainerSession upload) {
 		listContainerSessions = new ArrayList<ContainerSession>();
 		listContainerSessions.add(upload);
 	}
