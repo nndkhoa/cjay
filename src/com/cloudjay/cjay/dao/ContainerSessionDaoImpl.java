@@ -178,6 +178,10 @@ public class ContainerSessionDaoImpl extends
 
 		Logger.Log(LOG_TAG, "getListCheckOutContainerSessions()");
 
-		return null;
+		List<ContainerSession> containerSessions = this.query(this
+				.queryBuilder().where()
+				.eq(ContainerSession.FIELD_CHECK_OUT_TIME, "").prepare());
+
+		return containerSessions;
 	}
 }

@@ -56,9 +56,9 @@ public class ContainerSession implements Parcelable {
 
 	private static final String TAG = "ContainerSession";
 
-	public static final String CHECK_OUT_TIME = "check_out_time";
-	public static final String CHECK_IN_TIME = "check_in_time";
-	public static final String IMAGE_ID_PATH = "image_id_path";
+	public static final String FIELD_CHECK_OUT_TIME = "check_out_time";
+	public static final String FIELD_CHECK_IN_TIME = "check_in_time";
+	public static final String FIELD_IMAGE_ID_PATH = "image_id_path";
 	public static final String FIELD_STATE = "state";
 	public static final String ID = "id";
 	public static final String FIELD_UUID = "uuid";
@@ -89,13 +89,13 @@ public class ContainerSession implements Parcelable {
 	@DatabaseField(columnName = FIELD_LOCAL, defaultValue = "false")
 	private boolean onLocal;
 
-	@DatabaseField(columnName = IMAGE_ID_PATH, defaultValue = "")
+	@DatabaseField(columnName = FIELD_IMAGE_ID_PATH, defaultValue = "")
 	String image_id_path;
 
-	@DatabaseField(columnName = CHECK_IN_TIME, defaultValue = "")
+	@DatabaseField(columnName = FIELD_CHECK_IN_TIME, defaultValue = "")
 	String check_in_time;
 
-	@DatabaseField(columnName = CHECK_OUT_TIME, defaultValue = "")
+	@DatabaseField(columnName = FIELD_CHECK_OUT_TIME, defaultValue = "")
 	String check_out_time;
 
 	@DatabaseField(columnName = FIELD_STATE, defaultValue = "0")
@@ -261,7 +261,7 @@ public class ContainerSession implements Parcelable {
 	public Collection<Issue> getIssues() {
 		return issues;
 	}
-	
+
 	public String getIssueCount() {
 		return String.valueOf(getIssues().size());
 	}

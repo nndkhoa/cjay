@@ -21,8 +21,8 @@
 
     <TextView
         android:id="@+id/notfound_textview"
-        android:layout_below="@+id/search_edittext"
-		style="@style/NotFoundTextViewStyle" />
+        style="@style/NotFoundTextViewStyle"
+        android:layout_below="@+id/search_edittext" />
 
     <Button
         android:id="@+id/add_button"
@@ -38,6 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/search_edittext"
         android:layout_centerHorizontal="true"
-        android:choiceMode="singleChoice" />
+        android:choiceMode="singleChoice"
+        android:scrollbars="none" />
 
 </RelativeLayout>
