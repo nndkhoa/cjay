@@ -22,9 +22,12 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.Logger;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener.OnDismissCallback;
+import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.UiThread;
 
 import de.greenrobot.event.EventBus;
 
+@EFragment
 public class UploadsFragment extends SherlockFragment implements
 		OnDismissCallback, OnItemClickListener {
 
@@ -94,11 +97,16 @@ public class UploadsFragment extends SherlockFragment implements
 	 */
 	public void onEvent(ContainerSessionEnqueueEvent event) {
 		Logger.Log(LOG_TAG, "onEvent ContainerSessionEnqueueEvent");
-		mAdapter.notifyDataSetChanged();
+		updateUI();
 	}
 
 	public void onEvent(ContainerSessionUploadedEvent event) {
 		Logger.Log(LOG_TAG, "onEvent ContainerSessionUploadedEvent");
+		updateUI();
+	}
+
+	@UiThread
+	void updateUI() {
 		mAdapter.notifyDataSetChanged();
 	}
 

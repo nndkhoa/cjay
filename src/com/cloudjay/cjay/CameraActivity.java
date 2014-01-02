@@ -447,10 +447,13 @@ public class CameraActivity extends Activity {
 			imageType = "repair";
 			break;
 		}
+
+		// TODO: BUG HERE
 		String depotCode = containerSession.getContainer().getDepot()
 				.getDepotCode();
 
-		// filename sample: gate-in-[depot-id]-2013-12-19-[UUID].jpg
+		// filename sample:
+		// [depot-code]-2013-12-19-[gate-in|gate-out|report]-[UUID].jpg
 		String fileName = depotCode + "-"
 				+ StringHelper.getCurrentTimestamp("yyyy-mm-dd") + imageType
 				+ "-" + uuid + ".jpg";
