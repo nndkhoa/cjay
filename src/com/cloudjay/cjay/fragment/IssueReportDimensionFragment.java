@@ -51,7 +51,7 @@ public class IssueReportDimensionFragment extends IssueReportFragment  {
         try {
             mCallback = (AuditorIssueReportListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnReportPageCompleted");
+            throw new ClassCastException(activity.toString() + " must implement AuditorIssueReportListener");
         }
     }
 	

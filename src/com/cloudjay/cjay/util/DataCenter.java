@@ -7,6 +7,7 @@ import java.util.List;
 import android.content.Context;
 import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.UserDaoImpl;
+import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Depot;
 import com.cloudjay.cjay.model.IDatabaseManager;
@@ -90,8 +91,18 @@ public class DataCenter {
 		Logger.Log(LOG_TAG, "get list Operators");
 
 		try {
-			return getDatabaseManager().getHelper(context).getOperatorDaoImpl()
-					.getAllOperators();
+			return getDatabaseManager().getHelper(context).getOperatorDaoImpl().getAllOperators();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public List<ComponentCode> getListComponents(Context context) {
+		Logger.Log(LOG_TAG, "get list Components");
+
+		try {
+			return getDatabaseManager().getHelper(context).getComponentCodeDaoImpl().getAllComponentCodes();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

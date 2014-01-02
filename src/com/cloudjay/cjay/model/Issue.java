@@ -83,6 +83,14 @@ public class Issue implements Parcelable {
 		return this.repairCode;
 	}
 
+	public String getRepairCodeString() {
+		if (this.repairCode != null) {
+			return this.repairCode.getCode();
+		} else {
+			return null;
+		}
+	}
+
 	public void setComponentCode(ComponentCode componentCode) {
 		this.componentCode = componentCode;
 	}
@@ -90,10 +98,10 @@ public class Issue implements Parcelable {
 	public ComponentCode getComponentCode() {
 		return this.componentCode;
 	}
-
-	public String getRepairCodeString() {
-		if (this.repairCode != null) {
-			return this.repairCode.getCode();
+	
+	public String getComponentCodeString() {
+		if (this.componentCode != null) {
+			return this.componentCode.getCode();
 		} else {
 			return null;
 		}

@@ -17,6 +17,7 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.app.ActionBar;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
+import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
@@ -158,23 +159,23 @@ public class AuditorIssueReportActivity extends CJayActivity
 	public void onReportValueChanged(int type, String val) {
 		// save value
 		switch (type) {
-		case AuditorIssueReportListener.TYPE_LOCATION_CODE:
+		case TYPE_LOCATION_CODE:
 			mCJayImage.getIssue().setLocationCode(val);
 			
 			break;
-		case AuditorIssueReportListener.TYPE_LENGTH:
+		case TYPE_LENGTH:
 			mCJayImage.getIssue().setLength(val);
 			
 			break;
-		case AuditorIssueReportListener.TYPE_HEIGHT:
+		case TYPE_HEIGHT:
 			mCJayImage.getIssue().setHeight(val);
 			
 			break;
-		case AuditorIssueReportListener.TYPE_QUANTITY:
+		case TYPE_QUANTITY:
 			mCJayImage.getIssue().setQuantity(val);
 			
 			break;
-		case AuditorIssueReportListener.TYPE_DAMAGE_CODE:
+		case TYPE_DAMAGE_CODE:
 			try {
 				DamageCodeDaoImpl damageCodeDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getDamageCodeDaoImpl();
 				mCJayImage.getIssue().setDamageCode(damageCodeDaoImpl.findDamageCode(val));
@@ -183,10 +184,19 @@ public class AuditorIssueReportActivity extends CJayActivity
 			}
 			
 			break;
-		case AuditorIssueReportListener.TYPE_REPAIR_CODE:
+		case TYPE_REPAIR_CODE:
 			try {
 				RepairCodeDaoImpl repairCodeDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getRepairCodeDaoImpl();
 				mCJayImage.getIssue().setRepairCode(repairCodeDaoImpl.findRepairCode(val));
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			
+			break;
+		case TYPE_COMPONENT_CODE:
+			try {
+				ComponentCodeDaoImpl componentCodeDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getComponentCodeDaoImpl();
+				mCJayImage.getIssue().setComponentCode(componentCodeDaoImpl.findComponentCode(val));
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -214,18 +224,22 @@ public class AuditorIssueReportActivity extends CJayActivity
 			IssueReportFragment fragment;
 			
 			switch (position) {
-			case 0:
+			case TAB_ISSUE_LOCATION:
 				fragment = new IssueReportLocationFragment_();
 				break;
-			case 1:
+			case TAB_ISSUE_DAMAGE:
 				fragment = new IssueReportDamageFragment_();
 				break;
-			case 2:
+			case TAB_ISSUE_REPAIR:
 				fragment = new IssueReportRepairFragment_();
 				break;
-			case 3:
+			case TAB_ISSUE_COMPONENT:
+				fragment = new IssueReportComponentFragment_();
+				break;
+			case TAB_ISSUE_DIMENSION:
 				fragment = new IssueReportDimensionFragment_();
 				break;
+			case TAB_ISSUE_QUANTITY:
 			default:
 				fragment = new IssueReportQuantityFragment_();
 				break;

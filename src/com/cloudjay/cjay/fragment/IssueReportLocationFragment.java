@@ -102,7 +102,7 @@ public class IssueReportLocationFragment extends IssueReportFragment
         try {
             mCallback = (AuditorIssueReportListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnHeadlineSelectedListener");
+            throw new ClassCastException(activity.toString() + " must implement AuditorIssueReportListener");
         }
     }
 

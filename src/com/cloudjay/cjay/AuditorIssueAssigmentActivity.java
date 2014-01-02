@@ -129,9 +129,7 @@ public class AuditorIssueAssigmentActivity extends CJayActivity {
 				new StringExtractor<Issue>() {
 					@Override
 					public String getStringValue(Issue item, int position) {
-//						return item.getIssue().getDamageCode().getCode();
-						// TODO
-						return Utils.stripNull(null);
+						return Utils.stripNull(item.getComponentCodeString());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_quantity,

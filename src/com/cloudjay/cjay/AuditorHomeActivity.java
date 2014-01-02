@@ -14,13 +14,17 @@ import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.view.AddContainerDialog;
+import com.cloudjay.cjay.view.SearchOperatorDialog;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_auditor_home)
 public class AuditorHomeActivity extends SherlockFragmentActivity implements
-		OnPageChangeListener, TabListener {
+		OnPageChangeListener, TabListener,
+		AddContainerDialog.AddContainerDialogListener,
+		SearchOperatorDialog.SearchOperatorDialogListener  {
 
 	private String[] locations;
 	@ViewById
@@ -83,7 +87,25 @@ public class AuditorHomeActivity extends SherlockFragmentActivity implements
 	@Override
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
 	}
+	
+	@Override
+	public void OnOperatorSelected(Fragment parent, String containerId,
+			String operatorName, int mode) {
+		if (parent instanceof AuditorReportingListFragment) {
+			((AuditorReportingListFragment) parent).OnOperatorSelected(containerId,
+					operatorName, mode);
+		}
+	}
 
+	@Override
+	public void OnContainerInputCompleted(Fragment parent, String containerId,
+			String operatorName, int mode) {
+		if (parent instanceof AuditorReportingListFragment) {
+			((AuditorReportingListFragment) parent).OnContainerInputCompleted(
+					containerId, operatorName, mode);
+		}
+	}
+	
 	public class AuditorHomeTabPageAdaptor extends FragmentPagerAdapter {
 		private String[] locations;
 

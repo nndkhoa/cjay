@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.cloudjay.cjay.model.ComponentCode;
-import com.cloudjay.cjay.model.RepairCode;
 import com.j256.ormlite.dao.Dao;
 
 /**

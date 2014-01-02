@@ -91,6 +91,13 @@ public class CJayImage implements Parcelable {
 		return null;
 	}
 	
+	public String getIssueComponentCode() {
+		if (issue != null) {
+			return issue.getComponentCodeString();
+		} 
+		return null;
+	}
+	
 	public String getIssueRepairCode() {
 		if (issue != null) {
 			return issue.getRepairCodeString();

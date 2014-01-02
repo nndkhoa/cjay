@@ -257,9 +257,7 @@ public class AuditorContainerActivity extends CJayActivity {
 				new StringExtractor<CJayImage>() {
 					@Override
 					public String getStringValue(CJayImage item, int position) {
-//						return Utils.stripNull(item.getIssue().getDamageCode().getCode();
-						// TODO
-						return Utils.stripNull(null);
+						return Utils.stripNull(item.getIssueComponentCode());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_quantity,

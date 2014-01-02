@@ -10,7 +10,7 @@
         android:id="@+id/item_picture"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="5"
+        android:layout_weight="3"
         android:contentDescription="@string/container_id"
         android:src="@drawable/ic_app"
         android:scaleType="fitCenter" />
@@ -19,6 +19,6 @@
 	    android:id="@+id/pager"
 	    android:layout_width="match_parent"
 	    android:layout_height="0dp"
-        android:layout_weight="4" />
+        android:layout_weight="5" />
 
 </LinearLayout>
