@@ -158,6 +158,7 @@ public class AuditorReportingListFragment extends SherlockFragment {
 
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListReportingContainerSessions(getActivity());
+
 		if (null != mSearchEditText) {
 			mSearchEditText.setText(""); // this will refresh the list
 		}
@@ -358,11 +359,5 @@ public class AuditorReportingListFragment extends SherlockFragment {
 		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(),
 				containers, R.layout.list_item_audit_container, feedsDict);
 		mFeedListView.setAdapter(mFeedsAdapter);
-	}
-
-	public void refresh() {
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListContainerSessions(getActivity());
-		mFeedsAdapter.updateData(mFeeds);
 	}
 }

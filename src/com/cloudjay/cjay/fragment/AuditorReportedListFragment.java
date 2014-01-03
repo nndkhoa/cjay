@@ -121,7 +121,6 @@ public class AuditorReportedListFragment extends SherlockFragment {
 			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 					.getListReportedContainerSessions(getActivity());
 			mFeedsAdapter.updateData(mFeeds);
-
 		}
 	}
 
@@ -186,7 +185,7 @@ public class AuditorReportedListFragment extends SherlockFragment {
 
 	public void refresh() {
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListContainerSessions(getActivity());
+				.getListReportedContainerSessions(getActivity());
 		mFeedsAdapter.updateData(mFeeds);
 	}
 }

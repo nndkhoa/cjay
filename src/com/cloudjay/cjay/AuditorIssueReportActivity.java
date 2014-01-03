@@ -67,7 +67,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 				issue.setContainerSession(mCJayImage.getContainerSession());
 				mCJayImage.setIssue(issue);
 			}
-			
+
 			imageLoader.displayImage(mCJayImage.getUri(), imageView);
 
 		} catch (SQLException e) {

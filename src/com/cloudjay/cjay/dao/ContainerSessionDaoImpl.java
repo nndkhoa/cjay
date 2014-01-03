@@ -200,12 +200,21 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public List<ContainerSession> getListReportedContainerSessions()
 			throws SQLException {
+
 		Logger.Log(LOG_TAG, "getListReportedContainerSessions()");
 
-		List<ContainerSession> containerSessions = getAllContainerSessions();
+		List<ContainerSession> containerSessions = this.query(this
+				.queryBuilder()
+				.where()
+				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
+				.and()
+				.ne(ContainerSession.FIELD_STATE,
+						ContainerSession.STATE_UPLOAD_COMPLETED).prepare());
+
 		List<ContainerSession> reportedContainerSessions = new ArrayList<ContainerSession>();
 
 		for (ContainerSession containerSession : containerSessions) {
+
 			boolean hasReportTypeImages = false;
 			boolean hasUnreportedImages = false;
 			for (CJayImage cJayImage : containerSession.getCJayImages()) {
