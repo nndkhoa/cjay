@@ -497,9 +497,6 @@ public class ContainerSession implements Parcelable {
 	}
 
 	public Uri getOriginalPhotoUri() {
-
-		Logger.Log(TAG, "getOriginalPhotoUri from: " + image_id_path);
-
 		if (null == mFullUri && !TextUtils.isEmpty(image_id_path)) {
 			mFullUri = Uri.parse(image_id_path);
 		}

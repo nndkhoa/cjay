@@ -184,6 +184,8 @@ public class AuditorReportedListFragment extends SherlockFragment {
 	}
 
 	public void refresh() {
+
+		Logger.Log(LOG_TAG, "refresh");
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListReportedContainerSessions(getActivity());
 		mFeedsAdapter.updateData(mFeeds);

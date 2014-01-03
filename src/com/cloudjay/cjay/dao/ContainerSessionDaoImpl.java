@@ -89,7 +89,7 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public ContainerSession getNextWaiting() throws SQLException {
 
-		Logger.Log(LOG_TAG, "getNextWaiting() at ContainerSessionDaoImpl");
+		// Logger.Log(LOG_TAG, "getNextWaiting() at ContainerSessionDaoImpl");
 
 		ContainerSession result = null;
 		List<ContainerSession> containerSessions = this
@@ -101,10 +101,10 @@ public class ContainerSessionDaoImpl extends
 						.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, true)
 						.prepare());
 
-		Logger.Log(
-				LOG_TAG,
-				"getNextWaiting with "
-						+ Integer.toString(containerSessions.size()) + " items");
+		// Logger.Log(
+		// LOG_TAG,
+		// "getNextWaiting with "
+		// + Integer.toString(containerSessions.size()) + " items");
 
 		for (ContainerSession containerSession : containerSessions) {
 
@@ -112,7 +112,10 @@ public class ContainerSessionDaoImpl extends
 			Collection<CJayImage> cJayImages = containerSession.getCJayImages();
 
 			for (CJayImage cJayImage : cJayImages) {
+
 				if (cJayImage.getUploadState() != CJayImage.STATE_UPLOAD_COMPLETED) {
+
+					Logger.Log(LOG_TAG, "Problem with cjayImage");
 					flag = false;
 					break;
 				}
@@ -204,12 +207,9 @@ public class ContainerSessionDaoImpl extends
 		Logger.Log(LOG_TAG, "getListReportedContainerSessions()");
 
 		List<ContainerSession> containerSessions = this.query(this
-				.queryBuilder()
-				.where()
+				.queryBuilder().where()
 				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
-				.and()
-				.ne(ContainerSession.FIELD_STATE,
-						ContainerSession.STATE_UPLOAD_COMPLETED).prepare());
+				.prepare());
 
 		List<ContainerSession> reportedContainerSessions = new ArrayList<ContainerSession>();
 
@@ -226,6 +226,7 @@ public class ContainerSessionDaoImpl extends
 					}
 				}
 			}
+
 			if (hasReportTypeImages && !hasUnreportedImages) {
 				reportedContainerSessions.add(containerSession);
 			}

@@ -177,7 +177,7 @@ public class AuditorIssueAssigmentActivity extends CJayActivity {
 					@Override
 					public void loadImage(String url, ImageView view) {
 						imageLoader.displayImage(url, view);
-						
+
 						// try {
 						// view.setImageBitmap(Utils.decodeImage(
 						// getContentResolver(), Uri.parse(url),

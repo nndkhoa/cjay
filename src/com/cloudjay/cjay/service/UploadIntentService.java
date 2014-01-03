@@ -76,7 +76,7 @@ public class UploadIntentService extends IntentService implements
 	 */
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		Logger.Log(LOG_TAG, "onHandleIntent");
+		// Logger.Log(LOG_TAG, "onHandleIntent");
 
 		if (NetworkHelper.isConnected(getApplicationContext())) {
 			try {
@@ -298,7 +298,7 @@ public class UploadIntentService extends IntentService implements
 	}
 
 	void finishedNotification() {
-		Logger.Log(LOG_TAG, "finishedNotification");
+		// Logger.Log(LOG_TAG, "finishedNotification");
 
 		if (null != mNotificationBuilder) {
 			String text = getResources().getQuantityString(

@@ -95,6 +95,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 		try {
 			IssueDaoImpl issueDaoImpl = CJayClient.getInstance()
 					.getDatabaseManager().getHelper(this).getIssueDaoImpl();
+
 			issueDaoImpl.createOrUpdate(mCJayImage.getIssue());
 
 			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance()
