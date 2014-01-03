@@ -27,9 +27,11 @@ import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
+import android.service.textservice.SpellCheckerService.Session;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.actionbarsherlock.R.color;
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
@@ -41,6 +43,7 @@ import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.TmpContainerSession;
+import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.task.PhotupThreadRunnable;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -235,8 +238,18 @@ public class UploadIntentService extends IntentService implements
 					containerSession, getApplicationContext());
 
 			// Post to Server and notify event to UploadFragment
-			CJayClient.getInstance().postContainerSession(
-					getApplicationContext(), uploadItem);
+
+			User user = com.cloudjay.cjay.util.Session.restore(
+					getApplicationContext()).getCurrentUser();
+
+			Logger.Log(LOG_TAG, "User role: " + user.getRoleName());
+			if (user.getRole() == User.ROLE_GATE_KEEPER) {
+				CJayClient.getInstance().postContainerSession(
+						getApplicationContext(), uploadItem);
+			} else {
+				CJayClient.getInstance().postContainerSessionReportList(
+						getApplicationContext(), uploadItem);
+			}
 
 			containerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_COMPLETED);

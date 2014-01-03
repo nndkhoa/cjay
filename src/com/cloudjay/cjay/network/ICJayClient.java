@@ -51,4 +51,5 @@ public interface ICJayClient {
 
 	void postContainerSession(Context ctx, TmpContainerSession item);
 
+	void postContainerSessionReportList(Context ctx, TmpContainerSession item);
 }

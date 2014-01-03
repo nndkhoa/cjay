@@ -3,6 +3,7 @@ package com.cloudjay.cjay.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -21,7 +22,7 @@ public class TmpContainerSession implements Parcelable {
 	private String check_in_time;
 	private String check_out_time;
 	private String depot_code;
-	private List<AuditReportItem> audit_report_items;  
+	private List<AuditReportItem> audit_report_items;
 	private List<GateReportImage> gate_report_images;
 
 	public TmpContainerSession() {
@@ -37,7 +38,7 @@ public class TmpContainerSession implements Parcelable {
 		this.id = id;
 	}
 
-	public String getContainerId() { 
+	public String getContainerId() {
 		return container_id;
 	}
 

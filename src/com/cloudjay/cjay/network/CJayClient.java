@@ -536,7 +536,32 @@ public class CJayClient implements ICJayClient {
 
 				String url = CJayConstant.CJAY_ITEMS;
 				requestWrapper.sendPost(url, data, "application/json", headers);
-				
+
+			} else {
+				Logger.Log("Network is not available");
+				UIHelper.toast(ctx, "Network is not available");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void postContainerSessionReportList(Context ctx,
+			TmpContainerSession item) {
+		try {
+			if (NetworkHelper.isConnected(ctx)) {
+				HashMap<String, String> headers = prepareHeadersWithToken(ctx);
+				Gson gson = new Gson();
+
+				String data = gson.toJson(item);
+
+				if (null != data)
+					Logger.Log(LOG_TAG, data);
+
+				String url = CJayConstant.LIST_CONTAINER_SESSIONS_REPORT_LIST;
+				requestWrapper.sendPost(url, data, "application/json", headers);
+
 			} else {
 				Logger.Log("Network is not available");
 				UIHelper.toast(ctx, "Network is not available");
