@@ -30,14 +30,19 @@ public class SplashScreenActivity extends CJayActivity {
 		int hour = cal.get(Calendar.HOUR_OF_DAY);
 		Boolean isNight = hour < 6 || hour > 18;
 
-		if (isNight) {
-			Logger.Log(LOG_TAG, "at Night");
-			backgroundImageView
-					.setBackgroundResource(R.drawable.container_terminal_night);
-		} else {
-			Logger.Log(LOG_TAG, "at Daytime");
-			backgroundImageView
-					.setBackgroundResource(R.drawable.container_terminal_day);
+		try {
+			if (isNight) {
+				Logger.Log(LOG_TAG, "at Night");
+
+				backgroundImageView
+						.setImageResource(R.drawable.container_terminal_night);
+			} else {
+				Logger.Log(LOG_TAG, "at Daytime");
+				backgroundImageView
+						.setImageResource(R.drawable.container_terminal_day);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		new Handler().postDelayed(new Runnable() {

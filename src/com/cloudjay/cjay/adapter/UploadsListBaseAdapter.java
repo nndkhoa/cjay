@@ -27,6 +27,17 @@ public class UploadsListBaseAdapter extends BaseAdapter {
 				mContext);
 	}
 
+	public UploadsListBaseAdapter(Context context,
+			List<ContainerSession> listItems) {
+		mContext = context;
+		mLayoutInflater = LayoutInflater.from(mContext);
+		mItems = listItems;
+	}
+
+	public void setContainerSessions(List<ContainerSession> listItems) {
+		this.mItems = listItems;
+	}
+
 	public int getCount() {
 		return null != mItems ? mItems.size() : 0;
 	}
@@ -51,15 +62,14 @@ public class UploadsListBaseAdapter extends BaseAdapter {
 		return view;
 	}
 
-	@Override
-	public void notifyDataSetChanged() {
-
-		// Update list items
-		if (null != mContext)
-			mItems = DataCenter.getInstance().getListUploadContainerSessions(
-					mContext);
-
-		super.notifyDataSetChanged();
-	}
-
+	// @Override
+	// public void notifyDataSetChanged() {
+	//
+	// // Update list items
+	// if (null != mContext)
+	// mItems = DataCenter.getInstance().getListUploadContainerSessions(
+	// mContext);
+	//
+	// super.notifyDataSetChanged();
+	// }
 }

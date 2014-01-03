@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
@@ -38,12 +39,13 @@ public class Mapper {
 				.getDepot().getDepotCode());
 		tmpContainerSession.setContainerId(containerSession.getContainerId());
 
-		// TODO: return Check in time (may cause error)
 		tmpContainerSession
 				.setCheckInTime(containerSession.getRawCheckInTime());
 
 		tmpContainerSession.setCheckOutTime(containerSession
 				.getRawCheckOutTime());
+
+		tmpContainerSession.setImageIdPath(containerSession.getImageIdPath());
 
 		Collection<CJayImage> cJayImages = containerSession.getCJayImages();
 
@@ -59,8 +61,8 @@ public class Mapper {
 
 		tmpContainerSession.setGateReportImages(gateReportImages);
 
-		// TODO: need to remove
-		if (gateReportImages.isEmpty() == false)
+		if (TextUtils.isEmpty(tmpContainerSession.getImageIdPath())
+				&& gateReportImages.isEmpty() == false)
 			tmpContainerSession.setImageIdPath(gateReportImages.get(0)
 					.getImageName());
 

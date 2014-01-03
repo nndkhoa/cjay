@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.fragment;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,10 +20,13 @@ import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.events.ContainerSessionUploadedEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.view.AddContainerDialog;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener.OnDismissCallback;
 import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.OptionsItem;
 import com.googlecode.androidannotations.annotations.OptionsMenu;
 import com.googlecode.androidannotations.annotations.UiThread;
 
@@ -37,6 +41,7 @@ public class UploadsFragment extends SherlockFragment implements
 
 	private UploadsListBaseAdapter mAdapter;
 	ContainerSessionDaoImpl containerSessionDaoImpl = null;
+	List<ContainerSession> listContainerSessions = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -52,7 +57,11 @@ public class UploadsFragment extends SherlockFragment implements
 			e.printStackTrace();
 		}
 
-		mAdapter = new UploadsListBaseAdapter(getActivity());
+		listContainerSessions = DataCenter.getInstance()
+				.getListUploadContainerSessions(getActivity());
+
+		mAdapter = new UploadsListBaseAdapter(getActivity(),
+				listContainerSessions);
 	}
 
 	@Override
@@ -82,8 +91,8 @@ public class UploadsFragment extends SherlockFragment implements
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
 		EventBus.getDefault().unregister(this);
+		super.onDestroy();
 	}
 
 	public void onItemClick(AdapterView<?> l, View view, int position, long id) {
@@ -109,19 +118,32 @@ public class UploadsFragment extends SherlockFragment implements
 
 	@UiThread
 	void updateUI() {
+		listContainerSessions = DataCenter.getInstance()
+				.getListUploadContainerSessions(getActivity());
+		mAdapter.setContainerSessions(listContainerSessions);
 		mAdapter.notifyDataSetChanged();
 	}
 
-	// @Override
-	// public void onPrepareOptionsMenu(Menu menu) {
-	//
-	// super.onPrepareOptionsMenu(menu);
-	// }
+	@OptionsItem(R.id.menu_clear_uploaded)
+	void clearUploadsMenuItemSelected() {
+		Logger.Log(LOG_TAG, "Menu clear upload items clicked");
+
+		for (ContainerSession containerSession : listContainerSessions) {
+			try {
+				containerSession.setCleared(true);
+				containerSessionDaoImpl.update(containerSession);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		updateUI();
+	}
 
 	public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
 		Logger.Log(LOG_TAG, "onSwipeDismiss");
 
-		// set item Cleared = true then notifyDataSetChanged
+		// set item Cleared = true then call updateUI()
 		try {
 			for (int i = 0, z = reverseSortedPositions.length; i < z; i++) {
 				ContainerSession item = (ContainerSession) listView
@@ -135,7 +157,7 @@ public class UploadsFragment extends SherlockFragment implements
 			e.printStackTrace();
 		}
 
-		mAdapter.notifyDataSetChanged();
+		updateUI();
 	}
 
 	public boolean canDismiss(AbsListView listView, int position) {

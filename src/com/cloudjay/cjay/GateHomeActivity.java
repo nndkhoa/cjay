@@ -131,7 +131,6 @@ public class GateHomeActivity extends CJayActivity implements
 
 			getSession().deleteSession(getApplicationContext());
 			startActivity(new Intent(this, LoginActivity_.class));
-
 			finish();
 			return true;
 		}

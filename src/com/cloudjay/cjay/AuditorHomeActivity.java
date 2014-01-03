@@ -3,6 +3,7 @@ package com.cloudjay.cjay;
 //import android.app.FragmentManager;
 import java.lang.reflect.Field;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,7 +18,9 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -25,10 +28,12 @@ import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_auditor_home)
-public class AuditorHomeActivity extends SherlockFragmentActivity implements
+public class AuditorHomeActivity extends CJayActivity implements
 		OnPageChangeListener, TabListener,
 		AddContainerDialog.AddContainerDialogListener,
 		SearchOperatorDialog.SearchOperatorDialogListener {
+
+	private static final String LOG_TAG = "AuditorHomeActivity";
 
 	private String[] locations;
 	@ViewById
@@ -155,5 +160,21 @@ public class AuditorHomeActivity extends SherlockFragmentActivity implements
 				return uploadFragment;
 			}
 		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		switch (item.getItemId()) {
+		case R.id.menu_logout:
+			Logger.Log(LOG_TAG, "Logout");
+
+			getSession().deleteSession(getApplicationContext());
+			startActivity(new Intent(this, LoginActivity_.class));
+			finish();
+			return true;
+		}
+
+		return super.onOptionsItemSelected(item);
 	}
 }
