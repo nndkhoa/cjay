@@ -47,8 +47,11 @@ public class Mapper {
 		List<GateReportImage> gateReportImages = new ArrayList<GateReportImage>();
 
 		for (CJayImage cJayImage : cJayImages) {
-			gateReportImages.add(new GateReportImage(cJayImage.getType(),
-					cJayImage.getTimePosted(), cJayImage.getImageName()));
+			if (cJayImage.getType() == CJayImage.TYPE_IMPORT
+					|| cJayImage.getType() == CJayImage.TYPE_EXPORT) {
+				gateReportImages.add(new GateReportImage(cJayImage.getType(),
+						cJayImage.getTimePosted(), cJayImage.getImageName()));
+			}
 		}
 
 		tmpContainerSession.setGateReportImages(gateReportImages);

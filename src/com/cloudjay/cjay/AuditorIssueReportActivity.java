@@ -38,6 +38,7 @@ import com.googlecode.androidannotations.annotations.OptionsItem;
 import com.googlecode.androidannotations.annotations.OptionsMenu;
 import com.googlecode.androidannotations.annotations.ViewById;
 import com.nostra13.universalimageloader.core.ImageLoader;
+
 // slide 20
 
 @EActivity(R.layout.activity_auditor_issue_report)
@@ -125,7 +126,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 	public void onTabSelected(Tab tab, FragmentTransaction ft) {
 		int position = tab.getPosition();
 		pager.setCurrentItem(position);
-		
+
 		// show keyboard for specific tabs
 		switch (position) {
 		case TAB_ISSUE_DIMENSION:
@@ -204,8 +205,8 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 		if (currPosition < getSupportActionBar().getTabCount() - 1) {
 			getSupportActionBar().selectTab(
 					getSupportActionBar().getTabAt(++currPosition));
-			
-		} else {			
+
+		} else {
 			// if the last tab is complete, then save issue and exit
 			checkMenuItemClicked();
 		}

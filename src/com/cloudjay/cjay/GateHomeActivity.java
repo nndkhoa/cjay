@@ -1,10 +1,15 @@
 package com.cloudjay.cjay;
 
+import java.lang.reflect.Field;
+
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.view.ViewConfiguration;
+
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
@@ -37,6 +42,25 @@ public class GateHomeActivity extends CJayActivity implements
 
 	@ViewById
 	ViewPager pager;
+
+	@Override
+	protected void onCreate(Bundle arg0) {
+
+		// Below code to show `More Action` item on menu
+		try {
+			ViewConfiguration config = ViewConfiguration.get(this);
+			Field menuKeyField = ViewConfiguration.class
+					.getDeclaredField("sHasPermanentMenuKey");
+			if (menuKeyField != null) {
+				menuKeyField.setAccessible(true);
+				menuKeyField.setBoolean(config, false);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		super.onCreate(arg0);
+	}
 
 	@AfterViews
 	void afterViews() {
