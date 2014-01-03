@@ -114,6 +114,18 @@ public class IssueReportComponentFragment extends IssueReportFragment  {
 	
 	@Override
 	public void showKeyboard() {
+		// show keyboard
+		InputMethodManager imm = (InputMethodManager) getActivity()
+				.getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.showSoftInput(mComponentEditText, 0);
+	}
+	
+	@Override
+	public void hideKeyboard() {
+		// show keyboard
+		InputMethodManager imm = (InputMethodManager) getActivity()
+				.getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(mComponentEditText.getWindowToken(), 0);
 	}
 	
 	private void search(String searchText) {

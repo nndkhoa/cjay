@@ -81,4 +81,12 @@ public class IssueReportDimensionFragment extends IssueReportFragment {
 				.getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.showSoftInput(mLengthEditText, 0);
 	}
+	
+	@Override
+	public void hideKeyboard() {
+		// show keyboard
+		InputMethodManager imm = (InputMethodManager) getActivity()
+				.getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(mLengthEditText.getWindowToken(), 0);
+	}
 }
