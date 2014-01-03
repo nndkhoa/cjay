@@ -530,10 +530,6 @@ public class CJayClient implements ICJayClient {
 				Gson gson = new Gson();
 
 				String data = gson.toJson(item);
-
-				if (null != data)
-					Logger.Log(LOG_TAG, data);
-
 				String url = CJayConstant.CJAY_ITEMS;
 				requestWrapper.sendPost(url, data, "application/json", headers);
 
@@ -555,10 +551,6 @@ public class CJayClient implements ICJayClient {
 				Gson gson = new Gson();
 
 				String data = gson.toJson(item);
-
-				if (null != data)
-					Logger.Log(LOG_TAG, data);
-
 				String url = CJayConstant.LIST_CONTAINER_SESSIONS_REPORT_LIST;
 				requestWrapper.sendPost(url, data, "application/json", headers);
 

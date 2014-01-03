@@ -7,7 +7,7 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "user", daoClass = UserDaoImpl.class)
 public class User {
 
-	public static final int ROLE_GATE_KEEPER = 0;
+	public static final int ROLE_GATE_KEEPER = 6;
 	public static final int ROLE_AUDITOR = 1;
 	public static final int ROLE_REPAIR_STAFF = 2;
 
