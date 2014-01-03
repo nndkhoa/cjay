@@ -95,7 +95,7 @@ public class CJayApplication extends Application {
 			break;
 
 		case 4: // Sửa chữa
-			intent = new Intent(context, RepairTeamHomeActivity_.class);
+			intent = new Intent(context, RepairHomeActivity_.class);
 			break;
 
 		case 6: // Cổng

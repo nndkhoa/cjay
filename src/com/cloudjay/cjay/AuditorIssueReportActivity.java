@@ -80,7 +80,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 		}
 
 		locations = getResources().getStringArray(
-				R.array.auditor_damage_report_tabs);
+				R.array.auditor_issue_report_tabs);
 		configureViewPager();
 		configureActionBar();
 	}

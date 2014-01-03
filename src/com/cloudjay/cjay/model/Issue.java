@@ -17,6 +17,7 @@ public class Issue implements Parcelable {
 
 	public static final String ID = "id";
 	public static final String FIELD_UUID = "uuid";
+	public static final String FIELD_FIXED = "fixed";
 
 	@DatabaseField(columnName = ID)
 	int id;
@@ -44,6 +45,9 @@ public class Issue implements Parcelable {
 
 	@DatabaseField(canBeNull = true)
 	String quantity;
+	
+	@DatabaseField(columnName = FIELD_FIXED, canBeNull = true, defaultValue = "false")
+	boolean fixed;
 
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	ContainerSession containerSession;
@@ -65,6 +69,14 @@ public class Issue implements Parcelable {
 
 	public String getUUID() {
 		return this.uuid;
+	}
+	
+	public void setFixed(boolean fixed) {
+		this.fixed = fixed;
+	}
+	
+	public boolean isFixed() {
+		return fixed;
 	}
 
 	public void setLocationCode(String locationCode) {

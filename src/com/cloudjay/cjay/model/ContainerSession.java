@@ -64,6 +64,7 @@ public class ContainerSession implements Parcelable {
 	public static final String FIELD_UPLOAD_CONFIRMATION = "upload_confirmation";
 	public static final String FIELD_CLEARED = "cleared";
 	public static final String FIELD_LOCAL = "on_local";
+	public static final String FIELD_FIXED = "fixed";
 
 	public static final int STATE_UPLOAD_COMPLETED = 4;
 	public static final int STATE_UPLOAD_ERROR = 3;
@@ -99,6 +100,9 @@ public class ContainerSession implements Parcelable {
 
 	@DatabaseField(columnName = FIELD_STATE, defaultValue = "0")
 	int mState;
+	
+	@DatabaseField(columnName = FIELD_FIXED, defaultValue = "false")
+	boolean fixed;
 
 	@DatabaseField(columnName = FIELD_UPLOAD_CONFIRMATION, defaultValue = "false")
 	private boolean uploadConfirmation;
@@ -215,6 +219,14 @@ public class ContainerSession implements Parcelable {
 		this.uuid = uuid;
 	}
 
+	public void setFixed(boolean fixed) {
+		this.fixed = fixed;
+	}
+	
+	public boolean isFixed() {
+		return fixed;
+	}
+	
 	public int getUploadState() {
 		return mState;
 	}

@@ -55,7 +55,15 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="com.cloudjay.cjay.RepairTeamHomeActivity_"
+            android:name="com.cloudjay.cjay.RepairHomeActivity_"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="com.cloudjay.cjay.RepairContainerActivity_"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="com.cloudjay.cjay.RepairIssueReportActivity_"
             android:label="@string/app_name" >
         </activity>
         <activity
