@@ -31,7 +31,7 @@
         <item name="android:shadowRadius">2</item>
     </style>
     
-    <style name="DamageReportLocationCodeEditText">
+    <style name="IssueReportLocationCodeEditText">
     	<item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_weight">1</item>
@@ -43,22 +43,24 @@
 	    <item name="android:background">@drawable/textview_location_background</item>
     </style>
     
-    <style name="DamageReportLocationCodeButton">
+    <style name="IssueReportLocationCodeButton">
     	<item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_marginLeft">2dp</item>
         <item name="android:layout_marginRight">2dp</item>
+        <item name="android:text">@string/button_text_placeholder</item>
     </style>
     
-    <style name="DamageReportDamageCodeButton">
+    <style name="IssueReportDamageCodeButton">
     	<item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_height">50dp</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_marginLeft">8dp</item>
         <item name="android:layout_marginRight">8dp</item>
         <item name="android:layout_marginTop">3dp</item>
         <item name="android:layout_marginBottom">3dp</item>
+        <item name="android:text">@string/button_text_placeholder</item>
     </style>
 
     <style name="EmptyUploadStyle">

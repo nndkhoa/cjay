@@ -36,5 +36,6 @@
     <string name="activity_select_issue_message">Chọn lỗi đã được báo cáo</string>
     
     <string name="component_name_hint">Tên component</string>
+    <string name="button_text_placeholder">X</string>
     
 </resources>
