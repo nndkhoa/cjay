@@ -3,6 +3,7 @@ package com.cloudjay.cjay.fragment;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.ListView;
 
@@ -22,6 +23,7 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.ItemClick;
 import com.googlecode.androidannotations.annotations.ItemLongClick;
 import com.googlecode.androidannotations.annotations.OptionsItem;
 import com.googlecode.androidannotations.annotations.OptionsMenu;
@@ -65,6 +67,16 @@ public class AuditorReportedListFragment extends SherlockFragment {
 		mSelectedContainerSession = mFeedsAdapter.getItem(position);
 		getActivity().supportInvalidateOptionsMenu();
 	}
+	
+	@ItemClick(R.id.container_list)
+	void listItemClicked(int position) {
+		// refresh highlighting
+		mFeedListView.setItemChecked(position, false);
+
+		// clear current selection
+		mSelectedContainerSession = null;
+		getActivity().supportInvalidateOptionsMenu();
+	}
 
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
@@ -87,9 +99,7 @@ public class AuditorReportedListFragment extends SherlockFragment {
 
 				// It will trigger `UploadsFragment` Adapter
 				// notifyDataSetChanged
-				EventBus.getDefault().post(
-						new ContainerSessionEnqueueEvent(
-								mSelectedContainerSession));
+				EventBus.getDefault().post(new ContainerSessionEnqueueEvent(mSelectedContainerSession));
 
 				hideMenuItems();
 
@@ -122,6 +132,18 @@ public class AuditorReportedListFragment extends SherlockFragment {
 					.getListReportedContainerSessions(getActivity());
 			mFeedsAdapter.updateData(mFeeds);
 		}
+	}
+	
+	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		EventBus.getDefault().register(this);
+		super.onCreate(savedInstanceState);
 	}
 
 	private void initContainerFeedAdapter(ArrayList<ContainerSession> containers) {
@@ -184,7 +206,6 @@ public class AuditorReportedListFragment extends SherlockFragment {
 	}
 
 	public void refresh() {
-
 		Logger.Log(LOG_TAG, "refresh");
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListReportedContainerSessions(getActivity());

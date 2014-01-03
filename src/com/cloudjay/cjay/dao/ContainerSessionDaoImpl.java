@@ -226,7 +226,10 @@ public class ContainerSessionDaoImpl extends
 					}
 				}
 			}
-
+			
+			// reported container sessions:
+			// - containers have report images,
+			// - and report images have issue
 			if (hasReportTypeImages && !hasUnreportedImages) {
 				reportedContainerSessions.add(containerSession);
 			}
@@ -240,7 +243,11 @@ public class ContainerSessionDaoImpl extends
 			throws SQLException {
 		Logger.Log(LOG_TAG, "getListReportingContainerSessions()");
 
-		List<ContainerSession> containerSessions = getAllContainerSessions();
+		List<ContainerSession> containerSessions = this.query(this
+				.queryBuilder().where()
+				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
+				.prepare());
+		
 		List<ContainerSession> reportingContainerSessions = new ArrayList<ContainerSession>();
 
 		for (ContainerSession containerSession : containerSessions) {
@@ -255,6 +262,12 @@ public class ContainerSessionDaoImpl extends
 					}
 				}
 			}
+			
+			// unreported container sessions:
+			// - containers don't have report images
+			// OR
+			// - containers have report images,
+			// - and report images don't have issue
 			if (!hasReportTypeImages
 					|| (hasReportTypeImages && hasUnreportedImages)) {
 				reportingContainerSessions.add(containerSession);
