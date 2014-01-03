@@ -108,8 +108,11 @@ public class ContainerSessionDaoImpl extends
 			Collection<CJayImage> cJayImages = containerSession.getCJayImages();
 
 			for (CJayImage cJayImage : cJayImages) {
+				// int uploadState = cJayImage.getUploadState();
+				// if (uploadState == CJayImage.STATE_NONE || uploadState == cj)
 
-				if (cJayImage.getUploadState() != CJayImage.STATE_UPLOAD_COMPLETED) {
+				if (cJayImage.getUploadState() != CJayImage.STATE_UPLOAD_COMPLETED
+						&& cJayImage.getUploadState() != CJayImage.STATE_UPLOAD_IN_PROGRESS) {
 
 					Logger.Log(LOG_TAG, "Problem with cjayImage");
 					flag = false;
@@ -222,7 +225,7 @@ public class ContainerSessionDaoImpl extends
 					}
 				}
 			}
-			
+
 			// reported container sessions:
 			// - containers have report images,
 			// - and report images have issue
@@ -243,7 +246,7 @@ public class ContainerSessionDaoImpl extends
 				.queryBuilder().where()
 				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
 				.prepare());
-		
+
 		List<ContainerSession> reportingContainerSessions = new ArrayList<ContainerSession>();
 
 		for (ContainerSession containerSession : containerSessions) {
@@ -258,7 +261,7 @@ public class ContainerSessionDaoImpl extends
 					}
 				}
 			}
-			
+
 			// unreported container sessions:
 			// - containers don't have report images
 			// OR

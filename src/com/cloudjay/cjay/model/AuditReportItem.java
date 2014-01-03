@@ -34,12 +34,12 @@ public class AuditReportItem implements Parcelable {
 			this.height = issue.getHeight();
 			this.quantity = issue.getQuantity();
 
-			List<AuditReportImage> auditReportImages = new ArrayList<AuditReportImage>();
+			audit_report_images = new ArrayList<AuditReportImage>();
 			Collection<CJayImage> cJayImages = issue.getCJayImages();
 			if (null != cJayImages) {
 				for (CJayImage cJayImage : cJayImages) {
 					if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
-						auditReportImages.add(new AuditReportImage(cJayImage
+						audit_report_images.add(new AuditReportImage(cJayImage
 								.getType(), cJayImage.getTimePosted(),
 								cJayImage.getImageName()));
 					}
