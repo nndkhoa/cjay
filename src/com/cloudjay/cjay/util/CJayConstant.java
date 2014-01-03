@@ -51,6 +51,9 @@ public final class CJayConstant {
 	public static final String LIST_CONTAINER_SESSIONS_WITH_DATETIME = API_ROOT
 			+ "cjay/container-sessions.json?created_after=%s";
 
+	public static final String LIST_CONTAINER_SESSIONS_REPORT_LIST = API_ROOT
+			+ "cjay/container-sessions-report-list.json";
+
 	public static final String CJAY_TMP_STORAGE = "https://www.googleapis.com/upload/storage/v1beta2/b/cjaytmp/o?uploadType=media&name=%s";
 
 	/**

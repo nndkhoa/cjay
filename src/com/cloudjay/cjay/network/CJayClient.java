@@ -536,6 +536,7 @@ public class CJayClient implements ICJayClient {
 
 				String url = CJayConstant.CJAY_ITEMS;
 				requestWrapper.sendPost(url, data, "application/json", headers);
+				
 			} else {
 				Logger.Log("Network is not available");
 				UIHelper.toast(ctx, "Network is not available");

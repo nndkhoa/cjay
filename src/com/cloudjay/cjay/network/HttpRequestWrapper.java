@@ -40,6 +40,8 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 	private HttpPost httpPost = null;
 	private HttpGet httpGet = null;
 
+	private static final String LOG_TAG = "HttpRequestWrapper";
+
 	public static final String DEFAULT_ACCEPT_HEADER = "text/html,application/xml,application/xhtml+xml,text/html,application/json;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5";
 	public static final String DEFAULT_CONTENT_TYPE = "application/x-www-form-urlencoded";
 	public static final String JSON_CONTENT_TYPE = "application/json";
@@ -120,6 +122,9 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 		try {
 			response = httpClient.execute(httpPost, localContext);
 			ret = EntityUtils.toString(response.getEntity());
+
+			Logger.Log(LOG_TAG, ret);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
