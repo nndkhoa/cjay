@@ -94,4 +94,8 @@ public class IssueReportDamageFragment extends IssueReportFragment implements On
 		}
 		btn.setBackgroundResource(R.drawable.btn_code_selected);
 	}
+	
+	@Override
+	public void showKeyboard() {
+	}
 }

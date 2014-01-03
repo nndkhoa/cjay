@@ -17,10 +17,10 @@
 		<item>Tải lên</item>
 	</string-array>
 	<string-array name="auditor_damage_report_tabs">
+		<item>CODE component</item>
 		<item>CODE vị trí</item>
 		<item>CODE hư hỏng</item>
 		<item>CODE sửa chữa</item>
-		<item>CODE component</item>
 		<item>Kích thước</item>
 		<item>Số lượng</item>
 	</string-array>
