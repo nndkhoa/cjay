@@ -7,7 +7,6 @@ import java.util.List;
 
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.Logger;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
@@ -274,5 +273,41 @@ public class ContainerSessionDaoImpl extends
 		}
 
 		return reportingContainerSessions;
+	}
+
+	@Override
+	public List<ContainerSession> getListPendingContainerSessions()
+			throws SQLException {
+		Logger.Log(LOG_TAG, "getListPendingContainerSessions()");
+
+		List<ContainerSession> containerSessions = this.query(this
+				.queryBuilder()
+				.where()
+				.eq(ContainerSession.FIELD_FIXED, false)
+				.and()
+				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
+				.and()
+				.ne(ContainerSession.FIELD_STATE,
+						ContainerSession.STATE_UPLOAD_COMPLETED).prepare());
+
+		return containerSessions;
+	}
+
+	@Override
+	public List<ContainerSession> getListFixedContainerSessions()
+			throws SQLException {
+		Logger.Log(LOG_TAG, "getListFixedContainerSessions()");
+
+		List<ContainerSession> containerSessions = this.query(this
+				.queryBuilder()
+				.where()
+				.eq(ContainerSession.FIELD_FIXED, true)
+				.and()
+				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
+				.and()
+				.ne(ContainerSession.FIELD_STATE,
+						ContainerSession.STATE_UPLOAD_COMPLETED).prepare());
+
+		return containerSessions;
 	}
 }

@@ -203,6 +203,32 @@ public class DataCenter {
 		}
 		return null;
 	}
+	
+	public List<ContainerSession> getListPendingContainerSessions(
+			Context context) {
+		Logger.Log(LOG_TAG, "get list pending Container sessions");
+		try {
+			return getDatabaseManager().getHelper(context)
+					.getContainerSessionDaoImpl()
+					.getListPendingContainerSessions();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public List<ContainerSession> getListFixedContainerSessions(
+			Context context) {
+		Logger.Log(LOG_TAG, "get list fixed Container sessions");
+		try {
+			return getDatabaseManager().getHelper(context)
+					.getContainerSessionDaoImpl()
+					.getListFixedContainerSessions();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	public List<String> getListOperatorNames(Context context) {
 		List<Operator> operators = this.getListOperators(context);

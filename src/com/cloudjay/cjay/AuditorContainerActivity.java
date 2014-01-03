@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.text.TextUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -311,15 +312,9 @@ public class AuditorContainerActivity extends CJayActivity {
 				}, new DynamicImageLoader() {
 					@Override
 					public void loadImage(String url, ImageView view) {
-
-						imageLoader.displayImage(url, view);
-
-						// try {
-						// view.setImageBitmap(Utils.decodeImage(getContentResolver(),
-						// Uri.parse(url), Utils.MINI_THUMBNAIL_SIZE));
-						// } catch (FileNotFoundException e) {
-						// e.printStackTrace();
-						// }
+						if (url != null && !TextUtils.isEmpty(url)) {
+							imageLoader.displayImage(url, view);
+						}
 					}
 				});
 		mFeedsAdapter = new FunDapter<CJayImage>(this, containers,

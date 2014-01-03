@@ -22,7 +22,11 @@ public interface IContainerSessionDao extends Dao<ContainerSession, String> {
 	List<ContainerSession> getListReportedContainerSessions() throws SQLException;
 	
 	List<ContainerSession> getListReportingContainerSessions() throws SQLException;
-
+	
+	List<ContainerSession> getListPendingContainerSessions() throws SQLException;
+	
+	List<ContainerSession> getListFixedContainerSessions() throws SQLException;
+	
 	void addListContainerSessions(List<ContainerSession> containerSessions) throws SQLException;
 
 	void addContainerSessions(ContainerSession containerSession) throws SQLException;

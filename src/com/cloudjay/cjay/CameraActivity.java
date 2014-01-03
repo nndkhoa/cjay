@@ -39,6 +39,7 @@ import android.widget.Toast;
 import com.aerilys.helpers.android.UIHelper;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -55,6 +56,8 @@ import com.googlecode.androidannotations.annotations.Extra;
 import com.googlecode.androidannotations.annotations.NoTitle;
 import com.googlecode.androidannotations.annotations.SystemService;
 import com.googlecode.androidannotations.annotations.ViewById;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Input:
@@ -131,6 +134,9 @@ public class CameraActivity extends Activity {
 
 	@Extra("type")
 	int type = 0;
+	
+	@Extra("tag")
+	String tag = "";
 
 	// endregion
 
@@ -503,6 +509,11 @@ public class CameraActivity extends Activity {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}
+		
+		// tell people that an image has been created
+		if (!TextUtils.isEmpty(tag)) {
+			EventBus.getDefault().post(new CJayImageAddedEvent(uploadItem, tag));
 		}
 	}
 

@@ -1,6 +1,5 @@
 package com.cloudjay.cjay;
 
-//import android.app.FragmentManager;
 import java.lang.reflect.Field;
 
 import android.content.Intent;
@@ -18,21 +17,15 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.cloudjay.cjay.fragment.AuditorReportedListFragment_;
-import com.cloudjay.cjay.fragment.AuditorReportingListFragment;
-import com.cloudjay.cjay.fragment.AuditorReportingListFragment_;
+import com.cloudjay.cjay.fragment.RepairContainerPendingListFragment_;
 import com.cloudjay.cjay.fragment.UploadsFragment_;
-import com.cloudjay.cjay.view.AddContainerDialog;
-import com.cloudjay.cjay.view.SearchOperatorDialog;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.ViewById;
 
-@EActivity(R.layout.activity_auditor_home)
-public class AuditorHomeActivity extends CJayActivity implements
-		OnPageChangeListener, TabListener,
-		AddContainerDialog.AddContainerDialogListener,
-		SearchOperatorDialog.SearchOperatorDialogListener {
+@EActivity(R.layout.activity_repair_home)
+public class RepairHomeActivity extends CJayActivity implements
+		OnPageChangeListener, TabListener {
 
 	private String[] locations;
 	@ViewById
@@ -58,7 +51,7 @@ public class AuditorHomeActivity extends CJayActivity implements
 
 	@AfterViews
 	void afterViews() {
-		locations = getResources().getStringArray(R.array.auditor_home_tabs);
+		locations = getResources().getStringArray(R.array.repair_home_tabs);
 		configureViewPager();
 		configureActionBar();
 	}
@@ -129,24 +122,6 @@ public class AuditorHomeActivity extends CJayActivity implements
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
 	}
 
-	@Override
-	public void OnOperatorSelected(Fragment parent, String containerId,
-			String operatorName, int mode) {
-		if (parent instanceof AuditorReportingListFragment) {
-			((AuditorReportingListFragment) parent).OnOperatorSelected(
-					containerId, operatorName, mode);
-		}
-	}
-
-	@Override
-	public void OnContainerInputCompleted(Fragment parent, String containerId,
-			String operatorName, int mode) {
-		if (parent instanceof AuditorReportingListFragment) {
-			((AuditorReportingListFragment) parent).OnContainerInputCompleted(
-					containerId, operatorName, mode);
-		}
-	}
-
 	public class AuditorHomeTabPageAdaptor extends FragmentPagerAdapter {
 		private String[] locations;
 
@@ -162,11 +137,11 @@ public class AuditorHomeActivity extends CJayActivity implements
 		public Fragment getItem(int position) {
 			switch (position) {
 			case 0:
-				Fragment reportingListFragment_ = new AuditorReportingListFragment_();
-				return reportingListFragment_;
+				Fragment pendingFragment = new RepairContainerPendingListFragment_();
+				return pendingFragment;
 			case 1:
-				Fragment reportedListFragment_ = new AuditorReportedListFragment_();
-				return reportedListFragment_;
+				Fragment fixedFragment = new RepairContainerPendingListFragment_();
+				return fixedFragment;
 
 			case 2:
 			default:
