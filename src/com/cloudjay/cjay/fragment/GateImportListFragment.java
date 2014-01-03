@@ -36,6 +36,7 @@ import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Session;
 import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Click;
@@ -325,7 +326,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getContainerId();
+						return Utils.stripNull(item.getContainerId());
 					}
 				});
 		feedsDict.addStringField(R.id.feed_item_container_owner,
@@ -333,7 +334,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getOperatorName();
+						return Utils.stripNull(item.getOperatorName());
 					}
 				});
 		feedsDict.addStringField(R.id.feed_item_container_import_date,
@@ -341,7 +342,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getCheckInTime();
+						return Utils.stripNull(item.getCheckInTime());
 					}
 				});
 		feedsDict.addStringField(R.id.feed_item_container_export_date,
@@ -349,7 +350,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getCheckOutTime();
+						return Utils.stripNull(item.getCheckOutTime());
 					}
 				});
 

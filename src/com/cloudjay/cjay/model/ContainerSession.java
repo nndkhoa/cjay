@@ -151,16 +151,17 @@ public class ContainerSession implements Parcelable {
 					.getContainerDaoImpl();
 
 			Operator operator = null;
-			List<Operator> listOperators = operatorDaoImpl.queryForEq(
-					Operator.CODE, operatorCode);
-
-			if (listOperators.isEmpty()) {
-				operator = new Operator();
-				operator.setCode(operatorCode);
-				operator.setName(operatorCode);
-				operatorDaoImpl.addOperator(operator);
-			} else {
-				operator = listOperators.get(0);
+			if (!TextUtils.isEmpty(operatorCode)) {
+				List<Operator> listOperators = operatorDaoImpl.queryForEq(
+						Operator.CODE, operatorCode);
+				if (listOperators.isEmpty()) {
+					operator = new Operator();
+					operator.setCode(operatorCode);
+					operator.setName(operatorCode);
+					operatorDaoImpl.addOperator(operator);
+				} else {
+					operator = listOperators.get(0);
+				}
 			}
 
 			// Create `depot` object if needed
@@ -275,15 +276,24 @@ public class ContainerSession implements Parcelable {
 	}
 
 	public String getOperatorName() {
-		return getContainer().getOperator().getCode();
+		if (getContainer() != null && getContainer().getOperator() != null) {
+			return getContainer().getOperator().getCode();			
+		}
+		return null;
 	}
 
 	public String getContainerId() {
-		return getContainer().getContainerId();
+		if (getContainer() != null) {
+			return getContainer().getContainerId();
+		}
+		return null;
 	}
 
 	public String getFullContainerId() {
-		return getContainer().getFullContainerId();
+		if (getContainer() != null) {
+			return getContainer().getFullContainerId();
+		}
+		return null;
 	}
 
 	public String getCheckInTime() {

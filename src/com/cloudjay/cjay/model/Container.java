@@ -30,7 +30,7 @@ public class Container implements Parcelable {
 	@DatabaseField(columnName = CONTAINER_ID)
 	String container_id;
 
-	@DatabaseField(canBeNull = false, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
+	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	Operator operator;
 
 	@ForeignCollectionField(eager = true)
