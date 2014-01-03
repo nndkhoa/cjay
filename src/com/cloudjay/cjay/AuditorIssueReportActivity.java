@@ -44,6 +44,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 	private AuditorIssueReportTabPageAdaptor mViewPagerAdapter;
 	private String[] locations;
 	private CJayImage mCJayImage;
+	private Issue mIssue;
 	private ImageLoader imageLoader;
 
 	@Extra(CJAY_IMAGE_EXTRA)
@@ -63,9 +64,10 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 					.getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
 			mCJayImage = cJayImageDaoImpl.findByUuid(mCJayImageUUID);
 			if (mCJayImage.getIssue() == null) {
-				Issue issue = new Issue();
-				issue.setContainerSession(mCJayImage.getContainerSession());
-				mCJayImage.setIssue(issue);
+
+				mIssue = new Issue();
+				mIssue.setContainerSession(mCJayImage.getContainerSession());
+				mCJayImage.setIssue(mIssue);
 			}
 
 			imageLoader.displayImage(mCJayImage.getUri(), imageView);
@@ -96,11 +98,13 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 			IssueDaoImpl issueDaoImpl = CJayClient.getInstance()
 					.getDatabaseManager().getHelper(this).getIssueDaoImpl();
 
-			issueDaoImpl.createOrUpdate(mCJayImage.getIssue());
-
 			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance()
 					.getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
+
+			// issueDaoImpl.createOrUpdate(mCJayImage.getIssue());
+			issueDaoImpl.createOrUpdate(mIssue);
 			cJayImageDaoImpl.createOrUpdate(mCJayImage);
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
