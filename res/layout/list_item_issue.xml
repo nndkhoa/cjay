@@ -3,118 +3,132 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal" >
 
     <ImageView
         android:id="@+id/issue_picture"
         android:layout_width="0dp"
-        android:layout_height="fill_parent"
-        android:layout_weight="1"
+        android:layout_height="@dimen/listview_issue_item_dimension"
         android:layout_margin="3dp"
+        android:layout_weight="1"
+        android:contentDescription="@string/container_id"
         android:padding="3dp"
-        android:scaleType="centerCrop"
-        android:contentDescription="@string/container_id" />
-    
+        android:scaleType="centerCrop" />
+
     <LinearLayout
         android:id="@+id/feed_item_descriptions"
         android:layout_width="0dp"
         android:layout_height="fill_parent"
-        android:layout_weight="2"
         android:layout_margin="3dp"
-        android:padding="3dp"
-        android:orientation="vertical">
+        android:layout_weight="2"
+        android:orientation="vertical"
+        android:padding="3dp" >
 
         <LinearLayout
-	        android:layout_width="fill_parent"
-	        android:layout_height="0dp"
-	        android:layout_weight="1"
-	        android:orientation="horizontal">
-	        <TextView
-		        android:text="@string/issue_location_code"
-		        style="@style/ListItemIssueLabel" />
-	        <TextView
-		        android:id="@+id/issue_location_code"
-		        style="@style/ListItemIssueValue" />
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal" >
+
+            <TextView
+                style="@style/ListItemIssueLabel"
+                android:text="@string/issue_location_code" />
+
+            <TextView
+                android:id="@+id/issue_location_code"
+                style="@style/ListItemIssueValue" />
         </LinearLayout>
-        
+
         <LinearLayout
-	        android:layout_width="fill_parent"
-	        android:layout_height="0dp"
-	        android:layout_weight="1"
-	        android:orientation="horizontal">
-	        <TextView
-		        android:text="@string/issue_damage_code"
-		        style="@style/ListItemIssueLabel" />
-	        <TextView
-		        android:id="@+id/issue_damage_code"
-		        style="@style/ListItemIssueValue" />
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal" >
+
+            <TextView
+                style="@style/ListItemIssueLabel"
+                android:text="@string/issue_damage_code" />
+
+            <TextView
+                android:id="@+id/issue_damage_code"
+                style="@style/ListItemIssueValue" />
         </LinearLayout>
-        
+
         <LinearLayout
-	        android:layout_width="fill_parent"
-	        android:layout_height="0dp"
-	        android:layout_weight="1"
-	        android:orientation="horizontal">
-	        <TextView
-		        android:text="@string/issue_repair_code"
-		        style="@style/ListItemIssueLabel" />
-	        <TextView
-		        android:id="@+id/issue_repair_code"
-		        style="@style/ListItemIssueValue" />
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal" >
+
+            <TextView
+                style="@style/ListItemIssueLabel"
+                android:text="@string/issue_repair_code" />
+
+            <TextView
+                android:id="@+id/issue_repair_code"
+                style="@style/ListItemIssueValue" />
         </LinearLayout>
-        
+
         <LinearLayout
-	        android:layout_width="fill_parent"
-	        android:layout_height="0dp"
-	        android:layout_weight="1"
-	        android:orientation="horizontal">
-	        <TextView
-		        android:text="@string/issue_component_code"
-		        style="@style/ListItemIssueLabel" />
-	        <TextView
-		        android:id="@+id/issue_component_code"
-		        style="@style/ListItemIssueValue" />
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal" >
+
+            <TextView
+                style="@style/ListItemIssueLabel"
+                android:text="@string/issue_component_code" />
+
+            <TextView
+                android:id="@+id/issue_component_code"
+                style="@style/ListItemIssueValue" />
         </LinearLayout>
-        
+
         <LinearLayout
-	        android:layout_width="fill_parent"
-	        android:layout_height="0dp"
-	        android:layout_weight="1"
-	        android:orientation="horizontal">
-	        <TextView
-		        android:text="@string/issue_length"
-		        android:layout_weight="1.5"
-		        style="@style/ListItemIssueLabel" />
-	        <TextView
-		        android:id="@+id/issue_length"
-		        android:layout_weight="1.5"
-		        style="@style/ListItemIssueValue" />
-	        <TextView
-		        android:layout_weight="1"
-		        style="@style/ListItemIssueLabel" />
-	        <TextView
-		        android:text="@string/issue_height"
-		        android:layout_weight="1.5"
-		        style="@style/ListItemIssueLabel" />
-	        <TextView
-		        android:id="@+id/issue_height"
-		        android:layout_weight="1.5"
-		        style="@style/ListItemIssueValue" />
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal" >
+
+            <TextView
+                style="@style/ListItemIssueLabel"
+                android:layout_weight="1.5"
+                android:text="@string/issue_length" />
+
+            <TextView
+                android:id="@+id/issue_length"
+                style="@style/ListItemIssueValue"
+                android:layout_weight="1.5" />
+
+            <TextView
+                style="@style/ListItemIssueLabel"
+                android:layout_weight="1" />
+
+            <TextView
+                style="@style/ListItemIssueLabel"
+                android:layout_weight="1.5"
+                android:text="@string/issue_height" />
+
+            <TextView
+                android:id="@+id/issue_height"
+                style="@style/ListItemIssueValue"
+                android:layout_weight="1.5" />
         </LinearLayout>
-        
+
         <LinearLayout
-	        android:layout_width="fill_parent"
-	        android:layout_height="0dp"
-	        android:layout_weight="1"
-	        android:orientation="horizontal">
-	        <TextView
-		        android:text="@string/issue_quantity"
-		        style="@style/ListItemIssueLabel" />
-	        <TextView
-		        android:id="@+id/issue_quantity"
-		        style="@style/ListItemIssueValue" />
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal" >
+
+            <TextView
+                style="@style/ListItemIssueLabel"
+                android:text="@string/issue_quantity" />
+
+            <TextView
+                android:id="@+id/issue_quantity"
+                style="@style/ListItemIssueValue" />
         </LinearLayout>
-        
     </LinearLayout>
 
 </LinearLayout>
