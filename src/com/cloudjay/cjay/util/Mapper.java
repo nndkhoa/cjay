@@ -19,6 +19,7 @@ import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Depot;
 import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.model.IDatabaseManager;
+import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
@@ -52,10 +53,21 @@ public class Mapper {
 
 		tmpContainerSession.setGateReportImages(gateReportImages);
 
+		// TODO: need to remove
 		if (gateReportImages.isEmpty() == false)
 			tmpContainerSession.setImageIdPath(gateReportImages.get(0)
 					.getImageName());
 
+		List<AuditReportItem> auditReportItems = new ArrayList<AuditReportItem>();
+		Collection<Issue> issues = containerSession.getIssues();
+
+		if (null != issues) {
+			for (Issue issue : issues) {
+				auditReportItems.add(new AuditReportItem(issue));
+			}
+		}
+
+		tmpContainerSession.setAuditReportItems(auditReportItems);
 		return tmpContainerSession;
 	}
 

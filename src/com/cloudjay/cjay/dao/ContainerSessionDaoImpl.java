@@ -75,6 +75,17 @@ public class ContainerSessionDaoImpl extends
 		return null;
 	}
 
+	/**
+	 * 
+	 * return ContainerSession obj that has
+	 * 
+	 * - upload_confirmation = true
+	 * 
+	 * - upload state = WAITING
+	 * 
+	 * - all cjayimages are uploaded
+	 * 
+	 */
 	@Override
 	public ContainerSession getNextWaiting() throws SQLException {
 

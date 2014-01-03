@@ -14,11 +14,6 @@ public class TmpContainerSession implements Parcelable {
 
 	private static final String TAG = "TmpContainerSession";
 
-	public static final int STATE_UPLOAD_COMPLETED = 5;
-	public static final int STATE_UPLOAD_ERROR = 4;
-	public static final int STATE_UPLOAD_IN_PROGRESS = 3;
-	public static final int STATE_UPLOAD_WAITING = 2;
-
 	private int id;
 	private String container_id;
 	private String image_id_path;
@@ -28,8 +23,6 @@ public class TmpContainerSession implements Parcelable {
 	private String depot_code;
 	private List<AuditReportItem> audit_report_items;
 	private List<GateReportImage> gate_report_images;
-	private int mState;
-	private int mProgress;
 
 	public TmpContainerSession() {
 		audit_report_items = new ArrayList<AuditReportItem>();
@@ -108,14 +101,6 @@ public class TmpContainerSession implements Parcelable {
 		this.gate_report_images = gate_report_images;
 	}
 
-	public int getUploadProgress() {
-		return mProgress;
-	}
-
-	public int getUploadState() {
-		return mState;
-	}
-
 	public void printMe() {
 		Logger.Log(TAG, "CId: " + getContainerId() + " - OpCode: "
 				+ getOperatorCode() + " - Depot Code: " + getDepotCode()
@@ -140,9 +125,6 @@ public class TmpContainerSession implements Parcelable {
 		dest.writeString(depot_code);
 		dest.writeTypedList(audit_report_items);
 		dest.writeTypedList(gate_report_images);
-		dest.writeInt(mState);
-		dest.writeInt(mProgress);
-
 	}
 
 	private void readFromParcel(Parcel in) {
@@ -159,8 +141,6 @@ public class TmpContainerSession implements Parcelable {
 
 		in.readTypedList(audit_report_items, AuditReportItem.CREATOR);
 		in.readTypedList(gate_report_images, GateReportImage.CREATOR);
-		this.mState = in.readInt();
-		this.mProgress = in.readInt();
 	}
 
 	public static final Parcelable.Creator<TmpContainerSession> CREATOR = new Parcelable.Creator<TmpContainerSession>() {

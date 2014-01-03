@@ -1,10 +1,8 @@
 package com.cloudjay.cjay.fragment;
 
-import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import android.net.Uri;
 import android.widget.ImageView;
 import android.widget.ListView;
 
@@ -19,10 +17,8 @@ import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
-import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EFragment;
@@ -174,17 +170,7 @@ public class AuditorReportedListFragment extends SherlockFragment {
 					@Override
 					public void loadImage(String url, ImageView view) {
 						if (url != null) {
-
 							imageLoader.displayImage(url, view);
-
-							// try {
-							// view.setImageBitmap(Utils.decodeImage(
-							// getActivity().getContentResolver(),
-							// Uri.parse(url),
-							// Utils.MINI_THUMBNAIL_SIZE));
-							// } catch (FileNotFoundException e) {
-							// e.printStackTrace();
-							// }
 						}
 					}
 				});

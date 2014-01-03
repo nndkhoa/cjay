@@ -1,10 +1,8 @@
 package com.cloudjay.cjay;
 
-import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import android.net.Uri;
 import android.widget.ImageView;
 import android.widget.ListView;
 

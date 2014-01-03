@@ -17,7 +17,7 @@ public class CJayImage implements Parcelable {
 	public static final int STATE_UPLOAD_IN_PROGRESS = 2;
 	public static final int STATE_UPLOAD_WAITING = 1;
 	public static final int STATE_NONE = 0;
-	
+
 	public static final int TYPE_IMPORT = 0;
 	public static final int TYPE_EXPORT = 1;
 	public static final int TYPE_REPORT = 2;
@@ -83,49 +83,49 @@ public class CJayImage implements Parcelable {
 	public void setIssue(Issue issue) {
 		this.issue = issue;
 	}
-	
+
 	public String getIssueLocationCode() {
 		if (issue != null) {
 			return issue.getLocationCode();
 		}
 		return null;
 	}
-	
+
 	public String getIssueComponentCode() {
 		if (issue != null) {
 			return issue.getComponentCodeString();
-		} 
+		}
 		return null;
 	}
-	
+
 	public String getIssueRepairCode() {
 		if (issue != null) {
 			return issue.getRepairCodeString();
-		} 
+		}
 		return null;
 	}
-	
+
 	public String getIssueDamageCode() {
 		if (issue != null) {
 			return issue.getDamageCodeString();
-		} 
+		}
 		return null;
 	}
-	
+
 	public String getIssueQuantity() {
 		if (issue != null) {
 			return String.valueOf(issue.getQuantity());
 		}
 		return null;
 	}
-	
+
 	public String getIssueLength() {
 		if (issue != null) {
 			return String.valueOf(issue.getLength());
 		}
 		return null;
 	}
-	
+
 	public String getIssueHeight() {
 		if (issue != null) {
 			return String.valueOf(issue.getHeight());

@@ -1,15 +1,53 @@
 package com.cloudjay.cjay.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+// TODO: need to add Parcelable for List<>
 @SuppressLint("ParcelCreator")
 public class AuditReportItem implements Parcelable {
 
+	private int damage_id;
+	private int repair_id;
+	private int component_id;
+	private String length;
+	private String height;
+	private String quantity;
+	private List<AuditReportImage> audit_report_images;
+
+	public AuditReportItem() {
+
+	}
+
+	public AuditReportItem(Issue issue) {
+		if (null != issue) {
+			this.damage_id = issue.getDamageCode().getId();
+			this.repair_id = issue.getRepairCode().getId();
+			this.component_id = issue.getComponentCode().getId();
+			this.length = issue.getLength();
+			this.height = issue.getHeight();
+			this.quantity = issue.getQuantity();
+
+			List<AuditReportImage> auditReportImages = new ArrayList<AuditReportImage>();
+			Collection<CJayImage> cJayImages = issue.getCJayImages();
+			if (null != cJayImages) {
+				for (CJayImage cJayImage : cJayImages) {
+					auditReportImages.add(new AuditReportImage(cJayImage
+							.getType(), cJayImage.getTimePosted(), cJayImage
+							.getImageName()));
+				}
+			}
+		}
+	}
+
 	@Override
 	public int describeContents() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

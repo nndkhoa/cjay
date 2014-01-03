@@ -1,12 +1,10 @@
 package com.cloudjay.cjay.fragment;
 
-import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Locale;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -353,18 +351,7 @@ public class AuditorReportingListFragment extends SherlockFragment {
 					@Override
 					public void loadImage(String url, ImageView view) {
 						if (url != null) {
-
 							imageLoader.displayImage(url, view);
-
-							// try {
-							// view.setImageBitmap(Utils.decodeImage(
-							// getActivity().getContentResolver(),
-							// Uri.parse(url),
-							// Utils.MINI_THUMBNAIL_SIZE));
-							//
-							// } catch (FileNotFoundException e) {
-							// e.printStackTrace();
-							// }
 						}
 					}
 				});

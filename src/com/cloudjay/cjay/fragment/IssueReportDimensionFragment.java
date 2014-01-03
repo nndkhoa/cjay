@@ -14,47 +14,52 @@ import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_issue_dimension)
-public class IssueReportDimensionFragment extends IssueReportFragment  {
+public class IssueReportDimensionFragment extends IssueReportFragment {
 	private AuditorIssueReportListener mCallback;
 	private Issue mIssue;
-	
-	@ViewById(R.id.length) EditText mLengthEditText;
-	@ViewById(R.id.height) EditText mHeightEditText;
-	
+
+	@ViewById(R.id.length)
+	EditText mLengthEditText;
+	@ViewById(R.id.height)
+	EditText mHeightEditText;
+
 	@AfterViews
 	void afterViews() {
-		mHeightEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView textView, int id,
-					KeyEvent keyEvent) {
-				if (id == EditorInfo.IME_ACTION_DONE) {
-					// move to next tab
-					mCallback.onReportPageCompleted(AuditorIssueReportListener.TAB_ISSUE_DIMENSION);
-					return true;
-				}
-				return false;
-			}
-		});
-		
+		mHeightEditText
+				.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+					@Override
+					public boolean onEditorAction(TextView textView, int id,
+							KeyEvent keyEvent) {
+						if (id == EditorInfo.IME_ACTION_DONE) {
+							// move to next tab
+							mCallback
+									.onReportPageCompleted(AuditorIssueReportListener.TAB_ISSUE_DIMENSION);
+							return true;
+						}
+						return false;
+					}
+				});
+
 		// initialize with issue
 		if (mIssue != null) {
 			mLengthEditText.setText(mIssue.getLength());
 			mHeightEditText.setText(mIssue.getHeight());
 		}
-		
+
 		mLengthEditText.requestFocus();
 	}
-	
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mCallback = (AuditorIssueReportListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement AuditorIssueReportListener");
-        }
-    }
-	
+
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		try {
+			mCallback = (AuditorIssueReportListener) activity;
+		} catch (ClassCastException e) {
+			throw new ClassCastException(activity.toString()
+					+ " must implement AuditorIssueReportListener");
+		}
+	}
+
 	@Override
 	public void setIssue(Issue issue) {
 		mIssue = issue;
@@ -63,7 +68,9 @@ public class IssueReportDimensionFragment extends IssueReportFragment  {
 	@Override
 	public void validateAndSaveData() {
 		// save data
-		mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_LENGTH, mLengthEditText.getText().toString());
-		mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_HEIGHT, mHeightEditText.getText().toString());
+		mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_LENGTH,
+				mLengthEditText.getText().toString());
+		mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_HEIGHT,
+				mHeightEditText.getText().toString());
 	}
 }

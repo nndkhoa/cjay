@@ -528,7 +528,12 @@ public class CJayClient implements ICJayClient {
 			if (NetworkHelper.isConnected(ctx)) {
 				HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 				Gson gson = new Gson();
+
 				String data = gson.toJson(item);
+
+				if (null != data)
+					Logger.Log(LOG_TAG, data);
+
 				String url = CJayConstant.CJAY_ITEMS;
 				requestWrapper.sendPost(url, data, "application/json", headers);
 			} else {

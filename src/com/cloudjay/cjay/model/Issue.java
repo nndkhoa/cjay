@@ -98,7 +98,7 @@ public class Issue implements Parcelable {
 	public ComponentCode getComponentCode() {
 		return this.componentCode;
 	}
-	
+
 	public String getComponentCodeString() {
 		if (this.componentCode != null) {
 			return this.componentCode.getCode();

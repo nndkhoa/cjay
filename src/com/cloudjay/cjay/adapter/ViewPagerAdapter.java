@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.cloudjay.cjay.fragment.GateExportListFragment_;
 import com.cloudjay.cjay.fragment.GateImportListFragment_;
-import com.cloudjay.cjay.fragment.UploadsFragment;
 import com.cloudjay.cjay.fragment.UploadsFragment_;
 
 public class ViewPagerAdapter extends FragmentPagerAdapter {

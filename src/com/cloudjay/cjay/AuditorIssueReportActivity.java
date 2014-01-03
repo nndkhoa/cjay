@@ -1,6 +1,5 @@
 package com.cloudjay.cjay;
 
-import java.io.FileNotFoundException;
 import java.sql.SQLException;
 
 import android.support.v4.app.Fragment;
@@ -26,7 +25,6 @@ import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
-import com.cloudjay.cjay.util.Utils;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.Extra;
@@ -69,12 +67,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 				issue.setContainerSession(mCJayImage.getContainerSession());
 				mCJayImage.setIssue(issue);
 			}
-
-			// imageView.setImageBitmap(Utils
-			// .decodeImage(getContentResolver(),
-			// mCJayImage.getOriginalPhotoUri(),
-			// Utils.MINI_THUMBNAIL_SIZE));
-
+			
 			imageLoader.displayImage(mCJayImage.getUri(), imageView);
 
 		} catch (SQLException e) {
@@ -163,12 +156,16 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 
 	@Override
 	public void onReportPageCompleted(int page) {
+
 		// go to next tab
 		int currPosition = getSupportActionBar().getSelectedNavigationIndex();
 		if (currPosition < getSupportActionBar().getTabCount() - 1) {
 			getSupportActionBar().selectTab(
 					getSupportActionBar().getTabAt(++currPosition));
 		}
+
+		// TODO: //
+		// if (page ==)
 	}
 
 	@Override
