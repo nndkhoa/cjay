@@ -74,6 +74,8 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 				mIssue = new Issue();
 				mIssue.setContainerSession(mCJayImage.getContainerSession());
 				mCJayImage.setIssue(mIssue);
+			} else {
+				mIssue = mCJayImage.getIssue();
 			}
 
 			imageLoader.displayImage(mCJayImage.getUri(), imageView);
@@ -125,14 +127,37 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 		pager.setCurrentItem(position);
 		
 		// show keyboard for specific tabs
-		if (position == TAB_ISSUE_DIMENSION || position == TAB_ISSUE_QUANTITY) {
+		switch (position) {
+		case TAB_ISSUE_DIMENSION:
+		case TAB_ISSUE_QUANTITY:
 			IssueReportFragment fragment = (IssueReportFragment) mViewPagerAdapter.getRegisteredFragment(position);
-			fragment.showKeyboard();
+			if (fragment != null) {
+				fragment.showKeyboard();				
+			}		
+			break;
+
+		default:
+			break;
 		}
 	}
 
 	@Override
 	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+		// hide keyboard for specific tabs
+		int position = tab.getPosition();
+		switch (position) {
+		case TAB_ISSUE_COMPONENT:
+		case TAB_ISSUE_DIMENSION:
+		case TAB_ISSUE_QUANTITY:
+			IssueReportFragment fragment = (IssueReportFragment) mViewPagerAdapter.getRegisteredFragment(position);
+			if (fragment != null) {
+				fragment.hideKeyboard();				
+			}			
+			break;
+
+		default:
+			break;
+		}
 	}
 
 	@Override

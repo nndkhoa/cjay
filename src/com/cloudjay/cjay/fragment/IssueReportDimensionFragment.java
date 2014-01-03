@@ -77,6 +77,7 @@ public class IssueReportDimensionFragment extends IssueReportFragment {
 	@Override
 	public void showKeyboard() {
 		// show keyboard
+		mLengthEditText.requestFocus();
 		InputMethodManager imm = (InputMethodManager) getActivity()
 				.getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.showSoftInput(mLengthEditText, 0);

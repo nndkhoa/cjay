@@ -51,8 +51,6 @@ public class IssueReportQuantityFragment extends IssueReportFragment {
 		if (mIssue != null) {
 			mQuantityEditText.setText(mIssue.getQuantity());
 		}
-
-		mQuantityEditText.requestFocus();
 	}
 
 	@Override
@@ -82,6 +80,7 @@ public class IssueReportQuantityFragment extends IssueReportFragment {
 	@Override
 	public void showKeyboard() {
 		// show keyboard
+		mQuantityEditText.requestFocus();
 		InputMethodManager imm = (InputMethodManager) getActivity()
 				.getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.showSoftInput(mQuantityEditText, 0);

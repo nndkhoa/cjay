@@ -16,19 +16,19 @@
 	    <EditText
 	        android:id="@+id/locationCode0"
 	        android:tag="0"
-			style="@style/DamageReportLocationCodeEditText" />
+			style="@style/IssueReportLocationCodeEditText" />
 	    <EditText
 	        android:id="@+id/locationCode1"
 	        android:tag="1"
-			style="@style/DamageReportLocationCodeEditText" />
+			style="@style/IssueReportLocationCodeEditText" />
 	    <EditText
 	        android:id="@+id/locationCode2"
 	        android:tag="2"
-			style="@style/DamageReportLocationCodeEditText" />
+			style="@style/IssueReportLocationCodeEditText" />
 	    <EditText
 	        android:id="@+id/locationCode3"
 	        android:tag="3"
-			style="@style/DamageReportLocationCodeEditText" />
+			style="@style/IssueReportLocationCodeEditText" />
 	</LinearLayout>
     
     <LinearLayout
@@ -42,22 +42,22 @@
 		
 	    <Button
 	        android:id="@+id/btnCode0"
-			style="@style/DamageReportLocationCodeButton" />
+			style="@style/IssueReportLocationCodeButton" />
 	    <Button
 	        android:id="@+id/btnCode1"
-			style="@style/DamageReportLocationCodeButton" />
+			style="@style/IssueReportLocationCodeButton" />
 	    <Button
 	        android:id="@+id/btnCode2"
-			style="@style/DamageReportLocationCodeButton" />
+			style="@style/IssueReportLocationCodeButton" />
 	    <Button
 	        android:id="@+id/btnCode3"
-			style="@style/DamageReportLocationCodeButton" />
+			style="@style/IssueReportLocationCodeButton" />
 	    <Button
 	        android:id="@+id/btnCode4"
-			style="@style/DamageReportLocationCodeButton" />
+			style="@style/IssueReportLocationCodeButton" />
 	    <Button
 	        android:id="@+id/btnCode5"
-			style="@style/DamageReportLocationCodeButton" />
+			style="@style/IssueReportLocationCodeButton" />
 	</LinearLayout>
 	
     <LinearLayout
@@ -71,22 +71,22 @@
 		
 	    <Button
 	        android:id="@+id/btnCode6"
-			style="@style/DamageReportLocationCodeButton" />
+			style="@style/IssueReportLocationCodeButton" />
 	    <Button
 	        android:id="@+id/btnCode7"
-			style="@style/DamageReportLocationCodeButton" />
+			style="@style/IssueReportLocationCodeButton" />
 	    <Button
 	        android:id="@+id/btnCode8"
-			style="@style/DamageReportLocationCodeButton" />
+			style="@style/IssueReportLocationCodeButton" />
 	    <Button
 	        android:id="@+id/btnCode9"
-			style="@style/DamageReportLocationCodeButton" />
+			style="@style/IssueReportLocationCodeButton" />
 	    <Button
 	        android:id="@+id/btnCode10"
-			style="@style/DamageReportLocationCodeButton" />
+			style="@style/IssueReportLocationCodeButton" />
 	    <Button
 	        android:id="@+id/btnCode11"
-			style="@style/DamageReportLocationCodeButton" />
+			style="@style/IssueReportLocationCodeButton" />
 	</LinearLayout>
     
 </LinearLayout>

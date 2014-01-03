@@ -81,11 +81,7 @@ public class IssueReportComponentFragment extends IssueReportFragment  {
 		ignoreSearch = false;
 		
 		// hide keyboard
-		InputMethodManager imm = (InputMethodManager) getActivity()
-				.getSystemService(
-						Context.INPUT_METHOD_SERVICE);
-		imm.hideSoftInputFromWindow(
-				mComponentEditText.getWindowToken(), 0);
+		hideKeyboard();
 		
 		// move to next tab
 		mCallback.onReportPageCompleted(AuditorIssueReportListener.TAB_ISSUE_COMPONENT);
@@ -114,15 +110,11 @@ public class IssueReportComponentFragment extends IssueReportFragment  {
 	
 	@Override
 	public void showKeyboard() {
-		// show keyboard
-		InputMethodManager imm = (InputMethodManager) getActivity()
-				.getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.showSoftInput(mComponentEditText, 0);
 	}
 	
 	@Override
 	public void hideKeyboard() {
-		// show keyboard
+		// hide keyboard
 		InputMethodManager imm = (InputMethodManager) getActivity()
 				.getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(mComponentEditText.getWindowToken(), 0);
