@@ -39,7 +39,7 @@ public final class CJayConstant {
 	public static final String LIST_REPAIR_CODES = API_ROOT
 			+ "cjay/repair-codes";
 	public static final String LIST_COMPONENT_CODES = API_ROOT
-			+ "cjay/repair-codes";
+			+ "cjay/component-codes";
 	public static final String CJAY_RESOURCE_STATUS = API_ROOT
 			+ "cjay/cjay-resource-status";
 	public static final String LIST_CONTAINER_SESSIONS = API_ROOT

@@ -16,9 +16,11 @@ public class AuditReportItem implements Parcelable {
 	private int damage_id;
 	private int repair_id;
 	private int component_id;
+	private String location_code;
 	private String length;
 	private String height;
 	private String quantity;
+
 	private List<AuditReportImage> audit_report_images;
 
 	public AuditReportItem() {
@@ -33,6 +35,7 @@ public class AuditReportItem implements Parcelable {
 			this.length = issue.getLength();
 			this.height = issue.getHeight();
 			this.quantity = issue.getQuantity();
+			this.location_code = issue.getLocationCode();
 
 			audit_report_images = new ArrayList<AuditReportImage>();
 			Collection<CJayImage> cJayImages = issue.getCJayImages();

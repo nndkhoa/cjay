@@ -37,8 +37,11 @@ public class Mapper {
 		tmpContainerSession.setDepotCode(containerSession.getContainer()
 				.getDepot().getDepotCode());
 		tmpContainerSession.setContainerId(containerSession.getContainerId());
+
+		// TODO: return Check in time (may cause error)
 		tmpContainerSession
 				.setCheckInTime(containerSession.getRawCheckInTime());
+
 		tmpContainerSession.setCheckOutTime(containerSession
 				.getRawCheckOutTime());
 
