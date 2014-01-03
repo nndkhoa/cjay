@@ -98,4 +98,8 @@ public class IssueReportDamageFragment extends IssueReportFragment implements On
 	@Override
 	public void showKeyboard() {
 	}
+	
+	@Override
+	public void hideKeyboard() {
+	}
 }

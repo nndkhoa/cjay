@@ -146,6 +146,10 @@ public class IssueReportLocationFragment extends IssueReportFragment
 	public void showKeyboard() {
 	}
 	
+	@Override
+	public void hideKeyboard() {
+	}
+	
 	private void configureControls(int step) {
 		for (int i = 0; i < mCodeButtons.length; i++) {
 			mCodeButtons[i].setText(mCodes[step][i]);

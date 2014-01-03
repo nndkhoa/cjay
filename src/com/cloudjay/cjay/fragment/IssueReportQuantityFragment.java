@@ -86,4 +86,12 @@ public class IssueReportQuantityFragment extends IssueReportFragment {
 				.getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.showSoftInput(mQuantityEditText, 0);
 	}
+	
+	@Override
+	public void hideKeyboard() {
+		// show keyboard
+		InputMethodManager imm = (InputMethodManager) getActivity()
+				.getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(mQuantityEditText.getWindowToken(), 0);
+	}
 }
