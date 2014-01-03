@@ -71,6 +71,14 @@ public class Mapper {
 		return tmpContainerSession;
 	}
 
+	/**
+	 * 
+	 * Sử dụng để convert data lấy từ server thành local data
+	 * 
+	 * @param tmpSession
+	 * @param ctx
+	 * @return
+	 */
 	public static ContainerSession toContainerSession(
 			TmpContainerSession tmpSession, Context ctx) {
 
@@ -150,6 +158,7 @@ public class Mapper {
 
 			List<CJayImage> listImages = new ArrayList<CJayImage>();
 
+			// TODO: cần xử lý thêm khi làm app cho Team Sửa Chữa
 			// process audit report item
 			List<AuditReportItem> auditReportItems = tmpSession
 					.getAuditReportItems();
@@ -160,18 +169,18 @@ public class Mapper {
 			}
 
 			// process gate report images
-
 			List<GateReportImage> gateReportImages = tmpSession
 					.getGateReportImages();
 			if (null != gateReportImages) {
 				for (GateReportImage gateReportImage : gateReportImages) {
 
-					// Logger.Log(Integer.toString(gateReportImage.getId()));
-
 					CJayImage image = new CJayImage(gateReportImage.getId(),
 							gateReportImage.getType(),
 							gateReportImage.getTimePosted(),
 							gateReportImage.getImageName());
+
+					// set default value
+					image.setUploadState(CJayImage.STATE_UPLOAD_COMPLETED);
 
 					if (null != image)
 						image.setContainerSession(containerSession);

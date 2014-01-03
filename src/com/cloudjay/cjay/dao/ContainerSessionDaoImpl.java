@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.Logger;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
@@ -100,11 +101,6 @@ public class ContainerSessionDaoImpl extends
 								ContainerSession.STATE_UPLOAD_WAITING).and()
 						.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, true)
 						.prepare());
-
-		// Logger.Log(
-		// LOG_TAG,
-		// "getNextWaiting with "
-		// + Integer.toString(containerSessions.size()) + " items");
 
 		for (ContainerSession containerSession : containerSessions) {
 

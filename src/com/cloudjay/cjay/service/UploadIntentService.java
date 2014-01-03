@@ -376,6 +376,7 @@ public class UploadIntentService extends IntentService implements
 				Log.i("FOO", resp.getStatusLine().getReasonPhrase());
 				if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_OK
 						|| resp.getStatusLine().getStatusCode() == HttpStatus.SC_ACCEPTED) {
+
 					// Set Status Success
 					uploadItem.setUploadState(CJayImage.STATE_UPLOAD_COMPLETED);
 					cJayImageDaoImpl.update(uploadItem);
