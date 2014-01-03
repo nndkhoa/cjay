@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import android.app.Activity;
+import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -78,6 +80,13 @@ public class IssueReportComponentFragment extends IssueReportFragment  {
 		mComponentEditText.setText(mComponentName);
 		ignoreSearch = false;
 		
+		// hide keyboard
+		InputMethodManager imm = (InputMethodManager) getActivity()
+				.getSystemService(
+						Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(
+				mComponentEditText.getWindowToken(), 0);
+		
 		// move to next tab
 		mCallback.onReportPageCompleted(AuditorIssueReportListener.TAB_ISSUE_COMPONENT);
 	}
@@ -101,6 +110,10 @@ public class IssueReportComponentFragment extends IssueReportFragment  {
 	public void validateAndSaveData() {
 		// save data
 		mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_COMPONENT_CODE, mComponentCode);		
+	}
+	
+	@Override
+	public void showKeyboard() {
 	}
 	
 	private void search(String searchText) {

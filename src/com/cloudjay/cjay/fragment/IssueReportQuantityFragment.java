@@ -78,4 +78,12 @@ public class IssueReportQuantityFragment extends IssueReportFragment {
 				AuditorIssueReportListener.TYPE_QUANTITY, mQuantityEditText
 						.getText().toString());
 	}
+
+	@Override
+	public void showKeyboard() {
+		// show keyboard
+		InputMethodManager imm = (InputMethodManager) getActivity()
+				.getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.showSoftInput(mQuantityEditText, 0);
+	}
 }

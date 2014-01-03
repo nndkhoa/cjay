@@ -1,8 +1,10 @@
 package com.cloudjay.cjay.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -45,8 +47,6 @@ public class IssueReportDimensionFragment extends IssueReportFragment {
 			mLengthEditText.setText(mIssue.getLength());
 			mHeightEditText.setText(mIssue.getHeight());
 		}
-
-		mLengthEditText.requestFocus();
 	}
 
 	@Override
@@ -72,5 +72,13 @@ public class IssueReportDimensionFragment extends IssueReportFragment {
 				mLengthEditText.getText().toString());
 		mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_HEIGHT,
 				mHeightEditText.getText().toString());
+	}
+	
+	@Override
+	public void showKeyboard() {
+		// show keyboard
+		InputMethodManager imm = (InputMethodManager) getActivity()
+				.getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.showSoftInput(mLengthEditText, 0);
 	}
 }

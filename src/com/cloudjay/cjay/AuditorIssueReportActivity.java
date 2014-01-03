@@ -12,15 +12,21 @@ import android.util.SparseArray;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
-import com.actionbarsherlock.app.ActionBar;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
-import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.fragment.IssueReportComponentFragment_;
+import com.cloudjay.cjay.fragment.IssueReportDamageFragment_;
+import com.cloudjay.cjay.fragment.IssueReportDimensionFragment_;
+import com.cloudjay.cjay.fragment.IssueReportFragment;
+import com.cloudjay.cjay.fragment.IssueReportLocationFragment_;
+import com.cloudjay.cjay.fragment.IssueReportQuantityFragment_;
+import com.cloudjay.cjay.fragment.IssueReportRepairFragment_;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Issue;
@@ -30,9 +36,9 @@ import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.Extra;
 import com.googlecode.androidannotations.annotations.OptionsItem;
 import com.googlecode.androidannotations.annotations.OptionsMenu;
-// slide 20
 import com.googlecode.androidannotations.annotations.ViewById;
 import com.nostra13.universalimageloader.core.ImageLoader;
+// slide 20
 
 @EActivity(R.layout.activity_auditor_issue_report)
 @OptionsMenu(R.menu.menu_audit_issue_report)
@@ -117,6 +123,12 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 	public void onTabSelected(Tab tab, FragmentTransaction ft) {
 		int position = tab.getPosition();
 		pager.setCurrentItem(position);
+		
+		// show keyboard for specific tabs
+		if (position == TAB_ISSUE_DIMENSION || position == TAB_ISSUE_QUANTITY) {
+			IssueReportFragment fragment = (IssueReportFragment) mViewPagerAdapter.getRegisteredFragment(position);
+			fragment.showKeyboard();
+		}
 	}
 
 	@Override
@@ -167,10 +179,11 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 		if (currPosition < getSupportActionBar().getTabCount() - 1) {
 			getSupportActionBar().selectTab(
 					getSupportActionBar().getTabAt(++currPosition));
+			
+		} else {			
+			// if the last tab is complete, then save issue and exit
+			checkMenuItemClicked();
 		}
-
-		// TODO: //
-		// if (page ==)
 	}
 
 	@Override
