@@ -113,7 +113,8 @@ public class ContainerSessionDaoImpl extends
 				if (cJayImage.getUploadState() != CJayImage.STATE_UPLOAD_COMPLETED
 						&& cJayImage.getUploadState() != CJayImage.STATE_UPLOAD_IN_PROGRESS) {
 
-					Logger.Log(LOG_TAG, "Problem with cjayImage");
+					Logger.Log(LOG_TAG,
+							"Some cJayImages are still not uploaded");
 					flag = false;
 					break;
 				}

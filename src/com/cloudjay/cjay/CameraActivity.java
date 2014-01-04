@@ -497,7 +497,7 @@ public class CameraActivity extends Activity {
 
 		if (TextUtils.isEmpty(containerSession.getImageIdPath())) {
 			Logger.Log(LOG_TAG, "image_id_path: " + uri);
-			containerSession.setImageIdPath(image_name);
+			containerSession.setImageIdPath(uri);
 		}
 
 		try {

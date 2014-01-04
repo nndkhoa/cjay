@@ -1,4 +1,5 @@
 package com.cloudjay.cjay;
+
 import java.lang.reflect.Field;
 
 import android.content.Intent;
@@ -48,7 +49,7 @@ public class AuditorHomeActivity extends CJayActivity implements
 				menuKeyField.setBoolean(config, false);
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+
 		}
 		super.onCreate(arg0);
 	}
@@ -157,7 +158,7 @@ public class AuditorHomeActivity extends CJayActivity implements
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {

@@ -56,7 +56,6 @@ public class GateHomeActivity extends CJayActivity implements
 				menuKeyField.setBoolean(config, false);
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
 		}
 
 		super.onCreate(arg0);

@@ -28,6 +28,8 @@ import com.cloudjay.cjay.network.CJayClient;
 
 public class Mapper {
 
+	private final String LOG_TAG = "Mapper";
+
 	private static IDatabaseManager databaseManager = null;
 	private static Mapper instance = null;
 
@@ -45,7 +47,7 @@ public class Mapper {
 		return instance;
 	}
 
-	public void update(Context ctx, TmpContainerSession tmp,
+	public synchronized void update(Context ctx, TmpContainerSession tmp,
 			ContainerSession main) {
 
 		try {
@@ -60,15 +62,29 @@ public class Mapper {
 
 			if (gateReportImages != null) {
 				for (GateReportImage gateReportImage : gateReportImages) {
-					for (CJayImage cJayImage : main.getCJayImages()) {
+					for (CJayImage cJayImage : cJayImages) {
 						String gateReportImageName = gateReportImage
 								.getImageName();
 						String cJayImageName = cJayImage.getImageName();
 						if (gateReportImageName.contains(cJayImageName)) {
 
+							Logger.Log(
+									LOG_TAG,
+									"Gate Report Image Id: "
+											+ Integer.toString(gateReportImage
+													.getId())
+											+ "\nGate Report Image Name: "
+											+ gateReportImageName
+											+ "\nGate Report Image Type: "
+											+ Integer.toString(gateReportImage
+													.getType())
+											+ "\nGate Report Image Time: "
+											+ gateReportImage.getTimePosted());
+
 							cJayImage.setId(gateReportImage.getId());
 							cJayImage.setImageName(gateReportImageName);
 							cJayImageDaoImpl.update(cJayImage);
+
 							break;
 						}
 					}
