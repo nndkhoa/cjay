@@ -1,5 +1,7 @@
 package com.cloudjay.cjay.model;
 
+import android.R.integer;
+
 import com.cloudjay.cjay.dao.UserDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -187,5 +189,24 @@ public class User {
 
 	public void setPhone(int phone) {
 		this.phone = phone;
+	}
+
+	public int getFilterStatus() {
+		int result = 0;
+
+		switch (this.role) {
+		case User.ROLE_GATE_KEEPER:
+			result = 5; // repaired containers
+
+		case User.ROLE_AUDITOR:
+			result = 0; // checked in containers
+
+		case User.ROLE_REPAIR_STAFF:
+			result = 4; // confirmed
+
+		default:
+			break;
+		}
+		return result;
 	}
 }

@@ -45,11 +45,17 @@ public final class CJayConstant {
 	public static final String LIST_CONTAINER_SESSIONS = API_ROOT
 			+ "cjay/container-sessions";
 
+	public static final String LIST_CONTAINER_SESSIONS_WITH_FILTER = API_ROOT
+			+ "cjay/container-sessions.json?filter_status=%s";
+
 	public static final String CJAY_ITEMS = API_ROOT
 			+ "cjay/container-sessions.json";
 
 	public static final String LIST_CONTAINER_SESSIONS_WITH_DATETIME = API_ROOT
 			+ "cjay/container-sessions.json?created_after=%s";
+
+	public static final String LIST_CONTAINER_SESSIONS_WITH_FILTER_AND_DATETIME = API_ROOT
+			+ "cjay/container-sessions.json?filter_status=%s&created_after=%s";
 
 	public static final String LIST_CONTAINER_SESSIONS_REPORT_LIST = API_ROOT
 			+ "cjay/container-sessions-report-list.json";
@@ -92,8 +98,8 @@ public final class CJayConstant {
 	public static final int SELECT_PHOTO = 101;
 	public static final float IMAGE_CACHE_HEAP_PERCENTAGE = 1f / 6f;
 
-	public static final String CJAY_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
-	public static final String CJAY_SERVER_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+	public static final String CJAY_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";	// with timezone
+	public static final String CJAY_SERVER_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss"; // without timezone
 	public static final String CJAY_UPLOAD_DATETIME_FORMAT = "yyyy-MM-dd";
 
 	public static final long SCALE_ANIMATION_DURATION_FULL_DISTANCE = 800;

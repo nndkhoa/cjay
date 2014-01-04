@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
@@ -151,12 +152,12 @@ public class CJayClient implements ICJayClient {
 
 			Date now = new Date();
 
-			// 2013-11-10T21:05:24+08:00
+			// 2013-11-10T21:05:24 (do not have timezone info)
 			SimpleDateFormat dateFormat = new SimpleDateFormat(
 					CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
 			String nowString = dateFormat.format(now);
 
-			// 1. chưa có data
+			// 1. chưa có ISO code data
 			Logger.Log(LOG_TAG, "no iso code");
 			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx)
 					.getOperatorDaoImpl();
@@ -218,14 +219,19 @@ public class CJayClient implements ICJayClient {
 			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
 					.getHelper(ctx).getContainerSessionDaoImpl();
 
+			int filterStatus = Session.restore(ctx).getFilterStatus();
+
 			// 3. Update list ContainerSessions
 			Logger.Log(LOG_TAG, "get list container sessions");
 			List<ContainerSession> containerSessions = null;
 
 			if (containerSessionDaoImpl.isEmpty()) {
 
-				Logger.Log(LOG_TAG, "get new list container sessions");
-				containerSessions = getContainerSessions(ctx);
+				Logger.Log(LOG_TAG,
+						"get new list container sessions based on user role");
+
+				// containerSessions = getAllContainerSessions(ctx);
+				containerSessions = getContainerSessions(ctx, filterStatus);
 
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE,
@@ -247,7 +253,11 @@ public class CJayClient implements ICJayClient {
 					Logger.Log(LOG_TAG, "No new container sessions");
 				}
 			}
-			containerSessionDaoImpl.addListContainerSessions(containerSessions);
+
+			if (null != containerSessions) {
+				containerSessionDaoImpl
+						.addListContainerSessions(containerSessions);
+			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -373,16 +383,16 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public List<ContainerSession> getContainerSessions(Context ctx) {
+	public List<ContainerSession> getAllContainerSessions(Context ctx) {
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 		String response = requestWrapper.sendGet(
 				CJayConstant.LIST_CONTAINER_SESSIONS, headers);
 
-		Logger.Log(LOG_TAG, "getContainerSessions(Context ctx)");
+		Logger.Log(LOG_TAG, "getAllContainerSessions(Context ctx)");
 		Logger.Log(LOG_TAG, response);
 
 		Gson gson = new GsonBuilder().setDateFormat(
-				CJayConstant.CJAY_DATETIME_FORMAT).create();
+				CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
 
 		Type listType = new TypeToken<List<TmpContainerSession>>() {
 		}.getType();
@@ -422,13 +432,152 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
+	public List<ContainerSession> getContainerSessions(Context ctx,
+			int filterStatus) {
+
+		Logger.Log(LOG_TAG, "getContainerSessions(Context ctx, int userRole)");
+		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
+
+		String response = requestWrapper.sendGet(String.format(
+				CJayConstant.LIST_CONTAINER_SESSIONS_WITH_FILTER,
+				Integer.toString(filterStatus)), headers);
+
+		if (TextUtils.isEmpty(response)) {
+			Logger.Log(
+					LOG_TAG,
+					"No new items for user role "
+							+ Integer.toString(filterStatus));
+		} else {
+			Logger.Log(LOG_TAG, "Response: " + response);
+
+			Gson gson = new GsonBuilder().setDateFormat(
+					CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
+
+			Type listType = new TypeToken<List<TmpContainerSession>>() {
+			}.getType();
+
+			List<TmpContainerSession> tmpContainerSessions = null;
+			try {
+				tmpContainerSessions = gson.fromJson(response, listType);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			// Parse to `ContainerSession`
+			List<ContainerSession> items = new ArrayList<ContainerSession>();
+			try {
+				ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
+						.getHelper(ctx).getContainerSessionDaoImpl();
+
+				if (tmpContainerSessions != null) {
+					for (TmpContainerSession tmpSession : tmpContainerSessions) {
+						ContainerSession containerSession = Mapper
+								.toContainerSession(tmpSession, ctx);
+
+						if (null != containerSession) {
+							containerSessionDaoImpl
+									.addContainerSessions(containerSession);
+							items.add(containerSession);
+						}
+					}
+
+				}
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			return items;
+		}
+
+		return null;
+	}
+
+	@Override
+	public List<ContainerSession> getContainerSessions(Context ctx,
+			int filterStatus, Date date) {
+
+		Logger.Log(LOG_TAG,
+				"getContainerSessions(Context ctx, int userRole, Date date)");
+
+		List<ContainerSession> items = new ArrayList<ContainerSession>();
+		String formatedDate = StringHelper.getTimestamp(
+				CJayConstant.CJAY_SERVER_DATETIME_FORMAT, date);
+
+		items = getContainerSessions(ctx, filterStatus, formatedDate);
+		return items;
+	}
+
+	@Override
+	public List<ContainerSession> getContainerSessions(Context ctx,
+			int filterStatus, String date) {
+
+		Logger.Log(LOG_TAG,
+				"getContainerSessions(Context ctx, int userRole, String date");
+		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
+
+		String response = requestWrapper.sendGet(String.format(
+				CJayConstant.LIST_CONTAINER_SESSIONS_WITH_FILTER_AND_DATETIME,
+				Integer.toString(filterStatus), date), headers);
+
+		if (TextUtils.isEmpty(response)) {
+			Logger.Log(LOG_TAG, "No new items from: " + date
+					+ " for user role: " + Integer.toString(filterStatus));
+
+		} else {
+			Logger.Log(LOG_TAG, response);
+
+			Gson gson = new GsonBuilder().setDateFormat(
+					CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
+
+			Type listType = new TypeToken<List<TmpContainerSession>>() {
+			}.getType();
+
+			List<TmpContainerSession> tmpContainerSessions = null;
+			try {
+				tmpContainerSessions = gson.fromJson(response, listType);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			// Parse to `ContainerSession`
+			List<ContainerSession> items = new ArrayList<ContainerSession>();
+			try {
+				ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
+						.getHelper(ctx).getContainerSessionDaoImpl();
+
+				if (tmpContainerSessions != null) {
+					for (TmpContainerSession tmpSession : tmpContainerSessions) {
+						ContainerSession containerSession = Mapper
+								.toContainerSession(tmpSession, ctx);
+
+						if (null != containerSession) {
+							containerSessionDaoImpl
+									.addContainerSessions(containerSession);
+							items.add(containerSession);
+						}
+					}
+
+				}
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			return items;
+		}
+
+		return null;
+	}
+
+	@Override
 	public List<ContainerSession> getContainerSessions(Context ctx, Date date) {
 
 		Logger.Log(LOG_TAG, "getContainerSessions(Context ctx, Date date)");
 
 		List<ContainerSession> items = new ArrayList<ContainerSession>();
 		String formatedDate = StringHelper.getTimestamp(
-				CJayConstant.CJAY_DATETIME_FORMAT, date);
+				CJayConstant.CJAY_SERVER_DATETIME_FORMAT, date);
 
 		items = getContainerSessions(ctx, formatedDate);
 		return items;
@@ -450,7 +599,7 @@ public class CJayClient implements ICJayClient {
 			Logger.Log(LOG_TAG, response);
 
 			Gson gson = new GsonBuilder().setDateFormat(
-					CJayConstant.CJAY_DATETIME_FORMAT).create();
+					CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
 
 			Type listType = new TypeToken<List<TmpContainerSession>>() {
 			}.getType();

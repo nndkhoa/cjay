@@ -41,7 +41,15 @@ public interface ICJayClient {
 
 	List<ComponentCode> getComponentCodes(Context ctx);
 
-	List<ContainerSession> getContainerSessions(Context ctx);
+	List<ContainerSession> getAllContainerSessions(Context ctx);
+
+	List<ContainerSession> getContainerSessions(Context ctx, int userRole);
+
+	List<ContainerSession> getContainerSessions(Context ctx, int userRole,
+			Date date);
+
+	List<ContainerSession> getContainerSessions(Context ctx, int userRole,
+			String date);
 
 	List<ContainerSession> getContainerSessions(Context ctx, Date date);
 

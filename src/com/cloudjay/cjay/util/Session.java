@@ -30,6 +30,10 @@ public class Session {
 		return currentUser.getRole();
 	}
 
+	public int getFilterStatus() {
+		return currentUser.getFilterStatus();
+	}
+
 	public Session(User user) {
 		currentUser = user;
 	}
