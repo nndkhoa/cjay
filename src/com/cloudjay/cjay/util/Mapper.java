@@ -1,5 +1,6 @@
 package com.cloudjay.cjay.util;
 
+import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +26,9 @@ import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 public class Mapper {
 
@@ -47,57 +51,80 @@ public class Mapper {
 		return instance;
 	}
 
-	public synchronized void update(Context ctx, TmpContainerSession tmp,
+	public synchronized void update(Context ctx, String jsonString,
 			ContainerSession main) {
 
 		try {
-			CJayImageDaoImpl cJayImageDaoImpl = databaseManager.getHelper(ctx)
-					.getCJayImageDaoImpl();
 
-			main.setId(tmp.getId());
-			main.setImageIdPath(tmp.getImageIdPath());
+			TmpContainerSession tmp = null;
+			Gson gson = new GsonBuilder().setDateFormat(
+					CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
 
-			List<GateReportImage> gateReportImages = tmp.getGateReportImages();
-			Collection<CJayImage> cJayImages = main.getCJayImages();
+			Type listType = new TypeToken<TmpContainerSession>() {
+			}.getType();
 
-			if (gateReportImages != null) {
-				for (GateReportImage gateReportImage : gateReportImages) {
-					for (CJayImage cJayImage : cJayImages) {
-						String gateReportImageName = gateReportImage
-								.getImageName();
-						String cJayImageName = cJayImage.getImageName();
-						if (gateReportImageName.contains(cJayImageName)) {
+			try {
+				tmp = gson.fromJson(jsonString, listType);
+			} catch (Exception e) {
+				Logger.Log(LOG_TAG, "jsonString is on wrong format");
+				e.printStackTrace();
+				return;
+			}
 
-							Logger.Log(
-									LOG_TAG,
-									"Gate Report Image Id: "
-											+ Integer.toString(gateReportImage
-													.getId())
-											+ "\nGate Report Image Name: "
-											+ gateReportImageName
-											+ "\nGate Report Image Type: "
-											+ Integer.toString(gateReportImage
-													.getType())
-											+ "\nGate Report Image Time: "
-											+ gateReportImage.getTimePosted());
+			if (null != tmp) {
+				CJayImageDaoImpl cJayImageDaoImpl = databaseManager.getHelper(
+						ctx).getCJayImageDaoImpl();
 
-							cJayImage.setId(gateReportImage.getId());
-							cJayImage.setImageName(gateReportImageName);
-							cJayImageDaoImpl.update(cJayImage);
+				main.setId(tmp.getId());
+				main.setImageIdPath(tmp.getImageIdPath());
 
-							break;
+				List<GateReportImage> gateReportImages = tmp
+						.getGateReportImages();
+				Collection<CJayImage> cJayImages = main.getCJayImages();
+
+				if (gateReportImages != null) {
+					for (GateReportImage gateReportImage : gateReportImages) {
+						for (CJayImage cJayImage : cJayImages) {
+							String gateReportImageName = gateReportImage
+									.getImageName();
+							String cJayImageName = cJayImage.getImageName();
+							if (gateReportImageName.contains(cJayImageName)) {
+
+								// Logger.Log(
+								// LOG_TAG,
+								// "Gate Report Image Id: "
+								// + Integer
+								// .toString(gateReportImage
+								// .getId())
+								// + "\nGate Report Image Name: "
+								// + gateReportImageName
+								// + "\nGate Report Image Type: "
+								// + Integer
+								// .toString(gateReportImage
+								// .getType())
+								// + "\nGate Report Image Time: "
+								// + gateReportImage
+								// .getTimePosted());
+
+								cJayImage.setId(gateReportImage.getId());
+								cJayImage.setImageName(gateReportImageName);
+								cJayImageDaoImpl.update(cJayImage);
+
+								break;
+							}
 						}
 					}
 				}
-			}
 
-			List<AuditReportItem> auditReportItems = tmp.getAuditReportItems();
-			if (auditReportItems != null) {
-				for (AuditReportItem auditReportItem : auditReportItems) {
-					// TODO: need to check for case of auditor
+				List<AuditReportItem> auditReportItems = tmp
+						.getAuditReportItems();
+				if (auditReportItems != null) {
+					for (AuditReportItem auditReportItem : auditReportItems) {
+						// TODO: need to check for case of auditor
+
+					}
 				}
 			}
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (Exception e) {

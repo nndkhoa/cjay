@@ -1,6 +1,8 @@
 package com.cloudjay.cjay;
 
+import java.lang.reflect.Type;
 import java.util.Calendar;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -25,6 +27,7 @@ import android.view.WindowManager;
 
 import com.cloudjay.cjay.model.DatabaseManager;
 import com.cloudjay.cjay.model.IDatabaseManager;
+import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.network.HttpRequestWrapper;
 import com.cloudjay.cjay.network.IHttpRequestWrapper;
@@ -35,6 +38,9 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Logger;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -154,6 +160,28 @@ public class CJayApplication extends Application {
 		// Start every 10 seconds
 		alarm.setRepeating(AlarmManager.RTC_WAKEUP, current.getTimeInMillis(),
 				10 * 1000, pintent);
+
+		// // TEST
+		// String resp =
+		// "[{\"id\": 54, \"container_id\": \"UDJEU\", \"image_id_path\": \"http://storage-cjay.cloudjay.com/phuoc_long_icd_test-2014-49-05-gate-in-b5b89f5b-0dcf-4010-9b80-99e7bf02fdd6.jpg\", \"operator_code\": \"CAI\", \"operator_name\": \"CAI (CAI)\", \"check_in_time\": \"2014-01-05T03:50:15\", \"check_out_time\": null, \"depot_code\": \"phuoc_long_icd_test\", \"gate_report_images\": [{\"id\": 190, \"type\": 0, \"time_posted\": \"2014-01-05T03:50:15\", \"image_name\": \"http://storage-cjay.cloudjay.com/phuoc_long_icd_test-2014-49-05-gate-in-b5b89f5b-0dcf-4010-9b80-99e7bf02fdd6.jpg\"}, {\"id\": 191, \"type\": 0, \"time_posted\": \"2014-01-05T03:50:15\", \"image_name\": \"http://storage-cjay.cloudjay.com/phuoc_long_icd_test-2014-49-05-gate-in-bd38639d-35ae-4dbe-ae8a-4a106035f820.jpg\"}, {\"id\": 192, \"type\": 0, \"time_posted\": \"2014-01-05T03:50:15\", \"image_name\": \"http://storage-cjay.cloudjay.com/phuoc_long_icd_test-2014-49-05-gate-in-695960ee-3582-44a1-b6e4-b5925b34f457.jpg\"}], \"status\": 0}]";
+		// Gson gson = new GsonBuilder().setDateFormat(
+		// CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
+		//
+		// Type listType = new TypeToken<List<TmpContainerSession>>() {
+		// }.getType();
+		//
+		// List<TmpContainerSession> tmpContainerSessions = null;
+		// try {
+		// tmpContainerSessions = gson.fromJson(resp, listType);
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
+		//
+		// if (null != tmpContainerSessions) {
+		// TmpContainerSession tmp = tmpContainerSessions.get(0);
+		//
+		// }
+
 	}
 
 	public void checkInstantUploadReceiverState() {

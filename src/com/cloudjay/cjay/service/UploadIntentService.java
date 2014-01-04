@@ -259,7 +259,7 @@ public class UploadIntentService extends IntentService implements
 
 			// convert back then save containerSession
 			// save: (id, image_id_path)
-			Mapper.getInstance().update(getApplicationContext(), uploadItem,
+			Mapper.getInstance().update(getApplicationContext(), returnJson,
 					containerSession);
 
 			containerSession
