@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -12,6 +13,7 @@ import android.os.Parcelable;
 @SuppressLint("ParcelCreator")
 public class AuditReportItem implements Parcelable {
 
+	private int id;
 	private int damage_id;
 	private int repair_id;
 	private int component_id;
@@ -28,6 +30,7 @@ public class AuditReportItem implements Parcelable {
 
 	public AuditReportItem(Issue issue) {
 		if (null != issue) {
+			this.id = issue.getId();
 			this.damage_id = issue.getDamageCode().getId();
 			this.repair_id = issue.getRepairCode().getId();
 			this.component_id = issue.getComponentCode().getId();
@@ -42,8 +45,8 @@ public class AuditReportItem implements Parcelable {
 				for (CJayImage cJayImage : cJayImages) {
 					if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
 						audit_report_images.add(new AuditReportImage(cJayImage
-								.getType(), cJayImage.getTimePosted(),
-								cJayImage.getImageName()));
+								.getId(), cJayImage.getType(), cJayImage
+								.getTimePosted(), cJayImage.getImageName()));
 					}
 				}
 			}

@@ -38,14 +38,14 @@ public class CJayImage implements Parcelable {
 	}
 
 	public CJayImage(int id, int type, String time_posted, String image_name) {
-		this.id = id;
+		this.setId(id);
 		this.setType(type);
 		this.setImageName(image_name);
 		this.time_posted = time_posted;
 	}
 
-	@DatabaseField(columnName = ID)
-	int id;
+	@DatabaseField(columnName = ID, defaultValue = "0")
+	private int id;
 
 	@DatabaseField(columnName = FIELD_IMAGE_NAME)
 	String image_name;
@@ -205,7 +205,7 @@ public class CJayImage implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 
-		dest.writeInt(id);
+		dest.writeInt(getId());
 		dest.writeString(image_name);
 		dest.writeString(time_posted);
 		dest.writeString(uuid);
@@ -217,7 +217,7 @@ public class CJayImage implements Parcelable {
 	}
 
 	private void readFromParcel(Parcel in) {
-		this.id = in.readInt();
+		this.setId(in.readInt());
 		this.image_name = in.readString();
 		this.time_posted = in.readString();
 		this.uuid = in.readString();
@@ -242,5 +242,13 @@ public class CJayImage implements Parcelable {
 	public CJayImage(Parcel in) {
 
 		readFromParcel(in);
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }

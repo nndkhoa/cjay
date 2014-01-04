@@ -12,7 +12,6 @@ import java.util.UUID;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
@@ -413,7 +412,7 @@ public class CJayClient implements ICJayClient {
 
 			if (null != tmpContainerSessions) {
 				for (TmpContainerSession tmpSession : tmpContainerSessions) {
-					ContainerSession containerSession = Mapper
+					ContainerSession containerSession = Mapper.getInstance()
 							.toContainerSession(tmpSession, ctx);
 
 					if (null != containerSession) {
@@ -472,7 +471,8 @@ public class CJayClient implements ICJayClient {
 				if (tmpContainerSessions != null) {
 					for (TmpContainerSession tmpSession : tmpContainerSessions) {
 						ContainerSession containerSession = Mapper
-								.toContainerSession(tmpSession, ctx);
+								.getInstance().toContainerSession(tmpSession,
+										ctx);
 
 						if (null != containerSession) {
 							containerSessionDaoImpl
@@ -549,7 +549,8 @@ public class CJayClient implements ICJayClient {
 				if (tmpContainerSessions != null) {
 					for (TmpContainerSession tmpSession : tmpContainerSessions) {
 						ContainerSession containerSession = Mapper
-								.toContainerSession(tmpSession, ctx);
+								.getInstance().toContainerSession(tmpSession,
+										ctx);
 
 						if (null != containerSession) {
 							containerSessionDaoImpl
@@ -620,7 +621,8 @@ public class CJayClient implements ICJayClient {
 				if (tmpContainerSessions != null) {
 					for (TmpContainerSession tmpSession : tmpContainerSessions) {
 						ContainerSession containerSession = Mapper
-								.toContainerSession(tmpSession, ctx);
+								.getInstance().toContainerSession(tmpSession,
+										ctx);
 
 						if (null != containerSession) {
 							containerSessionDaoImpl

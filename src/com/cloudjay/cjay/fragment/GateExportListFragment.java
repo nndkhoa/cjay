@@ -167,7 +167,7 @@ public class GateExportListFragment extends SherlockFragment {
 
 		// get the selected container session
 		ContainerSession containerSession = mFeedsAdapter.getItem(position);
-		TmpContainerSession tmpContainerSession = Mapper.toTmpContainerSession(
+		TmpContainerSession tmpContainerSession = Mapper.getInstance().toTmpContainerSession(
 				containerSession, getActivity());
 
 		// Pass tmpContainerSession away

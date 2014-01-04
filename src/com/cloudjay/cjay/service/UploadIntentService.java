@@ -7,6 +7,8 @@ import java.util.concurrent.ExecutorService;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.EService;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
@@ -27,12 +29,9 @@ import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
-import android.service.textservice.SpellCheckerService.Session;
 import android.support.v4.app.NotificationCompat;
-import android.text.TextUtils;
 import android.util.Log;
 
-import com.actionbarsherlock.R.color;
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
@@ -55,6 +54,7 @@ import com.cloudjay.cjay.util.Mapper;
 
 import de.greenrobot.event.EventBus;
 
+@EService
 public class UploadIntentService extends IntentService implements
 		CountingInputStreamEntity.UploadListener {
 
@@ -73,6 +73,11 @@ public class UploadIntentService extends IntentService implements
 
 	public UploadIntentService() {
 		super("UploadIntentService");
+	}
+
+	@Background
+	void save() {
+
 	}
 
 	/**
@@ -236,8 +241,9 @@ public class UploadIntentService extends IntentService implements
 			containerSessionDaoImpl.update(containerSession);
 
 			// Convert ContainerSession to TmpContainerSession for uploading
-			TmpContainerSession uploadItem = Mapper.toTmpContainerSession(
-					containerSession, getApplicationContext());
+			TmpContainerSession uploadItem = Mapper.getInstance()
+					.toTmpContainerSession(containerSession,
+							getApplicationContext());
 
 			// Post to Server and notify event to UploadFragment
 
@@ -257,6 +263,8 @@ public class UploadIntentService extends IntentService implements
 			}
 
 			// convert back then save containerSession
+			// save: (id, image_id_path)
+			
 
 			containerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_COMPLETED);

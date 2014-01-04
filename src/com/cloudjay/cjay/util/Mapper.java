@@ -11,6 +11,7 @@ import android.text.TextUtils;
 
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
+import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.model.AuditReportItem;
@@ -28,8 +29,67 @@ import com.cloudjay.cjay.network.CJayClient;
 public class Mapper {
 
 	private static IDatabaseManager databaseManager = null;
+	private static Mapper instance = null;
 
-	public static TmpContainerSession toTmpContainerSession(
+	public Mapper() {
+		if (null == databaseManager) {
+			databaseManager = CJayClient.getInstance().getDatabaseManager();
+		}
+	}
+
+	public static Mapper getInstance() {
+		if (instance == null) {
+			instance = new Mapper();
+		}
+
+		return instance;
+	}
+
+	public void update(Context ctx, TmpContainerSession tmp,
+			ContainerSession main) {
+
+		try {
+			CJayImageDaoImpl cJayImageDaoImpl = databaseManager.getHelper(ctx)
+					.getCJayImageDaoImpl();
+
+			main.setId(tmp.getId());
+			main.setImageIdPath(tmp.getImageIdPath());
+
+			List<GateReportImage> gateReportImages = tmp.getGateReportImages();
+			Collection<CJayImage> cJayImages = main.getCJayImages();
+
+			if (gateReportImages != null) {
+				for (GateReportImage gateReportImage : gateReportImages) {
+					for (CJayImage cJayImage : main.getCJayImages()) {
+						String gateReportImageName = gateReportImage
+								.getImageName();
+						String cJayImageName = cJayImage.getImageName();
+						if (gateReportImageName.contains(cJayImageName)) {
+
+							cJayImage.setId(gateReportImage.getId());
+							cJayImage.setImageName(gateReportImageName);
+							cJayImageDaoImpl.update(cJayImage);
+							break;
+						}
+					}
+				}
+			}
+
+			List<AuditReportItem> auditReportItems = tmp.getAuditReportItems();
+			if (auditReportItems != null) {
+				for (AuditReportItem auditReportItem : auditReportItems) {
+					// TODO: need to check for case of auditor
+				}
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public TmpContainerSession toTmpContainerSession(
 			ContainerSession containerSession, Context ctx) {
 
 		TmpContainerSession tmpContainerSession = new TmpContainerSession();
@@ -87,12 +147,8 @@ public class Mapper {
 	 * @param ctx
 	 * @return
 	 */
-	public static ContainerSession toContainerSession(
-			TmpContainerSession tmpSession, Context ctx) {
-
-		if (null == databaseManager) {
-			databaseManager = CJayClient.getInstance().getDatabaseManager();
-		}
+	public ContainerSession toContainerSession(TmpContainerSession tmpSession,
+			Context ctx) {
 
 		try {
 

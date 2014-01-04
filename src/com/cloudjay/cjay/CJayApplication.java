@@ -29,7 +29,7 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.network.HttpRequestWrapper;
 import com.cloudjay.cjay.network.IHttpRequestWrapper;
 import com.cloudjay.cjay.receivers.InstantUploadReceiver;
-import com.cloudjay.cjay.service.QueueIntentService;
+import com.cloudjay.cjay.service.QueueIntentService_;
 import com.cloudjay.cjay.task.PhotupThreadFactory;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
@@ -145,7 +145,7 @@ public class CJayApplication extends Application {
 		Logger.PRODUCTION_MODE = false;
 
 		// Making Alarm for Queue Worker
-		Intent intent = new Intent(this, QueueIntentService.class);
+		Intent intent = new Intent(this, QueueIntentService_.class);
 		PendingIntent pintent = PendingIntent.getService(this, 0, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 		Calendar current = Calendar.getInstance();
