@@ -12,21 +12,27 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
+import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
+import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.cloudjay.cjay.model.AuditReportImage;
 import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
+import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Depot;
 import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.google.gson.Gson;
@@ -126,6 +132,7 @@ public class Mapper {
 						.getAuditReportItems();
 
 				Collection<Issue> issues = main.getIssues();
+
 				if (auditReportItems != null) {
 					for (AuditReportItem auditReportItem : auditReportItems) {
 						for (Issue issue : issues) {
@@ -151,6 +158,15 @@ public class Mapper {
 													.getId());
 											cJayImage
 													.setImageName(auditReportImageName);
+
+											Logger.Log(
+													LOG_TAG,
+													"Gate Report Image Id: "
+															+ Integer
+																	.toString(cJayImage
+																			.getId())
+															+ "\nGate Report Image Name: "
+															+ cJayImage);
 
 											cJayImageDaoImpl.update(cJayImage);
 											break;
@@ -244,6 +260,14 @@ public class Mapper {
 					.getContainerDaoImpl();
 			CJayImageDaoImpl cJayImageDaoImpl = databaseManager.getHelper(ctx)
 					.getCJayImageDaoImpl();
+			DamageCodeDaoImpl damageCodeDaoImpl = databaseManager
+					.getHelper(ctx).getDamageCodeDaoImpl();
+			RepairCodeDaoImpl repairCodeDaoImpl = databaseManager
+					.getHelper(ctx).getRepairCodeDaoImpl();
+			ComponentCodeDaoImpl componentCodeDaoImpl = databaseManager
+					.getHelper(ctx).getComponentCodeDaoImpl();
+			IssueDaoImpl issueDaoImpl = databaseManager.getHelper(ctx)
+					.getIssueDaoImpl();
 
 			Operator operator = null;
 			List<Operator> listOperators = operatorDaoImpl.queryForEq(
@@ -304,21 +328,52 @@ public class Mapper {
 			if (null != container)
 				containerSession.setContainer(container);
 
-			List<CJayImage> listImages = new ArrayList<CJayImage>();
-
-			// TODO: cần xử lý thêm khi làm app cho Team Sửa Chữa
 			// process audit report item
 			List<AuditReportItem> auditReportItems = tmpSession
 					.getAuditReportItems();
+			Collection<Issue> issues = new ArrayList<Issue>();
 			if (null != auditReportItems) {
 				for (AuditReportItem auditReportItem : auditReportItems) {
 
+					List<AuditReportImage> auditReportImages = auditReportItem
+							.getAuditReportImages();
+					Collection<CJayImage> cJayImages = new ArrayList<CJayImage>();
+
+					for (AuditReportImage item : auditReportImages) {
+						CJayImage tmp = new CJayImage(item.getId(),
+								item.getType(), item.getImageName());
+						cJayImages.add(tmp);
+					}
+
+					cJayImageDaoImpl
+							.addListCJayImages((List<CJayImage>) cJayImages);
+
+					DamageCode damageCode = damageCodeDaoImpl
+							.queryForId(auditReportItem.getDamageId());
+					RepairCode repairCode = repairCodeDaoImpl
+							.queryForId(auditReportItem.getRepairId());
+					ComponentCode componentCode = componentCodeDaoImpl
+							.queryForId(auditReportItem.getComponentId());
+
+					Issue issue = new Issue(auditReportItem.getId(),
+							damageCode, repairCode, componentCode,
+							auditReportItem.getLocationCode(),
+							auditReportItem.getLength(),
+							auditReportItem.getHeight(),
+							auditReportItem.getQuantity(), cJayImages);
+
+					if (issue != null)
+						issue.setContainerSession(containerSession);
+
+					issueDaoImpl.addIssue(issue);
+					issues.add(issue);
 				}
 			}
 
 			// process gate report images
 			List<GateReportImage> gateReportImages = tmpSession
 					.getGateReportImages();
+			List<CJayImage> listImages = new ArrayList<CJayImage>();
 			if (null != gateReportImages) {
 				for (GateReportImage gateReportImage : gateReportImages) {
 
@@ -334,14 +389,13 @@ public class Mapper {
 						image.setContainerSession(containerSession);
 
 					cJayImageDaoImpl.addCJayImage(image);
-
-					// data for returning
 					listImages.add(image);
 				}
 			}
 
-			// TODO: ??
+			// // Không cần add chiều xuôi
 			// containerSession.setCJayImages(listImages);
+			// containerSession.setIssues(issues);
 
 			return containerSession;
 		} catch (SQLException e) {

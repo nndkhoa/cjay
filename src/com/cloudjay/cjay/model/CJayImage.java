@@ -38,10 +38,17 @@ public class CJayImage implements Parcelable {
 	}
 
 	public CJayImage(int id, int type, String time_posted, String image_name) {
-		this.setId(id);
-		this.setType(type);
-		this.setImageName(image_name);
+		this.id = id;
+		this.type = type;
+		this.image_name = image_name;
 		this.time_posted = time_posted;
+	}
+
+	public CJayImage(int id, int type, String image_name) {
+		this.id = id;
+		this.type = type;
+		this.image_name = image_name;
+		time_posted = "";
 	}
 
 	@DatabaseField(columnName = ID, defaultValue = "0")

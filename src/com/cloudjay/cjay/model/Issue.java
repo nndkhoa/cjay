@@ -8,6 +8,7 @@ import java.util.UUID;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
+import com.cloudjay.cjay.network.CJayClient;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -57,6 +58,20 @@ public class Issue implements Parcelable {
 
 	public Issue(Parcel in) {
 		readFromParcel(in);
+	}
+
+	public Issue(int id, DamageCode damageCode, RepairCode repairCode,
+			ComponentCode componentCode, String location_code, String length,
+			String height, String quantity, Collection<CJayImage> cJayImages) {
+		this.id = id;
+		this.damageCode = damageCode;
+		this.repairCode = repairCode;
+		this.componentCode = componentCode;
+		this.locationCode = location_code;
+		this.length = length;
+		this.height = height;
+		this.quantity = quantity;
+		this.cJayImages = cJayImages;
 	}
 
 	public Issue() {
