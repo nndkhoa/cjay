@@ -29,6 +29,7 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.service.textservice.SpellCheckerService.Session;
 import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.actionbarsherlock.R.color;
@@ -229,6 +230,7 @@ public class UploadIntentService extends IntentService implements
 		// post UploadStateChangedEvent
 
 		try {
+			String returnJson = "";
 			containerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_IN_PROGRESS);
 			containerSessionDaoImpl.update(containerSession);
@@ -244,12 +246,17 @@ public class UploadIntentService extends IntentService implements
 
 			Logger.Log(LOG_TAG, "User role: " + user.getRoleName());
 			if (user.getRole() == User.ROLE_GATE_KEEPER) {
-				CJayClient.getInstance().postContainerSession(
+
+				returnJson = CJayClient.getInstance().postContainerSession(
 						getApplicationContext(), uploadItem);
 			} else {
-				CJayClient.getInstance().postContainerSessionReportList(
-						getApplicationContext(), uploadItem);
+
+				returnJson = CJayClient.getInstance()
+						.postContainerSessionReportList(
+								getApplicationContext(), uploadItem);
 			}
+
+			// convert back then save containerSession
 
 			containerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_COMPLETED);

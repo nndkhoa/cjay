@@ -203,7 +203,7 @@ public class DataCenter {
 		}
 		return null;
 	}
-	
+
 	public List<ContainerSession> getListPendingContainerSessions(
 			Context context) {
 		Logger.Log(LOG_TAG, "get list pending Container sessions");
@@ -216,9 +216,8 @@ public class DataCenter {
 		}
 		return null;
 	}
-	
-	public List<ContainerSession> getListFixedContainerSessions(
-			Context context) {
+
+	public List<ContainerSession> getListFixedContainerSessions(Context context) {
 		Logger.Log(LOG_TAG, "get list fixed Container sessions");
 		try {
 			return getDatabaseManager().getHelper(context)

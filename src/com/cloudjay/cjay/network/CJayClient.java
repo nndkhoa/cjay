@@ -230,7 +230,6 @@ public class CJayClient implements ICJayClient {
 				Logger.Log(LOG_TAG,
 						"get new list container sessions based on user role");
 
-				// containerSessions = getAllContainerSessions(ctx);
 				containerSessions = getContainerSessions(ctx, filterStatus);
 
 				PreferencesUtil.storePrefsValue(ctx,
@@ -243,7 +242,8 @@ public class CJayClient implements ICJayClient {
 				String date = PreferencesUtil.getPrefsValue(ctx,
 						PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE);
 
-				containerSessions = getContainerSessions(ctx, date);
+				containerSessions = getContainerSessions(ctx, filterStatus,
+						date);
 
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE,
@@ -671,8 +671,8 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public void postContainerSession(Context ctx, TmpContainerSession item) {
-
+	public String postContainerSession(Context ctx, TmpContainerSession item) {
+		String ret = "";
 		try {
 			if (NetworkHelper.isConnected(ctx)) {
 				HashMap<String, String> headers = prepareHeadersWithToken(ctx);
@@ -680,7 +680,8 @@ public class CJayClient implements ICJayClient {
 
 				String data = gson.toJson(item);
 				String url = CJayConstant.CJAY_ITEMS;
-				requestWrapper.sendPost(url, data, "application/json", headers);
+				ret = requestWrapper.sendPost(url, data, "application/json",
+						headers);
 
 			} else {
 				Logger.Log("Network is not available");
@@ -689,11 +690,14 @@ public class CJayClient implements ICJayClient {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return ret;
 	}
 
 	@Override
-	public void postContainerSessionReportList(Context ctx,
+	public String postContainerSessionReportList(Context ctx,
 			TmpContainerSession item) {
+
+		String ret = "";
 		try {
 			if (NetworkHelper.isConnected(ctx)) {
 				HashMap<String, String> headers = prepareHeadersWithToken(ctx);
@@ -701,7 +705,8 @@ public class CJayClient implements ICJayClient {
 
 				String data = gson.toJson(item);
 				String url = CJayConstant.LIST_CONTAINER_SESSIONS_REPORT_LIST;
-				requestWrapper.sendPost(url, data, "application/json", headers);
+				ret = requestWrapper.sendPost(url, data, "application/json",
+						headers);
 
 			} else {
 				Logger.Log("Network is not available");
@@ -710,6 +715,7 @@ public class CJayClient implements ICJayClient {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return ret;
 
 	}
 }

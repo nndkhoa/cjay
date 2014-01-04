@@ -57,7 +57,7 @@ public interface ICJayClient {
 
 	List<CJayResourceStatus> getCJayResourceStatus(Context ctx);
 
-	void postContainerSession(Context ctx, TmpContainerSession item);
+	String postContainerSession(Context ctx, TmpContainerSession item);
 
-	void postContainerSessionReportList(Context ctx, TmpContainerSession item);
+	String postContainerSessionReportList(Context ctx, TmpContainerSession item);
 }
