@@ -14,7 +14,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
-import com.cloudjay.cjay.fragment.RepairIssueImageListFragment_;
+import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
