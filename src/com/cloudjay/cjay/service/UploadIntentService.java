@@ -75,11 +75,6 @@ public class UploadIntentService extends IntentService implements
 		super("UploadIntentService");
 	}
 
-	@Background
-	void save() {
-
-	}
-
 	/**
 	 * Main method, it called from QueueIntentService
 	 */
@@ -264,7 +259,8 @@ public class UploadIntentService extends IntentService implements
 
 			// convert back then save containerSession
 			// save: (id, image_id_path)
-			
+			Mapper.getInstance().update(getApplicationContext(), uploadItem,
+					containerSession);
 
 			containerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_COMPLETED);

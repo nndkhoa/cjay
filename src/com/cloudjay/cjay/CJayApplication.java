@@ -29,7 +29,7 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.network.HttpRequestWrapper;
 import com.cloudjay.cjay.network.IHttpRequestWrapper;
 import com.cloudjay.cjay.receivers.InstantUploadReceiver;
-import com.cloudjay.cjay.service.QueueIntentService_;
+import com.cloudjay.cjay.service.*;
 import com.cloudjay.cjay.task.PhotupThreadFactory;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
