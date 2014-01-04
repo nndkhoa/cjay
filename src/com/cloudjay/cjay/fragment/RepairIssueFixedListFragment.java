@@ -28,7 +28,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 @EFragment(R.layout.fragment_repair_issue_fixed)
 public class RepairIssueFixedListFragment extends SherlockFragment {
-	
+
 	private ArrayList<Issue> mFeeds;
 	private FunDapter<Issue> mFeedsAdapter;
 	private ContainerSession mContainerSession;
@@ -45,8 +45,8 @@ public class RepairIssueFixedListFragment extends SherlockFragment {
 			imageLoader = ImageLoader.getInstance();
 
 			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-					.getInstance().getDatabaseManager().getHelper(getActivity())
-					.getContainerSessionDaoImpl();
+					.getInstance().getDatabaseManager()
+					.getHelper(getActivity()).getContainerSessionDaoImpl();
 			mContainerSession = containerSessionDaoImpl
 					.queryForId(mContainerSessionUUID);
 
@@ -59,24 +59,25 @@ public class RepairIssueFixedListFragment extends SherlockFragment {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@ItemClick(R.id.feeds)
 	void imageItemClicked(int position) {
 		mSelectedIssue = mFeedsAdapter.getItem(position);
-		
+
 		// show issue report activity
-		Intent intent = new Intent(getActivity(), RepairIssueReportActivity_.class);
+		Intent intent = new Intent(getActivity(),
+				RepairIssueReportActivity_.class);
 		intent.putExtra(RepairIssueReportActivity_.CJAY_ISSUE_EXTRA,
 				mSelectedIssue.getUUID());
 		startActivity(intent);
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
 		refresh();
 	}
-	
+
 	public void setContainerSessionUUID(String containerSessionUUID) {
 		mContainerSessionUUID = containerSessionUUID;
 	}
@@ -90,11 +91,11 @@ public class RepairIssueFixedListFragment extends SherlockFragment {
 		mFeeds = new ArrayList<Issue>();
 		try {
 			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-					.getInstance().getDatabaseManager().getHelper(getActivity())
-					.getContainerSessionDaoImpl();
+					.getInstance().getDatabaseManager()
+					.getHelper(getActivity()).getContainerSessionDaoImpl();
 			mContainerSession = containerSessionDaoImpl
 					.queryForId(mContainerSessionUUID);
-			
+
 			if (null != mContainerSession) {
 				for (Issue issue : mContainerSession.getIssues()) {
 					if (issue.isFixed()) {
@@ -177,7 +178,8 @@ public class RepairIssueFixedListFragment extends SherlockFragment {
 						}
 					}
 				});
-		mFeedsAdapter = new FunDapter<Issue>(getActivity(), containers, R.layout.list_item_issue, feedsDict);
+		mFeedsAdapter = new FunDapter<Issue>(getActivity(), containers,
+				R.layout.list_item_issue, feedsDict);
 		mFeedListView.setAdapter(mFeedsAdapter);
 	}
 }

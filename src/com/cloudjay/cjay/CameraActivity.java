@@ -134,7 +134,7 @@ public class CameraActivity extends Activity {
 
 	@Extra("type")
 	int type = 0;
-	
+
 	@Extra("tag")
 	String tag = "";
 
@@ -496,7 +496,7 @@ public class CameraActivity extends Activity {
 
 		if (TextUtils.isEmpty(containerSession.getImageIdPath())) {
 			Logger.Log(LOG_TAG, "image_id_path: " + uri);
-			containerSession.setImageIdPath(uri);
+			containerSession.setImageIdPath(image_name);
 		}
 
 		try {
@@ -510,10 +510,11 @@ public class CameraActivity extends Activity {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		// tell people that an image has been created
 		if (!TextUtils.isEmpty(tag)) {
-			EventBus.getDefault().post(new CJayImageAddedEvent(uploadItem, tag));
+			EventBus.getDefault()
+					.post(new CJayImageAddedEvent(uploadItem, tag));
 		}
 	}
 

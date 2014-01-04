@@ -9,7 +9,7 @@ public class User {
 
 	public static final int ROLE_GATE_KEEPER = 6;
 	public static final int ROLE_AUDITOR = 1;
-	public static final int ROLE_REPAIR_STAFF = 2;
+	public static final int ROLE_REPAIR_STAFF = 4;
 
 	public static final String ID = "id";
 	public static final String USERNAME = "username";

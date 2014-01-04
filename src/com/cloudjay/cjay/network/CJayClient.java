@@ -153,7 +153,7 @@ public class CJayClient implements ICJayClient {
 
 			// 2013-11-10T21:05:24+08:00
 			SimpleDateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ssZZ");
+					CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
 			String nowString = dateFormat.format(now);
 
 			// 1. chưa có data
