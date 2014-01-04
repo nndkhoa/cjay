@@ -3,6 +3,7 @@ package com.cloudjay.cjay.fragment;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -13,6 +14,7 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
+import com.cloudjay.cjay.AuditorContainerActivity_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
@@ -76,6 +78,12 @@ public class AuditorReportedListFragment extends SherlockFragment {
 		// clear current selection
 		mSelectedContainerSession = null;
 		getActivity().supportInvalidateOptionsMenu();
+		
+		Intent intent = new Intent(getActivity(),
+				AuditorContainerActivity_.class);
+		intent.putExtra(AuditorContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+				mFeedsAdapter.getItem(position).getUuid());
+		startActivity(intent);
 	}
 
 	@OptionsItem(R.id.menu_upload)
