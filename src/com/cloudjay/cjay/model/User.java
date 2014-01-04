@@ -195,12 +195,15 @@ public class User {
 		switch (this.role) {
 		case User.ROLE_GATE_KEEPER:
 			result = 5; // repaired containers
+			break;
 
 		case User.ROLE_AUDITOR:
 			result = 0; // checked in containers
+			break;
 
 		case User.ROLE_REPAIR_STAFF:
 			result = 4; // confirmed
+			break;
 
 		default:
 			break;

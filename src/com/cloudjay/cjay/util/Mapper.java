@@ -4,6 +4,7 @@ import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,7 +15,9 @@ import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DepotDaoImpl;
+import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
+import com.cloudjay.cjay.model.AuditReportImage;
 import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Container;
@@ -75,6 +78,9 @@ public class Mapper {
 				CJayImageDaoImpl cJayImageDaoImpl = databaseManager.getHelper(
 						ctx).getCJayImageDaoImpl();
 
+				IssueDaoImpl issueDaoImpl = databaseManager.getHelper(ctx)
+						.getIssueDaoImpl();
+
 				main.setId(tmp.getId());
 				main.setImageIdPath(tmp.getImageIdPath());
 
@@ -118,10 +124,45 @@ public class Mapper {
 
 				List<AuditReportItem> auditReportItems = tmp
 						.getAuditReportItems();
+
+				Collection<Issue> issues = main.getIssues();
 				if (auditReportItems != null) {
 					for (AuditReportItem auditReportItem : auditReportItems) {
-						// TODO: need to check for case of auditor
+						for (Issue issue : issues) {
+							if (issue.equals(auditReportItem)) {
+								issue.setId(auditReportItem.getId());
 
+								List<AuditReportImage> auditReportImages = auditReportItem
+										.getAuditReportImages();
+
+								Collection<CJayImage> issueImages = issue
+										.getCJayImages();
+
+								for (AuditReportImage auditReportImage : auditReportImages) {
+									for (CJayImage cJayImage : issueImages) {
+										String auditReportImageName = auditReportImage
+												.getImageName();
+										String cJayImageName = cJayImage
+												.getImageName();
+										if (auditReportImageName
+												.contains(cJayImageName)) {
+
+											cJayImage.setId(auditReportImage
+													.getId());
+											cJayImage
+													.setImageName(auditReportImageName);
+
+											cJayImageDaoImpl.update(cJayImage);
+											break;
+										}
+									}
+								}
+
+								issueDaoImpl.update(issue);
+
+								break;
+							}
+						}
 					}
 				}
 			}

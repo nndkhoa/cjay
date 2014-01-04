@@ -248,4 +248,20 @@ public class Issue implements Parcelable {
 	public void setId(int id) {
 		this.id = id;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+
+		if (o.getClass() == AuditReportItem.class) {
+			AuditReportItem tmp = (AuditReportItem) o;
+			return this.damageCode.getId() == tmp.getDamageId()
+					&& this.repairCode.getId() == tmp.getRepairId()
+					&& this.getComponentCode().getId() == tmp.getComponentId()
+					&& this.length == tmp.getLength()
+					&& this.getHeight() == tmp.getHeight()
+					&& this.getQuantity() == tmp.getQuantity();
+		}
+
+		return super.equals(o);
+	}
 }

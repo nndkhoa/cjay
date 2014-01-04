@@ -245,7 +245,7 @@ public class UploadIntentService extends IntentService implements
 			User user = com.cloudjay.cjay.util.Session.restore(
 					getApplicationContext()).getCurrentUser();
 
-			Logger.Log(LOG_TAG, "User role: " + user.getRoleName());
+			Logger.Log(LOG_TAG, "Current User role: " + user.getRoleName());
 			if (user.getRole() == User.ROLE_GATE_KEEPER) {
 
 				returnJson = CJayClient.getInstance().postContainerSession(
@@ -258,7 +258,6 @@ public class UploadIntentService extends IntentService implements
 			}
 
 			// convert back then save containerSession
-			// save: (id, image_id_path)
 			Mapper.getInstance().update(getApplicationContext(), returnJson,
 					containerSession);
 

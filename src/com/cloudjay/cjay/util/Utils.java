@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.List;
 
 import com.cloudjay.cjay.CJayApplication;
+import com.cloudjay.cjay.model.AuditReportItem;
+import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.service.UploadIntentService_;
 import com.lightbox.android.photoprocessing.PhotoProcessing;
 import com.lightbox.android.photoprocessing.utils.MediaUtils;
