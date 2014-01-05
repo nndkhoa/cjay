@@ -5,19 +5,27 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.Issue;
+import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.service.UploadIntentService_;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.lightbox.android.photoprocessing.PhotoProcessing;
 import com.lightbox.android.photoprocessing.utils.MediaUtils;
 
+import android.R.integer;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -40,6 +48,11 @@ public class Utils {
 
 	public static final int MINI_THUMBNAIL_SIZE = 300;
 	public static final int MICRO_THUMBNAIL_SIZE = 96;
+	
+	private static final String TAG = "GCM_CJAY";
+	private static final String PROPERTY_REG_ID = "registration_id";
+	private static final String PROPERTY_CURRENT_USER_ID = "current_user_id";
+	private static final String PROPERTY_APP_VERSION = "appVersion";
 
 	public static void isStillRunning(Context ctx, String packageName) {
 
@@ -285,4 +298,87 @@ public class Utils {
 	public static String stripNull(String in) {
 		return (in == null || in.equals("") ? " " : in);
 	}
+	
+	/**
+	 * Gets the current registration ID for application on GCM service.
+	 * <p>
+	 * If result is empty, the app needs to register.
+	 * 
+	 * @return registration ID, or empty string if there is no existing
+	 *         registration ID.
+	 */
+	public static String getRegistrationId(Context context) {
+		final SharedPreferences prefs = getGCMPreferences(context);
+		String registrationId = prefs.getString(PROPERTY_REG_ID, "");
+		if (registrationId.isEmpty()) {
+			Log.i(TAG, "Registration not found.");
+			return "";
+		}
+		// Check if app was updated; if so, it must clear the registration ID
+		// since the existing regID is not guaranteed to work with the new
+		// app version.
+		int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION,
+				Integer.MIN_VALUE);
+		int registeredCurrentUserId = prefs.getInt(PROPERTY_CURRENT_USER_ID,
+				Integer.MIN_VALUE);
+		int currentVersion = getAppVersion(context);
+		if (registeredVersion != currentVersion
+				|| registeredCurrentUserId != Session.restore(context).getCurrentUser().getID()) {
+			Log.i(TAG, "App version changed.");
+			return "";
+		}
+		return registrationId;
+	}
+
+	/**
+	 * @return Application's {@code SharedPreferences}.
+	 */
+	private static SharedPreferences getGCMPreferences(Context context) {
+		// This sample app persists the registration ID in shared preferences,
+		// but
+		// how you store the regID in your app is up to you.
+		
+		return context.getSharedPreferences(CJayActivity.class.getSimpleName(),
+				Context.MODE_PRIVATE);
+	}
+
+	/**
+	 * @return Application's version code from the {@code PackageManager}.
+	 */
+	private static int getAppVersion(Context context) {
+		try {
+			PackageInfo packageInfo = context.getPackageManager()
+					.getPackageInfo(context.getPackageName(), 0);
+			return packageInfo.versionCode;
+		} catch (NameNotFoundException e) {
+			// should never happen
+			throw new RuntimeException("Could not get package name: " + e);
+		}
+	}
+
+	
+
+	/**
+	 * Stores the registration ID and app versionCode in the application's
+	 * {@code SharedPreferences}.
+	 * 
+	 * @param context
+	 *            application's context.
+	 * @param regId
+	 *            registration ID
+	 */
+	public static void storeRegistrationId(Context context, String regId) {
+		final SharedPreferences prefs = getGCMPreferences(context);
+		int appVersion = getAppVersion(context);
+		Log.i(TAG, "Saving regId on app version " + appVersion);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putString(PROPERTY_REG_ID, regId);
+		// Save Current User to Match the Current Recognized User to Get
+		// Notifications.
+		User user = Session.restore(context).getCurrentUser();		
+		int CURRENT_USER_ID = user.getID();
+		editor.putInt(PROPERTY_CURRENT_USER_ID, CURRENT_USER_ID);
+		editor.putInt(PROPERTY_APP_VERSION, appVersion);
+		editor.commit();
+	}	
 }

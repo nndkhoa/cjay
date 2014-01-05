@@ -1,5 +1,7 @@
 package com.cloudjay.cjay.model;
 
+import android.R.integer;
+
 import com.cloudjay.cjay.dao.UserDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -107,6 +109,14 @@ public class User {
 
 	public void setUserName(String userName) {
 		this.username = userName;
+	}
+	
+	public int getID() {
+		return id;
+	}
+
+	public void setID(int id) {
+		this.id = id;
 	}
 
 	public String getEmail() {

@@ -296,14 +296,21 @@ public class CJayClient implements ICJayClient {
 	public void addGCMDevice(String regid, Context ctx) throws JSONException {
 		JSONObject requestPacket = new JSONObject();
 		requestPacket.put("registration_id", regid);
-		String androidId = Secure.getString(ctx.getContentResolver(),
-				Secure.ANDROID_ID);
+		String androidId = "";
+		try {
+			androidId = Secure.getString(ctx.getContentResolver(),
+					Secure.ANDROID_ID);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 
 		UUID deviceUuid = new UUID(androidId.hashCode(), androidId.hashCode());
 		String deviceId = deviceUuid.toString();
 		requestPacket.put("device_id", deviceId);
+		requestPacket.put("app_code", "CJAY");
 		requestPacket.put("name", android.os.Build.MODEL);
-
+		
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 
 		String response = requestWrapper.sendJSONPost(
