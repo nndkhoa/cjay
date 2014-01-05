@@ -10,6 +10,7 @@ import java.util.UUID;
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,16 +21,21 @@ import android.provider.MediaStore.Images.Thumbnails;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.CJayApplication;
+import com.cloudjay.cjay.CameraActivity_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
+import com.cloudjay.cjay.events.ContainerCreatedEvent;
+import com.cloudjay.cjay.events.ContainerEditedEvent;
+import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Session;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
 import com.j256.ormlite.field.DatabaseField;
@@ -287,9 +293,16 @@ public class ContainerSession implements Parcelable {
 		return cJayImages;
 	}
 
-	public String getOperatorName() {
+	public String getOperatorCode() {
 		if (getContainer() != null && getContainer().getOperator() != null) {
 			return getContainer().getOperator().getCode();			
+		}
+		return null;
+	}
+	
+	public String getOperatorName() {
+		if (getContainer() != null && getContainer().getOperator() != null) {
+			return getContainer().getOperator().getName();			
 		}
 		return null;
 	}
@@ -566,5 +579,81 @@ public class ContainerSession implements Parcelable {
 
 	public void setOnLocal(boolean onLocal) {
 		this.onLocal = onLocal;
+	}
+	
+	public static ContainerSession createContainerSession(Context ctx, String containerId, String operatorCode) throws SQLException {
+		// Create Container Session object
+		User currentUser = Session.restore(ctx).getCurrentUser();
+
+		String depotCode = "";
+		if (currentUser != null && currentUser.getDepot() != null) {
+			depotCode = currentUser.getDepot().getDepotCode();
+		}
+		ContainerSession containerSession = new ContainerSession(
+				ctx,
+				containerId,
+				operatorCode,
+				StringHelper.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT),
+				depotCode);
+
+		containerSession.setUploadConfirmation(false);
+		containerSession.setOnLocal(true);
+		containerSession.setUploadState(ContainerSession.STATE_NONE);
+		
+		ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
+				.getInstance().getDatabaseManager()
+				.getHelper(ctx).getContainerSessionDaoImpl();
+
+		containerSessionDaoImpl.addContainerSessions(containerSession);
+		
+		// trigger update container lists
+		EventBus.getDefault().post(new ContainerCreatedEvent(containerSession));
+		EventBus.getDefault().post(new ContainerSessionEnqueueEvent(containerSession));
+		
+		return containerSession;
+	}
+	
+	public static void gotoCamera(Context ctx, ContainerSession containerSession, int imageType, String activityTag) {
+		Intent intent = new Intent(ctx, CameraActivity_.class);
+		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA, containerSession.getUuid());
+		intent.putExtra("type", imageType);
+		if (activityTag != null && !TextUtils.isEmpty(activityTag)) {
+			intent.putExtra("tag", activityTag);
+		}
+		ctx.startActivity(intent);
+	}
+	
+	public static void gotoCamera(Context ctx, ContainerSession containerSession, int imageType) {
+		gotoCamera(ctx, containerSession, imageType, null);
+	}
+	
+	public static ContainerSession editContainerSession(Context ctx, ContainerSession containerSession, String containerId, String operatorCode) throws SQLException {
+		if (containerSession.getContainerId().equals(containerId)
+				&& containerSession.getOperatorCode().equals(operatorCode)) {
+			// do nothing
+		} else {
+			DatabaseHelper databaseHelper = CJayClient.getInstance().getDatabaseManager().getHelper(ctx);
+			OperatorDaoImpl operatorDaoImpl = databaseHelper.getOperatorDaoImpl();
+			ContainerDaoImpl containerDaoImpl = databaseHelper.getContainerDaoImpl();
+			ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper.getContainerSessionDaoImpl();
+
+			// find operator
+			Operator operator = operatorDaoImpl
+					.findOperator(operatorCode);
+
+			// update container details
+			Container container = containerSession.getContainer();
+			container.setContainerId(containerId);
+			container.setOperator(operator);
+
+			// update database
+			containerDaoImpl.update(container);
+			containerSessionDaoImpl.update(containerSession);
+
+			// trigger update container lists
+			EventBus.getDefault().post(new ContainerEditedEvent(containerSession));
+		}
+		
+		return containerSession;
 	}
 }

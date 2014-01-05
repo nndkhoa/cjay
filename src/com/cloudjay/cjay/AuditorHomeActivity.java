@@ -2,6 +2,10 @@ package com.cloudjay.cjay;
 
 import java.lang.reflect.Field;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.ViewById;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,12 +21,12 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.fragment.AuditorReportedListFragment_;
+import com.cloudjay.cjay.fragment.AuditorReportingListFragment;
+import com.cloudjay.cjay.fragment.AuditorReportingListFragment_;
+import com.cloudjay.cjay.fragment.UploadsFragment_;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
-import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_auditor_home)
 public class AuditorHomeActivity extends CJayActivity implements
@@ -30,7 +34,7 @@ public class AuditorHomeActivity extends CJayActivity implements
 		AddContainerDialog.AddContainerDialogListener,
 		SearchOperatorDialog.SearchOperatorDialogListener {
 
-	private static final String LOG_TAG = "AuditorHomeActivity";
+//	private static final String LOG_TAG = "AuditorHomeActivity";
 
 	private String[] locations;
 	@ViewById
@@ -143,18 +147,24 @@ public class AuditorHomeActivity extends CJayActivity implements
 		}
 
 		public Fragment getItem(int position) {
+			Fragment fragment;
 			switch (position) {
-			case 0:
-				Fragment reportingListFragment_ = new AuditorReportingListFragment_();
-				return reportingListFragment_;
-			case 1:
-				Fragment reportedListFragment_ = new AuditorReportedListFragment_();
-				return reportedListFragment_;
+			case 0: // containers that have no 'report images'
+				fragment = new AuditorReportingListFragment_();
+				((AuditorReportingListFragment_) fragment).setState(AuditorReportingListFragment_.STATE_NOT_REPORTED);
+				return fragment;
+			case 1: // containers that have 'report images' with no issues
+				fragment = new AuditorReportingListFragment_();
+				((AuditorReportingListFragment_) fragment).setState(AuditorReportingListFragment_.STATE_REPORTING);
+				return fragment;
+			case 2: // containers that have 'report images' and issues
+				fragment = new AuditorReportedListFragment_();
+				return fragment;
 
-			case 2:
+			case 3:
 			default:
-				Fragment uploadFragment = new UploadsFragment_();
-				return uploadFragment;
+				fragment = new UploadsFragment_();
+				return fragment;
 			}
 		}
 	}

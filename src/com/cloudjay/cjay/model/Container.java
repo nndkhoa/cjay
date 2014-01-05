@@ -48,7 +48,11 @@ public class Container implements Parcelable {
 	}
 
 	public String getFullContainerId() {
-		return operator.getId() + container_id;
+		if (operator != null) {
+			return operator.getId() + container_id;
+		} else {
+			return container_id;
+		}		
 	}
 
 	public String getContainerId() {

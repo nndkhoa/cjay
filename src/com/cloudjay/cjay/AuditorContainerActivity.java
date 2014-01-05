@@ -169,9 +169,14 @@ public class AuditorContainerActivity extends CJayActivity {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-
+			
 			// refresh image list
 			refresh();
+
+			// hide menu items
+			mLongClickedCJayImage = null;
+			mFeedListView.setItemChecked(-1, true);
+			supportInvalidateOptionsMenu();
 		}
 	}
 

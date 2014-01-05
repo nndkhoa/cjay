@@ -118,9 +118,10 @@ public class RepairContainerFixedListFragment extends SherlockFragment {
 
 	void hideMenuItems() {
 		mSelectedContainerSession = null;
+		mFeedListView.setItemChecked(-1, true);
 		getActivity().supportInvalidateOptionsMenu();
 	}
-
+	
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);

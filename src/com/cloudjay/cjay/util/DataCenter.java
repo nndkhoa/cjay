@@ -133,7 +133,7 @@ public class DataCenter {
 					currentUser.getDepotCode());
 
 			if (null != depots && !depots.isEmpty()) {
-
+				currentUser.setDepot(depots.get(0));
 			} else {
 				Depot depot = new Depot();
 				depot.setDepotCode(currentUser.getDepotCode());
@@ -198,6 +198,19 @@ public class DataCenter {
 			return getDatabaseManager().getHelper(context)
 					.getContainerSessionDaoImpl()
 					.getListReportingContainerSessions();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public List<ContainerSession> getListNotReportedContainerSessions(
+			Context context) {
+		Logger.Log(LOG_TAG, "get list not reported Container sessions");
+		try {
+			return getDatabaseManager().getHelper(context)
+					.getContainerSessionDaoImpl()
+					.getListNotReportedContainerSessions();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

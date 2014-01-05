@@ -120,6 +120,7 @@ public class AuditorReportedListFragment extends SherlockFragment {
 
 	void hideMenuItems() {
 		mSelectedContainerSession = null;
+		mFeedListView.setItemChecked(-1, true);
 		getActivity().supportInvalidateOptionsMenu();
 	}
 
