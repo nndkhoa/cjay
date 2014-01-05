@@ -221,8 +221,10 @@ public class CJayClient implements ICJayClient {
 
 			User user = Session.restore(ctx).getCurrentUser();
 			int userRole = user.getRole();
-
 			int filterStatus = user.getFilterStatus();
+
+			Logger.Log(LOG_TAG, "User Role: " + user.getRoleName()
+					+ "\nFilter: " + Integer.toString(user.getFilterStatus()));
 
 			// 3. Update list ContainerSessions
 			Logger.Log(LOG_TAG, "get list container sessions");

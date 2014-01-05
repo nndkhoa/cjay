@@ -151,7 +151,7 @@ public class CJayApplication extends Application {
 		Logger.PRODUCTION_MODE = false;
 
 		// Making Alarm for Queue Worker
-		Intent intent = new Intent(this, QueueIntentService_.class);
+		Intent intent = new Intent(this, QueueIntentService.class);
 		PendingIntent pintent = PendingIntent.getService(this, 0, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 		Calendar current = Calendar.getInstance();

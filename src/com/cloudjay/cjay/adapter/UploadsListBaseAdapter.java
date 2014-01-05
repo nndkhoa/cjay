@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.view.UploadItemLayout;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class UploadsListBaseAdapter extends BaseAdapter {
 
@@ -19,12 +21,14 @@ public class UploadsListBaseAdapter extends BaseAdapter {
 
 	private final Context mContext;
 	private final LayoutInflater mLayoutInflater;
+	private ImageLoader imageLoader;
 
 	public UploadsListBaseAdapter(Context context) {
 		mContext = context;
 		mLayoutInflater = LayoutInflater.from(mContext);
 		mItems = DataCenter.getInstance().getListUploadContainerSessions(
 				mContext);
+		imageLoader = ImageLoader.getInstance();
 	}
 
 	public UploadsListBaseAdapter(Context context,
@@ -32,6 +36,7 @@ public class UploadsListBaseAdapter extends BaseAdapter {
 		mContext = context;
 		mLayoutInflater = LayoutInflater.from(mContext);
 		mItems = listItems;
+		imageLoader = ImageLoader.getInstance();
 	}
 
 	public void setContainerSessions(List<ContainerSession> listItems) {
@@ -51,13 +56,16 @@ public class UploadsListBaseAdapter extends BaseAdapter {
 	}
 
 	public View getView(int position, View view, ViewGroup parent) {
+
 		if (null == view) {
 			view = mLayoutInflater.inflate(R.layout.item_list_upload, parent,
 					false);
 		}
 
+		ContainerSession containerSession = getItem(position);
+
 		UploadItemLayout layout = (UploadItemLayout) view;
-		layout.setContainerSession(getItem(position));
+		layout.setContainerSession(containerSession);
 
 		return view;
 	}

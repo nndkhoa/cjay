@@ -54,7 +54,6 @@ import com.cloudjay.cjay.util.Mapper;
 
 import de.greenrobot.event.EventBus;
 
-@EService
 public class UploadIntentService extends IntentService implements
 		CountingInputStreamEntity.UploadListener {
 

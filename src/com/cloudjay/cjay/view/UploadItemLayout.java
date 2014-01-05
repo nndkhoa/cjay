@@ -11,6 +11,8 @@ import android.widget.TextView;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 import de.greenrobot.event.EventBus;
 
 public class UploadItemLayout extends LinearLayout {
@@ -101,6 +103,8 @@ public class UploadItemLayout extends LinearLayout {
 		ImageView iv = getImageView();
 		if (null != iv) {
 			// iv.requestThumbnail(mSelection, false);
+			ImageLoader.getInstance().displayImage(
+					mContainerSession.getImageIdPath(), iv);
 		}
 
 		TextView tv = getCaptionTextView();

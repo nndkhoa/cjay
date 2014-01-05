@@ -8,7 +8,7 @@ import java.util.List;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.Issue;
-import com.cloudjay.cjay.service.UploadIntentService_;
+import com.cloudjay.cjay.service.UploadIntentService;
 import com.lightbox.android.photoprocessing.PhotoProcessing;
 import com.lightbox.android.photoprocessing.utils.MediaUtils;
 
@@ -137,7 +137,7 @@ public class Utils {
 	}
 
 	public static Intent getUploadIntent(Context context) {
-		Intent intent = new Intent(context, UploadIntentService_.class);
+		Intent intent = new Intent(context, UploadIntentService.class);
 		intent.setAction(CJayConstant.INTENT_SERVICE_UPLOAD_ALL);
 		return intent;
 	}

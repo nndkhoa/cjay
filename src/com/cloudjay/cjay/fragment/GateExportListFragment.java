@@ -92,7 +92,7 @@ public class GateExportListFragment extends SherlockFragment {
 		imageLoader = ImageLoader.getInstance();
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
 				.getListOperators(getActivity());
-		
+
 		initContainerFeedAdapter(null);
 		mSelectedContainerSession = null;
 
@@ -106,37 +106,41 @@ public class GateExportListFragment extends SherlockFragment {
 
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
-		if (null != mSelectedContainerSession) {
-			try {
 
-				Logger.Log(LOG_TAG, "Menu upload item clicked");
+		synchronized (this) {
+			if (null != mSelectedContainerSession) {
+				try {
 
-				ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-						.getInstance().getDatabaseManager()
-						.getHelper(getActivity()).getContainerSessionDaoImpl();
+					Logger.Log(LOG_TAG, "Menu upload item clicked");
 
-				// User confirm upload
-				mSelectedContainerSession.setUploadConfirmation(true);
+					ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
+							.getInstance().getDatabaseManager()
+							.getHelper(getActivity())
+							.getContainerSessionDaoImpl();
 
-				mSelectedContainerSession
-						.setCheckOutTime(StringHelper
-								.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT));
+					// User confirm upload
+					mSelectedContainerSession.setUploadConfirmation(true);
 
-				mSelectedContainerSession
-						.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+					mSelectedContainerSession
+							.setCheckOutTime(StringHelper
+									.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT));
 
-				containerSessionDaoImpl.update(mSelectedContainerSession);
+					mSelectedContainerSession
+							.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
 
-				// It will trigger `UploadsFragment` Adapter
-				// notifyDataSetChanged
-				EventBus.getDefault().post(
-						new ContainerSessionEnqueueEvent(
-								mSelectedContainerSession));
+					containerSessionDaoImpl.update(mSelectedContainerSession);
 
-				hideMenuItems();
+					// It will trigger `UploadsFragment` Adapter
+					// notifyDataSetChanged
+					EventBus.getDefault().post(
+							new ContainerSessionEnqueueEvent(
+									mSelectedContainerSession));
 
-			} catch (SQLException e) {
-				e.printStackTrace();
+					hideMenuItems();
+
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -160,7 +164,8 @@ public class GateExportListFragment extends SherlockFragment {
 
 		// get the selected container session and open camera
 		ContainerSession containerSession = mFeedsAdapter.getItem(position);
-		ContainerSession.gotoCamera(getActivity(), containerSession, CJayImage.TYPE_EXPORT);
+		ContainerSession.gotoCamera(getActivity(), containerSession,
+				CJayImage.TYPE_EXPORT);
 	}
 
 	@ItemLongClick(R.id.container_list)
@@ -223,8 +228,11 @@ public class GateExportListFragment extends SherlockFragment {
 		switch (mode) {
 		case AddContainerDialog.CONTAINER_DIALOG_ADD:
 			try {
-				ContainerSession containerSession = ContainerSession.createContainerSession(getActivity(), containerId, operatorCode);
-				ContainerSession.gotoCamera(getActivity(), containerSession, CJayImage.TYPE_EXPORT);
+				ContainerSession containerSession = ContainerSession
+						.createContainerSession(getActivity(), containerId,
+								operatorCode);
+				ContainerSession.gotoCamera(getActivity(), containerSession,
+						CJayImage.TYPE_EXPORT);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

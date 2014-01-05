@@ -6,7 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.cloudjay.cjay.service.UploadIntentService_;
+import com.cloudjay.cjay.service.UploadIntentService;
 
 public class UploadAlertDialogActivity extends CJayActivity {
 	private NotificationManager nm;
@@ -37,7 +37,7 @@ public class UploadAlertDialogActivity extends CJayActivity {
 
 								Intent uploadIntent = new Intent(
 										UploadAlertDialogActivity.this,
-										UploadIntentService_.class);
+										UploadIntentService.class);
 								uploadIntent.putExtra("uuid", uuid);
 								uploadIntent.putExtra("tmpImgUri", tmpImgUri);
 								startService(uploadIntent);
