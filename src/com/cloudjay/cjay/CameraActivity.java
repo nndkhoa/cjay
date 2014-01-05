@@ -707,9 +707,11 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	    // Submit focus area to camera
 	    if (supportedFocusMode.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
 	    	cameraParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-//	    	cameraParameters.setFocusAreas(focusAreas);
 		    camera.setParameters(cameraParameters);
 		    camera.autoFocus(this);
+	    } else {
+	    	Logger.Log(TAG, "No auto focus mode supported, now just take picture");
+	    	camera.takePicture(shutterCallback, null, photoCallback);
 	    }
 
 		inPreview = false;
@@ -790,7 +792,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Override
 	public void onAutoFocus(boolean arg0, Camera arg1) {
-		Logger.Log(TAG, "Auto focus");
+		Logger.Log(TAG, "Auto focused, now take picture");
 		camera.takePicture(shutterCallback, null, photoCallback);
 	}
 }
