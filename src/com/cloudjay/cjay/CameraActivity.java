@@ -694,15 +694,26 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	@Background
 	void takePicture() {
 //		if (inPreview) {
+		
 		Logger.Log(LOG_TAG, "Prepare to take picture");
 		
-        int width = preview.getWidth();
-        int height = preview.getHeight();
+		Camera.Parameters cameraParameters = camera.getParameters();
+	    
+	    List<String> supportedFocusMode = cameraParameters.getSupportedFocusModes();
+	    for (String mode : supportedFocusMode) {
+			Logger.Log(TAG, "Camera supports Focus Mode: "+ mode);
+		}
 
-        Rect touchRect = new Rect((width-100)/2, (height-100)/2, 100, 100);
-        this.submitFocusAreaRect(touchRect);
+	    // Submit focus area to camera
+	    if (supportedFocusMode.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+	    	cameraParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+//	    	cameraParameters.setFocusAreas(focusAreas);
+		    camera.setParameters(cameraParameters);
+		    camera.autoFocus(this);
+	    }
 
 		inPreview = false;
+		
 //		}
 	}
 
@@ -713,20 +724,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		}
 	};
 	
-	private void submitFocusAreaRect(final Rect touchRect)
-	{
-	    Camera.Parameters cameraParameters = camera.getParameters();
-
-	    // Submit focus area to camera
-	    ArrayList<Camera.Area> focusAreas = new ArrayList<Camera.Area>();
-	    focusAreas.add(new Camera.Area(touchRect, 1000));
-
-	    cameraParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-	    cameraParameters.setFocusAreas(focusAreas);
-	    camera.setParameters(cameraParameters);
-	    camera.autoFocus(this);
-	}
-
 	public static void setCameraDisplayOrientation(Activity activity,
 
 	int cameraId, android.hardware.Camera camera) {
