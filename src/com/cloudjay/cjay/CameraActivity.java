@@ -534,6 +534,12 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		openCamera();
 		setContentView(R.layout.activity_camera);
 	}
+	
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+
+		setCameraDisplayOrientation(this, cameraMode, camera);
+	}
 
 	void openCamera() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
@@ -727,8 +733,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	};
 	
 	public static void setCameraDisplayOrientation(Activity activity,
-
-	int cameraId, android.hardware.Camera camera) {
+			int cameraId, android.hardware.Camera camera) {
 
 		android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
 		android.hardware.Camera.getCameraInfo(cameraId, info);
