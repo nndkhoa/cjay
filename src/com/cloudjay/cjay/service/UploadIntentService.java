@@ -7,6 +7,8 @@ import java.util.concurrent.ExecutorService;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.EService;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
@@ -27,11 +29,9 @@ import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
-import android.service.textservice.SpellCheckerService.Session;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.actionbarsherlock.R.color;
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
@@ -54,6 +54,7 @@ import com.cloudjay.cjay.util.Mapper;
 
 import de.greenrobot.event.EventBus;
 
+@EService
 public class UploadIntentService extends IntentService implements
 		CountingInputStreamEntity.UploadListener {
 
@@ -94,6 +95,7 @@ public class UploadIntentService extends IntentService implements
 						.getNextWaiting();
 				//
 				if (null != containerSession) {
+
 					//
 					// // trigger event to display in UploadsFragment
 					//
@@ -221,7 +223,8 @@ public class UploadIntentService extends IntentService implements
 	 * 
 	 * @param containerSession
 	 */
-	private void doUploadContainer(ContainerSession containerSession) {
+	private synchronized void doUploadContainer(
+			ContainerSession containerSession) {
 
 		Logger.Log(LOG_TAG,
 				"doUploadContainer: " + containerSession.getContainerId());
@@ -229,27 +232,36 @@ public class UploadIntentService extends IntentService implements
 		// post UploadStateChangedEvent
 
 		try {
+			String returnJson = "";
 			containerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_IN_PROGRESS);
 			containerSessionDaoImpl.update(containerSession);
 
 			// Convert ContainerSession to TmpContainerSession for uploading
-			TmpContainerSession uploadItem = Mapper.toTmpContainerSession(
-					containerSession, getApplicationContext());
+			TmpContainerSession uploadItem = Mapper.getInstance()
+					.toTmpContainerSession(containerSession,
+							getApplicationContext());
 
 			// Post to Server and notify event to UploadFragment
 
 			User user = com.cloudjay.cjay.util.Session.restore(
 					getApplicationContext()).getCurrentUser();
 
-			Logger.Log(LOG_TAG, "User role: " + user.getRoleName());
+			Logger.Log(LOG_TAG, "Current User role: " + user.getRoleName());
 			if (user.getRole() == User.ROLE_GATE_KEEPER) {
-				CJayClient.getInstance().postContainerSession(
+
+				returnJson = CJayClient.getInstance().postContainerSession(
 						getApplicationContext(), uploadItem);
 			} else {
-				CJayClient.getInstance().postContainerSessionReportList(
-						getApplicationContext(), uploadItem);
+
+				returnJson = CJayClient.getInstance()
+						.postContainerSessionReportList(
+								getApplicationContext(), uploadItem);
 			}
+
+			// convert back then save containerSession
+			Mapper.getInstance().update(getApplicationContext(), returnJson,
+					containerSession);
 
 			containerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_COMPLETED);

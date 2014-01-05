@@ -188,4 +188,27 @@ public class User {
 	public void setPhone(int phone) {
 		this.phone = phone;
 	}
+
+	public int getFilterStatus() {
+		int result = 0;
+
+		switch (this.role) {
+		case User.ROLE_GATE_KEEPER:
+			result = 5; // repaired containers
+			break;
+
+		case User.ROLE_AUDITOR:
+			result = 0; // checked in containers
+			break;
+
+		case User.ROLE_REPAIR_STAFF:
+			// result = 4; // repair confirmed containers
+			result = 1;
+			break;
+
+		default:
+			break;
+		}
+		return result;
+	}
 }

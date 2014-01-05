@@ -3,7 +3,15 @@ package com.cloudjay.cjay.fragment;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import android.content.Intent;
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Click;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.ItemLongClick;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.ViewById;
+
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
@@ -17,36 +25,21 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.*;
-import com.cloudjay.cjay.dao.ContainerDaoImpl;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
-import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.events.ContainerCreatedEvent;
-import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.events.ContainerEditedEvent;
+import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.model.CJayImage;
-import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.model.DatabaseHelper;
 import com.cloudjay.cjay.model.Operator;
-import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
-import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.Session;
-import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
-import com.googlecode.androidannotations.annotations.AfterViews;
-import com.googlecode.androidannotations.annotations.Click;
-import com.googlecode.androidannotations.annotations.EFragment;
-import com.googlecode.androidannotations.annotations.ItemClick;
-import com.googlecode.androidannotations.annotations.ItemLongClick;
-import com.googlecode.androidannotations.annotations.OptionsItem;
-import com.googlecode.androidannotations.annotations.OptionsMenu;
-import com.googlecode.androidannotations.annotations.ViewById;
 import com.nostra13.universalimageloader.core.ImageLoader;
+
 import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_gate_import)
@@ -72,25 +65,18 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	void afterViews() {
 		imageLoader = ImageLoader.getInstance();
 
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListLocalContainerSessions(getActivity());
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
 				.getListOperators(getActivity());
 
-		initContainerFeedAdapter(mFeeds);
+		initContainerFeedAdapter(null);
 		mSelectedContainerSession = null;
-
 	}
 
 	@OptionsItem(R.id.menu_camera)
 	void cameraMenuItemSelected() {
 		Logger.Log(LOG_TAG, "Menu camera item clicked");
 
-		String uuid = mSelectedContainerSession.getUuid();
-		Intent intent = new Intent(getActivity(), CameraActivity_.class);
-		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA, uuid);
-		intent.putExtra("type", CJayImage.TYPE_IMPORT); // in
-		startActivity(intent);
+		ContainerSession.gotoCamera(getActivity(), mSelectedContainerSession, CJayImage.TYPE_IMPORT);
 	}
 
 	@OptionsItem(R.id.menu_edit_container)
@@ -105,6 +91,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 	void hideMenuItems() {
 		mSelectedContainerSession = null;
+		mFeedListView.setItemChecked(-1, true);
 		getActivity().supportInvalidateOptionsMenu();
 	}
 
@@ -227,93 +214,21 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 		switch (mode) {
 		case AddContainerDialog.CONTAINER_DIALOG_ADD:
-
-			User currentUser = Session.restore(getActivity()).getCurrentUser();
-
-			// Create Container Session object
-			ContainerSession containerSession = new ContainerSession(
-					getActivity(),
-					containerId,
-					operatorCode,
-					StringHelper
-							.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT),
-					currentUser.getDepot().getDepotCode());
-
-			containerSession.setUploadConfirmation(false);
-			containerSession.setOnLocal(true);
-			containerSession.setUploadState(ContainerSession.STATE_NONE);
-
 			try {
-				ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-						.getInstance().getDatabaseManager()
-						.getHelper(getActivity()).getContainerSessionDaoImpl();
-
-				containerSessionDaoImpl.addContainerSessions(containerSession);
-
-				// trigger update container lists
-				EventBus.getDefault().post(
-						new ContainerCreatedEvent(containerSession));
-
-				Intent intent = new Intent(getActivity(), CameraActivity_.class);
-				intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-						containerSession.getUuid());
-				intent.putExtra("type", 0); // in
-				startActivity(intent);
-
+				ContainerSession containerSession = ContainerSession.createContainerSession(getActivity(), containerId, operatorCode);
+				ContainerSession.gotoCamera(getActivity(), containerSession, CJayImage.TYPE_IMPORT);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-
 			break;
 
 		case AddContainerDialog.CONTAINER_DIALOG_EDIT:
 			try {
-
-				if (mSelectedContainerSession.getContainerId().equals(
-						containerId)
-						&& mSelectedContainerSession.getOperatorName().equals(
-								operatorName)) {
-					// do nothing
-				} else {
-					DatabaseHelper databaseHelper = CJayClient.getInstance()
-							.getDatabaseManager().getHelper(getActivity());
-					OperatorDaoImpl operatorDaoImpl = databaseHelper
-							.getOperatorDaoImpl();
-					ContainerDaoImpl containerDaoImpl = databaseHelper
-							.getContainerDaoImpl();
-					ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper
-							.getContainerSessionDaoImpl();
-
-					// find operator
-					Operator operator = operatorDaoImpl
-							.findOperator(operatorCode);
-
-					// update container details
-					Container container = mSelectedContainerSession
-							.getContainer();
-					container.setContainerId(containerId);
-					container.setOperator(operator);
-
-					// save container details
-					containerSessionDaoImpl
-							.addContainerSessions(mSelectedContainerSession);
-
-					// update database
-					containerDaoImpl.update(container);
-					containerSessionDaoImpl.update(mSelectedContainerSession);
-
-					// trigger update container lists
-					EventBus.getDefault()
-							.post(new ContainerEditedEvent(
-									mSelectedContainerSession));
-				}
-
+				ContainerSession.editContainerSession(getActivity(), mSelectedContainerSession, containerId, operatorCode);
 				hideMenuItems();
-
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-
 			break;
 		}
 
@@ -395,7 +310,6 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	}
 
 	public void refresh() {
-
 		Logger.Log(LOG_TAG, "onRefresh");
 
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
@@ -404,11 +318,9 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	}
 
 	@Override
-	public void onResume() {
+	public void onResume() {		
 		if (mFeedsAdapter != null) {
-			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-					.getListLocalContainerSessions(getActivity());
-			mFeedsAdapter.updateData(mFeeds);
+			refresh();
 		}
 
 		super.onResume();

@@ -22,13 +22,13 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
-import com.googlecode.androidannotations.annotations.AfterViews;
-import com.googlecode.androidannotations.annotations.EFragment;
-import com.googlecode.androidannotations.annotations.ItemClick;
-import com.googlecode.androidannotations.annotations.ItemLongClick;
-import com.googlecode.androidannotations.annotations.OptionsItem;
-import com.googlecode.androidannotations.annotations.OptionsMenu;
-import com.googlecode.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.ItemLongClick;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.ViewById;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import de.greenrobot.event.EventBus;
@@ -51,11 +51,7 @@ public class AuditorReportedListFragment extends SherlockFragment {
 	void afterViews() {
 		imageLoader = ImageLoader.getInstance();
 
-		// load list data
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListReportedContainerSessions(getActivity());
-		initContainerFeedAdapter(mFeeds);
-
+		initContainerFeedAdapter(null);
 		mSelectedContainerSession = null;
 	}
 
@@ -68,7 +64,7 @@ public class AuditorReportedListFragment extends SherlockFragment {
 		mSelectedContainerSession = mFeedsAdapter.getItem(position);
 		getActivity().supportInvalidateOptionsMenu();
 	}
-	
+
 	@ItemClick(R.id.container_list)
 	void listItemClicked(int position) {
 		// refresh highlighting
@@ -77,7 +73,7 @@ public class AuditorReportedListFragment extends SherlockFragment {
 		// clear current selection
 		mSelectedContainerSession = null;
 		getActivity().supportInvalidateOptionsMenu();
-		
+
 		Intent intent = new Intent(getActivity(),
 				AuditorContainerActivity_.class);
 		intent.putExtra(AuditorContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
@@ -106,7 +102,9 @@ public class AuditorReportedListFragment extends SherlockFragment {
 
 				// It will trigger `UploadsFragment` Adapter
 				// notifyDataSetChanged
-				EventBus.getDefault().post(new ContainerSessionEnqueueEvent(mSelectedContainerSession));
+				EventBus.getDefault().post(
+						new ContainerSessionEnqueueEvent(
+								mSelectedContainerSession));
 
 				hideMenuItems();
 
@@ -118,6 +116,7 @@ public class AuditorReportedListFragment extends SherlockFragment {
 
 	void hideMenuItems() {
 		mSelectedContainerSession = null;
+		mFeedListView.setItemChecked(-1, true);
 		getActivity().supportInvalidateOptionsMenu();
 	}
 
@@ -131,16 +130,13 @@ public class AuditorReportedListFragment extends SherlockFragment {
 
 	@Override
 	public void onResume() {
-		super.onResume();
-
 		if (null != mFeedsAdapter) {
-			// refresh list
-			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-					.getListReportedContainerSessions(getActivity());
-			mFeedsAdapter.updateData(mFeeds);
+			refresh();
 		}
+
+		super.onResume();
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		EventBus.getDefault().unregister(this);

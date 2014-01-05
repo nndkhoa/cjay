@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -23,14 +24,17 @@ import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.CJayImage;
+import com.cloudjay.cjay.model.ComponentCode;
+import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Issue;
+import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.network.CJayClient;
-import com.googlecode.androidannotations.annotations.AfterViews;
-import com.googlecode.androidannotations.annotations.EActivity;
-import com.googlecode.androidannotations.annotations.Extra;
-import com.googlecode.androidannotations.annotations.OptionsItem;
-import com.googlecode.androidannotations.annotations.OptionsMenu;
-import com.googlecode.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.ViewById;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 // slide 20
@@ -142,6 +146,8 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 		int position = tab.getPosition();
 		switch (position) {
 		case TAB_ISSUE_COMPONENT:
+		case TAB_ISSUE_DAMAGE:
+		case TAB_ISSUE_REPAIR:
 		case TAB_ISSUE_DIMENSION:
 		case TAB_ISSUE_QUANTITY:
 			IssueReportFragment fragment = (IssueReportFragment) mViewPagerAdapter.getRegisteredFragment(position);
@@ -228,11 +234,14 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 			break;
 		case TYPE_DAMAGE_CODE:
 			try {
-				DamageCodeDaoImpl damageCodeDaoImpl = CJayClient.getInstance()
-						.getDatabaseManager().getHelper(this)
-						.getDamageCodeDaoImpl();
-				mCJayImage.getIssue().setDamageCode(
-						damageCodeDaoImpl.findDamageCode(val));
+				DamageCode damageCode = null;
+				if (val != null && !TextUtils.isEmpty(val)) {
+					DamageCodeDaoImpl damageCodeDaoImpl = CJayClient.getInstance()
+							.getDatabaseManager().getHelper(this)
+							.getDamageCodeDaoImpl();
+					damageCode = damageCodeDaoImpl.findDamageCode(val);
+				}
+				mCJayImage.getIssue().setDamageCode(damageCode);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -240,11 +249,14 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 			break;
 		case TYPE_REPAIR_CODE:
 			try {
-				RepairCodeDaoImpl repairCodeDaoImpl = CJayClient.getInstance()
-						.getDatabaseManager().getHelper(this)
-						.getRepairCodeDaoImpl();
-				mCJayImage.getIssue().setRepairCode(
-						repairCodeDaoImpl.findRepairCode(val));
+				RepairCode repairCode = null;
+				if (val != null && !TextUtils.isEmpty(val)) {
+					RepairCodeDaoImpl repairCodeDaoImpl = CJayClient.getInstance()
+							.getDatabaseManager().getHelper(this)
+							.getRepairCodeDaoImpl();
+					repairCode = repairCodeDaoImpl.findRepairCode(val);
+				}
+				mCJayImage.getIssue().setRepairCode(repairCode);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -252,11 +264,14 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 			break;
 		case TYPE_COMPONENT_CODE:
 			try {
-				ComponentCodeDaoImpl componentCodeDaoImpl = CJayClient
-						.getInstance().getDatabaseManager().getHelper(this)
-						.getComponentCodeDaoImpl();
-				mCJayImage.getIssue().setComponentCode(
-						componentCodeDaoImpl.findComponentCode(val));
+				ComponentCode componentCode = null;
+				if (val != null && !TextUtils.isEmpty(val)) {
+					ComponentCodeDaoImpl componentCodeDaoImpl = CJayClient
+							.getInstance().getDatabaseManager().getHelper(this)
+							.getComponentCodeDaoImpl();
+					componentCode = componentCodeDaoImpl.findComponentCode(val);
+				}
+				mCJayImage.getIssue().setComponentCode(componentCode);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

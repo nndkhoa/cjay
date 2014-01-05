@@ -94,8 +94,8 @@
             android:theme="@style/AppTheme.NoTitleBar" >
         </activity>
 
-        <service android:name="com.cloudjay.cjay.service.UploadIntentService" />
-        <service android:name="com.cloudjay.cjay.service.QueueIntentService" />
+        <service android:name="com.cloudjay.cjay.service.UploadIntentService_" />
+        <service android:name="com.cloudjay.cjay.service.QueueIntentService_" />
 
         <receiver
             android:name="com.cloudjay.cjay.receivers.ConnectionChangeReceiver"

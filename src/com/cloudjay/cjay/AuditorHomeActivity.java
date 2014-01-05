@@ -1,5 +1,10 @@
 package com.cloudjay.cjay;
+
 import java.lang.reflect.Field;
+
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.ViewById;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,9 +24,6 @@ import com.actionbarsherlock.view.MenuItem;
 import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
-import com.googlecode.androidannotations.annotations.AfterViews;
-import com.googlecode.androidannotations.annotations.EActivity;
-import com.googlecode.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_auditor_home)
 public class AuditorHomeActivity extends CJayActivity implements
@@ -48,7 +50,7 @@ public class AuditorHomeActivity extends CJayActivity implements
 				menuKeyField.setBoolean(config, false);
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+
 		}
 		super.onCreate(arg0);
 	}
@@ -144,20 +146,32 @@ public class AuditorHomeActivity extends CJayActivity implements
 		public Fragment getItem(int position) {
 			switch (position) {
 			case 0:
-				Fragment reportingListFragment_ = new AuditorReportingListFragment_();
-				return reportingListFragment_;
+				// containers that have no 'report images'
+				Fragment notReportedFragment = new AuditorReportingListFragment_();
+				((AuditorReportingListFragment_) notReportedFragment)
+						.setState(AuditorReportingListFragment_.STATE_NOT_REPORTED);
+				return notReportedFragment;
+
 			case 1:
-				Fragment reportedListFragment_ = new AuditorReportedListFragment_();
-				return reportedListFragment_;
+				// containers that have 'report images' with no issues
+				Fragment reportingFragment = new AuditorReportingListFragment_();
+				((AuditorReportingListFragment_) reportingFragment)
+						.setState(AuditorReportingListFragment_.STATE_REPORTING);
+				return reportingFragment;
 
 			case 2:
+				// containers that have 'report images' and issues
+				Fragment reportedFragment = new AuditorReportedListFragment_();
+				return reportedFragment;
+
+			case 3:
 			default:
 				Fragment uploadFragment = new UploadsFragment_();
 				return uploadFragment;
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {

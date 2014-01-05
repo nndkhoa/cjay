@@ -26,15 +26,15 @@ import com.cloudjay.cjay.model.DatabaseHelper;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.Utils;
-import com.googlecode.androidannotations.annotations.AfterViews;
-import com.googlecode.androidannotations.annotations.Click;
-import com.googlecode.androidannotations.annotations.EActivity;
-import com.googlecode.androidannotations.annotations.Extra;
-import com.googlecode.androidannotations.annotations.ItemClick;
-import com.googlecode.androidannotations.annotations.ItemLongClick;
-import com.googlecode.androidannotations.annotations.OptionsItem;
-import com.googlecode.androidannotations.annotations.OptionsMenu;
-import com.googlecode.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Click;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.ItemLongClick;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.ViewById;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 //slide 15
@@ -65,24 +65,11 @@ public class AuditorContainerActivity extends CJayActivity {
 
 	@AfterViews
 	void afterViews() {
-		try {
-			imageLoader = ImageLoader.getInstance();
-
-			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-					.getInstance().getDatabaseManager().getHelper(this)
-					.getContainerSessionDaoImpl();
-			mContainerSession = containerSessionDaoImpl
-					.queryForId(mContainerSessionUUID);
-
-			if (null != mContainerSession) {
-				containerIdTextView.setText(mContainerSession.getContainerId());
-				populateCjayImages();
-				initImageFeedAdapter(mFeeds);
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		imageLoader = ImageLoader.getInstance();
+		
+		initImageFeedAdapter(null);
+		mLongClickedCJayImage = null;
+		mSelectedCJayImage = null;
 	}
 
 	@ItemClick(R.id.feeds)
@@ -169,9 +156,14 @@ public class AuditorContainerActivity extends CJayActivity {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-
+			
 			// refresh image list
 			refresh();
+
+			// hide menu items
+			mLongClickedCJayImage = null;
+			mFeedListView.setItemChecked(-1, true);
+			supportInvalidateOptionsMenu();
 		}
 	}
 
@@ -204,6 +196,8 @@ public class AuditorContainerActivity extends CJayActivity {
 					.queryForId(mContainerSessionUUID);
 
 			if (null != mContainerSession) {
+				containerIdTextView.setText(mContainerSession.getContainerId());
+				
 				for (CJayImage cJayImage : mContainerSession.getCJayImages()) {
 					if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
 						mFeeds.add(cJayImage);

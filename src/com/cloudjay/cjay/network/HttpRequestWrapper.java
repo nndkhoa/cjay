@@ -122,7 +122,7 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 		try {
 			response = httpClient.execute(httpPost, localContext);
 			ret = EntityUtils.toString(response.getEntity());
-			Logger.Log(LOG_TAG, ret);
+			Logger.Log(LOG_TAG, "Return from server: " + ret);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

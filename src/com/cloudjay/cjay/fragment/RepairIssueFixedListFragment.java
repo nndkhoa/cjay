@@ -20,10 +20,10 @@ import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.Utils;
-import com.googlecode.androidannotations.annotations.AfterViews;
-import com.googlecode.androidannotations.annotations.EFragment;
-import com.googlecode.androidannotations.annotations.ItemClick;
-import com.googlecode.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.ViewById;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 @EFragment(R.layout.fragment_repair_issue_fixed)
@@ -41,23 +41,9 @@ public class RepairIssueFixedListFragment extends SherlockFragment {
 
 	@AfterViews
 	void afterViews() {
-		try {
-			imageLoader = ImageLoader.getInstance();
-
-			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-					.getInstance().getDatabaseManager()
-					.getHelper(getActivity()).getContainerSessionDaoImpl();
-			mContainerSession = containerSessionDaoImpl
-					.queryForId(mContainerSessionUUID);
-
-			if (null != mContainerSession) {
-				populateIssueList();
-				initIssueFeedAdapter(mFeeds);
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		imageLoader = ImageLoader.getInstance();
+		
+		initIssueFeedAdapter(null);
 	}
 
 	@ItemClick(R.id.feeds)

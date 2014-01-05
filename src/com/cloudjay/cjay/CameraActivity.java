@@ -8,6 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.Click;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.NoTitle;
+import org.androidannotations.annotations.SystemService;
+import org.androidannotations.annotations.ViewById;
+
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.content.res.Resources.NotFoundException;
@@ -48,14 +57,6 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
-import com.googlecode.androidannotations.annotations.AfterViews;
-import com.googlecode.androidannotations.annotations.Background;
-import com.googlecode.androidannotations.annotations.Click;
-import com.googlecode.androidannotations.annotations.EActivity;
-import com.googlecode.androidannotations.annotations.Extra;
-import com.googlecode.androidannotations.annotations.NoTitle;
-import com.googlecode.androidannotations.annotations.SystemService;
-import com.googlecode.androidannotations.annotations.ViewById;
 
 import de.greenrobot.event.EventBus;
 
@@ -496,7 +497,7 @@ public class CameraActivity extends Activity {
 
 		if (TextUtils.isEmpty(containerSession.getImageIdPath())) {
 			Logger.Log(LOG_TAG, "image_id_path: " + uri);
-			containerSession.setImageIdPath(image_name);
+			containerSession.setImageIdPath(uri);
 		}
 
 		try {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -12,6 +13,7 @@ import android.os.Parcelable;
 @SuppressLint("ParcelCreator")
 public class AuditReportItem implements Parcelable {
 
+	private int id;
 	private int damage_id;
 	private int repair_id;
 	private int component_id;
@@ -28,22 +30,25 @@ public class AuditReportItem implements Parcelable {
 
 	public AuditReportItem(Issue issue) {
 		if (null != issue) {
-			this.damage_id = issue.getDamageCode().getId();
-			this.repair_id = issue.getRepairCode().getId();
-			this.component_id = issue.getComponentCode().getId();
-			this.length = issue.getLength();
-			this.height = issue.getHeight();
-			this.quantity = issue.getQuantity();
-			this.location_code = issue.getLocationCode();
+			this.setId(issue.getId());
+			this.setDamageId(issue.getDamageCode().getId());
+			this.setRepairId(issue.getRepairCode().getId());
+			this.setComponentId(issue.getComponentCode().getId());
+			this.setLength(issue.getLength());
+			this.setHeight(issue.getHeight());
+			this.setQuantity(issue.getQuantity());
+			this.setLocationCode(issue.getLocationCode());
 
-			audit_report_images = new ArrayList<AuditReportImage>();
+			setAuditReportImages(new ArrayList<AuditReportImage>());
 			Collection<CJayImage> cJayImages = issue.getCJayImages();
 			if (null != cJayImages) {
 				for (CJayImage cJayImage : cJayImages) {
 					if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
-						audit_report_images.add(new AuditReportImage(cJayImage
-								.getType(), cJayImage.getTimePosted(),
-								cJayImage.getImageName()));
+						getAuditReportImages().add(
+								new AuditReportImage(cJayImage.getId(),
+										cJayImage.getType(), cJayImage
+												.getTimePosted(), cJayImage
+												.getImageName()));
 					}
 				}
 			}
@@ -67,6 +72,78 @@ public class AuditReportItem implements Parcelable {
 
 	private void readFromParcel(Parcel in) {
 
+	}
+
+	public int getDamageId() {
+		return damage_id;
+	}
+
+	public void setDamageId(int damage_id) {
+		this.damage_id = damage_id;
+	}
+
+	public int getRepairId() {
+		return repair_id;
+	}
+
+	public void setRepairId(int repair_id) {
+		this.repair_id = repair_id;
+	}
+
+	public int getComponentId() {
+		return component_id;
+	}
+
+	public void setComponentId(int component_id) {
+		this.component_id = component_id;
+	}
+
+	public String getLocationCode() {
+		return location_code;
+	}
+
+	public void setLocationCode(String location_code) {
+		this.location_code = location_code;
+	}
+
+	public String getLength() {
+		return length;
+	}
+
+	public void setLength(String length) {
+		this.length = length;
+	}
+
+	public String getHeight() {
+		return height;
+	}
+
+	public void setHeight(String height) {
+		this.height = height;
+	}
+
+	public String getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(String quantity) {
+		this.quantity = quantity;
+	}
+
+	public List<AuditReportImage> getAuditReportImages() {
+		return audit_report_images;
+	}
+
+	public void setAuditReportImages(List<AuditReportImage> audit_report_images) {
+		this.audit_report_images = audit_report_images;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public static final Parcelable.Creator<AuditReportItem> CREATOR = new Parcelable.Creator<AuditReportItem>() {

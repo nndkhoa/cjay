@@ -24,14 +24,15 @@ import com.cloudjay.cjay.events.ContainerRepairedEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
-import com.googlecode.androidannotations.annotations.AfterViews;
-import com.googlecode.androidannotations.annotations.EFragment;
-import com.googlecode.androidannotations.annotations.ItemClick;
-import com.googlecode.androidannotations.annotations.ItemLongClick;
-import com.googlecode.androidannotations.annotations.OptionsItem;
-import com.googlecode.androidannotations.annotations.OptionsMenu;
-import com.googlecode.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.ItemLongClick;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.ViewById;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import de.greenrobot.event.EventBus;
@@ -39,6 +40,8 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.fragment_repair_container_pending)
 @OptionsMenu(R.menu.menu_repair_container_pending)
 public class RepairContainerPendingListFragment extends SherlockFragment {
+
+	private final static String LOG_TAG = "RepairContainerPendingListFragment";
 
 	private ArrayList<ContainerSession> mFeeds;
 	private FunDapter<ContainerSession> mFeedsAdapter;
@@ -54,8 +57,6 @@ public class RepairContainerPendingListFragment extends SherlockFragment {
 
 	@AfterViews
 	void afterViews() {
-		imageLoader = ImageLoader.getInstance();
-
 		mSearchEditText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable arg0) {
@@ -71,10 +72,9 @@ public class RepairContainerPendingListFragment extends SherlockFragment {
 			}
 		});
 
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListPendingContainerSessions(getActivity());
-		initContainerFeedAdapter(mFeeds);
+		imageLoader = ImageLoader.getInstance();
 
+		initContainerFeedAdapter(null);
 		mSelectedContainerSession = null;
 	}
 
@@ -95,6 +95,7 @@ public class RepairContainerPendingListFragment extends SherlockFragment {
 		
 		// clear current selection
 		mSelectedContainerSession = null;
+		mFeedListView.setItemChecked(-1, true);
 		getActivity().supportInvalidateOptionsMenu();
 		
 		EventBus.getDefault().post(new ContainerRepairedEvent(mSelectedContainerSession));
@@ -147,8 +148,11 @@ public class RepairContainerPendingListFragment extends SherlockFragment {
 
 	@Override
 	public void onResume() {
+		if (null != mFeedsAdapter) {
+			refresh();
+		}
+		
 		super.onResume();
-		refresh();
 	}
 
 	private void search(String searchText) {
@@ -171,12 +175,13 @@ public class RepairContainerPendingListFragment extends SherlockFragment {
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListPendingContainerSessions(getActivity());
 
-		if (null != mSearchEditText) {
+		if (mSearchEditText != null) {
 			mSearchEditText.setText(""); // this will refresh the list
 		}
 	}
 
 	public void onEvent(ContainerRepairedEvent event) {
+		Logger.Log(LOG_TAG, "onEvent ContainerRepairedEvent");
 		refresh();
 	}
 

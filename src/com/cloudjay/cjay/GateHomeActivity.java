@@ -21,9 +21,9 @@ import com.cloudjay.cjay.fragment.GateImportListFragment;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
-import com.googlecode.androidannotations.annotations.AfterViews;
-import com.googlecode.androidannotations.annotations.EActivity;
-import com.googlecode.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_gate_home)
 public class GateHomeActivity extends CJayActivity implements
@@ -56,7 +56,6 @@ public class GateHomeActivity extends CJayActivity implements
 				menuKeyField.setBoolean(config, false);
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
 		}
 
 		super.onCreate(arg0);

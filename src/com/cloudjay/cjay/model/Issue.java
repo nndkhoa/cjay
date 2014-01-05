@@ -8,6 +8,7 @@ import java.util.UUID;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
+import com.cloudjay.cjay.network.CJayClient;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -19,7 +20,7 @@ public class Issue implements Parcelable {
 	public static final String FIELD_UUID = "uuid";
 	public static final String FIELD_FIXED = "fixed";
 
-	@DatabaseField(columnName = ID)
+	@DatabaseField(columnName = ID, defaultValue = "0")
 	int id;
 
 	@DatabaseField(columnName = FIELD_UUID, id = true)
@@ -45,7 +46,7 @@ public class Issue implements Parcelable {
 
 	@DatabaseField(canBeNull = true)
 	String quantity;
-	
+
 	@DatabaseField(columnName = FIELD_FIXED, canBeNull = true, defaultValue = "false")
 	boolean fixed;
 
@@ -59,6 +60,20 @@ public class Issue implements Parcelable {
 		readFromParcel(in);
 	}
 
+	public Issue(int id, DamageCode damageCode, RepairCode repairCode,
+			ComponentCode componentCode, String location_code, String length,
+			String height, String quantity, Collection<CJayImage> cJayImages) {
+		this.id = id;
+		this.damageCode = damageCode;
+		this.repairCode = repairCode;
+		this.componentCode = componentCode;
+		this.locationCode = location_code;
+		this.length = length;
+		this.height = height;
+		this.quantity = quantity;
+		this.cJayImages = cJayImages;
+	}
+
 	public Issue() {
 		this.setUUID(UUID.randomUUID().toString());
 	}
@@ -70,11 +85,11 @@ public class Issue implements Parcelable {
 	public String getUUID() {
 		return this.uuid;
 	}
-	
+
 	public void setFixed(boolean fixed) {
 		this.fixed = fixed;
 	}
-	
+
 	public boolean isFixed() {
 		return fixed;
 	}
@@ -183,7 +198,7 @@ public class Issue implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeInt(id);
+		dest.writeInt(getId());
 		dest.writeString(locationCode);
 		dest.writeParcelable(damageCode, 0);
 		dest.writeParcelable(repairCode, 0);
@@ -196,7 +211,7 @@ public class Issue implements Parcelable {
 	}
 
 	private void readFromParcel(Parcel in) {
-		this.id = in.readInt();
+		this.setId(in.readInt());
 		this.locationCode = in.readString();
 		in.readParcelable(DamageCode.class.getClassLoader());
 		in.readParcelable(RepairCode.class.getClassLoader());
@@ -239,5 +254,35 @@ public class Issue implements Parcelable {
 		} else {
 			return null;
 		}
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+
+		if (o.getClass() == AuditReportItem.class) {
+			AuditReportItem tmp = (AuditReportItem) o;
+
+			boolean isEqual = this.damageCode.getId() == tmp.getDamageId()
+					&& this.repairCode.getId() == tmp.getRepairId()
+					&& this.getComponentCode().getId() == tmp.getComponentId()
+					&& Float.parseFloat(this.length) == Float.parseFloat(tmp
+							.getLength())
+					&& Float.parseFloat(this.height) == Float.parseFloat(tmp
+							.getHeight())
+					&& Integer.parseInt(this.quantity) == Integer.parseInt(tmp
+							.getQuantity());
+
+			return isEqual;
+		}
+
+		return super.equals(o);
 	}
 }

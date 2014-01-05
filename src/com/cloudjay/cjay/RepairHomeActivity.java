@@ -18,9 +18,9 @@ import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.cloudjay.cjay.fragment.*;
-import com.googlecode.androidannotations.annotations.AfterViews;
-import com.googlecode.androidannotations.annotations.EActivity;
-import com.googlecode.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_repair_home)
 public class RepairHomeActivity extends CJayActivity implements
@@ -43,7 +43,7 @@ public class RepairHomeActivity extends CJayActivity implements
 				menuKeyField.setBoolean(config, false);
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+
 		}
 		super.onCreate(arg0);
 	}
@@ -96,7 +96,6 @@ public class RepairHomeActivity extends CJayActivity implements
 
 			getSession().deleteSession(getApplicationContext());
 			startActivity(new Intent(this, LoginActivity_.class));
-
 			finish();
 			return true;
 		}
@@ -138,6 +137,7 @@ public class RepairHomeActivity extends CJayActivity implements
 			case 0:
 				Fragment pendingFragment = new RepairContainerPendingListFragment_();
 				return pendingFragment;
+				
 			case 1:
 				Fragment fixedFragment = new RepairContainerFixedListFragment_();
 				return fixedFragment;

@@ -23,10 +23,10 @@ import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
-import com.googlecode.androidannotations.annotations.AfterViews;
-import com.googlecode.androidannotations.annotations.Click;
-import com.googlecode.androidannotations.annotations.EFragment;
-import com.googlecode.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Click;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ViewById;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import de.greenrobot.event.EventBus;
@@ -58,23 +58,9 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 			mCameraButton.setLayoutParams(p);			
 		}
 		
-		// load issue and image list
-		try {
-			imageLoader = ImageLoader.getInstance();
-
-			IssueDaoImpl issueDaoImpl = CJayClient
-					.getInstance().getDatabaseManager().getHelper(getActivity())
-					.getIssueDaoImpl();
-			mIssue = issueDaoImpl.queryForId(mIssueUUID);
-
-			if (null != mIssueUUID) {
-				populateCJayImages();
-				initImageFeedAdapter(mFeeds);
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		imageLoader = ImageLoader.getInstance();
+			
+		initImageFeedAdapter(null);
 	}
 
 	@Click(R.id.btn_add_new)

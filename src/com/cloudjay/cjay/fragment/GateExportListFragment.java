@@ -4,7 +4,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import android.content.Intent;
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Click;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.ItemLongClick;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.ViewById;
+
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
@@ -23,7 +31,7 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerCreatedEvent;
 import com.cloudjay.cjay.events.ContainerEditedEvent;
@@ -31,25 +39,13 @@ import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
-import com.cloudjay.cjay.model.TmpContainerSession;
-import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.Mapper;
-import com.cloudjay.cjay.util.Session;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
-import com.googlecode.androidannotations.annotations.AfterViews;
-import com.googlecode.androidannotations.annotations.Click;
-import com.googlecode.androidannotations.annotations.EFragment;
-import com.googlecode.androidannotations.annotations.ItemClick;
-import com.googlecode.androidannotations.annotations.ItemLongClick;
-import com.googlecode.androidannotations.annotations.OptionsItem;
-import com.googlecode.androidannotations.annotations.OptionsMenu;
-import com.googlecode.androidannotations.annotations.ViewById;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import de.greenrobot.event.EventBus;
@@ -94,20 +90,17 @@ public class GateExportListFragment extends SherlockFragment {
 		});
 
 		imageLoader = ImageLoader.getInstance();
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListCheckOutContainerSessions(getActivity());
-
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
 				.getListOperators(getActivity());
-		configureControls(mFeeds);
-		initContainerFeedAdapter(mFeeds);
-
+		
+		initContainerFeedAdapter(null);
 		mSelectedContainerSession = null;
 
 	}
 
 	void hideMenuItems() {
 		mSelectedContainerSession = null;
+		mFeedListView.setItemChecked(-1, true);
 		getActivity().supportInvalidateOptionsMenu();
 	}
 
@@ -165,18 +158,9 @@ public class GateExportListFragment extends SherlockFragment {
 		mSelectedContainerSession = null;
 		getActivity().supportInvalidateOptionsMenu();
 
-		// get the selected container session
+		// get the selected container session and open camera
 		ContainerSession containerSession = mFeedsAdapter.getItem(position);
-		TmpContainerSession tmpContainerSession = Mapper.toTmpContainerSession(
-				containerSession, getActivity());
-
-		// Pass tmpContainerSession away
-		// Then start showing the Camera
-		Intent intent = new Intent(getActivity(), CameraActivity_.class);
-		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-				tmpContainerSession);
-		intent.putExtra("type", CJayImage.TYPE_EXPORT); // out
-		startActivity(intent);
+		ContainerSession.gotoCamera(getActivity(), containerSession, CJayImage.TYPE_EXPORT);
 	}
 
 	@ItemLongClick(R.id.container_list)
@@ -238,37 +222,9 @@ public class GateExportListFragment extends SherlockFragment {
 
 		switch (mode) {
 		case AddContainerDialog.CONTAINER_DIALOG_ADD:
-			// Create Container Session object
-			User currentUser = Session.restore(getActivity()).getCurrentUser();
-			ContainerSession containerSession = new ContainerSession(
-					getActivity(),
-					containerId,
-					operatorCode,
-					StringHelper
-							.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT),
-					currentUser.getDepot().getDepotCode());
-
-			containerSession.setUploadConfirmation(false);
-			containerSession.setOnLocal(true);
-			containerSession.setUploadState(ContainerSession.STATE_NONE);
-
 			try {
-				ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-						.getInstance().getDatabaseManager()
-						.getHelper(getActivity()).getContainerSessionDaoImpl();
-
-				containerSessionDaoImpl.addContainerSessions(containerSession);
-
-				// trigger update container lists
-				EventBus.getDefault().post(
-						new ContainerCreatedEvent(containerSession));
-
-				Intent intent = new Intent(getActivity(), CameraActivity_.class);
-				intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-						containerSession.getUuid());
-				intent.putExtra("type", 1); // in
-				startActivity(intent);
-
+				ContainerSession containerSession = ContainerSession.createContainerSession(getActivity(), containerId, operatorCode);
+				ContainerSession.gotoCamera(getActivity(), containerSession, CJayImage.TYPE_EXPORT);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -380,22 +336,17 @@ public class GateExportListFragment extends SherlockFragment {
 	}
 
 	public void refresh() {
-
 		Logger.Log(LOG_TAG, "onRefresh");
 
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListCheckOutContainerSessions(getActivity());
-
 		mSearchEditText.setText(""); // this will refresh the list
 	}
 
 	@Override
 	public void onResume() {
-
 		if (mFeedsAdapter != null) {
-			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-					.getListCheckOutContainerSessions(getActivity());
-			mFeedsAdapter.updateData(mFeeds);
+			refresh();
 		}
 
 		super.onResume();

@@ -1,5 +1,7 @@
 package com.cloudjay.cjay.service;
 
+import org.androidannotations.annotations.EService;
+
 import android.app.ActivityManager;
 import android.app.IntentService;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -7,6 +9,7 @@ import android.content.Intent;
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.util.CountingInputStreamEntity;
 
+@EService
 public class QueueIntentService extends IntentService implements
 		CountingInputStreamEntity.UploadListener {
 	private boolean isUploadIntentServiceRunning() {
@@ -29,7 +32,7 @@ public class QueueIntentService extends IntentService implements
 	protected void onHandleIntent(Intent intent) {
 		if (isUploadIntentServiceRunning() == false
 				&& NetworkHelper.isConnected(getApplicationContext())) {
-			Intent uploadIntent = new Intent(this, UploadIntentService.class);
+			Intent uploadIntent = new Intent(this, UploadIntentService_.class);
 			startService(uploadIntent);
 		}
 	}

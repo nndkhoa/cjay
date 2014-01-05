@@ -9,9 +9,11 @@ import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.UserDaoImpl;
 import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Depot;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
@@ -111,6 +113,30 @@ public class DataCenter {
 		return null;
 	}
 
+	public List<DamageCode> getListDamageCodes(Context context) {
+		Logger.Log(LOG_TAG, "get list Damage Codes");
+
+		try {
+			return getDatabaseManager().getHelper(context)
+					.getDamageCodeDaoImpl().getAllDamageCodes();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public List<RepairCode> getListRepairCodes(Context context) {
+		Logger.Log(LOG_TAG, "get list Repair Codes");
+
+		try {
+			return getDatabaseManager().getHelper(context)
+					.getRepairCodeDaoImpl().getAllRepairCodes();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	public User saveCredential(Context context, String token) {
 		try {
 
@@ -133,7 +159,7 @@ public class DataCenter {
 					currentUser.getDepotCode());
 
 			if (null != depots && !depots.isEmpty()) {
-
+				currentUser.setDepot(depots.get(0));
 			} else {
 				Depot depot = new Depot();
 				depot.setDepotCode(currentUser.getDepotCode());
@@ -203,7 +229,20 @@ public class DataCenter {
 		}
 		return null;
 	}
-	
+
+	public List<ContainerSession> getListNotReportedContainerSessions(
+			Context context) {
+		Logger.Log(LOG_TAG, "get list not reported Container sessions");
+		try {
+			return getDatabaseManager().getHelper(context)
+					.getContainerSessionDaoImpl()
+					.getListNotReportedContainerSessions();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	public List<ContainerSession> getListPendingContainerSessions(
 			Context context) {
 		Logger.Log(LOG_TAG, "get list pending Container sessions");
@@ -216,9 +255,8 @@ public class DataCenter {
 		}
 		return null;
 	}
-	
-	public List<ContainerSession> getListFixedContainerSessions(
-			Context context) {
+
+	public List<ContainerSession> getListFixedContainerSessions(Context context) {
 		Logger.Log(LOG_TAG, "get list fixed Container sessions");
 		try {
 			return getDatabaseManager().getHelper(context)

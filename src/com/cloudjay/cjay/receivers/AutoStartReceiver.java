@@ -2,7 +2,7 @@ package com.cloudjay.cjay.receivers;
 
 import java.util.Calendar;
 
-import com.cloudjay.cjay.service.QueueIntentService;
+import com.cloudjay.cjay.service.QueueIntentService_;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -18,7 +18,7 @@ public class AutoStartReceiver extends BroadcastReceiver {
 		Log.i("AutoStart", "**********started************");
 
 		// Making Alarm for Queue Worker
-		intent = new Intent(context, QueueIntentService.class);
+		intent = new Intent(context, QueueIntentService_.class);
 		PendingIntent pintent = PendingIntent.getService(context, 0, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 		Calendar current = Calendar.getInstance();

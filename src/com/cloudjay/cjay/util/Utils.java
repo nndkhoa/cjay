@@ -6,7 +6,9 @@ import java.util.Collection;
 import java.util.List;
 
 import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.service.UploadIntentService;
+import com.cloudjay.cjay.model.AuditReportItem;
+import com.cloudjay.cjay.model.Issue;
+import com.cloudjay.cjay.service.UploadIntentService_;
 import com.lightbox.android.photoprocessing.PhotoProcessing;
 import com.lightbox.android.photoprocessing.utils.MediaUtils;
 
@@ -38,7 +40,7 @@ public class Utils {
 
 	public static final int MINI_THUMBNAIL_SIZE = 300;
 	public static final int MICRO_THUMBNAIL_SIZE = 96;
-	
+
 	public static void isStillRunning(Context ctx, String packageName) {
 
 		ActivityManager activityManager = (ActivityManager) ctx
@@ -135,7 +137,7 @@ public class Utils {
 	}
 
 	public static Intent getUploadIntent(Context context) {
-		Intent intent = new Intent(context, UploadIntentService.class);
+		Intent intent = new Intent(context, UploadIntentService_.class);
 		intent.setAction(CJayConstant.INTENT_SERVICE_UPLOAD_ALL);
 		return intent;
 	}
@@ -279,7 +281,7 @@ public class Utils {
 					"PhotoProcessing should be done on corrent thread!");
 		}
 	}
-	
+
 	public static String stripNull(String in) {
 		return (in == null || in.equals("") ? " " : in);
 	}

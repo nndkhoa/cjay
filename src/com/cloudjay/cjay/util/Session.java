@@ -12,7 +12,6 @@ import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 
-import android.R.integer;
 import android.content.Context;
 
 public class Session {
@@ -28,6 +27,10 @@ public class Session {
 
 	public int getUserRole() {
 		return currentUser.getRole();
+	}
+
+	public int getFilterStatus() {
+		return currentUser.getFilterStatus();
 	}
 
 	public Session(User user) {

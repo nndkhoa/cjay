@@ -23,13 +23,13 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
-import com.googlecode.androidannotations.annotations.AfterViews;
-import com.googlecode.androidannotations.annotations.EFragment;
-import com.googlecode.androidannotations.annotations.ItemClick;
-import com.googlecode.androidannotations.annotations.ItemLongClick;
-import com.googlecode.androidannotations.annotations.OptionsItem;
-import com.googlecode.androidannotations.annotations.OptionsMenu;
-import com.googlecode.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.ItemLongClick;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.ViewById;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import de.greenrobot.event.EventBus;
@@ -38,7 +38,8 @@ import de.greenrobot.event.EventBus;
 @OptionsMenu(R.menu.menu_repair_container_fixed)
 public class RepairContainerFixedListFragment extends SherlockFragment {
 
-	private final static String LOG_TAG = "RepairTeamFixedFragment";
+	private final static String LOG_TAG = "RepairContainerFixedListFragment";
+	
 	private ArrayList<ContainerSession> mFeeds;
 	private FunDapter<ContainerSession> mFeedsAdapter;
 	private ContainerSession mSelectedContainerSession;
@@ -52,11 +53,7 @@ public class RepairContainerFixedListFragment extends SherlockFragment {
 	void afterViews() {
 		imageLoader = ImageLoader.getInstance();
 
-		// load list data
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListFixedContainerSessions(getActivity());
-		initContainerFeedAdapter(mFeeds);
-
+		initContainerFeedAdapter(null);
 		mSelectedContainerSession = null;
 	}
 
@@ -118,9 +115,10 @@ public class RepairContainerFixedListFragment extends SherlockFragment {
 
 	void hideMenuItems() {
 		mSelectedContainerSession = null;
+		mFeedListView.setItemChecked(-1, true);
 		getActivity().supportInvalidateOptionsMenu();
 	}
-
+	
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
@@ -131,14 +129,11 @@ public class RepairContainerFixedListFragment extends SherlockFragment {
 
 	@Override
 	public void onResume() {
-		super.onResume();
-
 		if (null != mFeedsAdapter) {
-			// refresh list
-			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-					.getListFixedContainerSessions(getActivity());
-			mFeedsAdapter.updateData(mFeeds);
+			refresh();
 		}
+		
+		super.onResume();
 	}
 	
 	@Override
@@ -216,5 +211,10 @@ public class RepairContainerFixedListFragment extends SherlockFragment {
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListFixedContainerSessions(getActivity());
 		mFeedsAdapter.updateData(mFeeds);
+	}
+
+	public void onEvent(ContainerSessionEnqueueEvent event) {
+		Logger.Log(LOG_TAG, "onEvent ContainerSessionEnqueueEvent");
+		refresh();
 	}
 }
