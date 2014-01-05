@@ -366,28 +366,33 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		if (data != null) {
 			if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-
+				
 				Bitmap bm = BitmapFactory.decodeByteArray(data, 0,
 						(data != null) ? data.length : 0);
 
-				Logger.Log(
-						LOG_TAG,
-						"Captured bitmap size: "
-								+ Integer.toString(bm.getWidth()) + "/"
-								+ Integer.toString(bm.getHeight()));
-
+				android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
+				android.hardware.Camera.getCameraInfo(cameraMode, info);
+				
+				int rotation = getWindowManager().getDefaultDisplay().getRotation();
+				
 				Matrix mtx = new Matrix();
-				mtx.postRotate(90);
 
+				if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT
+						&& rotation == Surface.ROTATION_0) {
+					mtx.postRotate(270);
+				} else {
+					mtx.postRotate(90);
+				}
+		
 				Bitmap rotatedBitmap = Bitmap.createBitmap(bm, 0, 0,
 						bm.getWidth(), bm.getHeight(), mtx, true);
-
+	
 				if (bm != null) {
 					bm.recycle();
 					bm = null;
 					System.gc();
 				}
-
+	
 				return rotatedBitmap;
 
 			} else {
@@ -395,6 +400,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 				int rotation = getWindowManager().getDefaultDisplay().getRotation();
 
 				if (rotation == Surface.ROTATION_270) {
+					
 					Matrix mtx = new Matrix();
 					mtx.postRotate(180);
 
@@ -417,7 +423,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		return null;
 	}
 
-	void saveBitmap(Bitmap bitmap, File filename) {
+	void saveBitmapToFile(Bitmap bitmap, File filename) {
 
 		Logger.Log(LOG_TAG, "===== On SaveBitmap =====");
 		Logger.Log(LOG_TAG,
@@ -476,7 +482,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
 
 		// Save Bitmap to JPEG
-		saveBitmap(capturedBitmap, photo);
+		saveBitmapToFile(capturedBitmap, photo);
 
 		// Upload image
 		uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
