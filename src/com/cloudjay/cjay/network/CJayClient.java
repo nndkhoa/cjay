@@ -218,7 +218,10 @@ public class CJayClient implements ICJayClient {
 			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
 					.getHelper(ctx).getContainerSessionDaoImpl();
 
-			int filterStatus = Session.restore(ctx).getFilterStatus();
+			User user = Session.restore(ctx).getCurrentUser();
+			int userRole = user.getRole();
+			
+			int filterStatus = user.getFilterStatus();
 
 			// 3. Update list ContainerSessions
 			Logger.Log(LOG_TAG, "get list container sessions");

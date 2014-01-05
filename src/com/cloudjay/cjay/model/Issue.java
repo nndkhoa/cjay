@@ -269,12 +269,18 @@ public class Issue implements Parcelable {
 
 		if (o.getClass() == AuditReportItem.class) {
 			AuditReportItem tmp = (AuditReportItem) o;
-			return this.damageCode.getId() == tmp.getDamageId()
+
+			boolean isEqual = this.damageCode.getId() == tmp.getDamageId()
 					&& this.repairCode.getId() == tmp.getRepairId()
 					&& this.getComponentCode().getId() == tmp.getComponentId()
-					&& this.length == tmp.getLength()
-					&& this.getHeight() == tmp.getHeight()
-					&& this.getQuantity() == tmp.getQuantity();
+					&& Float.parseFloat(this.length) == Float.parseFloat(tmp
+							.getLength())
+					&& Float.parseFloat(this.height) == Float.parseFloat(tmp
+							.getHeight())
+					&& Integer.parseInt(this.quantity) == Integer.parseInt(tmp
+							.getQuantity());
+
+			return isEqual;
 		}
 
 		return super.equals(o);

@@ -95,6 +95,7 @@ public class UploadIntentService extends IntentService implements
 						.getNextWaiting();
 				//
 				if (null != containerSession) {
+
 					//
 					// // trigger event to display in UploadsFragment
 					//
@@ -222,7 +223,8 @@ public class UploadIntentService extends IntentService implements
 	 * 
 	 * @param containerSession
 	 */
-	private void doUploadContainer(ContainerSession containerSession) {
+	private synchronized void doUploadContainer(
+			ContainerSession containerSession) {
 
 		Logger.Log(LOG_TAG,
 				"doUploadContainer: " + containerSession.getContainerId());

@@ -43,7 +43,7 @@ public class RepairHomeActivity extends CJayActivity implements
 				menuKeyField.setBoolean(config, false);
 			}
 		} catch (Exception ex) {
-			
+
 		}
 		super.onCreate(arg0);
 	}
@@ -96,7 +96,6 @@ public class RepairHomeActivity extends CJayActivity implements
 
 			getSession().deleteSession(getApplicationContext());
 			startActivity(new Intent(this, LoginActivity_.class));
-
 			finish();
 			return true;
 		}
@@ -138,6 +137,7 @@ public class RepairHomeActivity extends CJayActivity implements
 			case 0:
 				Fragment pendingFragment = new RepairContainerPendingListFragment_();
 				return pendingFragment;
+				
 			case 1:
 				Fragment fixedFragment = new RepairContainerFixedListFragment_();
 				return fixedFragment;

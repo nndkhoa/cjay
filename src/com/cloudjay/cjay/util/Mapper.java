@@ -175,7 +175,6 @@ public class Mapper {
 								}
 
 								issueDaoImpl.update(issue);
-
 								break;
 							}
 						}
