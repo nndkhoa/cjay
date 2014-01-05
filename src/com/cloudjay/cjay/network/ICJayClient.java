@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.json.JSONException;
 
-import android.R.integer;
 import android.content.Context;
 
 import com.cloudjay.cjay.model.CJayResourceStatus;

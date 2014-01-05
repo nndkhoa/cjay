@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.json.JSONException;
 
-import android.R.string;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;

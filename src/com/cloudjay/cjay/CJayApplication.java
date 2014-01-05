@@ -1,8 +1,6 @@
 package com.cloudjay.cjay;
 
-import java.lang.reflect.Type;
 import java.util.Calendar;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -27,7 +25,6 @@ import android.view.WindowManager;
 
 import com.cloudjay.cjay.model.DatabaseManager;
 import com.cloudjay.cjay.model.IDatabaseManager;
-import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.network.HttpRequestWrapper;
 import com.cloudjay.cjay.network.IHttpRequestWrapper;
@@ -38,9 +35,6 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Logger;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;

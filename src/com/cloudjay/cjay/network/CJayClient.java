@@ -12,7 +12,6 @@ import java.util.UUID;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
@@ -305,14 +304,13 @@ public class CJayClient implements ICJayClient {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 
 		UUID deviceUuid = new UUID(androidId.hashCode(), androidId.hashCode());
 		String deviceId = deviceUuid.toString();
 		requestPacket.put("device_id", deviceId);
 		requestPacket.put("app_code", "CJAY");
 		requestPacket.put("name", android.os.Build.MODEL);
-		
+
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 
 		String response = requestWrapper.sendJSONPost(
@@ -452,16 +450,30 @@ public class CJayClient implements ICJayClient {
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 
 		String response = "";
-		if (userRole == User.ROLE_REPAIR_STAFF) {
+
+		switch (userRole) {
+		case User.ROLE_REPAIR_STAFF:
 			response = requestWrapper
 					.sendGet(
 							String.format(
 									CJayConstant.LIST_CONTAINER_SESSIONS_REPORT_LIST_WITH_FILTER,
 									Integer.toString(filterStatus)), headers);
-		} else {
+			break;
+
+		case User.ROLE_GATE_KEEPER:
+			// simply send request to get all containers that automatically
+			// filter by server with `check_out_time = null`
+
+			response = requestWrapper.sendGet(
+					CJayConstant.LIST_CONTAINER_SESSIONS, headers);
+			break;
+
+		case User.ROLE_AUDITOR:
+		default:
 			response = requestWrapper.sendGet(String.format(
 					CJayConstant.LIST_CONTAINER_SESSIONS_WITH_FILTER,
 					Integer.toString(filterStatus)), headers);
+			break;
 		}
 
 		if (TextUtils.isEmpty(response)) {
@@ -540,20 +552,31 @@ public class CJayClient implements ICJayClient {
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 
 		String response = "";
-		if (userRole == User.ROLE_REPAIR_STAFF) {
+		switch (userRole) {
+		case User.ROLE_REPAIR_STAFF:
 			response = requestWrapper
 					.sendGet(
 							String.format(
 									CJayConstant.LIST_CONTAINER_SESSIONS_REPORT_LIST_WITH_FILTER_AND_DATETIME,
 									Integer.toString(filterStatus), date),
 							headers);
-		} else {
+			break;
+
+		case User.ROLE_GATE_KEEPER:
+			response = requestWrapper.sendGet(String.format(
+					CJayConstant.LIST_CONTAINER_SESSIONS_WITH_DATETIME, date),
+					headers);
+			break;
+
+		case User.ROLE_AUDITOR:
+		default:
 			response = requestWrapper
 					.sendGet(
 							String.format(
 									CJayConstant.LIST_CONTAINER_SESSIONS_WITH_FILTER_AND_DATETIME,
 									Integer.toString(filterStatus), date),
 							headers);
+			break;
 		}
 
 		if (TextUtils.isEmpty(response)) {

@@ -8,7 +8,6 @@ import java.util.UUID;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
-import com.cloudjay.cjay.network.CJayClient;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;

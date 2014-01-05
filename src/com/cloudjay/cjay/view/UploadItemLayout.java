@@ -95,25 +95,30 @@ public class UploadItemLayout extends LinearLayout {
 	}
 
 	public void setContainerSession(ContainerSession selection) {
-		mContainerSession = selection;
+		try {
+			mContainerSession = selection;
 
-		/**
-		 * Initial UI Update
-		 */
-		ImageView iv = getImageView();
-		if (null != iv) {
-			// iv.requestThumbnail(mSelection, false);
-			ImageLoader.getInstance().displayImage(
-					mContainerSession.getImageIdPath(), iv);
+			/**
+			 * Initial UI Update
+			 */
+			ImageView iv = getImageView();
+			if (null != iv) {
+				// iv.requestThumbnail(mSelection, false);
+				ImageLoader.getInstance().displayImage(
+						mContainerSession.getImageIdPath(), iv);
+			}
+
+			TextView tv = getCaptionTextView();
+			tv.setText(mContainerSession.getContainerId() + " -- "
+					+ mContainerSession.getOperatorName());
+
+			/**
+			 * Refresh Progress Bar
+			 */
+			refreshUploadUi();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-
-		TextView tv = getCaptionTextView();
-		tv.setText(mContainerSession.getContainerId());
-
-		/**
-		 * Refresh Progress Bar
-		 */
-		refreshUploadUi();
 	}
 
 	@Override

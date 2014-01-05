@@ -7,16 +7,11 @@ import java.util.List;
 
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.model.AuditReportItem;
-import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.service.UploadIntentService;
 import com.cloudjay.cjay.model.User;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.lightbox.android.photoprocessing.PhotoProcessing;
 import com.lightbox.android.photoprocessing.utils.MediaUtils;
 
-import android.R.integer;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.ContentResolver;
