@@ -16,7 +16,7 @@
            	android:paddingTop="12dp" /> -->
         
         <TextView
-	        android:id="@+id/operator_name"
+	        android:id="@+id/name"
 	        android:layout_width="0dp"
 	        android:layout_height="fill_parent"
         	android:layout_weight="4"
