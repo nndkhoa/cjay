@@ -19,14 +19,12 @@ public class UploadsListBaseAdapter extends BaseAdapter {
 
 	private final Context mContext;
 	private final LayoutInflater mLayoutInflater;
-	private ImageLoader imageLoader;
 
 	public UploadsListBaseAdapter(Context context) {
 		mContext = context;
 		mLayoutInflater = LayoutInflater.from(mContext);
 		mItems = DataCenter.getInstance().getListUploadContainerSessions(
 				mContext);
-		imageLoader = ImageLoader.getInstance();
 	}
 
 	public UploadsListBaseAdapter(Context context,
@@ -34,7 +32,7 @@ public class UploadsListBaseAdapter extends BaseAdapter {
 		mContext = context;
 		mLayoutInflater = LayoutInflater.from(mContext);
 		mItems = listItems;
-		imageLoader = ImageLoader.getInstance();
+
 	}
 
 	public void setContainerSessions(List<ContainerSession> listItems) {

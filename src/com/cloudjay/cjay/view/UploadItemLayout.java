@@ -109,8 +109,8 @@ public class UploadItemLayout extends LinearLayout {
 			}
 
 			TextView tv = getCaptionTextView();
-			tv.setText(mContainerSession.getContainerId() + " -- "
-					+ mContainerSession.getOperatorName());
+			tv.setText(mContainerSession.getOperatorName() + " -- "
+					+ mContainerSession.getContainerId());
 
 			/**
 			 * Refresh Progress Bar
