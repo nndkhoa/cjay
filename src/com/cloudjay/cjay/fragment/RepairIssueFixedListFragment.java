@@ -41,23 +41,9 @@ public class RepairIssueFixedListFragment extends SherlockFragment {
 
 	@AfterViews
 	void afterViews() {
-		try {
-			imageLoader = ImageLoader.getInstance();
-
-			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-					.getInstance().getDatabaseManager()
-					.getHelper(getActivity()).getContainerSessionDaoImpl();
-			mContainerSession = containerSessionDaoImpl
-					.queryForId(mContainerSessionUUID);
-
-			if (null != mContainerSession) {
-				populateIssueList();
-				initIssueFeedAdapter(mFeeds);
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		imageLoader = ImageLoader.getInstance();
+		
+		initIssueFeedAdapter(null);
 	}
 
 	@ItemClick(R.id.feeds)

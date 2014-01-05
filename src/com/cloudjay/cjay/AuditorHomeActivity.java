@@ -147,24 +147,28 @@ public class AuditorHomeActivity extends CJayActivity implements
 		}
 
 		public Fragment getItem(int position) {
-			Fragment fragment;
 			switch (position) {
-			case 0: // containers that have no 'report images'
-				fragment = new AuditorReportingListFragment_();
-				((AuditorReportingListFragment_) fragment).setState(AuditorReportingListFragment_.STATE_NOT_REPORTED);
-				return fragment;
-			case 1: // containers that have 'report images' with no issues
-				fragment = new AuditorReportingListFragment_();
-				((AuditorReportingListFragment_) fragment).setState(AuditorReportingListFragment_.STATE_REPORTING);
-				return fragment;
-			case 2: // containers that have 'report images' and issues
-				fragment = new AuditorReportedListFragment_();
-				return fragment;
+			case 0: 
+				// containers that have no 'report images'
+				Fragment notReportedFragment = new AuditorReportingListFragment_();
+				((AuditorReportingListFragment_) notReportedFragment).setState(AuditorReportingListFragment_.STATE_NOT_REPORTED);
+				return notReportedFragment;
+				
+			case 1: 
+				// containers that have 'report images' with no issues
+				Fragment reportingFragment = new AuditorReportingListFragment_();
+				((AuditorReportingListFragment_) reportingFragment).setState(AuditorReportingListFragment_.STATE_REPORTING);
+				return reportingFragment;
+				
+			case 2: 
+				// containers that have 'report images' and issues
+				Fragment reportedFragment = new AuditorReportedListFragment_();
+				return reportedFragment;
 
 			case 3:
 			default:
-				fragment = new UploadsFragment_();
-				return fragment;
+				Fragment uploadFragment = new UploadsFragment_();
+				return uploadFragment;
 			}
 		}
 	}

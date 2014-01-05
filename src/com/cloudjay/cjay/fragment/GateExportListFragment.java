@@ -90,14 +90,10 @@ public class GateExportListFragment extends SherlockFragment {
 		});
 
 		imageLoader = ImageLoader.getInstance();
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListCheckOutContainerSessions(getActivity());
-
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
 				.getListOperators(getActivity());
-		configureControls(mFeeds);
-		initContainerFeedAdapter(mFeeds);
-
+		
+		initContainerFeedAdapter(null);
 		mSelectedContainerSession = null;
 
 	}
@@ -340,22 +336,17 @@ public class GateExportListFragment extends SherlockFragment {
 	}
 
 	public void refresh() {
-
 		Logger.Log(LOG_TAG, "onRefresh");
 
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListCheckOutContainerSessions(getActivity());
-
 		mSearchEditText.setText(""); // this will refresh the list
 	}
 
 	@Override
 	public void onResume() {
-
 		if (mFeedsAdapter != null) {
-			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-					.getListCheckOutContainerSessions(getActivity());
-			mFeedsAdapter.updateData(mFeeds);
+			refresh();
 		}
 
 		super.onResume();
