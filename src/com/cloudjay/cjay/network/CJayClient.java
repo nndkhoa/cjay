@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
@@ -220,7 +221,7 @@ public class CJayClient implements ICJayClient {
 
 			User user = Session.restore(ctx).getCurrentUser();
 			int userRole = user.getRole();
-			
+
 			int filterStatus = user.getFilterStatus();
 
 			// 3. Update list ContainerSessions
@@ -232,7 +233,8 @@ public class CJayClient implements ICJayClient {
 				Logger.Log(LOG_TAG,
 						"get new list container sessions based on user role");
 
-				containerSessions = getContainerSessions(ctx, filterStatus);
+				containerSessions = getContainerSessions(ctx, userRole,
+						filterStatus);
 
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE,
@@ -244,8 +246,8 @@ public class CJayClient implements ICJayClient {
 				String date = PreferencesUtil.getPrefsValue(ctx,
 						PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE);
 
-				containerSessions = getContainerSessions(ctx, filterStatus,
-						date);
+				containerSessions = getContainerSessions(ctx, userRole,
+						filterStatus, date);
 
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE,
@@ -435,14 +437,23 @@ public class CJayClient implements ICJayClient {
 
 	@Override
 	public List<ContainerSession> getContainerSessions(Context ctx,
-			int filterStatus) {
+			int userRole, int filterStatus) {
 
 		Logger.Log(LOG_TAG, "getContainerSessions(Context ctx, int userRole)");
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 
-		String response = requestWrapper.sendGet(String.format(
-				CJayConstant.LIST_CONTAINER_SESSIONS_WITH_FILTER,
-				Integer.toString(filterStatus)), headers);
+		String response = "";
+		if (userRole == User.ROLE_REPAIR_STAFF) {
+			response = requestWrapper
+					.sendGet(
+							String.format(
+									CJayConstant.LIST_CONTAINER_SESSIONS_REPORT_LIST_WITH_FILTER,
+									Integer.toString(filterStatus)), headers);
+		} else {
+			response = requestWrapper.sendGet(String.format(
+					CJayConstant.LIST_CONTAINER_SESSIONS_WITH_FILTER,
+					Integer.toString(filterStatus)), headers);
+		}
 
 		if (TextUtils.isEmpty(response)) {
 			Logger.Log(
@@ -498,7 +509,7 @@ public class CJayClient implements ICJayClient {
 
 	@Override
 	public List<ContainerSession> getContainerSessions(Context ctx,
-			int filterStatus, Date date) {
+			int userRole, int filterStatus, Date date) {
 
 		Logger.Log(LOG_TAG,
 				"getContainerSessions(Context ctx, int userRole, Date date)");
@@ -507,21 +518,34 @@ public class CJayClient implements ICJayClient {
 		String formatedDate = StringHelper.getTimestamp(
 				CJayConstant.CJAY_SERVER_DATETIME_FORMAT, date);
 
-		items = getContainerSessions(ctx, filterStatus, formatedDate);
+		items = getContainerSessions(ctx, userRole, filterStatus, formatedDate);
 		return items;
 	}
 
 	@Override
 	public List<ContainerSession> getContainerSessions(Context ctx,
-			int filterStatus, String date) {
+			int userRole, int filterStatus, String date) {
 
 		Logger.Log(LOG_TAG,
 				"getContainerSessions(Context ctx, int userRole, String date");
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 
-		String response = requestWrapper.sendGet(String.format(
-				CJayConstant.LIST_CONTAINER_SESSIONS_WITH_FILTER_AND_DATETIME,
-				Integer.toString(filterStatus), date), headers);
+		String response = "";
+		if (userRole == User.ROLE_REPAIR_STAFF) {
+			response = requestWrapper
+					.sendGet(
+							String.format(
+									CJayConstant.LIST_CONTAINER_SESSIONS_REPORT_LIST_WITH_FILTER_AND_DATETIME,
+									Integer.toString(filterStatus), date),
+							headers);
+		} else {
+			response = requestWrapper
+					.sendGet(
+							String.format(
+									CJayConstant.LIST_CONTAINER_SESSIONS_WITH_FILTER_AND_DATETIME,
+									Integer.toString(filterStatus), date),
+							headers);
+		}
 
 		if (TextUtils.isEmpty(response)) {
 			Logger.Log(LOG_TAG, "No new items from: " + date

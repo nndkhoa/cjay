@@ -21,10 +21,7 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.cloudjay.cjay.fragment.AuditorReportedListFragment_;
-import com.cloudjay.cjay.fragment.AuditorReportingListFragment;
-import com.cloudjay.cjay.fragment.AuditorReportingListFragment_;
-import com.cloudjay.cjay.fragment.UploadsFragment_;
+import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
 
@@ -34,7 +31,7 @@ public class AuditorHomeActivity extends CJayActivity implements
 		AddContainerDialog.AddContainerDialogListener,
 		SearchOperatorDialog.SearchOperatorDialogListener {
 
-//	private static final String LOG_TAG = "AuditorHomeActivity";
+	private static final String LOG_TAG = "AuditorHomeActivity";
 
 	private String[] locations;
 	@ViewById
@@ -151,11 +148,13 @@ public class AuditorHomeActivity extends CJayActivity implements
 			switch (position) {
 			case 0: // containers that have no 'report images'
 				fragment = new AuditorReportingListFragment_();
-				((AuditorReportingListFragment_) fragment).setState(AuditorReportingListFragment_.STATE_NOT_REPORTED);
+				((AuditorReportingListFragment_) fragment)
+						.setState(AuditorReportingListFragment_.STATE_NOT_REPORTED);
 				return fragment;
 			case 1: // containers that have 'report images' with no issues
 				fragment = new AuditorReportingListFragment_();
-				((AuditorReportingListFragment_) fragment).setState(AuditorReportingListFragment_.STATE_REPORTING);
+				((AuditorReportingListFragment_) fragment)
+						.setState(AuditorReportingListFragment_.STATE_REPORTING);
 				return fragment;
 			case 2: // containers that have 'report images' and issues
 				fragment = new AuditorReportedListFragment_();

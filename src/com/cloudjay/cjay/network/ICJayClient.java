@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.json.JSONException;
 
+import android.R.integer;
 import android.content.Context;
 
 import com.cloudjay.cjay.model.CJayResourceStatus;
@@ -43,13 +44,14 @@ public interface ICJayClient {
 
 	List<ContainerSession> getAllContainerSessions(Context ctx);
 
-	List<ContainerSession> getContainerSessions(Context ctx, int userRole);
+	List<ContainerSession> getContainerSessions(Context ctx, int userRole,
+			int filterStatus);
 
 	List<ContainerSession> getContainerSessions(Context ctx, int userRole,
-			Date date);
+			int filterStatus, Date date);
 
 	List<ContainerSession> getContainerSessions(Context ctx, int userRole,
-			String date);
+			int filterStatus, String date);
 
 	List<ContainerSession> getContainerSessions(Context ctx, Date date);
 
