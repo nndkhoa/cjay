@@ -361,7 +361,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	 * @return
 	 */
 	Bitmap saveToBitmap(byte[] data) {
-
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inJustDecodeBounds = true;
 
@@ -393,11 +392,26 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			} else {
 
-				// LANDSCAPE MODE
-				// No need to reverse width and height
-				Bitmap bm = BitmapFactory.decodeByteArray(data, 0,
-						(data != null) ? data.length : 0);
-				return bm;
+				int rotation = getWindowManager().getDefaultDisplay().getRotation();
+
+				if (rotation == Surface.ROTATION_270) {
+					Matrix mtx = new Matrix();
+					mtx.postRotate(180);
+
+					// Flip Bitmap
+					Logger.Log(TAG, "Flip image");
+					Bitmap bm = BitmapFactory.decodeByteArray(data, 0,
+							(data != null) ? data.length : 0);
+					bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), mtx, true);
+					return bm;
+					
+				} else {
+					// LANDSCAPE MODE
+					// No need to reverse width and height
+					Bitmap bm = BitmapFactory.decodeByteArray(data, 0,
+							(data != null) ? data.length : 0);
+					return bm;
+				}
 			}
 		}
 		return null;
@@ -738,8 +752,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
 		android.hardware.Camera.getCameraInfo(cameraId, info);
 
-		int rotation = activity.getWindowManager().getDefaultDisplay()
-				.getRotation();
+		int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
 
 		int degrees = 0;
 		switch (rotation) {
@@ -756,6 +769,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			degrees = 270;
 			break;
 		}
+		
+		Logger.Log(TAG, "Rotate degree: " + degrees);
 
 		int result;
 		if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
