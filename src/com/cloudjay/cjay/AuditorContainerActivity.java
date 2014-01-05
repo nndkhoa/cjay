@@ -65,24 +65,11 @@ public class AuditorContainerActivity extends CJayActivity {
 
 	@AfterViews
 	void afterViews() {
-		try {
-			imageLoader = ImageLoader.getInstance();
-
-			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-					.getInstance().getDatabaseManager().getHelper(this)
-					.getContainerSessionDaoImpl();
-			mContainerSession = containerSessionDaoImpl
-					.queryForId(mContainerSessionUUID);
-
-			if (null != mContainerSession) {
-				containerIdTextView.setText(mContainerSession.getContainerId());
-				populateCjayImages();
-				initImageFeedAdapter(mFeeds);
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		imageLoader = ImageLoader.getInstance();
+		
+		initImageFeedAdapter(null);
+		mLongClickedCJayImage = null;
+		mSelectedCJayImage = null;
 	}
 
 	@ItemClick(R.id.feeds)
@@ -209,6 +196,8 @@ public class AuditorContainerActivity extends CJayActivity {
 					.queryForId(mContainerSessionUUID);
 
 			if (null != mContainerSession) {
+				containerIdTextView.setText(mContainerSession.getContainerId());
+				
 				for (CJayImage cJayImage : mContainerSession.getCJayImages()) {
 					if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
 						mFeeds.add(cJayImage);

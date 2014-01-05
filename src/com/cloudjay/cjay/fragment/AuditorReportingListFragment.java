@@ -43,6 +43,8 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 @OptionsMenu(R.menu.menu_auditor_reporting)
 public class AuditorReportingListFragment extends SherlockFragment {
 	
+	public static final String LOG_TAG = "AuditorReportingListFragment";
+	
 	public static final int STATE_NOT_REPORTED = 0;
 	public static final int STATE_REPORTING = 1;
 	
@@ -66,8 +68,6 @@ public class AuditorReportingListFragment extends SherlockFragment {
 
 	@AfterViews
 	void afterViews() {
-		imageLoader = ImageLoader.getInstance();
-
 		mSearchEditText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable arg0) {
@@ -82,20 +82,13 @@ public class AuditorReportingListFragment extends SherlockFragment {
 					int count) {
 			}
 		});
+		
+		imageLoader = ImageLoader.getInstance();
 
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
 				.getListOperators(getActivity());
 		
-		if (mState == STATE_REPORTING) {
-			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-					.getListReportingContainerSessions(getActivity());
-		} else {
-			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-					.getListNotReportedContainerSessions(getActivity());
-		}
-		configureControls(mFeeds);
-		initContainerFeedAdapter(mFeeds);
-
+		initContainerFeedAdapter(null);
 		mSelectedContainerSession = null;
 	}
 
@@ -151,19 +144,21 @@ public class AuditorReportingListFragment extends SherlockFragment {
 
 	@Override
 	public void onResume() {
+		if (mFeedsAdapter != null) {
+			if (mState == STATE_REPORTING) {
+				mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+						.getListReportingContainerSessions(getActivity());
+			} else {
+				mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+						.getListNotReportedContainerSessions(getActivity());
+			}
+
+			if (mSearchEditText != null) {
+				mSearchEditText.setText(""); // this will refresh the list
+			}
+		}
+		
 		super.onResume();
-
-		if (mState == STATE_REPORTING) {
-			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-					.getListReportingContainerSessions(getActivity());
-		} else {
-			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-					.getListNotReportedContainerSessions(getActivity());
-		}
-
-		if (null != mSearchEditText) {
-			mSearchEditText.setText(""); // this will refresh the list
-		}
 	}
 	
 	public void setState(int state) {

@@ -65,14 +65,11 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	void afterViews() {
 		imageLoader = ImageLoader.getInstance();
 
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListLocalContainerSessions(getActivity());
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
 				.getListOperators(getActivity());
 
-		initContainerFeedAdapter(mFeeds);
+		initContainerFeedAdapter(null);
 		mSelectedContainerSession = null;
-
 	}
 
 	@OptionsItem(R.id.menu_camera)
@@ -313,7 +310,6 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	}
 
 	public void refresh() {
-
 		Logger.Log(LOG_TAG, "onRefresh");
 
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
@@ -322,11 +318,9 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	}
 
 	@Override
-	public void onResume() {
+	public void onResume() {		
 		if (mFeedsAdapter != null) {
-			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-					.getListLocalContainerSessions(getActivity());
-			mFeedsAdapter.updateData(mFeeds);
+			refresh();
 		}
 
 		super.onResume();

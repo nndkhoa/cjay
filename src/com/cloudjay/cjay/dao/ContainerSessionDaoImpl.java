@@ -234,7 +234,7 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public List<ContainerSession> getListNotReportedContainerSessions()
 			throws SQLException {
-		Logger.Log(LOG_TAG, "getListReportingContainerSessions()");
+		Logger.Log(LOG_TAG, "getListNotReportedContainerSessions()");
 
 		List<ContainerSession> containerSessions = getNotUploadedContainerSessions();
 		List<ContainerSession> reportingContainerSessions = new ArrayList<ContainerSession>();

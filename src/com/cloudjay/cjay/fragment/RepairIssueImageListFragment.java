@@ -58,23 +58,9 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 			mCameraButton.setLayoutParams(p);			
 		}
 		
-		// load issue and image list
-		try {
-			imageLoader = ImageLoader.getInstance();
-
-			IssueDaoImpl issueDaoImpl = CJayClient
-					.getInstance().getDatabaseManager().getHelper(getActivity())
-					.getIssueDaoImpl();
-			mIssue = issueDaoImpl.queryForId(mIssueUUID);
-
-			if (null != mIssueUUID) {
-				populateCJayImages();
-				initImageFeedAdapter(mFeeds);
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		imageLoader = ImageLoader.getInstance();
+			
+		initImageFeedAdapter(null);
 	}
 
 	@Click(R.id.btn_add_new)

@@ -51,11 +51,7 @@ public class AuditorReportedListFragment extends SherlockFragment {
 	void afterViews() {
 		imageLoader = ImageLoader.getInstance();
 
-		// load list data
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListReportedContainerSessions(getActivity());
-		initContainerFeedAdapter(mFeeds);
-
+		initContainerFeedAdapter(null);
 		mSelectedContainerSession = null;
 	}
 
@@ -134,14 +130,11 @@ public class AuditorReportedListFragment extends SherlockFragment {
 
 	@Override
 	public void onResume() {
-		super.onResume();
-
 		if (null != mFeedsAdapter) {
-			// refresh list
-			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-					.getListReportedContainerSessions(getActivity());
-			mFeedsAdapter.updateData(mFeeds);
+			refresh();
 		}
+
+		super.onResume();
 	}
 
 	@Override
