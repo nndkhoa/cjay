@@ -125,9 +125,6 @@ public class CameraActivity extends Activity {
 	@SystemService
 	AudioManager audioManager;
 
-	// @Extra(CJAY_CONTAINER_SESSION_EXTRA)
-	// TmpContainerSession tmpContainerSession;
-
 	ContainerSession containerSession = null;
 
 	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
@@ -480,7 +477,8 @@ public class CameraActivity extends Activity {
 		}
 	}
 
-	void uploadImage(String uuid, String uri, String image_name) {
+	private synchronized void uploadImage(String uuid, String uri,
+			String image_name) {
 
 		// Create Database Entity Object
 		CJayImage uploadItem = new CJayImage();

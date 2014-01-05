@@ -1,6 +1,8 @@
 package com.cloudjay.cjay.fragment;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import android.os.Bundle;
@@ -20,8 +22,12 @@ import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.events.ContainerSessionUploadedEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.PreferencesUtil;
+import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.Utils;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener.OnDismissCallback;
 import org.androidannotations.annotations.EFragment;
@@ -113,6 +119,14 @@ public class UploadsFragment extends SherlockFragment implements
 	public void onEvent(ContainerSessionUploadedEvent event) {
 		Logger.Log(LOG_TAG, "onEvent ContainerSessionUploadedEvent");
 		updateUI();
+
+		// // TODO: Update nowString
+		// String nowString = StringHelper.getTimestamp(
+		// CJayConstant.CJAY_SERVER_DATETIME_FORMAT, new Date());
+		//
+		// PreferencesUtil.storePrefsValue(getActivity(),
+		// PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE, nowString);
+
 	}
 
 	@UiThread
