@@ -68,7 +68,7 @@ public class AuditorReportedListFragment extends SherlockFragment {
 		mSelectedContainerSession = mFeedsAdapter.getItem(position);
 		getActivity().supportInvalidateOptionsMenu();
 	}
-	
+
 	@ItemClick(R.id.container_list)
 	void listItemClicked(int position) {
 		// refresh highlighting
@@ -77,7 +77,7 @@ public class AuditorReportedListFragment extends SherlockFragment {
 		// clear current selection
 		mSelectedContainerSession = null;
 		getActivity().supportInvalidateOptionsMenu();
-		
+
 		Intent intent = new Intent(getActivity(),
 				AuditorContainerActivity_.class);
 		intent.putExtra(AuditorContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
@@ -106,7 +106,9 @@ public class AuditorReportedListFragment extends SherlockFragment {
 
 				// It will trigger `UploadsFragment` Adapter
 				// notifyDataSetChanged
-				EventBus.getDefault().post(new ContainerSessionEnqueueEvent(mSelectedContainerSession));
+				EventBus.getDefault().post(
+						new ContainerSessionEnqueueEvent(
+								mSelectedContainerSession));
 
 				hideMenuItems();
 
@@ -140,7 +142,7 @@ public class AuditorReportedListFragment extends SherlockFragment {
 			mFeedsAdapter.updateData(mFeeds);
 		}
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		EventBus.getDefault().unregister(this);

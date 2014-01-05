@@ -328,6 +328,7 @@ public class Mapper {
 			if (null != container)
 				containerSession.setContainer(container);
 
+			// TODO: may cause bugs
 			// process audit report item
 			List<AuditReportItem> auditReportItems = tmpSession
 					.getAuditReportItems();
@@ -393,9 +394,12 @@ public class Mapper {
 				}
 			}
 
-			// // Không cần add chiều xuôi
-			// containerSession.setCJayImages(listImages);
-			// containerSession.setIssues(issues);
+			// TODO: Không cần add chiều xuôi??
+			if (null != listImages)
+				containerSession.setCJayImages(listImages);
+
+			if (null != issues)
+				containerSession.setIssues(issues);
 
 			return containerSession;
 		} catch (SQLException e) {
