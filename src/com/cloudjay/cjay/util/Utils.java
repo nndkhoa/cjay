@@ -3,6 +3,7 @@ package com.cloudjay.cjay.util;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import com.cloudjay.cjay.CJayActivity;
@@ -374,5 +375,10 @@ public class Utils {
 		editor.putInt(PROPERTY_CURRENT_USER_ID, CURRENT_USER_ID);
 		editor.putInt(PROPERTY_APP_VERSION, appVersion);
 		editor.commit();
+	}
+
+	public static void updatePreferenceData(Context ctx, String nowString) {
+		PreferencesUtil.storePrefsValue(ctx,
+				PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE, nowString);
 	}
 }

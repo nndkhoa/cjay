@@ -106,7 +106,7 @@ public class ContainerSession implements Parcelable {
 
 	@DatabaseField(columnName = FIELD_STATE, defaultValue = "0")
 	int mState;
-	
+
 	@DatabaseField(columnName = FIELD_FIXED, defaultValue = "false")
 	boolean fixed;
 
@@ -228,11 +228,11 @@ public class ContainerSession implements Parcelable {
 	public void setFixed(boolean fixed) {
 		this.fixed = fixed;
 	}
-	
+
 	public boolean isFixed() {
 		return fixed;
 	}
-	
+
 	public int getUploadState() {
 		return mState;
 	}
@@ -295,14 +295,14 @@ public class ContainerSession implements Parcelable {
 
 	public String getOperatorCode() {
 		if (getContainer() != null && getContainer().getOperator() != null) {
-			return getContainer().getOperator().getCode();			
+			return getContainer().getOperator().getCode();
 		}
 		return null;
 	}
-	
+
 	public String getOperatorName() {
 		if (getContainer() != null && getContainer().getOperator() != null) {
-			return getContainer().getOperator().getName();			
+			return getContainer().getOperator().getName();
 		}
 		return null;
 	}
@@ -580,8 +580,9 @@ public class ContainerSession implements Parcelable {
 	public void setOnLocal(boolean onLocal) {
 		this.onLocal = onLocal;
 	}
-	
-	public static ContainerSession createContainerSession(Context ctx, String containerId, String operatorCode) throws SQLException {
+
+	public static ContainerSession createContainerSession(Context ctx,
+			String containerId, String operatorCode) throws SQLException {
 		// Create Container Session object
 		User currentUser = Session.restore(ctx).getCurrentUser();
 
@@ -593,53 +594,63 @@ public class ContainerSession implements Parcelable {
 				ctx,
 				containerId,
 				operatorCode,
-				StringHelper.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT),
+				StringHelper
+						.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT),
 				depotCode);
 
 		containerSession.setUploadConfirmation(false);
 		containerSession.setOnLocal(true);
 		containerSession.setUploadState(ContainerSession.STATE_NONE);
-		
+
 		ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-				.getInstance().getDatabaseManager()
-				.getHelper(ctx).getContainerSessionDaoImpl();
+				.getInstance().getDatabaseManager().getHelper(ctx)
+				.getContainerSessionDaoImpl();
 
 		containerSessionDaoImpl.addContainerSessions(containerSession);
-		
+
 		// trigger update container lists
 		EventBus.getDefault().post(new ContainerCreatedEvent(containerSession));
-		EventBus.getDefault().post(new ContainerSessionEnqueueEvent(containerSession));
-		
+		EventBus.getDefault().post(
+				new ContainerSessionEnqueueEvent(containerSession));
+
 		return containerSession;
 	}
-	
-	public static void gotoCamera(Context ctx, ContainerSession containerSession, int imageType, String activityTag) {
+
+	public static void gotoCamera(Context ctx,
+			ContainerSession containerSession, int imageType, String activityTag) {
 		Intent intent = new Intent(ctx, CameraActivity_.class);
-		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA, containerSession.getUuid());
+		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+				containerSession.getUuid());
 		intent.putExtra("type", imageType);
 		if (activityTag != null && !TextUtils.isEmpty(activityTag)) {
 			intent.putExtra("tag", activityTag);
 		}
 		ctx.startActivity(intent);
 	}
-	
-	public static void gotoCamera(Context ctx, ContainerSession containerSession, int imageType) {
+
+	public static void gotoCamera(Context ctx,
+			ContainerSession containerSession, int imageType) {
 		gotoCamera(ctx, containerSession, imageType, null);
 	}
-	
-	public static ContainerSession editContainerSession(Context ctx, ContainerSession containerSession, String containerId, String operatorCode) throws SQLException {
+
+	public static ContainerSession editContainerSession(Context ctx,
+			ContainerSession containerSession, String containerId,
+			String operatorCode) throws SQLException {
 		if (containerSession.getContainerId().equals(containerId)
 				&& containerSession.getOperatorCode().equals(operatorCode)) {
 			// do nothing
 		} else {
-			DatabaseHelper databaseHelper = CJayClient.getInstance().getDatabaseManager().getHelper(ctx);
-			OperatorDaoImpl operatorDaoImpl = databaseHelper.getOperatorDaoImpl();
-			ContainerDaoImpl containerDaoImpl = databaseHelper.getContainerDaoImpl();
-			ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper.getContainerSessionDaoImpl();
+			DatabaseHelper databaseHelper = CJayClient.getInstance()
+					.getDatabaseManager().getHelper(ctx);
+			OperatorDaoImpl operatorDaoImpl = databaseHelper
+					.getOperatorDaoImpl();
+			ContainerDaoImpl containerDaoImpl = databaseHelper
+					.getContainerDaoImpl();
+			ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper
+					.getContainerSessionDaoImpl();
 
 			// find operator
-			Operator operator = operatorDaoImpl
-					.findOperator(operatorCode);
+			Operator operator = operatorDaoImpl.findOperator(operatorCode);
 
 			// update container details
 			Container container = containerSession.getContainer();
@@ -651,9 +662,10 @@ public class ContainerSession implements Parcelable {
 			containerSessionDaoImpl.update(containerSession);
 
 			// trigger update container lists
-			EventBus.getDefault().post(new ContainerEditedEvent(containerSession));
+			EventBus.getDefault().post(
+					new ContainerEditedEvent(containerSession));
 		}
-		
+
 		return containerSession;
 	}
 }

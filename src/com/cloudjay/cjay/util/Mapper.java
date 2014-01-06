@@ -87,6 +87,11 @@ public class Mapper {
 
 				main.setId(tmp.getId());
 				main.setImageIdPath(tmp.getImageIdPath());
+				main.setCheckInTime(tmp.getCheckInTime());
+
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE,
+						tmp.getCheckInTime());
 
 				List<GateReportImage> gateReportImages = tmp
 						.getGateReportImages();
@@ -330,6 +335,7 @@ public class Mapper {
 			List<AuditReportItem> auditReportItems = tmpSession
 					.getAuditReportItems();
 			Collection<Issue> issues = new ArrayList<Issue>();
+
 			if (null != auditReportItems) {
 				for (AuditReportItem auditReportItem : auditReportItems) {
 
@@ -350,22 +356,25 @@ public class Mapper {
 					if (issue != null) {
 						issue.setContainerSession(containerSession);
 
-						issueDaoImpl.addIssue(issue);
-						issues.add(issue);
-
 						List<AuditReportImage> auditReportImages = auditReportItem
 								.getAuditReportImages();
 						Collection<CJayImage> cJayImages = new ArrayList<CJayImage>();
-
 						for (AuditReportImage item : auditReportImages) {
-							CJayImage tmp = new CJayImage(item.getId(),
-									item.getType(), item.getImageName());
+							CJayImage tmpCJayImage = new CJayImage(
+									item.getId(), item.getType(),
+									item.getImageName());
 
-							tmp.setIssue(issue);
-
-							cJayImages.add(tmp);
-							cJayImageDaoImpl.addCJayImage(tmp);
+							tmpCJayImage.setIssue(issue);
+							cJayImages.add(tmpCJayImage);
+							cJayImageDaoImpl.addCJayImage(tmpCJayImage);
 						}
+
+						if (null != cJayImages)
+							issue.setCJayImages(cJayImages);
+
+						issues.add(issue);
+						issueDaoImpl.addIssue(issue);
+
 					}
 				}
 			}
