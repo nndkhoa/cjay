@@ -2,6 +2,10 @@ package com.cloudjay.cjay;
 
 import java.lang.reflect.Field;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.ViewById;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -21,9 +25,6 @@ import com.cloudjay.cjay.fragment.GateImportListFragment;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
-import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_gate_home)
 public class GateHomeActivity extends CJayActivity implements

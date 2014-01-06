@@ -1,17 +1,11 @@
 package com.cloudjay.cjay;
 
-import org.json.JSONException;
-
-import com.aerilys.helpers.android.NetworkHelper;
-import com.aerilys.helpers.android.UIHelper;
-import com.cloudjay.cjay.network.CJayClient;
-import com.cloudjay.cjay.util.DataCenter;
-import com.cloudjay.cjay.util.Logger;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
+import org.json.JSONException;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -26,6 +20,12 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.aerilys.helpers.android.NetworkHelper;
+import com.aerilys.helpers.android.UIHelper;
+import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Logger;
 
 @EActivity(R.layout.activity_login)
 public class LoginActivity extends CJayActivity {
@@ -46,8 +46,8 @@ public class LoginActivity extends CJayActivity {
 	private String mPassword = "123456";
 
 	@Extra(EXTRA_EMAIL)
-	String mEmail = "giamdinhcong1.icd1@pip.com.vn";
-	// String mEmail = "giamdinhsuachua.icd1@pip.com.vn";
+//	String mEmail = "giamdinhcong1.icd1@pip.com.vn";
+	 String mEmail = "giamdinhsuachua.icd1@pip.com.vn";
 	// String mEmail = "tosuachua1.icd1@pip.com.vn";
 
 	// UI references.

@@ -3,6 +3,16 @@ package com.cloudjay.cjay;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Click;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.ItemLongClick;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.ViewById;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,15 +36,6 @@ import com.cloudjay.cjay.model.DatabaseHelper;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.Utils;
-import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Click;
-import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.Extra;
-import org.androidannotations.annotations.ItemClick;
-import org.androidannotations.annotations.ItemLongClick;
-import org.androidannotations.annotations.OptionsItem;
-import org.androidannotations.annotations.OptionsMenu;
-import org.androidannotations.annotations.ViewById;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 //slide 15

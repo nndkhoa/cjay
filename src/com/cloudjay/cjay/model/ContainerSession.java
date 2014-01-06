@@ -537,6 +537,14 @@ public class ContainerSession implements Parcelable {
 		}
 		return mFullUri;
 	}
+	
+	public String getOriginalPhotoUriString() {
+		Uri uri = getOriginalPhotoUri();
+		if (uri != null) {
+			return uri.toString();
+		}
+		return null;
+	}
 
 	public boolean isCleared() {
 		return cleared;

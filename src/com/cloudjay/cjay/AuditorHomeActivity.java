@@ -21,7 +21,9 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.fragment.AuditorReportingListFragment;
+import com.cloudjay.cjay.fragment.AuditorReportingListFragment_;
+import com.cloudjay.cjay.fragment.UploadsFragment_;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
 
@@ -31,7 +33,7 @@ public class AuditorHomeActivity extends CJayActivity implements
 		AddContainerDialog.AddContainerDialogListener,
 		SearchOperatorDialog.SearchOperatorDialogListener {
 
-	private static final String LOG_TAG = "AuditorHomeActivity";
+//	private static final String LOG_TAG = "AuditorHomeActivity";
 
 	private String[] locations;
 	@ViewById
@@ -153,18 +155,13 @@ public class AuditorHomeActivity extends CJayActivity implements
 				return notReportedFragment;
 
 			case 1:
-				// containers that have 'report images' with no issues
+				// containers that have 'report images'
 				Fragment reportingFragment = new AuditorReportingListFragment_();
 				((AuditorReportingListFragment_) reportingFragment)
 						.setState(AuditorReportingListFragment_.STATE_REPORTING);
 				return reportingFragment;
 
 			case 2:
-				// containers that have 'report images' and issues
-				Fragment reportedFragment = new AuditorReportedListFragment_();
-				return reportedFragment;
-
-			case 3:
 			default:
 				Fragment uploadFragment = new UploadsFragment_();
 				return uploadFragment;

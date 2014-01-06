@@ -9,12 +9,9 @@ import org.json.JSONException;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.StrictMode;
-import android.provider.ContactsContract.CommonDataKinds.Event;
 import android.util.Log;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.cloudjay.cjay.events.DataLoadedEvent;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DataCenter;
@@ -25,7 +22,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-import de.greenrobot.event.EventBus;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 

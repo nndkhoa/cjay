@@ -3,6 +3,11 @@ package com.cloudjay.cjay.fragment;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Click;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ViewById;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -16,17 +21,14 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.CameraActivity_;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
-import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Click;
-import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.ViewById;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import de.greenrobot.event.EventBus;
@@ -89,8 +91,6 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 	
 	@Override
 	public void onResume() {
-		super.onResume();
-		
 		// update new images and database
 		if (mTakenImages != null && mTakenImages.size() > 0) {
 			try {
@@ -112,6 +112,13 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 		}
 		
 		// refresh list
+		if (mFeedsAdapter != null) {
+			refresh();
+		}
+		super.onResume();
+	}
+	
+	public void refresh() {
 		populateCJayImages();
 		mFeedsAdapter.updateData(mFeeds);
 	}

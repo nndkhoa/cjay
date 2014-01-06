@@ -4,6 +4,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.ItemLongClick;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.ViewById;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -18,21 +26,16 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.RepairContainerActivity_;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerRepairedEvent;
+import com.cloudjay.cjay.events.DataLoadedEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
-import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.ItemClick;
-import org.androidannotations.annotations.ItemLongClick;
-import org.androidannotations.annotations.OptionsItem;
-import org.androidannotations.annotations.OptionsMenu;
-import org.androidannotations.annotations.ViewById;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import de.greenrobot.event.EventBus;
@@ -103,12 +106,8 @@ public class RepairContainerPendingListFragment extends SherlockFragment {
 
 	@ItemClick(R.id.container_list)
 	void listItemClicked(int position) {
-		// refresh highlighting
-		mFeedListView.setItemChecked(position, false);
-
 		// clear current selection
-		mSelectedContainerSession = null;
-		getActivity().supportInvalidateOptionsMenu();
+		hideMenuItems();
 
 		Intent intent = new Intent(getActivity(), RepairContainerActivity_.class);
 		intent.putExtra(RepairContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
@@ -118,10 +117,8 @@ public class RepairContainerPendingListFragment extends SherlockFragment {
 
 	@ItemLongClick(R.id.container_list)
 	void listItemLongClicked(int position) {
-		// refresh highlighting
+		// refresh highlighting and menu
 		mFeedListView.setItemChecked(position, true);
-
-		// refresh menu
 		mSelectedContainerSession = mFeedsAdapter.getItem(position);
 		getActivity().supportInvalidateOptionsMenu();
 	}
@@ -151,8 +148,13 @@ public class RepairContainerPendingListFragment extends SherlockFragment {
 		if (null != mFeedsAdapter) {
 			refresh();
 		}
-		
 		super.onResume();
+	}
+	
+	void hideMenuItems() {
+		mSelectedContainerSession = null;
+		mFeedListView.setItemChecked(-1, true);
+		getActivity().supportInvalidateOptionsMenu();
 	}
 
 	private void search(String searchText) {
@@ -182,6 +184,11 @@ public class RepairContainerPendingListFragment extends SherlockFragment {
 
 	public void onEvent(ContainerRepairedEvent event) {
 		Logger.Log(LOG_TAG, "onEvent ContainerRepairedEvent");
+		refresh();
+	}
+
+	public void onEventMainThread(DataLoadedEvent event) {
+		Logger.Log(LOG_TAG, "onEvent DataLoadedEvent");
 		refresh();
 	}
 
@@ -224,7 +231,7 @@ public class RepairContainerPendingListFragment extends SherlockFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getOriginalPhotoUri().toString();
+						return item.getImageIdPath();
 					}
 				}, new DynamicImageLoader() {
 					@Override

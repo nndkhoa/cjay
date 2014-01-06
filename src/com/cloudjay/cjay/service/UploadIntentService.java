@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
+
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 
@@ -24,9 +25,9 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.ParcelFileDescriptor;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
+import android.os.ParcelFileDescriptor;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -49,6 +50,7 @@ import com.cloudjay.cjay.util.CountingInputStreamEntity;
 import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Mapper;
+
 import de.greenrobot.event.EventBus;
 
 public class UploadIntentService extends IntentService implements

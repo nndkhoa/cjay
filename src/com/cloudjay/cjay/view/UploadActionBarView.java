@@ -15,8 +15,6 @@
  */
 package com.cloudjay.cjay.view;
 
-import com.cloudjay.cjay.R;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
@@ -24,6 +22,8 @@ import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.RelativeLayout;
+
+import com.cloudjay.cjay.R;
 
 public class UploadActionBarView extends RelativeLayout implements
 		AnimationListener {

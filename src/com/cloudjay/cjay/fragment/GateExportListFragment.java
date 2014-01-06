@@ -156,12 +156,8 @@ public class GateExportListFragment extends SherlockFragment {
 
 	@ItemClick(R.id.container_list)
 	void listItemClicked(int position) {
-		// refresh highlighting
-		mFeedListView.setItemChecked(position, false);
-
 		// clear current selection
-		mSelectedContainerSession = null;
-		getActivity().supportInvalidateOptionsMenu();
+		hideMenuItems();
 
 		// get the selected container session and open camera
 		ContainerSession containerSession = mFeedsAdapter.getItem(position);
@@ -171,10 +167,8 @@ public class GateExportListFragment extends SherlockFragment {
 
 	@ItemLongClick(R.id.container_list)
 	void listItemLongClicked(int position) {
-		// refresh highlighting
+		// refresh highlighting and menu
 		mFeedListView.setItemChecked(position, true);
-
-		// refresh menu
 		mSelectedContainerSession = mFeedsAdapter.getItem(position);
 		getActivity().supportInvalidateOptionsMenu();
 	}

@@ -2,6 +2,10 @@ package com.cloudjay.cjay;
 
 import java.lang.reflect.Field;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.ViewById;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,10 +21,9 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.cloudjay.cjay.fragment.*;
-import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.ViewById;
+import com.cloudjay.cjay.fragment.RepairContainerFixedListFragment_;
+import com.cloudjay.cjay.fragment.RepairContainerPendingListFragment_;
+import com.cloudjay.cjay.fragment.UploadsFragment_;
 
 @EActivity(R.layout.activity_repair_home)
 public class RepairHomeActivity extends CJayActivity implements

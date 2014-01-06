@@ -202,33 +202,35 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public List<ContainerSession> getListReportedContainerSessions()
 			throws SQLException {
-		Logger.Log(LOG_TAG, "getListReportedContainerSessions()");
+//		Logger.Log(LOG_TAG, "getListReportedContainerSessions()");
+//		
+//		List<ContainerSession> containerSessions = getNotUploadedContainerSessions();
+//		List<ContainerSession> reportedContainerSessions = new ArrayList<ContainerSession>();
+//
+//		for (ContainerSession containerSession : containerSessions) {
+//			boolean hasReportTypeImages = false;
+//			boolean hasUnreportedImages = false;
+//			for (CJayImage cJayImage : containerSession.getCJayImages()) {
+//				if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
+//					hasReportTypeImages = true;
+//					if (cJayImage.getIssue() == null) {
+//						hasUnreportedImages = true;
+//						break;
+//					}
+//				}
+//			}
+//
+//			// reported container sessions:
+//			// - containers have report images,
+//			// - and report images have issue
+//			if (hasReportTypeImages && !hasUnreportedImages) {
+//				reportedContainerSessions.add(containerSession);
+//			}
+//		}
+//
+//		return reportedContainerSessions;
 		
-		List<ContainerSession> containerSessions = getNotUploadedContainerSessions();
-		List<ContainerSession> reportedContainerSessions = new ArrayList<ContainerSession>();
-
-		for (ContainerSession containerSession : containerSessions) {
-			boolean hasReportTypeImages = false;
-			boolean hasUnreportedImages = false;
-			for (CJayImage cJayImage : containerSession.getCJayImages()) {
-				if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
-					hasReportTypeImages = true;
-					if (cJayImage.getIssue() == null) {
-						hasUnreportedImages = true;
-						break;
-					}
-				}
-			}
-
-			// reported container sessions:
-			// - containers have report images,
-			// - and report images have issue
-			if (hasReportTypeImages && !hasUnreportedImages) {
-				reportedContainerSessions.add(containerSession);
-			}
-		}
-
-		return reportedContainerSessions;
+		return null; // Vu: don't need this function for now. But keep for reference
 	}
 	
 	@Override
@@ -268,21 +270,16 @@ public class ContainerSessionDaoImpl extends
 
 		for (ContainerSession containerSession : containerSessions) {
 			boolean hasReportTypeImages = false;
-			boolean hasUnreportedImages = false;
 			for (CJayImage cJayImage : containerSession.getCJayImages()) {
 				if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
 					hasReportTypeImages = true;
-					if (cJayImage.getIssue() == null) {
-						hasUnreportedImages = true;
-						break;
-					}
+					break;
 				}
 			}
 
 			// reporting container sessions:
 			// - containers have report images,
-			// - and report images don't have issue
-			if (hasReportTypeImages && hasUnreportedImages) {
+			if (hasReportTypeImages) {
 				reportingContainerSessions.add(containerSession);
 			}
 		}

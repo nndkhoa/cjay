@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.receivers.GcmBroadcastReceiver;
 import com.google.android.gms.gcm.GoogleCloudMessaging;

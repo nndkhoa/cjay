@@ -1,10 +1,5 @@
 package com.cloudjay.cjay.receivers;
 
-import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.ConnectionUtils;
-import com.cloudjay.cjay.util.Flags;
-import com.cloudjay.cjay.util.Utils;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +8,11 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.ConnectionUtils;
+import com.cloudjay.cjay.util.Flags;
+import com.cloudjay.cjay.util.Utils;
 
 public class InstantUploadReceiver extends BroadcastReceiver {
 

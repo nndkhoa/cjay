@@ -1,12 +1,13 @@
 
 package com.cloudjay.cjay;
 
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.widget.TextView;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
+
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.widget.TextView;
 
 @EFragment(R.layout.fragment_sample)
 public class SampleFragment

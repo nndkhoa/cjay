@@ -9,7 +9,6 @@
 	<string-array name="auditor_home_tabs">
 		<item>Chưa báo cáo</item>
 		<item>Đang báo cáo</item>
-		<item>Đã báo cáo</item>
 		<item>Tải lên</item>
 	</string-array>
 	<string-array name="repair_home_tabs">

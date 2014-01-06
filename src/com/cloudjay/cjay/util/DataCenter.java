@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+
 import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.UserDaoImpl;
 import com.cloudjay.cjay.events.DataLoadedEvent;

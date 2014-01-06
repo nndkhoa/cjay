@@ -2,6 +2,13 @@ package com.cloudjay.cjay;
 
 import java.sql.SQLException;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.ViewById;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -14,16 +21,10 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
-import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.fragment.RepairIssueImageListFragment_;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
-import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.Extra;
-import org.androidannotations.annotations.OptionsItem;
-import org.androidannotations.annotations.OptionsMenu;
-import org.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_repair_issue_report)
 @OptionsMenu(R.menu.menu_repair_issue_report)

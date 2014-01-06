@@ -3,6 +3,13 @@ package com.cloudjay.cjay.fragment;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Click;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.ViewById;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -14,21 +21,21 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.AuditorIssueReportActivity_;
+import com.cloudjay.cjay.CameraActivity_;
+import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.RepairIssueReportActivity_;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
+import com.cloudjay.cjay.events.DataLoadedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
-import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Click;
-import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.ItemClick;
-import org.androidannotations.annotations.ViewById;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import de.greenrobot.event.EventBus;
@@ -132,9 +139,14 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 			mTakenImages = null;
 
 		} else {
-			populateIssueList();
-			mFeedsAdapter.updateData(mFeeds);
+			// refresh list
+			refresh();
 		}
+	}
+	
+	public void refresh() {
+		populateIssueList();
+		mFeedsAdapter.updateData(mFeeds);		
 	}
 
 	public void setContainerSessionUUID(String containerSessionUUID) {
@@ -164,9 +176,15 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 
 	public void onEvent(CJayImageAddedEvent event) {
 		// retrieve image
+		Logger.Log(LOG_TAG, "onEvent CJayImageAddedEvent");
 		if (event.getTag().equals(LOG_TAG)) {
 			mTakenImages.add(event.getCJayImage());
 		}
+	}
+
+	public void onEventMainThread(DataLoadedEvent event) {
+		Logger.Log(LOG_TAG, "onEvent DataLoadedEvent");
+		refresh();
 	}
 
 	private void initIssueFeedAdapter(ArrayList<Issue> containers) {

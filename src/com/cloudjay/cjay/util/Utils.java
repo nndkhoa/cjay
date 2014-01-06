@@ -5,13 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.cloudjay.cjay.CJayActivity;
-import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.service.UploadIntentService;
-import com.cloudjay.cjay.model.User;
-import com.lightbox.android.photoprocessing.PhotoProcessing;
-import com.lightbox.android.photoprocessing.utils.MediaUtils;
-
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.ContentResolver;
@@ -38,6 +31,13 @@ import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.widget.Toast;
+
+import com.cloudjay.cjay.CJayActivity;
+import com.cloudjay.cjay.CJayApplication;
+import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.service.UploadIntentService;
+import com.lightbox.android.photoprocessing.PhotoProcessing;
+import com.lightbox.android.photoprocessing.utils.MediaUtils;
 
 public class Utils {
 

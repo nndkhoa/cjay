@@ -7,8 +7,8 @@ import java.util.concurrent.Executors;
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
-import uk.co.senab.bitmapcache.BitmapLruCache;
 
+import uk.co.senab.bitmapcache.BitmapLruCache;
 import android.app.AlarmManager;
 import android.app.Application;
 import android.app.PendingIntent;
@@ -29,7 +29,7 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.network.HttpRequestWrapper;
 import com.cloudjay.cjay.network.IHttpRequestWrapper;
 import com.cloudjay.cjay.receivers.InstantUploadReceiver;
-import com.cloudjay.cjay.service.*;
+import com.cloudjay.cjay.service.QueueIntentService;
 import com.cloudjay.cjay.task.PhotupThreadFactory;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;

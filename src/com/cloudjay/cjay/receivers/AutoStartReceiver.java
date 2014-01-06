@@ -2,14 +2,14 @@ package com.cloudjay.cjay.receivers;
 
 import java.util.Calendar;
 
-import com.cloudjay.cjay.service.QueueIntentService;
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+
+import com.cloudjay.cjay.service.QueueIntentService;
 
 public class AutoStartReceiver extends BroadcastReceiver {
 	@Override

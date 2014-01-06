@@ -2,6 +2,11 @@ package com.cloudjay.cjay;
 
 import java.sql.SQLException;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.ViewById;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -15,13 +20,10 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
-import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.fragment.RepairIssueFixedListFragment_;
+import com.cloudjay.cjay.fragment.RepairIssuePendingListFragment_;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
-import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.Extra;
-import org.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_repair_container)
 public class RepairContainerActivity extends SherlockFragmentActivity implements

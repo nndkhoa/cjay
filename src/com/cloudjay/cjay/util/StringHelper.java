@@ -1,12 +1,12 @@
 package com.cloudjay.cjay.util;
 
-import android.annotation.SuppressLint;
-import android.text.TextUtils;
-import android.text.format.DateUtils;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import android.annotation.SuppressLint;
+import android.text.TextUtils;
+import android.text.format.DateUtils;
 
 public class StringHelper {
 	public static boolean isNullOrEmpty(String input) {

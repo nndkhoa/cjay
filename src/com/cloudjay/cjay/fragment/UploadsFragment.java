@@ -3,6 +3,11 @@ package com.cloudjay.cjay.fragment;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.UiThread;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,10 +29,6 @@ import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener.OnDismissCallback;
-import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.OptionsItem;
-import org.androidannotations.annotations.OptionsMenu;
-import org.androidannotations.annotations.UiThread;
 
 import de.greenrobot.event.EventBus;
 

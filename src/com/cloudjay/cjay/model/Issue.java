@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;

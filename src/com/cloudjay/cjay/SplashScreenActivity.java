@@ -2,15 +2,15 @@ package com.cloudjay.cjay;
 
 import java.util.Calendar;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.widget.ImageView;
+
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Session;
-
-import android.os.Bundle;
-import android.os.Handler;
-import android.widget.ImageView;
-import android.content.Intent;
 
 public class SplashScreenActivity extends CJayActivity {
 

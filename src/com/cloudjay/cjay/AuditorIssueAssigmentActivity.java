@@ -3,6 +3,14 @@ package com.cloudjay.cjay;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.ViewById;
+
 import android.widget.ImageView;
 import android.widget.ListView;
 
@@ -17,13 +25,6 @@ import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.Utils;
-import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.Extra;
-import org.androidannotations.annotations.ItemClick;
-import org.androidannotations.annotations.OptionsItem;
-import org.androidannotations.annotations.OptionsMenu;
-import org.androidannotations.annotations.ViewById;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 @EActivity(R.layout.activity_auditor_issue_assignment)

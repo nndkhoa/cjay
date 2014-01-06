@@ -136,12 +136,8 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 	@ItemClick(R.id.feeds)
 	void listItemClicked(int position) {
-		// refresh highlighting
-		mFeedListView.setItemChecked(position, false);
-
 		// clear current selection
-		mSelectedContainerSession = null;
-		getActivity().supportInvalidateOptionsMenu();
+		hideMenuItems();
 
 		Logger.Log(LOG_TAG, "Show item at position: " + position);
 
@@ -155,10 +151,8 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 	@ItemLongClick(R.id.feeds)
 	void listItemLongClicked(int position) {
-		// refresh highlighting
+		// refresh highlighting and menu
 		mFeedListView.setItemChecked(position, true);
-
-		// refresh menu
 		mSelectedContainerSession = mFeedsAdapter.getItem(position);
 		getActivity().supportInvalidateOptionsMenu();
 	}

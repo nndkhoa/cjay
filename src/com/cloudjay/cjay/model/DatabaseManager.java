@@ -1,8 +1,8 @@
 package com.cloudjay.cjay.model;
 
-import com.j256.ormlite.android.apptools.OpenHelperManager;
-
 import android.content.Context;
+
+import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 public class DatabaseManager implements IDatabaseManager {
 	private DatabaseHelper databaseHelper = null;

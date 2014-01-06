@@ -2,6 +2,13 @@ package com.cloudjay.cjay;
 
 import java.sql.SQLException;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.ViewById;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -21,7 +28,13 @@ import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
-import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.fragment.IssueReportComponentFragment_;
+import com.cloudjay.cjay.fragment.IssueReportDamageFragment_;
+import com.cloudjay.cjay.fragment.IssueReportDimensionFragment_;
+import com.cloudjay.cjay.fragment.IssueReportFragment;
+import com.cloudjay.cjay.fragment.IssueReportLocationFragment_;
+import com.cloudjay.cjay.fragment.IssueReportQuantityFragment_;
+import com.cloudjay.cjay.fragment.IssueReportRepairFragment_;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ComponentCode;
@@ -29,12 +42,6 @@ import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.network.CJayClient;
-import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.Extra;
-import org.androidannotations.annotations.OptionsItem;
-import org.androidannotations.annotations.OptionsMenu;
-import org.androidannotations.annotations.ViewById;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 // slide 20

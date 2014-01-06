@@ -22,8 +22,8 @@ import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
-import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.model.Issue;
+import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Utils;
 
