@@ -171,6 +171,8 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 					public void loadImage(String url, ImageView view) {
 						if (url != null && !TextUtils.isEmpty(url)) {
 							imageLoader.displayImage(url, view);
+						} else {
+							view.setImageResource(R.drawable.ic_app);
 						}
 					}
 				});

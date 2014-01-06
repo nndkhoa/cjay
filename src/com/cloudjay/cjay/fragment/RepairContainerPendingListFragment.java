@@ -15,6 +15,7 @@ import org.androidannotations.annotations.ViewById;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -236,8 +237,10 @@ public class RepairContainerPendingListFragment extends SherlockFragment {
 				}, new DynamicImageLoader() {
 					@Override
 					public void loadImage(String url, ImageView view) {
-						if (url != null) {
+						if (url != null && !TextUtils.isEmpty(url)) {
 							imageLoader.displayImage(url, view);
+						} else {
+							view.setImageResource(R.drawable.ic_app);
 						}
 					}
 				});

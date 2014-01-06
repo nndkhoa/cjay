@@ -11,6 +11,7 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
+import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.ListView;
 
@@ -177,15 +178,11 @@ public class AuditorIssueAssigmentActivity extends CJayActivity {
 				}, new DynamicImageLoader() {
 					@Override
 					public void loadImage(String url, ImageView view) {
-						imageLoader.displayImage(url, view);
-
-						// try {
-						// view.setImageBitmap(Utils.decodeImage(
-						// getContentResolver(), Uri.parse(url),
-						// Utils.MINI_THUMBNAIL_SIZE));
-						// } catch (FileNotFoundException e) {
-						// e.printStackTrace();
-						// }
+						if (url != null && !TextUtils.isEmpty(url)) {
+							imageLoader.displayImage(url, view);
+						} else {
+							view.setImageResource(R.drawable.ic_app);
+						}
 					}
 				});
 		mFeedsAdapter = new FunDapter<Issue>(this, containers,

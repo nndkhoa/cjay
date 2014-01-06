@@ -242,9 +242,7 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 				new StringExtractor<Issue>() {
 					@Override
 					public String getStringValue(Issue item, int position) {
-
 						Collection<CJayImage> cJayImages = item.getCJayImages();
-
 						if (null != cJayImages) {
 							for (CJayImage cJayImage : cJayImages) {
 								if (!TextUtils.isEmpty(cJayImage.getUri())) {
@@ -252,7 +250,6 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 								}
 							}
 						}
-
 						return null;
 					}
 				}, new DynamicImageLoader() {
@@ -260,6 +257,8 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 					public void loadImage(String url, ImageView view) {
 						if (url != null && !TextUtils.isEmpty(url)) {
 							imageLoader.displayImage(url, view);
+						} else {
+							view.setImageResource(R.drawable.ic_app);
 						}
 					}
 				});

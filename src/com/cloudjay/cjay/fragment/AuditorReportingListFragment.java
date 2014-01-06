@@ -319,8 +319,10 @@ public class AuditorReportingListFragment extends SherlockFragment {
 				}, new DynamicImageLoader() {
 					@Override
 					public void loadImage(String url, ImageView view) {
-						if (url != null) {
+						if (url != null && !TextUtils.isEmpty(url)) {
 							imageLoader.displayImage(url, view);
+						} else {
+							view.setImageResource(R.drawable.ic_app);
 						}
 					}
 				});

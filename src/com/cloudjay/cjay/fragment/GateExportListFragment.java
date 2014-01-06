@@ -310,10 +310,10 @@ public class GateExportListFragment extends SherlockFragment {
 				}, new DynamicImageLoader() {
 					@Override
 					public void loadImage(String url, ImageView view) {
-						if (TextUtils.isEmpty(url)) {
-							view.setImageResource(R.drawable.ic_app);
-						} else {
+						if (url != null && !TextUtils.isEmpty(url)) {
 							imageLoader.displayImage(url, view);
+						} else {
+							view.setImageResource(R.drawable.ic_app);
 						}
 					}
 
