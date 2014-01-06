@@ -9,6 +9,7 @@ import org.json.JSONException;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.provider.ContactsContract.CommonDataKinds.Event;
 import android.util.Log;
 
@@ -61,6 +62,13 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	protected void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
 		session = Session.restore(getApplicationContext());
+
+		// if (android.os.Build.VERSION.SDK_INT > 9) {
+		// StrictMode.ThreadPolicy policy = new
+		// StrictMode.ThreadPolicy.Builder()
+		// .permitAll().build();
+		// StrictMode.setThreadPolicy(policy);
+		// }
 	}
 
 	@Override
@@ -76,7 +84,10 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	protected void onResume() {
 
 		if (null != session) {
+
 			Logger.Log(LOG_TAG, "DataCenter.reload onResume");
+
+			// DataCenter.reload(getApplicationContext());
 
 			reloadData();
 			context = getApplicationContext();
@@ -98,7 +109,6 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	@Background
 	void reloadData() {
 		DataCenter.reload(getApplicationContext());
-
 	}
 
 	private void sendRegistrationIdToBackend() {

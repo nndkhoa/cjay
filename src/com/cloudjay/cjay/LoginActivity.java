@@ -46,9 +46,9 @@ public class LoginActivity extends CJayActivity {
 	private String mPassword = "123456";
 
 	@Extra(EXTRA_EMAIL)
-	// String mEmail = "giamdinhcong1.icd1@pip.com.vn";
+	String mEmail = "giamdinhcong1.icd1@pip.com.vn";
 	// String mEmail = "giamdinhsuachua.icd1@pip.com.vn";
-	String mEmail = "tosuachua1.icd1@pip.com.vn";
+	// String mEmail = "tosuachua1.icd1@pip.com.vn";
 
 	// UI references.
 	@ViewById(R.id.email)
@@ -224,9 +224,8 @@ public class LoginActivity extends CJayActivity {
 					if (NetworkHelper.isConnected(ctx)) {
 						DataCenter.getInstance().saveCredential(
 								LoginActivity.this, userToken);
-						DataCenter.fetchData(LoginActivity.this);
 
-						// CJayClient.getInstance().fetchData(LoginActivity.this);
+						// DataCenter.fetchData(LoginActivity.this);
 
 					} else {
 						UIHelper.toast(ctx,

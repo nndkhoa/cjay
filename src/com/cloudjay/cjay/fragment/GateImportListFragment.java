@@ -315,7 +315,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		refresh();
 	}
 
-	public void onEvent(DataLoadedEvent event) {
+	public void onEventMainThread(DataLoadedEvent event) {
 		Logger.Log(LOG_TAG, "onEvent DataLoadedEvent");
 		refresh();
 	}
