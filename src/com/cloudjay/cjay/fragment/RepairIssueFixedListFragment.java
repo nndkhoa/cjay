@@ -19,8 +19,7 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.RepairIssueReportActivity_;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.DataLoadedEvent;
 import com.cloudjay.cjay.model.CJayImage;
@@ -37,7 +36,7 @@ import de.greenrobot.event.EventBus;
 public class RepairIssueFixedListFragment extends SherlockFragment {
 
 	private final static String LOG_TAG = "RepairIssueFixedListFragment";
-	
+
 	private ArrayList<Issue> mFeeds;
 	private FunDapter<Issue> mFeedsAdapter;
 	private ContainerSession mContainerSession;
@@ -51,7 +50,7 @@ public class RepairIssueFixedListFragment extends SherlockFragment {
 	@AfterViews
 	void afterViews() {
 		imageLoader = ImageLoader.getInstance();
-		
+
 		initIssueFeedAdapter(null);
 	}
 
@@ -130,21 +129,24 @@ public class RepairIssueFixedListFragment extends SherlockFragment {
 				new StringExtractor<Issue>() {
 					@Override
 					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item.getDamageCodeString());
+						return Utils.replaceNullBySpace(item
+								.getDamageCodeString());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_repair_code,
 				new StringExtractor<Issue>() {
 					@Override
 					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item.getRepairCodeString());
+						return Utils.replaceNullBySpace(item
+								.getRepairCodeString());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_component_code,
 				new StringExtractor<Issue>() {
 					@Override
 					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item.getComponentCodeString());
+						return Utils.replaceNullBySpace(item
+								.getComponentCodeString());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_quantity,

@@ -23,8 +23,7 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.RepairContainerActivity_;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerRepairedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
@@ -43,7 +42,7 @@ import de.greenrobot.event.EventBus;
 public class RepairContainerFixedListFragment extends SherlockFragment {
 
 	private final static String LOG_TAG = "RepairContainerFixedListFragment";
-	
+
 	private ArrayList<ContainerSession> mFeeds;
 	private FunDapter<ContainerSession> mFeedsAdapter;
 	private ContainerSession mSelectedContainerSession;
@@ -68,13 +67,14 @@ public class RepairContainerFixedListFragment extends SherlockFragment {
 		mSelectedContainerSession = mFeedsAdapter.getItem(position);
 		getActivity().supportInvalidateOptionsMenu();
 	}
-	
+
 	@ItemClick(R.id.container_list)
 	void listItemClicked(int position) {
 		// clear current selection
 		hideMenuItems();
 
-		Intent intent = new Intent(getActivity(), RepairContainerActivity_.class);
+		Intent intent = new Intent(getActivity(),
+				RepairContainerActivity_.class);
 		intent.putExtra(RepairContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
 				mFeedsAdapter.getItem(position).getUuid());
 		startActivity(intent);
@@ -101,7 +101,9 @@ public class RepairContainerFixedListFragment extends SherlockFragment {
 
 				// It will trigger `UploadsFragment` Adapter
 				// notifyDataSetChanged
-				EventBus.getDefault().post(new ContainerSessionEnqueueEvent(mSelectedContainerSession));
+				EventBus.getDefault().post(
+						new ContainerSessionEnqueueEvent(
+								mSelectedContainerSession));
 
 				hideMenuItems();
 
@@ -116,7 +118,7 @@ public class RepairContainerFixedListFragment extends SherlockFragment {
 		mFeedListView.setItemChecked(-1, true);
 		getActivity().supportInvalidateOptionsMenu();
 	}
-	
+
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
@@ -132,7 +134,7 @@ public class RepairContainerFixedListFragment extends SherlockFragment {
 		}
 		super.onResume();
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		EventBus.getDefault().unregister(this);

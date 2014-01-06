@@ -27,8 +27,7 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.RepairContainerActivity_;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerRepairedEvent;
 import com.cloudjay.cjay.events.DataLoadedEvent;
@@ -86,23 +85,24 @@ public class RepairContainerPendingListFragment extends SherlockFragment {
 	void checkMenuItemSelected() {
 		// set fixed to true
 		mSelectedContainerSession.setFixed(true);
-		
+
 		// save db records
 		try {
 			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-					.getInstance().getDatabaseManager().getHelper(getActivity())
-					.getContainerSessionDaoImpl();
+					.getInstance().getDatabaseManager()
+					.getHelper(getActivity()).getContainerSessionDaoImpl();
 			containerSessionDaoImpl.createOrUpdate(mSelectedContainerSession);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		// clear current selection
 		mSelectedContainerSession = null;
 		mFeedListView.setItemChecked(-1, true);
 		getActivity().supportInvalidateOptionsMenu();
-		
-		EventBus.getDefault().post(new ContainerRepairedEvent(mSelectedContainerSession));
+
+		EventBus.getDefault().post(
+				new ContainerRepairedEvent(mSelectedContainerSession));
 	}
 
 	@ItemClick(R.id.container_list)
@@ -110,7 +110,8 @@ public class RepairContainerPendingListFragment extends SherlockFragment {
 		// clear current selection
 		hideMenuItems();
 
-		Intent intent = new Intent(getActivity(), RepairContainerActivity_.class);
+		Intent intent = new Intent(getActivity(),
+				RepairContainerActivity_.class);
 		intent.putExtra(RepairContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
 				mFeedsAdapter.getItem(position).getUuid());
 		startActivity(intent);
@@ -151,7 +152,7 @@ public class RepairContainerPendingListFragment extends SherlockFragment {
 		}
 		super.onResume();
 	}
-	
+
 	void hideMenuItems() {
 		mSelectedContainerSession = null;
 		mFeedListView.setItemChecked(-1, true);
@@ -173,7 +174,7 @@ public class RepairContainerPendingListFragment extends SherlockFragment {
 			mFeedsAdapter.updateData(searchFeeds);
 		}
 	}
-	
+
 	public void refresh() {
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListPendingContainerSessions(getActivity());

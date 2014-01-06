@@ -21,9 +21,7 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.cloudjay.cjay.fragment.AuditorReportingListFragment;
-import com.cloudjay.cjay.fragment.AuditorReportingListFragment_;
-import com.cloudjay.cjay.fragment.UploadsFragment_;
+import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
 
@@ -33,7 +31,7 @@ public class AuditorHomeActivity extends CJayActivity implements
 		AddContainerDialog.AddContainerDialogListener,
 		SearchOperatorDialog.SearchOperatorDialogListener {
 
-//	private static final String LOG_TAG = "AuditorHomeActivity";
+	// private static final String LOG_TAG = "AuditorHomeActivity";
 
 	private String[] locations;
 	@ViewById

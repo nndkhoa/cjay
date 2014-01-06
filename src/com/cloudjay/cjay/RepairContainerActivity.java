@@ -20,8 +20,7 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
-import com.cloudjay.cjay.fragment.RepairIssueFixedListFragment_;
-import com.cloudjay.cjay.fragment.RepairIssuePendingListFragment_;
+import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 
@@ -33,12 +32,12 @@ public class RepairContainerActivity extends SherlockFragmentActivity implements
 
 	private ContainerSession mContainerSession;
 	private String[] locations;
-	
+
 	@ViewById
 	ViewPager pager;
 	@ViewById(R.id.container_id_textview)
 	TextView containerIdTextView;
-	
+
 	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
 	String mContainerSessionUUID = "";
 
@@ -58,8 +57,9 @@ public class RepairContainerActivity extends SherlockFragmentActivity implements
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
-		locations = getResources().getStringArray(R.array.repair_container_tabs);
+
+		locations = getResources()
+				.getStringArray(R.array.repair_container_tabs);
 		configureViewPager();
 		configureActionBar();
 	}

@@ -21,10 +21,7 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.AuditorIssueReportActivity_;
-import com.cloudjay.cjay.CameraActivity_;
-import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.RepairIssueReportActivity_;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
@@ -143,10 +140,10 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 			refresh();
 		}
 	}
-	
+
 	public void refresh() {
 		populateIssueList();
-		mFeedsAdapter.updateData(mFeeds);		
+		mFeedsAdapter.updateData(mFeeds);
 	}
 
 	public void setContainerSessionUUID(String containerSessionUUID) {
@@ -200,21 +197,24 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 				new StringExtractor<Issue>() {
 					@Override
 					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item.getDamageCodeString());
+						return Utils.replaceNullBySpace(item
+								.getDamageCodeString());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_repair_code,
 				new StringExtractor<Issue>() {
 					@Override
 					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item.getRepairCodeString());
+						return Utils.replaceNullBySpace(item
+								.getRepairCodeString());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_component_code,
 				new StringExtractor<Issue>() {
 					@Override
 					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item.getComponentCodeString());
+						return Utils.replaceNullBySpace(item
+								.getComponentCodeString());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_quantity,

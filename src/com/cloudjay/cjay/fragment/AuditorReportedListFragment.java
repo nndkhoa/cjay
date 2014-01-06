@@ -23,8 +23,7 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.AuditorContainerActivity_;
-import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.events.DataLoadedEvent;
@@ -42,7 +41,7 @@ import de.greenrobot.event.EventBus;
 public class AuditorReportedListFragment extends SherlockFragment {
 
 	private final static String LOG_TAG = "AuditorReportedListFragment";
-	
+
 	private ArrayList<ContainerSession> mFeeds;
 	private FunDapter<ContainerSession> mFeedsAdapter;
 	private ContainerSession mSelectedContainerSession;

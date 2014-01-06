@@ -32,8 +32,7 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.AuditorContainerActivity_;
-import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.events.DataLoadedEvent;
@@ -102,14 +101,14 @@ public class AuditorReportingListFragment extends SherlockFragment {
 		mSelectedContainerSession = null;
 	}
 
-//	@OptionsItem(R.id.menu_edit_container)
-//	void editMenuItemSelected() {
-//		// Open dialog for editing details
-//		showContainerDetailDialog(mSelectedContainerSession.getContainerId(),
-//				mSelectedContainerSession.getOperatorName(),
-//				AddContainerDialog.CONTAINER_DIALOG_EDIT);
-//	}
-	
+	// @OptionsItem(R.id.menu_edit_container)
+	// void editMenuItemSelected() {
+	// // Open dialog for editing details
+	// showContainerDetailDialog(mSelectedContainerSession.getContainerId(),
+	// mSelectedContainerSession.getOperatorName(),
+	// AddContainerDialog.CONTAINER_DIALOG_EDIT);
+	// }
+
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 		if (mSelectedContainerSession != null) {
@@ -150,10 +149,10 @@ public class AuditorReportingListFragment extends SherlockFragment {
 		if (!TextUtils.isEmpty(mSearchEditText.getText().toString())) {
 			containerId = mSearchEditText.getText().toString();
 		} else {
-			containerId = getResources().getString(R.string.default_container_id);
+			containerId = getResources().getString(
+					R.string.default_container_id);
 		}
-		showContainerDetailDialog(
-				containerId, "",
+		showContainerDetailDialog(containerId, "",
 				AddContainerDialog.CONTAINER_DIALOG_ADD);
 	}
 
@@ -183,9 +182,9 @@ public class AuditorReportingListFragment extends SherlockFragment {
 
 		if (mState == STATE_REPORTING) {
 			boolean isDisplayed = (mSelectedContainerSession != null);
-			menu.findItem(R.id.menu_upload).setVisible(isDisplayed);	
+			menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
 		} else {
-			menu.findItem(R.id.menu_upload).setVisible(false);			
+			menu.findItem(R.id.menu_upload).setVisible(false);
 		}
 	}
 
@@ -356,7 +355,7 @@ public class AuditorReportingListFragment extends SherlockFragment {
 			mSearchEditText.setText(""); // this will refresh the list
 		}
 	}
-	
+
 	void hideMenuItems() {
 		mSelectedContainerSession = null;
 		mFeedListView.setItemChecked(-1, true);

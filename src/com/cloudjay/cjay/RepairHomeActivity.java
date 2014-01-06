@@ -21,9 +21,7 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.cloudjay.cjay.fragment.RepairContainerFixedListFragment_;
-import com.cloudjay.cjay.fragment.RepairContainerPendingListFragment_;
-import com.cloudjay.cjay.fragment.UploadsFragment_;
+import com.cloudjay.cjay.fragment.*;
 
 @EActivity(R.layout.activity_repair_home)
 public class RepairHomeActivity extends CJayActivity implements
@@ -140,7 +138,7 @@ public class RepairHomeActivity extends CJayActivity implements
 			case 0:
 				Fragment pendingFragment = new RepairContainerPendingListFragment_();
 				return pendingFragment;
-				
+
 			case 1:
 				Fragment fixedFragment = new RepairContainerFixedListFragment_();
 				return fixedFragment;

@@ -21,8 +21,7 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.CameraActivity_;
-import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
@@ -38,7 +37,7 @@ import de.greenrobot.event.EventBus;
 public class RepairIssueImageListFragment extends SherlockFragment {
 
 	private final String LOG_TAG = "RepairIssueImageListFragment";
-	
+
 	private ArrayList<CJayImage> mFeeds;
 	private ArrayList<CJayImage> mTakenImages;
 	private FunDapter<CJayImage> mFeedsAdapter;
@@ -56,28 +55,29 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 	void afterViews() {
 		// show or hide camera button
 		if (mType == CJayImage.TYPE_REPORT) {
-			RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams)mCameraButton.getLayoutParams();
+			RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) mCameraButton
+					.getLayoutParams();
 			p.height = 0;
-			mCameraButton.setLayoutParams(p);			
+			mCameraButton.setLayoutParams(p);
 		}
-		
+
 		imageLoader = ImageLoader.getInstance();
-			
+
 		initImageFeedAdapter(null);
 	}
 
 	@Click(R.id.btn_add_new)
 	void cameraClicked() {
 		mTakenImages = new ArrayList<CJayImage>();
-		
+
 		Intent intent = new Intent(getActivity(), CameraActivity_.class);
-		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-				mIssue.getContainerSession().getUuid());
+		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA, mIssue
+				.getContainerSession().getUuid());
 		intent.putExtra("type", CJayImage.TYPE_REPAIRED);
 		intent.putExtra("tag", LOG_TAG);
 		startActivity(intent);
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		EventBus.getDefault().unregister(this);
@@ -89,45 +89,46 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 		EventBus.getDefault().register(this);
 		super.onCreate(savedInstanceState);
 	}
-	
+
 	@Override
 	public void onResume() {
 		// update new images and database
 		if (mTakenImages != null && mTakenImages.size() > 0) {
 			try {
 				CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance()
-						.getDatabaseManager().getHelper(getActivity()).getCJayImageDaoImpl();
-				
+						.getDatabaseManager().getHelper(getActivity())
+						.getCJayImageDaoImpl();
+
 				for (CJayImage cJayImage : mTakenImages) {
 					cJayImage.setIssue(mIssue);
 					cJayImage.setContainerSession(mIssue.getContainerSession());
 					cJayImageDaoImpl.createOrUpdate(cJayImage);
-				}		
-				
+				}
+
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			
+
 			mTakenImages.clear();
 			mTakenImages = null;
 		}
-		
+
 		// refresh list
 		if (mFeedsAdapter != null) {
 			refresh();
 		}
 		super.onResume();
 	}
-	
+
 	public void refresh() {
 		populateCJayImages();
 		mFeedsAdapter.updateData(mFeeds);
 	}
-	
+
 	public void setIssueUUID(String issueUUID) {
 		mIssueUUID = issueUUID;
 	}
-	
+
 	public void setType(int type) {
 		mType = type;
 	}
@@ -135,11 +136,11 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 	private void populateCJayImages() {
 		mFeeds = new ArrayList<CJayImage>();
 		try {
-			IssueDaoImpl issueDaoImpl = CJayClient
-					.getInstance().getDatabaseManager().getHelper(getActivity())
+			IssueDaoImpl issueDaoImpl = CJayClient.getInstance()
+					.getDatabaseManager().getHelper(getActivity())
 					.getIssueDaoImpl();
 			mIssue = issueDaoImpl.queryForId(mIssueUUID);
-			
+
 			if (null != mIssue) {
 				for (CJayImage cJayImage : mIssue.getCJayImages()) {
 					if (cJayImage.getType() == mType) {
@@ -151,7 +152,7 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void onEvent(CJayImageAddedEvent event) {
 		// retrieve image
 		if (event.getTag().equals(LOG_TAG)) {
@@ -177,7 +178,8 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 						}
 					}
 				});
-		mFeedsAdapter = new FunDapter<CJayImage>(getActivity(), containers, R.layout.list_item_image, feedsDict);
+		mFeedsAdapter = new FunDapter<CJayImage>(getActivity(), containers,
+				R.layout.list_item_image, feedsDict);
 		mFeedListView.setAdapter(mFeedsAdapter);
 	}
 }

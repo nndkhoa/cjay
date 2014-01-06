@@ -28,13 +28,7 @@ import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
-import com.cloudjay.cjay.fragment.IssueReportComponentFragment_;
-import com.cloudjay.cjay.fragment.IssueReportDamageFragment_;
-import com.cloudjay.cjay.fragment.IssueReportDimensionFragment_;
-import com.cloudjay.cjay.fragment.IssueReportFragment;
-import com.cloudjay.cjay.fragment.IssueReportLocationFragment_;
-import com.cloudjay.cjay.fragment.IssueReportQuantityFragment_;
-import com.cloudjay.cjay.fragment.IssueReportRepairFragment_;
+import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ComponentCode;
@@ -136,10 +130,11 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 		switch (position) {
 		case TAB_ISSUE_DIMENSION:
 		case TAB_ISSUE_QUANTITY:
-			IssueReportFragment fragment = (IssueReportFragment) mViewPagerAdapter.getRegisteredFragment(position);
+			IssueReportFragment fragment = (IssueReportFragment) mViewPagerAdapter
+					.getRegisteredFragment(position);
 			if (fragment != null) {
-				fragment.showKeyboard();				
-			}		
+				fragment.showKeyboard();
+			}
 			break;
 
 		default:
@@ -157,10 +152,11 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 		case TAB_ISSUE_REPAIR:
 		case TAB_ISSUE_DIMENSION:
 		case TAB_ISSUE_QUANTITY:
-			IssueReportFragment fragment = (IssueReportFragment) mViewPagerAdapter.getRegisteredFragment(position);
+			IssueReportFragment fragment = (IssueReportFragment) mViewPagerAdapter
+					.getRegisteredFragment(position);
 			if (fragment != null) {
-				fragment.hideKeyboard();				
-			}			
+				fragment.hideKeyboard();
+			}
 			break;
 
 		default:
@@ -243,8 +239,8 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 			try {
 				DamageCode damageCode = null;
 				if (val != null && !TextUtils.isEmpty(val)) {
-					DamageCodeDaoImpl damageCodeDaoImpl = CJayClient.getInstance()
-							.getDatabaseManager().getHelper(this)
+					DamageCodeDaoImpl damageCodeDaoImpl = CJayClient
+							.getInstance().getDatabaseManager().getHelper(this)
 							.getDamageCodeDaoImpl();
 					damageCode = damageCodeDaoImpl.findDamageCode(val);
 				}
@@ -258,8 +254,8 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 			try {
 				RepairCode repairCode = null;
 				if (val != null && !TextUtils.isEmpty(val)) {
-					RepairCodeDaoImpl repairCodeDaoImpl = CJayClient.getInstance()
-							.getDatabaseManager().getHelper(this)
+					RepairCodeDaoImpl repairCodeDaoImpl = CJayClient
+							.getInstance().getDatabaseManager().getHelper(this)
 							.getRepairCodeDaoImpl();
 					repairCode = repairCodeDaoImpl.findRepairCode(val);
 				}
