@@ -3,14 +3,10 @@ package com.cloudjay.cjay.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 
-import org.androidannotations.annotations.Background;
-import org.androidannotations.annotations.EService;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
@@ -53,8 +49,6 @@ import com.cloudjay.cjay.util.CountingInputStreamEntity;
 import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Mapper;
-import com.cloudjay.cjay.util.PreferencesUtil;
-
 import de.greenrobot.event.EventBus;
 
 public class UploadIntentService extends IntentService implements

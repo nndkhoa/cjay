@@ -14,6 +14,7 @@ import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -31,23 +32,27 @@ import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.events.DataLoadedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import de.greenrobot.event.EventBus;
+
 @EFragment(R.layout.fragment_auditor_reporting)
 @OptionsMenu(R.menu.menu_auditor_reporting)
 public class AuditorReportingListFragment extends SherlockFragment {
-	
+
 	public static final String LOG_TAG = "AuditorReportingListFragment";
-	
+
 	public static final int STATE_NOT_REPORTED = 0;
 	public static final int STATE_REPORTING = 1;
-	
+
 	private ArrayList<Operator> mOperators;
 	private ArrayList<ContainerSession> mFeeds;
 	private FunDapter<ContainerSession> mFeedsAdapter;
@@ -82,12 +87,12 @@ public class AuditorReportingListFragment extends SherlockFragment {
 					int count) {
 			}
 		});
-		
+
 		imageLoader = ImageLoader.getInstance();
 
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
 				.getListOperators(getActivity());
-		
+
 		initContainerFeedAdapter(null);
 		mSelectedContainerSession = null;
 	}
@@ -142,25 +147,6 @@ public class AuditorReportingListFragment extends SherlockFragment {
 		menu.findItem(R.id.menu_edit_container).setVisible(isDisplayed);
 	}
 
-	@Override
-	public void onResume() {
-		if (mFeedsAdapter != null) {
-			if (mState == STATE_REPORTING) {
-				mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-						.getListReportingContainerSessions(getActivity());
-			} else {
-				mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-						.getListNotReportedContainerSessions(getActivity());
-			}
-
-			if (mSearchEditText != null) {
-				mSearchEditText.setText(""); // this will refresh the list
-			}
-		}
-		
-		super.onResume();
-	}
-	
 	public void setState(int state) {
 		mState = state;
 	}
@@ -193,10 +179,13 @@ public class AuditorReportingListFragment extends SherlockFragment {
 		}
 
 		switch (mode) {
-		case AddContainerDialog.CONTAINER_DIALOG_ADD:			
+		case AddContainerDialog.CONTAINER_DIALOG_ADD:
 			try {
-				ContainerSession containerSession = ContainerSession.createContainerSession(getActivity(), containerId, operatorCode);
-				ContainerSession.gotoCamera(getActivity(), containerSession, CJayImage.TYPE_REPORT);
+				ContainerSession containerSession = ContainerSession
+						.createContainerSession(getActivity(), containerId,
+								operatorCode);
+				ContainerSession.gotoCamera(getActivity(), containerSession,
+						CJayImage.TYPE_REPORT);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -204,7 +193,8 @@ public class AuditorReportingListFragment extends SherlockFragment {
 
 		case AddContainerDialog.CONTAINER_DIALOG_EDIT:
 			try {
-				ContainerSession.editContainerSession(getActivity(), mSelectedContainerSession, containerId, operatorCode);
+				ContainerSession.editContainerSession(getActivity(),
+						mSelectedContainerSession, containerId, operatorCode);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -295,5 +285,47 @@ public class AuditorReportingListFragment extends SherlockFragment {
 		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(),
 				containers, R.layout.list_item_audit_container, feedsDict);
 		mFeedListView.setAdapter(mFeedsAdapter);
+	}
+
+	public void onEvent(DataLoadedEvent event) {
+		Logger.Log(LOG_TAG, "onEvent DataLoadedEvent");
+		refresh();
+	}
+
+	public void refresh() {
+		Logger.Log(LOG_TAG, "onRefresh");
+
+		if (mState == STATE_REPORTING) {
+			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+					.getListReportingContainerSessions(getActivity());
+		} else {
+			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+					.getListNotReportedContainerSessions(getActivity());
+		}
+
+		if (mSearchEditText != null) {
+			mSearchEditText.setText(""); // this will refresh the list
+		}
+	}
+
+	@Override
+	public void onResume() {
+		if (mFeedsAdapter != null) {
+			refresh();
+		}
+
+		super.onResume();
+	}
+
+	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		EventBus.getDefault().register(this);
+		super.onCreate(savedInstanceState);
 	}
 }

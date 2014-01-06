@@ -2,7 +2,7 @@ package com.cloudjay.cjay.fragment;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-
+import java.util.Collection;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -224,13 +224,17 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 				new StringExtractor<Issue>() {
 					@Override
 					public String getStringValue(Issue item, int position) {
-						
-						for (CJayImage cJayImage : item.getCJayImages()) {
-							if (!TextUtils.isEmpty(cJayImage.getUri())) {
-								return cJayImage.getUri();
+
+						Collection<CJayImage> cJayImages = item.getCJayImages();
+
+						if (null != cJayImages) {
+							for (CJayImage cJayImage : cJayImages) {
+								if (!TextUtils.isEmpty(cJayImage.getUri())) {
+									return cJayImage.getUri();
+								}
 							}
-						 }
-						
+						}
+
 						return null;
 					}
 				}, new DynamicImageLoader() {

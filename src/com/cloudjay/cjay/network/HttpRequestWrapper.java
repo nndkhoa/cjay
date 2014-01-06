@@ -123,7 +123,7 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 			response = httpClient.execute(httpPost, localContext);
 			ret = EntityUtils.toString(response.getEntity());
 			Logger.Log(LOG_TAG, "Return from server: " + ret);
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -158,12 +158,14 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 		try {
 			response = httpClient.execute(httpGet);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 		String ret = null;
 		try {
 			ret = EntityUtils.toString(response.getEntity(), HTTP.UTF_8);
 		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		return ret;
 	}

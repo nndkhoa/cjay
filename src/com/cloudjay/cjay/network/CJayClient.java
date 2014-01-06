@@ -470,9 +470,12 @@ public class CJayClient implements ICJayClient {
 
 		case User.ROLE_AUDITOR:
 		default:
-			response = requestWrapper.sendGet(String.format(
+
+			String url = String.format(
 					CJayConstant.LIST_CONTAINER_SESSIONS_WITH_FILTER,
-					Integer.toString(filterStatus)), headers);
+					Integer.toString(filterStatus));
+
+			response = requestWrapper.sendGet(url, headers);
 			break;
 		}
 

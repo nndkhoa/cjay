@@ -36,6 +36,7 @@ import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerCreatedEvent;
 import com.cloudjay.cjay.events.ContainerEditedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
+import com.cloudjay.cjay.events.DataLoadedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
@@ -340,6 +341,11 @@ public class GateExportListFragment extends SherlockFragment {
 
 	public void onEvent(ContainerSessionEnqueueEvent event) {
 		Logger.Log(LOG_TAG, "onEvent ContainerSessionEnqueueEvent");
+		refresh();
+	}
+
+	public void onEvent(DataLoadedEvent event) {
+		Logger.Log(LOG_TAG, "onEvent DataLoadedEvent");
 		refresh();
 	}
 

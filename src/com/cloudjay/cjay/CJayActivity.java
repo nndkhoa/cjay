@@ -2,14 +2,18 @@ package com.cloudjay.cjay;
 
 import java.io.IOException;
 
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.EActivity;
 import org.json.JSONException;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.ContactsContract.CommonDataKinds.Event;
 import android.util.Log;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.cloudjay.cjay.events.DataLoadedEvent;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DataCenter;
@@ -20,9 +24,11 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import de.greenrobot.event.EventBus;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
+@EActivity
 public class CJayActivity extends SherlockFragmentActivity implements
 		ICJayActivity {
 
@@ -61,9 +67,8 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	public Context getContext() {
 		return this;
 	}
-	
-	
-	GoogleCloudMessaging gcm;	
+
+	GoogleCloudMessaging gcm;
 	Context context;
 	String regid;
 
@@ -72,14 +77,15 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 		if (null != session) {
 			Logger.Log(LOG_TAG, "DataCenter.reload onResume");
-			DataCenter.reload(getApplicationContext());
-			
+
+			reloadData();
 			context = getApplicationContext();
+
 			// Check device for Play Services APK.
 			if (checkPlayServices()) {
 				gcm = GoogleCloudMessaging.getInstance(this);
 				regid = Utils.getRegistrationId(context);
-	
+
 				if (regid.isEmpty()) {
 					registerInBackground();
 				}
@@ -87,6 +93,12 @@ public class CJayActivity extends SherlockFragmentActivity implements
 		}
 
 		super.onResume();
+	}
+
+	@Background
+	void reloadData() {
+		DataCenter.reload(getApplicationContext());
+
 	}
 
 	private void sendRegistrationIdToBackend() {
@@ -99,7 +111,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 			Log.e(LOG_TAG, "Can't Register device with the Back-end!");
 		}
 	}
-	
+
 	/**
 	 * Registers the application with GCM servers asynchronously.
 	 * <p>
@@ -118,7 +130,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 					regid = gcm.register(SENDER_ID);
 					Log.d("registration Id", regid + "");
 					msg = "Device registered, registration ID=" + regid;
-					
+
 					// You should send the registration ID to your server over
 					// HTTP, so it
 					// can use GCM/HTTP or CCS to send messages to your app.
@@ -146,7 +158,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 			}
 		}.execute(null, null, null);
 	}
-	
+
 	private boolean checkPlayServices() {
 		int resultCode = GooglePlayServicesUtil
 				.isGooglePlayServicesAvailable(this);
@@ -162,7 +174,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 		}
 		return true;
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();

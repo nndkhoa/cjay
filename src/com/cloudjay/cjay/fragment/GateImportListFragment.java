@@ -30,6 +30,7 @@ import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerCreatedEvent;
 import com.cloudjay.cjay.events.ContainerEditedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
+import com.cloudjay.cjay.events.DataLoadedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
@@ -76,7 +77,8 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	void cameraMenuItemSelected() {
 		Logger.Log(LOG_TAG, "Menu camera item clicked");
 
-		ContainerSession.gotoCamera(getActivity(), mSelectedContainerSession, CJayImage.TYPE_IMPORT);
+		ContainerSession.gotoCamera(getActivity(), mSelectedContainerSession,
+				CJayImage.TYPE_IMPORT);
 	}
 
 	@OptionsItem(R.id.menu_edit_container)
@@ -215,8 +217,11 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		switch (mode) {
 		case AddContainerDialog.CONTAINER_DIALOG_ADD:
 			try {
-				ContainerSession containerSession = ContainerSession.createContainerSession(getActivity(), containerId, operatorCode);
-				ContainerSession.gotoCamera(getActivity(), containerSession, CJayImage.TYPE_IMPORT);
+				ContainerSession containerSession = ContainerSession
+						.createContainerSession(getActivity(), containerId,
+								operatorCode);
+				ContainerSession.gotoCamera(getActivity(), containerSession,
+						CJayImage.TYPE_IMPORT);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -224,7 +229,8 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 		case AddContainerDialog.CONTAINER_DIALOG_EDIT:
 			try {
-				ContainerSession.editContainerSession(getActivity(), mSelectedContainerSession, containerId, operatorCode);
+				ContainerSession.editContainerSession(getActivity(),
+						mSelectedContainerSession, containerId, operatorCode);
 				hideMenuItems();
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -309,6 +315,11 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		refresh();
 	}
 
+	public void onEvent(DataLoadedEvent event) {
+		Logger.Log(LOG_TAG, "onEvent DataLoadedEvent");
+		refresh();
+	}
+
 	public void refresh() {
 		Logger.Log(LOG_TAG, "onRefresh");
 
@@ -318,7 +329,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	}
 
 	@Override
-	public void onResume() {		
+	public void onResume() {
 		if (mFeedsAdapter != null) {
 			refresh();
 		}

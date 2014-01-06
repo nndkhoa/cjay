@@ -3,7 +3,6 @@ package com.cloudjay.cjay.util;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import com.cloudjay.cjay.CJayActivity;

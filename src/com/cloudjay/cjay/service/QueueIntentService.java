@@ -1,7 +1,5 @@
 package com.cloudjay.cjay.service;
 
-import org.androidannotations.annotations.EService;
-
 import android.app.ActivityManager;
 import android.app.IntentService;
 import android.app.ActivityManager.RunningServiceInfo;

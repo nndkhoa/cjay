@@ -11,7 +11,6 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.view.UploadItemLayout;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class UploadsListBaseAdapter extends BaseAdapter {
 
