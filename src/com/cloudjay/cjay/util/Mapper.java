@@ -333,19 +333,6 @@ public class Mapper {
 			if (null != auditReportItems) {
 				for (AuditReportItem auditReportItem : auditReportItems) {
 
-					List<AuditReportImage> auditReportImages = auditReportItem
-							.getAuditReportImages();
-					Collection<CJayImage> cJayImages = new ArrayList<CJayImage>();
-
-					for (AuditReportImage item : auditReportImages) {
-						CJayImage tmp = new CJayImage(item.getId(),
-								item.getType(), item.getImageName());
-						cJayImages.add(tmp);
-					}
-
-					cJayImageDaoImpl
-							.addListCJayImages((List<CJayImage>) cJayImages);
-
 					DamageCode damageCode = damageCodeDaoImpl
 							.queryForId(auditReportItem.getDamageId());
 					RepairCode repairCode = repairCodeDaoImpl
@@ -358,13 +345,28 @@ public class Mapper {
 							auditReportItem.getLocationCode(),
 							auditReportItem.getLength(),
 							auditReportItem.getHeight(),
-							auditReportItem.getQuantity(), cJayImages);
+							auditReportItem.getQuantity());
 
-					if (issue != null)
+					if (issue != null) {
 						issue.setContainerSession(containerSession);
 
-					issueDaoImpl.addIssue(issue);
-					issues.add(issue);
+						issueDaoImpl.addIssue(issue);
+						issues.add(issue);
+
+						List<AuditReportImage> auditReportImages = auditReportItem
+								.getAuditReportImages();
+						Collection<CJayImage> cJayImages = new ArrayList<CJayImage>();
+
+						for (AuditReportImage item : auditReportImages) {
+							CJayImage tmp = new CJayImage(item.getId(),
+									item.getType(), item.getImageName());
+
+							tmp.setIssue(issue);
+
+							cJayImages.add(tmp);
+							cJayImageDaoImpl.addCJayImage(tmp);
+						}
+					}
 				}
 			}
 

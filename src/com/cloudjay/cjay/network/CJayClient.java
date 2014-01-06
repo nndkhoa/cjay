@@ -581,7 +581,7 @@ public class CJayClient implements ICJayClient {
 
 		if (TextUtils.isEmpty(response)) {
 			Logger.Log(LOG_TAG, "No new items from: " + date
-					+ " for user role: " + Integer.toString(filterStatus));
+					+ " for user role: " + Integer.toString(userRole));
 
 		} else {
 			Logger.Log(LOG_TAG, response);

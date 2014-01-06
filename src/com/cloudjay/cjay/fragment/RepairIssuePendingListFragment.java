@@ -224,11 +224,13 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 				new StringExtractor<Issue>() {
 					@Override
 					public String getStringValue(Issue item, int position) {
+						
 						for (CJayImage cJayImage : item.getCJayImages()) {
 							if (!TextUtils.isEmpty(cJayImage.getUri())) {
 								return cJayImage.getUri();
 							}
-						}
+						 }
+						
 						return null;
 					}
 				}, new DynamicImageLoader() {

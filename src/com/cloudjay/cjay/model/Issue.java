@@ -73,6 +73,21 @@ public class Issue implements Parcelable {
 		this.cJayImages = cJayImages;
 	}
 
+	public Issue(int id, DamageCode damageCode, RepairCode repairCode,
+			ComponentCode componentCode, String location_code, String length,
+			String height, String quantity) {
+
+		this.id = id;
+		this.damageCode = damageCode;
+		this.repairCode = repairCode;
+		this.componentCode = componentCode;
+		this.locationCode = location_code;
+		this.length = length;
+		this.height = height;
+		this.quantity = quantity;
+
+	}
+
 	public Issue() {
 		this.setUUID(UUID.randomUUID().toString());
 	}
