@@ -290,8 +290,12 @@ public class Utils {
 		}
 	}
 
-	public static String stripNull(String in) {
+	public static String replaceNullBySpace(String in) {
 		return (in == null || in.equals("") ? " " : in);
+	}
+	
+	public static String stripNull(String in) {
+		return (in == null ? "" : in);
 	}
 
 	/**

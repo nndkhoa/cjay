@@ -29,6 +29,7 @@ import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import de.greenrobot.event.EventBus;
@@ -164,12 +165,12 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 				new StringExtractor<CJayImage>() {
 					@Override
 					public String getStringValue(CJayImage item, int position) {
-						return item.getUri();
+						return Utils.stripNull(item.getUri());
 					}
 				}, new DynamicImageLoader() {
 					@Override
 					public void loadImage(String url, ImageView view) {
-						if (url != null && !TextUtils.isEmpty(url)) {
+						if (!TextUtils.isEmpty(url)) {
 							imageLoader.displayImage(url, view);
 						} else {
 							view.setImageResource(R.drawable.ic_app);

@@ -152,7 +152,7 @@ public class IssueReportRepairFragment extends IssueReportFragment  {
 				new StringExtractor<RepairCode>() {
 					@Override
 					public String getStringValue(RepairCode item, int position) {
-						return Utils.stripNull(item.getName());
+						return Utils.replaceNullBySpace(item.getName());
 					}
 				});
 		mRepairsAdapter = new FunDapter<RepairCode>(getActivity(), repairCodes,

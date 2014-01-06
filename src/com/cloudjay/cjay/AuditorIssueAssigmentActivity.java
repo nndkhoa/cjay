@@ -121,49 +121,49 @@ public class AuditorIssueAssigmentActivity extends CJayActivity {
 				new StringExtractor<Issue>() {
 					@Override
 					public String getStringValue(Issue item, int position) {
-						return Utils.stripNull(item.getLocationCode());
+						return Utils.replaceNullBySpace(item.getLocationCode());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_damage_code,
 				new StringExtractor<Issue>() {
 					@Override
 					public String getStringValue(Issue item, int position) {
-						return Utils.stripNull(item.getDamageCodeString());
+						return Utils.replaceNullBySpace(item.getDamageCodeString());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_repair_code,
 				new StringExtractor<Issue>() {
 					@Override
 					public String getStringValue(Issue item, int position) {
-						return Utils.stripNull(item.getRepairCodeString());
+						return Utils.replaceNullBySpace(item.getRepairCodeString());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_component_code,
 				new StringExtractor<Issue>() {
 					@Override
 					public String getStringValue(Issue item, int position) {
-						return Utils.stripNull(item.getComponentCodeString());
+						return Utils.replaceNullBySpace(item.getComponentCodeString());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_quantity,
 				new StringExtractor<Issue>() {
 					@Override
 					public String getStringValue(Issue item, int position) {
-						return Utils.stripNull(item.getQuantity());
+						return Utils.replaceNullBySpace(item.getQuantity());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_length,
 				new StringExtractor<Issue>() {
 					@Override
 					public String getStringValue(Issue item, int position) {
-						return Utils.stripNull(item.getLength());
+						return Utils.replaceNullBySpace(item.getLength());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_height,
 				new StringExtractor<Issue>() {
 					@Override
 					public String getStringValue(Issue item, int position) {
-						return Utils.stripNull(item.getHeight());
+						return Utils.replaceNullBySpace(item.getHeight());
 					}
 				});
 		feedsDict.addDynamicImageField(R.id.issue_picture,

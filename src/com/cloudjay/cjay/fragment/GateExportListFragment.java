@@ -273,7 +273,7 @@ public class GateExportListFragment extends SherlockFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return Utils.stripNull(item.getContainerId());
+						return Utils.replaceNullBySpace(item.getContainerId());
 					}
 				});
 		feedsDict.addStringField(R.id.feed_item_container_owner,
@@ -281,7 +281,7 @@ public class GateExportListFragment extends SherlockFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return Utils.stripNull(item.getOperatorName());
+						return Utils.replaceNullBySpace(item.getOperatorName());
 					}
 				});
 		feedsDict.addStringField(R.id.feed_item_container_import_date,
@@ -289,7 +289,7 @@ public class GateExportListFragment extends SherlockFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return Utils.stripNull(item.getCheckInTime());
+						return Utils.replaceNullBySpace(item.getCheckInTime());
 					}
 				});
 		feedsDict.addStringField(R.id.feed_item_container_export_date,
@@ -297,7 +297,7 @@ public class GateExportListFragment extends SherlockFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return Utils.stripNull(item.getCheckOutTime());
+						return Utils.replaceNullBySpace(item.getCheckOutTime());
 					}
 				});
 		feedsDict.addDynamicImageField(R.id.feed_item_picture,
@@ -305,12 +305,12 @@ public class GateExportListFragment extends SherlockFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getImageIdPath();
+						return Utils.stripNull(item.getImageIdPath());
 					}
 				}, new DynamicImageLoader() {
 					@Override
 					public void loadImage(String url, ImageView view) {
-						if (url != null && !TextUtils.isEmpty(url)) {
+						if (!TextUtils.isEmpty(url)) {
 							imageLoader.displayImage(url, view);
 						} else {
 							view.setImageResource(R.drawable.ic_app);

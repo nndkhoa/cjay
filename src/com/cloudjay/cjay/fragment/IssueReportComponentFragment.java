@@ -152,7 +152,7 @@ public class IssueReportComponentFragment extends IssueReportFragment  {
 				new StringExtractor<ComponentCode>() {
 					@Override
 					public String getStringValue(ComponentCode item, int position) {
-						return Utils.stripNull(item.getName());
+						return Utils.replaceNullBySpace(item.getName());
 					}
 				});
 		mComponentsAdapter = new FunDapter<ComponentCode>(getActivity(), components,

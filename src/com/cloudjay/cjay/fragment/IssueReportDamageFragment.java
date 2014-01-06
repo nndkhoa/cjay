@@ -152,7 +152,7 @@ public class IssueReportDamageFragment extends IssueReportFragment  {
 				new StringExtractor<DamageCode>() {
 					@Override
 					public String getStringValue(DamageCode item, int position) {
-						return Utils.stripNull(item.getName());
+						return Utils.replaceNullBySpace(item.getName());
 					}
 				});
 		mDamagesAdapter = new FunDapter<DamageCode>(getActivity(), damageCodes,
