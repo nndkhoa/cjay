@@ -31,11 +31,15 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.AuditorContainerActivity_;
+import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.events.DataLoadedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
@@ -97,12 +101,45 @@ public class AuditorReportingListFragment extends SherlockFragment {
 		mSelectedContainerSession = null;
 	}
 
-	@OptionsItem(R.id.menu_edit_container)
-	void editMenuItemSelected() {
-		// Open dialog for editing details
-		showContainerDetailDialog(mSelectedContainerSession.getContainerId(),
-				mSelectedContainerSession.getOperatorName(),
-				AddContainerDialog.CONTAINER_DIALOG_EDIT);
+//	@OptionsItem(R.id.menu_edit_container)
+//	void editMenuItemSelected() {
+//		// Open dialog for editing details
+//		showContainerDetailDialog(mSelectedContainerSession.getContainerId(),
+//				mSelectedContainerSession.getOperatorName(),
+//				AddContainerDialog.CONTAINER_DIALOG_EDIT);
+//	}
+	
+	@OptionsItem(R.id.menu_upload)
+	void uploadMenuItemSelected() {
+		if (mSelectedContainerSession != null) {
+			try {
+				Logger.Log(LOG_TAG, "Menu upload item clicked");
+
+				ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
+						.getInstance().getDatabaseManager()
+						.getHelper(getActivity()).getContainerSessionDaoImpl();
+
+				// User confirm upload
+				mSelectedContainerSession.setUploadConfirmation(true);
+
+				mSelectedContainerSession
+						.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+
+				containerSessionDaoImpl.update(mSelectedContainerSession);
+
+				// It will trigger `UploadsFragment` Adapter
+				// notifyDataSetChanged
+				EventBus.getDefault().post(
+						new ContainerSessionEnqueueEvent(
+								mSelectedContainerSession));
+
+				// hide menu items
+				hideMenuItems();
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Click(R.id.add_button)
@@ -115,12 +152,8 @@ public class AuditorReportingListFragment extends SherlockFragment {
 
 	@ItemClick(R.id.container_list)
 	void listItemClicked(int position) {
-		// refresh highlighting
-		mFeedListView.setItemChecked(position, false);
-
 		// clear current selection
-		mSelectedContainerSession = null;
-		getActivity().supportInvalidateOptionsMenu();
+		hideMenuItems();
 
 		Intent intent = new Intent(getActivity(),
 				AuditorContainerActivity_.class);
@@ -131,10 +164,8 @@ public class AuditorReportingListFragment extends SherlockFragment {
 
 	@ItemLongClick(R.id.container_list)
 	void listItemLongClicked(int position) {
-		// refresh highlighting
+		// refresh highlighting and menu
 		mFeedListView.setItemChecked(position, true);
-
-		// refresh menu
 		mSelectedContainerSession = mFeedsAdapter.getItem(position);
 		getActivity().supportInvalidateOptionsMenu();
 	}
@@ -143,8 +174,12 @@ public class AuditorReportingListFragment extends SherlockFragment {
 	public void onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
 
-		boolean isDisplayed = !(mSelectedContainerSession == null);
-		menu.findItem(R.id.menu_edit_container).setVisible(isDisplayed);
+		if (mState == STATE_REPORTING) {
+			boolean isDisplayed = (mSelectedContainerSession != null);
+			menu.findItem(R.id.menu_upload).setVisible(isDisplayed);	
+		} else {
+			menu.findItem(R.id.menu_upload).setVisible(false);			
+		}
 	}
 
 	public void setState(int state) {
@@ -272,7 +307,7 @@ public class AuditorReportingListFragment extends SherlockFragment {
 					@Override
 					public String getStringValue(ContainerSession item,
 							int position) {
-						return item.getOriginalPhotoUri().toString();
+						return item.getImageIdPath();
 					}
 				}, new DynamicImageLoader() {
 					@Override
@@ -287,7 +322,12 @@ public class AuditorReportingListFragment extends SherlockFragment {
 		mFeedListView.setAdapter(mFeedsAdapter);
 	}
 
-	public void onEvent(DataLoadedEvent event) {
+	public void onEvent(ContainerSessionEnqueueEvent event) {
+		Logger.Log(LOG_TAG, "onEvent ContainerSessionEnqueueEvent");
+		refresh();
+	}
+
+	public void onEventMainThread(DataLoadedEvent event) {
 		Logger.Log(LOG_TAG, "onEvent DataLoadedEvent");
 		refresh();
 	}
@@ -307,13 +347,18 @@ public class AuditorReportingListFragment extends SherlockFragment {
 			mSearchEditText.setText(""); // this will refresh the list
 		}
 	}
+	
+	void hideMenuItems() {
+		mSelectedContainerSession = null;
+		mFeedListView.setItemChecked(-1, true);
+		getActivity().supportInvalidateOptionsMenu();
+	}
 
 	@Override
 	public void onResume() {
 		if (mFeedsAdapter != null) {
 			refresh();
 		}
-
 		super.onResume();
 	}
 
