@@ -1,5 +1,9 @@
 package com.cloudjay.cjay.fragment;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ViewById;
+
 import android.app.Activity;
 import android.text.InputType;
 import android.view.View;
@@ -12,9 +16,6 @@ import android.widget.LinearLayout;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.Issue;
-import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_issue_location_code)
 public class IssueReportLocationFragment extends IssueReportFragment 
@@ -159,11 +160,11 @@ public class IssueReportLocationFragment extends IssueReportFragment
 		switch (step) {
 		case 0:
 		case 1:
-		case 2:
 			p.weight = 0;
 			mCodeButtons[5].setLayoutParams(p);
 			mCodeButtons[11].setLayoutParams(p);
 			break;
+		case 2:
 		case 3:
 		default:
 			p.weight = 1;
