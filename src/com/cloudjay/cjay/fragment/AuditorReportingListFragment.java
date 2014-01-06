@@ -17,6 +17,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
@@ -145,8 +146,14 @@ public class AuditorReportingListFragment extends SherlockFragment {
 	@Click(R.id.add_button)
 	void addButtonClicked() {
 		// show add container dialog
+		String containerId;
+		if (!TextUtils.isEmpty(mSearchEditText.getText().toString())) {
+			containerId = mSearchEditText.getText().toString();
+		} else {
+			containerId = getResources().getString(R.string.default_container_id);
+		}
 		showContainerDetailDialog(
-				getResources().getString(R.string.default_container_id), "",
+				containerId, "",
 				AddContainerDialog.CONTAINER_DIALOG_ADD);
 	}
 
