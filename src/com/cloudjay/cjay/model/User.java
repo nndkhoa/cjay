@@ -210,8 +210,8 @@ public class User {
 			break;
 
 		case User.ROLE_REPAIR_STAFF:
-			// result = 4; // repair confirmed containers
-			result = 1; // temporary
+			result = 4; // repair confirmed containers
+			// result = 1; // temporary
 			break;
 
 		default:

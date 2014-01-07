@@ -49,26 +49,10 @@ public class CJayApplication extends Application {
 	public static final String THREAD_FILTERS = "filters_thread";
 
 	private BitmapLruCache mImageCache;
-
 	IDatabaseManager databaseManager = null;
 	IHttpRequestWrapper httpRequestWrapper = null;
 
-	private ExecutorService mDatabaseThreadExecutor, mMultiThreadExecutor;
-
-	public ExecutorService getMultiThreadExecutorService() {
-		if (null == mMultiThreadExecutor || mMultiThreadExecutor.isShutdown()) {
-			final int numThreads = Math.round(Runtime.getRuntime()
-					.availableProcessors() * EXECUTOR_POOL_SIZE_PER_CORE);
-			mMultiThreadExecutor = Executors.newFixedThreadPool(numThreads,
-					new PhotupThreadFactory());
-
-			if (Flags.DEBUG) {
-				Log.d(LOG_TAG, "MultiThreadExecutor created with " + numThreads
-						+ " threads");
-			}
-		}
-		return mMultiThreadExecutor;
-	}
+	private ExecutorService mDatabaseThreadExecutor;
 
 	public ExecutorService getDatabaseThreadExecutorService() {
 
