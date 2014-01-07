@@ -108,7 +108,7 @@ public class User {
 	public void setUserName(String userName) {
 		this.username = userName;
 	}
-	
+
 	public int getID() {
 		return id;
 	}
@@ -211,7 +211,7 @@ public class User {
 
 		case User.ROLE_REPAIR_STAFF:
 			// result = 4; // repair confirmed containers
-			result = 1;
+			result = 1; // temporary
 			break;
 
 		default:

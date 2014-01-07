@@ -482,34 +482,31 @@ public class CJayClient implements ICJayClient {
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 
 		String response = "";
-
+		String url = "";
 		switch (userRole) {
 		case User.ROLE_REPAIR_STAFF:
-			response = requestWrapper
-					.sendGet(
-							String.format(
-									CJayConstant.LIST_CONTAINER_SESSIONS_REPORT_LIST_WITH_FILTER,
-									Integer.toString(filterStatus)), headers);
+			url = String
+					.format(CJayConstant.LIST_CONTAINER_SESSIONS_REPORT_LIST_WITH_FILTER,
+							Integer.toString(filterStatus));
 			break;
 
 		case User.ROLE_GATE_KEEPER:
 			// simply send request to get all containers that automatically
 			// filter by server with `check_out_time = null`
 
-			response = requestWrapper.sendGet(
-					CJayConstant.LIST_CONTAINER_SESSIONS, headers);
+			url = CJayConstant.LIST_CONTAINER_SESSIONS;
 			break;
 
 		case User.ROLE_AUDITOR:
 		default:
 
-			String url = String.format(
+			url = String.format(
 					CJayConstant.LIST_CONTAINER_SESSIONS_WITH_FILTER,
 					Integer.toString(filterStatus));
-
-			response = requestWrapper.sendGet(url, headers);
 			break;
 		}
+
+		response = requestWrapper.sendGet(url, headers);
 
 		if (TextUtils.isEmpty(response)) {
 			Logger.Log(
@@ -587,32 +584,28 @@ public class CJayClient implements ICJayClient {
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 
 		String response = "";
+		String url = "";
 		switch (userRole) {
 		case User.ROLE_REPAIR_STAFF:
-			response = requestWrapper
-					.sendGet(
-							String.format(
-									CJayConstant.LIST_CONTAINER_SESSIONS_REPORT_LIST_WITH_FILTER_AND_DATETIME,
-									Integer.toString(filterStatus), date),
-							headers);
+			url = String
+					.format(CJayConstant.LIST_CONTAINER_SESSIONS_REPORT_LIST_WITH_FILTER_AND_DATETIME,
+							Integer.toString(filterStatus), date);
 			break;
 
 		case User.ROLE_GATE_KEEPER:
-			response = requestWrapper.sendGet(String.format(
-					CJayConstant.LIST_CONTAINER_SESSIONS_WITH_DATETIME, date),
-					headers);
+			url = String.format(
+					CJayConstant.LIST_CONTAINER_SESSIONS_WITH_DATETIME, date);
 			break;
 
 		case User.ROLE_AUDITOR:
 		default:
-			response = requestWrapper
-					.sendGet(
-							String.format(
-									CJayConstant.LIST_CONTAINER_SESSIONS_WITH_FILTER_AND_DATETIME,
-									Integer.toString(filterStatus), date),
-							headers);
+			url = String
+					.format(CJayConstant.LIST_CONTAINER_SESSIONS_WITH_FILTER_AND_DATETIME,
+							Integer.toString(filterStatus), date);
 			break;
 		}
+
+		response = requestWrapper.sendGet(url, headers);
 
 		if (TextUtils.isEmpty(response)) {
 			Logger.Log(LOG_TAG, "No new items from: " + date

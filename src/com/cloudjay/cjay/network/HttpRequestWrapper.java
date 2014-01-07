@@ -150,6 +150,8 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 	}
 
 	public String sendGet(String url, Map<String, String> headers) {
+
+		Logger.Log(LOG_TAG, "Url: " + url);
 		httpGet = new HttpGet(url);
 
 		headers.put("Accept", DEFAULT_ACCEPT_HEADER);

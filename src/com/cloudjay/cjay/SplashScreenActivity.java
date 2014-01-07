@@ -5,6 +5,7 @@ import java.util.Calendar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.widget.ImageView;
 
 import com.cloudjay.cjay.network.CJayClient;
@@ -23,6 +24,12 @@ public class SplashScreenActivity extends CJayActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splash_screen);
+		
+		if (android.os.Build.VERSION.SDK_INT > 9) {
+			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+					.permitAll().build();
+			StrictMode.setThreadPolicy(policy);
+		}
 
 		backgroundImageView = (ImageView) findViewById(R.id.splash_screen_background);
 
