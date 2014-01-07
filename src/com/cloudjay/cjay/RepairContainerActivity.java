@@ -114,7 +114,7 @@ public class RepairContainerActivity extends SherlockFragmentActivity implements
 
 		public AuditorHomeTabPageAdaptor(FragmentManager fm, String[] locations) {
 			super(fm);
-			this.locations = locations;
+			this.locations = locations; 
 		}
 
 		public int getCount() {

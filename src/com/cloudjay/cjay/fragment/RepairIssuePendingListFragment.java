@@ -56,7 +56,6 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 	@AfterViews
 	void afterViews() {
 		imageLoader = ImageLoader.getInstance();
-
 		initIssueFeedAdapter(null);
 		mSelectedIssue = null;
 	}
@@ -64,7 +63,7 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 	@ItemClick(R.id.feeds)
 	void imageItemClicked(int position) {
 		mSelectedIssue = mFeedsAdapter.getItem(position);
-
+ 
 		// show issue report activity
 		Intent intent = new Intent(getActivity(),
 				RepairIssueReportActivity_.class);
