@@ -1,5 +1,7 @@
 package com.cloudjay.cjay.model;
 
+import java.util.UUID;
+
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -42,13 +44,17 @@ public class CJayImage implements Parcelable {
 		this.type = type;
 		this.image_name = image_name;
 		this.time_posted = time_posted;
+		this.uuid = UUID.randomUUID().toString();
+		this.mUri = image_name;
 	}
 
 	public CJayImage(int id, int type, String image_name) {
 		this.id = id;
 		this.type = type;
 		this.image_name = image_name;
+		this.uuid = UUID.randomUUID().toString();
 		time_posted = "";
+		this.mUri = image_name;
 	}
 
 	@DatabaseField(columnName = ID, defaultValue = "0")

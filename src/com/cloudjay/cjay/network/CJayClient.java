@@ -13,6 +13,7 @@ import java.util.UUID;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.R.anim;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
@@ -248,10 +249,13 @@ public class CJayClient implements ICJayClient {
 						nowString);
 
 			} else {
-				Logger.Log(LOG_TAG, "get updated list container sessions");
 
 				String date = PreferencesUtil.getPrefsValue(ctx,
 						PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE);
+
+				Logger.Log(LOG_TAG,
+						"get updated list container sessions from last time: "
+								+ date);
 
 				// update Last Update for each time convert container session
 				containerSessions = getContainerSessions(ctx, userRole,
@@ -263,8 +267,20 @@ public class CJayClient implements ICJayClient {
 						nowString);
 
 				if (containerSessions == null) {
-					Logger.Log(LOG_TAG, "No new container sessions");
+					Logger.Log(LOG_TAG, "-----> NO new container sessions");
+				} else {
+					Logger.Log(LOG_TAG,
+							"Has " + Integer.toString(containerSessions.size())
+									+ " new container sessions");
 				}
+
+				Logger.Log(
+						LOG_TAG,
+						"----> Last update from "
+								+ PreferencesUtil
+										.getPrefsValue(
+												ctx,
+												PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE));
 			}
 
 			if (null != containerSessions) {
@@ -563,8 +579,8 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public List<ContainerSession> getContainerSessions(Context ctx,
-			int userRole, int filterStatus, String date) {
+	public synchronized List<ContainerSession> getContainerSessions(
+			Context ctx, int userRole, int filterStatus, String date) {
 
 		Logger.Log(LOG_TAG,
 				"getContainerSessions(Context ctx, int userRole, String date");

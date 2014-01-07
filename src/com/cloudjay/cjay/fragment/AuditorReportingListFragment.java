@@ -352,6 +352,7 @@ public class AuditorReportingListFragment extends SherlockFragment {
 		}
 
 		if (mSearchEditText != null) {
+			mFeedsAdapter.updateData(mFeeds);
 			mSearchEditText.setText(""); // this will refresh the list
 		}
 	}
@@ -364,6 +365,7 @@ public class AuditorReportingListFragment extends SherlockFragment {
 
 	@Override
 	public void onResume() {
+
 		if (mFeedsAdapter != null) {
 			refresh();
 		}

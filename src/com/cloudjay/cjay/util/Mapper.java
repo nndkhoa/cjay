@@ -249,8 +249,8 @@ public class Mapper {
 	 * @param ctx
 	 * @return
 	 */
-	public ContainerSession toContainerSession(TmpContainerSession tmpSession,
-			Context ctx) {
+	public synchronized ContainerSession toContainerSession(
+			TmpContainerSession tmpSession, Context ctx) {
 
 		try {
 
@@ -365,6 +365,7 @@ public class Mapper {
 									item.getImageName());
 
 							tmpCJayImage.setIssue(issue);
+
 							cJayImages.add(tmpCJayImage);
 							cJayImageDaoImpl.addCJayImage(tmpCJayImage);
 						}
