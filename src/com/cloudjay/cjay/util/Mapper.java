@@ -404,11 +404,11 @@ public class Mapper {
 			}
 
 			// TODO: Không cần add chiều xuôi??
-			if (null != listImages)
-				containerSession.setCJayImages(listImages);
-
-			if (null != issues)
-				containerSession.setIssues(issues);
+			// if (null != listImages)
+			// containerSession.setCJayImages(listImages);
+			//
+			// if (null != issues)
+			// containerSession.setIssues(issues);
 
 			return containerSession;
 		} catch (SQLException e) {

@@ -72,6 +72,7 @@ public class Issue implements Parcelable {
 		this.height = height;
 		this.quantity = quantity;
 		this.cJayImages = cJayImages;
+		this.uuid = UUID.randomUUID().toString();
 	}
 
 	public Issue(int id, DamageCode damageCode, RepairCode repairCode,
@@ -86,7 +87,7 @@ public class Issue implements Parcelable {
 		this.length = length;
 		this.height = height;
 		this.quantity = quantity;
-
+		this.uuid = UUID.randomUUID().toString();
 	}
 
 	public Issue() {

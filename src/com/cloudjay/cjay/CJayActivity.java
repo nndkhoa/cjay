@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.widget.TabHost.OnTabChangeListener;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.cloudjay.cjay.model.User;
@@ -86,6 +87,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 			// DataCenter.reload(getApplicationContext());
 
+			// TODO: need to refactor
 			reloadData();
 			context = getApplicationContext();
 
