@@ -8,6 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.Click;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.NoTitle;
+import org.androidannotations.annotations.SystemService;
+import org.androidannotations.annotations.ViewById;
+
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.content.res.Resources.NotFoundException;
@@ -41,6 +50,7 @@ import android.widget.Toast;
 import com.aerilys.helpers.android.UIHelper;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -49,14 +59,8 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
-import com.googlecode.androidannotations.annotations.AfterViews;
-import com.googlecode.androidannotations.annotations.Background;
-import com.googlecode.androidannotations.annotations.Click;
-import com.googlecode.androidannotations.annotations.EActivity;
-import com.googlecode.androidannotations.annotations.Extra;
-import com.googlecode.androidannotations.annotations.NoTitle;
-import com.googlecode.androidannotations.annotations.SystemService;
-import com.googlecode.androidannotations.annotations.ViewById;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Input:
@@ -124,9 +128,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	@SystemService
 	AudioManager audioManager;
 
-	// @Extra(CJAY_CONTAINER_SESSION_EXTRA)
-	// TmpContainerSession tmpContainerSession;
-
 	ContainerSession containerSession = null;
 
 	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
@@ -134,6 +135,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Extra("type")
 	int type = 0;
+
+	@Extra("tag")
+	String tag = "";
 
 	// endregion
 
@@ -471,13 +475,16 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			imageType = "repair";
 			break;
 		}
+
+		// TODO: BUG HERE
 		String depotCode = containerSession.getContainer().getDepot()
 				.getDepotCode();
 
-		// filename sample: gate-in-[depot-id]-2013-12-19-[UUID].jpg
+		// filename sample:
+		// [depot-code]-2013-12-19-[gate-in|gate-out|report]-[UUID].jpg
 		String fileName = depotCode + "-"
-				+ StringHelper.getCurrentTimestamp("yyyy-mm-dd") + imageType
-				+ "-" + uuid + ".jpg";
+				+ StringHelper.getCurrentTimestamp("yyyy-mm-dd") + "-"
+				+ imageType + "-" + uuid + ".jpg";
 
 		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
 
@@ -494,7 +501,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		}
 	}
 
-	void uploadImage(String uuid, String uri, String image_name) {
+	private synchronized void uploadImage(String uuid, String uri,
+			String image_name) {
 
 		// Create Database Entity Object
 		CJayImage uploadItem = new CJayImage();
@@ -524,6 +532,12 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}
+
+		// tell people that an image has been created
+		if (!TextUtils.isEmpty(tag)) {
+			EventBus.getDefault()
+					.post(new CJayImageAddedEvent(uploadItem, tag));
 		}
 	}
 

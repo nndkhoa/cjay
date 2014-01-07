@@ -6,13 +6,13 @@ package com.cloudjay.cjay.util;
 
 import java.sql.SQLException;
 
+import android.content.Context;
+
 import com.cloudjay.cjay.dao.IUserDao;
 import com.cloudjay.cjay.model.DatabaseHelper;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
-
-import android.content.Context;
 
 public class Session {
 
@@ -23,6 +23,14 @@ public class Session {
 
 	public User getCurrentUser() {
 		return currentUser;
+	}
+
+	public int getUserRole() {
+		return currentUser.getRole();
+	}
+
+	public int getFilterStatus() {
+		return currentUser.getFilterStatus();
 	}
 
 	public Session(User user) {
@@ -71,6 +79,9 @@ public class Session {
 				this.currentUser = null;
 				return true;
 			}
+
+			helper.close();
+			context.deleteDatabase(helper.DATABASE_NAME);
 
 		} catch (SQLException e) {
 			e.printStackTrace();

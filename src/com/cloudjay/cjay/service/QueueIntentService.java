@@ -1,9 +1,10 @@
 package com.cloudjay.cjay.service;
 
 import android.app.ActivityManager;
-import android.app.IntentService;
 import android.app.ActivityManager.RunningServiceInfo;
+import android.app.IntentService;
 import android.content.Intent;
+
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.util.CountingInputStreamEntity;
 

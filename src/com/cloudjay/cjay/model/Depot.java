@@ -6,6 +6,7 @@ import java.util.List;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;

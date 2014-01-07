@@ -2,6 +2,7 @@ package com.cloudjay.cjay.network;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -40,6 +41,8 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 	private HttpPost httpPost = null;
 	private HttpGet httpGet = null;
 
+	private static final String LOG_TAG = "HttpRequestWrapper";
+
 	public static final String DEFAULT_ACCEPT_HEADER = "text/html,application/xml,application/xhtml+xml,text/html,application/json;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5";
 	public static final String DEFAULT_CONTENT_TYPE = "application/x-www-form-urlencoded";
 	public static final String JSON_CONTENT_TYPE = "application/json";
@@ -47,7 +50,10 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 	public HttpRequestWrapper() {
 		HttpParams myParams = new BasicHttpParams();
 		HttpConnectionParams.setConnectionTimeout(myParams, 10000);
-		HttpConnectionParams.setSoTimeout(myParams, 10000);
+
+		// this will cause SocketTimeout
+		// HttpConnectionParams.setSoTimeout(myParams, 10000);
+
 		HttpProtocolParams.setVersion(myParams, HttpVersion.HTTP_1_1);
 		HttpProtocolParams.setContentCharset(myParams,
 				HTTP.DEFAULT_CONTENT_CHARSET);
@@ -65,22 +71,24 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 		localContext = new BasicHttpContext();
 	}
 
-	public String sendPost(String url, String data) {
+	public String sendPost(String url, String data)
+			throws SocketTimeoutException {
 		return sendPost(url, data, null);
 	}
 
-	public String sendJSONPost(String url, JSONObject data) {
+	public String sendJSONPost(String url, JSONObject data)
+			throws SocketTimeoutException {
 		Map<String, String> headers = new HashMap<String, String>();
 		return sendJSONPost(url, data, headers);
 	}
 
 	public String sendJSONPost(String url, JSONObject data,
-			Map<String, String> headers) {
+			Map<String, String> headers) throws SocketTimeoutException {
 		return sendPost(url, data.toString(), "application/json", headers);
 	}
 
 	public String sendPost(String url, String data, String contentType,
-			Map<String, String> headers) {
+			Map<String, String> headers) throws SocketTimeoutException {
 
 		Logger.Log("URL: " + url);
 		Logger.Log("Data: " + data);
@@ -120,13 +128,18 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 		try {
 			response = httpClient.execute(httpPost, localContext);
 			ret = EntityUtils.toString(response.getEntity());
+			Logger.Log(LOG_TAG, "Return from server: " + ret);
+
+		} catch (SocketTimeoutException se) {
+			throw new SocketTimeoutException();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return ret;
 	}
 
-	public String sendPost(String url, String data, String contentType) {
+	public String sendPost(String url, String data, String contentType)
+			throws SocketTimeoutException {
 		Map<String, String> headers = new HashMap<String, String>();
 		return sendPost(url, data, contentType, headers);
 	}
@@ -137,6 +150,8 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 	}
 
 	public String sendGet(String url, Map<String, String> headers) {
+
+		Logger.Log(LOG_TAG, "Url: " + url);
 		httpGet = new HttpGet(url);
 
 		headers.put("Accept", DEFAULT_ACCEPT_HEADER);
@@ -154,12 +169,14 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 		try {
 			response = httpClient.execute(httpGet);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 		String ret = null;
 		try {
 			ret = EntityUtils.toString(response.getEntity(), HTTP.UTF_8);
 		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		return ret;
 	}

@@ -7,8 +7,8 @@ import java.util.concurrent.Executors;
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
-import uk.co.senab.bitmapcache.BitmapLruCache;
 
+import uk.co.senab.bitmapcache.BitmapLruCache;
 import android.app.AlarmManager;
 import android.app.Application;
 import android.app.PendingIntent;
@@ -49,26 +49,10 @@ public class CJayApplication extends Application {
 	public static final String THREAD_FILTERS = "filters_thread";
 
 	private BitmapLruCache mImageCache;
-
 	IDatabaseManager databaseManager = null;
 	IHttpRequestWrapper httpRequestWrapper = null;
 
-	private ExecutorService mDatabaseThreadExecutor, mMultiThreadExecutor;
-
-	public ExecutorService getMultiThreadExecutorService() {
-		if (null == mMultiThreadExecutor || mMultiThreadExecutor.isShutdown()) {
-			final int numThreads = Math.round(Runtime.getRuntime()
-					.availableProcessors() * EXECUTOR_POOL_SIZE_PER_CORE);
-			mMultiThreadExecutor = Executors.newFixedThreadPool(numThreads,
-					new PhotupThreadFactory());
-
-			if (Flags.DEBUG) {
-				Log.d(LOG_TAG, "MultiThreadExecutor created with " + numThreads
-						+ " threads");
-			}
-		}
-		return mMultiThreadExecutor;
-	}
+	private ExecutorService mDatabaseThreadExecutor;
 
 	public ExecutorService getDatabaseThreadExecutorService() {
 
@@ -95,7 +79,7 @@ public class CJayApplication extends Application {
 			break;
 
 		case 4: // Sửa chữa
-			intent = new Intent(context, RepairTeamHomeActivity_.class);
+			intent = new Intent(context, RepairHomeActivity_.class);
 			break;
 
 		case 6: // Cổng
@@ -154,6 +138,28 @@ public class CJayApplication extends Application {
 		// Start every 10 seconds
 		alarm.setRepeating(AlarmManager.RTC_WAKEUP, current.getTimeInMillis(),
 				10 * 1000, pintent);
+
+		// // TEST
+		// String resp =
+		// "[{\"id\": 54, \"container_id\": \"UDJEU\", \"image_id_path\": \"http://storage-cjay.cloudjay.com/phuoc_long_icd_test-2014-49-05-gate-in-b5b89f5b-0dcf-4010-9b80-99e7bf02fdd6.jpg\", \"operator_code\": \"CAI\", \"operator_name\": \"CAI (CAI)\", \"check_in_time\": \"2014-01-05T03:50:15\", \"check_out_time\": null, \"depot_code\": \"phuoc_long_icd_test\", \"gate_report_images\": [{\"id\": 190, \"type\": 0, \"time_posted\": \"2014-01-05T03:50:15\", \"image_name\": \"http://storage-cjay.cloudjay.com/phuoc_long_icd_test-2014-49-05-gate-in-b5b89f5b-0dcf-4010-9b80-99e7bf02fdd6.jpg\"}, {\"id\": 191, \"type\": 0, \"time_posted\": \"2014-01-05T03:50:15\", \"image_name\": \"http://storage-cjay.cloudjay.com/phuoc_long_icd_test-2014-49-05-gate-in-bd38639d-35ae-4dbe-ae8a-4a106035f820.jpg\"}, {\"id\": 192, \"type\": 0, \"time_posted\": \"2014-01-05T03:50:15\", \"image_name\": \"http://storage-cjay.cloudjay.com/phuoc_long_icd_test-2014-49-05-gate-in-695960ee-3582-44a1-b6e4-b5925b34f457.jpg\"}], \"status\": 0}]";
+		// Gson gson = new GsonBuilder().setDateFormat(
+		// CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
+		//
+		// Type listType = new TypeToken<List<TmpContainerSession>>() {
+		// }.getType();
+		//
+		// List<TmpContainerSession> tmpContainerSessions = null;
+		// try {
+		// tmpContainerSessions = gson.fromJson(resp, listType);
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
+		//
+		// if (null != tmpContainerSessions) {
+		// TmpContainerSession tmp = tmpContainerSessions.get(0);
+		//
+		// }
+
 	}
 
 	public void checkInstantUploadReceiverState() {

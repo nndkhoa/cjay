@@ -1,6 +1,12 @@
 package com.cloudjay.cjay;
 
-//import android.app.FragmentManager;
+import java.lang.reflect.Field;
+
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.ViewById;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -8,27 +14,46 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.view.ViewConfiguration;
+
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
-import com.googlecode.androidannotations.annotations.AfterViews;
-import com.googlecode.androidannotations.annotations.EActivity;
-import com.googlecode.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_auditor_home)
-public class AuditorHomeActivity extends SherlockFragmentActivity implements
+public class AuditorHomeActivity extends CJayActivity implements
 		OnPageChangeListener, TabListener,
 		AddContainerDialog.AddContainerDialogListener,
-		SearchOperatorDialog.SearchOperatorDialogListener  {
+		SearchOperatorDialog.SearchOperatorDialogListener {
+
+	// private static final String LOG_TAG = "AuditorHomeActivity";
 
 	private String[] locations;
 	@ViewById
 	ViewPager pager;
+
+	@Override
+	protected void onCreate(Bundle arg0) {
+
+		// Below code to show `More Action` item on menu
+		try {
+			ViewConfiguration config = ViewConfiguration.get(this);
+			Field menuKeyField = ViewConfiguration.class
+					.getDeclaredField("sHasPermanentMenuKey");
+			if (menuKeyField != null) {
+				menuKeyField.setAccessible(true);
+				menuKeyField.setBoolean(config, false);
+			}
+		} catch (Exception ex) {
+
+		}
+		super.onCreate(arg0);
+	}
 
 	@AfterViews
 	void afterViews() {
@@ -87,13 +112,13 @@ public class AuditorHomeActivity extends SherlockFragmentActivity implements
 	@Override
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
 	}
-	
+
 	@Override
 	public void OnOperatorSelected(Fragment parent, String containerId,
 			String operatorName, int mode) {
 		if (parent instanceof AuditorReportingListFragment) {
-			((AuditorReportingListFragment) parent).OnOperatorSelected(containerId,
-					operatorName, mode);
+			((AuditorReportingListFragment) parent).OnOperatorSelected(
+					containerId, operatorName, mode);
 		}
 	}
 
@@ -105,7 +130,7 @@ public class AuditorHomeActivity extends SherlockFragmentActivity implements
 					containerId, operatorName, mode);
 		}
 	}
-	
+
 	public class AuditorHomeTabPageAdaptor extends FragmentPagerAdapter {
 		private String[] locations;
 
@@ -119,20 +144,42 @@ public class AuditorHomeActivity extends SherlockFragmentActivity implements
 		}
 
 		public Fragment getItem(int position) {
-			Fragment fragment = new SampleFragment_();
-			Bundle bundle = new Bundle();
 			switch (position) {
 			case 0:
-				Fragment reportingListFragment_ = new AuditorReportingListFragment_();
-				return reportingListFragment_;
+				// containers that have no 'report images'
+				Fragment notReportedFragment = new AuditorReportingListFragment_();
+				((AuditorReportingListFragment_) notReportedFragment)
+						.setState(AuditorReportingListFragment_.STATE_NOT_REPORTED);
+				return notReportedFragment;
+
 			case 1:
-				Fragment reportedListFragment_ = new AuditorReportedListFragment_();
-				return reportedListFragment_;
+				// containers that have 'report images'
+				Fragment reportingFragment = new AuditorReportingListFragment_();
+				((AuditorReportingListFragment_) reportingFragment)
+						.setState(AuditorReportingListFragment_.STATE_REPORTING);
+				return reportingFragment;
+
+			case 2:
 			default:
-				bundle.putString("label", locations[position]);
-				fragment.setArguments(bundle);
-				return fragment;
+				Fragment uploadFragment = new UploadsFragment_();
+				return uploadFragment;
 			}
 		}
 	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_logout:
+
+			getSession().deleteSession(getApplicationContext());
+			startActivity(new Intent(this, LoginActivity_.class));
+
+			finish();
+			return true;
+		}
+
+		return super.onOptionsItemSelected(item);
+	}
+
 }

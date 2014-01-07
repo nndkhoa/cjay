@@ -5,16 +5,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+
 import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.UserDaoImpl;
+import com.cloudjay.cjay.events.DataLoadedEvent;
 import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Depot;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * 
@@ -91,18 +97,44 @@ public class DataCenter {
 		Logger.Log(LOG_TAG, "get list Operators");
 
 		try {
-			return getDatabaseManager().getHelper(context).getOperatorDaoImpl().getAllOperators();
+			return getDatabaseManager().getHelper(context).getOperatorDaoImpl()
+					.getAllOperators();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
-	
+
 	public List<ComponentCode> getListComponents(Context context) {
 		Logger.Log(LOG_TAG, "get list Components");
 
 		try {
-			return getDatabaseManager().getHelper(context).getComponentCodeDaoImpl().getAllComponentCodes();
+			return getDatabaseManager().getHelper(context)
+					.getComponentCodeDaoImpl().getAllComponentCodes();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public List<DamageCode> getListDamageCodes(Context context) {
+		Logger.Log(LOG_TAG, "get list Damage Codes");
+
+		try {
+			return getDatabaseManager().getHelper(context)
+					.getDamageCodeDaoImpl().getAllDamageCodes();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public List<RepairCode> getListRepairCodes(Context context) {
+		Logger.Log(LOG_TAG, "get list Repair Codes");
+
+		try {
+			return getDatabaseManager().getHelper(context)
+					.getRepairCodeDaoImpl().getAllRepairCodes();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -131,7 +163,7 @@ public class DataCenter {
 					currentUser.getDepotCode());
 
 			if (null != depots && !depots.isEmpty()) {
-
+				currentUser.setDepot(depots.get(0));
 			} else {
 				Depot depot = new Depot();
 				depot.setDepotCode(currentUser.getDepotCode());
@@ -175,21 +207,65 @@ public class DataCenter {
 		}
 		return null;
 	}
-	
-	public List<ContainerSession> getListReportedContainerSessions(Context context) {
+
+	public List<ContainerSession> getListReportedContainerSessions(
+			Context context) {
 		Logger.Log(LOG_TAG, "get list reported Container sessions");
 		try {
-			return getDatabaseManager().getHelper(context).getContainerSessionDaoImpl().getListReportedContainerSessions();
+			return getDatabaseManager().getHelper(context)
+					.getContainerSessionDaoImpl()
+					.getListReportedContainerSessions();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
-	
-	public List<ContainerSession> getListReportingContainerSessions(Context context) {
+
+	public List<ContainerSession> getListReportingContainerSessions(
+			Context context) {
 		Logger.Log(LOG_TAG, "get list reporting Container sessions");
 		try {
-			return getDatabaseManager().getHelper(context).getContainerSessionDaoImpl().getListReportingContainerSessions();
+			return getDatabaseManager().getHelper(context)
+					.getContainerSessionDaoImpl()
+					.getListReportingContainerSessions();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public List<ContainerSession> getListNotReportedContainerSessions(
+			Context context) {
+		Logger.Log(LOG_TAG, "get list not reported Container sessions");
+		try {
+			return getDatabaseManager().getHelper(context)
+					.getContainerSessionDaoImpl()
+					.getListNotReportedContainerSessions();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public List<ContainerSession> getListPendingContainerSessions(
+			Context context) {
+		Logger.Log(LOG_TAG, "get list pending Container sessions");
+		try {
+			return getDatabaseManager().getHelper(context)
+					.getContainerSessionDaoImpl()
+					.getListPendingContainerSessions();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public List<ContainerSession> getListFixedContainerSessions(Context context) {
+		Logger.Log(LOG_TAG, "get list fixed Container sessions");
+		try {
+			return getDatabaseManager().getHelper(context)
+					.getContainerSessionDaoImpl()
+					.getListFixedContainerSessions();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

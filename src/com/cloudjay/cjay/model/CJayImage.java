@@ -1,5 +1,7 @@
 package com.cloudjay.cjay.model;
 
+import java.util.UUID;
+
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -17,7 +19,7 @@ public class CJayImage implements Parcelable {
 	public static final int STATE_UPLOAD_IN_PROGRESS = 2;
 	public static final int STATE_UPLOAD_WAITING = 1;
 	public static final int STATE_NONE = 0;
-	
+
 	public static final int TYPE_IMPORT = 0;
 	public static final int TYPE_EXPORT = 1;
 	public static final int TYPE_REPORT = 2;
@@ -39,13 +41,24 @@ public class CJayImage implements Parcelable {
 
 	public CJayImage(int id, int type, String time_posted, String image_name) {
 		this.id = id;
-		this.setType(type);
-		this.setImageName(image_name);
+		this.type = type;
+		this.image_name = image_name;
 		this.time_posted = time_posted;
+		this.uuid = UUID.randomUUID().toString();
+		this.mUri = image_name;
 	}
 
-	@DatabaseField(columnName = ID)
-	int id;
+	public CJayImage(int id, int type, String image_name) {
+		this.id = id;
+		this.type = type;
+		this.image_name = image_name;
+		this.uuid = UUID.randomUUID().toString();
+		time_posted = "";
+		this.mUri = image_name;
+	}
+
+	@DatabaseField(columnName = ID, defaultValue = "0")
+	private int id;
 
 	@DatabaseField(columnName = FIELD_IMAGE_NAME)
 	String image_name;
@@ -83,49 +96,49 @@ public class CJayImage implements Parcelable {
 	public void setIssue(Issue issue) {
 		this.issue = issue;
 	}
-	
+
 	public String getIssueLocationCode() {
 		if (issue != null) {
 			return issue.getLocationCode();
 		}
 		return null;
 	}
-	
+
 	public String getIssueComponentCode() {
 		if (issue != null) {
 			return issue.getComponentCodeString();
-		} 
+		}
 		return null;
 	}
-	
+
 	public String getIssueRepairCode() {
 		if (issue != null) {
 			return issue.getRepairCodeString();
-		} 
+		}
 		return null;
 	}
-	
+
 	public String getIssueDamageCode() {
 		if (issue != null) {
 			return issue.getDamageCodeString();
-		} 
+		}
 		return null;
 	}
-	
+
 	public String getIssueQuantity() {
 		if (issue != null) {
 			return String.valueOf(issue.getQuantity());
 		}
 		return null;
 	}
-	
+
 	public String getIssueLength() {
 		if (issue != null) {
 			return String.valueOf(issue.getLength());
 		}
 		return null;
 	}
-	
+
 	public String getIssueHeight() {
 		if (issue != null) {
 			return String.valueOf(issue.getHeight());
@@ -205,7 +218,7 @@ public class CJayImage implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 
-		dest.writeInt(id);
+		dest.writeInt(getId());
 		dest.writeString(image_name);
 		dest.writeString(time_posted);
 		dest.writeString(uuid);
@@ -217,7 +230,7 @@ public class CJayImage implements Parcelable {
 	}
 
 	private void readFromParcel(Parcel in) {
-		this.id = in.readInt();
+		this.setId(in.readInt());
 		this.image_name = in.readString();
 		this.time_posted = in.readString();
 		this.uuid = in.readString();
@@ -242,5 +255,13 @@ public class CJayImage implements Parcelable {
 	public CJayImage(Parcel in) {
 
 		readFromParcel(in);
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }

@@ -2,15 +2,16 @@ package com.cloudjay.cjay;
 
 import java.util.Calendar;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.StrictMode;
+import android.widget.ImageView;
+
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Session;
-
-import android.os.Bundle;
-import android.os.Handler;
-import android.widget.ImageView;
-import android.content.Intent;
 
 public class SplashScreenActivity extends CJayActivity {
 
@@ -24,20 +25,31 @@ public class SplashScreenActivity extends CJayActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splash_screen);
 
+		if (android.os.Build.VERSION.SDK_INT > 9) {
+			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+					.permitAll().build();
+			StrictMode.setThreadPolicy(policy);
+		}
+
 		backgroundImageView = (ImageView) findViewById(R.id.splash_screen_background);
 
 		Calendar cal = Calendar.getInstance();
 		int hour = cal.get(Calendar.HOUR_OF_DAY);
 		Boolean isNight = hour < 6 || hour > 18;
 
-		if (isNight) {
-			Logger.Log(LOG_TAG, "at Night");
-			backgroundImageView
-					.setBackgroundResource(R.drawable.container_terminal_night);
-		} else {
-			Logger.Log(LOG_TAG, "at Daytime");
-			backgroundImageView
-					.setBackgroundResource(R.drawable.container_terminal_day);
+		try {
+			if (isNight) {
+				Logger.Log(LOG_TAG, "at Night");
+
+				backgroundImageView
+						.setImageResource(R.drawable.container_terminal_night);
+			} else {
+				Logger.Log(LOG_TAG, "at Daytime");
+				backgroundImageView
+						.setImageResource(R.drawable.container_terminal_day);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		new Handler().postDelayed(new Runnable() {
@@ -53,10 +65,7 @@ public class SplashScreenActivity extends CJayActivity {
 				} else {
 					// user signed in
 					Logger.Log(LOG_TAG, "User signed in");
-					Logger.Log(LOG_TAG, "Fetching data from server ...");
-
 					session.extendAccessTokenIfNeeded(getApplicationContext());
-					CJayClient.getInstance().fetchData(getApplicationContext());
 					CJayApplication
 							.startCJayHomeActivity(SplashScreenActivity.this);
 				}

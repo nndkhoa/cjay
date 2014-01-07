@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
+
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 
@@ -24,9 +25,9 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.ParcelFileDescriptor;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
+import android.os.ParcelFileDescriptor;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -36,10 +37,12 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.SplashScreenActivity;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.events.ContainerSessionUploadedEvent;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.TmpContainerSession;
+import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.task.PhotupThreadRunnable;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -47,6 +50,8 @@ import com.cloudjay.cjay.util.CountingInputStreamEntity;
 import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Mapper;
+
+import de.greenrobot.event.EventBus;
 
 public class UploadIntentService extends IntentService implements
 		CountingInputStreamEntity.UploadListener {
@@ -73,7 +78,7 @@ public class UploadIntentService extends IntentService implements
 	 */
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		Logger.Log(LOG_TAG, "onHandleIntent");
+		// Logger.Log(LOG_TAG, "onHandleIntent");
 
 		if (NetworkHelper.isConnected(getApplicationContext())) {
 			try {
@@ -83,11 +88,12 @@ public class UploadIntentService extends IntentService implements
 					doFileUpload(uploadItem);
 				}
 
-				// // It will return container with `upload confirmation = true`
+				// It will return container which `upload confirmation = true`
 				ContainerSession containerSession = containerSessionDaoImpl
 						.getNextWaiting();
 				//
 				if (null != containerSession) {
+
 					//
 					// // trigger event to display in UploadsFragment
 					//
@@ -215,7 +221,8 @@ public class UploadIntentService extends IntentService implements
 	 * 
 	 * @param containerSession
 	 */
-	private void doUploadContainer(ContainerSession containerSession) {
+	private synchronized void doUploadContainer(
+			ContainerSession containerSession) {
 
 		Logger.Log(LOG_TAG,
 				"doUploadContainer: " + containerSession.getContainerId());
@@ -223,20 +230,43 @@ public class UploadIntentService extends IntentService implements
 		// post UploadStateChangedEvent
 
 		try {
+			String returnJson = "";
 			containerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_IN_PROGRESS);
 			containerSessionDaoImpl.update(containerSession);
+
 			// Convert ContainerSession to TmpContainerSession for uploading
-			TmpContainerSession uploadItem = Mapper.toTmpContainerSession(
-					containerSession, getApplicationContext());
+			TmpContainerSession uploadItem = Mapper.getInstance()
+					.toTmpContainerSession(containerSession,
+							getApplicationContext());
 
 			// Post to Server and notify event to UploadFragment
-			CJayClient.getInstance().postContainerSession(
-					getApplicationContext(), uploadItem);
+
+			User user = com.cloudjay.cjay.util.Session.restore(
+					getApplicationContext()).getCurrentUser();
+
+			Logger.Log(LOG_TAG, "Current User role: " + user.getRoleName());
+			if (user.getRole() == User.ROLE_GATE_KEEPER) {
+
+				returnJson = CJayClient.getInstance().postContainerSession(
+						getApplicationContext(), uploadItem);
+			} else {
+
+				returnJson = CJayClient.getInstance()
+						.postContainerSessionReportList(
+								getApplicationContext(), uploadItem);
+			}
+
+			// convert back then save containerSession
+			Mapper.getInstance().update(getApplicationContext(), returnJson,
+					containerSession);
 
 			containerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_COMPLETED);
 			containerSessionDaoImpl.update(containerSession);
+
+			EventBus.getDefault().post(
+					new ContainerSessionUploadedEvent(containerSession));
 
 		} catch (SQLException e1) {
 			e1.printStackTrace();
@@ -291,7 +321,7 @@ public class UploadIntentService extends IntentService implements
 	}
 
 	void finishedNotification() {
-		Logger.Log(LOG_TAG, "finishedNotification");
+		// Logger.Log(LOG_TAG, "finishedNotification");
 
 		if (null != mNotificationBuilder) {
 			String text = getResources().getQuantityString(
@@ -369,6 +399,7 @@ public class UploadIntentService extends IntentService implements
 				Log.i("FOO", resp.getStatusLine().getReasonPhrase());
 				if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_OK
 						|| resp.getStatusLine().getStatusCode() == HttpStatus.SC_ACCEPTED) {
+
 					// Set Status Success
 					uploadItem.setUploadState(CJayImage.STATE_UPLOAD_COMPLETED);
 					cJayImageDaoImpl.update(uploadItem);

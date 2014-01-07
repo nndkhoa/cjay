@@ -3,10 +3,18 @@ package com.cloudjay.cjay.fragment;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.ViewById;
+import org.droidparts.widget.ClearableEditText;
+import org.droidparts.widget.ClearableEditText.Listener;
+
 import android.app.Activity;
+import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.widget.EditText;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ListView;
 
 import com.ami.fundapter.BindDictionary;
@@ -18,10 +26,6 @@ import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Utils;
-import com.googlecode.androidannotations.annotations.AfterViews;
-import com.googlecode.androidannotations.annotations.EFragment;
-import com.googlecode.androidannotations.annotations.ItemClick;
-import com.googlecode.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_issue_component_code)
 public class IssueReportComponentFragment extends IssueReportFragment  {
@@ -34,7 +38,7 @@ public class IssueReportComponentFragment extends IssueReportFragment  {
 	private String mComponentName;
 	private boolean ignoreSearch;
 	
-	@ViewById(R.id.component_name) EditText mComponentEditText;
+	@ViewById(R.id.component_name) ClearableEditText mComponentEditText;
 	@ViewById(R.id.component_list) ListView mComponentListView;
 	
 	@AfterViews
@@ -51,6 +55,13 @@ public class IssueReportComponentFragment extends IssueReportFragment  {
 
 			public void onTextChanged(CharSequence s, int start, int before,
 					int count) {
+			}
+		});
+		mComponentEditText.setListener(new Listener() {
+			@Override
+			public void didClearText() {
+				mComponentCode = "";
+				mComponentName = "";
 			}
 		});
 		
@@ -78,6 +89,9 @@ public class IssueReportComponentFragment extends IssueReportFragment  {
 		mComponentEditText.setText(mComponentName);
 		ignoreSearch = false;
 		
+		// hide keyboard
+		hideKeyboard();
+		
 		// move to next tab
 		mCallback.onReportPageCompleted(AuditorIssueReportListener.TAB_ISSUE_COMPONENT);
 	}
@@ -103,6 +117,18 @@ public class IssueReportComponentFragment extends IssueReportFragment  {
 		mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_COMPONENT_CODE, mComponentCode);		
 	}
 	
+	@Override
+	public void showKeyboard() {
+	}
+	
+	@Override
+	public void hideKeyboard() {
+		// hide keyboard
+		InputMethodManager imm = (InputMethodManager) getActivity()
+				.getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(mComponentEditText.getWindowToken(), 0);
+	}
+	
 	private void search(String searchText) {
 		if (searchText.equals("") || ignoreSearch) {
 			mComponentsAdapter.updateData(mComponents);
@@ -122,15 +148,15 @@ public class IssueReportComponentFragment extends IssueReportFragment  {
 
 	private void initComponentsAdapter(ArrayList<ComponentCode> components) {
 		BindDictionary<ComponentCode> componentDict = new BindDictionary<ComponentCode>();
-		componentDict.addStringField(R.id.operator_name,
+		componentDict.addStringField(R.id.name,
 				new StringExtractor<ComponentCode>() {
 					@Override
 					public String getStringValue(ComponentCode item, int position) {
-						return Utils.stripNull(item.getName());
+						return Utils.replaceNullBySpace(item.getName());
 					}
 				});
 		mComponentsAdapter = new FunDapter<ComponentCode>(getActivity(), components,
-				R.layout.list_item_component, componentDict);
+				R.layout.list_item_issue_code, componentDict);
 		mComponentListView.setAdapter(mComponentsAdapter);
 	}
 }

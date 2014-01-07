@@ -7,6 +7,10 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "user", daoClass = UserDaoImpl.class)
 public class User {
 
+	public static final int ROLE_GATE_KEEPER = 6;
+	public static final int ROLE_AUDITOR = 1;
+	public static final int ROLE_REPAIR_STAFF = 4;
+
 	public static final String ID = "id";
 	public static final String USERNAME = "username";
 	public static final String EMAIL = "email";
@@ -105,6 +109,14 @@ public class User {
 		this.username = userName;
 	}
 
+	public int getID() {
+		return id;
+	}
+
+	public void setID(int id) {
+		this.id = id;
+	}
+
 	public String getEmail() {
 		return email;
 	}
@@ -183,5 +195,28 @@ public class User {
 
 	public void setPhone(int phone) {
 		this.phone = phone;
+	}
+
+	public int getFilterStatus() {
+		int result = 0;
+
+		switch (this.role) {
+		case User.ROLE_GATE_KEEPER:
+			result = 5; // repaired containers
+			break;
+
+		case User.ROLE_AUDITOR:
+			result = 0; // checked in containers
+			break;
+
+		case User.ROLE_REPAIR_STAFF:
+			result = 4; // repair confirmed containers
+			// result = 1; // temporary
+			break;
+
+		default:
+			break;
+		}
+		return result;
 	}
 }

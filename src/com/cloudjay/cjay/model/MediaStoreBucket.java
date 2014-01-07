@@ -15,9 +15,9 @@
  */
 package com.cloudjay.cjay.model;
 
-import com.cloudjay.cjay.R;
-
 import android.content.Context;
+
+import com.cloudjay.cjay.R;
 
 public class MediaStoreBucket {
 

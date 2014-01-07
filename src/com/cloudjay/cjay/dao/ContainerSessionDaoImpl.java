@@ -40,6 +40,16 @@ public class ContainerSessionDaoImpl extends
 	public void addContainerSessions(ContainerSession containerSession)
 			throws SQLException {
 		if (containerSession != null) {
+
+			ContainerSession tmp = this.queryForFirst(this.queryBuilder()
+					.where()
+					.eq(ContainerSession.FIELD_ID, containerSession.getId())
+					.prepare());
+
+			if (null != tmp) {
+				containerSession.setUuid(tmp.getUuid());
+			}
+
 			this.createOrUpdate(containerSession);
 		}
 	}
@@ -75,10 +85,21 @@ public class ContainerSessionDaoImpl extends
 		return null;
 	}
 
+	/**
+	 * 
+	 * return ContainerSession obj that has
+	 * 
+	 * - upload_confirmation = true
+	 * 
+	 * - upload state = WAITING
+	 * 
+	 * - all cjayimages are uploaded
+	 * 
+	 */
 	@Override
 	public ContainerSession getNextWaiting() throws SQLException {
 
-		Logger.Log(LOG_TAG, "getNextWaiting() at ContainerSessionDaoImpl");
+		// Logger.Log(LOG_TAG, "getNextWaiting() at ContainerSessionDaoImpl");
 
 		ContainerSession result = null;
 		List<ContainerSession> containerSessions = this
@@ -90,18 +111,20 @@ public class ContainerSessionDaoImpl extends
 						.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, true)
 						.prepare());
 
-		Logger.Log(
-				LOG_TAG,
-				"getNextWaiting with "
-						+ Integer.toString(containerSessions.size()) + " items");
-
 		for (ContainerSession containerSession : containerSessions) {
 
 			boolean flag = true;
 			Collection<CJayImage> cJayImages = containerSession.getCJayImages();
 
 			for (CJayImage cJayImage : cJayImages) {
-				if (cJayImage.getUploadState() != CJayImage.STATE_UPLOAD_COMPLETED) {
+				// int uploadState = cJayImage.getUploadState();
+				// if (uploadState == CJayImage.STATE_NONE || uploadState == cj)
+
+				if (cJayImage.getUploadState() != CJayImage.STATE_UPLOAD_COMPLETED
+						&& cJayImage.getUploadState() != CJayImage.STATE_UPLOAD_IN_PROGRESS) {
+
+					Logger.Log(LOG_TAG,
+							"Some cJayImages are still not uploaded");
 					flag = false;
 					break;
 				}
@@ -189,29 +212,65 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public List<ContainerSession> getListReportedContainerSessions()
 			throws SQLException {
-		Logger.Log(LOG_TAG, "getListReportedContainerSessions()");
+		// Logger.Log(LOG_TAG, "getListReportedContainerSessions()");
+		//
+		// List<ContainerSession> containerSessions =
+		// getNotUploadedContainerSessions();
+		// List<ContainerSession> reportedContainerSessions = new
+		// ArrayList<ContainerSession>();
+		//
+		// for (ContainerSession containerSession : containerSessions) {
+		// boolean hasReportTypeImages = false;
+		// boolean hasUnreportedImages = false;
+		// for (CJayImage cJayImage : containerSession.getCJayImages()) {
+		// if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
+		// hasReportTypeImages = true;
+		// if (cJayImage.getIssue() == null) {
+		// hasUnreportedImages = true;
+		// break;
+		// }
+		// }
+		// }
+		//
+		// // reported container sessions:
+		// // - containers have report images,
+		// // - and report images have issue
+		// if (hasReportTypeImages && !hasUnreportedImages) {
+		// reportedContainerSessions.add(containerSession);
+		// }
+		// }
+		//
+		// return reportedContainerSessions;
 
-		List<ContainerSession> containerSessions = getAllContainerSessions();
-		List<ContainerSession> reportedContainerSessions = new ArrayList<ContainerSession>();
+		return null; // Vu: don't need this function for now. But keep for
+						// reference
+	}
+
+	@Override
+	public List<ContainerSession> getListNotReportedContainerSessions()
+			throws SQLException {
+		Logger.Log(LOG_TAG, "getListNotReportedContainerSessions()");
+
+		List<ContainerSession> containerSessions = getNotUploadedContainerSessions();
+		List<ContainerSession> reportingContainerSessions = new ArrayList<ContainerSession>();
 
 		for (ContainerSession containerSession : containerSessions) {
 			boolean hasReportTypeImages = false;
-			boolean hasUnreportedImages = false;
 			for (CJayImage cJayImage : containerSession.getCJayImages()) {
 				if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
 					hasReportTypeImages = true;
-					if (cJayImage.getIssue() == null) {
-						hasUnreportedImages = true;
-						break;
-					}
+					break;
 				}
 			}
-			if (hasReportTypeImages && !hasUnreportedImages) {
-				reportedContainerSessions.add(containerSession);
+
+			// unreported container sessions:
+			// - containers don't have report images
+			if (!hasReportTypeImages) {
+				reportingContainerSessions.add(containerSession);
 			}
 		}
 
-		return reportedContainerSessions;
+		return reportingContainerSessions;
 	}
 
 	@Override
@@ -219,27 +278,68 @@ public class ContainerSessionDaoImpl extends
 			throws SQLException {
 		Logger.Log(LOG_TAG, "getListReportingContainerSessions()");
 
-		List<ContainerSession> containerSessions = getAllContainerSessions();
+		List<ContainerSession> containerSessions = getNotUploadedContainerSessions();
 		List<ContainerSession> reportingContainerSessions = new ArrayList<ContainerSession>();
 
 		for (ContainerSession containerSession : containerSessions) {
 			boolean hasReportTypeImages = false;
-			boolean hasUnreportedImages = false;
 			for (CJayImage cJayImage : containerSession.getCJayImages()) {
 				if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
 					hasReportTypeImages = true;
-					if (cJayImage.getIssue() == null) {
-						hasUnreportedImages = true;
-						break;
-					}
+					break;
 				}
 			}
-			if (!hasReportTypeImages
-					|| (hasReportTypeImages && hasUnreportedImages)) {
+
+			// reporting container sessions:
+			// - containers have report images,
+			if (hasReportTypeImages) {
 				reportingContainerSessions.add(containerSession);
 			}
 		}
 
 		return reportingContainerSessions;
+	}
+
+	@Override
+	public List<ContainerSession> getListPendingContainerSessions()
+			throws SQLException {
+		Logger.Log(LOG_TAG, "getListPendingContainerSessions()");
+
+		List<ContainerSession> containerSessions = this.query(this
+				.queryBuilder()
+				.where()
+				.eq(ContainerSession.FIELD_FIXED, false)
+				.and()
+				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
+				.and()
+				.ne(ContainerSession.FIELD_STATE,
+						ContainerSession.STATE_UPLOAD_COMPLETED).prepare());
+
+		return containerSessions;
+	}
+
+	@Override
+	public List<ContainerSession> getListFixedContainerSessions()
+			throws SQLException {
+		Logger.Log(LOG_TAG, "getListFixedContainerSessions()");
+
+		List<ContainerSession> containerSessions = this.query(this
+				.queryBuilder()
+				.where()
+				.eq(ContainerSession.FIELD_FIXED, true)
+				.and()
+				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
+				.and()
+				.ne(ContainerSession.FIELD_STATE,
+						ContainerSession.STATE_UPLOAD_COMPLETED).prepare());
+
+		return containerSessions;
+	}
+
+	private List<ContainerSession> getNotUploadedContainerSessions()
+			throws SQLException {
+		return this.query(this.queryBuilder().where()
+				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
+				.prepare());
 	}
 }

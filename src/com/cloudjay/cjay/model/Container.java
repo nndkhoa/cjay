@@ -6,6 +6,7 @@ import java.util.List;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
@@ -30,7 +31,7 @@ public class Container implements Parcelable {
 	@DatabaseField(columnName = CONTAINER_ID)
 	String container_id;
 
-	@DatabaseField(canBeNull = false, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
+	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	Operator operator;
 
 	@ForeignCollectionField(eager = true)
@@ -48,7 +49,11 @@ public class Container implements Parcelable {
 	}
 
 	public String getFullContainerId() {
-		return operator.getId() + container_id;
+		if (operator != null) {
+			return operator.getId() + container_id;
+		} else {
+			return container_id;
+		}		
 	}
 
 	public String getContainerId() {

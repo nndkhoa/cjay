@@ -4,6 +4,11 @@ import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.ViewById;
+
 import android.content.Context;
 import android.net.Uri;
 import android.view.View;
@@ -17,10 +22,6 @@ import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.Utils;
-import com.googlecode.androidannotations.annotations.AfterViews;
-import com.googlecode.androidannotations.annotations.EActivity;
-import com.googlecode.androidannotations.annotations.Extra;
-import com.googlecode.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_gate_photo_viewer)
 public class PhotoViewerActivity extends CJayActivity {

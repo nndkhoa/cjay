@@ -30,11 +30,14 @@
     
     <string name="dialog_report_message">Lỗi này đã được báo cáo?</string>
     <string name="dialog_report_title">Báo cáo lỗi</string>
-    <string name="dialog_report_yes">Có</string>
-    <string name="dialog_report_no">Không</string>
+    <string name="dialog_report_yes">Rồi</string>
+    <string name="dialog_report_no">Chưa</string>
     
     <string name="activity_select_issue_message">Chọn lỗi đã được báo cáo</string>
     
     <string name="component_name_hint">Tên component</string>
+    <string name="damage_name_hint">CODE hư hỏng</string>
+    <string name="repair_name_hint">CODE sửa chữa</string>
+    <string name="button_text_placeholder">X</string>
     
 </resources>

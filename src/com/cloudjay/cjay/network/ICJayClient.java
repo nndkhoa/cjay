@@ -1,5 +1,6 @@
 package com.cloudjay.cjay.network;
 
+import java.net.SocketTimeoutException;
 import java.util.Date;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public interface ICJayClient {
 	boolean hasNewMetadata(Context ctx);
 
 	String getUserToken(String username, String password, Context ctx)
-			throws JSONException;
+			throws JSONException, SocketTimeoutException;
 
 	// String getGoogleCloudToken(String token);
 
@@ -41,7 +42,16 @@ public interface ICJayClient {
 
 	List<ComponentCode> getComponentCodes(Context ctx);
 
-	List<ContainerSession> getContainerSessions(Context ctx);
+	List<ContainerSession> getAllContainerSessions(Context ctx);
+
+	List<ContainerSession> getContainerSessions(Context ctx, int userRole,
+			int filterStatus);
+
+	List<ContainerSession> getContainerSessions(Context ctx, int userRole,
+			int filterStatus, Date date);
+
+	List<ContainerSession> getContainerSessions(Context ctx, int userRole,
+			int filterStatus, String date);
 
 	List<ContainerSession> getContainerSessions(Context ctx, Date date);
 
@@ -49,6 +59,7 @@ public interface ICJayClient {
 
 	List<CJayResourceStatus> getCJayResourceStatus(Context ctx);
 
-	void postContainerSession(Context ctx, TmpContainerSession item);
+	String postContainerSession(Context ctx, TmpContainerSession item);
 
+	String postContainerSessionReportList(Context ctx, TmpContainerSession item);
 }

@@ -1,12 +1,12 @@
 package com.cloudjay.cjay.adapter;
 
+import java.util.List;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-
-import java.util.List;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -27,6 +27,18 @@ public class UploadsListBaseAdapter extends BaseAdapter {
 				mContext);
 	}
 
+	public UploadsListBaseAdapter(Context context,
+			List<ContainerSession> listItems) {
+		mContext = context;
+		mLayoutInflater = LayoutInflater.from(mContext);
+		mItems = listItems;
+
+	}
+
+	public void setContainerSessions(List<ContainerSession> listItems) {
+		this.mItems = listItems;
+	}
+
 	public int getCount() {
 		return null != mItems ? mItems.size() : 0;
 	}
@@ -40,26 +52,28 @@ public class UploadsListBaseAdapter extends BaseAdapter {
 	}
 
 	public View getView(int position, View view, ViewGroup parent) {
+
 		if (null == view) {
 			view = mLayoutInflater.inflate(R.layout.item_list_upload, parent,
 					false);
 		}
 
+		ContainerSession containerSession = getItem(position);
+
 		UploadItemLayout layout = (UploadItemLayout) view;
-		layout.setContainerSession(getItem(position));
+		layout.setContainerSession(containerSession);
 
 		return view;
 	}
 
-	@Override
-	public void notifyDataSetChanged() {
-
-		// Update list items
-		if (null != mContext)
-			mItems = DataCenter.getInstance().getListUploadContainerSessions(
-					mContext);
-
-		super.notifyDataSetChanged();
-	}
-
+	// @Override
+	// public void notifyDataSetChanged() {
+	//
+	// // Update list items
+	// if (null != mContext)
+	// mItems = DataCenter.getInstance().getListUploadContainerSessions(
+	// mContext);
+	//
+	// super.notifyDataSetChanged();
+	// }
 }

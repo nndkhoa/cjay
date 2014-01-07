@@ -139,14 +139,14 @@ public class SearchOperatorDialog extends SherlockDialogFragment {
 				new StringExtractor<Operator>() {
 					@Override
 					public String getStringValue(Operator item, int position) {
-						return Utils.stripNull(item.getName());
+						return Utils.replaceNullBySpace(item.getName());
 					}
 				});
 		operatorsDict.addStringField(R.id.operator_code,
 				new StringExtractor<Operator>() {
 					@Override
 					public String getStringValue(Operator item, int position) {
-						return Utils.stripNull(item.getCode());
+						return Utils.replaceNullBySpace(item.getCode());
 					}
 				});
 		mOperatorsAdapter = new FunDapter<Operator>(getActivity(), operators,

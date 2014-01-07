@@ -15,16 +15,16 @@
  */
 package com.cloudjay.cjay.util;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Images.ImageColumns;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 
 import com.cloudjay.cjay.model.MediaStoreBucket;
 import com.cloudjay.cjay.model.TmpContainerSession;

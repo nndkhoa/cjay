@@ -9,7 +9,7 @@ import com.j256.ormlite.support.ConnectionSource;
 
 public class CJayImageDaoImpl extends BaseDaoImpl<CJayImage, String> implements
 		ICJayImageDao {
-	
+
 	public CJayImageDaoImpl(ConnectionSource connectionSource)
 			throws SQLException {
 		super(connectionSource, CJayImage.class);
@@ -43,6 +43,7 @@ public class CJayImageDaoImpl extends BaseDaoImpl<CJayImage, String> implements
 
 	@Override
 	public CJayImage getNextWaiting() throws SQLException {
+
 		List<CJayImage> result = this.queryForEq("state",
 				CJayImage.STATE_UPLOAD_WAITING);
 
