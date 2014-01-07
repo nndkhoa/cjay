@@ -64,7 +64,6 @@ public class DataCenter {
 	public static void reload(Context context) {
 		Logger.Log(LOG_TAG, "reload");
 		CJayClient.getInstance().fetchData(context);
-		EventBus.getDefault().post(new DataLoadedEvent());
 	}
 
 	/**

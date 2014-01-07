@@ -25,6 +25,7 @@ import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
+import com.cloudjay.cjay.events.DataLoadedEvent;
 import com.cloudjay.cjay.model.CJayResourceStatus;
 import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -45,6 +46,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * 
@@ -149,6 +152,8 @@ public class CJayClient implements ICJayClient {
 
 		try {
 
+			boolean hasNewData = false;
+
 			Date now = new Date();
 
 			// 2013-11-10T21:05:24 (do not have timezone info)
@@ -247,9 +252,11 @@ public class CJayClient implements ICJayClient {
 				String date = PreferencesUtil.getPrefsValue(ctx,
 						PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE);
 
+				// update Last Update for each time convert container session
 				containerSessions = getContainerSessions(ctx, userRole,
 						filterStatus, date);
 
+				// TODO: need to refactor after implement push notification
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE,
 						nowString);
@@ -262,6 +269,7 @@ public class CJayClient implements ICJayClient {
 			if (null != containerSessions) {
 				containerSessionDaoImpl
 						.addListContainerSessions(containerSessions);
+				EventBus.getDefault().post(new DataLoadedEvent());
 			}
 
 		} catch (SQLException e) {

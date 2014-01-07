@@ -1,8 +1,11 @@
 package com.cloudjay.cjay.util;
 
 import java.io.FileNotFoundException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import android.app.ActivityManager;
@@ -293,7 +296,7 @@ public class Utils {
 	public static String replaceNullBySpace(String in) {
 		return (in == null || in.equals("") ? " " : in);
 	}
-	
+
 	public static String stripNull(String in) {
 		return (in == null ? "" : in);
 	}
@@ -380,8 +383,28 @@ public class Utils {
 		editor.commit();
 	}
 
-	public static void updatePreferenceData(Context ctx, String nowString) {
-		PreferencesUtil.storePrefsValue(ctx,
-				PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE, nowString);
+	public static void updatePreferenceData(Context ctx, String candidateString) {
+
+		String lastDateString = PreferencesUtil.getPrefsValue(ctx,
+				PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE);
+
+		try {
+			Date lastDate = new SimpleDateFormat(
+					CJayConstant.CJAY_SERVER_DATETIME_FORMAT)
+					.parse(lastDateString);
+
+			Date candidate = new SimpleDateFormat(
+					CJayConstant.CJAY_SERVER_DATETIME_FORMAT)
+					.parse(candidateString);
+
+			if (candidate.after(lastDate)) {
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE,
+						candidateString);
+			}
+
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 	}
 }

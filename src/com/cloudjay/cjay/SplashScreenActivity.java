@@ -58,10 +58,7 @@ public class SplashScreenActivity extends CJayActivity {
 				} else {
 					// user signed in
 					Logger.Log(LOG_TAG, "User signed in");
-					Logger.Log(LOG_TAG, "Fetching data from server ...");
-
 					session.extendAccessTokenIfNeeded(getApplicationContext());
-					CJayClient.getInstance().fetchData(getApplicationContext());
 					CJayApplication
 							.startCJayHomeActivity(SplashScreenActivity.this);
 				}

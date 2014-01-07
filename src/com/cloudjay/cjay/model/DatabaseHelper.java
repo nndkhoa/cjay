@@ -38,7 +38,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			CJayImage.class };
 
 	public static final String DATABASE_NAME = "cjay.db";
-	private static final int DATABASE_VERSION = 1;
+	public static final int DATABASE_VERSION = 1;
 
 	UserDaoImpl userDaoImpl = null;
 	OperatorDaoImpl operatorDaoImpl = null;
@@ -107,18 +107,23 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	@Override
 	public void close() {
 
-		userDaoImpl = null;
-		operatorDaoImpl = null;
-		issueDaoImpl = null;
-		cJayImageDaoImpl = null;
-		containerDaoImpl = null;
-		containerSessionDaoImpl = null;
-		damageCodeDaoImpl = null;
-		depotDaoImpl = null;
-		repairCodeDaoImpl = null;
-		componentCodeDaoImpl = null;
+		try {
+			userDaoImpl = null;
+			operatorDaoImpl = null;
+			issueDaoImpl = null;
+			cJayImageDaoImpl = null;
+			containerDaoImpl = null;
+			containerSessionDaoImpl = null;
+			damageCodeDaoImpl = null;
+			depotDaoImpl = null;
+			repairCodeDaoImpl = null;
+			componentCodeDaoImpl = null;
 
-		super.close();
+			this.connectionSource.close();
+			super.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public UserDaoImpl getUserDaoImpl() throws SQLException {
