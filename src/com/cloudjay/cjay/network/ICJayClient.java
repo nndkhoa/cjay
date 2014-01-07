@@ -1,5 +1,6 @@
 package com.cloudjay.cjay.network;
 
+import java.net.SocketTimeoutException;
 import java.util.Date;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public interface ICJayClient {
 	boolean hasNewMetadata(Context ctx);
 
 	String getUserToken(String username, String password, Context ctx)
-			throws JSONException;
+			throws JSONException, SocketTimeoutException;
 
 	// String getGoogleCloudToken(String token);
 

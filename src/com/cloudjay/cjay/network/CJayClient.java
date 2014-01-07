@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.network;
 
 import java.lang.reflect.Type;
+import java.net.SocketTimeoutException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -279,7 +280,7 @@ public class CJayClient implements ICJayClient {
 
 	@Override
 	public String getUserToken(String username, String password, Context ctx)
-			throws JSONException {
+			throws JSONException, SocketTimeoutException {
 
 		Logger.Log("getting User Token ... ");
 
@@ -287,8 +288,9 @@ public class CJayClient implements ICJayClient {
 		requestPacket.put("username", username);
 		requestPacket.put("password", password);
 
-		String tokenResponseString = requestWrapper.sendJSONPost(
-				CJayConstant.TOKEN, requestPacket);
+		String tokenResponseString = "";
+		tokenResponseString = requestWrapper.sendJSONPost(CJayConstant.TOKEN,
+				requestPacket);
 
 		JsonElement jelement = new JsonParser().parse(tokenResponseString);
 
@@ -321,9 +323,15 @@ public class CJayClient implements ICJayClient {
 
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 
-		String response = requestWrapper.sendJSONPost(
-				CJayConstant.API_ADD_GCM_DEVICE, requestPacket, headers);
-		Log.i("GCM", response);
+		String response = "";
+		try {
+			response = requestWrapper.sendJSONPost(
+					CJayConstant.API_ADD_GCM_DEVICE, requestPacket, headers);
+
+			Logger.Log("GCM", response);
+		} catch (SocketTimeoutException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
