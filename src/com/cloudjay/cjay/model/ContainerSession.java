@@ -65,7 +65,7 @@ public class ContainerSession implements Parcelable {
 	public static final String FIELD_CHECK_IN_TIME = "check_in_time";
 	public static final String FIELD_IMAGE_ID_PATH = "image_id_path";
 	public static final String FIELD_STATE = "state";
-	public static final String ID = "id";
+	public static final String FIELD_ID = "id";
 	public static final String FIELD_UUID = "uuid";
 	public static final String FIELD_UPLOAD_CONFIRMATION = "upload_confirmation";
 	public static final String FIELD_CLEARED = "cleared";
@@ -83,7 +83,7 @@ public class ContainerSession implements Parcelable {
 
 	private Uri mFullUri;
 
-	@DatabaseField(columnName = ID)
+	@DatabaseField(columnName = FIELD_ID)
 	int id;
 
 	@DatabaseField(columnName = FIELD_UUID, id = true)

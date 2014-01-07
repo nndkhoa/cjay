@@ -40,6 +40,16 @@ public class ContainerSessionDaoImpl extends
 	public void addContainerSessions(ContainerSession containerSession)
 			throws SQLException {
 		if (containerSession != null) {
+
+			ContainerSession tmp = this.queryForFirst(this.queryBuilder()
+					.where()
+					.eq(ContainerSession.FIELD_ID, containerSession.getId())
+					.prepare());
+
+			if (null != tmp) {
+				containerSession.setUuid(tmp.getUuid());
+			}
+
 			this.createOrUpdate(containerSession);
 		}
 	}
@@ -202,37 +212,40 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public List<ContainerSession> getListReportedContainerSessions()
 			throws SQLException {
-//		Logger.Log(LOG_TAG, "getListReportedContainerSessions()");
-//		
-//		List<ContainerSession> containerSessions = getNotUploadedContainerSessions();
-//		List<ContainerSession> reportedContainerSessions = new ArrayList<ContainerSession>();
-//
-//		for (ContainerSession containerSession : containerSessions) {
-//			boolean hasReportTypeImages = false;
-//			boolean hasUnreportedImages = false;
-//			for (CJayImage cJayImage : containerSession.getCJayImages()) {
-//				if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
-//					hasReportTypeImages = true;
-//					if (cJayImage.getIssue() == null) {
-//						hasUnreportedImages = true;
-//						break;
-//					}
-//				}
-//			}
-//
-//			// reported container sessions:
-//			// - containers have report images,
-//			// - and report images have issue
-//			if (hasReportTypeImages && !hasUnreportedImages) {
-//				reportedContainerSessions.add(containerSession);
-//			}
-//		}
-//
-//		return reportedContainerSessions;
-		
-		return null; // Vu: don't need this function for now. But keep for reference
+		// Logger.Log(LOG_TAG, "getListReportedContainerSessions()");
+		//
+		// List<ContainerSession> containerSessions =
+		// getNotUploadedContainerSessions();
+		// List<ContainerSession> reportedContainerSessions = new
+		// ArrayList<ContainerSession>();
+		//
+		// for (ContainerSession containerSession : containerSessions) {
+		// boolean hasReportTypeImages = false;
+		// boolean hasUnreportedImages = false;
+		// for (CJayImage cJayImage : containerSession.getCJayImages()) {
+		// if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
+		// hasReportTypeImages = true;
+		// if (cJayImage.getIssue() == null) {
+		// hasUnreportedImages = true;
+		// break;
+		// }
+		// }
+		// }
+		//
+		// // reported container sessions:
+		// // - containers have report images,
+		// // - and report images have issue
+		// if (hasReportTypeImages && !hasUnreportedImages) {
+		// reportedContainerSessions.add(containerSession);
+		// }
+		// }
+		//
+		// return reportedContainerSessions;
+
+		return null; // Vu: don't need this function for now. But keep for
+						// reference
 	}
-	
+
 	@Override
 	public List<ContainerSession> getListNotReportedContainerSessions()
 			throws SQLException {
@@ -322,10 +335,10 @@ public class ContainerSessionDaoImpl extends
 
 		return containerSessions;
 	}
-	
-	private List<ContainerSession> getNotUploadedContainerSessions() throws SQLException {
-		return this.query(this
-				.queryBuilder().where()
+
+	private List<ContainerSession> getNotUploadedContainerSessions()
+			throws SQLException {
+		return this.query(this.queryBuilder().where()
 				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
 				.prepare());
 	}
