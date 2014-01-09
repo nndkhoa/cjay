@@ -1,3 +1,8 @@
+/**
+ * Vu: Currently not using this fragment.
+ * All fragments in Auditor view are handled by AuditorReportingListFragment.java
+ */
+
 package com.cloudjay.cjay.fragment;
 
 import java.sql.SQLException;

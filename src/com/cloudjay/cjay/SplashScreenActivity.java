@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.os.StrictMode;
 import android.widget.ImageView;
 
-import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Session;

@@ -9,9 +9,7 @@ import org.json.JSONException;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.util.Log;
-import android.widget.TabHost.OnTabChangeListener;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.cloudjay.cjay.model.User;

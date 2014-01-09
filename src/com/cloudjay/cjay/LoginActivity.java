@@ -28,7 +28,6 @@ import com.aerilys.helpers.android.UIHelper;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
-import com.google.android.gms.common.data.e;
 
 @EActivity(R.layout.activity_login)
 public class LoginActivity extends CJayActivity {
@@ -50,8 +49,8 @@ public class LoginActivity extends CJayActivity {
 
 	@Extra(EXTRA_EMAIL)
 	String mEmail = "giamdinhcong1.icd1@pip.com.vn";
-	// String mEmail = "giamdinhsuachua.icd1@pip.com.vn";
-	// String mEmail = "tosuachua1.icd1@pip.com.vn";
+//	String mEmail = "giamdinhsuachua.icd1@pip.com.vn";
+//	String mEmail = "tosuachua1.icd1@pip.com.vn";
 
 	// UI references.
 	@ViewById(R.id.email)

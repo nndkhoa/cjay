@@ -8,7 +8,6 @@ import android.content.Context;
 
 import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.UserDaoImpl;
-import com.cloudjay.cjay.events.DataLoadedEvent;
 import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.DamageCode;
@@ -19,8 +18,6 @@ import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
-
-import de.greenrobot.event.EventBus;
 
 /**
  * 
