@@ -14,6 +14,7 @@ import android.util.Log;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Session;
@@ -30,8 +31,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 		ICJayActivity {
 
 	private static final String LOG_TAG = "CJayActivity";
-	private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-	String SENDER_ID = "189386999383";
+
 	private Session session;
 	private DataCenter dataCenter;
 
@@ -134,7 +134,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 					if (gcm == null) {
 						gcm = GoogleCloudMessaging.getInstance(context);
 					}
-					regid = gcm.register(SENDER_ID);
+					regid = gcm.register(CJayConstant.SENDER_ID);
 					Log.d("registration Id", regid + "");
 					msg = "Device registered, registration ID=" + regid;
 
@@ -172,7 +172,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 		if (resultCode != ConnectionResult.SUCCESS) {
 			if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
 				GooglePlayServicesUtil.getErrorDialog(resultCode, this,
-						PLAY_SERVICES_RESOLUTION_REQUEST).show();
+						CJayConstant.PLAY_SERVICES_RESOLUTION_REQUEST).show();
 			} else {
 				Log.e("DEVICE_UNSUPPORTED", "This device is not supported.");
 				finish();
@@ -197,4 +197,5 @@ public class CJayActivity extends SherlockFragmentActivity implements
 		Crouton.showText(this, R.string.started_uploads, Style.CONFIRM);
 	}
 
+	
 }

@@ -117,4 +117,10 @@ public final class CJayConstant {
 	public static final String INTENT_SERVICE_UPLOAD_ALL = "cjay.intent.action.UPLOAD_ALL";
 	public static final String PREF_INSTANT_UPLOAD_IF_ROAMING = "pref_instant_upload_roaming_enabled";
 	public static final String PREF_INSTANT_UPLOAD_WIFI_ONLY = "pref_instant_upload_wifi_only";
+
+	/**
+	 * GCM
+	 */
+	public static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+	public static final String SENDER_ID = "189386999383";
 }
