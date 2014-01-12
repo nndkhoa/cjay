@@ -176,6 +176,7 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 			e.printStackTrace();
 			return null;
 		}
+		
 		String ret = null;
 		try {
 			ret = EntityUtils.toString(response.getEntity(), HTTP.UTF_8);

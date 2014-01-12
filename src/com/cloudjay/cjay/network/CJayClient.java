@@ -109,7 +109,6 @@ public class CJayClient implements ICJayClient {
 		User currentUser = null;
 		currentUser = Session.restore(ctx).getCurrentUser();
 
-		// User currentUser = ((CJayActivity) ctx).getCurrentUser();
 		HashMap<String, String> headers = new HashMap<String, String>();
 		String accessToken = currentUser.getAccessToken();
 		headers.put("Authorization", "Token " + accessToken);
@@ -243,8 +242,10 @@ public class CJayClient implements ICJayClient {
 				Logger.Log(LOG_TAG,
 						"get new list container sessions based on user role");
 
-				containerSessions = getContainerSessions(ctx, userRole,
-						filterStatus);
+				// containerSessions = getContainerSessions(ctx, userRole,
+				// filterStatus);
+
+				containerSessions = getAllContainerSessions(ctx);
 
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
@@ -260,8 +261,10 @@ public class CJayClient implements ICJayClient {
 								+ date);
 
 				// update Last Update for each time convert container session
-				containerSessions = getContainerSessions(ctx, userRole,
-						filterStatus, date);
+				// containerSessions = getContainerSessions(ctx, userRole,
+				// filterStatus, date);
+
+				containerSessions = getContainerSessions(ctx, date);
 
 				// TODO: need to refactor after implement push notification
 				PreferencesUtil.storePrefsValue(ctx,
