@@ -14,6 +14,10 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 
 		if (NetworkHelper.isConnected(context)) {
+
+			PreferencesUtil.storePrefsValue(context,
+					PreferencesUtil.PREF_NO_CONNECTION, false);
+
 			Toast.makeText(context, "Connected", Toast.LENGTH_SHORT).show();
 		} else {
 

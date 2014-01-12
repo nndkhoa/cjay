@@ -84,7 +84,8 @@ public class DataCenter {
 
 	/**
 	 * Get data from server
-	 * @throws NoConnectionException 
+	 * 
+	 * @throws NoConnectionException
 	 */
 	public static void fetchData(Context context) throws NoConnectionException {
 		Logger.Log(LOG_TAG, "fetching data ...");

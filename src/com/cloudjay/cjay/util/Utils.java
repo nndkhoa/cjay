@@ -397,7 +397,7 @@ public class Utils {
 
 	public static boolean hasNoConnection(final Context context) {
 		return context.getSharedPreferences(PreferencesUtil.PREFS, 0)
-				.getBoolean(PreferencesUtil.PREF_NO_CONNECTION, false) == false;
+				.getBoolean(PreferencesUtil.PREF_NO_CONNECTION, false) == true;
 	}
 
 }

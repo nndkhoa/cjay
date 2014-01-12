@@ -7,7 +7,14 @@ import org.json.JSONObject;
 
 import com.cloudjay.cjay.util.NoConnectionException;
 
+/**
+ * Early throws for compiled-time errors
+ * 
+ * @author tieubao
+ * 
+ */
 public interface IHttpRequestWrapper {
+
 	String sendPost(String url, String data) throws SocketTimeoutException,
 			NoConnectionException;
 
