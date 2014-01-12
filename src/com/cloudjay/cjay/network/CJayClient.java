@@ -13,13 +13,10 @@ import java.util.UUID;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.R.anim;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
 import android.text.TextUtils;
-import android.util.Log;
-
 import com.aerilys.helpers.android.NetworkHelper;
 import com.aerilys.helpers.android.UIHelper;
 import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
@@ -40,9 +37,11 @@ import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Mapper;
+import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Session;
 import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -177,7 +176,7 @@ public class CJayClient implements ICJayClient {
 			if (operatorDaoImpl.isEmpty()) {
 				Logger.Log(LOG_TAG, "get list operators");
 				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.RESOURCE_OPERATOR_LAST_UPDATE,
+						PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE,
 						nowString);
 
 				List<Operator> operators = getOperators(ctx);
@@ -188,7 +187,8 @@ public class CJayClient implements ICJayClient {
 			if (damageCodeDaoImpl.isEmpty()) {
 				Logger.Log(LOG_TAG, "get list damage codes");
 				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.RESOURCE_DAMAGE_LAST_UPDATE, nowString);
+						PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE,
+						nowString);
 				List<DamageCode> damageCodes = getDamageCodes(ctx);
 				if (null != damageCodes)
 					damageCodeDaoImpl.addListDamageCodes(damageCodes);
@@ -197,7 +197,8 @@ public class CJayClient implements ICJayClient {
 			if (repairCodeDaoImpl.isEmpty()) {
 				Logger.Log(LOG_TAG, "get list repair codes");
 				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.RESOURCE_REPAIR_LAST_UPDATE, nowString);
+						PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE,
+						nowString);
 
 				List<RepairCode> repairCodes = getRepairCodes(ctx);
 				if (null != repairCodes)
@@ -208,7 +209,7 @@ public class CJayClient implements ICJayClient {
 				Logger.Log(LOG_TAG, "get list of component codes");
 
 				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.RESOURCE_COMPONENT_LAST_UPDATE,
+						PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE,
 						nowString);
 
 				List<ComponentCode> componentCodes = getComponentCodes(ctx);
@@ -245,13 +246,13 @@ public class CJayClient implements ICJayClient {
 						filterStatus);
 
 				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE,
+						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
 						nowString);
 
 			} else {
 
 				String date = PreferencesUtil.getPrefsValue(ctx,
-						PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE);
+						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE);
 
 				Logger.Log(LOG_TAG,
 						"get updated list container sessions from last time: "
@@ -263,7 +264,7 @@ public class CJayClient implements ICJayClient {
 
 				// TODO: need to refactor after implement push notification
 				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE,
+						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
 						nowString);
 
 				if (containerSessions == null) {
@@ -280,7 +281,7 @@ public class CJayClient implements ICJayClient {
 								+ PreferencesUtil
 										.getPrefsValue(
 												ctx,
-												PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE));
+												PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE));
 			}
 
 			if (null != containerSessions) {
@@ -296,7 +297,12 @@ public class CJayClient implements ICJayClient {
 
 	@Override
 	public String getUserToken(String username, String password, Context ctx)
-			throws JSONException, SocketTimeoutException {
+			throws JSONException, SocketTimeoutException, NoConnectionException {
+
+		if (Utils.hasConnection(ctx)) {
+			Logger.Log(LOG_TAG, "No connection");
+			throw new NoConnectionException();
+		}
 
 		Logger.Log("getting User Token ... ");
 
@@ -352,6 +358,7 @@ public class CJayClient implements ICJayClient {
 
 	@Override
 	public User getCurrentUser(String token, Context ctx) {
+
 		Logger.Log("getting Current User ...");
 
 		HashMap<String, String> headers = new HashMap<String, String>();

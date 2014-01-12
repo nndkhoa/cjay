@@ -24,9 +24,7 @@ public class InstantUploadReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context ctx, Intent intent) {
-		if (Flags.DEBUG) {
-			Log.d(LOG_TAG, "onReceive");
-		}
+		
 		mContext = ctx;
 		mPreferences = PreferenceManager.getDefaultSharedPreferences(ctx);
 

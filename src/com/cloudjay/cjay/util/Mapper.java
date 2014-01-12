@@ -90,7 +90,7 @@ public class Mapper {
 				main.setCheckInTime(tmp.getCheckInTime());
 
 				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE,
+						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
 						tmp.getCheckInTime());
 
 				List<GateReportImage> gateReportImages = tmp

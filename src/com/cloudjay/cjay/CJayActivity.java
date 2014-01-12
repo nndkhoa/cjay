@@ -4,12 +4,14 @@ import java.io.IOException;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.UiThread;
 import org.json.JSONException;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.cloudjay.cjay.model.User;
@@ -23,6 +25,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
@@ -82,8 +85,6 @@ public class CJayActivity extends SherlockFragmentActivity implements
 		if (null != session) {
 
 			Logger.Log(LOG_TAG, "DataCenter.reload onResume");
-
-			// DataCenter.reload(getApplicationContext());
 
 			// TODO: need to refactor
 			reloadData();
@@ -184,18 +185,53 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 	@Override
 	protected void onDestroy() {
+		Crouton.cancelAllCroutons();
 		super.onDestroy();
 	}
 
-	protected final void showUploadingDisabledCrouton() {
+	@UiThread
+	protected void showCrouton(int textResId) {
+		final Crouton crouton = Crouton.makeText(this, textResId, Style.ALERT)
+				.setConfiguration(
+						new Configuration.Builder().setDuration(
+								Configuration.DURATION_INFINITE).build());
+
+		crouton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Crouton.hide(crouton);
+			}
+		});
+
+		crouton.show();
+	}
+
+	@UiThread
+	protected void showCrouton(String message) {
+		final Crouton crouton = Crouton.makeText(this, message, Style.ALERT)
+				.setConfiguration(
+						new Configuration.Builder().setDuration(
+								Configuration.DURATION_INFINITE).build());
+
+		crouton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Crouton.hide(crouton);
+			}
+		});
+
+		crouton.show();
+	}
+
+	@UiThread
+	protected void showUploadingDisabledCrouton() {
 		Crouton.cancelAllCroutons();
 		Crouton.showText(this, R.string.stopped_uploads, Style.ALERT);
 	}
 
-	protected final void showUploadingEnabledCrouton() {
+	@UiThread
+	protected void showUploadingEnabledCrouton() {
 		Crouton.cancelAllCroutons();
 		Crouton.showText(this, R.string.started_uploads, Style.CONFIRM);
 	}
-
-	
 }

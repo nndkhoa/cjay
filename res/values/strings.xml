@@ -19,7 +19,6 @@
     all you have to do is click OK.</string>
     <string name="crash_dialog_comment_prompt">You might add your comments about the problem below:</string>
     <string name="crash_dialog_ok_toast">Thank you</string>
-    <string name="alert_no_network">Hãy bật kết nối mạng</string>
 
     <!--  -->
     <string name="stop_uploads">Stop Uploading</string>
@@ -52,5 +51,11 @@
     <string name="menu_issue_report_check_title">Báo cáo xong</string>
     <string name="notification_uploading_photo">Uploading Photo %1$s</string>
     <string name="notification_uploading_photo_progress">Uploading Photo %1$d %2$d%%</string>
+
+    <!-- exception alert -->
+    <string name="alert_try_again">Có lỗi phát sinh. Hãy thử lại lần nữa</string>
+    <string name="alert_no_network">Không có kết nối mạng</string>
+    <string name="alert_ssl_timeout">Có vấn đề với SSL</string>
+    <string name="alert_server_error">Máy chủ có vấn đề. Hãy thử lại lần sau</string>
 
 </resources>

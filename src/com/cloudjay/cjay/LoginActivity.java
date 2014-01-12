@@ -6,13 +6,13 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONException;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.text.TextUtils;
@@ -22,13 +22,19 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import com.aerilys.helpers.android.NetworkHelper;
-import com.aerilys.helpers.android.UIHelper;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.NoConnectionException;
 
+/**
+ * 
+ * Login activity is extended from CJayActivity and mix AsyncTask<> and Android
+ * Annotation to log user in.
+ * 
+ * @author tieubao
+ * 
+ */
 @EActivity(R.layout.activity_login)
 public class LoginActivity extends CJayActivity {
 
@@ -49,8 +55,8 @@ public class LoginActivity extends CJayActivity {
 
 	@Extra(EXTRA_EMAIL)
 	String mEmail = "giamdinhcong1.icd1@pip.com.vn";
-//	String mEmail = "giamdinhsuachua.icd1@pip.com.vn";
-//	String mEmail = "tosuachua1.icd1@pip.com.vn";
+	// String mEmail = "giamdinhsuachua.icd1@pip.com.vn";
+	// String mEmail = "tosuachua1.icd1@pip.com.vn";
 
 	// UI references.
 	@ViewById(R.id.email)
@@ -123,7 +129,7 @@ public class LoginActivity extends CJayActivity {
 			// Check for a valid password.
 			if (TextUtils.isEmpty(mPassword)) {
 				mPasswordView
-						.setError(getString(R.string.error_field_required));
+						.setError(getString(R.string.error_password_field_required));
 				focusView = mPasswordView;
 				cancel = true;
 			} else if (mPassword.length() < 4) {
@@ -135,7 +141,8 @@ public class LoginActivity extends CJayActivity {
 
 			// Check for a valid email address.
 			if (TextUtils.isEmpty(mEmail)) {
-				mEmailView.setError(getString(R.string.error_field_required));
+				mEmailView
+						.setError(getString(R.string.error_email_field_required));
 				focusView = mEmailView;
 				cancel = true;
 			} else if (!mEmail.contains("@")) {
@@ -159,7 +166,7 @@ public class LoginActivity extends CJayActivity {
 				mAuthTask.execute((Void) null);
 			}
 		} catch (Exception e) {
-			UIHelper.toast(context, "Có lỗi phát sinh. Hãy thử đăng nhập lại.");
+			showCrouton(R.string.error_try_again);
 		}
 	}
 
@@ -167,7 +174,8 @@ public class LoginActivity extends CJayActivity {
 	 * Shows the progress UI and hides the login form.
 	 */
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-	private void showProgress(final boolean show) {
+	@UiThread
+	void showProgress(final boolean show) {
 		// On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
 		// for very easy animations. If available, use these APIs to fade-in
 		// the progress spinner.
@@ -214,38 +222,27 @@ public class LoginActivity extends CJayActivity {
 		protected Boolean doInBackground(Void... params) {
 			// attempt authentication against a network service.
 			try {
-				String userToken = "";
-				Context ctx = LoginActivity.this;
-
-				if (NetworkHelper.isConnected(getApplicationContext())) {
-					userToken = CJayClient.getInstance().getUserToken(mEmail,
-							mPassword, LoginActivity.this);
-				} else {
-					UIHelper.toast(ctx,
-							ctx.getString(R.string.alert_no_network));
-				}
+				String userToken = CJayClient.getInstance().getUserToken(
+						mEmail, mPassword, LoginActivity.this);
 
 				if (TextUtils.isEmpty(userToken)) {
 					// Wrong credential --> return and display error alert
 					return false;
 				} else {
 					// Time to get data from Server and save to database
-					if (NetworkHelper.isConnected(ctx)) {
-						DataCenter.getInstance().saveCredential(
-								LoginActivity.this, userToken);
-
-						// DataCenter.fetchData(LoginActivity.this);
-
-					} else {
-						UIHelper.toast(ctx,
-								ctx.getString(R.string.alert_no_network));
-					}
+					DataCenter.getInstance().saveCredential(LoginActivity.this,
+							userToken);
 					return true;
 				}
 			} catch (SocketTimeoutException se) {
+				showCrouton(R.string.alert_ssl_timeout);
 				se.printStackTrace();
 			} catch (JSONException e) {
+				showCrouton(R.string.alert_server_error);
 				e.printStackTrace();
+			} catch (NoConnectionException e) {
+				showCrouton(R.string.alert_no_network);
+				cancel(isFinishing());
 			}
 
 			return true;
@@ -259,7 +256,6 @@ public class LoginActivity extends CJayActivity {
 			if (success) {
 				// Navigate user to Main Activity based on user role
 				Logger.Log(LOG_TAG, "Login successfully");
-
 				CJayApplication.startCJayHomeActivity(LoginActivity.this);
 				finish();
 			} else {

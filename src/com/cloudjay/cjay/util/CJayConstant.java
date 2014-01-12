@@ -4,13 +4,6 @@ import java.io.File;
 
 import android.os.Environment;
 
-/**
- * 
- * Return JayPix meta string
- * 
- * @author Tieu Bao
- * 
- */
 public final class CJayConstant {
 
 	/**
@@ -117,6 +110,7 @@ public final class CJayConstant {
 	public static final String INTENT_SERVICE_UPLOAD_ALL = "cjay.intent.action.UPLOAD_ALL";
 	public static final String PREF_INSTANT_UPLOAD_IF_ROAMING = "pref_instant_upload_roaming_enabled";
 	public static final String PREF_INSTANT_UPLOAD_WIFI_ONLY = "pref_instant_upload_wifi_only";
+	
 
 	/**
 	 * GCM

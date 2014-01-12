@@ -1,8 +1,6 @@
 <resources>
 
     <string name="title_activity_login">Đăng nhập</string>
-
-    <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Mật khẩu</string>
     <string name="action_sign_in_register"><b>Sign in</b> or register</string>
@@ -13,5 +11,8 @@
     <string name="error_invalid_password">Mật khẩu quá ngắn</string>
     <string name="error_incorrect_password">Sai mật khẩu</string>
     <string name="error_field_required">This field is required</string>
+    <string name="error_email_field_required">Bạn chưa điền email</string>
+    <string name="error_password_field_required">Bạn chưa điền mật khẩu</string>
+    <string name="error_try_again">Có lỗi phát sinh. Hãy thử đăng nhập lại</string>
 
 </resources>

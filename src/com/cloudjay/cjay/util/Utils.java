@@ -8,13 +8,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
@@ -26,7 +26,6 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
-import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -132,19 +131,6 @@ public class Utils {
 				* CJayConstant.SCALE_ANIMATION_DURATION_FULL_DISTANCE));
 
 		return scaleAnimation;
-	}
-
-	public static boolean isUploadingPaused(final Context context) {
-		return PreferenceManager.getDefaultSharedPreferences(context)
-				.getBoolean(CJayConstant.PREF_UPLOADS_PAUSED, false);
-	}
-
-	public static void setUploadingPaused(final Context context,
-			final boolean paused) {
-		Editor editor = PreferenceManager.getDefaultSharedPreferences(context)
-				.edit();
-		editor.putBoolean(CJayConstant.PREF_UPLOADS_PAUSED, paused);
-		editor.commit();
 	}
 
 	public static Intent getUploadIntent(Context context) {
@@ -383,10 +369,11 @@ public class Utils {
 		editor.commit();
 	}
 
+	@SuppressLint("SimpleDateFormat")
 	public static void updatePreferenceData(Context ctx, String candidateString) {
 
 		String lastDateString = PreferencesUtil.getPrefsValue(ctx,
-				PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE);
+				PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE);
 
 		try {
 			Date lastDate = new SimpleDateFormat(
@@ -399,7 +386,7 @@ public class Utils {
 
 			if (candidate.after(lastDate)) {
 				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE,
+						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
 						candidateString);
 			}
 
@@ -407,4 +394,10 @@ public class Utils {
 			e.printStackTrace();
 		}
 	}
+
+	public static boolean hasConnection(final Context context) {
+		return context.getSharedPreferences(PreferencesUtil.PREFS, 0)
+				.getBoolean(PreferencesUtil.PREF_NO_CONNECTION, false) == true;
+	}
+
 }
