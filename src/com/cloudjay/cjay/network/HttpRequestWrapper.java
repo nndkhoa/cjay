@@ -33,6 +33,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.NoConnectionException;
 
 public class HttpRequestWrapper implements IHttpRequestWrapper {
 	private DefaultHttpClient httpClient;
@@ -72,23 +73,25 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 	}
 
 	public String sendPost(String url, String data)
-			throws SocketTimeoutException {
+			throws SocketTimeoutException, NoConnectionException {
 		return sendPost(url, data, null);
 	}
 
 	public String sendJSONPost(String url, JSONObject data)
-			throws SocketTimeoutException {
+			throws SocketTimeoutException, NoConnectionException {
 		Map<String, String> headers = new HashMap<String, String>();
 		return sendJSONPost(url, data, headers);
 	}
 
 	public String sendJSONPost(String url, JSONObject data,
-			Map<String, String> headers) throws SocketTimeoutException {
+			Map<String, String> headers) throws SocketTimeoutException,
+			NoConnectionException {
 		return sendPost(url, data.toString(), "application/json", headers);
 	}
 
 	public String sendPost(String url, String data, String contentType,
-			Map<String, String> headers) throws SocketTimeoutException {
+			Map<String, String> headers) throws SocketTimeoutException,
+			NoConnectionException {
 
 		Logger.Log("URL: " + url);
 		Logger.Log("Data: " + data);
@@ -139,17 +142,18 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 	}
 
 	public String sendPost(String url, String data, String contentType)
-			throws SocketTimeoutException {
+			throws SocketTimeoutException, NoConnectionException {
 		Map<String, String> headers = new HashMap<String, String>();
 		return sendPost(url, data, contentType, headers);
 	}
 
-	public String sendGet(String url) {
+	public String sendGet(String url) throws NoConnectionException {
 		Map<String, String> headers = new HashMap<String, String>();
 		return sendGet(url, headers);
 	}
 
-	public String sendGet(String url, Map<String, String> headers) {
+	public String sendGet(String url, Map<String, String> headers)
+			throws NoConnectionException {
 
 		Logger.Log(LOG_TAG, "Url: " + url);
 		httpGet = new HttpGet(url);

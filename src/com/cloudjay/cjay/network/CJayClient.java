@@ -147,8 +147,9 @@ public class CJayClient implements ICJayClient {
 	 * 1.
 	 * 
 	 * @param ctx
+	 * @throws NoConnectionException
 	 */
-	public void fetchData(Context ctx) {
+	public void fetchData(Context ctx) throws NoConnectionException {
 		Logger.Log(LOG_TAG, "fetching data ...");
 
 		try {
@@ -299,7 +300,7 @@ public class CJayClient implements ICJayClient {
 	public String getUserToken(String username, String password, Context ctx)
 			throws JSONException, SocketTimeoutException, NoConnectionException {
 
-		if (Utils.hasConnection(ctx)) {
+		if (Utils.hasNoConnection(ctx)) {
 			Logger.Log(LOG_TAG, "No connection");
 			throw new NoConnectionException();
 		}
@@ -326,7 +327,14 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public void addGCMDevice(String regid, Context ctx) throws JSONException {
+	public void addGCMDevice(String regid, Context ctx) throws JSONException,
+			NoConnectionException {
+
+		if (Utils.hasNoConnection(ctx)) {
+			Logger.Log(LOG_TAG, "No connection");
+			throw new NoConnectionException();
+		}
+
 		JSONObject requestPacket = new JSONObject();
 		requestPacket.put("registration_id", regid);
 		String androidId = "";
@@ -357,9 +365,15 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public User getCurrentUser(String token, Context ctx) {
+	public User getCurrentUser(String token, Context ctx)
+			throws NoConnectionException {
 
 		Logger.Log("getting Current User ...");
+
+		if (Utils.hasNoConnection(ctx)) {
+			Logger.Log(LOG_TAG, "No connection");
+			throw new NoConnectionException();
+		}
 
 		HashMap<String, String> headers = new HashMap<String, String>();
 		headers.put("Authorization", "Token " + token);
@@ -376,7 +390,13 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public List<Operator> getOperators(Context ctx) {
+	public List<Operator> getOperators(Context ctx)
+			throws NoConnectionException {
+
+		if (Utils.hasNoConnection(ctx)) {
+			Logger.Log(LOG_TAG, "No connection");
+			throw new NoConnectionException();
+		}
 
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 		String response = requestWrapper.sendGet(CJayConstant.LIST_OPERATORS,
@@ -394,7 +414,13 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public List<DamageCode> getDamageCodes(Context ctx) {
+	public List<DamageCode> getDamageCodes(Context ctx)
+			throws NoConnectionException {
+
+		if (Utils.hasNoConnection(ctx)) {
+			throw new NoConnectionException();
+		}
+
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 		String response = requestWrapper.sendGet(
 				CJayConstant.LIST_DAMAGE_CODES, headers);
@@ -407,7 +433,13 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public List<RepairCode> getRepairCodes(Context ctx) {
+	public List<RepairCode> getRepairCodes(Context ctx)
+			throws NoConnectionException {
+
+		if (Utils.hasNoConnection(ctx)) {
+			throw new NoConnectionException();
+		}
+
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 		String response = requestWrapper.sendGet(
 				CJayConstant.LIST_REPAIR_CODES, headers);
@@ -420,7 +452,13 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public List<ComponentCode> getComponentCodes(Context ctx) {
+	public List<ComponentCode> getComponentCodes(Context ctx)
+			throws NoConnectionException {
+
+		if (Utils.hasNoConnection(ctx)) {
+			throw new NoConnectionException();
+		}
+
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 		String response = requestWrapper.sendGet(
 				CJayConstant.LIST_COMPONENT_CODES, headers);
@@ -433,12 +471,19 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public List<ContainerSession> getAllContainerSessions(Context ctx) {
+	public List<ContainerSession> getAllContainerSessions(Context ctx)
+			throws NoConnectionException {
+
+		Logger.Log(LOG_TAG, "getAllContainerSessions(Context ctx)");
+
+		if (Utils.hasNoConnection(ctx)) {
+			throw new NoConnectionException();
+		}
+
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 		String response = requestWrapper.sendGet(
 				CJayConstant.LIST_CONTAINER_SESSIONS, headers);
 
-		Logger.Log(LOG_TAG, "getAllContainerSessions(Context ctx)");
 		Logger.Log(LOG_TAG, response);
 
 		Gson gson = new GsonBuilder().setDateFormat(
@@ -483,9 +528,14 @@ public class CJayClient implements ICJayClient {
 
 	@Override
 	public List<ContainerSession> getContainerSessions(Context ctx,
-			int userRole, int filterStatus) {
+			int userRole, int filterStatus) throws NoConnectionException {
 
 		Logger.Log(LOG_TAG, "getContainerSessions(Context ctx, int userRole)");
+
+		if (Utils.hasNoConnection(ctx)) {
+			throw new NoConnectionException();
+		}
+
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 
 		String response = "";
@@ -569,10 +619,15 @@ public class CJayClient implements ICJayClient {
 
 	@Override
 	public List<ContainerSession> getContainerSessions(Context ctx,
-			int userRole, int filterStatus, Date date) {
+			int userRole, int filterStatus, Date date)
+			throws NoConnectionException {
 
 		Logger.Log(LOG_TAG,
 				"getContainerSessions(Context ctx, int userRole, Date date)");
+
+		if (Utils.hasNoConnection(ctx)) {
+			throw new NoConnectionException();
+		}
 
 		List<ContainerSession> items = new ArrayList<ContainerSession>();
 		String formatedDate = StringHelper.getTimestamp(
@@ -584,10 +639,16 @@ public class CJayClient implements ICJayClient {
 
 	@Override
 	public synchronized List<ContainerSession> getContainerSessions(
-			Context ctx, int userRole, int filterStatus, String date) {
+			Context ctx, int userRole, int filterStatus, String date)
+			throws NoConnectionException {
 
 		Logger.Log(LOG_TAG,
 				"getContainerSessions(Context ctx, int userRole, String date");
+
+		if (Utils.hasNoConnection(ctx)) {
+			throw new NoConnectionException();
+		}
+
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 
 		String response = "";
@@ -666,9 +727,14 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public List<ContainerSession> getContainerSessions(Context ctx, Date date) {
+	public List<ContainerSession> getContainerSessions(Context ctx, Date date)
+			throws NoConnectionException {
 
 		Logger.Log(LOG_TAG, "getContainerSessions(Context ctx, Date date)");
+
+		if (Utils.hasNoConnection(ctx)) {
+			throw new NoConnectionException();
+		}
 
 		List<ContainerSession> items = new ArrayList<ContainerSession>();
 		String formatedDate = StringHelper.getTimestamp(
@@ -679,9 +745,15 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public List<ContainerSession> getContainerSessions(Context ctx, String date) {
+	public List<ContainerSession> getContainerSessions(Context ctx, String date)
+			throws NoConnectionException {
 
 		Logger.Log(LOG_TAG, "getContainerSessions(Context ctx, String date)");
+
+		if (Utils.hasNoConnection(ctx)) {
+			throw new NoConnectionException();
+		}
+
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 
 		String response = requestWrapper.sendGet(String.format(
@@ -753,7 +825,13 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public List<CJayResourceStatus> getCJayResourceStatus(Context ctx) {
+	public List<CJayResourceStatus> getCJayResourceStatus(Context ctx)
+			throws NoConnectionException {
+
+		if (Utils.hasNoConnection(ctx)) {
+			throw new NoConnectionException();
+		}
+
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 		String response = requestWrapper.sendGet(
 				CJayConstant.CJAY_RESOURCE_STATUS, headers);

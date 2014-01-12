@@ -19,6 +19,7 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.Session;
 import com.cloudjay.cjay.util.Utils;
 import com.google.android.gms.common.ConnectionResult;
@@ -106,7 +107,11 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 	@Background
 	void reloadData() {
-		DataCenter.reload(getApplicationContext());
+		try {
+			DataCenter.reload(getApplicationContext());
+		} catch (NoConnectionException e) {
+			showCrouton(R.string.alert_no_network);
+		}
 	}
 
 	private void sendRegistrationIdToBackend() {
@@ -117,6 +122,8 @@ public class CJayActivity extends SherlockFragmentActivity implements
 			Utils.storeRegistrationId(context, regid);
 		} catch (JSONException e) {
 			Log.e(LOG_TAG, "Can't Register device with the Back-end!");
+		} catch (NoConnectionException e) {
+			showCrouton(R.string.alert_no_network);
 		}
 	}
 

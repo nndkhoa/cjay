@@ -58,7 +58,7 @@ public class DataCenter {
 		this.databaseManager = databaseManager;
 	}
 
-	public static void reload(Context context) {
+	public static void reload(Context context) throws NoConnectionException {
 		Logger.Log(LOG_TAG, "reload");
 		CJayClient.getInstance().fetchData(context);
 	}
@@ -84,8 +84,9 @@ public class DataCenter {
 
 	/**
 	 * Get data from server
+	 * @throws NoConnectionException 
 	 */
-	public static void fetchData(Context context) {
+	public static void fetchData(Context context) throws NoConnectionException {
 		Logger.Log(LOG_TAG, "fetching data ...");
 		CJayClient.getInstance().fetchData(context);
 	}
