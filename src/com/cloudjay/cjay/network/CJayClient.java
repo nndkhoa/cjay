@@ -17,8 +17,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
 import android.text.TextUtils;
-import com.aerilys.helpers.android.NetworkHelper;
-import com.aerilys.helpers.android.UIHelper;
 import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;

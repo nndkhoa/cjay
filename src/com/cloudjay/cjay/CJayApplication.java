@@ -1,6 +1,5 @@
 package com.cloudjay.cjay;
 
-import java.util.Calendar;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -9,9 +8,7 @@ import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 
 import uk.co.senab.bitmapcache.BitmapLruCache;
-import android.app.AlarmManager;
 import android.app.Application;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -30,8 +27,6 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.network.HttpRequestWrapper;
 import com.cloudjay.cjay.network.IHttpRequestWrapper;
 import com.cloudjay.cjay.receivers.InstantUploadReceiver;
-import com.cloudjay.cjay.service.QueueIntentService;
-import com.cloudjay.cjay.task.PhotupThreadFactory;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Flags;
@@ -54,19 +49,6 @@ public class CJayApplication extends Application {
 	private BitmapLruCache mImageCache;
 	IDatabaseManager databaseManager = null;
 	IHttpRequestWrapper httpRequestWrapper = null;
-
-	private ExecutorService mDatabaseThreadExecutor;
-
-	public ExecutorService getDatabaseThreadExecutorService() {
-
-		if (null == mDatabaseThreadExecutor
-				|| mDatabaseThreadExecutor.isShutdown()) {
-			mDatabaseThreadExecutor = Executors
-					.newSingleThreadExecutor(new PhotupThreadFactory());
-		}
-
-		return mDatabaseThreadExecutor;
-	}
 
 	public static CJayApplication getApplication(Context context) {
 		return (CJayApplication) context.getApplicationContext();
@@ -95,6 +77,7 @@ public class CJayApplication extends Application {
 
 	@Override
 	public void onCreate() {
+		Logger.Log(LOG_TAG, "Start Application");
 		super.onCreate();
 
 		databaseManager = new DatabaseManager();
@@ -132,9 +115,13 @@ public class CJayApplication extends Application {
 		Logger.PRODUCTION_MODE = false;
 
 		// Configure Alarm Manager
-		Utils.startAlarm(getApplicationContext());
+		if (!Utils.isAlarmUp(getApplicationContext())) {
+			Logger.Log(LOG_TAG, "Alarm Manager is not running.");
+			Utils.startAlarm(getApplicationContext());
+		}
 
 		if (NetworkHelper.isConnected(this)) {
+
 			PreferencesUtil.storePrefsValue(this,
 					PreferencesUtil.PREF_NO_CONNECTION, false);
 		} else {

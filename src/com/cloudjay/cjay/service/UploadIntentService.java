@@ -42,9 +42,8 @@ import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.TmpContainerSession;
-import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
-import com.cloudjay.cjay.task.PhotupThreadRunnable;
+
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CountingInputStreamEntity;
 import com.cloudjay.cjay.util.Flags;
@@ -126,7 +125,7 @@ public class UploadIntentService extends IntentService implements
 			final Bitmap uploadBigPic = upload.getBigPictureNotificationBmp();
 
 			if (null == uploadBigPic) {
-				mExecutor.submit(new UpdateBigPictureStyleRunnable(upload));
+				// mExecutor.submit(new UpdateBigPictureStyleRunnable(upload));
 			}
 			mBigPicStyle.bigPicture(uploadBigPic);
 		}
@@ -425,18 +424,19 @@ public class UploadIntentService extends IntentService implements
 		}
 	}
 
-	private class UpdateBigPictureStyleRunnable extends PhotupThreadRunnable {
-
-		private final ContainerSession mSelection;
-
-		public UpdateBigPictureStyleRunnable(ContainerSession selection) {
-			mSelection = selection;
-		}
-
-		public void runImpl() {
-			mSelection.setBigPictureNotificationBmp(UploadIntentService.this,
-					mSelection.getThumbnailImage(UploadIntentService.this));
-			updateNotification(mSelection);
-		}
-	}
+	// private class UpdateBigPictureStyleRunnable extends PhotupThreadRunnable
+	// {
+	//
+	// private final ContainerSession mSelection;
+	//
+	// public UpdateBigPictureStyleRunnable(ContainerSession selection) {
+	// mSelection = selection;
+	// }
+	//
+	// public void runImpl() {
+	// mSelection.setBigPictureNotificationBmp(UploadIntentService.this,
+	// mSelection.getThumbnailImage(UploadIntentService.this));
+	// updateNotification(mSelection);
+	// }
+	// }
 }

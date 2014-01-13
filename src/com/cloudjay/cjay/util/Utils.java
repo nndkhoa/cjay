@@ -50,6 +50,7 @@ public class Utils {
 	public static final int MINI_THUMBNAIL_SIZE = 300;
 	public static final int MICRO_THUMBNAIL_SIZE = 96;
 
+	public static final String LOG_TAG = "Utils";
 	private static final String TAG = "GCM_CJAY";
 	private static final String PROPERTY_REG_ID = "registration_id";
 	private static final String PROPERTY_CURRENT_USER_ID = "current_user_id";
@@ -405,6 +406,9 @@ public class Utils {
 	}
 
 	public static void startAlarm(Context context) {
+
+		Logger.Log(LOG_TAG, "start Alarm Manager");
+
 		// Making Alarm for Queue Worker
 		Intent intent = new Intent(context, QueueIntentService.class);
 		PendingIntent pintent = PendingIntent.getService(context, 0, intent,
@@ -419,6 +423,8 @@ public class Utils {
 	}
 
 	public static void cancelAlarm(Context context) {
+
+		Logger.Log(LOG_TAG, "stop Alarm Manager");
 
 		Intent intent = new Intent(context, QueueIntentService.class);
 		PendingIntent sender = PendingIntent
