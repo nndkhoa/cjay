@@ -109,6 +109,7 @@ public class CJayClient implements ICJayClient {
 		User currentUser = null;
 		currentUser = Session.restore(ctx).getCurrentUser();
 
+		// User currentUser = ((CJayActivity) ctx).getCurrentUser();
 		HashMap<String, String> headers = new HashMap<String, String>();
 		String accessToken = currentUser.getAccessToken();
 		headers.put("Authorization", "Token " + accessToken);
@@ -848,47 +849,51 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public String postContainerSession(Context ctx, TmpContainerSession item) {
+	public String postContainerSession(Context ctx, TmpContainerSession item)
+			throws NoConnectionException {
+
+		if (Utils.hasNoConnection(ctx)) {
+			Logger.Log("Network is not available");
+			throw new NoConnectionException();
+		}
+
 		String ret = "";
 		try {
-			if (NetworkHelper.isConnected(ctx)) {
-				HashMap<String, String> headers = prepareHeadersWithToken(ctx);
-				Gson gson = new Gson();
 
-				String data = gson.toJson(item);
-				String url = CJayConstant.CJAY_ITEMS;
-				ret = requestWrapper.sendPost(url, data, "application/json",
-						headers);
+			HashMap<String, String> headers = prepareHeadersWithToken(ctx);
+			Gson gson = new Gson();
 
-			} else {
-				Logger.Log("Network is not available");
-				UIHelper.toast(ctx, "Network is not available");
-			}
+			String data = gson.toJson(item);
+			String url = CJayConstant.CJAY_ITEMS;
+			ret = requestWrapper.sendPost(url, data, "application/json",
+					headers);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		return ret;
 	}
 
 	@Override
 	public String postContainerSessionReportList(Context ctx,
-			TmpContainerSession item) {
+			TmpContainerSession item) throws NoConnectionException {
+
+		if (Utils.hasNoConnection(ctx)) {
+			Logger.Log("Network is not available");
+			throw new NoConnectionException();
+		}
 
 		String ret = "";
 		try {
-			if (NetworkHelper.isConnected(ctx)) {
-				HashMap<String, String> headers = prepareHeadersWithToken(ctx);
-				Gson gson = new Gson();
+			HashMap<String, String> headers = prepareHeadersWithToken(ctx);
+			Gson gson = new Gson();
 
-				String data = gson.toJson(item);
-				String url = CJayConstant.LIST_CONTAINER_SESSIONS_REPORT_LIST;
-				ret = requestWrapper.sendPost(url, data, "application/json",
-						headers);
+			String data = gson.toJson(item);
+			String url = CJayConstant.LIST_CONTAINER_SESSIONS_REPORT_LIST;
+			ret = requestWrapper.sendPost(url, data, "application/json",
+					headers);
 
-			} else {
-				Logger.Log("Network is not available");
-				UIHelper.toast(ctx, "Network is not available");
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

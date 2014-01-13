@@ -50,6 +50,7 @@ import com.cloudjay.cjay.util.CountingInputStreamEntity;
 import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Mapper;
+import com.cloudjay.cjay.util.NoConnectionException;
 
 import de.greenrobot.event.EventBus;
 
@@ -230,7 +231,6 @@ public class UploadIntentService extends IntentService implements
 		// post UploadStateChangedEvent
 
 		try {
-			String returnJson = "";
 			containerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_IN_PROGRESS);
 			containerSessionDaoImpl.update(containerSession);
@@ -241,21 +241,8 @@ public class UploadIntentService extends IntentService implements
 							getApplicationContext());
 
 			// Post to Server and notify event to UploadFragment
-
-			User user = com.cloudjay.cjay.util.Session.restore(
-					getApplicationContext()).getCurrentUser();
-
-			Logger.Log(LOG_TAG, "Current User role: " + user.getRoleName());
-			if (user.getRole() == User.ROLE_GATE_KEEPER) {
-
-				returnJson = CJayClient.getInstance().postContainerSession(
-						getApplicationContext(), uploadItem);
-			} else {
-
-				returnJson = CJayClient.getInstance()
-						.postContainerSessionReportList(
-								getApplicationContext(), uploadItem);
-			}
+			String returnJson = CJayClient.getInstance().postContainerSession(
+					getApplicationContext(), uploadItem);
 
 			// convert back then save containerSession
 			Mapper.getInstance().update(getApplicationContext(), returnJson,
@@ -270,6 +257,11 @@ public class UploadIntentService extends IntentService implements
 
 		} catch (SQLException e1) {
 			e1.printStackTrace();
+		} catch (NoConnectionException e) {
+			
+			// Turn off alarm manager
+			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			containerSession

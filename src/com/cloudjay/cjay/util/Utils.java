@@ -4,12 +4,15 @@ import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -37,6 +40,7 @@ import android.widget.Toast;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.service.QueueIntentService;
 import com.cloudjay.cjay.service.UploadIntentService;
 import com.lightbox.android.photoprocessing.PhotoProcessing;
 import com.lightbox.android.photoprocessing.utils.MediaUtils;
@@ -399,5 +403,24 @@ public class Utils {
 		return context.getSharedPreferences(PreferencesUtil.PREFS, 0)
 				.getBoolean(PreferencesUtil.PREF_NO_CONNECTION, false) == true;
 	}
+
+	public static void startAlarm(Context context) {
+
+		// Making Alarm for Queue Worker
+		Intent intent = new Intent(context, QueueIntentService.class);
+		PendingIntent pintent = PendingIntent.getService(context, 0, intent,
+				PendingIntent.FLAG_UPDATE_CURRENT);
+		Calendar current = Calendar.getInstance();
+		AlarmManager alarm = (AlarmManager) context
+				.getSystemService(Context.ALARM_SERVICE);
+
+		// Start every 10 seconds
+		alarm.setRepeating(AlarmManager.RTC_WAKEUP, current.getTimeInMillis(),
+				10 * 1000, pintent);
+		
+		alarm.cancel(pintent);
+	}
+	
+	
 
 }
