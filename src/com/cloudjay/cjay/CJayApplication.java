@@ -37,6 +37,7 @@ import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.cloudjay.cjay.util.Utils;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -129,17 +130,7 @@ public class CJayApplication extends Application {
 
 		// Configure Logger
 		Logger.PRODUCTION_MODE = false;
-
-		// Making Alarm for Queue Worker
-		Intent intent = new Intent(this, QueueIntentService.class);
-		PendingIntent pintent = PendingIntent.getService(this, 0, intent,
-				PendingIntent.FLAG_UPDATE_CURRENT);
-		Calendar current = Calendar.getInstance();
-		AlarmManager alarm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
-		// Start every 10 seconds
-		alarm.setRepeating(AlarmManager.RTC_WAKEUP, current.getTimeInMillis(),
-				10 * 1000, pintent);
+		Utils.startAlarm(getApplicationContext());
 
 		if (NetworkHelper.isConnected(this)) {
 			PreferencesUtil.storePrefsValue(this,

@@ -405,7 +405,6 @@ public class Utils {
 	}
 
 	public static void startAlarm(Context context) {
-
 		// Making Alarm for Queue Worker
 		Intent intent = new Intent(context, QueueIntentService.class);
 		PendingIntent pintent = PendingIntent.getService(context, 0, intent,
@@ -417,10 +416,16 @@ public class Utils {
 		// Start every 10 seconds
 		alarm.setRepeating(AlarmManager.RTC_WAKEUP, current.getTimeInMillis(),
 				10 * 1000, pintent);
-		
-		alarm.cancel(pintent);
 	}
-	
-	
 
+	public static void cancelAlarm(Context context) {
+
+		Intent intent = new Intent(context, QueueIntentService.class);
+		PendingIntent sender = PendingIntent
+				.getBroadcast(context, 0, intent, 0);
+		AlarmManager alarmManager = (AlarmManager) context
+				.getSystemService(Context.ALARM_SERVICE);
+
+		alarmManager.cancel(sender);
+	}
 }
