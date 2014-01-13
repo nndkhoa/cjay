@@ -428,4 +428,9 @@ public class Utils {
 
 		alarmManager.cancel(sender);
 	}
+
+	public static boolean isAlarmUp(Context context) {
+		return PendingIntent.getService(context, 0, new Intent(context,
+				QueueIntentService.class), PendingIntent.FLAG_NO_CREATE) != null;
+	}
 }

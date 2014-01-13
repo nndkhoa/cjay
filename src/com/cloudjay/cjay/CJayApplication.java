@@ -130,6 +130,8 @@ public class CJayApplication extends Application {
 
 		// Configure Logger
 		Logger.PRODUCTION_MODE = false;
+
+		// Configure Alarm Manager
 		Utils.startAlarm(getApplicationContext());
 
 		if (NetworkHelper.isConnected(this)) {
@@ -138,7 +140,6 @@ public class CJayApplication extends Application {
 		} else {
 			PreferencesUtil.storePrefsValue(this,
 					PreferencesUtil.PREF_NO_CONNECTION, true);
-
 		}
 	}
 
