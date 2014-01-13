@@ -195,8 +195,8 @@ public class Mapper {
 			ContainerSession containerSession, Context ctx) {
 
 		TmpContainerSession tmpContainerSession = new TmpContainerSession();
-
 		tmpContainerSession.setOperatorCode(containerSession.getOperatorName());
+		tmpContainerSession.setOperatorId(containerSession.getOperatorId());
 		tmpContainerSession.setDepotCode(containerSession.getContainer()
 				.getDepot().getDepotCode());
 		tmpContainerSession.setContainerId(containerSession.getContainerId());
@@ -271,18 +271,8 @@ public class Mapper {
 			IssueDaoImpl issueDaoImpl = databaseManager.getHelper(ctx)
 					.getIssueDaoImpl();
 
-			Operator operator = null;
-			List<Operator> listOperators = operatorDaoImpl.queryForEq(
-					Operator.CODE, tmpSession.getOperatorCode());
-
-			if (listOperators.isEmpty()) {
-				operator = new Operator();
-				operator.setCode(tmpSession.getOperatorCode());
-				operator.setName(tmpSession.getOperatorCode());
-				operatorDaoImpl.addOperator(operator);
-			} else {
-				operator = listOperators.get(0);
-			}
+			Operator operator = operatorDaoImpl.queryForId(tmpSession
+					.getOperatorId());
 
 			// Create `depot` object if needed
 			Depot depot = null;

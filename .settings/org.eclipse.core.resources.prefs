@@ -5,6 +5,7 @@ encoding//src/com/cloudjay/cjay/CameraActivity.java=UTF-8
 encoding//src/com/cloudjay/cjay/LoginActivity.java=UTF-8
 encoding//src/com/cloudjay/cjay/events/DataLoadedEvent.java=UTF-8
 encoding//src/com/cloudjay/cjay/events/UploadsStartEvent.java=UTF-8
+encoding//src/com/cloudjay/cjay/fragment/GateImportListFragment.java=UTF-8
 encoding//src/com/cloudjay/cjay/fragment/UploadsFragment.java=UTF-8
 encoding//src/com/cloudjay/cjay/model/ComponentCode.java=UTF-8
 encoding//src/com/cloudjay/cjay/model/Container.java=UTF-8

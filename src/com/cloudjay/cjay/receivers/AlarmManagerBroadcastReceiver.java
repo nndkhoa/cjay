@@ -53,10 +53,8 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 		Intent intent = new Intent(context, AlarmManagerBroadcastReceiver.class);
 		intent.putExtra(ONE_TIME, Boolean.FALSE);
 		PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent, 0);
-
-		// After after 5 seconds
 		am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
-				1000 * 5, pi);
+				1000 * 10, pi);
 	}
 
 	public void cancelAlarm(Context context) {

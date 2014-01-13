@@ -232,6 +232,7 @@ public class LoginActivity extends CJayActivity {
 					// Time to get data from Server and save to database
 					DataCenter.getInstance().saveCredential(LoginActivity.this,
 							userToken);
+					CJayClient.getInstance().fetchData(LoginActivity.this);
 					return true;
 				}
 			} catch (SocketTimeoutException se) {

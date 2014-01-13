@@ -258,9 +258,8 @@ public class UploadIntentService extends IntentService implements
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		} catch (NoConnectionException e) {
-			
+
 			// Turn off alarm manager
-			
 
 		} catch (Exception e) {
 			e.printStackTrace();

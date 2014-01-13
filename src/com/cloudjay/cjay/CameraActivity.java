@@ -286,7 +286,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 						parameters.setPictureFormat(ImageFormat.JPEG);
 						parameters.setFlashMode(flashMode);
-						parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+						parameters
+								.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
 
 						List<String> modes = parameters
 								.getSupportedFocusModes();
@@ -369,15 +370,16 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		if (data != null) {
 			if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-				
+
 				Bitmap bm = BitmapFactory.decodeByteArray(data, 0,
 						(data != null) ? data.length : 0);
 
 				android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
 				android.hardware.Camera.getCameraInfo(cameraMode, info);
-				
-				int rotation = getWindowManager().getDefaultDisplay().getRotation();
-				
+
+				int rotation = getWindowManager().getDefaultDisplay()
+						.getRotation();
+
 				Matrix mtx = new Matrix();
 
 				if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT
@@ -386,24 +388,25 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 				} else {
 					mtx.postRotate(90);
 				}
-		
+
 				Bitmap rotatedBitmap = Bitmap.createBitmap(bm, 0, 0,
 						bm.getWidth(), bm.getHeight(), mtx, true);
-	
+
 				if (bm != null) {
 					bm.recycle();
 					bm = null;
 					System.gc();
 				}
-	
+
 				return rotatedBitmap;
 
 			} else {
 
-				int rotation = getWindowManager().getDefaultDisplay().getRotation();
+				int rotation = getWindowManager().getDefaultDisplay()
+						.getRotation();
 
 				if (rotation == Surface.ROTATION_270) {
-					
+
 					Matrix mtx = new Matrix();
 					mtx.postRotate(180);
 
@@ -411,9 +414,10 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 					Logger.Log(TAG, "Flip image");
 					Bitmap bm = BitmapFactory.decodeByteArray(data, 0,
 							(data != null) ? data.length : 0);
-					bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), mtx, true);
+					bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(),
+							bm.getHeight(), mtx, true);
 					return bm;
-					
+
 				} else {
 					// LANDSCAPE MODE
 					// No need to reverse width and height
@@ -567,7 +571,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		openCamera();
 		setContentView(R.layout.activity_camera);
 	}
-	
+
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 
@@ -732,30 +736,32 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Background
 	void takePicture() {
-//		if (inPreview) {
-		
+		// if (inPreview) {
+
 		Logger.Log(LOG_TAG, "Prepare to take picture");
-		
+
 		Camera.Parameters cameraParameters = camera.getParameters();
-	    
-	    List<String> supportedFocusMode = cameraParameters.getSupportedFocusModes();
-	    for (String mode : supportedFocusMode) {
-			Logger.Log(TAG, "Camera supports Focus Mode: "+ mode);
+
+		List<String> supportedFocusMode = cameraParameters
+				.getSupportedFocusModes();
+		for (String mode : supportedFocusMode) {
+			Logger.Log(TAG, "Camera supports Focus Mode: " + mode);
 		}
 
-	    // Submit focus area to camera
-	    if (supportedFocusMode.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
-	    	cameraParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-		    camera.setParameters(cameraParameters);
-		    camera.autoFocus(this);
-	    } else {
-	    	Logger.Log(TAG, "No auto focus mode supported, now just take picture");
-	    	camera.takePicture(shutterCallback, null, photoCallback);
-	    }
+		// Submit focus area to camera
+		if (supportedFocusMode.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+			cameraParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+			camera.setParameters(cameraParameters);
+			camera.autoFocus(this);
+		} else {
+			Logger.Log(TAG,
+					"No auto focus mode supported, now just take picture");
+			camera.takePicture(shutterCallback, null, photoCallback);
+		}
 
 		inPreview = false;
-		
-//		}
+
+		// }
 	}
 
 	PictureCallback rawCallback = new PictureCallback() {
@@ -764,14 +770,15 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			Logger.Log(LOG_TAG, "rawCallback");
 		}
 	};
-	
+
 	public static void setCameraDisplayOrientation(Activity activity,
 			int cameraId, android.hardware.Camera camera) {
 
 		android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
 		android.hardware.Camera.getCameraInfo(cameraId, info);
 
-		int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+		int rotation = activity.getWindowManager().getDefaultDisplay()
+				.getRotation();
 
 		int degrees = 0;
 		switch (rotation) {
@@ -788,7 +795,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			degrees = 270;
 			break;
 		}
-		
+
 		Logger.Log(TAG, "Rotate degree: " + degrees);
 
 		int result;

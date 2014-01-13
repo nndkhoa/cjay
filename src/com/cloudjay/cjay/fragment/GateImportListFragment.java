@@ -199,6 +199,8 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 	public void OnContainerInputCompleted(String containerId,
 			String operatorName, int mode) {
+
+		// TODO: Bug: chưa load xong data nên không có mOperators
 		// Get the container id and container operator code
 		String operatorCode = "";
 		for (Operator operator : mOperators) {

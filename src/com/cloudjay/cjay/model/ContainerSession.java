@@ -300,6 +300,13 @@ public class ContainerSession implements Parcelable {
 		return null;
 	}
 
+	public int getOperatorId() {
+		if (getContainer() != null && getContainer().getOperator() != null) {
+			return getContainer().getOperator().getId();
+		}
+		return 0;
+	}
+
 	public String getOperatorName() {
 		if (getContainer() != null && getContainer().getOperator() != null) {
 			return getContainer().getOperator().getName();
@@ -537,7 +544,7 @@ public class ContainerSession implements Parcelable {
 		}
 		return mFullUri;
 	}
-	
+
 	public String getOriginalPhotoUriString() {
 		Uri uri = getOriginalPhotoUri();
 		if (uri != null) {

@@ -111,9 +111,7 @@ public class AddContainerDialog extends SherlockDialogFragment {
 						.getText().toString(), mOperatorEditText.getText()
 						.toString(), mMode);
 				dismiss();
-				
-				
-				
+
 			}
 		});
 		mCancelButton.setOnClickListener(new OnClickListener() {
