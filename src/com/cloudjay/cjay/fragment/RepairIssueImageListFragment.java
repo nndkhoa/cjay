@@ -21,7 +21,8 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.CameraActivity_;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
@@ -103,8 +104,9 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 				CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance()
 						.getDatabaseManager().getHelper(getActivity())
 						.getCJayImageDaoImpl();
-
+				
 				for (CJayImage cJayImage : mTakenImages) {
+					cJayImageDaoImpl.refresh(cJayImage);
 					cJayImage.setIssue(mIssue);
 					cJayImage.setContainerSession(mIssue.getContainerSession());
 					cJayImageDaoImpl.update(cJayImage);
