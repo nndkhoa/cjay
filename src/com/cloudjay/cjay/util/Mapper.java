@@ -105,21 +105,21 @@ public class Mapper {
 							String cJayImageName = cJayImage.getImageName();
 							if (gateReportImageName.contains(cJayImageName)) {
 
-								// Logger.Log(
-								// LOG_TAG,
-								// "Gate Report Image Id: "
-								// + Integer
-								// .toString(gateReportImage
-								// .getId())
-								// + "\nGate Report Image Name: "
-								// + gateReportImageName
-								// + "\nGate Report Image Type: "
-								// + Integer
-								// .toString(gateReportImage
-								// .getType())
-								// + "\nGate Report Image Time: "
-								// + gateReportImage
-								// .getTimePosted());
+								Logger.Log(
+										LOG_TAG,
+										"Gate Report Image Id: "
+												+ Integer
+														.toString(gateReportImage
+																.getId())
+												+ "\nGate Report Image Name: "
+												+ gateReportImageName
+												+ "\nGate Report Image Type: "
+												+ Integer
+														.toString(gateReportImage
+																.getType())
+												+ "\nGate Report Image Time: "
+												+ gateReportImage
+														.getTimePosted());
 
 								cJayImage.setId(gateReportImage.getId());
 								cJayImage.setImageName(gateReportImageName);
@@ -164,11 +164,11 @@ public class Mapper {
 
 											Logger.Log(
 													LOG_TAG,
-													"Gate Report Image Id: "
+													"Audit Report Image Id: "
 															+ Integer
 																	.toString(cJayImage
 																			.getId())
-															+ "\nGate Report Image Name: "
+															+ "\nAudit Report Image Name: "
 															+ cJayImage);
 
 											cJayImageDaoImpl.update(cJayImage);
