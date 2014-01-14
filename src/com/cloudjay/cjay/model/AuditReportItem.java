@@ -42,7 +42,7 @@ public class AuditReportItem implements Parcelable {
 			Collection<CJayImage> cJayImages = issue.getCJayImages();
 			if (null != cJayImages) {
 				for (CJayImage cJayImage : cJayImages) {
-					if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
+					if (cJayImage.getType() == CJayImage.TYPE_REPORT || cJayImage.getType() == CJayImage.TYPE_REPAIRED) {
 						getAuditReportImages().add(
 								new AuditReportImage(cJayImage.getId(),
 										cJayImage.getType(), cJayImage
