@@ -95,6 +95,7 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 
 	@Override
 	public void onResume() {
+
 		// update new images and database
 		if (mTakenImages != null && mTakenImages.size() > 0) {
 			try {
@@ -165,6 +166,7 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 			try {
 
 				if (mTakenImages == null) {
+					Logger.Log(LOG_TAG, "mTakenImages is NULL");
 					mTakenImages = new ArrayList<CJayImage>();
 				}
 

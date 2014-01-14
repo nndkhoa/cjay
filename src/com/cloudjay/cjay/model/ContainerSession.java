@@ -210,8 +210,10 @@ public class ContainerSession implements Parcelable {
 			String uuid = UUID.randomUUID().toString();
 			this.setCheckInTime(checkInTime);
 			this.setUuid(uuid);
+
 			if (null != container)
 				this.setContainer(container);
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -605,6 +607,7 @@ public class ContainerSession implements Parcelable {
 		if (currentUser != null && currentUser.getDepot() != null) {
 			depotCode = currentUser.getDepot().getDepotCode();
 		}
+
 		ContainerSession containerSession = new ContainerSession(
 				ctx,
 				containerId,
@@ -621,12 +624,13 @@ public class ContainerSession implements Parcelable {
 				.getInstance().getDatabaseManager().getHelper(ctx)
 				.getContainerSessionDaoImpl();
 
-		containerSessionDaoImpl.addContainerSessions(containerSession);
+		containerSessionDaoImpl.addContainerSession(containerSession);
 
 		// trigger update container lists
 		EventBus.getDefault().post(new ContainerCreatedEvent(containerSession));
-		EventBus.getDefault().post(
-				new ContainerSessionEnqueueEvent(containerSession));
+
+		// EventBus.getDefault().post(
+		// new ContainerSessionEnqueueEvent(containerSession));
 
 		return containerSession;
 	}

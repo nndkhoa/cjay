@@ -181,6 +181,7 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 		} else {
 
 			if (mTakenImages == null) {
+				Logger.Log(LOG_TAG, "mTakenImages is NULL");
 				mTakenImages = new ArrayList<CJayImage>();
 			}
 

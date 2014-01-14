@@ -553,7 +553,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
 					.getInstance().getDatabaseManager().getHelper(this)
 					.getContainerSessionDaoImpl();
-			containerSessionDaoImpl.addContainerSessions(containerSession);
+			containerSessionDaoImpl.addContainerSession(containerSession);
 
 		} catch (SQLException e) {
 			e.printStackTrace();

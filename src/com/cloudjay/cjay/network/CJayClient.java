@@ -512,7 +512,7 @@ public class CJayClient implements ICJayClient {
 
 					if (null != containerSession) {
 						containerSessionDaoImpl
-								.addContainerSessions(containerSession);
+								.addContainerSession(containerSession);
 						items.add(containerSession);
 					}
 				}
@@ -599,7 +599,7 @@ public class CJayClient implements ICJayClient {
 
 						if (null != containerSession) {
 							containerSessionDaoImpl
-									.addContainerSessions(containerSession);
+									.addContainerSession(containerSession);
 							items.add(containerSession);
 						}
 					}
@@ -708,7 +708,7 @@ public class CJayClient implements ICJayClient {
 
 						if (null != containerSession) {
 							containerSessionDaoImpl
-									.addContainerSessions(containerSession);
+									.addContainerSession(containerSession);
 							items.add(containerSession);
 						}
 					}
@@ -791,7 +791,7 @@ public class CJayClient implements ICJayClient {
 
 						if (null != containerSession) {
 							containerSessionDaoImpl
-									.addContainerSessions(containerSession);
+									.addContainerSession(containerSession);
 							items.add(containerSession);
 						}
 					}
