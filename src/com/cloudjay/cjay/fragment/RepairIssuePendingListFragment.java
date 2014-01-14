@@ -63,7 +63,7 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 	@ItemClick(R.id.feeds)
 	void imageItemClicked(int position) {
 		mSelectedIssue = mFeedsAdapter.getItem(position);
- 
+
 		// show issue report activity
 		Intent intent = new Intent(getActivity(),
 				RepairIssueReportActivity_.class);
@@ -74,7 +74,12 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 
 	@Click(R.id.btn_add_new)
 	void cameraClicked() {
-		mTakenImages = new ArrayList<CJayImage>();
+		Logger.Log(LOG_TAG, "cameraClicked()");
+
+		if (mTakenImages == null) {
+			Logger.Log(LOG_TAG, "mTakenImages is NULL. Init mTakenImages");
+			mTakenImages = new ArrayList<CJayImage>();
+		}
 
 		Intent intent = new Intent(getActivity(), CameraActivity_.class);
 		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
@@ -171,10 +176,23 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 	}
 
 	public void onEvent(CJayImageAddedEvent event) {
-		// retrieve image
-		Logger.Log(LOG_TAG, "onEvent CJayImageAddedEvent");
-		if (event.getTag().equals(LOG_TAG)) {
-			mTakenImages.add(event.getCJayImage());
+		if (event == null) {
+			Logger.Log(LOG_TAG, "Event is null");
+		} else {
+
+			if (mTakenImages == null) {
+				mTakenImages = new ArrayList<CJayImage>();
+			}
+
+			try {
+				// retrieve image
+				Logger.Log(LOG_TAG, "onEvent CJayImageAddedEvent");
+				if (event.getTag().equals(LOG_TAG)) {
+					mTakenImages.add(event.getCJayImage());
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

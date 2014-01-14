@@ -404,9 +404,6 @@ public class CJayClient implements ICJayClient {
 		String response = requestWrapper.sendGet(CJayConstant.LIST_OPERATORS,
 				headers);
 
-		response = requestWrapper.sendGet(CJayConstant.LIST_OPERATORS, headers);
-		// Logger.Log(LOG_TAG, response);
-
 		Gson gson = new Gson();
 		Type listType = new TypeToken<List<Operator>>() {
 		}.getType();

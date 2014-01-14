@@ -28,6 +28,7 @@ import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -68,7 +69,9 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 
 	@Click(R.id.btn_add_new)
 	void cameraClicked() {
-		mTakenImages = new ArrayList<CJayImage>();
+		if (mTakenImages == null) {
+			mTakenImages = new ArrayList<CJayImage>();
+		}
 
 		Intent intent = new Intent(getActivity(), CameraActivity_.class);
 		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA, mIssue
@@ -154,10 +157,25 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 	}
 
 	public void onEvent(CJayImageAddedEvent event) {
-		// retrieve image
-		if (event.getTag().equals(LOG_TAG)) {
-			mTakenImages.add(event.getCJayImage());
+
+		if (event == null) {
+			Logger.Log(LOG_TAG, "Event is null");
+		} else {
+			// retrieve image
+			try {
+
+				if (mTakenImages == null) {
+					mTakenImages = new ArrayList<CJayImage>();
+				}
+
+				if (event.getTag().equals(LOG_TAG)) {
+					mTakenImages.add(event.getCJayImage());
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
+
 	}
 
 	private void initImageFeedAdapter(ArrayList<CJayImage> containers) {
