@@ -31,7 +31,7 @@ public interface IContainerSessionDao extends Dao<ContainerSession, String> {
 	
 	void addListContainerSessions(List<ContainerSession> containerSessions) throws SQLException;
 
-	void addContainerSessions(ContainerSession containerSession) throws SQLException;
+	void addContainerSession(ContainerSession containerSession) throws SQLException;
 
 	void deleteAllContainerSessions() throws SQLException;
 

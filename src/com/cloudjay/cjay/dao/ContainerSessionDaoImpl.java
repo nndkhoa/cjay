@@ -37,14 +37,17 @@ public class ContainerSessionDaoImpl extends
 	}
 
 	@Override
-	public void addContainerSessions(ContainerSession containerSession)
+	public void addContainerSession(ContainerSession containerSession)
 			throws SQLException {
+
 		if (containerSession != null) {
 
-			ContainerSession tmp = this.queryForFirst(this.queryBuilder()
-					.where()
-					.eq(ContainerSession.FIELD_ID, containerSession.getId())
-					.prepare());
+			ContainerSession tmp = this
+					.queryForFirst(this
+							.queryBuilder()
+							.where()
+							.eq(ContainerSession.FIELD_UUID,
+									containerSession.getUuid()).prepare());
 
 			if (null != tmp) {
 				containerSession.setUuid(tmp.getUuid());

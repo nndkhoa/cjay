@@ -96,6 +96,7 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 
 	@Override
 	public void onResume() {
+
 		// update new images and database
 
 		Logger.Log(LOG_TAG, "onResume");

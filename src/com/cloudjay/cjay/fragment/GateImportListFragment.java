@@ -328,7 +328,6 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		if (mFeedsAdapter != null) {
 			refresh();
 		}
-
 		super.onResume();
 	}
 }
