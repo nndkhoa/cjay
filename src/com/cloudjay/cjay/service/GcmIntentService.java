@@ -53,7 +53,7 @@ public class GcmIntentService extends IntentService {
 					.equals(messageType)) {
 
 				// TODO: implement get data here
-				// sendNotification(extras);
+				sendNotification(extras);
 				Log.i(TAG, "Received: " + extras.toString());
 			}
 		}
@@ -65,10 +65,36 @@ public class GcmIntentService extends IntentService {
 	// This is just one simple example of what you might choose to do with
 	// a GCM message.
 	private void sendNotification(Bundle extras) {
+
 		mNotificationManager = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
 		// TODO: Tieu Bao can cai gi thi viet o day
+		int id = extras.getInt("id");
+		String type = extras.getString("type");
+
+		if (type == "NEW_CONTAINER") {
+			// Container được upload lên từ CỔNG
+			// Gửi cho GATE và AUDIT
+
+		} else if (type == "EXPORT_CONTAINER") {
+			// Container xuất khỏi Depot ở CỔNG
+			// Gửi cho mọi ROLE kèm `id`
+
+		} else if (type == "NEW_ERROR_LIST") {
+			// AUDIT post new Issue List
+			// Gửi cho REPAIR
+			// Đối với ROLE == AUDIT, kèm `id` để remove
+
+		} else if (type == "UPDATE_ERROR_LIST") {
+			// Có thông tin thay đổi từ `văn phòng` || tổ sửa chữa thêm lỗi mới
+			// Gửi cho REPAIR
+
+		} else if (type == "CONTAINER_REPAIRED") {
+			// Sau khi post báo cáo `Sau sửa chữa` từ REPAIR
+			// Gửi cho REPAIR kèm `id`
+
+		}
 
 		// Intent previewIntent = new Intent(this, ItemDetailActivity_.class);
 		// previewIntent.putExtra("feed_id", extras.getString("feed_id"));
