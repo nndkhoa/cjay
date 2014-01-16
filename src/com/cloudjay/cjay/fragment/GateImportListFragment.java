@@ -130,9 +130,8 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 	@Click(R.id.btn_add_new)
 	void addContainerClicked() {
-		showContainerDetailDialog(
-				getResources().getString(R.string.default_container_id), "",
-				AddContainerDialog.CONTAINER_DIALOG_ADD);
+		// getResources().getString(R.string.default_container_id)
+		showContainerDetailDialog("", "", AddContainerDialog.CONTAINER_DIALOG_ADD);		
 	}
 
 	@ItemClick(R.id.feeds)
@@ -211,6 +210,8 @@ public class GateImportListFragment extends SherlockDialogFragment {
 			}
 		}
 
+		if (TextUtils.isEmpty(containerId) || TextUtils.isEmpty(operatorCode)) { return; }
+			
 		switch (mode) {
 		case AddContainerDialog.CONTAINER_DIALOG_ADD:
 			try {

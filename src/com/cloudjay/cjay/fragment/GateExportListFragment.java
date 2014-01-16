@@ -171,8 +171,7 @@ public class GateExportListFragment extends SherlockFragment {
 		if (!TextUtils.isEmpty(mSearchEditText.getText().toString())) {
 			containerId = mSearchEditText.getText().toString();
 		} else {
-			containerId = getResources().getString(
-					R.string.default_container_id);
+			containerId = "";
 		}
 		showContainerDetailDialog(containerId, "",
 				AddContainerDialog.CONTAINER_DIALOG_ADD);
@@ -244,6 +243,8 @@ public class GateExportListFragment extends SherlockFragment {
 			}
 		}
 
+		if (TextUtils.isEmpty(containerId) || TextUtils.isEmpty(operatorCode)) { return; }
+		
 		switch (mode) {
 		case AddContainerDialog.CONTAINER_DIALOG_ADD:
 			try {

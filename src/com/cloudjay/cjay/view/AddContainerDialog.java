@@ -3,6 +3,7 @@ package com.cloudjay.cjay.view;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -106,12 +107,21 @@ public class AddContainerDialog extends SherlockDialogFragment {
 		mOkButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mCallback = (AddContainerDialogListener) getActivity();
-				mCallback.OnContainerInputCompleted(mParent, mContainerEditText
-						.getText().toString(), mOperatorEditText.getText()
-						.toString(), mMode);
-				dismiss();
-
+				mContainerId = mContainerEditText.getText().toString();
+				mOperatorName = mOperatorEditText.getText().toString();
+				
+				mContainerEditText.setError(null);
+				mOperatorEditText.setError(null);
+				
+				if (TextUtils.isEmpty(mContainerId)) {
+					mContainerEditText.setError(getString(R.string.dialog_container_id_required));
+				} else if (TextUtils.isEmpty(mOperatorName)) {
+					mOperatorEditText.setError(getString(R.string.dialog_container_owner_required));
+				} else {
+					mCallback = (AddContainerDialogListener) getActivity();
+					mCallback.OnContainerInputCompleted(mParent, mContainerId, mOperatorName, mMode);
+					dismiss();
+				}
 			}
 		});
 		mCancelButton.setOnClickListener(new OnClickListener() {

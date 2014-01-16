@@ -148,8 +148,7 @@ public class AuditorReportingListFragment extends SherlockFragment {
 		if (!TextUtils.isEmpty(mSearchEditText.getText().toString())) {
 			containerId = mSearchEditText.getText().toString();
 		} else {
-			containerId = getResources().getString(
-					R.string.default_container_id);
+			containerId = "";
 		}
 		showContainerDetailDialog(containerId, "",
 				AddContainerDialog.CONTAINER_DIALOG_ADD);

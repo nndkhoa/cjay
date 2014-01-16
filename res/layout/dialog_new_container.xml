@@ -38,7 +38,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:paddingBottom="25dp" >
 
         <TextView
             android:layout_width="0dp"
@@ -69,21 +70,24 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-
+        android:orientation="horizontal"
+        style="@android:attr/buttonBarStyle" >
+        
         <Button
             android:id="@+id/dialog_new_container_cancel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/dialog_container_cancel" />
+            android:text="@string/dialog_container_cancel"
+            style="@android:attr/buttonBarButtonStyle" />
 
         <Button
             android:id="@+id/dialog_new_container_ok"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/dialog_container_ok" />
+            android:text="@string/dialog_container_ok"
+            style="@android:attr/buttonBarButtonStyle" />
     </LinearLayout>
 
 </LinearLayout>
