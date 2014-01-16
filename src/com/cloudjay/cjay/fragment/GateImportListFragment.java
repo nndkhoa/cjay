@@ -51,16 +51,14 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 	@ViewById(R.id.btn_add_new)
 	Button mAddNewBtn;
-	
+
 	@ViewById(R.id.feeds)
 	ListView mFeedListView;
 
 	private ArrayList<Operator> mOperators;
 	private ArrayList<ContainerSession> mFeeds;
 	private FunDapter<ContainerSession> mFeedsAdapter;
-
 	private ImageLoader imageLoader;
-
 	private ContainerSession mSelectedContainerSession;
 
 	@AfterViews
@@ -131,7 +129,8 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	@Click(R.id.btn_add_new)
 	void addContainerClicked() {
 		// getResources().getString(R.string.default_container_id)
-		showContainerDetailDialog("", "", AddContainerDialog.CONTAINER_DIALOG_ADD);		
+		showContainerDetailDialog("", "",
+				AddContainerDialog.CONTAINER_DIALOG_ADD);
 	}
 
 	@ItemClick(R.id.feeds)
@@ -210,8 +209,10 @@ public class GateImportListFragment extends SherlockDialogFragment {
 			}
 		}
 
-		if (TextUtils.isEmpty(containerId) || TextUtils.isEmpty(operatorCode)) { return; }
-			
+		if (TextUtils.isEmpty(containerId) || TextUtils.isEmpty(operatorCode)) {
+			return;
+		}
+
 		switch (mode) {
 		case AddContainerDialog.CONTAINER_DIALOG_ADD:
 			try {

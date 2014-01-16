@@ -93,20 +93,24 @@ public class GateExportListFragment extends SherlockFragment {
 					int count) {
 			}
 		});
-		
-		mSearchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-				if (id == EditorInfo.IME_ACTION_SEARCH) {
-					// hide keyboard
-					InputMethodManager imm = (InputMethodManager) getActivity()
-							.getSystemService(Context.INPUT_METHOD_SERVICE);
-					imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
-					return true;
-				}
-				return false;
-			}
-		});
+
+		mSearchEditText
+				.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+					@Override
+					public boolean onEditorAction(TextView textView, int id,
+							KeyEvent keyEvent) {
+						if (id == EditorInfo.IME_ACTION_SEARCH) {
+							// hide keyboard
+							InputMethodManager imm = (InputMethodManager) getActivity()
+									.getSystemService(
+											Context.INPUT_METHOD_SERVICE);
+							imm.hideSoftInputFromWindow(
+									mSearchEditText.getWindowToken(), 0);
+							return true;
+						}
+						return false;
+					}
+				});
 
 		imageLoader = ImageLoader.getInstance();
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
@@ -243,8 +247,10 @@ public class GateExportListFragment extends SherlockFragment {
 			}
 		}
 
-		if (TextUtils.isEmpty(containerId) || TextUtils.isEmpty(operatorCode)) { return; }
-		
+		if (TextUtils.isEmpty(containerId) || TextUtils.isEmpty(operatorCode)) {
+			return;
+		}
+
 		switch (mode) {
 		case AddContainerDialog.CONTAINER_DIALOG_ADD:
 			try {
@@ -373,6 +379,8 @@ public class GateExportListFragment extends SherlockFragment {
 
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListCheckOutContainerSessions(getActivity());
+
+		mFeedsAdapter.updateData(mFeeds);
 		mSearchEditText.setText(""); // this will refresh the list
 	}
 
