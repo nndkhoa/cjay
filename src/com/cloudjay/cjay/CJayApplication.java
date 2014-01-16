@@ -112,7 +112,7 @@ public class CJayApplication extends Application {
 			CJayConstant.HIDDEN_APP_DIRECTORY_FILE.mkdir();
 
 		// Configure Logger
-		Logger.PRODUCTION_MODE = false;
+		Logger.PRODUCTION_MODE = true;
 
 		// Configure Alarm Manager
 		if (!Utils.isAlarmUp(getApplicationContext())) {
