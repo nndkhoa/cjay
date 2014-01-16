@@ -40,9 +40,8 @@
     	android:layout_width="match_parent"
     	android:layout_height="0dp"
         android:layout_weight="1"
-        android:choiceMode="singleChoice"
         android:listSelector="@android:color/black"
-   	 	android:textAppearance="?android:attr/textAppearanceListItem"
-   	 	android:minHeight="260dp" />
+   	 	android:minHeight="260dp"
+		style="@style/CJayListView" />
     
 </LinearLayout>

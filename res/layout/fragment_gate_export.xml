@@ -37,8 +37,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/search_edittext"
-        android:layout_centerHorizontal="true"
-        android:choiceMode="singleChoice"
-        android:scrollbars="none" />
+		style="@style/CJayListView" />
 
 </RelativeLayout>
