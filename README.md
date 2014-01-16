@@ -3,7 +3,7 @@ cjay
 
 ### IMPORTANT
 
-Need to check updated data everytime get data from server because server can't return exact data with filter `datetime` (caused by python). Sample: `ContainerSessionDaoImpl.java`
+Need to check updated data everytime getting data from server because server can't return exact data with filter `datetime` (caused by python). Sample: `ContainerSessionDaoImpl.java`
 
 ### List of open source plugins
 
