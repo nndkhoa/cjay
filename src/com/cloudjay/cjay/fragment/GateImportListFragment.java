@@ -229,7 +229,6 @@ public class GateImportListFragment extends SherlockDialogFragment {
 			try {
 				ContainerSession.editContainerSession(getActivity(),
 						mSelectedContainerSession, containerId, operatorCode);
-				hideMenuItems();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
