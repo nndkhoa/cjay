@@ -13,6 +13,7 @@ import com.cloudjay.cjay.model.DatabaseHelper;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
+import com.j256.ormlite.table.TableUtils;
 
 public class Session {
 
@@ -63,32 +64,37 @@ public class Session {
 
 	public boolean deleteSession(Context context) {
 		Logger.Log(LOG_TAG, "deleting session ...");
-
 		databaseManager = CJayClient.getInstance().getDatabaseManager();
 		try {
-			DatabaseHelper helper = databaseManager.getHelper(context);
-			userDao = helper.getUserDaoImpl();
 
+			DatabaseHelper helper = databaseManager.getHelper(context);
+
+			userDao = helper.getUserDaoImpl();
 			User user = userDao.getMainUser();
 
 			if (null != user) {
 				user.setMainAccount(false);
 				user.setAccessToken("");
 				userDao.update(user);
-
 				this.currentUser = null;
-				return true;
 			}
 
-			helper.close();
-			context.deleteDatabase(helper.DATABASE_NAME);
+			for (Class<?> dataClass : DatabaseHelper.DROP_CLASSES) {
+				TableUtils.dropTable(helper.getConnectionSource(), dataClass,
+						true);
+			}
 
+			for (Class<?> dataClass : DatabaseHelper.DROP_CLASSES) {
+				TableUtils.createTable(helper.getConnectionSource(), dataClass);
+			}
+
+			return true;
 		} catch (SQLException e) {
+
 			e.printStackTrace();
+			context.deleteDatabase(DatabaseHelper.DATABASE_NAME);
 			return false;
 		}
-
-		return false;
 	}
 
 	public void extendAccessTokenIfNeeded(Context applicationContext) {

@@ -58,7 +58,8 @@ public class SplashScreenActivity extends CJayActivity {
 				Session session = getSession();
 				if (null == getSession()) {
 					// user did not sign in
-					Logger.Log(LOG_TAG, "session == null");
+					Logger.Log(LOG_TAG,
+							"Session is NULL. User did not sign in.");
 					startActivity(new Intent(SplashScreenActivity.this,
 							LoginActivity_.class));
 				} else {

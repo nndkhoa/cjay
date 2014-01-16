@@ -51,6 +51,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 	@ViewById(R.id.btn_add_new)
 	Button mAddNewBtn;
+	
 	@ViewById(R.id.feeds)
 	ListView mFeedListView;
 
