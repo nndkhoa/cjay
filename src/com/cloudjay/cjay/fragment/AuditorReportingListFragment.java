@@ -13,13 +13,17 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -82,6 +86,20 @@ public class AuditorReportingListFragment extends SherlockFragment {
 					int count) {
 			}
 		});
+		
+		mSearchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+				if (id == EditorInfo.IME_ACTION_SEARCH) {
+					// hide keyboard
+					InputMethodManager imm = (InputMethodManager) getActivity()
+							.getSystemService(Context.INPUT_METHOD_SERVICE);
+					imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
+					return true;
+				}
+				return false;
+			}
+		});
 
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
 				.getListOperators(getActivity());
@@ -130,8 +148,7 @@ public class AuditorReportingListFragment extends SherlockFragment {
 		if (!TextUtils.isEmpty(mSearchEditText.getText().toString())) {
 			containerId = mSearchEditText.getText().toString();
 		} else {
-			containerId = getResources().getString(
-					R.string.default_container_id);
+			containerId = "";
 		}
 		showContainerDetailDialog(containerId, "",
 				AddContainerDialog.CONTAINER_DIALOG_ADD);

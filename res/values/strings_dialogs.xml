@@ -8,6 +8,9 @@
     <string name="dialog_container_cancel">Cancel</string>
     <string name="dialog_container_ok">OK</string>
     
+    <string name="dialog_container_id_required">Xin nhập Container ID</string>
+    <string name="dialog_container_owner_required">Xin chọn hãng tàu</string>
+    
     <string name="dialog_operator_title">Chọn hãng tàu</string>
     
     <string-array name="dialog_container_owner_list">

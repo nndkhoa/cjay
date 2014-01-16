@@ -15,9 +15,7 @@
         android:layout_marginTop="10dp"
         android:ems="10"
         android:hint="@string/container_search"
-        android:imeOptions="actionSearch"
-        android:inputType="textCapCharacters"
-        android:singleLine="true" />
+		style="@style/SearchEditTextStyle" />
 
     <TextView
         android:id="@+id/notfound_textview"
@@ -37,7 +35,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/search_edittext"
-        android:layout_centerHorizontal="true"
-        android:choiceMode="singleChoice" />
+		style="@style/CJayListView" />
 
 </RelativeLayout>

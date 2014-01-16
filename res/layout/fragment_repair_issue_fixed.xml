@@ -9,7 +9,7 @@
     	android:layout_width="match_parent"
     	android:layout_height="match_parent"
     	android:layout_below="@id/btn_add_new"
-   	 	android:textAppearance="?android:attr/textAppearanceListItem"
-   	 	android:minHeight="260dp" />
+   	 	android:minHeight="260dp"
+		style="@style/CJayListView" />
     
 </RelativeLayout>

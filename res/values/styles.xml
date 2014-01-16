@@ -70,6 +70,12 @@
         <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
     </style>
     
+    <style name="SearchEditTextStyle">
+        <item name="android:imeOptions">actionSearch</item>
+        <item name="android:inputType">textCapCharacters</item>
+        <item name="android:singleLine">true</item>
+    </style>
+    
     <style name="NotFoundTextViewStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -106,5 +112,12 @@
         <item name="android:padding">8dp</item>
         <item name="android:textSize">20sp</item>
         <item name="android:textStyle">bold</item>
+    </style>
+    
+    <style name="CJayListView">
+        <item name="android:scrollbars">none</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:choiceMode">singleChoice</item>
+        <item name="android:textAppearance">@android:attr/textAppearanceListItem</item>
     </style>
 </resources>
