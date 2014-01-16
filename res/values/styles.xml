@@ -70,6 +70,12 @@
         <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
     </style>
     
+    <style name="SearchEditTextStyle">
+        <item name="android:imeOptions">actionSearch</item>
+        <item name="android:inputType">textCapCharacters</item>
+        <item name="android:singleLine">true</item>
+    </style>
+    
     <style name="NotFoundTextViewStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
