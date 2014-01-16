@@ -222,7 +222,8 @@ public class ContainerSessionDaoImpl extends
 
 		List<ContainerSession> containerSessions = this.query(this
 				.queryBuilder().where()
-				.eq(ContainerSession.FIELD_CHECK_OUT_TIME, "").prepare());
+				.eq(ContainerSession.FIELD_CHECK_OUT_TIME, "").and()
+				.eq(ContainerSession.FIELD_LOCAL, false).prepare());
 
 		return containerSessions;
 	}

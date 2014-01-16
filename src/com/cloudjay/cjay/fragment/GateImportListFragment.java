@@ -111,6 +111,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 			mSelectedContainerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+			mSelectedContainerSession.setOnLocal(false);
 
 			containerSessionDaoImpl.update(mSelectedContainerSession);
 
