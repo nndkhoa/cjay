@@ -3,6 +3,7 @@ encoding//src/com/cloudjay/cjay/CJayActivity.java=UTF-8
 encoding//src/com/cloudjay/cjay/CJayApplication.java=UTF-8
 encoding//src/com/cloudjay/cjay/CameraActivity.java=UTF-8
 encoding//src/com/cloudjay/cjay/LoginActivity.java=UTF-8
+encoding//src/com/cloudjay/cjay/dao/ContainerSessionDaoImpl.java=UTF-8
 encoding//src/com/cloudjay/cjay/events/DataLoadedEvent.java=UTF-8
 encoding//src/com/cloudjay/cjay/events/UploadsStartEvent.java=UTF-8
 encoding//src/com/cloudjay/cjay/fragment/GateImportListFragment.java=UTF-8

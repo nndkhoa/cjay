@@ -41,19 +41,34 @@ public class ContainerSessionDaoImpl extends
 			throws SQLException {
 
 		if (containerSession != null) {
+			int containerSessionId = containerSession.getId();
 
-			ContainerSession tmp = this
-					.queryForFirst(this
-							.queryBuilder()
-							.where()
-							.eq(ContainerSession.FIELD_UUID,
-									containerSession.getUuid()).prepare());
+			if (containerSessionId == 0) { // new Container Session
+				Logger.Log(
+						LOG_TAG,
+						"Insert new Container with ID: "
+								+ Integer.toString(containerSessionId)
+								+ " Name: " + containerSession.getContainerId());
+				this.createOrUpdate(containerSession);
+			} else { // existed Container Session
 
-			if (null != tmp) {
-				containerSession.setUuid(tmp.getUuid());
+				ContainerSession tmp = this
+						.queryForFirst(this
+								.queryBuilder()
+								.where()
+								.eq(ContainerSession.FIELD_ID,
+										containerSession.getId()).prepare());
+
+				if (null != tmp) {
+					containerSession.setUuid(tmp.getUuid());
+				}
+
+				Logger.Log(LOG_TAG, "Update Container Session with ID: "
+						+ Integer.toString(containerSessionId) + " Name: "
+						+ containerSession.getContainerId());
+
+				this.createOrUpdate(containerSession);
 			}
-
-			this.createOrUpdate(containerSession);
 		}
 	}
 
