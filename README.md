@@ -1,6 +1,10 @@
 cjay
 ====
 
+### IMPORTANT
+
+Need to check updated data everytime getting data from server because server can't return exact data with filter `datetime` (caused by python). Sample: `ContainerSessionDaoImpl.java`
+
 ### List of open source plugins
 
 * [FunDapter](https://github.com/amigold/FunDapter): If your ListView is simple and do not have some speacial features like `pull to refresh` or `sticky header`, you can use FunDapter to remove redundant Adapter. View `JayPixApp` > `PreviewActivity` for sample.
@@ -30,6 +34,4 @@ Recommended device: [Casio G'zOne](http://www.gsmarena.com/casio_g'zone_commando
 [Naming conventions for drawables] (http://petrnohejl.github.io/Android-Cheatsheet-For-Graphic-Designers/#naming-conventions).
 
 Datetime format: `%Y-%m-%dT%H:%M:%S`
-
-
 
