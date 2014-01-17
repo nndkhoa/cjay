@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.network;
 
 import java.net.SocketTimeoutException;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -25,7 +26,8 @@ public interface ICJayClient {
 	String getUserToken(String username, String password, Context ctx)
 			throws JSONException, SocketTimeoutException, NoConnectionException;
 
-	void addGCMDevice(String regid, Context ctx) throws JSONException, NoConnectionException;
+	void addGCMDevice(String regid, Context ctx) throws JSONException,
+			NoConnectionException;
 
 	User getCurrentUser(String token, Context ctx) throws NoConnectionException;
 
@@ -70,4 +72,13 @@ public interface ICJayClient {
 
 	String postContainerSessionReportList(Context ctx, TmpContainerSession item)
 			throws NoConnectionException;
+
+	void fetchData(Context ctx) throws NoConnectionException;
+
+	void updateListContainerSessions(Context ctx) throws NoConnectionException,
+			SQLException;
+
+	void updateListISOCode(Context ctx) throws NoConnectionException,
+			SQLException;
+
 }

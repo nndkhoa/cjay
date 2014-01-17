@@ -121,183 +121,6 @@ public class CJayClient implements ICJayClient {
 		return headers;
 	}
 
-	/**
-	 * 
-	 * fetch data based on current user role
-	 * 
-	 * - Giám định cổng:
-	 * 
-	 * 1. In: Hiển thị list container ở local và chưa được upload
-	 * (upload_confirmation = false).
-	 * 
-	 * 2. Out: Hiện thị list container ở local + server, chưa xuất
-	 * (check_out_time = null), chưa upload.
-	 * 
-	 * - Giám định sửa chữa:
-	 * 
-	 * 1. Chưa sửa chữa: hiển thị các container có các `CJayImage` chưa điền đầy
-	 * đủ thông tin `Issue`
-	 * 
-	 * 2. Đã sửa chữa: hiển thị các container có đầy đủ thông tin về `Issue`
-	 * 
-	 * - Giám định sau sửa chữa:
-	 * 
-	 * 1.
-	 * 
-	 * @param ctx
-	 * @throws NoConnectionException
-	 */
-	public void fetchData(Context ctx) throws NoConnectionException {
-		Logger.Log(LOG_TAG, "fetching data ...");
-
-		try {
-
-			boolean hasNewData = false;
-
-			Date now = new Date();
-
-			// 2013-11-10T21:05:24 (do not have timezone info)
-			SimpleDateFormat dateFormat = new SimpleDateFormat(
-					CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
-			String nowString = dateFormat.format(now);
-
-			// 1. chưa có ISO code data
-			Logger.Log(LOG_TAG, "no iso code");
-			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx)
-					.getOperatorDaoImpl();
-			DamageCodeDaoImpl damageCodeDaoImpl = databaseManager
-					.getHelper(ctx).getDamageCodeDaoImpl();
-			RepairCodeDaoImpl repairCodeDaoImpl = databaseManager
-					.getHelper(ctx).getRepairCodeDaoImpl();
-			ComponentCodeDaoImpl componentCodeDaoImpl = databaseManager
-					.getHelper(ctx).getComponentCodeDaoImpl();
-
-			if (operatorDaoImpl.isEmpty()) {
-				Logger.Log(LOG_TAG, "get list operators");
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE,
-						nowString);
-
-				List<Operator> operators = getOperators(ctx);
-				if (null != operators)
-					operatorDaoImpl.addListOperators(operators);
-			}
-
-			if (damageCodeDaoImpl.isEmpty()) {
-				Logger.Log(LOG_TAG, "get list damage codes");
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE,
-						nowString);
-				List<DamageCode> damageCodes = getDamageCodes(ctx);
-				if (null != damageCodes)
-					damageCodeDaoImpl.addListDamageCodes(damageCodes);
-			}
-
-			if (repairCodeDaoImpl.isEmpty()) {
-				Logger.Log(LOG_TAG, "get list repair codes");
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE,
-						nowString);
-
-				List<RepairCode> repairCodes = getRepairCodes(ctx);
-				if (null != repairCodes)
-					repairCodeDaoImpl.addListRepairCodes(repairCodes);
-			}
-
-			if (componentCodeDaoImpl.isEmpty()) {
-				Logger.Log(LOG_TAG, "get list of component codes");
-
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE,
-						nowString);
-
-				List<ComponentCode> componentCodes = getComponentCodes(ctx);
-				if (null != componentCodes)
-					componentCodeDaoImpl.addListComponentCodes(componentCodes);
-
-			}
-
-			// 2. fetch ISO CODE
-			if (hasNewMetadata(ctx)) {
-				Logger.Log(LOG_TAG, "fetch iso code");
-			}
-
-			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
-					.getHelper(ctx).getContainerSessionDaoImpl();
-
-			User user = Session.restore(ctx).getCurrentUser();
-			int userRole = user.getRole();
-			int filterStatus = user.getFilterStatus();
-
-			Logger.Log(LOG_TAG, "User Role: " + user.getRoleName()
-					+ "\nFilter: " + Integer.toString(user.getFilterStatus()));
-
-			// 3. Update list ContainerSessions
-			Logger.Log(LOG_TAG, "get list container sessions");
-			List<ContainerSession> containerSessions = null;
-
-			if (containerSessionDaoImpl.isEmpty()) {
-
-				Logger.Log(LOG_TAG,
-						"get new list container sessions based on user role");
-
-				// containerSessions = getContainerSessions(ctx, userRole,
-				// filterStatus);
-
-				containerSessions = getAllContainerSessions(ctx);
-
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
-						nowString);
-
-			} else {
-
-				String date = PreferencesUtil.getPrefsValue(ctx,
-						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE);
-
-				Logger.Log(LOG_TAG,
-						"get updated list container sessions from last time: "
-								+ date);
-
-				// update Last Update for each time convert container session
-				// containerSessions = getContainerSessions(ctx, userRole,
-				// filterStatus, date);
-
-				containerSessions = getContainerSessions(ctx, date);
-
-				// TODO: need to refactor after implement push notification
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
-						nowString);
-
-				if (containerSessions == null) {
-					Logger.Log(LOG_TAG, "-----> NO new container sessions");
-				} else {
-					Logger.Log(LOG_TAG,
-							"Has " + Integer.toString(containerSessions.size())
-									+ " new container sessions");
-				}
-
-				Logger.Log(
-						LOG_TAG,
-						"----> Last update from "
-								+ PreferencesUtil
-										.getPrefsValue(
-												ctx,
-												PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE));
-			}
-
-			if (null != containerSessions) {
-				containerSessionDaoImpl
-						.addListContainerSessions(containerSessions);
-				EventBus.getDefault().post(new DataLoadedEvent());
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
 	@Override
 	public String getUserToken(String username, String password, Context ctx)
 			throws JSONException, SocketTimeoutException, NoConnectionException {
@@ -895,4 +718,207 @@ public class CJayClient implements ICJayClient {
 		return ret;
 
 	}
+
+	@Override
+	public void updateListContainerSessions(Context ctx)
+			throws NoConnectionException, SQLException {
+
+		try {
+			Date now = new Date();
+
+			// 2013-11-10T21:05:24 (do not have timezone info)
+			SimpleDateFormat dateFormat = new SimpleDateFormat(
+					CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
+			String nowString = dateFormat.format(now);
+
+			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
+					.getHelper(ctx).getContainerSessionDaoImpl();
+
+			// 3. Update list ContainerSessions
+			Logger.Log(LOG_TAG, "get list container sessions");
+			List<ContainerSession> containerSessions = null;
+
+			if (containerSessionDaoImpl.isEmpty()) {
+
+				Logger.Log(LOG_TAG,
+						"get new list container sessions based on user role");
+
+				containerSessions = getAllContainerSessions(ctx);
+
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
+						nowString);
+
+			} else {
+
+				String date = PreferencesUtil.getPrefsValue(ctx,
+						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE);
+
+				Logger.Log(LOG_TAG,
+						"get updated list container sessions from last time: "
+								+ date);
+
+				containerSessions = getContainerSessions(ctx, date);
+
+				// TODO: need to refactor after implement push notification
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
+						nowString);
+
+				if (containerSessions == null) {
+					Logger.Log(LOG_TAG, "-----> NO new container sessions");
+				} else {
+					Logger.Log(LOG_TAG,
+							"Has " + Integer.toString(containerSessions.size())
+									+ " new container sessions");
+				}
+
+				Logger.Log(
+						LOG_TAG,
+						"----> Last update from "
+								+ PreferencesUtil
+										.getPrefsValue(
+												ctx,
+												PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE));
+			}
+
+			if (null != containerSessions) {
+				containerSessionDaoImpl
+						.addListContainerSessions(containerSessions);
+				EventBus.getDefault().post(new DataLoadedEvent());
+			}
+
+		} catch (NoConnectionException e) {
+			throw e;
+		} catch (SQLException e) {
+			throw e;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	@Override
+	public void updateListISOCode(Context ctx) throws NoConnectionException,
+			SQLException {
+
+		try {
+			Date now = new Date();
+
+			// 2013-11-10T21:05:24 (do not have timezone info)
+			SimpleDateFormat dateFormat = new SimpleDateFormat(
+					CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
+			String nowString = dateFormat.format(now);
+
+			// 1. chưa có ISO code data
+			Logger.Log(LOG_TAG, "no iso code");
+			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx)
+					.getOperatorDaoImpl();
+			DamageCodeDaoImpl damageCodeDaoImpl = databaseManager
+					.getHelper(ctx).getDamageCodeDaoImpl();
+			RepairCodeDaoImpl repairCodeDaoImpl = databaseManager
+					.getHelper(ctx).getRepairCodeDaoImpl();
+			ComponentCodeDaoImpl componentCodeDaoImpl = databaseManager
+					.getHelper(ctx).getComponentCodeDaoImpl();
+
+			if (operatorDaoImpl.isEmpty()) {
+				Logger.Log(LOG_TAG, "get list operators");
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE,
+						nowString);
+
+				List<Operator> operators = getOperators(ctx);
+				if (null != operators)
+					operatorDaoImpl.addListOperators(operators);
+			}
+
+			if (damageCodeDaoImpl.isEmpty()) {
+				Logger.Log(LOG_TAG, "get list damage codes");
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE,
+						nowString);
+				List<DamageCode> damageCodes = getDamageCodes(ctx);
+				if (null != damageCodes)
+					damageCodeDaoImpl.addListDamageCodes(damageCodes);
+			}
+
+			if (repairCodeDaoImpl.isEmpty()) {
+				Logger.Log(LOG_TAG, "get list repair codes");
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE,
+						nowString);
+
+				List<RepairCode> repairCodes = getRepairCodes(ctx);
+				if (null != repairCodes)
+					repairCodeDaoImpl.addListRepairCodes(repairCodes);
+			}
+
+			if (componentCodeDaoImpl.isEmpty()) {
+				Logger.Log(LOG_TAG, "get list of component codes");
+
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE,
+						nowString);
+
+				List<ComponentCode> componentCodes = getComponentCodes(ctx);
+				if (null != componentCodes)
+					componentCodeDaoImpl.addListComponentCodes(componentCodes);
+
+			}
+
+			// 2. fetch ISO CODE
+			if (hasNewMetadata(ctx)) {
+				Logger.Log(LOG_TAG, "fetch iso code");
+			}
+
+		} catch (NoConnectionException e) {
+			throw e;
+		} catch (SQLException e) {
+			throw e;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 * fetch data based on current user role
+	 * 
+	 * - Giám định cổng:
+	 * 
+	 * 1. In: upload_confirmation = false && local = true
+	 * 
+	 * 2. Out: local = false && check_out_time = null
+	 * 
+	 * - Giám định sửa chữa:
+	 * 
+	 * 1. Chưa báo cáo: hiển thị các container có các `CJayImage` chưa điền đầy
+	 * đủ thông tin `Issue`
+	 * 
+	 * 2. Đang báo cáo: hiển thị các container có đầy đủ thông tin về `Issue`
+	 * 
+	 * - Giám định sau sửa chữa:
+	 * 
+	 * 1.
+	 * 
+	 * @param ctx
+	 * @throws NoConnectionException
+	 */
+	public void fetchData(Context ctx) throws NoConnectionException {
+		try {
+
+			Logger.Log(LOG_TAG, "fetching data ...");
+
+			updateListISOCode(ctx);
+			updateListContainerSessions(ctx);
+
+		} catch (NoConnectionException e) {
+			throw e;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 }

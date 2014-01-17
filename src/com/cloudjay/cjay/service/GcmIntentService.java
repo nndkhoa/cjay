@@ -71,7 +71,6 @@ public class GcmIntentService extends IntentService {
 		mNotificationManager = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		// TODO: Tieu Bao can cai gi thi viet o day
 		int id = extras.getInt("id");
 		String type = extras.getString("type");
 
@@ -79,22 +78,34 @@ public class GcmIntentService extends IntentService {
 			// Container được upload lên từ CỔNG
 			// Gửi cho GATE và AUDIT
 
+			// TODO: --> Get more data from Server
+
 		} else if (type == "EXPORT_CONTAINER") {
 			// Container xuất khỏi Depot ở CỔNG
 			// Gửi cho mọi ROLE kèm `id`
+
+			// TODO: --> Remove Container Session having this id
 
 		} else if (type == "NEW_ERROR_LIST") {
 			// AUDIT post new Issue List
 			// Gửi cho REPAIR
 			// Đối với ROLE == AUDIT, kèm `id` để remove
 
+			// TODO: Get more data from Server
+
+			// TODO: If role = AUDIT --> remove Container Session having this id
+
 		} else if (type == "UPDATE_ERROR_LIST") {
 			// Có thông tin thay đổi từ `văn phòng` || tổ sửa chữa thêm lỗi mới
 			// Gửi cho REPAIR
 
+			// TODO: Get more data from Server -->
+
 		} else if (type == "CONTAINER_REPAIRED") {
 			// Sau khi post báo cáo `Sau sửa chữa` từ REPAIR
 			// Gửi cho REPAIR kèm `id`
+
+			// TODO: Remove Container Session having this id
 
 		}
 
