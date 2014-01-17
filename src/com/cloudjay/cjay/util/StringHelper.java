@@ -46,15 +46,9 @@ public class StringHelper {
 		Logger.Log(newFormat);
 		Logger.Log(date);
 
-		try {
-			Date tmp = new SimpleDateFormat(oldFormat).parse(date);
-			SimpleDateFormat formatter = new SimpleDateFormat(newFormat);
-			String timeStamp = formatter.format(date);
-			return timeStamp;
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		return "";
+		SimpleDateFormat formatter = new SimpleDateFormat(newFormat);
+		String timeStamp = formatter.format(date);
+		return timeStamp;
 	}
 
 	@SuppressLint("SimpleDateFormat")

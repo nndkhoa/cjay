@@ -313,6 +313,31 @@ public class DataCenter {
 		return null;
 	}
 
+	public boolean removeContainerSession(Context context, int id) {
+		Logger.Log(LOG_TAG,
+				"remove Container Session with Id = " + Integer.toString(id));
+		try {
+
+			getDatabaseManager().getHelper(context)
+					.getContainerSessionDaoImpl().delete(id);
+			return true;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public void updateListContainerSessions(Context context) {
+		try {
+			CJayClient.getInstance().updateListContainerSessions(context);
+		} catch (NoConnectionException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public IDatabaseManager getDatabaseManager() {
 		return databaseManager;
 	}

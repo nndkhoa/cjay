@@ -12,7 +12,9 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.receivers.GcmBroadcastReceiver;
+import com.cloudjay.cjay.util.DataCenter;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 public class GcmIntentService extends IntentService {
@@ -79,34 +81,45 @@ public class GcmIntentService extends IntentService {
 			// Gửi cho GATE và AUDIT
 
 			// TODO: --> Get more data from Server
+			DataCenter.getInstance().updateListContainerSessions(this);
 
 		} else if (type == "EXPORT_CONTAINER") {
 			// Container xuất khỏi Depot ở CỔNG
 			// Gửi cho mọi ROLE kèm `id`
 
 			// TODO: --> Remove Container Session having this id
+			DataCenter.getInstance().removeContainerSession(this, id);
 
 		} else if (type == "NEW_ERROR_LIST") {
 			// AUDIT post new Issue List
 			// Gửi cho REPAIR
 			// Đối với ROLE == AUDIT, kèm `id` để remove
 
-			// TODO: Get more data from Server
+			User user = com.cloudjay.cjay.util.Session.restore(this)
+					.getCurrentUser();
 
-			// TODO: If role = AUDIT --> remove Container Session having this id
+			if (user.getRole() == User.ROLE_AUDITOR) {
+				// TODO: If role = AUDIT --> remove Container Session having
+				// this id
+				DataCenter.getInstance().removeContainerSession(this, id);
+			} else {
+				// TODO: Get more data from Server
+				DataCenter.getInstance().updateListContainerSessions(this);
+			}
 
 		} else if (type == "UPDATE_ERROR_LIST") {
 			// Có thông tin thay đổi từ `văn phòng` || tổ sửa chữa thêm lỗi mới
 			// Gửi cho REPAIR
 
-			// TODO: Get more data from Server -->
+			// TODO: Get more data from Server
+			DataCenter.getInstance().updateListContainerSessions(this);
 
 		} else if (type == "CONTAINER_REPAIRED") {
 			// Sau khi post báo cáo `Sau sửa chữa` từ REPAIR
 			// Gửi cho REPAIR kèm `id`
 
 			// TODO: Remove Container Session having this id
-
+			DataCenter.getInstance().removeContainerSession(this, id);
 		}
 
 		// Intent previewIntent = new Intent(this, ItemDetailActivity_.class);

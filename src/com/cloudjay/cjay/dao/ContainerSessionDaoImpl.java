@@ -83,6 +83,21 @@ public class ContainerSessionDaoImpl extends
 		}
 	}
 
+	public void delete(int id) throws SQLException {
+
+		if (id == 0) { // new Container Session
+			Logger.Log(LOG_TAG, "Container Session ID = 0");
+		} else { // existed Container Session
+
+			ContainerSession tmp = this.queryForFirst(this.queryBuilder()
+					.where().eq(ContainerSession.FIELD_ID, id).prepare());
+
+			if (null != tmp) {
+				this.delete(tmp);
+			}
+		}
+	}
+
 	@Override
 	public boolean isEmpty() throws SQLException {
 		ContainerSession containerSession = this.queryForFirst(this

@@ -79,6 +79,7 @@ import de.greenrobot.event.EventBus;
  * thực hiện enqueue (save to db)
  * 
  */
+@SuppressWarnings("deprecation")
 @EActivity(R.layout.activity_camera)
 @NoTitle
 public class CameraActivity extends Activity implements AutoFocusCallback {
@@ -104,10 +105,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
 	private static final int PREVIEW_SIZE_MAX_WIDTH = 1280;
 
-	// region GetViewById
 	@ViewById(R.id.camera_preview)
 	SurfaceView preview;
-	// CameraPreview preview;
 
 	@ViewById(R.id.btn_back)
 	ImageButton backButton;
@@ -198,7 +197,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		}
 	};
 
-	@SuppressWarnings({ "deprecation", "unchecked" })
+	@SuppressWarnings({})
 	@AfterViews
 	void initCamera() {
 		Logger.Log(LOG_TAG, "initCamera(), addSurfaceCallback");
@@ -632,7 +631,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		super.onPause();
 	}
 
-	@SuppressWarnings("deprecation")
 	public String getPath(Uri uri) {
 		String[] projection = { MediaStore.Images.Media.DATA };
 		Cursor cursor = (Cursor) managedQuery(uri, projection, null, null, null);
