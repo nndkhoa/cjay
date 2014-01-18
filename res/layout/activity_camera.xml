@@ -68,9 +68,9 @@
     <LinearLayout
         android:id="@+id/camera_activity_bottom_bar_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/camera_option_background_selector"
+        android:background="@color/camera_background_transparent"
         android:orientation="horizontal" >
 
         <ImageView
@@ -79,7 +79,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:background="@drawable/camera_option_background_selector" />
+            android:background="@color/camera_background_transparent" />
 
         <ImageButton
             android:id="@+id/btn_capture"
@@ -89,17 +89,27 @@
             android:background="@drawable/camera_option_background_selector"
             android:src="@drawable/ic_capture" />
 
-        <Button
-            android:id="@+id/btn_camera_done"
-            style="@style/StyledButton"
+        <RelativeLayout
+            android:id="@+id/rl_camera_done"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="1"
-            android:background="@drawable/btn_blue"
-            android:minHeight="40dp"
-            android:shadowDx="1"
-            android:text="@string/camera_done" />
+            android:layout_height="match_parent"
+            android:layout_weight="1" >
+
+            <Button
+                android:id="@+id/btn_camera_done"
+                style="@style/StyledButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:background="@drawable/btn_blue"
+                android:minHeight="40dp"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:shadowDx="1"
+                android:text="@string/camera_done" />
+        </RelativeLayout>
     </LinearLayout>
 
 </RelativeLayout>

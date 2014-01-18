@@ -45,6 +45,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.aerilys.helpers.android.UIHelper;
@@ -123,6 +124,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@ViewById(R.id.btn_camera_done)
 	Button doneButton;
+
+	@ViewById(R.id.rl_camera_done)
+	RelativeLayout cameraDoneLayout;
 
 	@SystemService
 	AudioManager audioManager;
@@ -541,7 +545,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		}
 	}
 
-	@Click(R.id.btn_camera_done)
+	@Click({ R.id.btn_camera_done, R.id.btn_back, R.id.rl_camera_done })
 	void doneButtonClicked() {
 		Logger.Log(LOG_TAG, "doneButtonClicked()");
 
@@ -560,7 +564,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	}
 
 	// region Override Activity
-
 	@Override
 	protected void onResume() {
 		Logger.Log(LOG_TAG, "onResume()");
@@ -642,13 +645,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			return cursor.getString(column_index);
 		} else
 			return null;
-	}
-
-	// region UIView Interaction
-	@Click(R.id.btn_back)
-	void backButtonClicked() {
-		// releaseCamera();
-		this.onBackPressed();
 	}
 
 	@Click(R.id.btn_switch_camera)
