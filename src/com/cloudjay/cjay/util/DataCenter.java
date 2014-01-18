@@ -329,6 +329,7 @@ public class DataCenter {
 	}
 
 	public void updateListContainerSessions(Context context) {
+		Logger.Log(LOG_TAG, "updateListContainerSessions()");
 		try {
 			CJayClient.getInstance().updateListContainerSessions(context);
 		} catch (NoConnectionException e) {

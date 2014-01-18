@@ -39,6 +39,7 @@ import android.os.Build;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -209,8 +210,10 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
 		// Restore camera state from database or somewhere else
-		flashMode = Camera.Parameters.FLASH_MODE_OFF;
+		flashMode = Camera.Parameters.FLASH_MODE_AUTO;
 		cameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
+
+		this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 	}
 
 	@AfterViews
@@ -260,11 +263,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 				Logger.Log(LOG_TAG, "config Camera");
 
 				Camera.Parameters parameters = camera.getParameters();
-
-				// Camera.Size size = getBestPreviewSize(width, height,
-				// parameters);
-				// Camera.Size pictureSize = getBestPictureSize(parameters);
-
 				Camera.Size size = determineBestPreviewSize(parameters);
 				Camera.Size pictureSize = determineBestPictureSize(parameters);
 
@@ -690,6 +688,11 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	}
 
+	/**
+	 * Default:
+	 * 
+	 * OFF --> AUTO --> ON --> OFF
+	 */
 	@Click(R.id.btn_toggle_flash)
 	void toggleFlashButtonClicked() {
 
@@ -701,17 +704,17 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			if (flashMode.equalsIgnoreCase(Parameters.FLASH_MODE_OFF)) {
 
-				// toggleFlashButton.setImageResource(R.drawable.ic_flash_auto);
+				toggleFlashButton.setImageResource(R.drawable.ic_flash_auto);
 				params.setFlashMode(Parameters.FLASH_MODE_AUTO);
 
 			} else if (flashMode.equalsIgnoreCase(Parameters.FLASH_MODE_AUTO)) {
 
-				// toggleFlashButton.setImageResource(R.drawable.ic_flash_on);
+				toggleFlashButton.setImageResource(R.drawable.ic_flash_on);
 				params.setFlashMode(Parameters.FLASH_MODE_ON);
 
 			} else if (flashMode.equalsIgnoreCase(Parameters.FLASH_MODE_ON)) {
 
-				// toggleFlashButton.setImageResource(R.drawable.ic_flash_off);
+				toggleFlashButton.setImageResource(R.drawable.ic_flash_off);
 				params.setFlashMode(Parameters.FLASH_MODE_OFF);
 
 			} else {
@@ -838,5 +841,18 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	public void onAutoFocus(boolean arg0, Camera arg1) {
 		Logger.Log(TAG, "Auto focused, now take picture");
 		camera.takePicture(shutterCallback, null, photoCallback);
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+		if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
+				|| keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+
+			takePicture();
+			return true;
+		}
+
+		return super.onKeyDown(keyCode, event);
 	}
 }
