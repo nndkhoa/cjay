@@ -68,8 +68,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 			public void uncaughtException(Thread arg0, Throwable arg1) {
 
 				showCrouton(R.string.alert_try_again);
-				ACRA.getErrorReporter().handleSilentException(arg1);
-
+				// ACRA.getErrorReporter().handleSilentException(arg1);
 				// ACRA.getErrorReporter().handleException(new
 				// Exception("Just for the stacktrace"));
 			}

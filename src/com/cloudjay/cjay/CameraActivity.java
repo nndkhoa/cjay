@@ -202,6 +202,11 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		}
 	};
 
+	// @Override
+	// public void onCreate(android.os.Bundle savedInstanceState) {
+	// onConfigurationChanged(getResources().getConfiguration());
+	// };
+
 	@SuppressWarnings({})
 	@AfterViews
 	void initCamera() {
@@ -572,10 +577,12 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		setContentView(R.layout.activity_camera);
 	}
 
+	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
-
 		setCameraDisplayOrientation(this, cameraMode, camera);
+		
+		setContentView(R.layout.activity_camera);
 	}
 
 	void openCamera() {
@@ -720,6 +727,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			// Update camera and camera setting
 			camera.setParameters(params);
 			flashMode = params.getFlashMode();
+
 		} else {
 			Logger.Log(LOG_TAG, "Camera does not open");
 		}
