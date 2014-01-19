@@ -304,6 +304,8 @@ public class DataCenter {
 	}
 
 	public List<ContainerSession> getListLocalContainerSessions(Context context) {
+
+		Logger.Log(LOG_TAG, "get list local Container sessions");
 		try {
 			return getDatabaseManager().getHelper(context)
 					.getContainerSessionDaoImpl().getLocalContainerSessions();

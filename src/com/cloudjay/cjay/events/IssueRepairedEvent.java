@@ -7,9 +7,9 @@ import com.cloudjay.cjay.model.Issue;
 
 /**
  * 
- * Trigger when user add container session to queue (upload confirmation = true)
+ * Trigger when an issue is repaired.
  * 
- * @author tieubao
+ * @author quocvule
  * 
  */
 

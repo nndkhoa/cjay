@@ -6,6 +6,8 @@ import java.util.List;
 import com.cloudjay.cjay.model.ContainerSession;
 
 /**
+ * Trigger when container session was deleted, created, edited. View
+ * `ContainerSessionDaoImpl` for more information.
  * 
  * @author tieubao
  * 

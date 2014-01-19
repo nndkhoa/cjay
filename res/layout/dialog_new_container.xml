@@ -27,9 +27,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:ellipsize="end"
             android:hint="@string/dialog_container_id"
             android:imeOptions="actionNext"
             android:inputType="textCapCharacters"
+            android:lines="1"
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:textAllCaps="true" />
@@ -51,6 +53,7 @@
             android:paddingRight="18dp"
             android:paddingTop="12dp"
             android:text="@string/dialog_container_owner" />
+
         <!--
          		    <Spinner
 	      android:id="@+id/dialog_new_container_owner"
@@ -64,30 +67,33 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="@string/dialog_container_owner" />
+            android:ellipsize="end"
+            android:hint="@string/dialog_container_owner"
+            android:lines="1"
+            android:singleLine="true" />
     </LinearLayout>
 
     <LinearLayout
+        style="@android:attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        style="@android:attr/buttonBarStyle" >
-        
+        android:orientation="horizontal" >
+
         <Button
             android:id="@+id/dialog_new_container_cancel"
+            style="@android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/dialog_container_cancel"
-            style="@android:attr/buttonBarButtonStyle" />
+            android:text="@string/dialog_container_cancel" />
 
         <Button
             android:id="@+id/dialog_new_container_ok"
+            style="@android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/dialog_container_ok"
-            style="@android:attr/buttonBarButtonStyle" />
+            android:text="@string/dialog_container_ok" />
     </LinearLayout>
 
 </LinearLayout>

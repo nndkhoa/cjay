@@ -22,7 +22,6 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadsListBaseAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
-import com.cloudjay.cjay.events.ContainerSessionUploadedEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DataCenter;
@@ -111,18 +110,15 @@ public class UploadsFragment extends SherlockFragment implements
 		updateUI();
 	}
 
-	public void onEvent(ContainerSessionUploadedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerSessionUploadedEvent");
-		updateUI();
-
-		// // TODO: Update nowString
-		// String nowString = StringHelper.getTimestamp(
-		// CJayConstant.CJAY_SERVER_DATETIME_FORMAT, new Date());
-		//
-		// PreferencesUtil.storePrefsValue(getActivity(),
-		// PreferencesUtil.CONTAINER_SESSION_LAST_UPDATE, nowString);
-
-	}
+	// public void onEvent(ContainerSessionUploadedEvent event) {
+	// Logger.Log(LOG_TAG, "onEvent ContainerSessionUploadedEvent");
+	// updateUI();
+	// }
+	//
+	// public void onEvent(UploadStateChangedEvent event) {
+	// Logger.Log(LOG_TAG, "onEvent UploadStateChangedEvent");
+	// updateUI();
+	// }
 
 	@UiThread
 	void updateUI() {
@@ -138,6 +134,8 @@ public class UploadsFragment extends SherlockFragment implements
 
 		for (ContainerSession containerSession : listContainerSessions) {
 			try {
+
+				// just clear items from UI
 				containerSession.setCleared(true);
 				containerSessionDaoImpl.update(containerSession);
 			} catch (SQLException e) {

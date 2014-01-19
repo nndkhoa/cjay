@@ -37,7 +37,6 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.SplashScreenActivity;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
-import com.cloudjay.cjay.events.ContainerSessionUploadedEvent;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -50,8 +49,6 @@ import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Mapper;
 import com.cloudjay.cjay.util.NoConnectionException;
-
-import de.greenrobot.event.EventBus;
 
 public class UploadIntentService extends IntentService implements
 		CountingInputStreamEntity.UploadListener {
@@ -186,8 +183,6 @@ public class UploadIntentService extends IntentService implements
 	}
 
 	public void onEventMainThread(UploadStateChangedEvent event) {
-		Logger.Log(LOG_TAG, "onEventMainThread UploadStateChangedEvent");
-
 		ContainerSession upload = event.getContainerSession();
 
 		switch (upload.getUploadState()) {
@@ -227,8 +222,6 @@ public class UploadIntentService extends IntentService implements
 		Logger.Log(LOG_TAG,
 				"doUploadContainer: " + containerSession.getContainerId());
 
-		// post UploadStateChangedEvent
-
 		try {
 			containerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_IN_PROGRESS);
@@ -251,8 +244,8 @@ public class UploadIntentService extends IntentService implements
 					.setUploadState(ContainerSession.STATE_UPLOAD_COMPLETED);
 			containerSessionDaoImpl.update(containerSession);
 
-			EventBus.getDefault().post(
-					new ContainerSessionUploadedEvent(containerSession));
+			// EventBus.getDefault().post(
+			// new ContainerSessionUploadedEvent(containerSession));
 
 		} catch (SQLException e1) {
 			e1.printStackTrace();

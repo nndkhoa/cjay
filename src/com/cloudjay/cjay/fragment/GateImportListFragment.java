@@ -157,8 +157,6 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
-
-		Logger.Log(LOG_TAG, "onPrepareOptionsMenu");
 		super.onPrepareOptionsMenu(menu);
 
 		boolean isDisplayed = !(mSelectedContainerSession == null);
@@ -297,7 +295,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	}
 
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerSessionChangedEvent");
+		Logger.Log(LOG_TAG, "onEventMainThread ContainerSessionChangedEvent");
 		refresh();
 	}
 
@@ -318,9 +316,10 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	public void onResume() {
 		Logger.Log(LOG_TAG, "onResume " + LOG_TAG);
 
-		if (mFeedsAdapter != null) {
-			refresh();
-		}
+		// if (mFeedsAdapter != null) {
+		// refresh();
+		// }
+
 		super.onResume();
 	}
 }

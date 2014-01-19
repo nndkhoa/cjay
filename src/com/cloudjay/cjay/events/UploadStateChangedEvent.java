@@ -4,11 +4,12 @@ import com.cloudjay.cjay.model.ContainerSession;
 
 /**
  * 
- * Trigger when user change UploadState
+ * Trigger when user change `Upload State` of item in `UploadsFragment`.
  * 
  * @author tieubao
  * 
  */
+
 public class UploadStateChangedEvent {
 
 	private final ContainerSession containerSession;

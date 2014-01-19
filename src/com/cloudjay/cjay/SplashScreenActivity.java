@@ -54,20 +54,23 @@ public class SplashScreenActivity extends CJayActivity {
 		new Handler().postDelayed(new Runnable() {
 			public void run() {
 
-				// restore Session
 				Session session = getSession();
 				if (null == getSession()) {
+
 					// user did not sign in
 					Logger.Log(LOG_TAG,
 							"Session is NULL. User did not sign in.");
 					startActivity(new Intent(SplashScreenActivity.this,
 							LoginActivity_.class));
+
 				} else {
+
 					// user signed in
 					Logger.Log(LOG_TAG, "User signed in");
 					session.extendAccessTokenIfNeeded(getApplicationContext());
 					CJayApplication
 							.startCJayHomeActivity(SplashScreenActivity.this);
+
 				}
 
 				finish();

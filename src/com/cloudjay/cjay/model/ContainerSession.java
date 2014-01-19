@@ -248,9 +248,6 @@ public class ContainerSession implements Parcelable {
 			case STATE_UPLOAD_COMPLETED:
 				mBigPictureNotificationBmp = null;
 
-				// EventBus.getDefault().post(
-				// new ContainerSessionUploadedEvent(this));
-
 				break;
 			case STATE_UPLOAD_WAITING:
 				mProgress = -1;

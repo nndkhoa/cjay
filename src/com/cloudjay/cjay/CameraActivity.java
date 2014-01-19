@@ -552,13 +552,15 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Click({ R.id.btn_camera_done, R.id.btn_back, R.id.rl_camera_done })
 	void doneButtonClicked() {
-		Logger.Log(LOG_TAG, "doneButtonClicked()");
+		Logger.Log(LOG_TAG,
+				"doneButtonClicked(). Ready to update Container Session.");
 
 		try {
 
 			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
 					.getInstance().getDatabaseManager().getHelper(this)
 					.getContainerSessionDaoImpl();
+
 			containerSessionDaoImpl.addContainerSession(containerSession);
 
 		} catch (SQLException e) {

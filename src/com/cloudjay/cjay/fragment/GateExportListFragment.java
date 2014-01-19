@@ -352,18 +352,13 @@ public class GateExportListFragment extends SherlockFragment {
 		mFeedListView.setAdapter(mFeedsAdapter);
 	}
 
-	public void onEvent(ContainerSessionChangedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerCreatedEvent");
-		refresh();
-	}
-
 	public void onEvent(ContainerSessionEnqueueEvent event) {
 		Logger.Log(LOG_TAG, "onEvent ContainerSessionEnqueueEvent");
 		refresh();
 	}
 
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerSessionChangedEvent");
+		Logger.Log(LOG_TAG, "onEventMainThread ContainerSessionChangedEvent");
 		refresh();
 	}
 
@@ -373,16 +368,18 @@ public class GateExportListFragment extends SherlockFragment {
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListCheckOutContainerSessions(getActivity());
 
-		mFeedsAdapter.updateData(mFeeds);
-		// mSearchEditText.setText(""); // this will refresh the list
+		// mFeedsAdapter.updateData(mFeeds);
+		mSearchEditText.setText(""); // this will refresh the list
 	}
 
 	@Override
 	public void onResume() {
+
 		Logger.Log(LOG_TAG, "onResume " + LOG_TAG);
-		if (mFeedsAdapter != null) {
-			refresh();
-		}
+		
+		// if (mFeedsAdapter != null) {
+		// refresh();
+		// }
 
 		super.onResume();
 	}

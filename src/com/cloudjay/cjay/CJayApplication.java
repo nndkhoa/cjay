@@ -39,7 +39,7 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 @ReportsCrashes(formKey = "", formUri = "https://cloudjay-web.appspot.com/acra/", mode = ReportingInteractionMode.TOAST, resToastText = R.string.crash_toast_text, resDialogText = R.string.crash_dialog_text, resDialogIcon = android.R.drawable.ic_dialog_info, resDialogTitle = R.string.crash_dialog_title, resDialogCommentPrompt = R.string.crash_dialog_comment_prompt, resDialogOkToast = R.string.crash_dialog_ok_toast)
 public class CJayApplication extends Application {
 
-	private final String LOG_TAG = "CJayApplication";
+	private static final String LOG_TAG = "CJayApplication";
 	static final float EXECUTOR_POOL_SIZE_PER_CORE = 1.5f;
 	public static final String THREAD_FILTERS = "filters_thread";
 
@@ -52,6 +52,8 @@ public class CJayApplication extends Application {
 	}
 
 	public static void startCJayHomeActivity(Context context) {
+
+		Logger.Log(LOG_TAG, "start CJayHome Activity");
 		int userRole = ((CJayActivity) context).getCurrentUser().getRole();
 
 		Intent intent = null;

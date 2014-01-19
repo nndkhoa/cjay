@@ -93,10 +93,10 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 			Map<String, String> headers) throws SocketTimeoutException,
 			NoConnectionException {
 
-		Logger.Log("URL: " + url);
-		Logger.Log("Data: " + data);
-		Logger.Log("Content Type: " + contentType);
-		Logger.Log("Header: " + headers.toString());
+		Logger.Log(LOG_TAG, "URL: " + url);
+		Logger.Log(LOG_TAG, "Data: " + data);
+		Logger.Log(LOG_TAG, "Content Type: " + contentType);
+		Logger.Log(LOG_TAG, "Header: " + headers.toString());
 
 		httpClient.getParams().setParameter(ClientPNames.COOKIE_POLICY,
 				CookiePolicy.RFC_2109);
@@ -176,7 +176,7 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 			e.printStackTrace();
 			return null;
 		}
-		
+
 		String ret = null;
 		try {
 			ret = EntityUtils.toString(response.getEntity(), HTTP.UTF_8);

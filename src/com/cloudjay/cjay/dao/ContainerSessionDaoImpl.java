@@ -43,12 +43,14 @@ public class ContainerSessionDaoImpl extends
 
 	@Override
 	public int update(ContainerSession containerSession) throws SQLException {
+		int result = super.update(containerSession);
+
 		Logger.Log(LOG_TAG, "update()");
 
 		EventBus.getDefault().post(
 				new ContainerSessionChangedEvent(containerSession));
 
-		return super.update(containerSession);
+		return result;
 	}
 
 	@Override
@@ -69,8 +71,8 @@ public class ContainerSessionDaoImpl extends
 				this.createOrUpdate(containerSession);
 
 				// trigger update container lists
-				EventBus.getDefault().post(
-						new ContainerSessionChangedEvent(containerSession));
+				// EventBus.getDefault().post(
+				// new ContainerSessionChangedEvent(containerSession));
 
 			} else { // existed Container Session
 
@@ -88,14 +90,14 @@ public class ContainerSessionDaoImpl extends
 				}
 
 				Logger.Log(LOG_TAG, "Update Container Session with ID: "
-						+ Integer.toString(containerSessionId) + " Name: "
+						+ Integer.toString(containerSessionId) + " | Name: "
 						+ containerSession.getContainerId());
 
 				this.createOrUpdate(containerSession);
 
 				// trigger update container lists
-				EventBus.getDefault().post(
-						new ContainerSessionChangedEvent(containerSession));
+				// EventBus.getDefault().post(
+				// new ContainerSessionChangedEvent(containerSession));
 
 			}
 		}
@@ -112,6 +114,7 @@ public class ContainerSessionDaoImpl extends
 		}
 	}
 
+	@Override
 	public void delete(int id) throws SQLException {
 
 		if (id == 0) { // new Container Session
@@ -130,7 +133,7 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public int delete(ContainerSession containerSession) throws SQLException {
 
-		Logger.Log(LOG_TAG, "delete " + containerSession.toString());
+		Logger.Log(LOG_TAG, "delete " + containerSession.getContainerId());
 
 		EventBus.getDefault().post(
 				new ContainerSessionChangedEvent(containerSession));
@@ -221,6 +224,7 @@ public class ContainerSessionDaoImpl extends
 	 * @return
 	 * @throws SQLException
 	 */
+	@Override
 	public List<ContainerSession> getListUploadContainerSessions()
 			throws SQLException {
 
@@ -410,8 +414,10 @@ public class ContainerSessionDaoImpl extends
 		return containerSessions;
 	}
 
-	private List<ContainerSession> getNotUploadedContainerSessions()
+	@Override
+	public List<ContainerSession> getNotUploadedContainerSessions()
 			throws SQLException {
+
 		return this.query(this.queryBuilder().where()
 				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
 				.prepare());

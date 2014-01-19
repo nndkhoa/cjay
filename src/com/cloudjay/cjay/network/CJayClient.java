@@ -111,13 +111,6 @@ public class CJayClient implements ICJayClient {
 		return headers;
 	}
 
-	private HashMap<String, String> prepareHeadersWithToken(String token) {
-
-		HashMap<String, String> headers = new HashMap<String, String>();
-		headers.put("Authorization", "Token " + token);
-		return headers;
-	}
-
 	@Override
 	public String getUserToken(String username, String password, Context ctx)
 			throws JSONException, SocketTimeoutException, NoConnectionException {
@@ -127,7 +120,7 @@ public class CJayClient implements ICJayClient {
 			throw new NoConnectionException();
 		}
 
-		Logger.Log("getting User Token ... ");
+		Logger.Log(LOG_TAG, "getting User Token ... ");
 
 		JSONObject requestPacket = new JSONObject();
 		requestPacket.put("username", username);
@@ -179,8 +172,6 @@ public class CJayClient implements ICJayClient {
 		try {
 			response = requestWrapper.sendJSONPost(
 					CJayConstant.API_ADD_GCM_DEVICE, requestPacket, headers);
-
-			Logger.Log("GCM", response);
 		} catch (SocketTimeoutException e) {
 			e.printStackTrace();
 		}
@@ -190,7 +181,7 @@ public class CJayClient implements ICJayClient {
 	public User getCurrentUser(String token, Context ctx)
 			throws NoConnectionException {
 
-		Logger.Log("getting Current User ...");
+		Logger.Log(LOG_TAG, "getting Current User ...");
 
 		if (Utils.hasNoConnection(ctx)) {
 			Logger.Log(LOG_TAG, "No connection");
@@ -779,10 +770,11 @@ public class CJayClient implements ICJayClient {
 												PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE));
 			}
 
-			if (null != containerSessions) {
-				containerSessionDaoImpl
-						.addListContainerSessions(containerSessions);
-			}
+			// NOTE: already added inside
+			// if (null != containerSessions) {
+			// containerSessionDaoImpl
+			// .addListContainerSessions(containerSessions);
+			// }
 
 		} catch (NoConnectionException e) {
 			throw e;
@@ -906,6 +898,7 @@ public class CJayClient implements ICJayClient {
 			Logger.Log(LOG_TAG, "fetching data ...");
 
 			updateListISOCode(ctx);
+
 			updateListContainerSessions(ctx);
 
 		} catch (NoConnectionException e) {
