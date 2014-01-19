@@ -1,26 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:layout_centerVertical="true"
     android:orientation="vertical" >
-    
-	<EditText
+
+    <EditText
         android:id="@+id/dialog_operator_name"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:hint="@string/dialog_container_owner" />
-    
+
     <ListView
         android:id="@+id/dialog_operator_list"
         android:layout_width="fill_parent"
         android:layout_height="300dp"
         android:minHeight="30dp"
-        android:paddingBottom="12dp"
-       	android:paddingLeft="18dp"
-       	android:paddingRight="18dp"
-       	android:paddingTop="12dp"
+        android:padding="12dp"
+        android:scrollbars="none"
         android:textAppearance="?android:attr/textAppearanceListItem" />
 
 </LinearLayout>

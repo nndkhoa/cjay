@@ -66,7 +66,6 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 			@Override
 			public void uncaughtException(Thread arg0, Throwable arg1) {
-
 				showCrouton(R.string.alert_try_again);
 				// ACRA.getErrorReporter().handleSilentException(arg1);
 				// ACRA.getErrorReporter().handleException(new
@@ -98,9 +97,9 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	@Override
 	protected void onResume() {
 
-		if (null != session) {
+		Logger.Log(LOG_TAG, "DataCenter.reload onResume");
 
-			Logger.Log(LOG_TAG, "DataCenter.reload onResume");
+		if (null != session) {
 
 			// TODO: need to refactor
 			reloadData();

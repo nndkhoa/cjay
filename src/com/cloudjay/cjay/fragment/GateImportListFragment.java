@@ -328,6 +328,8 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 	@Override
 	public void onResume() {
+		Logger.Log(LOG_TAG, "onResume " + LOG_TAG);
+		
 		if (mFeedsAdapter != null) {
 			refresh();
 		}

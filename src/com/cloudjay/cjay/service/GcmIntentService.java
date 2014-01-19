@@ -15,13 +15,14 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.receivers.GcmBroadcastReceiver;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Logger;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 public class GcmIntentService extends IntentService {
 
 	public static final int NOTIFICATION_ID = 1;
 	private NotificationManager mNotificationManager;
-	static final String TAG = "GCMDemo";
+	static final String LOG_TAG = "GcmIntentService";
 	NotificationCompat.Builder builder;
 
 	public GcmIntentService() {
@@ -30,13 +31,18 @@ public class GcmIntentService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
+
+		Log.i(LOG_TAG, "onHandleIntent()");
+
 		Bundle extras = intent.getExtras();
 		GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
+
 		// The getMessageType() intent parameter must be the intent you received
 		// in your BroadcastReceiver.
 		String messageType = gcm.getMessageType(intent);
 
 		if (!extras.isEmpty()) { // has effect of unparcelling Bundle
+
 			/*
 			 * Filter messages based on message type. Since it is likely that
 			 * GCM will be extended in the future with new message types, just
@@ -56,9 +62,8 @@ public class GcmIntentService extends IntentService {
 			} else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE
 					.equals(messageType)) {
 
-				// TODO: implement get data here
 				sendNotification(extras);
-				Log.i(TAG, "Received: " + extras.toString());
+				Log.i(LOG_TAG, "Received: " + extras.toString());
 			}
 		}
 		// Release the wake lock provided by the WakefulBroadcastReceiver.
@@ -69,57 +74,64 @@ public class GcmIntentService extends IntentService {
 	// This is just one simple example of what you might choose to do with
 	// a GCM message.
 	private void sendNotification(Bundle extras) {
+		try {
+			mNotificationManager = (NotificationManager) this
+					.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		mNotificationManager = (NotificationManager) this
-				.getSystemService(Context.NOTIFICATION_SERVICE);
+			int id = extras.getInt("id");
+			String type = extras.getString("type");
 
-		int id = extras.getInt("id");
-		String type = extras.getString("type");
+			Logger.Log(LOG_TAG, "Notification got Type = " + type + " | Id = "
+					+ Integer.toString(id));
 
-		if (type == "NEW_CONTAINER") {
-			// Container được upload lên từ CỔNG
-			// Gửi cho GATE và AUDIT
+			if (type.equalsIgnoreCase("NEW_CONTAINER")) {
 
-			// TODO: --> Get more data from Server
-			DataCenter.getInstance().updateListContainerSessions(this);
+				// Container được upload lên từ CỔNG
+				// Gửi cho GATE và AUDIT
 
-		} else if (type == "EXPORT_CONTAINER") {
-			// Container xuất khỏi Depot ở CỔNG
-			// Gửi cho mọi ROLE kèm `id`
+				// TODO: --> Get more data from Server
+				DataCenter.getInstance().updateListContainerSessions(this);
+			} else if (type.equalsIgnoreCase("EXPORT_CONTAINER")) {
+				// Container xuất khỏi Depot ở CỔNG
+				// Gửi cho mọi ROLE kèm `id`
 
-			// TODO: --> Remove Container Session having this id
-			DataCenter.getInstance().removeContainerSession(this, id);
-
-		} else if (type == "NEW_ERROR_LIST") {
-			// AUDIT post new Issue List
-			// Gửi cho REPAIR
-			// Đối với ROLE == AUDIT, kèm `id` để remove
-
-			User user = com.cloudjay.cjay.util.Session.restore(this)
-					.getCurrentUser();
-
-			if (user.getRole() == User.ROLE_AUDITOR) {
-				// TODO: If role = AUDIT --> remove Container Session having
-				// this id
+				// TODO: --> Remove Container Session having this id
 				DataCenter.getInstance().removeContainerSession(this, id);
-			} else {
+
+			} else if (type.equalsIgnoreCase("NEW_ERROR_LIST")) {
+				// AUDIT post new Issue List
+				// Gửi cho REPAIR
+				// Đối với ROLE == AUDIT, kèm `id` để remove
+
+				User user = com.cloudjay.cjay.util.Session.restore(this)
+						.getCurrentUser();
+
+				if (user.getRole() == User.ROLE_AUDITOR) {
+					// TODO: If role = AUDIT --> remove Container Session having
+					// this id
+					DataCenter.getInstance().removeContainerSession(this, id);
+				} else {
+					// TODO: Get more data from Server
+					DataCenter.getInstance().updateListContainerSessions(this);
+				}
+
+			} else if (type.equalsIgnoreCase("UPDATE_ERROR_LIST")) {
+				// Có thông tin thay đổi từ `văn phòng` || tổ sửa chữa thêm lỗi
+				// mới
+				// Gửi cho REPAIR
+
 				// TODO: Get more data from Server
 				DataCenter.getInstance().updateListContainerSessions(this);
+
+			} else if (type.equalsIgnoreCase("CONTAINER_REPAIRED")) {
+				// Sau khi post báo cáo `Sau sửa chữa` từ REPAIR
+				// Gửi cho REPAIR kèm `id`
+
+				// TODO: Remove Container Session having this id
+				DataCenter.getInstance().removeContainerSession(this, id);
 			}
-
-		} else if (type == "UPDATE_ERROR_LIST") {
-			// Có thông tin thay đổi từ `văn phòng` || tổ sửa chữa thêm lỗi mới
-			// Gửi cho REPAIR
-
-			// TODO: Get more data from Server
-			DataCenter.getInstance().updateListContainerSessions(this);
-
-		} else if (type == "CONTAINER_REPAIRED") {
-			// Sau khi post báo cáo `Sau sửa chữa` từ REPAIR
-			// Gửi cho REPAIR kèm `id`
-
-			// TODO: Remove Container Session having this id
-			DataCenter.getInstance().removeContainerSession(this, id);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		// Intent previewIntent = new Intent(this, ItemDetailActivity_.class);

@@ -581,7 +581,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 		setCameraDisplayOrientation(this, cameraMode, camera);
-		
+
 		setContentView(R.layout.activity_camera);
 	}
 

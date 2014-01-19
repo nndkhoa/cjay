@@ -29,11 +29,13 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public void addListContainerSessions(
 			List<ContainerSession> containerSessions) throws SQLException {
+
 		if (containerSessions != null) {
 			for (ContainerSession containerSession : containerSessions) {
-				this.createOrUpdate(containerSession);
+				addContainerSession(containerSession);
 			}
 		}
+
 	}
 
 	@Override
@@ -52,15 +54,17 @@ public class ContainerSessionDaoImpl extends
 				this.createOrUpdate(containerSession);
 			} else { // existed Container Session
 
-				ContainerSession tmp = this
+				ContainerSession result = this
 						.queryForFirst(this
 								.queryBuilder()
 								.where()
 								.eq(ContainerSession.FIELD_ID,
 										containerSession.getId()).prepare());
 
-				if (null != tmp) {
-					containerSession.setUuid(tmp.getUuid());
+				if (null != result
+						&& !result.getUuid().equals(containerSession.getUuid())) {
+					Logger.Log(LOG_TAG, "Update container session UUID");
+					containerSession.setUuid(result.getUuid());
 				}
 
 				Logger.Log(LOG_TAG, "Update Container Session with ID: "

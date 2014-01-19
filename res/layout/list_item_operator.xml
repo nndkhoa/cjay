@@ -3,26 +3,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal" >
 
-        <TextView
-            android:id="@+id/operator_name"
-	        android:layout_width="0dp"
-	        android:layout_height="fill_parent"
-        	android:layout_weight="1"
-        	android:paddingBottom="12dp"
-           	android:paddingLeft="18dp"
-           	android:paddingRight="18dp"
-           	android:paddingTop="12dp" />
-        
-        <TextView
-	        android:id="@+id/operator_code"
-	        android:layout_width="0dp"
-	        android:layout_height="fill_parent"
-        	android:layout_weight="1"
-	        android:gravity="right"
-	        android:paddingBottom="12dp"
-          	android:paddingLeft="18dp"
-          	android:paddingRight="18dp"
-          	android:paddingTop="12dp" />  
+    <TextView
+        android:id="@+id/operator_name"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:lines="1"
+        android:paddingBottom="9dp"
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp"
+        android:paddingTop="9dp"
+        android:singleLine="false" />
+
+    <TextView
+        android:id="@+id/operator_code"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_weight="0"
+        android:gravity="right"
+        android:paddingBottom="9dp"
+        android:paddingLeft="9dp"
+        android:paddingRight="6dp"
+        android:paddingTop="9dp" />
+
 </LinearLayout>

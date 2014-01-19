@@ -381,11 +381,12 @@ public class GateExportListFragment extends SherlockFragment {
 				.getListCheckOutContainerSessions(getActivity());
 
 		mFeedsAdapter.updateData(mFeeds);
-		mSearchEditText.setText(""); // this will refresh the list
+		// mSearchEditText.setText(""); // this will refresh the list
 	}
 
 	@Override
 	public void onResume() {
+		Logger.Log(LOG_TAG, "onResume " + LOG_TAG);
 		if (mFeedsAdapter != null) {
 			refresh();
 		}
