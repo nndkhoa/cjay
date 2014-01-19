@@ -3,12 +3,17 @@ package com.cloudjay.cjay.dao;
 import java.sql.SQLException;
 import java.util.List;
 
+import android.util.Log;
+
 import com.cloudjay.cjay.model.CJayImage;
+import com.cloudjay.cjay.util.Logger;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
 public class CJayImageDaoImpl extends BaseDaoImpl<CJayImage, String> implements
 		ICJayImageDao {
+
+	public static final String LOG_TAG = "CJayImageDaoImpl";
 
 	public CJayImageDaoImpl(ConnectionSource connectionSource)
 			throws SQLException {
@@ -48,9 +53,12 @@ public class CJayImageDaoImpl extends BaseDaoImpl<CJayImage, String> implements
 				CJayImage.STATE_UPLOAD_WAITING);
 
 		if (result != null && result.size() > 0) {
+			Logger.Log(LOG_TAG, "getNextWaiting " + result.toString()
+					+ Log.INFO);
 			return result.get(0);
 		}
 
+		// Logger.Log(LOG_TAG, "getNextWaiting return NULL", Log.ERROR);
 		return null;
 	}
 

@@ -299,11 +299,6 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		refresh();
 	}
 
-	public void onEvent(ContainerSessionEnqueueEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerSessionEnqueueEvent");
-		refresh();
-	}
-
 	public void refresh() {
 		Logger.Log(LOG_TAG, "onRefresh");
 
@@ -316,9 +311,9 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	public void onResume() {
 		Logger.Log(LOG_TAG, "onResume " + LOG_TAG);
 
-		// if (mFeedsAdapter != null) {
-		// refresh();
-		// }
+		if (mFeedsAdapter != null) {
+			refresh();
+		}
 
 		super.onResume();
 	}

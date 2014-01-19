@@ -1,6 +1,10 @@
 package com.cloudjay.cjay.view;
 
+import java.io.File;
+import java.util.List;
+
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
@@ -12,6 +16,9 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.DiscCacheUtil;
+import com.nostra13.universalimageloader.core.assist.MemoryCacheUtil;
+import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 
 import de.greenrobot.event.EventBus;
 
@@ -45,9 +52,11 @@ public class UploadItemLayout extends LinearLayout {
 	}
 
 	public void onEventMainThread(UploadStateChangedEvent event) {
+
 		if (mContainerSession == event.getContainerSession()) {
 			refreshUploadUi();
 		}
+
 	}
 
 	public void refreshUploadUi() {
@@ -104,8 +113,12 @@ public class UploadItemLayout extends LinearLayout {
 			ImageView iv = getImageView();
 			if (null != iv) {
 				// iv.requestThumbnail(mSelection, false);
-				ImageLoader.getInstance().displayImage(
-						mContainerSession.getImageIdPath(), iv);
+				try {
+					ImageLoader.getInstance().displayImage(
+							mContainerSession.getImageIdPath(), iv);
+				} catch (Exception e) {
+
+				}
 			}
 
 			TextView tv = getCaptionTextView();
@@ -117,6 +130,7 @@ public class UploadItemLayout extends LinearLayout {
 			 */
 			refreshUploadUi();
 		} catch (Exception e) {
+
 			e.printStackTrace();
 		}
 	}

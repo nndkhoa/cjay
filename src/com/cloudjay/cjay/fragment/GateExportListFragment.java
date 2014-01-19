@@ -352,11 +352,6 @@ public class GateExportListFragment extends SherlockFragment {
 		mFeedListView.setAdapter(mFeedsAdapter);
 	}
 
-	public void onEvent(ContainerSessionEnqueueEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerSessionEnqueueEvent");
-		refresh();
-	}
-
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
 		Logger.Log(LOG_TAG, "onEventMainThread ContainerSessionChangedEvent");
 		refresh();
@@ -376,10 +371,10 @@ public class GateExportListFragment extends SherlockFragment {
 	public void onResume() {
 
 		Logger.Log(LOG_TAG, "onResume " + LOG_TAG);
-		
-		// if (mFeedsAdapter != null) {
-		// refresh();
-		// }
+
+		if (mFeedsAdapter != null) {
+			refresh();
+		}
 
 		super.onResume();
 	}

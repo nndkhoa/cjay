@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import android.util.Log;
+
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -193,14 +195,15 @@ public class ContainerSessionDaoImpl extends
 			Collection<CJayImage> cJayImages = containerSession.getCJayImages();
 
 			for (CJayImage cJayImage : cJayImages) {
-				// int uploadState = cJayImage.getUploadState();
-				// if (uploadState == CJayImage.STATE_NONE || uploadState == cj)
 
-				if (cJayImage.getUploadState() != CJayImage.STATE_UPLOAD_COMPLETED
-						&& cJayImage.getUploadState() != CJayImage.STATE_UPLOAD_IN_PROGRESS) {
+				// if (cJayImage.getUploadState() !=
+				// CJayImage.STATE_UPLOAD_COMPLETED
+				// && cJayImage.getUploadState() !=
+				// CJayImage.STATE_UPLOAD_IN_PROGRESS) {
 
+				if (cJayImage.getUploadState() != CJayImage.STATE_UPLOAD_COMPLETED) {
 					Logger.Log(LOG_TAG,
-							"Some cJayImages are still not uploaded");
+							"Some cJayImages are still not uploaded", Log.ERROR);
 					flag = false;
 					break;
 				}

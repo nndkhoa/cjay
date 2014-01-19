@@ -37,6 +37,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.SplashScreenActivity;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.events.ContainerSessionUploadedEvent;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -49,6 +50,8 @@ import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Mapper;
 import com.cloudjay.cjay.util.NoConnectionException;
+
+import de.greenrobot.event.EventBus;
 
 public class UploadIntentService extends IntentService implements
 		CountingInputStreamEntity.UploadListener {
@@ -233,6 +236,7 @@ public class UploadIntentService extends IntentService implements
 							getApplicationContext());
 
 			// Post to Server and notify event to UploadFragment
+			Log.i(LOG_TAG, "Ready to post Container Session");
 			String returnJson = CJayClient.getInstance().postContainerSession(
 					getApplicationContext(), uploadItem);
 
@@ -244,13 +248,12 @@ public class UploadIntentService extends IntentService implements
 					.setUploadState(ContainerSession.STATE_UPLOAD_COMPLETED);
 			containerSessionDaoImpl.update(containerSession);
 
-			// EventBus.getDefault().post(
-			// new ContainerSessionUploadedEvent(containerSession));
+			EventBus.getDefault().post(
+					new ContainerSessionUploadedEvent(containerSession));
 
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		} catch (NoConnectionException e) {
-
 			// Turn off alarm manager
 
 		} catch (Exception e) {
@@ -377,9 +380,10 @@ public class UploadIntentService extends IntentService implements
 			post.setEntity(entity);
 
 			try {
-				Log.i("FOO", "About to call httpClient.execute");
+				Log.i(LOG_TAG, "About to call httpClient.execute");
 				resp = httpClient.execute(post);
-				Log.i("FOO", resp.getStatusLine().getReasonPhrase());
+
+				Log.i(LOG_TAG, resp.getStatusLine().getReasonPhrase());
 				if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_OK
 						|| resp.getStatusLine().getStatusCode() == HttpStatus.SC_ACCEPTED) {
 
