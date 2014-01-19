@@ -26,7 +26,7 @@ import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
-import com.cloudjay.cjay.events.DataLoadedEvent;
+import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Issue;
@@ -197,11 +197,11 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 		}
 	}
 
-	public void onEventMainThread(DataLoadedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent DataLoadedEvent");
+	public void onEventMainThread(ContainerSessionChangedEvent event) {
+		Logger.Log(LOG_TAG, "onEvent ContainerSessionChangedEvent");
 		refresh();
 	}
-
+	
 	private void initIssueFeedAdapter(ArrayList<Issue> containers) {
 		BindDictionary<Issue> feedsDict = new BindDictionary<Issue>();
 		feedsDict.addStringField(R.id.issue_location_code,

@@ -15,7 +15,7 @@ public class CJayImageAddedEvent {
 	public CJayImage getCJayImage() {
 		return this.mCJayImage;
 	}
-	
+
 	public String getTag() {
 		return this.mTag;
 	}

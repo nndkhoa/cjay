@@ -30,7 +30,7 @@ import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerRepairedEvent;
-import com.cloudjay.cjay.events.DataLoadedEvent;
+import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DataCenter;
@@ -189,8 +189,8 @@ public class RepairContainerPendingListFragment extends SherlockFragment {
 		refresh();
 	}
 
-	public void onEventMainThread(DataLoadedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent DataLoadedEvent");
+	public void onEventMainThread(ContainerSessionChangedEvent event) {
+		Logger.Log(LOG_TAG, "onEvent ContainerSessionChangedEvent");
 		refresh();
 	}
 

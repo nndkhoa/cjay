@@ -91,6 +91,7 @@ public class GcmIntentService extends IntentService {
 
 				// TODO: --> Get more data from Server
 				DataCenter.getInstance().updateListContainerSessions(this);
+				
 			} else if (type.equalsIgnoreCase("EXPORT_CONTAINER")) {
 				// Container xuất khỏi Depot ở CỔNG
 				// Gửi cho mọi ROLE kèm `id`

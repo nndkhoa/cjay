@@ -27,8 +27,6 @@ import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
-import com.cloudjay.cjay.events.ContainerCreatedEvent;
-import com.cloudjay.cjay.events.ContainerEditedEvent;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -622,15 +620,7 @@ public class ContainerSession implements Parcelable {
 		ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
 				.getInstance().getDatabaseManager().getHelper(ctx)
 				.getContainerSessionDaoImpl();
-
 		containerSessionDaoImpl.addContainerSession(containerSession);
-
-		// trigger update container lists
-		EventBus.getDefault().post(new ContainerCreatedEvent(containerSession));
-
-		// EventBus.getDefault().post(
-		// new ContainerSessionEnqueueEvent(containerSession));
-
 		return containerSession;
 	}
 
@@ -678,10 +668,6 @@ public class ContainerSession implements Parcelable {
 			// update database
 			containerDaoImpl.update(container);
 			containerSessionDaoImpl.update(containerSession);
-
-			// trigger update container lists
-			EventBus.getDefault().post(
-					new ContainerEditedEvent(containerSession));
 		}
 
 		return containerSession;

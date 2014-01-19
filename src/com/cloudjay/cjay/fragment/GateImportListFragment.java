@@ -27,10 +27,8 @@ import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
-import com.cloudjay.cjay.events.ContainerCreatedEvent;
-import com.cloudjay.cjay.events.ContainerEditedEvent;
+import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
-import com.cloudjay.cjay.events.DataLoadedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
@@ -298,23 +296,13 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		mFeedListView.setAdapter(mFeedsAdapter);
 	}
 
-	public void onEvent(ContainerCreatedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerCreatedEvent");
-		refresh();
-	}
-
-	public void onEvent(ContainerEditedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerEditedEvent");
+	public void onEventMainThread(ContainerSessionChangedEvent event) {
+		Logger.Log(LOG_TAG, "onEvent ContainerSessionChangedEvent");
 		refresh();
 	}
 
 	public void onEvent(ContainerSessionEnqueueEvent event) {
 		Logger.Log(LOG_TAG, "onEvent ContainerSessionEnqueueEvent");
-		refresh();
-	}
-
-	public void onEventMainThread(DataLoadedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent DataLoadedEvent");
 		refresh();
 	}
 
@@ -329,7 +317,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	@Override
 	public void onResume() {
 		Logger.Log(LOG_TAG, "onResume " + LOG_TAG);
-		
+
 		if (mFeedsAdapter != null) {
 			refresh();
 		}

@@ -37,10 +37,8 @@ import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
-import com.cloudjay.cjay.events.ContainerCreatedEvent;
-import com.cloudjay.cjay.events.ContainerEditedEvent;
+import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
-import com.cloudjay.cjay.events.DataLoadedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
@@ -354,13 +352,8 @@ public class GateExportListFragment extends SherlockFragment {
 		mFeedListView.setAdapter(mFeedsAdapter);
 	}
 
-	public void onEvent(ContainerCreatedEvent event) {
+	public void onEvent(ContainerSessionChangedEvent event) {
 		Logger.Log(LOG_TAG, "onEvent ContainerCreatedEvent");
-		refresh();
-	}
-
-	public void onEvent(ContainerEditedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerEditedEvent");
 		refresh();
 	}
 
@@ -369,8 +362,8 @@ public class GateExportListFragment extends SherlockFragment {
 		refresh();
 	}
 
-	public void onEventMainThread(DataLoadedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent DataLoadedEvent");
+	public void onEventMainThread(ContainerSessionChangedEvent event) {
+		Logger.Log(LOG_TAG, "onEvent ContainerSessionChangedEvent");
 		refresh();
 	}
 

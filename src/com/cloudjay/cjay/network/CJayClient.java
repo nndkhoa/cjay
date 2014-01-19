@@ -22,7 +22,6 @@ import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
-import com.cloudjay.cjay.events.DataLoadedEvent;
 import com.cloudjay.cjay.model.CJayResourceStatus;
 import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -45,8 +44,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
-
-import de.greenrobot.event.EventBus;
 
 /**
  * 
@@ -785,7 +782,6 @@ public class CJayClient implements ICJayClient {
 			if (null != containerSessions) {
 				containerSessionDaoImpl
 						.addListContainerSessions(containerSessions);
-				EventBus.getDefault().post(new DataLoadedEvent());
 			}
 
 		} catch (NoConnectionException e) {

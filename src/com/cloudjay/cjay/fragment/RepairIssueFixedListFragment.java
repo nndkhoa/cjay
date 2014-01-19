@@ -21,7 +21,7 @@ import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
-import com.cloudjay.cjay.events.DataLoadedEvent;
+import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Issue;
@@ -196,8 +196,8 @@ public class RepairIssueFixedListFragment extends SherlockFragment {
 		mFeedListView.setAdapter(mFeedsAdapter);
 	}
 
-	public void onEventMainThread(DataLoadedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent DataLoadedEvent");
+	public void onEventMainThread(ContainerSessionChangedEvent event) {
+		Logger.Log(LOG_TAG, "onEvent ContainerSessionChangedEvent");
 		refresh();
 	}
 }

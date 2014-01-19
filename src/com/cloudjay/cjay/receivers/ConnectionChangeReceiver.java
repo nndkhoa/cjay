@@ -41,8 +41,7 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
 				Logger.Log(LOG_TAG, "Alarm Manager is running.");
 				Utils.cancelAlarm(context);
 			}
-
-			// EventBus.getDefault().post(new NoConnectionEvent());
+			
 			Toast.makeText(context, "Not connect to Internet",
 					Toast.LENGTH_SHORT).show();
 		}

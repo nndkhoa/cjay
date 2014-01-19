@@ -7,21 +7,19 @@ import com.cloudjay.cjay.model.ContainerSession;
 
 /**
  * 
- * Trigger when user add container session to queue (upload confirmation = true)
- * 
  * @author tieubao
  * 
  */
 
-public class ContainerCreatedEvent {
+public class ContainerSessionChangedEvent {
 
 	private final List<ContainerSession> listContainerSessions;
 
-	public ContainerCreatedEvent(List<ContainerSession> containerSessions) {
+	public ContainerSessionChangedEvent(List<ContainerSession> containerSessions) {
 		listContainerSessions = containerSessions;
 	}
 
-	public ContainerCreatedEvent(ContainerSession containerSession) {
+	public ContainerSessionChangedEvent(ContainerSession containerSession) {
 		listContainerSessions = new ArrayList<ContainerSession>();
 		listContainerSessions.add(containerSession);
 	}

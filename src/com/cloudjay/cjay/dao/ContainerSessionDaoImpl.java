@@ -5,11 +5,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.util.Logger;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
+
+import de.greenrobot.event.EventBus;
 
 public class ContainerSessionDaoImpl extends
 		BaseDaoImpl<ContainerSession, String> implements IContainerSessionDao {
@@ -39,8 +42,20 @@ public class ContainerSessionDaoImpl extends
 	}
 
 	@Override
+	public int update(ContainerSession containerSession) throws SQLException {
+		Logger.Log(LOG_TAG, "update()");
+
+		EventBus.getDefault().post(
+				new ContainerSessionChangedEvent(containerSession));
+
+		return super.update(containerSession);
+	}
+
+	@Override
 	public void addContainerSession(ContainerSession containerSession)
 			throws SQLException {
+
+		Logger.Log(LOG_TAG, "addContainerSession()");
 
 		if (containerSession != null) {
 			int containerSessionId = containerSession.getId();
@@ -52,6 +67,11 @@ public class ContainerSessionDaoImpl extends
 								+ Integer.toString(containerSessionId)
 								+ " Name: " + containerSession.getContainerId());
 				this.createOrUpdate(containerSession);
+
+				// trigger update container lists
+				EventBus.getDefault().post(
+						new ContainerSessionChangedEvent(containerSession));
+
 			} else { // existed Container Session
 
 				ContainerSession result = this
@@ -61,8 +81,8 @@ public class ContainerSessionDaoImpl extends
 								.eq(ContainerSession.FIELD_ID,
 										containerSession.getId()).prepare());
 
-				if (null != result
-						&& !result.getUuid().equals(containerSession.getUuid())) {
+				// update UUID if needed
+				if (null != result) {
 					Logger.Log(LOG_TAG, "Update container session UUID");
 					containerSession.setUuid(result.getUuid());
 				}
@@ -72,6 +92,11 @@ public class ContainerSessionDaoImpl extends
 						+ containerSession.getContainerId());
 
 				this.createOrUpdate(containerSession);
+
+				// trigger update container lists
+				EventBus.getDefault().post(
+						new ContainerSessionChangedEvent(containerSession));
+
 			}
 		}
 	}
@@ -93,13 +118,24 @@ public class ContainerSessionDaoImpl extends
 			Logger.Log(LOG_TAG, "Container Session ID = 0");
 		} else { // existed Container Session
 
-			ContainerSession tmp = this.queryForFirst(this.queryBuilder()
+			ContainerSession result = this.queryForFirst(this.queryBuilder()
 					.where().eq(ContainerSession.FIELD_ID, id).prepare());
 
-			if (null != tmp) {
-				this.delete(tmp);
+			if (null != result) {
+				this.delete(result);
 			}
 		}
+	}
+
+	@Override
+	public int delete(ContainerSession containerSession) throws SQLException {
+
+		Logger.Log(LOG_TAG, "delete " + containerSession.toString());
+
+		EventBus.getDefault().post(
+				new ContainerSessionChangedEvent(containerSession));
+
+		return super.delete(containerSession);
 	}
 
 	@Override
