@@ -80,7 +80,8 @@
         <activity
             android:name="com.cloudjay.cjay.AuditorIssueReportActivity_"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateUnchanged|adjustResize" >
         </activity>
         <activity
             android:name="com.cloudjay.cjay.AuditorIssueAssigmentActivity_"

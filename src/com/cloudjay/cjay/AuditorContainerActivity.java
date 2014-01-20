@@ -67,7 +67,7 @@ public class AuditorContainerActivity extends CJayActivity {
 	@AfterViews
 	void afterViews() {
 		imageLoader = ImageLoader.getInstance();
-		
+
 		initImageFeedAdapter(null);
 		mLongClickedCJayImage = null;
 		mSelectedCJayImage = null;
@@ -157,7 +157,7 @@ public class AuditorContainerActivity extends CJayActivity {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			
+
 			// refresh image list
 			refresh();
 
@@ -198,7 +198,7 @@ public class AuditorContainerActivity extends CJayActivity {
 
 			if (null != mContainerSession) {
 				containerIdTextView.setText(mContainerSession.getContainerId());
-				
+
 				for (CJayImage cJayImage : mContainerSession.getCJayImages()) {
 					if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
 						mFeeds.add(cJayImage);
@@ -253,28 +253,32 @@ public class AuditorContainerActivity extends CJayActivity {
 				new StringExtractor<CJayImage>() {
 					@Override
 					public String getStringValue(CJayImage item, int position) {
-						return Utils.replaceNullBySpace(item.getIssueLocationCode());
+						return Utils.replaceNullBySpace(item
+								.getIssueLocationCode());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_damage_code,
 				new StringExtractor<CJayImage>() {
 					@Override
 					public String getStringValue(CJayImage item, int position) {
-						return Utils.replaceNullBySpace(item.getIssueDamageCode());
+						return Utils.replaceNullBySpace(item
+								.getIssueDamageCode());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_repair_code,
 				new StringExtractor<CJayImage>() {
 					@Override
 					public String getStringValue(CJayImage item, int position) {
-						return Utils.replaceNullBySpace(item.getIssueRepairCode());
+						return Utils.replaceNullBySpace(item
+								.getIssueRepairCode());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_component_code,
 				new StringExtractor<CJayImage>() {
 					@Override
 					public String getStringValue(CJayImage item, int position) {
-						return Utils.replaceNullBySpace(item.getIssueComponentCode());
+						return Utils.replaceNullBySpace(item
+								.getIssueComponentCode());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_quantity,

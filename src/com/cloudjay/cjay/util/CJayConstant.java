@@ -79,6 +79,16 @@ public final class CJayConstant {
 			Environment.getExternalStorageDirectory(),
 			CJayConstant.HIDDEN_APP_DIRECTORY);
 
+	public static File getAppDirectoryFile() {
+		return new File(Environment.getExternalStorageDirectory(),
+				CJayConstant.APP_DIRECTORY);
+	}
+
+	public static File getHiddentAppDirectoryFile() {
+		return new File(Environment.getExternalStorageDirectory(),
+				CJayConstant.HIDDEN_APP_DIRECTORY);
+	}
+
 	/**
 	 * Threshold
 	 */
@@ -110,7 +120,6 @@ public final class CJayConstant {
 	public static final String INTENT_SERVICE_UPLOAD_ALL = "cjay.intent.action.UPLOAD_ALL";
 	public static final String PREF_INSTANT_UPLOAD_IF_ROAMING = "pref_instant_upload_roaming_enabled";
 	public static final String PREF_INSTANT_UPLOAD_WIFI_ONLY = "pref_instant_upload_wifi_only";
-	
 
 	/**
 	 * GCM

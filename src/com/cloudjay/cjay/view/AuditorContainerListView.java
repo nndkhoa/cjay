@@ -22,8 +22,9 @@ public class AuditorContainerListView extends CJayListView<ContainerSession> {
 	public AuditorContainerListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
-	
-	public AuditorContainerListView(Context context, AttributeSet attrs, int defStyle) {
+
+	public AuditorContainerListView(Context context, AttributeSet attrs,
+			int defStyle) {
 		super(context, attrs, defStyle);
 	}
 
@@ -79,7 +80,7 @@ public class AuditorContainerListView extends CJayListView<ContainerSession> {
 						}
 					}
 				});
-		setFeedsAdapter(new FunDapter<ContainerSession>(getContext(),
-				null, R.layout.list_item_audit_container, feedsDict));
+		setFeedsAdapter(new FunDapter<ContainerSession>(getContext(), null,
+				R.layout.list_item_audit_container, feedsDict));
 	}
 }

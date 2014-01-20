@@ -444,12 +444,26 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 						+ Integer.toString(bitmap.getHeight()));
 
 		try {
+			
+			Logger.Log(LOG_TAG, "Path: " + filename.getAbsolutePath());
 			FileOutputStream out = new FileOutputStream(filename);
 			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
 			out.flush();
 			out.close();
 
-			Logger.Log(LOG_TAG, "Path: " + filename.getAbsolutePath());
+			// if (filename.exists()) {
+			//
+			// Logger.Log(LOG_TAG, "Path: " + filename.getAbsolutePath());
+			// FileOutputStream out = new FileOutputStream(filename);
+			// bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+			// out.flush();
+			// out.close();
+			// } else {
+			// String output = MediaStore.Images.Media.insertImage(
+			// getContentResolver(), bitmap, filename.getName(),
+			// filename.getPath());
+			// Logger.Log(LOG_TAG, "Path: " + output);
+			// }
 
 		} catch (Exception e) {
 			e.printStackTrace();
