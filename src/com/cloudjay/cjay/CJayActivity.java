@@ -62,18 +62,19 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	@Override
 	protected void onCreate(Bundle arg0) {
 
-		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-
-			@Override
-			public void uncaughtException(Thread arg0, Throwable arg1) {
-				showCrouton(R.string.alert_try_again);
-
-				// ACRA.getErrorReporter().handleSilentException(arg1);
-				// ACRA.getErrorReporter().handleException(new
-				// Exception("Just for the stacktrace"));
-			}
-
-		});
+		// Thread.setDefaultUncaughtExceptionHandler(new
+		// UncaughtExceptionHandler() {
+		//
+		// @Override
+		// public void uncaughtException(Thread arg0, Throwable arg1) {
+		// showCrouton(R.string.alert_try_again);
+		//
+		// // ACRA.getErrorReporter().handleSilentException(arg1);
+		// // ACRA.getErrorReporter().handleException(new
+		// // Exception("Just for the stacktrace"));
+		// }
+		//
+		// });
 
 		super.onCreate(arg0);
 		session = Session.restore(getApplicationContext());

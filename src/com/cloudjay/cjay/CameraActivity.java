@@ -444,26 +444,12 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 						+ Integer.toString(bitmap.getHeight()));
 
 		try {
-			
+
 			Logger.Log(LOG_TAG, "Path: " + filename.getAbsolutePath());
 			FileOutputStream out = new FileOutputStream(filename);
 			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
 			out.flush();
 			out.close();
-
-			// if (filename.exists()) {
-			//
-			// Logger.Log(LOG_TAG, "Path: " + filename.getAbsolutePath());
-			// FileOutputStream out = new FileOutputStream(filename);
-			// bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-			// out.flush();
-			// out.close();
-			// } else {
-			// String output = MediaStore.Images.Media.insertImage(
-			// getContentResolver(), bitmap, filename.getName(),
-			// filename.getPath());
-			// Logger.Log(LOG_TAG, "Path: " + output);
-			// }
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -511,11 +497,24 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
 
-		// Save Bitmap to JPEG
-		saveBitmapToFile(capturedBitmap, photo);
+		if (photo.exists()) {
+			// Save Bitmap to JPEG
+			saveBitmapToFile(capturedBitmap, photo);
 
-		// Upload image
-		uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
+			// Upload image
+			uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
+
+		} else {
+			String output = MediaStore.Images.Media.insertImage(
+					getContentResolver(), capturedBitmap, photo.getName(),
+					photo.getPath());
+
+			Logger.Log(LOG_TAG, "Path: " + output);
+
+			// Upload image
+			uploadImage(uuid, output, fileName);
+
+		}
 
 		if (capturedBitmap != null) {
 			capturedBitmap.recycle();
@@ -591,6 +590,12 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		super.onResume();
 		openCamera();
 		setContentView(R.layout.activity_camera);
+	}
+
+	@Override
+	public void onBackPressed() {
+		Logger.Log(LOG_TAG, "onBackPressed");
+		super.onBackPressed();
 	}
 
 	@Override

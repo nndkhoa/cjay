@@ -264,7 +264,7 @@ public class AuditorReportingListFragment extends SherlockFragment {
 	}
 
 	private void configureControls(ArrayList<ContainerSession> list) {
-		boolean hasContainers = list.size() > 0;
+		boolean hasContainers = list != null && list.size() > 0;
 		if (hasContainers) {
 			mFeedListView.setVisibility(View.VISIBLE);
 			mAddButton.setVisibility(View.INVISIBLE);
