@@ -1,5 +1,6 @@
 package com.cloudjay.cjay.util;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,6 +27,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
@@ -439,4 +441,15 @@ public class Utils {
 		return PendingIntent.getService(context, 0, new Intent(context,
 				QueueIntentService.class), PendingIntent.FLAG_NO_CREATE) != null;
 	}
+
+	public static File getAppDirectoryFile() {
+		return new File(Environment.getExternalStorageDirectory(),
+				CJayConstant.APP_DIRECTORY);
+	}
+
+	public static File getHiddentAppDirectoryFile() {
+		return new File(Environment.getExternalStorageDirectory(),
+				CJayConstant.HIDDEN_APP_DIRECTORY);
+	}
+
 }

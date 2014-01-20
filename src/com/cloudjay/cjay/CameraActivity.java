@@ -496,6 +496,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 				+ imageType + "-" + uuid + ".jpg";
 
 		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
+		Logger.Log(LOG_TAG, "Photo Path: " + photo.getAbsolutePath());
 
 		if (photo.exists()) {
 			// Save Bitmap to JPEG
@@ -565,20 +566,21 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Click({ R.id.btn_camera_done, R.id.btn_back, R.id.rl_camera_done })
 	void doneButtonClicked() {
+
 		Logger.Log(LOG_TAG,
 				"doneButtonClicked(). Ready to update Container Session.");
 
-		try {
-
-			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-					.getInstance().getDatabaseManager().getHelper(this)
-					.getContainerSessionDaoImpl();
-
-			containerSessionDaoImpl.addContainerSession(containerSession);
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		// try {
+		//
+		// ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
+		// .getInstance().getDatabaseManager().getHelper(this)
+		// .getContainerSessionDaoImpl();
+		//
+		// containerSessionDaoImpl.addContainerSession(containerSession);
+		//
+		// } catch (SQLException e) {
+		// e.printStackTrace();
+		// }
 
 		this.onBackPressed();
 	}
@@ -595,6 +597,19 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	@Override
 	public void onBackPressed() {
 		Logger.Log(LOG_TAG, "onBackPressed");
+
+		try {
+
+			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
+					.getInstance().getDatabaseManager().getHelper(this)
+					.getContainerSessionDaoImpl();
+
+			containerSessionDaoImpl.addContainerSession(containerSession);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
 		super.onBackPressed();
 	}
 

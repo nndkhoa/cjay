@@ -65,29 +65,29 @@ public final class CJayConstant {
 	/**
 	 * File path
 	 */
-	public static final String APP_DIRECTORY = "DCIM/CJay";
-	public static final String HIDDEN_APP_DIRECTORY = "Pictures/.CJay"; // for
-																		// temporary
+	public static final String APP_DIRECTORY = "CJay";
+	public static final String HIDDEN_APP_DIRECTORY = ".CJay"; // for
+																// temporary
 
-	// `/sdcard/DCMI/CJay/`
+	// // `/sdcard/DCMI/CJay/`
+	// public static final File APP_DIRECTORY_FILE = new File(
+	// Environment.getExternalStorageDirectory(),
+	// CJayConstant.APP_DIRECTORY);
+	//
+	// // `/sdcard/Pictures/.CJay/`
+	// public static final File HIDDEN_APP_DIRECTORY_FILE = new File(
+	// Environment.getExternalStorageDirectory(),
+	// CJayConstant.HIDDEN_APP_DIRECTORY);
+
 	public static final File APP_DIRECTORY_FILE = new File(
-			Environment.getExternalStorageDirectory(),
+			Environment
+					.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
 			CJayConstant.APP_DIRECTORY);
 
-	// `/sdcard/Pictures/.CJay/`
 	public static final File HIDDEN_APP_DIRECTORY_FILE = new File(
-			Environment.getExternalStorageDirectory(),
+			Environment
+					.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
 			CJayConstant.HIDDEN_APP_DIRECTORY);
-
-	public static File getAppDirectoryFile() {
-		return new File(Environment.getExternalStorageDirectory(),
-				CJayConstant.APP_DIRECTORY);
-	}
-
-	public static File getHiddentAppDirectoryFile() {
-		return new File(Environment.getExternalStorageDirectory(),
-				CJayConstant.HIDDEN_APP_DIRECTORY);
-	}
 
 	/**
 	 * Threshold
