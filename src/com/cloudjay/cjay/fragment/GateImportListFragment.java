@@ -121,6 +121,10 @@ public class GateImportListFragment extends SherlockDialogFragment {
 			hideMenuItems();
 
 		} catch (SQLException e) {
+			
+			mSelectedContainerSession.setUploadConfirmation(false);
+			mSelectedContainerSession.setOnLocal(true);
+			
 			e.printStackTrace();
 		}
 	}
@@ -304,7 +308,8 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListLocalContainerSessions(getActivity());
-		mFeedsAdapter.updateData(mFeeds);
+		if (null != mFeeds)
+			mFeedsAdapter.updateData(mFeeds);
 	}
 
 	@Override

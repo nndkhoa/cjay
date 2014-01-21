@@ -46,17 +46,11 @@ public interface ICJayClient {
 	List<ComponentCode> getComponentCodes(Context ctx)
 			throws NoConnectionException;
 
-	List<ContainerSession> getAllContainerSessions(Context ctx)
+	List<CJayResourceStatus> getCJayResourceStatus(Context ctx)
 			throws NoConnectionException;
 
-	List<ContainerSession> getContainerSessions(Context ctx, int userRole,
-			int filterStatus) throws NoConnectionException;
-
-	List<ContainerSession> getContainerSessions(Context ctx, int userRole,
-			int filterStatus, Date date) throws NoConnectionException;
-
-	List<ContainerSession> getContainerSessions(Context ctx, int userRole,
-			int filterStatus, String date) throws NoConnectionException;
+	List<ContainerSession> getAllContainerSessions(Context ctx)
+			throws NoConnectionException;
 
 	List<ContainerSession> getContainerSessions(Context ctx, Date date)
 			throws NoConnectionException;
@@ -64,13 +58,7 @@ public interface ICJayClient {
 	List<ContainerSession> getContainerSessions(Context ctx, String date)
 			throws NoConnectionException;
 
-	List<CJayResourceStatus> getCJayResourceStatus(Context ctx)
-			throws NoConnectionException;
-
 	String postContainerSession(Context ctx, TmpContainerSession item)
-			throws NoConnectionException;
-
-	String postContainerSessionReportList(Context ctx, TmpContainerSession item)
 			throws NoConnectionException;
 
 	void fetchData(Context ctx) throws NoConnectionException;

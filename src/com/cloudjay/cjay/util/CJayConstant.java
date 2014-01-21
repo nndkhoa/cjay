@@ -48,42 +48,21 @@ public final class CJayConstant {
 	public static final String LIST_CONTAINER_SESSIONS_WITH_DATETIME = API_ROOT
 			+ "cjay/container-sessions.json?created_after=%s";
 
-	public static final String LIST_CONTAINER_SESSIONS_WITH_FILTER_AND_DATETIME = API_ROOT
-			+ "cjay/container-sessions.json?filter_status=%s&created_after=%s";
-
-	public static final String LIST_CONTAINER_SESSIONS_REPORT_LIST = API_ROOT
-			+ "cjay/container-sessions-report-list.json";
-
-	public static final String LIST_CONTAINER_SESSIONS_REPORT_LIST_WITH_FILTER = API_ROOT
-			+ "cjay/container-sessions-report-list.json?filter_status=%s";
-
-	public static final String LIST_CONTAINER_SESSIONS_REPORT_LIST_WITH_FILTER_AND_DATETIME = API_ROOT
-			+ "cjay/container-sessions-report-list.json?filter_status=%s&created_after=%s";
-
 	public static final String CJAY_TMP_STORAGE = "https://www.googleapis.com/upload/storage/v1beta2/b/cjaytmp/o?uploadType=media&name=%s";
 
 	/**
 	 * File path
 	 */
 	public static final String APP_DIRECTORY = "CJay";
-	public static final String HIDDEN_APP_DIRECTORY = ".CJay"; // for
-																// temporary
+	public static final String HIDDEN_APP_DIRECTORY = ".CJay";
 
-	// // `/sdcard/DCMI/CJay/`
-	// public static final File APP_DIRECTORY_FILE = new File(
-	// Environment.getExternalStorageDirectory(),
-	// CJayConstant.APP_DIRECTORY);
-	//
-	// // `/sdcard/Pictures/.CJay/`
-	// public static final File HIDDEN_APP_DIRECTORY_FILE = new File(
-	// Environment.getExternalStorageDirectory(),
-	// CJayConstant.HIDDEN_APP_DIRECTORY);
-
+	// `/sdcard/DCMI/CJay/`
 	public static final File APP_DIRECTORY_FILE = new File(
 			Environment
 					.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
 			CJayConstant.APP_DIRECTORY);
 
+	// `/sdcard/Pictures/.CJay/`
 	public static final File HIDDEN_APP_DIRECTORY_FILE = new File(
 			Environment
 					.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),

@@ -337,206 +337,6 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public List<ContainerSession> getContainerSessions(Context ctx,
-			int userRole, int filterStatus) throws NoConnectionException {
-
-		Logger.Log(LOG_TAG, "getContainerSessions(Context ctx, int userRole)");
-
-		if (Utils.hasNoConnection(ctx)) {
-			throw new NoConnectionException();
-		}
-
-		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
-
-		String response = "";
-		String url = "";
-		switch (userRole) {
-		case User.ROLE_REPAIR_STAFF:
-			url = String
-					.format(CJayConstant.LIST_CONTAINER_SESSIONS_REPORT_LIST_WITH_FILTER,
-							Integer.toString(filterStatus));
-			break;
-
-		case User.ROLE_GATE_KEEPER:
-			// simply send request to get all containers that automatically
-			// filter by server with `check_out_time = null`
-
-			url = CJayConstant.LIST_CONTAINER_SESSIONS;
-			break;
-
-		case User.ROLE_AUDITOR:
-		default:
-
-			url = String.format(
-					CJayConstant.LIST_CONTAINER_SESSIONS_WITH_FILTER,
-					Integer.toString(filterStatus));
-			break;
-		}
-
-		response = requestWrapper.sendGet(url, headers);
-
-		if (TextUtils.isEmpty(response)) {
-			Logger.Log(
-					LOG_TAG,
-					"No new items for user role "
-							+ Integer.toString(filterStatus));
-		} else {
-			Logger.Log(LOG_TAG, "Response: " + response);
-
-			Gson gson = new GsonBuilder().setDateFormat(
-					CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
-
-			Type listType = new TypeToken<List<TmpContainerSession>>() {
-			}.getType();
-
-			List<TmpContainerSession> tmpContainerSessions = null;
-			try {
-				tmpContainerSessions = gson.fromJson(response, listType);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			// Parse to `ContainerSession`
-			List<ContainerSession> items = new ArrayList<ContainerSession>();
-			try {
-				ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
-						.getHelper(ctx).getContainerSessionDaoImpl();
-
-				if (tmpContainerSessions != null) {
-					for (TmpContainerSession tmpSession : tmpContainerSessions) {
-						ContainerSession containerSession = Mapper
-								.getInstance().toContainerSession(tmpSession,
-										ctx);
-
-						if (null != containerSession) {
-							containerSessionDaoImpl
-									.addContainerSession(containerSession);
-							items.add(containerSession);
-						}
-					}
-
-				}
-
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-
-			return items;
-		}
-
-		return null;
-	}
-
-	@Override
-	public List<ContainerSession> getContainerSessions(Context ctx,
-			int userRole, int filterStatus, Date date)
-			throws NoConnectionException {
-
-		Logger.Log(LOG_TAG,
-				"getContainerSessions(Context ctx, int userRole, Date date)");
-
-		if (Utils.hasNoConnection(ctx)) {
-			throw new NoConnectionException();
-		}
-
-		List<ContainerSession> items = new ArrayList<ContainerSession>();
-		String formatedDate = StringHelper.getTimestamp(
-				CJayConstant.CJAY_SERVER_DATETIME_FORMAT, date);
-
-		items = getContainerSessions(ctx, userRole, filterStatus, formatedDate);
-		return items;
-	}
-
-	@Override
-	public synchronized List<ContainerSession> getContainerSessions(
-			Context ctx, int userRole, int filterStatus, String date)
-			throws NoConnectionException {
-
-		Logger.Log(LOG_TAG,
-				"getContainerSessions(Context ctx, int userRole, String date");
-
-		if (Utils.hasNoConnection(ctx)) {
-			throw new NoConnectionException();
-		}
-
-		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
-
-		String response = "";
-		String url = "";
-		switch (userRole) {
-		case User.ROLE_REPAIR_STAFF:
-			url = String
-					.format(CJayConstant.LIST_CONTAINER_SESSIONS_REPORT_LIST_WITH_FILTER_AND_DATETIME,
-							Integer.toString(filterStatus), date);
-			break;
-
-		case User.ROLE_GATE_KEEPER:
-			url = String.format(
-					CJayConstant.LIST_CONTAINER_SESSIONS_WITH_DATETIME, date);
-			break;
-
-		case User.ROLE_AUDITOR:
-		default:
-			url = String
-					.format(CJayConstant.LIST_CONTAINER_SESSIONS_WITH_FILTER_AND_DATETIME,
-							Integer.toString(filterStatus), date);
-			break;
-		}
-
-		response = requestWrapper.sendGet(url, headers);
-
-		if (TextUtils.isEmpty(response)) {
-			Logger.Log(LOG_TAG, "No new items from: " + date
-					+ " for user role: " + Integer.toString(userRole));
-
-		} else {
-			Logger.Log(LOG_TAG, response);
-
-			Gson gson = new GsonBuilder().setDateFormat(
-					CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
-
-			Type listType = new TypeToken<List<TmpContainerSession>>() {
-			}.getType();
-
-			List<TmpContainerSession> tmpContainerSessions = null;
-			try {
-				tmpContainerSessions = gson.fromJson(response, listType);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			// Parse to `ContainerSession`
-			List<ContainerSession> items = new ArrayList<ContainerSession>();
-			try {
-				ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
-						.getHelper(ctx).getContainerSessionDaoImpl();
-
-				if (tmpContainerSessions != null) {
-					for (TmpContainerSession tmpSession : tmpContainerSessions) {
-						ContainerSession containerSession = Mapper
-								.getInstance().toContainerSession(tmpSession,
-										ctx);
-
-						if (null != containerSession) {
-							containerSessionDaoImpl
-									.addContainerSession(containerSession);
-							items.add(containerSession);
-						}
-					}
-
-				}
-
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-
-			return items;
-		}
-
-		return null;
-	}
-
-	@Override
 	public List<ContainerSession> getContainerSessions(Context ctx, Date date)
 			throws NoConnectionException {
 
@@ -596,6 +396,8 @@ public class CJayClient implements ICJayClient {
 
 				if (tmpContainerSessions != null) {
 					for (TmpContainerSession tmpSession : tmpContainerSessions) {
+
+						// Create container session based on result from server
 						ContainerSession containerSession = Mapper
 								.getInstance().toContainerSession(tmpSession,
 										ctx);
@@ -679,32 +481,6 @@ public class CJayClient implements ICJayClient {
 		}
 
 		return ret;
-	}
-
-	@Override
-	public String postContainerSessionReportList(Context ctx,
-			TmpContainerSession item) throws NoConnectionException {
-
-		if (Utils.hasNoConnection(ctx)) {
-			Logger.Log("Network is not available");
-			throw new NoConnectionException();
-		}
-
-		String ret = "";
-		try {
-			HashMap<String, String> headers = prepareHeadersWithToken(ctx);
-			Gson gson = new Gson();
-
-			String data = gson.toJson(item);
-			String url = CJayConstant.LIST_CONTAINER_SESSIONS_REPORT_LIST;
-			ret = requestWrapper.sendPost(url, data, "application/json",
-					headers);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return ret;
-
 	}
 
 	@Override
@@ -909,5 +685,4 @@ public class CJayClient implements ICJayClient {
 			e.printStackTrace();
 		}
 	}
-
 }

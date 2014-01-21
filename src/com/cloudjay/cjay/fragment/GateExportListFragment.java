@@ -267,7 +267,9 @@ public class GateExportListFragment extends SherlockFragment {
 	private void search(String searchText) {
 		if (searchText.equals("")) {
 			configureControls(mFeeds);
-			mFeedsAdapter.updateData(mFeeds);
+
+			if (null != mFeeds)
+				mFeedsAdapter.updateData(mFeeds);
 		} else {
 			ArrayList<ContainerSession> searchFeeds = new ArrayList<ContainerSession>();
 			for (ContainerSession containerSession : mFeeds) {

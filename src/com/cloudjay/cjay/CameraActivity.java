@@ -446,6 +446,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		try {
 
 			Logger.Log(LOG_TAG, "Path: " + filename.getAbsolutePath());
+
 			FileOutputStream out = new FileOutputStream(filename);
 			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
 			out.flush();
@@ -485,37 +486,44 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			break;
 		}
 
-		// TODO: BUG HERE
 		String depotCode = containerSession.getContainer().getDepot()
 				.getDepotCode();
 
 		// filename sample:
 		// [depot-code]-2013-12-19-[gate-in|gate-out|report]-[UUID].jpg
 		String fileName = depotCode + "-"
-				+ StringHelper.getCurrentTimestamp("yyyy-mm-dd") + "-"
+				+ StringHelper.getCurrentTimestamp("yyyy-MM-dd") + "-"
 				+ imageType + "-" + uuid + ".jpg";
 
 		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
 		Logger.Log(LOG_TAG, "Photo Path: " + photo.getAbsolutePath());
 
-		if (photo.exists()) {
-			// Save Bitmap to JPEG
-			saveBitmapToFile(capturedBitmap, photo);
+		// Save Bitmap to JPEG
+		saveBitmapToFile(capturedBitmap, photo);
 
-			// Upload image
-			uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
+		// Upload image
+		uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
 
-		} else {
-			String output = MediaStore.Images.Media.insertImage(
-					getContentResolver(), capturedBitmap, photo.getName(),
-					photo.getPath());
-
-			Logger.Log(LOG_TAG, "Path: " + output);
-
-			// Upload image
-			uploadImage(uuid, output, fileName);
-
-		}
+		// if (photo.exists()) {
+		//
+		// // Save Bitmap to JPEG
+		// saveBitmapToFile(capturedBitmap, photo);
+		//
+		// // Upload image
+		// uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
+		//
+		// } else {
+		//
+		// String output = MediaStore.Images.Media.insertImage(
+		// getContentResolver(), capturedBitmap, fileName,
+		// photo.getPath());
+		//
+		// Logger.Log(LOG_TAG, "output: " + output);
+		// Logger.Log(LOG_TAG, "filename: " + fileName);
+		//
+		// // Upload image
+		// uploadImage(uuid, output, fileName);
+		// }
 
 		if (capturedBitmap != null) {
 			capturedBitmap.recycle();
@@ -546,12 +554,12 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		}
 
 		try {
-			CJayImageDaoImpl uploadList = CJayClient.getInstance()
+			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance()
 					.getDatabaseManager().getHelper(getApplicationContext())
 					.getCJayImageDaoImpl();
 
 			cJayImages.add(uploadItem);
-			uploadList.addCJayImage(uploadItem);
+			cJayImageDaoImpl.addCJayImage(uploadItem);
 
 		} catch (SQLException e) {
 			e.printStackTrace();

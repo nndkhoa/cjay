@@ -100,12 +100,6 @@ public class UploadsFragment extends SherlockFragment implements
 				"onItemClick at index: " + Integer.toString(position));
 	}
 
-	/**
-	 * Lẽ ra nên update list items bằng cách pop up từ event.getTargets() rồi
-	 * append vào list.
-	 * 
-	 * @param event
-	 */
 	public void onEvent(ContainerSessionEnqueueEvent event) {
 		Logger.Log(LOG_TAG, "onEvent ContainerSessionEnqueueEvent");
 		updateUI();
@@ -125,6 +119,7 @@ public class UploadsFragment extends SherlockFragment implements
 	void updateUI() {
 		listContainerSessions = DataCenter.getInstance()
 				.getListUploadContainerSessions(getActivity());
+		
 		mAdapter.setContainerSessions(listContainerSessions);
 		mAdapter.notifyDataSetChanged();
 	}
@@ -139,6 +134,7 @@ public class UploadsFragment extends SherlockFragment implements
 				// just clear items from UI
 				containerSession.setCleared(true);
 				containerSessionDaoImpl.update(containerSession);
+				
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
