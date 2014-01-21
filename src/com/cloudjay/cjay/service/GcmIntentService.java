@@ -62,8 +62,9 @@ public class GcmIntentService extends IntentService {
 			} else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE
 					.equals(messageType)) {
 
+				Logger.Log(LOG_TAG, "Received: " + extras.toString());
 				sendNotification(extras);
-				Log.i(LOG_TAG, "Received: " + extras.toString());
+
 			}
 		}
 		// Release the wake lock provided by the WakefulBroadcastReceiver.
@@ -78,7 +79,13 @@ public class GcmIntentService extends IntentService {
 			mNotificationManager = (NotificationManager) this
 					.getSystemService(Context.NOTIFICATION_SERVICE);
 
-			int id = extras.getInt("id");
+			int id = -1;
+			try {
+				id = Integer.parseInt(extras.getString("id"));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
 			String type = extras.getString("type");
 
 			Logger.Log(LOG_TAG, "Notification got Type = " + type + " | Id = "
@@ -130,6 +137,17 @@ public class GcmIntentService extends IntentService {
 
 				// TODO: Remove Container Session having this id
 				DataCenter.getInstance().removeContainerSession(this, id);
+
+			} else if (type.equalsIgnoreCase("UPDATE_DAMAGE_CODE")) {
+
+			} else if (type.equalsIgnoreCase("UPDATE_REPAIR_CODE")) {
+
+			} else if (type.equalsIgnoreCase("UPDATE_COMP_CODE")) {
+
+			} else if (type.equalsIgnoreCase("UPDATE_OPERATOR_LIST")) {
+				// truyền modified_after cho server
+				// add or update to db
+
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
