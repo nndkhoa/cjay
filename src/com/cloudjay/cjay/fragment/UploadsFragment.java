@@ -119,7 +119,7 @@ public class UploadsFragment extends SherlockFragment implements
 	void updateUI() {
 		listContainerSessions = DataCenter.getInstance()
 				.getListUploadContainerSessions(getActivity());
-		
+
 		mAdapter.setContainerSessions(listContainerSessions);
 		mAdapter.notifyDataSetChanged();
 	}
@@ -134,7 +134,7 @@ public class UploadsFragment extends SherlockFragment implements
 				// just clear items from UI
 				containerSession.setCleared(true);
 				containerSessionDaoImpl.update(containerSession);
-				
+
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

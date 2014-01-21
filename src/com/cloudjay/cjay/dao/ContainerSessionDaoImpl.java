@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import android.R.integer;
 import android.util.Log;
 
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
@@ -48,6 +49,18 @@ public class ContainerSessionDaoImpl extends
 		int result = super.update(containerSession);
 
 		Logger.Log(LOG_TAG, "update()");
+
+		EventBus.getDefault().post(
+				new ContainerSessionChangedEvent(containerSession));
+
+		return result;
+	}
+
+	@Override
+	public int create(ContainerSession containerSession) throws SQLException {
+		int result = super.create(containerSession);
+
+		Logger.Log(LOG_TAG, "create()");
 
 		EventBus.getDefault().post(
 				new ContainerSessionChangedEvent(containerSession));
@@ -119,8 +132,9 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public void delete(int id) throws SQLException {
 
-		if (id == 0) { // new Container Session
-			Logger.Log(LOG_TAG, "Container Session ID = 0");
+		if (id == -1) {
+			Logger.Log(LOG_TAG, "Container Session ID = -1");
+
 		} else { // existed Container Session
 
 			ContainerSession result = this.queryForFirst(this.queryBuilder()
@@ -135,12 +149,12 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public int delete(ContainerSession containerSession) throws SQLException {
 
-		Logger.Log(LOG_TAG, "delete " + containerSession.getContainerId());
-
+		Logger.Log(LOG_TAG, "deleting " + containerSession.getContainerId());
+		int result = super.delete(containerSession);
 		EventBus.getDefault().post(
 				new ContainerSessionChangedEvent(containerSession));
 
-		return super.delete(containerSession);
+		return result;
 	}
 
 	@Override
