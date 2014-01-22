@@ -12,17 +12,15 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
+import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -47,11 +45,10 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
-
 import de.greenrobot.event.EventBus;
 
-//@EFragment(R.layout.fragment_gate_import)
-@EFragment
+//@EFragment
+@EFragment(R.layout.fragment_gate_import)
 @OptionsMenu(R.menu.menu_gate_import)
 public class GateImportListFragment extends SherlockDialogFragment implements
 		OnRefreshListener {
@@ -73,23 +70,6 @@ public class GateImportListFragment extends SherlockDialogFragment implements
 	@ViewById(R.id.ptr_layout)
 	PullToRefreshLayout mPullToRefreshLayout;
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-
-		View view = inflater.inflate(R.layout.fragment_gate_import, container,
-				false);
-
-		// Now give the find the PullToRefreshLayout and set it up
-		mPullToRefreshLayout = (PullToRefreshLayout) view
-				.findViewById(R.id.ptr_layout);
-
-		ActionBarPullToRefresh.from(getActivity()).allChildrenArePullable()
-				.listener(this).setup(mPullToRefreshLayout);
-
-		return super.onCreateView(inflater, container, savedInstanceState);
-	}
-
 	@AfterViews
 	void afterViews() {
 		imageLoader = ImageLoader.getInstance();
@@ -100,6 +80,8 @@ public class GateImportListFragment extends SherlockDialogFragment implements
 		initContainerFeedAdapter(null);
 		mSelectedContainerSession = null;
 
+		ActionBarPullToRefresh.from(getActivity()).allChildrenArePullable()
+				.listener(this).setup(mPullToRefreshLayout);
 	}
 
 	@OptionsItem(R.id.menu_camera)
@@ -364,7 +346,11 @@ public class GateImportListFragment extends SherlockDialogFragment implements
 
 			@Override
 			protected Void doInBackground(Void... params) {
+
+				Logger.Log(LOG_TAG, "onRefreshStarted");
+
 				try {
+
 					Thread.sleep(CJayConstant.SIMULATED_REFRESH_LENGTH);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
