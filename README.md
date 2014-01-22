@@ -23,6 +23,12 @@ Need to check updated data everytime getting data from server because server can
 
 * Helper Tools For Android [(com.aerilys.helpers.android)](https://github.com/Neferetheka/Helper-Tools-for-Android)
 
+* [ActionBarSherlock](https://github.com/JakeWharton/ActionBarSherlock): Action bar implementation which uses the native action bar on Android 4.0+ and a custom implementation on pre-4.0 through a single API and theme.
+
+* [ActionBar-PullToRefresh](https://github.com/chrisbanes/ActionBar-PullToRefresh): A modern implementation of the pull-to-refresh interaction for #android. Support pull to refresh feature like new KitKat Gmail app.
+
+* [SmoothProgressBar](https://github.com/castorflex/SmoothProgressBar): A small Android library allowing you to have a smooth and customizable horizontal indeterminate ProgressBar
+
 ### How to build project
 
 Visit [**documentation**](https://github.com/tieubao/cjay/wiki/How-to-build-project).
