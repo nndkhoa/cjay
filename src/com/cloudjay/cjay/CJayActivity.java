@@ -1,8 +1,6 @@
 package com.cloudjay.cjay;
 
 import java.io.IOException;
-import java.lang.Thread.UncaughtExceptionHandler;
-
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.UiThread;

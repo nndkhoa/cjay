@@ -105,4 +105,6 @@ public final class CJayConstant {
 	 */
 	public static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 	public static final String SENDER_ID = "189386999383";
+
+	public static final int SIMULATED_REFRESH_LENGTH = 5000;
 }

@@ -12,9 +12,17 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -33,6 +41,7 @@ import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
@@ -41,9 +50,11 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import de.greenrobot.event.EventBus;
 
-@EFragment(R.layout.fragment_gate_import)
+//@EFragment(R.layout.fragment_gate_import)
+@EFragment
 @OptionsMenu(R.menu.menu_gate_import)
-public class GateImportListFragment extends SherlockDialogFragment {
+public class GateImportListFragment extends SherlockDialogFragment implements
+		OnRefreshListener {
 
 	private final static String LOG_TAG = "GateImportListFragment";
 
@@ -59,6 +70,26 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	private ImageLoader imageLoader;
 	private ContainerSession mSelectedContainerSession;
 
+	@ViewById(R.id.ptr_layout)
+	PullToRefreshLayout mPullToRefreshLayout;
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+
+		View view = inflater.inflate(R.layout.fragment_gate_import, container,
+				false);
+
+		// Now give the find the PullToRefreshLayout and set it up
+		mPullToRefreshLayout = (PullToRefreshLayout) view
+				.findViewById(R.id.ptr_layout);
+
+		ActionBarPullToRefresh.from(getActivity()).allChildrenArePullable()
+				.listener(this).setup(mPullToRefreshLayout);
+
+		return super.onCreateView(inflater, container, savedInstanceState);
+	}
+
 	@AfterViews
 	void afterViews() {
 		imageLoader = ImageLoader.getInstance();
@@ -68,6 +99,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 		initContainerFeedAdapter(null);
 		mSelectedContainerSession = null;
+
 	}
 
 	@OptionsItem(R.id.menu_camera)
@@ -121,10 +153,10 @@ public class GateImportListFragment extends SherlockDialogFragment {
 			hideMenuItems();
 
 		} catch (SQLException e) {
-			
+
 			mSelectedContainerSession.setUploadConfirmation(false);
 			mSelectedContainerSession.setOnLocal(true);
-			
+
 			e.printStackTrace();
 		}
 	}
@@ -138,9 +170,9 @@ public class GateImportListFragment extends SherlockDialogFragment {
 
 	@ItemClick(R.id.feeds)
 	void listItemClicked(int position) {
+
 		// clear current selection
 		hideMenuItems();
-
 		Logger.Log(LOG_TAG, "Show item at position: " + position);
 
 		// open photo viewer
@@ -200,7 +232,7 @@ public class GateImportListFragment extends SherlockDialogFragment {
 	public void OnContainerInputCompleted(String containerId,
 			String operatorName, int mode) {
 
-		// TODO: Bug: chưa load xong data nên không có mOperators
+		// TODO: Bug: Background chưa load xong data nên không có mOperators
 		// Get the container id and container operator code
 		String operatorCode = "";
 		for (Operator operator : mOperators) {
@@ -321,5 +353,32 @@ public class GateImportListFragment extends SherlockDialogFragment {
 		}
 
 		super.onResume();
+	}
+
+	@Override
+	public void onRefreshStarted(View view) {
+		/**
+		 * Simulate Refresh with 4 seconds sleep
+		 */
+		new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... params) {
+				try {
+					Thread.sleep(CJayConstant.SIMULATED_REFRESH_LENGTH);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void result) {
+				super.onPostExecute(result);
+
+				// Notify PullToRefreshLayout that the refresh has finished
+				mPullToRefreshLayout.setRefreshComplete();
+			}
+		}.execute();
 	}
 }
