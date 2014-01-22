@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -47,7 +48,6 @@ import com.cloudjay.cjay.view.AddContainerDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import de.greenrobot.event.EventBus;
 
-//@EFragment
 @EFragment(R.layout.fragment_gate_import)
 @OptionsMenu(R.menu.menu_gate_import)
 public class GateImportListFragment extends SherlockDialogFragment implements
@@ -67,7 +67,6 @@ public class GateImportListFragment extends SherlockDialogFragment implements
 	private ImageLoader imageLoader;
 	private ContainerSession mSelectedContainerSession;
 
-	@ViewById(R.id.ptr_layout)
 	PullToRefreshLayout mPullToRefreshLayout;
 
 	@AfterViews
@@ -79,8 +78,16 @@ public class GateImportListFragment extends SherlockDialogFragment implements
 
 		initContainerFeedAdapter(null);
 		mSelectedContainerSession = null;
+	}
 
-		ActionBarPullToRefresh.from(getActivity()).allChildrenArePullable()
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+
+		ViewGroup viewGroup = (ViewGroup) view;
+		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
+		ActionBarPullToRefresh.from(getActivity()).insertLayoutInto(viewGroup)
+				.theseChildrenArePullable(R.id.feeds, android.R.id.empty)
 				.listener(this).setup(mPullToRefreshLayout);
 	}
 

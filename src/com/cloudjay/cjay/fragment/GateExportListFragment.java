@@ -13,7 +13,12 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
+import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
@@ -21,6 +26,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -55,7 +61,8 @@ import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_gate_export)
 @OptionsMenu(R.menu.menu_gate_export)
-public class GateExportListFragment extends SherlockFragment {
+public class GateExportListFragment extends SherlockFragment implements
+		OnRefreshListener {
 
 	private final static String LOG_TAG = "GateExportListFragment";
 
@@ -74,6 +81,31 @@ public class GateExportListFragment extends SherlockFragment {
 	Button mAddButton;
 	@ViewById(R.id.notfound_textview)
 	TextView mNotfoundTextView;
+
+	PullToRefreshLayout mPullToRefreshLayout;
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+
+		ViewGroup viewGroup = (ViewGroup) view;
+
+		// As we're using a ListFragment we create a PullToRefreshLayout
+		// manually
+		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
+
+		// We can now setup the PullToRefreshLayout
+		ActionBarPullToRefresh
+				.from(getActivity())
+				// We need to insert the PullToRefreshLayout into the Fragment's
+				// ViewGroup
+				.insertLayoutInto(viewGroup)
+				// Here we mark just the ListView and it's Empty View as
+				// pullable
+				.theseChildrenArePullable(R.id.container_list,
+						android.R.id.empty).listener(this)
+				.setup(mPullToRefreshLayout);
+	}
 
 	@AfterViews
 	void afterViews() {
@@ -116,6 +148,9 @@ public class GateExportListFragment extends SherlockFragment {
 
 		initContainerFeedAdapter(null);
 		mSelectedContainerSession = null;
+
+		// ActionBarPullToRefresh.from(getActivity()).allChildrenArePullable()
+		// .listener(this).setup(mPullToRefreshLayout);
 
 	}
 
@@ -380,5 +415,36 @@ public class GateExportListFragment extends SherlockFragment {
 		}
 
 		super.onResume();
+	}
+
+	@Override
+	public void onRefreshStarted(View view) {
+		/**
+		 * Simulate Refresh with 4 seconds sleep
+		 */
+		new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... params) {
+
+				Logger.Log(LOG_TAG, "onRefreshStarted");
+
+				try {
+
+					Thread.sleep(CJayConstant.SIMULATED_REFRESH_LENGTH);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void result) {
+				super.onPostExecute(result);
+
+				// Notify PullToRefreshLayout that the refresh has finished
+				mPullToRefreshLayout.setRefreshComplete();
+			}
+		}.execute();
 	}
 }
