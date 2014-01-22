@@ -83,7 +83,7 @@ public class GcmIntentService extends IntentService {
 			try {
 				id = Integer.parseInt(extras.getString("id"));
 			} catch (Exception e) {
-				e.printStackTrace();
+
 			}
 
 			String type = extras.getString("type");
@@ -93,53 +93,55 @@ public class GcmIntentService extends IntentService {
 
 			if (type.equalsIgnoreCase("NEW_CONTAINER")) {
 
-				// Container được upload lên từ CỔNG
-				// Gửi cho GATE và AUDIT
+				// Received: Container được upload lên từ CỔNG
+				// Received Roles: GATE | AUDIT
+				// --> Get more data from Server
 
-				// TODO: --> Get more data from Server
 				DataCenter.getInstance().updateListContainerSessions(this);
 
 			} else if (type.equalsIgnoreCase("EXPORT_CONTAINER")) {
-				// Container xuất khỏi Depot ở CỔNG
-				// Gửi cho mọi ROLE kèm `id`
+				// Received: Container xuất khỏi Depot ở CỔNG
+				// Received Roles: all roles with attached `id`
+				// --> Remove Container Session having this id
 
-				// TODO: --> Remove Container Session having this id
 				DataCenter.getInstance().removeContainerSession(this, id);
 
 			} else if (type.equalsIgnoreCase("NEW_ERROR_LIST")) {
-				// AUDIT post new Issue List
-				// Gửi cho REPAIR
+				// Received: AUDIT post new Issue List
+				// Received Roles: REPAIR
 				// Đối với ROLE == AUDIT, kèm `id` để remove
 
 				User user = com.cloudjay.cjay.util.Session.restore(this)
 						.getCurrentUser();
 
 				if (user.getRole() == User.ROLE_AUDITOR) {
-					// TODO: If role = AUDIT --> remove Container Session having
-					// this id
+
+					// If role is AUDIT -> remove Container Session having `id`
 					DataCenter.getInstance().removeContainerSession(this, id);
+
 				} else {
-					// TODO: Get more data from Server
+
+					// Get more data from Server
 					DataCenter.getInstance().updateListContainerSessions(this);
 				}
 
 			} else if (type.equalsIgnoreCase("UPDATE_ERROR_LIST")) {
-				// Có thông tin thay đổi từ `văn phòng` || tổ sửa chữa thêm lỗi
-				// mới
-				// Gửi cho REPAIR
 
-				// TODO: Get more data from Server
+				// Received: Có thông tin thay đổi từ `văn phòng` || tổ sửa chữa
+				// thêm lỗi mới
+				// Received Roles: REPAIR
+				// --> Get more data from Server
 				DataCenter.getInstance().updateListContainerSessions(this);
 
 			} else if (type.equalsIgnoreCase("CONTAINER_REPAIRED")) {
-				// Sau khi post báo cáo `Sau sửa chữa` từ REPAIR
-				// Gửi cho REPAIR kèm `id`
 
-				// TODO: Remove Container Session having this id
+				// Received: Sau khi post báo cáo `Sau sửa chữa` từ REPAIR
+				// Received Roles: REPAIR with attached `id`
+				// --> Remove Container Session having this `id`
 				DataCenter.getInstance().removeContainerSession(this, id);
 
 			} else if (type.equalsIgnoreCase("UPDATE_DAMAGE_CODE")) {
-
+				
 			} else if (type.equalsIgnoreCase("UPDATE_REPAIR_CODE")) {
 
 			} else if (type.equalsIgnoreCase("UPDATE_COMP_CODE")) {
@@ -147,6 +149,7 @@ public class GcmIntentService extends IntentService {
 			} else if (type.equalsIgnoreCase("UPDATE_OPERATOR_LIST")) {
 				// truyền modified_after cho server
 				// add or update to db
+				
 
 			}
 		} catch (Exception e) {

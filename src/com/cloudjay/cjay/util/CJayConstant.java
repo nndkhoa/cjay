@@ -20,19 +20,30 @@ public final class CJayConstant {
 
 	public static final String API_ADD_GCM_DEVICE = API_ROOT
 			+ "mobile/gcm-devices.json";
-	// public static final String API_GOOGLE_CLOUD_STORAGE_TOKEN = API_ROOT
-	// + "auth/get-google-cloud-storage-token/";
 
 	public static final String CURRENT_USER = API_ROOT + "cjay/current-user";
 	public static final String ALL_USERS = API_ROOT + "auth/jayusers";
+
 	public static final String LIST_OPERATORS = API_ROOT
 			+ "cjay/container-operators";
+	public static final String LIST_OPERATORS_WITH_DATETIME = API_ROOT
+			+ "cjay/container-operators.json?modified_after=%s";
+
 	public static final String LIST_DAMAGE_CODES = API_ROOT
 			+ "cjay/damage-codes";
+	public static final String LIST_DAMAGE_CODES_WITH_DATETIME = API_ROOT
+			+ "cjay/damage-codes.json?modified_after=%s";
+
 	public static final String LIST_REPAIR_CODES = API_ROOT
 			+ "cjay/repair-codes";
+	public static final String LIST_REPAIR_CODES_WITH_DATETIME = API_ROOT
+			+ "cjay/repair-codes.json?modified_after=%s";
+
 	public static final String LIST_COMPONENT_CODES = API_ROOT
 			+ "cjay/component-codes";
+	public static final String LIST_COMPONENT_CODES_WITH_DATETIME = API_ROOT
+			+ "cjay/component-codes.json?modified_after=%s";
+
 	public static final String CJAY_RESOURCE_STATUS = API_ROOT
 			+ "cjay/cjay-resource-status";
 

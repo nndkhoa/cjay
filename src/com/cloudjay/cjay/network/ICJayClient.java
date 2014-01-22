@@ -21,8 +21,6 @@ import com.cloudjay.cjay.util.NoConnectionException;
 
 public interface ICJayClient {
 
-	boolean hasNewMetadata(Context ctx);
-
 	String getUserToken(String username, String password, Context ctx)
 			throws JSONException, SocketTimeoutException, NoConnectionException;
 
@@ -41,9 +39,18 @@ public interface ICJayClient {
 
 	List<DamageCode> getDamageCodes(Context ctx) throws NoConnectionException;
 
+	List<DamageCode> getDamageCodes(Context ctx, String date)
+			throws NoConnectionException;
+
 	List<RepairCode> getRepairCodes(Context ctx) throws NoConnectionException;
 
+	List<RepairCode> getRepairCodes(Context ctx, String date)
+			throws NoConnectionException;
+
 	List<ComponentCode> getComponentCodes(Context ctx)
+			throws NoConnectionException;
+
+	List<ComponentCode> getComponentCodes(Context ctx, String date)
 			throws NoConnectionException;
 
 	List<CJayResourceStatus> getCJayResourceStatus(Context ctx)
@@ -67,6 +74,18 @@ public interface ICJayClient {
 			SQLException;
 
 	void updateListISOCode(Context ctx) throws NoConnectionException,
+			SQLException;
+
+	void updateListRepairCodes(Context ctx) throws NoConnectionException,
+			SQLException;
+
+	void updateListComponentCodes(Context ctx) throws NoConnectionException,
+			SQLException;
+
+	void updateListDamageCodes(Context ctx) throws NoConnectionException,
+			SQLException;
+
+	void updateListOperators(Context ctx) throws NoConnectionException,
 			SQLException;
 
 }

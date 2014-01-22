@@ -116,6 +116,18 @@ public class DataCenter {
 		return null;
 	}
 
+	public List<ComponentCode> getListComponents(Context context, String date) {
+		Logger.Log(LOG_TAG, "get list Components from: " + date);
+
+		try {
+			return CJayClient.getInstance().getComponentCodes(context, date);
+		} catch (NoConnectionException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
 	public List<DamageCode> getListDamageCodes(Context context) {
 		Logger.Log(LOG_TAG, "get list Damage Codes");
 
@@ -128,6 +140,18 @@ public class DataCenter {
 		return null;
 	}
 
+	public List<DamageCode> getListDamageCodes(Context context, String date) {
+		Logger.Log(LOG_TAG, "get list Damage Codes from: " + date);
+
+		try {
+			return CJayClient.getInstance().getDamageCodes(context, date);
+		} catch (NoConnectionException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
 	public List<RepairCode> getListRepairCodes(Context context) {
 		Logger.Log(LOG_TAG, "get list Repair Codes");
 
@@ -137,6 +161,18 @@ public class DataCenter {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return null;
+	}
+
+	public List<RepairCode> getListRepairCodes(Context context, String date) {
+		Logger.Log(LOG_TAG, "get list Repair Codes from: " + date);
+
+		try {
+			return CJayClient.getInstance().getRepairCodes(context, date);
+		} catch (NoConnectionException e) {
+			e.printStackTrace();
+		}
+
 		return null;
 	}
 

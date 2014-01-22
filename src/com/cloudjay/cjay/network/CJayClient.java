@@ -169,12 +169,15 @@ public class CJayClient implements ICJayClient {
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 
 		String response = "";
+
 		try {
 			response = requestWrapper.sendJSONPost(
 					CJayConstant.API_ADD_GCM_DEVICE, requestPacket, headers);
+
 		} catch (SocketTimeoutException e) {
 			e.printStackTrace();
 		}
+
 	}
 
 	@Override
@@ -206,6 +209,8 @@ public class CJayClient implements ICJayClient {
 	public List<Operator> getOperators(Context ctx)
 			throws NoConnectionException {
 
+		Logger.Log(LOG_TAG, "getOperators");
+
 		if (Utils.hasNoConnection(ctx)) {
 			Logger.Log(LOG_TAG, "No connection");
 			throw new NoConnectionException();
@@ -227,6 +232,8 @@ public class CJayClient implements ICJayClient {
 	public List<DamageCode> getDamageCodes(Context ctx)
 			throws NoConnectionException {
 
+		Logger.Log(LOG_TAG, "getDamageCodes");
+
 		if (Utils.hasNoConnection(ctx)) {
 			throw new NoConnectionException();
 		}
@@ -243,9 +250,32 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
+	public List<DamageCode> getDamageCodes(Context ctx, String date)
+			throws NoConnectionException {
+
+		Logger.Log(LOG_TAG, "getDamageCodes from " + date);
+		if (Utils.hasNoConnection(ctx)) {
+			throw new NoConnectionException();
+		}
+
+		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
+		String response = requestWrapper.sendGet(String.format(
+				CJayConstant.LIST_DAMAGE_CODES_WITH_DATETIME, date), headers);
+
+		Gson gson = new Gson();
+		Type listType = new TypeToken<List<DamageCode>>() {
+		}.getType();
+
+		List<DamageCode> items = gson.fromJson(response, listType);
+		return items;
+
+	}
+
+	@Override
 	public List<RepairCode> getRepairCodes(Context ctx)
 			throws NoConnectionException {
 
+		Logger.Log(LOG_TAG, "getRepairCodes");
 		if (Utils.hasNoConnection(ctx)) {
 			throw new NoConnectionException();
 		}
@@ -262,8 +292,31 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
+	public List<RepairCode> getRepairCodes(Context ctx, String date)
+			throws NoConnectionException {
+
+		Logger.Log(LOG_TAG, "getRepairCodes from " + date);
+		if (Utils.hasNoConnection(ctx)) {
+			throw new NoConnectionException();
+		}
+
+		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
+		String response = requestWrapper.sendGet(String.format(
+				CJayConstant.LIST_REPAIR_CODES_WITH_DATETIME, date), headers);
+
+		Gson gson = new Gson();
+		Type listType = new TypeToken<List<RepairCode>>() {
+		}.getType();
+
+		List<RepairCode> items = gson.fromJson(response, listType);
+		return items;
+	}
+
+	@Override
 	public List<ComponentCode> getComponentCodes(Context ctx)
 			throws NoConnectionException {
+
+		Logger.Log(LOG_TAG, "getComponentCodes");
 
 		if (Utils.hasNoConnection(ctx)) {
 			throw new NoConnectionException();
@@ -272,6 +325,29 @@ public class CJayClient implements ICJayClient {
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 		String response = requestWrapper.sendGet(
 				CJayConstant.LIST_COMPONENT_CODES, headers);
+		Gson gson = new Gson();
+		Type listType = new TypeToken<List<ComponentCode>>() {
+		}.getType();
+
+		List<ComponentCode> items = gson.fromJson(response, listType);
+		return items;
+	}
+
+	@Override
+	public List<ComponentCode> getComponentCodes(Context ctx, String date)
+			throws NoConnectionException {
+
+		Logger.Log(LOG_TAG, "getComponentCodes from " + date);
+		if (Utils.hasNoConnection(ctx)) {
+			throw new NoConnectionException();
+		}
+
+		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
+		String response = requestWrapper
+				.sendGet(String.format(
+						CJayConstant.LIST_COMPONENT_CODES_WITH_DATETIME, date),
+						headers);
+
 		Gson gson = new Gson();
 		Type listType = new TypeToken<List<ComponentCode>>() {
 		}.getType();
@@ -427,13 +503,27 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public List<Operator> getOperators(Context ctx, String date) {
-		return null;
-	}
+	public List<Operator> getOperators(Context ctx, String date)
+			throws NoConnectionException {
 
-	@Override
-	public boolean hasNewMetadata(Context ctx) {
-		return false;
+		Logger.Log(LOG_TAG, "getOperators from " + date);
+
+		if (Utils.hasNoConnection(ctx)) {
+			Logger.Log(LOG_TAG, "No connection");
+			throw new NoConnectionException();
+		}
+
+		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
+		String response = requestWrapper.sendGet(
+				String.format(CJayConstant.LIST_OPERATORS_WITH_DATETIME, date),
+				headers);
+
+		Gson gson = new Gson();
+		Type listType = new TypeToken<List<Operator>>() {
+		}.getType();
+
+		List<Operator> items = gson.fromJson(response, listType);
+		return items;
 	}
 
 	@Override
@@ -559,11 +649,30 @@ public class CJayClient implements ICJayClient {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	@Override
 	public void updateListISOCode(Context ctx) throws NoConnectionException,
+			SQLException {
+
+		try {
+
+			updateListOperators(ctx);
+			updateListDamageCodes(ctx);
+			updateListRepairCodes(ctx);
+			updateListComponentCodes(ctx);
+
+		} catch (NoConnectionException e) {
+			throw e;
+		} catch (SQLException e) {
+			throw e;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void updateListOperators(Context ctx) throws NoConnectionException,
 			SQLException {
 
 		try {
@@ -574,66 +683,251 @@ public class CJayClient implements ICJayClient {
 					CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
 			String nowString = dateFormat.format(now);
 
-			// 1. chưa có ISO code data
-			Logger.Log(LOG_TAG, "no iso code");
 			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx)
 					.getOperatorDaoImpl();
-			DamageCodeDaoImpl damageCodeDaoImpl = databaseManager
-					.getHelper(ctx).getDamageCodeDaoImpl();
-			RepairCodeDaoImpl repairCodeDaoImpl = databaseManager
-					.getHelper(ctx).getRepairCodeDaoImpl();
-			ComponentCodeDaoImpl componentCodeDaoImpl = databaseManager
-					.getHelper(ctx).getComponentCodeDaoImpl();
 
+			// get list operator
+			List<Operator> operators = null;
 			if (operatorDaoImpl.isEmpty()) {
-				Logger.Log(LOG_TAG, "get list operators");
+				Logger.Log(LOG_TAG, "no Operator");
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE,
 						nowString);
 
-				List<Operator> operators = getOperators(ctx);
-				if (null != operators)
-					operatorDaoImpl.addListOperators(operators);
-			}
+				operators = getOperators(ctx);
 
+			} else {
+
+				String date = PreferencesUtil.getPrefsValue(ctx,
+						PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE);
+
+				Logger.Log(LOG_TAG,
+						"get updated list operator from last time: " + date);
+
+				operators = getOperators(ctx, date);
+
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE,
+						nowString);
+
+				if (operators == null) {
+					Logger.Log(LOG_TAG, "-----> NO new operators");
+				} else {
+					Logger.Log(LOG_TAG,
+							"Has " + Integer.toString(operators.size())
+									+ " new operators");
+				}
+
+				Logger.Log(
+						LOG_TAG,
+						"----> Last update from "
+								+ PreferencesUtil
+										.getPrefsValue(
+												ctx,
+												PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE));
+			}
+			if (null != operators)
+				operatorDaoImpl.addListOperators(operators);
+
+		} catch (NoConnectionException e) {
+			throw e;
+		} catch (SQLException e) {
+			throw e;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void updateListDamageCodes(Context ctx)
+			throws NoConnectionException, SQLException {
+
+		try {
+			Date now = new Date();
+
+			// 2013-11-10T21:05:24 (do not have timezone info)
+			SimpleDateFormat dateFormat = new SimpleDateFormat(
+					CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
+			String nowString = dateFormat.format(now);
+
+			DamageCodeDaoImpl damageCodeDaoImpl = databaseManager
+					.getHelper(ctx).getDamageCodeDaoImpl();
+
+			// Get list damage
+			List<DamageCode> damageCodes = null;
 			if (damageCodeDaoImpl.isEmpty()) {
-				Logger.Log(LOG_TAG, "get list damage codes");
+				Logger.Log(LOG_TAG, "no Damage Code");
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE,
 						nowString);
-				List<DamageCode> damageCodes = getDamageCodes(ctx);
-				if (null != damageCodes)
-					damageCodeDaoImpl.addListDamageCodes(damageCodes);
-			}
+				damageCodes = getDamageCodes(ctx);
 
-			if (repairCodeDaoImpl.isEmpty()) {
-				Logger.Log(LOG_TAG, "get list repair codes");
+			} else {
+				String date = PreferencesUtil.getPrefsValue(ctx,
+						PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE);
+
+				Logger.Log(LOG_TAG,
+						"get updated list damage codes from last time: " + date);
+
+				damageCodes = getDamageCodes(ctx, date);
+
 				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE,
+						PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE,
 						nowString);
 
-				List<RepairCode> repairCodes = getRepairCodes(ctx);
-				if (null != repairCodes)
-					repairCodeDaoImpl.addListRepairCodes(repairCodes);
+				if (damageCodes == null) {
+					Logger.Log(LOG_TAG, "-----> NO new damage codes");
+				} else {
+					Logger.Log(LOG_TAG,
+							"Has " + Integer.toString(damageCodes.size())
+									+ " new damage codes");
+				}
+
+				Logger.Log(
+						LOG_TAG,
+						"----> Last update from "
+								+ PreferencesUtil
+										.getPrefsValue(
+												ctx,
+												PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE));
 			}
 
+			if (null != damageCodes)
+				damageCodeDaoImpl.addListDamageCodes(damageCodes);
+
+		} catch (NoConnectionException e) {
+			throw e;
+		} catch (SQLException e) {
+			throw e;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void updateListComponentCodes(Context ctx)
+			throws NoConnectionException, SQLException {
+		try {
+			Date now = new Date();
+
+			// 2013-11-10T21:05:24 (do not have timezone info)
+			SimpleDateFormat dateFormat = new SimpleDateFormat(
+					CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
+			String nowString = dateFormat.format(now);
+
+			ComponentCodeDaoImpl componentCodeDaoImpl = databaseManager
+					.getHelper(ctx).getComponentCodeDaoImpl();
+
+			// Get list Component
+			List<ComponentCode> componentCodes = null;
 			if (componentCodeDaoImpl.isEmpty()) {
-				Logger.Log(LOG_TAG, "get list of component codes");
+				Logger.Log(LOG_TAG, "no Component Code");
 
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE,
 						nowString);
 
-				List<ComponentCode> componentCodes = getComponentCodes(ctx);
-				if (null != componentCodes)
-					componentCodeDaoImpl.addListComponentCodes(componentCodes);
+				componentCodes = getComponentCodes(ctx);
 
+			} else {
+
+				String date = PreferencesUtil.getPrefsValue(ctx,
+						PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE);
+
+				Logger.Log(LOG_TAG,
+						"get updated list component codes from last time: "
+								+ date);
+
+				componentCodes = getComponentCodes(ctx);
+
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE,
+						nowString);
+
+				if (componentCodes == null) {
+					Logger.Log(LOG_TAG, "-----> NO new component codes");
+				} else {
+					Logger.Log(LOG_TAG,
+							"Has " + Integer.toString(componentCodes.size())
+									+ " new component codes");
+				}
+
+				Logger.Log(
+						LOG_TAG,
+						"----> Last update from "
+								+ PreferencesUtil
+										.getPrefsValue(
+												ctx,
+												PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE));
 			}
 
-			// 2. fetch ISO CODE
-			if (hasNewMetadata(ctx)) {
-				Logger.Log(LOG_TAG, "fetch iso code");
+			if (null != componentCodes)
+				componentCodeDaoImpl.addListComponentCodes(componentCodes);
+
+		} catch (NoConnectionException e) {
+			throw e;
+		} catch (SQLException e) {
+			throw e;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void updateListRepairCodes(Context ctx)
+			throws NoConnectionException, SQLException {
+		try {
+			Date now = new Date();
+
+			// 2013-11-10T21:05:24 (do not have timezone info)
+			SimpleDateFormat dateFormat = new SimpleDateFormat(
+					CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
+			String nowString = dateFormat.format(now);
+
+			RepairCodeDaoImpl repairCodeDaoImpl = databaseManager
+					.getHelper(ctx).getRepairCodeDaoImpl();
+
+			// Get list Repair
+			List<RepairCode> repairCodes = null;
+			if (repairCodeDaoImpl.isEmpty()) {
+				Logger.Log(LOG_TAG, "no Repair Code");
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE,
+						nowString);
+
+				repairCodes = getRepairCodes(ctx);
+
+			} else {
+				String date = PreferencesUtil.getPrefsValue(ctx,
+						PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE);
+
+				Logger.Log(LOG_TAG,
+						"get updated list repair codes from last time: " + date);
+
+				repairCodes = getRepairCodes(ctx);
+
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE,
+						nowString);
+
+				if (repairCodes == null) {
+					Logger.Log(LOG_TAG, "-----> NO new repair codes");
+				} else {
+					Logger.Log(LOG_TAG,
+							"Has " + Integer.toString(repairCodes.size())
+									+ " new repair codes");
+				}
+
+				Logger.Log(
+						LOG_TAG,
+						"----> Last update from "
+								+ PreferencesUtil
+										.getPrefsValue(
+												ctx,
+												PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE));
 			}
+			if (null != repairCodes)
+				repairCodeDaoImpl.addListRepairCodes(repairCodes);
 
 		} catch (NoConnectionException e) {
 			throw e;
