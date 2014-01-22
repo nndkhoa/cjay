@@ -13,8 +13,13 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
+import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
@@ -22,6 +27,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -38,6 +44,7 @@ import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.view.AddContainerDialog;
@@ -47,7 +54,8 @@ import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_auditor_reporting)
 @OptionsMenu(R.menu.menu_auditor_reporting)
-public class AuditorReportingListFragment extends SherlockFragment {
+public class AuditorReportingListFragment extends SherlockFragment implements
+		OnRefreshListener {
 
 	public static final String LOG_TAG = "AuditorReportingListFragment";
 
@@ -56,19 +64,66 @@ public class AuditorReportingListFragment extends SherlockFragment {
 
 	private ArrayList<Operator> mOperators;
 	private ArrayList<ContainerSession> mFeeds;
-
 	private int mState = STATE_NOT_REPORTED;
-
 	private ContainerSession mSelectedContainerSession;
+	PullToRefreshLayout mPullToRefreshLayout;
 
 	@ViewById(R.id.container_list)
 	AuditorContainerListView mFeedListView;
+
 	@ViewById(R.id.search_edittext)
 	EditText mSearchEditText;
+
 	@ViewById(R.id.add_button)
 	Button mAddButton;
+
 	@ViewById(R.id.notfound_textview)
 	TextView mNotfoundTextView;
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+
+		ViewGroup viewGroup = (ViewGroup) view;
+		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
+		ActionBarPullToRefresh
+				.from(getActivity())
+				.insertLayoutInto(viewGroup)
+				.theseChildrenArePullable(R.id.container_list,
+						android.R.id.empty).listener(this)
+				.setup(mPullToRefreshLayout);
+	}
+
+	@Override
+	public void onRefreshStarted(View view) {
+		/**
+		 * Simulate Refresh with 4 seconds sleep
+		 */
+		new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... params) {
+
+				Logger.Log(LOG_TAG, "onRefreshStarted");
+
+				try {
+
+					Thread.sleep(CJayConstant.SIMULATED_REFRESH_LENGTH);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void result) {
+				super.onPostExecute(result);
+
+				// Notify PullToRefreshLayout that the refresh has finished
+				mPullToRefreshLayout.setRefreshComplete();
+			}
+		}.execute();
+	}
 
 	@AfterViews
 	void afterViews() {

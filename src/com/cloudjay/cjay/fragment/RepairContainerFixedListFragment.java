@@ -11,9 +11,16 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
+import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
 
@@ -30,6 +37,7 @@ import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
@@ -39,18 +47,64 @@ import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_repair_container_fixed)
 @OptionsMenu(R.menu.menu_repair_container_fixed)
-public class RepairContainerFixedListFragment extends SherlockFragment {
+public class RepairContainerFixedListFragment extends SherlockFragment
+		implements OnRefreshListener {
 
 	private final static String LOG_TAG = "RepairContainerFixedListFragment";
 
 	private ArrayList<ContainerSession> mFeeds;
 	private FunDapter<ContainerSession> mFeedsAdapter;
 	private ContainerSession mSelectedContainerSession;
+	private ImageLoader imageLoader;
+	PullToRefreshLayout mPullToRefreshLayout;
 
 	@ViewById(R.id.container_list)
 	ListView mFeedListView;
 
-	private ImageLoader imageLoader;
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+
+		ViewGroup viewGroup = (ViewGroup) view;
+		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
+		ActionBarPullToRefresh
+				.from(getActivity())
+				.insertLayoutInto(viewGroup)
+				.theseChildrenArePullable(R.id.container_list,
+						android.R.id.empty).listener(this)
+				.setup(mPullToRefreshLayout);
+	}
+
+	@Override
+	public void onRefreshStarted(View view) {
+		/**
+		 * Simulate Refresh with 4 seconds sleep
+		 */
+		new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... params) {
+
+				Logger.Log(LOG_TAG, "onRefreshStarted");
+
+				try {
+
+					Thread.sleep(CJayConstant.SIMULATED_REFRESH_LENGTH);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void result) {
+				super.onPostExecute(result);
+
+				// Notify PullToRefreshLayout that the refresh has finished
+				mPullToRefreshLayout.setRefreshComplete();
+			}
+		}.execute();
+	}
 
 	@AfterViews
 	void afterViews() {
