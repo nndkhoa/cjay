@@ -141,15 +141,16 @@ public class GcmIntentService extends IntentService {
 				DataCenter.getInstance().removeContainerSession(this, id);
 
 			} else if (type.equalsIgnoreCase("UPDATE_DAMAGE_CODE")) {
-				
+				DataCenter.getInstance().updateListDamageCodes(this);
+
 			} else if (type.equalsIgnoreCase("UPDATE_REPAIR_CODE")) {
+				DataCenter.getInstance().updateListRepairCodes(this);
 
 			} else if (type.equalsIgnoreCase("UPDATE_COMP_CODE")) {
+				DataCenter.getInstance().updateListComponentCodes(this);
 
 			} else if (type.equalsIgnoreCase("UPDATE_OPERATOR_LIST")) {
-				// truyền modified_after cho server
-				// add or update to db
-				
+				DataCenter.getInstance().updateListOperators(this);
 
 			}
 		} catch (Exception e) {
