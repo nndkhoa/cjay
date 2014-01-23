@@ -24,17 +24,18 @@ public class SplashScreenActivity extends CJayActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splash_screen);
 
-		if (android.os.Build.VERSION.SDK_INT > 9) {
-			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-					.permitAll().build();
-			StrictMode.setThreadPolicy(policy);
-		}
+		// if (android.os.Build.VERSION.SDK_INT > 9) {
+		// StrictMode.ThreadPolicy policy = new
+		// StrictMode.ThreadPolicy.Builder()
+		// .permitAll().build();
+		// StrictMode.setThreadPolicy(policy);
+		// }
 
 		backgroundImageView = (ImageView) findViewById(R.id.splash_screen_background);
 
-		Calendar cal = Calendar.getInstance();
-		int hour = cal.get(Calendar.HOUR_OF_DAY);
-		Boolean isNight = hour < 6 || hour > 18;
+		// Calendar cal = Calendar.getInstance();
+		// int hour = cal.get(Calendar.HOUR_OF_DAY);
+		// Boolean isNight = hour < 6 || hour > 18;
 
 		// try {
 		// if (isNight) {
@@ -67,6 +68,7 @@ public class SplashScreenActivity extends CJayActivity {
 
 					// user signed in
 					Logger.Log(LOG_TAG, "User signed in");
+
 					session.extendAccessTokenIfNeeded(getApplicationContext());
 					CJayApplication
 							.startCJayHomeActivity(SplashScreenActivity.this);

@@ -449,6 +449,7 @@ public class DataCenter {
 	public void updateListOperators(Context ctx) throws NoConnectionException,
 			SQLException {
 
+		Logger.Log(LOG_TAG, "updateListOperators()");
 		try {
 			Date now = new Date();
 
@@ -515,6 +516,7 @@ public class DataCenter {
 	public void updateListDamageCodes(Context ctx)
 			throws NoConnectionException, SQLException {
 
+		Logger.Log(LOG_TAG, "updateListDamageCodes()");
 		try {
 			Date now = new Date();
 
@@ -580,6 +582,9 @@ public class DataCenter {
 
 	public void updateListComponentCodes(Context ctx)
 			throws NoConnectionException, SQLException {
+
+		Logger.Log(LOG_TAG, "updateListComponentCodes()");
+
 		try {
 			Date now = new Date();
 
@@ -650,6 +655,8 @@ public class DataCenter {
 
 	public void updateListRepairCodes(Context ctx)
 			throws NoConnectionException, SQLException {
+
+		Logger.Log(LOG_TAG, "updateListComponentCodes()");
 		try {
 			Date now = new Date();
 
@@ -672,6 +679,7 @@ public class DataCenter {
 				repairCodes = CJayClient.getInstance().getRepairCodes(ctx);
 
 			} else {
+
 				String date = PreferencesUtil.getPrefsValue(ctx,
 						PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE);
 
@@ -715,6 +723,7 @@ public class DataCenter {
 	public void updateListISOCode(Context ctx) throws NoConnectionException,
 			SQLException {
 
+		Logger.Log(LOG_TAG, "updateListISOCode()");
 		try {
 
 			updateListOperators(ctx);
@@ -759,6 +768,7 @@ public class DataCenter {
 		try {
 
 			Logger.Log(LOG_TAG, "fetching data ...");
+
 			updateListISOCode(ctx);
 			updateListContainerSessions(ctx);
 
