@@ -67,25 +67,4 @@ public interface ICJayClient {
 
 	String postContainerSession(Context ctx, TmpContainerSession item)
 			throws NoConnectionException;
-
-	void fetchData(Context ctx) throws NoConnectionException;
-
-	void updateListContainerSessions(Context ctx) throws NoConnectionException,
-			SQLException;
-
-	void updateListISOCode(Context ctx) throws NoConnectionException,
-			SQLException;
-
-	void updateListRepairCodes(Context ctx) throws NoConnectionException,
-			SQLException;
-
-	void updateListComponentCodes(Context ctx) throws NoConnectionException,
-			SQLException;
-
-	void updateListDamageCodes(Context ctx) throws NoConnectionException,
-			SQLException;
-
-	void updateListOperators(Context ctx) throws NoConnectionException,
-			SQLException;
-
 }

@@ -121,7 +121,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	@Background
 	void reloadData() {
 		try {
-			DataCenter.reload(getApplicationContext());
+			DataCenter.getInstance().fetchData(getApplicationContext());
 		} catch (NoConnectionException e) {
 			showCrouton(R.string.alert_no_network);
 		}
@@ -241,17 +241,5 @@ public class CJayActivity extends SherlockFragmentActivity implements
 		});
 
 		crouton.show();
-	}
-
-	@UiThread
-	protected void showUploadingDisabledCrouton() {
-		Crouton.cancelAllCroutons();
-		Crouton.showText(this, R.string.stopped_uploads, Style.ALERT);
-	}
-
-	@UiThread
-	protected void showUploadingEnabledCrouton() {
-		Crouton.cancelAllCroutons();
-		Crouton.showText(this, R.string.started_uploads, Style.CONFIRM);
 	}
 }
