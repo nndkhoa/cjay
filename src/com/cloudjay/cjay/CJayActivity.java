@@ -210,7 +210,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	}
 
 	@UiThread
-	protected void showCrouton(int textResId) {
+	public void showCrouton(int textResId) {
 		final Crouton crouton = Crouton.makeText(this, textResId, Style.ALERT)
 				.setConfiguration(
 						new Configuration.Builder().setDuration(

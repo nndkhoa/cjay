@@ -43,6 +43,7 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -94,9 +95,10 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 				Logger.Log(LOG_TAG, "onRefreshStarted");
 
 				try {
-
-					Thread.sleep(CJayConstant.SIMULATED_REFRESH_LENGTH);
-				} catch (InterruptedException e) {
+					DataCenter.getInstance().fetchData(getActivity());
+				} catch (NoConnectionException e) {
+					((CJayActivity) getActivity())
+							.showCrouton(R.string.alert_no_network);
 					e.printStackTrace();
 				}
 				return null;

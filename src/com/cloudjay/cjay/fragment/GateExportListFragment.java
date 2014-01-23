@@ -41,6 +41,7 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
+import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
@@ -52,6 +53,7 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
@@ -430,9 +432,10 @@ public class GateExportListFragment extends SherlockFragment implements
 				Logger.Log(LOG_TAG, "onRefreshStarted");
 
 				try {
-
-					Thread.sleep(CJayConstant.SIMULATED_REFRESH_LENGTH);
-				} catch (InterruptedException e) {
+					DataCenter.getInstance().fetchData(getActivity());
+				} catch (NoConnectionException e) {
+					((CJayActivity) getActivity())
+							.showCrouton(R.string.alert_no_network);
 					e.printStackTrace();
 				}
 				return null;
