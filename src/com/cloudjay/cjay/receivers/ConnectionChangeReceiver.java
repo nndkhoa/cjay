@@ -28,7 +28,8 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
 				Utils.startAlarm(context);
 			}
 
-			Toast.makeText(context, "Connected", Toast.LENGTH_SHORT).show();
+			Toast.makeText(context, "Connected to Internet", Toast.LENGTH_SHORT)
+					.show();
 
 		} else {
 			Logger.Log(LOG_TAG, "Not connect to Internet");
@@ -41,7 +42,7 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
 				Logger.Log(LOG_TAG, "Alarm Manager is running.");
 				Utils.cancelAlarm(context);
 			}
-			
+
 			Toast.makeText(context, "Not connect to Internet",
 					Toast.LENGTH_SHORT).show();
 		}
