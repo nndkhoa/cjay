@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -31,6 +32,8 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
+
+import android.util.Log;
 
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
@@ -86,7 +89,15 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 	public String sendJSONPost(String url, JSONObject data,
 			Map<String, String> headers) throws SocketTimeoutException,
 			NoConnectionException {
-		return sendPost(url, data.toString(), "application/json", headers);
+
+		String ret = "";
+		try {
+			ret = sendPost(url, data.toString(), "application/json", headers);
+		} catch (Exception e) {
+
+		}
+
+		return ret;
 	}
 
 	public String sendPost(String url, String data, String contentType,
@@ -130,8 +141,17 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 
 		try {
 			response = httpClient.execute(httpPost, localContext);
-			ret = EntityUtils.toString(response.getEntity());
-			Logger.Log(LOG_TAG, "Return from server: " + ret);
+
+			if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK
+					|| response.getStatusLine().getStatusCode() == HttpStatus.SC_ACCEPTED) {
+
+				ret = EntityUtils.toString(response.getEntity());
+				Logger.Log(LOG_TAG, "Return from server: " + ret);
+
+			} else {
+				Log.i("FOO", "Screw up with http - "
+						+ response.getStatusLine().getStatusCode());
+			}
 
 		} catch (SocketTimeoutException se) {
 			throw new SocketTimeoutException();

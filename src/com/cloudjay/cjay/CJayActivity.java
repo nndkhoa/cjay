@@ -112,15 +112,11 @@ public class CJayActivity extends SherlockFragmentActivity implements
 					protected Void doInBackground(Void... params) {
 
 						try {
-							DataCenter.getInstance()
-									.updateListContainerSessions(
-											getApplicationContext());
-
+							DataCenter.getInstance().fetchData(
+									getApplicationContext());
 						} catch (NoConnectionException e) {
 							e.printStackTrace();
 							showCrouton(R.string.alert_no_network);
-						} catch (SQLException e) {
-							e.printStackTrace();
 						}
 						return null;
 					}
@@ -136,12 +132,14 @@ public class CJayActivity extends SherlockFragmentActivity implements
 					protected Void doInBackground(Void... params) {
 
 						try {
-							DataCenter.getInstance().fetchData(
-									getApplicationContext());
-
+							DataCenter.getInstance()
+									.updateListContainerSessions(
+											getApplicationContext());
 						} catch (NoConnectionException e) {
 							e.printStackTrace();
 							showCrouton(R.string.alert_no_network);
+						} catch (SQLException e) {
+							e.printStackTrace();
 						}
 						return null;
 					}
