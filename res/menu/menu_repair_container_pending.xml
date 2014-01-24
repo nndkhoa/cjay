@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/menu_check"
-        android:icon="@drawable/icon_menu_check"
+        android:icon="@drawable/ic_btn_selection_checked"
         android:showAsAction="always"
         android:title="@string/menu_issue_report_check_title"/>
 	<item

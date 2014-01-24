@@ -765,19 +765,43 @@ public class DataCenter {
 	 * @throws NoConnectionException
 	 */
 	public void fetchData(Context ctx) throws NoConnectionException {
-		try {
 
-			Logger.Log(LOG_TAG, "fetching data ...");
+		if (isFetchingData(ctx)) {
+			Logger.Log(LOG_TAG, "fetchData() is already running");
+			return;
 
-			updateListISOCode(ctx);
-			updateListContainerSessions(ctx);
+		} else {
+			try {
+				// Mark that Application
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.PREF_IS_FETCHING_DATA, true);
 
-		} catch (NoConnectionException e) {
-			throw e;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
+				Logger.Log(LOG_TAG, "fetching data ...");
+
+				updateListISOCode(ctx);
+				updateListContainerSessions(ctx);
+
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.PREF_IS_FETCHING_DATA, false);
+
+			} catch (NoConnectionException e) {
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.PREF_IS_FETCHING_DATA, false);
+				throw e;
+			} catch (SQLException e) {
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.PREF_IS_FETCHING_DATA, false);
+				e.printStackTrace();
+			} catch (Exception e) {
+				PreferencesUtil.storePrefsValue(ctx,
+						PreferencesUtil.PREF_IS_FETCHING_DATA, false);
+				e.printStackTrace();
+			}
 		}
+	}
+
+	public boolean isFetchingData(Context context) {
+		return context.getSharedPreferences(PreferencesUtil.PREFS, 0)
+				.getBoolean(PreferencesUtil.PREF_IS_FETCHING_DATA, false) == true;
 	}
 }

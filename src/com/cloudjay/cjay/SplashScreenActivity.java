@@ -21,15 +21,10 @@ public class SplashScreenActivity extends CJayActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		Logger.Log(LOG_TAG, "onCreate SplashScreenActivity");
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splash_screen);
-
-		// if (android.os.Build.VERSION.SDK_INT > 9) {
-		// StrictMode.ThreadPolicy policy = new
-		// StrictMode.ThreadPolicy.Builder()
-		// .permitAll().build();
-		// StrictMode.setThreadPolicy(policy);
-		// }
 
 		backgroundImageView = (ImageView) findViewById(R.id.splash_screen_background);
 
@@ -68,7 +63,6 @@ public class SplashScreenActivity extends CJayActivity {
 
 					// user signed in
 					Logger.Log(LOG_TAG, "User signed in");
-
 					session.extendAccessTokenIfNeeded(getApplicationContext());
 					CJayApplication
 							.startCJayHomeActivity(SplashScreenActivity.this);

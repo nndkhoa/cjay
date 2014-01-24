@@ -10,6 +10,7 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONException;
 
+import android.R.integer;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
@@ -170,6 +171,11 @@ public class LoginActivity extends CJayActivity {
 		}
 	}
 
+	@UiThread
+	void changeProgressText(int stringRes) {
+		mLoginStatusMessageView.setText(stringRes);
+	}
+
 	/**
 	 * Shows the progress UI and hides the login form.
 	 */
@@ -230,8 +236,13 @@ public class LoginActivity extends CJayActivity {
 					return false;
 				} else {
 					// Time to get data from Server and save to database
+					changeProgressText(R.string.login_progress_signing_in);
+
 					DataCenter.getInstance().saveCredential(LoginActivity.this,
 							userToken);
+
+					changeProgressText(R.string.login_progress_loading_data);
+
 					DataCenter.getInstance().fetchData(LoginActivity.this);
 					return true;
 				}

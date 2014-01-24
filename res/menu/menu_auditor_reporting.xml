@@ -11,6 +11,7 @@
         android:icon="@drawable/ic_action_upload"
         android:showAsAction="always"
         android:title="@string/menu_upload_title"/>
+    
     <item
         android:id="@+id/menu_logout"
         android:showAsAction="never"

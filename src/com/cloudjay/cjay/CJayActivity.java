@@ -101,7 +101,25 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 		if (null != session) {
 
-			reloadData();
+			// reloadData();
+			new AsyncTask<Void, Integer, Void>() {
+
+				@Override
+				protected Void doInBackground(Void... params) {
+
+					try {
+						DataCenter.getInstance().fetchData(
+								getApplicationContext());
+
+					} catch (NoConnectionException e) {
+						e.printStackTrace();
+						showCrouton(R.string.alert_no_network);
+					}
+					return null;
+				}
+
+			}.execute();
+
 			context = getApplicationContext();
 
 			// Check device for Play Services APK.
@@ -116,15 +134,6 @@ public class CJayActivity extends SherlockFragmentActivity implements
 		}
 
 		super.onResume();
-	}
-
-	@Background
-	void reloadData() {
-		try {
-			DataCenter.getInstance().fetchData(getApplicationContext());
-		} catch (NoConnectionException e) {
-			showCrouton(R.string.alert_no_network);
-		}
 	}
 
 	private void sendRegistrationIdToBackend() {
@@ -188,6 +197,8 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	}
 
 	private boolean checkPlayServices() {
+		Logger.Log(LOG_TAG, "checkPlayServices()");
+
 		int resultCode = GooglePlayServicesUtil
 				.isGooglePlayServicesAvailable(this);
 		if (resultCode != ConnectionResult.SUCCESS) {
@@ -211,6 +222,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 	@UiThread
 	public void showCrouton(int textResId) {
+		Crouton.cancelAllCroutons();
 		final Crouton crouton = Crouton.makeText(this, textResId, Style.ALERT)
 				.setConfiguration(
 						new Configuration.Builder().setDuration(
@@ -228,6 +240,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 	@UiThread
 	protected void showCrouton(String message) {
+		Crouton.cancelAllCroutons();
 		final Crouton crouton = Crouton.makeText(this, message, Style.ALERT)
 				.setConfiguration(
 						new Configuration.Builder().setDuration(

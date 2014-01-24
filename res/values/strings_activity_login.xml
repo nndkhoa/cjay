@@ -7,6 +7,7 @@
     <string name="action_sign_in_short">Đăng nhập</string>
     <string name="action_forgot_password">Recover lost password</string>
     <string name="login_progress_signing_in">Đang đăng nhập&#8230;</string>
+    <string name="login_progress_loading_data">Đang tải dữ liệu</string>
     <string name="error_invalid_email">Email không hợp lệ</string>
     <string name="error_invalid_password">Mật khẩu quá ngắn</string>
     <string name="error_incorrect_password">Sai mật khẩu</string>

@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/menu_clear_uploaded"
-        android:icon="@drawable/ic_menu_clear_upload"
+        android:icon="@drawable/ic_notify_clear_normal"
         android:showAsAction="always"
         android:title="@string/menu_clear_uploaded_title"/>
     <item
