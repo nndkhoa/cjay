@@ -244,7 +244,7 @@ public class ContainerSessionDaoImpl extends
 	public List<ContainerSession> getListUploadContainerSessions()
 			throws SQLException {
 
-		Logger.Log(LOG_TAG, "getListUploadContainerSessions()");
+		Logger.Log(LOG_TAG, "***\nget List UPLOAD Container Sessions\n***");
 
 		List<ContainerSession> containerSessions = this.query(this
 				.queryBuilder().where()
@@ -267,8 +267,8 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public List<ContainerSession> getLocalContainerSessions()
 			throws SQLException {
-		Logger.Log(LOG_TAG, "getLocalContainerSessions()");
 
+		Logger.Log(LOG_TAG, "***\nget list LOCAL Container sessions\n***");
 		List<ContainerSession> containerSessions = this.query(this
 				.queryBuilder()
 				.where()
@@ -293,7 +293,7 @@ public class ContainerSessionDaoImpl extends
 	public List<ContainerSession> getListCheckOutContainerSessions()
 			throws SQLException {
 
-		Logger.Log(LOG_TAG, "getListCheckOutContainerSessions()");
+		Logger.Log(LOG_TAG, "***\nget List CHECKOUT Container Sessions\n***");
 
 		List<ContainerSession> containerSessions = this.query(this
 				.queryBuilder().where()
@@ -343,7 +343,7 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public List<ContainerSession> getListNotReportedContainerSessions()
 			throws SQLException {
-		Logger.Log(LOG_TAG, "getListNotReportedContainerSessions()");
+		Logger.Log(LOG_TAG, "***\nget List NOT REPORTED Container Sessions\n***");
 
 		List<ContainerSession> containerSessions = getNotUploadedContainerSessions();
 		List<ContainerSession> reportingContainerSessions = new ArrayList<ContainerSession>();
@@ -370,7 +370,7 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public List<ContainerSession> getListReportingContainerSessions()
 			throws SQLException {
-		Logger.Log(LOG_TAG, "getListReportingContainerSessions()");
+		Logger.Log(LOG_TAG, "***\nget List REPORTING Container Sessions\n***");
 
 		List<ContainerSession> containerSessions = getNotUploadedContainerSessions();
 		List<ContainerSession> reportingContainerSessions = new ArrayList<ContainerSession>();
@@ -397,7 +397,7 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public List<ContainerSession> getListPendingContainerSessions()
 			throws SQLException {
-		Logger.Log(LOG_TAG, "getListPendingContainerSessions()");
+		Logger.Log(LOG_TAG, "***\nget List PENDING Container Sessions\n***");
 
 		List<ContainerSession> containerSessions = this.query(this
 				.queryBuilder()
@@ -415,7 +415,7 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public List<ContainerSession> getListFixedContainerSessions()
 			throws SQLException {
-		Logger.Log(LOG_TAG, "getListFixedContainerSessions()");
+		Logger.Log(LOG_TAG, "***\nget List FIXED Container Sessions***\n");
 
 		List<ContainerSession> containerSessions = this.query(this
 				.queryBuilder()
@@ -433,7 +433,7 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public List<ContainerSession> getNotUploadedContainerSessions()
 			throws SQLException {
-
+		Logger.Log(LOG_TAG, "***\nget List NOT UPLOADED Container Sessions***\n");
 		return this.query(this.queryBuilder().where()
 				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
 				.prepare());

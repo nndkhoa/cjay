@@ -368,7 +368,7 @@ public class DataCenter {
 	public void updateListContainerSessions(Context ctx)
 			throws NoConnectionException, SQLException {
 
-		Logger.Log(LOG_TAG, "updateListContainerSessions()");
+		Logger.Log(LOG_TAG, "***\nUPDATE LIST CONTAINER SESSIONS\n***");
 
 		try {
 			Date now = new Date();
@@ -415,16 +415,18 @@ public class DataCenter {
 						nowString);
 
 				if (containerSessions == null) {
-					Logger.Log(LOG_TAG, "-----> NO new container sessions");
+					Logger.Log(LOG_TAG, "----> NO new container sessions");
 				} else {
-					Logger.Log(LOG_TAG,
-							"Has " + Integer.toString(containerSessions.size())
+					Logger.Log(
+							LOG_TAG,
+							"----> Has "
+									+ Integer.toString(containerSessions.size())
 									+ " new container sessions");
 				}
 
 				Logger.Log(
 						LOG_TAG,
-						"----> Last update from "
+						"Last update from "
 								+ PreferencesUtil
 										.getPrefsValue(
 												ctx,
@@ -449,7 +451,7 @@ public class DataCenter {
 	public void updateListOperators(Context ctx) throws NoConnectionException,
 			SQLException {
 
-		Logger.Log(LOG_TAG, "updateListOperators()");
+		Logger.Log(LOG_TAG, "***\nUPDATE LIST OPERATORS\n***");
 		try {
 			Date now = new Date();
 
@@ -486,16 +488,16 @@ public class DataCenter {
 						nowString);
 
 				if (operators == null) {
-					Logger.Log(LOG_TAG, "-----> NO new operators");
+					Logger.Log(LOG_TAG, "----> NO new operators");
 				} else {
 					Logger.Log(LOG_TAG,
-							"Has " + Integer.toString(operators.size())
+							"----> Has " + Integer.toString(operators.size())
 									+ " new operators");
 				}
 
 				Logger.Log(
 						LOG_TAG,
-						"----> Last update from "
+						"Last update from "
 								+ PreferencesUtil
 										.getPrefsValue(
 												ctx,
@@ -516,7 +518,7 @@ public class DataCenter {
 	public void updateListDamageCodes(Context ctx)
 			throws NoConnectionException, SQLException {
 
-		Logger.Log(LOG_TAG, "updateListDamageCodes()");
+		Logger.Log(LOG_TAG, "***\nUPDATE LIST DAMAGE\n***");
 		try {
 			Date now = new Date();
 
@@ -552,16 +554,16 @@ public class DataCenter {
 						nowString);
 
 				if (damageCodes == null) {
-					Logger.Log(LOG_TAG, "-----> NO new damage codes");
+					Logger.Log(LOG_TAG, "----> NO new damage codes");
 				} else {
 					Logger.Log(LOG_TAG,
-							"Has " + Integer.toString(damageCodes.size())
+							"----> Has " + Integer.toString(damageCodes.size())
 									+ " new damage codes");
 				}
 
 				Logger.Log(
 						LOG_TAG,
-						"----> Last update from "
+						"Last update from "
 								+ PreferencesUtil
 										.getPrefsValue(
 												ctx,
@@ -583,7 +585,7 @@ public class DataCenter {
 	public void updateListComponentCodes(Context ctx)
 			throws NoConnectionException, SQLException {
 
-		Logger.Log(LOG_TAG, "updateListComponentCodes()");
+		Logger.Log(LOG_TAG, "***\nUPDATE LIST COMPONENT\n***");
 
 		try {
 			Date now = new Date();
@@ -617,24 +619,26 @@ public class DataCenter {
 						"get updated list component codes from last time: "
 								+ date);
 
-				componentCodes = CJayClient.getInstance()
-						.getComponentCodes(ctx);
+				componentCodes = CJayClient.getInstance().getComponentCodes(
+						ctx, date);
 
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE,
 						nowString);
 
 				if (componentCodes == null) {
-					Logger.Log(LOG_TAG, "-----> NO new component codes");
+					Logger.Log(LOG_TAG, "----> NO new component codes");
 				} else {
-					Logger.Log(LOG_TAG,
-							"Has " + Integer.toString(componentCodes.size())
+					Logger.Log(
+							LOG_TAG,
+							"----> Has "
+									+ Integer.toString(componentCodes.size())
 									+ " new component codes");
 				}
 
 				Logger.Log(
 						LOG_TAG,
-						"----> Last update from "
+						"Last update from "
 								+ PreferencesUtil
 										.getPrefsValue(
 												ctx,
@@ -656,7 +660,7 @@ public class DataCenter {
 	public void updateListRepairCodes(Context ctx)
 			throws NoConnectionException, SQLException {
 
-		Logger.Log(LOG_TAG, "updateListComponentCodes()");
+		Logger.Log(LOG_TAG, "***\nUPDATE LIST REPAIR\n***");
 		try {
 			Date now = new Date();
 
@@ -686,23 +690,24 @@ public class DataCenter {
 				Logger.Log(LOG_TAG,
 						"get updated list repair codes from last time: " + date);
 
-				repairCodes = CJayClient.getInstance().getRepairCodes(ctx);
+				repairCodes = CJayClient.getInstance()
+						.getRepairCodes(ctx, date);
 
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE,
 						nowString);
 
 				if (repairCodes == null) {
-					Logger.Log(LOG_TAG, "-----> NO new repair codes");
+					Logger.Log(LOG_TAG, "----> NO new repair codes");
 				} else {
 					Logger.Log(LOG_TAG,
-							"Has " + Integer.toString(repairCodes.size())
+							"----> Has " + Integer.toString(repairCodes.size())
 									+ " new repair codes");
 				}
 
 				Logger.Log(
 						LOG_TAG,
-						"----> Last update from "
+						"Last update from "
 								+ PreferencesUtil
 										.getPrefsValue(
 												ctx,
@@ -723,7 +728,7 @@ public class DataCenter {
 	public void updateListISOCode(Context ctx) throws NoConnectionException,
 			SQLException {
 
-		Logger.Log(LOG_TAG, "updateListISOCode()");
+		Logger.Log(LOG_TAG, "***\nUPDATE ALL ISO CODE\n***");
 		try {
 
 			updateListOperators(ctx);
@@ -766,6 +771,8 @@ public class DataCenter {
 	 */
 	public void fetchData(Context ctx) throws NoConnectionException {
 
+		Logger.Log(LOG_TAG, "***\nFETCHING DATA ...\n***");
+
 		if (isFetchingData(ctx)) {
 			Logger.Log(LOG_TAG, "fetchData() is already running");
 			return;
@@ -775,8 +782,6 @@ public class DataCenter {
 				// Mark that Application
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.PREF_IS_FETCHING_DATA, true);
-
-				Logger.Log(LOG_TAG, "fetching data ...");
 
 				updateListISOCode(ctx);
 				updateListContainerSessions(ctx);

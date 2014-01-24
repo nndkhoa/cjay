@@ -1,11 +1,8 @@
 package com.cloudjay.cjay;
 
-import java.util.Calendar;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.StrictMode;
 import android.widget.ImageView;
 
 import com.cloudjay.cjay.util.CJayConstant;

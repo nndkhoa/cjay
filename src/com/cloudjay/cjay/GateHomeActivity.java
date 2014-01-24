@@ -6,7 +6,6 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
-import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 
 import android.content.Intent;
@@ -28,7 +27,6 @@ import com.cloudjay.cjay.fragment.GateImportListFragment;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
-import com.google.android.gms.internal.ac;
 
 @EActivity(R.layout.activity_gate_home)
 public class GateHomeActivity extends CJayActivity implements

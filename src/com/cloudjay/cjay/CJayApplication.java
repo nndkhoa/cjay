@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Display;
@@ -93,7 +94,9 @@ public class CJayApplication extends Application {
 				getApplicationContext())
 				.defaultDisplayImageOptions(defaultOptions)
 				.memoryCacheSize(41943040).discCacheSize(104857600)
-				.memoryCache(new WeakMemoryCache()).threadPoolSize(10)
+				.memoryCache(new WeakMemoryCache()).threadPoolSize(3)
+				// .discCacheExtraOptions(1024, 1024, CompressFormat.PNG, 100,
+				// null)
 				.threadPriority(Thread.MAX_PRIORITY).build();
 
 		ACRA.init(CJayApplication.this);

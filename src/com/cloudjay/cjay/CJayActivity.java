@@ -1,7 +1,8 @@
 package com.cloudjay.cjay;
 
 import java.io.IOException;
-import org.androidannotations.annotations.Background;
+import java.sql.SQLException;
+
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.UiThread;
 import org.json.JSONException;
@@ -97,28 +98,56 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	@Override
 	protected void onResume() {
 
-		Logger.Log(LOG_TAG, "DataCenter.reload onResume");
+		Logger.Log(LOG_TAG, "***\nonResume - DataCenter.reload\n***");
 
 		if (null != session) {
 
-			// reloadData();
-			new AsyncTask<Void, Integer, Void>() {
+			if (this instanceof SplashScreenActivity) {
 
-				@Override
-				protected Void doInBackground(Void... params) {
+				Logger.Log(LOG_TAG, "Call from SplashScreenActivity");
 
-					try {
-						DataCenter.getInstance().fetchData(
-								getApplicationContext());
+				new AsyncTask<Void, Integer, Void>() {
 
-					} catch (NoConnectionException e) {
-						e.printStackTrace();
-						showCrouton(R.string.alert_no_network);
+					@Override
+					protected Void doInBackground(Void... params) {
+
+						try {
+							DataCenter.getInstance()
+									.updateListContainerSessions(
+											getApplicationContext());
+
+						} catch (NoConnectionException e) {
+							e.printStackTrace();
+							showCrouton(R.string.alert_no_network);
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
+						return null;
 					}
-					return null;
-				}
 
-			}.execute();
+				}.execute();
+
+			} else {
+
+				Logger.Log(LOG_TAG, "Call from others");
+				new AsyncTask<Void, Integer, Void>() {
+
+					@Override
+					protected Void doInBackground(Void... params) {
+
+						try {
+							DataCenter.getInstance().fetchData(
+									getApplicationContext());
+
+						} catch (NoConnectionException e) {
+							e.printStackTrace();
+							showCrouton(R.string.alert_no_network);
+						}
+						return null;
+					}
+
+				}.execute();
+			}
 
 			context = getApplicationContext();
 
