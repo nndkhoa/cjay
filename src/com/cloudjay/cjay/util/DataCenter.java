@@ -53,13 +53,16 @@ public class DataCenter {
 
 	private static final String LOG_TAG = "DataCenter";
 	private static DataCenter instance = null;
-
 	private IDatabaseManager databaseManager = null;
-	private ContainerSession currentSession = null;
 
 	public DataCenter() {
 	}
 
+	/**
+	 * Apply Singleton Pattern and return only one instance of class DataCenter
+	 * 
+	 * @return instance of Singleton class {@code DataCenter}.
+	 */
 	public static DataCenter getInstance() {
 		if (null == instance) {
 			instance = new DataCenter();
@@ -78,17 +81,6 @@ public class DataCenter {
 
 	public void setDatabaseManager(IDatabaseManager databaseManager) {
 		this.databaseManager = databaseManager;
-	}
-
-	/**
-	 * Save data to server
-	 */
-	public void setCurrentSession(ContainerSession session) {
-		currentSession = session;
-	}
-
-	public ContainerSession getCurrentSession() {
-		return currentSession;
 	}
 
 	public List<Operator> getListOperators(Context context) {
@@ -139,6 +131,13 @@ public class DataCenter {
 		return null;
 	}
 
+	/**
+	 * Get list of damage codes from last {@link date}
+	 * 
+	 * @param context
+	 * @param date
+	 * @return
+	 */
 	public List<DamageCode> getListDamageCodes(Context context, String date) {
 		Logger.Log(LOG_TAG, "get list Damage Codes from: " + date);
 
@@ -151,6 +150,12 @@ public class DataCenter {
 		return null;
 	}
 
+	/**
+	 * Get List of repair codes
+	 * 
+	 * @param context
+	 * @return
+	 */
 	public List<RepairCode> getListRepairCodes(Context context) {
 		Logger.Log(LOG_TAG, "get list Repair Codes");
 
@@ -163,6 +168,13 @@ public class DataCenter {
 		return null;
 	}
 
+	/**
+	 * Get List of repair codes from last `date`
+	 * 
+	 * @param context
+	 * @param date
+	 * @return
+	 */
 	public List<RepairCode> getListRepairCodes(Context context, String date) {
 		Logger.Log(LOG_TAG, "get list Repair Codes from: " + date);
 
@@ -175,6 +187,14 @@ public class DataCenter {
 		return null;
 	}
 
+	/**
+	 * Save credential of user to local database. After that, user is verified
+	 * that signed in.
+	 * 
+	 * @param context
+	 * @param token
+	 * @return
+	 */
 	public User saveCredential(Context context, String token) {
 		try {
 
@@ -338,6 +358,15 @@ public class DataCenter {
 		return null;
 	}
 
+	/**
+	 * Return List<ContainerSession> that is created by current user and stored
+	 * in local database.
+	 * 
+	 * @param context
+	 * @return List of Container Sessions that created by current user
+	 * @see ContainerSession
+	 * @since 1.0
+	 */
 	public List<ContainerSession> getListLocalContainerSessions(Context context) {
 
 		Logger.Log(LOG_TAG, "get list local Container sessions");
@@ -350,6 +379,16 @@ public class DataCenter {
 		return null;
 	}
 
+	/**
+	 * Remove Container Session that have following {@code id}
+	 * 
+	 * @param context
+	 * @param id
+	 *            {@code id} of container Session
+	 * @return {@code true} if remove completed. {@code false} if error happen.
+	 * @see ContainerSession
+	 * @since 1.0
+	 */
 	public boolean removeContainerSession(Context context, int id) {
 		Logger.Log(LOG_TAG,
 				"remove Container Session with Id = " + Integer.toString(id));
@@ -365,6 +404,14 @@ public class DataCenter {
 		}
 	}
 
+	/**
+	 * Get new Container Sessions from last time
+	 * 
+	 * @param ctx
+	 * @throws NoConnectionException
+	 *             if there is no connection to Internet
+	 * @throws SQLException
+	 */
 	public void updateListContainerSessions(Context ctx)
 			throws NoConnectionException, SQLException {
 
@@ -448,6 +495,14 @@ public class DataCenter {
 		}
 	}
 
+	/**
+	 * Get new operators from server
+	 * 
+	 * @param ctx
+	 * @throws NoConnectionException
+	 *             if there is no connection to internet
+	 * @throws SQLException
+	 */
 	public void updateListOperators(Context ctx) throws NoConnectionException,
 			SQLException {
 
@@ -515,6 +570,14 @@ public class DataCenter {
 		}
 	}
 
+	/**
+	 * Get new damage codes from server
+	 * 
+	 * @param ctx
+	 * @throws NoConnectionException
+	 *             if there is no connection to internet
+	 * @throws SQLException
+	 */
 	public void updateListDamageCodes(Context ctx)
 			throws NoConnectionException, SQLException {
 
@@ -582,6 +645,14 @@ public class DataCenter {
 		}
 	}
 
+	/**
+	 * Get new component codes from server
+	 * 
+	 * @param ctx
+	 * @throws NoConnectionException
+	 *             if there is no connection to internet
+	 * @throws SQLException
+	 */
 	public void updateListComponentCodes(Context ctx)
 			throws NoConnectionException, SQLException {
 
@@ -657,6 +728,14 @@ public class DataCenter {
 		}
 	}
 
+	/**
+	 * Get new repair codes from server
+	 * 
+	 * @param ctx
+	 * @throws NoConnectionException
+	 *             if there is no connection to internet
+	 * @throws SQLException
+	 */
 	public void updateListRepairCodes(Context ctx)
 			throws NoConnectionException, SQLException {
 
@@ -725,6 +804,14 @@ public class DataCenter {
 		}
 	}
 
+	/**
+	 * Get new ISO Code from server
+	 * 
+	 * @param ctx
+	 * @throws NoConnectionException
+	 *             if there is no connection to internet
+	 * @throws SQLException
+	 */
 	public void updateListISOCode(Context ctx) throws NoConnectionException,
 			SQLException {
 
@@ -746,28 +833,11 @@ public class DataCenter {
 	}
 
 	/**
-	 * 
-	 * fetch data based on current user role
-	 * 
-	 * - Giám định cổng:
-	 * 
-	 * 1. In: upload_confirmation = false && local = true
-	 * 
-	 * 2. Out: local = false && check_out_time = null
-	 * 
-	 * - Giám định sửa chữa:
-	 * 
-	 * 1. Chưa báo cáo: hiển thị các container có các `CJayImage` chưa điền đầy
-	 * đủ thông tin `Issue`
-	 * 
-	 * 2. Đang báo cáo: hiển thị các container có đầy đủ thông tin về `Issue`
-	 * 
-	 * - Giám định sau sửa chữa:
-	 * 
-	 * 1.
+	 * Fetch data from server based on current user role.
 	 * 
 	 * @param ctx
 	 * @throws NoConnectionException
+	 *             if there is no connection to internet
 	 */
 	public void fetchData(Context ctx) throws NoConnectionException {
 
@@ -776,7 +846,6 @@ public class DataCenter {
 		if (isFetchingData(ctx)) {
 			Logger.Log(LOG_TAG, "fetchData() is already running");
 			return;
-
 		} else {
 			try {
 				// Mark that Application
@@ -805,6 +874,12 @@ public class DataCenter {
 		}
 	}
 
+	/**
+	 * Indicate that {@link #fetchData(Context)} is running or not
+	 * 
+	 * @param context
+	 * @return {@code PreferencesUtil.PREF_IS_FETCHING_DATA} value
+	 */
 	public boolean isFetchingData(Context context) {
 		return context.getSharedPreferences(PreferencesUtil.PREFS, 0)
 				.getBoolean(PreferencesUtil.PREF_IS_FETCHING_DATA, false) == true;

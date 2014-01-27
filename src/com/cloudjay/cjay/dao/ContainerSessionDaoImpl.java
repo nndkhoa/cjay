@@ -108,11 +108,6 @@ public class ContainerSessionDaoImpl extends
 						+ containerSession.getContainerId());
 
 				this.createOrUpdate(containerSession);
-
-				// trigger update container lists
-				// EventBus.getDefault().post(
-				// new ContainerSessionChangedEvent(containerSession));
-
 			}
 		}
 	}
@@ -343,7 +338,8 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public List<ContainerSession> getListNotReportedContainerSessions()
 			throws SQLException {
-		Logger.Log(LOG_TAG, "***\nget List NOT REPORTED Container Sessions\n***");
+		Logger.Log(LOG_TAG,
+				"***\nget List NOT REPORTED Container Sessions\n***");
 
 		List<ContainerSession> containerSessions = getNotUploadedContainerSessions();
 		List<ContainerSession> reportingContainerSessions = new ArrayList<ContainerSession>();
@@ -433,7 +429,8 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public List<ContainerSession> getNotUploadedContainerSessions()
 			throws SQLException {
-		Logger.Log(LOG_TAG, "***\nget List NOT UPLOADED Container Sessions***\n");
+		Logger.Log(LOG_TAG,
+				"***\nget List NOT UPLOADED Container Sessions***\n");
 		return this.query(this.queryBuilder().where()
 				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
 				.prepare());

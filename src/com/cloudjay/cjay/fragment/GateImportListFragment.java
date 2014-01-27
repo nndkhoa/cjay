@@ -160,17 +160,8 @@ public class GateImportListFragment extends SherlockDialogFragment implements
 
 	@ItemClick(R.id.feeds)
 	void listItemClicked(int position) {
-
-		// clear current selection
+		Logger.Log(LOG_TAG, "Clicked item at position: " + position);
 		hideMenuItems();
-		Logger.Log(LOG_TAG, "Show item at position: " + position);
-
-		// open photo viewer
-		// Intent intent = new Intent(getActivity(),
-		// PhotoViewerActivity_.class);
-		// intent.putExtra(PhotoViewerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-		// mFeedsAdapter.getItem(position).getUuid());
-		// startActivity(intent);
 	}
 
 	@ItemLongClick(R.id.feeds)
