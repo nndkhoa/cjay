@@ -35,9 +35,10 @@ Visit [**documentation**](https://github.com/tieubao/cjay/wiki/How-to-build-proj
 
 ### Recommendation
 
-Recommended device: [Casio G'zOne](http://www.gsmarena.com/casio_g'zone_commando-4550.php) with resolution 480x800
-
-[Naming conventions for drawables] (http://petrnohejl.github.io/Android-Cheatsheet-For-Graphic-Designers/#naming-conventions).
+Recommended device: [Casio G'zOne](http://www.gsmarena.com/casio_g'zone_commando-4550.php) with resolution 480x800. Android version: 4.1.2
 
 Datetime format: `%Y-%m-%dT%H:%M:%S`
 
+### Coding Convention
+
+Visit [wiki](https://github.com/tieubao/cjay/wiki/Android-Coding-Convention).
