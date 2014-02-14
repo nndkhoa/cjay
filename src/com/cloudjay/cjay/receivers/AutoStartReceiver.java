@@ -22,6 +22,7 @@ public class AutoStartReceiver extends BroadcastReceiver {
 		PendingIntent pintent = PendingIntent.getService(context, 0, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 		Calendar current = Calendar.getInstance();
+		
 		AlarmManager alarm = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
 
