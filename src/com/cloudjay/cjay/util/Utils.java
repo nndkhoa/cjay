@@ -431,6 +431,7 @@ public class Utils {
 		Intent intent = new Intent(context, QueueIntentService.class);
 		PendingIntent sender = PendingIntent
 				.getBroadcast(context, 0, intent, 0);
+		
 		AlarmManager alarmManager = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
 
@@ -438,8 +439,10 @@ public class Utils {
 	}
 
 	public static boolean isAlarmUp(Context context) {
+		
 		return PendingIntent.getService(context, 0, new Intent(context,
 				QueueIntentService.class), PendingIntent.FLAG_NO_CREATE) != null;
+		
 	}
 
 	public static File getAppDirectoryFile() {

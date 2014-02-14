@@ -31,50 +31,92 @@ public class GcmIntentService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
+		try {
+			Log.i(LOG_TAG, "onHandleIntent()");
 
-		Log.i(LOG_TAG, "onHandleIntent()");
+			Bundle extras = intent.getExtras();
+			GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
 
-		Bundle extras = intent.getExtras();
-		GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
+			// The getMessageType() intent parameter must be the intent you
+			// received
+			// in your BroadcastReceiver.
+			String messageType = gcm.getMessageType(intent);
 
-		// The getMessageType() intent parameter must be the intent you received
-		// in your BroadcastReceiver.
-		String messageType = gcm.getMessageType(intent);
+			if (!extras.isEmpty()) { // has effect of unparcelling Bundle
 
-		if (!extras.isEmpty()) { // has effect of unparcelling Bundle
+				Logger.Log(LOG_TAG, "Extra is not empty");
+				Logger.Log(LOG_TAG, "Message Type: " + messageType);
 
-			/*
-			 * Filter messages based on message type. Since it is likely that
-			 * GCM will be extended in the future with new message types, just
-			 * ignore any message types you're not interested in, or that you
-			 * don't recognize.
-			 */
-			if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR
-					.equals(messageType)) {
-				sendNotification("Send error: " + extras.toString());
+				/*
+				 * Filter messages based on message type. Since it is likely
+				 * that GCM will be extended in the future with new message
+				 * types, just ignore any message types you're not interested
+				 * in, or that you don't recognize.
+				 */
 
-			} else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED
-					.equals(messageType)) {
-				sendNotification("Deleted messages on server: "
-						+ extras.toString());
+				if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR
+						.equals(messageType)) {
 
-				// If it's a regular GCM message, do some work.
-			} else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE
-					.equals(messageType)) {
+					Logger.Log(LOG_TAG, "Send error: " + extras.toString());
+					sendNotification("Send error: " + extras.toString());
 
-				Logger.Log(LOG_TAG, "Received: " + extras.toString());
-				sendNotification(extras);
+				} else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED
+						.equals(messageType)) {
 
+					Logger.Log(LOG_TAG,
+							"Deleted messages on server: " + extras.toString());
+
+					sendNotification("Deleted messages on server: "
+							+ extras.toString());
+
+					// If it's a regular GCM message, do some work.
+				} else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE
+						.equals(messageType)) {
+
+					Logger.Log(LOG_TAG, "Received: " + extras.toString());
+					sendNotification(extras);
+
+				} else {
+					//
+					Logger.Log(LOG_TAG, "Last case - " + extras.toString());
+					Logger.Log(LOG_TAG, "MessageType: " + messageType);
+
+					int id = -1;
+					try {
+						id = Integer.parseInt(extras.getString("id"));
+					} catch (Exception e) {
+
+					}
+
+					String msg = extras.getString("msg");
+					String type = extras.getString("type");
+					
+					Logger.Log(LOG_TAG,
+							"Notification got Type = " + type + " | MSG = "
+									+ msg + " | Id = " + Integer.toString(id));
+
+				}
+
+			} else {
+				Logger.Log(LOG_TAG, "Extra is Empty");
 			}
+
+			// Release the wake lock provided by the WakefulBroadcastReceiver.
+			GcmBroadcastReceiver.completeWakefulIntent(intent);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			GcmBroadcastReceiver.completeWakefulIntent(intent);
 		}
-		// Release the wake lock provided by the WakefulBroadcastReceiver.
-		GcmBroadcastReceiver.completeWakefulIntent(intent);
 	}
 
 	// Put the message into a notification and post it.
 	// This is just one simple example of what you might choose to do with
 	// a GCM message.
 	private void sendNotification(Bundle extras) {
+
+		Logger.Log(LOG_TAG, "sendNotification");
+
 		try {
 			mNotificationManager = (NotificationManager) this
 					.getSystemService(Context.NOTIFICATION_SERVICE);
