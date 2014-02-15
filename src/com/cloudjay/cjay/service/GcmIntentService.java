@@ -18,6 +18,13 @@ import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+/**
+ * 
+ * Handle notification from server
+ * 
+ * @author anhqnguyen
+ *
+ */
 public class GcmIntentService extends IntentService {
 
 	public static final int NOTIFICATION_ID = 1;
