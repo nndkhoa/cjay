@@ -4,12 +4,8 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v4.content.WakefulBroadcastReceiver;
-import android.util.Log;
-
 import com.cloudjay.cjay.service.GcmIntentService;
-import com.cloudjay.cjay.util.Logger;
 
 public class GcmBroadcastReceiver extends WakefulBroadcastReceiver {
 
