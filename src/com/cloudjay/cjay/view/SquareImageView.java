@@ -1,13 +1,4 @@
-/**
- * 
- */
 package com.cloudjay.cjay.view;
-
-/**
- * @author tieubao
- * 
- * Nov 10, 2013
- */
 
 import com.cloudjay.cjay.R;
 import android.content.Context;
@@ -15,6 +6,13 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
+/**
+ * 
+ * User can configure fixed along dimension
+ * 
+ * @author tieubao
+ * 
+ */
 public class SquareImageView extends ImageView {
 
 	public static enum FixedAlong {
@@ -33,9 +31,11 @@ public class SquareImageView extends ImageView {
 		TypedArray array = context.obtainStyledAttributes(attrs,
 				R.styleable.SquareImage, 0, 0);
 
+		// get fixed along value from xml configuration
 		fixedAlong = FixedAlong.valueOf(array
 				.getString(R.styleable.SquareImage_fixedAlong));
 
+		// save fixed along value
 		if (fixedAlong == null)
 			fixedAlong = FixedAlong.width;
 
@@ -61,5 +61,4 @@ public class SquareImageView extends ImageView {
 
 		setMeasuredDimension(squareDimen, squareDimen);
 	}
-
 }
