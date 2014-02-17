@@ -480,60 +480,6 @@ public class ContainerSession implements Parcelable {
 		EventBus.getDefault().post(new UploadStateChangedEvent(this));
 	}
 
-	public Bitmap getThumbnailImage(Context context) {
-		if (ContentResolver.SCHEME_CONTENT.equals(getOriginalPhotoUri()
-				.getScheme())) {
-			return getThumbnailImageFromMediaStore(context);
-		}
-
-		final Resources res = context.getResources();
-		int size = res.getBoolean(R.bool.load_mini_thumbnails) ? MINI_THUMBNAIL_SIZE
-				: MICRO_THUMBNAIL_SIZE;
-		if (size == MINI_THUMBNAIL_SIZE
-				&& res.getBoolean(R.bool.sample_mini_thumbnails)) {
-			size /= 2;
-		}
-
-		try {
-			Bitmap bitmap = Utils.decodeImage(context.getContentResolver(),
-					getOriginalPhotoUri(), size);
-
-			return bitmap;
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	private Bitmap getThumbnailImageFromMediaStore(Context context) {
-		Resources res = context.getResources();
-
-		final int kind = res.getBoolean(R.bool.load_mini_thumbnails) ? Thumbnails.MINI_KIND
-				: Thumbnails.MICRO_KIND;
-
-		BitmapFactory.Options opts = null;
-		if (kind == Thumbnails.MINI_KIND
-				&& res.getBoolean(R.bool.sample_mini_thumbnails)) {
-			opts = new BitmapFactory.Options();
-			opts.inSampleSize = 2;
-		}
-
-		try {
-			final long id = Long.parseLong(getOriginalPhotoUri()
-					.getLastPathSegment());
-
-			Bitmap bitmap = Thumbnails.getThumbnail(
-					context.getContentResolver(), id, kind, opts);
-
-			return bitmap;
-		} catch (Exception e) {
-			if (Flags.DEBUG) {
-				e.printStackTrace();
-			}
-			return null;
-		}
-	}
-
 	public Uri getOriginalPhotoUri() {
 		if (null == mFullUri && !TextUtils.isEmpty(image_id_path)) {
 			mFullUri = Uri.parse(image_id_path);
