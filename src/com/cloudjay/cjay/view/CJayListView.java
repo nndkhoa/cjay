@@ -10,6 +10,7 @@ import com.ami.fundapter.FunDapter;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 public abstract class CJayListView<T> extends ListView {
+	
 	private ArrayList<T> mFeeds;
 	private FunDapter<T> mFeedsAdapter;
 	private ImageLoader mImageLoader;
