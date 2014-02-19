@@ -50,5 +50,7 @@
     <color name="camera_button_red_background">#F50407</color>
     <color name="camera_button_red_background_pressed">#DDF50407</color>
     <color name="camera_splashscreen_background">#808080</color>
+    
+    <color name="list_item_bg_container_fixed">#556fccf7</color>
 
 </resources>
