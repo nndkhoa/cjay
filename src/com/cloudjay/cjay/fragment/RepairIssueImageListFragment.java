@@ -111,6 +111,9 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 					cJayImage.setContainerSession(mIssue.getContainerSession());
 					cJayImageDaoImpl.update(cJayImage);
 				}
+				
+				// refresh menu
+				getActivity().supportInvalidateOptionsMenu();
 
 			} catch (SQLException e) {
 				e.printStackTrace();

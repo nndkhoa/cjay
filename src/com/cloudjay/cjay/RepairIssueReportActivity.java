@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
+import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.model.CJayImage;
@@ -88,6 +89,41 @@ public class RepairIssueReportActivity extends CJayActivity implements
 		this.onBackPressed();
 	}
 
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		// only show check menu item if has TYPE_REPAIRED images
+		boolean hasRepaired = false;
+		
+		if (null != mIssue) {
+			IssueDaoImpl issueDaoImpl;
+			try {
+				issueDaoImpl = CJayClient
+						.getInstance().getDatabaseManager().getHelper(this)
+						.getIssueDaoImpl();
+				mIssue = issueDaoImpl.queryForId(mIssueUUID);
+				issueDaoImpl.refresh(mIssue);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			
+			for (CJayImage cJayImage : mIssue.getCJayImages()) {
+				if (cJayImage.getType() == CJayImage.TYPE_REPAIRED) {
+					hasRepaired = true;
+					break;
+				}
+			}
+		}
+		menu.findItem(R.id.menu_check).setVisible(hasRepaired);
+		
+		return super.onPrepareOptionsMenu(menu);
+	}
+	
+//	@Override
+//	public void onResume() {
+//		invalidateOptionsMenu();
+//		super.onResume();
+//	}
+	
 	private void configureViewPager() {
 		AuditorHomeTabPageAdaptor viewPagerAdapter = new AuditorHomeTabPageAdaptor(
 				getSupportFragmentManager(), locations);
