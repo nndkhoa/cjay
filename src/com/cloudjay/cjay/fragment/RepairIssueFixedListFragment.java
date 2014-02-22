@@ -57,6 +57,7 @@ public class RepairIssueFixedListFragment extends SherlockFragment {
 	@ItemClick(R.id.feeds)
 	void imageItemClicked(int position) {
 		mSelectedIssue = mFeedsAdapter.getItem(position);
+		mFeedListView.setItemChecked(-1, true);
 
 		// show issue report activity
 		Intent intent = new Intent(getActivity(),
