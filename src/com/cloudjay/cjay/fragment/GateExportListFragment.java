@@ -25,6 +25,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -43,6 +44,7 @@ import android.widget.TextView;
 import com.actionbarsherlock.view.Menu;
 import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
+import com.ami.fundapter.extractors.ChildExtractor;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.CJayActivity;
@@ -92,7 +94,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 	TextView mNotfoundTextView;
 
 	PullToRefreshLayout mPullToRefreshLayout;
-	SimpleCursorAdapter cursorAdapter;
+	CursorAdapter cursorAdapter;
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -163,24 +165,18 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		// ActionBarPullToRefresh.from(getActivity()).allChildrenArePullable()
 		// .listener(this).setup(mPullToRefreshLayout);
 
-		Cursor cursor = DataCenter.getInstance()
-				.getCheckOutContainerSessionCursor(getActivity());
-
-		// create and setup CursorAdapter
-		ContainerCursorAdapter adapter = new ContainerCursorAdapter(
-				getActivity(), R.layout.list_item_container, cursor, 0);
-
-		// initialize loader
 		getLoaderManager().initLoader(0, null, this);
 
-		mFeedListView.setAdapter(adapter);
 	}
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-		CursorLoader cursorLoader = null;
+		CJayCursorLoader cursorLoader = new CJayCursorLoader(getActivity());
+		// chi can la class extends tu Loader<?> la dc roi :)
+		// ua em vua lam y chang anh no bao loi :botay: ok chay thu xem.
 
 		// TODO: create cursor loader
+
 		// String rawQuery = "SELECT ...";
 		// String[] queryParams = null;// to substitute placeholders
 		// SQLiteCursorLoader loader = new SQLiteCursorLoader(getActivity()
@@ -192,8 +188,14 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 	}
 
 	@Override
-	public void onLoadFinished(Loader<Cursor> arg0, Cursor arg1) {
-		cursorAdapter.swapCursor(arg1);
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+		if (cursorAdapter == null) {
+			cursorAdapter = new ContainerCursorAdapter(getActivity(),
+					R.layout.list_item_container, cursor, 0);
+			mFeedListView.setAdapter(cursorAdapter);
+		} else {
+			cursorAdapter.swapCursor(cursor);
+		}
 	}
 
 	@Override

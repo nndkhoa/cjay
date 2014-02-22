@@ -176,6 +176,8 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 			throws NoConnectionException {
 
 		Logger.Log(LOG_TAG, "Url: " + url);
+		Logger.Log(LOG_TAG, "Header: " + headers.toString());
+		
 		httpGet = new HttpGet(url);
 
 		headers.put("Accept", DEFAULT_ACCEPT_HEADER);

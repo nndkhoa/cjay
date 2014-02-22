@@ -117,8 +117,12 @@ public class ContainerCursorAdapter extends CursorAdapter implements Filterable 
 
 		// TODO: get data from cursor and bind to holder
 		String importDate = cursor.getString(cursor
-				.getColumnIndexOrThrow("check_in_time"));
+				.getColumnIndexOrThrow(ContainerSession.FIELD_CHECK_IN_TIME));
 		holder.importDateView.setText(importDate);
+
+		String exportDate = cursor.getString(cursor
+				.getColumnIndexOrThrow(ContainerSession.FIELD_CHECK_OUT_TIME));
+		holder.exportDateView.setText(exportDate);
 
 	}
 

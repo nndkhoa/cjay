@@ -65,7 +65,7 @@ public class ContainerSession implements Parcelable {
 	public static final String FIELD_ID = "id";
 	
 	// _id for cursor loader usage
-	public static final String FIELD_UUID = "uuid_id";
+	public static final String FIELD_UUID = "_id";
 	public static final String FIELD_UPLOAD_CONFIRMATION = "upload_confirmation";
 	public static final String FIELD_CLEARED = "cleared";
 	public static final String FIELD_LOCAL = "on_local";

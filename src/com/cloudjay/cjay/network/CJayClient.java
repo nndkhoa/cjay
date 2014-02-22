@@ -355,17 +355,24 @@ public class CJayClient implements ICJayClient {
 			throws NoConnectionException {
 
 		Logger.Log(LOG_TAG, "getAllContainerSessions(Context ctx)");
-		long startTime = System.currentTimeMillis();
 
 		if (Utils.hasNoConnection(ctx)) {
 			throw new NoConnectionException();
 		}
 
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
+
+		// cho nay ne anh
+		// sendGet --> lay tron. file json ve
+		// roi moi parse ben duoi'
+		long startTime = System.currentTimeMillis();
 		String response = requestWrapper.sendGet(
 				CJayConstant.LIST_CONTAINER_SESSIONS, headers);
 
-		Logger.Log(LOG_TAG, response);
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference));
+
+		// Logger.Log(LOG_TAG, response);
 
 		Gson gson = new GsonBuilder().setDateFormat(
 				CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
@@ -404,8 +411,8 @@ public class CJayClient implements ICJayClient {
 			e.printStackTrace();
 		}
 
-		long difference = System.currentTimeMillis() - startTime;
-		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference));
+		// long difference = System.currentTimeMillis() - startTime;
+		// Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference));
 
 		return items;
 	}

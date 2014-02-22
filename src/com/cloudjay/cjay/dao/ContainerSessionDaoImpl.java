@@ -330,7 +330,8 @@ public class ContainerSessionDaoImpl extends
 			cursor = results.getRawCursor();
 
 		} finally {
-			iterator.closeQuietly();
+			
+//			iterator.closeQuietly();
 		}
 
 		return cursor;
