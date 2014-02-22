@@ -31,7 +31,7 @@ public class RepairCode implements Parcelable {
 	@DatabaseField(columnName = DISPLAY_NAME)
 	String display_name;
 
-	@DatabaseField(columnName = CODE)
+	@DatabaseField(columnName = CODE, index = true)
 	String code;
 
 	@ForeignCollectionField(eager = true)

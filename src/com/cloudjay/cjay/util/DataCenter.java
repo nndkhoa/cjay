@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import android.content.Context;
+import android.database.Cursor;
 
 import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -257,6 +258,19 @@ public class DataCenter {
 					.getContainerSessionDaoImpl()
 					.getListCheckOutContainerSessions();
 		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public Cursor getCheckOutContainerSessionCursor(Context context) {
+
+		try {
+			return getDatabaseManager().getHelper(context)
+					.getContainerSessionDaoImpl()
+					.getCheckOutContainerSessionCursor();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;

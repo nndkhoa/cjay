@@ -18,9 +18,14 @@ import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -35,7 +40,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
@@ -43,6 +47,7 @@ import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.adapter.ContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
@@ -51,6 +56,7 @@ import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
@@ -63,8 +69,8 @@ import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_gate_export)
 @OptionsMenu(R.menu.menu_gate_export)
-public class GateExportListFragment extends SherlockFragment implements
-		OnRefreshListener {
+public class GateExportListFragment extends CJaySherlockFragment implements
+		OnRefreshListener, LoaderCallbacks<Cursor> {
 
 	private final static String LOG_TAG = "GateExportListFragment";
 
@@ -77,6 +83,7 @@ public class GateExportListFragment extends SherlockFragment implements
 
 	@ViewById(R.id.container_list)
 	ListView mFeedListView;
+
 	@ViewById(R.id.search_edittext)
 	EditText mSearchEditText;
 	@ViewById(R.id.add_button)
@@ -85,6 +92,7 @@ public class GateExportListFragment extends SherlockFragment implements
 	TextView mNotfoundTextView;
 
 	PullToRefreshLayout mPullToRefreshLayout;
+	SimpleCursorAdapter cursorAdapter;
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -111,6 +119,7 @@ public class GateExportListFragment extends SherlockFragment implements
 
 	@AfterViews
 	void afterViews() {
+
 		mSearchEditText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable arg0) {
@@ -148,12 +157,48 @@ public class GateExportListFragment extends SherlockFragment implements
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
 				.getListOperators(getActivity());
 
-		initContainerFeedAdapter(null);
+		// initContainerFeedAdapter(null);
 		mSelectedContainerSession = null;
 
 		// ActionBarPullToRefresh.from(getActivity()).allChildrenArePullable()
 		// .listener(this).setup(mPullToRefreshLayout);
 
+		Cursor cursor = DataCenter.getInstance()
+				.getCheckOutContainerSessionCursor(getActivity());
+
+		// create and setup CursorAdapter
+		ContainerCursorAdapter adapter = new ContainerCursorAdapter(
+				getActivity(), R.layout.list_item_container, cursor, 0);
+
+		// initialize loader
+		getLoaderManager().initLoader(0, null, this);
+
+		mFeedListView.setAdapter(adapter);
+	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+		CursorLoader cursorLoader = null;
+
+		// TODO: create cursor loader
+		// String rawQuery = "SELECT ...";
+		// String[] queryParams = null;// to substitute placeholders
+		// SQLiteCursorLoader loader = new SQLiteCursorLoader(getActivity()
+		// .getApplicationContext(), yourSqliteOpenHelper, rawQuery,
+		// queryParams);
+		// return loader;
+
+		return cursorLoader;
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor arg1) {
+		cursorAdapter.swapCursor(arg1);
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		cursorAdapter.swapCursor(null);
 	}
 
 	void hideMenuItems() {
@@ -205,6 +250,7 @@ public class GateExportListFragment extends SherlockFragment implements
 
 	@Click(R.id.add_button)
 	void addButtonClicked() {
+
 		// show add container dialog
 		String containerId;
 		if (!TextUtils.isEmpty(mSearchEditText.getText().toString())) {
@@ -212,12 +258,14 @@ public class GateExportListFragment extends SherlockFragment implements
 		} else {
 			containerId = "";
 		}
+
 		showContainerDetailDialog(containerId, "",
 				AddContainerDialog.CONTAINER_DIALOG_ADD);
 	}
 
 	@ItemClick(R.id.container_list)
 	void listItemClicked(int position) {
+
 		// clear current selection
 		hideMenuItems();
 
@@ -268,11 +316,14 @@ public class GateExportListFragment extends SherlockFragment implements
 
 	public void OnOperatorSelected(String containerId, String operatorName,
 			int mode) {
+
 		showContainerDetailDialog(containerId, operatorName, mode);
+
 	}
 
 	public void OnContainerInputCompleted(String containerId,
 			String operatorName, int mode) {
+
 		// Get the container id and container operator code
 		String operatorCode = "";
 		for (Operator operator : mOperators) {
@@ -308,6 +359,7 @@ public class GateExportListFragment extends SherlockFragment implements
 			if (null != mFeeds)
 				mFeedsAdapter.updateData(mFeeds);
 		} else {
+
 			ArrayList<ContainerSession> searchFeeds = new ArrayList<ContainerSession>();
 			for (ContainerSession containerSession : mFeeds) {
 				if (containerSession.getContainerId().toLowerCase(Locale.US)
@@ -315,6 +367,7 @@ public class GateExportListFragment extends SherlockFragment implements
 					searchFeeds.add(containerSession);
 				}
 			}
+
 			// refresh list
 			configureControls(searchFeeds);
 			mFeedsAdapter.updateData(searchFeeds);
@@ -389,6 +442,7 @@ public class GateExportListFragment extends SherlockFragment implements
 				});
 		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(),
 				containers, R.layout.list_item_container, feedsDict);
+
 		mFeedListView.setAdapter(mFeedsAdapter);
 	}
 
@@ -397,6 +451,7 @@ public class GateExportListFragment extends SherlockFragment implements
 		refresh();
 	}
 
+	// TODO: need to embed inside AsyncTask
 	public void refresh() {
 		Logger.Log(LOG_TAG, "onRefresh");
 

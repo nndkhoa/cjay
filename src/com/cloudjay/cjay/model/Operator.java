@@ -25,7 +25,7 @@ public class Operator implements Parcelable {
 	@DatabaseField(id = true, columnName = ID)
 	int id;
 
-	@DatabaseField(columnName = CODE)
+	@DatabaseField(columnName = CODE, index = true)
 	String operator_code;
 
 	@DatabaseField(columnName = NAME)

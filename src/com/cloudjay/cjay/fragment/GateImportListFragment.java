@@ -27,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
+import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
@@ -51,7 +52,7 @@ import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_gate_import)
 @OptionsMenu(R.menu.menu_gate_import)
-public class GateImportListFragment extends SherlockDialogFragment implements
+public class GateImportListFragment extends CJaySherlockFragment implements
 		OnRefreshListener {
 
 	private final static String LOG_TAG = "GateImportListFragment";
@@ -253,7 +254,9 @@ public class GateImportListFragment extends SherlockDialogFragment implements
 	}
 
 	private void initContainerFeedAdapter(ArrayList<ContainerSession> containers) {
+
 		BindDictionary<ContainerSession> feedsDict = new BindDictionary<ContainerSession>();
+
 		feedsDict.addStringField(R.id.feed_item_container_id,
 				new StringExtractor<ContainerSession>() {
 					@Override

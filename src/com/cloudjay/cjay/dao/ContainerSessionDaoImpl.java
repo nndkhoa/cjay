@@ -5,13 +5,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import android.database.Cursor;
 import android.util.Log;
 
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.util.Logger;
+import com.j256.ormlite.android.AndroidDatabaseResults;
 import com.j256.ormlite.dao.BaseDaoImpl;
+import com.j256.ormlite.dao.CloseableIterator;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 
 import de.greenrobot.event.EventBus;
@@ -83,10 +87,6 @@ public class ContainerSessionDaoImpl extends
 								+ Integer.toString(containerSessionId)
 								+ " Name: " + containerSession.getContainerId());
 				this.createOrUpdate(containerSession);
-
-				// trigger update container lists
-				// EventBus.getDefault().post(
-				// new ContainerSessionChangedEvent(containerSession));
 
 			} else { // existed Container Session
 
@@ -239,12 +239,17 @@ public class ContainerSessionDaoImpl extends
 	public List<ContainerSession> getListUploadContainerSessions()
 			throws SQLException {
 
+		long startTime = System.currentTimeMillis();
 		Logger.Log(LOG_TAG, "***\nget List UPLOAD Container Sessions\n***");
 
 		List<ContainerSession> containerSessions = this.query(this
 				.queryBuilder().where()
 				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, true).and()
 				.eq(ContainerSession.FIELD_CLEARED, false).prepare());
+
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference)
+				+ " ms");
 
 		return containerSessions;
 
@@ -263,6 +268,7 @@ public class ContainerSessionDaoImpl extends
 	public List<ContainerSession> getLocalContainerSessions()
 			throws SQLException {
 
+		long startTime = System.currentTimeMillis();
 		Logger.Log(LOG_TAG, "***\nget list LOCAL Container sessions\n***");
 		List<ContainerSession> containerSessions = this.query(this
 				.queryBuilder()
@@ -273,6 +279,10 @@ public class ContainerSessionDaoImpl extends
 				.and()
 				.ne(ContainerSession.FIELD_STATE,
 						ContainerSession.STATE_UPLOAD_COMPLETED).prepare());
+
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference)
+				+ " ms");
 
 		return containerSessions;
 	}
@@ -288,14 +298,42 @@ public class ContainerSessionDaoImpl extends
 	public List<ContainerSession> getListCheckOutContainerSessions()
 			throws SQLException {
 
-		Logger.Log(LOG_TAG, "***\nget List CHECKOUT Container Sessions\n***");
+		long startTime = System.currentTimeMillis();
 
+		Logger.Log(LOG_TAG, "***\nget List CHECKOUT Container Sessions\n***");
 		List<ContainerSession> containerSessions = this.query(this
 				.queryBuilder().where()
 				.eq(ContainerSession.FIELD_CHECK_OUT_TIME, "").and()
 				.eq(ContainerSession.FIELD_LOCAL, false).prepare());
 
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference));
+
 		return containerSessions;
+	}
+
+	public Cursor getCheckOutContainerSessionCursor() throws SQLException {
+
+		Cursor cursor = null;
+
+		QueryBuilder<ContainerSession, String> queryBuilder = this
+				.queryBuilder();
+		queryBuilder.where().eq(ContainerSession.FIELD_CHECK_OUT_TIME, "")
+				.and().eq(ContainerSession.FIELD_LOCAL, false);
+		CloseableIterator<ContainerSession> iterator = this
+				.iterator(queryBuilder.prepare());
+
+		try {
+			// get the raw results which can be cast under Android
+			AndroidDatabaseResults results = (AndroidDatabaseResults) iterator
+					.getRawResults();
+			cursor = results.getRawCursor();
+
+		} finally {
+			iterator.closeQuietly();
+		}
+
+		return cursor;
 	}
 
 	@Override
@@ -366,6 +404,7 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public List<ContainerSession> getListReportingContainerSessions()
 			throws SQLException {
+
 		Logger.Log(LOG_TAG, "***\nget List REPORTING Container Sessions\n***");
 
 		List<ContainerSession> containerSessions = getNotUploadedContainerSessions();
@@ -411,6 +450,8 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public List<ContainerSession> getListFixedContainerSessions()
 			throws SQLException {
+
+		long startTime = System.currentTimeMillis();
 		Logger.Log(LOG_TAG, "***\nget List FIXED Container Sessions***\n");
 
 		List<ContainerSession> containerSessions = this.query(this
@@ -422,6 +463,9 @@ public class ContainerSessionDaoImpl extends
 				.and()
 				.ne(ContainerSession.FIELD_STATE,
 						ContainerSession.STATE_UPLOAD_COMPLETED).prepare());
+
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference));
 
 		return containerSessions;
 	}

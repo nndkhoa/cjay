@@ -1,6 +1,7 @@
 package com.cloudjay.cjay;
 
 import java.net.SocketTimeoutException;
+import java.sql.SQLException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
@@ -55,7 +56,8 @@ public class LoginActivity extends CJayActivity {
 
 	@Extra(EXTRA_EMAIL)
 	// String mEmail = "giamdinhcong@test.com";
-	String mEmail = "giamdinhsuachua@test.com";
+	String mEmail = "giamdinhcong1.icd1@pip.com.vn";
+	// String mEmail = "giamdinhsuachua@test.com";
 	// String mEmail = "tosuachua@test.com";
 
 	// UI references.
@@ -243,19 +245,32 @@ public class LoginActivity extends CJayActivity {
 					changeProgressText(R.string.login_progress_loading_data);
 
 					DataCenter.getInstance().fetchData(LoginActivity.this);
+					// DataCenter.getInstance().updateListISOCode(
+					// LoginActivity.this);
 					return true;
 				}
+
 			} catch (SocketTimeoutException se) {
 				showCrouton(R.string.alert_ssl_timeout);
 				se.printStackTrace();
+				cancel(isFinishing());
+
 			} catch (JSONException e) {
 				showCrouton(R.string.alert_server_error);
 				e.printStackTrace();
+				cancel(isFinishing());
+
 			} catch (NoConnectionException e) {
 				showCrouton(R.string.alert_no_network);
 				cancel(isFinishing());
+
 			}
 
+			// catch (SQLException e) {
+			// e.printStackTrace();
+			// showCrouton(R.string.alert_try_again);
+			// cancel(isFinishing());
+			// }
 			return true;
 		}
 
@@ -265,10 +280,12 @@ public class LoginActivity extends CJayActivity {
 			showProgress(false);
 
 			if (success) {
+
 				// Navigate user to Main Activity based on user role
 				Logger.Log(LOG_TAG, "Login successfully");
 				CJayApplication.startCJayHomeActivity(LoginActivity.this);
 				finish();
+
 			} else {
 				Logger.Log(LOG_TAG, "Incorrect Username|Password");
 				mPasswordView

@@ -63,7 +63,9 @@ public class ContainerSession implements Parcelable {
 	public static final String FIELD_IMAGE_ID_PATH = "image_id_path";
 	public static final String FIELD_STATE = "state";
 	public static final String FIELD_ID = "id";
-	public static final String FIELD_UUID = "uuid";
+	
+	// _id for cursor loader usage
+	public static final String FIELD_UUID = "uuid_id";
 	public static final String FIELD_UPLOAD_CONFIRMATION = "upload_confirmation";
 	public static final String FIELD_CLEARED = "cleared";
 	public static final String FIELD_LOCAL = "on_local";
@@ -80,7 +82,7 @@ public class ContainerSession implements Parcelable {
 
 	private Uri mFullUri;
 
-	@DatabaseField(columnName = FIELD_ID)
+	@DatabaseField(columnName = FIELD_ID, index = true)
 	int id;
 
 	@DatabaseField(columnName = FIELD_UUID, id = true)
@@ -98,16 +100,16 @@ public class ContainerSession implements Parcelable {
 	@DatabaseField(columnName = FIELD_CHECK_IN_TIME, defaultValue = "")
 	String check_in_time;
 
-	@DatabaseField(columnName = FIELD_CHECK_OUT_TIME, defaultValue = "")
+	@DatabaseField(columnName = FIELD_CHECK_OUT_TIME, defaultValue = "", index = true)
 	String check_out_time;
 
-	@DatabaseField(columnName = FIELD_STATE, defaultValue = "0")
+	@DatabaseField(columnName = FIELD_STATE, defaultValue = "0", index = true)
 	int mState;
 
 	@DatabaseField(columnName = FIELD_FIXED, defaultValue = "false")
 	boolean fixed;
 
-	@DatabaseField(columnName = FIELD_UPLOAD_CONFIRMATION, defaultValue = "false")
+	@DatabaseField(columnName = FIELD_UPLOAD_CONFIRMATION, defaultValue = "false", index = true)
 	private boolean uploadConfirmation;
 
 	// container_id

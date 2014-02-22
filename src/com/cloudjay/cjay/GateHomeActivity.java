@@ -55,8 +55,6 @@ public class GateHomeActivity extends CJayActivity implements
 	@Override
 	protected void onCreate(Bundle arg0) {
 	
-//		mPullToRefreshAttacher = 
-
 		// Below code to show `More Action` item on menu
 		try {
 			ViewConfiguration config = ViewConfiguration.get(this);

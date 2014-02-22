@@ -34,7 +34,7 @@ import de.greenrobot.event.EventBus;
 
 @EFragment
 @OptionsMenu(R.menu.menu_upload)
-public class UploadsFragment extends SherlockFragment implements
+public class UploadsFragment extends CJaySherlockFragment implements
 		OnDismissCallback, OnItemClickListener {
 
 	private static final String LOG_TAG = "UploadsFragment";

@@ -1,5 +1,8 @@
 package com.cloudjay.cjay;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
@@ -13,6 +16,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.Fragment.SavedState;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
@@ -47,6 +52,16 @@ public class CJayApplication extends Application {
 	IDatabaseManager databaseManager = null;
 	IHttpRequestWrapper httpRequestWrapper = null;
 
+	Map<String, Fragment.SavedState> savedStateMap;
+
+	public void setFragmentSavedState(String key, SavedState savedState) {
+		savedStateMap.put(key, savedState);
+	}
+
+	public Fragment.SavedState getFragmentSavedState(String key) {
+		return savedStateMap.get(key);
+	}
+
 	public static CJayApplication getApplication(Context context) {
 		return (CJayApplication) context.getApplicationContext();
 	}
@@ -77,6 +92,8 @@ public class CJayApplication extends Application {
 	@Override
 	public void onCreate() {
 		Logger.Log(LOG_TAG, "Start Application");
+		savedStateMap = new HashMap<String, Fragment.SavedState>();
+
 		super.onCreate();
 
 		databaseManager = new DatabaseManager();

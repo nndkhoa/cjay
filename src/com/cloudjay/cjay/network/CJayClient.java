@@ -355,6 +355,7 @@ public class CJayClient implements ICJayClient {
 			throws NoConnectionException {
 
 		Logger.Log(LOG_TAG, "getAllContainerSessions(Context ctx)");
+		long startTime = System.currentTimeMillis();
 
 		if (Utils.hasNoConnection(ctx)) {
 			throw new NoConnectionException();
@@ -403,6 +404,9 @@ public class CJayClient implements ICJayClient {
 			e.printStackTrace();
 		}
 
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference));
+
 		return items;
 	}
 
@@ -411,6 +415,7 @@ public class CJayClient implements ICJayClient {
 			throws NoConnectionException {
 
 		Logger.Log(LOG_TAG, "getContainerSessions(Context ctx, Date date)");
+		long startTime = System.currentTimeMillis();
 
 		if (Utils.hasNoConnection(ctx)) {
 			throw new NoConnectionException();
@@ -421,6 +426,9 @@ public class CJayClient implements ICJayClient {
 				CJayConstant.CJAY_SERVER_DATETIME_FORMAT, date);
 
 		items = getContainerSessions(ctx, formatedDate);
+
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference));
 		return items;
 	}
 

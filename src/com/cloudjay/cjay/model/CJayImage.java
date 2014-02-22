@@ -75,7 +75,7 @@ public class CJayImage implements Parcelable {
 	@DatabaseField(columnName = FIELD_TYPE)
 	int type;
 
-	@DatabaseField(columnName = FIELD_STATE)
+	@DatabaseField(columnName = FIELD_STATE, index = true)
 	int mState;
 
 	@DatabaseField(columnName = FIELD_URI, id = true)
