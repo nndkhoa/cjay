@@ -312,6 +312,32 @@ public class ContainerSessionDaoImpl extends
 		return containerSessions;
 	}
 
+	public Cursor filterCheckOut(String query) throws SQLException {
+		Cursor cursor = null;
+
+		QueryBuilder<ContainerSession, String> queryBuilder = this
+				.queryBuilder();
+
+		queryBuilder.where().eq(ContainerSession.FIELD_CHECK_OUT_TIME, "")
+				.and().eq(ContainerSession.FIELD_LOCAL, false);
+
+		CloseableIterator<ContainerSession> iterator = this
+				.iterator(queryBuilder.prepare());
+
+		try {
+			// get the raw results which can be cast under Android
+			AndroidDatabaseResults results = (AndroidDatabaseResults) iterator
+					.getRawResults();
+			cursor = results.getRawCursor();
+
+		} finally {
+
+			// iterator.closeQuietly();
+		}
+
+		return cursor;
+	}
+
 	public Cursor getCheckOutContainerSessionCursor() throws SQLException {
 
 		Cursor cursor = null;

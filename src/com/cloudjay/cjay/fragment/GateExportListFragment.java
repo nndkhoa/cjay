@@ -2,6 +2,7 @@ package com.cloudjay.cjay.fragment;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import org.androidannotations.annotations.AfterViews;
@@ -35,9 +36,12 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FilterQueryProvider;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.ami.fundapter.BindDictionary;
@@ -72,21 +76,23 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		OnRefreshListener, LoaderCallbacks<Cursor> {
 
 	private final static String LOG_TAG = "GateExportListFragment";
+	private final static int LOADER_ID = 1;
 
-	private ArrayList<Operator> mOperators;
 	private ArrayList<ContainerSession> mFeeds;
 	private FunDapter<ContainerSession> mFeedsAdapter;
 
-	private ContainerSession mSelectedContainerSession;
-	private ImageLoader imageLoader;
+	private ArrayList<Operator> mOperators;
+	private ContainerSession mSelectedContainerSession = null;
 
 	@ViewById(R.id.container_list)
 	ListView mFeedListView;
 
 	@ViewById(R.id.search_edittext)
 	EditText mSearchEditText;
+
 	@ViewById(R.id.add_button)
 	Button mAddButton;
+
 	@ViewById(R.id.notfound_textview)
 	TextView mNotfoundTextView;
 
@@ -122,7 +128,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		mSearchEditText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable arg0) {
-				search(arg0.toString());
+				cursorAdapter.getFilter().filter(arg0.toString());
 			}
 
 			public void beforeTextChanged(CharSequence s, int start, int count,
@@ -152,15 +158,11 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 					}
 				});
 
-		imageLoader = ImageLoader.getInstance();
+		mFeedListView.setFastScrollEnabled(true);
+		mFeedListView.setTextFilterEnabled(true);
+
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
 				.getListOperators(getActivity());
-
-		// initContainerFeedAdapter(null);
-		mSelectedContainerSession = null;
-
-		// ActionBarPullToRefresh.from(getActivity()).allChildrenArePullable()
-		// .listener(this).setup(mPullToRefreshLayout);
 
 		getLoaderManager().initLoader(0, null, this);
 	}
@@ -168,6 +170,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
 		Context context = getActivity();
+
 		return new CJayCursorLoader(context) {
 			@Override
 			public Cursor loadInBackground() {
@@ -192,6 +195,15 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 
 			cursorAdapter = new ContainerCursorAdapter(getActivity(),
 					R.layout.list_item_container, cursor, 0);
+
+			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+				@Override
+				public Cursor runQuery(CharSequence constraint) {
+					// TODO Auto-generated method stub
+					return null;
+				}
+			});
+
 			mFeedListView.setAdapter(cursorAdapter);
 
 		} else {
@@ -308,6 +320,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 
 	public void showContainerDetailDialog(String containerId,
 			String operatorName, int mode) {
+
 		FragmentManager fm = getActivity().getSupportFragmentManager();
 		AddContainerDialog addContainerDialog = new AddContainerDialog();
 		addContainerDialog.setContainerId(containerId);
@@ -315,6 +328,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		addContainerDialog.setMode(mode);
 		addContainerDialog.setParent(this);
 		addContainerDialog.show(fm, "add_container_dialog");
+
 	}
 
 	public void OnOperatorSelected(String containerId, String operatorName,
@@ -353,28 +367,6 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		}
 	}
 
-	private void search(String searchText) {
-		if (searchText.equals("")) {
-			configureControls(mFeeds);
-
-			if (null != mFeeds)
-				mFeedsAdapter.updateData(mFeeds);
-		} else {
-
-			ArrayList<ContainerSession> searchFeeds = new ArrayList<ContainerSession>();
-			for (ContainerSession containerSession : mFeeds) {
-				if (containerSession.getContainerId().toLowerCase(Locale.US)
-						.contains(searchText.toLowerCase(Locale.US))) {
-					searchFeeds.add(containerSession);
-				}
-			}
-
-			// refresh list
-			configureControls(searchFeeds);
-			mFeedsAdapter.updateData(searchFeeds);
-		}
-	}
-
 	private void configureControls(ArrayList<ContainerSession> list) {
 
 		boolean hasContainers = list != null && list.size() > 0;
@@ -389,64 +381,6 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		}
 	}
 
-	private void initContainerFeedAdapter(ArrayList<ContainerSession> containers) {
-		BindDictionary<ContainerSession> feedsDict = new BindDictionary<ContainerSession>();
-		feedsDict.addStringField(R.id.feed_item_container_id,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.replaceNullBySpace(item.getContainerId());
-					}
-				});
-		feedsDict.addStringField(R.id.feed_item_container_owner,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.replaceNullBySpace(item.getOperatorName());
-					}
-				});
-		feedsDict.addStringField(R.id.feed_item_container_import_date,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.replaceNullBySpace(item.getCheckInTime());
-					}
-				});
-		feedsDict.addStringField(R.id.feed_item_container_export_date,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.replaceNullBySpace(item.getCheckOutTime());
-					}
-				});
-		feedsDict.addDynamicImageField(R.id.feed_item_picture,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.stripNull(item.getImageIdPath());
-					}
-				}, new DynamicImageLoader() {
-					@Override
-					public void loadImage(String url, ImageView view) {
-						if (!TextUtils.isEmpty(url)) {
-							imageLoader.displayImage(url, view);
-						} else {
-							view.setImageResource(R.drawable.ic_app);
-						}
-					}
-
-				});
-		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(),
-				containers, R.layout.list_item_container, feedsDict);
-
-		mFeedListView.setAdapter(mFeedsAdapter);
-	}
-
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
 		Logger.Log(LOG_TAG, "onEventMainThread ContainerSessionChangedEvent");
 		refresh();
@@ -456,8 +390,8 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 	public void refresh() {
 		Logger.Log(LOG_TAG, "onRefresh");
 
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListCheckOutContainerSessions(getActivity());
+		// mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
+		// .getListCheckOutContainerSessions(getActivity());
 
 		// mFeedsAdapter.updateData(mFeeds);
 		mSearchEditText.setText(""); // this will refresh the list

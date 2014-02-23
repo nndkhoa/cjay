@@ -162,11 +162,15 @@ public class GateHomeActivity extends CJayActivity implements
 	public void OnContainerInputCompleted(Fragment parent, String containerId,
 			String operatorName, int mode) {
 		if (parent instanceof GateImportListFragment) {
+			
 			((GateImportListFragment) parent).OnContainerInputCompleted(
 					containerId, operatorName, mode);
+			
 		} else if (parent instanceof GateExportListFragment) {
+			
 			((GateExportListFragment) parent).OnContainerInputCompleted(
 					containerId, operatorName, mode);
+			
 		}
 	}
 
