@@ -78,9 +78,6 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 	private final static String LOG_TAG = "GateExportListFragment";
 	private final static int LOADER_ID = 1;
 
-	private ArrayList<ContainerSession> mFeeds;
-	private FunDapter<ContainerSession> mFeedsAdapter;
-
 	private ArrayList<Operator> mOperators;
 	private ContainerSession mSelectedContainerSession = null;
 
@@ -199,8 +196,8 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
 				@Override
 				public Cursor runQuery(CharSequence constraint) {
-					// TODO Auto-generated method stub
-					return null;
+					return DataCenter.getInstance().filterCheckoutCursor(
+							getActivity(), constraint);
 				}
 			});
 
@@ -285,7 +282,8 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		hideMenuItems();
 
 		// get the selected container session and open camera
-		ContainerSession containerSession = mFeedsAdapter.getItem(position);
+		ContainerSession containerSession = (ContainerSession) cursorAdapter
+				.getItem(position);
 		ContainerSession.gotoCamera(getActivity(), containerSession,
 				CJayImage.TYPE_EXPORT);
 	}
@@ -294,7 +292,8 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 	void listItemLongClicked(int position) {
 		// refresh highlighting and menu
 		mFeedListView.setItemChecked(position, true);
-		mSelectedContainerSession = mFeedsAdapter.getItem(position);
+		mSelectedContainerSession = (ContainerSession) cursorAdapter
+				.getItem(position);
 		getActivity().supportInvalidateOptionsMenu();
 	}
 
@@ -386,34 +385,21 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		refresh();
 	}
 
-	// TODO: need to embed inside AsyncTask
 	public void refresh() {
 		Logger.Log(LOG_TAG, "onRefresh");
-
-		// mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-		// .getListCheckOutContainerSessions(getActivity());
-
-		// mFeedsAdapter.updateData(mFeeds);
-		mSearchEditText.setText(""); // this will refresh the list
 	}
 
 	@Override
 	public void onResume() {
-
 		Logger.Log(LOG_TAG, "onResume " + LOG_TAG);
-
-		if (mFeedsAdapter != null) {
+		if (cursorAdapter != null) {
 			refresh();
 		}
-
 		super.onResume();
 	}
 
 	@Override
 	public void onRefreshStarted(View view) {
-		/**
-		 * Simulate Refresh with 4 seconds sleep
-		 */
 		new AsyncTask<Void, Void, Void>() {
 
 			@Override

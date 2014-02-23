@@ -276,6 +276,18 @@ public class DataCenter {
 		return null;
 	}
 
+	public Cursor filterCheckoutCursor(Context context, CharSequence constraint) {
+
+		try {
+			return getDatabaseManager().getHelper(context)
+					.getContainerSessionDaoImpl()
+					.filterCheckOutCursor(constraint);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	public List<ContainerSession> getListReportedContainerSessions(
 			Context context) {
 		Logger.Log(LOG_TAG, "get list reported Container sessions");

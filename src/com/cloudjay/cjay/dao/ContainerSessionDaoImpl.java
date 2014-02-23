@@ -312,7 +312,8 @@ public class ContainerSessionDaoImpl extends
 		return containerSessions;
 	}
 
-	public Cursor filterCheckOut(String query) throws SQLException {
+	public Cursor filterCheckOutCursor(CharSequence constraint)
+			throws SQLException {
 		Cursor cursor = null;
 
 		QueryBuilder<ContainerSession, String> queryBuilder = this
