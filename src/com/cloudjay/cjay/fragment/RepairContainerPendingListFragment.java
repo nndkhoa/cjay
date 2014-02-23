@@ -37,8 +37,7 @@ import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.CJayActivity;
-import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.RepairContainerActivity_;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerRepairedEvent;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
@@ -133,60 +132,65 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 					int count) {
 			}
 		});
-		
+
 		mFeedListView.setMultiChoiceModeListener(new MultiChoiceModeListener() {
-		    @Override
-		    public void onItemCheckedStateChanged(ActionMode mode, int position,
-		                                          long id, boolean checked) {
-		        // Here you can do something when items are selected/de-selected,
-		        // such as update the title in the CAB
-		    	mode.setTitle(String.valueOf(mFeedListView.getCheckedItemCount()));
-		    }
+			@Override
+			public void onItemCheckedStateChanged(ActionMode mode,
+					int position, long id, boolean checked) {
+				// Here you can do something when items are
+				// selected/de-selected,
+				// such as update the title in the CAB
+				mode.setTitle(String.valueOf(mFeedListView
+						.getCheckedItemCount()));
+			}
 
-		    @Override
-		    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-		        // Respond to clicks on the actions in the CAB
-		        switch (item.getItemId()) {
-		            case R.id.menu_check:
-		            	setSelectedContainersFixed();
-		                mode.finish(); // Action picked, so close the CAB
-		                return true;
-		            default:
-		                return false;
-		        }
-		    }
+			@Override
+			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+				// Respond to clicks on the actions in the CAB
+				switch (item.getItemId()) {
+				case R.id.menu_check:
+					setSelectedContainersFixed();
+					mode.finish(); // Action picked, so close the CAB
+					return true;
+				default:
+					return false;
+				}
+			}
 
-		    @Override
-		    public boolean onCreateActionMode(ActionMode mode, android.view.Menu menu) {
-		        // Inflate the menu for the CAB
-		        MenuInflater inflater = mode.getMenuInflater();
-		        inflater.inflate(R.menu.menu_repair_container_pending, menu);
-		        return true;
-		    }
+			@Override
+			public boolean onCreateActionMode(ActionMode mode,
+					android.view.Menu menu) {
+				// Inflate the menu for the CAB
+				MenuInflater inflater = mode.getMenuInflater();
+				inflater.inflate(R.menu.menu_repair_container_pending, menu);
+				return true;
+			}
 
-		    @Override
-		    public void onDestroyActionMode(ActionMode mode) {
-		        // Here you can make any necessary updates to the activity when
-		        // the CAB is removed. By default, selected items are deselected/unchecked.
-		    }
+			@Override
+			public void onDestroyActionMode(ActionMode mode) {
+				// Here you can make any necessary updates to the activity when
+				// the CAB is removed. By default, selected items are
+				// deselected/unchecked.
+			}
 
-		    @Override
-		    public boolean onPrepareActionMode(ActionMode mode, android.view.Menu menu) {
-		        // Here you can perform updates to the CAB due to
-		        // an invalidate() request
-		        return false;
-		    }
+			@Override
+			public boolean onPrepareActionMode(ActionMode mode,
+					android.view.Menu menu) {
+				// Here you can perform updates to the CAB due to
+				// an invalidate() request
+				return false;
+			}
 		});
 
 		imageLoader = ImageLoader.getInstance();
 		initContainerFeedAdapter(null);
 	}
 
-//	@OptionsItem(R.id.menu_check)
-//	void checkMenuItemSelected() {
-//		setContainerFixed(mSelectedContainerSession);
-//		hideMenuItems();
-//	}
+	// @OptionsItem(R.id.menu_check)
+	// void checkMenuItemSelected() {
+	// setContainerFixed(mSelectedContainerSession);
+	// hideMenuItems();
+	// }
 
 	@ItemClick(R.id.container_list)
 	void listItemClicked(int position) {
@@ -197,20 +201,20 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 		startActivity(intent);
 	}
 
-//	@ItemLongClick(R.id.container_list)
-//	void listItemLongClicked(int position) {
-//		// refresh highlighting and menu
-//		mFeedListView.setItemChecked(position, true);
-//		mSelectedContainerSession = mFeedsAdapter.getItem(position);
-//		getActivity().supportInvalidateOptionsMenu();
-//	}
+	// @ItemLongClick(R.id.container_list)
+	// void listItemLongClicked(int position) {
+	// // refresh highlighting and menu
+	// mFeedListView.setItemChecked(position, true);
+	// mSelectedContainerSession = mFeedsAdapter.getItem(position);
+	// getActivity().supportInvalidateOptionsMenu();
+	// }
 
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
 
-//		boolean isDisplayed = !(mSelectedContainerSession == null);
-//		menu.findItem(R.id.menu_check).setVisible(isDisplayed);
+		// boolean isDisplayed = !(mSelectedContainerSession == null);
+		// menu.findItem(R.id.menu_check).setVisible(isDisplayed);
 		menu.findItem(R.id.menu_check).setVisible(false);
 	}
 
@@ -233,27 +237,30 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 		}
 		super.onResume();
 	}
-	
+
 	void setSelectedContainersFixed() {
 		// loop through all the selected container sessions
 		// and set each of them as fixed
 		SparseBooleanArray selected = mFeedListView.getCheckedItemPositions();
 		mSelectedContainerSessions = new ArrayList<ContainerSession>();
-		
+
 		for (int i = 0; i < selected.size(); i++) {
-		    if(selected.valueAt(i) == true) {
-		        ContainerSession containerSession = (ContainerSession)mFeedListView.getItemAtPosition(selected.keyAt(i));
-		        mSelectedContainerSessions.add(containerSession);
-		    }
+			if (selected.valueAt(i) == true) {
+				ContainerSession containerSession = (ContainerSession) mFeedListView
+						.getItemAtPosition(selected.keyAt(i));
+				mSelectedContainerSessions.add(containerSession);
+			}
 		}
-		
+
 		for (ContainerSession containerSession : mSelectedContainerSessions) {
-	        setContainerFixed(containerSession);			
+			setContainerFixed(containerSession);
 		}
-		
-		EventBus.getDefault().post(new ContainerRepairedEvent(mSelectedContainerSessions)); // Force refresh
+
+		EventBus.getDefault().post(
+				new ContainerRepairedEvent(mSelectedContainerSessions)); // Force
+																			// refresh
 	}
-	
+
 	void setContainerFixed(ContainerSession containerSession) {
 		// set fixed to true
 		containerSession.setFixed(true);
@@ -269,10 +276,10 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 		}
 	}
 
-//	void hideMenuItems() {
-//		mFeedListView.setItemChecked(-1, true);
-//		getActivity().supportInvalidateOptionsMenu();
-//	}
+	// void hideMenuItems() {
+	// mFeedListView.setItemChecked(-1, true);
+	// getActivity().supportInvalidateOptionsMenu();
+	// }
 
 	private void search(String searchText) {
 		if (searchText.equals("")) {
@@ -360,30 +367,30 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 						}
 					}
 				});
-//		feedsDict.addDynamicImageField(R.id.feed_item_background,
-//				new StringExtractor<ContainerSession>() {
-//					@Override
-//					public String getStringValue(ContainerSession item,
-//							int position) {
-//						boolean fixed = item.getIssues().size() > 0;
-//						for (Issue issue : item.getIssues()) {
-//							if (!issue.isFixed()) {
-//								fixed = false;
-//								break;
-//							}
-//						}
-//						return (fixed ? "fixed" : "not fixed");
-//					}
-//				}, new DynamicImageLoader() {
-//					@Override
-//					public void loadImage(String url, ImageView view) {
-//						if (url.equals("fixed")) {
-//							view.setBackgroundResource(R.color.list_item_bg_container_fixed);
-//						} else {
-//							view.setBackgroundResource(0);
-//						}
-//					}
-//				});
+		// feedsDict.addDynamicImageField(R.id.feed_item_background,
+		// new StringExtractor<ContainerSession>() {
+		// @Override
+		// public String getStringValue(ContainerSession item,
+		// int position) {
+		// boolean fixed = item.getIssues().size() > 0;
+		// for (Issue issue : item.getIssues()) {
+		// if (!issue.isFixed()) {
+		// fixed = false;
+		// break;
+		// }
+		// }
+		// return (fixed ? "fixed" : "not fixed");
+		// }
+		// }, new DynamicImageLoader() {
+		// @Override
+		// public void loadImage(String url, ImageView view) {
+		// if (url.equals("fixed")) {
+		// view.setBackgroundResource(R.color.list_item_bg_container_fixed);
+		// } else {
+		// view.setBackgroundResource(0);
+		// }
+		// }
+		// });
 		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(),
 				containers, R.layout.list_item_repair_container, feedsDict);
 		mFeedListView.setAdapter(mFeedsAdapter);
