@@ -6,7 +6,7 @@
     android:versionName="1.0.3.3" >
 
     <uses-sdk
-        android:minSdkVersion="14"
+        android:minSdkVersion="15"
         android:targetSdkVersion="15" />
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -149,7 +149,6 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        
         <receiver android:name="com.cloudjay.cjay.receivers.InstantUploadReceiver" >
             <intent-filter>
                 <action android:name="com.android.camera.NEW_PICTURE" />
@@ -164,7 +163,6 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
-        
     </application>
 
 </manifest>

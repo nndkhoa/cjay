@@ -17,7 +17,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadsListBaseAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;

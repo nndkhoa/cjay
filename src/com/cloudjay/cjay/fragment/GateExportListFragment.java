@@ -23,10 +23,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -44,7 +42,6 @@ import android.widget.TextView;
 import com.actionbarsherlock.view.Menu;
 import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
-import com.ami.fundapter.extractors.ChildExtractor;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.CJayActivity;
@@ -166,33 +163,37 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		// .listener(this).setup(mPullToRefreshLayout);
 
 		getLoaderManager().initLoader(0, null, this);
-
 	}
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-		CJayCursorLoader cursorLoader = new CJayCursorLoader(getActivity());
-		// chi can la class extends tu Loader<?> la dc roi :)
-		// ua em vua lam y chang anh no bao loi :botay: ok chay thu xem.
+		Context context = getActivity();
+		return new CJayCursorLoader(context) {
+			@Override
+			public Cursor loadInBackground() {
+				Cursor cursor = DataCenter.getInstance()
+						.getCheckOutContainerSessionCursor(getContext());
 
-		// TODO: create cursor loader
+				if (cursor != null) {
+					// Ensure the cursor window is filled
+					cursor.getCount();
+					cursor.registerContentObserver(mObserver);
+				}
 
-		// String rawQuery = "SELECT ...";
-		// String[] queryParams = null;// to substitute placeholders
-		// SQLiteCursorLoader loader = new SQLiteCursorLoader(getActivity()
-		// .getApplicationContext(), yourSqliteOpenHelper, rawQuery,
-		// queryParams);
-		// return loader;
-
-		return cursorLoader;
+				return cursor;
+			}
+		};
 	}
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+
 		if (cursorAdapter == null) {
+
 			cursorAdapter = new ContainerCursorAdapter(getActivity(),
 					R.layout.list_item_container, cursor, 0);
 			mFeedListView.setAdapter(cursorAdapter);
+
 		} else {
 			cursorAdapter.swapCursor(cursor);
 		}
@@ -318,9 +319,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 
 	public void OnOperatorSelected(String containerId, String operatorName,
 			int mode) {
-
 		showContainerDetailDialog(containerId, operatorName, mode);
-
 	}
 
 	public void OnContainerInputCompleted(String containerId,

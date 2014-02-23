@@ -1,8 +1,6 @@
 package com.cloudjay.cjay;
 
 import java.net.SocketTimeoutException;
-import java.sql.SQLException;
-
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;

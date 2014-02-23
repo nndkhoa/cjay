@@ -3,13 +3,12 @@ package com.cloudjay.cjay.adapter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.util.Logger;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.widget.CursorAdapter;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +21,7 @@ public class ContainerCursorAdapter extends CursorAdapter implements Filterable 
 	private int layout;
 	private Cursor mCursor;
 	private LayoutInflater inflater;
+	private ImageLoader imageLoader;
 
 	@SuppressWarnings("deprecation")
 	public ContainerCursorAdapter(Context context, Cursor c) {
@@ -36,7 +36,7 @@ public class ContainerCursorAdapter extends CursorAdapter implements Filterable 
 		this.layout = layout;
 		this.inflater = LayoutInflater.from(context);
 		this.mCursor = c;
-
+		this.imageLoader = ImageLoader.getInstance();
 	}
 
 	private static class ViewHolder {
@@ -47,25 +47,6 @@ public class ContainerCursorAdapter extends CursorAdapter implements Filterable 
 		public TextView exportDateView;
 		public ImageView itemPictureView;
 
-		public ViewHolder() {
-			containerIdView = null;
-			containerOwnerView = null;
-			importDateView = null;
-			exportDateView = null;
-			itemPictureView = null;
-		}
-
-		public ViewHolder(TextView containerId, TextView containerOwner,
-				TextView importDate, TextView exportDate,
-				ImageView itemPictureView) {
-
-			this.containerIdView = containerId;
-			this.containerOwnerView = containerOwner;
-			this.importDateView = importDate;
-			this.exportDateView = exportDate;
-			this.itemPictureView = itemPictureView;
-
-		}
 	}
 
 	@Override
@@ -95,9 +76,7 @@ public class ContainerCursorAdapter extends CursorAdapter implements Filterable 
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 
-		Logger.Log("Calling bindView");
 		ViewHolder holder = (ViewHolder) view.getTag();
-
 		if (holder == null) {
 			Logger.Log("Holder inside bindView is NULL");
 
@@ -123,6 +102,15 @@ public class ContainerCursorAdapter extends CursorAdapter implements Filterable 
 		String exportDate = cursor.getString(cursor
 				.getColumnIndexOrThrow(ContainerSession.FIELD_CHECK_OUT_TIME));
 		holder.exportDateView.setText(exportDate);
+
+		String url = cursor.getString(cursor
+				.getColumnIndexOrThrow(ContainerSession.FIELD_IMAGE_ID_PATH));
+
+		if (!TextUtils.isEmpty(url)) {
+			imageLoader.displayImage(url, holder.itemPictureView);
+		} else {
+			holder.itemPictureView.setImageResource(R.drawable.ic_app);
+		}
 
 	}
 

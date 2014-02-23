@@ -2,37 +2,34 @@ package com.cloudjay.cjay.util;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.support.v4.content.AsyncTaskLoader;
-import android.support.v4.content.CursorLoader;
 
-public class CJayCursorLoader extends AsyncTaskLoader<Cursor> {
+public abstract class CJayCursorLoader extends AsyncTaskLoader<Cursor> {
 
 	private Cursor mCursor;
+	protected final ForceLoadContentObserver mObserver = new ForceLoadContentObserver();
 
 	public CJayCursorLoader(Context context) {
 		super(context);
-
 	}
 
 	/* Runs on a worker thread */
 	@Override
-	public Cursor loadInBackground() {
-
-		return DataCenter.getInstance().getCheckOutContainerSessionCursor(
-				getContext());
-	}
+	public abstract Cursor loadInBackground();
 
 	/* Runs on the UI thread */
 	@Override
 	public void deliverResult(Cursor cursor) {
+
 		if (isReset()) {
+
 			// An async query came in while the loader is stopped
 			if (cursor != null) {
 				cursor.close();
 			}
 			return;
 		}
+
 		Cursor oldCursor = mCursor;
 		mCursor = cursor;
 

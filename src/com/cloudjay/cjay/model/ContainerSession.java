@@ -8,16 +8,13 @@ import java.util.List;
 import java.util.UUID;
 
 import android.annotation.SuppressLint;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.provider.MediaStore.Images.Thumbnails;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.CJayApplication;
@@ -30,7 +27,6 @@ import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Session;
 import com.cloudjay.cjay.util.StringHelper;
@@ -63,7 +59,7 @@ public class ContainerSession implements Parcelable {
 	public static final String FIELD_IMAGE_ID_PATH = "image_id_path";
 	public static final String FIELD_STATE = "state";
 	public static final String FIELD_ID = "id";
-	
+
 	// _id for cursor loader usage
 	public static final String FIELD_UUID = "_id";
 	public static final String FIELD_UPLOAD_CONFIRMATION = "upload_confirmation";

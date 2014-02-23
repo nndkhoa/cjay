@@ -26,8 +26,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockDialogFragment;
-import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
