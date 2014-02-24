@@ -2,9 +2,6 @@ package com.cloudjay.cjay.fragment;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
@@ -20,6 +17,7 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.CursorJoiner;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -34,22 +32,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.actionbarsherlock.view.Menu;
-import com.ami.fundapter.BindDictionary;
-import com.ami.fundapter.FunDapter;
-import com.ami.fundapter.extractors.StringExtractor;
-import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.adapter.CheckOutCursorAdapter;
 import com.cloudjay.cjay.adapter.ContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
@@ -64,9 +58,8 @@ import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.StringHelper;
-import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.j256.ormlite.stmt.PreparedQuery;
 
 import de.greenrobot.event.EventBus;
 
@@ -76,8 +69,6 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		OnRefreshListener, LoaderCallbacks<Cursor> {
 
 	private final static String LOG_TAG = "GateExportListFragment";
-	private final static int LOADER_ID = 1;
-
 	private ArrayList<Operator> mOperators;
 	private ContainerSession mSelectedContainerSession = null;
 
@@ -94,7 +85,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 	TextView mNotfoundTextView;
 
 	PullToRefreshLayout mPullToRefreshLayout;
-	CursorAdapter cursorAdapter;
+	ContainerCursorAdapter cursorAdapter;
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -155,13 +146,46 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 					}
 				});
 
-		mFeedListView.setFastScrollEnabled(true);
-		mFeedListView.setTextFilterEnabled(true);
-
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
 				.getListOperators(getActivity());
 
 		getLoaderManager().initLoader(0, null, this);
+
+		// mFeedListView.setSmoothScrollbarEnabled(true);
+		// mFeedListView.setFastScrollEnabled(true);
+
+		mFeedListView.setTextFilterEnabled(true);
+		mFeedListView.setScrollingCacheEnabled(false);
+		mFeedListView.setOnScrollListener(new OnScrollListener() {
+
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				
+				// if (scrollState != 0) {
+				// ((CheckOutCursorAdapter)
+				// mFeedListView.getAdapter()).isScrolling = true;
+				// } else {
+				// ((CheckOutCursorAdapter)
+				// mFeedListView.getAdapter()).isScrolling = false;
+				// ((CheckOutCursorAdapter) mFeedListView.getAdapter())
+				// .notifyDataSetChanged();
+				// }
+
+				if (scrollState != 0) {
+					((ContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
+				} else {
+					((ContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
+					((ContainerCursorAdapter) mFeedListView.getAdapter())
+							.notifyDataSetChanged();
+				}
+			}
+
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount) {
+			}
+		});
+
 	}
 
 	@Override
@@ -175,6 +199,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 						.getCheckOutContainerSessionCursor(getContext());
 
 				if (cursor != null) {
+
 					// Ensure the cursor window is filled
 					cursor.getCount();
 					cursor.registerContentObserver(mObserver);
@@ -188,10 +213,29 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 
+		if (cursor.getCount() != 0) {
+			mFeedListView.setVisibility(View.VISIBLE);
+			mAddButton.setVisibility(View.INVISIBLE);
+			mNotfoundTextView.setVisibility(View.INVISIBLE);
+		} else {
+			mFeedListView.setVisibility(View.INVISIBLE);
+			mAddButton.setVisibility(View.VISIBLE);
+			mNotfoundTextView.setVisibility(View.VISIBLE);
+		}
+
 		if (cursorAdapter == null) {
 
+			PreparedQuery<ContainerSession> query = DataCenter.getInstance()
+					.getListCheckOutPreparedQuery(getActivity());
+
+			// cursorAdapter = new CheckOutCursorAdapter(getActivity(),
+			// R.layout.list_item_container, cursor, query);
+
+			// cursorAdapter = new ContainerCursorAdapter(getActivity(),
+			// R.layout.list_item_container, cursor, 0);
+
 			cursorAdapter = new ContainerCursorAdapter(getActivity(),
-					R.layout.list_item_container, cursor, 0);
+					R.layout.list_item_container, cursor, 0, query);
 
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
 				@Override

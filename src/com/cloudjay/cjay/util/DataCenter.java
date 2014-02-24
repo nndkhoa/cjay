@@ -25,6 +25,7 @@ import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
+import com.j256.ormlite.stmt.PreparedQuery;
 
 /**
  * 
@@ -263,6 +264,18 @@ public class DataCenter {
 		return null;
 	}
 
+	public PreparedQuery<ContainerSession> getListCheckOutPreparedQuery(
+			Context context) {
+		try {
+			return getDatabaseManager().getHelper(context)
+					.getContainerSessionDaoImpl()
+					.getListCheckOutPreparedQuery();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	public Cursor getCheckOutContainerSessionCursor(Context context) {
 
 		try {
@@ -270,7 +283,17 @@ public class DataCenter {
 					.getContainerSessionDaoImpl()
 					.getCheckOutContainerSessionCursor();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public Cursor getAllContainersCursor(Context context) {
+
+		try {
+			return getDatabaseManager().getHelper(context)
+					.getContainerDaoImpl().getAllContainersCursor();
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return null;

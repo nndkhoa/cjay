@@ -10,11 +10,14 @@ import android.util.Log;
 
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
+import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.util.Logger;
+import com.j256.ormlite.android.AndroidDatabaseConnection;
 import com.j256.ormlite.android.AndroidDatabaseResults;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.CloseableIterator;
+import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 
@@ -312,8 +315,17 @@ public class ContainerSessionDaoImpl extends
 		return containerSessions;
 	}
 
+	public PreparedQuery<ContainerSession> getListCheckOutPreparedQuery()
+			throws SQLException {
+
+		return this.queryBuilder().where()
+				.eq(ContainerSession.FIELD_CHECK_OUT_TIME, "").and()
+				.eq(ContainerSession.FIELD_LOCAL, false).prepare();
+	}
+
 	public Cursor filterCheckOutCursor(CharSequence constraint)
 			throws SQLException {
+
 		Cursor cursor = null;
 
 		QueryBuilder<ContainerSession, String> queryBuilder = this
@@ -345,8 +357,18 @@ public class ContainerSessionDaoImpl extends
 
 		QueryBuilder<ContainerSession, String> queryBuilder = this
 				.queryBuilder();
+
 		queryBuilder.where().eq(ContainerSession.FIELD_CHECK_OUT_TIME, "")
 				.and().eq(ContainerSession.FIELD_LOCAL, false);
+
+		// ContainerDaoImpl containerDaoImpl = new ContainerDaoImpl(
+		// connectionSource);
+		// QueryBuilder<Container, Integer> containerQueryBuilder =
+		// containerDaoImpl
+		// .queryBuilder();
+		//
+		// queryBuilder.join(containerQueryBuilder);
+
 		CloseableIterator<ContainerSession> iterator = this
 				.iterator(queryBuilder.prepare());
 

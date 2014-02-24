@@ -1,12 +1,20 @@
 package com.cloudjay.cjay.adapter;
 
+import java.sql.SQLException;
+
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.dao.ContainerDaoImpl;
+import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.j256.ormlite.android.AndroidDatabaseResults;
+import com.j256.ormlite.stmt.PreparedQuery;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.CursorJoiner;
 import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -22,6 +30,8 @@ public class ContainerCursorAdapter extends CursorAdapter implements Filterable 
 	private Cursor mCursor;
 	private LayoutInflater inflater;
 	private ImageLoader imageLoader;
+	private PreparedQuery<ContainerSession> mQuery;
+	public boolean isScrolling;
 
 	@SuppressWarnings("deprecation")
 	public ContainerCursorAdapter(Context context, Cursor c) {
@@ -30,13 +40,22 @@ public class ContainerCursorAdapter extends CursorAdapter implements Filterable 
 
 	public ContainerCursorAdapter(Context context, int layout, Cursor c,
 			int flags) {
-
 		super(context, c, flags);
-
 		this.layout = layout;
 		this.inflater = LayoutInflater.from(context);
 		this.mCursor = c;
 		this.imageLoader = ImageLoader.getInstance();
+	}
+
+	public ContainerCursorAdapter(Context context, int layout, Cursor c,
+			int flags, PreparedQuery<ContainerSession> query) {
+
+		super(context, c, flags);
+		this.layout = layout;
+		this.inflater = LayoutInflater.from(context);
+		this.mCursor = c;
+		this.imageLoader = ImageLoader.getInstance();
+		this.mQuery = query;
 	}
 
 	private static class ViewHolder {
@@ -50,31 +69,11 @@ public class ContainerCursorAdapter extends CursorAdapter implements Filterable 
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		if (!mDataValid) {
-			throw new IllegalStateException(
-					"this should only be called when the cursor is valid");
-		}
-
-		if (!mCursor.moveToPosition(position)) {
-			throw new IllegalStateException("couldn't move cursor to position "
-					+ position);
-		}
-
-		View v;
-		if (convertView == null) {
-			v = newView(mContext, mCursor, parent);
-		} else {
-			v = convertView;
-		}
-
-		bindView(v, mContext, mCursor);
-		return v;
-
-	}
-
-	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
+
+		if (cursor == null) {
+			Logger.Log("-----> BUG");
+		}
 
 		ViewHolder holder = (ViewHolder) view.getTag();
 		if (holder == null) {
@@ -95,21 +94,59 @@ public class ContainerCursorAdapter extends CursorAdapter implements Filterable 
 		}
 
 		// TODO: get data from cursor and bind to holder
-		String importDate = cursor.getString(cursor
-				.getColumnIndexOrThrow(ContainerSession.FIELD_CHECK_IN_TIME));
-		holder.importDateView.setText(importDate);
+		try {
 
-		String exportDate = cursor.getString(cursor
-				.getColumnIndexOrThrow(ContainerSession.FIELD_CHECK_OUT_TIME));
-		holder.exportDateView.setText(exportDate);
+			ContainerSession item = mQuery.mapRow(new AndroidDatabaseResults(
+					cursor, null));
 
-		String url = cursor.getString(cursor
-				.getColumnIndexOrThrow(ContainerSession.FIELD_IMAGE_ID_PATH));
+			if (isScrolling == true) {
 
-		if (!TextUtils.isEmpty(url)) {
-			imageLoader.displayImage(url, holder.itemPictureView);
-		} else {
-			holder.itemPictureView.setImageResource(R.drawable.ic_app);
+				holder.containerIdView.setText(item.getContainer()
+						.getContainerId());
+				holder.containerOwnerView.setText(item.getContainer()
+						.getOperator().getName());
+			} else {
+				holder.importDateView.setText(item.getCheckInTime());
+				// holder.exportDateView.setText(item.getCheckOutTime());
+				holder.containerOwnerView.setText(item.getContainer()
+						.getOperator().getName());
+				holder.containerIdView.setText(item.getContainer()
+						.getContainerId());
+
+				String url = item.getImageIdPath();
+				if (!TextUtils.isEmpty(url)) {
+					imageLoader.displayImage(url, holder.itemPictureView);
+				} else {
+					holder.itemPictureView.setImageResource(R.drawable.ic_app);
+				}
+			}
+
+			// String url = cursor
+			// .getString(cursor
+			// .getColumnIndexOrThrow(ContainerSession.FIELD_IMAGE_ID_PATH));
+			// if (!TextUtils.isEmpty(url)) {
+			// imageLoader.displayImage(url, holder.itemPictureView);
+			// } else {
+			// holder.itemPictureView.setImageResource(R.drawable.ic_app);
+			// }
+			//
+			// String importDate = cursor
+			// .getString(cursor
+			// .getColumnIndexOrThrow(ContainerSession.FIELD_CHECK_IN_TIME));
+			// holder.importDateView.setText(importDate);
+			//
+			// String exportDate = cursor
+			// .getString(cursor
+			// .getColumnIndexOrThrow(ContainerSession.FIELD_CHECK_OUT_TIME));
+			// holder.exportDateView.setText(exportDate);
+			//
+			// String containerId = cursor.getString(cursor
+			// .getColumnIndexOrThrow("container_id"));
+			// holder.containerIdView.setText(containerId);
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 	}

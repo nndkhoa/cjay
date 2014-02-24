@@ -15,7 +15,7 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "container", daoClass = ContainerDaoImpl.class)
 public class Container implements Parcelable {
 
-	public static final String ID = "id";
+	public static final String ID = "_id";
 	public static final String CONTAINER_ID = "container_id";
 
 	public Container(String container_id) {

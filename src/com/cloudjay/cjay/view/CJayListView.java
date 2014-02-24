@@ -14,7 +14,7 @@ public abstract class CJayListView<T> extends ListView {
 	private ArrayList<T> mFeeds;
 	private FunDapter<T> mFeedsAdapter;
 	private ImageLoader mImageLoader;
-
+	
 	public CJayListView(Context context) {
 		super(context);
 		init();
