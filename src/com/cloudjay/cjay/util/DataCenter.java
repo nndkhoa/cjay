@@ -286,15 +286,6 @@ public class DataCenter {
 		String queryString = "SELECT * FROM csview cs WHERE cs.check_out_time = '' AND cs.on_local = 0";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
 				queryString, new String[] {});
-
-		// try {
-		// return getDatabaseManager().getHelper(context)
-		// .getContainerSessionDaoImpl()
-		// .getCheckOutContainerSessionCursor();
-		// } catch (SQLException e) {
-		// e.printStackTrace();
-		// }
-		// return null;
 	}
 
 	public Cursor getAllContainersCursor(Context context) {
@@ -310,14 +301,10 @@ public class DataCenter {
 
 	public Cursor filterCheckoutCursor(Context context, CharSequence constraint) {
 
-		try {
-			return getDatabaseManager().getHelper(context)
-					.getContainerSessionDaoImpl()
-					.filterCheckOutCursor(constraint);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
+		String queryString = "SELECT * FROM csview cs "
+				+ "WHERE cs.check_out_time = '' AND cs.on_local = 0 AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] { constraint + "%" });
 	}
 
 	public List<ContainerSession> getListReportedContainerSessions(
