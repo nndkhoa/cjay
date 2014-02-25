@@ -103,9 +103,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 		if (null != session) {
 
 			if (this instanceof SplashScreenActivity) {
-
 				Logger.Log(LOG_TAG, "Call from SplashScreenActivity");
-
 				new AsyncTask<Void, Integer, Void>() {
 
 					@Override
@@ -135,6 +133,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 							DataCenter.getInstance()
 									.updateListContainerSessions(
 											getApplicationContext());
+
 						} catch (NoConnectionException e) {
 							e.printStackTrace();
 							showCrouton(R.string.alert_no_network);

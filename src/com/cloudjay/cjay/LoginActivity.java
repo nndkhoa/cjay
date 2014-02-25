@@ -1,6 +1,8 @@
 package com.cloudjay.cjay;
 
 import java.net.SocketTimeoutException;
+import java.sql.SQLException;
+
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
@@ -227,6 +229,8 @@ public class LoginActivity extends CJayActivity {
 		protected Boolean doInBackground(Void... params) {
 			// attempt authentication against a network service.
 			try {
+				
+				// TODO: fix bug wrong credential
 				String userToken = CJayClient.getInstance().getUserToken(
 						mEmail, mPassword, LoginActivity.this);
 
@@ -239,12 +243,11 @@ public class LoginActivity extends CJayActivity {
 
 					DataCenter.getInstance().saveCredential(LoginActivity.this,
 							userToken);
-
 					changeProgressText(R.string.login_progress_loading_data);
 
-					DataCenter.getInstance().fetchData(LoginActivity.this);
-					// DataCenter.getInstance().updateListISOCode(
-					// LoginActivity.this);
+					// DataCenter.getInstance().fetchData(LoginActivity.this);
+					DataCenter.getInstance().updateListISOCode(
+							LoginActivity.this);
 					return true;
 				}
 
@@ -262,13 +265,11 @@ public class LoginActivity extends CJayActivity {
 				showCrouton(R.string.alert_no_network);
 				cancel(isFinishing());
 
+			} catch (SQLException e) {
+				e.printStackTrace();
+				showCrouton(R.string.alert_try_again);
+				cancel(isFinishing());
 			}
-
-			// catch (SQLException e) {
-			// e.printStackTrace();
-			// showCrouton(R.string.alert_try_again);
-			// cancel(isFinishing());
-			// }
 			return true;
 		}
 

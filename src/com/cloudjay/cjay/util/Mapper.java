@@ -277,7 +277,7 @@ public class Mapper {
 
 			Operator operator = null;
 			List<Operator> listOperators = operatorDaoImpl.queryForEq(
-					Operator.CODE, tmpSession.getOperatorCode());
+					Operator.FIELD_CODE, tmpSession.getOperatorCode());
 
 			if (listOperators.isEmpty()) {
 				operator = new Operator();

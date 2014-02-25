@@ -18,17 +18,17 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "operator", daoClass = OperatorDaoImpl.class)
 public class Operator implements Parcelable {
 
-	public static final String ID = "id";
-	public static final String CODE = "operator_code";
-	public static final String NAME = "operator_name";
+	public static final String FIELD_ID = "_id";
+	public static final String FIELD_CODE = "operator_code";
+	public static final String FIELD_NAME = "operator_name";
 
-	@DatabaseField(id = true, columnName = ID)
+	@DatabaseField(id = true, columnName = FIELD_ID)
 	int id;
 
-	@DatabaseField(columnName = CODE, index = true)
+	@DatabaseField(columnName = FIELD_CODE, index = true)
 	String operator_code;
 
-	@DatabaseField(columnName = NAME)
+	@DatabaseField(columnName = FIELD_NAME)
 	String operator_name;
 
 	// @ForeignCollectionField(eager = true)

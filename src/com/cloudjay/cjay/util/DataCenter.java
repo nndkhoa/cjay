@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 
@@ -51,6 +52,7 @@ import com.j256.ormlite.stmt.PreparedQuery;
  * @author tieubao
  * 
  */
+@SuppressLint("SimpleDateFormat")
 public class DataCenter {
 
 	private static final String LOG_TAG = "DataCenter";
@@ -278,14 +280,18 @@ public class DataCenter {
 
 	public Cursor getCheckOutContainerSessionCursor(Context context) {
 
-		try {
-			return getDatabaseManager().getHelper(context)
-					.getContainerSessionDaoImpl()
-					.getCheckOutContainerSessionCursor();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
+		String queryString = "SELECT * FROM csview cs WHERE cs.check_out_time = '' AND cs.on_local = 0";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] {});
+
+		// try {
+		// return getDatabaseManager().getHelper(context)
+		// .getContainerSessionDaoImpl()
+		// .getCheckOutContainerSessionCursor();
+		// } catch (SQLException e) {
+		// e.printStackTrace();
+		// }
+		// return null;
 	}
 
 	public Cursor getAllContainersCursor(Context context) {
@@ -552,6 +558,7 @@ public class DataCenter {
 	 *             if there is no connection to internet
 	 * @throws SQLException
 	 */
+	@SuppressLint("SimpleDateFormat")
 	public void updateListOperators(Context ctx) throws NoConnectionException,
 			SQLException {
 

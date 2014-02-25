@@ -21,7 +21,6 @@ public class CheckOutCursorAdapter extends
 		OrmliteCursorAdapter<ContainerSession> implements Filterable {
 
 	private ImageLoader imageLoader;
-	public boolean isScrolling;
 
 	public CheckOutCursorAdapter(Context context, int layout, Cursor c,
 			PreparedQuery<ContainerSession> query) {

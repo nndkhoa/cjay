@@ -76,6 +76,14 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 				TableUtils.createTable(connectionSource, dataClass);
 			}
 
+			// Create view
+			String sql = "CREATE VIEW csview AS"
+					+ " SELECT cs._id, cs.check_out_time, cs.check_in_time, cs.image_id_path, cs.on_local, cs.fixed, cs.upload_confirmation, cs.state, cs.cleared, c.container_id, o.operator_name"
+					+ " FROM container_session AS cs, container AS c, operator as o"
+					+ " WHERE cs.container_id = c._id AND c.operator_id = o._id";
+
+			db.execSQL(sql);
+
 		} catch (SQLException e) {
 			Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
 			throw new RuntimeException(e);
@@ -216,6 +224,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			uploadItemDeoImpl = DaoManager.createDao(
 					this.getConnectionSource(), UploadItem.class);
 		}
+
 		return uploadItemDeoImpl;
 	}
+
 }

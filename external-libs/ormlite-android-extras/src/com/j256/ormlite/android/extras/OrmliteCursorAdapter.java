@@ -14,6 +14,7 @@ import com.j256.ormlite.stmt.PreparedQuery;
 public abstract class OrmliteCursorAdapter<T> extends CursorAdapter {
 
 	private PreparedQuery<T> mQuery;
+	protected boolean isScrolling;
 	protected int layout;
 	protected LayoutInflater inflater;
 
@@ -51,6 +52,14 @@ public abstract class OrmliteCursorAdapter<T> extends CursorAdapter {
 
 	public PreparedQuery<T> getQuery() {
 		return mQuery;
+	}
+
+	public boolean isScrolling() {
+		return isScrolling;
+	}
+
+	public void setScrolling(boolean isScrolling) {
+		this.isScrolling = isScrolling;
 	}
 
 }

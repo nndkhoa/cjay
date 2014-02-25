@@ -94,60 +94,59 @@ public class ContainerCursorAdapter extends CursorAdapter implements Filterable 
 		}
 
 		// TODO: get data from cursor and bind to holder
-		try {
+		// try {
 
-			ContainerSession item = mQuery.mapRow(new AndroidDatabaseResults(
-					cursor, null));
+		// ContainerSession item = mQuery.mapRow(new AndroidDatabaseResults(
+		// cursor, null));
+		//
+		// if (isScrolling == true) {
+		//
+		// holder.containerIdView.setText(item.getContainer()
+		// .getContainerId());
+		// holder.containerOwnerView.setText(item.getContainer()
+		// .getOperator().getName());
+		// } else {
+		// holder.importDateView.setText(item.getCheckInTime());
+		// // holder.exportDateView.setText(item.getCheckOutTime());
+		// holder.containerOwnerView.setText(item.getContainer()
+		// .getOperator().getName());
+		// holder.containerIdView.setText(item.getContainer()
+		// .getContainerId());
+		//
+		// String url = item.getImageIdPath();
+		// if (!TextUtils.isEmpty(url)) {
+		// imageLoader.displayImage(url, holder.itemPictureView);
+		// } else {
+		// holder.itemPictureView.setImageResource(R.drawable.ic_app);
+		// }
+		// }
 
-			if (isScrolling == true) {
+		holder.importDateView.setText("Hello");
 
-				holder.containerIdView.setText(item.getContainer()
-						.getContainerId());
-				holder.containerOwnerView.setText(item.getContainer()
-						.getOperator().getName());
-			} else {
-				holder.importDateView.setText(item.getCheckInTime());
-				// holder.exportDateView.setText(item.getCheckOutTime());
-				holder.containerOwnerView.setText(item.getContainer()
-						.getOperator().getName());
-				holder.containerIdView.setText(item.getContainer()
-						.getContainerId());
-
-				String url = item.getImageIdPath();
-				if (!TextUtils.isEmpty(url)) {
-					imageLoader.displayImage(url, holder.itemPictureView);
-				} else {
-					holder.itemPictureView.setImageResource(R.drawable.ic_app);
-				}
-			}
-
-			// String url = cursor
-			// .getString(cursor
-			// .getColumnIndexOrThrow(ContainerSession.FIELD_IMAGE_ID_PATH));
-			// if (!TextUtils.isEmpty(url)) {
-			// imageLoader.displayImage(url, holder.itemPictureView);
-			// } else {
-			// holder.itemPictureView.setImageResource(R.drawable.ic_app);
-			// }
-			//
-			// String importDate = cursor
-			// .getString(cursor
-			// .getColumnIndexOrThrow(ContainerSession.FIELD_CHECK_IN_TIME));
-			// holder.importDateView.setText(importDate);
-			//
-			// String exportDate = cursor
-			// .getString(cursor
-			// .getColumnIndexOrThrow(ContainerSession.FIELD_CHECK_OUT_TIME));
-			// holder.exportDateView.setText(exportDate);
-			//
-			// String containerId = cursor.getString(cursor
-			// .getColumnIndexOrThrow("container_id"));
-			// holder.containerIdView.setText(containerId);
-
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		// String url = cursor.getString(cursor
+		// .getColumnIndexOrThrow(ContainerSession.FIELD_IMAGE_ID_PATH));
+		// if (!TextUtils.isEmpty(url)) {
+		// imageLoader.displayImage(url, holder.itemPictureView);
+		// } else {
+		// holder.itemPictureView.setImageResource(R.drawable.ic_app);
+		// }
+		//
+		// String importDate = cursor.getString(cursor
+		// .getColumnIndexOrThrow(ContainerSession.FIELD_CHECK_IN_TIME));
+		// holder.importDateView.setText(importDate);
+		//
+		// String exportDate = cursor.getString(cursor
+		// .getColumnIndexOrThrow(ContainerSession.FIELD_CHECK_OUT_TIME));
+		// holder.exportDateView.setText(exportDate);
+		//
+		// String containerId = cursor.getString(cursor
+		// .getColumnIndexOrThrow("container_id"));
+		// holder.containerIdView.setText(containerId);
+		//
+		// } catch (SQLException e) {
+		//
+		// e.printStackTrace();
+		// }
 
 	}
 

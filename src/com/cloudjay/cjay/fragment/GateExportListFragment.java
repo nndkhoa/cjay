@@ -160,24 +160,26 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
-				
-				// if (scrollState != 0) {
-				// ((CheckOutCursorAdapter)
-				// mFeedListView.getAdapter()).isScrolling = true;
-				// } else {
-				// ((CheckOutCursorAdapter)
-				// mFeedListView.getAdapter()).isScrolling = false;
-				// ((CheckOutCursorAdapter) mFeedListView.getAdapter())
-				// .notifyDataSetChanged();
-				// }
 
 				if (scrollState != 0) {
-					((ContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
+					((CheckOutCursorAdapter) mFeedListView.getAdapter())
+							.setScrolling(true);
 				} else {
-					((ContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
-					((ContainerCursorAdapter) mFeedListView.getAdapter())
+					((CheckOutCursorAdapter) mFeedListView.getAdapter())
+							.setScrolling(false);
+					((CheckOutCursorAdapter) mFeedListView.getAdapter())
 							.notifyDataSetChanged();
 				}
+
+				// if (scrollState != 0) {
+				// ((ContainerCursorAdapter)
+				// mFeedListView.getAdapter()).isScrolling = true;
+				// } else {
+				// ((ContainerCursorAdapter)
+				// mFeedListView.getAdapter()).isScrolling = false;
+				// ((ContainerCursorAdapter) mFeedListView.getAdapter())
+				// .notifyDataSetChanged();
+				// }
 			}
 
 			@Override
@@ -225,17 +227,17 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 
 		if (cursorAdapter == null) {
 
-			PreparedQuery<ContainerSession> query = DataCenter.getInstance()
-					.getListCheckOutPreparedQuery(getActivity());
+			// PreparedQuery<ContainerSession> query = DataCenter.getInstance()
+			// .getListCheckOutPreparedQuery(getActivity());
 
 			// cursorAdapter = new CheckOutCursorAdapter(getActivity(),
 			// R.layout.list_item_container, cursor, query);
 
 			// cursorAdapter = new ContainerCursorAdapter(getActivity(),
-			// R.layout.list_item_container, cursor, 0);
+			// R.layout.list_item_container, cursor, 0, query);
 
 			cursorAdapter = new ContainerCursorAdapter(getActivity(),
-					R.layout.list_item_container, cursor, 0, query);
+					R.layout.list_item_container, cursor, 0);
 
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
 				@Override
@@ -407,20 +409,6 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 				e.printStackTrace();
 			}
 			break;
-		}
-	}
-
-	private void configureControls(ArrayList<ContainerSession> list) {
-
-		boolean hasContainers = list != null && list.size() > 0;
-		if (hasContainers) {
-			mFeedListView.setVisibility(View.VISIBLE);
-			mAddButton.setVisibility(View.INVISIBLE);
-			mNotfoundTextView.setVisibility(View.INVISIBLE);
-		} else {
-			mFeedListView.setVisibility(View.INVISIBLE);
-			mAddButton.setVisibility(View.VISIBLE);
-			mNotfoundTextView.setVisibility(View.VISIBLE);
 		}
 	}
 

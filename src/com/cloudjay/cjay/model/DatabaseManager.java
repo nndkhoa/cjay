@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.model;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
@@ -20,5 +21,9 @@ public class DatabaseManager implements IDatabaseManager {
 			OpenHelperManager.releaseHelper();
 			databaseHelper = null;
 		}
+	}
+
+	public SQLiteDatabase getReadableDatabase(Context context) {
+		return getHelper(context).getReadableDatabase();
 	}
 }

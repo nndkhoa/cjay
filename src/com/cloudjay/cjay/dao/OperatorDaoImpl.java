@@ -61,7 +61,7 @@ public class OperatorDaoImpl extends BaseDaoImpl<Operator, Integer> implements
 	}
 	
 	public Operator findOperator(String operatorCode) throws SQLException {
-		List<Operator> listOperators = queryForEq(Operator.CODE, operatorCode);
+		List<Operator> listOperators = queryForEq(Operator.FIELD_CODE, operatorCode);
 		
 		if (listOperators.isEmpty()) {
 			return null;

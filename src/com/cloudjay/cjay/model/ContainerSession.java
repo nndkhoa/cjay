@@ -158,7 +158,7 @@ public class ContainerSession implements Parcelable {
 			Operator operator = null;
 			if (!TextUtils.isEmpty(operatorCode)) {
 				List<Operator> listOperators = operatorDaoImpl.queryForEq(
-						Operator.CODE, operatorCode);
+						Operator.FIELD_CODE, operatorCode);
 				if (listOperators.isEmpty()) {
 					operator = new Operator();
 					operator.setCode(operatorCode);
