@@ -47,38 +47,11 @@ public class ContainerSessionDaoImpl extends
 				addContainerSession(containerSession);
 			}
 		}
-
-	}
-
-	@Override
-	public int update(ContainerSession containerSession) throws SQLException {
-		int result = super.update(containerSession);
-
-		Logger.Log(LOG_TAG, "update()");
-
-		EventBus.getDefault().post(
-				new ContainerSessionChangedEvent(containerSession));
-
-		return result;
-	}
-
-	@Override
-	public int create(ContainerSession containerSession) throws SQLException {
-		int result = super.create(containerSession);
-
-		Logger.Log(LOG_TAG, "create()");
-
-		EventBus.getDefault().post(
-				new ContainerSessionChangedEvent(containerSession));
-
-		return result;
 	}
 
 	@Override
 	public void addContainerSession(ContainerSession containerSession)
 			throws SQLException {
-
-		Logger.Log(LOG_TAG, "addContainerSession()");
 
 		if (containerSession != null) {
 			int containerSessionId = containerSession.getId();
@@ -144,17 +117,6 @@ public class ContainerSessionDaoImpl extends
 	}
 
 	@Override
-	public int delete(ContainerSession containerSession) throws SQLException {
-
-		Logger.Log(LOG_TAG, "deleting " + containerSession.getContainerId());
-		int result = super.delete(containerSession);
-		EventBus.getDefault().post(
-				new ContainerSessionChangedEvent(containerSession));
-
-		return result;
-	}
-
-	@Override
 	public boolean isEmpty() throws SQLException {
 		ContainerSession containerSession = this.queryForFirst(this
 				.queryBuilder().prepare());
@@ -206,12 +168,6 @@ public class ContainerSessionDaoImpl extends
 			Collection<CJayImage> cJayImages = containerSession.getCJayImages();
 
 			for (CJayImage cJayImage : cJayImages) {
-
-				// if (cJayImage.getUploadState() !=
-				// CJayImage.STATE_UPLOAD_COMPLETED
-				// && cJayImage.getUploadState() !=
-				// CJayImage.STATE_UPLOAD_IN_PROGRESS) {
-
 				if (cJayImage.getUploadState() != CJayImage.STATE_UPLOAD_COMPLETED) {
 					Logger.Log(LOG_TAG,
 							"Some cJayImages are still not uploaded", Log.ERROR);

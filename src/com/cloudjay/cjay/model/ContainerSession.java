@@ -24,6 +24,7 @@ import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
+import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -562,6 +563,8 @@ public class ContainerSession implements Parcelable {
 				.getInstance().getDatabaseManager().getHelper(ctx)
 				.getContainerSessionDaoImpl();
 		containerSessionDaoImpl.addContainerSession(containerSession);
+		EventBus.getDefault().post(
+				new ContainerSessionChangedEvent(containerSession));
 		return containerSession;
 	}
 

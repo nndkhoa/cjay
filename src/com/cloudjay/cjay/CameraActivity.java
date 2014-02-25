@@ -52,6 +52,7 @@ import com.aerilys.helpers.android.UIHelper;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
+import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -613,6 +614,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 					.getContainerSessionDaoImpl();
 
 			containerSessionDaoImpl.addContainerSession(containerSession);
+			EventBus.getDefault().post(
+					new ContainerSessionChangedEvent(containerSession));
 
 		} catch (SQLException e) {
 			e.printStackTrace();

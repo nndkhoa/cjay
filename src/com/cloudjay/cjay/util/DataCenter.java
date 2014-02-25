@@ -17,6 +17,7 @@ import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.cloudjay.cjay.dao.UserDaoImpl;
+import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.DamageCode;
@@ -27,6 +28,8 @@ import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.j256.ormlite.stmt.PreparedQuery;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * 
@@ -495,6 +498,12 @@ public class DataCenter {
 				containerSessions = CJayClient.getInstance()
 						.getAllContainerSessions(ctx);
 
+				if (null != containerSessions && !containerSessions.isEmpty()) {
+					EventBus.getDefault()
+							.post(new ContainerSessionChangedEvent(
+									containerSessions));
+				}
+
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
 						nowString);
@@ -516,9 +525,14 @@ public class DataCenter {
 						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
 						nowString);
 
-				if (containerSessions == null) {
+				if (null == containerSessions) {
 					Logger.Log(LOG_TAG, "----> NO new container sessions");
-				} else {
+				} else if (!containerSessions.isEmpty()) {
+
+					EventBus.getDefault()
+							.post(new ContainerSessionChangedEvent(
+									containerSessions));
+
 					Logger.Log(
 							LOG_TAG,
 							"----> Has "

@@ -322,6 +322,7 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListLocalContainerSessions(getActivity());
+
 		if (null != mFeeds)
 			mFeedsAdapter.updateData(mFeeds);
 	}

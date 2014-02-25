@@ -400,12 +400,12 @@ public class CJayClient implements ICJayClient {
 							.toContainerSession(tmpSession, ctx);
 
 					if (null != containerSession) {
-						containerSessionDaoImpl
-								.addContainerSession(containerSession);
 						items.add(containerSession);
 					}
 				}
 			}
+
+			containerSessionDaoImpl.addListContainerSessions(items);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -488,13 +488,13 @@ public class CJayClient implements ICJayClient {
 										ctx);
 
 						if (null != containerSession) {
-							containerSessionDaoImpl
-									.addContainerSession(containerSession);
 							items.add(containerSession);
 						}
 					}
 
 				}
+
+				containerSessionDaoImpl.addListContainerSessions(items);
 
 			} catch (SQLException e) {
 				e.printStackTrace();
