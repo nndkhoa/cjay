@@ -3,7 +3,6 @@ package com.cloudjay.cjay.adapter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.util.Logger;
-import com.j256.ormlite.android.AndroidDatabaseResults;
 import com.j256.ormlite.android.extras.OrmliteCursorAdapter;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.nostra13.universalimageloader.core.ImageLoader;

@@ -8,20 +8,15 @@ import java.util.List;
 import android.database.Cursor;
 import android.util.Log;
 
-import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
-import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.util.Logger;
-import com.j256.ormlite.android.AndroidDatabaseConnection;
 import com.j256.ormlite.android.AndroidDatabaseResults;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.CloseableIterator;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
-
-import de.greenrobot.event.EventBus;
 
 public class ContainerSessionDaoImpl extends
 		BaseDaoImpl<ContainerSession, String> implements IContainerSessionDao {

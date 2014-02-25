@@ -6,11 +6,9 @@ import java.util.List;
 import android.database.Cursor;
 
 import com.cloudjay.cjay.model.Container;
-import com.cloudjay.cjay.model.ContainerSession;
 import com.j256.ormlite.android.AndroidDatabaseResults;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.CloseableIterator;
-import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 
 public class ContainerDaoImpl extends BaseDaoImpl<Container, Integer> implements

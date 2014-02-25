@@ -45,16 +45,15 @@ public class GateHomeActivity extends CJayActivity implements
 
 	@ViewById
 	ViewPager pager;
-
 	PullToRefreshAttacher mPullToRefreshAttacher;
-	
+
 	public PullToRefreshAttacher getPullToRefreshAttacher() {
-	    return mPullToRefreshAttacher;
+		return mPullToRefreshAttacher;
 	}
 
 	@Override
 	protected void onCreate(Bundle arg0) {
-	
+
 		// Below code to show `More Action` item on menu
 		try {
 			ViewConfiguration config = ViewConfiguration.get(this);
@@ -162,15 +161,15 @@ public class GateHomeActivity extends CJayActivity implements
 	public void OnContainerInputCompleted(Fragment parent, String containerId,
 			String operatorName, int mode) {
 		if (parent instanceof GateImportListFragment) {
-			
+
 			((GateImportListFragment) parent).OnContainerInputCompleted(
 					containerId, operatorName, mode);
-			
+
 		} else if (parent instanceof GateExportListFragment) {
-			
+
 			((GateExportListFragment) parent).OnContainerInputCompleted(
 					containerId, operatorName, mode);
-			
+
 		}
 	}
 

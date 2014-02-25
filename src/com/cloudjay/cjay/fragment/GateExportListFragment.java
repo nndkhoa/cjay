@@ -17,13 +17,11 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.CursorJoiner;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.CursorAdapter;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -34,7 +32,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
@@ -43,7 +40,6 @@ import android.widget.TextView;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.adapter.CheckOutCursorAdapter;
 import com.cloudjay.cjay.adapter.ContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
@@ -59,8 +55,6 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.view.AddContainerDialog;
-import com.j256.ormlite.stmt.PreparedQuery;
-
 import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_gate_export)
@@ -151,35 +145,19 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 
 		getLoaderManager().initLoader(0, null, this);
 
-		// mFeedListView.setSmoothScrollbarEnabled(true);
-		// mFeedListView.setFastScrollEnabled(true);
-
 		mFeedListView.setTextFilterEnabled(true);
 		mFeedListView.setScrollingCacheEnabled(false);
 		mFeedListView.setOnScrollListener(new OnScrollListener() {
 
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
-
 				if (scrollState != 0) {
-					((CheckOutCursorAdapter) mFeedListView.getAdapter())
-							.setScrolling(true);
+					((ContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
 				} else {
-					((CheckOutCursorAdapter) mFeedListView.getAdapter())
-							.setScrolling(false);
-					((CheckOutCursorAdapter) mFeedListView.getAdapter())
+					((ContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
+					((ContainerCursorAdapter) mFeedListView.getAdapter())
 							.notifyDataSetChanged();
 				}
-
-				// if (scrollState != 0) {
-				// ((ContainerCursorAdapter)
-				// mFeedListView.getAdapter()).isScrolling = true;
-				// } else {
-				// ((ContainerCursorAdapter)
-				// mFeedListView.getAdapter()).isScrolling = false;
-				// ((ContainerCursorAdapter) mFeedListView.getAdapter())
-				// .notifyDataSetChanged();
-				// }
 			}
 
 			@Override
@@ -226,16 +204,6 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		}
 
 		if (cursorAdapter == null) {
-
-			// PreparedQuery<ContainerSession> query = DataCenter.getInstance()
-			// .getListCheckOutPreparedQuery(getActivity());
-
-			// cursorAdapter = new CheckOutCursorAdapter(getActivity(),
-			// R.layout.list_item_container, cursor, query);
-
-			// cursorAdapter = new ContainerCursorAdapter(getActivity(),
-			// R.layout.list_item_container, cursor, 0, query);
-
 			cursorAdapter = new ContainerCursorAdapter(getActivity(),
 					R.layout.list_item_container, cursor, 0);
 

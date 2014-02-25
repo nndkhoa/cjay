@@ -229,7 +229,7 @@ public class LoginActivity extends CJayActivity {
 		protected Boolean doInBackground(Void... params) {
 			// attempt authentication against a network service.
 			try {
-				
+
 				// TODO: fix bug wrong credential
 				String userToken = CJayClient.getInstance().getUserToken(
 						mEmail, mPassword, LoginActivity.this);

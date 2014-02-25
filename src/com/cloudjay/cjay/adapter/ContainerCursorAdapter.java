@@ -1,20 +1,17 @@
 package com.cloudjay.cjay.adapter;
 
-import java.sql.SQLException;
-
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.dao.ContainerDaoImpl;
-import com.cloudjay.cjay.dao.OperatorDaoImpl;
+import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
-import com.j256.ormlite.android.AndroidDatabaseResults;
+import com.cloudjay.cjay.util.StringHelper;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.CursorJoiner;
 import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -27,7 +24,6 @@ import android.widget.TextView;
 public class ContainerCursorAdapter extends CursorAdapter implements Filterable {
 
 	private int layout;
-	private Cursor mCursor;
 	private LayoutInflater inflater;
 	private ImageLoader imageLoader;
 	private PreparedQuery<ContainerSession> mQuery;
@@ -93,60 +89,32 @@ public class ContainerCursorAdapter extends CursorAdapter implements Filterable 
 			view.setTag(holder);
 		}
 
-		// TODO: get data from cursor and bind to holder
-		// try {
+		// get data from cursor and bind to holder
+		String importDate = cursor.getString(cursor
+				.getColumnIndexOrThrow(ContainerSession.FIELD_CHECK_IN_TIME));
+		importDate = StringHelper.getRelativeDate(
+				CJayConstant.CJAY_SERVER_DATETIME_FORMAT, importDate);
+		holder.importDateView.setText(importDate);
 
-		// ContainerSession item = mQuery.mapRow(new AndroidDatabaseResults(
-		// cursor, null));
-		//
-		// if (isScrolling == true) {
-		//
-		// holder.containerIdView.setText(item.getContainer()
-		// .getContainerId());
-		// holder.containerOwnerView.setText(item.getContainer()
-		// .getOperator().getName());
-		// } else {
-		// holder.importDateView.setText(item.getCheckInTime());
-		// // holder.exportDateView.setText(item.getCheckOutTime());
-		// holder.containerOwnerView.setText(item.getContainer()
-		// .getOperator().getName());
-		// holder.containerIdView.setText(item.getContainer()
-		// .getContainerId());
-		//
-		// String url = item.getImageIdPath();
-		// if (!TextUtils.isEmpty(url)) {
-		// imageLoader.displayImage(url, holder.itemPictureView);
-		// } else {
-		// holder.itemPictureView.setImageResource(R.drawable.ic_app);
-		// }
-		// }
-
-		holder.importDateView.setText("Hello");
-
-		// String url = cursor.getString(cursor
-		// .getColumnIndexOrThrow(ContainerSession.FIELD_IMAGE_ID_PATH));
-		// if (!TextUtils.isEmpty(url)) {
-		// imageLoader.displayImage(url, holder.itemPictureView);
-		// } else {
-		// holder.itemPictureView.setImageResource(R.drawable.ic_app);
-		// }
-		//
-		// String importDate = cursor.getString(cursor
-		// .getColumnIndexOrThrow(ContainerSession.FIELD_CHECK_IN_TIME));
-		// holder.importDateView.setText(importDate);
-		//
 		// String exportDate = cursor.getString(cursor
 		// .getColumnIndexOrThrow(ContainerSession.FIELD_CHECK_OUT_TIME));
 		// holder.exportDateView.setText(exportDate);
-		//
-		// String containerId = cursor.getString(cursor
-		// .getColumnIndexOrThrow("container_id"));
-		// holder.containerIdView.setText(containerId);
-		//
-		// } catch (SQLException e) {
-		//
-		// e.printStackTrace();
-		// }
+
+		String containerId = cursor.getString(cursor
+				.getColumnIndexOrThrow(Container.CONTAINER_ID));
+		holder.containerIdView.setText(containerId);
+
+		String operator = cursor.getString(cursor
+				.getColumnIndexOrThrow(Operator.FIELD_NAME));
+		holder.containerOwnerView.setText(operator);
+
+		String url = cursor.getString(cursor
+				.getColumnIndexOrThrow(ContainerSession.FIELD_IMAGE_ID_PATH));
+		if (!TextUtils.isEmpty(url)) {
+			imageLoader.displayImage(url, holder.itemPictureView);
+		} else {
+			holder.itemPictureView.setImageResource(R.drawable.ic_app);
+		}
 
 	}
 
