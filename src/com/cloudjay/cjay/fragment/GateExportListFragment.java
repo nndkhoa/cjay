@@ -40,7 +40,7 @@ import android.widget.TextView;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.adapter.ContainerCursorAdapter;
+import com.cloudjay.cjay.adapter.CheckoutContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
@@ -63,6 +63,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		OnRefreshListener, LoaderCallbacks<Cursor> {
 
 	private final static String LOG_TAG = "GateExportListFragment";
+	private final static int LOADER_ID = 0;
 	private ArrayList<Operator> mOperators;
 	private ContainerSession mSelectedContainerSession = null;
 
@@ -79,7 +80,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 	TextView mNotfoundTextView;
 
 	PullToRefreshLayout mPullToRefreshLayout;
-	ContainerCursorAdapter cursorAdapter;
+	CheckoutContainerCursorAdapter cursorAdapter;
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -143,7 +144,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
 				.getListOperators(getActivity());
 
-		getLoaderManager().initLoader(0, null, this);
+		getLoaderManager().initLoader(LOADER_ID, null, this);
 
 		mFeedListView.setTextFilterEnabled(true);
 		mFeedListView.setScrollingCacheEnabled(false);
@@ -152,11 +153,13 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				if (scrollState != 0) {
-					((ContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
+					((CheckoutContainerCursorAdapter) mFeedListView
+							.getAdapter()).isScrolling = true;
 				} else {
-					((ContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
-					((ContainerCursorAdapter) mFeedListView.getAdapter())
-							.notifyDataSetChanged();
+					((CheckoutContainerCursorAdapter) mFeedListView
+							.getAdapter()).isScrolling = false;
+					((CheckoutContainerCursorAdapter) mFeedListView
+							.getAdapter()).notifyDataSetChanged();
 				}
 			}
 
@@ -179,7 +182,6 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 						.getCheckOutContainerSessionCursor(getContext());
 
 				if (cursor != null) {
-
 					// Ensure the cursor window is filled
 					cursor.getCount();
 					cursor.registerContentObserver(mObserver);
@@ -204,7 +206,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		}
 
 		if (cursorAdapter == null) {
-			cursorAdapter = new ContainerCursorAdapter(getActivity(),
+			cursorAdapter = new CheckoutContainerCursorAdapter(getActivity(),
 					R.layout.list_item_container, cursor, 0);
 
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
@@ -387,6 +389,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 
 	public void refresh() {
 		Logger.Log(LOG_TAG, "onRefresh");
+		getLoaderManager().restartLoader(LOADER_ID, null, this);
 	}
 
 	@Override
@@ -406,7 +409,6 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 			protected Void doInBackground(Void... params) {
 
 				Logger.Log(LOG_TAG, "onRefreshStarted");
-
 				try {
 					DataCenter.getInstance().fetchData(getActivity());
 				} catch (NoConnectionException e) {
@@ -420,7 +422,6 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 			@Override
 			protected void onPostExecute(Void result) {
 				super.onPostExecute(result);
-
 				// Notify PullToRefreshLayout that the refresh has finished
 				mPullToRefreshLayout.setRefreshComplete();
 			}

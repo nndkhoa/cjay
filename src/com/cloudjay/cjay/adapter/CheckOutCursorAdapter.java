@@ -16,6 +16,12 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+/**
+ * Sample Cursor Adapter using Ormlite Extra
+ * 
+ * @author tieubao
+ * 
+ */
 public class CheckOutCursorAdapter extends
 		OrmliteCursorAdapter<ContainerSession> implements Filterable {
 

@@ -1,13 +1,13 @@
 package com.cloudjay.cjay.adapter;
 
 import com.cloudjay.cjay.R;
+
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
-import com.j256.ormlite.stmt.PreparedQuery;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import android.content.Context;
@@ -21,37 +21,26 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class ContainerCursorAdapter extends CursorAdapter implements Filterable {
+public class CheckoutContainerCursorAdapter extends CursorAdapter implements
+		Filterable {
 
 	private int layout;
 	private LayoutInflater inflater;
 	private ImageLoader imageLoader;
-	private PreparedQuery<ContainerSession> mQuery;
 	public boolean isScrolling;
 
 	@SuppressWarnings("deprecation")
-	public ContainerCursorAdapter(Context context, Cursor c) {
+	public CheckoutContainerCursorAdapter(Context context, Cursor c) {
 		super(context, c);
 	}
 
-	public ContainerCursorAdapter(Context context, int layout, Cursor c,
-			int flags) {
+	public CheckoutContainerCursorAdapter(Context context, int layout,
+			Cursor c, int flags) {
 		super(context, c, flags);
 		this.layout = layout;
 		this.inflater = LayoutInflater.from(context);
 		this.mCursor = c;
 		this.imageLoader = ImageLoader.getInstance();
-	}
-
-	public ContainerCursorAdapter(Context context, int layout, Cursor c,
-			int flags, PreparedQuery<ContainerSession> query) {
-
-		super(context, c, flags);
-		this.layout = layout;
-		this.inflater = LayoutInflater.from(context);
-		this.mCursor = c;
-		this.imageLoader = ImageLoader.getInstance();
-		this.mQuery = query;
 	}
 
 	private static class ViewHolder {
@@ -95,10 +84,6 @@ public class ContainerCursorAdapter extends CursorAdapter implements Filterable 
 		importDate = StringHelper.getRelativeDate(
 				CJayConstant.CJAY_SERVER_DATETIME_FORMAT, importDate);
 		holder.importDateView.setText(importDate);
-
-		// String exportDate = cursor.getString(cursor
-		// .getColumnIndexOrThrow(ContainerSession.FIELD_CHECK_OUT_TIME));
-		// holder.exportDateView.setText(exportDate);
 
 		String containerId = cursor.getString(cursor
 				.getColumnIndexOrThrow(Container.CONTAINER_ID));
