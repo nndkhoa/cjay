@@ -19,9 +19,12 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -30,13 +33,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FilterQueryProvider;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.AbsListView.OnScrollListener;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.adapter.AuditorContainerCursorAdapter;
+import com.cloudjay.cjay.adapter.CheckoutContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
@@ -44,6 +53,7 @@ import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
@@ -55,20 +65,21 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.fragment_auditor_reporting)
 @OptionsMenu(R.menu.menu_auditor_reporting)
 public class AuditorReportingListFragment extends SherlockFragment implements
-		OnRefreshListener {
+		OnRefreshListener, LoaderCallbacks<Cursor> {
 
 	public static final String LOG_TAG = "AuditorReportingListFragment";
 
 	public static final int STATE_NOT_REPORTED = 0;
 	public static final int STATE_REPORTING = 1;
+	private int LOADER_ID;
 
 	private ArrayList<Operator> mOperators;
-	private ArrayList<ContainerSession> mFeeds;
 	private int mState = STATE_NOT_REPORTED;
-	private ContainerSession mSelectedContainerSession;
-	PullToRefreshLayout mPullToRefreshLayout;
+	private ContainerSession mSelectedContainerSession = null;
+	private int mItemLayout = R.layout.list_item_audit_container;
 
 	@ViewById(R.id.container_list)
+	// ListView mFeedListView;
 	AuditorContainerListView mFeedListView;
 
 	@ViewById(R.id.search_edittext)
@@ -79,6 +90,9 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 
 	@ViewById(R.id.notfound_textview)
 	TextView mNotfoundTextView;
+
+	AuditorContainerCursorAdapter cursorAdapter;
+	PullToRefreshLayout mPullToRefreshLayout;
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -131,7 +145,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 		mSearchEditText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable arg0) {
-				search(arg0.toString());
+				cursorAdapter.getFilter().filter(arg0.toString());
 			}
 
 			public void beforeTextChanged(CharSequence s, int start, int count,
@@ -164,8 +178,108 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
 				.getListOperators(getActivity());
 
-		mFeedListView.initAdapter();
-		mSelectedContainerSession = null;
+		if (mState == STATE_REPORTING) {
+			LOADER_ID = 2;
+		} else {
+			LOADER_ID = 3;
+		}
+		getLoaderManager().initLoader(LOADER_ID, null, this);
+
+		mFeedListView.setTextFilterEnabled(true);
+		mFeedListView.setScrollingCacheEnabled(false);
+		mFeedListView.setOnScrollListener(new OnScrollListener() {
+
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				if (scrollState != 0) {
+					((AuditorContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
+				} else {
+					((AuditorContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
+					((AuditorContainerCursorAdapter) mFeedListView.getAdapter())
+							.notifyDataSetChanged();
+				}
+			}
+
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount) {
+			}
+		});
+	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		Context context = getActivity();
+
+		return new CJayCursorLoader(context) {
+			@Override
+			public Cursor loadInBackground() {
+
+				Cursor cursor = null;
+				if (mState == STATE_REPORTING) {
+					cursor = DataCenter.getInstance()
+							.getCheckOutContainerSessionCursor(getContext());
+				} else {
+					cursor = DataCenter.getInstance()
+							.getCheckOutContainerSessionCursor(getContext());
+				}
+
+				if (cursor != null) {
+					// Ensure the cursor window is filled
+					cursor.getCount();
+					cursor.registerContentObserver(mObserver);
+				}
+
+				return cursor;
+			}
+		};
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+
+		if (cursor.getCount() != 0) {
+			mFeedListView.setVisibility(View.VISIBLE);
+			mAddButton.setVisibility(View.INVISIBLE);
+			mNotfoundTextView.setVisibility(View.INVISIBLE);
+		} else {
+			mFeedListView.setVisibility(View.INVISIBLE);
+			mAddButton.setVisibility(View.VISIBLE);
+			mNotfoundTextView.setVisibility(View.VISIBLE);
+		}
+
+		if (cursorAdapter == null) {
+			cursorAdapter = new AuditorContainerCursorAdapter(getActivity(),
+					mItemLayout, cursor, 0);
+
+			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+				@Override
+				public Cursor runQuery(CharSequence constraint) {
+
+					Cursor cursor = null;
+					if (mState == STATE_REPORTING) {
+						cursor = DataCenter.getInstance().filterCheckoutCursor(
+								getActivity(), constraint);
+					} else {
+						cursor = DataCenter.getInstance().filterCheckoutCursor(
+								getActivity(), constraint);
+					}
+
+					return cursor;
+				}
+			});
+
+			mFeedListView.setAdapter(cursorAdapter);
+
+		} else {
+			cursorAdapter.swapCursor(cursor);
+		}
+
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		cursorAdapter.swapCursor(null);
 	}
 
 	@OptionsItem(R.id.menu_upload)
@@ -301,37 +415,6 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 		}
 	}
 
-	private void search(String searchText) {
-		if (searchText.equals("")) {
-			configureControls(mFeeds);
-			mFeedListView.setFeeds(mFeeds);
-		} else {
-			ArrayList<ContainerSession> searchFeeds = new ArrayList<ContainerSession>();
-			for (ContainerSession containerSession : mFeeds) {
-				if (containerSession.getContainerId().toLowerCase(Locale.US)
-						.contains(searchText.toLowerCase(Locale.US))) {
-					searchFeeds.add(containerSession);
-				}
-			}
-			// refresh list
-			configureControls(searchFeeds);
-			mFeedListView.setFeeds(searchFeeds);
-		}
-	}
-
-	private void configureControls(ArrayList<ContainerSession> list) {
-		boolean hasContainers = list != null && list.size() > 0;
-		if (hasContainers) {
-			mFeedListView.setVisibility(View.VISIBLE);
-			mAddButton.setVisibility(View.INVISIBLE);
-			mNotfoundTextView.setVisibility(View.INVISIBLE);
-		} else {
-			mFeedListView.setVisibility(View.INVISIBLE);
-			mAddButton.setVisibility(View.VISIBLE);
-			mNotfoundTextView.setVisibility(View.VISIBLE);
-		}
-	}
-
 	public void onEvent(ContainerSessionEnqueueEvent event) {
 		Logger.Log(LOG_TAG, "onEvent ContainerSessionEnqueueEvent");
 		refresh();
@@ -344,21 +427,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 
 	public void refresh() {
 		Logger.Log(LOG_TAG, "onRefresh");
-
-		if (mState == STATE_REPORTING) {
-			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-					.getListReportingContainerSessions(getActivity());
-		} else {
-			mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-					.getListNotReportedContainerSessions(getActivity());
-		}
-
-		if (mSearchEditText != null) {
-
-			// mFeedListView.setFeeds(mFeeds); // --> already setFeeds inside
-			// setText("");
-			mSearchEditText.setText(""); // this will refresh the list
-		}
+		getLoaderManager().restartLoader(LOADER_ID, null, this);
 	}
 
 	void hideMenuItems() {
@@ -369,7 +438,10 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 
 	@Override
 	public void onResume() {
-		refresh();
+		Logger.Log(LOG_TAG, "onResume " + LOG_TAG);
+		if (cursorAdapter != null) {
+			refresh();
+		}
 		super.onResume();
 	}
 

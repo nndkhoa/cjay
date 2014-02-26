@@ -15,6 +15,7 @@ import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefresh
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
+import android.R.integer;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -66,6 +67,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 	private final static int LOADER_ID = 0;
 	private ArrayList<Operator> mOperators;
 	private ContainerSession mSelectedContainerSession = null;
+	private int mItemLayout = R.layout.list_item_container;
 
 	@ViewById(R.id.container_list)
 	ListView mFeedListView;
@@ -207,7 +209,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 
 		if (cursorAdapter == null) {
 			cursorAdapter = new CheckoutContainerCursorAdapter(getActivity(),
-					R.layout.list_item_container, cursor, 0);
+					mItemLayout, cursor, 0);
 
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
 				@Override

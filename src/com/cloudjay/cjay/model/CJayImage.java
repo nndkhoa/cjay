@@ -25,7 +25,7 @@ public class CJayImage implements Parcelable {
 	public static final int TYPE_REPORT = 2;
 	public static final int TYPE_REPAIRED = 3;
 
-	public static final String ID = "id";
+	public static final String ID = "_id";
 	public static final String FIELD_IMAGE_NAME = "image_name";
 	public static final String FIELD_TYPE = "type";
 	public static final String FIELD_TIME_POSTED = "time_posted";

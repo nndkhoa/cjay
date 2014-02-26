@@ -10,7 +10,7 @@
     <string name="login_progress_loading_data">Đang tải dữ liệu</string>
     <string name="error_invalid_email">Email không hợp lệ</string>
     <string name="error_invalid_password">Mật khẩu quá ngắn</string>
-    <string name="error_incorrect_password">Sai mật khẩu</string>
+    <string name="error_incorrect_password">Sai thông tin đăng nhập</string>
     <string name="error_field_required">This field is required</string>
     <string name="error_email_field_required">Bạn chưa điền email</string>
     <string name="error_password_field_required">Bạn chưa điền mật khẩu</string>

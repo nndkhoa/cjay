@@ -282,10 +282,23 @@ public class DataCenter {
 	}
 
 	public Cursor getCheckOutContainerSessionCursor(Context context) {
-
 		String queryString = "SELECT * FROM csview cs WHERE cs.check_out_time = '' AND cs.on_local = 0";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
 				queryString, new String[] {});
+	}
+
+	public Cursor getNotReportedContainerSessionCursor(Context context) {
+		String queryString = "SELECT cs.*, COUNT(ci.type)"
+				+ " FROM csview cs INNER JOIN cjay_image ci ON ci.containerSession_id = cs._id"
+				+ " WHERE cs.upload_confirmation = 0 AND ci.type <> 2"
+				+ " GROUP BY cs._id, ci.type" + " HAVING COUNT(ci.type) = 0";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] {});
+	}
+
+	public Cursor getReportingContainerSessionCursor(Context context) {
+		return null;
 	}
 
 	public Cursor getAllContainersCursor(Context context) {
