@@ -331,6 +331,32 @@ public class DataCenter {
 
 		String queryString = "SELECT * FROM csview cs "
 				+ "WHERE cs.check_out_time = '' AND cs.on_local = 0 AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
+		
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] { constraint + "%" });
+	}
+
+	public Cursor filterNotReportedCursor(Context context,
+			CharSequence constraint) {
+
+		String queryString = "SELECT cs.* FROM csiview AS cs"
+				+ " WHERE cs.upload_confirmation = 0 AND cs._id NOT IN "
+				+ " (SELECT container_session._id"
+				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
+				+ " WHERE cjay_image.type = 2) AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] { constraint + "%" });
+	}
+
+	public Cursor filterReportingCursor(Context context, CharSequence constraint) {
+
+		String queryString = "SELECT cs.* FROM csiview AS cs"
+				+ " WHERE cs.upload_confirmation = 0 AND cs._id IN "
+				+ " (SELECT container_session._id"
+				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
+				+ " WHERE cjay_image.type = 2) AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
+
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
 				queryString, new String[] { constraint + "%" });
 	}

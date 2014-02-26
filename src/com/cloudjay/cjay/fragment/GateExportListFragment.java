@@ -121,7 +121,9 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		mSearchEditText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable arg0) {
-				cursorAdapter.getFilter().filter(arg0.toString());
+				if (cursorAdapter != null) {
+					cursorAdapter.getFilter().filter(arg0.toString());
+				}
 			}
 
 			public void beforeTextChanged(CharSequence s, int start, int count,
@@ -202,8 +204,11 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		};
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+
+		Logger.Log("onLoadFinished");
 
 		if (cursor.getCount() != 0) {
 			mFeedListView.setVisibility(View.VISIBLE);
@@ -215,6 +220,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 			mNotfoundTextView.setVisibility(View.VISIBLE);
 		}
 
+		getActivity().startManagingCursor(cursor);
 		if (cursorAdapter == null) {
 			cursorAdapter = new CheckoutContainerCursorAdapter(getActivity(),
 					mItemLayout, cursor, 0);
@@ -236,6 +242,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> arg0) {
+		Logger.Log(LOG_TAG, "onLoaderReset");
 		cursorAdapter.swapCursor(null);
 	}
 

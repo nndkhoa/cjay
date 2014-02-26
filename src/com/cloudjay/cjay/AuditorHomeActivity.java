@@ -9,8 +9,6 @@ import org.androidannotations.annotations.ViewById;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -21,6 +19,7 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
@@ -31,8 +30,9 @@ public class AuditorHomeActivity extends CJayActivity implements
 		AddContainerDialog.AddContainerDialogListener,
 		SearchOperatorDialog.SearchOperatorDialogListener {
 
-	// private static final String LOG_TAG = "AuditorHomeActivity";
+	private static final String LOG_TAG = "AuditorHomeActivity";
 
+	private ViewPagerAdapter viewPagerAdapter;
 	private String[] locations;
 	@ViewById
 	ViewPager pager;
@@ -63,8 +63,33 @@ public class AuditorHomeActivity extends CJayActivity implements
 	}
 
 	private void configureViewPager() {
-		AuditorHomeTabPageAdaptor viewPagerAdapter = new AuditorHomeTabPageAdaptor(
-				getSupportFragmentManager(), locations);
+		viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(),
+				locations) {
+
+			@Override
+			public Fragment getItem(int position) {
+				switch (position) {
+				case 0:
+					// containers that have no 'report images'
+					Fragment notReportedFragment = new AuditorReportingListFragment_();
+					((AuditorReportingListFragment_) notReportedFragment)
+							.setState(AuditorReportingListFragment_.STATE_NOT_REPORTED);
+					return notReportedFragment;
+
+				case 1:
+					// containers that have 'report images'
+					Fragment reportingFragment = new AuditorReportingListFragment_();
+					((AuditorReportingListFragment_) reportingFragment)
+							.setState(AuditorReportingListFragment_.STATE_REPORTING);
+					return reportingFragment;
+
+				case 2:
+				default:
+					Fragment uploadFragment = new UploadsFragment_();
+					return uploadFragment;
+				}
+			}
+		};
 		pager.setAdapter(viewPagerAdapter);
 		pager.setOnPageChangeListener(this);
 	}
@@ -128,42 +153,6 @@ public class AuditorHomeActivity extends CJayActivity implements
 		if (parent instanceof AuditorReportingListFragment) {
 			((AuditorReportingListFragment) parent).OnContainerInputCompleted(
 					containerId, operatorName, mode);
-		}
-	}
-
-	public class AuditorHomeTabPageAdaptor extends FragmentPagerAdapter {
-		private String[] locations;
-
-		public AuditorHomeTabPageAdaptor(FragmentManager fm, String[] locations) {
-			super(fm);
-			this.locations = locations;
-		}
-
-		public int getCount() {
-			return locations.length;
-		}
-
-		public Fragment getItem(int position) {
-			switch (position) {
-			case 0:
-				// containers that have no 'report images'
-				Fragment notReportedFragment = new AuditorReportingListFragment_();
-				((AuditorReportingListFragment_) notReportedFragment)
-						.setState(AuditorReportingListFragment_.STATE_NOT_REPORTED);
-				return notReportedFragment;
-
-			case 1:
-				// containers that have 'report images'
-				Fragment reportingFragment = new AuditorReportingListFragment_();
-				((AuditorReportingListFragment_) reportingFragment)
-						.setState(AuditorReportingListFragment_.STATE_REPORTING);
-				return reportingFragment;
-
-			case 2:
-			default:
-				Fragment uploadFragment = new UploadsFragment_();
-				return uploadFragment;
-			}
 		}
 	}
 

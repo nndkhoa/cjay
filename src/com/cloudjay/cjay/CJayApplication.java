@@ -91,6 +91,9 @@ public class CJayApplication extends Application {
 
 	@Override
 	public void onCreate() {
+		// Configure Logger
+		Logger.PRODUCTION_MODE = false;
+
 		Logger.Log(LOG_TAG, "Start Application");
 		savedStateMap = new HashMap<String, Fragment.SavedState>();
 
@@ -128,9 +131,6 @@ public class CJayApplication extends Application {
 
 		if (!CJayConstant.HIDDEN_APP_DIRECTORY_FILE.exists())
 			CJayConstant.HIDDEN_APP_DIRECTORY_FILE.mkdir();
-
-		// Configure Logger
-		Logger.PRODUCTION_MODE = true;
 
 		// Configure Alarm Manager
 		if (!Utils.isAlarmUp(getApplicationContext())) {

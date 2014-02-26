@@ -39,7 +39,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AbsListView.OnScrollListener;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.adapter.AuditorContainerCursorAdapter;
@@ -55,14 +54,12 @@ import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.view.AddContainerDialog;
-import com.cloudjay.cjay.view.AuditorContainerListView;
-
 import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_auditor_reporting)
 @OptionsMenu(R.menu.menu_auditor_reporting)
-public class AuditorReportingListFragment extends SherlockFragment implements
-		OnRefreshListener, LoaderCallbacks<Cursor> {
+public class AuditorReportingListFragment extends CJaySherlockFragment
+		implements OnRefreshListener, LoaderCallbacks<Cursor> {
 
 	public static final String LOG_TAG = "AuditorReportingListFragment";
 
@@ -152,7 +149,9 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 		mSearchEditText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable arg0) {
-				cursorAdapter.getFilter().filter(arg0.toString());
+				if (cursorAdapter != null) {
+					cursorAdapter.getFilter().filter(arg0.toString());
+				}
 			}
 
 			public void beforeTextChanged(CharSequence s, int start, int count,
@@ -265,17 +264,18 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 
 					Cursor cursor = null;
 					if (mState == STATE_REPORTING) {
-						cursor = DataCenter.getInstance().filterCheckoutCursor(
-								getActivity(), constraint);
+						cursor = DataCenter.getInstance()
+								.filterReportingCursor(getActivity(),
+										constraint);
 					} else {
-						cursor = DataCenter.getInstance().filterCheckoutCursor(
-								getActivity(), constraint);
+						cursor = DataCenter.getInstance()
+								.filterNotReportedCursor(getActivity(),
+										constraint);
 					}
 
 					return cursor;
 				}
 			});
-
 			mFeedListView.setAdapter(cursorAdapter);
 
 		} else {
@@ -446,8 +446,14 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 	}
 
 	public void refresh() {
-		Logger.Log(LOG_TAG, "onRefresh");
+		Logger.Log(LOG_TAG,
+				"onRefresh with LOADER_ID: " + Integer.toString(LOADER_ID));
+
 		getLoaderManager().restartLoader(LOADER_ID, null, this);
+		// mFeedListView.setAdapter(cursorAdapter);
+		// cursorAdapter.notifyDataSetChanged();
+		// mFeedListView.invalidateViews();
+
 	}
 
 	void hideMenuItems() {
@@ -459,6 +465,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 	@Override
 	public void onResume() {
 		Logger.Log(LOG_TAG, "onResume " + LOG_TAG);
+
 		if (cursorAdapter != null) {
 			refresh();
 		}

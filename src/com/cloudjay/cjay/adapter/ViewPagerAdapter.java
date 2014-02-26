@@ -2,13 +2,9 @@ package com.cloudjay.cjay.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.cloudjay.cjay.fragment.GateExportListFragment_;
-import com.cloudjay.cjay.fragment.GateImportListFragment_;
-import com.cloudjay.cjay.fragment.UploadsFragment_;
-
-public class ViewPagerAdapter extends FragmentPagerAdapter {
+public abstract class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
 	private String[] locations;
 
@@ -21,19 +17,5 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
 		return locations.length;
 	}
 
-	public Fragment getItem(int position) {
-		switch (position) {
-		case 0:
-			Fragment importFeedFragment = new GateImportListFragment_();
-			return importFeedFragment;
-		case 1:
-			Fragment exportFeedFragment = new GateExportListFragment_();
-			return exportFeedFragment;
-		case 2:
-		default:
-			Fragment uploadFragment = new UploadsFragment_();
-			return uploadFragment;
-		}
-	}
-
+	abstract public Fragment getItem(int position);
 }

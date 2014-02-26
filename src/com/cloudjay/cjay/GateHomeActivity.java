@@ -22,8 +22,7 @@ import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
-import com.cloudjay.cjay.fragment.GateExportListFragment;
-import com.cloudjay.cjay.fragment.GateImportListFragment;
+import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
@@ -78,7 +77,24 @@ public class GateHomeActivity extends CJayActivity implements
 
 	private void configureViewPager() {
 		mPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(),
-				locations);
+				locations) {
+
+			@Override
+			public Fragment getItem(int position) {
+				switch (position) {
+				case 0:
+					Fragment importFeedFragment = new GateImportListFragment_();
+					return importFeedFragment;
+				case 1:
+					Fragment exportFeedFragment = new GateExportListFragment_();
+					return exportFeedFragment;
+				case 2:
+				default:
+					Fragment uploadFragment = new UploadsFragment_();
+					return uploadFragment;
+				}
+			}
+		};
 		pager.setAdapter(mPagerAdapter);
 		pager.setOnPageChangeListener(this);
 	}
