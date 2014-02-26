@@ -91,6 +91,10 @@ public class AuditorContainerCursorAdapter extends CursorAdapter implements
 				.getColumnIndexOrThrow(Operator.FIELD_NAME));
 		holder.containerOwnerView.setText(operator);
 
+		String issueCount = cursor.getString(cursor
+				.getColumnIndexOrThrow("issue_count"));
+		holder.containerIssuesView.setText(issueCount);
+
 		String url = cursor.getString(cursor
 				.getColumnIndexOrThrow(ContainerSession.FIELD_IMAGE_ID_PATH));
 		if (!TextUtils.isEmpty(url)) {

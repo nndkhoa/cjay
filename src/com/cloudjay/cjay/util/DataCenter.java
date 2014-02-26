@@ -289,7 +289,7 @@ public class DataCenter {
 
 	public Cursor getNotReportedContainerSessionCursor(Context context) {
 
-		String queryString = "SELECT cs.* FROM csview AS cs"
+		String queryString = "SELECT cs.* FROM csiview AS cs"
 				+ " WHERE cs.upload_confirmation = 0 AND cs._id NOT IN ("
 				+ " SELECT csview._id"
 				+ " FROM cjay_image JOIN csview ON cjay_image.containerSession_id = csview._id"
@@ -300,7 +300,7 @@ public class DataCenter {
 	}
 
 	public Cursor getReportingContainerSessionCursor(Context context) {
-		String queryString = "SELECT cs.* FROM csview AS cs"
+		String queryString = "SELECT cs.* FROM csiview AS cs"
 				+ " WHERE cs.upload_confirmation = 0 AND cs._id IN ("
 				+ " SELECT csview._id"
 				+ " FROM cjay_image JOIN csview ON cjay_image.containerSession_id = csview._id"

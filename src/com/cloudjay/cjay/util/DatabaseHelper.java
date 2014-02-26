@@ -92,6 +92,21 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 			db.execSQL(sql);
 
+			sql = "CREATE VIEW csiview AS"
+					+ " SELECT csview.*, count(issue.containerSession_id) as issue_count"
+					+ " FROM issue JOIN csview ON issue.containerSession_id = csview._id"
+					+ " GROUP BY containerSession_id"
+					+ " UNION ALL"
+					+ " SELECT csview.*, 0 as issue_count"
+					+ " FROM csview"
+					+ " WHERE csview.container_id NOT IN"
+					+ " (SELECT csview.container_id"
+					+ " FROM issue JOIN csview ON issue.containerSession_id = csview._id"
+					+ " GROUP BY containerSession_id"
+					+ " HAVING count(containerSession_id) > 0)";
+
+			db.execSQL(sql);
+
 		} catch (SQLException e) {
 			Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
 			throw new RuntimeException(e);
