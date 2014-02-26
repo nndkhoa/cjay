@@ -85,6 +85,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			}
 
 			// Create view
+			// csview --> join table of operator + container + container_session
 			String sql = "CREATE VIEW csview AS"
 					+ " SELECT cs._id, cs.check_out_time, cs.check_in_time, cs.image_id_path, cs.on_local, cs.fixed, cs.upload_confirmation, cs.state, cs.cleared, c.container_id, o.operator_name"
 					+ " FROM container_session AS cs, container AS c, operator as o"
@@ -92,6 +93,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 			db.execSQL(sql);
 
+			// csiview --> csview + issue_count
 			sql = "CREATE VIEW csiview AS"
 					+ " SELECT csview.*, count(issue.containerSession_id) as issue_count"
 					+ " FROM issue JOIN csview ON issue.containerSession_id = csview._id"
