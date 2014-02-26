@@ -1,9 +1,11 @@
 package com.cloudjay.cjay.dao;
 
 import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import android.database.Cursor;
 import android.util.Log;
@@ -17,6 +19,7 @@ import com.j256.ormlite.dao.CloseableIterator;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
+import com.j256.ormlite.support.DatabaseConnection;
 
 public class ContainerSessionDaoImpl extends
 		BaseDaoImpl<ContainerSession, String> implements IContainerSessionDao {
@@ -37,11 +40,69 @@ public class ContainerSessionDaoImpl extends
 	public void addListContainerSessions(
 			List<ContainerSession> containerSessions) throws SQLException {
 
+		long startTime = System.currentTimeMillis();
+		Logger.Log(LOG_TAG, "***\nadd List of Container Sessions***\n");
 		if (containerSessions != null) {
 			for (ContainerSession containerSession : containerSessions) {
 				addContainerSession(containerSession);
 			}
 		}
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference));
+	}
+
+	private void bulkInsertDataByCallBatchTasks(
+			final List<ContainerSession> containerSessions) throws SQLException {
+
+		long startTime = System.currentTimeMillis();
+		Logger.Log(LOG_TAG, "***\nbulkInsertDataByCallBatchTasks***\n");
+		if (containerSessions != null) {
+			this.callBatchTasks(new Callable<Void>() {
+				@Override
+				public Void call() throws Exception {
+					for (ContainerSession containerSession : containerSessions) {
+						addContainerSession(containerSession);
+					}
+					return null;
+				}
+
+			});
+		}
+
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference));
+	}
+
+	private void bulkInsertDataBySavePoint(
+			final List<ContainerSession> containerSessions) {
+		long startTime = System.currentTimeMillis();
+		Logger.Log(LOG_TAG, "***\nbulkInsertDataBySavePoint***\n");
+		if (containerSessions != null) {
+
+			DatabaseConnection conn = null;
+			Savepoint savepoint = null;
+			try {
+				conn = this.startThreadConnection();
+				savepoint = conn.setSavePoint("bulk_insert");
+				for (ContainerSession containerSession : containerSessions) {
+					addContainerSession(containerSession);
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				if (conn != null) {
+					try {
+						conn.commit(savepoint);
+						this.endThreadConnection(conn);
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference));
+
 	}
 
 	@Override

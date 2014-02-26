@@ -288,17 +288,25 @@ public class DataCenter {
 	}
 
 	public Cursor getNotReportedContainerSessionCursor(Context context) {
-		String queryString = "SELECT cs.*, COUNT(ci.type)"
-				+ " FROM csview cs INNER JOIN cjay_image ci ON ci.containerSession_id = cs._id"
-				+ " WHERE cs.upload_confirmation = 0 AND ci.type <> 2"
-				+ " GROUP BY cs._id, ci.type" + " HAVING COUNT(ci.type) = 0";
+
+		String queryString = "SELECT cs.* FROM csview AS cs"
+				+ " WHERE cs.upload_confirmation = 0 AND cs._id NOT IN ("
+				+ " SELECT csview._id"
+				+ " FROM cjay_image JOIN csview ON cjay_image.containerSession_id = csview._id"
+				+ " WHERE cjay_image.type = 2)";
 
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
 				queryString, new String[] {});
 	}
 
 	public Cursor getReportingContainerSessionCursor(Context context) {
-		return null;
+		String queryString = "SELECT cs.* FROM csview AS cs"
+				+ " WHERE cs.upload_confirmation = 0 AND cs._id IN ("
+				+ " SELECT csview._id"
+				+ " FROM cjay_image JOIN csview ON cjay_image.containerSession_id = csview._id"
+				+ " WHERE cjay_image.type = 2)";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] {});
 	}
 
 	public Cursor getAllContainersCursor(Context context) {

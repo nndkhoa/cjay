@@ -15,7 +15,6 @@ import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefresh
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
-import android.R.integer;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -67,6 +66,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 	private final static int LOADER_ID = 0;
 	private ArrayList<Operator> mOperators;
 	private ContainerSession mSelectedContainerSession = null;
+	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
 	private int mItemLayout = R.layout.list_item_container;
 
 	@ViewById(R.id.container_list)
@@ -109,6 +109,14 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 
 	@AfterViews
 	void afterViews() {
+
+		try {
+			containerSessionDaoImpl = CJayClient.getInstance()
+					.getDatabaseManager().getHelper(getActivity())
+					.getContainerSessionDaoImpl();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
 		mSearchEditText.addTextChangedListener(new TextWatcher() {
 			@Override
@@ -246,11 +254,6 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 
 					Logger.Log(LOG_TAG, "Menu upload item clicked");
 
-					ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-							.getInstance().getDatabaseManager()
-							.getHelper(getActivity())
-							.getContainerSessionDaoImpl();
-
 					// User confirm upload
 					mSelectedContainerSession.setUploadConfirmation(true);
 
@@ -260,6 +263,12 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 
 					mSelectedContainerSession
 							.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+
+					if (null == containerSessionDaoImpl) {
+						containerSessionDaoImpl = CJayClient.getInstance()
+								.getDatabaseManager().getHelper(getActivity())
+								.getContainerSessionDaoImpl();
+					}
 
 					containerSessionDaoImpl.update(mSelectedContainerSession);
 
@@ -300,18 +309,34 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		hideMenuItems();
 
 		// get the selected container session and open camera
-		ContainerSession containerSession = (ContainerSession) cursorAdapter
-				.getItem(position);
-		ContainerSession.gotoCamera(getActivity(), containerSession,
-				CJayImage.TYPE_EXPORT);
+		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
+		String uuidString = cursor.getString(cursor
+				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+		ContainerSession containerSession;
+		try {
+			containerSession = containerSessionDaoImpl.findByUuid(uuidString);
+			ContainerSession.gotoCamera(getActivity(), containerSession,
+					CJayImage.TYPE_EXPORT);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@ItemLongClick(R.id.container_list)
 	void listItemLongClicked(int position) {
 		// refresh highlighting and menu
 		mFeedListView.setItemChecked(position, true);
-		mSelectedContainerSession = (ContainerSession) cursorAdapter
-				.getItem(position);
+
+		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
+		String uuidString = cursor.getString(cursor
+				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+		try {
+			mSelectedContainerSession = containerSessionDaoImpl
+					.findByUuid(uuidString);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
 		getActivity().supportInvalidateOptionsMenu();
 	}
 

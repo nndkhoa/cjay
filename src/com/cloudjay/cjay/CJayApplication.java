@@ -23,7 +23,6 @@ import android.view.Display;
 import android.view.WindowManager;
 
 import com.aerilys.helpers.android.NetworkHelper;
-import com.cloudjay.cjay.model.DatabaseManager;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.network.HttpRequestWrapper;
@@ -31,6 +30,7 @@ import com.cloudjay.cjay.network.IHttpRequestWrapper;
 import com.cloudjay.cjay.receivers.InstantUploadReceiver;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.DatabaseManager;
 import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;

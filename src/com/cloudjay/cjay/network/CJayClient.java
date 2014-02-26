@@ -8,14 +8,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.Callable;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.provider.Settings.Secure;
 import android.text.TextUtils;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -40,7 +37,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
-import com.j256.ormlite.misc.TransactionManager;
 
 /**
  * 
@@ -503,7 +499,7 @@ public class CJayClient implements ICJayClient {
 				}
 
 				containerSessionDaoImpl.addListContainerSessions(items);
-				
+
 				// SQLiteDatabase db = getDatabaseManager().getReadableDatabase(
 				// ctx);
 				// db.setLockingEnabled(false);

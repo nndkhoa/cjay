@@ -28,6 +28,7 @@ import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.DatabaseHelper;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Session;
 import com.cloudjay.cjay.util.StringHelper;

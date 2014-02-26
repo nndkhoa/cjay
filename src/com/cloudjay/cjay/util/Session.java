@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import android.content.Context;
 
 import com.cloudjay.cjay.dao.IUserDao;
-import com.cloudjay.cjay.model.DatabaseHelper;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;

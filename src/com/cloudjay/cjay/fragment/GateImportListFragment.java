@@ -54,6 +54,7 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 		OnRefreshListener {
 
 	private final static String LOG_TAG = "GateImportListFragment";
+	private final static int LOADER_ID = 1;
 
 	@ViewById(R.id.btn_add_new)
 	Button mAddNewBtn;

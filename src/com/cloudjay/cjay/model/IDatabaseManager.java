@@ -1,5 +1,7 @@
 package com.cloudjay.cjay.model;
 
+import com.cloudjay.cjay.util.DatabaseHelper;
+
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 

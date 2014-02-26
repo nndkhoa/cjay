@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.model;
+package com.cloudjay.cjay.util;
 
 import java.sql.SQLException;
 
@@ -18,8 +18,16 @@ import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.cloudjay.cjay.dao.UploadItem;
 import com.cloudjay.cjay.dao.UploadItemDaoImpl;
 import com.cloudjay.cjay.dao.UserDaoImpl;
-import com.cloudjay.cjay.util.Flags;
-import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.model.CJayImage;
+import com.cloudjay.cjay.model.ComponentCode;
+import com.cloudjay.cjay.model.Container;
+import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.DamageCode;
+import com.cloudjay.cjay.model.Depot;
+import com.cloudjay.cjay.model.Issue;
+import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.model.RepairCode;
+import com.cloudjay.cjay.model.User;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;

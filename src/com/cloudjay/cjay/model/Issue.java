@@ -17,7 +17,7 @@ import com.j256.ormlite.table.DatabaseTable;
 public class Issue implements Parcelable {
 
 	public static final String ID = "id";
-	public static final String FIELD_UUID = "uuid";
+	public static final String FIELD_UUID = "_id";
 	public static final String FIELD_FIXED = "fixed";
 
 	@DatabaseField(columnName = ID, defaultValue = "0")

@@ -2,8 +2,6 @@ package com.cloudjay.cjay.fragment;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Locale;
-
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
@@ -45,7 +43,6 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.adapter.AuditorContainerCursorAdapter;
-import com.cloudjay.cjay.adapter.CheckoutContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
@@ -77,10 +74,11 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 	private int mState = STATE_NOT_REPORTED;
 	private ContainerSession mSelectedContainerSession = null;
 	private int mItemLayout = R.layout.list_item_audit_container;
+	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
 
 	@ViewById(R.id.container_list)
-	// ListView mFeedListView;
-	AuditorContainerListView mFeedListView;
+	ListView mFeedListView;
+	// AuditorContainerListView mFeedListView;
 
 	@ViewById(R.id.search_edittext)
 	EditText mSearchEditText;
@@ -142,6 +140,15 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 
 	@AfterViews
 	void afterViews() {
+
+		try {
+			containerSessionDaoImpl = CJayClient.getInstance()
+					.getDatabaseManager().getHelper(getActivity())
+					.getContainerSessionDaoImpl();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
 		mSearchEditText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable arg0) {
@@ -218,10 +225,10 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 				Cursor cursor = null;
 				if (mState == STATE_REPORTING) {
 					cursor = DataCenter.getInstance()
-							.getCheckOutContainerSessionCursor(getContext());
+							.getReportingContainerSessionCursor(getContext());
 				} else {
 					cursor = DataCenter.getInstance()
-							.getCheckOutContainerSessionCursor(getContext());
+							.getNotReportedContainerSessionCursor(getContext());
 				}
 
 				if (cursor != null) {
@@ -288,15 +295,17 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 			try {
 				Logger.Log(LOG_TAG, "Menu upload item clicked");
 
-				ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-						.getInstance().getDatabaseManager()
-						.getHelper(getActivity()).getContainerSessionDaoImpl();
-
 				// User confirm upload
 				mSelectedContainerSession.setUploadConfirmation(true);
 
 				mSelectedContainerSession
 						.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+
+				if (null == containerSessionDaoImpl) {
+					containerSessionDaoImpl = CJayClient.getInstance()
+							.getDatabaseManager().getHelper(getActivity())
+							.getContainerSessionDaoImpl();
+				}
 
 				containerSessionDaoImpl.update(mSelectedContainerSession);
 
@@ -332,19 +341,30 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 	void listItemClicked(int position) {
 		// clear current selection
 		hideMenuItems();
-
 		Intent intent = new Intent(getActivity(),
 				AuditorContainerActivity_.class);
+
+		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
+		String uuidString = cursor.getString(cursor
+				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
 		intent.putExtra(AuditorContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-				mFeedListView.getItem(position).getUuid());
+				uuidString);
 		startActivity(intent);
 	}
 
 	@ItemLongClick(R.id.container_list)
 	void listItemLongClicked(int position) {
 		// refresh highlighting and menu
-		mFeedListView.highlightAt(position);
-		mSelectedContainerSession = mFeedListView.getItem(position);
+		mFeedListView.setItemChecked(position, true);
+		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
+		String uuidString = cursor.getString(cursor
+				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+		try {
+			mSelectedContainerSession = containerSessionDaoImpl
+					.findByUuid(uuidString);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		getActivity().supportInvalidateOptionsMenu();
 	}
 
@@ -432,7 +452,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 
 	void hideMenuItems() {
 		mSelectedContainerSession = null;
-		mFeedListView.clearHighlighting();
+		mFeedListView.setItemChecked(-1, true);
 		getActivity().supportInvalidateOptionsMenu();
 	}
 

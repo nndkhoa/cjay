@@ -1,8 +1,9 @@
-package com.cloudjay.cjay.model;
+package com.cloudjay.cjay.util;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.cloudjay.cjay.model.IDatabaseManager;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 public class DatabaseManager implements IDatabaseManager {
