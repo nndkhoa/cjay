@@ -190,6 +190,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 					if (gcm == null) {
 						gcm = GoogleCloudMessaging.getInstance(context);
 					}
+
 					regid = gcm.register(CJayConstant.SENDER_ID);
 					Log.d("registration Id", regid + "");
 					msg = "Device registered, registration ID=" + regid;
@@ -207,7 +208,9 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 					// Persist the regID - no need to register again.
 				} catch (IOException ex) {
+					// may catch "SERVICE_NOT_AVAILABLE"
 					msg = "Error :" + ex.getMessage();
+					
 					// If there is an error, don't just keep trying to register.
 					// Require the user to click a button again, or perform
 					// exponential back-off.

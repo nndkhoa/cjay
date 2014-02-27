@@ -2,6 +2,7 @@ package com.cloudjay.cjay.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,7 +11,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.json.JSONException;
+
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -27,6 +31,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -41,9 +46,14 @@ import android.widget.Toast;
 
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.service.QueueIntentService;
 import com.cloudjay.cjay.service.UploadIntentService;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.lightbox.android.photoprocessing.PhotoProcessing;
 import com.lightbox.android.photoprocessing.utils.MediaUtils;
 
@@ -364,9 +374,11 @@ public class Utils {
 	public static void storeRegistrationId(Context context, String regId) {
 		final SharedPreferences prefs = getGCMPreferences(context);
 		int appVersion = getAppVersion(context);
+
 		Log.i(TAG, "Saving regId on app version " + appVersion);
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putString(PROPERTY_REG_ID, regId);
+
 		// Save Current User to Match the Current Recognized User to Get
 		// Notifications.
 		User user = Session.restore(context).getCurrentUser();
@@ -374,6 +386,26 @@ public class Utils {
 		editor.putInt(PROPERTY_CURRENT_USER_ID, CURRENT_USER_ID);
 		editor.putInt(PROPERTY_APP_VERSION, appVersion);
 		editor.commit();
+	}
+
+	public static boolean checkPlayServices(Context context) {
+		Logger.Log(LOG_TAG, "checkPlayServices()");
+
+		int resultCode = GooglePlayServicesUtil
+				.isGooglePlayServicesAvailable(context);
+		if (resultCode != ConnectionResult.SUCCESS) {
+			if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+
+				GooglePlayServicesUtil.getErrorDialog(resultCode,
+						(Activity) context,
+						CJayConstant.PLAY_SERVICES_RESOLUTION_REQUEST).show();
+			} else {
+				Log.e("DEVICE_UNSUPPORTED", "This device is not supported.");
+				((Activity) context).finish();
+			}
+			return false;
+		}
+		return true;
 	}
 
 	@SuppressLint("SimpleDateFormat")
@@ -431,7 +463,7 @@ public class Utils {
 		Intent intent = new Intent(context, QueueIntentService.class);
 		PendingIntent sender = PendingIntent
 				.getBroadcast(context, 0, intent, 0);
-		
+
 		AlarmManager alarmManager = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
 
@@ -439,10 +471,10 @@ public class Utils {
 	}
 
 	public static boolean isAlarmUp(Context context) {
-		
+
 		return PendingIntent.getService(context, 0, new Intent(context,
 				QueueIntentService.class), PendingIntent.FLAG_NO_CREATE) != null;
-		
+
 	}
 
 	public static File getAppDirectoryFile() {
