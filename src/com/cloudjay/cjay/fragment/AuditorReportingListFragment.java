@@ -354,6 +354,7 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 
 	@ItemLongClick(R.id.container_list)
 	void listItemLongClicked(int position) {
+
 		// refresh highlighting and menu
 		mFeedListView.setItemChecked(position, true);
 		Cursor cursor = (Cursor) cursorAdapter.getItem(position);

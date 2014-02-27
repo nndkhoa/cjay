@@ -184,7 +184,8 @@ public class ContainerSessionDaoImpl extends
 
 	@Override
 	public ContainerSession findByUuid(String uuid) throws SQLException {
-		List<ContainerSession> result = this.queryForEq("uuid", uuid);
+		List<ContainerSession> result = this.queryForEq(
+				ContainerSession.FIELD_UUID, uuid);
 		if (result != null && result.size() > 0) {
 			return result.get(0);
 		}
