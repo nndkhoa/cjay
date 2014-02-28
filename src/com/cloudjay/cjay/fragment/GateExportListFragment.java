@@ -35,6 +35,7 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.actionbarsherlock.view.Menu;
@@ -68,6 +69,9 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 	private ContainerSession mSelectedContainerSession = null;
 	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
 	private int mItemLayout = R.layout.list_item_container;
+
+	@ViewById(R.id.ll_empty_element)
+	LinearLayout mEmptyElement;
 
 	@ViewById(R.id.container_list)
 	ListView mFeedListView;
@@ -181,6 +185,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 			}
 		});
 
+		mFeedListView.setEmptyView(mEmptyElement);
 	}
 
 	@Override

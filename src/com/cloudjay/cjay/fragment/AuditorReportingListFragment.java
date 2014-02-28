@@ -35,6 +35,7 @@ import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AbsListView.OnScrollListener;
@@ -72,6 +73,9 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 	private ContainerSession mSelectedContainerSession = null;
 	private int mItemLayout = R.layout.list_item_audit_container;
 	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
+
+	@ViewById(R.id.ll_empty_element)
+	LinearLayout mEmptyElement;
 
 	@ViewById(R.id.container_list)
 	ListView mFeedListView;
@@ -211,6 +215,8 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 					int visibleItemCount, int totalItemCount) {
 			}
 		});
+
+		mFeedListView.setEmptyView(mEmptyElement);
 	}
 
 	@Override
@@ -244,16 +250,6 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 
-		if (cursor.getCount() != 0) {
-			mFeedListView.setVisibility(View.VISIBLE);
-			mAddButton.setVisibility(View.INVISIBLE);
-			mNotfoundTextView.setVisibility(View.INVISIBLE);
-		} else {
-			mFeedListView.setVisibility(View.INVISIBLE);
-			mAddButton.setVisibility(View.VISIBLE);
-			mNotfoundTextView.setVisibility(View.VISIBLE);
-		}
-
 		if (cursorAdapter == null) {
 			cursorAdapter = new AuditorContainerCursorAdapter(getActivity(),
 					mItemLayout, cursor, 0);
@@ -261,6 +257,9 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
 				@Override
 				public Cursor runQuery(CharSequence constraint) {
+
+					Logger.Log(LOG_TAG,
+							"public Cursor runQuery(CharSequence constraint)");
 
 					Cursor cursor = null;
 					if (mState == STATE_REPORTING) {
