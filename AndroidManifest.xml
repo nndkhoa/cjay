@@ -150,12 +150,12 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".UpdateReceiver" >
+        <receiver android:name="com.cloudjay.cjay.receivers.UpdateReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
 
                 <data
-                    android:path="com.cloudjay.com"
+                    android:path="com.cloudjay.cjay"
                     android:scheme="package" />
             </intent-filter>
         </receiver>

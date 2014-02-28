@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_centerVertical="true"
     android:orientation="vertical" >
 
     <EditText
         android:id="@+id/dialog_operator_name"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/dialog_container_owner" />
 
     <ListView
         android:id="@+id/dialog_operator_list"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="300dp"
         android:minHeight="30dp"
         android:padding="12dp"

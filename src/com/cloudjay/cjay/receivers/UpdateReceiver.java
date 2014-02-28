@@ -16,6 +16,7 @@ import android.util.Log;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.service.QueueIntentService;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.Utils;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -29,7 +30,9 @@ public class UpdateReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		Logger.Log(LOG_TAG, "onReceive()");
 		mContext = context;
+
 		if (Utils.checkPlayServices(context)) {
 			gcm = GoogleCloudMessaging.getInstance(context);
 			regid = Utils.getRegistrationId(context);

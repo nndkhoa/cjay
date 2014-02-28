@@ -36,10 +36,12 @@
 
     <!-- Camera Colours -->
     <color name="camera_background_transparent">#66747474</color>
-    <color name="camera_button_background">#373737</color>
+    <color name="camera_button_background">#CC6fccf7</color>
+    <!-- <color name="camera_button_background">#373737</color> -->
     <color name="camera_button_background_transparent">#22373737</color>
     <color name="camera_button_text">#f9f9f9</color>
-    <color name="camera_button_background_pressed">#747474</color>
+    <!-- <color name="camera_button_background_pressed">#747474</color> -->
+    <color name="camera_button_background_pressed">#556fccf7</color>
     <color name="camera_button_text_pressed">#747474</color>
     <color name="camera_button_transparent_background_pressed">#44a0a0a0</color>
     <color name="camera_button_orange_background">#ff9500</color>
@@ -47,9 +49,7 @@
     <color name="camera_button_red_background">#F50407</color>
     <color name="camera_button_red_background_pressed">#DDF50407</color>
     <color name="camera_splashscreen_background">#808080</color>
-    
     <color name="list_item_bg_container_fixed">#556fccf7</color>
-    
     <color name="pressed_photup">#CC6fccf7</color>
 
 </resources>

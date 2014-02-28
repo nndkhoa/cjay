@@ -69,7 +69,7 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 	private int LOADER_ID;
 
 	private ArrayList<Operator> mOperators;
-	private int mState = STATE_NOT_REPORTED;
+	private int mState;
 	private ContainerSession mSelectedContainerSession = null;
 	private int mItemLayout = R.layout.list_item_audit_container;
 	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
@@ -469,6 +469,7 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 		if (cursorAdapter != null) {
 			refresh();
 		}
+		
 		super.onResume();
 	}
 

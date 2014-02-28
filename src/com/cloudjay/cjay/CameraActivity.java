@@ -66,21 +66,21 @@ import de.greenrobot.event.EventBus;
 
 /**
  * Input:
- * 
+ *
  * - type: chỉ định đang mở Camera ở in | out | audit | repair
- * 
+ *
  * - uuid: container session uuid --> use to load object from db
- * 
+ *
  * Output:
- * 
+ *
  * - Mỗi lần chụp hình thực hiện tạo Object `GateReportImage` |
  * `AuditReportItem` phụ thuộc vào type ban đầu truyền vào và add vào
  * tmpContainerSession. Tạo con CJayImage để upload lên server.
- * 
- * 
+ *
+ *
  * - Sau khi click Done >> Convert tmpContainerSession > ContainerSession và
  * thực hiện enqueue (save to db)
- * 
+ *
  */
 @SuppressWarnings("deprecation")
 @EActivity(R.layout.activity_camera)
@@ -150,6 +150,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		public void surfaceCreated(SurfaceHolder holder) {
 			// no-op -- wait until surfaceChanged()
 			Logger.Log(LOG_TAG, "onSurfaceCreated");
+			inPreview = true;
 		}
 
 		public void surfaceChanged(SurfaceHolder holder, int format, int width,
@@ -183,6 +184,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	};
 
 	ShutterCallback shutterCallback = new ShutterCallback() {
+
 
 		@Override
 		public void onShutter() {
@@ -310,7 +312,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 						cameraConfigured = true;
 					}
 				} catch (NotFoundException e) {
-
+					e.printStackTrace();
 				}
 			}
 		}
@@ -367,7 +369,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	/**
 	 * save byte array to Bitmap
-	 * 
+	 *
 	 * @param data
 	 * @return
 	 */
@@ -740,7 +742,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	/**
 	 * Default:
-	 * 
+	 *
 	 * OFF --> AUTO --> ON --> OFF
 	 */
 	@Click(R.id.btn_toggle_flash)
@@ -788,32 +790,37 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Background
 	void takePicture() {
-		// if (inPreview) {
+		if (inPreview) {
 
-		Logger.Log(LOG_TAG, "Prepare to take picture");
+			try {
+				Logger.Log(LOG_TAG, "Prepare to take picture");
+				Camera.Parameters cameraParameters = camera.getParameters();
 
-		Camera.Parameters cameraParameters = camera.getParameters();
+				List<String> supportedFocusMode = cameraParameters
+						.getSupportedFocusModes();
+				for (String mode : supportedFocusMode) {
+					Logger.Log(TAG, "Camera supports Focus Mode: " + mode);
+				}
 
-		List<String> supportedFocusMode = cameraParameters
-				.getSupportedFocusModes();
-		for (String mode : supportedFocusMode) {
-			Logger.Log(TAG, "Camera supports Focus Mode: " + mode);
+				// Submit focus area to camera
+				if (supportedFocusMode
+						.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+					cameraParameters
+							.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+					camera.setParameters(cameraParameters);
+					camera.autoFocus(this);
+				} else {
+					Logger.Log(TAG,
+							"No auto focus mode supported, now just take picture");
+					camera.takePicture(shutterCallback, null, photoCallback);
+				}
+
+				inPreview = false;
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
-
-		// Submit focus area to camera
-		if (supportedFocusMode.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
-			cameraParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-			camera.setParameters(cameraParameters);
-			camera.autoFocus(this);
-		} else {
-			Logger.Log(TAG,
-					"No auto focus mode supported, now just take picture");
-			camera.takePicture(shutterCallback, null, photoCallback);
-		}
-
-		inPreview = false;
-
-		// }
 	}
 
 	PictureCallback rawCallback = new PictureCallback() {
@@ -896,7 +903,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-
 		if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
 				|| keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
 
