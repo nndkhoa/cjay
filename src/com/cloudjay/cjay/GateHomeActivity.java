@@ -4,6 +4,8 @@ import java.lang.reflect.Field;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenuItem;
 import org.androidannotations.annotations.ViewById;
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
@@ -41,6 +43,9 @@ public class GateHomeActivity extends CJayActivity implements
 
 	private String[] locations;
 	private ViewPagerAdapter mPagerAdapter;
+
+	@OptionsMenuItem(R.id.menu_more)
+	MenuItem menuSearch;
 
 	@ViewById
 	ViewPager pager;
@@ -143,23 +148,31 @@ public class GateHomeActivity extends CJayActivity implements
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getSupportMenuInflater();
-		return true;
+		return super.onCreateOptionsMenu(menu);
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_logout:
-			Logger.Log(LOG_TAG, "Logout");
+	// @OptionsItem(R.id.menu_logout)
+	// boolean logout() {
+	// Logger.Log(LOG_TAG, "Logout");
+	// getSession().deleteSession(getApplicationContext());
+	// startActivity(new Intent(this, LoginActivity_.class));
+	// finish();
+	// return true;
+	// }
 
-			getSession().deleteSession(getApplicationContext());
-			startActivity(new Intent(this, LoginActivity_.class));
-			finish();
-			return true;
-		}
-
-		return super.onOptionsItemSelected(item);
-	}
+	// @Override
+	// public boolean onOptionsItemSelected(MenuItem item) {
+	// switch (item.getItemId()) {
+	// case R.id.menu_logout:
+	// Logger.Log(LOG_TAG, "Logout");
+	// getSession().deleteSession(getApplicationContext());
+	// startActivity(new Intent(this, LoginActivity_.class));
+	// finish();
+	// return true;
+	// }
+	//
+	// return super.onOptionsItemSelected(item);
+	// }
 
 	@Override
 	public void OnOperatorSelected(Fragment parent, String containerId,

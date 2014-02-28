@@ -116,6 +116,12 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 		getActivity().supportInvalidateOptionsMenu();
 	}
 
+	@OptionsItem(R.id.menu_more)
+	boolean menuMore() {
+		Logger.Log(LOG_TAG, "Menu More");
+		return false;
+	}
+
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 		try {

@@ -17,8 +17,20 @@
         android:showAsAction="always"
         android:title="@string/menu_upload_title"/>
     <item
-        android:id="@+id/menu_logout"
-        android:showAsAction="never"
-        android:title="@string/menu_logout_title"/>
+        android:id="@+id/menu_more"
+        android:icon="@android:drawable/ic_menu_more"
+        android:showAsAction="always">
+    </item>
+
+    <!--
+    <menu>
+            <item
+                android:id="@+id/menu_logout"
+                android:icon="@android:drawable/ic_lock_power_off"
+                android:showAsAction="never"
+                android:title="@string/menu_logout_title"/>
+        </menu>
+    </item>
+    -->
 
 </menu>
