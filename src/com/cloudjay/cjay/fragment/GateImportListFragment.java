@@ -10,29 +10,33 @@ import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ItemLongClick;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.ViewById;
-
 import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
+import android.content.Context;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.FilterQueryProvider;
 import android.widget.ListView;
+import android.widget.AbsListView.OnScrollListener;
 
 import com.actionbarsherlock.view.Menu;
-import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
-import com.ami.fundapter.extractors.StringExtractor;
-import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.adapter.GateContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
@@ -40,18 +44,17 @@ import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
-import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
-import com.nostra13.universalimageloader.core.ImageLoader;
 import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_gate_import)
 @OptionsMenu(R.menu.menu_gate_import)
 public class GateImportListFragment extends CJaySherlockFragment implements
-		OnRefreshListener {
+		OnRefreshListener, LoaderCallbacks<Cursor> {
 
 	private final static String LOG_TAG = "GateImportListFragment";
 	private final static int LOADER_ID = 1;
@@ -63,22 +66,99 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 	ListView mFeedListView;
 
 	private ArrayList<Operator> mOperators;
-	private ArrayList<ContainerSession> mFeeds;
+
 	private FunDapter<ContainerSession> mFeedsAdapter;
-	private ImageLoader imageLoader;
-	private ContainerSession mSelectedContainerSession;
+
+	private ContainerSession mSelectedContainerSession = null;
+	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
+	private int mItemLayout = R.layout.list_item_container;
 
 	PullToRefreshLayout mPullToRefreshLayout;
+	GateContainerCursorAdapter cursorAdapter;
 
 	@AfterViews
 	void afterViews() {
-		imageLoader = ImageLoader.getInstance();
+
+		try {
+			containerSessionDaoImpl = CJayClient.getInstance()
+					.getDatabaseManager().getHelper(getActivity())
+					.getContainerSessionDaoImpl();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
 				.getListOperators(getActivity());
 
-		initContainerFeedAdapter(null);
-		mSelectedContainerSession = null;
+		// initContainerFeedAdapter(null);
+		getLoaderManager().initLoader(LOADER_ID, null, this);
+
+		mFeedListView.setScrollingCacheEnabled(false);
+		mFeedListView.setOnScrollListener(new OnScrollListener() {
+
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				if (scrollState != 0) {
+					((GateContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
+				} else {
+					((GateContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
+					((GateContainerCursorAdapter) mFeedListView.getAdapter())
+							.notifyDataSetChanged();
+				}
+			}
+
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount) {
+			}
+		});
+	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		Context context = getActivity();
+
+		return new CJayCursorLoader(context) {
+			@Override
+			public Cursor loadInBackground() {
+				Cursor cursor = DataCenter.getInstance()
+						.getLocalContainerSessionCursor(getContext());
+
+				if (cursor != null) {
+					// Ensure the cursor window is filled
+					cursor.getCount();
+					cursor.registerContentObserver(mObserver);
+				}
+
+				return cursor;
+			}
+		};
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+		if (cursorAdapter == null) {
+			cursorAdapter = new GateContainerCursorAdapter(getActivity(),
+					mItemLayout, cursor, 0);
+
+			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+				@Override
+				public Cursor runQuery(CharSequence constraint) {
+					return DataCenter.getInstance().filterCheckoutCursor(
+							getActivity(), constraint);
+				}
+			});
+
+			mFeedListView.setAdapter(cursorAdapter);
+
+		} else {
+			cursorAdapter.swapCursor(cursor);
+		}
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		cursorAdapter.swapCursor(null);
 	}
 
 	@Override
@@ -114,12 +194,6 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 		mSelectedContainerSession = null;
 		mFeedListView.setItemChecked(-1, true);
 		getActivity().supportInvalidateOptionsMenu();
-	}
-
-	@OptionsItem(R.id.menu_more)
-	boolean menuMore() {
-		Logger.Log(LOG_TAG, "Menu More");
-		return false;
 	}
 
 	@OptionsItem(R.id.menu_upload)
@@ -158,6 +232,7 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 	}
 
 	@Click(R.id.btn_add_new)
+	@Trace
 	void addContainerClicked() {
 		// getResources().getString(R.string.default_container_id)
 		showContainerDetailDialog("", "",
@@ -174,7 +249,17 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 	void listItemLongClicked(int position) {
 		// refresh highlighting and menu
 		mFeedListView.setItemChecked(position, true);
-		mSelectedContainerSession = mFeedsAdapter.getItem(position);
+
+		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
+		String uuidString = cursor.getString(cursor
+				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+		try {
+			mSelectedContainerSession = containerSessionDaoImpl
+					.findByUuid(uuidString);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
 		getActivity().supportInvalidateOptionsMenu();
 	}
 
@@ -258,67 +343,6 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 
 	}
 
-	private void initContainerFeedAdapter(ArrayList<ContainerSession> containers) {
-
-		BindDictionary<ContainerSession> feedsDict = new BindDictionary<ContainerSession>();
-
-		feedsDict.addStringField(R.id.feed_item_container_id,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.replaceNullBySpace(item.getContainerId());
-					}
-				});
-		feedsDict.addStringField(R.id.feed_item_container_owner,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.replaceNullBySpace(item.getOperatorName());
-					}
-				});
-		feedsDict.addStringField(R.id.feed_item_container_import_date,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.replaceNullBySpace(item.getCheckInTime());
-					}
-				});
-		feedsDict.addStringField(R.id.feed_item_container_export_date,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.replaceNullBySpace(item.getCheckOutTime());
-					}
-				});
-
-		feedsDict.addDynamicImageField(R.id.feed_item_picture,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.stripNull(item.getImageIdPath());
-					}
-				}, new DynamicImageLoader() {
-					@Override
-					public void loadImage(String url, ImageView view) {
-						if (!TextUtils.isEmpty(url)) {
-							imageLoader.displayImage(url, view);
-						} else {
-							view.setImageResource(R.drawable.ic_app);
-						}
-					}
-				});
-
-		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(),
-				containers, R.layout.list_item_container, feedsDict);
-
-		mFeedListView.setAdapter(mFeedsAdapter);
-	}
-
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
 		Logger.Log(LOG_TAG, "onEventMainThread ContainerSessionChangedEvent");
 		refresh();
@@ -326,12 +350,7 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 
 	public void refresh() {
 		Logger.Log(LOG_TAG, "onRefresh");
-
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListLocalContainerSessions(getActivity());
-
-		if (null != mFeeds)
-			mFeedsAdapter.updateData(mFeeds);
+		getLoaderManager().restartLoader(LOADER_ID, null, this);
 	}
 
 	@Override

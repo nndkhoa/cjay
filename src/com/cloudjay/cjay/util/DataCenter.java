@@ -9,7 +9,6 @@ import java.util.List;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
-
 import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
@@ -287,6 +286,12 @@ public class DataCenter {
 				queryString, new String[] {});
 	}
 
+	public Cursor getLocalContainerSessionCursor(Context context) {
+		String queryString = "SELECT * FROM csview cs WHERE cs.upload_confirmation = 0 AND cs.on_local = 1 AND cs.state <> 4";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] {});
+	}
+
 	public Cursor getNotReportedContainerSessionCursor(Context context) {
 
 		// String queryString = "SELECT cs.* FROM csiview AS cs"
@@ -331,7 +336,7 @@ public class DataCenter {
 
 		String queryString = "SELECT * FROM csview cs "
 				+ "WHERE cs.check_out_time = '' AND cs.on_local = 0 AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
-		
+
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
 				queryString, new String[] { constraint + "%" });
 	}

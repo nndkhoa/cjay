@@ -36,7 +36,7 @@
         android:required="false" />
 
     <application
-        android:name="com.cloudjay.cjay.CJayApplication"
+        android:name="com.cloudjay.cjay.CJayApplication_"
         android:allowBackup="true"
         android:icon="@drawable/ic_app"
         android:label="@string/app_name"
@@ -133,9 +133,9 @@
             android:theme="@style/AppTheme.NoTitleBar" >
         </activity>
 
-        <service android:name="com.cloudjay.cjay.service.UploadIntentService" />
-        <service android:name="com.cloudjay.cjay.service.QueueIntentService" />
-        <service android:name="com.cloudjay.cjay.service.GcmIntentService" />
+        <service android:name="com.cloudjay.cjay.service.UploadIntentService_" />
+        <service android:name="com.cloudjay.cjay.service.QueueIntentService_" />
+        <service android:name="com.cloudjay.cjay.service.GcmIntentService_" />
 
         <receiver
             android:name="com.cloudjay.cjay.receivers.ConnectionChangeReceiver"

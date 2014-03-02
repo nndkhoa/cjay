@@ -2,7 +2,6 @@ package com.cloudjay.cjay.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,8 +9,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-
-import org.json.JSONException;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -31,7 +28,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -46,14 +42,11 @@ import android.widget.Toast;
 
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.User;
-import com.cloudjay.cjay.network.CJayClient;
-import com.cloudjay.cjay.service.QueueIntentService;
+import com.cloudjay.cjay.service.QueueIntentService_;
 import com.cloudjay.cjay.service.UploadIntentService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.lightbox.android.photoprocessing.PhotoProcessing;
 import com.lightbox.android.photoprocessing.utils.MediaUtils;
 
@@ -447,7 +440,7 @@ public class Utils {
 		Logger.Log(LOG_TAG, "start Alarm Manager");
 
 		// Making Alarm for Queue Worker
-		Intent intent = new Intent(context, QueueIntentService.class);
+		Intent intent = new Intent(context, QueueIntentService_.class);
 		PendingIntent pintent = PendingIntent.getService(context, 0, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 		Calendar current = Calendar.getInstance();
@@ -463,7 +456,7 @@ public class Utils {
 
 		Logger.Log(LOG_TAG, "stop Alarm Manager");
 
-		Intent intent = new Intent(context, QueueIntentService.class);
+		Intent intent = new Intent(context, QueueIntentService_.class);
 		PendingIntent sender = PendingIntent
 				.getBroadcast(context, 0, intent, 0);
 
@@ -476,7 +469,7 @@ public class Utils {
 	public static boolean isAlarmUp(Context context) {
 
 		return PendingIntent.getService(context, 0, new Intent(context,
-				QueueIntentService.class), PendingIntent.FLAG_NO_CREATE) != null;
+				QueueIntentService_.class), PendingIntent.FLAG_NO_CREATE) != null;
 
 	}
 

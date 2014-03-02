@@ -1,12 +1,8 @@
 package com.cloudjay.cjay.receivers;
 
 import java.io.IOException;
-import java.util.Calendar;
-
 import org.json.JSONException;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +10,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.cloudjay.cjay.network.CJayClient;
-import com.cloudjay.cjay.service.QueueIntentService;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;

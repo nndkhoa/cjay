@@ -9,7 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.cloudjay.cjay.service.QueueIntentService;
+import com.cloudjay.cjay.service.QueueIntentService_;
 
 public class AutoStartReceiver extends BroadcastReceiver {
 	@Override
@@ -18,7 +18,7 @@ public class AutoStartReceiver extends BroadcastReceiver {
 		Log.i("AutoStart", "**********started************");
 
 		// Making Alarm for Queue Worker
-		intent = new Intent(context, QueueIntentService.class);
+		intent = new Intent(context, QueueIntentService_.class);
 		PendingIntent pintent = PendingIntent.getService(context, 0, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 		Calendar current = Calendar.getInstance();

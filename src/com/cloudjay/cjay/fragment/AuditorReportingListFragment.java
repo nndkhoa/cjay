@@ -257,10 +257,7 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
 				@Override
 				public Cursor runQuery(CharSequence constraint) {
-
-					Logger.Log(LOG_TAG,
-							"public Cursor runQuery(CharSequence constraint)");
-
+					
 					Cursor cursor = null;
 					if (mState == STATE_REPORTING) {
 						cursor = DataCenter.getInstance()
@@ -450,6 +447,7 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 				"onRefresh with LOADER_ID: " + Integer.toString(LOADER_ID));
 
 		getLoaderManager().restartLoader(LOADER_ID, null, this);
+		
 		// mFeedListView.setAdapter(cursorAdapter);
 		// cursorAdapter.notifyDataSetChanged();
 		// mFeedListView.invalidateViews();

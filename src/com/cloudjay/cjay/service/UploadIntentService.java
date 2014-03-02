@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 
+import org.androidannotations.annotations.EIntentService;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
@@ -53,6 +54,7 @@ import com.cloudjay.cjay.util.NoConnectionException;
 
 import de.greenrobot.event.EventBus;
 
+@EIntentService
 public class UploadIntentService extends IntentService implements
 		CountingInputStreamEntity.UploadListener {
 

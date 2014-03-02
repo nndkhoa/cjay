@@ -1,5 +1,7 @@
 package com.cloudjay.cjay.service;
 
+import org.androidannotations.annotations.EIntentService;
+
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -23,8 +25,10 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
  * Handle notification from server
  * 
  * @author anhqnguyen
- *
+ * 
  */
+
+@EIntentService
 public class GcmIntentService extends IntentService {
 
 	public static final int NOTIFICATION_ID = 1;
@@ -97,7 +101,7 @@ public class GcmIntentService extends IntentService {
 
 					String msg = extras.getString("msg");
 					String type = extras.getString("type");
-					
+
 					Logger.Log(LOG_TAG,
 							"Notification got Type = " + type + " | MSG = "
 									+ msg + " | Id = " + Integer.toString(id));

@@ -41,7 +41,7 @@ import android.widget.TextView;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.adapter.CheckoutContainerCursorAdapter;
+import com.cloudjay.cjay.adapter.GateContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
@@ -86,7 +86,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 	TextView mNotfoundTextView;
 
 	PullToRefreshLayout mPullToRefreshLayout;
-	CheckoutContainerCursorAdapter cursorAdapter;
+	GateContainerCursorAdapter cursorAdapter;
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -169,12 +169,12 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				if (scrollState != 0) {
-					((CheckoutContainerCursorAdapter) mFeedListView
+					((GateContainerCursorAdapter) mFeedListView
 							.getAdapter()).isScrolling = true;
 				} else {
-					((CheckoutContainerCursorAdapter) mFeedListView
+					((GateContainerCursorAdapter) mFeedListView
 							.getAdapter()).isScrolling = false;
-					((CheckoutContainerCursorAdapter) mFeedListView
+					((GateContainerCursorAdapter) mFeedListView
 							.getAdapter()).notifyDataSetChanged();
 				}
 			}
@@ -209,25 +209,10 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		};
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
-
-		Logger.Log("onLoadFinished");
-
-		if (cursor.getCount() != 0) {
-			mFeedListView.setVisibility(View.VISIBLE);
-			mAddButton.setVisibility(View.INVISIBLE);
-			mNotfoundTextView.setVisibility(View.INVISIBLE);
-		} else {
-			mFeedListView.setVisibility(View.INVISIBLE);
-			mAddButton.setVisibility(View.VISIBLE);
-			mNotfoundTextView.setVisibility(View.VISIBLE);
-		}
-
-		getActivity().startManagingCursor(cursor);
 		if (cursorAdapter == null) {
-			cursorAdapter = new CheckoutContainerCursorAdapter(getActivity(),
+			cursorAdapter = new GateContainerCursorAdapter(getActivity(),
 					mItemLayout, cursor, 0);
 
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
@@ -247,7 +232,6 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> arg0) {
-		Logger.Log(LOG_TAG, "onLoaderReset");
 		cursorAdapter.swapCursor(null);
 	}
 
