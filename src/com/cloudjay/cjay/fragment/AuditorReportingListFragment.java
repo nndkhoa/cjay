@@ -63,7 +63,6 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 		implements OnRefreshListener, LoaderCallbacks<Cursor> {
 
 	public static final String LOG_TAG = "AuditorReportingListFragment";
-
 	public static final int STATE_NOT_REPORTED = 0;
 	public static final int STATE_REPORTING = 1;
 	private int LOADER_ID;
@@ -257,7 +256,7 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
 				@Override
 				public Cursor runQuery(CharSequence constraint) {
-					
+
 					Cursor cursor = null;
 					if (mState == STATE_REPORTING) {
 						cursor = DataCenter.getInstance()
@@ -447,7 +446,7 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 				"onRefresh with LOADER_ID: " + Integer.toString(LOADER_ID));
 
 		getLoaderManager().restartLoader(LOADER_ID, null, this);
-		
+
 		// mFeedListView.setAdapter(cursorAdapter);
 		// cursorAdapter.notifyDataSetChanged();
 		// mFeedListView.invalidateViews();
@@ -467,7 +466,7 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 		if (cursorAdapter != null) {
 			refresh();
 		}
-		
+
 		super.onResume();
 	}
 

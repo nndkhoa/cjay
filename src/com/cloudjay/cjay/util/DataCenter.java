@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
@@ -19,11 +20,13 @@ import com.cloudjay.cjay.dao.UserDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.ContainerSessionResult;
 import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Depot;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.RepairCode;
+import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.j256.ormlite.stmt.PreparedQuery;
@@ -534,21 +537,47 @@ public class DataCenter {
 
 			// 3. Update list ContainerSessions
 			Logger.Log(LOG_TAG, "get list container sessions");
-			List<ContainerSession> containerSessions = null;
-
 			if (containerSessionDaoImpl.isEmpty()) {
 
-				Logger.Log(LOG_TAG,
-						"get new list container sessions based on user role");
+				int page = 1;
 
-				containerSessions = CJayClient.getInstance()
-						.getAllContainerSessions(ctx);
+				do {
+					ContainerSessionResult result = null;
+					List<ContainerSession> containerSessions = new ArrayList<ContainerSession>();
 
-				if (null != containerSessions && !containerSessions.isEmpty()) {
-					EventBus.getDefault()
-							.post(new ContainerSessionChangedEvent(
-									containerSessions));
-				}
+					result = CJayClient.getInstance()
+							.getContainerSessionsByPage(ctx, page);
+
+					if (null != result) {
+						page = result.getNext();
+						List<TmpContainerSession> tmpContainerSessions = result
+								.getResults();
+
+						if (null != tmpContainerSessions) {
+
+							for (TmpContainerSession tmpSession : tmpContainerSessions) {
+								ContainerSession containerSession = Mapper
+										.getInstance().toContainerSession(
+												tmpSession, ctx);
+
+								if (null != containerSession) {
+									containerSessions.add(containerSession);
+								}
+							}
+						}
+
+						containerSessionDaoImpl
+								.addListContainerSessions(containerSessions);
+
+						if (null != containerSessions
+								&& !containerSessions.isEmpty()) {
+							EventBus.getDefault().post(
+									new ContainerSessionChangedEvent(
+											containerSessions));
+						}
+					}
+
+				} while (page >= 1);
 
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
@@ -563,28 +592,68 @@ public class DataCenter {
 						"get updated list container sessions from last time: "
 								+ date);
 
-				containerSessions = CJayClient.getInstance()
-						.getContainerSessions(ctx, date);
+				int page = 1;
 
-				// TODO: need to refactor after implement push notification
+				do {
+					List<ContainerSession> containerSessions = new ArrayList<ContainerSession>();
+					ContainerSessionResult result = null;
+
+					result = CJayClient.getInstance()
+							.getContainerSessionsByPage(ctx, date, page);
+
+					if (null != result) {
+						page = result.getNext();
+						List<TmpContainerSession> tmpContainerSessions = result
+								.getResults();
+
+						if (null != tmpContainerSessions) {
+
+							for (TmpContainerSession tmpSession : tmpContainerSessions) {
+								ContainerSession containerSession = Mapper
+										.getInstance().toContainerSession(
+												tmpSession, ctx);
+
+								if (null != containerSession) {
+									containerSessions.add(containerSession);
+								}
+							}
+						}
+
+						containerSessionDaoImpl
+								.addListContainerSessions(containerSessions);
+
+						if (null != containerSessions
+								&& !containerSessions.isEmpty()) {
+							EventBus.getDefault().post(
+									new ContainerSessionChangedEvent(
+											containerSessions));
+						}
+
+						if (containerSessions.isEmpty()) {
+							Logger.Log(LOG_TAG,
+									"----> NO new container sessions");
+						} else {
+
+							EventBus.getDefault().post(
+									new ContainerSessionChangedEvent(
+											containerSessions));
+
+							Logger.Log(
+									LOG_TAG,
+									"----> Has "
+											+ Integer
+													.toString(containerSessions
+															.size())
+											+ " new container sessions");
+						}
+
+					}
+
+				} while (page > 1);
+
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
 						nowString);
-
-				if (null == containerSessions) {
-					Logger.Log(LOG_TAG, "----> NO new container sessions");
-				} else if (!containerSessions.isEmpty()) {
-
-					EventBus.getDefault()
-							.post(new ContainerSessionChangedEvent(
-									containerSessions));
-
-					Logger.Log(
-							LOG_TAG,
-							"----> Has "
-									+ Integer.toString(containerSessions.size())
-									+ " new container sessions");
-				}
 
 				Logger.Log(
 						LOG_TAG,
@@ -594,12 +663,6 @@ public class DataCenter {
 												ctx,
 												PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE));
 			}
-
-			// NOTE: already added inside
-			// if (null != containerSessions) {
-			// containerSessionDaoImpl
-			// .addListContainerSessions(containerSessions);
-			// }
 
 		} catch (NoConnectionException e) {
 			throw e;

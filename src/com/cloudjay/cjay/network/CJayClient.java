@@ -11,6 +11,7 @@ import java.util.UUID;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
@@ -19,6 +20,7 @@ import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.model.CJayResourceStatus;
 import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.ContainerSessionResult;
 import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.Operator;
@@ -354,6 +356,36 @@ public class CJayClient implements ICJayClient {
 		return items;
 	}
 
+	public ContainerSessionResult getContainerSessionsByPage(Context ctx,
+			int page) throws NoConnectionException {
+
+		if (Utils.hasNoConnection(ctx)) {
+			throw new NoConnectionException();
+		}
+
+		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
+
+		String response = requestWrapper.sendGet(String.format(
+				CJayConstant.LIST_CONTAINER_SESSIONS_WITH_PAGE, page), headers);
+
+		Logger.Log(LOG_TAG, response);
+
+		Gson gson = new GsonBuilder().setDateFormat(
+				CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
+
+		Type listType = new TypeToken<ContainerSessionResult>() {
+		}.getType();
+
+		ContainerSessionResult result = null;
+		try {
+			result = gson.fromJson(response, listType);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+
 	@Override
 	public List<ContainerSession> getAllContainerSessions(Context ctx)
 			throws NoConnectionException {
@@ -366,9 +398,6 @@ public class CJayClient implements ICJayClient {
 
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
 
-		// cho nay ne anh
-		// sendGet --> lay tron. file json ve
-		// roi moi parse ben duoi'
 		long startTime = System.currentTimeMillis();
 		String response = requestWrapper.sendGet(
 				CJayConstant.LIST_CONTAINER_SESSIONS, headers);
@@ -441,6 +470,37 @@ public class CJayClient implements ICJayClient {
 		long difference = System.currentTimeMillis() - startTime;
 		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference));
 		return items;
+	}
+
+	public ContainerSessionResult getContainerSessionsByPage(Context ctx,
+			String date, int page) throws NoConnectionException {
+
+		if (Utils.hasNoConnection(ctx)) {
+			throw new NoConnectionException();
+		}
+
+		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
+
+		String response = requestWrapper.sendGet(String.format(
+				CJayConstant.LIST_CONTAINER_SESSIONS_WITH_DATETIME_AND_PAGE,
+				date, page), headers);
+
+		Logger.Log(LOG_TAG, response);
+
+		Gson gson = new GsonBuilder().setDateFormat(
+				CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
+
+		Type listType = new TypeToken<ContainerSessionResult>() {
+		}.getType();
+
+		ContainerSessionResult result = null;
+		try {
+			result = gson.fromJson(response, listType);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return result;
 	}
 
 	@Override

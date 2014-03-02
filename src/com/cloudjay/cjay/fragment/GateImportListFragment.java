@@ -304,8 +304,6 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 	public void OnContainerInputCompleted(String containerId,
 			String operatorName, int mode) {
 
-		// TODO: Bug: Background chưa load xong data nên không có mOperators
-		// Get the container id and container operator code
 		String operatorCode = "";
 		for (Operator operator : mOperators) {
 			if (operator.getName().equals(operatorName)) {
