@@ -25,6 +25,7 @@
         <item>Sau sửa chữa</item>
     </string-array>
     <string-array name="auditor_issue_report_tabs">
+        <item>PHOTO</item>
         <item>CODE component</item>
         <item>CODE vị trí</item>
         <item>CODE hư hỏng</item>

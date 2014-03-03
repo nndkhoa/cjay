@@ -19,6 +19,7 @@ import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
@@ -28,7 +29,14 @@ import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
-import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.fragment.IssueReportComponentFragment_;
+import com.cloudjay.cjay.fragment.IssueReportDamageFragment_;
+import com.cloudjay.cjay.fragment.IssueReportDimensionFragment_;
+import com.cloudjay.cjay.fragment.IssueReportFragment;
+import com.cloudjay.cjay.fragment.IssueReportLocationFragment_;
+import com.cloudjay.cjay.fragment.IssueReportPhotoFragment_;
+import com.cloudjay.cjay.fragment.IssueReportQuantityFragment_;
+import com.cloudjay.cjay.fragment.IssueReportRepairFragment_;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ComponentCode;
@@ -125,9 +133,19 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 	public void onTabSelected(Tab tab, FragmentTransaction ft) {
 		int position = tab.getPosition();
 		pager.setCurrentItem(position);
+		
+		LinearLayout.LayoutParams p = (LinearLayout.LayoutParams)imageView.getLayoutParams();
 
 		// show keyboard for specific tabs
 		switch (position) {
+		case TAB_ISSUE_PHOTO:
+			// hide the small image because we are displaying a larger version
+			if (p.weight > 0) {
+				p.weight = 0;
+				imageView.setLayoutParams(p);				
+			}
+			break;
+			
 		case TAB_ISSUE_DIMENSION:
 		case TAB_ISSUE_QUANTITY:
 			IssueReportFragment fragment = (IssueReportFragment) mViewPagerAdapter
@@ -135,9 +153,20 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 			if (fragment != null) {
 				fragment.showKeyboard();
 			}
+
+			// show the small image
+			if (p.weight == 0) {
+				p.weight = 3;
+				imageView.setLayoutParams(p);				
+			}
 			break;
 
 		default:
+			// show the small image
+			if (p.weight == 0) {
+				p.weight = 3;
+				imageView.setLayoutParams(p);				
+			}
 			break;
 		}
 	}
@@ -146,12 +175,16 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 		// hide keyboard for specific tabs
 		int position = tab.getPosition();
+//		LinearLayout.LayoutParams p = (LinearLayout.LayoutParams)imageView.getLayoutParams();
+		
 		switch (position) {
+		case TAB_ISSUE_PHOTO:
 		case TAB_ISSUE_COMPONENT:
 		case TAB_ISSUE_DAMAGE:
 		case TAB_ISSUE_REPAIR:
 		case TAB_ISSUE_DIMENSION:
 		case TAB_ISSUE_QUANTITY:
+			// show-hide keyboard
 			IssueReportFragment fragment = (IssueReportFragment) mViewPagerAdapter
 					.getRegisteredFragment(position);
 			if (fragment != null) {
@@ -302,6 +335,10 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 			IssueReportFragment fragment;
 
 			switch (position) {
+			case TAB_ISSUE_PHOTO:
+				fragment = new IssueReportPhotoFragment_();
+				((IssueReportPhotoFragment_)fragment).setCJayImage(mCJayImage);
+				break;
 			case TAB_ISSUE_LOCATION:
 				fragment = new IssueReportLocationFragment_();
 				break;
