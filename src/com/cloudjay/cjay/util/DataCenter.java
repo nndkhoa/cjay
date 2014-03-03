@@ -10,6 +10,9 @@ import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.CursorJoiner.Result;
+import android.text.TextUtils;
+
 import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
@@ -537,9 +540,11 @@ public class DataCenter {
 
 			// 3. Update list ContainerSessions
 			Logger.Log(LOG_TAG, "get list container sessions");
-			if (containerSessionDaoImpl.isEmpty()) {
 
-				int page = 1;
+			int page = 1;
+			String nextUrl = "";
+
+			if (containerSessionDaoImpl.isEmpty()) {
 
 				do {
 					ContainerSessionResult result = null;
@@ -549,7 +554,9 @@ public class DataCenter {
 							.getContainerSessionsByPage(ctx, page);
 
 					if (null != result) {
-						page = result.getNext();
+						page = page + 1;
+						nextUrl = result.getNext();
+
 						List<TmpContainerSession> tmpContainerSessions = result
 								.getResults();
 
@@ -577,7 +584,7 @@ public class DataCenter {
 						}
 					}
 
-				} while (page >= 1);
+				} while (!TextUtils.isEmpty(nextUrl));
 
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
@@ -591,9 +598,6 @@ public class DataCenter {
 				Logger.Log(LOG_TAG,
 						"get updated list container sessions from last time: "
 								+ date);
-
-				int page = 1;
-
 				do {
 					List<ContainerSession> containerSessions = new ArrayList<ContainerSession>();
 					ContainerSessionResult result = null;
@@ -602,7 +606,9 @@ public class DataCenter {
 							.getContainerSessionsByPage(ctx, date, page);
 
 					if (null != result) {
-						page = result.getNext();
+						page = page + 1;
+						nextUrl = result.getNext();
+
 						List<TmpContainerSession> tmpContainerSessions = result
 								.getResults();
 
@@ -649,7 +655,7 @@ public class DataCenter {
 
 					}
 
-				} while (page > 1);
+				} while (!TextUtils.isEmpty(nextUrl));
 
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,

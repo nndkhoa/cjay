@@ -359,16 +359,17 @@ public class CJayClient implements ICJayClient {
 	public ContainerSessionResult getContainerSessionsByPage(Context ctx,
 			int page) throws NoConnectionException {
 
+		// Logger.Log(LOG_TAG, "Current page: " + Integer.toString(page));
+
 		if (Utils.hasNoConnection(ctx)) {
 			throw new NoConnectionException();
 		}
 
 		HashMap<String, String> headers = prepareHeadersWithToken(ctx);
-
 		String response = requestWrapper.sendGet(String.format(
 				CJayConstant.LIST_CONTAINER_SESSIONS_WITH_PAGE, page), headers);
 
-		Logger.Log(LOG_TAG, response);
+		// Logger.Log(LOG_TAG, "Server response: " + response);
 
 		Gson gson = new GsonBuilder().setDateFormat(
 				CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
@@ -485,7 +486,7 @@ public class CJayClient implements ICJayClient {
 				CJayConstant.LIST_CONTAINER_SESSIONS_WITH_DATETIME_AND_PAGE,
 				date, page), headers);
 
-		Logger.Log(LOG_TAG, response);
+		// Logger.Log(LOG_TAG, response);
 
 		Gson gson = new GsonBuilder().setDateFormat(
 				CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();

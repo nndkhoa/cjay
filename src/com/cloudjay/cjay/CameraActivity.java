@@ -66,21 +66,21 @@ import de.greenrobot.event.EventBus;
 
 /**
  * Input:
- *
+ * 
  * - type: chỉ định đang mở Camera ở in | out | audit | repair
- *
+ * 
  * - uuid: container session uuid --> use to load object from db
- *
+ * 
  * Output:
- *
+ * 
  * - Mỗi lần chụp hình thực hiện tạo Object `GateReportImage` |
  * `AuditReportItem` phụ thuộc vào type ban đầu truyền vào và add vào
  * tmpContainerSession. Tạo con CJayImage để upload lên server.
- *
- *
+ * 
+ * 
  * - Sau khi click Done >> Convert tmpContainerSession > ContainerSession và
  * thực hiện enqueue (save to db)
- *
+ * 
  */
 @SuppressWarnings("deprecation")
 @EActivity(R.layout.activity_camera)
@@ -185,7 +185,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	ShutterCallback shutterCallback = new ShutterCallback() {
 
-
 		@Override
 		public void onShutter() {
 			int volume = audioManager
@@ -204,11 +203,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			Logger.Log(LOG_TAG, "onShutter");
 		}
 	};
-
-	// @Override
-	// public void onCreate(android.os.Bundle savedInstanceState) {
-	// onConfigurationChanged(getResources().getConfiguration());
-	// };
 
 	@SuppressWarnings({})
 	@AfterViews
@@ -369,7 +363,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	/**
 	 * save byte array to Bitmap
-	 *
+	 * 
 	 * @param data
 	 * @return
 	 */
@@ -742,7 +736,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	/**
 	 * Default:
-	 *
+	 * 
 	 * OFF --> AUTO --> ON --> OFF
 	 */
 	@Click(R.id.btn_toggle_flash)

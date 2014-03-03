@@ -13,6 +13,7 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
+import com.cloudjay.cjay.util.Session;
 import com.cloudjay.cjay.util.Utils;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
@@ -28,7 +29,9 @@ public class UpdateReceiver extends BroadcastReceiver {
 		Logger.Log(LOG_TAG, "onReceive()");
 		mContext = context;
 
-		if (Utils.checkPlayServices(context)) {
+		Session session = Session.restore(context);
+
+		if (null != session && Utils.checkPlayServices(context)) {
 			gcm = GoogleCloudMessaging.getInstance(context);
 			regid = Utils.getRegistrationId(context);
 
@@ -93,7 +96,7 @@ public class UpdateReceiver extends BroadcastReceiver {
 	}
 
 	public void sendRegistrationIdToBackend() throws NoConnectionException {
-		// Your implementation here.
+
 		try {
 			CJayClient.getInstance().addGCMDevice(regid, mContext);
 

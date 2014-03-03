@@ -3,16 +3,17 @@ package com.cloudjay.cjay.model;
 import java.util.List;
 
 public class ContainerSessionResult {
-	int next;
-	List<TmpContainerSession> results;
+	String next;
 
-	public int getNext() {
+	public String getNext() {
 		return next;
 	}
 
-	public void setNext(int next) {
+	public void setNext(String next) {
 		this.next = next;
 	}
+
+	List<TmpContainerSession> results;
 
 	public List<TmpContainerSession> getResults() {
 		return results;
