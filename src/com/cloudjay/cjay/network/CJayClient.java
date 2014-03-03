@@ -11,7 +11,6 @@ import java.util.UUID;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;

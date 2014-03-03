@@ -42,9 +42,6 @@ public class GateHomeActivity extends CJayActivity implements
 	private String[] locations;
 	private ViewPagerAdapter mPagerAdapter;
 
-	// @OptionsMenuItem(R.id.menu_more)
-	// MenuItem menuSearch;
-
 	@ViewById
 	ViewPager pager;
 	PullToRefreshAttacher mPullToRefreshAttacher;
@@ -85,10 +82,10 @@ public class GateHomeActivity extends CJayActivity implements
 			@Override
 			public Fragment getItem(int position) {
 				switch (position) {
-				case 0:
+				case 1:
 					Fragment importFeedFragment = new GateImportListFragment_();
 					return importFeedFragment;
-				case 1:
+				case 0:
 					Fragment exportFeedFragment = new GateExportListFragment_();
 					return exportFeedFragment;
 				case 2:

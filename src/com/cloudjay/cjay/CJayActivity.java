@@ -129,13 +129,15 @@ public class CJayActivity extends SherlockFragmentActivity implements
 				Logger.Log(LOG_TAG, "Call from others Activity");
 				new AsyncTask<Void, Integer, Void>() {
 
+					@Override
 					protected void onPreExecute() {
-						Logger.Log(LOG_TAG, "onPreExecute");
+						Logger.Log(LOG_TAG, "----------> onPreExecute");
 						EventBus.getDefault().post(new PreLoadDataEvent());
 					};
 
+					@Override
 					protected void onPostExecute(Void result) {
-						Logger.Log(LOG_TAG, "onPostExecute");
+						Logger.Log(LOG_TAG, "----------> onPostExecute");
 						EventBus.getDefault().post(new PostLoadDataEvent());
 					};
 

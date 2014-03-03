@@ -6,11 +6,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.CursorJoiner.Result;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
@@ -527,6 +525,9 @@ public class DataCenter {
 
 		Logger.Log(LOG_TAG, "***\nUPDATE LIST CONTAINER SESSIONS\n***");
 
+		PreferencesUtil.storePrefsValue(ctx,
+				PreferencesUtil.PREF_IS_UPDATING_DATA, true);
+
 		try {
 			Date now = new Date();
 
@@ -670,11 +671,20 @@ public class DataCenter {
 												PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE));
 			}
 
+			PreferencesUtil.storePrefsValue(ctx,
+					PreferencesUtil.PREF_IS_UPDATING_DATA, false);
+
 		} catch (NoConnectionException e) {
+			PreferencesUtil.storePrefsValue(ctx,
+					PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			throw e;
 		} catch (SQLException e) {
+			PreferencesUtil.storePrefsValue(ctx,
+					PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			throw e;
 		} catch (Exception e) {
+			PreferencesUtil.storePrefsValue(ctx,
+					PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			e.printStackTrace();
 		}
 	}
@@ -1069,4 +1079,18 @@ public class DataCenter {
 		return context.getSharedPreferences(PreferencesUtil.PREFS, 0)
 				.getBoolean(PreferencesUtil.PREF_IS_FETCHING_DATA, false) == true;
 	}
+
+	/**
+	 * 
+	 * Indicate that {@link #updateListContainerSessions(Context)} is running or
+	 * not
+	 * 
+	 * @param context
+	 * @return
+	 */
+	public boolean isUpdating(Context context) {
+		return context.getSharedPreferences(PreferencesUtil.PREFS, 0)
+				.getBoolean(PreferencesUtil.PREF_IS_UPDATING_DATA, false) == true;
+	}
+
 }

@@ -58,8 +58,6 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.view.AddContainerDialog;
-import com.google.android.gms.internal.m;
-
 import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_gate_export)
@@ -398,11 +396,13 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		switch (mode) {
 		case AddContainerDialog.CONTAINER_DIALOG_ADD:
 			try {
+
 				ContainerSession containerSession = ContainerSession
 						.createContainerSession(getActivity(), containerId,
 								operatorCode);
 				ContainerSession.gotoCamera(getActivity(), containerSession,
 						CJayImage.TYPE_EXPORT);
+
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -410,11 +410,13 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		}
 	}
 
-	public void onEventMainThread(PreLoadDataEvent event) {
+	public void onEvent(PreLoadDataEvent event) {
+		Logger.Log(LOG_TAG, "onEvent PreLoadDataEvent");
 		mLoadMoreDataLayout.setVisibility(View.VISIBLE);
 	}
 
-	public void onEventMainThread(PostLoadDataEvent event) {
+	public void onEvent(PostLoadDataEvent event) {
+		Logger.Log(LOG_TAG, "onEvent PostLoadDataEvent");
 		mLoadMoreDataLayout.setVisibility(View.GONE);
 	}
 
@@ -430,10 +432,17 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 
 	@Override
 	public void onResume() {
+
 		Logger.Log(LOG_TAG, "onResume " + LOG_TAG);
 		if (cursorAdapter != null) {
 			refresh();
 		}
+
+		if (DataCenter.getInstance().isUpdating(getActivity()) == false) {
+			Logger.Log(LOG_TAG, "is not updating");
+			mLoadMoreDataLayout.setVisibility(View.GONE);
+		}
+
 		super.onResume();
 	}
 
