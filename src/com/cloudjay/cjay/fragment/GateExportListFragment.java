@@ -420,6 +420,11 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 		mLoadMoreDataLayout.setVisibility(View.GONE);
 	}
 
+	public void onEvent(ContainerSessionEnqueueEvent event) {
+		Logger.Log(LOG_TAG, "onEvent ContainerSessionEnqueueEvent");
+		refresh();
+	}
+
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
 		Logger.Log(LOG_TAG, "onEventMainThread ContainerSessionChangedEvent");
 		refresh();

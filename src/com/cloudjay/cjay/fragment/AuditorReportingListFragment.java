@@ -46,6 +46,8 @@ import com.cloudjay.cjay.adapter.AuditorContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
+import com.cloudjay.cjay.events.PostLoadDataEvent;
+import com.cloudjay.cjay.events.PreLoadDataEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
@@ -76,9 +78,11 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 	@ViewById(R.id.ll_empty_element)
 	LinearLayout mEmptyElement;
 
+	@ViewById(R.id.ll_loading_data)
+	LinearLayout mLoadMoreDataLayout;
+
 	@ViewById(R.id.container_list)
 	ListView mFeedListView;
-	// AuditorContainerListView mFeedListView;
 
 	@ViewById(R.id.search_edittext)
 	EditText mSearchEditText;
@@ -98,6 +102,7 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 
 		ViewGroup viewGroup = (ViewGroup) view;
 		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
+
 		ActionBarPullToRefresh
 				.from(getActivity())
 				.insertLayoutInto(viewGroup)
@@ -431,6 +436,16 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 		}
 	}
 
+	public void onEvent(PreLoadDataEvent event) {
+		Logger.Log(LOG_TAG, "onEvent PreLoadDataEvent");
+		mLoadMoreDataLayout.setVisibility(View.VISIBLE);
+	}
+
+	public void onEvent(PostLoadDataEvent event) {
+		Logger.Log(LOG_TAG, "onEvent PostLoadDataEvent");
+		mLoadMoreDataLayout.setVisibility(View.GONE);
+	}
+
 	public void onEvent(ContainerSessionEnqueueEvent event) {
 		Logger.Log(LOG_TAG, "onEvent ContainerSessionEnqueueEvent");
 		refresh();
@@ -465,6 +480,11 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 
 		if (cursorAdapter != null) {
 			refresh();
+		}
+
+		if (DataCenter.getInstance().isUpdating(getActivity()) == false) {
+			Logger.Log(LOG_TAG, "is not updating");
+			mLoadMoreDataLayout.setVisibility(View.GONE);
 		}
 
 		super.onResume();
