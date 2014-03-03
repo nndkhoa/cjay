@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.FilterQueryProvider;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.AbsListView.OnScrollListener;
 
@@ -40,6 +41,8 @@ import com.cloudjay.cjay.adapter.GateContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
+import com.cloudjay.cjay.events.PostLoadDataEvent;
+import com.cloudjay.cjay.events.PreLoadDataEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
@@ -64,7 +67,7 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 
 	@ViewById(R.id.feeds)
 	ListView mFeedListView;
-
+	
 	private ArrayList<Operator> mOperators;
 
 	private FunDapter<ContainerSession> mFeedsAdapter;

@@ -45,6 +45,8 @@ import com.cloudjay.cjay.adapter.GateContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
+import com.cloudjay.cjay.events.PostLoadDataEvent;
+import com.cloudjay.cjay.events.PreLoadDataEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
@@ -56,6 +58,8 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.view.AddContainerDialog;
+import com.google.android.gms.internal.m;
+
 import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_gate_export)
@@ -72,6 +76,9 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 
 	@ViewById(R.id.ll_empty_element)
 	LinearLayout mEmptyElement;
+
+	@ViewById(R.id.ll_loading_data)
+	LinearLayout mLoadMoreDataLayout;
 
 	@ViewById(R.id.container_list)
 	ListView mFeedListView;
@@ -169,13 +176,11 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				if (scrollState != 0) {
-					((GateContainerCursorAdapter) mFeedListView
-							.getAdapter()).isScrolling = true;
+					((GateContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
 				} else {
-					((GateContainerCursorAdapter) mFeedListView
-							.getAdapter()).isScrolling = false;
-					((GateContainerCursorAdapter) mFeedListView
-							.getAdapter()).notifyDataSetChanged();
+					((GateContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
+					((GateContainerCursorAdapter) mFeedListView.getAdapter())
+							.notifyDataSetChanged();
 				}
 			}
 
@@ -403,6 +408,14 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 			}
 			break;
 		}
+	}
+
+	public void onEventMainThread(PreLoadDataEvent event) {
+		mLoadMoreDataLayout.setVisibility(View.VISIBLE);
+	}
+
+	public void onEventMainThread(PostLoadDataEvent event) {
+		mLoadMoreDataLayout.setVisibility(View.GONE);
 	}
 
 	public void onEventMainThread(ContainerSessionChangedEvent event) {

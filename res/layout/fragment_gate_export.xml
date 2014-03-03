@@ -4,10 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
+    <include
+        layout="@layout/loading_data"
+        android:visibility="gone" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="top" >
+        android:gravity="top"
+        android:orientation="vertical" >
 
         <EditText
             android:id="@+id/search_edittext"

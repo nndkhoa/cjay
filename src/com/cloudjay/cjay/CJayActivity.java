@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.View;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.cloudjay.cjay.events.PostLoadDataEvent;
+import com.cloudjay.cjay.events.PreLoadDataEvent;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -26,6 +28,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import de.greenrobot.event.EventBus;
 import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
@@ -123,8 +126,18 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 			} else {
 
-				Logger.Log(LOG_TAG, "Call from others");
+				Logger.Log(LOG_TAG, "Call from others Activity");
 				new AsyncTask<Void, Integer, Void>() {
+
+					protected void onPreExecute() {
+						Logger.Log(LOG_TAG, "onPreExecute");
+						EventBus.getDefault().post(new PreLoadDataEvent());
+					};
+
+					protected void onPostExecute(Void result) {
+						Logger.Log(LOG_TAG, "onPostExecute");
+						EventBus.getDefault().post(new PostLoadDataEvent());
+					};
 
 					@Override
 					protected Void doInBackground(Void... params) {
@@ -210,7 +223,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 				} catch (IOException ex) {
 					// may catch "SERVICE_NOT_AVAILABLE"
 					msg = "Error :" + ex.getMessage();
-					
+
 					// If there is an error, don't just keep trying to register.
 					// Require the user to click a button again, or perform
 					// exponential back-off.
