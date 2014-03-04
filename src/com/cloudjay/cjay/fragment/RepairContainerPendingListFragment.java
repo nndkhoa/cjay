@@ -42,6 +42,8 @@ import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerRepairedEvent;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
+import com.cloudjay.cjay.events.PostLoadDataEvent;
+import com.cloudjay.cjay.events.PreLoadDataEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayCursorLoader;
@@ -387,6 +389,16 @@ public class RepairContainerPendingListFragment extends CJaySherlockFragment
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
 		Logger.Log(LOG_TAG, "onEvent ContainerSessionChangedEvent");
 		refresh();
+	}
+
+	public void onEvent(PreLoadDataEvent event) {
+		Logger.Log(LOG_TAG, "onEvent PreLoadDataEvent");
+		mLoadMoreDataLayout.setVisibility(View.VISIBLE);
+	}
+
+	public void onEvent(PostLoadDataEvent event) {
+		Logger.Log(LOG_TAG, "onEvent PostLoadDataEvent");
+		mLoadMoreDataLayout.setVisibility(View.GONE);
 	}
 
 }

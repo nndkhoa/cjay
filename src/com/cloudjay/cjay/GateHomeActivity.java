@@ -82,10 +82,10 @@ public class GateHomeActivity extends CJayActivity implements
 			@Override
 			public Fragment getItem(int position) {
 				switch (position) {
-				case 1:
+				case 0:
 					Fragment importFeedFragment = new GateImportListFragment_();
 					return importFeedFragment;
-				case 0:
+				case 1:
 					Fragment exportFeedFragment = new GateExportListFragment_();
 					return exportFeedFragment;
 				case 2:

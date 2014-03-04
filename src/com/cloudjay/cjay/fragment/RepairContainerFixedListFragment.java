@@ -1,8 +1,6 @@
 package com.cloudjay.cjay.fragment;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
@@ -15,48 +13,54 @@ import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefresh
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.AbsListView;
+import android.widget.FilterQueryProvider;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.AbsListView.OnScrollListener;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
-import com.ami.fundapter.BindDictionary;
-import com.ami.fundapter.FunDapter;
-import com.ami.fundapter.extractors.StringExtractor;
-import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerRepairedEvent;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
-import com.cloudjay.cjay.util.Utils;
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_repair_container_fixed)
 @OptionsMenu(R.menu.menu_repair_container_fixed)
 public class RepairContainerFixedListFragment extends SherlockFragment
-		implements OnRefreshListener {
+		implements OnRefreshListener, LoaderCallbacks<Cursor> {
 
 	private final static String LOG_TAG = "RepairContainerFixedListFragment";
+	private final static int LOADER_ID = 5;
 
-	private ArrayList<ContainerSession> mFeeds;
-	private FunDapter<ContainerSession> mFeedsAdapter;
-	private ContainerSession mSelectedContainerSession;
-	private ImageLoader imageLoader;
+	private ContainerSession mSelectedContainerSession = null;
+	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
+	private int mItemLayout = R.layout.list_item_audit_container;
+
 	PullToRefreshLayout mPullToRefreshLayout;
+	IssueContainerCursorAdapter cursorAdapter;
+
+	@ViewById(R.id.ll_empty_element)
+	LinearLayout mEmptyElement;
 
 	@ViewById(R.id.container_list)
 	ListView mFeedListView;
@@ -109,17 +113,57 @@ public class RepairContainerFixedListFragment extends SherlockFragment
 
 	@AfterViews
 	void afterViews() {
-		imageLoader = ImageLoader.getInstance();
 
-		initContainerFeedAdapter(null);
-		mSelectedContainerSession = null;
+		try {
+			containerSessionDaoImpl = CJayClient.getInstance()
+					.getDatabaseManager().getHelper(getActivity())
+					.getContainerSessionDaoImpl();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		getLoaderManager().initLoader(LOADER_ID, null, this);
+
+		mFeedListView.setTextFilterEnabled(true);
+		mFeedListView.setScrollingCacheEnabled(false);
+		mFeedListView.setOnScrollListener(new OnScrollListener() {
+
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				if (scrollState != 0) {
+					((IssueContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
+				} else {
+					((IssueContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
+					((IssueContainerCursorAdapter) mFeedListView.getAdapter())
+							.notifyDataSetChanged();
+				}
+			}
+
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount) {
+			}
+		});
+
+		mFeedListView.setEmptyView(mEmptyElement);
 	}
 
 	@ItemLongClick(R.id.container_list)
 	void listItemLongClicked(int position) {
+
 		// refresh highlighting and menu
 		mFeedListView.setItemChecked(position, true);
-		mSelectedContainerSession = mFeedsAdapter.getItem(position);
+
+		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
+		String uuidString = cursor.getString(cursor
+				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+		try {
+			mSelectedContainerSession = containerSessionDaoImpl
+					.findByUuid(uuidString);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
 		getActivity().supportInvalidateOptionsMenu();
 	}
 
@@ -130,40 +174,45 @@ public class RepairContainerFixedListFragment extends SherlockFragment
 
 		Intent intent = new Intent(getActivity(),
 				RepairContainerActivity_.class);
+
+		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
+		String uuidString = cursor.getString(cursor
+				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+
 		intent.putExtra(RepairContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-				mFeedsAdapter.getItem(position).getUuid());
+				uuidString);
+
 		startActivity(intent);
 	}
 
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
-		if (mSelectedContainerSession != null) {
-			try {
 
-				Logger.Log(LOG_TAG, "Menu upload item clicked");
+		synchronized (this) {
+			if (mSelectedContainerSession != null) {
+				try {
 
-				ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-						.getInstance().getDatabaseManager()
-						.getHelper(getActivity()).getContainerSessionDaoImpl();
+					Logger.Log(LOG_TAG, "Menu upload item clicked");
 
-				// User confirm upload
-				mSelectedContainerSession.setUploadConfirmation(true);
+					// User confirm upload
+					mSelectedContainerSession.setUploadConfirmation(true);
 
-				mSelectedContainerSession
-						.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+					mSelectedContainerSession
+							.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
 
-				containerSessionDaoImpl.update(mSelectedContainerSession);
+					containerSessionDaoImpl.update(mSelectedContainerSession);
 
-				// It will trigger `UploadsFragment` Adapter
-				// notifyDataSetChanged
-				EventBus.getDefault().post(
-						new ContainerSessionEnqueueEvent(
-								mSelectedContainerSession));
+					// It will trigger `UploadsFragment` Adapter
+					// notifyDataSetChanged
+					EventBus.getDefault().post(
+							new ContainerSessionEnqueueEvent(
+									mSelectedContainerSession));
 
-				hideMenuItems();
+					hideMenuItems();
 
-			} catch (SQLException e) {
-				e.printStackTrace();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -184,7 +233,7 @@ public class RepairContainerFixedListFragment extends SherlockFragment
 
 	@Override
 	public void onResume() {
-		if (null != mFeedsAdapter) {
+		if (cursorAdapter != null) {
 			refresh();
 		}
 		super.onResume();
@@ -206,67 +255,9 @@ public class RepairContainerFixedListFragment extends SherlockFragment
 		refresh();
 	}
 
-	private void initContainerFeedAdapter(ArrayList<ContainerSession> containers) {
-		BindDictionary<ContainerSession> feedsDict = new BindDictionary<ContainerSession>();
-		feedsDict.addStringField(R.id.feed_item_container_id,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.replaceNullBySpace(item.getContainerId());
-					}
-				});
-		feedsDict.addStringField(R.id.feed_item_container_owner,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.replaceNullBySpace(item.getOperatorName());
-					}
-				});
-		feedsDict.addStringField(R.id.feed_item_container_import_date,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.replaceNullBySpace(item.getCheckInTime());
-					}
-				});
-		feedsDict.addStringField(R.id.feed_item_container_issues,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.replaceNullBySpace(item.getIssueCount());
-					}
-				});
-		feedsDict.addDynamicImageField(R.id.feed_item_picture,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.stripNull(item.getImageIdPath());
-					}
-				}, new DynamicImageLoader() {
-					@Override
-					public void loadImage(String url, ImageView view) {
-						if (!TextUtils.isEmpty(url)) {
-							imageLoader.displayImage(url, view);
-						} else {
-							view.setImageResource(R.drawable.ic_app);
-						}
-					}
-				});
-		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(),
-				containers, R.layout.list_item_audit_container, feedsDict);
-		mFeedListView.setAdapter(mFeedsAdapter);
-	}
-
 	public void refresh() {
 		Logger.Log(LOG_TAG, "refresh");
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListFixedContainerSessions(getActivity());
-		mFeedsAdapter.updateData(mFeeds);
+		getLoaderManager().restartLoader(LOADER_ID, null, this);
 	}
 
 	public void onEvent(ContainerSessionEnqueueEvent event) {
@@ -277,5 +268,52 @@ public class RepairContainerFixedListFragment extends SherlockFragment
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
 		Logger.Log(LOG_TAG, "onEvent ContainerSessionChangedEvent");
 		refresh();
+	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		Context context = getActivity();
+
+		return new CJayCursorLoader(context) {
+			@Override
+			public Cursor loadInBackground() {
+				Cursor cursor = DataCenter.getInstance()
+						.getFixedContainerSessionCursor(getContext());
+
+				if (cursor != null) {
+					// Ensure the cursor window is filled
+					cursor.getCount();
+					cursor.registerContentObserver(mObserver);
+				}
+
+				return cursor;
+			}
+		};
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+		if (cursorAdapter == null) {
+			cursorAdapter = new IssueContainerCursorAdapter(getActivity(),
+					mItemLayout, cursor, 0);
+
+			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+				@Override
+				public Cursor runQuery(CharSequence constraint) {
+					return DataCenter.getInstance().filterFixedCursor(
+							getActivity(), constraint);
+				}
+			});
+
+			mFeedListView.setAdapter(cursorAdapter);
+
+		} else {
+			cursorAdapter.swapCursor(cursor);
+		}
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		cursorAdapter.swapCursor(null);
 	}
 }
