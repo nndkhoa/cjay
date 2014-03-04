@@ -21,7 +21,7 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class AuditorContainerCursorAdapter extends CursorAdapter implements
+public class IssueContainerCursorAdapter extends CursorAdapter implements
 		Filterable {
 
 	private int layout;
@@ -30,11 +30,11 @@ public class AuditorContainerCursorAdapter extends CursorAdapter implements
 	public boolean isScrolling;
 
 	@SuppressWarnings("deprecation")
-	public AuditorContainerCursorAdapter(Context context, Cursor c) {
+	public IssueContainerCursorAdapter(Context context, Cursor c) {
 		super(context, c);
 	}
 
-	public AuditorContainerCursorAdapter(Context context, int layout, Cursor c,
+	public IssueContainerCursorAdapter(Context context, int layout, Cursor c,
 			int flags) {
 		super(context, c, flags);
 		this.layout = layout;

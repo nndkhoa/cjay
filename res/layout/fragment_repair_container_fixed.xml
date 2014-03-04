@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ptr_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="top" >
+    android:layout_height="match_parent" >
 
-    <ListView
-        android:id="@+id/container_list"
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true" 
-		style="@style/CJayListView" />
+        android:layout_height="match_parent"
+        android:gravity="top" >
 
-</RelativeLayout>
+        <ListView
+            android:id="@+id/container_list"
+            style="@style/CJayListView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true" />
+    </RelativeLayout>
+
+</uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout>

@@ -1,28 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ptr_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="top" >
+    android:layout_height="match_parent" >
 
-    <EditText
-        android:id="@+id/search_edittext"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:ems="10"
-        android:hint="@string/container_search"
-		style="@style/SearchEditTextStyle" />
+        android:layout_height="match_parent"
+        android:gravity="top"
+        android:orientation="vertical" >
 
-    <ListView
-        android:id="@+id/container_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/search_edittext"
-		style="@style/CJayListView"
-		android:choiceMode="multipleChoiceModal" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical" >
 
-</RelativeLayout>
+            <EditText
+                android:id="@+id/search_edittext"
+                style="@style/SearchEditTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:ems="10"
+                android:hint="@string/container_search"
+                android:inputType="textCapCharacters"
+                android:lines="1"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:textAllCaps="true" />
+
+            <LinearLayout
+                android:id="@+id/ll_empty_element"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/search_edittext"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/notfound_textview"
+                    style="@style/NotFoundTextViewStyle" />
+
+                <Button
+                    android:id="@+id/add_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/btn_add_more" />
+            </LinearLayout>
+
+            <ListView
+                android:id="@+id/container_list"
+                style="@style/CJayListView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/search_edittext"
+                android:choiceMode="multipleChoiceModal" />
+        </RelativeLayout>
+
+        <include
+            android:layout_height="0dp"
+            android:layout_weight="0"
+            layout="@layout/loading_data"
+            android:visibility="visible" />
+    </LinearLayout>
+
+</uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout>

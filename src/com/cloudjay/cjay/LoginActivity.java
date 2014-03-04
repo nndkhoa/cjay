@@ -58,8 +58,8 @@ public class LoginActivity extends CJayActivity {
 	// String mEmail = "giamdinhcong@test.com";
 	// String mEmail = "giamdinhcong1.icd1@pip.com.vn";
 	// String mEmail = "giamdinhsuachua.icd1@pip.com.vn";
-	String mEmail = "giamdinhsuachua@test.com";
-	// String mEmail = "tosuachua@test.com";
+	// String mEmail = "giamdinhsuachua@test.com";
+	String mEmail = "tosuachua@test.com";
 
 	// UI references.
 	@ViewById(R.id.email)

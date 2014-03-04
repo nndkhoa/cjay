@@ -30,10 +30,9 @@ public class AuditorHomeActivity extends CJayActivity implements
 		AddContainerDialog.AddContainerDialogListener,
 		SearchOperatorDialog.SearchOperatorDialogListener {
 
-	private static final String LOG_TAG = "AuditorHomeActivity";
-
 	private ViewPagerAdapter viewPagerAdapter;
 	private String[] locations;
+
 	@ViewById
 	ViewPager pager;
 

@@ -325,6 +325,18 @@ public class DataCenter {
 				queryString, new String[] {});
 	}
 
+	public Cursor getPendingContainerSessionCursor(Context context) {
+		String queryString = "SELECT * FROM csiview cs WHERE cs.upload_confirmation = 0 AND cs.fixed = 0 AND cs.state <> 4";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] {});
+	}
+
+	public Cursor getFixedContainerSessionCursor(Context context) {
+		String queryString = "SELECT * FROM csiview cs WHERE cs.upload_confirmation = 0 AND cs.fixed = 1 AND cs.state <> 4";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] {});
+	}
+
 	public Cursor getAllContainersCursor(Context context) {
 
 		try {
@@ -365,6 +377,25 @@ public class DataCenter {
 				+ " (SELECT container_session._id"
 				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
 				+ " WHERE cjay_image.type = 2) AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] { constraint + "%" });
+	}
+
+	public Cursor filterPendingCursor(Context context, CharSequence constraint) {
+
+		String queryString = "SELECT * FROM csiview cs"
+				+ " WHERE cs.upload_confirmation = 0 AND cs.fixed = 0 AND cs.state <> 4 AND AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] { constraint + "%" });
+	}
+
+	// String queryString =
+	// "SELECT * FROM csview cs WHERE cs.upload_confirmation = 0 AND cs.fixed = 0 AND cs.state <> 4";
+
+	public Cursor filterFixedCursor(Context context, CharSequence constraint) {
+		String queryString = "SELECT * FROM csiview cs"
+				+ " WHERE cs.upload_confirmation = 0 AND cs.fixed = 1 AND cs.state <> 4 AND AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
 
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
 				queryString, new String[] { constraint + "%" });
