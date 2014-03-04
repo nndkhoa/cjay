@@ -1,14 +1,16 @@
 package com.cloudjay.cjay.listener;
 
 
+
 public interface AuditorIssueReportListener {
 	
-	public static final int TAB_ISSUE_COMPONENT = 0;
-	public static final int TAB_ISSUE_LOCATION = 1;
-	public static final int TAB_ISSUE_DAMAGE = 2;
-	public static final int TAB_ISSUE_REPAIR = 3;
-	public static final int TAB_ISSUE_DIMENSION = 4;
-	public static final int TAB_ISSUE_QUANTITY = 5;
+	public static final int TAB_ISSUE_PHOTO = 0;
+	public static final int TAB_ISSUE_COMPONENT = 1;
+	public static final int TAB_ISSUE_LOCATION = 2;
+	public static final int TAB_ISSUE_DAMAGE = 3;
+	public static final int TAB_ISSUE_REPAIR = 4;
+	public static final int TAB_ISSUE_DIMENSION = 5;
+	public static final int TAB_ISSUE_QUANTITY = 6;
 
 	public static final int TYPE_LOCATION_CODE = 0;
 	public static final int TYPE_LENGTH = 1;
