@@ -25,6 +25,10 @@ public class Session {
 	private User currentUser;
 
 	public User getCurrentUser() {
+		if (currentUser == null) {
+			Logger.Log(LOG_TAG);
+		}
+
 		return currentUser;
 	}
 
@@ -91,7 +95,7 @@ public class Session {
 				TableUtils.createTable(helper.getConnectionSource(), dataClass);
 			}
 
-			EventBus.getDefault().post(new UserLoggedOutEvent());
+			// EventBus.getDefault().post(new UserLoggedOutEvent());
 
 			return true;
 		} catch (SQLException e) {

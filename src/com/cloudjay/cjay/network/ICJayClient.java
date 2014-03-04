@@ -11,12 +11,14 @@ import android.content.Context;
 import com.cloudjay.cjay.model.CJayResourceStatus;
 import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.ContainerSessionResult;
 import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.NoConnectionException;
+import com.cloudjay.cjay.util.NullSessionException;
 
 public interface ICJayClient {
 
@@ -28,42 +30,51 @@ public interface ICJayClient {
 
 	User getCurrentUser(String token, Context ctx) throws NoConnectionException;
 
-	List<Operator> getOperators(Context ctx) throws NoConnectionException;
+	List<Operator> getOperators(Context ctx) throws NoConnectionException,
+			NullSessionException;
 
 	List<Operator> getOperators(Context ctx, Date date)
 			throws NoConnectionException;
 
 	List<Operator> getOperators(Context ctx, String date)
-			throws NoConnectionException;
+			throws NoConnectionException, NullSessionException;
 
-	List<DamageCode> getDamageCodes(Context ctx) throws NoConnectionException;
+	List<DamageCode> getDamageCodes(Context ctx) throws NoConnectionException,
+			NullSessionException;
 
 	List<DamageCode> getDamageCodes(Context ctx, String date)
-			throws NoConnectionException;
+			throws NoConnectionException, NullSessionException;
 
-	List<RepairCode> getRepairCodes(Context ctx) throws NoConnectionException;
+	List<RepairCode> getRepairCodes(Context ctx) throws NoConnectionException,
+			NullSessionException;
 
 	List<RepairCode> getRepairCodes(Context ctx, String date)
-			throws NoConnectionException;
+			throws NoConnectionException, NullSessionException;
 
 	List<ComponentCode> getComponentCodes(Context ctx)
-			throws NoConnectionException;
+			throws NoConnectionException, NullSessionException;
 
 	List<ComponentCode> getComponentCodes(Context ctx, String date)
-			throws NoConnectionException;
+			throws NoConnectionException, NullSessionException;
 
 	List<CJayResourceStatus> getCJayResourceStatus(Context ctx)
-			throws NoConnectionException;
+			throws NoConnectionException, NullSessionException;
 
 	List<ContainerSession> getAllContainerSessions(Context ctx)
-			throws NoConnectionException;
+			throws NoConnectionException, NullSessionException;
 
 	List<ContainerSession> getContainerSessions(Context ctx, Date date)
-			throws NoConnectionException;
+			throws NoConnectionException, NullSessionException;
 
 	List<ContainerSession> getContainerSessions(Context ctx, String date)
-			throws NoConnectionException;
+			throws NoConnectionException, NullSessionException;
 
 	String postContainerSession(Context ctx, TmpContainerSession item)
 			throws NoConnectionException;
+
+	ContainerSessionResult getContainerSessionsByPage(Context ctx, int page)
+			throws NoConnectionException, NullSessionException;
+
+	ContainerSessionResult getContainerSessionsByPage(Context ctx, String date,
+			int page) throws NoConnectionException, NullSessionException;
 }

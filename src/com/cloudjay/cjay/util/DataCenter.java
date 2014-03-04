@@ -9,6 +9,7 @@ import java.util.List;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
@@ -30,6 +31,7 @@ import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
+import com.google.android.gms.internal.ca;
 import com.j256.ormlite.stmt.PreparedQuery;
 
 import de.greenrobot.event.EventBus;
@@ -62,6 +64,11 @@ import de.greenrobot.event.EventBus;
 public class DataCenter {
 
 	private static final String LOG_TAG = "DataCenter";
+
+	// TODO: does DataCenter really need to manage them?
+	public static AsyncTask<Void, Integer, Void> LoadDataTask;
+	public static AsyncTask<Void, Void, String> RegisterGCMTask;
+
 	private static DataCenter instance = null;
 	private IDatabaseManager databaseManager = null;
 
@@ -124,6 +131,8 @@ public class DataCenter {
 			return CJayClient.getInstance().getComponentCodes(context, date);
 		} catch (NoConnectionException e) {
 			e.printStackTrace();
+		} catch (NullSessionException e) {
+			e.printStackTrace();
 		}
 
 		return null;
@@ -154,6 +163,8 @@ public class DataCenter {
 		try {
 			return CJayClient.getInstance().getDamageCodes(context, date);
 		} catch (NoConnectionException e) {
+			e.printStackTrace();
+		} catch (NullSessionException e) {
 			e.printStackTrace();
 		}
 
@@ -191,6 +202,8 @@ public class DataCenter {
 		try {
 			return CJayClient.getInstance().getRepairCodes(context, date);
 		} catch (NoConnectionException e) {
+			e.printStackTrace();
+		} catch (NullSessionException e) {
 			e.printStackTrace();
 		}
 
@@ -713,6 +726,8 @@ public class DataCenter {
 			PreferencesUtil.storePrefsValue(ctx,
 					PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			throw e;
+		} catch (NullSessionException e) {
+
 		} catch (Exception e) {
 			PreferencesUtil.storePrefsValue(ctx,
 					PreferencesUtil.PREF_IS_UPDATING_DATA, false);

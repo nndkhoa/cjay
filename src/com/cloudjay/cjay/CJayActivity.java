@@ -10,6 +10,7 @@ import org.json.JSONException;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
@@ -43,7 +44,6 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 	private Session session;
 	private DataCenter dataCenter;
-	AsyncTask<Void, Integer, Void> loadDataTask;
 
 	public DataCenter getDataCenter() {
 		return dataCenter;
@@ -111,7 +111,8 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 			if (this instanceof SplashScreenActivity) {
 				Logger.Log(LOG_TAG, "Call from SplashScreenActivity");
-				loadDataTask = new AsyncTask<Void, Integer, Void>() {
+
+				new AsyncTask<Void, Integer, Void>() {
 
 					@Override
 					protected Void doInBackground(Void... params) {
@@ -125,15 +126,13 @@ public class CJayActivity extends SherlockFragmentActivity implements
 						}
 						return null;
 					}
-				};
-
-				loadDataTask.execute();
+				}.execute();
 
 			} else {
 
 				Logger.Log(LOG_TAG, "Call from others Activity");
 
-				loadDataTask = new AsyncTask<Void, Integer, Void>() {
+				DataCenter.LoadDataTask = new AsyncTask<Void, Integer, Void>() {
 
 					@Override
 					protected void onPreExecute() {
@@ -166,7 +165,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 				};
 
-				loadDataTask.execute();
+				DataCenter.LoadDataTask.execute();
 			}
 
 			context = getApplicationContext();
@@ -186,18 +185,30 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	}
 
 	public void onEvent(UserLoggedOutEvent event) {
+
 		Logger.Log(LOG_TAG, "onEvent UserLoggedOutEvent");
-		if (loadDataTask.getStatus() == AsyncTask.Status.RUNNING) {
-			loadDataTask.cancel(true);
+
+		if (DataCenter.LoadDataTask.getStatus() == AsyncTask.Status.RUNNING) {
+			Logger.Log(LOG_TAG, "BGTask is running");
+			DataCenter.LoadDataTask.cancel(true);
 		}
+
+		if (DataCenter.LoadDataTask.getStatus() == AsyncTask.Status.RUNNING) {
+			Logger.Log(LOG_TAG, "BGTask is still running ????");
+		}
+
 	}
 
 	private void sendRegistrationIdToBackend() {
 		// Your implementation here.
 		try {
 			CJayClient.getInstance().addGCMDevice(regid, context);
-			// When Submit Server Successfully, save it here!.
-			Utils.storeRegistrationId(context, regid);
+			if (TextUtils.isEmpty(regid)) {
+				Logger.Log(LOG_TAG, "Cannot send Registration ID to Server");
+			} else {
+				// When Submit Server Successfully, save it here!.
+				Utils.storeRegistrationId(context, regid);
+			}
 		} catch (JSONException e) {
 			Log.e(LOG_TAG, "Can't Register device with the Back-end!");
 		} catch (NoConnectionException e) {
@@ -212,7 +223,9 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	 * shared preferences.
 	 */
 	private void registerInBackground() {
-		new AsyncTask<Void, Void, String>() {
+
+		DataCenter.RegisterGCMTask = new AsyncTask<Void, Void, String>() {
+
 			@Override
 			protected String doInBackground(Void... params) {
 				String msg = "";
@@ -252,7 +265,9 @@ public class CJayActivity extends SherlockFragmentActivity implements
 			protected void onPostExecute(String msg) {
 				Log.d(LOG_TAG, msg + "\n");
 			}
-		}.execute(null, null, null);
+		};
+
+		DataCenter.RegisterGCMTask.execute(null, null, null);
 	}
 
 	private boolean checkPlayServices() {
