@@ -172,7 +172,7 @@ public class AuditorContainerActivity extends CJayActivity {
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		boolean isDisplayed = !(mLongClickedCJayImage == null);
 		menu.findItem(R.id.menu_trash).setVisible(isDisplayed);
-		menu.findItem(R.id.menu_upload).setVisible(false);
+		menu.findItem(R.id.menu_upload).setVisible(ContainerSession.validateAuditorContainerSessionForUpload(mContainerSession));
 
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -186,6 +186,7 @@ public class AuditorContainerActivity extends CJayActivity {
 	public void refresh() {
 		populateCjayImages();
 		mFeedsAdapter.updateData(mFeeds);
+		supportInvalidateOptionsMenu();
 	}
 
 	private void populateCjayImages() {

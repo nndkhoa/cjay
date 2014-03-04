@@ -9,6 +9,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.cloudjay.cjay.dao.IssueDaoImpl;
+import com.cloudjay.cjay.util.Utils;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -171,7 +172,7 @@ public class Issue implements Parcelable {
 	}
 
 	public String getLength() {
-		return this.length;
+		return Utils.stripNull(this.length);
 	}
 
 	public void setHeight(String height) {
@@ -179,7 +180,7 @@ public class Issue implements Parcelable {
 	}
 
 	public String getHeight() {
-		return this.height;
+		return Utils.stripNull(this.height);
 	}
 
 	public void setQuantity(String quantity) {
@@ -187,7 +188,7 @@ public class Issue implements Parcelable {
 	}
 
 	public String getQuantity() {
-		return this.quantity;
+		return Utils.stripNull(this.quantity);
 	}
 
 	public void setContainerSession(ContainerSession containerSession) {

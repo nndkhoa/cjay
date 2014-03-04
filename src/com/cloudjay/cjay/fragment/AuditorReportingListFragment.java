@@ -374,7 +374,8 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 		super.onPrepareOptionsMenu(menu);
 
 		if (mState == STATE_REPORTING) {
-			boolean isDisplayed = (mSelectedContainerSession != null);
+			boolean isDisplayed = (mSelectedContainerSession != null) && 
+					ContainerSession.validateAuditorContainerSessionForUpload(mSelectedContainerSession);
 			menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
 		} else {
 			menu.findItem(R.id.menu_upload).setVisible(false);
