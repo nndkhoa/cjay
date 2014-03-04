@@ -9,10 +9,13 @@ import java.sql.SQLException;
 import android.content.Context;
 
 import com.cloudjay.cjay.dao.IUserDao;
+import com.cloudjay.cjay.events.UserLoggedOutEvent;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.j256.ormlite.table.TableUtils;
+
+import de.greenrobot.event.EventBus;
 
 public class Session {
 
@@ -62,6 +65,7 @@ public class Session {
 	}
 
 	public boolean deleteSession(Context context) {
+
 		Logger.Log(LOG_TAG, "deleting session ...");
 		databaseManager = CJayClient.getInstance().getDatabaseManager();
 		try {
@@ -86,6 +90,8 @@ public class Session {
 			for (Class<?> dataClass : DatabaseHelper.DROP_CLASSES) {
 				TableUtils.createTable(helper.getConnectionSource(), dataClass);
 			}
+
+			EventBus.getDefault().post(new UserLoggedOutEvent());
 
 			return true;
 		} catch (SQLException e) {

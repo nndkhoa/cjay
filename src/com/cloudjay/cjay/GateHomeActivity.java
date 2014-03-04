@@ -155,6 +155,7 @@ public class GateHomeActivity extends CJayActivity implements
 			startActivity(new Intent(this, LoginActivity_.class));
 			finish();
 			return true;
+			
 		case R.id.menu_more:
 			Logger.Log(LOG_TAG, "Menu More");
 			return true;

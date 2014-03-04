@@ -14,8 +14,10 @@ import android.util.Log;
 import android.view.View;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.PostLoadDataEvent;
 import com.cloudjay.cjay.events.PreLoadDataEvent;
+import com.cloudjay.cjay.events.UserLoggedOutEvent;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -41,6 +43,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 	private Session session;
 	private DataCenter dataCenter;
+	AsyncTask<Void, Integer, Void> loadDataTask;
 
 	public DataCenter getDataCenter() {
 		return dataCenter;
@@ -78,6 +81,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 		//
 		// });
 
+		EventBus.getDefault().register(this);
 		super.onCreate(arg0);
 		session = Session.restore(getApplicationContext());
 
@@ -107,7 +111,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 			if (this instanceof SplashScreenActivity) {
 				Logger.Log(LOG_TAG, "Call from SplashScreenActivity");
-				new AsyncTask<Void, Integer, Void>() {
+				loadDataTask = new AsyncTask<Void, Integer, Void>() {
 
 					@Override
 					protected Void doInBackground(Void... params) {
@@ -121,13 +125,15 @@ public class CJayActivity extends SherlockFragmentActivity implements
 						}
 						return null;
 					}
+				};
 
-				}.execute();
+				loadDataTask.execute();
 
 			} else {
 
 				Logger.Log(LOG_TAG, "Call from others Activity");
-				new AsyncTask<Void, Integer, Void>() {
+
+				loadDataTask = new AsyncTask<Void, Integer, Void>() {
 
 					@Override
 					protected void onPreExecute() {
@@ -158,7 +164,9 @@ public class CJayActivity extends SherlockFragmentActivity implements
 						return null;
 					}
 
-				}.execute();
+				};
+
+				loadDataTask.execute();
 			}
 
 			context = getApplicationContext();
@@ -175,6 +183,13 @@ public class CJayActivity extends SherlockFragmentActivity implements
 		}
 
 		super.onResume();
+	}
+
+	public void onEvent(UserLoggedOutEvent event) {
+		Logger.Log(LOG_TAG, "onEvent UserLoggedOutEvent");
+		if (loadDataTask.getStatus() == AsyncTask.Status.RUNNING) {
+			loadDataTask.cancel(true);
+		}
 	}
 
 	private void sendRegistrationIdToBackend() {
@@ -260,6 +275,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 	@Override
 	protected void onDestroy() {
+		EventBus.getDefault().unregister(this);
 		Crouton.cancelAllCroutons();
 		super.onDestroy();
 	}
