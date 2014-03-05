@@ -538,6 +538,7 @@ public class ContainerSession implements Parcelable {
 		this.onLocal = onLocal;
 	}
 
+	// TODO: need to refactor
 	public static ContainerSession createContainerSession(Context ctx,
 			String containerId, String operatorCode) throws SQLException {
 		// Create Container Session object
@@ -569,6 +570,7 @@ public class ContainerSession implements Parcelable {
 		return containerSession;
 	}
 
+	// TODO: need to refactor
 	public static void gotoCamera(Context ctx,
 			ContainerSession containerSession, int imageType, String activityTag) {
 		Intent intent = new Intent(ctx, CameraActivity_.class);
@@ -581,11 +583,13 @@ public class ContainerSession implements Parcelable {
 		ctx.startActivity(intent);
 	}
 
+	// TODO: need to refactor
 	public static void gotoCamera(Context ctx,
 			ContainerSession containerSession, int imageType) {
 		gotoCamera(ctx, containerSession, imageType, null);
 	}
 
+	// TODO: need to refactor
 	public static ContainerSession editContainerSession(Context ctx,
 			ContainerSession containerSession, String containerId,
 			String operatorCode) throws SQLException {
@@ -617,43 +621,47 @@ public class ContainerSession implements Parcelable {
 
 		return containerSession;
 	}
-	
-	public static boolean validateAuditorContainerSessionForUpload(ContainerSession containerSession) {
+
+	// TODO: need to refactor
+	public static boolean validateAuditorContainerSessionForUpload(
+			ContainerSession containerSession) {
 		// check if all REPORT image assigned to issues
 		boolean allowUpload = false;
-		if (containerSession != null && containerSession.getCJayImages().size() > 0) {
+		if (containerSession != null
+				&& containerSession.getCJayImages().size() > 0) {
 			int imageWithoutIssueCount = 0;
 			int blankIssueCount = 0;
-			
+
 			// count images without issues
 			for (CJayImage cJayImage : containerSession.getCJayImages()) {
-				if (cJayImage.getType() == CJayImage.TYPE_REPORT && cJayImage.getIssue() == null) {
+				if (cJayImage.getType() == CJayImage.TYPE_REPORT
+						&& cJayImage.getIssue() == null) {
 					imageWithoutIssueCount++;
 					if (imageWithoutIssueCount > 1) {
 						break;
 					}
 				}
 			}
-			
+
 			// count blank issues
 			for (Issue issue : containerSession.getIssues()) {
-				if (issue.getComponentCode() == null && 
-						issue.getDamageCode() == null &&
-						issue.getRepairCode() == null && 
-						issue.getLocationCode() == null && 
-						TextUtils.isEmpty(issue.getHeight()) && 
-						TextUtils.isEmpty(issue.getLength()) &&
-						TextUtils.isEmpty(issue.getQuantity())) {
+				if (issue.getComponentCode() == null
+						&& issue.getDamageCode() == null
+						&& issue.getRepairCode() == null
+						&& issue.getLocationCode() == null
+						&& TextUtils.isEmpty(issue.getHeight())
+						&& TextUtils.isEmpty(issue.getLength())
+						&& TextUtils.isEmpty(issue.getQuantity())) {
 					blankIssueCount++;
 					if (blankIssueCount > 1) {
 						break;
 					}
 				}
 			}
-				
+
 			allowUpload = blankIssueCount + imageWithoutIssueCount <= 1;
 		}
-		
+
 		return allowUpload;
 	}
 }
