@@ -238,6 +238,14 @@ public class Mapper {
 			}
 		}
 
+		for (CJayImage cJayImage : cJayImages) {
+			if (cJayImage.getType() == CJayImage.TYPE_REPORT
+					&& cJayImage.getIssue() == null) {
+				// TODO: save container_id_image
+				break;
+			}
+		}
+
 		tmpContainerSession.setAuditReportItems(auditReportItems);
 		return tmpContainerSession;
 	}

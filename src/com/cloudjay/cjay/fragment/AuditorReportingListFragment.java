@@ -15,6 +15,7 @@ import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefresh
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -52,10 +53,12 @@ import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
+import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import de.greenrobot.event.EventBus;
 
@@ -374,8 +377,8 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 		super.onPrepareOptionsMenu(menu);
 
 		if (mState == STATE_REPORTING) {
-			boolean isDisplayed = (mSelectedContainerSession != null) && 
-					ContainerSession.validateAuditorContainerSessionForUpload(mSelectedContainerSession);
+			boolean isDisplayed = (mSelectedContainerSession != null)
+					&& mSelectedContainerSession.isValidForUploading();
 			menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
 		} else {
 			menu.findItem(R.id.menu_upload).setVisible(false);
@@ -415,21 +418,41 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 
 		switch (mode) {
 		case AddContainerDialog.CONTAINER_DIALOG_ADD:
+
+			Activity activity = getActivity();
+			String currentTimeStamp = StringHelper
+					.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
+
+			String depotCode = "";
+			if (getActivity() instanceof CJayActivity) {
+				depotCode = ((CJayActivity) activity).getSession().getDepot()
+						.getDepotCode();
+			}
+
+			ContainerSession containerSession = new ContainerSession(activity,
+					containerId, operatorCode, currentTimeStamp, depotCode);
+			containerSession.setOnLocal(true);
+
 			try {
-				ContainerSession containerSession = ContainerSession
-						.createContainerSession(getActivity(), containerId,
-								operatorCode);
-				ContainerSession.gotoCamera(getActivity(), containerSession,
-						CJayImage.TYPE_REPORT);
+				containerSessionDaoImpl.addContainerSession(containerSession);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
+
+			EventBus.getDefault().post(
+					new ContainerSessionChangedEvent(containerSession));
+
+			CJayApplication.gotoCamera(activity, containerSession,
+					CJayImage.TYPE_REPORT, LOG_TAG);
+
 			break;
 
 		case AddContainerDialog.CONTAINER_DIALOG_EDIT:
 			try {
+
 				ContainerSession.editContainerSession(getActivity(),
 						mSelectedContainerSession, containerId, operatorCode);
+
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

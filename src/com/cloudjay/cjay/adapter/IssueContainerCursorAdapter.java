@@ -73,6 +73,7 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements
 					.findViewById(R.id.feed_item_container_issues);
 			holder.itemPictureView = (ImageView) view
 					.findViewById(R.id.feed_item_picture);
+
 			view.setTag(holder);
 		}
 
