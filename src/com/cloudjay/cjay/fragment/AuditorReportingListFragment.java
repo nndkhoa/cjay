@@ -29,6 +29,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -40,6 +41,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.*;
@@ -61,6 +63,8 @@ import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 @EFragment(R.layout.fragment_auditor_reporting)
 @OptionsMenu(R.menu.menu_auditor_reporting)
@@ -295,31 +299,40 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 		if (mSelectedContainerSession != null) {
+
 			try {
 				Logger.Log(LOG_TAG, "Menu upload item clicked");
 
-				// User confirm upload
-				mSelectedContainerSession.setUploadConfirmation(true);
+				if (mSelectedContainerSession.isValidForUploading()) {
 
-				mSelectedContainerSession
-						.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+					// User confirm upload
+					mSelectedContainerSession.setUploadConfirmation(true);
 
-				if (null == containerSessionDaoImpl) {
-					containerSessionDaoImpl = CJayClient.getInstance()
-							.getDatabaseManager().getHelper(getActivity())
-							.getContainerSessionDaoImpl();
+					mSelectedContainerSession
+							.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+
+					if (null == containerSessionDaoImpl) {
+						containerSessionDaoImpl = CJayClient.getInstance()
+								.getDatabaseManager().getHelper(getActivity())
+								.getContainerSessionDaoImpl();
+					}
+
+					containerSessionDaoImpl.update(mSelectedContainerSession);
+
+					// It will trigger `UploadsFragment` Adapter
+					// notifyDataSetChanged
+					EventBus.getDefault().post(
+							new ContainerSessionEnqueueEvent(
+									mSelectedContainerSession));
+
+					// hide menu items
+					hideMenuItems();
+				} else {
+					Crouton.cancelAllCroutons();
+					Crouton.makeText(getActivity(),
+							R.string.alert_invalid_container, Style.ALERT)
+							.show();
 				}
-
-				containerSessionDaoImpl.update(mSelectedContainerSession);
-
-				// It will trigger `UploadsFragment` Adapter
-				// notifyDataSetChanged
-				EventBus.getDefault().post(
-						new ContainerSessionEnqueueEvent(
-								mSelectedContainerSession));
-
-				// hide menu items
-				hideMenuItems();
 
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -377,8 +390,7 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 		super.onPrepareOptionsMenu(menu);
 
 		if (mState == STATE_REPORTING) {
-			boolean isDisplayed = (mSelectedContainerSession != null)
-					&& mSelectedContainerSession.isValidForUploading();
+			boolean isDisplayed = (mSelectedContainerSession != null);
 			menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
 		} else {
 			menu.findItem(R.id.menu_upload).setVisible(false);

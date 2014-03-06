@@ -241,7 +241,11 @@ public class Mapper {
 		for (CJayImage cJayImage : cJayImages) {
 			if (cJayImage.getType() == CJayImage.TYPE_REPORT
 					&& cJayImage.getIssue() == null) {
-				// TODO: save container_id_image
+
+				Logger.Log(LOG_TAG,
+						"Container Id Image: " + cJayImage.getImageName());
+				tmpContainerSession.setContainerIdImage(cJayImage
+						.getImageName());
 				break;
 			}
 		}

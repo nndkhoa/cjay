@@ -16,7 +16,6 @@ public class AuditReportItem implements Parcelable {
 	private int damage_id;
 	private int repair_id;
 	private int component_id;
-	private String container_id_image;
 	private String location_code;
 	private String length;
 	private String height;
@@ -145,14 +144,6 @@ public class AuditReportItem implements Parcelable {
 
 	public void setId(int id) {
 		this.id = id;
-	}
-
-	public String getContainerIdImage() {
-		return container_id_image;
-	}
-
-	public void setContainerIdImage(String container_id_image) {
-		this.container_id_image = container_id_image;
 	}
 
 	public static final Parcelable.Creator<AuditReportItem> CREATOR = new Parcelable.Creator<AuditReportItem>() {
