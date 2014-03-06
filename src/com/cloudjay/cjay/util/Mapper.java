@@ -238,6 +238,18 @@ public class Mapper {
 			}
 		}
 
+		for (CJayImage cJayImage : cJayImages) {
+			if (cJayImage.getType() == CJayImage.TYPE_REPORT
+					&& cJayImage.getIssue() == null) {
+
+				Logger.Log(LOG_TAG,
+						"Container Id Image: " + cJayImage.getImageName());
+				tmpContainerSession.setContainerIdImage(cJayImage
+						.getImageName());
+				break;
+			}
+		}
+
 		tmpContainerSession.setAuditReportItems(auditReportItems);
 		return tmpContainerSession;
 	}

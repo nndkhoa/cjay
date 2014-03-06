@@ -10,6 +10,7 @@ import android.content.Context;
 
 import com.cloudjay.cjay.dao.IUserDao;
 import com.cloudjay.cjay.events.UserLoggedOutEvent;
+import com.cloudjay.cjay.model.Depot;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
@@ -26,10 +27,19 @@ public class Session {
 
 	public User getCurrentUser() {
 		if (currentUser == null) {
-			Logger.Log(LOG_TAG);
+			Logger.Log(LOG_TAG, "Current user is null ??");
 		}
 
 		return currentUser;
+	}
+
+	public Depot getDepot() {
+
+		if (null != currentUser) {
+			return currentUser.getDepot();
+		}
+
+		return null;
 	}
 
 	public int getUserRole() {

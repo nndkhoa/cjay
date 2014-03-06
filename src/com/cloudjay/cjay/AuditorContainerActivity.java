@@ -171,9 +171,10 @@ public class AuditorContainerActivity extends CJayActivity {
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		boolean isDisplayed = !(mLongClickedCJayImage == null);
-		menu.findItem(R.id.menu_trash).setVisible(isDisplayed);
-		menu.findItem(R.id.menu_upload).setVisible(ContainerSession.validateAuditorContainerSessionForUpload(mContainerSession));
 
+		menu.findItem(R.id.menu_trash).setVisible(isDisplayed);
+		menu.findItem(R.id.menu_upload).setVisible(
+				mContainerSession.isValidForUploading());
 		return super.onPrepareOptionsMenu(menu);
 	}
 

@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.util.Utils;
@@ -301,5 +302,16 @@ public class Issue implements Parcelable {
 		}
 
 		return super.equals(o);
+	}
+
+	public boolean isValid() {
+
+		if (componentCode == null && repairCode == null
+				&& TextUtils.isEmpty(locationCode) && damageCode == null) {
+			return false;
+		}
+
+		return true;
+
 	}
 }

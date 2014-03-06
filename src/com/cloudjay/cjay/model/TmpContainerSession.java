@@ -22,6 +22,7 @@ public class TmpContainerSession implements Parcelable {
 	private String check_in_time;
 	private String check_out_time;
 	private String depot_code;
+	private String container_id_image;
 	private List<AuditReportItem> audit_report_items;
 	private List<GateReportImage> gate_report_images;
 
@@ -166,6 +167,14 @@ public class TmpContainerSession implements Parcelable {
 
 	public void setOperatorId(int operator_id) {
 		this.operator_id = operator_id;
+	}
+
+	public String getContainerIdImage() {
+		return container_id_image;
+	}
+
+	public void setContainerIdImage(String container_id_image) {
+		this.container_id_image = container_id_image;
 	}
 
 }

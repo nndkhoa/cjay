@@ -58,5 +58,6 @@
     <string name="alert_no_network">Không có kết nối mạng</string>
     <string name="alert_ssl_timeout">Có vấn đề với SSL</string>
     <string name="alert_server_error">Máy chủ có vấn đề. Hãy thử lại lần sau</string>
+    <string name="alert_invalid_container">Container không hợp lệ. Hãy kiểm tra lại.</string>
 
 </resources>

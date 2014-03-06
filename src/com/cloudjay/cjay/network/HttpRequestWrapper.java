@@ -100,6 +100,7 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 		return ret;
 	}
 
+	// final call
 	public String sendPost(String url, String data, String contentType,
 			Map<String, String> headers) throws SocketTimeoutException,
 			NoConnectionException {
@@ -111,6 +112,7 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 
 		httpClient.getParams().setParameter(ClientPNames.COOKIE_POLICY,
 				CookiePolicy.RFC_2109);
+
 		httpPost = new HttpPost(url);
 		StringEntity postEntity = null;
 
@@ -143,6 +145,7 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 			response = httpClient.execute(httpPost, localContext);
 
 			if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK
+					|| response.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED
 					|| response.getStatusLine().getStatusCode() == HttpStatus.SC_ACCEPTED) {
 
 				ret = EntityUtils.toString(response.getEntity());
@@ -177,7 +180,7 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 
 		Logger.Log(LOG_TAG, "Url: " + url);
 		Logger.Log(LOG_TAG, "Header: " + headers.toString());
-		
+
 		httpGet = new HttpGet(url);
 
 		headers.put("Accept", DEFAULT_ACCEPT_HEADER);

@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -145,6 +146,11 @@ public class ContainerSession implements Parcelable {
 	}
 
 	public ContainerSession() {
+		cleared = false;
+		onLocal = false;
+		fixed = false;
+		uploadConfirmation = false;
+		mState = 0;
 	}
 
 	public ContainerSession(Context ctx, String containerId,
@@ -213,7 +219,7 @@ public class ContainerSession implements Parcelable {
 			this.setUuid(uuid);
 			
 			// Validate container for uploading in auditor view
-			this.setAuditorUploadValidation(ContainerSession.validateAuditorContainerSessionForUpload(this));
+//			this.setAuditorUploadValidation(ContainerSession.validateAuditorContainerSessionForUpload(this));
 
 			if (null != container)
 				this.setContainer(container);
@@ -553,54 +559,7 @@ public class ContainerSession implements Parcelable {
 		this.onLocal = onLocal;
 	}
 
-	public static ContainerSession createContainerSession(Context ctx,
-			String containerId, String operatorCode) throws SQLException {
-		// Create Container Session object
-		User currentUser = Session.restore(ctx).getCurrentUser();
-
-		String depotCode = "";
-		if (currentUser != null && currentUser.getDepot() != null) {
-			depotCode = currentUser.getDepot().getDepotCode();
-		}
-
-		ContainerSession containerSession = new ContainerSession(
-				ctx,
-				containerId,
-				operatorCode,
-				StringHelper
-						.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT),
-				depotCode);
-
-		containerSession.setUploadConfirmation(false);
-		containerSession.setOnLocal(true);
-		containerSession.setUploadState(ContainerSession.STATE_NONE);
-
-		ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-				.getInstance().getDatabaseManager().getHelper(ctx)
-				.getContainerSessionDaoImpl();
-		containerSessionDaoImpl.addContainerSession(containerSession);
-		EventBus.getDefault().post(
-				new ContainerSessionChangedEvent(containerSession));
-		return containerSession;
-	}
-
-	public static void gotoCamera(Context ctx,
-			ContainerSession containerSession, int imageType, String activityTag) {
-		Intent intent = new Intent(ctx, CameraActivity_.class);
-		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-				containerSession.getUuid());
-		intent.putExtra("type", imageType);
-		if (activityTag != null && !TextUtils.isEmpty(activityTag)) {
-			intent.putExtra("tag", activityTag);
-		}
-		ctx.startActivity(intent);
-	}
-
-	public static void gotoCamera(Context ctx,
-			ContainerSession containerSession, int imageType) {
-		gotoCamera(ctx, containerSession, imageType, null);
-	}
-
+	// TODO: need to refactor
 	public static ContainerSession editContainerSession(Context ctx,
 			ContainerSession containerSession, String containerId,
 			String operatorCode) throws SQLException {
@@ -632,46 +591,37 @@ public class ContainerSession implements Parcelable {
 
 		return containerSession;
 	}
-	
-	public static boolean validateAuditorContainerSessionForUpload(ContainerSession containerSession) {
+
+	// 0 issue --> Failed
+	// > 0 issues:
+	// image without issue <= 1 && all issue is valid --> OK
+	public boolean isValidForUploading() {
+
+		if (issues.isEmpty()) {
+			return false;
+		}
+
 		// check if all REPORT image assigned to issues
-		boolean allowUpload = false;
-		if (containerSession != null && containerSession.getCJayImages().size() > 0) {
-			int imageWithoutIssueCount = 0;
-			int blankIssueCount = 0;
-			
-			// count images without issues
-			for (CJayImage cJayImage : containerSession.getCJayImages()) {
-				if (cJayImage.getType() == CJayImage.TYPE_REPORT && cJayImage.getIssue() == null) {
-					imageWithoutIssueCount++;
-					if (imageWithoutIssueCount > 1) {
-						break;
-					}
+		int imageWithoutIssueCount = 0;
+
+		// count images without issues
+		for (CJayImage cJayImage : cJayImages) {
+			if (cJayImage.getType() == CJayImage.TYPE_REPORT
+					&& cJayImage.getIssue() == null) {
+				imageWithoutIssueCount++;
+				if (imageWithoutIssueCount > 1) {
+					return false;
 				}
 			}
-			
-			// count blank issues
-			for (Issue issue : containerSession.getIssues()) {
-				if (issue.getComponentCode() == null && 
-						issue.getDamageCode() == null &&
-						issue.getRepairCode() == null && 
-						issue.getLocationCode() == null && 
-						TextUtils.isEmpty(issue.getHeight()) && 
-						TextUtils.isEmpty(issue.getLength()) &&
-						TextUtils.isEmpty(issue.getQuantity())) {
-					blankIssueCount++;
-					if (blankIssueCount > 1) {
-						break;
-					}
-				}
+		}
+
+		// count invalid issues
+		for (Issue issue : issues) {
+			if (!issue.isValid()) {
+				return false;
 			}
-				
-			allowUpload = blankIssueCount + imageWithoutIssueCount <= 1;
 		}
 		
-		// Update database field
-		containerSession.setAuditorUploadValidation(allowUpload);
-		
-		return allowUpload;
+		return true;
 	}
 }

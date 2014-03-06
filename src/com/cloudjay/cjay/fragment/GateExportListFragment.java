@@ -15,6 +15,7 @@ import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefresh
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -40,6 +41,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.CJayActivity;
+import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -313,9 +315,11 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
 		ContainerSession containerSession;
 		try {
+
 			containerSession = containerSessionDaoImpl.findByUuid(uuidString);
-			ContainerSession.gotoCamera(getActivity(), containerSession,
-					CJayImage.TYPE_EXPORT);
+			CJayApplication.gotoCamera(getActivity(), containerSession,
+					CJayImage.TYPE_EXPORT, LOG_TAG);
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -395,17 +399,33 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 
 		switch (mode) {
 		case AddContainerDialog.CONTAINER_DIALOG_ADD:
+
+			Activity activity = getActivity();
+			String currentTimeStamp = StringHelper
+					.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
+
+			String depotCode = "";
+			if (getActivity() instanceof CJayActivity) {
+				depotCode = ((CJayActivity) activity).getSession().getDepot()
+						.getDepotCode();
+			}
+
+			ContainerSession containerSession = new ContainerSession(activity,
+					containerId, operatorCode, currentTimeStamp, depotCode);
+			containerSession.setOnLocal(true);
+
 			try {
-
-				ContainerSession containerSession = ContainerSession
-						.createContainerSession(getActivity(), containerId,
-								operatorCode);
-				ContainerSession.gotoCamera(getActivity(), containerSession,
-						CJayImage.TYPE_EXPORT);
-
+				containerSessionDaoImpl.addContainerSession(containerSession);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
+
+			EventBus.getDefault().post(
+					new ContainerSessionChangedEvent(containerSession));
+
+			CJayApplication.gotoCamera(activity, containerSession,
+					CJayImage.TYPE_EXPORT, LOG_TAG);
+
 			break;
 		}
 	}

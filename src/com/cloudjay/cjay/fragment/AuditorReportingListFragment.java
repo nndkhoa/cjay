@@ -15,6 +15,7 @@ import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefresh
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -28,6 +29,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -39,6 +41,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.*;
@@ -52,12 +55,16 @@ import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
+import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 @EFragment(R.layout.fragment_auditor_reporting)
 @OptionsMenu(R.menu.menu_auditor_reporting)
@@ -292,31 +299,40 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 		if (mSelectedContainerSession != null) {
+
 			try {
 				Logger.Log(LOG_TAG, "Menu upload item clicked");
 
-				// User confirm upload
-				mSelectedContainerSession.setUploadConfirmation(true);
+				if (mSelectedContainerSession.isValidForUploading()) {
 
-				mSelectedContainerSession
-						.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+					// User confirm upload
+					mSelectedContainerSession.setUploadConfirmation(true);
 
-				if (null == containerSessionDaoImpl) {
-					containerSessionDaoImpl = CJayClient.getInstance()
-							.getDatabaseManager().getHelper(getActivity())
-							.getContainerSessionDaoImpl();
+					mSelectedContainerSession
+							.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+
+					if (null == containerSessionDaoImpl) {
+						containerSessionDaoImpl = CJayClient.getInstance()
+								.getDatabaseManager().getHelper(getActivity())
+								.getContainerSessionDaoImpl();
+					}
+
+					containerSessionDaoImpl.update(mSelectedContainerSession);
+
+					// It will trigger `UploadsFragment` Adapter
+					// notifyDataSetChanged
+					EventBus.getDefault().post(
+							new ContainerSessionEnqueueEvent(
+									mSelectedContainerSession));
+
+					// hide menu items
+					hideMenuItems();
+				} else {
+					Crouton.cancelAllCroutons();
+					Crouton.makeText(getActivity(),
+							R.string.alert_invalid_container, Style.ALERT)
+							.show();
 				}
-
-				containerSessionDaoImpl.update(mSelectedContainerSession);
-
-				// It will trigger `UploadsFragment` Adapter
-				// notifyDataSetChanged
-				EventBus.getDefault().post(
-						new ContainerSessionEnqueueEvent(
-								mSelectedContainerSession));
-
-				// hide menu items
-				hideMenuItems();
 
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -374,8 +390,7 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 		super.onPrepareOptionsMenu(menu);
 
 		if (mState == STATE_REPORTING) {
-			boolean isDisplayed = (mSelectedContainerSession != null) && 
-					ContainerSession.validateAuditorContainerSessionForUpload(mSelectedContainerSession);
+			boolean isDisplayed = (mSelectedContainerSession != null);
 			menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
 		} else {
 			menu.findItem(R.id.menu_upload).setVisible(false);
@@ -415,21 +430,41 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 
 		switch (mode) {
 		case AddContainerDialog.CONTAINER_DIALOG_ADD:
+
+			Activity activity = getActivity();
+			String currentTimeStamp = StringHelper
+					.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
+
+			String depotCode = "";
+			if (getActivity() instanceof CJayActivity) {
+				depotCode = ((CJayActivity) activity).getSession().getDepot()
+						.getDepotCode();
+			}
+
+			ContainerSession containerSession = new ContainerSession(activity,
+					containerId, operatorCode, currentTimeStamp, depotCode);
+			containerSession.setOnLocal(true);
+
 			try {
-				ContainerSession containerSession = ContainerSession
-						.createContainerSession(getActivity(), containerId,
-								operatorCode);
-				ContainerSession.gotoCamera(getActivity(), containerSession,
-						CJayImage.TYPE_REPORT);
+				containerSessionDaoImpl.addContainerSession(containerSession);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
+
+			EventBus.getDefault().post(
+					new ContainerSessionChangedEvent(containerSession));
+
+			CJayApplication.gotoCamera(activity, containerSession,
+					CJayImage.TYPE_REPORT, LOG_TAG);
+
 			break;
 
 		case AddContainerDialog.CONTAINER_DIALOG_EDIT:
 			try {
+
 				ContainerSession.editContainerSession(getActivity(),
 						mSelectedContainerSession, containerId, operatorCode);
+
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

@@ -19,11 +19,13 @@ import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.Fragment.SavedState;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
 import com.aerilys.helpers.android.NetworkHelper;
+import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.network.HttpRequestWrapper;
@@ -66,6 +68,21 @@ public class CJayApplication extends Application {
 
 	public static CJayApplication getApplication(Context context) {
 		return (CJayApplication) context.getApplicationContext();
+	}
+
+	public static void gotoCamera(Context ctx,
+			ContainerSession containerSession, int imageType, String activityTag) {
+
+		Intent intent = new Intent(ctx, CameraActivity_.class);
+		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+				containerSession.getUuid());
+		intent.putExtra("type", imageType);
+
+		if (activityTag != null && !TextUtils.isEmpty(activityTag)) {
+			intent.putExtra("tag", activityTag);
+		}
+
+		ctx.startActivity(intent);
 	}
 
 	public static void startCJayHomeActivity(Context context) {

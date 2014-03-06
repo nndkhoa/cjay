@@ -16,6 +16,7 @@ import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefresh
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -35,6 +36,7 @@ import android.widget.AbsListView.OnScrollListener;
 import com.actionbarsherlock.view.Menu;
 import com.ami.fundapter.FunDapter;
 import com.cloudjay.cjay.CJayActivity;
+import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -44,11 +46,15 @@ import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
+import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.view.AddContainerDialog;
+import com.j256.ormlite.support.DatabaseConnection;
+
 import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_gate_import)
@@ -64,7 +70,7 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 
 	@ViewById(R.id.feeds)
 	ListView mFeedListView;
-	
+
 	private ArrayList<Operator> mOperators;
 
 	private FunDapter<ContainerSession> mFeedsAdapter;
@@ -175,9 +181,8 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 	@OptionsItem(R.id.menu_camera)
 	void cameraMenuItemSelected() {
 		Logger.Log(LOG_TAG, "Menu camera item clicked");
-
-		ContainerSession.gotoCamera(getActivity(), mSelectedContainerSession,
-				CJayImage.TYPE_IMPORT);
+		CJayApplication.gotoCamera(getActivity(), mSelectedContainerSession,
+				CJayImage.TYPE_IMPORT, LOG_TAG);
 	}
 
 	@OptionsItem(R.id.menu_edit_container)
@@ -318,15 +323,33 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 
 		switch (mode) {
 		case AddContainerDialog.CONTAINER_DIALOG_ADD:
+
+			Activity activity = getActivity();
+			String currentTimeStamp = StringHelper
+					.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
+
+			String depotCode = "";
+			if (getActivity() instanceof CJayActivity) {
+				depotCode = ((CJayActivity) activity).getSession().getDepot()
+						.getDepotCode();
+			}
+
+			ContainerSession containerSession = new ContainerSession(activity,
+					containerId, operatorCode, currentTimeStamp, depotCode);
+			containerSession.setOnLocal(true);
+
 			try {
-				ContainerSession containerSession = ContainerSession
-						.createContainerSession(getActivity(), containerId,
-								operatorCode);
-				ContainerSession.gotoCamera(getActivity(), containerSession,
-						CJayImage.TYPE_IMPORT);
+				containerSessionDaoImpl.addContainerSession(containerSession);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
+
+			EventBus.getDefault().post(
+					new ContainerSessionChangedEvent(containerSession));
+
+			CJayApplication.gotoCamera(activity, containerSession,
+					CJayImage.TYPE_IMPORT, LOG_TAG);
+
 			break;
 
 		case AddContainerDialog.CONTAINER_DIALOG_EDIT:
