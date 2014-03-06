@@ -1,15 +1,5 @@
 package com.cloudjay.cjay.adapter;
 
-import com.cloudjay.cjay.R;
-
-import com.cloudjay.cjay.model.Container;
-import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.model.Operator;
-import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.StringHelper;
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
@@ -20,6 +10,15 @@ import android.view.ViewGroup;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.model.Container;
+import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.StringHelper;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class IssueContainerCursorAdapter extends CursorAdapter implements
 		Filterable {
@@ -49,6 +48,7 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements
 		public TextView importDateView;
 		public TextView containerIssuesView;
 		public ImageView itemPictureView;
+		public ImageView validationImageView;
 	}
 
 	@Override
@@ -73,6 +73,8 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements
 					.findViewById(R.id.feed_item_container_issues);
 			holder.itemPictureView = (ImageView) view
 					.findViewById(R.id.feed_item_picture);
+			holder.validationImageView = (ImageView) view
+					.findViewById(R.id.feed_item_validator);
 			view.setTag(holder);
 		}
 
@@ -102,7 +104,14 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements
 		} else {
 			holder.itemPictureView.setImageResource(R.drawable.ic_app);
 		}
-
+		
+		int auditorUploadValidation = cursor.getInt(cursor
+				.getColumnIndexOrThrow(ContainerSession.FIELD_AUDITOR_VALIDATION_UPLOAD));
+		if (auditorUploadValidation > 0) {
+			holder.validationImageView.setVisibility(ImageView.VISIBLE);
+		} else {
+			holder.validationImageView.setVisibility(ImageView.INVISIBLE);
+		}
 	}
 
 	@Override
@@ -120,6 +129,8 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements
 				.findViewById(R.id.feed_item_container_issues);
 		holder.itemPictureView = (ImageView) v
 				.findViewById(R.id.feed_item_picture);
+		holder.validationImageView = (ImageView) v
+				.findViewById(R.id.feed_item_validator);
 
 		v.setTag(holder);
 
