@@ -242,6 +242,8 @@ public class UploadIntentService extends IntentService implements
 			String returnJson = CJayClient.getInstance().postContainerSession(
 					getApplicationContext(), uploadItem);
 
+			Logger.Log(returnJson);
+
 			// convert back then save containerSession
 			Mapper.getInstance().update(getApplicationContext(), returnJson,
 					containerSession);
@@ -253,11 +255,15 @@ public class UploadIntentService extends IntentService implements
 			EventBus.getDefault().post(
 					new ContainerSessionUploadedEvent(containerSession));
 
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+			return;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			containerSession
+					.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
 		} catch (NoConnectionException e) {
 			// Turn off alarm manager
-
+			containerSession
+					.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
 		} catch (Exception e) {
 			e.printStackTrace();
 			containerSession

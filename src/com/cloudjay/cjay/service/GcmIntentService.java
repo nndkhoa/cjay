@@ -1,12 +1,15 @@
 package com.cloudjay.cjay.service;
 
 import org.androidannotations.annotations.EIntentService;
+import org.androidannotations.annotations.SystemService;
 
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -35,6 +38,11 @@ public class GcmIntentService extends IntentService {
 	private NotificationManager mNotificationManager;
 	static final String LOG_TAG = "GcmIntentService";
 	NotificationCompat.Builder builder;
+
+	@SystemService
+	AudioManager audioManager;
+
+	MediaPlayer shootMediaPlayer = null;
 
 	public GcmIntentService() {
 		super("GcmIntentService");
@@ -107,6 +115,19 @@ public class GcmIntentService extends IntentService {
 									+ msg + " | Id = " + Integer.toString(id));
 
 				}
+
+				// int volume = audioManager
+				// .getStreamVolume(AudioManager.STREAM_NOTIFICATION);
+				//
+				// if (volume != 0) {
+				// if (shootMediaPlayer == null)
+				// shootMediaPlayer = MediaPlayer
+				// .create(getApplicationContext(),
+				// Uri.parse("file:///system/media/audio/ui/camera_click.ogg"));
+				//
+				// if (shootMediaPlayer != null)
+				// shootMediaPlayer.start();
+				// }
 
 			} else {
 				Logger.Log(LOG_TAG, "Extra is Empty");

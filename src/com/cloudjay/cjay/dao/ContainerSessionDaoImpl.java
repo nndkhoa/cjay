@@ -41,7 +41,7 @@ public class ContainerSessionDaoImpl extends
 			List<ContainerSession> containerSessions) throws SQLException {
 
 		long startTime = System.currentTimeMillis();
-		Logger.Log(LOG_TAG, "***\nadd List of Container Sessions***\n");
+		Logger.Log(LOG_TAG, "***\nadd List of Container Sessions\n***");
 		if (containerSessions != null) {
 			for (ContainerSession containerSession : containerSessions) {
 				addContainerSession(containerSession);

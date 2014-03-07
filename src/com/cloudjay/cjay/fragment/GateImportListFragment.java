@@ -369,6 +369,10 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 		refresh();
 	}
 
+	public void onEventMainThread(ContainerSessionEnqueueEvent event) {
+		refresh();
+	}
+
 	public void refresh() {
 		Logger.Log(LOG_TAG, "onRefresh");
 		getLoaderManager().restartLoader(LOADER_ID, null, this);

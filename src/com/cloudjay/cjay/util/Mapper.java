@@ -100,9 +100,11 @@ public class Mapper {
 				if (gateReportImages != null) {
 					for (GateReportImage gateReportImage : gateReportImages) {
 						for (CJayImage cJayImage : cJayImages) {
+
 							String gateReportImageName = gateReportImage
 									.getImageName();
 							String cJayImageName = cJayImage.getImageName();
+
 							if (gateReportImageName.contains(cJayImageName)) {
 
 								Logger.Log(
@@ -183,6 +185,7 @@ public class Mapper {
 						}
 					}
 				}
+
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
