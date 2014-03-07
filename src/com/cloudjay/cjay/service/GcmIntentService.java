@@ -116,19 +116,6 @@ public class GcmIntentService extends IntentService {
 
 				}
 
-				// int volume = audioManager
-				// .getStreamVolume(AudioManager.STREAM_NOTIFICATION);
-				//
-				// if (volume != 0) {
-				// if (shootMediaPlayer == null)
-				// shootMediaPlayer = MediaPlayer
-				// .create(getApplicationContext(),
-				// Uri.parse("file:///system/media/audio/ui/camera_click.ogg"));
-				//
-				// if (shootMediaPlayer != null)
-				// shootMediaPlayer.start();
-				// }
-
 			} else {
 				Logger.Log(LOG_TAG, "Extra is Empty");
 			}

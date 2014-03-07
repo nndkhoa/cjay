@@ -69,6 +69,7 @@ public class ContainerSession implements Parcelable {
 	public static final String FIELD_CLEARED = "cleared";
 	public static final String FIELD_LOCAL = "on_local";
 	public static final String FIELD_FIXED = "fixed";
+
 	public static final String FIELD_AUDITOR_VALIDATION_UPLOAD = "auditor_validation_upload";
 
 	public static final int STATE_UPLOAD_COMPLETED = 4;
@@ -108,7 +109,7 @@ public class ContainerSession implements Parcelable {
 
 	@DatabaseField(columnName = FIELD_FIXED, defaultValue = "false")
 	boolean fixed;
-	
+
 	@DatabaseField(columnName = FIELD_AUDITOR_VALIDATION_UPLOAD, defaultValue = "false")
 	boolean auditorUploadValidation;
 
@@ -217,9 +218,9 @@ public class ContainerSession implements Parcelable {
 			String uuid = UUID.randomUUID().toString();
 			this.setCheckInTime(checkInTime);
 			this.setUuid(uuid);
-			
+
 			// Validate container for uploading in auditor view
-//			this.setAuditorUploadValidation(ContainerSession.validateAuditorContainerSessionForUpload(this));
+			// this.setAuditorUploadValidation(ContainerSession.validateAuditorContainerSessionForUpload(this));
 
 			if (null != container)
 				this.setContainer(container);
@@ -228,11 +229,11 @@ public class ContainerSession implements Parcelable {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public boolean getAuditorUploadValidation() {
 		return auditorUploadValidation;
 	}
-	
+
 	public void setAuditorUploadValidation(boolean auditorUploadValidation) {
 		this.auditorUploadValidation = auditorUploadValidation;
 	}
@@ -621,7 +622,7 @@ public class ContainerSession implements Parcelable {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 }

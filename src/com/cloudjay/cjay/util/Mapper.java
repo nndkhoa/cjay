@@ -121,7 +121,7 @@ public class Mapper {
 																.getType())
 												+ "\nGate Report Image Time: "
 												+ gateReportImage
-														.getTimePosted());
+														.getCreatedAt());
 
 								cJayImage.setId(gateReportImage.getId());
 								cJayImage.setImageName(gateReportImageName);
@@ -220,8 +220,16 @@ public class Mapper {
 		for (CJayImage cJayImage : cJayImages) {
 			if (cJayImage.getType() == CJayImage.TYPE_IMPORT
 					|| cJayImage.getType() == CJayImage.TYPE_EXPORT) {
-				gateReportImages.add(new GateReportImage(cJayImage.getType(),
-						cJayImage.getTimePosted(), cJayImage.getImageName()));
+
+				if (cJayImage.getId() != 0) {
+					gateReportImages.add(new GateReportImage(cJayImage.getId(),
+							cJayImage.getType(), cJayImage.getTimePosted(),
+							cJayImage.getImageName()));
+				} else {
+					gateReportImages.add(new GateReportImage(cJayImage
+							.getType(), cJayImage.getTimePosted(), cJayImage
+							.getImageName()));
+				}
 			}
 		}
 
@@ -394,7 +402,6 @@ public class Mapper {
 
 						issues.add(issue);
 						issueDaoImpl.addIssue(issue);
-
 					}
 				}
 			}
@@ -408,7 +415,7 @@ public class Mapper {
 
 					CJayImage image = new CJayImage(gateReportImage.getId(),
 							gateReportImage.getType(),
-							gateReportImage.getTimePosted(),
+							gateReportImage.getCreatedAt(),
 							gateReportImage.getImageName());
 
 					// set default value

@@ -12,7 +12,7 @@ public class GateReportImage implements Parcelable {
 
 	private int id;
 	private int type;
-	private String time_posted;
+	private String created_at;
 	private String image_name;
 
 	public GateReportImage() {
@@ -23,13 +23,13 @@ public class GateReportImage implements Parcelable {
 			String image_name) {
 		this.id = id;
 		this.type = type;
-		this.time_posted = time_posted;
+		this.created_at = time_posted;
 		this.image_name = image_name;
 	}
 
 	public GateReportImage(int type, String time_posted, String image_name) {
 		this.type = type;
-		this.time_posted = time_posted;
+		this.created_at = time_posted;
 		this.image_name = image_name;
 	}
 
@@ -49,12 +49,12 @@ public class GateReportImage implements Parcelable {
 		this.type = type;
 	}
 
-	public String getTimePosted() {
-		return time_posted;
+	public String getCreatedAt() {
+		return created_at;
 	}
 
-	public void setTimePosted(String time_posted) {
-		this.time_posted = time_posted;
+	public void setCreatedAt(String time_posted) {
+		this.created_at = time_posted;
 	}
 
 	public String getImageName() {
@@ -74,7 +74,7 @@ public class GateReportImage implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(id);
 		dest.writeInt(type);
-		dest.writeString(time_posted);
+		dest.writeString(created_at);
 		dest.writeString(image_name);
 
 	}
@@ -87,7 +87,7 @@ public class GateReportImage implements Parcelable {
 	private void readFromParcel(Parcel in) {
 		this.id = in.readInt();
 		this.type = in.readInt();
-		this.time_posted = in.readString();
+		this.created_at = in.readString();
 		this.image_name = in.readString();
 	}
 
