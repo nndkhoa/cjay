@@ -30,13 +30,19 @@ import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
+import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DatabaseHelper;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
+
+import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 //slide 15
 
@@ -44,6 +50,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 @OptionsMenu(R.menu.menu_auditor_container)
 public class AuditorContainerActivity extends CJayActivity {
 
+	public static final String LOG_TAG = "AuditorContainerActivity";
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
 	// private static final String TAG = "AuditorContainerActivity";
 
@@ -166,6 +173,45 @@ public class AuditorContainerActivity extends CJayActivity {
 			mFeedListView.setItemChecked(-1, true);
 			supportInvalidateOptionsMenu();
 		}
+	}
+	
+	@OptionsItem(R.id.menu_upload)
+	void uploadMenuItemClicked() {
+		try {
+			Logger.Log(LOG_TAG, "Menu upload item clicked");
+
+			if (mContainerSession.isValidForUploading()) {
+
+				// User confirm upload
+				mContainerSession.setUploadConfirmation(true);
+
+				mContainerSession
+						.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+
+				ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient.getInstance()
+							.getDatabaseManager().getHelper(this)
+							.getContainerSessionDaoImpl();
+
+				containerSessionDaoImpl.update(mContainerSession);
+
+				// It will trigger `UploadsFragment` Adapter
+				// notifyDataSetChanged
+				EventBus.getDefault().post(
+						new ContainerSessionEnqueueEvent(
+								mContainerSession));
+			} else {
+				Crouton.cancelAllCroutons();
+				Crouton.makeText(this,
+						R.string.alert_invalid_container, Style.ALERT)
+						.show();
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		// go back
+		this.onBackPressed();
 	}
 
 	@Override
