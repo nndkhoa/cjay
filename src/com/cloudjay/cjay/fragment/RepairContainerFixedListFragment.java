@@ -59,9 +59,6 @@ public class RepairContainerFixedListFragment extends SherlockFragment
 	PullToRefreshLayout mPullToRefreshLayout;
 	IssueContainerCursorAdapter cursorAdapter;
 
-	@ViewById(R.id.ll_empty_element)
-	LinearLayout mEmptyElement;
-
 	@ViewById(R.id.container_list)
 	ListView mFeedListView;
 
@@ -144,8 +141,6 @@ public class RepairContainerFixedListFragment extends SherlockFragment
 					int visibleItemCount, int totalItemCount) {
 			}
 		});
-
-		mFeedListView.setEmptyView(mEmptyElement);
 	}
 
 	@ItemLongClick(R.id.container_list)

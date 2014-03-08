@@ -10,33 +10,12 @@
         android:gravity="top"
         android:orientation="vertical" >
 
-        <RelativeLayout
+        <ListView
+            android:id="@+id/container_list"
+            style="@style/CJayListView"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="vertical" >
-
-            <LinearLayout
-                android:id="@+id/ll_empty_element"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" >
-
-                <TextView
-                    android:id="@+id/notfound_textview"
-                    style="@style/NotFoundTextViewStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center" />
-            </LinearLayout>
-
-            <ListView
-                android:id="@+id/container_list"
-                style="@style/CJayListView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true" />
-        </RelativeLayout>
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true" />
     </LinearLayout>
 
 </uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout>

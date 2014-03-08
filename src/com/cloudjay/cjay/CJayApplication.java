@@ -111,7 +111,7 @@ public class CJayApplication extends Application {
 	@Override
 	public void onCreate() {
 		// Configure Logger
-		Logger.PRODUCTION_MODE = false;
+		Logger.PRODUCTION_MODE = true;
 
 		Logger.Log(LOG_TAG, "Start Application");
 		savedStateMap = new HashMap<String, Fragment.SavedState>();

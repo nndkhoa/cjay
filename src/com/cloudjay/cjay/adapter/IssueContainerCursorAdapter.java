@@ -105,27 +105,31 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements
 			holder.itemPictureView.setImageResource(R.drawable.ic_app);
 		}
 
-		boolean isValidForUpload = false;
-		if (cursor.getColumnIndex("non_issue_image_count") >= 0
-				&& cursor.getColumnIndex("invalid_issue_count") >= 0
-				&& cursor.getColumnIndex("issue_count") >= 0) {
-			int imageWithoutIssueCount = cursor.getInt(cursor
-					.getColumnIndexOrThrow("non_issue_image_count"));
-			int invalidIssueCount = cursor.getInt(cursor
-					.getColumnIndexOrThrow("invalid_issue_count"));
-			int validIssueCount = cursor.getInt(cursor
-					.getColumnIndexOrThrow("issue_count"));
-			if (imageWithoutIssueCount > 1 || validIssueCount == 0
-					|| invalidIssueCount > 0) {
-				isValidForUpload = false;
-			} else {
-				isValidForUpload = true;
+		if (holder.validationImageView != null) {
+
+			boolean isValidForUpload = false;
+			if (cursor.getColumnIndex("non_issue_image_count") >= 0
+					&& cursor.getColumnIndex("invalid_issue_count") >= 0
+					&& cursor.getColumnIndex("issue_count") >= 0) {
+				int imageWithoutIssueCount = cursor.getInt(cursor
+						.getColumnIndexOrThrow("non_issue_image_count"));
+				int invalidIssueCount = cursor.getInt(cursor
+						.getColumnIndexOrThrow("invalid_issue_count"));
+				int validIssueCount = cursor.getInt(cursor
+						.getColumnIndexOrThrow("issue_count"));
+				if (imageWithoutIssueCount > 1 || validIssueCount == 0
+						|| invalidIssueCount > 0) {
+					isValidForUpload = false;
+				} else {
+					isValidForUpload = true;
+				}
 			}
-		}
-		if (!isValidForUpload) {
-			holder.validationImageView.setVisibility(ImageView.INVISIBLE);
-		} else {
-			holder.validationImageView.setVisibility(ImageView.VISIBLE);
+
+			if (!isValidForUpload) {
+				holder.validationImageView.setVisibility(ImageView.INVISIBLE);
+			} else {
+				holder.validationImageView.setVisibility(ImageView.VISIBLE);
+			}
 		}
 
 	}

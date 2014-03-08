@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
@@ -295,20 +296,25 @@ public class Mapper {
 			IssueDaoImpl issueDaoImpl = databaseManager.getHelper(ctx)
 					.getIssueDaoImpl();
 
-			// Operator operator = operatorDaoImpl.queryForId(tmpSession
-			// .getOperatorId());
+			String operatorCode = tmpSession.getOperatorCode();
+			String containerId = tmpSession.getContainerId();
 
 			Operator operator = null;
-			List<Operator> listOperators = operatorDaoImpl.queryForEq(
-					Operator.FIELD_CODE, tmpSession.getOperatorCode());
-
-			if (listOperators.isEmpty()) {
-				operator = new Operator();
-				operator.setCode(tmpSession.getOperatorCode());
-				operator.setName(tmpSession.getOperatorCode());
-				operatorDaoImpl.addOperator(operator);
+			if (TextUtils.isEmpty(operatorCode)) {
+				Logger.Log(LOG_TAG, "Container " + containerId
+						+ " does not have Operator", Log.ERROR);
 			} else {
-				operator = listOperators.get(0);
+				List<Operator> listOperators = operatorDaoImpl.queryForEq(
+						Operator.FIELD_CODE, operatorCode);
+
+				if (listOperators.isEmpty()) {
+					operator = new Operator();
+					operator.setCode(tmpSession.getOperatorCode());
+					operator.setName(tmpSession.getOperatorCode());
+					operatorDaoImpl.addOperator(operator);
+				} else {
+					operator = listOperators.get(0);
+				}
 			}
 
 			// Create `depot` object if needed
