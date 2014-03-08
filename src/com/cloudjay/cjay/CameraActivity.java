@@ -161,6 +161,11 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			initPreview(width, height);
 			startPreview();
 
+			// Camera.Parameters parameters = camera.getParameters();
+			// parameters.set("orientation", "portrait");
+			// // set other parameters ..
+			// camera.setParameters(parameters);
+
 			Logger.Log(LOG_TAG, "endSurfaceChanged");
 		}
 
@@ -207,7 +212,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	@SuppressWarnings({})
 	@AfterViews
 	void initCamera() {
-		Logger.Log(LOG_TAG, "initCamera(), addSurfaceCallback");
+		Logger.Log(LOG_TAG, "----> initCamera(), addSurfaceCallback");
 
 		// WARNING: this block should be run before onResume()
 		// Setup Surface Holder
@@ -224,8 +229,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@AfterViews
 	void initContainerSession() {
-		Logger.Log(LOG_TAG, "initContainerSession()");
-
 		try {
 			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
 					.getInstance().getDatabaseManager().getHelper(this)
@@ -259,7 +262,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			if (!cameraConfigured) {
 
-				// Logger.Log(LOG_TAG, "config Camera");
+				Logger.Log(LOG_TAG, "config Camera");
 
 				Camera.Parameters parameters = camera.getParameters();
 				Camera.Size size = determineBestPreviewSize(parameters);
@@ -285,16 +288,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 						parameters
 								.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
 
-						// List<String> modes = parameters
-						// .getSupportedFocusModes();
-
-						// for (String string : modes) {
-						// Logger.Log(LOG_TAG, string);
-						// }
-
-						// parameters
-						// setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-
 						camera.setParameters(parameters);
 						cameraConfigured = true;
 					}
@@ -306,11 +299,11 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	}
 
 	private void startPreview() {
-		Logger.Log(LOG_TAG, "startPreview");
+		Logger.Log(LOG_TAG, "----> startPreview");
 
 		if (cameraConfigured && camera != null) {
-			Logger.Log(LOG_TAG, "cameraConfigured and camera != null");
 
+			Logger.Log(LOG_TAG, "cameraConfigured and camera != null");
 			camera.startPreview();
 			inPreview = true;
 		}
@@ -564,24 +557,23 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Click({ R.id.btn_camera_done, R.id.btn_back, R.id.rl_camera_done })
 	void doneButtonClicked() {
-		Logger.Log(LOG_TAG,
-				"doneButtonClicked(). Ready to update Container Session.");
 		this.onBackPressed();
 	}
 
 	// region Override Activity
 	@Override
 	protected void onResume() {
-		Logger.Log(LOG_TAG, "onResume()");
+
+		Logger.Log(LOG_TAG, "----> onResume()");
 		super.onResume();
+
 		openCamera();
 		setContentView(R.layout.activity_camera);
+
 	}
 
 	@Override
 	public void onBackPressed() {
-		Logger.Log(LOG_TAG, "onBackPressed");
-
 		try {
 
 			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
@@ -601,13 +593,24 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
+
+		// cameraConfigured = false;
 		super.onConfigurationChanged(newConfig);
-		setCameraDisplayOrientation(this, cameraMode, camera);
+
+		// setCameraDisplayOrientation(this, cameraMode, camera);
+		// onResume();
 
 		setContentView(R.layout.activity_camera);
+		openCamera();
+
 	}
 
 	void openCamera() {
+
+		if (camera != null) {
+			camera.release();
+		}
+
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
 			Camera.CameraInfo info = new Camera.CameraInfo();
 
@@ -619,7 +622,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 					camera = Camera.open(i);
 					setCameraDisplayOrientation(this, cameraMode, camera);
-
 				}
 			}
 		}
@@ -633,6 +635,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	}
 
 	void releaseCamera() {
+
 		if (camera != null) {
 
 			Logger.Log(LOG_TAG, "Release camera ... ");
@@ -757,81 +760,82 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Click(R.id.btn_capture)
 	void captureButtonClicked() {
-		// Logger.Log(LOG_TAG, "captureButtonClicked()");
 		takePicture();
 	}
 
 	@Background
 	void takePicture() {
 
-		// if (inPreview) {
+		if (inPreview) {
 
-		try {
-			// Logger.Log(LOG_TAG, "Prepare to take picture");
-			Camera.Parameters cameraParameters = camera.getParameters();
+			try {
+				// Logger.Log(LOG_TAG, "Prepare to take picture");
+				Camera.Parameters cameraParameters = camera.getParameters();
 
-			List<String> supportedFocusMode = cameraParameters
-					.getSupportedFocusModes();
+				List<String> supportedFocusMode = cameraParameters
+						.getSupportedFocusModes();
 
-			// for (String mode : supportedFocusMode) {
-			// Logger.Log(TAG, "Camera supports Focus Mode: " + mode);
-			// }
+				// Submit focus area to camera
+				if (supportedFocusMode
+						.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+					cameraParameters
+							.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+					camera.setParameters(cameraParameters);
+					camera.autoFocus(this);
+				} else {
+					Logger.Log(TAG,
+							"No auto focus mode supported, now just take picture");
+					camera.takePicture(shutterCallback, null, photoCallback);
+				}
 
-			// Submit focus area to camera
-			if (supportedFocusMode.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
-				cameraParameters
-						.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-				camera.setParameters(cameraParameters);
-				camera.autoFocus(this);
-			} else {
-				Logger.Log(TAG,
-						"No auto focus mode supported, now just take picture");
-				camera.takePicture(shutterCallback, null, photoCallback);
+				inPreview = false;
+
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-
-			inPreview = false;
-
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
-		// }
 	}
 
 	public static void setCameraDisplayOrientation(Activity activity,
 			int cameraId, android.hardware.Camera camera) {
 
-		android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
-		android.hardware.Camera.getCameraInfo(cameraId, info);
+		if (camera != null) {
 
-		int rotation = activity.getWindowManager().getDefaultDisplay()
-				.getRotation();
+			android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
+			android.hardware.Camera.getCameraInfo(cameraId, info);
 
-		int degrees = 0;
-		switch (rotation) {
-		case Surface.ROTATION_0:
-			degrees = 0;
-			break;
-		case Surface.ROTATION_90:
-			degrees = 90;
-			break;
-		case Surface.ROTATION_180:
-			degrees = 180;
-			break;
-		case Surface.ROTATION_270:
-			degrees = 270;
-			break;
+			int rotation = activity.getWindowManager().getDefaultDisplay()
+					.getRotation();
+
+			int degrees = 0;
+			switch (rotation) {
+			case Surface.ROTATION_0:
+				degrees = 0;
+				break;
+			case Surface.ROTATION_90:
+				degrees = 90;
+				break;
+			case Surface.ROTATION_180:
+				degrees = 180;
+				break;
+			case Surface.ROTATION_270:
+				degrees = 270;
+				break;
+			}
+
+			Logger.Log(TAG, "Rotate degree: " + degrees);
+
+			int result;
+			if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+				result = (info.orientation + degrees) % 360;
+				result = (360 - result) % 360; // compensate the mirror
+
+			} else { // back-facing
+				result = (info.orientation - degrees + 360) % 360;
+			}
+
+			camera.setDisplayOrientation(result);
 		}
-
-		Logger.Log(TAG, "Rotate degree: " + degrees);
-
-		int result;
-		if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-			result = (info.orientation + degrees) % 360;
-			result = (360 - result) % 360; // compensate the mirror
-		} else { // back-facing
-			result = (info.orientation - degrees + 360) % 360;
-		}
-		camera.setDisplayOrientation(result);
 	}
 
 	private Size determineBestPreviewSize(Camera.Parameters parameters) {

@@ -85,7 +85,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			}
 
 			// Create view
-			// csview --> join table of operator + container + container_session
+			// csview --> join table operator + container + container_session
 			String sql = "CREATE VIEW csview AS"
 					+ " SELECT cs._id, cs.check_out_time, cs.check_in_time, cs.image_id_path, cs.on_local, cs.fixed, cs.upload_confirmation, cs.state, cs.cleared, c.container_id, o.operator_name"
 					+ " FROM container_session AS cs, container AS c, operator as o"
@@ -108,22 +108,22 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 					+ " HAVING count(containerSession_id) > 0)";
 
 			db.execSQL(sql);
-			
-			// view for validate container sessions before upload in Auditor mode
-			sql = "create view csi_auditor_validation_view as" +
-					" select csi.*, count(image._id) as non_issue_image_count" +
-					" from" +
-					"	(select csiview.*, count(issue.containerSession_id) as invalid_issue_count" +
-					"	from csiview" +
-					"	left join issue on csiview._id = issue.containerSession_id and issue._id in" +
-					"		(select issue._id" +
-					"		from issue" +
-					"		where coalesce(componentCode_id, '') = '' or coalesce(damageCode_id, '') = ''" +
-					"		or coalesce(locationCode, '') = '' or coalesce(repairCode_id, '') = '')" +
-					"	group by csiview._id) as csi" +
-					" left join cjay_image as image on csi._id = image.containerSession_id and image.type = 2 and image.issue_id is NULL" +
-					" group by csi._id";
-			
+
+			// view for validate container sessions before upload in Auditor
+			sql = "create view csi_auditor_validation_view as"
+					+ " select csi.*, count(image._id) as non_issue_image_count"
+					+ " from"
+					+ "	(select csiview.*, count(issue.containerSession_id) as invalid_issue_count"
+					+ "	from csiview"
+					+ "	left join issue on csiview._id = issue.containerSession_id and issue._id in"
+					+ "		(select issue._id"
+					+ "		from issue"
+					+ "		where coalesce(componentCode_id, '') = '' or coalesce(damageCode_id, '') = ''"
+					+ "		or coalesce(locationCode, '') = '' or coalesce(repairCode_id, '') = '')"
+					+ "	group by csiview._id) as csi"
+					+ " left join cjay_image as image on csi._id = image.containerSession_id and image.type = 2 and image.issue_id is NULL"
+					+ " group by csi._id";
+
 			db.execSQL(sql);
 
 		} catch (SQLException e) {
