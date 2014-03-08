@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.cloudjay.cjay.R;
@@ -38,6 +40,7 @@ public class AddContainerDialog extends SherlockDialogFragment {
 	private Fragment mParent;
 	public boolean isOperatorRequired = true;
 
+	TextView mOperatorLabel;
 	EditText mContainerEditText;
 	EditText mOperatorEditText;
 	Button mCancelButton;
@@ -70,6 +73,7 @@ public class AddContainerDialog extends SherlockDialogFragment {
 		mCancelButton = (Button) view
 				.findViewById(R.id.dialog_new_container_cancel);
 		mOkButton = (Button) view.findViewById(R.id.dialog_new_container_ok);
+		mOperatorLabel = (TextView) view.findViewById(R.id.dialog_new_container_owner_label);
 
 		if (mContainerId != null) {
 			mContainerEditText.setText(mContainerId);
@@ -138,6 +142,15 @@ public class AddContainerDialog extends SherlockDialogFragment {
 		// show keyboard
 		getDialog().getWindow().setSoftInputMode(
 				WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+		
+		if (!isOperatorRequired) {
+			LinearLayout.LayoutParams p = (LinearLayout.LayoutParams)mOperatorEditText.getLayoutParams();
+			p.height = 0;
+			mOperatorEditText.setLayoutParams(p);
+			p = (LinearLayout.LayoutParams)mOperatorLabel.getLayoutParams();
+			p.height = 0;
+			mOperatorLabel.setLayoutParams(p);
+		}
 
 		return view;
 	}

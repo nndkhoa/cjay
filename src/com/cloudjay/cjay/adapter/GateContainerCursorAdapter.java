@@ -50,6 +50,7 @@ public class GateContainerCursorAdapter extends CursorAdapter implements
 		public TextView importDateView;
 		public TextView exportDateView;
 		public ImageView itemPictureView;
+		public ImageView validationImageView;
 
 	}
 
@@ -75,6 +76,8 @@ public class GateContainerCursorAdapter extends CursorAdapter implements
 					.findViewById(R.id.feed_item_container_export_date);
 			holder.itemPictureView = (ImageView) view
 					.findViewById(R.id.feed_item_picture);
+			holder.validationImageView = (ImageView) view
+					.findViewById(R.id.feed_item_validator);
 			view.setTag(holder);
 		}
 
@@ -101,6 +104,17 @@ public class GateContainerCursorAdapter extends CursorAdapter implements
 			holder.itemPictureView.setImageResource(R.drawable.ic_app);
 		}
 
+		boolean isValidForUpload = false;
+		if (cursor.getColumnIndex("export_image_count") >= 0) {
+			isValidForUpload = cursor.getInt(cursor.getColumnIndexOrThrow("export_image_count")) > 0;
+		} else if (cursor.getColumnIndex("import_image_count") >= 0) {
+			isValidForUpload = cursor.getInt(cursor.getColumnIndexOrThrow("import_image_count")) > 0;			
+		}
+		if (isValidForUpload) {
+			holder.validationImageView.setVisibility(ImageView.VISIBLE);			
+		} else {
+			holder.validationImageView.setVisibility(ImageView.INVISIBLE);
+		}
 	}
 
 	@Override
@@ -118,6 +132,8 @@ public class GateContainerCursorAdapter extends CursorAdapter implements
 				.findViewById(R.id.feed_item_container_export_date);
 		holder.itemPictureView = (ImageView) v
 				.findViewById(R.id.feed_item_picture);
+		holder.validationImageView = (ImageView) v
+				.findViewById(R.id.feed_item_validator);
 
 		v.setTag(holder);
 

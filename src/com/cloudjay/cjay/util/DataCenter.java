@@ -297,13 +297,13 @@ public class DataCenter {
 	}
 
 	public Cursor getCheckOutContainerSessionCursor(Context context) {
-		String queryString = "SELECT * FROM csview cs WHERE cs.check_out_time = '' AND cs.on_local = 0";
+		String queryString = "SELECT * FROM cs_export_validation_view";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
 				queryString, new String[] {});
 	}
 
 	public Cursor getLocalContainerSessionCursor(Context context) {
-		String queryString = "SELECT * FROM csview cs WHERE cs.upload_confirmation = 0 AND cs.on_local = 1 AND cs.state <> 4";
+		String queryString = "SELECT * FROM cs_import_validation_view";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
 				queryString, new String[] {});
 	}
@@ -318,7 +318,7 @@ public class DataCenter {
 		// + " WHERE cjay_image.type = 2)";
 
 		String queryString = "SELECT cs.* FROM csi_auditor_validation_view AS cs"
-				+ " WHERE cs.upload_confirmation = 0 AND cs._id NOT IN ("
+				+ " WHERE cs.upload_confirmation = 0 AND cs._id IN ("
 				+ " SELECT container_session._id"
 				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
 				+ " WHERE cjay_image.type = 2)";
@@ -360,10 +360,19 @@ public class DataCenter {
 		return null;
 	}
 
+	public Cursor filterLocalCursor(Context context, CharSequence constraint) {
+
+		String queryString = "SELECT * FROM cs_import_validation_view"
+				+ " WHERE container_id LIKE ? ORDER BY container_id LIMIT 100";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] { constraint + "%" });
+	}
+
 	public Cursor filterCheckoutCursor(Context context, CharSequence constraint) {
 
-		String queryString = "SELECT * FROM csview cs "
-				+ "WHERE cs.check_out_time = '' AND cs.on_local = 0 AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
+		String queryString = "SELECT * FROM cs_export_validation_view"
+				+ " WHERE container_id LIKE ? ORDER BY container_id LIMIT 100";
 
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
 				queryString, new String[] { constraint + "%" });

@@ -93,6 +93,24 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 			db.execSQL(sql);
 
+			// view for validate container sessions before upload in Gate Import
+			sql = "CREATE VIEW cs_import_validation_view as"
+					+ " SELECT cs.*, count(cjay_image._id) as import_image_count "
+					+ " FROM csview cs"
+					+ " LEFT JOIN cjay_image ON cjay_image.containerSession_id = cs._id AND cjay_image.type = 0"
+					+ " WHERE cs.upload_confirmation = 0 AND cs.on_local = 1 AND cs.state <> 4"
+					+ " GROUP BY cs._id";
+			db.execSQL(sql);
+
+			// view for validate container sessions before upload in Gate Export
+			sql = "CREATE VIEW cs_export_validation_view as"
+					+ " SELECT cs.*, count(cjay_image._id) as export_image_count "
+					+ " FROM csview cs"
+					+ " LEFT JOIN cjay_image ON cjay_image.containerSession_id = cs._id AND cjay_image.type = 1"
+					+ " WHERE cs.check_out_time = '' AND cs.on_local = 0 "
+					+ " GROUP BY cs._id";
+			db.execSQL(sql);
+			
 			// csiview --> csview + issue_count
 			sql = "CREATE VIEW csiview AS"
 					+ " SELECT csview.*, count(issue.containerSession_id) as issue_count"

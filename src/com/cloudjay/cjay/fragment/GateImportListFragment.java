@@ -12,10 +12,10 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.ViewById;
+
 import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
-
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
@@ -28,10 +28,10 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.Button;
 import android.widget.FilterQueryProvider;
 import android.widget.ListView;
-import android.widget.AbsListView.OnScrollListener;
 
 import com.actionbarsherlock.view.Menu;
 import com.ami.fundapter.FunDapter;
@@ -53,7 +53,6 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.view.AddContainerDialog;
-import com.j256.ormlite.support.DatabaseConnection;
 
 import de.greenrobot.event.EventBus;
 
@@ -150,7 +149,7 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
 				@Override
 				public Cursor runQuery(CharSequence constraint) {
-					return DataCenter.getInstance().filterCheckoutCursor(
+					return DataCenter.getInstance().filterLocalCursor(
 							getActivity(), constraint);
 				}
 			});
