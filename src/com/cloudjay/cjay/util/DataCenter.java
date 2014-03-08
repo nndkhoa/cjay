@@ -318,7 +318,7 @@ public class DataCenter {
 		// + " WHERE cjay_image.type = 2)";
 
 		String queryString = "SELECT cs.* FROM csi_auditor_validation_view AS cs"
-				+ " WHERE cs.upload_confirmation = 0 AND cs._id IN ("
+				+ " WHERE cs.upload_confirmation = 0 AND cs._id NOT IN ("
 				+ " SELECT container_session._id"
 				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
 				+ " WHERE cjay_image.type = 2)";

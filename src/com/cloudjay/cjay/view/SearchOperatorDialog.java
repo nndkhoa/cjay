@@ -10,6 +10,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
@@ -110,7 +111,11 @@ public class SearchOperatorDialog extends SherlockDialogFragment {
 		initContainerOperatorAdapter(mOperators);
 		getDialog().setTitle(
 				getResources().getString(R.string.dialog_operator_title));
-
+		
+		// show keyboard
+		getDialog().getWindow().setSoftInputMode(
+				WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+		
 		return view;
 	}
 
