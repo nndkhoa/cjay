@@ -9,14 +9,11 @@ import java.sql.SQLException;
 import android.content.Context;
 
 import com.cloudjay.cjay.dao.IUserDao;
-import com.cloudjay.cjay.events.UserLoggedOutEvent;
 import com.cloudjay.cjay.model.Depot;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.j256.ormlite.table.TableUtils;
-
-import de.greenrobot.event.EventBus;
 
 public class Session {
 

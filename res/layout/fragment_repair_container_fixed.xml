@@ -24,7 +24,10 @@
 
                 <TextView
                     android:id="@+id/notfound_textview"
-                    style="@style/NotFoundTextViewStyle" />
+                    style="@style/NotFoundTextViewStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center" />
             </LinearLayout>
 
             <ListView

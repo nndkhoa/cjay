@@ -15,7 +15,6 @@ import android.util.Log;
 import android.view.View;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.PostLoadDataEvent;
 import com.cloudjay.cjay.events.PreLoadDataEvent;
 import com.cloudjay.cjay.events.UserLoggedOutEvent;

@@ -29,7 +29,6 @@ import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Parameters;
-import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
 import android.hardware.Camera.Size;
 import android.media.AudioManager;
@@ -460,7 +459,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			break;
 
 		case CJayImage.TYPE_REPORT:
-			imageType = "report";
+			imageType = "auditor";
 			break;
 
 		case CJayImage.TYPE_REPAIRED:
@@ -471,12 +470,13 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		String depotCode = containerSession.getContainer().getDepot()
 				.getDepotCode();
+		String containerId = containerSession.getContainerId();
 
 		// filename sample:
 		// [depot-code]-2013-12-19-[gate-in|gate-out|report]-[UUID].jpg
 		String fileName = depotCode + "-"
 				+ StringHelper.getCurrentTimestamp("yyyy-MM-dd") + "-"
-				+ imageType + "-" + uuid + ".jpg";
+				+ imageType + "-" + containerId + "-" + uuid + ".jpg";
 
 		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
 		Logger.Log(LOG_TAG, "Photo Path: " + photo.getAbsolutePath());

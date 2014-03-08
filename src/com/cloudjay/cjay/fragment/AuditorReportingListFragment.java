@@ -10,6 +10,7 @@ import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ItemLongClick;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.ViewById;
 
 import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
@@ -42,10 +43,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.view.Menu;
-import com.cloudjay.cjay.AuditorContainerActivity_;
-import com.cloudjay.cjay.CJayActivity;
-import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
@@ -83,6 +81,9 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 	private ContainerSession mSelectedContainerSession = null;
 	private int mItemLayout = R.layout.list_item_audit_container;
 	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
+
+	@SystemService
+	InputMethodManager inputMethodManager;
 
 	@ViewById(R.id.ll_empty_element)
 	LinearLayout mEmptyElement;
@@ -186,11 +187,7 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 					public boolean onEditorAction(TextView textView, int id,
 							KeyEvent keyEvent) {
 						if (id == EditorInfo.IME_ACTION_SEARCH) {
-							// hide keyboard
-							InputMethodManager imm = (InputMethodManager) getActivity()
-									.getSystemService(
-											Context.INPUT_METHOD_SERVICE);
-							imm.hideSoftInputFromWindow(
+							inputMethodManager.hideSoftInputFromWindow(
 									mSearchEditText.getWindowToken(), 0);
 							return true;
 						}
@@ -214,6 +211,7 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
+
 				if (scrollState != 0) {
 					((IssueContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
 				} else {
@@ -221,6 +219,9 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 					((IssueContainerCursorAdapter) mFeedListView.getAdapter())
 							.notifyDataSetChanged();
 				}
+
+				inputMethodManager.hideSoftInputFromWindow(
+						mSearchEditText.getWindowToken(), 0);
 			}
 
 			@Override
@@ -344,6 +345,7 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 
 	@Click(R.id.add_button)
 	void addButtonClicked() {
+
 		// show add container dialog
 		String containerId;
 		if (!TextUtils.isEmpty(mSearchEditText.getText().toString())) {

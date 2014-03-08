@@ -6,6 +6,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.ViewById;
 
 import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
@@ -22,10 +23,13 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
+import android.view.KeyEvent;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AbsListView;
@@ -66,6 +70,9 @@ public class RepairContainerPendingListFragment extends CJaySherlockFragment
 
 	PullToRefreshLayout mPullToRefreshLayout;
 	IssueContainerCursorAdapter cursorAdapter;
+
+	@SystemService
+	InputMethodManager inputMethodManager;
 
 	@ViewById(R.id.container_list)
 	ListView mFeedListView;
@@ -207,6 +214,24 @@ public class RepairContainerPendingListFragment extends CJaySherlockFragment
 			}
 		});
 
+		mSearchEditText
+				.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+					@Override
+					public boolean onEditorAction(TextView textView, int id,
+							KeyEvent keyEvent) {
+						if (id == EditorInfo.IME_ACTION_SEARCH) {
+
+							inputMethodManager.hideSoftInputFromWindow(
+									mSearchEditText.getWindowToken(), 0);
+
+							return true;
+						}
+						return false;
+					}
+
+				});
+
 		mFeedListView.setMultiChoiceModeListener(new MultiChoiceModeListener() {
 			@Override
 			public void onItemCheckedStateChanged(ActionMode mode,
@@ -271,6 +296,9 @@ public class RepairContainerPendingListFragment extends CJaySherlockFragment
 					((IssueContainerCursorAdapter) mFeedListView.getAdapter())
 							.notifyDataSetChanged();
 				}
+
+				inputMethodManager.hideSoftInputFromWindow(
+						mSearchEditText.getWindowToken(), 0);
 			}
 
 			@Override
