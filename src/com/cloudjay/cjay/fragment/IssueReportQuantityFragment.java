@@ -71,11 +71,12 @@ public class IssueReportQuantityFragment extends IssueReportFragment {
 	}
 
 	@Override
-	public void validateAndSaveData() {
+	public boolean validateAndSaveData() {
 		// save data
 		mCallback.onReportValueChanged(
 				AuditorIssueReportListener.TYPE_QUANTITY, mQuantityEditText
 						.getText().toString());
+		return true;
 	}
 
 	@Override

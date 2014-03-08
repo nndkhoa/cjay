@@ -40,4 +40,7 @@
     <string name="repair_name_hint">CODE sửa chữa</string>
     <string name="button_text_placeholder">X</string>
     
+    <string name="issue_details_missing_warning">Dữ liệu chưa hoàn chỉnh</string>
+    <string name="issue_code_missing_warning">Xin vui lòng nhập code</string>
+    
 </resources>

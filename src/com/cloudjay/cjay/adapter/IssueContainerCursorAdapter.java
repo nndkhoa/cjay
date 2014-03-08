@@ -105,13 +105,17 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements
 			holder.itemPictureView.setImageResource(R.drawable.ic_app);
 		}
 		
-//		int auditorUploadValidation = cursor.getInt(cursor
-//				.getColumnIndexOrThrow(ContainerSession.FIELD_AUDITOR_VALIDATION_UPLOAD));
-//		if (auditorUploadValidation > 0) {
-//			holder.validationImageView.setVisibility(ImageView.VISIBLE);
-//		} else {
-//			holder.validationImageView.setVisibility(ImageView.INVISIBLE);
-//		}
+		int imageWithoutIssueCount = cursor.getInt(cursor
+				.getColumnIndexOrThrow("non_issue_image_count"));
+		int invalidIssueCount = cursor.getInt(cursor
+				.getColumnIndexOrThrow("invalid_issue_count"));
+		int validIssueCount = cursor.getInt(cursor
+				.getColumnIndexOrThrow("issue_count"));
+		if (imageWithoutIssueCount > 1 || validIssueCount == 0 || invalidIssueCount > 0) {
+			holder.validationImageView.setVisibility(ImageView.INVISIBLE);
+		} else {
+			holder.validationImageView.setVisibility(ImageView.VISIBLE);
+		}
 	}
 
 	@Override

@@ -20,6 +20,7 @@ import android.util.SparseArray;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
@@ -93,13 +94,20 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 
 	@OptionsItem(R.id.menu_check)
 	void checkMenuItemClicked() {
-		// save data
+		// validate and save data
+		boolean isValidated = true;
 		for (int i = 0; i < mViewPagerAdapter.getCount(); i++) {
 			IssueReportFragment fragment = (IssueReportFragment) mViewPagerAdapter
 					.getRegisteredFragment(i);
 			if (fragment != null) {
-				fragment.validateAndSaveData();
+				if (!fragment.validateAndSaveData()) {
+					isValidated = false;
+				}
 			}
+		}
+		if (!isValidated) {
+			Toast.makeText(this, getString(R.string.issue_details_missing_warning), Toast.LENGTH_LONG).show();
+			return;
 		}
 
 		// save db records

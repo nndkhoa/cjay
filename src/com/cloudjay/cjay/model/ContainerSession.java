@@ -7,10 +7,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -19,19 +17,16 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.CameraActivity_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
-import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DatabaseHelper;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.Session;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
 import com.j256.ormlite.field.DatabaseField;
@@ -70,8 +65,6 @@ public class ContainerSession implements Parcelable {
 	public static final String FIELD_LOCAL = "on_local";
 	public static final String FIELD_FIXED = "fixed";
 
-	public static final String FIELD_AUDITOR_VALIDATION_UPLOAD = "auditor_validation_upload";
-
 	public static final int STATE_UPLOAD_COMPLETED = 4;
 	public static final int STATE_UPLOAD_ERROR = 3;
 	public static final int STATE_UPLOAD_IN_PROGRESS = 2;
@@ -109,9 +102,6 @@ public class ContainerSession implements Parcelable {
 
 	@DatabaseField(columnName = FIELD_FIXED, defaultValue = "false")
 	boolean fixed;
-
-	@DatabaseField(columnName = FIELD_AUDITOR_VALIDATION_UPLOAD, defaultValue = "false")
-	boolean auditorUploadValidation;
 
 	@DatabaseField(columnName = FIELD_UPLOAD_CONFIRMATION, defaultValue = "false", index = true)
 	private boolean uploadConfirmation;
@@ -218,24 +208,13 @@ public class ContainerSession implements Parcelable {
 			String uuid = UUID.randomUUID().toString();
 			this.setCheckInTime(checkInTime);
 			this.setUuid(uuid);
-
-			// Validate container for uploading in auditor view
-			// this.setAuditorUploadValidation(ContainerSession.validateAuditorContainerSessionForUpload(this));
-
+			
 			if (null != container)
 				this.setContainer(container);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public boolean getAuditorUploadValidation() {
-		return auditorUploadValidation;
-	}
-
-	public void setAuditorUploadValidation(boolean auditorUploadValidation) {
-		this.auditorUploadValidation = auditorUploadValidation;
 	}
 
 	public String getUuid() {

@@ -67,12 +67,13 @@ public class IssueReportDimensionFragment extends IssueReportFragment {
 	}
 
 	@Override
-	public void validateAndSaveData() {
+	public boolean validateAndSaveData() {
 		// save data
 		mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_LENGTH,
 				mLengthEditText.getText().toString());
 		mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_HEIGHT,
 				mHeightEditText.getText().toString());
+		return true;
 	}
 	
 	@Override

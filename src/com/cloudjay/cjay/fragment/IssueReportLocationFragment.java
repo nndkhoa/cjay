@@ -133,14 +133,20 @@ public class IssueReportLocationFragment extends IssueReportFragment
 	}
 
 	@Override
-	public void validateAndSaveData() {
+	public boolean validateAndSaveData() {
 		// save location code
 		String locationCode = new StringBuilder()
 			.append(mLocationCodes[0]).append(mLocationCodes[1])
 			.append(mLocationCodes[2]).append(mLocationCodes[3]).toString();
 		if (locationCode.length() == 4) {
-			mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_LOCATION_CODE, locationCode);			
-		}	
+			mCode3EditText.setError(null);	
+			mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_LOCATION_CODE, locationCode);
+			return true;
+			
+		} else {
+			mCode3EditText.setError(getString(R.string.issue_code_missing_warning));	
+			return false;			
+		}
 	}
 	
 	@Override

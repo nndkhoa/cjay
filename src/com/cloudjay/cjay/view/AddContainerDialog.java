@@ -36,6 +36,7 @@ public class AddContainerDialog extends SherlockDialogFragment {
 	private String mOperatorName;
 	private int mMode;
 	private Fragment mParent;
+	public boolean isOperatorRequired = true;
 
 	EditText mContainerEditText;
 	EditText mOperatorEditText;
@@ -57,7 +58,7 @@ public class AddContainerDialog extends SherlockDialogFragment {
 	public void setParent(Fragment parent) {
 		mParent = parent;
 	}
-
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -115,7 +116,7 @@ public class AddContainerDialog extends SherlockDialogFragment {
 				
 				if (TextUtils.isEmpty(mContainerId)) {
 					mContainerEditText.setError(getString(R.string.dialog_container_id_required));
-				} else if (TextUtils.isEmpty(mOperatorName)) {
+				} else if (isOperatorRequired && TextUtils.isEmpty(mOperatorName)) {
 					mOperatorEditText.setError(getString(R.string.dialog_container_owner_required));
 				} else {
 					mCallback = (AddContainerDialogListener) getActivity();
