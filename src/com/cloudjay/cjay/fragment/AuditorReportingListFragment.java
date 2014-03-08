@@ -42,7 +42,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.view.Menu;
-import com.cloudjay.cjay.AuditorContainerActivity_;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
@@ -344,6 +344,7 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 
 	@Click(R.id.add_button)
 	void addButtonClicked() {
+		
 		// show add container dialog
 		String containerId;
 		if (!TextUtils.isEmpty(mSearchEditText.getText().toString())) {

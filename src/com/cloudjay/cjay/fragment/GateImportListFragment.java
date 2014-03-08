@@ -53,8 +53,6 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.view.AddContainerDialog;
-import com.j256.ormlite.support.DatabaseConnection;
-
 import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_gate_import)
