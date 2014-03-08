@@ -31,7 +31,6 @@ import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
-import com.google.android.gms.internal.ca;
 import com.j256.ormlite.stmt.PreparedQuery;
 
 import de.greenrobot.event.EventBus;
@@ -318,7 +317,7 @@ public class DataCenter {
 		// " FROM cjay_image JOIN csview ON cjay_image.containerSession_id = csview._id"
 		// + " WHERE cjay_image.type = 2)";
 
-		String queryString = "SELECT cs.* FROM csiview AS cs"
+		String queryString = "SELECT cs.* FROM csi_auditor_validation_view AS cs"
 				+ " WHERE cs.upload_confirmation = 0 AND cs._id NOT IN ("
 				+ " SELECT container_session._id"
 				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
@@ -329,7 +328,7 @@ public class DataCenter {
 	}
 
 	public Cursor getReportingContainerSessionCursor(Context context) {
-		String queryString = "SELECT cs.* FROM csiview AS cs"
+		String queryString = "SELECT cs.* FROM csi_auditor_validation_view AS cs"
 				+ " WHERE cs.upload_confirmation = 0 AND cs._id IN ("
 				+ " SELECT container_session._id"
 				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
@@ -373,7 +372,7 @@ public class DataCenter {
 	public Cursor filterNotReportedCursor(Context context,
 			CharSequence constraint) {
 
-		String queryString = "SELECT cs.* FROM csiview AS cs"
+		String queryString = "SELECT cs.* FROM csi_auditor_validation_view AS cs"
 				+ " WHERE cs.upload_confirmation = 0 AND cs._id NOT IN "
 				+ " (SELECT container_session._id"
 				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
@@ -385,7 +384,7 @@ public class DataCenter {
 
 	public Cursor filterReportingCursor(Context context, CharSequence constraint) {
 
-		String queryString = "SELECT cs.* FROM csiview AS cs"
+		String queryString = "SELECT cs.* FROM csi_auditor_validation_view AS cs"
 				+ " WHERE cs.upload_confirmation = 0 AND cs._id IN "
 				+ " (SELECT container_session._id"
 				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"

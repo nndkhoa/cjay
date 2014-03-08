@@ -13,6 +13,7 @@ import org.droidparts.widget.ClearableEditText.Listener;
 import android.app.Activity;
 import android.content.Context;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ListView;
@@ -112,9 +113,16 @@ public class IssueReportComponentFragment extends IssueReportFragment  {
 	}
 
 	@Override
-	public void validateAndSaveData() {
-		// save data
-		mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_COMPONENT_CODE, mComponentCode);		
+	public boolean validateAndSaveData() {
+		if (!TextUtils.isEmpty(mComponentCode)) {
+			mComponentEditText.setError(null);
+			mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_COMPONENT_CODE, mComponentCode);
+			return true;
+			
+		} else {
+			mComponentEditText.setError(getString(R.string.issue_code_missing_warning));	
+			return false;
+		}
 	}
 	
 	@Override

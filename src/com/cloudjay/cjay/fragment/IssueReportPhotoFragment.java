@@ -34,7 +34,8 @@ public class IssueReportPhotoFragment extends IssueReportFragment {
 	}
 
 	@Override
-	public void validateAndSaveData() {
+	public boolean validateAndSaveData() {
+		return true;
 	}
 
 	@Override
