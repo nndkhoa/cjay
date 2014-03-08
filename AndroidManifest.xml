@@ -3,7 +3,7 @@
     package="com.cloudjay.cjay"
     android:installLocation="auto"
     android:versionCode="1"
-    android:versionName="1.0.5.1" >
+    android:versionName="1.0.6" >
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -114,7 +114,8 @@
         </activity>
         <activity
             android:name="com.cloudjay.cjay.SplashScreenActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
+            android:theme="@android:style/Theme.NoTitleBar" 
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -175,7 +175,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
-			Logger.Log(LOG_TAG, "onPictureTaken");
+			// Logger.Log(LOG_TAG, "onPictureTaken");
 
 			savePhoto(data);
 			camera.startPreview();
@@ -200,7 +200,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 					shootMediaPlayer.start();
 			}
 
-			Logger.Log(LOG_TAG, "onShutter");
+			// Logger.Log(LOG_TAG, "onShutter");
 		}
 	};
 
@@ -234,13 +234,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			containerSession = containerSessionDaoImpl
 					.queryForId(containerSessionUUID);
 
-			// TODO: xử lý container session
-			if (null != containerSession) {
-
-			} else {
-
-			}
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -266,19 +259,19 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			if (!cameraConfigured) {
 
-				Logger.Log(LOG_TAG, "config Camera");
+				// Logger.Log(LOG_TAG, "config Camera");
 
 				Camera.Parameters parameters = camera.getParameters();
 				Camera.Size size = determineBestPreviewSize(parameters);
 				Camera.Size pictureSize = determineBestPictureSize(parameters);
 
-				Logger.Log(LOG_TAG,
-						"PreviewSize: " + Integer.toString(size.width) + "/"
-								+ Integer.toString(size.height));
-
-				Logger.Log(LOG_TAG,
-						"PictureSize: " + Integer.toString(pictureSize.width)
-								+ "/" + Integer.toString(pictureSize.height));
+				// Logger.Log(LOG_TAG,
+				// "PreviewSize: " + Integer.toString(size.width) + "/"
+				// + Integer.toString(size.height));
+				//
+				// Logger.Log(LOG_TAG,
+				// "PictureSize: " + Integer.toString(pictureSize.width)
+				// + "/" + Integer.toString(pictureSize.height));
 
 				try {
 					if (size != null && pictureSize != null) {
@@ -292,12 +285,12 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 						parameters
 								.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
 
-						List<String> modes = parameters
-								.getSupportedFocusModes();
+						// List<String> modes = parameters
+						// .getSupportedFocusModes();
 
-						for (String string : modes) {
-							Logger.Log(LOG_TAG, string);
-						}
+						// for (String string : modes) {
+						// Logger.Log(LOG_TAG, string);
+						// }
 
 						// parameters
 						// setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
@@ -571,22 +564,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Click({ R.id.btn_camera_done, R.id.btn_back, R.id.rl_camera_done })
 	void doneButtonClicked() {
-
 		Logger.Log(LOG_TAG,
 				"doneButtonClicked(). Ready to update Container Session.");
-
-		// try {
-		//
-		// ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-		// .getInstance().getDatabaseManager().getHelper(this)
-		// .getContainerSessionDaoImpl();
-		//
-		// containerSessionDaoImpl.addContainerSession(containerSession);
-		//
-		// } catch (SQLException e) {
-		// e.printStackTrace();
-		// }
-
 		this.onBackPressed();
 	}
 
@@ -742,7 +721,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	@Click(R.id.btn_toggle_flash)
 	void toggleFlashButtonClicked() {
 
-		Logger.Log(LOG_TAG, "toggleFlashButtonClicked()");
+		// Logger.Log(LOG_TAG, "toggleFlashButtonClicked()");
 
 		if (inPreview && camera != null) {
 			Parameters params = camera.getParameters();
@@ -778,51 +757,45 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Click(R.id.btn_capture)
 	void captureButtonClicked() {
-		Logger.Log(LOG_TAG, "captureButtonClicked()");
+		// Logger.Log(LOG_TAG, "captureButtonClicked()");
 		takePicture();
 	}
 
 	@Background
 	void takePicture() {
-		if (inPreview) {
 
-			try {
-				Logger.Log(LOG_TAG, "Prepare to take picture");
-				Camera.Parameters cameraParameters = camera.getParameters();
+		// if (inPreview) {
 
-				List<String> supportedFocusMode = cameraParameters
-						.getSupportedFocusModes();
-				for (String mode : supportedFocusMode) {
-					Logger.Log(TAG, "Camera supports Focus Mode: " + mode);
-				}
+		try {
+			// Logger.Log(LOG_TAG, "Prepare to take picture");
+			Camera.Parameters cameraParameters = camera.getParameters();
 
-				// Submit focus area to camera
-				if (supportedFocusMode
-						.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
-					cameraParameters
-							.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-					camera.setParameters(cameraParameters);
-					camera.autoFocus(this);
-				} else {
-					Logger.Log(TAG,
-							"No auto focus mode supported, now just take picture");
-					camera.takePicture(shutterCallback, null, photoCallback);
-				}
+			List<String> supportedFocusMode = cameraParameters
+					.getSupportedFocusModes();
 
-				inPreview = false;
+			// for (String mode : supportedFocusMode) {
+			// Logger.Log(TAG, "Camera supports Focus Mode: " + mode);
+			// }
 
-			} catch (Exception e) {
-				e.printStackTrace();
+			// Submit focus area to camera
+			if (supportedFocusMode.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+				cameraParameters
+						.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+				camera.setParameters(cameraParameters);
+				camera.autoFocus(this);
+			} else {
+				Logger.Log(TAG,
+						"No auto focus mode supported, now just take picture");
+				camera.takePicture(shutterCallback, null, photoCallback);
 			}
-		}
-	}
 
-	PictureCallback rawCallback = new PictureCallback() {
-		@Override
-		public void onPictureTaken(byte[] data, Camera camera) {
-			Logger.Log(LOG_TAG, "rawCallback");
+			inPreview = false;
+
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-	};
+		// }
+	}
 
 	public static void setCameraDisplayOrientation(Activity activity,
 			int cameraId, android.hardware.Camera camera) {
@@ -891,7 +864,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Override
 	public void onAutoFocus(boolean arg0, Camera arg1) {
-		Logger.Log(TAG, "Auto focused, now take picture");
+		// Logger.Log(TAG, "Auto focused, now take picture");
 		camera.takePicture(shutterCallback, null, photoCallback);
 	}
 

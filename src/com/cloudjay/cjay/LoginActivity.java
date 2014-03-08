@@ -269,7 +269,7 @@ public class LoginActivity extends CJayActivity {
 				e.printStackTrace();
 				showCrouton(R.string.alert_try_again);
 				cancel(isFinishing());
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 				showCrouton(R.string.alert_try_again);
