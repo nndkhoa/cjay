@@ -9,6 +9,7 @@ import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ItemLongClick;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.ViewById;
 
 import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
@@ -73,6 +74,9 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 	private ContainerSession mSelectedContainerSession = null;
 	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
 	private int mItemLayout = R.layout.list_item_container;
+
+	@SystemService
+	InputMethodManager inputMethodManager;
 
 	@ViewById(R.id.ll_empty_element)
 	LinearLayout mEmptyElement;
@@ -148,20 +152,20 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 
 		mSearchEditText
 				.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+					
 					@Override
 					public boolean onEditorAction(TextView textView, int id,
 							KeyEvent keyEvent) {
 						if (id == EditorInfo.IME_ACTION_SEARCH) {
-							// hide keyboard
-							InputMethodManager imm = (InputMethodManager) getActivity()
-									.getSystemService(
-											Context.INPUT_METHOD_SERVICE);
-							imm.hideSoftInputFromWindow(
+
+							inputMethodManager.hideSoftInputFromWindow(
 									mSearchEditText.getWindowToken(), 0);
+
 							return true;
 						}
 						return false;
 					}
+					
 				});
 
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
@@ -182,6 +186,9 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 					((GateContainerCursorAdapter) mFeedListView.getAdapter())
 							.notifyDataSetChanged();
 				}
+
+				inputMethodManager.hideSoftInputFromWindow(
+						mSearchEditText.getWindowToken(), 0);
 			}
 
 			@Override
