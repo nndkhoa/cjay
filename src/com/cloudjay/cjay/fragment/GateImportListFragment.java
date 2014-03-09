@@ -39,6 +39,7 @@ import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateContainerCursorAdapter;
+import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
@@ -49,10 +50,12 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.DatabaseHelper;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.view.AddContainerDialog;
+
 import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_gate_import)
@@ -199,6 +202,37 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 		getActivity().supportInvalidateOptionsMenu();
 	}
 
+	@OptionsItem(R.id.menu_trash)
+	void trashMenuItemSelected() {
+		if (mSelectedContainerSession != null && mSelectedContainerSession.isOnLocal()) {
+			try {
+				// delete selected container session from database
+				DatabaseHelper databaseHelper = CJayClient.getInstance()
+						.getDatabaseManager().getHelper(getActivity());
+				ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper
+						.getContainerSessionDaoImpl();
+				CJayImageDaoImpl cJayImageDaoImpl = databaseHelper
+						.getCJayImageDaoImpl();
+				
+				// delete images from database
+				for (CJayImage cJayImage : mSelectedContainerSession.getCJayImages()) {
+					mSelectedContainerSession.getCJayImages().remove(cJayImage);
+					cJayImageDaoImpl.delete(cJayImage);
+				}
+				
+				// delete container session from database
+				containerSessionDaoImpl.delete(mSelectedContainerSession);
+				
+				EventBus.getDefault().post(new ContainerSessionChangedEvent(mSelectedContainerSession));
+				
+				hideMenuItems();
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}	
+	
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 		try {
@@ -274,6 +308,7 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 		menu.findItem(R.id.menu_camera).setVisible(isDisplayed);
 		menu.findItem(R.id.menu_edit_container).setVisible(isDisplayed);
 		menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
+		menu.findItem(R.id.menu_trash).setVisible(isDisplayed);
 	}
 
 	@Override

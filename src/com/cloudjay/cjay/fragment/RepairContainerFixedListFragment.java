@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.fragment;
 
 import java.sql.SQLException;
+
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
@@ -12,7 +13,6 @@ import org.androidannotations.annotations.ViewById;
 import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
-
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -23,14 +23,15 @@ import android.support.v4.content.Loader;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.FilterQueryProvider;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.FilterQueryProvider;
+import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.CJayActivity;
+import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.RepairContainerActivity_;
 import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerRepairedEvent;
@@ -42,6 +43,7 @@ import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
+
 import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_repair_container_fixed)
