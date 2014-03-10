@@ -30,6 +30,7 @@ import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
+import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -50,6 +51,7 @@ import de.keyboardsurfer.android.widget.crouton.Style;
 @OptionsMenu(R.menu.menu_auditor_container)
 public class AuditorContainerActivity extends CJayActivity {
 
+	private static final String LOG_TAG = "AuditorContainerActivity";
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
 
 	private ArrayList<CJayImage> mFeeds;
@@ -58,6 +60,7 @@ public class AuditorContainerActivity extends CJayActivity {
 	private CJayImage mSelectedCJayImage;
 	private CJayImage mLongClickedCJayImage;
 	private ImageLoader imageLoader;
+	private int mNewImageCount;
 
 	@ViewById(R.id.btn_add_new)
 	ImageButton mAddButton;
@@ -76,6 +79,7 @@ public class AuditorContainerActivity extends CJayActivity {
 		initImageFeedAdapter(null);
 		mLongClickedCJayImage = null;
 		mSelectedCJayImage = null;
+		mNewImageCount = 0;
 	}
 
 	@ItemClick(R.id.feeds)
@@ -110,10 +114,12 @@ public class AuditorContainerActivity extends CJayActivity {
 
 	@Click(R.id.btn_add_new)
 	void cameraClicked() {
+		mNewImageCount = 0;
 		Intent intent = new Intent(this, CameraActivity_.class);
 		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
 				mContainerSession.getUuid());
 		intent.putExtra("type", CJayImage.TYPE_REPORT);
+		intent.putExtra("tag", LOG_TAG);
 		startActivity(intent);
 	}
 
@@ -223,7 +229,17 @@ public class AuditorContainerActivity extends CJayActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		refresh();
+		
+		if (mNewImageCount > 1) {
+			// when more than one images were taken continuously,
+			// then go back to container list
+			mNewImageCount = 0;
+			this.onBackPressed();
+			
+		} else {
+			// otherwise refresh the image list
+			refresh();
+		}
 	}
 
 	public void refresh() {
@@ -366,5 +382,11 @@ public class AuditorContainerActivity extends CJayActivity {
 		mFeedsAdapter = new FunDapter<CJayImage>(this, containers,
 				R.layout.list_item_issue, feedsDict);
 		mFeedListView.setAdapter(mFeedsAdapter);
+	}
+	
+	public void onEvent(CJayImageAddedEvent event) {
+		if (event.getTag().equals(LOG_TAG)) {
+			mNewImageCount++;
+		}
 	}
 }
