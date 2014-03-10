@@ -1,6 +1,8 @@
 package com.cloudjay.cjay.receivers;
 
 import java.io.IOException;
+
+import org.androidannotations.annotations.EReceiver;
 import org.json.JSONException;
 
 import android.content.BroadcastReceiver;
@@ -17,6 +19,7 @@ import com.cloudjay.cjay.util.Session;
 import com.cloudjay.cjay.util.Utils;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+@EReceiver
 public class UpdateReceiver extends BroadcastReceiver {
 
 	GoogleCloudMessaging gcm;

@@ -39,12 +39,15 @@
     <application
         android:name="com.cloudjay.cjay.CJayApplication_"
         android:allowBackup="true"
+        android:allowClearUserData="true"
+        android:enabled="true"
         android:icon="@drawable/ic_app"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:logo="@drawable/ic_app_circle"
-        android:theme="@style/AppTheme" android:largeHeap="true" android:allowClearUserData="true" android:enabled="true">
+        android:theme="@style/AppTheme" >
         <receiver
-            android:name="com.cloudjay.cjay.receivers.GcmBroadcastReceiver"
+            android:name="com.cloudjay.cjay.receivers.GcmBroadcastReceiver_"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
 
@@ -140,19 +143,19 @@
         <service android:name="com.cloudjay.cjay.service.GcmIntentService_" />
 
         <receiver
-            android:name="com.cloudjay.cjay.receivers.ConnectionChangeReceiver"
+            android:name="com.cloudjay.cjay.receivers.ConnectionChangeReceiver_"
             android:label="ConnectionChangeReceiver" >
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.cloudjay.cjay.receivers.AutoStartReceiver" >
+        <receiver android:name="com.cloudjay.cjay.receivers.AutoStartReceiver_" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.cloudjay.cjay.receivers.UpdateReceiver" >
+        <receiver android:name="com.cloudjay.cjay.receivers.UpdateReceiver_" >
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
 
@@ -161,7 +164,7 @@
                     android:scheme="package" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.cloudjay.cjay.receivers.InstantUploadReceiver" >
+        <receiver android:name="com.cloudjay.cjay.receivers.InstantUploadReceiver_" >
             <intent-filter>
                 <action android:name="com.android.camera.NEW_PICTURE" />
                 <action android:name="android.hardware.action.NEW_PICTURE" />

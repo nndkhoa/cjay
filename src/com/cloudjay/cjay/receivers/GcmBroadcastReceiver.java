@@ -1,5 +1,7 @@
 package com.cloudjay.cjay.receivers;
 
+import org.androidannotations.annotations.EReceiver;
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -7,6 +9,7 @@ import android.content.Intent;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import com.cloudjay.cjay.service.GcmIntentService_;
 
+@EReceiver
 public class GcmBroadcastReceiver extends WakefulBroadcastReceiver {
 
 	@Override

@@ -1,5 +1,7 @@
 package com.cloudjay.cjay.receivers;
 
+import org.androidannotations.annotations.EReceiver;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +15,7 @@ import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 
+@EReceiver
 public class InstantUploadReceiver extends BroadcastReceiver {
 
 	static final String KEY_LAST_UPLOADED = "last_uploaded_uri";

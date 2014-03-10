@@ -1,5 +1,7 @@
 package com.cloudjay.cjay.receivers;
 
+import org.androidannotations.annotations.EReceiver;
+
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -10,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
+@EReceiver
 public class ConnectionChangeReceiver extends BroadcastReceiver {
 
 	@Override
