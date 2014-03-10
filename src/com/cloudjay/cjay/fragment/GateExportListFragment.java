@@ -16,6 +16,7 @@ import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefresh
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
+import android.R.integer;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
@@ -76,6 +77,7 @@ public class GateExportListFragment extends SherlockFragment implements
 	private ContainerSession mSelectedContainerSession = null;
 	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
 	private int mItemLayout = R.layout.list_item_container;
+	private int mCurrentPosition = -1;
 
 	@SystemService
 	InputMethodManager inputMethodManager;
@@ -254,9 +256,11 @@ public class GateExportListFragment extends SherlockFragment implements
 	}
 
 	void hideMenuItems() {
+
 		mSelectedContainerSession = null;
 		mFeedListView.setItemChecked(-1, true);
 		getActivity().supportInvalidateOptionsMenu();
+
 	}
 
 	@OptionsItem(R.id.menu_upload)
@@ -319,19 +323,22 @@ public class GateExportListFragment extends SherlockFragment implements
 	@ItemClick(R.id.container_list)
 	void listItemClicked(int position) {
 
+		mCurrentPosition = position;
+		mFeedListView.setItemChecked(mCurrentPosition, true);
+
 		// clear current selection
 		hideMenuItems();
 
 		// get the selected container session and open camera
-		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
+		Cursor cursor = (Cursor) cursorAdapter.getItem(mCurrentPosition);
 		String uuidString = cursor.getString(cursor
 				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
-		ContainerSession containerSession;
-		try {
 
-			containerSession = containerSessionDaoImpl.findByUuid(uuidString);
-			CJayApplication.gotoCamera(getActivity(), containerSession,
-					CJayImage.TYPE_EXPORT, LOG_TAG);
+		try {
+			mSelectedContainerSession = containerSessionDaoImpl
+					.findByUuid(uuidString);
+			CJayApplication.gotoCamera(getActivity(),
+					mSelectedContainerSession, CJayImage.TYPE_EXPORT, LOG_TAG);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -340,6 +347,7 @@ public class GateExportListFragment extends SherlockFragment implements
 
 	@ItemLongClick(R.id.container_list)
 	void listItemLongClicked(int position) {
+
 		// refresh highlighting and menu
 		mFeedListView.setItemChecked(position, true);
 
@@ -469,6 +477,13 @@ public class GateExportListFragment extends SherlockFragment implements
 
 	@Override
 	public void onResume() {
+
+		if (mSelectedContainerSession != null) {
+
+			mFeedListView.setItemChecked(mCurrentPosition, true);
+			Logger.d(mSelectedContainerSession.getContainerId());
+
+		}
 
 		if (cursorAdapter != null) {
 			refresh();
