@@ -1,6 +1,5 @@
 package com.cloudjay.cjay.network;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
@@ -187,6 +186,7 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 		headers.put("Content-Type", "text/plain; charset=utf-8");
 		Iterator<Entry<String, String>> iterator = headers.entrySet()
 				.iterator();
+
 		while (iterator.hasNext()) {
 			Map.Entry<String, String> pairs = (Map.Entry<String, String>) iterator
 					.next();
@@ -195,19 +195,21 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 			httpGet.setHeader(Key, value);
 		}
 
-		try {
-			response = httpClient.execute(httpGet);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-
 		String ret = null;
 		try {
+			response = httpClient.execute(httpGet);
+			int responseCode = response.getStatusLine().getStatusCode();
+
+			if (responseCode == HttpStatus.SC_FORBIDDEN) {
+				// Log user out
+				Logger.Log(LOG_TAG, "Token was expired.", Log.ERROR);
+			}
+
 			ret = EntityUtils.toString(response.getEntity(), HTTP.UTF_8);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		return ret;
 	}
 }
