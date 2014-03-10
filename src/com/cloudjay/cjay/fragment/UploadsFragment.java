@@ -36,11 +36,12 @@ import de.greenrobot.event.EventBus;
 public class UploadsFragment extends CJaySherlockFragment implements
 		OnDismissCallback, OnItemClickListener {
 
-	private static final String LOG_TAG = "UploadsFragment";
-
 	private UploadsListBaseAdapter mAdapter;
 	ContainerSessionDaoImpl containerSessionDaoImpl = null;
 	List<ContainerSession> listContainerSessions = null;
+
+	public UploadsFragment() {
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -95,22 +96,21 @@ public class UploadsFragment extends CJaySherlockFragment implements
 	}
 
 	public void onItemClick(AdapterView<?> l, View view, int position, long id) {
-		Logger.Log(LOG_TAG,
-				"onItemClick at index: " + Integer.toString(position));
+		Logger.Log("onItemClick at index: " + Integer.toString(position));
 	}
 
 	public void onEvent(ContainerSessionEnqueueEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerSessionEnqueueEvent");
+		Logger.Log("onEvent ContainerSessionEnqueueEvent");
 		updateUI();
 	}
 
 	public void onEvent(ContainerSessionUploadedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerSessionUploadedEvent");
+		Logger.Log("onEvent ContainerSessionUploadedEvent");
 		updateUI();
 	}
 
 	// public void onEvent(UploadStateChangedEvent event) {
-	// Logger.Log(LOG_TAG, "onEvent UploadStateChangedEvent");
+	// Logger.Log( "onEvent UploadStateChangedEvent");
 	// updateUI();
 	// }
 
@@ -125,7 +125,7 @@ public class UploadsFragment extends CJaySherlockFragment implements
 
 	@OptionsItem(R.id.menu_clear_uploaded)
 	void clearUploadsMenuItemSelected() {
-		Logger.Log(LOG_TAG, "Menu clear upload items clicked");
+		Logger.Log("Menu clear upload items clicked");
 
 		for (ContainerSession containerSession : listContainerSessions) {
 			try {
@@ -143,7 +143,7 @@ public class UploadsFragment extends CJaySherlockFragment implements
 	}
 
 	public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
-		Logger.Log(LOG_TAG, "onSwipeDismiss");
+		Logger.Log("onSwipeDismiss");
 
 		// set item Cleared = true then call updateUI()
 		try {

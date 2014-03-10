@@ -20,7 +20,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.Fragment.SavedState;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -48,7 +47,6 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 @EApplication
 public class CJayApplication extends Application {
 
-	private static final String LOG_TAG = "CJayApplication";
 	static final float EXECUTOR_POOL_SIZE_PER_CORE = 1.5f;
 	public static final String THREAD_FILTERS = "filters_thread";
 
@@ -70,54 +68,16 @@ public class CJayApplication extends Application {
 		return (CJayApplication) context.getApplicationContext();
 	}
 
-	public static void gotoCamera(Context ctx,
-			ContainerSession containerSession, int imageType, String activityTag) {
-
-		Intent intent = new Intent(ctx, CameraActivity_.class);
-		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-				containerSession.getUuid());
-		intent.putExtra("type", imageType);
-
-		if (activityTag != null && !TextUtils.isEmpty(activityTag)) {
-			intent.putExtra("tag", activityTag);
-		}
-
-		ctx.startActivity(intent);
-	}
-
-	public static void startCJayHomeActivity(Context context) {
-
-		Logger.Log(LOG_TAG, "start CJayHome Activity");
-		int userRole = ((CJayActivity) context).getCurrentUser().getRole();
-
-		Intent intent = null;
-		switch (userRole) {
-		case 1: // Giám định
-			intent = new Intent(context, AuditorHomeActivity_.class);
-			break;
-
-		case 4: // Sửa chữa
-			intent = new Intent(context, RepairHomeActivity_.class);
-			break;
-
-		case 6: // Cổng
-		default:
-			intent = new Intent(context, GateHomeActivity_.class);
-			break;
-		}
-		context.startActivity(intent);
-	}
-
 	@Override
 	public void onCreate() {
-		// Configure Logger
-		Logger.PRODUCTION_MODE = false;
 
-		Logger.Log(LOG_TAG, "Start Application");
+		Logger.Log("Start Application");
+
+		// Configure Logger
+		Logger.getInstance().setDebuggable(true);
 		savedStateMap = new HashMap<String, Fragment.SavedState>();
 
 		super.onCreate();
-
 		databaseManager = new DatabaseManager();
 		httpRequestWrapper = new HttpRequestWrapper();
 
@@ -125,16 +85,15 @@ public class CJayApplication extends Application {
 				.cacheInMemory(true).cacheOnDisc(true)
 				.bitmapConfig(Bitmap.Config.RGB_565)
 				.imageScaleType(ImageScaleType.IN_SAMPLE_INT)
-				// .displayer(new FadeInBitmapDisplayer(300))
-				.build();
+				.showImageOnLoading(R.drawable.ic_app)
+				.showImageOnFail(R.drawable.ic_app)
+				.showImageForEmptyUri(R.drawable.ic_app).build();
 
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
 				getApplicationContext())
 				.defaultDisplayImageOptions(defaultOptions)
-				.memoryCacheSize(41943040).discCacheSize(104857600)
-				.memoryCache(new WeakMemoryCache()).threadPoolSize(3)
-				// .discCacheExtraOptions(1024, 1024, CompressFormat.PNG, 100,
-				// null)
+				.discCacheSize(100 * 1024 * 1024)
+				.memoryCache(new WeakMemoryCache()).threadPoolSize(2)
 				.threadPriority(Thread.MAX_PRIORITY).build();
 
 		ACRA.init(CJayApplication.this);
@@ -153,18 +112,59 @@ public class CJayApplication extends Application {
 
 		// Configure Alarm Manager
 		if (!Utils.isAlarmUp(getApplicationContext())) {
-			Logger.Log(LOG_TAG, "Alarm Manager is not running.");
+			Logger.Log("Alarm Manager is not running.");
 			Utils.startAlarm(getApplicationContext());
 		}
 
 		if (NetworkHelper.isConnected(this)) {
-
 			PreferencesUtil.storePrefsValue(this,
 					PreferencesUtil.PREF_NO_CONNECTION, false);
 		} else {
 			PreferencesUtil.storePrefsValue(this,
 					PreferencesUtil.PREF_NO_CONNECTION, true);
 		}
+	}
+
+	public static void gotoCamera(Context ctx,
+			ContainerSession containerSession, int imageType, String activityTag) {
+
+		Intent intent = new Intent(ctx, CameraActivity_.class);
+		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+				containerSession.getUuid());
+		intent.putExtra("type", imageType);
+
+		if (activityTag != null && !TextUtils.isEmpty(activityTag)) {
+			intent.putExtra("tag", activityTag);
+		}
+
+		ctx.startActivity(intent);
+	}
+
+	public static void startCJayHomeActivity(Context context) {
+
+		/**
+		 * Gate: 6 | Audit: 1 | Repair: 4
+		 */
+
+		Logger.Log("start CJayHome Activity");
+		int userRole = ((CJayActivity) context).getCurrentUser().getRole();
+
+		Intent intent = null;
+		switch (userRole) {
+		case 1:
+			intent = new Intent(context, AuditorHomeActivity_.class);
+			break;
+
+		case 4:
+			intent = new Intent(context, RepairHomeActivity_.class);
+			break;
+
+		case 6:
+		default:
+			intent = new Intent(context, GateHomeActivity_.class);
+			break;
+		}
+		context.startActivity(intent);
 	}
 
 	public void checkInstantUploadReceiverState() {
@@ -184,7 +184,7 @@ public class CJayApplication extends Application {
 						PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
 						PackageManager.DONT_KILL_APP);
 				if (Flags.DEBUG) {
-					Log.d(LOG_TAG, "Enabled Instant Upload Receiver");
+					Logger.d("Enabled Instant Upload Receiver");
 				}
 			}
 			break;
@@ -196,7 +196,7 @@ public class CJayApplication extends Application {
 						PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
 						PackageManager.DONT_KILL_APP);
 				if (Flags.DEBUG) {
-					Log.d(LOG_TAG, "Disabled Instant Upload Receiver");
+					Logger.d("Disabled Instant Upload Receiver");
 				}
 			}
 			break;

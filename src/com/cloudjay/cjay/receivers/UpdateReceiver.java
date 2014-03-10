@@ -19,14 +19,13 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 public class UpdateReceiver extends BroadcastReceiver {
 
-	protected static final String LOG_TAG = "UpdateReceiver";
 	GoogleCloudMessaging gcm;
 	Context mContext;
 	String regid;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Logger.Log(LOG_TAG, "onReceive()");
+		Logger.Log("onReceive()");
 		mContext = context;
 
 		Session session = Session.restore(context);
@@ -90,7 +89,7 @@ public class UpdateReceiver extends BroadcastReceiver {
 
 			@Override
 			protected void onPostExecute(String msg) {
-				Log.d(LOG_TAG, msg + "\n");
+				Logger.d(msg + "\n");
 			}
 		}.execute(null, null, null);
 	}
@@ -103,9 +102,9 @@ public class UpdateReceiver extends BroadcastReceiver {
 			// When Submit Server Successfully, save it here!.
 			Utils.storeRegistrationId(mContext, regid);
 		} catch (JSONException e) {
-			Log.e(LOG_TAG, "Can't Register device with the Back-end!");
+			Logger.e("Can't Register device with the Back-end!");
 		} catch (NoConnectionException e) {
-			Log.e(LOG_TAG, "No Connection");
+			Logger.e("No Connection");
 			throw e;
 			// showCrouton(R.string.alert_no_network);
 		}

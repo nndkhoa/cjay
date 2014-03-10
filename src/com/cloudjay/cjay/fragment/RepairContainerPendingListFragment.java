@@ -40,6 +40,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
@@ -58,10 +59,9 @@ import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_repair_container_pending)
 @OptionsMenu(R.menu.menu_repair_container_pending)
-public class RepairContainerPendingListFragment extends CJaySherlockFragment
+public class RepairContainerPendingListFragment extends SherlockFragment
 		implements OnRefreshListener, LoaderCallbacks<Cursor> {
 
-	private final static String LOG_TAG = "RepairContainerPendingListFragment";
 	private final static int LOADER_ID = 4;
 
 	private ArrayList<ContainerSession> mSelectedContainerSessions;
@@ -164,7 +164,7 @@ public class RepairContainerPendingListFragment extends CJaySherlockFragment
 			@Override
 			protected Void doInBackground(Void... params) {
 
-				Logger.Log(LOG_TAG, "onRefreshStarted");
+				Logger.Log("onRefreshStarted");
 
 				try {
 					DataCenter.getInstance().fetchData(getActivity());
@@ -346,13 +346,12 @@ public class RepairContainerPendingListFragment extends CJaySherlockFragment
 	@Override
 	public void onResume() {
 
-		Logger.Log(LOG_TAG, "onResume " + LOG_TAG);
 		if (cursorAdapter != null) {
 			refresh();
 		}
 
 		if (DataCenter.getInstance().isUpdating(getActivity()) == false) {
-			Logger.Log(LOG_TAG, "is not updating");
+			Logger.Log("is not updating");
 			mLoadMoreDataLayout.setVisibility(View.GONE);
 		}
 
@@ -410,22 +409,22 @@ public class RepairContainerPendingListFragment extends CJaySherlockFragment
 	}
 
 	public void onEvent(ContainerRepairedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerRepairedEvent");
+		Logger.Log("onEvent ContainerRepairedEvent");
 		refresh();
 	}
 
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerSessionChangedEvent");
+		Logger.Log("onEvent ContainerSessionChangedEvent");
 		refresh();
 	}
 
 	public void onEvent(PreLoadDataEvent event) {
-		Logger.Log(LOG_TAG, "onEvent PreLoadDataEvent");
+		Logger.Log("onEvent PreLoadDataEvent");
 		mLoadMoreDataLayout.setVisibility(View.VISIBLE);
 	}
 
 	public void onEvent(PostLoadDataEvent event) {
-		Logger.Log(LOG_TAG, "onEvent PostLoadDataEvent");
+		Logger.Log("onEvent PostLoadDataEvent");
 		mLoadMoreDataLayout.setVisibility(View.GONE);
 	}
 

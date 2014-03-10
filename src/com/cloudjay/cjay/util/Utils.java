@@ -55,8 +55,6 @@ public class Utils {
 	public static final int MINI_THUMBNAIL_SIZE = 300;
 	public static final int MICRO_THUMBNAIL_SIZE = 96;
 
-	public static final String LOG_TAG = "Utils";
-	private static final String TAG = "GCM_CJAY";
 	private static final String PROPERTY_REG_ID = "registration_id";
 	private static final String PROPERTY_CURRENT_USER_ID = "current_user_id";
 	private static final String PROPERTY_APP_VERSION = "appVersion";
@@ -309,7 +307,7 @@ public class Utils {
 		final SharedPreferences prefs = getGCMPreferences(context);
 		String registrationId = prefs.getString(PROPERTY_REG_ID, "");
 		if (registrationId.isEmpty()) {
-			Log.i(TAG, "Registration not found.");
+			Logger.i("Registration not found.");
 			return "";
 		}
 
@@ -326,7 +324,7 @@ public class Utils {
 		if (registeredVersion != currentVersion
 				|| registeredCurrentUserId != Session.restore(context)
 						.getCurrentUser().getID()) {
-			Log.i(TAG, "App version changed.");
+			Logger.i("App version changed.");
 			return "";
 		}
 		return registrationId;
@@ -371,7 +369,7 @@ public class Utils {
 		final SharedPreferences prefs = getGCMPreferences(context);
 		int appVersion = getAppVersion(context);
 
-		Log.i(TAG, "Saving regId on app version " + appVersion);
+		Logger.i("Saving regId on app version " + appVersion);
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putString(PROPERTY_REG_ID, regId);
 
@@ -385,7 +383,7 @@ public class Utils {
 	}
 
 	public static boolean checkPlayServices(Context context) {
-		Logger.Log(LOG_TAG, "checkPlayServices()");
+		Logger.Log("checkPlayServices()");
 
 		int resultCode = GooglePlayServicesUtil
 				.isGooglePlayServicesAvailable(context);
@@ -437,7 +435,7 @@ public class Utils {
 
 	public static void startAlarm(Context context) {
 
-		Logger.Log(LOG_TAG, "start Alarm Manager");
+		Logger.Log("start Alarm Manager");
 
 		// Making Alarm for Queue Worker
 		Intent intent = new Intent(context, QueueIntentService_.class);
@@ -454,7 +452,7 @@ public class Utils {
 
 	public static void cancelAlarm(Context context) {
 
-		Logger.Log(LOG_TAG, "stop Alarm Manager");
+		Logger.Log("stop Alarm Manager");
 
 		Intent intent = new Intent(context, QueueIntentService_.class);
 		PendingIntent sender = PendingIntent

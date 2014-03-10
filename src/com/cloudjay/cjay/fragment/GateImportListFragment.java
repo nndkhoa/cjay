@@ -33,6 +33,7 @@ import android.widget.Button;
 import android.widget.FilterQueryProvider;
 import android.widget.ListView;
 
+import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.ami.fundapter.FunDapter;
 import com.cloudjay.cjay.CJayActivity;
@@ -60,7 +61,7 @@ import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_gate_import)
 @OptionsMenu(R.menu.menu_gate_import)
-public class GateImportListFragment extends CJaySherlockFragment implements
+public class GateImportListFragment extends SherlockFragment implements
 		OnRefreshListener, LoaderCallbacks<Cursor> {
 
 	private final static String LOG_TAG = "GateImportListFragment";
@@ -82,6 +83,9 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 
 	PullToRefreshLayout mPullToRefreshLayout;
 	GateContainerCursorAdapter cursorAdapter;
+
+	public GateImportListFragment() {
+	}
 
 	@AfterViews
 	void afterViews() {
@@ -181,14 +185,14 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 
 	@OptionsItem(R.id.menu_camera)
 	void cameraMenuItemSelected() {
-		Logger.Log(LOG_TAG, "Menu camera item clicked");
+		Logger.Log("Menu camera item clicked");
 		CJayApplication.gotoCamera(getActivity(), mSelectedContainerSession,
 				CJayImage.TYPE_IMPORT, LOG_TAG);
 	}
 
 	@OptionsItem(R.id.menu_edit_container)
 	void editMenuItemSelected() {
-		Logger.Log(LOG_TAG, "Menu edit item clicked");
+		Logger.Log("Menu edit item clicked");
 
 		// Open dialog for editing details
 		showContainerDetailDialog(mSelectedContainerSession.getContainerId(),
@@ -204,7 +208,8 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 
 	@OptionsItem(R.id.menu_trash)
 	void trashMenuItemSelected() {
-		if (mSelectedContainerSession != null && mSelectedContainerSession.isOnLocal()) {
+		if (mSelectedContainerSession != null
+				&& mSelectedContainerSession.isOnLocal()) {
 			try {
 				// delete selected container session from database
 				DatabaseHelper databaseHelper = CJayClient.getInstance()
@@ -213,32 +218,34 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 						.getContainerSessionDaoImpl();
 				CJayImageDaoImpl cJayImageDaoImpl = databaseHelper
 						.getCJayImageDaoImpl();
-				
+
 				// delete images from database
-				for (CJayImage cJayImage : mSelectedContainerSession.getCJayImages()) {
+				for (CJayImage cJayImage : mSelectedContainerSession
+						.getCJayImages()) {
 					mSelectedContainerSession.getCJayImages().remove(cJayImage);
 					cJayImageDaoImpl.delete(cJayImage);
 				}
-				
+
 				// delete container session from database
 				containerSessionDaoImpl.delete(mSelectedContainerSession);
-				
-				EventBus.getDefault().post(new ContainerSessionChangedEvent(mSelectedContainerSession));
-				
+
+				EventBus.getDefault().post(
+						new ContainerSessionChangedEvent(
+								mSelectedContainerSession));
+
 				hideMenuItems();
-				
+
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
-	}	
-	
+	}
+
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 		try {
 
-			Logger.Log(LOG_TAG, "Menu upload item clicked");
-
+			Logger.Log("Menu upload item clicked");
 			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
 					.getInstance().getDatabaseManager()
 					.getHelper(getActivity()).getContainerSessionDaoImpl();
@@ -278,7 +285,7 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 
 	@ItemClick(R.id.feeds)
 	void listItemClicked(int position) {
-		Logger.Log(LOG_TAG, "Clicked item at position: " + position);
+		Logger.Log("Clicked item at position: " + position);
 		hideMenuItems();
 	}
 
@@ -398,7 +405,7 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 	}
 
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
-		Logger.Log(LOG_TAG, "onEventMainThread ContainerSessionChangedEvent");
+		Logger.Log("ContainerSessionChangedEvent");
 		refresh();
 	}
 
@@ -407,18 +414,14 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 	}
 
 	public void refresh() {
-		Logger.Log(LOG_TAG, "onRefresh");
 		getLoaderManager().restartLoader(LOADER_ID, null, this);
 	}
 
 	@Override
 	public void onResume() {
-		Logger.Log(LOG_TAG, "onResume " + LOG_TAG);
-
 		if (mFeedsAdapter != null) {
 			refresh();
 		}
-
 		super.onResume();
 	}
 
@@ -432,7 +435,7 @@ public class GateImportListFragment extends CJaySherlockFragment implements
 			@Override
 			protected Void doInBackground(Void... params) {
 
-				Logger.Log(LOG_TAG, "onRefreshStarted");
+				Logger.Log("onRefreshStarted");
 
 				try {
 					DataCenter.getInstance().fetchData(getActivity());

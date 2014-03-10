@@ -45,8 +45,6 @@ import de.greenrobot.event.EventBus;
 @OptionsMenu(R.menu.menu_auditor_reported)
 public class AuditorReportedListFragment extends SherlockFragment {
 
-	private final static String LOG_TAG = "AuditorReportedListFragment";
-
 	private ArrayList<ContainerSession> mFeeds;
 	private FunDapter<ContainerSession> mFeedsAdapter;
 	private ContainerSession mSelectedContainerSession;
@@ -89,7 +87,7 @@ public class AuditorReportedListFragment extends SherlockFragment {
 		if (mSelectedContainerSession != null) {
 			try {
 
-				Logger.Log(LOG_TAG, "Menu upload item clicked");
+				Logger.Log("Menu upload item clicked");
 
 				ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
 						.getInstance().getDatabaseManager()
@@ -208,17 +206,17 @@ public class AuditorReportedListFragment extends SherlockFragment {
 	}
 
 	public void onEvent(ContainerSessionEnqueueEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerSessionEnqueueEvent");
+		Logger.Log("onEvent ContainerSessionEnqueueEvent");
 		refresh();
 	}
 
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerSessionChangedEvent");
+		Logger.Log("onEvent ContainerSessionChangedEvent");
 		refresh();
 	}
 
 	public void refresh() {
-		Logger.Log(LOG_TAG, "refresh");
+		Logger.Log("refresh");
 		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
 				.getListReportedContainerSessions(getActivity());
 		mFeedsAdapter.updateData(mFeeds);

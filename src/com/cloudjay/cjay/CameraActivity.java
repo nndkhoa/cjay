@@ -86,7 +86,6 @@ import de.greenrobot.event.EventBus;
 @NoTitle
 public class CameraActivity extends Activity implements AutoFocusCallback {
 
-	private static final String TAG = "CameraActivity";
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
 
 	Camera camera = null;
@@ -97,8 +96,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	String flashMode;
 	int cameraMode;
-
-	private final String LOG_TAG = "CameraActivity";
 
 	List<GateReportImage> gateReportImages = new ArrayList<GateReportImage>();
 	List<AuditReportItem> auditReportItems = new ArrayList<AuditReportItem>();
@@ -148,14 +145,14 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		public void surfaceCreated(SurfaceHolder holder) {
 			// no-op -- wait until surfaceChanged()
-			Logger.Log(LOG_TAG, "onSurfaceCreated");
+			Logger.Log("onSurfaceCreated");
 			inPreview = true;
 		}
 
 		public void surfaceChanged(SurfaceHolder holder, int format, int width,
 				int height) {
 
-			Logger.Log(LOG_TAG, "onSurfaceChanged");
+			Logger.Log("onSurfaceChanged");
 
 			initPreview(width, height);
 			startPreview();
@@ -165,12 +162,12 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			// // set other parameters ..
 			// camera.setParameters(parameters);
 
-			Logger.Log(LOG_TAG, "endSurfaceChanged");
+			Logger.Log("endSurfaceChanged");
 		}
 
 		public void surfaceDestroyed(SurfaceHolder holder) {
 			// no-op
-			Logger.Log(LOG_TAG, "onSurfaceDestroyed");
+			Logger.Log("onSurfaceDestroyed");
 
 		}
 	};
@@ -179,7 +176,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
-			// Logger.Log(LOG_TAG, "onPictureTaken");
+			// Logger.Log( "onPictureTaken");
 
 			savePhoto(data);
 			camera.startPreview();
@@ -204,14 +201,14 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 					shootMediaPlayer.start();
 			}
 
-			// Logger.Log(LOG_TAG, "onShutter");
+			// Logger.Log( "onShutter");
 		}
 	};
 
 	@SuppressWarnings({})
 	@AfterViews
 	void initCamera() {
-		Logger.Log(LOG_TAG, "----> initCamera(), addSurfaceCallback");
+		Logger.Log("----> initCamera(), addSurfaceCallback");
 
 		// WARNING: this block should be run before onResume()
 		// Setup Surface Holder
@@ -243,11 +240,11 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	}
 
 	private void initPreview(int width, int height) {
-		Logger.Log(LOG_TAG, "initPreview()");
+		Logger.Log("initPreview()");
 
 		if (camera != null && previewHolder.getSurface() != null) {
 			try {
-				Logger.Log(LOG_TAG, "setPreviewDisplay");
+				Logger.Log("setPreviewDisplay");
 				camera.setPreviewDisplay(previewHolder);
 				// camera.setPreviewCallback(null);
 				// camera.setOneShotPreviewCallback(null);
@@ -261,17 +258,17 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			if (!cameraConfigured) {
 
-				Logger.Log(LOG_TAG, "config Camera");
+				Logger.Log("config Camera");
 
 				Camera.Parameters parameters = camera.getParameters();
 				Camera.Size size = determineBestPreviewSize(parameters);
 				Camera.Size pictureSize = determineBestPictureSize(parameters);
 
-				// Logger.Log(LOG_TAG,
+				// Logger.Log(
 				// "PreviewSize: " + Integer.toString(size.width) + "/"
 				// + Integer.toString(size.height));
 				//
-				// Logger.Log(LOG_TAG,
+				// Logger.Log(
 				// "PictureSize: " + Integer.toString(pictureSize.width)
 				// + "/" + Integer.toString(pictureSize.height));
 
@@ -298,11 +295,11 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	}
 
 	private void startPreview() {
-		Logger.Log(LOG_TAG, "----> startPreview");
+		Logger.Log("----> startPreview");
 
 		if (cameraConfigured && camera != null) {
 
-			Logger.Log(LOG_TAG, "cameraConfigured and camera != null");
+			Logger.Log("cameraConfigured and camera != null");
 			camera.startPreview();
 			inPreview = true;
 		}
@@ -399,7 +396,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 					mtx.postRotate(180);
 
 					// Flip Bitmap
-					Logger.Log(TAG, "Flip image");
+					Logger.Log("Flip image");
 					Bitmap bm = BitmapFactory.decodeByteArray(data, 0,
 							(data != null) ? data.length : 0);
 					bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(),
@@ -420,14 +417,13 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	void saveBitmapToFile(Bitmap bitmap, File filename) {
 
-		Logger.Log(LOG_TAG, "===== On SaveBitmap =====");
-		Logger.Log(LOG_TAG,
-				"Width/Height: " + Integer.toString(bitmap.getWidth()) + "/"
-						+ Integer.toString(bitmap.getHeight()));
+		Logger.Log("===== On SaveBitmap =====");
+		Logger.Log("Width/Height: " + Integer.toString(bitmap.getWidth()) + "/"
+				+ Integer.toString(bitmap.getHeight()));
 
 		try {
 
-			Logger.Log(LOG_TAG, "Path: " + filename.getAbsolutePath());
+			Logger.Log("Path: " + filename.getAbsolutePath());
 
 			FileOutputStream out = new FileOutputStream(filename);
 			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
@@ -479,7 +475,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 				+ imageType + "-" + containerId + "-" + uuid + ".jpg";
 
 		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
-		Logger.Log(LOG_TAG, "Photo Path: " + photo.getAbsolutePath());
+		Logger.Log("Photo Path: " + photo.getAbsolutePath());
 
 		// Save Bitmap to JPEG
 		saveBitmapToFile(capturedBitmap, photo);
@@ -501,8 +497,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		// getContentResolver(), capturedBitmap, fileName,
 		// photo.getPath());
 		//
-		// Logger.Log(LOG_TAG, "output: " + output);
-		// Logger.Log(LOG_TAG, "filename: " + fileName);
+		// Logger.Log( "output: " + output);
+		// Logger.Log( "filename: " + fileName);
 		//
 		// // Upload image
 		// uploadImage(uuid, output, fileName);
@@ -532,7 +528,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		uploadItem.setContainerSession(containerSession);
 
 		if (TextUtils.isEmpty(containerSession.getImageIdPath())) {
-			Logger.Log(LOG_TAG, "image_id_path: " + uri);
+			Logger.Log("image_id_path: " + uri);
 			containerSession.setImageIdPath(uri);
 		}
 
@@ -564,7 +560,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	@Override
 	protected void onResume() {
 
-		Logger.Log(LOG_TAG, "----> onResume()");
+		Logger.Log("----> onResume()");
 		super.onResume();
 
 		openCamera();
@@ -618,7 +614,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 				Camera.getCameraInfo(i, info);
 				if (info.facing == cameraMode) {
-					Logger.Log(LOG_TAG, "inside onResume: camera != null");
+					Logger.Log("inside onResume: camera != null");
 
 					camera = Camera.open(i);
 					setCameraDisplayOrientation(this, cameraMode, camera);
@@ -627,7 +623,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		}
 
 		if (camera == null) {
-			Logger.Log(LOG_TAG, "inside onResume: camera == null");
+			Logger.Log("inside onResume: camera == null");
 			camera = Camera.open(cameraMode);
 		}
 
@@ -638,10 +634,10 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		if (camera != null) {
 
-			Logger.Log(LOG_TAG, "Release camera ... ");
+			Logger.Log("Release camera ... ");
 
 			if (inPreview) {
-				Logger.Log(LOG_TAG, "Stop Preview ... ");
+				Logger.Log("Stop Preview ... ");
 				camera.stopPreview();
 				// preview.getHolder().removeCallback(null);
 			}
@@ -654,7 +650,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			inPreview = false;
 			cameraConfigured = false;
 
-			Logger.Log(LOG_TAG, "Release camera complete");
+			Logger.Log("Release camera complete");
 		}
 	}
 
@@ -682,7 +678,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	@Click(R.id.btn_switch_camera)
 	void switchCameraButtonClicked() {
 
-		Logger.Log(LOG_TAG, "switchCameraButtonClicked()");
+		Logger.Log("switchCameraButtonClicked()");
 		if (inPreview && camera != null) {
 			if (Camera.getNumberOfCameras() > 1) {
 
@@ -693,10 +689,10 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 				if (cameraMode == CameraInfo.CAMERA_FACING_BACK) {
 					cameraMode = CameraInfo.CAMERA_FACING_FRONT;
-					Logger.Log(LOG_TAG, "CameraInfo.CAMERA_FACING_FRONT");
+					Logger.Log("CameraInfo.CAMERA_FACING_FRONT");
 				} else {
 					cameraMode = CameraInfo.CAMERA_FACING_BACK;
-					Logger.Log(LOG_TAG, "CameraInfo.CAMERA_FACING_BACK");
+					Logger.Log("CameraInfo.CAMERA_FACING_BACK");
 				}
 
 				camera = Camera.open(cameraMode);
@@ -724,7 +720,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	@Click(R.id.btn_toggle_flash)
 	void toggleFlashButtonClicked() {
 
-		// Logger.Log(LOG_TAG, "toggleFlashButtonClicked()");
+		// Logger.Log( "toggleFlashButtonClicked()");
 
 		if (inPreview && camera != null) {
 			Parameters params = camera.getParameters();
@@ -754,7 +750,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			flashMode = params.getFlashMode();
 
 		} else {
-			Logger.Log(LOG_TAG, "Camera does not open");
+			Logger.Log("Camera does not open");
 		}
 	}
 
@@ -769,7 +765,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		if (inPreview) {
 
 			try {
-				// Logger.Log(LOG_TAG, "Prepare to take picture");
+				// Logger.Log( "Prepare to take picture");
 				Camera.Parameters cameraParameters = camera.getParameters();
 
 				List<String> supportedFocusMode = cameraParameters
@@ -783,8 +779,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 					camera.setParameters(cameraParameters);
 					camera.autoFocus(this);
 				} else {
-					Logger.Log(TAG,
-							"No auto focus mode supported, now just take picture");
+					Logger.Log("No auto focus mode supported, now just take picture");
 					camera.takePicture(shutterCallback, null, photoCallback);
 				}
 
@@ -823,7 +818,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 				break;
 			}
 
-			Logger.Log(TAG, "Rotate degree: " + degrees);
+			Logger.Log("Rotate degree: " + degrees);
 
 			int result;
 			if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
@@ -868,7 +863,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Override
 	public void onAutoFocus(boolean arg0, Camera arg1) {
-		// Logger.Log(TAG, "Auto focused, now take picture");
+		// Logger.Log("Auto focused, now take picture");
 		camera.takePicture(shutterCallback, null, photoCallback);
 	}
 

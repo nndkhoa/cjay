@@ -7,24 +7,22 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
-import android.util.Log;
-
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.ConnectionUtils;
 import com.cloudjay.cjay.util.Flags;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 
 public class InstantUploadReceiver extends BroadcastReceiver {
 
 	static final String KEY_LAST_UPLOADED = "last_uploaded_uri";
-	static final String LOG_TAG = "InstantUploadReceiver";
 
 	private Context mContext;
 	private SharedPreferences mPreferences;
 
 	@Override
 	public void onReceive(Context ctx, Intent intent) {
-		
+
 		mContext = ctx;
 		mPreferences = PreferenceManager.getDefaultSharedPreferences(ctx);
 
@@ -43,7 +41,7 @@ public class InstantUploadReceiver extends BroadcastReceiver {
 
 		if (intentHandled && canStartUpload()) {
 			if (Flags.DEBUG) {
-				Log.d(LOG_TAG, "Starting Service for Instant Upload.");
+				Logger.d("Starting Service for Instant Upload.");
 			}
 			ctx.startService(Utils.getUploadIntent(ctx));
 		}
@@ -64,14 +62,14 @@ public class InstantUploadReceiver extends BroadcastReceiver {
 		//
 		// if (null != account && null != uri) {
 		// if (Flags.DEBUG) {
-		// Log.d(LOG_TAG, "Got Photo with URI: " + uri.toString());
+		// Log.d( "Got Photo with URI: " + uri.toString());
 		// }
 		//
 		// final String albumId = mPreferences.getString(
 		// PreferenceConstants.PREF_INSTANT_UPLOAD_ALBUM_ID, null);
 		// if (TextUtils.isEmpty(albumId)) {
 		// if (Flags.DEBUG) {
-		// Log.d(LOG_TAG, "No album set!!!");
+		// Log.d( "No album set!!!");
 		// }
 		// return false;
 		// }
@@ -90,7 +88,7 @@ public class InstantUploadReceiver extends BroadcastReceiver {
 		// .getFromContext(mContext);
 		//
 		// if (Flags.DEBUG) {
-		// Log.d(LOG_TAG, "Adding Upload for URI: " + uri.toString());
+		// Log.d( "Adding Upload for URI: " + uri.toString());
 		// }
 		// return controller.addUpload(upload);
 		// }

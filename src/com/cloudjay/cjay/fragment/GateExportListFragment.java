@@ -40,6 +40,8 @@ import android.widget.FilterQueryProvider;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
@@ -65,7 +67,7 @@ import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_gate_export)
 @OptionsMenu(R.menu.menu_gate_export)
-public class GateExportListFragment extends CJaySherlockFragment implements
+public class GateExportListFragment extends SherlockFragment implements
 		OnRefreshListener, LoaderCallbacks<Cursor> {
 
 	private final static String LOG_TAG = "GateExportListFragment";
@@ -98,6 +100,9 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 
 	PullToRefreshLayout mPullToRefreshLayout;
 	GateContainerCursorAdapter cursorAdapter;
+
+	public GateExportListFragment() {
+	}
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -152,7 +157,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 
 		mSearchEditText
 				.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-					
+
 					@Override
 					public boolean onEditorAction(TextView textView, int id,
 							KeyEvent keyEvent) {
@@ -165,7 +170,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 						}
 						return false;
 					}
-					
+
 				});
 
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
@@ -175,6 +180,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 
 		mFeedListView.setTextFilterEnabled(true);
 		mFeedListView.setScrollingCacheEnabled(false);
+
 		mFeedListView.setOnScrollListener(new OnScrollListener() {
 
 			@Override
@@ -260,7 +266,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 			if (null != mSelectedContainerSession) {
 				try {
 
-					Logger.Log(LOG_TAG, "Menu upload item clicked");
+					Logger.Log("Menu upload item clicked");
 
 					// User confirm upload
 					mSelectedContainerSession.setUploadConfirmation(true);
@@ -438,40 +444,37 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 	}
 
 	public void onEvent(PreLoadDataEvent event) {
-		Logger.Log(LOG_TAG, "onEvent PreLoadDataEvent");
+		Logger.Log("PreLoadDataEvent");
 		mLoadMoreDataLayout.setVisibility(View.VISIBLE);
 	}
 
 	public void onEvent(PostLoadDataEvent event) {
-		Logger.Log(LOG_TAG, "onEvent PostLoadDataEvent");
+		Logger.Log("PostLoadDataEvent");
 		mLoadMoreDataLayout.setVisibility(View.GONE);
 	}
 
 	public void onEvent(ContainerSessionEnqueueEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerSessionEnqueueEvent");
+		Logger.Log("ContainerSessionEnqueueEvent");
 		refresh();
 	}
 
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
-		Logger.Log(LOG_TAG, "onEventMainThread ContainerSessionChangedEvent");
+		Logger.Log("ContainerSessionChangedEvent");
 		refresh();
 	}
 
 	public void refresh() {
-		Logger.Log(LOG_TAG, "onRefresh");
 		getLoaderManager().restartLoader(LOADER_ID, null, this);
 	}
 
 	@Override
 	public void onResume() {
 
-		Logger.Log(LOG_TAG, "onResume " + LOG_TAG);
 		if (cursorAdapter != null) {
 			refresh();
 		}
 
-		if (DataCenter.getInstance().isUpdating(getActivity()) == false) {
-			Logger.Log(LOG_TAG, "is not updating");
+		if (!DataCenter.getInstance().isUpdating(getActivity())) {
 			mLoadMoreDataLayout.setVisibility(View.GONE);
 		}
 
@@ -485,7 +488,7 @@ public class GateExportListFragment extends CJaySherlockFragment implements
 			@Override
 			protected Void doInBackground(Void... params) {
 
-				Logger.Log(LOG_TAG, "onRefreshStarted");
+				Logger.Log("onRefreshStarted");
 				try {
 					DataCenter.getInstance().fetchData(getActivity());
 				} catch (NoConnectionException e) {

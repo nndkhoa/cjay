@@ -10,8 +10,6 @@ import com.j256.ormlite.support.ConnectionSource;
 
 public class UserDaoImpl extends BaseDaoImpl<User, Integer> implements IUserDao {
 
-	public static final String LOG_TAG = "UserDaoImpl";
-
 	public UserDaoImpl(ConnectionSource connectionSource) throws SQLException {
 		super(connectionSource, User.class);
 	}
@@ -30,7 +28,7 @@ public class UserDaoImpl extends BaseDaoImpl<User, Integer> implements IUserDao 
 
 	@Override
 	public void addUser(User user) throws SQLException {
-		Logger.Log(LOG_TAG, "add User");
+		Logger.Log("add User");
 		this.createOrUpdate(user);
 	}
 
@@ -44,7 +42,7 @@ public class UserDaoImpl extends BaseDaoImpl<User, Integer> implements IUserDao 
 
 	@Override
 	public User getMainUser() throws SQLException {
-		
+
 		User user = null;
 		List<User> users = this.query(this.queryBuilder().where()
 				.eq(User.IS_MAIN_ACCOUNT, true).prepare());

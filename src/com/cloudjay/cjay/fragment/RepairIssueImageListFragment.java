@@ -98,7 +98,7 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 
 		// update new images and database
 
-		Logger.Log(LOG_TAG, "onResume");
+		Logger.Log("onResume");
 		if (mTakenImages != null && mTakenImages.size() > 0) {
 			try {
 				CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance()
@@ -111,7 +111,7 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 					cJayImage.setContainerSession(mIssue.getContainerSession());
 					cJayImageDaoImpl.update(cJayImage);
 				}
-				
+
 				// refresh menu
 				getActivity().supportInvalidateOptionsMenu();
 
@@ -166,7 +166,7 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 	public void onEvent(CJayImageAddedEvent event) {
 
 		if (event == null) {
-			Logger.Log(LOG_TAG, "Event is null");
+			Logger.Log("Event is null");
 		} else {
 			// retrieve image
 			try {

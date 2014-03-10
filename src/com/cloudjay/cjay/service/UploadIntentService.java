@@ -58,7 +58,6 @@ import de.greenrobot.event.EventBus;
 public class UploadIntentService extends IntentService implements
 		CountingInputStreamEntity.UploadListener {
 
-	private static final String LOG_TAG = "UploadIntentService";
 	int increment = 10;
 	int targetProgressBar = 0;
 	static final int NOTIFICATION_ID = 1000;
@@ -80,7 +79,7 @@ public class UploadIntentService extends IntentService implements
 	 */
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		// Logger.Log(LOG_TAG, "onHandleIntent");
+		// Logger.Log("onHandleIntent");
 
 		if (NetworkHelper.isConnected(getApplicationContext())) {
 			try {
@@ -119,7 +118,7 @@ public class UploadIntentService extends IntentService implements
 
 	void updateNotification(final ContainerSession upload) {
 
-		Logger.Log(LOG_TAG, "updateNotification: " + upload.getContainerId());
+		Logger.Log("updateNotification: " + upload.getContainerId());
 
 		String text;
 
@@ -164,7 +163,7 @@ public class UploadIntentService extends IntentService implements
 
 	private void startForeground() {
 
-		Logger.Log(LOG_TAG, "startForeground");
+		Logger.Log("startForeground");
 
 		if (null == mNotificationBuilder) {
 			mNotificationBuilder = new NotificationCompat.Builder(this);
@@ -224,8 +223,7 @@ public class UploadIntentService extends IntentService implements
 	private synchronized void doUploadContainer(
 			ContainerSession containerSession) {
 
-		Logger.Log(LOG_TAG,
-				"doUploadContainer: " + containerSession.getContainerId());
+		Logger.Log("doUploadContainer: " + containerSession.getContainerId());
 
 		try {
 			containerSession
@@ -238,7 +236,7 @@ public class UploadIntentService extends IntentService implements
 							getApplicationContext());
 
 			// Post to Server and notify event to UploadFragment
-			Log.i(LOG_TAG, "Ready to post Container Session");
+			Logger.Log("Ready to post Container Session");
 			String returnJson = CJayClient.getInstance().postContainerSession(
 					getApplicationContext(), uploadItem);
 
@@ -315,7 +313,7 @@ public class UploadIntentService extends IntentService implements
 	}
 
 	void finishedNotification() {
-		// Logger.Log(LOG_TAG, "finishedNotification");
+		// Logger.Log("finishedNotification");
 
 		if (null != mNotificationBuilder) {
 			String text = getResources().getQuantityString(
@@ -342,7 +340,7 @@ public class UploadIntentService extends IntentService implements
 
 	private void doFileUpload(CJayImage uploadItem) {
 
-		Logger.Log(LOG_TAG, "doFileUpload: " + uploadItem.getImageName());
+		Logger.Log("doFileUpload: " + uploadItem.getImageName());
 
 		try {
 			// Try New Upload Method
@@ -388,10 +386,10 @@ public class UploadIntentService extends IntentService implements
 			post.setEntity(entity);
 
 			try {
-				Log.i(LOG_TAG, "About to call httpClient.execute");
+				Logger.i("About to call httpClient.execute");
 				resp = httpClient.execute(post);
 
-				Log.i(LOG_TAG, resp.getStatusLine().getReasonPhrase());
+				Logger.i(resp.getStatusLine().getReasonPhrase());
 				if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_OK
 						|| resp.getStatusLine().getStatusCode() == HttpStatus.SC_ACCEPTED) {
 

@@ -50,9 +50,7 @@ import de.keyboardsurfer.android.widget.crouton.Style;
 @OptionsMenu(R.menu.menu_auditor_container)
 public class AuditorContainerActivity extends CJayActivity {
 
-	public static final String LOG_TAG = "AuditorContainerActivity";
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
-	// private static final String TAG = "AuditorContainerActivity";
 
 	private ArrayList<CJayImage> mFeeds;
 	private FunDapter<CJayImage> mFeedsAdapter;
@@ -174,11 +172,11 @@ public class AuditorContainerActivity extends CJayActivity {
 			supportInvalidateOptionsMenu();
 		}
 	}
-	
+
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemClicked() {
 		try {
-			Logger.Log(LOG_TAG, "Menu upload item clicked");
+			Logger.Log("Menu upload item clicked");
 
 			if (mContainerSession.isValidForUploading()) {
 
@@ -188,28 +186,26 @@ public class AuditorContainerActivity extends CJayActivity {
 				mContainerSession
 						.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
 
-				ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient.getInstance()
-							.getDatabaseManager().getHelper(this)
-							.getContainerSessionDaoImpl();
+				ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
+						.getInstance().getDatabaseManager().getHelper(this)
+						.getContainerSessionDaoImpl();
 
 				containerSessionDaoImpl.update(mContainerSession);
 
 				// It will trigger `UploadsFragment` Adapter
 				// notifyDataSetChanged
 				EventBus.getDefault().post(
-						new ContainerSessionEnqueueEvent(
-								mContainerSession));
+						new ContainerSessionEnqueueEvent(mContainerSession));
 			} else {
 				Crouton.cancelAllCroutons();
-				Crouton.makeText(this,
-						R.string.alert_invalid_container, Style.ALERT)
-						.show();
+				Crouton.makeText(this, R.string.alert_invalid_container,
+						Style.ALERT).show();
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		// go back
 		this.onBackPressed();
 	}

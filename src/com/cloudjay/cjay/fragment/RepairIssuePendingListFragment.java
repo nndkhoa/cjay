@@ -75,10 +75,10 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 
 	@Click(R.id.btn_add_new)
 	void cameraClicked() {
-		Logger.Log(LOG_TAG, "cameraClicked()");
+		Logger.Log("cameraClicked()");
 
 		if (mTakenImages == null) {
-			Logger.Log(LOG_TAG, "mTakenImages is NULL. Init mTakenImages");
+			Logger.Log("mTakenImages is NULL. Init mTakenImages");
 			mTakenImages = new ArrayList<CJayImage>();
 		}
 
@@ -178,17 +178,17 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 
 	public void onEvent(CJayImageAddedEvent event) {
 		if (event == null) {
-			Logger.Log(LOG_TAG, "Event is null");
+			Logger.Log("Event is null");
 		} else {
 
 			if (mTakenImages == null) {
-				Logger.Log(LOG_TAG, "mTakenImages is NULL");
+				Logger.Log("mTakenImages is NULL");
 				mTakenImages = new ArrayList<CJayImage>();
 			}
 
 			try {
 				// retrieve image
-				Logger.Log(LOG_TAG, "onEvent CJayImageAddedEvent");
+				Logger.Log("onEvent CJayImageAddedEvent");
 				if (event.getTag().equals(LOG_TAG)) {
 					mTakenImages.add(event.getCJayImage());
 				}
@@ -199,10 +199,10 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 	}
 
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerSessionChangedEvent");
+		Logger.Log("onEvent ContainerSessionChangedEvent");
 		refresh();
 	}
-	
+
 	private void initIssueFeedAdapter(ArrayList<Issue> containers) {
 		BindDictionary<Issue> feedsDict = new BindDictionary<Issue>();
 		feedsDict.addStringField(R.id.issue_location_code,

@@ -14,8 +14,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
-
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.receivers.GcmBroadcastReceiver;
@@ -36,7 +34,6 @@ public class GcmIntentService extends IntentService {
 
 	public static final int NOTIFICATION_ID = 1;
 	private NotificationManager mNotificationManager;
-	static final String LOG_TAG = "GcmIntentService";
 	NotificationCompat.Builder builder;
 
 	@SystemService
@@ -51,7 +48,7 @@ public class GcmIntentService extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		try {
-			Log.i(LOG_TAG, "onHandleIntent()");
+			Logger.i("onHandleIntent()");
 
 			Bundle extras = intent.getExtras();
 			GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
@@ -63,8 +60,8 @@ public class GcmIntentService extends IntentService {
 
 			if (!extras.isEmpty()) { // has effect of unparcelling Bundle
 
-				Logger.Log(LOG_TAG, "Extra is not empty");
-				Logger.Log(LOG_TAG, "Message Type: " + messageType);
+				Logger.Log("Extra is not empty");
+				Logger.Log("Message Type: " + messageType);
 
 				/*
 				 * Filter messages based on message type. Since it is likely
@@ -76,14 +73,14 @@ public class GcmIntentService extends IntentService {
 				if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR
 						.equals(messageType)) {
 
-					Logger.Log(LOG_TAG, "Send error: " + extras.toString());
+					Logger.Log("Send error: " + extras.toString());
 					sendNotification("Send error: " + extras.toString());
 
 				} else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED
 						.equals(messageType)) {
 
-					Logger.Log(LOG_TAG,
-							"Deleted messages on server: " + extras.toString());
+					Logger.Log("Deleted messages on server: "
+							+ extras.toString());
 
 					sendNotification("Deleted messages on server: "
 							+ extras.toString());
@@ -92,13 +89,13 @@ public class GcmIntentService extends IntentService {
 				} else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE
 						.equals(messageType)) {
 
-					Logger.Log(LOG_TAG, "Received: " + extras.toString());
+					Logger.Log("Received: " + extras.toString());
 					sendNotification(extras);
 
 				} else {
 					//
-					Logger.Log(LOG_TAG, "Last case - " + extras.toString());
-					Logger.Log(LOG_TAG, "MessageType: " + messageType);
+					Logger.Log("Last case - " + extras.toString());
+					Logger.Log("MessageType: " + messageType);
 
 					int id = -1;
 					try {
@@ -110,14 +107,13 @@ public class GcmIntentService extends IntentService {
 					String msg = extras.getString("msg");
 					String type = extras.getString("type");
 
-					Logger.Log(LOG_TAG,
-							"Notification got Type = " + type + " | MSG = "
-									+ msg + " | Id = " + Integer.toString(id));
+					Logger.Log("Notification got Type = " + type + " | MSG = "
+							+ msg + " | Id = " + Integer.toString(id));
 
 				}
 
 			} else {
-				Logger.Log(LOG_TAG, "Extra is Empty");
+				Logger.Log("Extra is Empty");
 			}
 
 			// Release the wake lock provided by the WakefulBroadcastReceiver.
@@ -134,7 +130,7 @@ public class GcmIntentService extends IntentService {
 	// a GCM message.
 	private void sendNotification(Bundle extras) {
 
-		Logger.Log(LOG_TAG, "sendNotification");
+		Logger.Log("sendNotification");
 
 		try {
 			mNotificationManager = (NotificationManager) this
@@ -149,7 +145,7 @@ public class GcmIntentService extends IntentService {
 
 			String type = extras.getString("type");
 
-			Logger.Log(LOG_TAG, "Notification got Type = " + type + " | Id = "
+			Logger.Log("Notification got Type = " + type + " | Id = "
 					+ Integer.toString(id));
 
 			if (type.equalsIgnoreCase("NEW_CONTAINER")) {

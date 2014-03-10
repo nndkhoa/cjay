@@ -38,9 +38,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
+@SuppressWarnings("unused")
 public class Mapper {
-
-	private final String LOG_TAG = "Mapper";
 
 	private static IDatabaseManager databaseManager = null;
 	private static Mapper instance = null;
@@ -74,7 +73,7 @@ public class Mapper {
 			try {
 				tmp = gson.fromJson(jsonString, listType);
 			} catch (Exception e) {
-				Logger.Log(LOG_TAG, "jsonString is on wrong format");
+				Logger.Log("jsonString is on wrong format");
 				e.printStackTrace();
 				return;
 			}
@@ -109,20 +108,17 @@ public class Mapper {
 							if (gateReportImageName.contains(cJayImageName)) {
 
 								Logger.Log(
-										LOG_TAG,
-										"Gate Report Image Id: "
-												+ Integer
-														.toString(gateReportImage
-																.getId())
-												+ "\nGate Report Image Name: "
-												+ gateReportImageName
-												+ "\nGate Report Image Type: "
-												+ Integer
-														.toString(gateReportImage
-																.getType())
-												+ "\nGate Report Image Time: "
-												+ gateReportImage
-														.getCreatedAt());
+
+								"Gate Report Image Id: "
+										+ Integer.toString(gateReportImage
+												.getId())
+										+ "\nGate Report Image Name: "
+										+ gateReportImageName
+										+ "\nGate Report Image Type: "
+										+ Integer.toString(gateReportImage
+												.getType())
+										+ "\nGate Report Image Time: "
+										+ gateReportImage.getCreatedAt());
 
 								cJayImage.setId(gateReportImage.getId());
 								cJayImage.setImageName(gateReportImageName);
@@ -166,13 +162,13 @@ public class Mapper {
 													.setImageName(auditReportImageName);
 
 											Logger.Log(
-													LOG_TAG,
-													"Audit Report Image Id: "
-															+ Integer
-																	.toString(cJayImage
-																			.getId())
-															+ "\nAudit Report Image Name: "
-															+ cJayImage);
+
+											"Audit Report Image Id: "
+													+ Integer
+															.toString(cJayImage
+																	.getId())
+													+ "\nAudit Report Image Name: "
+													+ cJayImage);
 
 											cJayImageDaoImpl.update(cJayImage);
 											break;
@@ -254,8 +250,7 @@ public class Mapper {
 			if (cJayImage.getType() == CJayImage.TYPE_REPORT
 					&& cJayImage.getIssue() == null) {
 
-				Logger.Log(LOG_TAG,
-						"Container Id Image: " + cJayImage.getImageName());
+				Logger.Log("Container Id Image: " + cJayImage.getImageName());
 				tmpContainerSession.setContainerIdImage(cJayImage
 						.getImageName());
 				break;
@@ -301,8 +296,7 @@ public class Mapper {
 
 			Operator operator = null;
 			if (TextUtils.isEmpty(operatorCode)) {
-				Logger.Log(LOG_TAG, "Container " + containerId
-						+ " does not have Operator", Log.ERROR);
+				Logger.e("Container " + containerId + " does not have Operator");
 			} else {
 				List<Operator> listOperators = operatorDaoImpl.queryForEq(
 						Operator.FIELD_CODE, operatorCode);

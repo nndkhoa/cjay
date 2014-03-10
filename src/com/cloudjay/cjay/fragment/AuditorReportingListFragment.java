@@ -42,6 +42,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
@@ -68,8 +69,8 @@ import de.keyboardsurfer.android.widget.crouton.Style;
 
 @EFragment(R.layout.fragment_auditor_reporting)
 @OptionsMenu(R.menu.menu_auditor_reporting)
-public class AuditorReportingListFragment extends CJaySherlockFragment
-		implements OnRefreshListener, LoaderCallbacks<Cursor> {
+public class AuditorReportingListFragment extends SherlockFragment implements
+		OnRefreshListener, LoaderCallbacks<Cursor> {
 
 	public static final String LOG_TAG = "AuditorReportingListFragment";
 	public static final int STATE_NOT_REPORTED = 0;
@@ -131,7 +132,7 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 			@Override
 			protected Void doInBackground(Void... params) {
 
-				Logger.Log(LOG_TAG, "onRefreshStarted");
+				Logger.Log("onRefreshStarted");
 
 				try {
 					DataCenter.getInstance().fetchData(getActivity());
@@ -304,7 +305,7 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 		if (mSelectedContainerSession != null) {
 
 			try {
-				Logger.Log(LOG_TAG, "Menu upload item clicked");
+				Logger.Log("Menu upload item clicked");
 
 				if (mSelectedContainerSession.isValidForUploading()) {
 
@@ -478,28 +479,27 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 	}
 
 	public void onEvent(PreLoadDataEvent event) {
-		Logger.Log(LOG_TAG, "onEvent PreLoadDataEvent");
+		Logger.Log("onEvent PreLoadDataEvent");
 		mLoadMoreDataLayout.setVisibility(View.VISIBLE);
 	}
 
 	public void onEvent(PostLoadDataEvent event) {
-		Logger.Log(LOG_TAG, "onEvent PostLoadDataEvent");
+		Logger.Log("onEvent PostLoadDataEvent");
 		mLoadMoreDataLayout.setVisibility(View.GONE);
 	}
 
 	public void onEvent(ContainerSessionEnqueueEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerSessionEnqueueEvent");
+		Logger.Log("onEvent ContainerSessionEnqueueEvent");
 		refresh();
 	}
 
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerSessionChangedEvent");
+		Logger.Log("onEvent ContainerSessionChangedEvent");
 		refresh();
 	}
 
 	public void refresh() {
-		Logger.Log(LOG_TAG,
-				"onRefresh with LOADER_ID: " + Integer.toString(LOADER_ID));
+		Logger.Log("onRefresh with LOADER_ID: " + Integer.toString(LOADER_ID));
 
 		getLoaderManager().restartLoader(LOADER_ID, null, this);
 
@@ -517,14 +517,12 @@ public class AuditorReportingListFragment extends CJaySherlockFragment
 
 	@Override
 	public void onResume() {
-		Logger.Log(LOG_TAG, "onResume " + LOG_TAG);
-
 		if (cursorAdapter != null) {
 			refresh();
 		}
 
 		if (DataCenter.getInstance().isUpdating(getActivity()) == false) {
-			Logger.Log(LOG_TAG, "is not updating");
+			Logger.Log("is not updating");
 			mLoadMoreDataLayout.setVisibility(View.GONE);
 		}
 

@@ -17,14 +17,13 @@ import com.j256.ormlite.table.TableUtils;
 
 public class Session {
 
-	private static final String LOG_TAG = "Session";
 	private static IDatabaseManager databaseManager;
 	private static IUserDao userDao;
 	private User currentUser;
 
 	public User getCurrentUser() {
 		if (currentUser == null) {
-			Logger.Log(LOG_TAG, "Current user is null ??");
+			Logger.Log("Current user is null ??");
 		}
 
 		return currentUser;
@@ -56,7 +55,7 @@ public class Session {
 	}
 
 	public static Session restore(Context context) {
-		Logger.Log(LOG_TAG, "restoring session ... ");
+		Logger.Log("restoring session ... ");
 		databaseManager = CJayClient.getInstance().getDatabaseManager();
 		try {
 			DatabaseHelper helper = databaseManager.getHelper(context);
@@ -77,7 +76,7 @@ public class Session {
 
 	public boolean deleteSession(Context context) {
 
-		Logger.Log(LOG_TAG, "deleting session ...");
+		Logger.Log("deleting session ...");
 		databaseManager = CJayClient.getInstance().getDatabaseManager();
 		try {
 
@@ -114,6 +113,6 @@ public class Session {
 	}
 
 	public void extendAccessTokenIfNeeded(Context applicationContext) {
-		Logger.Log(LOG_TAG, "extending user access token ...");
+		Logger.Log("extending user access token ...");
 	}
 }

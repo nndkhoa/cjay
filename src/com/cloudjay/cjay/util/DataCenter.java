@@ -62,8 +62,6 @@ import de.greenrobot.event.EventBus;
 @SuppressLint("SimpleDateFormat")
 public class DataCenter {
 
-	private static final String LOG_TAG = "DataCenter";
-
 	// TODO: does DataCenter really need to manage them?
 	public static AsyncTask<Void, Integer, Void> LoadDataTask;
 	public static AsyncTask<Void, Void, String> RegisterGCMTask;
@@ -87,7 +85,7 @@ public class DataCenter {
 	}
 
 	public void initialize(IDatabaseManager databaseManager) {
-		Logger.Log(LOG_TAG, "initialize");
+		Logger.Log("initializing ...");
 		this.databaseManager = databaseManager;
 	}
 
@@ -100,7 +98,7 @@ public class DataCenter {
 	}
 
 	public List<Operator> getListOperators(Context context) {
-		Logger.Log(LOG_TAG, "get list Operators");
+		Logger.Log("get list Operators");
 
 		try {
 			return getDatabaseManager().getHelper(context).getOperatorDaoImpl()
@@ -112,7 +110,7 @@ public class DataCenter {
 	}
 
 	public List<ComponentCode> getListComponents(Context context) {
-		Logger.Log(LOG_TAG, "get list Components");
+		Logger.Log("get list Components");
 
 		try {
 			return getDatabaseManager().getHelper(context)
@@ -124,7 +122,7 @@ public class DataCenter {
 	}
 
 	public List<ComponentCode> getListComponents(Context context, String date) {
-		Logger.Log(LOG_TAG, "get list Components from: " + date);
+		Logger.Log("get list Components from: " + date);
 
 		try {
 			return CJayClient.getInstance().getComponentCodes(context, date);
@@ -138,7 +136,7 @@ public class DataCenter {
 	}
 
 	public List<DamageCode> getListDamageCodes(Context context) {
-		Logger.Log(LOG_TAG, "get list Damage Codes");
+		Logger.Log("get list Damage Codes");
 
 		try {
 			return getDatabaseManager().getHelper(context)
@@ -157,7 +155,7 @@ public class DataCenter {
 	 * @return
 	 */
 	public List<DamageCode> getListDamageCodes(Context context, String date) {
-		Logger.Log(LOG_TAG, "get list Damage Codes from: " + date);
+		Logger.Log("get list Damage Codes from: " + date);
 
 		try {
 			return CJayClient.getInstance().getDamageCodes(context, date);
@@ -177,7 +175,7 @@ public class DataCenter {
 	 * @return
 	 */
 	public List<RepairCode> getListRepairCodes(Context context) {
-		Logger.Log(LOG_TAG, "get list Repair Codes");
+		Logger.Log("get list Repair Codes");
 
 		try {
 			return getDatabaseManager().getHelper(context)
@@ -196,7 +194,7 @@ public class DataCenter {
 	 * @return
 	 */
 	public List<RepairCode> getListRepairCodes(Context context, String date) {
-		Logger.Log(LOG_TAG, "get list Repair Codes from: " + date);
+		Logger.Log("get list Repair Codes from: " + date);
 
 		try {
 			return CJayClient.getInstance().getRepairCodes(context, date);
@@ -225,7 +223,7 @@ public class DataCenter {
 			currentUser.setAccessToken(token);
 			currentUser.setMainAccount(true);
 
-			Logger.Log(LOG_TAG, "User role: " + currentUser.getRoleName());
+			Logger.Log("User role: " + currentUser.getRoleName());
 
 			DepotDaoImpl depotDaoImpl;
 
@@ -261,7 +259,7 @@ public class DataCenter {
 	}
 
 	public List<ContainerSession> getListContainerSessions(Context context) {
-		Logger.Log(LOG_TAG, "get list Container sessions");
+		Logger.Log("get list Container sessions");
 		try {
 			return getDatabaseManager().getHelper(context)
 					.getContainerSessionDaoImpl().getAllContainerSessions();
@@ -273,7 +271,7 @@ public class DataCenter {
 
 	public List<ContainerSession> getListCheckOutContainerSessions(
 			Context context) {
-		Logger.Log(LOG_TAG, "get list check out Container sessions");
+		Logger.Log("get list check out Container sessions");
 		try {
 			return getDatabaseManager().getHelper(context)
 					.getContainerSessionDaoImpl()
@@ -406,7 +404,7 @@ public class DataCenter {
 	public Cursor filterPendingCursor(Context context, CharSequence constraint) {
 
 		String queryString = "SELECT * FROM csiview cs"
-				+ " WHERE cs.upload_confirmation = 0 AND cs.fixed = 0 AND cs.state <> 4 AND AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
+				+ " WHERE cs.upload_confirmation = 0 AND cs.fixed = 0 AND cs.state <> 4 AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
 				queryString, new String[] { constraint + "%" });
 	}
@@ -416,7 +414,7 @@ public class DataCenter {
 
 	public Cursor filterFixedCursor(Context context, CharSequence constraint) {
 		String queryString = "SELECT * FROM csiview cs"
-				+ " WHERE cs.upload_confirmation = 0 AND cs.fixed = 1 AND cs.state <> 4 AND AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
+				+ " WHERE cs.upload_confirmation = 0 AND cs.fixed = 1 AND cs.state <> 4 AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
 
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
 				queryString, new String[] { constraint + "%" });
@@ -424,7 +422,7 @@ public class DataCenter {
 
 	public List<ContainerSession> getListReportedContainerSessions(
 			Context context) {
-		Logger.Log(LOG_TAG, "get list reported Container sessions");
+		Logger.Log("get list reported Container sessions");
 		try {
 			return getDatabaseManager().getHelper(context)
 					.getContainerSessionDaoImpl()
@@ -437,7 +435,7 @@ public class DataCenter {
 
 	public List<ContainerSession> getListReportingContainerSessions(
 			Context context) {
-		Logger.Log(LOG_TAG, "get list reporting Container sessions");
+		Logger.Log("get list reporting Container sessions");
 		try {
 			return getDatabaseManager().getHelper(context)
 					.getContainerSessionDaoImpl()
@@ -450,7 +448,7 @@ public class DataCenter {
 
 	public List<ContainerSession> getListNotReportedContainerSessions(
 			Context context) {
-		Logger.Log(LOG_TAG, "get list not reported Container sessions");
+		Logger.Log("get list not reported Container sessions");
 		try {
 			return getDatabaseManager().getHelper(context)
 					.getContainerSessionDaoImpl()
@@ -463,7 +461,7 @@ public class DataCenter {
 
 	public List<ContainerSession> getListPendingContainerSessions(
 			Context context) {
-		Logger.Log(LOG_TAG, "get list pending Container sessions");
+		Logger.Log("get list pending Container sessions");
 		try {
 			return getDatabaseManager().getHelper(context)
 					.getContainerSessionDaoImpl()
@@ -475,7 +473,7 @@ public class DataCenter {
 	}
 
 	public List<ContainerSession> getListFixedContainerSessions(Context context) {
-		Logger.Log(LOG_TAG, "get list fixed Container sessions");
+		Logger.Log("get list fixed Container sessions");
 		try {
 			return getDatabaseManager().getHelper(context)
 					.getContainerSessionDaoImpl()
@@ -505,10 +503,8 @@ public class DataCenter {
 					.getListUploadContainerSessions();
 
 			if (result != null) {
-				Logger.Log(
-						LOG_TAG,
-						"Upload list number of items: "
-								+ Integer.toString(result.size()));
+				Logger.Log("Upload list number of items: "
+						+ Integer.toString(result.size()));
 			}
 
 			return result;
@@ -529,7 +525,7 @@ public class DataCenter {
 	 */
 	public List<ContainerSession> getListLocalContainerSessions(Context context) {
 
-		Logger.Log(LOG_TAG, "get list local Container sessions");
+		Logger.Log("get list local Container sessions");
 		try {
 			return getDatabaseManager().getHelper(context)
 					.getContainerSessionDaoImpl().getLocalContainerSessions();
@@ -550,8 +546,7 @@ public class DataCenter {
 	 * @since 1.0
 	 */
 	public boolean removeContainerSession(Context context, int id) {
-		Logger.Log(LOG_TAG,
-				"remove Container Session with Id = " + Integer.toString(id));
+		Logger.Log("remove Container Session with Id = " + Integer.toString(id));
 		try {
 
 			getDatabaseManager().getHelper(context)
@@ -575,7 +570,7 @@ public class DataCenter {
 	public void updateListContainerSessions(Context ctx)
 			throws NoConnectionException, SQLException {
 
-		Logger.Log(LOG_TAG, "***\nUPDATE LIST CONTAINER SESSIONS\n***");
+		Logger.Log("*** UPDATE LIST CONTAINER SESSIONS ***");
 
 		PreferencesUtil.storePrefsValue(ctx,
 				PreferencesUtil.PREF_IS_UPDATING_DATA, true);
@@ -592,7 +587,7 @@ public class DataCenter {
 					.getHelper(ctx).getContainerSessionDaoImpl();
 
 			// 3. Update list ContainerSessions
-			Logger.Log(LOG_TAG, "get list container sessions");
+			Logger.Log("get list container sessions");
 
 			int page = 1;
 			String nextUrl = "";
@@ -616,7 +611,7 @@ public class DataCenter {
 						if (null != tmpContainerSessions) {
 
 							for (TmpContainerSession tmpSession : tmpContainerSessions) {
-								
+
 								ContainerSession containerSession = Mapper
 										.getInstance().toContainerSession(
 												tmpSession, ctx);
@@ -649,9 +644,8 @@ public class DataCenter {
 				String date = PreferencesUtil.getPrefsValue(ctx,
 						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE);
 
-				Logger.Log(LOG_TAG,
-						"get updated list container sessions from last time: "
-								+ date);
+				Logger.Log("get updated list container sessions from last time: "
+						+ date);
 				do {
 					List<ContainerSession> containerSessions = new ArrayList<ContainerSession>();
 					ContainerSessionResult result = null;
@@ -690,21 +684,16 @@ public class DataCenter {
 						}
 
 						if (containerSessions.isEmpty()) {
-							Logger.Log(LOG_TAG,
-									"----> NO new container sessions");
+							Logger.Log("----> NO new container sessions");
 						} else {
 
 							EventBus.getDefault().post(
 									new ContainerSessionChangedEvent(
 											containerSessions));
 
-							Logger.Log(
-									LOG_TAG,
-									"----> Has "
-											+ Integer
-													.toString(containerSessions
-															.size())
-											+ " new container sessions");
+							Logger.Log("----> Has "
+									+ Integer.toString(containerSessions.size())
+									+ " new container sessions");
 						}
 
 					}
@@ -715,13 +704,11 @@ public class DataCenter {
 						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
 						nowString);
 
-				Logger.Log(
-						LOG_TAG,
-						"Last update from "
-								+ PreferencesUtil
-										.getPrefsValue(
-												ctx,
-												PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE));
+				Logger.Log("Last update from "
+						+ PreferencesUtil
+								.getPrefsValue(
+										ctx,
+										PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE));
 			}
 
 			PreferencesUtil.storePrefsValue(ctx,
@@ -756,7 +743,7 @@ public class DataCenter {
 	public void updateListOperators(Context ctx) throws NoConnectionException,
 			SQLException {
 
-		Logger.Log(LOG_TAG, "***\nUPDATE LIST OPERATORS\n***");
+		Logger.Log("*** UPDATE LIST OPERATORS ***");
 		try {
 			Date now = new Date();
 
@@ -771,7 +758,7 @@ public class DataCenter {
 			// get list operator
 			List<Operator> operators = null;
 			if (operatorDaoImpl.isEmpty()) {
-				Logger.Log(LOG_TAG, "no Operator");
+				Logger.Log("no Operator");
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE,
 						nowString);
@@ -783,8 +770,7 @@ public class DataCenter {
 				String date = PreferencesUtil.getPrefsValue(ctx,
 						PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE);
 
-				Logger.Log(LOG_TAG,
-						"get updated list operator from last time: " + date);
+				Logger.Log("get updated list operator from last time: " + date);
 
 				operators = CJayClient.getInstance().getOperators(ctx, date);
 
@@ -793,20 +779,18 @@ public class DataCenter {
 						nowString);
 
 				if (operators == null) {
-					Logger.Log(LOG_TAG, "----> NO new operators");
+					Logger.Log("----> NO new operators");
 				} else {
-					Logger.Log(LOG_TAG,
-							"----> Has " + Integer.toString(operators.size())
-									+ " new operators");
+					Logger.Log("----> Has "
+							+ Integer.toString(operators.size())
+							+ " new operators");
 				}
 
-				Logger.Log(
-						LOG_TAG,
-						"Last update from "
-								+ PreferencesUtil
-										.getPrefsValue(
-												ctx,
-												PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE));
+				Logger.Log("Last update from "
+						+ PreferencesUtil
+								.getPrefsValue(
+										ctx,
+										PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE));
 			}
 			if (null != operators)
 				operatorDaoImpl.addListOperators(operators);
@@ -831,7 +815,7 @@ public class DataCenter {
 	public void updateListDamageCodes(Context ctx)
 			throws NoConnectionException, SQLException {
 
-		Logger.Log(LOG_TAG, "***\nUPDATE LIST DAMAGE\n***");
+		Logger.Log("*** UPDATE LIST DAMAGE ***");
 		try {
 			Date now = new Date();
 
@@ -846,7 +830,7 @@ public class DataCenter {
 			// Get list damage
 			List<DamageCode> damageCodes = null;
 			if (damageCodeDaoImpl.isEmpty()) {
-				Logger.Log(LOG_TAG, "no Damage Code");
+				Logger.Log("no Damage Code");
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE,
 						nowString);
@@ -856,8 +840,8 @@ public class DataCenter {
 				String date = PreferencesUtil.getPrefsValue(ctx,
 						PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE);
 
-				Logger.Log(LOG_TAG,
-						"get updated list damage codes from last time: " + date);
+				Logger.Log("get updated list damage codes from last time: "
+						+ date);
 
 				damageCodes = CJayClient.getInstance()
 						.getDamageCodes(ctx, date);
@@ -867,20 +851,20 @@ public class DataCenter {
 						nowString);
 
 				if (damageCodes == null) {
-					Logger.Log(LOG_TAG, "----> NO new damage codes");
+					Logger.Log("----> NO new damage codes");
 				} else {
-					Logger.Log(LOG_TAG,
-							"----> Has " + Integer.toString(damageCodes.size())
-									+ " new damage codes");
+					Logger.Log("----> Has "
+							+ Integer.toString(damageCodes.size())
+							+ " new damage codes");
 				}
 
 				Logger.Log(
-						LOG_TAG,
-						"Last update from "
-								+ PreferencesUtil
-										.getPrefsValue(
-												ctx,
-												PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE));
+
+				"Last update from "
+						+ PreferencesUtil
+								.getPrefsValue(
+										ctx,
+										PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE));
 			}
 
 			if (null != damageCodes)
@@ -906,7 +890,7 @@ public class DataCenter {
 	public void updateListComponentCodes(Context ctx)
 			throws NoConnectionException, SQLException {
 
-		Logger.Log(LOG_TAG, "***\nUPDATE LIST COMPONENT\n***");
+		Logger.Log("*** UPDATE LIST COMPONENT ***");
 
 		try {
 			Date now = new Date();
@@ -922,7 +906,7 @@ public class DataCenter {
 			// Get list Component
 			List<ComponentCode> componentCodes = null;
 			if (componentCodeDaoImpl.isEmpty()) {
-				Logger.Log(LOG_TAG, "no Component Code");
+				Logger.Log("no Component Code");
 
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE,
@@ -936,9 +920,8 @@ public class DataCenter {
 				String date = PreferencesUtil.getPrefsValue(ctx,
 						PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE);
 
-				Logger.Log(LOG_TAG,
-						"get updated list component codes from last time: "
-								+ date);
+				Logger.Log("get updated list component codes from last time: "
+						+ date);
 
 				componentCodes = CJayClient.getInstance().getComponentCodes(
 						ctx, date);
@@ -948,22 +931,21 @@ public class DataCenter {
 						nowString);
 
 				if (componentCodes == null) {
-					Logger.Log(LOG_TAG, "----> NO new component codes");
+					Logger.Log("----> NO new component codes");
 				} else {
 					Logger.Log(
-							LOG_TAG,
-							"----> Has "
-									+ Integer.toString(componentCodes.size())
-									+ " new component codes");
+
+					"----> Has " + Integer.toString(componentCodes.size())
+							+ " new component codes");
 				}
 
 				Logger.Log(
-						LOG_TAG,
-						"Last update from "
-								+ PreferencesUtil
-										.getPrefsValue(
-												ctx,
-												PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE));
+
+				"Last update from "
+						+ PreferencesUtil
+								.getPrefsValue(
+										ctx,
+										PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE));
 			}
 
 			if (null != componentCodes)
@@ -989,7 +971,7 @@ public class DataCenter {
 	public void updateListRepairCodes(Context ctx)
 			throws NoConnectionException, SQLException {
 
-		Logger.Log(LOG_TAG, "***\nUPDATE LIST REPAIR\n***");
+		Logger.Log("*** UPDATE LIST REPAIR ***");
 		try {
 			Date now = new Date();
 
@@ -1004,7 +986,7 @@ public class DataCenter {
 			// Get list Repair
 			List<RepairCode> repairCodes = null;
 			if (repairCodeDaoImpl.isEmpty()) {
-				Logger.Log(LOG_TAG, "no Repair Code");
+				Logger.Log("no Repair Code");
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE,
 						nowString);
@@ -1016,8 +998,8 @@ public class DataCenter {
 				String date = PreferencesUtil.getPrefsValue(ctx,
 						PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE);
 
-				Logger.Log(LOG_TAG,
-						"get updated list repair codes from last time: " + date);
+				Logger.Log("get updated list repair codes from last time: "
+						+ date);
 
 				repairCodes = CJayClient.getInstance()
 						.getRepairCodes(ctx, date);
@@ -1027,20 +1009,18 @@ public class DataCenter {
 						nowString);
 
 				if (repairCodes == null) {
-					Logger.Log(LOG_TAG, "----> NO new repair codes");
+					Logger.Log("----> NO new repair codes");
 				} else {
-					Logger.Log(LOG_TAG,
-							"----> Has " + Integer.toString(repairCodes.size())
-									+ " new repair codes");
+					Logger.Log("----> Has "
+							+ Integer.toString(repairCodes.size())
+							+ " new repair codes");
 				}
 
-				Logger.Log(
-						LOG_TAG,
-						"Last update from "
-								+ PreferencesUtil
-										.getPrefsValue(
-												ctx,
-												PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE));
+				Logger.Log("Last update from "
+						+ PreferencesUtil
+								.getPrefsValue(
+										ctx,
+										PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE));
 			}
 			if (null != repairCodes)
 				repairCodeDaoImpl.addListRepairCodes(repairCodes);
@@ -1065,7 +1045,7 @@ public class DataCenter {
 	public void updateListISOCode(Context ctx) throws NoConnectionException,
 			SQLException {
 
-		Logger.Log(LOG_TAG, "***\nUPDATE ALL ISO CODE\n***");
+		Logger.Log("*** UPDATE ALL ISO CODE ***");
 		try {
 
 			updateListOperators(ctx);
@@ -1091,10 +1071,10 @@ public class DataCenter {
 	 */
 	public void fetchData(Context ctx) throws NoConnectionException {
 
-		Logger.Log(LOG_TAG, "***\nFETCHING DATA ...\n***");
+		Logger.Log("*** FETCHING DATA ... ***");
 
 		if (isFetchingData(ctx)) {
-			Logger.Log(LOG_TAG, "fetchData() is already running");
+			Logger.Log("fetchData() is already running");
 			return;
 		} else {
 			try {

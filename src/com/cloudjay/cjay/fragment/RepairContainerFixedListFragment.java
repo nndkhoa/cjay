@@ -30,8 +30,7 @@ import android.widget.ListView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.CJayActivity;
-import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.RepairContainerActivity_;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerRepairedEvent;
@@ -51,7 +50,6 @@ import de.greenrobot.event.EventBus;
 public class RepairContainerFixedListFragment extends SherlockFragment
 		implements OnRefreshListener, LoaderCallbacks<Cursor> {
 
-	private final static String LOG_TAG = "RepairContainerFixedListFragment";
 	private final static int LOADER_ID = 5;
 
 	private ContainerSession mSelectedContainerSession = null;
@@ -88,7 +86,7 @@ public class RepairContainerFixedListFragment extends SherlockFragment
 			@Override
 			protected Void doInBackground(Void... params) {
 
-				Logger.Log(LOG_TAG, "onRefreshStarted");
+				Logger.Log("onRefreshStarted");
 
 				try {
 					DataCenter.getInstance().fetchData(getActivity());
@@ -189,7 +187,7 @@ public class RepairContainerFixedListFragment extends SherlockFragment
 			if (mSelectedContainerSession != null) {
 				try {
 
-					Logger.Log(LOG_TAG, "Menu upload item clicked");
+					Logger.Log("Menu upload item clicked");
 
 					// User confirm upload
 					mSelectedContainerSession.setUploadConfirmation(true);
@@ -253,17 +251,17 @@ public class RepairContainerFixedListFragment extends SherlockFragment
 	}
 
 	public void refresh() {
-		Logger.Log(LOG_TAG, "refresh");
+		Logger.Log("refresh");
 		getLoaderManager().restartLoader(LOADER_ID, null, this);
 	}
 
 	public void onEvent(ContainerSessionEnqueueEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerSessionEnqueueEvent");
+		Logger.Log("onEvent ContainerSessionEnqueueEvent");
 		refresh();
 	}
 
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerSessionChangedEvent");
+		Logger.Log("onEvent ContainerSessionChangedEvent");
 		refresh();
 	}
 

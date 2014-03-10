@@ -39,8 +39,6 @@ import com.cloudjay.cjay.util.NoConnectionException;
 @EActivity(R.layout.activity_login)
 public class LoginActivity extends CJayActivity {
 
-	private static final String LOG_TAG = "LoginActivity";
-
 	/**
 	 * The default email to populate the email field with.
 	 */
@@ -57,12 +55,12 @@ public class LoginActivity extends CJayActivity {
 
 	@Extra(EXTRA_EMAIL)
 	// String mEmail = "";
-	// String mEmail = "giamdinhcong@test.com";
+	String mEmail = "giamdinhcong@test.com";
 	// String mEmail = "giamdinhcong1.icd1@pip.com.vn";
 	// String mEmail = "giamdinhsuachua.icd1@pip.com.vn";
 	// String mEmail = "giamdinhsuachua@test.com";
 	// String mEmail = "tosuachua@test.com";
-	String mEmail = "tosuachua1.icd1@pip.com.vn";
+	// String mEmail = "tosuachua1.icd1@pip.com.vn";
 
 	// UI references.
 	@ViewById(R.id.email)
@@ -115,7 +113,7 @@ public class LoginActivity extends CJayActivity {
 	public void attemptLogin() {
 
 		try {
-			Logger.Log(LOG_TAG, "trying to login ... ");
+			Logger.Log("trying to login ... ");
 
 			if (mAuthTask != null) {
 				return;
@@ -289,12 +287,12 @@ public class LoginActivity extends CJayActivity {
 			if (success) {
 
 				// Navigate user to Main Activity based on user role
-				Logger.Log(LOG_TAG, "Login successfully");
+				Logger.Log("Login successfully");
 				CJayApplication.startCJayHomeActivity(LoginActivity.this);
 				finish();
 
 			} else {
-				Logger.Log(LOG_TAG, "Incorrect Username|Password");
+				Logger.Log("Incorrect Username|Password");
 				mPasswordView
 						.setError(getString(R.string.error_incorrect_password));
 				mPasswordView.requestFocus();

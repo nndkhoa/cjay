@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import android.database.Cursor;
-import android.util.Log;
-
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.util.Logger;
@@ -23,8 +21,6 @@ import com.j256.ormlite.support.DatabaseConnection;
 
 public class ContainerSessionDaoImpl extends
 		BaseDaoImpl<ContainerSession, String> implements IContainerSessionDao {
-
-	private static final String LOG_TAG = "ContainerSessionDaoImpl";
 
 	public ContainerSessionDaoImpl(ConnectionSource connectionSource)
 			throws SQLException {
@@ -41,21 +37,21 @@ public class ContainerSessionDaoImpl extends
 			List<ContainerSession> containerSessions) throws SQLException {
 
 		long startTime = System.currentTimeMillis();
-		Logger.Log(LOG_TAG, "***\nadd List of Container Sessions\n***");
+		Logger.Log("*** add List of Container Sessions ***");
 		if (containerSessions != null) {
 			for (ContainerSession containerSession : containerSessions) {
 				addContainerSession(containerSession);
 			}
 		}
 		long difference = System.currentTimeMillis() - startTime;
-		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference));
+		Logger.Log("---> Total time: " + Long.toString(difference));
 	}
 
 	private void bulkInsertDataByCallBatchTasks(
 			final List<ContainerSession> containerSessions) throws SQLException {
 
 		long startTime = System.currentTimeMillis();
-		Logger.Log(LOG_TAG, "***\nbulkInsertDataByCallBatchTasks***\n");
+		Logger.Log("*** bulkInsertDataByCallBatchTasks ***");
 		if (containerSessions != null) {
 			this.callBatchTasks(new Callable<Void>() {
 				@Override
@@ -70,13 +66,13 @@ public class ContainerSessionDaoImpl extends
 		}
 
 		long difference = System.currentTimeMillis() - startTime;
-		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference));
+		Logger.Log("---> Total time: " + Long.toString(difference));
 	}
 
 	private void bulkInsertDataBySavePoint(
 			final List<ContainerSession> containerSessions) {
 		long startTime = System.currentTimeMillis();
-		Logger.Log(LOG_TAG, "***\nbulkInsertDataBySavePoint***\n");
+		Logger.Log("***bulkInsertDataBySavePoint***");
 		if (containerSessions != null) {
 
 			DatabaseConnection conn = null;
@@ -101,7 +97,7 @@ public class ContainerSessionDaoImpl extends
 			}
 		}
 		long difference = System.currentTimeMillis() - startTime;
-		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference));
+		Logger.Log("---> Total time: " + Long.toString(difference));
 
 	}
 
@@ -114,10 +110,10 @@ public class ContainerSessionDaoImpl extends
 
 			if (containerSessionId == 0) { // new Container Session
 				Logger.Log(
-						LOG_TAG,
-						"Insert new Container with ID: "
-								+ Integer.toString(containerSessionId)
-								+ " Name: " + containerSession.getContainerId());
+
+				"Insert new Container with ID: "
+						+ Integer.toString(containerSessionId) + " Name: "
+						+ containerSession.getContainerId());
 				this.createOrUpdate(containerSession);
 
 			} else { // existed Container Session
@@ -131,11 +127,11 @@ public class ContainerSessionDaoImpl extends
 
 				// update UUID if needed
 				if (null != result) {
-					Logger.Log(LOG_TAG, "Update container session UUID");
+					Logger.Log("Update container session UUID");
 					containerSession.setUuid(result.getUuid());
 				}
 
-				Logger.Log(LOG_TAG, "Update Container Session with ID: "
+				Logger.Log("Update Container Session with ID: "
 						+ Integer.toString(containerSessionId) + " | Name: "
 						+ containerSession.getContainerId());
 
@@ -159,7 +155,7 @@ public class ContainerSessionDaoImpl extends
 	public void delete(int id) throws SQLException {
 
 		if (id == -1) {
-			Logger.Log(LOG_TAG, "Container Session ID = -1");
+			Logger.Log("Container Session ID = -1");
 
 		} else { // existed Container Session
 
@@ -207,7 +203,7 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public ContainerSession getNextWaiting() throws SQLException {
 
-		// Logger.Log(LOG_TAG, "getNextWaiting() at ContainerSessionDaoImpl");
+		// Logger.Log( "getNextWaiting() at ContainerSessionDaoImpl");
 
 		ContainerSession result = null;
 		List<ContainerSession> containerSessions = this
@@ -226,8 +222,7 @@ public class ContainerSessionDaoImpl extends
 
 			for (CJayImage cJayImage : cJayImages) {
 				if (cJayImage.getUploadState() != CJayImage.STATE_UPLOAD_COMPLETED) {
-					Logger.Log(LOG_TAG,
-							"Some cJayImages are still not uploaded", Log.ERROR);
+					Logger.e("Some cJayImages are still not uploaded");
 					flag = false;
 					break;
 				}
@@ -256,7 +251,7 @@ public class ContainerSessionDaoImpl extends
 			throws SQLException {
 
 		long startTime = System.currentTimeMillis();
-		Logger.Log(LOG_TAG, "***\nget List UPLOAD Container Sessions\n***");
+		Logger.Log("*** get List UPLOAD Container Sessions ***");
 
 		List<ContainerSession> containerSessions = this.query(this
 				.queryBuilder().where()
@@ -264,8 +259,7 @@ public class ContainerSessionDaoImpl extends
 				.eq(ContainerSession.FIELD_CLEARED, false).prepare());
 
 		long difference = System.currentTimeMillis() - startTime;
-		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference)
-				+ " ms");
+		Logger.Log("---> Total time: " + Long.toString(difference) + " ms");
 
 		return containerSessions;
 
@@ -285,7 +279,7 @@ public class ContainerSessionDaoImpl extends
 			throws SQLException {
 
 		long startTime = System.currentTimeMillis();
-		Logger.Log(LOG_TAG, "***\nget list LOCAL Container sessions\n***");
+		Logger.Log("*** get list LOCAL Container sessions ***");
 		List<ContainerSession> containerSessions = this.query(this
 				.queryBuilder()
 				.where()
@@ -297,8 +291,7 @@ public class ContainerSessionDaoImpl extends
 						ContainerSession.STATE_UPLOAD_COMPLETED).prepare());
 
 		long difference = System.currentTimeMillis() - startTime;
-		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference)
-				+ " ms");
+		Logger.Log("---> Total time: " + Long.toString(difference) + " ms");
 
 		return containerSessions;
 	}
@@ -316,14 +309,14 @@ public class ContainerSessionDaoImpl extends
 
 		long startTime = System.currentTimeMillis();
 
-		Logger.Log(LOG_TAG, "***\nget List CHECKOUT Container Sessions\n***");
+		Logger.Log("*** get List CHECKOUT Container Sessions ***");
 		List<ContainerSession> containerSessions = this.query(this
 				.queryBuilder().where()
 				.eq(ContainerSession.FIELD_CHECK_OUT_TIME, "").and()
 				.eq(ContainerSession.FIELD_LOCAL, false).prepare());
 
 		long difference = System.currentTimeMillis() - startTime;
-		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference));
+		Logger.Log("---> Total time: " + Long.toString(difference));
 
 		return containerSessions;
 	}
@@ -402,7 +395,7 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public List<ContainerSession> getListReportedContainerSessions()
 			throws SQLException {
-		// Logger.Log(LOG_TAG, "getListReportedContainerSessions()");
+		// Logger.Log( "getListReportedContainerSessions()");
 		//
 		// List<ContainerSession> containerSessions =
 		// getNotUploadedContainerSessions();
@@ -439,8 +432,7 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public List<ContainerSession> getListNotReportedContainerSessions()
 			throws SQLException {
-		Logger.Log(LOG_TAG,
-				"***\nget List NOT REPORTED Container Sessions\n***");
+		Logger.Log("*** get List NOT REPORTED Container Sessions ***");
 
 		List<ContainerSession> containerSessions = getNotUploadedContainerSessions();
 		List<ContainerSession> reportingContainerSessions = new ArrayList<ContainerSession>();
@@ -468,7 +460,7 @@ public class ContainerSessionDaoImpl extends
 	public List<ContainerSession> getListReportingContainerSessions()
 			throws SQLException {
 
-		Logger.Log(LOG_TAG, "***\nget List REPORTING Container Sessions\n***");
+		Logger.Log("*** get List REPORTING Container Sessions ***");
 
 		List<ContainerSession> containerSessions = getNotUploadedContainerSessions();
 		List<ContainerSession> reportingContainerSessions = new ArrayList<ContainerSession>();
@@ -495,7 +487,7 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public List<ContainerSession> getListPendingContainerSessions()
 			throws SQLException {
-		Logger.Log(LOG_TAG, "***\nget List PENDING Container Sessions\n***");
+		Logger.Log("*** get List PENDING Container Sessions ***");
 
 		List<ContainerSession> containerSessions = this.query(this
 				.queryBuilder()
@@ -515,7 +507,7 @@ public class ContainerSessionDaoImpl extends
 			throws SQLException {
 
 		long startTime = System.currentTimeMillis();
-		Logger.Log(LOG_TAG, "***\nget List FIXED Container Sessions***\n");
+		Logger.Log("*** get List FIXED Container Sessions ***");
 
 		List<ContainerSession> containerSessions = this.query(this
 				.queryBuilder()
@@ -528,7 +520,7 @@ public class ContainerSessionDaoImpl extends
 						ContainerSession.STATE_UPLOAD_COMPLETED).prepare());
 
 		long difference = System.currentTimeMillis() - startTime;
-		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference));
+		Logger.Log("---> Total time: " + Long.toString(difference));
 
 		return containerSessions;
 	}
@@ -536,8 +528,7 @@ public class ContainerSessionDaoImpl extends
 	@Override
 	public List<ContainerSession> getNotUploadedContainerSessions()
 			throws SQLException {
-		Logger.Log(LOG_TAG,
-				"***\nget List NOT UPLOADED Container Sessions***\n");
+		Logger.Log("*** get List NOT UPLOADED Container Sessions ***");
 		return this.query(this.queryBuilder().where()
 				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
 				.prepare());

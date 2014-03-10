@@ -39,8 +39,6 @@ import de.keyboardsurfer.android.widget.crouton.Style;
 public class CJayActivity extends SherlockFragmentActivity implements
 		ICJayActivity {
 
-	private static final String LOG_TAG = "CJayActivity";
-
 	private Session session;
 	private DataCenter dataCenter;
 
@@ -104,12 +102,12 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	@Override
 	protected void onResume() {
 
-		Logger.Log(LOG_TAG, "***\nonResume - DataCenter.reload\n***");
+		Logger.Log("*** onResume - DataCenter.reload ***");
 
 		if (null != session) {
 
 			if (this instanceof SplashScreenActivity) {
-				Logger.Log(LOG_TAG, "Call from SplashScreenActivity");
+				Logger.Log("Call from SplashScreenActivity");
 
 				new AsyncTask<Void, Integer, Void>() {
 
@@ -129,19 +127,19 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 			} else {
 
-				Logger.Log(LOG_TAG, "Call from others Activity");
+				Logger.Log("Call from others Activity");
 
 				DataCenter.LoadDataTask = new AsyncTask<Void, Integer, Void>() {
 
 					@Override
 					protected void onPreExecute() {
-						Logger.Log(LOG_TAG, "----------> onPreExecute");
+						Logger.Log("----------> onPreExecute");
 						EventBus.getDefault().post(new PreLoadDataEvent());
 					};
 
 					@Override
 					protected void onPostExecute(Void result) {
-						Logger.Log(LOG_TAG, "----------> onPostExecute");
+						Logger.Log("----------> onPostExecute");
 						EventBus.getDefault().post(new PostLoadDataEvent());
 					};
 
@@ -185,15 +183,15 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 	public void onEvent(UserLoggedOutEvent event) {
 
-		Logger.Log(LOG_TAG, "onEvent UserLoggedOutEvent");
+		Logger.Log("onEvent UserLoggedOutEvent");
 
 		if (DataCenter.LoadDataTask.getStatus() == AsyncTask.Status.RUNNING) {
-			Logger.Log(LOG_TAG, "BGTask is running");
+			Logger.Log("BGTask is running");
 			DataCenter.LoadDataTask.cancel(true);
 		}
 
 		if (DataCenter.LoadDataTask.getStatus() == AsyncTask.Status.RUNNING) {
-			Logger.Log(LOG_TAG, "BGTask is still running ????");
+			Logger.Log("BGTask is still running ????");
 		}
 
 	}
@@ -203,13 +201,13 @@ public class CJayActivity extends SherlockFragmentActivity implements
 		try {
 			CJayClient.getInstance().addGCMDevice(regid, context);
 			if (TextUtils.isEmpty(regid)) {
-				Logger.Log(LOG_TAG, "Cannot send Registration ID to Server");
+				Logger.Log("Cannot send Registration ID to Server");
 			} else {
 				// When Submit Server Successfully, save it here!.
 				Utils.storeRegistrationId(context, regid);
 			}
 		} catch (JSONException e) {
-			Log.e(LOG_TAG, "Can't Register device with the Back-end!");
+			Logger.e("Can't Register device with the Back-end!");
 		} catch (NoConnectionException e) {
 			showCrouton(R.string.alert_no_network);
 		}
@@ -262,7 +260,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 			@Override
 			protected void onPostExecute(String msg) {
-				Log.d(LOG_TAG, msg + "\n");
+				Logger.d(msg + "\n");
 			}
 		};
 
@@ -270,7 +268,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	}
 
 	private boolean checkPlayServices() {
-		Logger.Log(LOG_TAG, "checkPlayServices()");
+		Logger.Log("checkPlayServices()");
 
 		int resultCode = GooglePlayServicesUtil
 				.isGooglePlayServicesAvailable(this);

@@ -34,8 +34,8 @@ public class GateContainerCursorAdapter extends CursorAdapter implements
 		super(context, c);
 	}
 
-	public GateContainerCursorAdapter(Context context, int layout,
-			Cursor c, int flags) {
+	public GateContainerCursorAdapter(Context context, int layout, Cursor c,
+			int flags) {
 		super(context, c, flags);
 		this.layout = layout;
 		this.inflater = LayoutInflater.from(context);
@@ -106,12 +106,14 @@ public class GateContainerCursorAdapter extends CursorAdapter implements
 
 		boolean isValidForUpload = false;
 		if (cursor.getColumnIndex("export_image_count") >= 0) {
-			isValidForUpload = cursor.getInt(cursor.getColumnIndexOrThrow("export_image_count")) > 0;
+			isValidForUpload = cursor.getInt(cursor
+					.getColumnIndexOrThrow("export_image_count")) > 0;
 		} else if (cursor.getColumnIndex("import_image_count") >= 0) {
-			isValidForUpload = cursor.getInt(cursor.getColumnIndexOrThrow("import_image_count")) > 0;			
+			isValidForUpload = cursor.getInt(cursor
+					.getColumnIndexOrThrow("import_image_count")) > 0;
 		}
 		if (isValidForUpload) {
-			holder.validationImageView.setVisibility(ImageView.VISIBLE);			
+			holder.validationImageView.setVisibility(ImageView.VISIBLE);
 		} else {
 			holder.validationImageView.setVisibility(ImageView.INVISIBLE);
 		}

@@ -50,7 +50,6 @@ import com.google.gson.reflect.TypeToken;
 @SuppressLint("SimpleDateFormat")
 public class CJayClient implements ICJayClient {
 
-	private static final String LOG_TAG = "CJayClient";
 	public static String BASE_URL = "https://cloudjay-web.appspot.com/api/jaypix/";
 
 	private IHttpRequestWrapper requestWrapper;
@@ -119,11 +118,11 @@ public class CJayClient implements ICJayClient {
 			throws JSONException, SocketTimeoutException, NoConnectionException {
 
 		if (Utils.hasNoConnection(ctx)) {
-			Logger.Log(LOG_TAG, "No connection");
+			Logger.Log("No connection");
 			throw new NoConnectionException();
 		}
 
-		Logger.Log(LOG_TAG, "getting User Token ... ");
+		Logger.Log("getting User Token ... ");
 
 		JSONObject requestPacket = new JSONObject();
 		requestPacket.put("username", username);
@@ -154,7 +153,7 @@ public class CJayClient implements ICJayClient {
 			NoConnectionException {
 
 		if (Utils.hasNoConnection(ctx)) {
-			Logger.Log(LOG_TAG, "No connection");
+			Logger.Log("No connection");
 			throw new NoConnectionException();
 		}
 
@@ -191,10 +190,10 @@ public class CJayClient implements ICJayClient {
 	public User getCurrentUser(String token, Context ctx)
 			throws NoConnectionException {
 
-		Logger.Log(LOG_TAG, "getting Current User ...");
+		Logger.Log("getting Current User ...");
 
 		if (Utils.hasNoConnection(ctx)) {
-			Logger.Log(LOG_TAG, "No connection");
+			Logger.Log("No connection");
 			throw new NoConnectionException();
 		}
 
@@ -216,10 +215,10 @@ public class CJayClient implements ICJayClient {
 	public List<Operator> getOperators(Context ctx)
 			throws NoConnectionException, NullSessionException {
 
-		Logger.Log(LOG_TAG, "getOperators");
+		Logger.Log("getOperators");
 
 		if (Utils.hasNoConnection(ctx)) {
-			Logger.Log(LOG_TAG, "No connection");
+			Logger.Log("No connection");
 			throw new NoConnectionException();
 		}
 
@@ -244,7 +243,7 @@ public class CJayClient implements ICJayClient {
 	public List<DamageCode> getDamageCodes(Context ctx)
 			throws NoConnectionException, NullSessionException {
 
-		Logger.Log(LOG_TAG, "getDamageCodes");
+		Logger.Log("getDamageCodes");
 
 		if (Utils.hasNoConnection(ctx)) {
 			throw new NoConnectionException();
@@ -272,7 +271,7 @@ public class CJayClient implements ICJayClient {
 	public List<DamageCode> getDamageCodes(Context ctx, String date)
 			throws NoConnectionException, NullSessionException {
 
-		Logger.Log(LOG_TAG, "getDamageCodes from " + date);
+		Logger.Log("getDamageCodes from " + date);
 		if (Utils.hasNoConnection(ctx)) {
 			throw new NoConnectionException();
 		}
@@ -300,7 +299,7 @@ public class CJayClient implements ICJayClient {
 	public List<RepairCode> getRepairCodes(Context ctx)
 			throws NoConnectionException, NullSessionException {
 
-		Logger.Log(LOG_TAG, "getRepairCodes");
+		Logger.Log("getRepairCodes");
 		if (Utils.hasNoConnection(ctx)) {
 			throw new NoConnectionException();
 		}
@@ -326,7 +325,7 @@ public class CJayClient implements ICJayClient {
 	public List<RepairCode> getRepairCodes(Context ctx, String date)
 			throws NoConnectionException, NullSessionException {
 
-		Logger.Log(LOG_TAG, "getRepairCodes from " + date);
+		Logger.Log("getRepairCodes from " + date);
 		if (Utils.hasNoConnection(ctx)) {
 			throw new NoConnectionException();
 		}
@@ -354,7 +353,7 @@ public class CJayClient implements ICJayClient {
 	public List<ComponentCode> getComponentCodes(Context ctx)
 			throws NoConnectionException, NullSessionException {
 
-		Logger.Log(LOG_TAG, "getComponentCodes");
+		Logger.Log("getComponentCodes");
 
 		if (Utils.hasNoConnection(ctx)) {
 			throw new NoConnectionException();
@@ -382,7 +381,7 @@ public class CJayClient implements ICJayClient {
 	public List<ComponentCode> getComponentCodes(Context ctx, String date)
 			throws NoConnectionException, NullSessionException {
 
-		Logger.Log(LOG_TAG, "getComponentCodes from " + date);
+		Logger.Log("getComponentCodes from " + date);
 		if (Utils.hasNoConnection(ctx)) {
 			throw new NoConnectionException();
 		}
@@ -409,7 +408,7 @@ public class CJayClient implements ICJayClient {
 	public ContainerSessionResult getContainerSessionsByPage(Context ctx,
 			int page) throws NoConnectionException, NullSessionException {
 
-		// Logger.Log(LOG_TAG, "Current page: " + Integer.toString(page));
+		// Logger.Log( "Current page: " + Integer.toString(page));
 
 		if (Utils.hasNoConnection(ctx)) {
 			throw new NoConnectionException();
@@ -425,7 +424,7 @@ public class CJayClient implements ICJayClient {
 		String response = requestWrapper.sendGet(String.format(
 				CJayConstant.LIST_CONTAINER_SESSIONS_WITH_PAGE, page), headers);
 
-		// Logger.Log(LOG_TAG, "Server response: " + response);
+		// Logger.Log( "Server response: " + response);
 
 		Gson gson = new GsonBuilder().setDateFormat(
 				CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
@@ -447,7 +446,7 @@ public class CJayClient implements ICJayClient {
 	public List<ContainerSession> getAllContainerSessions(Context ctx)
 			throws NoConnectionException, NullSessionException {
 
-		Logger.Log(LOG_TAG, "getAllContainerSessions(Context ctx)");
+		Logger.Log("getAllContainerSessions(Context ctx)");
 
 		if (Utils.hasNoConnection(ctx)) {
 			throw new NoConnectionException();
@@ -465,9 +464,9 @@ public class CJayClient implements ICJayClient {
 				CJayConstant.LIST_CONTAINER_SESSIONS, headers);
 
 		long difference = System.currentTimeMillis() - startTime;
-		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference));
+		Logger.Log("---> Total time: " + Long.toString(difference));
 
-		// Logger.Log(LOG_TAG, response);
+		// Logger.Log( response);
 
 		Gson gson = new GsonBuilder().setDateFormat(
 				CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
@@ -507,7 +506,7 @@ public class CJayClient implements ICJayClient {
 		}
 
 		// long difference = System.currentTimeMillis() - startTime;
-		// Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference));
+		// Logger.Log( "---> Total time: " + Long.toString(difference));
 
 		return items;
 	}
@@ -516,7 +515,7 @@ public class CJayClient implements ICJayClient {
 	public List<ContainerSession> getContainerSessions(Context ctx, Date date)
 			throws NoConnectionException, NullSessionException {
 
-		Logger.Log(LOG_TAG, "getContainerSessions(Context ctx, Date date)");
+		Logger.Log("getContainerSessions(Context ctx, Date date)");
 		long startTime = System.currentTimeMillis();
 
 		if (Utils.hasNoConnection(ctx)) {
@@ -530,7 +529,7 @@ public class CJayClient implements ICJayClient {
 		items = getContainerSessions(ctx, formatedDate);
 
 		long difference = System.currentTimeMillis() - startTime;
-		Logger.Log(LOG_TAG, "---> Total time: " + Long.toString(difference));
+		Logger.Log("---> Total time: " + Long.toString(difference));
 		return items;
 	}
 
@@ -553,7 +552,7 @@ public class CJayClient implements ICJayClient {
 				CJayConstant.LIST_CONTAINER_SESSIONS_WITH_DATETIME_AND_PAGE,
 				date, page), headers);
 
-		// Logger.Log(LOG_TAG, response);
+		// Logger.Log( response);
 
 		Gson gson = new GsonBuilder().setDateFormat(
 				CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
@@ -575,7 +574,7 @@ public class CJayClient implements ICJayClient {
 	public List<ContainerSession> getContainerSessions(Context ctx, String date)
 			throws NoConnectionException, NullSessionException {
 
-		Logger.Log(LOG_TAG, "getContainerSessions(Context ctx, String date)");
+		Logger.Log("getContainerSessions(Context ctx, String date)");
 
 		if (Utils.hasNoConnection(ctx)) {
 			throw new NoConnectionException();
@@ -593,9 +592,9 @@ public class CJayClient implements ICJayClient {
 				headers);
 
 		if (TextUtils.isEmpty(response)) {
-			Logger.Log(LOG_TAG, "No new items from " + date);
+			Logger.Log("No new items from " + date);
 		} else {
-			Logger.Log(LOG_TAG, response);
+			Logger.Log(response);
 
 			Gson gson = new GsonBuilder().setDateFormat(
 					CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
@@ -666,10 +665,10 @@ public class CJayClient implements ICJayClient {
 	public List<Operator> getOperators(Context ctx, String date)
 			throws NoConnectionException, NullSessionException {
 
-		Logger.Log(LOG_TAG, "getOperators from " + date);
+		Logger.Log("getOperators from " + date);
 
 		if (Utils.hasNoConnection(ctx)) {
-			Logger.Log(LOG_TAG, "No connection");
+			Logger.Log("No connection");
 			throw new NoConnectionException();
 		}
 

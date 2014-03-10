@@ -35,8 +35,6 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.fragment_repair_issue_fixed)
 public class RepairIssueFixedListFragment extends SherlockFragment {
 
-	private final static String LOG_TAG = "RepairIssueFixedListFragment";
-
 	private ArrayList<Issue> mFeeds;
 	private FunDapter<Issue> mFeedsAdapter;
 	private ContainerSession mContainerSession;
@@ -198,7 +196,7 @@ public class RepairIssueFixedListFragment extends SherlockFragment {
 	}
 
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
-		Logger.Log(LOG_TAG, "onEvent ContainerSessionChangedEvent");
+		Logger.Log("onEvent ContainerSessionChangedEvent");
 		refresh();
 	}
 }

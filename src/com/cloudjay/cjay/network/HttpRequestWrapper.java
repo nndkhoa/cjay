@@ -44,8 +44,6 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 	private HttpPost httpPost = null;
 	private HttpGet httpGet = null;
 
-	private static final String LOG_TAG = "HttpRequestWrapper";
-
 	public static final String DEFAULT_ACCEPT_HEADER = "text/html,application/xml,application/xhtml+xml,text/html,application/json;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5";
 	public static final String DEFAULT_CONTENT_TYPE = "application/x-www-form-urlencoded";
 	public static final String JSON_CONTENT_TYPE = "application/json";
@@ -104,10 +102,10 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 			Map<String, String> headers) throws SocketTimeoutException,
 			NoConnectionException {
 
-		Logger.Log(LOG_TAG, "URL: " + url);
-		Logger.Log(LOG_TAG, "Data: " + data);
-		Logger.Log(LOG_TAG, "Content Type: " + contentType);
-		Logger.Log(LOG_TAG, "Header: " + headers.toString());
+		Logger.Log("URL: " + url);
+		Logger.Log("Data: " + data);
+		Logger.Log("Content Type: " + contentType);
+		Logger.Log("Header: " + headers.toString());
 
 		httpClient.getParams().setParameter(ClientPNames.COOKIE_POLICY,
 				CookiePolicy.RFC_2109);
@@ -148,7 +146,7 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 					|| response.getStatusLine().getStatusCode() == HttpStatus.SC_ACCEPTED) {
 
 				ret = EntityUtils.toString(response.getEntity());
-				Logger.Log(LOG_TAG, "Return from server: " + ret);
+				Logger.Log("Return from server: " + ret);
 
 			} else {
 				Log.i("FOO", "Screw up with http - "
@@ -177,8 +175,8 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 	public String sendGet(String url, Map<String, String> headers)
 			throws NoConnectionException {
 
-		Logger.Log(LOG_TAG, "Url: " + url);
-		Logger.Log(LOG_TAG, "Header: " + headers.toString());
+		Logger.Log("Url: " + url);
+		Logger.Log("Header: " + headers.toString());
 
 		httpGet = new HttpGet(url);
 
@@ -202,7 +200,7 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 
 			if (responseCode == HttpStatus.SC_FORBIDDEN) {
 				// Log user out
-				Logger.Log(LOG_TAG, "Token was expired.", Log.ERROR);
+				Logger.e("Token was expired.");
 			}
 
 			ret = EntityUtils.toString(response.getEntity(), HTTP.UTF_8);

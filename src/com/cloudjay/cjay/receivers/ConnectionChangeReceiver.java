@@ -12,19 +12,17 @@ import android.widget.Toast;
 
 public class ConnectionChangeReceiver extends BroadcastReceiver {
 
-	public static final String LOG_TAG = "ConnectionChangeReceiver";
-
 	@Override
 	public void onReceive(Context context, Intent intent) {
 
 		if (NetworkHelper.isConnected(context)) {
-			Logger.Log(LOG_TAG, "Connected to Internet");
+			Logger.Log("Connected to Internet");
 
 			PreferencesUtil.storePrefsValue(context,
 					PreferencesUtil.PREF_NO_CONNECTION, false);
 
 			if (!Utils.isAlarmUp(context)) {
-				Logger.Log(LOG_TAG, "Alarm Manager is not running.");
+				Logger.Log("Alarm Manager is not running.");
 				Utils.startAlarm(context);
 			}
 
@@ -32,14 +30,14 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
 					.show();
 
 		} else {
-			Logger.Log(LOG_TAG, "Not connect to Internet");
+			Logger.Log("Not connect to Internet");
 
 			// Mark that device has no data connection
 			PreferencesUtil.storePrefsValue(context,
 					PreferencesUtil.PREF_NO_CONNECTION, true);
 
 			if (Utils.isAlarmUp(context)) {
-				Logger.Log(LOG_TAG, "Alarm Manager is running.");
+				Logger.Log("Alarm Manager is running.");
 				Utils.cancelAlarm(context);
 			}
 

@@ -37,14 +37,12 @@ public class GateHomeActivity extends CJayActivity implements
 	public static final int TAB_EXPORT = 1;
 	public static final int TAB_UPLOAD = 2;
 
-	private static final String LOG_TAG = "GateHomeActivity";
-
 	private String[] locations;
 	private ViewPagerAdapter mPagerAdapter;
+	PullToRefreshAttacher mPullToRefreshAttacher;
 
 	@ViewById
 	ViewPager pager;
-	PullToRefreshAttacher mPullToRefreshAttacher;
 
 	public PullToRefreshAttacher getPullToRefreshAttacher() {
 		return mPullToRefreshAttacher;
@@ -150,14 +148,14 @@ public class GateHomeActivity extends CJayActivity implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_logout:
-			Logger.Log(LOG_TAG, "Logout");
+			Logger.Log("Logout");
 			getSession().deleteSession(getApplicationContext());
 			startActivity(new Intent(this, LoginActivity_.class));
 			finish();
 			return true;
-			
+
 		case R.id.menu_more:
-			Logger.Log(LOG_TAG, "Menu More");
+			Logger.Log("Menu More");
 			return true;
 		}
 
