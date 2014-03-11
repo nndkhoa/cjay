@@ -87,7 +87,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			// Create view
 			// csview --> join table operator + container + container_session
 			String sql = "CREATE VIEW csview AS"
-					+ " SELECT cs._id, cs.check_out_time, cs.check_in_time, cs.image_id_path, cs.on_local, cs.fixed, cs.upload_confirmation, cs.state, cs.cleared, c.container_id, o.operator_name"
+					+ " SELECT cs._id, cs.check_out_time, cs.check_in_time, cs.image_id_path, cs.on_local, cs.fixed, cs.export, cs.upload_confirmation, cs.state, cs.cleared, c.container_id, o.operator_name"
 					+ " FROM container_session AS cs, container AS c"
 					+ " LEFT JOIN operator AS o ON c.operator_id = o._id"
 					+ " WHERE cs.container_id = c._id";
@@ -98,7 +98,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 					+ " SELECT cs.*, count(cjay_image._id) as import_image_count "
 					+ " FROM csview cs"
 					+ " LEFT JOIN cjay_image ON cjay_image.containerSession_id = cs._id AND cjay_image.type = 0"
-					+ " WHERE cs.upload_confirmation = 0 AND cs.on_local = 1 AND cs.state <> 4"
+					+ " WHERE cs.upload_confirmation = 0 AND cs.on_local = 1 AND cs.export = 0 AND cs.state <> 4"
 					+ " GROUP BY cs._id";
 			db.execSQL(sql);
 
@@ -107,7 +107,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 					+ " SELECT cs.*, count(cjay_image._id) as export_image_count "
 					+ " FROM csview cs"
 					+ " LEFT JOIN cjay_image ON cjay_image.containerSession_id = cs._id AND cjay_image.type = 1"
-					+ " WHERE cs.check_out_time = '' AND cs.on_local = 0 "
+					+ " WHERE cs.check_out_time = '' AND (cs.export = 1) OR (cs.on_local = 0)"
 					+ " GROUP BY cs._id";
 			db.execSQL(sql);
 

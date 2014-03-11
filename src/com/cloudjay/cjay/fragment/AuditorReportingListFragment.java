@@ -408,6 +408,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 
 	public void showContainerDetailDialog(String containerId,
 			String operatorName, int mode) {
+
 		FragmentManager fm = getActivity().getSupportFragmentManager();
 		AddContainerDialog addContainerDialog = new AddContainerDialog();
 		addContainerDialog.setContainerId(containerId);
