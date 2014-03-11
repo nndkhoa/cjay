@@ -21,10 +21,14 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.view.AddContainerDialog;
+import com.cloudjay.cjay.view.SearchOperatorDialog;
 
 @EActivity(R.layout.activity_repair_home)
 public class RepairHomeActivity extends CJayActivity implements
-		OnPageChangeListener, TabListener {
+		OnPageChangeListener, TabListener,
+		AddContainerDialog.AddContainerDialogListener,
+		SearchOperatorDialog.SearchOperatorDialogListener {
 
 	private String[] locations;
 	private ViewPagerAdapter viewPagerAdapter;
@@ -142,5 +146,23 @@ public class RepairHomeActivity extends CJayActivity implements
 
 	@Override
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
+	}
+
+	@Override
+	public void OnOperatorSelected(Fragment parent, String containerId,
+			String operatorName, int mode) {
+		if (parent instanceof RepairContainerPendingListFragment) {
+			((RepairContainerPendingListFragment) parent).OnOperatorSelected(
+					containerId, operatorName, mode);
+		}
+	}
+
+	@Override
+	public void OnContainerInputCompleted(Fragment parent, String containerId,
+			String operatorName, int mode) {
+		if (parent instanceof RepairContainerPendingListFragment) {
+			((RepairContainerPendingListFragment) parent).OnContainerInputCompleted(
+					containerId, operatorName, mode);
+		}
 	}
 }
