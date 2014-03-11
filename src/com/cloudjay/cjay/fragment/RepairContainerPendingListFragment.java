@@ -2,7 +2,9 @@ package com.cloudjay.cjay.fragment;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.OptionsMenu;
@@ -12,14 +14,17 @@ import org.androidannotations.annotations.ViewById;
 import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -30,9 +35,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
@@ -42,7 +47,9 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.CJayActivity;
+import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.RepairContainerActivity_;
 import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerRepairedEvent;
@@ -51,10 +58,14 @@ import com.cloudjay.cjay.events.PostLoadDataEvent;
 import com.cloudjay.cjay.events.PreLoadDataEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
+import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.view.AddContainerDialog;
+
 import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_repair_container_pending)
@@ -62,6 +73,7 @@ import de.greenrobot.event.EventBus;
 public class RepairContainerPendingListFragment extends SherlockFragment
 		implements OnRefreshListener, LoaderCallbacks<Cursor> {
 
+	private final static String LOG_TAG = "RepairContainerPendingListFragment";
 	private final static int LOADER_ID = 4;
 
 	private ArrayList<ContainerSession> mSelectedContainerSessions;
@@ -309,7 +321,72 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 
 		mFeedListView.setEmptyView(mEmptyElement);
 	}
+	
+	@Click(R.id.add_button)
+	void addButtonClicked() {
 
+		// show add container dialog
+		String containerId;
+		if (!TextUtils.isEmpty(mSearchEditText.getText().toString())) {
+			containerId = mSearchEditText.getText().toString();
+		} else {
+			containerId = "";
+		}
+		showContainerDetailDialog(containerId, "",
+				AddContainerDialog.CONTAINER_DIALOG_ADD);
+	}
+	
+	public void showContainerDetailDialog(String containerId,
+			String operatorName, int mode) {
+		FragmentManager fm = getActivity().getSupportFragmentManager();
+		AddContainerDialog addContainerDialog = new AddContainerDialog();
+		addContainerDialog.setContainerId(containerId);
+		addContainerDialog.setOperatorName(operatorName);
+		addContainerDialog.setMode(mode);
+		addContainerDialog.setParent(this);
+		addContainerDialog.isOperatorRequired = false;
+		addContainerDialog.show(fm, "add_container_dialog");
+	}
+	
+	public void OnOperatorSelected(String containerId, String operatorName,
+			int mode) {
+		showContainerDetailDialog(containerId, operatorName, mode);
+	}
+	
+	public void OnContainerInputCompleted(String containerId,
+			String operatorName, int mode) {
+		String operatorCode = "";
+
+		switch (mode) {
+		case AddContainerDialog.CONTAINER_DIALOG_ADD:
+
+			Activity activity = getActivity();
+			String currentTimeStamp = StringHelper
+					.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
+
+			String depotCode = "";
+			if (getActivity() instanceof CJayActivity) {
+				depotCode = ((CJayActivity) activity).getSession().getDepot()
+						.getDepotCode();
+			}
+
+			ContainerSession containerSession = new ContainerSession(activity,
+					containerId, operatorCode, currentTimeStamp, depotCode);
+			containerSession.setOnLocal(true);
+
+			try {
+				containerSessionDaoImpl.addContainerSession(containerSession);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			EventBus.getDefault().post(
+					new ContainerSessionChangedEvent(containerSession));
+
+			break;
+		}
+	}
+	
 	@ItemClick(R.id.container_list)
 	void listItemClicked(int position) {
 		Intent intent = new Intent(getActivity(),
