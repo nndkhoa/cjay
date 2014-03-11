@@ -3,7 +3,9 @@ package com.cloudjay.cjay;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.json.JSONException;
 
@@ -22,6 +24,7 @@ import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.DataCenter_;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.Session;
@@ -39,8 +42,15 @@ import de.keyboardsurfer.android.widget.crouton.Style;
 public class CJayActivity extends SherlockFragmentActivity implements
 		ICJayActivity {
 
-	private Session session;
-	private DataCenter dataCenter;
+	@Bean
+	Session session;
+
+	@Bean
+	DataCenter dataCenter;
+
+	GoogleCloudMessaging gcm;
+	Context context;
+	String regid;
 
 	public DataCenter getDataCenter() {
 		return dataCenter;
@@ -63,31 +73,9 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 	@Override
 	protected void onCreate(Bundle arg0) {
-
-		// Thread.setDefaultUncaughtExceptionHandler(new
-		// UncaughtExceptionHandler() {
-		//
-		// @Override
-		// public void uncaughtException(Thread arg0, Throwable arg1) {
-		// showCrouton(R.string.alert_try_again);
-		//
-		// // ACRA.getErrorReporter().handleSilentException(arg1);
-		// // ACRA.getErrorReporter().handleException(new
-		// // Exception("Just for the stacktrace"));
-		// }
-		//
-		// });
-
 		EventBus.getDefault().register(this);
 		super.onCreate(arg0);
 		session = Session.restore(getApplicationContext());
-
-		// if (android.os.Build.VERSION.SDK_INT > 9) {
-		// StrictMode.ThreadPolicy policy = new
-		// StrictMode.ThreadPolicy.Builder()
-		// .permitAll().build();
-		// StrictMode.setThreadPolicy(policy);
-		// }
 	}
 
 	@Override
@@ -95,11 +83,8 @@ public class CJayActivity extends SherlockFragmentActivity implements
 		return this;
 	}
 
-	GoogleCloudMessaging gcm;
-	Context context;
-	String regid;
-
 	@Override
+	@Trace(level = Log.WARN)
 	protected void onResume() {
 
 		Logger.Log("*** onResume - DataCenter.reload ***");
@@ -115,7 +100,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 					protected Void doInBackground(Void... params) {
 
 						try {
-							DataCenter.getInstance().fetchData(
+							DataCenter_.getInstance().fetchData(
 									getApplicationContext());
 						} catch (NoConnectionException e) {
 							e.printStackTrace();
@@ -129,7 +114,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 				Logger.Log("Call from others Activity");
 
-				DataCenter.LoadDataTask = new AsyncTask<Void, Integer, Void>() {
+				DataCenter_.LoadDataTask = new AsyncTask<Void, Integer, Void>() {
 
 					@Override
 					protected void onPreExecute() {
@@ -147,7 +132,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 					protected Void doInBackground(Void... params) {
 
 						try {
-							DataCenter.getInstance()
+							DataCenter_.getInstance()
 									.updateListContainerSessions(
 											getApplicationContext());
 
@@ -162,7 +147,7 @@ public class CJayActivity extends SherlockFragmentActivity implements
 
 				};
 
-				DataCenter.LoadDataTask.execute();
+				DataCenter_.LoadDataTask.execute();
 			}
 
 			context = getApplicationContext();

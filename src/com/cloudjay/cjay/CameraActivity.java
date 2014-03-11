@@ -469,7 +469,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		String containerId = containerSession.getContainerId();
 
 		// filename sample:
-		// [depot-code]-2013-12-19-[gate-in|gate-out|report]-[UUID].jpg
+		// [depot-code]-2013-12-19-[gate-in|gate-out|report]-[containerId]-[UUID].jpg
 		String fileName = depotCode + "-"
 				+ StringHelper.getCurrentTimestamp("yyyy-MM-dd") + "-"
 				+ imageType + "-" + containerId + "-" + uuid + ".jpg";

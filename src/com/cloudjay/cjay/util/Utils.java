@@ -41,13 +41,11 @@ import android.view.animation.ScaleAnimation;
 import android.widget.Toast;
 
 import com.cloudjay.cjay.CJayActivity;
-import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.service.QueueIntentService_;
 import com.cloudjay.cjay.service.UploadIntentService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.lightbox.android.photoprocessing.PhotoProcessing;
 import com.lightbox.android.photoprocessing.utils.MediaUtils;
 
 public class Utils {
@@ -254,37 +252,6 @@ public class Utils {
 		original.recycle();
 
 		return bitmap;
-	}
-
-	public static Bitmap fineResizePhoto(final Bitmap bitmap,
-			final int maxDimension) {
-		Utils.checkPhotoProcessingThread();
-
-		final int width = bitmap.getWidth();
-		final int height = bitmap.getHeight();
-		final int biggestDimension = Math.max(width, height);
-
-		if (biggestDimension <= maxDimension) {
-			return bitmap;
-		}
-
-		final float ratio = maxDimension / (float) biggestDimension;
-		Bitmap resized = PhotoProcessing.resize(bitmap,
-				Math.round(width * ratio), Math.round(height * ratio));
-		if (Flags.DEBUG) {
-			Log.d("PhotoUpload", "Finely resized to: " + resized.getWidth()
-					+ "x" + resized.getHeight());
-		}
-
-		return resized;
-	}
-
-	public static void checkPhotoProcessingThread() {
-		if (!CJayApplication.THREAD_FILTERS.equals(Thread.currentThread()
-				.getName())) {
-			throw new IllegalStateException(
-					"PhotoProcessing should be done on corrent thread!");
-		}
 	}
 
 	public static String replaceNullBySpace(String in) {

@@ -9,6 +9,7 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.androidannotations.annotations.EIntentService;
+import org.androidannotations.annotations.Trace;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
@@ -33,7 +34,6 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.aerilys.helpers.android.NetworkHelper;
-import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.SplashScreenActivity;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
@@ -62,13 +62,11 @@ public class UploadIntentService extends IntentService implements
 	int targetProgressBar = 0;
 	static final int NOTIFICATION_ID = 1000;
 
-	private NotificationManager mNotificationMgr;
-	private NotificationCompat.Builder mNotificationBuilder;
-	private NotificationCompat.BigPictureStyle mBigPicStyle;
 	private String mNotificationSubtitle;
 	private int mNumberUploaded = 0;
 
-	private ExecutorService mExecutor;
+	private CJayImageDaoImpl cJayImageDaoImpl;
+	private ContainerSessionDaoImpl containerSessionDaoImpl;
 
 	public UploadIntentService() {
 		super("UploadIntentService");
@@ -92,22 +90,9 @@ public class UploadIntentService extends IntentService implements
 				// It will return container which `upload confirmation = true`
 				ContainerSession containerSession = containerSessionDaoImpl
 						.getNextWaiting();
-				//
+
 				if (null != containerSession) {
-
-					//
-					// // trigger event to display in UploadsFragment
-					//
-					// // startForeground();
-					// // trimCache();
-					//
-					// // Photup implementation
-					// // updateNotification(containerSession);
-					//
-					// // Self-implementation
-
 					doUploadContainer(containerSession);
-					//
 				}
 
 			} catch (SQLException e) {
@@ -116,82 +101,11 @@ public class UploadIntentService extends IntentService implements
 		}
 	}
 
-	void updateNotification(final ContainerSession upload) {
-
-		Logger.Log("updateNotification: " + upload.getContainerId());
-
-		String text;
-
-		if (VERSION.SDK_INT >= VERSION_CODES.ICE_CREAM_SANDWICH) {
-			final Bitmap uploadBigPic = upload.getBigPictureNotificationBmp();
-
-			if (null == uploadBigPic) {
-				// mExecutor.submit(new UpdateBigPictureStyleRunnable(upload));
-			}
-			mBigPicStyle.bigPicture(uploadBigPic);
-		}
-
-		switch (upload.getUploadState()) {
-		case ContainerSession.STATE_UPLOAD_WAITING:
-			text = getString(R.string.notification_uploading_photo,
-					mNumberUploaded + 1);
-			mNotificationBuilder.setContentTitle(text);
-			mNotificationBuilder.setTicker(text);
-			mNotificationBuilder.setProgress(0, 0, true);
-			mNotificationBuilder.setWhen(System.currentTimeMillis());
-			break;
-
-		case ContainerSession.STATE_UPLOAD_IN_PROGRESS:
-			if (upload.getUploadProgress() >= 0) {
-				text = getString(
-						R.string.notification_uploading_photo_progress,
-						mNumberUploaded + 1, upload.getUploadProgress());
-				mNotificationBuilder.setContentTitle(text);
-				mNotificationBuilder.setProgress(100,
-						upload.getUploadProgress(), false);
-			}
-			break;
-		}
-
-		mBigPicStyle.setSummaryText(mNotificationSubtitle);
-		mNotificationMgr.notify(NOTIFICATION_ID, mBigPicStyle.build());
-	}
-
-	private void trimCache() {
-		CJayApplication.getApplication(this).getImageCache().trimMemory();
-	}
-
-	private void startForeground() {
-
-		Logger.Log("startForeground");
-
-		if (null == mNotificationBuilder) {
-			mNotificationBuilder = new NotificationCompat.Builder(this);
-			mNotificationBuilder.setSmallIcon(R.drawable.ic_stat_upload);
-			mNotificationBuilder.setContentTitle(getString(R.string.app_name));
-			mNotificationBuilder.setOngoing(true);
-			mNotificationBuilder.setWhen(System.currentTimeMillis());
-
-			PendingIntent intent = PendingIntent.getActivity(this, 0,
-					new Intent(this, SplashScreenActivity.class), 0);
-
-			mNotificationBuilder.setContentIntent(intent);
-		}
-
-		if (null == mBigPicStyle) {
-			mBigPicStyle = new NotificationCompat.BigPictureStyle(
-					mNotificationBuilder);
-		}
-
-		startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
-	}
-
 	public void onEventMainThread(UploadStateChangedEvent event) {
 		ContainerSession upload = event.getContainerSession();
 
 		switch (upload.getUploadState()) {
 		case ContainerSession.STATE_UPLOAD_IN_PROGRESS:
-			updateNotification(upload);
 			break;
 
 		case ContainerSession.STATE_UPLOAD_COMPLETED:
@@ -220,8 +134,8 @@ public class UploadIntentService extends IntentService implements
 	 * 
 	 * @param containerSession
 	 */
-	private synchronized void doUploadContainer(
-			ContainerSession containerSession) {
+	@Trace(level = Log.WARN)
+	synchronized void doUploadContainer(ContainerSession containerSession) {
 
 		Logger.Log("doUploadContainer: " + containerSession.getContainerId());
 
@@ -298,7 +212,6 @@ public class UploadIntentService extends IntentService implements
 
 		try {
 			stopForeground(true);
-			finishedNotification();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -312,33 +225,12 @@ public class UploadIntentService extends IntentService implements
 		return super.onStartCommand(intent, flags, startId);
 	}
 
-	void finishedNotification() {
-		// Logger.Log("finishedNotification");
-
-		if (null != mNotificationBuilder) {
-			String text = getResources().getQuantityString(
-					R.plurals.notification_uploaded_photo, mNumberUploaded,
-					mNumberUploaded);
-
-			mNotificationBuilder.setOngoing(false);
-			mNotificationBuilder.setProgress(0, 0, false);
-			mNotificationBuilder.setWhen(System.currentTimeMillis());
-			mNotificationBuilder.setContentTitle(text);
-			mNotificationBuilder.setTicker(text);
-
-			mNotificationMgr.notify(NOTIFICATION_ID,
-					mNotificationBuilder.build());
-		}
-	}
-
-	private CJayImageDaoImpl cJayImageDaoImpl;
-	private ContainerSessionDaoImpl containerSessionDaoImpl;
-
 	@Override
 	public void onChange(int progress) {
 	}
 
-	private void doFileUpload(CJayImage uploadItem) {
+	@Trace(level = Log.WARN)
+	void doFileUpload(CJayImage uploadItem) {
 
 		Logger.Log("doFileUpload: " + uploadItem.getImageName());
 
@@ -426,20 +318,4 @@ public class UploadIntentService extends IntentService implements
 			e.printStackTrace();
 		}
 	}
-
-	// private class UpdateBigPictureStyleRunnable extends PhotupThreadRunnable
-	// {
-	//
-	// private final ContainerSession mSelection;
-	//
-	// public UpdateBigPictureStyleRunnable(ContainerSession selection) {
-	// mSelection = selection;
-	// }
-	//
-	// public void runImpl() {
-	// mSelection.setBigPictureNotificationBmp(UploadIntentService.this,
-	// mSelection.getThumbnailImage(UploadIntentService.this));
-	// updateNotification(mSelection);
-	// }
-	// }
 }

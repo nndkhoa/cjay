@@ -8,7 +8,6 @@ import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 import org.androidannotations.annotations.EApplication;
 
-import uk.co.senab.bitmapcache.BitmapLruCache;
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
@@ -47,13 +46,8 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 @EApplication
 public class CJayApplication extends Application {
 
-	static final float EXECUTOR_POOL_SIZE_PER_CORE = 1.5f;
-	public static final String THREAD_FILTERS = "filters_thread";
-
-	private BitmapLruCache mImageCache;
 	IDatabaseManager databaseManager = null;
 	IHttpRequestWrapper httpRequestWrapper = null;
-
 	Map<String, Fragment.SavedState> savedStateMap;
 
 	public void setFragmentSavedState(String key, SavedState savedState) {
@@ -210,11 +204,4 @@ public class CJayApplication extends Application {
 		return Math.min(display.getHeight(), display.getWidth());
 	}
 
-	public BitmapLruCache getImageCache() {
-		if (null == mImageCache) {
-			mImageCache = new BitmapLruCache(this,
-					CJayConstant.IMAGE_CACHE_HEAP_PERCENTAGE);
-		}
-		return mImageCache;
-	}
 }

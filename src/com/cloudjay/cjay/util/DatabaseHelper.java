@@ -143,6 +143,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 					+ " group by csi._id";
 
 			db.execSQL(sql);
+			
+			// insert NULL operator
+//			sql = ""
 
 		} catch (SQLException e) {
 			Log.e(DatabaseHelper.class.getName(), "Can't create database", e);

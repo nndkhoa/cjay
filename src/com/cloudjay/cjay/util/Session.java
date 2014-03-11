@@ -6,6 +6,9 @@ package com.cloudjay.cjay.util;
 
 import java.sql.SQLException;
 
+import org.androidannotations.annotations.EBean;
+import org.androidannotations.annotations.EBean.Scope;
+
 import android.content.Context;
 
 import com.cloudjay.cjay.dao.IUserDao;
@@ -15,11 +18,16 @@ import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.j256.ormlite.table.TableUtils;
 
+@EBean(scope = Scope.Singleton)
 public class Session {
 
 	private static IDatabaseManager databaseManager;
 	private static IUserDao userDao;
 	private User currentUser;
+
+	public Session() {
+
+	}
 
 	public User getCurrentUser() {
 		if (currentUser == null) {
@@ -27,6 +35,10 @@ public class Session {
 		}
 
 		return currentUser;
+	}
+
+	public void setCurrentUser(User user) {
+		currentUser = user;
 	}
 
 	public Depot getDepot() {
@@ -46,10 +58,6 @@ public class Session {
 		return currentUser.getFilterStatus();
 	}
 
-	public Session(User user) {
-		currentUser = user;
-	}
-
 	public static void save(Context context) {
 
 	}
@@ -64,7 +72,9 @@ public class Session {
 			User user = userDao.getMainUser();
 
 			if (null != user) {
-				return new Session(user);
+				Session session = new Session();
+				session.setCurrentUser(user);
+				return session;
 			}
 
 		} catch (SQLException e) {
@@ -100,8 +110,6 @@ public class Session {
 			for (Class<?> dataClass : DatabaseHelper.DROP_CLASSES) {
 				TableUtils.createTable(helper.getConnectionSource(), dataClass);
 			}
-
-			// EventBus.getDefault().post(new UserLoggedOutEvent());
 
 			return true;
 		} catch (SQLException e) {

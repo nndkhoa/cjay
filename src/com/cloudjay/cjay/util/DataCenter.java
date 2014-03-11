@@ -6,11 +6,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.androidannotations.annotations.EBean;
+import org.androidannotations.annotations.EBean.Scope;
+import org.androidannotations.annotations.Trace;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -60,12 +65,11 @@ import de.greenrobot.event.EventBus;
  * 
  */
 @SuppressLint("SimpleDateFormat")
+@EBean(scope = Scope.Singleton)
 public class DataCenter {
 
-	// TODO: does DataCenter really need to manage them?
 	public static AsyncTask<Void, Integer, Void> LoadDataTask;
 	public static AsyncTask<Void, Void, String> RegisterGCMTask;
-
 	private static DataCenter instance = null;
 	private IDatabaseManager databaseManager = null;
 
@@ -567,6 +571,7 @@ public class DataCenter {
 	 *             if there is no connection to Internet
 	 * @throws SQLException
 	 */
+	@Trace(level = Log.WARN)
 	public void updateListContainerSessions(Context ctx)
 			throws NoConnectionException, SQLException {
 
