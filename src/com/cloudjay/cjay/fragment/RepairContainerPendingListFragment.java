@@ -48,8 +48,7 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.CJayActivity;
-import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.RepairContainerActivity_;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerRepairedEvent;
@@ -321,7 +320,7 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 
 		mFeedListView.setEmptyView(mEmptyElement);
 	}
-	
+
 	@Click(R.id.add_button)
 	void addButtonClicked() {
 
@@ -335,7 +334,7 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 		showContainerDetailDialog(containerId, "",
 				AddContainerDialog.CONTAINER_DIALOG_ADD);
 	}
-	
+
 	public void showContainerDetailDialog(String containerId,
 			String operatorName, int mode) {
 		FragmentManager fm = getActivity().getSupportFragmentManager();
@@ -347,12 +346,12 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 		addContainerDialog.isOperatorRequired = false;
 		addContainerDialog.show(fm, "add_container_dialog");
 	}
-	
+
 	public void OnOperatorSelected(String containerId, String operatorName,
 			int mode) {
 		showContainerDetailDialog(containerId, operatorName, mode);
 	}
-	
+
 	public void OnContainerInputCompleted(String containerId,
 			String operatorName, int mode) {
 		String operatorCode = "";
@@ -386,7 +385,7 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 			break;
 		}
 	}
-	
+
 	@ItemClick(R.id.container_list)
 	void listItemClicked(int position) {
 		Intent intent = new Intent(getActivity(),

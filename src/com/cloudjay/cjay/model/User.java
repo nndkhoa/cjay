@@ -1,5 +1,7 @@
 package com.cloudjay.cjay.model;
 
+import android.R.integer;
+
 import com.cloudjay.cjay.dao.UserDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -68,12 +70,6 @@ public class User {
 	@DatabaseField(columnName = EXPIRE)
 	int expire_in;
 
-	String depot_code;
-
-	public String getDepotCode() {
-		return depot_code;
-	}
-
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	private Depot depot;
 
@@ -84,6 +80,9 @@ public class User {
 	public void setDepot(Depot depot) {
 		this.depot = depot;
 	}
+
+	// use for json parsing purpose
+	private String depot_code;
 
 	public int getExpire() {
 		return expire_in;
@@ -218,5 +217,13 @@ public class User {
 			break;
 		}
 		return result;
+	}
+
+	public String getDepotCode() {
+		return depot_code;
+	}
+
+	public void setDepotCode(String depot_code) {
+		this.depot_code = depot_code;
 	}
 }

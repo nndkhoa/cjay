@@ -23,12 +23,7 @@ import com.cloudjay.cjay.events.UserLoggedOutEvent;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.DataCenter;
-import com.cloudjay.cjay.util.DataCenter_;
-import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.NoConnectionException;
-import com.cloudjay.cjay.util.Session;
-import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.*;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -84,7 +79,6 @@ public class CJayActivity extends SherlockFragmentActivity implements
 	}
 
 	@Override
-	@Trace(level = Log.WARN)
 	protected void onResume() {
 
 		Logger.Log("*** onResume - DataCenter.reload ***");

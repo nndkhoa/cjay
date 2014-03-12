@@ -276,7 +276,6 @@ public class GateImportListFragment extends SherlockFragment implements
 	}
 
 	@Click(R.id.btn_add_new)
-	@Trace
 	void addContainerClicked() {
 		// getResources().getString(R.string.default_container_id)
 		showContainerDetailDialog("", "",
