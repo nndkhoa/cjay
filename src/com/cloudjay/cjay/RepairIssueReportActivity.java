@@ -27,6 +27,13 @@ import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
 
+/**
+ * 
+ * Danh sách hình của một issue
+ * 
+ * @author quocvule
+ *
+ */
 @EActivity(R.layout.activity_repair_issue_report)
 @OptionsMenu(R.menu.menu_repair_issue_report)
 public class RepairIssueReportActivity extends CJayActivity implements
@@ -40,6 +47,7 @@ public class RepairIssueReportActivity extends CJayActivity implements
 	ViewPager pager;
 	@ViewById(R.id.container_id_textview)
 	TextView containerIdTextView;
+	
 	@ViewById(R.id.issue_textview)
 	TextView issueTextView;
 	

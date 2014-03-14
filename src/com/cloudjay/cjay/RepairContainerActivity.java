@@ -8,8 +8,6 @@ import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -19,11 +17,19 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 
+/**
+ * 
+ * Danh sách lỗi của container
+ * 
+ * @author quocvule
+ * 
+ */
 @EActivity(R.layout.activity_repair_container)
 public class RepairContainerActivity extends SherlockFragmentActivity implements
 		OnPageChangeListener, TabListener {
@@ -31,10 +37,12 @@ public class RepairContainerActivity extends SherlockFragmentActivity implements
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
 
 	private ContainerSession mContainerSession;
+	private ViewPagerAdapter viewPagerAdapter;
 	private String[] locations;
 
 	@ViewById
 	ViewPager pager;
+
 	@ViewById(R.id.container_id_textview)
 	TextView containerIdTextView;
 
@@ -47,6 +55,7 @@ public class RepairContainerActivity extends SherlockFragmentActivity implements
 			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
 					.getInstance().getDatabaseManager().getHelper(this)
 					.getContainerSessionDaoImpl();
+
 			mContainerSession = containerSessionDaoImpl
 					.queryForId(mContainerSessionUUID);
 
@@ -65,8 +74,29 @@ public class RepairContainerActivity extends SherlockFragmentActivity implements
 	}
 
 	private void configureViewPager() {
-		AuditorHomeTabPageAdaptor viewPagerAdapter = new AuditorHomeTabPageAdaptor(
-				getSupportFragmentManager(), locations);
+
+		viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(),
+				locations) {
+
+			@Override
+			public Fragment getItem(int position) {
+				switch (position) {
+				case 0:
+					RepairIssuePendingListFragment_ pendingFragment_ = new RepairIssuePendingListFragment_();
+					pendingFragment_
+							.setContainerSessionUUID(mContainerSessionUUID);
+					return pendingFragment_;
+				case 1:
+				default:
+					RepairIssueFixedListFragment_ fixedFragment_ = new RepairIssueFixedListFragment_();
+					fixedFragment_
+							.setContainerSessionUUID(mContainerSessionUUID);
+					return fixedFragment_;
+				}
+
+			}
+		};
+
 		pager.setAdapter(viewPagerAdapter);
 		pager.setOnPageChangeListener(this);
 	}
@@ -107,32 +137,5 @@ public class RepairContainerActivity extends SherlockFragmentActivity implements
 
 	@Override
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
-	}
-
-	public class AuditorHomeTabPageAdaptor extends FragmentPagerAdapter {
-		private String[] locations;
-
-		public AuditorHomeTabPageAdaptor(FragmentManager fm, String[] locations) {
-			super(fm);
-			this.locations = locations; 
-		}
-
-		public int getCount() {
-			return locations.length;
-		}
-
-		public Fragment getItem(int position) {
-			switch (position) {
-			case 0:
-				RepairIssuePendingListFragment_ pendingFragment_ = new RepairIssuePendingListFragment_();
-				pendingFragment_.setContainerSessionUUID(mContainerSessionUUID);
-				return pendingFragment_;
-			case 1:
-			default:
-				RepairIssueFixedListFragment_ fixedFragment_ = new RepairIssueFixedListFragment_();
-				fixedFragment_.setContainerSessionUUID(mContainerSessionUUID);
-				return fixedFragment_;
-			}
-		}
 	}
 }

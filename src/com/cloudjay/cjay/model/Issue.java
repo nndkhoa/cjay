@@ -93,14 +93,14 @@ public class Issue implements Parcelable {
 	}
 
 	public Issue() {
-		this.setUUID(UUID.randomUUID().toString());
+		this.setUuid(UUID.randomUUID().toString());
 	}
 
-	public void setUUID(String uuid) {
+	public void setUuid(String uuid) {
 		this.uuid = uuid;
 	}
 
-	public String getUUID() {
+	public String getUuid() {
 		return this.uuid;
 	}
 

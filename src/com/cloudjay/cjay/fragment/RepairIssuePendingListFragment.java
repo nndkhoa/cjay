@@ -8,11 +8,13 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.ViewById;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.ListView;
 
@@ -41,38 +43,63 @@ import de.greenrobot.event.EventBus;
 public class RepairIssuePendingListFragment extends SherlockFragment {
 
 	private final String LOG_TAG = "RepairPendingIssueListFragment";
-
 	private ArrayList<Issue> mFeeds;
 	private FunDapter<Issue> mFeedsAdapter;
+
 	private ContainerSession mContainerSession;
 	private String mContainerSessionUUID;
 	private Issue mSelectedIssue;
 	private ImageLoader imageLoader;
 	private ArrayList<CJayImage> mTakenImages;
+	IssueDaoImpl issueDaoImpl;
+	CJayImageDaoImpl cJayImageDaoImpl;
 
 	@ViewById(R.id.feeds)
 	ListView mFeedListView;
 
 	@AfterViews
 	void afterViews() {
+		try {
+			issueDaoImpl = CJayClient.getInstance().getDatabaseManager()
+					.getHelper(getActivity()).getIssueDaoImpl();
+			cJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager()
+					.getHelper(getActivity()).getCJayImageDaoImpl();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
 		imageLoader = ImageLoader.getInstance();
 		initIssueFeedAdapter(null);
 		mSelectedIssue = null;
 	}
 
+	/**
+	 * Click item --> chụp hình issue sau sửa chữa
+	 * 
+	 * @param position
+	 */
 	@ItemClick(R.id.feeds)
+	@Trace(level = Log.WARN)
 	void imageItemClicked(int position) {
 		mSelectedIssue = mFeedsAdapter.getItem(position);
 		mFeedListView.setItemChecked(-1, true);
 
-		// show issue report activity
-		Intent intent = new Intent(getActivity(),
-				RepairIssueReportActivity_.class);
-		intent.putExtra(RepairIssueReportActivity_.CJAY_ISSUE_EXTRA,
-				mSelectedIssue.getUUID());
+		// Open Camera
+		if (mTakenImages == null) {
+			Logger.Log("mTakenImages is NULL. Init mTakenImages");
+			mTakenImages = new ArrayList<CJayImage>();
+		}
+
+		Intent intent = new Intent(getActivity(), CameraActivity_.class);
+		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+				mContainerSession.getUuid());
+		intent.putExtra("type", CJayImage.TYPE_REPORT);
+		intent.putExtra("tag", LOG_TAG);
 		startActivity(intent);
 	}
 
+	@Deprecated
 	@Click(R.id.btn_add_new)
 	void cameraClicked() {
 		Logger.Log("cameraClicked()");
@@ -106,33 +133,18 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 	public void onResume() {
 		super.onResume();
 
-		// create issue if needed
 		if (mTakenImages != null && mTakenImages.size() > 0) {
+
+			// Update list cjay images of selected Issue
 			try {
-				IssueDaoImpl issueDaoImpl = CJayClient.getInstance()
-						.getDatabaseManager().getHelper(getActivity())
-						.getIssueDaoImpl();
-				CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance()
-						.getDatabaseManager().getHelper(getActivity())
-						.getCJayImageDaoImpl();
-
-				// create and save issue
-				Issue issue = new Issue();
-				issue.setContainerSession(mContainerSession);
-
 				for (CJayImage cJayImage : mTakenImages) {
-					cJayImage.setIssue(issue);
+					cJayImage.setIssue(mSelectedIssue);
 					cJayImage.setContainerSession(mContainerSession);
 					cJayImageDaoImpl.createOrUpdate(cJayImage);
 				}
-				issueDaoImpl.createOrUpdate(issue);
 
-				// show view to edit issue
-				Intent intent = new Intent(getActivity(),
-						AuditorIssueReportActivity_.class);
-				intent.putExtra(AuditorIssueReportActivity_.CJAY_IMAGE_EXTRA,
-						mTakenImages.get(0).getUuid());
-				startActivity(intent);
+				issueDaoImpl.createOrUpdate(mSelectedIssue);
+
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -141,7 +153,6 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 			mTakenImages = null;
 
 		} else {
-			// refresh list
 			refresh();
 		}
 	}
@@ -177,6 +188,7 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 	}
 
 	public void onEvent(CJayImageAddedEvent event) {
+
 		if (event == null) {
 			Logger.Log("Event is null");
 		} else {
@@ -196,6 +208,7 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 				e.printStackTrace();
 			}
 		}
+
 	}
 
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
