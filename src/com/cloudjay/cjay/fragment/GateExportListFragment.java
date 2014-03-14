@@ -324,7 +324,7 @@ public class GateExportListFragment extends SherlockFragment implements
 	void listItemClicked(int position) {
 
 		mCurrentPosition = position;
-		mFeedListView.setItemChecked(mCurrentPosition, true);
+//		mFeedListView.setItemChecked(mCurrentPosition, true);
 
 		// clear current selection
 		hideMenuItems();
