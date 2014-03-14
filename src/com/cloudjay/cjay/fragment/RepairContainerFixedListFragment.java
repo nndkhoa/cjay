@@ -29,7 +29,6 @@ import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
-import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -38,6 +37,7 @@ import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
@@ -50,7 +50,7 @@ import de.greenrobot.event.EventBus;
 public class RepairContainerFixedListFragment extends SherlockFragment
 		implements OnRefreshListener, LoaderCallbacks<Cursor> {
 
-	private final static int LOADER_ID = Constants.CURSOR_LOADER_ID_REPAIR_FIXED;
+	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_REPAIR_FIXED;
 
 	private ContainerSession mSelectedContainerSession = null;
 	private ContainerSessionDaoImpl containerSessionDaoImpl = null;

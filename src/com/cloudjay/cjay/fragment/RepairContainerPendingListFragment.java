@@ -48,7 +48,6 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.CJayActivity;
-import com.cloudjay.cjay.Constants;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.RepairContainerActivity_;
 import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
@@ -74,7 +73,7 @@ import de.greenrobot.event.EventBus;
 public class RepairContainerPendingListFragment extends SherlockFragment
 		implements OnRefreshListener, LoaderCallbacks<Cursor> {
 
-	private final static int LOADER_ID = Constants.CURSOR_LOADER_ID_REPAIR_PENDING;
+	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_REPAIR_PENDING;
 
 	private ArrayList<ContainerSession> mSelectedContainerSessions;
 	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
