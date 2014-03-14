@@ -64,6 +64,11 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
+            android:name="com.cloudjay.cjay.PhotoGridViewActivity_"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
             android:name="com.cloudjay.cjay.CJayActivity_"
             android:label="@string/app_name" >
         </activity>

@@ -35,9 +35,9 @@ import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
-import com.ami.fundapter.FunDapter;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
+import com.cloudjay.cjay.Constants;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateContainerCursorAdapter;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
@@ -65,7 +65,7 @@ public class GateImportListFragment extends SherlockFragment implements
 		OnRefreshListener, LoaderCallbacks<Cursor> {
 
 	private final static String LOG_TAG = "GateImportListFragment";
-	private final static int LOADER_ID = 1;
+	private final static int LOADER_ID = Constants.CURSOR_LOADER_ID_GATE_IMPORT;
 
 	@ViewById(R.id.btn_add_new)
 	Button mAddNewBtn;
@@ -74,8 +74,6 @@ public class GateImportListFragment extends SherlockFragment implements
 	ListView mFeedListView;
 
 	private ArrayList<Operator> mOperators;
-
-	private FunDapter<ContainerSession> mFeedsAdapter;
 
 	private ContainerSession mSelectedContainerSession = null;
 	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
@@ -419,7 +417,7 @@ public class GateImportListFragment extends SherlockFragment implements
 
 	@Override
 	public void onResume() {
-		if (mFeedsAdapter != null) {
+		if (cursorAdapter != null) {
 			refresh();
 		}
 		super.onResume();

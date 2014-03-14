@@ -45,6 +45,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
+import com.cloudjay.cjay.Constants;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -72,7 +73,7 @@ public class GateExportListFragment extends SherlockFragment implements
 		OnRefreshListener, LoaderCallbacks<Cursor> {
 
 	private final static String LOG_TAG = "GateExportListFragment";
-	private final static int LOADER_ID = 0;
+	private final static int LOADER_ID = Constants.CURSOR_LOADER_ID_GATE_EXPORT;
 	private ArrayList<Operator> mOperators;
 	private ContainerSession mSelectedContainerSession = null;
 	private ContainerSessionDaoImpl containerSessionDaoImpl = null;

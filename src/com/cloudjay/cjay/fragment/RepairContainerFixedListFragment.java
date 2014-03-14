@@ -50,7 +50,7 @@ import de.greenrobot.event.EventBus;
 public class RepairContainerFixedListFragment extends SherlockFragment
 		implements OnRefreshListener, LoaderCallbacks<Cursor> {
 
-	private final static int LOADER_ID = 5;
+	private final static int LOADER_ID = Constants.CURSOR_LOADER_ID_REPAIR_FIXED;
 
 	private ContainerSession mSelectedContainerSession = null;
 	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
