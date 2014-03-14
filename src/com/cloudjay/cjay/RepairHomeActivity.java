@@ -24,6 +24,13 @@ import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
 
+/**
+ * 
+ * Danh s‡ch container
+ * 
+ * @author quocvule
+ * 
+ */
 @EActivity(R.layout.activity_repair_home)
 public class RepairHomeActivity extends CJayActivity implements
 		OnPageChangeListener, TabListener,
@@ -161,8 +168,8 @@ public class RepairHomeActivity extends CJayActivity implements
 	public void OnContainerInputCompleted(Fragment parent, String containerId,
 			String operatorName, int mode) {
 		if (parent instanceof RepairContainerPendingListFragment) {
-			((RepairContainerPendingListFragment) parent).OnContainerInputCompleted(
-					containerId, operatorName, mode);
+			((RepairContainerPendingListFragment) parent)
+					.OnContainerInputCompleted(containerId, operatorName, mode);
 		}
 	}
 }

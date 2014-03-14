@@ -87,6 +87,7 @@ import de.greenrobot.event.EventBus;
 public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
+	// public static final String CJAY_ISSUE_EXTRA = "cjay_issue";
 
 	Camera camera = null;
 	MediaPlayer shootMediaPlayer = null;
@@ -132,6 +133,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
 	String containerSessionUUID = "";
+
+	// @Extra()
+	// String issueId = "";
 
 	@Extra("type")
 	int type = 0;

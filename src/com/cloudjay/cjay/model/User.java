@@ -1,7 +1,5 @@
 package com.cloudjay.cjay.model;
 
-import android.R.integer;
-
 import com.cloudjay.cjay.dao.UserDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;

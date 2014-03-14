@@ -200,9 +200,9 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 				.getListOperators(getActivity());
 
 		if (mState == STATE_REPORTING) {
-			LOADER_ID = Constants.CURSOR_LOADER_ID_AUDITOR_REPORTING;
+			LOADER_ID = CJayConstant.CURSOR_LOADER_ID_AUDITOR_REPORTING;
 		} else {
-			LOADER_ID = Constants.CURSOR_LOADER_ID_AUDITOR_NOT_REPORTED;
+			LOADER_ID = CJayConstant.CURSOR_LOADER_ID_AUDITOR_NOT_REPORTED;
 		}
 		getLoaderManager().initLoader(LOADER_ID, null, this);
 

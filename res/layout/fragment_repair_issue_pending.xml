@@ -1,26 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent" >
-   	
-   	<ImageButton
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <!-- Need to delete this button after user confirmation -->
+
+    <ImageButton
         android:id="@+id/btn_add_new"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:scaleType="fitXY"
-        android:background="#0000"
         android:adjustViewBounds="true"
-    	android:contentDescription="@string/camera_button_tooltip"
-        android:src="@drawable/btn_camera" />
+        android:background="#0000"
+        android:contentDescription="@string/camera_button_tooltip"
+        android:scaleType="fitXY"
+        android:src="@drawable/btn_camera"
+        android:visibility="gone" />
 
     <ListView
         android:id="@+id/feeds"
-    	android:layout_width="match_parent"
-    	android:layout_height="match_parent"
-    	android:layout_below="@id/btn_add_new"
-   	 	android:minHeight="260dp"
-		style="@style/CJayListView" />
-    
+        style="@style/CJayListView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/btn_add_new"
+        android:minHeight="260dp" />
+
 </RelativeLayout>

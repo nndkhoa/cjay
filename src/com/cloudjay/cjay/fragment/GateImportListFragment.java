@@ -37,7 +37,6 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.Constants;
 import com.cloudjay.cjay.PhotoGridViewActivity_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateContainerCursorAdapter;
@@ -66,7 +65,7 @@ public class GateImportListFragment extends SherlockFragment implements
 		OnRefreshListener, LoaderCallbacks<Cursor> {
 
 	private final static String LOG_TAG = "GateImportListFragment";
-	private final static int LOADER_ID = Constants.CURSOR_LOADER_ID_GATE_IMPORT;
+	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_GATE_IMPORT;
 
 	@ViewById(R.id.btn_add_new)
 	Button mAddNewBtn;

@@ -61,7 +61,7 @@ public class RepairIssueFixedListFragment extends SherlockFragment {
 		Intent intent = new Intent(getActivity(),
 				RepairIssueReportActivity_.class);
 		intent.putExtra(RepairIssueReportActivity_.CJAY_ISSUE_EXTRA,
-				mSelectedIssue.getUUID());
+				mSelectedIssue.getUuid());
 		startActivity(intent);
 	}
 

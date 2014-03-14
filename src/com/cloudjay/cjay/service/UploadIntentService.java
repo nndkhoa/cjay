@@ -3,8 +3,6 @@ package com.cloudjay.cjay.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.concurrent.ExecutorService;
-
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 
@@ -22,20 +20,12 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
 
 import android.app.IntentService;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.os.ParcelFileDescriptor;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.aerilys.helpers.android.NetworkHelper;
-import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.SplashScreenActivity;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionUploadedEvent;
