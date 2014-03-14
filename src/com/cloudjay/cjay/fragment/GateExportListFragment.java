@@ -183,7 +183,6 @@ public class GateExportListFragment extends SherlockFragment implements
 
 		mFeedListView.setTextFilterEnabled(true);
 		mFeedListView.setScrollingCacheEnabled(false);
-
 		mFeedListView.setOnScrollListener(new OnScrollListener() {
 
 			@Override
@@ -435,6 +434,7 @@ public class GateExportListFragment extends SherlockFragment implements
 			ContainerSession containerSession = new ContainerSession(activity,
 					containerId, operatorCode, currentTimeStamp, depotCode);
 			containerSession.setOnLocal(true);
+			containerSession.setExport(true);
 
 			try {
 				containerSessionDaoImpl.addContainerSession(containerSession);

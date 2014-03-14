@@ -2,6 +2,7 @@ package com.cloudjay.cjay.service;
 
 import org.androidannotations.annotations.EIntentService;
 import org.androidannotations.annotations.SystemService;
+import org.androidannotations.annotations.Trace;
 
 import android.app.IntentService;
 import android.app.Notification;
@@ -14,6 +15,9 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
+
+import com.cloudjay.cjay.LoginActivity;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.receivers.GcmBroadcastReceiver;
@@ -128,7 +132,8 @@ public class GcmIntentService extends IntentService {
 	// Put the message into a notification and post it.
 	// This is just one simple example of what you might choose to do with
 	// a GCM message.
-	private void sendNotification(Bundle extras) {
+	@Trace(level = Log.INFO)
+	void sendNotification(Bundle extras) {
 
 		Logger.Log("sendNotification");
 
@@ -209,6 +214,13 @@ public class GcmIntentService extends IntentService {
 			} else if (type.equalsIgnoreCase("UPDATE_OPERATOR_LIST")) {
 				DataCenter.getInstance().updateListOperators(this);
 
+			} else if (type.equalsIgnoreCase("USER_INFO_UPDATED")) {
+
+				User user = com.cloudjay.cjay.util.Session.restore(this)
+						.getCurrentUser();
+
+				DataCenter.getInstance().saveCredential(this,
+						user.getAccessToken());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

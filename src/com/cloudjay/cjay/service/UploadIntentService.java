@@ -134,7 +134,7 @@ public class UploadIntentService extends IntentService implements
 	 * 
 	 * @param containerSession
 	 */
-	@Trace(level = Log.WARN)
+	@Trace(level = Log.INFO)
 	synchronized void doUploadContainer(ContainerSession containerSession) {
 
 		Logger.Log("doUploadContainer: " + containerSession.getContainerId());
@@ -229,7 +229,7 @@ public class UploadIntentService extends IntentService implements
 	public void onChange(int progress) {
 	}
 
-	@Trace(level = Log.WARN)
+	@Trace(level = Log.INFO)
 	void doFileUpload(CJayImage uploadItem) {
 
 		Logger.Log("doFileUpload: " + uploadItem.getImageName());

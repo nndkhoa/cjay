@@ -224,24 +224,23 @@ public class DataCenter {
 
 			User currentUser = CJayClient.getInstance().getCurrentUser(token,
 					context);
+
 			currentUser.setAccessToken(token);
 			currentUser.setMainAccount(true);
 
 			Logger.Log("User role: " + currentUser.getRoleName());
-
-			DepotDaoImpl depotDaoImpl;
-
-			depotDaoImpl = getDatabaseManager().getHelper(context)
+			DepotDaoImpl depotDaoImpl = getDatabaseManager().getHelper(context)
 					.getDepotDaoImpl();
-
 			UserDaoImpl userDaoImpl = getDatabaseManager().getHelper(context)
 					.getUserDaoImpl();
 
-			List<Depot> depots = depotDaoImpl.queryForEq(Depot.DEPOT_CODE,
-					currentUser.getDepotCode());
+			Depot result = depotDaoImpl
+					.queryForFirst(depotDaoImpl.queryBuilder().where()
+							.eq(Depot.DEPOT_CODE, currentUser.getDepotCode())
+							.prepare());
 
-			if (null != depots && !depots.isEmpty()) {
-				currentUser.setDepot(depots.get(0));
+			if (null != result) {
+				currentUser.setDepot(result);
 			} else {
 				Depot depot = new Depot();
 				depot.setDepotCode(currentUser.getDepotCode());
@@ -251,8 +250,8 @@ public class DataCenter {
 			}
 
 			userDaoImpl.addUser(currentUser);
-
 			return currentUser;
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
@@ -571,7 +570,7 @@ public class DataCenter {
 	 *             if there is no connection to Internet
 	 * @throws SQLException
 	 */
-	@Trace(level = Log.WARN)
+	@Trace(level = Log.INFO)
 	public void updateListContainerSessions(Context ctx)
 			throws NoConnectionException, SQLException {
 

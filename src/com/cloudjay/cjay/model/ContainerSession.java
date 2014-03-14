@@ -64,6 +64,7 @@ public class ContainerSession implements Parcelable {
 	public static final String FIELD_CLEARED = "cleared";
 	public static final String FIELD_LOCAL = "on_local";
 	public static final String FIELD_FIXED = "fixed";
+	public static final String FIELD_EXPORT = "export";
 
 	public static final int STATE_UPLOAD_COMPLETED = 4;
 	public static final int STATE_UPLOAD_ERROR = 3;
@@ -102,6 +103,9 @@ public class ContainerSession implements Parcelable {
 
 	@DatabaseField(columnName = FIELD_FIXED, defaultValue = "false")
 	boolean fixed;
+
+	@DatabaseField(columnName = FIELD_EXPORT, defaultValue = "false")
+	boolean export;
 
 	@DatabaseField(columnName = FIELD_UPLOAD_CONFIRMATION, defaultValue = "false", index = true)
 	private boolean uploadConfirmation;
@@ -208,7 +212,7 @@ public class ContainerSession implements Parcelable {
 			String uuid = UUID.randomUUID().toString();
 			this.setCheckInTime(checkInTime);
 			this.setUuid(uuid);
-			
+
 			if (null != container)
 				this.setContainer(container);
 
@@ -603,5 +607,13 @@ public class ContainerSession implements Parcelable {
 		}
 
 		return true;
+	}
+
+	public boolean isExport() {
+		return export;
+	}
+
+	public void setExport(boolean export) {
+		this.export = export;
 	}
 }

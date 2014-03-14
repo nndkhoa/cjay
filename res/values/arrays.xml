@@ -12,12 +12,12 @@
         <item>Tải lên</item>
     </string-array>
     <string-array name="repair_home_tabs">
-        <item>Chưa sửa chữa</item>
-        <item>Đã sửa chữa</item>
+        <item>List container</item>
+        <item>Đã chụp hình</item>
         <item>Tải lên</item>
     </string-array>
     <string-array name="repair_container_tabs">
-        <item>Chưa sửa chữa</item>
+        <item>Danh sách lỗi</item>
         <item>Đã sửa chữa</item>
     </string-array>
     <string-array name="repair_issue_report_tabs">

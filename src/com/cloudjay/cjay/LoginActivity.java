@@ -7,6 +7,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONException;
@@ -17,6 +18,7 @@ import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -55,10 +57,10 @@ public class LoginActivity extends CJayActivity {
 
 	@Extra(EXTRA_EMAIL)
 	// String mEmail = "";
-	// String mEmail = "giamdinhcong@test.com";
+	String mEmail = "giamdinhcong@test.com";
 	// String mEmail = "giamdinhcong1.icd1@pip.com.vn";
 	// String mEmail = "giamdinhsuachua.icd1@pip.com.vn";
-	String mEmail = "giamdinhsuachua@test.com";
+	// String mEmail = "giamdinhsuachua@test.com";
 	// String mEmail = "tosuachua@test.com";
 	// String mEmail = "tosuachua1.icd1@pip.com.vn";
 
@@ -110,11 +112,10 @@ public class LoginActivity extends CJayActivity {
 	 * If there are form errors (invalid email, missing fields, etc.), the
 	 * errors are presented and no actual login attempt is made.
 	 */
+	@Trace(level = Log.INFO)
 	public void attemptLogin() {
 
 		try {
-			Logger.Log("trying to login ... ");
-
 			if (mAuthTask != null) {
 				return;
 			}
