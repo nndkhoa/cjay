@@ -36,7 +36,7 @@ import de.keyboardsurfer.android.widget.crouton.Style;
 public class CJayActivity extends SherlockFragmentActivity {
 
 	@Bean
-	Session session;
+	CJaySession session;
 
 	@Bean
 	DataCenter dataCenter;
@@ -53,13 +53,13 @@ public class CJayActivity extends SherlockFragmentActivity {
 		this.dataCenter = dataCenter;
 	}
 
-	public Session getSession() {
+	public CJaySession getSession() {
 		return session;
 	}
 
 	public User getCurrentUser() {
 		if (null == session)
-			session = Session.restore(getApplicationContext());
+			session = CJaySession.restore(getApplicationContext());
 
 		return session.getCurrentUser();
 	}
@@ -68,7 +68,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 	protected void onCreate(Bundle arg0) {
 		EventBus.getDefault().register(this);
 		super.onCreate(arg0);
-		session = Session.restore(getApplicationContext());
+		session = CJaySession.restore(getApplicationContext());
 	}
 
 	public Context getContext() {

@@ -9,7 +9,7 @@ import android.widget.ImageView;
 
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.Session;
+import com.cloudjay.cjay.util.CJaySession;
 
 public class SplashScreenActivity extends CJayActivity {
 
@@ -46,7 +46,7 @@ public class SplashScreenActivity extends CJayActivity {
 		new Handler().postDelayed(new Runnable() {
 			public void run() {
 
-				Session session = getSession();
+				CJaySession session = getSession();
 				if (null == getSession()) {
 
 					// user did not sign in

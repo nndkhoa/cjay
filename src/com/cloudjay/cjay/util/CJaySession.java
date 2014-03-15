@@ -19,13 +19,13 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.j256.ormlite.table.TableUtils;
 
 @EBean(scope = Scope.Singleton)
-public class Session {
+public class CJaySession {
 
 	private static IDatabaseManager databaseManager;
 	private static IUserDao userDao;
 	private User currentUser;
 
-	public Session() {
+	public CJaySession() {
 
 	}
 
@@ -62,7 +62,7 @@ public class Session {
 
 	}
 
-	public static Session restore(Context context) {
+	public static CJaySession restore(Context context) {
 		Logger.Log("restoring session ... ");
 		databaseManager = CJayClient.getInstance().getDatabaseManager();
 		try {
@@ -72,7 +72,7 @@ public class Session {
 			User user = userDao.getMainUser();
 
 			if (null != user) {
-				Session session = new Session();
+				CJaySession session = new CJaySession();
 				session.setCurrentUser(user);
 				return session;
 			}

@@ -37,7 +37,6 @@ import com.cloudjay.cjay.network.CJayClient;
 
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CountingInputStreamEntity;
-import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Mapper;
 import com.cloudjay.cjay.util.NoConnectionException;
@@ -107,13 +106,11 @@ public class UploadIntentService extends IntentService implements
 			// // Fall through...
 
 		case ContainerSession.STATE_UPLOAD_WAITING:
-			if (Flags.ENABLE_DB_PERSISTENCE) {
-				try {
-					Logger.Log("onEventMainThread(UploadStateChangedEvent event)");
-					containerSessionDaoImpl.update(upload);
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
+			try {
+				Logger.Log("onEventMainThread(UploadStateChangedEvent event)");
+				containerSessionDaoImpl.update(upload);
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
 			break;
 		}

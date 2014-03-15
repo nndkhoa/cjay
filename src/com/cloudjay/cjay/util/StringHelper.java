@@ -8,11 +8,6 @@ import android.text.TextUtils;
 import android.text.format.DateUtils;
 
 public class StringHelper {
-	public static boolean isNullOrEmpty(String input) {
-		if (input == null || input.trim() == "")
-			return true;
-		return false;
-	}
 
 	public static String addThumbExtensionUrl(String input) {
 		try {
@@ -88,5 +83,4 @@ public class StringHelper {
 		return timeString;
 
 	}
-
 }

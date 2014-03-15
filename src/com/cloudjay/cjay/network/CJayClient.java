@@ -31,7 +31,7 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Mapper;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
-import com.cloudjay.cjay.util.Session;
+import com.cloudjay.cjay.util.CJaySession;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
 import com.google.gson.Gson;
@@ -99,7 +99,7 @@ public class CJayClient implements ICJayClient {
 		}
 
 		User currentUser = null;
-		currentUser = Session.restore(ctx).getCurrentUser();
+		currentUser = CJaySession.restore(ctx).getCurrentUser();
 
 		if (currentUser == null) {
 			throw new NullSessionException();

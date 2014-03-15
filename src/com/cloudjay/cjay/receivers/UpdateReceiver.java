@@ -15,7 +15,7 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
-import com.cloudjay.cjay.util.Session;
+import com.cloudjay.cjay.util.CJaySession;
 import com.cloudjay.cjay.util.Utils;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
@@ -31,7 +31,7 @@ public class UpdateReceiver extends BroadcastReceiver {
 		Logger.Log("onReceive()");
 		mContext = context;
 
-		Session session = Session.restore(context);
+		CJaySession session = CJaySession.restore(context);
 
 		if (null != session && Utils.checkPlayServices(context)) {
 			gcm = GoogleCloudMessaging.getInstance(context);

@@ -172,7 +172,7 @@ public class GcmIntentService extends IntentService {
 				// Received Roles: REPAIR
 				// Đối với ROLE == AUDIT, kèm `id` để remove
 
-				User user = com.cloudjay.cjay.util.Session.restore(this)
+				User user = com.cloudjay.cjay.util.CJaySession.restore(this)
 						.getCurrentUser();
 
 				if (user.getRole() == User.ROLE_AUDITOR) {
@@ -215,7 +215,7 @@ public class GcmIntentService extends IntentService {
 
 			} else if (type.equalsIgnoreCase("USER_INFO_UPDATED")) {
 
-				User user = com.cloudjay.cjay.util.Session.restore(this)
+				User user = com.cloudjay.cjay.util.CJaySession.restore(this)
 						.getCurrentUser();
 
 				DataCenter.getInstance().saveCredential(this,
