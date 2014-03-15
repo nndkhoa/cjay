@@ -17,6 +17,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.preference.Preference;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -29,6 +30,7 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
+import com.cloudjay.cjay.util.PreferencesUtil;
 
 /**
  * 
@@ -51,9 +53,7 @@ public class LoginActivity extends CJayActivity {
 	 */
 	private UserLoginTask mAuthTask = null;
 
-	// Values for email and password at the time of the login attempt.
-	private String mPassword = "123456";
-	// private String mPassword = "";
+	private String mPassword = "";
 
 	@Extra(EXTRA_EMAIL)
 	// String mEmail = "";
@@ -90,6 +90,11 @@ public class LoginActivity extends CJayActivity {
 
 	@AfterViews
 	void init() {
+
+		if (TextUtils.isEmpty(mEmail))
+			mEmail = PreferencesUtil.getPrefsValue(getApplicationContext(),
+					PreferencesUtil.PREF_USERNAME);
+
 		mEmailView.setText(mEmail);
 		mPasswordView.setText(mPassword);
 
@@ -250,6 +255,11 @@ public class LoginActivity extends CJayActivity {
 					// DataCenter.getInstance().fetchData(LoginActivity.this);
 					DataCenter.getInstance().updateListISOCode(
 							LoginActivity.this);
+
+					// Save username
+					PreferencesUtil.storePrefsValue(getApplicationContext(),
+							PreferencesUtil.PREF_USERNAME, mEmail);
+
 					return true;
 				}
 

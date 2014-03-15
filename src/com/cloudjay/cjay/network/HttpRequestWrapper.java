@@ -49,10 +49,10 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 	public static final String JSON_CONTENT_TYPE = "application/json";
 
 	public HttpRequestWrapper() {
-		HttpParams myParams = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(myParams, 10000);
 
-		// this will cause SocketTimeout
+		HttpParams myParams = new BasicHttpParams();
+
+		// HttpConnectionParams.setConnectionTim eout(myParams, 10000);
 		// HttpConnectionParams.setSoTimeout(myParams, 10000);
 
 		HttpProtocolParams.setVersion(myParams, HttpVersion.HTTP_1_1);
@@ -65,9 +65,9 @@ public class HttpRequestWrapper implements IHttpRequestWrapper {
 				.getSocketFactory(), 80));
 		schReg.register(new Scheme("https",
 				SSLSocketFactory.getSocketFactory(), 443));
+
 		ClientConnectionManager conMgr = new ThreadSafeClientConnManager(
 				myParams, schReg);
-
 		httpClient = new DefaultHttpClient(conMgr, myParams);
 		localContext = new BasicHttpContext();
 	}

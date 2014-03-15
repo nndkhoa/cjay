@@ -63,7 +63,7 @@ public class CJaySession {
 	}
 
 	public static CJaySession restore(Context context) {
-		Logger.Log("restoring session ... ");
+		// Logger.Log("restoring session ... ");
 		databaseManager = CJayClient.getInstance().getDatabaseManager();
 		try {
 			DatabaseHelper helper = databaseManager.getHelper(context);

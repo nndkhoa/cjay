@@ -299,7 +299,7 @@ public class ContainerSession {
 
 	public String getCheckInTime() {
 		return StringHelper.getRelativeDate(
-				CJayConstant.CJAY_SERVER_DATETIME_FORMAT,
+				CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE,
 				check_in_time.toString());
 	}
 
@@ -309,19 +309,19 @@ public class ContainerSession {
 
 	public String getFormattedCheckInTime() {
 		return StringHelper.getTimestamp(CJayConstant.CJAY_DATETIME_FORMAT,
-				CJayConstant.CJAY_SERVER_DATETIME_FORMAT, check_in_time);
+				CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE, check_in_time);
 	}
 
 	public String getFormattedCheckOutTime() {
 		return StringHelper.getTimestamp(CJayConstant.CJAY_DATETIME_FORMAT,
-				CJayConstant.CJAY_SERVER_DATETIME_FORMAT, check_out_time);
+				CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE, check_out_time);
 
 	}
 
 	public String getCheckOutTime() {
 
 		return StringHelper.getRelativeDate(
-				CJayConstant.CJAY_SERVER_DATETIME_FORMAT,
+				CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE,
 				check_out_time.toString());
 	}
 

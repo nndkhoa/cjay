@@ -82,7 +82,7 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements
 		String importDate = cursor.getString(cursor
 				.getColumnIndexOrThrow(ContainerSession.FIELD_CHECK_IN_TIME));
 		importDate = StringHelper.getRelativeDate(
-				CJayConstant.CJAY_SERVER_DATETIME_FORMAT, importDate);
+				CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE, importDate);
 		holder.importDateView.setText(importDate);
 
 		String containerId = cursor.getString(cursor

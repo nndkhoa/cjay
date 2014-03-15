@@ -524,7 +524,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		// Set Uploading Status
 		uploadItem.setType(type);
 		uploadItem.setTimePosted(StringHelper
-				.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT));
+				.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 		uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
 		uploadItem.setUuid(uuid);
 		uploadItem.setUri(uri);
@@ -532,7 +532,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		uploadItem.setContainerSession(containerSession);
 
 		if (TextUtils.isEmpty(containerSession.getImageIdPath())) {
-			Logger.Log("image_id_path: " + uri);
+			
+			Logger.Log("Set container image_id_path: " + uri);
 			containerSession.setImageIdPath(uri);
 		}
 

@@ -97,10 +97,6 @@ public class DataCenter {
 		return databaseManager;
 	}
 
-	public void setDatabaseManager(IDatabaseManager databaseManager) {
-		this.databaseManager = databaseManager;
-	}
-
 	public List<Operator> getListOperators(Context context) {
 		Logger.Log("get list Operators");
 
@@ -125,20 +121,6 @@ public class DataCenter {
 		return null;
 	}
 
-	public List<ComponentCode> getListComponents(Context context, String date) {
-		Logger.Log("get list Components from: " + date);
-
-		try {
-			return CJayClient.getInstance().getComponentCodes(context, date);
-		} catch (NoConnectionException e) {
-			e.printStackTrace();
-		} catch (NullSessionException e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
 	public List<DamageCode> getListDamageCodes(Context context) {
 		Logger.Log("get list Damage Codes");
 
@@ -148,27 +130,6 @@ public class DataCenter {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return null;
-	}
-
-	/**
-	 * Get list of damage codes from last {@link date}
-	 * 
-	 * @param context
-	 * @param date
-	 * @return
-	 */
-	public List<DamageCode> getListDamageCodes(Context context, String date) {
-		Logger.Log("get list Damage Codes from: " + date);
-
-		try {
-			return CJayClient.getInstance().getDamageCodes(context, date);
-		} catch (NoConnectionException e) {
-			e.printStackTrace();
-		} catch (NullSessionException e) {
-			e.printStackTrace();
-		}
-
 		return null;
 	}
 
@@ -187,27 +148,6 @@ public class DataCenter {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return null;
-	}
-
-	/**
-	 * Get List of repair codes from last `date`
-	 * 
-	 * @param context
-	 * @param date
-	 * @return
-	 */
-	public List<RepairCode> getListRepairCodes(Context context, String date) {
-		Logger.Log("get list Repair Codes from: " + date);
-
-		try {
-			return CJayClient.getInstance().getRepairCodes(context, date);
-		} catch (NoConnectionException e) {
-			e.printStackTrace();
-		} catch (NullSessionException e) {
-			e.printStackTrace();
-		}
-
 		return null;
 	}
 
@@ -258,42 +198,6 @@ public class DataCenter {
 			e.printStackTrace();
 		}
 
-		return null;
-	}
-
-	public List<ContainerSession> getListContainerSessions(Context context) {
-		Logger.Log("get list Container sessions");
-		try {
-			return getDatabaseManager().getHelper(context)
-					.getContainerSessionDaoImpl().getAllContainerSessions();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public List<ContainerSession> getListCheckOutContainerSessions(
-			Context context) {
-		Logger.Log("get list check out Container sessions");
-		try {
-			return getDatabaseManager().getHelper(context)
-					.getContainerSessionDaoImpl()
-					.getListCheckOutContainerSessions();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public PreparedQuery<ContainerSession> getListCheckOutPreparedQuery(
-			Context context) {
-		try {
-			return getDatabaseManager().getHelper(context)
-					.getContainerSessionDaoImpl()
-					.getListCheckOutPreparedQuery();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 		return null;
 	}
 
@@ -360,11 +264,14 @@ public class DataCenter {
 		}
 		return null;
 	}
-	
-	public Cursor getCJayImagesByContainer(Context context, String containerSessionUUID, int imageType) {
+
+	public Cursor getCJayImagesByContainer(Context context,
+			String containerSessionUUID, int imageType) {
 		String queryString = "SELECT * FROM cjay_image WHERE containerSession_id LIKE ? AND type = ?";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] { containerSessionUUID + "%", String.valueOf(imageType) });
+				queryString,
+				new String[] { containerSessionUUID + "%",
+						String.valueOf(imageType) });
 	}
 
 	public Cursor filterLocalCursor(Context context, CharSequence constraint) {
@@ -418,9 +325,6 @@ public class DataCenter {
 				queryString, new String[] { constraint + "%" });
 	}
 
-	// String queryString =
-	// "SELECT * FROM csview cs WHERE cs.upload_confirmation = 0 AND cs.fixed = 0 AND cs.state <> 4";
-
 	public Cursor filterFixedCursor(Context context, CharSequence constraint) {
 		String queryString = "SELECT * FROM csiview cs"
 				+ " WHERE cs.upload_confirmation = 0 AND cs.fixed = 1 AND cs.state <> 4 AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
@@ -442,68 +346,6 @@ public class DataCenter {
 		return null;
 	}
 
-	public List<ContainerSession> getListReportingContainerSessions(
-			Context context) {
-		Logger.Log("get list reporting Container sessions");
-		try {
-			return getDatabaseManager().getHelper(context)
-					.getContainerSessionDaoImpl()
-					.getListReportingContainerSessions();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public List<ContainerSession> getListNotReportedContainerSessions(
-			Context context) {
-		Logger.Log("get list not reported Container sessions");
-		try {
-			return getDatabaseManager().getHelper(context)
-					.getContainerSessionDaoImpl()
-					.getListNotReportedContainerSessions();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public List<ContainerSession> getListPendingContainerSessions(
-			Context context) {
-		Logger.Log("get list pending Container sessions");
-		try {
-			return getDatabaseManager().getHelper(context)
-					.getContainerSessionDaoImpl()
-					.getListPendingContainerSessions();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public List<ContainerSession> getListFixedContainerSessions(Context context) {
-		Logger.Log("get list fixed Container sessions");
-		try {
-			return getDatabaseManager().getHelper(context)
-					.getContainerSessionDaoImpl()
-					.getListFixedContainerSessions();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public List<String> getListOperatorNames(Context context) {
-		List<Operator> operators = this.getListOperators(context);
-		List<String> operatorNames = new ArrayList<String>();
-		for (Operator operator : operators) {
-			if (operator.getName().length() > 0) {
-				operatorNames.add(operator.getName());
-			}
-		}
-		return operatorNames;
-	}
-
 	public List<ContainerSession> getListUploadContainerSessions(Context context) {
 		try {
 
@@ -517,27 +359,6 @@ public class DataCenter {
 			}
 
 			return result;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	/**
-	 * Return List<ContainerSession> that is created by current user and stored
-	 * in local database.
-	 * 
-	 * @param context
-	 * @return List of Container Sessions that created by current user
-	 * @see ContainerSession
-	 * @since 1.0
-	 */
-	public List<ContainerSession> getListLocalContainerSessions(Context context) {
-
-		Logger.Log("get list local Container sessions");
-		try {
-			return getDatabaseManager().getHelper(context)
-					.getContainerSessionDaoImpl().getLocalContainerSessions();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -590,7 +411,7 @@ public class DataCenter {
 
 			// 2013-11-10T21:05:24 (do not have timezone info)
 			SimpleDateFormat dateFormat = new SimpleDateFormat(
-					CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
+					CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 			String nowString = dateFormat.format(now);
 
 			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
@@ -759,7 +580,7 @@ public class DataCenter {
 
 			// 2013-11-10T21:05:24 (do not have timezone info)
 			SimpleDateFormat dateFormat = new SimpleDateFormat(
-					CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
+					CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 			String nowString = dateFormat.format(now);
 
 			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx)
@@ -831,7 +652,7 @@ public class DataCenter {
 
 			// 2013-11-10T21:05:24 (do not have timezone info)
 			SimpleDateFormat dateFormat = new SimpleDateFormat(
-					CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
+					CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 			String nowString = dateFormat.format(now);
 
 			DamageCodeDaoImpl damageCodeDaoImpl = databaseManager
@@ -907,7 +728,7 @@ public class DataCenter {
 
 			// 2013-11-10T21:05:24 (do not have timezone info)
 			SimpleDateFormat dateFormat = new SimpleDateFormat(
-					CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
+					CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 			String nowString = dateFormat.format(now);
 
 			ComponentCodeDaoImpl componentCodeDaoImpl = databaseManager
@@ -987,7 +808,7 @@ public class DataCenter {
 
 			// 2013-11-10T21:05:24 (do not have timezone info)
 			SimpleDateFormat dateFormat = new SimpleDateFormat(
-					CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
+					CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 			String nowString = dateFormat.format(now);
 
 			RepairCodeDaoImpl repairCodeDaoImpl = databaseManager

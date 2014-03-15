@@ -54,20 +54,8 @@ public class CJayClient implements ICJayClient {
 	private IDatabaseManager databaseManager;
 	private static CJayClient instance = null;
 
-	public IHttpRequestWrapper getRequestWrapper() {
-		return requestWrapper;
-	}
-
-	public void setRequestWrapper(IHttpRequestWrapper requestWrapper) {
-		this.requestWrapper = requestWrapper;
-	}
-
 	public IDatabaseManager getDatabaseManager() {
 		return databaseManager;
-	}
-
-	public void setDatabaseManager(IDatabaseManager databaseManager) {
-		this.databaseManager = databaseManager;
 	}
 
 	private CJayClient() {
@@ -425,7 +413,7 @@ public class CJayClient implements ICJayClient {
 		// Logger.Log( "Server response: " + response);
 
 		Gson gson = new GsonBuilder().setDateFormat(
-				CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
+				CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE).create();
 
 		Type listType = new TypeToken<ContainerSessionResult>() {
 		}.getType();
@@ -438,97 +426,6 @@ public class CJayClient implements ICJayClient {
 		}
 
 		return result;
-	}
-
-	@Override
-	public List<ContainerSession> getAllContainerSessions(Context ctx)
-			throws NoConnectionException, NullSessionException {
-
-		Logger.Log("getAllContainerSessions(Context ctx)");
-
-		if (Utils.hasNoConnection(ctx)) {
-			throw new NoConnectionException();
-		}
-
-		HashMap<String, String> headers;
-		try {
-			headers = prepareHeadersWithToken(ctx);
-		} catch (NullSessionException e) {
-			throw e;
-		}
-
-		long startTime = System.currentTimeMillis();
-		String response = requestWrapper.sendGet(
-				CJayConstant.LIST_CONTAINER_SESSIONS, headers);
-
-		long difference = System.currentTimeMillis() - startTime;
-		Logger.Log("---> Total time: " + Long.toString(difference));
-
-		// Logger.Log( response);
-
-		Gson gson = new GsonBuilder().setDateFormat(
-				CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
-
-		Type listType = new TypeToken<List<TmpContainerSession>>() {
-		}.getType();
-
-		List<TmpContainerSession> tmpContainerSessions = null;
-		try {
-			tmpContainerSessions = gson.fromJson(response, listType);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		// Parse to `ContainerSession`
-		List<ContainerSession> items = new ArrayList<ContainerSession>();
-		try {
-			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
-					.getHelper(ctx).getContainerSessionDaoImpl();
-
-			if (null != tmpContainerSessions) {
-				for (TmpContainerSession tmpSession : tmpContainerSessions) {
-					ContainerSession containerSession = Mapper.getInstance()
-							.toContainerSession(tmpSession, ctx);
-
-					if (null != containerSession) {
-						items.add(containerSession);
-					}
-				}
-			}
-
-			containerSessionDaoImpl.addListContainerSessions(items);
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		// long difference = System.currentTimeMillis() - startTime;
-		// Logger.Log( "---> Total time: " + Long.toString(difference));
-
-		return items;
-	}
-
-	@Override
-	public List<ContainerSession> getContainerSessions(Context ctx, Date date)
-			throws NoConnectionException, NullSessionException {
-
-		Logger.Log("getContainerSessions(Context ctx, Date date)");
-		long startTime = System.currentTimeMillis();
-
-		if (Utils.hasNoConnection(ctx)) {
-			throw new NoConnectionException();
-		}
-
-		List<ContainerSession> items = new ArrayList<ContainerSession>();
-		String formatedDate = StringHelper.getTimestamp(
-				CJayConstant.CJAY_SERVER_DATETIME_FORMAT, date);
-
-		items = getContainerSessions(ctx, formatedDate);
-
-		long difference = System.currentTimeMillis() - startTime;
-		Logger.Log("---> Total time: " + Long.toString(difference));
-		return items;
 	}
 
 	public ContainerSessionResult getContainerSessionsByPage(Context ctx,
@@ -553,7 +450,7 @@ public class CJayClient implements ICJayClient {
 		// Logger.Log( response);
 
 		Gson gson = new GsonBuilder().setDateFormat(
-				CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
+				CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE).create();
 
 		Type listType = new TypeToken<ContainerSessionResult>() {
 		}.getType();
@@ -566,97 +463,6 @@ public class CJayClient implements ICJayClient {
 		}
 
 		return result;
-	}
-
-	@Override
-	public List<ContainerSession> getContainerSessions(Context ctx, String date)
-			throws NoConnectionException, NullSessionException {
-
-		Logger.Log("getContainerSessions(Context ctx, String date)");
-
-		if (Utils.hasNoConnection(ctx)) {
-			throw new NoConnectionException();
-		}
-
-		HashMap<String, String> headers;
-		try {
-			headers = prepareHeadersWithToken(ctx);
-		} catch (NullSessionException e) {
-			throw e;
-		}
-
-		String response = requestWrapper.sendGet(String.format(
-				CJayConstant.LIST_CONTAINER_SESSIONS_WITH_DATETIME, date),
-				headers);
-
-		if (TextUtils.isEmpty(response)) {
-			Logger.Log("No new items from " + date);
-		} else {
-			Logger.Log(response);
-
-			Gson gson = new GsonBuilder().setDateFormat(
-					CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
-
-			Type listType = new TypeToken<List<TmpContainerSession>>() {
-			}.getType();
-
-			List<TmpContainerSession> tmpContainerSessions = null;
-			try {
-				tmpContainerSessions = gson.fromJson(response, listType);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			// Parse to `ContainerSession`
-			List<ContainerSession> items = new ArrayList<ContainerSession>();
-			try {
-				ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
-						.getHelper(ctx).getContainerSessionDaoImpl();
-
-				if (tmpContainerSessions != null) {
-					for (TmpContainerSession tmpSession : tmpContainerSessions) {
-
-						// Create container session based on result from server
-						ContainerSession containerSession = Mapper
-								.getInstance().toContainerSession(tmpSession,
-										ctx);
-
-						if (null != containerSession) {
-							items.add(containerSession);
-						}
-					}
-
-				}
-
-				containerSessionDaoImpl.addListContainerSessions(items);
-
-				// SQLiteDatabase db = getDatabaseManager().getReadableDatabase(
-				// ctx);
-				// db.setLockingEnabled(false);
-				// db.beginTransaction();
-
-				// TransactionManager.callInTransaction(getDatabaseManager()
-				// .getHelper(ctx).getConnectionSource(),
-				// new Callable<Void>() {
-				// public Void call() throws Exception {
-				// containerSessionDaoImpl
-				// .addListContainerSessions(items);
-				// }
-				// });
-
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-
-			return items;
-		}
-
-		return null;
-	}
-
-	@Override
-	public List<Operator> getOperators(Context ctx, Date date) {
-		return null;
 	}
 
 	@Override
@@ -692,31 +498,6 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public List<CJayResourceStatus> getCJayResourceStatus(Context ctx)
-			throws NoConnectionException, NullSessionException {
-
-		if (Utils.hasNoConnection(ctx)) {
-			throw new NoConnectionException();
-		}
-
-		HashMap<String, String> headers;
-		try {
-			headers = prepareHeadersWithToken(ctx);
-		} catch (NullSessionException e) {
-			throw e;
-		}
-		String response = requestWrapper.sendGet(
-				CJayConstant.CJAY_RESOURCE_STATUS, headers);
-
-		Gson gson = new Gson();
-		Type listType = new TypeToken<List<CJayResourceStatus>>() {
-		}.getType();
-
-		List<CJayResourceStatus> items = gson.fromJson(response, listType);
-		return items;
-	}
-
-	@Override
 	public String postContainerSession(Context ctx, TmpContainerSession item)
 			throws NoConnectionException {
 
@@ -742,4 +523,5 @@ public class CJayClient implements ICJayClient {
 
 		return ret;
 	}
+
 }

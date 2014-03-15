@@ -33,9 +33,6 @@ public interface ICJayClient {
 	List<Operator> getOperators(Context ctx) throws NoConnectionException,
 			NullSessionException;
 
-	List<Operator> getOperators(Context ctx, Date date)
-			throws NoConnectionException;
-
 	List<Operator> getOperators(Context ctx, String date)
 			throws NoConnectionException, NullSessionException;
 
@@ -55,18 +52,6 @@ public interface ICJayClient {
 			throws NoConnectionException, NullSessionException;
 
 	List<ComponentCode> getComponentCodes(Context ctx, String date)
-			throws NoConnectionException, NullSessionException;
-
-	List<CJayResourceStatus> getCJayResourceStatus(Context ctx)
-			throws NoConnectionException, NullSessionException;
-
-	List<ContainerSession> getAllContainerSessions(Context ctx)
-			throws NoConnectionException, NullSessionException;
-
-	List<ContainerSession> getContainerSessions(Context ctx, Date date)
-			throws NoConnectionException, NullSessionException;
-
-	List<ContainerSession> getContainerSessions(Context ctx, String date)
 			throws NoConnectionException, NullSessionException;
 
 	String postContainerSession(Context ctx, TmpContainerSession item)

@@ -186,11 +186,11 @@ public class Utils {
 
 		try {
 			Date lastDate = new SimpleDateFormat(
-					CJayConstant.CJAY_SERVER_DATETIME_FORMAT)
+					CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE)
 					.parse(lastDateString);
 
 			Date candidate = new SimpleDateFormat(
-					CJayConstant.CJAY_SERVER_DATETIME_FORMAT)
+					CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE)
 					.parse(candidateString);
 
 			if (candidate.after(lastDate)) {

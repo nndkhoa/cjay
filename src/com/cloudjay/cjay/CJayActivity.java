@@ -83,8 +83,6 @@ public class CJayActivity extends SherlockFragmentActivity {
 		if (null != session) {
 
 			if (this instanceof SplashScreenActivity) {
-				Logger.Log("Call from SplashScreenActivity");
-
 				new AsyncTask<Void, Integer, Void>() {
 
 					@Override
@@ -102,20 +100,15 @@ public class CJayActivity extends SherlockFragmentActivity {
 				}.execute();
 
 			} else {
-
-				Logger.Log("Call from others Activity");
-
 				DataCenter_.LoadDataTask = new AsyncTask<Void, Integer, Void>() {
 
 					@Override
 					protected void onPreExecute() {
-						Logger.Log("----------> onPreExecute");
 						EventBus.getDefault().post(new PreLoadDataEvent());
 					};
 
 					@Override
 					protected void onPostExecute(Void result) {
-						Logger.Log("----------> onPostExecute");
 						EventBus.getDefault().post(new PostLoadDataEvent());
 					};
 

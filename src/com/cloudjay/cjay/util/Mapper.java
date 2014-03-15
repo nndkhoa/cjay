@@ -65,7 +65,7 @@ public class Mapper {
 
 			TmpContainerSession tmp = null;
 			Gson gson = new GsonBuilder().setDateFormat(
-					CJayConstant.CJAY_SERVER_DATETIME_FORMAT).create();
+					CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE).create();
 
 			Type listType = new TypeToken<TmpContainerSession>() {
 			}.getType();

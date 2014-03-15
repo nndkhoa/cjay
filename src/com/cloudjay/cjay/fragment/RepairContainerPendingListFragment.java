@@ -360,7 +360,7 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 
 			Activity activity = getActivity();
 			String currentTimeStamp = StringHelper
-					.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
+					.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 
 			String depotCode = "";
 			if (getActivity() instanceof CJayActivity) {

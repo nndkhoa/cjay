@@ -276,7 +276,7 @@ public class GateExportListFragment extends SherlockFragment implements
 
 					mSelectedContainerSession
 							.setCheckOutTime(StringHelper
-									.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT));
+									.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 
 					mSelectedContainerSession
 							.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
@@ -422,7 +422,7 @@ public class GateExportListFragment extends SherlockFragment implements
 
 			Activity activity = getActivity();
 			String currentTimeStamp = StringHelper
-					.getCurrentTimestamp(CJayConstant.CJAY_SERVER_DATETIME_FORMAT);
+					.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 
 			String depotCode = "";
 			if (getActivity() instanceof CJayActivity) {
