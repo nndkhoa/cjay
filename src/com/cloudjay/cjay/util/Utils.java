@@ -48,12 +48,17 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 
 public class Utils {
 
-	public static final int MINI_THUMBNAIL_SIZE = 300;
-	public static final int MICRO_THUMBNAIL_SIZE = 96;
-
 	private static final String PROPERTY_REG_ID = "registration_id";
 	private static final String PROPERTY_CURRENT_USER_ID = "current_user_id";
 	private static final String PROPERTY_APP_VERSION = "appVersion";
+
+	public static String replaceNullBySpace(String in) {
+		return (in == null || in.equals("") ? " " : in);
+	}
+
+	public static String stripNull(String in) {
+		return (in == null ? "" : in);
+	}
 
 	public static void isStillRunning(Context ctx, String packageName) {
 
@@ -67,139 +72,6 @@ public class Utils {
 						Toast.LENGTH_LONG).show();
 			}
 		}
-	}
-
-	public static Animation createScaleAnimation(View view, int parentWidth,
-			int parentHeight, int toX, int toY) {
-		// Difference in X and Y
-		final int diffX = toX - view.getLeft();
-		final int diffY = toY - view.getTop();
-
-		// Calculate actual distance using pythagors
-		float diffDistance = (float) Math.sqrt((toX * toX) + (toY * toY));
-		float parentDistance = (float) Math.sqrt((parentWidth * parentWidth)
-				+ (parentHeight * parentHeight));
-
-		ScaleAnimation scaleAnimation = new ScaleAnimation(1f, 0f, 1f, 0f,
-				Animation.ABSOLUTE, diffX, Animation.ABSOLUTE, diffY);
-		scaleAnimation.setFillAfter(true);
-		scaleAnimation.setInterpolator(new DecelerateInterpolator());
-		scaleAnimation.setDuration(Math.round(diffDistance / parentDistance
-				* CJayConstant.SCALE_ANIMATION_DURATION_FULL_DISTANCE));
-
-		return scaleAnimation;
-	}
-
-	public static Bitmap decodeImage(final ContentResolver resolver,
-			final Uri uri, final int MAX_DIM) throws FileNotFoundException {
-
-		// Get original dimensions
-		BitmapFactory.Options o = new BitmapFactory.Options();
-		o.inJustDecodeBounds = true;
-		try {
-			BitmapFactory.decodeStream(resolver.openInputStream(uri), null, o);
-		} catch (SecurityException se) {
-			se.printStackTrace();
-			return null;
-		}
-
-		final int origWidth = o.outWidth;
-		final int origHeight = o.outHeight;
-
-		// Holds returned bitmap
-		Bitmap bitmap;
-
-		o.inJustDecodeBounds = false;
-		o.inScaled = false;
-		o.inPurgeable = true;
-		o.inInputShareable = true;
-		o.inDither = true;
-		o.inPreferredConfig = Bitmap.Config.RGB_565;
-
-		if (origWidth > MAX_DIM || origHeight > MAX_DIM) {
-			int k = 1;
-			int tmpHeight = origHeight, tmpWidth = origWidth;
-			while ((tmpWidth / 2) >= MAX_DIM || (tmpHeight / 2) >= MAX_DIM) {
-				tmpWidth /= 2;
-				tmpHeight /= 2;
-				k *= 2;
-			}
-			o.inSampleSize = k;
-
-			bitmap = BitmapFactory.decodeStream(resolver.openInputStream(uri),
-					null, o);
-		} else {
-			bitmap = BitmapFactory.decodeStream(resolver.openInputStream(uri),
-					null, o);
-		}
-
-		if (null != bitmap) {
-			Logger.Log("Resized bitmap to: " + bitmap.getWidth() + "x"
-					+ bitmap.getHeight());
-		}
-
-		return bitmap;
-	}
-
-	// And to convert the image URI to the direct file system path of the image
-	// file
-	public static String getPathFromContentUri(ContentResolver cr,
-			Uri contentUri) {
-		Logger.Log("Getting file path for Uri: " + contentUri);
-		String returnValue = null;
-
-		if (ContentResolver.SCHEME_CONTENT.equals(contentUri.getScheme())) {
-			// can post image
-			String[] proj = { MediaStore.Images.Media.DATA };
-			Cursor cursor = cr.query(contentUri, proj, null, null, null);
-
-			if (null != cursor) {
-				if (cursor.moveToFirst()) {
-					returnValue = cursor
-							.getString(cursor
-									.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
-				}
-				cursor.close();
-			}
-		} else if (ContentResolver.SCHEME_FILE.equals(contentUri.getScheme())) {
-			returnValue = contentUri.getPath();
-		}
-
-		return returnValue;
-	}
-
-	public static Bitmap rotate(Bitmap original, final int angle) {
-		if ((angle % 360) == 0) {
-			return original;
-		}
-
-		final boolean dimensionsChanged = angle == 90 || angle == 270;
-		final int oldWidth = original.getWidth();
-		final int oldHeight = original.getHeight();
-		final int newWidth = dimensionsChanged ? oldHeight : oldWidth;
-		final int newHeight = dimensionsChanged ? oldWidth : oldHeight;
-
-		Bitmap bitmap = Bitmap.createBitmap(newWidth, newHeight,
-				original.getConfig());
-		Canvas canvas = new Canvas(bitmap);
-
-		Matrix matrix = new Matrix();
-		matrix.preTranslate((newWidth - oldWidth) / 2f,
-				(newHeight - oldHeight) / 2f);
-		matrix.postRotate(angle, bitmap.getWidth() / 2f, bitmap.getHeight() / 2);
-		canvas.drawBitmap(original, matrix, null);
-
-		original.recycle();
-
-		return bitmap;
-	}
-
-	public static String replaceNullBySpace(String in) {
-		return (in == null || in.equals("") ? " " : in);
-	}
-
-	public static String stripNull(String in) {
-		return (in == null ? "" : in);
 	}
 
 	/**
@@ -241,10 +113,7 @@ public class Utils {
 	 * @return Application's {@code SharedPreferences}.
 	 */
 	private static SharedPreferences getGCMPreferences(Context context) {
-		// This sample app persists the registration ID in shared preferences,
-		// but
 		// how you store the regID in your app is up to you.
-
 		return context.getSharedPreferences(CJayActivity.class.getSimpleName(),
 				Context.MODE_PRIVATE);
 	}

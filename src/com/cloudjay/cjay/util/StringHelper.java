@@ -9,18 +9,6 @@ import android.text.format.DateUtils;
 
 public class StringHelper {
 
-	public static String addThumbExtensionUrl(String input) {
-		try {
-			int lastIndex = input.lastIndexOf(".");
-			String extension = input.substring(lastIndex, input.length());
-			String result = input.replace(extension, "_thumb" + extension);
-			return result;
-		} catch (Exception ex) {
-			return input;
-		}
-
-	}
-
 	@SuppressLint("SimpleDateFormat")
 	public static String getTimestamp(String format, Date date) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat(format);
