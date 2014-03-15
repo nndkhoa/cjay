@@ -360,6 +360,12 @@ public class DataCenter {
 		}
 		return null;
 	}
+	
+	public Cursor getCJayImagesByContainer(Context context, String containerSessionUUID, int imageType) {
+		String queryString = "SELECT * FROM cjay_image WHERE containerSession_id LIKE ? AND type = ?";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] { containerSessionUUID + "%", String.valueOf(imageType) });
+	}
 
 	public Cursor filterLocalCursor(Context context, CharSequence constraint) {
 

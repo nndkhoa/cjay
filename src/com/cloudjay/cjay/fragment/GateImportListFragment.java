@@ -17,6 +17,7 @@ import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -36,6 +37,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
+import com.cloudjay.cjay.PhotoGridViewActivity_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateContainerCursorAdapter;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
@@ -282,6 +284,15 @@ public class GateImportListFragment extends SherlockFragment implements
 	void listItemClicked(int position) {
 		Logger.Log("Clicked item at position: " + position);
 		hideMenuItems();
+		
+		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
+		String uuidString = cursor.getString(cursor
+				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+		
+		Intent intent = new Intent(getActivity(), PhotoGridViewActivity_.class);
+		intent.putExtra(PhotoGridViewActivity_.CJAY_CONTAINER_SESSION_EXTRA, uuidString);
+		intent.putExtra(PhotoGridViewActivity_.CJAY_IMAGE_TYPE_EXTRA, CJayImage.TYPE_IMPORT);
+		startActivity(intent);
 	}
 
 	@ItemLongClick(R.id.feeds)
