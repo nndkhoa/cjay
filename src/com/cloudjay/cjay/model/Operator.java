@@ -1,9 +1,5 @@
 package com.cloudjay.cjay.model;
 
-import android.annotation.SuppressLint;
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;

@@ -50,8 +50,6 @@ import com.google.gson.reflect.TypeToken;
 @SuppressLint("SimpleDateFormat")
 public class CJayClient implements ICJayClient {
 
-	public static String BASE_URL = "https://cloudjay-web.appspot.com/api/jaypix/";
-
 	private IHttpRequestWrapper requestWrapper;
 	private IDatabaseManager databaseManager;
 	private static CJayClient instance = null;
@@ -705,7 +703,6 @@ public class CJayClient implements ICJayClient {
 		try {
 			headers = prepareHeadersWithToken(ctx);
 		} catch (NullSessionException e) {
-			// TODO Auto-generated catch block
 			throw e;
 		}
 		String response = requestWrapper.sendGet(

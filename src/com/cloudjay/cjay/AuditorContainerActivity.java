@@ -64,8 +64,10 @@ public class AuditorContainerActivity extends CJayActivity {
 
 	@ViewById(R.id.btn_add_new)
 	ImageButton mAddButton;
+
 	@ViewById(R.id.feeds)
 	ListView mFeedListView;
+
 	@ViewById(R.id.container_id_textview)
 	TextView containerIdTextView;
 
@@ -229,13 +231,13 @@ public class AuditorContainerActivity extends CJayActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		
+
 		if (mNewImageCount > 1) {
 			// when more than one images were taken continuously,
 			// then go back to container list
 			mNewImageCount = 0;
 			this.onBackPressed();
-			
+
 		} else {
 			// otherwise refresh the image list
 			refresh();
@@ -383,7 +385,7 @@ public class AuditorContainerActivity extends CJayActivity {
 				R.layout.list_item_issue, feedsDict);
 		mFeedListView.setAdapter(mFeedsAdapter);
 	}
-	
+
 	public void onEvent(CJayImageAddedEvent event) {
 		if (event.getTag().equals(LOG_TAG)) {
 			mNewImageCount++;

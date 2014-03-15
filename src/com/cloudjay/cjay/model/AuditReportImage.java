@@ -1,9 +1,5 @@
 package com.cloudjay.cjay.model;
 
-import android.annotation.SuppressLint;
-import android.os.Parcel;
-import android.os.Parcelable;
-
 public class AuditReportImage {
 
 	public static final String FIELD_STATE = "state";

@@ -70,15 +70,13 @@ public class CJayApplication extends Application {
 				.cacheInMemory(true).cacheOnDisc(true)
 				.bitmapConfig(Bitmap.Config.RGB_565)
 				.imageScaleType(ImageScaleType.IN_SAMPLE_INT)
-				.showImageOnLoading(R.drawable.ic_app)
-				.showImageOnFail(R.drawable.ic_app)
 				.showImageForEmptyUri(R.drawable.ic_app).build();
 
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
 				getApplicationContext())
 				.defaultDisplayImageOptions(defaultOptions)
 				.discCacheSize(100 * 1024 * 1024)
-				.memoryCache(new WeakMemoryCache()).threadPoolSize(2)
+				.memoryCache(new WeakMemoryCache()).threadPoolSize(3)
 				.threadPriority(Thread.MAX_PRIORITY).build();
 
 		ACRA.init(CJayApplication.this);

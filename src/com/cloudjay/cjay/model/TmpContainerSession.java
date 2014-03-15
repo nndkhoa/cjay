@@ -3,12 +3,6 @@ package com.cloudjay.cjay.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.annotation.SuppressLint;
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import com.cloudjay.cjay.util.Logger;
-
 public class TmpContainerSession {
 
 	private int id;

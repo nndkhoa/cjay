@@ -3,7 +3,6 @@ package com.cloudjay.cjay.receivers;
 import java.util.Calendar;
 
 import org.androidannotations.annotations.EReceiver;
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -15,6 +14,7 @@ import com.cloudjay.cjay.service.QueueIntentService_;
 
 @EReceiver
 public class AutoStartReceiver extends BroadcastReceiver {
+
 	@Override
 	public void onReceive(Context context, Intent intent) {
 
