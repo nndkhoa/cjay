@@ -53,8 +53,7 @@ public class PhotoGridViewCursorAdapter extends CursorAdapter implements
 			Logger.Log("Holder inside bindView is NULL");
 
 			holder = new ViewHolder();
-			holder.imageView = (ImageView) view
-					.findViewById(R.id.picture);
+			holder.imageView = (ImageView) view.findViewById(R.id.picture);
 			view.setTag(holder);
 		}
 
@@ -72,9 +71,8 @@ public class PhotoGridViewCursorAdapter extends CursorAdapter implements
 		View v = inflater.inflate(layout, parent, false);
 
 		ViewHolder holder = new ViewHolder();
-		holder.imageView = (ImageView) v
-				.findViewById(R.id.picture);
-		
+		holder.imageView = (ImageView) v.findViewById(R.id.picture);
+
 		v.setTag(holder);
 
 		return v;

@@ -17,7 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
- * Sample Cursor Adapter using Ormlite Extra
+ * Sample Cursor Adapter using Ormlite Extra. Just sample.
  * 
  * @author tieubao
  * 

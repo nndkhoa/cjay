@@ -14,9 +14,8 @@ import com.j256.ormlite.table.DatabaseTable;
  * @author tieubao
  * 
  */
-@SuppressLint("ParcelCreator")
 @DatabaseTable(tableName = "operator", daoClass = OperatorDaoImpl.class)
-public class Operator implements Parcelable {
+public class Operator {
 
 	public static final String FIELD_ID = "_id";
 	public static final String FIELD_CODE = "operator_code";
@@ -30,9 +29,6 @@ public class Operator implements Parcelable {
 
 	@DatabaseField(columnName = FIELD_NAME)
 	String operator_name;
-
-	// @ForeignCollectionField(eager = true)
-	// private ForeignCollection<Container> containers;
 
 	public String getName() {
 		return operator_name;
@@ -58,38 +54,6 @@ public class Operator implements Parcelable {
 		this.id = operatorId;
 	}
 
-	@Override
-	public int describeContents() {
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeInt(id);
-		dest.writeString(operator_code);
-		dest.writeString(operator_name);
-	}
-
-	private void readFromParcel(Parcel in) {
-		this.id = in.readInt();
-		this.operator_code = in.readString();
-		this.operator_name = in.readString();
-	}
-
-	public static final Parcelable.Creator<Operator> CREATOR = new Parcelable.Creator<Operator>() {
-		public Operator createFromParcel(Parcel source) {
-			return new Operator(source);
-		}
-
-		public Operator[] newArray(int size) {
-			return new Operator[size];
-		}
-	};
-
-	public Operator(Parcel in) {
-		readFromParcel(in);
-	}
-
 	public Operator() {
 
 	}
@@ -98,12 +62,4 @@ public class Operator implements Parcelable {
 		this.operator_code = operatorCode;
 		this.operator_name = operatorName;
 	}
-
-	// public void setContainers(Collection<Container> listContainers) {
-	// this.containers = (ForeignCollection<Container>) listContainers;
-	// }
-	//
-	// public Collection<Container> getContainers() {
-	// return containers;
-	// }
 }

@@ -1,12 +1,6 @@
 package com.cloudjay.cjay.model;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
@@ -19,7 +13,7 @@ import com.j256.ormlite.table.DatabaseTable;
  * 
  */
 @DatabaseTable(tableName = "repair_code", daoClass = RepairCodeDaoImpl.class)
-public class RepairCode implements Parcelable {
+public class RepairCode {
 
 	public static final String ID = "id";
 	public static final String DISPLAY_NAME = "display_name";
@@ -59,69 +53,5 @@ public class RepairCode implements Parcelable {
 
 	public void setId(int operatorId) {
 		this.id = operatorId;
-	}
-
-	@Override
-	public int describeContents() {
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeInt(id);
-		dest.writeString(display_name);
-		dest.writeString(code);
-		parcelCollection(dest, issues);
-		// dest.writeTypedList((List<Issue>) issues);
-	}
-
-	private void readFromParcel(Parcel in) {
-		this.id = in.readInt();
-		this.display_name = in.readString();
-		this.code = in.readString();
-		this.issues = unparcelCollection(in, Issue.CREATOR);
-		// in.readTypedList(issues, Issue.CREATOR);
-	}
-
-	public static final Parcelable.Creator<RepairCode> CREATOR = new Parcelable.Creator<RepairCode>() {
-
-		public RepairCode createFromParcel(Parcel source) {
-			return new RepairCode(source);
-		}
-
-		public RepairCode[] newArray(int size) {
-			return new RepairCode[size];
-		}
-	};
-
-	public RepairCode() {
-
-	}
-
-	public RepairCode(Parcel in) {
-
-		readFromParcel(in);
-	}
-
-	void parcelCollection(final Parcel out, final Collection<Issue> collection) {
-		if (collection != null) {
-			out.writeInt(collection.size());
-			out.writeTypedList(new ArrayList<Issue>(collection));
-		} else {
-			out.writeInt(-1);
-		}
-	}
-
-	Collection<Issue> unparcelCollection(final Parcel in,
-			final Creator<Issue> creator) {
-		final int size = in.readInt();
-
-		if (size >= 0) {
-			final List<Issue> list = new ArrayList<Issue>(size);
-			in.readTypedList(list, creator);
-			return list;
-		} else {
-			return null;
-		}
 	}
 }

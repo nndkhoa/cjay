@@ -8,9 +8,7 @@ import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-// TODO: need to add Parcelable for List<>
-@SuppressLint("ParcelCreator")
-public class AuditReportItem implements Parcelable {
+public class AuditReportItem {
 
 	private int id;
 	private int damage_id;
@@ -53,25 +51,6 @@ public class AuditReportItem implements Parcelable {
 				}
 			}
 		}
-	}
-
-	@Override
-	public int describeContents() {
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-
-	}
-
-	public AuditReportItem(Parcel in) {
-
-		readFromParcel(in);
-	}
-
-	private void readFromParcel(Parcel in) {
-
 	}
 
 	public int getDamageId() {
@@ -145,16 +124,5 @@ public class AuditReportItem implements Parcelable {
 	public void setId(int id) {
 		this.id = id;
 	}
-
-	public static final Parcelable.Creator<AuditReportItem> CREATOR = new Parcelable.Creator<AuditReportItem>() {
-
-		public AuditReportItem createFromParcel(Parcel source) {
-			return new AuditReportItem(source);
-		}
-
-		public AuditReportItem[] newArray(int size) {
-			return new AuditReportItem[size];
-		}
-	};
 
 }

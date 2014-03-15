@@ -33,8 +33,7 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
 @EActivity
-public class CJayActivity extends SherlockFragmentActivity implements
-		ICJayActivity {
+public class CJayActivity extends SherlockFragmentActivity {
 
 	@Bean
 	Session session;
@@ -72,7 +71,6 @@ public class CJayActivity extends SherlockFragmentActivity implements
 		session = Session.restore(getApplicationContext());
 	}
 
-	@Override
 	public Context getContext() {
 		return this;
 	}

@@ -9,10 +9,7 @@ import android.os.Parcelable;
 
 import com.cloudjay.cjay.util.Logger;
 
-@SuppressLint("ParcelCreator")
-public class TmpContainerSession implements Parcelable {
-
-	private static final String TAG = "TmpContainerSession";
+public class TmpContainerSession {
 
 	private int id;
 	private String container_id;
@@ -101,64 +98,6 @@ public class TmpContainerSession implements Parcelable {
 
 	public void setGateReportImages(List<GateReportImage> gate_report_images) {
 		this.gate_report_images = gate_report_images;
-	}
-
-	public void printMe() {
-		Logger.Log(TAG, "CId: " + getContainerId() + " - OpCode: "
-				+ getOperatorCode() + " - Depot Code: " + getDepotCode()
-				+ " - Time In: " + getCheckInTime() + " - Time Out: "
-				+ getCheckOutTime());
-	}
-
-	@Override
-	public int describeContents() {
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-
-		dest.writeInt(id);
-		dest.writeString(container_id);
-		dest.writeString(image_id_path);
-		dest.writeString(operator_code);
-		dest.writeString(check_in_time);
-		dest.writeString(check_out_time);
-		dest.writeString(depot_code);
-		dest.writeTypedList(audit_report_items);
-		dest.writeTypedList(gate_report_images);
-	}
-
-	private void readFromParcel(Parcel in) {
-		this.audit_report_items = new ArrayList<AuditReportItem>();
-		this.gate_report_images = new ArrayList<GateReportImage>();
-
-		this.id = in.readInt();
-		this.container_id = in.readString();
-		this.image_id_path = in.readString();
-		this.operator_code = in.readString();
-		this.check_in_time = in.readString();
-		this.check_out_time = in.readString();
-		this.depot_code = in.readString();
-
-		in.readTypedList(audit_report_items, AuditReportItem.CREATOR);
-		in.readTypedList(gate_report_images, GateReportImage.CREATOR);
-	}
-
-	public static final Parcelable.Creator<TmpContainerSession> CREATOR = new Parcelable.Creator<TmpContainerSession>() {
-
-		public TmpContainerSession createFromParcel(Parcel source) {
-			return new TmpContainerSession(source);
-		}
-
-		public TmpContainerSession[] newArray(int size) {
-			return new TmpContainerSession[size];
-		}
-	};
-
-	public TmpContainerSession(Parcel in) {
-
-		readFromParcel(in);
 	}
 
 	public int getOperatorId() {

@@ -3,6 +3,7 @@ package com.cloudjay.cjay.model;
 import java.util.Date;
 
 public class CJayResourceStatus {
+
 	// "id": 1,
 	// "type": 0,
 	// "type_name": "RESOURCE DAMAGE",

@@ -9,30 +9,21 @@ import org.acra.annotation.ReportsCrashes;
 import org.androidannotations.annotations.EApplication;
 
 import android.app.Application;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.Fragment.SavedState;
 import android.text.TextUtils;
-import android.view.Display;
-import android.view.WindowManager;
-
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.network.HttpRequestWrapper;
 import com.cloudjay.cjay.network.IHttpRequestWrapper;
-import com.cloudjay.cjay.receivers.InstantUploadReceiver;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.DatabaseManager;
-import com.cloudjay.cjay.util.Flags;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
@@ -160,48 +151,4 @@ public class CJayApplication extends Application {
 		}
 		context.startActivity(intent);
 	}
-
-	public void checkInstantUploadReceiverState() {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		final boolean enabled = prefs.getBoolean(
-				CJayConstant.PREF_INSTANT_UPLOAD_ENABLED, false);
-
-		final ComponentName component = new ComponentName(this,
-				InstantUploadReceiver.class);
-		final PackageManager pkgMgr = getPackageManager();
-
-		switch (pkgMgr.getComponentEnabledSetting(component)) {
-		case PackageManager.COMPONENT_ENABLED_STATE_DISABLED:
-			if (enabled) {
-				pkgMgr.setComponentEnabledSetting(component,
-						PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-						PackageManager.DONT_KILL_APP);
-				if (Flags.DEBUG) {
-					Logger.d("Enabled Instant Upload Receiver");
-				}
-			}
-			break;
-
-		case PackageManager.COMPONENT_ENABLED_STATE_DEFAULT:
-		case PackageManager.COMPONENT_ENABLED_STATE_ENABLED:
-			if (!enabled) {
-				pkgMgr.setComponentEnabledSetting(component,
-						PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-						PackageManager.DONT_KILL_APP);
-				if (Flags.DEBUG) {
-					Logger.d("Disabled Instant Upload Receiver");
-				}
-			}
-			break;
-		}
-	}
-
-	@SuppressWarnings("deprecation")
-	public int getSmallestScreenDimension() {
-		WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-		Display display = wm.getDefaultDisplay();
-		return Math.min(display.getHeight(), display.getWidth());
-	}
-
 }

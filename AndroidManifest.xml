@@ -169,20 +169,6 @@
                     android:scheme="package" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.cloudjay.cjay.receivers.InstantUploadReceiver_" >
-            <intent-filter>
-                <action android:name="com.android.camera.NEW_PICTURE" />
-                <action android:name="android.hardware.action.NEW_PICTURE" />
-
-                <data android:mimeType="image/*" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="photup.intent.action.PHOTO_TAKEN" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>

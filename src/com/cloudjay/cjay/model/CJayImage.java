@@ -2,17 +2,12 @@ package com.cloudjay.cjay.model;
 
 import java.util.UUID;
 
-import android.net.Uri;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.text.TextUtils;
-
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "cjay_image", daoClass = CJayImageDaoImpl.class)
-public class CJayImage implements Parcelable {
+public class CJayImage {
 
 	public static final int STATE_UPLOAD_COMPLETED = 4;
 	public static final int STATE_UPLOAD_ERROR = 3;
@@ -79,8 +74,6 @@ public class CJayImage implements Parcelable {
 	@DatabaseField(columnName = FIELD_URI, id = true)
 	String mUri;
 
-	Uri mFullUri;
-
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	ContainerSession containerSession;
 
@@ -144,13 +137,6 @@ public class CJayImage implements Parcelable {
 		return null;
 	}
 
-	public Uri getOriginalPhotoUri() {
-		if (null == mFullUri && !TextUtils.isEmpty(mUri)) {
-			mFullUri = Uri.parse(mUri);
-		}
-		return mFullUri;
-	}
-
 	public String getTimePosted() {
 		return time_posted;
 	}
@@ -205,54 +191,6 @@ public class CJayImage implements Parcelable {
 
 	public void setUri(String uri) {
 		mUri = uri;
-	}
-
-	@Override
-	public int describeContents() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-
-		dest.writeInt(getId());
-		dest.writeString(image_name);
-		dest.writeString(time_posted);
-		dest.writeString(uuid);
-		dest.writeInt(type);
-		dest.writeInt(mState);
-		dest.writeString(mUri);
-		dest.writeParcelable(containerSession, 0);
-		dest.writeParcelable(issue, 0);
-	}
-
-	private void readFromParcel(Parcel in) {
-		this.setId(in.readInt());
-		this.image_name = in.readString();
-		this.time_posted = in.readString();
-		this.uuid = in.readString();
-		this.type = in.readInt();
-		this.mState = in.readInt();
-		this.mUri = in.readString();
-		in.readParcelable(ContainerSession.class.getClassLoader());
-		in.readParcelable(Issue.class.getClassLoader());
-	}
-
-	public static final Parcelable.Creator<CJayImage> CREATOR = new Parcelable.Creator<CJayImage>() {
-
-		public CJayImage createFromParcel(Parcel source) {
-			return new CJayImage(source);
-		}
-
-		public CJayImage[] newArray(int size) {
-			return new CJayImage[size];
-		}
-	};
-
-	public CJayImage(Parcel in) {
-
-		readFromParcel(in);
 	}
 
 	public int getId() {

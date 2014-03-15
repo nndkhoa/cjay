@@ -1,12 +1,8 @@
 package com.cloudjay.cjay.model;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.dao.IssueDaoImpl;
@@ -16,7 +12,7 @@ import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "issue", daoClass = IssueDaoImpl.class)
-public class Issue implements Parcelable {
+public class Issue {
 
 	public static final String ID = "id";
 	public static final String FIELD_UUID = "_id";
@@ -57,10 +53,6 @@ public class Issue implements Parcelable {
 
 	@ForeignCollectionField(eager = true)
 	Collection<CJayImage> cJayImages;
-
-	public Issue(Parcel in) {
-		readFromParcel(in);
-	}
 
 	public Issue(int id, DamageCode damageCode, RepairCode repairCode,
 			ComponentCode componentCode, String location_code, String length,
@@ -206,72 +198,6 @@ public class Issue implements Parcelable {
 
 	public Collection<CJayImage> getCJayImages() {
 		return cJayImages;
-	}
-
-	@Override
-	public int describeContents() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeInt(getId());
-		dest.writeString(locationCode);
-		dest.writeParcelable(damageCode, 0);
-		dest.writeParcelable(repairCode, 0);
-		dest.writeString(length);
-		dest.writeString(height);
-		dest.writeString(quantity);
-		dest.writeParcelable(containerSession, 0);
-		parcelCollection(dest, cJayImages);
-		// dest.writeTypedList((List<CJayImage>) cJayImages);
-	}
-
-	private void readFromParcel(Parcel in) {
-		this.setId(in.readInt());
-		this.locationCode = in.readString();
-		in.readParcelable(DamageCode.class.getClassLoader());
-		in.readParcelable(RepairCode.class.getClassLoader());
-		this.length = in.readString();
-		this.height = in.readString();
-		this.quantity = in.readString();
-		cJayImages = unparcelCollection(in, CJayImage.CREATOR);
-		// in.readTypedList(cJayImages, CJayImage.CREATOR);
-	}
-
-	public static final Parcelable.Creator<Issue> CREATOR = new Parcelable.Creator<Issue>() {
-
-		public Issue createFromParcel(Parcel source) {
-			return new Issue(source);
-		}
-
-		public Issue[] newArray(int size) {
-			return new Issue[size];
-		}
-	};
-
-	void parcelCollection(final Parcel out,
-			final Collection<CJayImage> collection) {
-		if (collection != null) {
-			out.writeInt(collection.size());
-			out.writeTypedList(new ArrayList<CJayImage>(collection));
-		} else {
-			out.writeInt(-1);
-		}
-	}
-
-	Collection<CJayImage> unparcelCollection(final Parcel in,
-			final Creator<CJayImage> creator) {
-		final int size = in.readInt();
-
-		if (size >= 0) {
-			final List<CJayImage> list = new ArrayList<CJayImage>(size);
-			in.readTypedList(list, creator);
-			return list;
-		} else {
-			return null;
-		}
 	}
 
 	public int getId() {

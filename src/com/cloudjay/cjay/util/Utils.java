@@ -43,10 +43,8 @@ import android.widget.Toast;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.service.QueueIntentService_;
-import com.cloudjay.cjay.service.UploadIntentService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.lightbox.android.photoprocessing.utils.MediaUtils;
 
 public class Utils {
 
@@ -94,30 +92,6 @@ public class Utils {
 		}
 	}
 
-	public static int getOrientationFromContentUri(ContentResolver cr,
-			Uri contentUri) {
-		int returnValue = 0;
-
-		if (ContentResolver.SCHEME_CONTENT.equals(contentUri.getScheme())) {
-			// can post image
-			String[] proj = { MediaStore.Images.Media.ORIENTATION };
-			Cursor cursor = cr.query(contentUri, proj, null, null, null);
-
-			if (null != cursor) {
-				if (cursor.moveToFirst()) {
-					returnValue = cursor
-							.getInt(cursor
-									.getColumnIndexOrThrow(MediaStore.Images.Media.ORIENTATION));
-				}
-				cursor.close();
-			}
-		} else if (ContentResolver.SCHEME_FILE.equals(contentUri.getScheme())) {
-			returnValue = MediaUtils.getExifOrientation(contentUri.getPath());
-		}
-
-		return returnValue;
-	}
-
 	public static Animation createScaleAnimation(View view, int parentWidth,
 			int parentHeight, int toX, int toY) {
 		// Difference in X and Y
@@ -139,11 +113,6 @@ public class Utils {
 		return scaleAnimation;
 	}
 
-	public static Intent getUploadIntent(Context context) {
-		Intent intent = new Intent(context, UploadIntentService.class);
-		intent.setAction(CJayConstant.INTENT_SERVICE_UPLOAD_ALL);
-		return intent;
-	}
 
 	public static Bitmap decodeImage(final ContentResolver resolver,
 			final Uri uri, final int MAX_DIM) throws FileNotFoundException {
@@ -437,6 +406,8 @@ public class Utils {
 				QueueIntentService_.class), PendingIntent.FLAG_NO_CREATE) != null;
 
 	}
+	
+	
 
 	public static File getAppDirectoryFile() {
 		return new File(Environment.getExternalStorageDirectory(),

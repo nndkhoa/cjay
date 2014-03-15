@@ -4,8 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-@SuppressLint("ParcelCreator")
-public class AuditReportImage implements Parcelable {
+public class AuditReportImage {
 
 	public static final String FIELD_STATE = "state";
 	static final String FIELD_URI = "uri";
@@ -64,41 +63,4 @@ public class AuditReportImage implements Parcelable {
 	public void setImageName(String image_name) {
 		this.image_name = image_name;
 	}
-
-	@Override
-	public int describeContents() {
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeInt(id);
-		dest.writeInt(type);
-		dest.writeString(time_posted);
-		dest.writeString(image_name);
-
-	}
-
-	public AuditReportImage(Parcel in) {
-
-		readFromParcel(in);
-	}
-
-	private void readFromParcel(Parcel in) {
-		this.id = in.readInt();
-		this.type = in.readInt();
-		this.time_posted = in.readString();
-		this.image_name = in.readString();
-	}
-
-	public static final Parcelable.Creator<AuditReportImage> CREATOR = new Parcelable.Creator<AuditReportImage>() {
-
-		public AuditReportImage createFromParcel(Parcel source) {
-			return new AuditReportImage(source);
-		}
-
-		public AuditReportImage[] newArray(int size) {
-			return new AuditReportImage[size];
-		}
-	};
 }

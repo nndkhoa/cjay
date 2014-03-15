@@ -1,23 +1,13 @@
 package com.cloudjay.cjay.model;
 
-import java.io.FileNotFoundException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.text.TextUtils;
 
-import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DepotDaoImpl;
@@ -26,9 +16,7 @@ import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DatabaseHelper;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
-import com.cloudjay.cjay.util.Utils;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -46,11 +34,8 @@ import de.greenrobot.event.EventBus;
  * 
  */
 
-@SuppressLint("ParcelCreator")
 @DatabaseTable(tableName = "container_session", daoClass = ContainerSessionDaoImpl.class)
-public class ContainerSession implements Parcelable {
-
-	private static final String TAG = "ContainerSession";
+public class ContainerSession {
 
 	public static final String FIELD_CHECK_OUT_TIME = "check_out_time";
 	public static final String FIELD_CHECK_IN_TIME = "check_in_time";
@@ -74,8 +59,6 @@ public class ContainerSession implements Parcelable {
 
 	static final int MINI_THUMBNAIL_SIZE = 300;
 	static final int MICRO_THUMBNAIL_SIZE = 96;
-
-	private Uri mFullUri;
 
 	@DatabaseField(columnName = FIELD_ID, index = true)
 	int id;
@@ -124,21 +107,6 @@ public class ContainerSession implements Parcelable {
 	Collection<Issue> issues;
 
 	private int mProgress;
-	private Bitmap mBigPictureNotificationBmp;
-
-	public Bitmap getBigPictureNotificationBmp() {
-		return mBigPictureNotificationBmp;
-	}
-
-	public void setBigPictureNotificationBmp(Context context,
-			Bitmap bigPictureNotificationBmp) {
-		if (null == bigPictureNotificationBmp) {
-			mBigPictureNotificationBmp = BitmapFactory.decodeResource(
-					context.getResources(), R.drawable.ic_logo);
-		} else {
-			mBigPictureNotificationBmp = bigPictureNotificationBmp;
-		}
-	}
 
 	public ContainerSession() {
 		cleared = false;
@@ -251,7 +219,7 @@ public class ContainerSession implements Parcelable {
 				break;
 
 			case STATE_UPLOAD_COMPLETED:
-				mBigPictureNotificationBmp = null;
+				// Set Container Big Picture Display = null
 
 				break;
 			case STATE_UPLOAD_WAITING:
@@ -394,85 +362,6 @@ public class ContainerSession implements Parcelable {
 		this.id = id;
 	}
 
-	public void printMe() {
-		Logger.Log(TAG, "CId: " + getFullContainerId() + " - OpCode: "
-				+ getOperatorName() + " - TimeIn: " + getCheckInTime()
-				+ " - TimeOut: " + getCheckOutTime());
-	}
-
-	@Override
-	public int describeContents() {
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeInt(id);
-		dest.writeString(image_id_path);
-		dest.writeString(check_in_time);
-		dest.writeString(check_out_time);
-		dest.writeInt(mState);
-
-		try {
-			dest.writeParcelable(container, flags);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		parcelCollection(dest, cJayImages);
-		parcelCollection(dest, issues);
-	}
-
-	private void readFromParcel(Parcel in) {
-
-		this.id = in.readInt();
-		this.image_id_path = in.readString();
-		this.check_in_time = in.readString();
-		this.check_out_time = in.readString();
-		this.mState = in.readInt();
-		in.readParcelable(Container.class.getClassLoader());
-		this.cJayImages = unparcelCollection(in, CJayImage.CREATOR);
-		this.issues = unparcelCollection(in, Issue.CREATOR);
-	}
-
-	public static final Parcelable.Creator<ContainerSession> CREATOR = new Parcelable.Creator<ContainerSession>() {
-
-		public ContainerSession createFromParcel(Parcel source) {
-			return new ContainerSession(source);
-		}
-
-		public ContainerSession[] newArray(int size) {
-			return new ContainerSession[size];
-		}
-	};
-
-	public ContainerSession(Parcel in) {
-		readFromParcel(in);
-	}
-
-	<T extends Parcelable> void parcelCollection(final Parcel out,
-			final Collection<T> collection) {
-		if (collection != null) {
-			out.writeInt(collection.size());
-			out.writeTypedList(new ArrayList<T>(collection));
-		} else {
-			out.writeInt(-1);
-		}
-	}
-
-	<T extends Parcelable> Collection<T> unparcelCollection(final Parcel in,
-			final Creator<T> creator) {
-		final int size = in.readInt();
-
-		if (size >= 0) {
-			final List<T> list = new ArrayList<T>(size);
-			in.readTypedList(list, creator);
-			return list;
-		} else {
-			return null;
-		}
-	}
-
 	public boolean hasUploadConfirmed() {
 		return uploadConfirmation;
 	}
@@ -485,54 +374,12 @@ public class ContainerSession implements Parcelable {
 		EventBus.getDefault().post(new UploadStateChangedEvent(this));
 	}
 
-	public Uri getOriginalPhotoUri() {
-		if (null == mFullUri && !TextUtils.isEmpty(image_id_path)) {
-			mFullUri = Uri.parse(image_id_path);
-		}
-		return mFullUri;
-	}
-
-	public String getOriginalPhotoUriString() {
-		Uri uri = getOriginalPhotoUri();
-		if (uri != null) {
-			return uri.toString();
-		}
-		return null;
-	}
-
 	public boolean isCleared() {
 		return cleared;
 	}
 
 	public void setCleared(boolean cleared) {
 		this.cleared = cleared;
-	}
-
-	public String getDisplayImageKey() {
-		return "dsply_" + getOriginalPhotoUri();
-	}
-
-	public Bitmap getDisplayImage(Context context) {
-		try {
-			final int size = CJayApplication.getApplication(context)
-					.getSmallestScreenDimension();
-			Bitmap bitmap = Utils.decodeImage(context.getContentResolver(),
-					getOriginalPhotoUri(), size);
-			bitmap = Utils.rotate(bitmap, getExifRotation(context));
-			return bitmap;
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	public int getExifRotation(Context context) {
-		return Utils.getOrientationFromContentUri(context.getContentResolver(),
-				getOriginalPhotoUri());
-	}
-
-	public String getThumbnailImageKey() {
-		return "thumb_" + getOriginalPhotoUri();
 	}
 
 	public boolean isOnLocal() {

@@ -65,15 +65,4 @@ public class UploadsListBaseAdapter extends BaseAdapter {
 
 		return view;
 	}
-
-	// @Override
-	// public void notifyDataSetChanged() {
-	//
-	// // Update list items
-	// if (null != mContext)
-	// mItems = DataCenter.getInstance().getListUploadContainerSessions(
-	// mContext);
-	//
-	// super.notifyDataSetChanged();
-	// }
 }
