@@ -18,6 +18,7 @@ import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -45,6 +46,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
+import com.cloudjay.cjay.PhotoGridViewActivity_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -261,6 +263,20 @@ public class GateExportListFragment extends SherlockFragment implements
 		getActivity().supportInvalidateOptionsMenu();
 
 	}
+	
+	@OptionsItem(R.id.menu_edit_container)
+	void editMenuItemSelected() {
+		if (null != mSelectedContainerSession) {
+			Intent intent = new Intent(getActivity(), PhotoGridViewActivity_.class);
+			intent.putExtra(PhotoGridViewActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+					mSelectedContainerSession.getUuid());
+			intent.putExtra(PhotoGridViewActivity_.CJAY_IMAGE_TYPE_EXTRA,
+					CJayImage.TYPE_EXPORT);
+			startActivity(intent);
+
+			hideMenuItems();
+		}
+	}
 
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
@@ -369,6 +385,7 @@ public class GateExportListFragment extends SherlockFragment implements
 
 		boolean isDisplayed = !(mSelectedContainerSession == null);
 		menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
+		menu.findItem(R.id.menu_edit_container).setVisible(isDisplayed);
 	}
 
 	@Override
