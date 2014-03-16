@@ -46,7 +46,7 @@ public class CJayApplication extends Application {
 		Logger.Log("Start Application");
 
 		// Configure Logger
-		Logger.getInstance().setDebuggable(true);
+		Logger.getInstance().setDebuggable(false);
 		savedStateMap = new HashMap<String, Fragment.SavedState>();
 
 		super.onCreate();
