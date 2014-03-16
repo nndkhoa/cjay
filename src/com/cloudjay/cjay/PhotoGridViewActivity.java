@@ -6,10 +6,14 @@ import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 
 import com.cloudjay.cjay.adapter.PhotoGridViewCursorAdapter;
@@ -42,8 +46,21 @@ public class PhotoGridViewActivity extends CJayActivity implements
 	void afterViews() {
 		mItemLayout = R.layout.grid_item_image;
 		getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+		
+		final Context ctx = this;
+		mGridView.setOnItemClickListener(new OnItemClickListener() {
+	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+	    		Intent intent = new Intent(ctx, PhotoViewPagerActivity_.class);
+	    		intent.putExtra(PhotoViewPagerActivity_.START_POSITION, position);
+	    		intent.putExtra(PhotoViewPagerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+	    				mContainerSessionUUID);
+	    		intent.putExtra(PhotoViewPagerActivity_.CJAY_IMAGE_TYPE_EXTRA,
+	    				mCJayImageType);
+	    		startActivity(intent);
+	        }
+	    });
 	}
-
+	
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
 		Context context = this;
