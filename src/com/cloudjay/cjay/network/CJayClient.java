@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,6 +41,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+import com.koushikdutta.async.future.Future;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 
 /**
  * 
@@ -113,6 +118,21 @@ public class CJayClient implements ICJayClient {
 		JSONObject requestPacket = new JSONObject();
 		requestPacket.put("username", username);
 		requestPacket.put("password", password);
+
+		// String string;
+		// try {
+		// string = Ion.with(ctx, CJayConstant.TOKEN)
+		// .setBodyParameter("username", username)
+		// .setBodyParameter("password", password).asString().get();
+		//
+		// Logger.e(string);
+		// } catch (InterruptedException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// } catch (ExecutionException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
 
 		String tokenResponseString = "";
 		tokenResponseString = requestWrapper.sendJSONPost(CJayConstant.TOKEN,

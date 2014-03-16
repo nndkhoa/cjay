@@ -89,7 +89,7 @@ public class LoginActivity extends CJayActivity {
 	}
 
 	@AfterViews
-	void init() {
+	void initialize() {
 
 		if (TextUtils.isEmpty(mEmail))
 			mEmail = PreferencesUtil.getPrefsValue(getApplicationContext(),

@@ -84,7 +84,6 @@ public class UpdateReceiver extends BroadcastReceiver {
 					// Require the user to click a button again, or perform
 					// exponential back-off.
 				} catch (NoConnectionException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				return msg;

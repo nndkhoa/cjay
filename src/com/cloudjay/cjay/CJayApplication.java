@@ -41,18 +41,6 @@ public class CJayApplication extends Application {
 	IHttpRequestWrapper httpRequestWrapper = null;
 	Map<String, Fragment.SavedState> savedStateMap;
 
-	public void setFragmentSavedState(String key, SavedState savedState) {
-		savedStateMap.put(key, savedState);
-	}
-
-	public Fragment.SavedState getFragmentSavedState(String key) {
-		return savedStateMap.get(key);
-	}
-
-	public static CJayApplication getApplication(Context context) {
-		return (CJayApplication) context.getApplicationContext();
-	}
-
 	@Override
 	public void onCreate() {
 
