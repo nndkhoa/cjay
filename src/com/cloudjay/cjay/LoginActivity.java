@@ -17,7 +17,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.preference.Preference;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;

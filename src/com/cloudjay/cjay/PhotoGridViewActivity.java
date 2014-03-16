@@ -3,6 +3,8 @@ package com.cloudjay.cjay;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
 import android.content.Context;
@@ -21,46 +23,65 @@ import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Logger;
 
 @EActivity(R.layout.activity_photo_gridview)
 public class PhotoGridViewActivity extends CJayActivity implements
 		LoaderCallbacks<Cursor> {
 
 	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW;
-	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
+	public static final String CJAY_CONTAINER_SESSION_UUID_EXTRA = "cjay_container_session_uuid";
+	public static final String CJAY_CONTAINER_ID_EXTRA = "cjay_container_id";
 	public static final String CJAY_IMAGE_TYPE_EXTRA = "cjay_image_type";
 
 	PhotoGridViewCursorAdapter mCursorAdapter;
 	int mItemLayout;
 
-	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
+	@Extra(CJAY_CONTAINER_SESSION_UUID_EXTRA)
 	String mContainerSessionUUID = "";
 
 	@Extra(CJAY_IMAGE_TYPE_EXTRA)
 	int mCJayImageType = CJayImage.TYPE_IMPORT;
 
+	@Extra(CJAY_CONTAINER_ID_EXTRA)
+	String mContainerId = "";
+
 	@ViewById(R.id.gridview)
 	GridView mGridView;
 
+	@OptionsItem(android.R.id.home)
+	void homeIconClicked() {
+		finish();
+	}
+
 	@AfterViews
 	void afterViews() {
+
+		// Set Activity Title
+		setTitle(mContainerId);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 		mItemLayout = R.layout.grid_item_image;
 		getSupportLoaderManager().initLoader(LOADER_ID, null, this);
-		
+
 		final Context ctx = this;
 		mGridView.setOnItemClickListener(new OnItemClickListener() {
-	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-	    		Intent intent = new Intent(ctx, PhotoViewPagerActivity_.class);
-	    		intent.putExtra(PhotoViewPagerActivity_.START_POSITION, position);
-	    		intent.putExtra(PhotoViewPagerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-	    				mContainerSessionUUID);
-	    		intent.putExtra(PhotoViewPagerActivity_.CJAY_IMAGE_TYPE_EXTRA,
-	    				mCJayImageType);
-	    		startActivity(intent);
-	        }
-	    });
+
+			public void onItemClick(AdapterView<?> parent, View v,
+					int position, long id) {
+				Intent intent = new Intent(ctx, PhotoViewPagerActivity_.class);
+				intent.putExtra(PhotoViewPagerActivity_.START_POSITION,
+						position);
+				intent.putExtra(
+						PhotoViewPagerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+						mContainerSessionUUID);
+				intent.putExtra(PhotoViewPagerActivity_.CJAY_IMAGE_TYPE_EXTRA,
+						mCJayImageType);
+				startActivity(intent);
+			}
+		});
 	}
-	
+
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
 		Context context = this;

@@ -4,41 +4,42 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/selector_container_list"
+    android:baselineAligned="false"
     android:orientation="horizontal"
     android:padding="3dp" >
 
-    <RelativeLayout 
+    <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="@dimen/listview_item_dimension"
-        android:layout_weight="1"
         android:layout_marginBottom="3dp"
         android:layout_marginLeft="0dp"
         android:layout_marginRight="3dp"
         android:layout_marginTop="3dp"
-	    android:padding="3dp">
-        
+        android:layout_weight="1"
+        android:padding="3dp" >
+
         <ImageView
-	        android:id="@+id/feed_item_picture"
-	        android:layout_height="match_parent"
-	        android:layout_width="match_parent"
-	        android:contentDescription="@string/container_id"
-	        android:scaleType="centerCrop"
-	        android:src="@drawable/ic_app" />
-        
+            android:id="@+id/feed_item_picture"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/container_id"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_app" />
+
         <ImageView
-	        android:id="@+id/feed_item_validator"
-	        android:layout_alignRight="@+id/feed_item_picture"
-	        android:layout_alignTop="@+id/feed_item_picture"
-	        android:layout_marginRight="3dp"
-	        android:layout_marginTop="3dp"
-	        android:layout_height="20dp"
-	        android:layout_width="20dp"
-	        android:contentDescription="@string/container_id"
-	        android:scaleType="centerCrop"
-	        android:src="@drawable/icon_check"
-	        android:visibility="invisible" />  
+            android:id="@+id/feed_item_validator"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignRight="@+id/feed_item_picture"
+            android:layout_alignTop="@+id/feed_item_picture"
+            android:layout_marginRight="3dp"
+            android:layout_marginTop="3dp"
+            android:contentDescription="@string/container_id"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_btn_selection_checked"
+            android:visibility="invisible" />
     </RelativeLayout>
-    
+
     <LinearLayout
         android:id="@+id/feed_item_descriptions"
         android:layout_width="0dp"

@@ -35,8 +35,6 @@ import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
-import com.cloudjay.cjay.CJayActivity;
-import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.adapter.GateContainerCursorAdapter;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
@@ -44,6 +42,7 @@ import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.model.CJayImage;
+import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.network.CJayClient;
@@ -287,12 +286,18 @@ public class GateImportListFragment extends SherlockFragment implements
 		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
 		String uuidString = cursor.getString(cursor
 				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+		String containerId = cursor.getString(cursor
+				.getColumnIndexOrThrow(Container.CONTAINER_ID));
 
 		Intent intent = new Intent(getActivity(), PhotoGridViewActivity_.class);
-		intent.putExtra(PhotoGridViewActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+		intent.putExtra(
+				PhotoGridViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA,
 				uuidString);
 		intent.putExtra(PhotoGridViewActivity_.CJAY_IMAGE_TYPE_EXTRA,
 				CJayImage.TYPE_IMPORT);
+		intent.putExtra(PhotoGridViewActivity_.CJAY_CONTAINER_ID_EXTRA,
+				containerId);
+
 		startActivity(intent);
 	}
 

@@ -3,7 +3,7 @@
     package="com.cloudjay.cjay"
     android:installLocation="auto"
     android:versionCode="1"
-    android:versionName="1.0.9.2" >
+    android:versionName="1.0.9.3" >
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -66,7 +66,7 @@
         <activity
             android:name="com.cloudjay.cjay.PhotoViewPagerActivity_"
             android:label="@string/app_name" >
-        </activity>        
+        </activity>
         <activity
             android:name="com.cloudjay.cjay.PhotoGridViewActivity_"
             android:label="@string/app_name"
