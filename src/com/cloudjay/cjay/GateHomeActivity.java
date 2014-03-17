@@ -148,10 +148,7 @@ public class GateHomeActivity extends CJayActivity implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_logout:
-			Logger.Log("Logout");
-			getSession().deleteSession(getApplicationContext());
-			startActivity(new Intent(this, LoginActivity_.class));
-			finish();
+			showLogoutPrompt();
 			return true;
 
 		case R.id.menu_more:

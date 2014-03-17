@@ -8,7 +8,10 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.UiThread;
 import org.json.JSONException;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -21,7 +24,6 @@ import com.cloudjay.cjay.events.PreLoadDataEvent;
 import com.cloudjay.cjay.events.UserLoggedOutEvent;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
-import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.*;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -295,5 +297,27 @@ public class CJayActivity extends SherlockFragmentActivity {
 		});
 
 		crouton.show();
+	}
+
+	protected void showLogoutPrompt() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.logout_prompt_title);
+
+		builder.setPositiveButton(android.R.string.yes,
+				new DialogInterface.OnClickListener() {
+
+					public void onClick(DialogInterface dialog, int which) {
+						Logger.Log("Logout");
+						getSession().deleteSession(getApplicationContext());
+						startActivity(new Intent(getApplicationContext(),
+								LoginActivity_.class));
+						finish();
+						dialog.dismiss();
+					}
+				});
+		builder.setNegativeButton(android.R.string.cancel, null);
+
+		builder.show();
 	}
 }

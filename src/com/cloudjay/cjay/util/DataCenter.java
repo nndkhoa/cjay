@@ -958,9 +958,8 @@ public class DataCenter {
 				.getBoolean(PreferencesUtil.PREF_IS_UPDATING_DATA, false) == true;
 	}
 
-	
 	public List<CJayImage> getCheckOutImages() {
 		return null;
-		
+
 	}
 }
