@@ -32,8 +32,8 @@ public class SquareImageView extends ImageView {
 				R.styleable.SquareImage, 0, 0);
 
 		// get fixed along value from xml configuration
-//		fixedAlong = FixedAlong.valueOf(array
-//				.getString(R.styleable.SquareImage_fixedAlong));
+		fixedAlong = FixedAlong.valueOf(array
+				.getString(R.styleable.SquareImage_fixedAlong));
 
 		// save fixed along value
 		if (fixedAlong == null)
