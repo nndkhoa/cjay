@@ -25,6 +25,7 @@ import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.cloudjay.cjay.dao.UserDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
+import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.ContainerSessionResult;
@@ -957,4 +958,9 @@ public class DataCenter {
 				.getBoolean(PreferencesUtil.PREF_IS_UPDATING_DATA, false) == true;
 	}
 
+	
+	public List<CJayImage> getCheckOutImages() {
+		return null;
+		
+	}
 }

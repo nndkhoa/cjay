@@ -269,9 +269,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 				// camera.setOneShotPreviewCallback(null);
 
 			} catch (Throwable t) {
-
-				Log.e("PreviewDemo-surfaceCallback",
-						"Exception in setPreviewDisplay()", t);
+				Logger.e("Exception in setPreviewDisplay()");
 				Toast.makeText(this, t.getMessage(), Toast.LENGTH_LONG).show();
 			}
 
@@ -529,14 +527,10 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			if (TextUtils.isEmpty(containerSession.getImageIdPath())) {
 
-				Logger.e("Container Image Id Path is Empty");
-				Logger.Log("Set container image_id_path: " + uri);
+				Logger.e("Set container image_id_path: " + uri);
 				containerSession.setImageIdPath(uri);
 				containerSessionDaoImpl.addContainerSession(containerSession);
 
-			} else {
-				Logger.e("Container Image Id is not Empty: "
-						+ containerSession.getImageIdPath());
 			}
 
 			cJayImages.add(uploadItem);

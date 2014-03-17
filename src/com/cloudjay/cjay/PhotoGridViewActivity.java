@@ -17,6 +17,7 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 
@@ -96,6 +97,8 @@ public class PhotoGridViewActivity extends CJayActivity implements
 				startActivity(intent);
 			}
 		});
+
+		mGridView.setEmptyView(findViewById(android.R.id.empty));
 
 		try {
 			containerSessionDaoImpl = CJayClient.getInstance()
@@ -178,6 +181,7 @@ public class PhotoGridViewActivity extends CJayActivity implements
 			mCursorAdapter = new PhotoGridViewCursorAdapter(context,
 					mItemLayout, cursor, 0);
 			mGridView.setAdapter(mCursorAdapter);
+
 		} else {
 			mCursorAdapter.swapCursor(cursor);
 		}
