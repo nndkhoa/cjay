@@ -18,6 +18,7 @@ import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.ViewById;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources.NotFoundException;
 import android.database.Cursor;
@@ -52,6 +53,8 @@ import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
+import com.cloudjay.cjay.fragment.GateExportListFragment;
+import com.cloudjay.cjay.fragment.GateImportListFragment;
 import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -141,7 +144,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	int type = 0;
 
 	@Extra("tag")
-	String tag = "";
+	String sourceTag = "";
 
 	// endregion
 
@@ -523,8 +526,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		// Set Uploading Status
 		uploadItem.setType(type);
-		uploadItem.setTimePosted(StringHelper
-				.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+		uploadItem
+				.setTimePosted(StringHelper
+						.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 		uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
 		uploadItem.setUuid(uuid);
 		uploadItem.setUri(uri);
@@ -532,7 +536,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		uploadItem.setContainerSession(containerSession);
 
 		if (TextUtils.isEmpty(containerSession.getImageIdPath())) {
-			
+
 			Logger.Log("Set container image_id_path: " + uri);
 			containerSession.setImageIdPath(uri);
 		}
@@ -550,9 +554,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		}
 
 		// tell people that an image has been created
-		if (!TextUtils.isEmpty(tag)) {
-			EventBus.getDefault()
-					.post(new CJayImageAddedEvent(uploadItem, tag));
+		if (!TextUtils.isEmpty(sourceTag)) {
+			EventBus.getDefault().post(
+					new CJayImageAddedEvent(uploadItem, sourceTag));
 		}
 	}
 
@@ -585,6 +589,22 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			EventBus.getDefault().post(
 					new ContainerSessionChangedEvent(containerSession));
 
+			// Open GridView
+			if (sourceTag.equals(GateImportListFragment.LOG_TAG)) {
+				CJayApplication.openPhotoGridView(this,
+						containerSession.getUuid(), CJayImage.TYPE_IMPORT,
+						containerSession.getContainerId());
+
+				// finish();
+
+			} else if (sourceTag.equals(GateExportListFragment.LOG_TAG)) {
+
+				CJayApplication.openPhotoGridView(this,
+						containerSession.getUuid(), CJayImage.TYPE_EXPORT,
+						containerSession.getContainerId());
+
+				// finish();
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

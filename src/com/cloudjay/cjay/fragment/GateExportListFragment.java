@@ -72,7 +72,7 @@ import de.greenrobot.event.EventBus;
 public class GateExportListFragment extends SherlockFragment implements
 		OnRefreshListener, LoaderCallbacks<Cursor> {
 
-	private final static String LOG_TAG = "GateExportListFragment";
+	public final static String LOG_TAG = "GateExportListFragment";
 	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_GATE_EXPORT;
 	private ArrayList<Operator> mOperators;
 	private ContainerSession mSelectedContainerSession = null;

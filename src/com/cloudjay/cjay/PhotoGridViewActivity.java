@@ -1,5 +1,7 @@
 package com.cloudjay.cjay;
 
+import java.sql.SQLException;
+
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
@@ -19,13 +21,21 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 
 import com.cloudjay.cjay.adapter.PhotoGridViewCursorAdapter;
+import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.model.CJayImage;
+import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 
+import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+
 @EActivity(R.layout.activity_photo_gridview)
+@OptionsMenu(R.menu.menu_photo_grid_view)
 public class PhotoGridViewActivity extends CJayActivity implements
 		LoaderCallbacks<Cursor> {
 
@@ -35,7 +45,9 @@ public class PhotoGridViewActivity extends CJayActivity implements
 	public static final String CJAY_IMAGE_TYPE_EXTRA = "cjay_image_type";
 
 	PhotoGridViewCursorAdapter mCursorAdapter;
+	ContainerSession mContainerSession;
 	int mItemLayout;
+	ContainerSessionDaoImpl containerSessionDaoImpl;
 
 	@Extra(CJAY_CONTAINER_SESSION_UUID_EXTRA)
 	String mContainerSessionUUID = "";
@@ -80,6 +92,50 @@ public class PhotoGridViewActivity extends CJayActivity implements
 				startActivity(intent);
 			}
 		});
+
+		try {
+			containerSessionDaoImpl = CJayClient.getInstance()
+					.getDatabaseManager().getHelper(this)
+					.getContainerSessionDaoImpl();
+
+			mContainerSession = containerSessionDaoImpl
+					.queryForId(mContainerSessionUUID);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@OptionsItem(R.id.menu_upload)
+	void uploadMenuItemSelected() {
+		try {
+
+			if (null != mContainerSession) {
+				Logger.Log("Menu upload item clicked");
+
+				// User confirm upload
+				mContainerSession.setUploadConfirmation(true);
+				mContainerSession
+						.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+				mContainerSession.setOnLocal(false);
+				containerSessionDaoImpl.update(mContainerSession);
+
+				// It will trigger `UploadsFragment` Adapter
+				// notifyDataSetChanged
+				EventBus.getDefault().post(
+						new ContainerSessionEnqueueEvent(mContainerSession));
+
+				finish();
+			} else {
+				showCrouton(R.string.alert_invalid_container);
+			}
+
+		} catch (SQLException e) {
+			mContainerSession.setUploadConfirmation(false);
+			mContainerSession.setOnLocal(true);
+			e.printStackTrace();
+			showCrouton(R.string.alert_try_again);
+		}
 	}
 
 	@Override

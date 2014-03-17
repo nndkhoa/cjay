@@ -55,8 +55,8 @@ public class LoginActivity extends CJayActivity {
 	private String mPassword = "";
 
 	@Extra(EXTRA_EMAIL)
-	// String mEmail = "";
-	String mEmail = "giamdinhcong@test.com";
+	String mEmail = "";
+	// String mEmail = "giamdinhcong@test.com";
 	// String mEmail = "giamdinhcong1.icd1@pip.com.vn";
 	// String mEmail = "giamdinhsuachua.icd1@pip.com.vn";
 	// String mEmail = "giamdinhsuachua@test.com";
