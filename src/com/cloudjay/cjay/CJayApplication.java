@@ -5,14 +5,12 @@ import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 import org.androidannotations.annotations.EApplication;
 
-import android.R.integer;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
 import com.aerilys.helpers.android.NetworkHelper;
-import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.network.CJayClient;
@@ -107,7 +105,7 @@ public class CJayApplication extends Application {
 	}
 
 	public static void openPhotoGridView(Context ctx, String uuid,
-			int imageType, String containerId) {
+			int imageType, String containerId, String sourceTag) {
 
 		Intent intent = new Intent(ctx, PhotoGridViewActivity_.class);
 		intent.putExtra(
@@ -115,6 +113,7 @@ public class CJayApplication extends Application {
 		intent.putExtra(PhotoGridViewActivity_.CJAY_IMAGE_TYPE_EXTRA, imageType);
 		intent.putExtra(PhotoGridViewActivity_.CJAY_CONTAINER_ID_EXTRA,
 				containerId);
+		intent.putExtra("tag", sourceTag);
 
 		ctx.startActivity(intent);
 

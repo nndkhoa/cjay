@@ -18,7 +18,6 @@ import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.ViewById;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources.NotFoundException;
 import android.database.Cursor;
@@ -133,6 +132,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	AudioManager audioManager;
 
 	ContainerSession containerSession = null;
+	ContainerSessionDaoImpl containerSessionDaoImpl = null;
+	CJayImageDaoImpl cJayImageDaoImpl = null;
 
 	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
 	String containerSessionUUID = "";
@@ -183,8 +184,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
-			// Logger.Log( "onPictureTaken");
-
 			savePhoto(data);
 			camera.startPreview();
 			inPreview = true;
@@ -215,6 +214,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	@SuppressWarnings({})
 	@AfterViews
 	void initCamera() {
+
 		Logger.Log("----> initCamera(), addSurfaceCallback");
 
 		// WARNING: this block should be run before onResume()
@@ -226,19 +226,31 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		// Restore camera state from database or somewhere else
 		flashMode = Camera.Parameters.FLASH_MODE_AUTO;
 		cameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
-
 		this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 	}
 
 	@AfterViews
 	void initContainerSession() {
 		try {
-			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-					.getInstance().getDatabaseManager().getHelper(this)
-					.getContainerSessionDaoImpl();
 
-			containerSession = containerSessionDaoImpl
-					.queryForId(containerSessionUUID);
+			if (null == containerSessionDaoImpl) {
+				containerSessionDaoImpl = CJayClient.getInstance()
+						.getDatabaseManager().getHelper(this)
+						.getContainerSessionDaoImpl();
+
+			}
+
+			if (null == cJayImageDaoImpl) {
+				cJayImageDaoImpl = CJayClient.getInstance()
+						.getDatabaseManager().getHelper(this)
+						.getCJayImageDaoImpl();
+			}
+
+			if (containerSession == null) {
+				containerSession = containerSessionDaoImpl
+						.queryForId(containerSessionUUID);
+
+			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -411,8 +423,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 					return bm;
 
 				} else {
-					// LANDSCAPE MODE
-					// No need to reverse width and height
+					// LANDSCAPE MODE --> No need to reverse width and height
 					Bitmap bm = BitmapFactory.decodeByteArray(data, 0,
 							(data != null) ? data.length : 0);
 					return bm;
@@ -490,27 +501,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		// Upload image
 		uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
 
-		// if (photo.exists()) {
-		//
-		// // Save Bitmap to JPEG
-		// saveBitmapToFile(capturedBitmap, photo);
-		//
-		// // Upload image
-		// uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
-		//
-		// } else {
-		//
-		// String output = MediaStore.Images.Media.insertImage(
-		// getContentResolver(), capturedBitmap, fileName,
-		// photo.getPath());
-		//
-		// Logger.Log( "output: " + output);
-		// Logger.Log( "filename: " + fileName);
-		//
-		// // Upload image
-		// uploadImage(uuid, output, fileName);
-		// }
-
 		if (capturedBitmap != null) {
 			capturedBitmap.recycle();
 			capturedBitmap = null;
@@ -535,16 +525,19 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		uploadItem.setImageName(image_name);
 		uploadItem.setContainerSession(containerSession);
 
-		if (TextUtils.isEmpty(containerSession.getImageIdPath())) {
-
-			Logger.Log("Set container image_id_path: " + uri);
-			containerSession.setImageIdPath(uri);
-		}
-
 		try {
-			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance()
-					.getDatabaseManager().getHelper(getApplicationContext())
-					.getCJayImageDaoImpl();
+
+			if (TextUtils.isEmpty(containerSession.getImageIdPath())) {
+
+				Logger.e("Container Image Id Path is Empty");
+				Logger.Log("Set container image_id_path: " + uri);
+				containerSession.setImageIdPath(uri);
+				containerSessionDaoImpl.addContainerSession(containerSession);
+
+			} else {
+				Logger.e("Container Image Id is not Empty: "
+						+ containerSession.getImageIdPath());
+			}
 
 			cJayImages.add(uploadItem);
 			cJayImageDaoImpl.addCJayImage(uploadItem);
@@ -581,10 +574,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	public void onBackPressed() {
 		try {
 
-			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-					.getInstance().getDatabaseManager().getHelper(this)
-					.getContainerSessionDaoImpl();
-
 			containerSessionDaoImpl.addContainerSession(containerSession);
 			EventBus.getDefault().post(
 					new ContainerSessionChangedEvent(containerSession));
@@ -593,17 +582,15 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			if (sourceTag.equals(GateImportListFragment.LOG_TAG)) {
 				CJayApplication.openPhotoGridView(this,
 						containerSession.getUuid(), CJayImage.TYPE_IMPORT,
-						containerSession.getContainerId());
-
-				// finish();
+						containerSession.getContainerId(),
+						GateImportListFragment.LOG_TAG);
 
 			} else if (sourceTag.equals(GateExportListFragment.LOG_TAG)) {
 
 				CJayApplication.openPhotoGridView(this,
 						containerSession.getUuid(), CJayImage.TYPE_EXPORT,
-						containerSession.getContainerId());
-
-				// finish();
+						containerSession.getContainerId(),
+						GateExportListFragment.LOG_TAG);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

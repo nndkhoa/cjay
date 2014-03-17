@@ -23,6 +23,7 @@ import android.widget.GridView;
 import com.cloudjay.cjay.adapter.PhotoGridViewCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
+import com.cloudjay.cjay.fragment.GateImportListFragment;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
@@ -30,9 +31,9 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.StringHelper;
 
 import de.greenrobot.event.EventBus;
-import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 @EActivity(R.layout.activity_photo_gridview)
 @OptionsMenu(R.menu.menu_photo_grid_view)
@@ -60,6 +61,9 @@ public class PhotoGridViewActivity extends CJayActivity implements
 
 	@ViewById(R.id.gridview)
 	GridView mGridView;
+
+	@Extra("tag")
+	String sourceTag = "";
 
 	@OptionsItem(android.R.id.home)
 	void homeIconClicked() {
@@ -113,11 +117,18 @@ public class PhotoGridViewActivity extends CJayActivity implements
 			if (null != mContainerSession) {
 				Logger.Log("Menu upload item clicked");
 
-				// User confirm upload
 				mContainerSession.setUploadConfirmation(true);
 				mContainerSession
 						.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
-				mContainerSession.setOnLocal(false);
+
+				if (sourceTag.equals(GateImportListFragment.LOG_TAG)) {
+					mContainerSession.setOnLocal(false);
+				} else {
+					mContainerSession
+							.setCheckOutTime(StringHelper
+									.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+				}
+
 				containerSessionDaoImpl.update(mContainerSession);
 
 				// It will trigger `UploadsFragment` Adapter
@@ -131,10 +142,9 @@ public class PhotoGridViewActivity extends CJayActivity implements
 			}
 
 		} catch (SQLException e) {
-			mContainerSession.setUploadConfirmation(false);
-			mContainerSession.setOnLocal(true);
 			e.printStackTrace();
 			showCrouton(R.string.alert_try_again);
+			mContainerSession.setUploadConfirmation(false);
 		}
 	}
 
