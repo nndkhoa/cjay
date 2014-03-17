@@ -1,16 +1,13 @@
 package com.cloudjay.cjay.network;
 
 import java.net.SocketTimeoutException;
-import java.util.Date;
 import java.util.List;
 
 import org.json.JSONException;
 
 import android.content.Context;
 
-import com.cloudjay.cjay.model.CJayResourceStatus;
 import com.cloudjay.cjay.model.ComponentCode;
-import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.ContainerSessionResult;
 import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Operator;

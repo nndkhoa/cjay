@@ -46,8 +46,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.PhotoGridViewActivity_;
-import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.adapter.GateContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
@@ -73,7 +72,7 @@ import de.greenrobot.event.EventBus;
 public class GateExportListFragment extends SherlockFragment implements
 		OnRefreshListener, LoaderCallbacks<Cursor> {
 
-	private final static String LOG_TAG = "GateExportListFragment";
+	public final static String LOG_TAG = "GateExportListFragment";
 	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_GATE_EXPORT;
 	private ArrayList<Operator> mOperators;
 	private ContainerSession mSelectedContainerSession = null;
@@ -263,15 +262,19 @@ public class GateExportListFragment extends SherlockFragment implements
 		getActivity().supportInvalidateOptionsMenu();
 
 	}
-	
+
 	@OptionsItem(R.id.menu_edit_container)
 	void editMenuItemSelected() {
 		if (null != mSelectedContainerSession) {
-			Intent intent = new Intent(getActivity(), PhotoGridViewActivity_.class);
-			intent.putExtra(PhotoGridViewActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+			Intent intent = new Intent(getActivity(),
+					PhotoGridViewActivity_.class);
+			intent.putExtra(
+					PhotoGridViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA,
 					mSelectedContainerSession.getUuid());
 			intent.putExtra(PhotoGridViewActivity_.CJAY_IMAGE_TYPE_EXTRA,
 					CJayImage.TYPE_EXPORT);
+			intent.putExtra(PhotoGridViewActivity_.CJAY_CONTAINER_ID_EXTRA,
+					mSelectedContainerSession.getContainerId());
 			startActivity(intent);
 
 			hideMenuItems();
@@ -339,7 +342,7 @@ public class GateExportListFragment extends SherlockFragment implements
 	void listItemClicked(int position) {
 
 		mCurrentPosition = position;
-//		mFeedListView.setItemChecked(mCurrentPosition, true);
+		// mFeedListView.setItemChecked(mCurrentPosition, true);
 
 		// clear current selection
 		hideMenuItems();

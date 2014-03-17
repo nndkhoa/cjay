@@ -11,6 +11,8 @@ public final class CJayConstant {
 	public static final String TOKEN = CLOUDJAY_API + "/api-token-auth/";
 	public static final String API_ROOT = CLOUDJAY_API + "/api/";
 
+	public static final String ACRA = "https://cloudjay-web.appspot.com/acra/";
+
 	public static final String API_ADD_GCM_DEVICE = API_ROOT
 			+ "mobile/gcm-devices.json";
 

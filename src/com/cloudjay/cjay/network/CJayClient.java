@@ -2,12 +2,11 @@ package com.cloudjay.cjay.network;
 
 import java.lang.reflect.Type;
 import java.net.SocketTimeoutException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -15,10 +14,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
 import android.text.TextUtils;
-import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
-import com.cloudjay.cjay.model.CJayResourceStatus;
 import com.cloudjay.cjay.model.ComponentCode;
-import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.ContainerSessionResult;
 import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.IDatabaseManager;
@@ -28,17 +24,16 @@ import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.Mapper;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.CJaySession;
-import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+import com.koushikdutta.ion.Ion;
 
 /**
  * 
@@ -113,6 +108,21 @@ public class CJayClient implements ICJayClient {
 		JSONObject requestPacket = new JSONObject();
 		requestPacket.put("username", username);
 		requestPacket.put("password", password);
+
+		String string;
+		try {
+			string = Ion.with(ctx, CJayConstant.TOKEN)
+					.setBodyParameter("username", username)
+					.setBodyParameter("password", password).asString().get();
+
+			Logger.e(string);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		String tokenResponseString = "";
 		tokenResponseString = requestWrapper.sendJSONPost(CJayConstant.TOKEN,

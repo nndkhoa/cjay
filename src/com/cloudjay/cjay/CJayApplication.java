@@ -1,8 +1,5 @@
 package com.cloudjay.cjay;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
@@ -12,8 +9,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.Fragment.SavedState;
 import android.text.TextUtils;
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -33,25 +28,12 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
-@ReportsCrashes(formKey = "", formUri = "https://cloudjay-web.appspot.com/acra/", mode = ReportingInteractionMode.TOAST, resToastText = R.string.crash_toast_text, resDialogText = R.string.crash_dialog_text, resDialogIcon = android.R.drawable.ic_dialog_info, resDialogTitle = R.string.crash_dialog_title, resDialogCommentPrompt = R.string.crash_dialog_comment_prompt, resDialogOkToast = R.string.crash_dialog_ok_toast)
+@ReportsCrashes(formKey = "", formUri = CJayConstant.ACRA, mode = ReportingInteractionMode.TOAST, resToastText = R.string.crash_toast_text, resDialogText = R.string.crash_dialog_text, resDialogIcon = android.R.drawable.ic_dialog_info, resDialogTitle = R.string.crash_dialog_title, resDialogCommentPrompt = R.string.crash_dialog_comment_prompt, resDialogOkToast = R.string.crash_dialog_ok_toast)
 @EApplication
 public class CJayApplication extends Application {
 
 	IDatabaseManager databaseManager = null;
 	IHttpRequestWrapper httpRequestWrapper = null;
-	Map<String, Fragment.SavedState> savedStateMap;
-
-	public void setFragmentSavedState(String key, SavedState savedState) {
-		savedStateMap.put(key, savedState);
-	}
-
-	public Fragment.SavedState getFragmentSavedState(String key) {
-		return savedStateMap.get(key);
-	}
-
-	public static CJayApplication getApplication(Context context) {
-		return (CJayApplication) context.getApplicationContext();
-	}
 
 	@Override
 	public void onCreate() {
@@ -60,7 +42,6 @@ public class CJayApplication extends Application {
 
 		// Configure Logger
 		Logger.getInstance().setDebuggable(true);
-		savedStateMap = new HashMap<String, Fragment.SavedState>();
 
 		super.onCreate();
 		databaseManager = new DatabaseManager();
@@ -121,6 +102,21 @@ public class CJayApplication extends Application {
 		}
 
 		ctx.startActivity(intent);
+	}
+
+	public static void openPhotoGridView(Context ctx, String uuid,
+			int imageType, String containerId, String sourceTag) {
+
+		Intent intent = new Intent(ctx, PhotoGridViewActivity_.class);
+		intent.putExtra(
+				PhotoGridViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA, uuid);
+		intent.putExtra(PhotoGridViewActivity_.CJAY_IMAGE_TYPE_EXTRA, imageType);
+		intent.putExtra(PhotoGridViewActivity_.CJAY_CONTAINER_ID_EXTRA,
+				containerId);
+		intent.putExtra("tag", sourceTag);
+
+		ctx.startActivity(intent);
+
 	}
 
 	public static void startCJayHomeActivity(Context context) {

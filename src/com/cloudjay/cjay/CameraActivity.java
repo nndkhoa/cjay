@@ -52,6 +52,8 @@ import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
+import com.cloudjay.cjay.fragment.GateExportListFragment;
+import com.cloudjay.cjay.fragment.GateImportListFragment;
 import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -130,6 +132,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	AudioManager audioManager;
 
 	ContainerSession containerSession = null;
+	ContainerSessionDaoImpl containerSessionDaoImpl = null;
+	CJayImageDaoImpl cJayImageDaoImpl = null;
 
 	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
 	String containerSessionUUID = "";
@@ -141,7 +145,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	int type = 0;
 
 	@Extra("tag")
-	String tag = "";
+	String sourceTag = "";
 
 	// endregion
 
@@ -180,8 +184,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
-			// Logger.Log( "onPictureTaken");
-
 			savePhoto(data);
 			camera.startPreview();
 			inPreview = true;
@@ -212,6 +214,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	@SuppressWarnings({})
 	@AfterViews
 	void initCamera() {
+
 		Logger.Log("----> initCamera(), addSurfaceCallback");
 
 		// WARNING: this block should be run before onResume()
@@ -223,19 +226,31 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		// Restore camera state from database or somewhere else
 		flashMode = Camera.Parameters.FLASH_MODE_AUTO;
 		cameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
-
 		this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 	}
 
 	@AfterViews
 	void initContainerSession() {
 		try {
-			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-					.getInstance().getDatabaseManager().getHelper(this)
-					.getContainerSessionDaoImpl();
 
-			containerSession = containerSessionDaoImpl
-					.queryForId(containerSessionUUID);
+			if (null == containerSessionDaoImpl) {
+				containerSessionDaoImpl = CJayClient.getInstance()
+						.getDatabaseManager().getHelper(this)
+						.getContainerSessionDaoImpl();
+
+			}
+
+			if (null == cJayImageDaoImpl) {
+				cJayImageDaoImpl = CJayClient.getInstance()
+						.getDatabaseManager().getHelper(this)
+						.getCJayImageDaoImpl();
+			}
+
+			if (containerSession == null) {
+				containerSession = containerSessionDaoImpl
+						.queryForId(containerSessionUUID);
+
+			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -254,9 +269,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 				// camera.setOneShotPreviewCallback(null);
 
 			} catch (Throwable t) {
-
-				Log.e("PreviewDemo-surfaceCallback",
-						"Exception in setPreviewDisplay()", t);
+				Logger.e("Exception in setPreviewDisplay()");
 				Toast.makeText(this, t.getMessage(), Toast.LENGTH_LONG).show();
 			}
 
@@ -408,8 +421,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 					return bm;
 
 				} else {
-					// LANDSCAPE MODE
-					// No need to reverse width and height
+					// LANDSCAPE MODE --> No need to reverse width and height
 					Bitmap bm = BitmapFactory.decodeByteArray(data, 0,
 							(data != null) ? data.length : 0);
 					return bm;
@@ -487,27 +499,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		// Upload image
 		uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
 
-		// if (photo.exists()) {
-		//
-		// // Save Bitmap to JPEG
-		// saveBitmapToFile(capturedBitmap, photo);
-		//
-		// // Upload image
-		// uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
-		//
-		// } else {
-		//
-		// String output = MediaStore.Images.Media.insertImage(
-		// getContentResolver(), capturedBitmap, fileName,
-		// photo.getPath());
-		//
-		// Logger.Log( "output: " + output);
-		// Logger.Log( "filename: " + fileName);
-		//
-		// // Upload image
-		// uploadImage(uuid, output, fileName);
-		// }
-
 		if (capturedBitmap != null) {
 			capturedBitmap.recycle();
 			capturedBitmap = null;
@@ -523,24 +514,24 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		// Set Uploading Status
 		uploadItem.setType(type);
-		uploadItem.setTimePosted(StringHelper
-				.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+		uploadItem
+				.setTimePosted(StringHelper
+						.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 		uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
 		uploadItem.setUuid(uuid);
 		uploadItem.setUri(uri);
 		uploadItem.setImageName(image_name);
 		uploadItem.setContainerSession(containerSession);
 
-		if (TextUtils.isEmpty(containerSession.getImageIdPath())) {
-			
-			Logger.Log("Set container image_id_path: " + uri);
-			containerSession.setImageIdPath(uri);
-		}
-
 		try {
-			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance()
-					.getDatabaseManager().getHelper(getApplicationContext())
-					.getCJayImageDaoImpl();
+
+			if (TextUtils.isEmpty(containerSession.getImageIdPath())) {
+
+				Logger.e("Set container image_id_path: " + uri);
+				containerSession.setImageIdPath(uri);
+				containerSessionDaoImpl.addContainerSession(containerSession);
+
+			}
 
 			cJayImages.add(uploadItem);
 			cJayImageDaoImpl.addCJayImage(uploadItem);
@@ -550,9 +541,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		}
 
 		// tell people that an image has been created
-		if (!TextUtils.isEmpty(tag)) {
-			EventBus.getDefault()
-					.post(new CJayImageAddedEvent(uploadItem, tag));
+		if (!TextUtils.isEmpty(sourceTag)) {
+			EventBus.getDefault().post(
+					new CJayImageAddedEvent(uploadItem, sourceTag));
 		}
 	}
 
@@ -577,14 +568,24 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	public void onBackPressed() {
 		try {
 
-			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-					.getInstance().getDatabaseManager().getHelper(this)
-					.getContainerSessionDaoImpl();
-
 			containerSessionDaoImpl.addContainerSession(containerSession);
 			EventBus.getDefault().post(
 					new ContainerSessionChangedEvent(containerSession));
 
+			// Open GridView
+			if (sourceTag.equals(GateImportListFragment.LOG_TAG)) {
+				CJayApplication.openPhotoGridView(this,
+						containerSession.getUuid(), CJayImage.TYPE_IMPORT,
+						containerSession.getContainerId(),
+						GateImportListFragment.LOG_TAG);
+
+			} else if (sourceTag.equals(GateExportListFragment.LOG_TAG)) {
+
+				CJayApplication.openPhotoGridView(this,
+						containerSession.getUuid(), CJayImage.TYPE_EXPORT,
+						containerSession.getContainerId(),
+						GateExportListFragment.LOG_TAG);
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

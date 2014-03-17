@@ -7,7 +7,6 @@ encoding//src/com/cloudjay/cjay/RepairContainerActivity.java=UTF-8
 encoding//src/com/cloudjay/cjay/RepairIssueReportActivity.java=UTF-8
 encoding//src/com/cloudjay/cjay/dao/ContainerSessionDaoImpl.java=UTF-8
 encoding//src/com/cloudjay/cjay/fragment/AuditorReportingListFragment.java=UTF-8
-encoding//src/com/cloudjay/cjay/fragment/CJaySherlockFragment.java=UTF-8
 encoding//src/com/cloudjay/cjay/fragment/GateImportListFragment.java=UTF-8
 encoding//src/com/cloudjay/cjay/fragment/RepairIssuePendingListFragment.java=UTF-8
 encoding//src/com/cloudjay/cjay/fragment/UploadsFragment.java=UTF-8

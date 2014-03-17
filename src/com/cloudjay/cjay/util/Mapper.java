@@ -246,6 +246,7 @@ public class Mapper {
 			}
 		}
 
+		// TODO: only handle for app Auditor
 		for (CJayImage cJayImage : cJayImages) {
 			if (cJayImage.getType() == CJayImage.TYPE_REPORT
 					&& cJayImage.getIssue() == null) {

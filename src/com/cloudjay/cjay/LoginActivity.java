@@ -17,7 +17,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.preference.Preference;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -56,8 +55,8 @@ public class LoginActivity extends CJayActivity {
 	private String mPassword = "";
 
 	@Extra(EXTRA_EMAIL)
-	// String mEmail = "";
-	String mEmail = "giamdinhcong@test.com";
+	String mEmail = "";
+	// String mEmail = "giamdinhcong@test.com";
 	// String mEmail = "giamdinhcong1.icd1@pip.com.vn";
 	// String mEmail = "giamdinhsuachua.icd1@pip.com.vn";
 	// String mEmail = "giamdinhsuachua@test.com";
@@ -89,7 +88,7 @@ public class LoginActivity extends CJayActivity {
 	}
 
 	@AfterViews
-	void init() {
+	void initialize() {
 
 		if (TextUtils.isEmpty(mEmail))
 			mEmail = PreferencesUtil.getPrefsValue(getApplicationContext(),

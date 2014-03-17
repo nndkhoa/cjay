@@ -1,12 +1,9 @@
 package com.cloudjay.cjay.util;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -16,28 +13,13 @@ import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.ActivityManager.RunningAppProcessInfo;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.net.Uri;
 import android.os.Environment;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.os.Parcelable.Creator;
-import android.provider.MediaStore;
 import android.util.Log;
-import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.ScaleAnimation;
 import android.widget.Toast;
 
 import com.cloudjay.cjay.CJayActivity;
