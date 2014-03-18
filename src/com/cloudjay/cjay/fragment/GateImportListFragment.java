@@ -35,7 +35,10 @@ import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.CJayActivity;
+import com.cloudjay.cjay.CJayApplication;
+import com.cloudjay.cjay.PhotoGridViewActivity_;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateContainerCursorAdapter;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -322,12 +325,12 @@ public class GateImportListFragment extends SherlockFragment implements
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
-
+		
 		boolean isDisplayed = !(mSelectedContainerSession == null);
 		menu.findItem(R.id.menu_camera).setVisible(isDisplayed);
 		menu.findItem(R.id.menu_edit_container).setVisible(isDisplayed);
-		menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
 		menu.findItem(R.id.menu_trash).setVisible(isDisplayed);
+		menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
 	}
 
 	@Override
