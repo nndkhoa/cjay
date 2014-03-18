@@ -10,6 +10,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
+import android.util.Log;
+
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.IDatabaseManager;
@@ -22,6 +24,7 @@ import com.cloudjay.cjay.util.DatabaseManager;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
+import com.koushikdutta.ion.Ion;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -42,6 +45,8 @@ public class CJayApplication extends Application {
 
 		// Configure Logger
 		Logger.getInstance().setDebuggable(true);
+		Ion.getDefault(getBaseContext()).configure()
+				.setLogging("Network Module", Log.DEBUG);
 
 		super.onCreate();
 		databaseManager = new DatabaseManager();

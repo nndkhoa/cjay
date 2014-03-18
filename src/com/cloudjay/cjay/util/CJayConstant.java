@@ -16,34 +16,22 @@ public final class CJayConstant {
 	public static final String API_ADD_GCM_DEVICE = API_ROOT
 			+ "mobile/gcm-devices.json";
 
-	public static final String CURRENT_USER = API_ROOT + "cjay/current-user";
-	public static final String ALL_USERS = API_ROOT + "auth/jayusers";
+	public static final String CURRENT_USER = API_ROOT
+			+ "cjay/current-user.json";
 
 	public static final String LIST_OPERATORS = API_ROOT
-			+ "cjay/container-operators";
-	public static final String LIST_OPERATORS_WITH_DATETIME = API_ROOT
-			+ "cjay/container-operators.json?modified_after=%s";
+			+ "cjay/container-operators.json";
 
 	public static final String LIST_DAMAGE_CODES = API_ROOT
-			+ "cjay/damage-codes";
-	public static final String LIST_DAMAGE_CODES_WITH_DATETIME = API_ROOT
-			+ "cjay/damage-codes.json?modified_after=%s";
+			+ "cjay/damage-codes.json";
 
 	public static final String LIST_REPAIR_CODES = API_ROOT
-			+ "cjay/repair-codes";
-	public static final String LIST_REPAIR_CODES_WITH_DATETIME = API_ROOT
-			+ "cjay/repair-codes.json?modified_after=%s";
+			+ "cjay/repair-codes.json";
 
 	public static final String LIST_COMPONENT_CODES = API_ROOT
-			+ "cjay/component-codes";
+			+ "cjay/component-codes.json";
 
-	public static final String LIST_COMPONENT_CODES_WITH_DATETIME = API_ROOT
-			+ "cjay/component-codes.json?modified_after=%s";
-
-	public static final String LIST_CONTAINER_SESSIONS_WITH_PAGE = API_ROOT
-			+ "cjay/container-sessions.json?page=%s";
-
-	public static final String CJAY_ITEMS = API_ROOT
+	public static final String CONTAINER_SESSIONS = API_ROOT
 			+ "cjay/container-sessions.json";
 
 	public static final String LIST_CONTAINER_SESSIONS_WITH_DATETIME_AND_PAGE = API_ROOT

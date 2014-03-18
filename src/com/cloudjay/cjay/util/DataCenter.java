@@ -401,145 +401,76 @@ public class DataCenter {
 			throws NoConnectionException, SQLException {
 
 		Logger.Log("*** UPDATE LIST CONTAINER SESSIONS ***");
-
 		PreferencesUtil.storePrefsValue(ctx,
 				PreferencesUtil.PREF_IS_UPDATING_DATA, true);
 
 		try {
-			Date now = new Date();
-
 			// 2013-11-10T21:05:24 (do not have timezone info)
 			SimpleDateFormat dateFormat = new SimpleDateFormat(
 					CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-			String nowString = dateFormat.format(now);
+			String nowString = dateFormat.format(new Date());
 
 			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
 					.getHelper(ctx).getContainerSessionDaoImpl();
 
 			// 3. Update list ContainerSessions
-			Logger.Log("get list container sessions");
-
 			int page = 1;
 			String nextUrl = "";
+			String lastUpdate = "";
 
 			if (containerSessionDaoImpl.isEmpty()) {
 
-				do {
-					ContainerSessionResult result = null;
-					List<ContainerSession> containerSessions = new ArrayList<ContainerSession>();
-
-					result = CJayClient.getInstance()
-							.getContainerSessionsByPage(ctx, page);
-
-					if (null != result) {
-						page = page + 1;
-						nextUrl = result.getNext();
-
-						List<TmpContainerSession> tmpContainerSessions = result
-								.getResults();
-
-						if (null != tmpContainerSessions) {
-
-							for (TmpContainerSession tmpSession : tmpContainerSessions) {
-
-								ContainerSession containerSession = Mapper
-										.getInstance().toContainerSession(
-												tmpSession, ctx);
-
-								if (null != containerSession) {
-									containerSessions.add(containerSession);
-								}
-							}
-						}
-
-						containerSessionDaoImpl
-								.addListContainerSessions(containerSessions);
-
-						if (null != containerSessions
-								&& !containerSessions.isEmpty()) {
-							EventBus.getDefault().post(
-									new ContainerSessionChangedEvent(
-											containerSessions));
-						}
-					}
-
-				} while (!TextUtils.isEmpty(nextUrl));
-
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
-						nowString);
-
 			} else {
 
-				String date = PreferencesUtil.getPrefsValue(ctx,
+				lastUpdate = PreferencesUtil.getPrefsValue(ctx,
 						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE);
 
 				Logger.Log("get updated list container sessions from last time: "
-						+ date);
-				do {
-					List<ContainerSession> containerSessions = new ArrayList<ContainerSession>();
-					ContainerSessionResult result = null;
+						+ lastUpdate);
+			}
 
-					result = CJayClient.getInstance()
-							.getContainerSessionsByPage(ctx, date, page);
+			do {
+				List<ContainerSession> containerSessions = new ArrayList<ContainerSession>();
+				ContainerSessionResult result = null;
 
-					if (null != result) {
-						page = page + 1;
-						nextUrl = result.getNext();
+				result = CJayClient.getInstance().getContainerSessionsByPage(
+						ctx, lastUpdate, page);
 
-						List<TmpContainerSession> tmpContainerSessions = result
-								.getResults();
+				if (null != result) {
+					page = page + 1;
+					nextUrl = result.getNext();
 
-						if (null != tmpContainerSessions) {
+					List<TmpContainerSession> tmpContainerSessions = result
+							.getResults();
 
-							for (TmpContainerSession tmpSession : tmpContainerSessions) {
-								ContainerSession containerSession = Mapper
-										.getInstance().toContainerSession(
-												tmpSession, ctx);
+					if (null != tmpContainerSessions) {
 
-								if (null != containerSession) {
-									containerSessions.add(containerSession);
-								}
+						for (TmpContainerSession tmpSession : tmpContainerSessions) {
+							ContainerSession containerSession = Mapper
+									.getInstance().toContainerSession(
+											tmpSession, ctx);
+
+							if (null != containerSession) {
+								containerSessions.add(containerSession);
 							}
 						}
-
-						containerSessionDaoImpl
-								.addListContainerSessions(containerSessions);
-
-						if (null != containerSessions
-								&& !containerSessions.isEmpty()) {
-							EventBus.getDefault().post(
-									new ContainerSessionChangedEvent(
-											containerSessions));
-						}
-
-						if (containerSessions.isEmpty()) {
-							Logger.Log("----> NO new container sessions");
-						} else {
-
-							EventBus.getDefault().post(
-									new ContainerSessionChangedEvent(
-											containerSessions));
-
-							Logger.Log("----> Has "
-									+ Integer.toString(containerSessions.size())
-									+ " new container sessions");
-						}
-
 					}
 
-				} while (!TextUtils.isEmpty(nextUrl));
+					containerSessionDaoImpl
+							.addListContainerSessions(containerSessions);
 
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
-						nowString);
+					if (null != containerSessions
+							&& !containerSessions.isEmpty()) {
+						EventBus.getDefault().post(
+								new ContainerSessionChangedEvent(
+										containerSessions));
+					}
+				}
+			} while (!TextUtils.isEmpty(nextUrl));
 
-				Logger.Log("Last update from "
-						+ PreferencesUtil
-								.getPrefsValue(
-										ctx,
-										PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE));
-			}
+			PreferencesUtil.storePrefsValue(ctx,
+					PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
+					nowString);
 
 			PreferencesUtil.storePrefsValue(ctx,
 					PreferencesUtil.PREF_IS_UPDATING_DATA, false);
@@ -574,54 +505,40 @@ public class DataCenter {
 			SQLException {
 
 		Logger.Log("*** UPDATE LIST OPERATORS ***");
+
 		try {
-			Date now = new Date();
 
 			// 2013-11-10T21:05:24 (do not have timezone info)
 			SimpleDateFormat dateFormat = new SimpleDateFormat(
 					CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-			String nowString = dateFormat.format(now);
+			String nowString = dateFormat.format(new Date());
 
 			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx)
 					.getOperatorDaoImpl();
 
-			// get list operator
 			List<Operator> operators = null;
-			if (operatorDaoImpl.isEmpty()) {
-				Logger.Log("no Operator");
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE,
-						nowString);
+			String lastUpdate = "";
 
-				operators = CJayClient.getInstance().getOperators(ctx);
+			if (operatorDaoImpl.isEmpty()) {
 
 			} else {
-
-				String date = PreferencesUtil.getPrefsValue(ctx,
+				lastUpdate = PreferencesUtil.getPrefsValue(ctx,
 						PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE);
-
-				Logger.Log("get updated list operator from last time: " + date);
-
-				operators = CJayClient.getInstance().getOperators(ctx, date);
-
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE,
-						nowString);
-
-				if (operators == null) {
-					Logger.Log("----> NO new operators");
-				} else {
-					Logger.Log("----> Has "
-							+ Integer.toString(operators.size())
-							+ " new operators");
-				}
-
-				Logger.Log("Last update from "
-						+ PreferencesUtil
-								.getPrefsValue(
-										ctx,
-										PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE));
 			}
+
+			operators = CJayClient.getInstance().getOperators(ctx, lastUpdate);
+
+			if (operators == null) {
+				Logger.w("----> NO new operators");
+			} else {
+				Logger.w("----> Has " + Integer.toString(operators.size())
+						+ " new operators");
+			}
+
+			PreferencesUtil.storePrefsValue(ctx,
+					PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE,
+					nowString);
+
 			if (null != operators)
 				operatorDaoImpl.addListOperators(operators);
 
@@ -647,54 +564,36 @@ public class DataCenter {
 
 		Logger.Log("*** UPDATE LIST DAMAGE ***");
 		try {
-			Date now = new Date();
-
 			// 2013-11-10T21:05:24 (do not have timezone info)
 			SimpleDateFormat dateFormat = new SimpleDateFormat(
 					CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-			String nowString = dateFormat.format(now);
-
+			String nowString = dateFormat.format(new Date());
 			DamageCodeDaoImpl damageCodeDaoImpl = databaseManager
 					.getHelper(ctx).getDamageCodeDaoImpl();
 
 			// Get list damage
 			List<DamageCode> damageCodes = null;
+			String lastUpdate = "";
 			if (damageCodeDaoImpl.isEmpty()) {
-				Logger.Log("no Damage Code");
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE,
-						nowString);
-				damageCodes = CJayClient.getInstance().getDamageCodes(ctx);
 
 			} else {
-				String date = PreferencesUtil.getPrefsValue(ctx,
+				lastUpdate = PreferencesUtil.getPrefsValue(ctx,
 						PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE);
+			}
 
-				Logger.Log("get updated list damage codes from last time: "
-						+ date);
+			damageCodes = CJayClient.getInstance().getDamageCodes(ctx,
+					lastUpdate);
 
-				damageCodes = CJayClient.getInstance()
-						.getDamageCodes(ctx, date);
+			PreferencesUtil
+					.storePrefsValue(ctx,
+							PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE,
+							nowString);
 
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE,
-						nowString);
-
-				if (damageCodes == null) {
-					Logger.Log("----> NO new damage codes");
-				} else {
-					Logger.Log("----> Has "
-							+ Integer.toString(damageCodes.size())
-							+ " new damage codes");
-				}
-
-				Logger.Log(
-
-				"Last update from "
-						+ PreferencesUtil
-								.getPrefsValue(
-										ctx,
-										PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE));
+			if (damageCodes == null) {
+				Logger.w("----> NO new damage codes");
+			} else {
+				Logger.w("----> Has " + Integer.toString(damageCodes.size())
+						+ " new damage codes");
 			}
 
 			if (null != damageCodes)
@@ -723,59 +622,36 @@ public class DataCenter {
 		Logger.Log("*** UPDATE LIST COMPONENT ***");
 
 		try {
-			Date now = new Date();
-
 			// 2013-11-10T21:05:24 (do not have timezone info)
 			SimpleDateFormat dateFormat = new SimpleDateFormat(
 					CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-			String nowString = dateFormat.format(now);
+			String nowString = dateFormat.format(new Date());
 
 			ComponentCodeDaoImpl componentCodeDaoImpl = databaseManager
 					.getHelper(ctx).getComponentCodeDaoImpl();
 
 			// Get list Component
 			List<ComponentCode> componentCodes = null;
+			String lastUpdate = "";
 			if (componentCodeDaoImpl.isEmpty()) {
-				Logger.Log("no Component Code");
-
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE,
-						nowString);
-
-				componentCodes = CJayClient.getInstance()
-						.getComponentCodes(ctx);
 
 			} else {
-
-				String date = PreferencesUtil.getPrefsValue(ctx,
+				lastUpdate = PreferencesUtil.getPrefsValue(ctx,
 						PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE);
+			}
 
-				Logger.Log("get updated list component codes from last time: "
-						+ date);
+			componentCodes = CJayClient.getInstance().getComponentCodes(ctx,
+					lastUpdate);
 
-				componentCodes = CJayClient.getInstance().getComponentCodes(
-						ctx, date);
+			PreferencesUtil.storePrefsValue(ctx,
+					PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE,
+					nowString);
 
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE,
-						nowString);
-
-				if (componentCodes == null) {
-					Logger.Log("----> NO new component codes");
-				} else {
-					Logger.Log(
-
-					"----> Has " + Integer.toString(componentCodes.size())
-							+ " new component codes");
-				}
-
-				Logger.Log(
-
-				"Last update from "
-						+ PreferencesUtil
-								.getPrefsValue(
-										ctx,
-										PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE));
+			if (componentCodes == null) {
+				Logger.w("----> NO new component codes");
+			} else {
+				Logger.w("----> Has " + Integer.toString(componentCodes.size())
+						+ " new component codes");
 			}
 
 			if (null != componentCodes)
@@ -803,55 +679,40 @@ public class DataCenter {
 
 		Logger.Log("*** UPDATE LIST REPAIR ***");
 		try {
-			Date now = new Date();
-
 			// 2013-11-10T21:05:24 (do not have timezone info)
 			SimpleDateFormat dateFormat = new SimpleDateFormat(
 					CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-			String nowString = dateFormat.format(now);
+			String nowString = dateFormat.format(new Date());
 
 			RepairCodeDaoImpl repairCodeDaoImpl = databaseManager
 					.getHelper(ctx).getRepairCodeDaoImpl();
 
 			// Get list Repair
 			List<RepairCode> repairCodes = null;
+			String lastUpdate = "";
 			if (repairCodeDaoImpl.isEmpty()) {
-				Logger.Log("no Repair Code");
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE,
-						nowString);
-
-				repairCodes = CJayClient.getInstance().getRepairCodes(ctx);
 
 			} else {
 
-				String date = PreferencesUtil.getPrefsValue(ctx,
+				lastUpdate = PreferencesUtil.getPrefsValue(ctx,
 						PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE);
-
-				Logger.Log("get updated list repair codes from last time: "
-						+ date);
-
-				repairCodes = CJayClient.getInstance()
-						.getRepairCodes(ctx, date);
-
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE,
-						nowString);
-
-				if (repairCodes == null) {
-					Logger.Log("----> NO new repair codes");
-				} else {
-					Logger.Log("----> Has "
-							+ Integer.toString(repairCodes.size())
-							+ " new repair codes");
-				}
-
-				Logger.Log("Last update from "
-						+ PreferencesUtil
-								.getPrefsValue(
-										ctx,
-										PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE));
 			}
+
+			repairCodes = CJayClient.getInstance().getRepairCodes(ctx,
+					lastUpdate);
+
+			PreferencesUtil
+					.storePrefsValue(ctx,
+							PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE,
+							nowString);
+
+			if (repairCodes == null) {
+				Logger.w("----> NO new repair codes");
+			} else {
+				Logger.w("----> Has " + Integer.toString(repairCodes.size())
+						+ " new repair codes");
+			}
+
 			if (null != repairCodes)
 				repairCodeDaoImpl.addListRepairCodes(repairCodes);
 

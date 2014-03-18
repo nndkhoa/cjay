@@ -27,25 +27,13 @@ public interface ICJayClient {
 
 	User getCurrentUser(String token, Context ctx) throws NoConnectionException;
 
-	List<Operator> getOperators(Context ctx) throws NoConnectionException,
-			NullSessionException;
-
-	List<Operator> getOperators(Context ctx, String date)
+	List<Operator> getOperators(Context ctx, String modifiedAfter)
 			throws NoConnectionException, NullSessionException;
-
-	List<DamageCode> getDamageCodes(Context ctx) throws NoConnectionException,
-			NullSessionException;
 
 	List<DamageCode> getDamageCodes(Context ctx, String date)
 			throws NoConnectionException, NullSessionException;
 
-	List<RepairCode> getRepairCodes(Context ctx) throws NoConnectionException,
-			NullSessionException;
-
 	List<RepairCode> getRepairCodes(Context ctx, String date)
-			throws NoConnectionException, NullSessionException;
-
-	List<ComponentCode> getComponentCodes(Context ctx)
 			throws NoConnectionException, NullSessionException;
 
 	List<ComponentCode> getComponentCodes(Context ctx, String date)
@@ -53,9 +41,6 @@ public interface ICJayClient {
 
 	String postContainerSession(Context ctx, TmpContainerSession item)
 			throws NoConnectionException;
-
-	ContainerSessionResult getContainerSessionsByPage(Context ctx, int page)
-			throws NoConnectionException, NullSessionException;
 
 	ContainerSessionResult getContainerSessionsByPage(Context ctx, String date,
 			int page) throws NoConnectionException, NullSessionException;

@@ -54,10 +54,10 @@ public class LoginActivity extends CJayActivity {
 
 	@Extra(EXTRA_EMAIL)
 	// String mEmail = "";
-	// String mEmail = "giamdinhcong@test.com";
+	String mEmail = "giamdinhcong@test.com";
 	// String mEmail = "giamdinhcong1.icd1@pip.com.vn";
 	// String mEmail = "giamdinhsuachua.icd1@pip.com.vn";
-	String mEmail = "giamdinhsuachua@test.com";
+	// String mEmail = "giamdinhsuachua@test.com";
 	// String mEmail = "tosuachua@test.com";
 	// String mEmail = "tosuachua1.icd1@pip.com.vn";
 
@@ -249,7 +249,6 @@ public class LoginActivity extends CJayActivity {
 							userToken);
 					changeProgressText(R.string.login_progress_loading_data);
 
-					// DataCenter.getInstance().fetchData(LoginActivity.this);
 					DataCenter.getInstance().updateListISOCode(
 							LoginActivity.this);
 

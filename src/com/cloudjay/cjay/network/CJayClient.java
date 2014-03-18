@@ -97,7 +97,6 @@ public class CJayClient implements ICJayClient {
 			NoConnectionException {
 
 		if (Utils.hasNoConnection(ctx)) {
-			Logger.Log("No connection");
 			throw new NoConnectionException();
 		}
 
@@ -165,75 +164,50 @@ public class CJayClient implements ICJayClient {
 			throw new NoConnectionException();
 		}
 
-		HashMap<String, String> headers = new HashMap<String, String>();
-		headers.put("Authorization", "Token " + token);
-		String response = requestWrapper.sendGet(CJayConstant.CURRENT_USER,
-				headers);
+		User user = null;
+		try {
+			user = Ion.with(ctx, CJayConstant.CURRENT_USER)
+					.setHeader("Authorization", "Token " + token)
+					.as(new TypeToken<User>() {
+					}).get();
 
-		Logger.Log(response);
-		Gson gson = new Gson();
-		Type userType = new TypeToken<User>() {
-		}.getType();
-
-		User user = gson.fromJson(response, userType);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
 
 		return user;
 	}
 
 	@Override
-	public List<Operator> getOperators(Context ctx)
+	public List<Operator> getOperators(Context ctx, String date)
 			throws NoConnectionException, NullSessionException {
 
-		Logger.Log("getOperators");
+		Logger.Log("getOperators from " + date);
 
 		if (Utils.hasNoConnection(ctx)) {
 			Logger.Log("No connection");
 			throw new NoConnectionException();
 		}
 
-		HashMap<String, String> headers;
+		List<Operator> items = null;
 		try {
-			headers = prepareHeadersWithToken(ctx);
-		} catch (NullSessionException e) {
-			throw e;
+
+			String accessToken = CJaySession.restore(ctx).getAccessToken();
+			items = Ion.with(ctx, CJayConstant.LIST_OPERATORS)
+					.setHeader("Authorization", "Token " + accessToken)
+					.addQuery("modified_after", date)
+					.as(new TypeToken<List<Operator>>() {
+					}).get();
+
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
 		}
-		String response = requestWrapper.sendGet(CJayConstant.LIST_OPERATORS,
-				headers);
 
-		Gson gson = new Gson();
-		Type listType = new TypeToken<List<Operator>>() {
-		}.getType();
-
-		List<Operator> items = gson.fromJson(response, listType);
 		return items;
-	}
-
-	@Override
-	public List<DamageCode> getDamageCodes(Context ctx)
-			throws NoConnectionException, NullSessionException {
-
-		Logger.Log("getDamageCodes");
-
-		if (Utils.hasNoConnection(ctx)) {
-			throw new NoConnectionException();
-		}
-
-		HashMap<String, String> headers;
-		try {
-			headers = prepareHeadersWithToken(ctx);
-		} catch (NullSessionException e) {
-			throw e;
-		}
-
-		String response = requestWrapper.sendGet(
-				CJayConstant.LIST_DAMAGE_CODES, headers);
-		Gson gson = new Gson();
-		Type listType = new TypeToken<List<DamageCode>>() {
-		}.getType();
-
-		List<DamageCode> items = gson.fromJson(response, listType);
-		return items;
-
 	}
 
 	@Override
@@ -245,49 +219,22 @@ public class CJayClient implements ICJayClient {
 			throw new NoConnectionException();
 		}
 
-		HashMap<String, String> headers;
+		List<DamageCode> items = null;
 		try {
-			headers = prepareHeadersWithToken(ctx);
-		} catch (NullSessionException e) {
-			throw e;
+			String accessToken = CJaySession.restore(ctx).getAccessToken();
+			items = Ion.with(ctx, CJayConstant.LIST_DAMAGE_CODES)
+					.setHeader("Authorization", "Token " + accessToken)
+					.addQuery("modified_after", date)
+					.as(new TypeToken<List<DamageCode>>() {
+					}).get();
+
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
 		}
-
-		String response = requestWrapper.sendGet(String.format(
-				CJayConstant.LIST_DAMAGE_CODES_WITH_DATETIME, date), headers);
-
-		Gson gson = new Gson();
-		Type listType = new TypeToken<List<DamageCode>>() {
-		}.getType();
-
-		List<DamageCode> items = gson.fromJson(response, listType);
 		return items;
 
-	}
-
-	@Override
-	public List<RepairCode> getRepairCodes(Context ctx)
-			throws NoConnectionException, NullSessionException {
-
-		Logger.Log("getRepairCodes");
-		if (Utils.hasNoConnection(ctx)) {
-			throw new NoConnectionException();
-		}
-
-		HashMap<String, String> headers;
-		try {
-			headers = prepareHeadersWithToken(ctx);
-		} catch (NullSessionException e) {
-			throw e;
-		}
-
-		String response = requestWrapper.sendGet(
-				CJayConstant.LIST_REPAIR_CODES, headers);
-		Gson gson = new Gson();
-		Type listType = new TypeToken<List<RepairCode>>() {
-		}.getType();
-
-		List<RepairCode> items = gson.fromJson(response, listType);
-		return items;
 	}
 
 	@Override
@@ -299,49 +246,20 @@ public class CJayClient implements ICJayClient {
 			throw new NoConnectionException();
 		}
 
-		HashMap<String, String> headers;
+		List<RepairCode> items = null;
 		try {
-			headers = prepareHeadersWithToken(ctx);
-		} catch (NullSessionException e) {
-			throw e;
+			String accessToken = CJaySession.restore(ctx).getAccessToken();
+			items = Ion.with(ctx, CJayConstant.LIST_REPAIR_CODES)
+					.setHeader("Authorization", "Token " + accessToken)
+					.addQuery("modified_after", date)
+					.as(new TypeToken<List<RepairCode>>() {
+					}).get();
+
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
 		}
-
-		String response = requestWrapper.sendGet(String.format(
-				CJayConstant.LIST_REPAIR_CODES_WITH_DATETIME, date), headers);
-
-		Gson gson = new Gson();
-		Type listType = new TypeToken<List<RepairCode>>() {
-		}.getType();
-
-		List<RepairCode> items = gson.fromJson(response, listType);
-		return items;
-
-	}
-
-	@Override
-	public List<ComponentCode> getComponentCodes(Context ctx)
-			throws NoConnectionException, NullSessionException {
-
-		Logger.Log("getComponentCodes");
-
-		if (Utils.hasNoConnection(ctx)) {
-			throw new NoConnectionException();
-		}
-
-		HashMap<String, String> headers;
-		try {
-			headers = prepareHeadersWithToken(ctx);
-		} catch (NullSessionException e) {
-			throw e;
-		}
-
-		String response = requestWrapper.sendGet(
-				CJayConstant.LIST_COMPONENT_CODES, headers);
-		Gson gson = new Gson();
-		Type listType = new TypeToken<List<ComponentCode>>() {
-		}.getType();
-
-		List<ComponentCode> items = gson.fromJson(response, listType);
 		return items;
 
 	}
@@ -355,60 +273,21 @@ public class CJayClient implements ICJayClient {
 			throw new NoConnectionException();
 		}
 
-		HashMap<String, String> headers;
+		List<ComponentCode> items = null;
 		try {
-			headers = prepareHeadersWithToken(ctx);
-		} catch (NullSessionException e) {
-			throw e;
-		}
-		String response = requestWrapper
-				.sendGet(String.format(
-						CJayConstant.LIST_COMPONENT_CODES_WITH_DATETIME, date),
-						headers);
+			String accessToken = CJaySession.restore(ctx).getAccessToken();
+			items = Ion.with(ctx, CJayConstant.LIST_COMPONENT_CODES)
+					.setHeader("Authorization", "Token " + accessToken)
+					.addQuery("modified_after", date)
+					.as(new TypeToken<List<ComponentCode>>() {
+					}).get();
 
-		Gson gson = new Gson();
-		Type listType = new TypeToken<List<ComponentCode>>() {
-		}.getType();
-
-		List<ComponentCode> items = gson.fromJson(response, listType);
-		return items;
-	}
-
-	public ContainerSessionResult getContainerSessionsByPage(Context ctx,
-			int page) throws NoConnectionException, NullSessionException {
-
-		// Logger.Log( "Current page: " + Integer.toString(page));
-
-		if (Utils.hasNoConnection(ctx)) {
-			throw new NoConnectionException();
-		}
-
-		HashMap<String, String> headers;
-		try {
-			headers = prepareHeadersWithToken(ctx);
-		} catch (NullSessionException e) {
-			throw e;
-		}
-
-		String response = requestWrapper.sendGet(String.format(
-				CJayConstant.LIST_CONTAINER_SESSIONS_WITH_PAGE, page), headers);
-
-		// Logger.Log( "Server response: " + response);
-
-		Gson gson = new GsonBuilder().setDateFormat(
-				CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE).create();
-
-		Type listType = new TypeToken<ContainerSessionResult>() {
-		}.getType();
-
-		ContainerSessionResult result = null;
-		try {
-			result = gson.fromJson(response, listType);
-		} catch (Exception e) {
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
 			e.printStackTrace();
 		}
-
-		return result;
+		return items;
 	}
 
 	public ContainerSessionResult getContainerSessionsByPage(Context ctx,
@@ -419,16 +298,19 @@ public class CJayClient implements ICJayClient {
 			throw new NoConnectionException();
 		}
 
-		HashMap<String, String> headers;
+		String response = "";
 		try {
-			headers = prepareHeadersWithToken(ctx);
-		} catch (NullSessionException e) {
-			throw e;
-		}
+			String accessToken = CJaySession.restore(ctx).getAccessToken();
+			response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS)
+					.setHeader("Authorization", "Token " + accessToken)
+					.addQuery("page", Integer.toString(page))
+					.addQuery("created_after", date).asString().get();
 
-		String response = requestWrapper.sendGet(String.format(
-				CJayConstant.LIST_CONTAINER_SESSIONS_WITH_DATETIME_AND_PAGE,
-				date, page), headers);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
 
 		// Logger.Log( response);
 
@@ -449,38 +331,6 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public List<Operator> getOperators(Context ctx, String date)
-			throws NoConnectionException, NullSessionException {
-
-		Logger.Log("getOperators from " + date);
-
-		if (Utils.hasNoConnection(ctx)) {
-			Logger.Log("No connection");
-			throw new NoConnectionException();
-		}
-
-		HashMap<String, String> headers;
-		try {
-			headers = prepareHeadersWithToken(ctx);
-
-		} catch (NullSessionException e) {
-			throw e;
-		}
-
-		String response = requestWrapper.sendGet(
-				String.format(CJayConstant.LIST_OPERATORS_WITH_DATETIME, date),
-				headers);
-
-		Gson gson = new Gson();
-		Type listType = new TypeToken<List<Operator>>() {
-		}.getType();
-
-		List<Operator> items = gson.fromJson(response, listType);
-		return items;
-
-	}
-
-	@Override
 	public String postContainerSession(Context ctx, TmpContainerSession item)
 			throws NoConnectionException {
 
@@ -496,7 +346,7 @@ public class CJayClient implements ICJayClient {
 			Gson gson = new Gson();
 
 			String data = gson.toJson(item);
-			String url = CJayConstant.CJAY_ITEMS;
+			String url = CJayConstant.CONTAINER_SESSIONS;
 			ret = requestWrapper.sendPost(url, data, "application/json",
 					headers);
 

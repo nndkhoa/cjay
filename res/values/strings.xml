@@ -63,6 +63,6 @@
     <string name="empty_uploads">No uploads available</string>
     <string name="empty_items">No items available</string>
     <string name="logout">Logout %1$s</string>
-    <string name="logout_prompt_title">Bạn chắc chưa?</string>
+    <string name="logout_prompt_title">Dữ liệu sẽ bị xóa sau khi đăng xuất. Bạn có chắc chưa?</string>
 
 </resources>

@@ -54,6 +54,10 @@ public class CJaySession {
 		return currentUser.getRole();
 	}
 
+	public String getAccessToken() {
+		return currentUser.getAccessToken();
+	}
+
 	public int getFilterStatus() {
 		return currentUser.getFilterStatus();
 	}
