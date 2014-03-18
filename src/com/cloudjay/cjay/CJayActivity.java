@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
 import org.json.JSONException;
 
@@ -35,6 +36,7 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
 @EActivity
+@OptionsMenu(R.menu.menu_base)
 public class CJayActivity extends SherlockFragmentActivity {
 
 	@Bean
