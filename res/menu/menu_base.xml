@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_camera"
+        android:icon="@drawable/ic_menu_camera"
+        android:showAsAction="always"
+        android:title="@string/menu_camera_title"/>
+    <item
+        android:id="@+id/menu_edit_container"
+        android:icon="@drawable/icon_menu_edit"
+        android:showAsAction="always"
+        android:title="@string/menu_edit_container_title"/>
+    <item
+        android:id="@+id/menu_check"
+        android:icon="@drawable/icon_menu_check"       
+        android:showAsAction="always"
+        android:title="@string/menu_issue_report_check_title"/>
+   	<!-- android:icon="@drawable/ic_btn_selection_checked" -->
+    <item
+        android:id="@+id/menu_trash"
+        android:icon="@drawable/icon_menu_trash"
+        android:showAsAction="always"
+        android:title="@string/menu_trash_title"/>
+    <item
+        android:id="@+id/menu_more"
+        android:icon="@android:drawable/ic_menu_more"
+        android:showAsAction="never"
+        android:title="More"/>
+    <item
+        android:id="@+id/menu_upload"
+        android:icon="@drawable/ic_action_upload"
+        android:showAsAction="always"
+        android:title="@string/menu_upload_title"/>
+    <item
+        android:id="@+id/menu_clear_uploaded"
+        android:icon="@drawable/ic_notify_clear_normal"
+        android:showAsAction="always"
+        android:title="@string/menu_clear_uploaded_title"/>
+ 	<item
+	    android:id="@+id/menu_logout"
+		android:showAsAction="never"
+	    android:title="@string/menu_logout_title" />
+</menu>
