@@ -203,7 +203,6 @@ public class CJayActivity extends SherlockFragmentActivity {
 					}
 
 					regid = gcm.register(CJayConstant.SENDER_ID);
-					Log.d("registration Id", regid + "");
 					msg = "Device registered, registration ID=" + regid;
 
 					// You should send the registration ID to your server over

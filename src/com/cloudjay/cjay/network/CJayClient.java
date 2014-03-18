@@ -1,8 +1,6 @@
 package com.cloudjay.cjay.network;
 
 import java.lang.reflect.Type;
-import java.net.SocketTimeoutException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -13,6 +11,8 @@ import org.json.JSONObject;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
+import android.widget.Toast;
+
 import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSessionResult;
 import com.cloudjay.cjay.model.DamageCode;
@@ -31,6 +31,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
 /**
@@ -70,63 +71,6 @@ public class CJayClient implements ICJayClient {
 	public void init(IHttpRequestWrapper requestWrapper,
 			IDatabaseManager databaseManager) {
 		instance = new CJayClient(requestWrapper, databaseManager);
-	}
-
-	private HashMap<String, String> prepareHeadersWithToken(Context ctx)
-			throws NullSessionException {
-
-		if (ctx == null) {
-			return null;
-		}
-
-		User currentUser = null;
-		currentUser = CJaySession.restore(ctx).getCurrentUser();
-
-		if (currentUser == null) {
-			throw new NullSessionException();
-		} else {
-			HashMap<String, String> headers = new HashMap<String, String>();
-			String accessToken = currentUser.getAccessToken();
-			headers.put("Authorization", "Token " + accessToken);
-			return headers;
-		}
-	}
-
-	@Override
-	public void addGCMDevice(String regid, Context ctx) throws JSONException,
-			NoConnectionException {
-
-		if (Utils.hasNoConnection(ctx)) {
-			throw new NoConnectionException();
-		}
-
-		JSONObject requestPacket = new JSONObject();
-		requestPacket.put("registration_id", regid);
-		String androidId = "";
-		try {
-			androidId = Secure.getString(ctx.getContentResolver(),
-					Secure.ANDROID_ID);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		UUID deviceUuid = new UUID(androidId.hashCode(), androidId.hashCode());
-		String deviceId = deviceUuid.toString();
-		requestPacket.put("device_id", deviceId);
-		requestPacket.put("app_code", "CJAY");
-		requestPacket.put("name", android.os.Build.MODEL);
-
-		try {
-			HashMap<String, String> headers = prepareHeadersWithToken(ctx);
-			String response = requestWrapper.sendJSONPost(
-					CJayConstant.API_ADD_GCM_DEVICE, requestPacket, headers);
-
-		} catch (SocketTimeoutException e) {
-			e.printStackTrace();
-		} catch (NullSessionException e) {
-
-		}
-
 	}
 
 	@Override
@@ -340,21 +284,73 @@ public class CJayClient implements ICJayClient {
 		}
 
 		String ret = "";
+		String accessToken = CJaySession.restore(ctx).getAccessToken();
 		try {
+			ret = Ion
+					.with(ctx, CJayConstant.CONTAINER_SESSIONS)
+					.setHeader("Authorization", "Token " + accessToken)
+					.setJsonObjectBody(item,
+							new TypeToken<TmpContainerSession>() {
+							}).asString()
+					.setCallback(new FutureCallback<String>() {
 
-			HashMap<String, String> headers = prepareHeadersWithToken(ctx);
-			Gson gson = new Gson();
+						@Override
+						public void onCompleted(Exception arg0, String arg1) {
 
-			String data = gson.toJson(item);
-			String url = CJayConstant.CONTAINER_SESSIONS;
-			ret = requestWrapper.sendPost(url, data, "application/json",
-					headers);
+						}
+					}).get();
 
-		} catch (Exception e) {
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
 			e.printStackTrace();
 		}
 
 		return ret;
 	}
 
+	@Override
+	public void addGCMDevice(String regid, final Context ctx)
+			throws JSONException, NoConnectionException {
+
+		if (Utils.hasNoConnection(ctx)) {
+			throw new NoConnectionException();
+		}
+
+		String androidId = "";
+		try {
+			androidId = Secure.getString(ctx.getContentResolver(),
+					Secure.ANDROID_ID);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		UUID deviceUuid = new UUID(androidId.hashCode(), androidId.hashCode());
+		String deviceId = deviceUuid.toString();
+
+		JSONObject requestPacket = new JSONObject();
+		requestPacket.put("registration_id", regid);
+		requestPacket.put("device_id", deviceId);
+		requestPacket.put("app_code", "CJAY");
+		requestPacket.put("name", android.os.Build.MODEL);
+
+		String accessToken = CJaySession.restore(ctx).getAccessToken();
+		Ion.with(ctx, CJayConstant.API_ADD_GCM_DEVICE)
+				.setHeader("Authorization ", accessToken)
+				.setJsonObjectBody(requestPacket).asJsonObject()
+				.setCallback(new FutureCallback<JsonObject>() {
+
+					@Override
+					public void onCompleted(Exception e, JsonObject result) {
+
+						if (e != null) {
+							Toast.makeText(ctx, "Error post data",
+									Toast.LENGTH_LONG).show();
+							return;
+						}
+
+					}
+				});
+
+	}
 }
