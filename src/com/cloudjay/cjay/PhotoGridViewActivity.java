@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 
+import com.actionbarsherlock.view.MenuItem;
 import com.cloudjay.cjay.adapter.PhotoGridViewCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
@@ -110,6 +111,11 @@ public class PhotoGridViewActivity extends CJayActivity implements
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@OptionsItem(R.id.menu_logout)
+	void logOutMenuItemSelected() {
+		showLogoutPrompt();
 	}
 
 	@OptionsItem(R.id.menu_upload)

@@ -159,11 +159,7 @@ public class AuditorHomeActivity extends CJayActivity implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_logout:
-
-			getSession().deleteSession(getApplicationContext());
-			startActivity(new Intent(this, LoginActivity_.class));
-
-			finish();
+			showLogoutPrompt();
 			return true;
 		}
 

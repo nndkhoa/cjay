@@ -6,6 +6,7 @@
         android:icon="@drawable/ic_btn_selection_checked"
         android:showAsAction="always"
         android:title="@string/menu_issue_report_check_title"/>
+    
 	<item
 	    android:id="@+id/menu_logout"
 		android:showAsAction="never"
