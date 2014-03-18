@@ -1,6 +1,5 @@
 package com.cloudjay.cjay;
 
-import java.net.SocketTimeoutException;
 import java.sql.SQLException;
 
 import org.androidannotations.annotations.AfterViews;
@@ -10,8 +9,6 @@ import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
-import org.json.JSONException;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
@@ -52,14 +49,15 @@ public class LoginActivity extends CJayActivity {
 	 */
 	private UserLoginTask mAuthTask = null;
 
-	private String mPassword = "";
+	// private String mPassword = "";
+	private String mPassword = "123456";
 
 	@Extra(EXTRA_EMAIL)
-	String mEmail = "";
+	// String mEmail = "";
 	// String mEmail = "giamdinhcong@test.com";
 	// String mEmail = "giamdinhcong1.icd1@pip.com.vn";
 	// String mEmail = "giamdinhsuachua.icd1@pip.com.vn";
-	// String mEmail = "giamdinhsuachua@test.com";
+	String mEmail = "giamdinhsuachua@test.com";
 	// String mEmail = "tosuachua@test.com";
 	// String mEmail = "tosuachua1.icd1@pip.com.vn";
 
@@ -261,16 +259,6 @@ public class LoginActivity extends CJayActivity {
 
 					return true;
 				}
-
-			} catch (SocketTimeoutException se) {
-				showCrouton(R.string.alert_ssl_timeout);
-				se.printStackTrace();
-				cancel(isFinishing());
-
-			} catch (JSONException e) {
-				showCrouton(R.string.alert_server_error);
-				e.printStackTrace();
-				cancel(isFinishing());
 
 			} catch (NoConnectionException e) {
 				showCrouton(R.string.alert_no_network);

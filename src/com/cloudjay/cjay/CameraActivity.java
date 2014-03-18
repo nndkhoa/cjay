@@ -37,7 +37,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -160,17 +159,21 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		public void surfaceChanged(SurfaceHolder holder, int format, int width,
 				int height) {
 
-			Logger.Log("onSurfaceChanged");
+			try {
+				Logger.Log("onSurfaceChanged");
 
-			initPreview(width, height);
-			startPreview();
+				initPreview(width, height);
+				startPreview();
 
-			// Camera.Parameters parameters = camera.getParameters();
-			// parameters.set("orientation", "portrait");
-			// // set other parameters ..
-			// camera.setParameters(parameters);
+				Logger.Log("endSurfaceChanged");
 
-			Logger.Log("endSurfaceChanged");
+			} catch (Exception e) {
+
+				e.printStackTrace();
+				Toast.makeText(getApplicationContext(),
+						R.string.alert_camera_preview, Toast.LENGTH_LONG)
+						.show();
+			}
 		}
 
 		public void surfaceDestroyed(SurfaceHolder holder) {

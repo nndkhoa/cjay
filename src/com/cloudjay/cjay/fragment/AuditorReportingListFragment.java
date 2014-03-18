@@ -334,7 +334,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 				} else {
 					Crouton.cancelAllCroutons();
 					Crouton.makeText(getActivity(),
-							R.string.alert_invalid_container, Style.ALERT)
+							R.string.alert_no_issue_container, Style.ALERT)
 							.show();
 				}
 

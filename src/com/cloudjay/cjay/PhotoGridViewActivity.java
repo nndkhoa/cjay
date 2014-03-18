@@ -17,7 +17,6 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 

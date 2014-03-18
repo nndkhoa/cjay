@@ -13,7 +13,6 @@ import org.json.JSONObject;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
-import android.text.TextUtils;
 import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSessionResult;
 import com.cloudjay.cjay.model.DamageCode;
@@ -30,8 +29,7 @@ import com.cloudjay.cjay.util.CJaySession;
 import com.cloudjay.cjay.util.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.ion.Ion;
 
@@ -95,56 +93,6 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public String getUserToken(String username, String password, Context ctx)
-			throws JSONException, SocketTimeoutException, NoConnectionException {
-
-		if (Utils.hasNoConnection(ctx)) {
-			Logger.Log("No connection");
-			throw new NoConnectionException();
-		}
-
-		Logger.Log("getting User Token ... ");
-
-		JSONObject requestPacket = new JSONObject();
-		requestPacket.put("username", username);
-		requestPacket.put("password", password);
-
-		String string;
-		try {
-			string = Ion.with(ctx, CJayConstant.TOKEN)
-					.setBodyParameter("username", username)
-					.setBodyParameter("password", password).asString().get();
-
-			Logger.e(string);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		String tokenResponseString = "";
-		tokenResponseString = requestWrapper.sendJSONPost(CJayConstant.TOKEN,
-				requestPacket);
-
-		if (TextUtils.isEmpty(tokenResponseString)) {
-			return "";
-		} else {
-			JsonElement jelement = new JsonParser().parse(tokenResponseString);
-
-			String token = null;
-			try {
-				token = jelement.getAsJsonObject().get("token").getAsString();
-			} catch (Exception ex) {
-				token = null;
-			}
-			return token;
-		}
-
-	}
-
-	@Override
 	public void addGCMDevice(String regid, Context ctx) throws JSONException,
 			NoConnectionException {
 
@@ -183,13 +131,37 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
+	public String getUserToken(String username, String password, Context ctx)
+			throws NoConnectionException {
+
+		if (Utils.hasNoConnection(ctx)) {
+			Logger.w("No connection");
+			throw new NoConnectionException();
+		}
+
+		String token = "";
+		try {
+			JsonObject result = Ion.with(ctx, CJayConstant.TOKEN)
+					.setBodyParameter("username", username)
+					.setBodyParameter("password", password).asJsonObject()
+					.get();
+
+			token = result.get("token").getAsString();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+
+		return token;
+	}
+
+	@Override
 	public User getCurrentUser(String token, Context ctx)
 			throws NoConnectionException {
 
-		Logger.Log("getting Current User ...");
-
 		if (Utils.hasNoConnection(ctx)) {
-			Logger.Log("No connection");
+			Logger.w("No connection");
 			throw new NoConnectionException();
 		}
 
@@ -204,6 +176,7 @@ public class CJayClient implements ICJayClient {
 		}.getType();
 
 		User user = gson.fromJson(response, userType);
+
 		return user;
 	}
 
