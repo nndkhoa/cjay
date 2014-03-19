@@ -395,10 +395,11 @@ public class DataCenter {
 	 * @throws NoConnectionException
 	 *             if there is no connection to Internet
 	 * @throws SQLException
+	 * @throws NullSessionException
 	 */
 	@Trace(level = Log.INFO)
 	public void updateListContainerSessions(Context ctx)
-			throws NoConnectionException, SQLException {
+			throws NoConnectionException, SQLException, NullSessionException {
 
 		Logger.Log("*** UPDATE LIST CONTAINER SESSIONS ***");
 		PreferencesUtil.storePrefsValue(ctx,
@@ -485,6 +486,9 @@ public class DataCenter {
 			throw e;
 		} catch (NullSessionException e) {
 
+			PreferencesUtil.storePrefsValue(ctx,
+					PreferencesUtil.PREF_IS_UPDATING_DATA, false);
+			throw e;
 		} catch (Exception e) {
 			PreferencesUtil.storePrefsValue(ctx,
 					PreferencesUtil.PREF_IS_UPDATING_DATA, false);
@@ -499,10 +503,11 @@ public class DataCenter {
 	 * @throws NoConnectionException
 	 *             if there is no connection to internet
 	 * @throws SQLException
+	 * @throws NullSessionException
 	 */
 	@SuppressLint("SimpleDateFormat")
 	public void updateListOperators(Context ctx) throws NoConnectionException,
-			SQLException {
+			SQLException, NullSessionException {
 
 		Logger.Log("*** UPDATE LIST OPERATORS ***");
 
@@ -543,6 +548,8 @@ public class DataCenter {
 				operatorDaoImpl.addListOperators(operators);
 
 		} catch (NoConnectionException e) {
+			throw e;
+		} catch (NullSessionException e) {
 			throw e;
 		} catch (SQLException e) {
 			throw e;
@@ -615,9 +622,10 @@ public class DataCenter {
 	 * @throws NoConnectionException
 	 *             if there is no connection to internet
 	 * @throws SQLException
+	 * @throws NullSessionException
 	 */
 	public void updateListComponentCodes(Context ctx)
-			throws NoConnectionException, SQLException {
+			throws NoConnectionException, SQLException, NullSessionException {
 
 		Logger.Log("*** UPDATE LIST COMPONENT ***");
 
@@ -660,6 +668,8 @@ public class DataCenter {
 		} catch (NoConnectionException e) {
 			throw e;
 		} catch (SQLException e) {
+			throw e;
+		} catch (NullSessionException e) {
 			throw e;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -732,9 +742,10 @@ public class DataCenter {
 	 * @throws NoConnectionException
 	 *             if there is no connection to internet
 	 * @throws SQLException
+	 * @throws NullSessionException
 	 */
 	public void updateListISOCode(Context ctx) throws NoConnectionException,
-			SQLException {
+			SQLException, NullSessionException {
 
 		Logger.Log("*** UPDATE ALL ISO CODE ***");
 		try {
@@ -744,6 +755,8 @@ public class DataCenter {
 			updateListRepairCodes(ctx);
 			updateListComponentCodes(ctx);
 
+		} catch (NullSessionException e) {
+			throw e;
 		} catch (NoConnectionException e) {
 			throw e;
 		} catch (SQLException e) {
@@ -759,8 +772,10 @@ public class DataCenter {
 	 * @param ctx
 	 * @throws NoConnectionException
 	 *             if there is no connection to internet
+	 * @throws NullSessionException
 	 */
-	public void fetchData(Context ctx) throws NoConnectionException {
+	public void fetchData(Context ctx) throws NoConnectionException,
+			NullSessionException {
 
 		Logger.Log("*** FETCHING DATA ... ***");
 
@@ -787,6 +802,8 @@ public class DataCenter {
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.PREF_IS_FETCHING_DATA, false);
 				e.printStackTrace();
+			} catch (NullSessionException e) {
+				throw e;
 			} catch (Exception e) {
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.PREF_IS_FETCHING_DATA, false);

@@ -96,8 +96,15 @@ public class CJayActivity extends SherlockFragmentActivity {
 							DataCenter_.getInstance().fetchData(
 									getApplicationContext());
 						} catch (NoConnectionException e) {
+
 							e.printStackTrace();
 							showCrouton(R.string.alert_no_network);
+
+						} catch (NullSessionException e) {
+
+							CJayApplication.logOutInstantly(context);
+							finish();
+
 						}
 						return null;
 					}
@@ -129,6 +136,9 @@ public class CJayActivity extends SherlockFragmentActivity {
 							showCrouton(R.string.alert_no_network);
 						} catch (SQLException e) {
 							e.printStackTrace();
+						} catch (NullSessionException e) {
+							CJayApplication.logOutInstantly(context);
+							finish();
 						}
 						return null;
 					}
@@ -183,6 +193,8 @@ public class CJayActivity extends SherlockFragmentActivity {
 			Logger.e("Can't Register device with the Back-end!");
 		} catch (NoConnectionException e) {
 			showCrouton(R.string.alert_no_network);
+		} catch (NullSessionException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -309,7 +321,6 @@ public class CJayActivity extends SherlockFragmentActivity {
 				new DialogInterface.OnClickListener() {
 
 					public void onClick(DialogInterface dialog, int which) {
-						Logger.Log("Logout");
 						getSession().deleteSession(getApplicationContext());
 						startActivity(new Intent(getApplicationContext(),
 								LoginActivity_.class));

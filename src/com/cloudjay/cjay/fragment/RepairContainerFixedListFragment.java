@@ -42,6 +42,7 @@ import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
+import com.cloudjay.cjay.util.NullSessionException;
 
 import de.greenrobot.event.EventBus;
 
@@ -94,6 +95,9 @@ public class RepairContainerFixedListFragment extends SherlockFragment
 					((CJayActivity) getActivity())
 							.showCrouton(R.string.alert_no_network);
 					e.printStackTrace();
+				} catch (NullSessionException e) {
+					CJayApplication.logOutInstantly(getActivity());
+					onDestroy();
 				}
 				return null;
 			}

@@ -26,6 +26,7 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
+import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.PreferencesUtil;
 
 /**
@@ -251,6 +252,9 @@ public class LoginActivity extends CJayActivity {
 					return true;
 				}
 
+			} catch (NullSessionException e) {
+				CJayApplication.logOutInstantly(context);
+				finish();
 			} catch (NoConnectionException e) {
 				showCrouton(R.string.alert_no_network);
 				cancel(isFinishing());

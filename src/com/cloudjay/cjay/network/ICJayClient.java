@@ -20,10 +20,10 @@ import com.cloudjay.cjay.util.NullSessionException;
 public interface ICJayClient {
 
 	String getUserToken(String username, String password, Context ctx)
-			throws JSONException, SocketTimeoutException, NoConnectionException;
+			throws SocketTimeoutException, NoConnectionException;
 
-	void addGCMDevice(String regid, Context ctx) throws JSONException,
-			NoConnectionException;
+	void addGCMDevice(String regid, Context ctx) throws NoConnectionException,
+			NullSessionException, JSONException;
 
 	User getCurrentUser(String token, Context ctx) throws NoConnectionException;
 
@@ -40,7 +40,7 @@ public interface ICJayClient {
 			throws NoConnectionException, NullSessionException;
 
 	String postContainerSession(Context ctx, TmpContainerSession item)
-			throws NoConnectionException;
+			throws NoConnectionException, NullSessionException;
 
 	ContainerSessionResult getContainerSessionsByPage(Context ctx, String date,
 			int page) throws NoConnectionException, NullSessionException;

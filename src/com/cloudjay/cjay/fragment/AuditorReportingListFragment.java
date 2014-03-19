@@ -60,6 +60,7 @@ import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
+import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.view.AddContainerDialog;
 
@@ -140,6 +141,9 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 					((CJayActivity) getActivity())
 							.showCrouton(R.string.alert_no_network);
 					e.printStackTrace();
+				} catch (NullSessionException e) {
+					CJayApplication.logOutInstantly(getActivity());
+					onDestroy();
 				}
 				return null;
 			}

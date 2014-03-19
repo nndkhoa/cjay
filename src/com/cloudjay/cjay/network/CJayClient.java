@@ -5,15 +5,19 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.http.HttpStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.provider.Settings.Secure;
+import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.cloudjay.cjay.LoginActivity_;
 import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSessionResult;
 import com.cloudjay.cjay.model.DamageCode;
@@ -32,8 +36,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.koushikdutta.async.future.Future;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
+import com.koushikdutta.ion.Response;
 
 /**
  * 
@@ -90,6 +96,7 @@ public class CJayClient implements ICJayClient {
 					.get();
 
 			token = result.get("token").getAsString();
+
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (ExecutionException e) {
@@ -139,11 +146,28 @@ public class CJayClient implements ICJayClient {
 		try {
 
 			String accessToken = CJaySession.restore(ctx).getAccessToken();
-			items = Ion.with(ctx, CJayConstant.LIST_OPERATORS)
+
+			Response<List<Operator>> response = Ion
+					.with(ctx, CJayConstant.LIST_OPERATORS)
 					.setHeader("Authorization", "Token " + accessToken)
 					.addQuery("modified_after", date)
 					.as(new TypeToken<List<Operator>>() {
-					}).get();
+					}).withResponse().get();
+
+			switch (response.getHeaders().getResponseCode()) {
+			case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
+				throw new NullSessionException();
+
+			case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi
+				break;
+
+			case HttpStatus.SC_NOT_FOUND: // Không có dữ liệu tương ứng
+				break;
+
+			default:
+				items = response.getResult();
+				break;
+			}
 
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -166,11 +190,27 @@ public class CJayClient implements ICJayClient {
 		List<DamageCode> items = null;
 		try {
 			String accessToken = CJaySession.restore(ctx).getAccessToken();
-			items = Ion.with(ctx, CJayConstant.LIST_DAMAGE_CODES)
+			Response<List<DamageCode>> response = Ion
+					.with(ctx, CJayConstant.LIST_DAMAGE_CODES)
 					.setHeader("Authorization", "Token " + accessToken)
 					.addQuery("modified_after", date)
 					.as(new TypeToken<List<DamageCode>>() {
-					}).get();
+					}).withResponse().get();
+
+			switch (response.getHeaders().getResponseCode()) {
+			case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
+				throw new NullSessionException();
+
+			case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi
+				break;
+
+			case HttpStatus.SC_NOT_FOUND: // Không có dữ liệu tương ứng
+				break;
+
+			default:
+				items = response.getResult();
+				break;
+			}
 
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -193,11 +233,27 @@ public class CJayClient implements ICJayClient {
 		List<RepairCode> items = null;
 		try {
 			String accessToken = CJaySession.restore(ctx).getAccessToken();
-			items = Ion.with(ctx, CJayConstant.LIST_REPAIR_CODES)
+			Response<List<RepairCode>> response = Ion
+					.with(ctx, CJayConstant.LIST_REPAIR_CODES)
 					.setHeader("Authorization", "Token " + accessToken)
 					.addQuery("modified_after", date)
 					.as(new TypeToken<List<RepairCode>>() {
-					}).get();
+					}).withResponse().get();
+
+			switch (response.getHeaders().getResponseCode()) {
+			case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
+				throw new NullSessionException();
+
+			case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi
+				break;
+
+			case HttpStatus.SC_NOT_FOUND: // Không có dữ liệu tương ứng
+				break;
+
+			default:
+				items = response.getResult();
+				break;
+			}
 
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -220,11 +276,27 @@ public class CJayClient implements ICJayClient {
 		List<ComponentCode> items = null;
 		try {
 			String accessToken = CJaySession.restore(ctx).getAccessToken();
-			items = Ion.with(ctx, CJayConstant.LIST_COMPONENT_CODES)
+			Response<List<ComponentCode>> response = Ion
+					.with(ctx, CJayConstant.LIST_COMPONENT_CODES)
 					.setHeader("Authorization", "Token " + accessToken)
 					.addQuery("modified_after", date)
 					.as(new TypeToken<List<ComponentCode>>() {
-					}).get();
+					}).withResponse().get();
+
+			switch (response.getHeaders().getResponseCode()) {
+			case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
+				throw new NullSessionException();
+
+			case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi
+				break;
+
+			case HttpStatus.SC_NOT_FOUND: // Không có dữ liệu tương ứng
+				break;
+
+			default:
+				items = response.getResult();
+				break;
+			}
 
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -242,13 +314,30 @@ public class CJayClient implements ICJayClient {
 			throw new NoConnectionException();
 		}
 
-		String response = "";
+		String result = "";
 		try {
 			String accessToken = CJaySession.restore(ctx).getAccessToken();
-			response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS)
+			Response<String> response = Ion
+					.with(ctx, CJayConstant.CONTAINER_SESSIONS)
 					.setHeader("Authorization", "Token " + accessToken)
 					.addQuery("page", Integer.toString(page))
-					.addQuery("created_after", date).asString().get();
+					.addQuery("created_after", date).asString().withResponse()
+					.get();
+
+			switch (response.getHeaders().getResponseCode()) {
+			case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
+				throw new NullSessionException();
+
+			case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi
+				break;
+
+			case HttpStatus.SC_NOT_FOUND: // Không có dữ liệu tương ứng
+				break;
+
+			default:
+				result = response.getResult();
+				break;
+			}
 
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -256,7 +345,7 @@ public class CJayClient implements ICJayClient {
 			e.printStackTrace();
 		}
 
-		// Logger.Log( response);
+		// Logger.Log(result);
 
 		Gson gson = new GsonBuilder().setDateFormat(
 				CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE).create();
@@ -264,19 +353,19 @@ public class CJayClient implements ICJayClient {
 		Type listType = new TypeToken<ContainerSessionResult>() {
 		}.getType();
 
-		ContainerSessionResult result = null;
+		ContainerSessionResult item = null;
 		try {
-			result = gson.fromJson(response, listType);
+			result = gson.fromJson(result, listType);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		return result;
+		return item;
 	}
 
 	@Override
 	public String postContainerSession(Context ctx, TmpContainerSession item)
-			throws NoConnectionException {
+			throws NoConnectionException, NullSessionException {
 
 		if (Utils.hasNoConnection(ctx)) {
 			Logger.Log("Network is not available");
@@ -287,20 +376,35 @@ public class CJayClient implements ICJayClient {
 		String accessToken = CJaySession.restore(ctx).getAccessToken();
 
 		try {
-			ret = Ion
+
+			Response<String> response = Ion
 					.with(ctx, CJayConstant.CONTAINER_SESSIONS)
 					.setHeader("Authorization", "Token " + accessToken)
 					.setJsonObjectBody(item,
 							new TypeToken<TmpContainerSession>() {
-							}).asString()
-					.setCallback(new FutureCallback<String>() {
+							}).asString().withResponse()
+					.setCallback(new FutureCallback<Response<String>>() {
 
 						@Override
-						public void onCompleted(Exception arg0, String arg1) {
-
+						public void onCompleted(Exception arg0,
+								Response<String> arg1) {
 						}
-
 					}).get();
+
+			switch (response.getHeaders().getResponseCode()) {
+			case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
+				throw new NullSessionException();
+
+			case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi
+				break;
+
+			case HttpStatus.SC_NOT_FOUND: // Không có dữ liệu tương ứng
+				break;
+
+			default:
+				ret = response.getResult();
+				break;
+			}
 
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -313,7 +417,7 @@ public class CJayClient implements ICJayClient {
 
 	@Override
 	public void addGCMDevice(String regid, final Context ctx)
-			throws JSONException, NoConnectionException {
+			throws NoConnectionException, NullSessionException, JSONException {
 
 		if (Utils.hasNoConnection(ctx)) {
 			throw new NoConnectionException();
@@ -337,22 +441,40 @@ public class CJayClient implements ICJayClient {
 		requestPacket.put("name", android.os.Build.MODEL);
 
 		String accessToken = CJaySession.restore(ctx).getAccessToken();
-		Ion.with(ctx, CJayConstant.API_ADD_GCM_DEVICE)
-				.setHeader("Authorization ", accessToken)
-				.setJsonObjectBody(requestPacket).asJsonObject()
-				.setCallback(new FutureCallback<JsonObject>() {
+		try {
+			Response<JsonObject> response = Ion
+					.with(ctx, CJayConstant.API_ADD_GCM_DEVICE)
+					.setHeader("Authorization ", accessToken)
+					.setJsonObjectBody(requestPacket).asJsonObject()
+					.withResponse()
+					.setCallback(new FutureCallback<Response<JsonObject>>() {
 
-					@Override
-					public void onCompleted(Exception e, JsonObject result) {
+						@Override
+						public void onCompleted(Exception arg0,
+								Response<JsonObject> arg1) {
 
-						if (e != null) {
-							Toast.makeText(ctx, "Error post data",
-									Toast.LENGTH_LONG).show();
-							return;
 						}
+					}).get();
 
-					}
-				});
+			switch (response.getHeaders().getResponseCode()) {
+			case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
+				throw new NullSessionException();
+
+			case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi
+				break;
+
+			case HttpStatus.SC_NOT_FOUND: // Không có dữ liệu tương ứng
+				break;
+
+			default:
+				break;
+			}
+
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
 
 	}
 }

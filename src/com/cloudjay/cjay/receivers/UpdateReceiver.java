@@ -11,11 +11,13 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.CJaySession;
+import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.Utils;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
@@ -109,6 +111,8 @@ public class UpdateReceiver extends BroadcastReceiver {
 			Logger.e("No Connection");
 			throw e;
 			// showCrouton(R.string.alert_no_network);
+		} catch (NullSessionException e) {
+			CJayApplication.logOutInstantly(mContext);
 		}
 	}
 }

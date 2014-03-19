@@ -26,6 +26,7 @@ import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
 import com.aerilys.helpers.android.NetworkHelper;
+import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionUploadedEvent;
@@ -40,6 +41,7 @@ import com.cloudjay.cjay.util.CountingInputStreamEntity;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Mapper;
 import com.cloudjay.cjay.util.NoConnectionException;
+import com.cloudjay.cjay.util.NullSessionException;
 
 import de.greenrobot.event.EventBus;
 
@@ -155,6 +157,11 @@ public class UploadIntentService extends IntentService implements
 					new ContainerSessionUploadedEvent(containerSession));
 
 			return;
+		} catch (NullSessionException e) {
+
+			CJayApplication.logOutInstantly(getApplicationContext());
+			onDestroy();
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 			containerSession

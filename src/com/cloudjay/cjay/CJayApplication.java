@@ -6,7 +6,9 @@ import org.acra.annotation.ReportsCrashes;
 import org.androidannotations.annotations.EApplication;
 
 import android.app.Application;
+import android.app.Service;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
@@ -19,6 +21,7 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.network.HttpRequestWrapper;
 import com.cloudjay.cjay.network.IHttpRequestWrapper;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.CJaySession;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.DatabaseManager;
 import com.cloudjay.cjay.util.Logger;
@@ -92,6 +95,23 @@ public class CJayApplication extends Application {
 			PreferencesUtil.storePrefsValue(this,
 					PreferencesUtil.PREF_NO_CONNECTION, true);
 		}
+	}
+
+	public static void logOutInstantly(Context ctx) {
+
+		Logger.w("Access Token is expired");
+		CJaySession session = CJaySession.restore(ctx);
+		session.deleteSession(ctx);
+
+		Intent intent = new Intent(ctx, LoginActivity_.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		ctx.startActivity(intent);
+
+		// http://stackoverflow.com/questions/3007998/on-logout-clear-activity-history-stack-preventing-back-button-from-opening-l
+		// Intent intent = new Intent();
+		// broadcastIntent.setAction("com.package.ACTION_LOGOUT");
+		// sendBroadcast(broadcastIntent);
 	}
 
 	public static void gotoCamera(Context ctx,
