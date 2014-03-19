@@ -1,15 +1,11 @@
 cjay
 ====
 
-### IMPORTANT
-
-Need to check updated data everytime getting data from server because server can't return exact data with filter `datetime` (caused by python). Sample: `ContainerSessionDaoImpl.java`
-
 ### List of open source plugins
 
 * [FunDapter](https://github.com/amigold/FunDapter): If your ListView is simple and do not have some speacial features like `pull to refresh` or `sticky header`, you can use FunDapter to remove redundant Adapter. View `JayPixApp` > `PreviewActivity` for sample.
 
-* [Android Annotation](https://github.com/excilys/androidannotations/): must use its annotations to make source code clean and light.
+* [Android Annotation](https://github.com/excilys/androidannotations/): must use its annotations to make source code lean and light.
 
 * [Universal Image Loader](https://github.com/nostra13/Android-Universal-Image-Loader): Powerful library that provide a reusable instrument for asynchronous image loading, caching and displaying. View `JayPixApp` > `FeedFragment` for sample. 
 
@@ -28,6 +24,8 @@ Need to check updated data everytime getting data from server because server can
 * [ActionBar-PullToRefresh](https://github.com/chrisbanes/ActionBar-PullToRefresh): A modern implementation of the pull-to-refresh interaction for #android. Support pull to refresh feature like new KitKat Gmail app.
 
 * [SmoothProgressBar](https://github.com/castorflex/SmoothProgressBar): A small Android library allowing you to have a smooth and customizable horizontal indeterminate ProgressBar
+
+* [Ion](https://github.com/koush/ion/): Android Asynchronous Networking and Image Loading 
 
 ### How to build project
 
