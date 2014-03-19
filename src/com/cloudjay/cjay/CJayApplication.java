@@ -44,7 +44,7 @@ public class CJayApplication extends Application {
 		Logger.Log("Start Application");
 
 		// Configure Logger
-		Logger.getInstance().setDebuggable(true);
+		Logger.getInstance().setDebuggable(false);
 		Ion.getDefault(getBaseContext()).configure()
 				.setLogging("Network Module", Log.DEBUG);
 

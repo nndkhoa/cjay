@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Handler;
 import android.provider.Settings.Secure;
 import android.widget.Toast;
 
@@ -78,7 +79,6 @@ public class CJayClient implements ICJayClient {
 			throws NoConnectionException {
 
 		if (Utils.hasNoConnection(ctx)) {
-			Logger.w("No connection");
 			throw new NoConnectionException();
 		}
 
@@ -285,6 +285,7 @@ public class CJayClient implements ICJayClient {
 
 		String ret = "";
 		String accessToken = CJaySession.restore(ctx).getAccessToken();
+
 		try {
 			ret = Ion
 					.with(ctx, CJayConstant.CONTAINER_SESSIONS)
@@ -298,6 +299,7 @@ public class CJayClient implements ICJayClient {
 						public void onCompleted(Exception arg0, String arg1) {
 
 						}
+
 					}).get();
 
 		} catch (InterruptedException e) {

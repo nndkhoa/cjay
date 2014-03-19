@@ -48,18 +48,10 @@ public class LoginActivity extends CJayActivity {
 	 * Keep track of the login task to ensure we can cancel it if requested.
 	 */
 	private UserLoginTask mAuthTask = null;
-
-	// private String mPassword = "";
-	private String mPassword = "123456";
+	private String mPassword = "";
 
 	@Extra(EXTRA_EMAIL)
-	// String mEmail = "";
-	String mEmail = "giamdinhcong@test.com";
-	// String mEmail = "giamdinhcong1.icd1@pip.com.vn";
-	// String mEmail = "giamdinhsuachua.icd1@pip.com.vn";
-	// String mEmail = "giamdinhsuachua@test.com";
-	// String mEmail = "tosuachua@test.com";
-	// String mEmail = "tosuachua1.icd1@pip.com.vn";
+	String mEmail = "";
 
 	// UI references.
 	@ViewById(R.id.email)

@@ -20,11 +20,7 @@ import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
-import com.cloudjay.cjay.fragment.GateExportListFragment;
-import com.cloudjay.cjay.fragment.GateExportListFragment_;
-import com.cloudjay.cjay.fragment.GateImportListFragment;
-import com.cloudjay.cjay.fragment.GateImportListFragment_;
-import com.cloudjay.cjay.fragment.UploadsFragment_;
+import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
 
@@ -152,9 +148,9 @@ public class GateHomeActivity extends CJayActivity implements
 			showLogoutPrompt();
 			return true;
 
-//		case R.id.menu_more:
-//			Logger.Log("Menu More");
-//			return true;
+			// case R.id.menu_more:
+			// Logger.Log("Menu More");
+			// return true;
 		}
 
 		return super.onOptionsItemSelected(item);
