@@ -112,11 +112,6 @@ public class PhotoGridViewActivity extends CJayActivity implements
 		}
 	}
 
-	@OptionsItem(R.id.menu_logout)
-	void logOutMenuItemSelected() {
-		showLogoutPrompt();
-	}
-
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 		try {

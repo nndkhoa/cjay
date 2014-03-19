@@ -17,9 +17,11 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
-import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.fragment.RepairContainerFixedListFragment_;
+import com.cloudjay.cjay.fragment.RepairContainerPendingListFragment;
+import com.cloudjay.cjay.fragment.RepairContainerPendingListFragment_;
+import com.cloudjay.cjay.fragment.UploadsFragment_;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
 
@@ -121,17 +123,6 @@ public class RepairHomeActivity extends CJayActivity implements
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getSupportMenuInflater();
 		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_logout:
-			showLogoutPrompt();
-			return true;
-		}
-
-		return super.onOptionsItemSelected(item);
 	}
 
 	@Override

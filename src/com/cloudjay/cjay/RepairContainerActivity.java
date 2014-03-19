@@ -16,10 +16,10 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
-import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.fragment.RepairIssueFixedListFragment_;
+import com.cloudjay.cjay.fragment.RepairIssuePendingListFragment_;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 
@@ -31,7 +31,7 @@ import com.cloudjay.cjay.network.CJayClient;
  * 
  */
 @EActivity(R.layout.activity_repair_container)
-public class RepairContainerActivity extends SherlockFragmentActivity implements
+public class RepairContainerActivity extends CJayActivity implements
 		OnPageChangeListener, TabListener {
 
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";

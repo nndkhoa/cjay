@@ -20,6 +20,8 @@ import android.util.Log;
 import android.view.View;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.cloudjay.cjay.events.PostLoadDataEvent;
 import com.cloudjay.cjay.events.PreLoadDataEvent;
 import com.cloudjay.cjay.events.UserLoggedOutEvent;
@@ -77,6 +79,14 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 	public Context getContext() {
 		return this;
+	}
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		menu.findItem(R.id.menu_username).setTitle(getCurrentUser().getFullName());
+		menu.findItem(R.id.menu_role).setTitle(getCurrentUser().getRoleName());
+		
+		return super.onPrepareOptionsMenu(menu);
 	}
 
 	@Override
@@ -292,6 +302,17 @@ public class CJayActivity extends SherlockFragmentActivity {
 		});
 
 		crouton.show();
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_logout:
+			showLogoutPrompt();
+			return true;
+		}
+
+		return super.onOptionsItemSelected(item);
 	}
 
 	@UiThread
