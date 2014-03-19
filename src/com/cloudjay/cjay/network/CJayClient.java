@@ -11,13 +11,7 @@ import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
-import android.os.Handler;
 import android.provider.Settings.Secure;
-import android.text.TextUtils;
-import android.widget.Toast;
-
-import com.cloudjay.cjay.LoginActivity_;
 import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSessionResult;
 import com.cloudjay.cjay.model.DamageCode;
@@ -36,7 +30,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import com.koushikdutta.async.future.Future;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
@@ -355,7 +348,7 @@ public class CJayClient implements ICJayClient {
 
 		ContainerSessionResult item = null;
 		try {
-			result = gson.fromJson(result, listType);
+			item = gson.fromJson(result, listType);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

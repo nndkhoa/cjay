@@ -14,16 +14,13 @@ import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.service.textservice.SpellCheckerService.Session;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.LoginActivity_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.receivers.GcmBroadcastReceiver;
-import com.cloudjay.cjay.util.CJaySession;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NullSessionException;

@@ -142,8 +142,11 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 					cJayImage.setContainerSession(mContainerSession);
 					cJayImageDaoImpl.createOrUpdate(cJayImage);
 				}
-
+				
+				mSelectedIssue.setFixed(true);
 				issueDaoImpl.createOrUpdate(mSelectedIssue);
+
+				refresh();
 
 			} catch (SQLException e) {
 				e.printStackTrace();

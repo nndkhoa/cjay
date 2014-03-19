@@ -6,9 +6,7 @@ import org.acra.annotation.ReportsCrashes;
 import org.androidannotations.annotations.EApplication;
 
 import android.app.Application;
-import android.app.Service;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
@@ -47,7 +45,7 @@ public class CJayApplication extends Application {
 		Logger.Log("Start Application");
 
 		// Configure Logger
-		Logger.getInstance().setDebuggable(false);
+		Logger.getInstance().setDebuggable(true);
 		Ion.getDefault(getBaseContext()).configure()
 				.setLogging("Network Module", Log.DEBUG);
 
