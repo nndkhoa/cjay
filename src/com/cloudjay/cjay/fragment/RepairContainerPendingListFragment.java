@@ -247,6 +247,7 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 				});
 
 		mFeedListView.setMultiChoiceModeListener(new MultiChoiceModeListener() {
+
 			@Override
 			public void onItemCheckedStateChanged(ActionMode mode,
 					int position, long id, boolean checked) {
@@ -261,9 +262,42 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 				// Respond to clicks on the actions in the CAB
 				switch (item.getItemId()) {
-				case R.id.menu_check:
-					setSelectedContainersFixed();
-					mode.finish(); // Action picked, so close the CAB
+				// case R.id.menu_check:
+				// setSelectedContainersFixed();
+				// mode.finish(); // Action picked, so close the CAB
+				// return true;
+
+				case R.id.menu_upload:
+
+					SparseBooleanArray selected = mFeedListView
+							.getCheckedItemPositions();
+					mSelectedContainerSessions = new ArrayList<ContainerSession>();
+
+					for (int i = 0; i < selected.size(); i++) {
+						if (selected.valueAt(i) == true) {
+
+							Cursor cursor = (Cursor) cursorAdapter
+									.getItem(selected.keyAt(i));
+							String uuidString = cursor.getString(cursor
+									.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+							ContainerSession containerSession;
+							try {
+								containerSession = containerSessionDaoImpl
+										.findByUuid(uuidString);
+								mSelectedContainerSessions
+										.add(containerSession);
+							} catch (SQLException e) {
+								e.printStackTrace();
+							}
+						}
+					}
+
+					for (ContainerSession containerSession : mSelectedContainerSessions) {
+						CJayApplication.uploadContainerSesison(getActivity(),
+								containerSession);
+					}
+
+					mode.finish();
 					return true;
 				default:
 					return false;
@@ -273,10 +307,12 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 			@Override
 			public boolean onCreateActionMode(ActionMode mode,
 					android.view.Menu menu) {
+
 				// Inflate the menu for the CAB
 				MenuInflater inflater = mode.getMenuInflater();
 				inflater.inflate(R.menu.menu_repair_container_pending, menu);
 				return true;
+
 			}
 
 			@Override
@@ -406,8 +442,10 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
+
 		super.onPrepareOptionsMenu(menu);
-		menu.findItem(R.id.menu_check).setVisible(false);
+		// menu.findItem(R.id.menu_check).setVisible(false);
+		menu.findItem(R.id.menu_upload).setVisible(false);
 	}
 
 	@Override

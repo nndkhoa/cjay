@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <item
+    <!-- <item
         android:id="@+id/menu_check"
         android:icon="@drawable/ic_btn_selection_checked"
         android:showAsAction="always"
-        android:title="@string/menu_issue_report_check_title"/>
-    
+        android:title="@string/menu_issue_report_check_title"/> -->
+    <item
+        android:id="@+id/menu_upload"
+        android:icon="@drawable/ic_action_upload"
+        android:showAsAction="always"
+        android:title="@string/menu_upload_title"/>
+
 </menu>

@@ -114,39 +114,21 @@ public class PhotoGridViewActivity extends CJayActivity implements
 
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
-		try {
+		if (null != mContainerSession) {
 
-			if (null != mContainerSession) {
-				Logger.Log("Menu upload item clicked");
-
-				mContainerSession.setUploadConfirmation(true);
-				mContainerSession
-						.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
-
-				if (sourceTag.equals(GateImportListFragment.LOG_TAG)) {
-					mContainerSession.setOnLocal(false);
-				} else {
-					mContainerSession
-							.setCheckOutTime(StringHelper
-									.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
-				}
-
-				containerSessionDaoImpl.update(mContainerSession);
-
-				// It will trigger `UploadsFragment` Adapter
-				// notifyDataSetChanged
-				EventBus.getDefault().post(
-						new ContainerSessionEnqueueEvent(mContainerSession));
-
-				finish();
+			if (sourceTag.equals(GateImportListFragment.LOG_TAG)) {
+				mContainerSession.setOnLocal(false);
 			} else {
-				showCrouton(R.string.alert_invalid_container);
+				mContainerSession
+						.setCheckOutTime(StringHelper
+								.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 			}
 
-		} catch (SQLException e) {
-			e.printStackTrace();
-			showCrouton(R.string.alert_try_again);
-			mContainerSession.setUploadConfirmation(false);
+			CJayApplication.uploadContainerSesison(context, mContainerSession);
+
+			finish();
+		} else {
+			showCrouton(R.string.alert_invalid_container);
 		}
 	}
 

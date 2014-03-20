@@ -308,42 +308,18 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 	void uploadMenuItemSelected() {
 		if (mSelectedContainerSession != null) {
 
-			try {
-				Logger.Log("Menu upload item clicked");
+			Logger.Log("Menu upload item clicked");
+			if (mSelectedContainerSession.isValidForUploading()) {
 
-				if (mSelectedContainerSession.isValidForUploading()) {
+				CJayApplication.uploadContainerSesison(getActivity(),
+						mSelectedContainerSession);
 
-					// User confirm upload
-					mSelectedContainerSession.setUploadConfirmation(true);
-
-					mSelectedContainerSession
-							.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
-
-					if (null == containerSessionDaoImpl) {
-						containerSessionDaoImpl = CJayClient.getInstance()
-								.getDatabaseManager().getHelper(getActivity())
-								.getContainerSessionDaoImpl();
-					}
-
-					containerSessionDaoImpl.update(mSelectedContainerSession);
-
-					// It will trigger `UploadsFragment` Adapter
-					// notifyDataSetChanged
-					EventBus.getDefault().post(
-							new ContainerSessionEnqueueEvent(
-									mSelectedContainerSession));
-
-					// hide menu items
-					hideMenuItems();
-				} else {
-					Crouton.cancelAllCroutons();
-					Crouton.makeText(getActivity(),
-							R.string.alert_no_issue_container, Style.ALERT)
-							.show();
-				}
-
-			} catch (SQLException e) {
-				e.printStackTrace();
+				// hide menu items
+				hideMenuItems();
+			} else {
+				Crouton.cancelAllCroutons();
+				Crouton.makeText(getActivity(),
+						R.string.alert_no_issue_container, Style.ALERT).show();
 			}
 		}
 	}
