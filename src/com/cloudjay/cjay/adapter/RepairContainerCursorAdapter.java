@@ -20,7 +20,7 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-public class IssueContainerCursorAdapter extends CursorAdapter implements
+public class RepairContainerCursorAdapter extends CursorAdapter implements
 		Filterable {
 
 	private int layout;
@@ -29,11 +29,11 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements
 	public boolean isScrolling;
 
 	@SuppressWarnings("deprecation")
-	public IssueContainerCursorAdapter(Context context, Cursor c) {
+	public RepairContainerCursorAdapter(Context context, Cursor c) {
 		super(context, c);
 	}
 
-	public IssueContainerCursorAdapter(Context context, int layout, Cursor c,
+	public RepairContainerCursorAdapter(Context context, int layout, Cursor c,
 			int flags) {
 		super(context, c, flags);
 		this.layout = layout;

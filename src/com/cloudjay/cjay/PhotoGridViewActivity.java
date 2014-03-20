@@ -22,7 +22,6 @@ import android.widget.GridView;
 
 import com.cloudjay.cjay.adapter.PhotoGridViewCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
-import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.fragment.GateImportListFragment;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -30,10 +29,7 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
-
-import de.greenrobot.event.EventBus;
 
 @EActivity(R.layout.activity_photo_gridview)
 @OptionsMenu(R.menu.menu_photo_grid_view)
