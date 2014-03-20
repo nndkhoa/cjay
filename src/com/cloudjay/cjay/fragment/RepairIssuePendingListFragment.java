@@ -11,12 +11,15 @@ import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.ViewById;
 
+import android.R.anim;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.ami.fundapter.BindDictionary;
@@ -51,11 +54,15 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 	private Issue mSelectedIssue;
 	private ImageLoader imageLoader;
 	private ArrayList<CJayImage> mTakenImages;
+
 	IssueDaoImpl issueDaoImpl;
 	CJayImageDaoImpl cJayImageDaoImpl;
 
 	@ViewById(R.id.feeds)
 	ListView mFeedListView;
+
+	@ViewById(android.R.id.empty)
+	FrameLayout emptyElement;
 
 	@AfterViews
 	void afterViews() {
@@ -69,6 +76,7 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 			e.printStackTrace();
 		}
 
+		mFeedListView.setEmptyView(emptyElement);
 		imageLoader = ImageLoader.getInstance();
 		initIssueFeedAdapter(null);
 		mSelectedIssue = null;
@@ -142,7 +150,7 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 					cJayImage.setContainerSession(mContainerSession);
 					cJayImageDaoImpl.createOrUpdate(cJayImage);
 				}
-				
+
 				mSelectedIssue.setFixed(true);
 				issueDaoImpl.createOrUpdate(mSelectedIssue);
 

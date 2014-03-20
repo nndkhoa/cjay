@@ -18,6 +18,8 @@
         android:src="@drawable/btn_camera"
         android:visibility="gone" />
 
+    <include layout="@layout/layout_empty_issues" />
+
     <ListView
         android:id="@+id/feeds"
         style="@style/CJayListView"

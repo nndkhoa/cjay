@@ -13,7 +13,7 @@
     </string-array>
     <string-array name="repair_home_tabs">
         <item>List container</item>
-        <item>Đã chụp hình</item>
+        <!-- <item>Đã chụp hình</item> -->
         <item>Tải lên</item>
     </string-array>
     <string-array name="repair_container_tabs">

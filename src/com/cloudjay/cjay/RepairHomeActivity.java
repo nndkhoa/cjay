@@ -81,11 +81,12 @@ public class RepairHomeActivity extends CJayActivity implements
 					Fragment pendingFragment = new RepairContainerPendingListFragment_();
 					return pendingFragment;
 
-				case 1:
-					Fragment fixedFragment = new RepairContainerFixedListFragment_();
-					return fixedFragment;
+					// case 1:
+					// Fragment fixedFragment = new
+					// RepairContainerFixedListFragment_();
+					// return fixedFragment;
 
-				case 2:
+				case 1:
 				default:
 					Fragment uploadFragment = new UploadsFragment_();
 					return uploadFragment;
