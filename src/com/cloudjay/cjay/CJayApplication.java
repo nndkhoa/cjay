@@ -1,5 +1,7 @@
 package com.cloudjay.cjay;
 
+import java.sql.SQLException;
+
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
@@ -13,6 +15,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.aerilys.helpers.android.NetworkHelper;
+import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.network.CJayClient;
@@ -31,6 +35,8 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+
+import de.greenrobot.event.EventBus;
 
 @ReportsCrashes(formKey = "", formUri = CJayConstant.ACRA, mode = ReportingInteractionMode.TOAST, resToastText = R.string.crash_toast_text, resDialogText = R.string.crash_dialog_text, resDialogIcon = android.R.drawable.ic_dialog_info, resDialogTitle = R.string.crash_dialog_title, resDialogCommentPrompt = R.string.crash_dialog_comment_prompt, resDialogOkToast = R.string.crash_dialog_ok_toast)
 @EApplication
@@ -93,6 +99,33 @@ public class CJayApplication extends Application {
 			PreferencesUtil.storePrefsValue(this,
 					PreferencesUtil.PREF_NO_CONNECTION, true);
 		}
+	}
+
+	public static void uploadContainerSesison(Context ctx,
+			ContainerSession containerSession) {
+
+		ContainerSessionDaoImpl containerSessionDaoImpl = null;
+
+		// User confirm upload
+		containerSession.setUploadConfirmation(true);
+		containerSession.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+
+		if (null == containerSessionDaoImpl) {
+			try {
+				containerSessionDaoImpl = CJayClient.getInstance()
+						.getDatabaseManager().getHelper(ctx)
+						.getContainerSessionDaoImpl();
+
+				containerSessionDaoImpl.update(containerSession);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		// It will trigger `UploadsFragment` Adapter
+		// notifyDataSetChanged
+		EventBus.getDefault().post(
+				new ContainerSessionEnqueueEvent(containerSession));
 	}
 
 	public static void logOutInstantly(Context ctx) {

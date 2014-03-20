@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
 import android.support.v4.app.Fragment;
@@ -22,6 +24,10 @@ import com.cloudjay.cjay.fragment.RepairIssueFixedListFragment_;
 import com.cloudjay.cjay.fragment.RepairIssuePendingListFragment_;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.Logger;
+
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 /**
  * 
@@ -31,6 +37,7 @@ import com.cloudjay.cjay.network.CJayClient;
  * 
  */
 @EActivity(R.layout.activity_repair_container)
+@OptionsMenu(R.menu.menu_repair_issue)
 public class RepairContainerActivity extends CJayActivity implements
 		OnPageChangeListener, TabListener {
 
@@ -49,11 +56,39 @@ public class RepairContainerActivity extends CJayActivity implements
 	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
 	String mContainerSessionUUID = "";
 
+	ContainerSessionDaoImpl containerSessionDaoImpl;
+
+	@OptionsItem(R.id.menu_upload)
+	void uploadMenuItemSelected() {
+		// TODO: validate container session
+		Logger.Log("Validating container :"
+				+ mContainerSession.getContainerId());
+
+		if (null != mContainerSession) {
+			try {
+
+				containerSessionDaoImpl.refresh(mContainerSession);
+
+				if (mContainerSession.isValidForUploading()) {
+					CJayApplication.uploadContainerSesison(context,
+							mContainerSession);
+				} else {
+					Crouton.cancelAllCroutons();
+					Crouton.makeText(this, R.string.alert_no_issue_container,
+							Style.ALERT).show();
+				}
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	@AfterViews
 	void afterViews() {
 		try {
-			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-					.getInstance().getDatabaseManager().getHelper(this)
+			containerSessionDaoImpl = CJayClient.getInstance()
+					.getDatabaseManager().getHelper(this)
 					.getContainerSessionDaoImpl();
 
 			mContainerSession = containerSessionDaoImpl

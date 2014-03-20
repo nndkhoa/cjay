@@ -32,67 +32,67 @@ import com.cloudjay.cjay.network.CJayClient;
  * Danh sách hình của một issue
  * 
  * @author quocvule
- *
+ * 
  */
 @EActivity(R.layout.activity_repair_issue_report)
 @OptionsMenu(R.menu.menu_repair_issue_report)
 public class RepairIssueReportActivity extends CJayActivity implements
-	OnPageChangeListener, TabListener {
+		OnPageChangeListener, TabListener {
 
 	public static final String CJAY_ISSUE_EXTRA = "issue";
 	private Issue mIssue;
 	private String[] locations;
-	
+
 	@ViewById
 	ViewPager pager;
 	@ViewById(R.id.container_id_textview)
 	TextView containerIdTextView;
-	
+
 	@ViewById(R.id.issue_textview)
 	TextView issueTextView;
-	
+
 	@Extra(CJAY_ISSUE_EXTRA)
 	String mIssueUUID = "";
 
 	@AfterViews
 	void afterViews() {
 		try {
-			IssueDaoImpl issueDaoImpl = CJayClient
-					.getInstance().getDatabaseManager().getHelper(this)
-					.getIssueDaoImpl();
+			IssueDaoImpl issueDaoImpl = CJayClient.getInstance()
+					.getDatabaseManager().getHelper(this).getIssueDaoImpl();
 			mIssue = issueDaoImpl.queryForId(mIssueUUID);
 
 			if (null != mIssue) {
-				containerIdTextView.setText(mIssue.getContainerSession().getContainerId());
-				issueTextView.setText(mIssue.getLocationCode() + " " + 
-									mIssue.getDamageCodeString() + " " + 
-									mIssue.getRepairCodeString());
+				containerIdTextView.setText(mIssue.getContainerSession()
+						.getContainerId());
+				issueTextView.setText(mIssue.getLocationCode() + " "
+						+ mIssue.getDamageCodeString() + " "
+						+ mIssue.getRepairCodeString());
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
-		locations = getResources().getStringArray(R.array.repair_issue_report_tabs);
+
+		locations = getResources().getStringArray(
+				R.array.repair_issue_report_tabs);
 		configureViewPager();
 		configureActionBar();
 	}
-	
+
 	@OptionsItem(R.id.menu_check)
 	void checkMenuItemSelected() {
 		// set fixed to true
 		mIssue.setFixed(true);
-		
+
 		// save db records
 		try {
-			IssueDaoImpl issueDaoImpl = CJayClient
-					.getInstance().getDatabaseManager().getHelper(this)
-					.getIssueDaoImpl();
+			IssueDaoImpl issueDaoImpl = CJayClient.getInstance()
+					.getDatabaseManager().getHelper(this).getIssueDaoImpl();
 			issueDaoImpl.createOrUpdate(mIssue);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		// go back
 		this.onBackPressed();
 	}
@@ -101,19 +101,18 @@ public class RepairIssueReportActivity extends CJayActivity implements
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		// only show check menu item if has TYPE_REPAIRED images
 		boolean hasRepaired = false;
-		
+
 		if (null != mIssue) {
 			IssueDaoImpl issueDaoImpl;
 			try {
-				issueDaoImpl = CJayClient
-						.getInstance().getDatabaseManager().getHelper(this)
-						.getIssueDaoImpl();
+				issueDaoImpl = CJayClient.getInstance().getDatabaseManager()
+						.getHelper(this).getIssueDaoImpl();
 				mIssue = issueDaoImpl.queryForId(mIssueUUID);
 				issueDaoImpl.refresh(mIssue);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			
+
 			for (CJayImage cJayImage : mIssue.getCJayImages()) {
 				if (cJayImage.getType() == CJayImage.TYPE_REPAIRED) {
 					hasRepaired = true;
@@ -122,16 +121,16 @@ public class RepairIssueReportActivity extends CJayActivity implements
 			}
 		}
 		menu.findItem(R.id.menu_check).setVisible(hasRepaired);
-		
+
 		return super.onPrepareOptionsMenu(menu);
 	}
-	
-//	@Override
-//	public void onResume() {
-//		invalidateOptionsMenu();
-//		super.onResume();
-//	}
-	
+
+	// @Override
+	// public void onResume() {
+	// invalidateOptionsMenu();
+	// super.onResume();
+	// }
+
 	private void configureViewPager() {
 		AuditorHomeTabPageAdaptor viewPagerAdapter = new AuditorHomeTabPageAdaptor(
 				getSupportFragmentManager(), locations);
