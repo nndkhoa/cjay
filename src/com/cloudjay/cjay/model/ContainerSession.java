@@ -426,34 +426,59 @@ public class ContainerSession {
 	// 0 issue --> Failed
 	// > 0 issues:
 	// image without issue <= 1 && all issue is valid --> OK
-	public boolean isValidForUploading() {
+	public boolean isValidForUpload(int imageType) {
 
 		if (issues.isEmpty()) {
 			return false;
 		}
 
-		// check if all REPORT image assigned to issues
-		int imageWithoutIssueCount = 0;
+		switch (imageType) {
+		case CJayImage.TYPE_REPORT:
+			// check if all REPORT image assigned to issues
+			int imageWithoutIssueCount = 0;
 
-		// count images without issues
-		for (CJayImage cJayImage : cJayImages) {
-			if (cJayImage.getType() == CJayImage.TYPE_REPORT
-					&& cJayImage.getIssue() == null) {
-				imageWithoutIssueCount++;
-				if (imageWithoutIssueCount > 1) {
+			// count images without issues
+			for (CJayImage cJayImage : cJayImages) {
+				if (cJayImage.getType() == CJayImage.TYPE_REPORT
+						&& cJayImage.getIssue() == null) {
+					imageWithoutIssueCount++;
+					if (imageWithoutIssueCount > 1) {
+						return false;
+					}
+				}
+			}
+
+			// count invalid issues
+			for (Issue issue : issues) {
+				if (!issue.isValid()) {
 					return false;
 				}
 			}
-		}
-
-		// count invalid issues
-		for (Issue issue : issues) {
-			if (!issue.isValid()) {
-				return false;
+			
+			return true;
+			
+		case CJayImage.TYPE_REPAIRED:
+			// check if all issues have REPAIRED images
+			boolean issueHasNoImage;
+			for (Issue issue : issues) {
+				issueHasNoImage = true;
+				for (CJayImage cJayImage : issue.getCJayImages()) {
+					if (cJayImage.getType() == CJayImage.TYPE_REPAIRED) {
+						issueHasNoImage = false;
+						break;
+					}
+				}
+				
+				if (issueHasNoImage) {
+					return false;
+				}
 			}
+			
+			return true;
+			
+		default:
+			return true;
 		}
-
-		return true;
 	}
 
 	public boolean isExport() {
