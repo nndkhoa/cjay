@@ -30,7 +30,7 @@ import android.widget.ListView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.*;
-import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
+import com.cloudjay.cjay.adapter.RepairContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerRepairedEvent;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
@@ -58,7 +58,7 @@ public class RepairContainerFixedListFragment extends SherlockFragment
 	private int mItemLayout = R.layout.list_item_audit_container;
 
 	PullToRefreshLayout mPullToRefreshLayout;
-	IssueContainerCursorAdapter cursorAdapter;
+	RepairContainerCursorAdapter cursorAdapter;
 
 	@ViewById(R.id.container_list)
 	ListView mFeedListView;
@@ -132,10 +132,10 @@ public class RepairContainerFixedListFragment extends SherlockFragment
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				if (scrollState != 0) {
-					((IssueContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
+					((RepairContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
 				} else {
-					((IssueContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
-					((IssueContainerCursorAdapter) mFeedListView.getAdapter())
+					((RepairContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
+					((RepairContainerCursorAdapter) mFeedListView.getAdapter())
 							.notifyDataSetChanged();
 				}
 			}
@@ -293,7 +293,7 @@ public class RepairContainerFixedListFragment extends SherlockFragment
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 		if (cursorAdapter == null) {
-			cursorAdapter = new IssueContainerCursorAdapter(getActivity(),
+			cursorAdapter = new RepairContainerCursorAdapter(getActivity(),
 					mItemLayout, cursor, 0);
 
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {

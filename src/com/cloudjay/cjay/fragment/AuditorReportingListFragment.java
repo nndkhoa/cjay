@@ -45,7 +45,7 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.*;
-import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
+import com.cloudjay.cjay.adapter.RepairContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
@@ -105,7 +105,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 	@ViewById(R.id.notfound_textview)
 	TextView mNotfoundTextView;
 
-	IssueContainerCursorAdapter cursorAdapter;
+	RepairContainerCursorAdapter cursorAdapter;
 	PullToRefreshLayout mPullToRefreshLayout;
 
 	@Override
@@ -218,10 +218,10 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 
 				if (scrollState != 0) {
-					((IssueContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
+					((RepairContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
 				} else {
-					((IssueContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
-					((IssueContainerCursorAdapter) mFeedListView.getAdapter())
+					((RepairContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
+					((RepairContainerCursorAdapter) mFeedListView.getAdapter())
 							.notifyDataSetChanged();
 				}
 
@@ -270,7 +270,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 
 		if (cursorAdapter == null) {
-			cursorAdapter = new IssueContainerCursorAdapter(getActivity(),
+			cursorAdapter = new RepairContainerCursorAdapter(getActivity(),
 					mItemLayout, cursor, 0);
 
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
@@ -307,9 +307,9 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 		if (mSelectedContainerSession != null) {
-
+			
 			Logger.Log("Menu upload item clicked");
-			if (mSelectedContainerSession.isValidForUploading()) {
+			if (mSelectedContainerSession.isValidForUpload(CJayImage.TYPE_REPORT)) {
 
 				CJayApplication.uploadContainerSesison(getActivity(),
 						mSelectedContainerSession);

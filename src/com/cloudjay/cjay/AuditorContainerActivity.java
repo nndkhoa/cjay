@@ -186,7 +186,7 @@ public class AuditorContainerActivity extends CJayActivity {
 		try {
 			Logger.Log("Menu upload item clicked");
 
-			if (mContainerSession.isValidForUploading()) {
+			if (mContainerSession.isValidForUpload(CJayImage.TYPE_REPAIRED)) {
 
 				// User confirm upload
 				mContainerSession.setUploadConfirmation(true);
@@ -224,7 +224,7 @@ public class AuditorContainerActivity extends CJayActivity {
 
 		menu.findItem(R.id.menu_trash).setVisible(isDisplayed);
 		menu.findItem(R.id.menu_upload).setVisible(
-				mContainerSession.isValidForUploading());
+				mContainerSession.isValidForUpload(CJayImage.TYPE_REPAIRED));
 		return super.onPrepareOptionsMenu(menu);
 	}
 

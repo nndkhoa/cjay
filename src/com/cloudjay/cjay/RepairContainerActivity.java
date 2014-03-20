@@ -22,6 +22,7 @@ import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.fragment.RepairIssueFixedListFragment_;
 import com.cloudjay.cjay.fragment.RepairIssuePendingListFragment_;
+import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.Logger;
@@ -69,8 +70,9 @@ public class RepairContainerActivity extends CJayActivity implements
 
 				containerSessionDaoImpl.refresh(mContainerSession);
 
-				if (mContainerSession.isValidForUploading()) {
-					
+				if (mContainerSession.isValidForUpload(CJayImage.TYPE_REPAIRED)) {
+					CJayApplication.uploadContainerSesison(context,
+							mContainerSession);
 				} else {
 					Crouton.cancelAllCroutons();
 					Crouton.makeText(this, R.string.alert_no_issue_container,

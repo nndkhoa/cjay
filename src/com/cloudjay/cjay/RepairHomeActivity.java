@@ -18,7 +18,6 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
-import com.cloudjay.cjay.fragment.RepairContainerFixedListFragment_;
 import com.cloudjay.cjay.fragment.RepairContainerPendingListFragment;
 import com.cloudjay.cjay.fragment.RepairContainerPendingListFragment_;
 import com.cloudjay.cjay.fragment.UploadsFragment_;
