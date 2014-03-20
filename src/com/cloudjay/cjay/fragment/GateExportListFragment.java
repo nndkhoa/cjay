@@ -285,39 +285,15 @@ public class GateExportListFragment extends SherlockFragment implements
 
 		synchronized (this) {
 			if (null != mSelectedContainerSession) {
-				try {
 
-					Logger.Log("Menu upload item clicked");
+				mSelectedContainerSession
+						.setCheckOutTime(StringHelper
+								.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 
-					// User confirm upload
-					mSelectedContainerSession.setUploadConfirmation(true);
+				CJayApplication.uploadContainerSesison(getActivity(),
+						mSelectedContainerSession);
 
-					mSelectedContainerSession
-							.setCheckOutTime(StringHelper
-									.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
-
-					mSelectedContainerSession
-							.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
-
-					if (null == containerSessionDaoImpl) {
-						containerSessionDaoImpl = CJayClient.getInstance()
-								.getDatabaseManager().getHelper(getActivity())
-								.getContainerSessionDaoImpl();
-					}
-
-					containerSessionDaoImpl.update(mSelectedContainerSession);
-
-					// It will trigger `UploadsFragment` Adapter
-					// notifyDataSetChanged
-					EventBus.getDefault().post(
-							new ContainerSessionEnqueueEvent(
-									mSelectedContainerSession));
-
-					hideMenuItems();
-
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
+				hideMenuItems();
 			}
 		}
 	}

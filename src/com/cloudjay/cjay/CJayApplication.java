@@ -126,6 +126,7 @@ public class CJayApplication extends Application {
 		// notifyDataSetChanged
 		EventBus.getDefault().post(
 				new ContainerSessionEnqueueEvent(containerSession));
+
 	}
 
 	public static void logOutInstantly(Context ctx) {

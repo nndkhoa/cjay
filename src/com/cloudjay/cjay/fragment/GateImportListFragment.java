@@ -240,36 +240,11 @@ public class GateImportListFragment extends SherlockFragment implements
 
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
-		try {
-
-			Logger.Log("Menu upload item clicked");
-			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-					.getInstance().getDatabaseManager()
-					.getHelper(getActivity()).getContainerSessionDaoImpl();
-
-			// User confirm upload
-			mSelectedContainerSession.setUploadConfirmation(true);
-
-			mSelectedContainerSession
-					.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
-			mSelectedContainerSession.setOnLocal(false);
-
-			containerSessionDaoImpl.update(mSelectedContainerSession);
-
-			// It will trigger `UploadsFragment` Adapter notifyDataSetChanged
-			EventBus.getDefault()
-					.post(new ContainerSessionEnqueueEvent(
-							mSelectedContainerSession));
-
-			hideMenuItems();
-
-		} catch (SQLException e) {
-
-			mSelectedContainerSession.setUploadConfirmation(false);
-			mSelectedContainerSession.setOnLocal(true);
-
-			e.printStackTrace();
-		}
+		
+		mSelectedContainerSession.setOnLocal(false);
+		CJayApplication.uploadContainerSesison(getActivity(),
+				mSelectedContainerSession);
+		hideMenuItems();
 	}
 
 	@Click(R.id.btn_add_new)
