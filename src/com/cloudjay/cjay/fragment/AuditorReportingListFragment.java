@@ -45,7 +45,7 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.*;
-import com.cloudjay.cjay.adapter.RepairContainerCursorAdapter;
+import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
@@ -105,7 +105,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 	@ViewById(R.id.notfound_textview)
 	TextView mNotfoundTextView;
 
-	RepairContainerCursorAdapter cursorAdapter;
+	IssueContainerCursorAdapter cursorAdapter;
 	PullToRefreshLayout mPullToRefreshLayout;
 
 	@Override
@@ -218,10 +218,10 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 
 				if (scrollState != 0) {
-					((RepairContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
+					((IssueContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
 				} else {
-					((RepairContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
-					((RepairContainerCursorAdapter) mFeedListView.getAdapter())
+					((IssueContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
+					((IssueContainerCursorAdapter) mFeedListView.getAdapter())
 							.notifyDataSetChanged();
 				}
 
@@ -270,7 +270,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 
 		if (cursorAdapter == null) {
-			cursorAdapter = new RepairContainerCursorAdapter(getActivity(),
+			cursorAdapter = new IssueContainerCursorAdapter(getActivity(),
 					mItemLayout, cursor, 0);
 
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
