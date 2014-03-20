@@ -70,7 +70,7 @@ public class RepairContainerActivity extends CJayActivity implements
 				containerSessionDaoImpl.refresh(mContainerSession);
 
 				if (mContainerSession.isValidForUploading()) {
-
+					
 				} else {
 					Crouton.cancelAllCroutons();
 					Crouton.makeText(this, R.string.alert_no_issue_container,
