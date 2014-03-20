@@ -127,7 +127,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 			// view for validate container sessions before upload in Auditor
 			sql = "create view csi_auditor_validation_view as"
-					+ " select csi.*, count(image._id) as non_issue_image_count"
+					+ " select csi.*, count(image._id) as auditor_image_no_issue_count"
 					+ " from"
 					+ "	(select csiview.*, count(issue.containerSession_id) as invalid_issue_count"
 					+ "	from csiview"
@@ -139,6 +139,15 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 					+ "	group by csiview._id) as csi"
 					+ " left join cjay_image as image on csi._id = image.containerSession_id and image.type = 2 and image.issue_id is NULL"
 					+ " group by csi._id";
+
+			db.execSQL(sql);
+			
+			// view for validate container sessions before upload in Repair Mode
+			sql = "create view csi_repair_validation_view as"
+					+ " select csiview.*, count(issue._id) as fixed_issue_count"
+					+ " from csiview"
+					+ " left join issue on csiview._id = issue.containerSession_id and coalesce(issue.fixed, 0) = 1"
+					+ " group by csiview._id";
 
 			db.execSQL(sql);
 

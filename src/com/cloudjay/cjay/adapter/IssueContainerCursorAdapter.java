@@ -108,17 +108,30 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements
 		if (holder.validationImageView != null) {
 
 			boolean isValidForUpload = false;
-			if (cursor.getColumnIndex("non_issue_image_count") >= 0
+			if (cursor.getColumnIndex("auditor_image_no_issue_count") >= 0
 					&& cursor.getColumnIndex("invalid_issue_count") >= 0
 					&& cursor.getColumnIndex("issue_count") >= 0) {
 				int imageWithoutIssueCount = cursor.getInt(cursor
-						.getColumnIndexOrThrow("non_issue_image_count"));
+						.getColumnIndexOrThrow("auditor_image_no_issue_count"));
 				int invalidIssueCount = cursor.getInt(cursor
 						.getColumnIndexOrThrow("invalid_issue_count"));
 				int validIssueCount = cursor.getInt(cursor
 						.getColumnIndexOrThrow("issue_count"));
 				if (imageWithoutIssueCount > 1 || validIssueCount == 0
 						|| invalidIssueCount > 0) {
+					isValidForUpload = false;
+				} else {
+					isValidForUpload = true;
+				}
+			}
+			
+			if (cursor.getColumnIndex("fixed_issue_count") >= 0
+					&& cursor.getColumnIndex("issue_count") >= 0) {
+				int fixedIssueCount = cursor.getInt(cursor
+						.getColumnIndexOrThrow("fixed_issue_count"));
+				int validIssueCount = cursor.getInt(cursor
+						.getColumnIndexOrThrow("issue_count"));
+				if (fixedIssueCount < validIssueCount || validIssueCount == 0) {
 					isValidForUpload = false;
 				} else {
 					isValidForUpload = true;

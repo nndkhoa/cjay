@@ -47,13 +47,17 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.CJayActivity;
+import com.cloudjay.cjay.CJayApplication;
+import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.RepairContainerActivity_;
 import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerRepairedEvent;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.PostLoadDataEvent;
 import com.cloudjay.cjay.events.PreLoadDataEvent;
+import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -293,8 +297,10 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 					}
 
 					for (ContainerSession containerSession : mSelectedContainerSessions) {
-						CJayApplication.uploadContainerSesison(getActivity(),
-								containerSession);
+						if (containerSession.isValidForUpload(CJayImage.TYPE_REPAIRED)) {
+							CJayApplication.uploadContainerSesison(getActivity(),
+									containerSession);
+						}
 					}
 
 					mode.finish();

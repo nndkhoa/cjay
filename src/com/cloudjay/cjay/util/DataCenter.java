@@ -242,13 +242,13 @@ public class DataCenter {
 	}
 
 	public Cursor getPendingContainerSessionCursor(Context context) {
-		String queryString = "SELECT * FROM csiview cs WHERE cs.upload_confirmation = 0 AND cs.fixed = 0 AND cs.state <> 4";
+		String queryString = "SELECT * FROM csi_repair_validation_view cs WHERE cs.upload_confirmation = 0 AND cs.state <> 4";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
 				queryString, new String[] {});
 	}
 
 	public Cursor getFixedContainerSessionCursor(Context context) {
-		String queryString = "SELECT * FROM csiview cs WHERE cs.upload_confirmation = 0 AND cs.fixed = 1 AND cs.state <> 4";
+		String queryString = "SELECT * FROM csi_repair_validation_view cs WHERE cs.upload_confirmation = 0 AND cs.fixed = 1 AND cs.state <> 4";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
 				queryString, new String[] {});
 	}
@@ -318,14 +318,14 @@ public class DataCenter {
 
 	public Cursor filterPendingCursor(Context context, CharSequence constraint) {
 
-		String queryString = "SELECT * FROM csiview cs"
+		String queryString = "SELECT * FROM csi_repair_validation_view cs"
 				+ " WHERE cs.upload_confirmation = 0 AND cs.fixed = 0 AND cs.state <> 4 AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
 				queryString, new String[] { constraint + "%" });
 	}
 
 	public Cursor filterFixedCursor(Context context, CharSequence constraint) {
-		String queryString = "SELECT * FROM csiview cs"
+		String queryString = "SELECT * FROM csi_repair_validation_view cs"
 				+ " WHERE cs.upload_confirmation = 0 AND cs.fixed = 1 AND cs.state <> 4 AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
 
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
