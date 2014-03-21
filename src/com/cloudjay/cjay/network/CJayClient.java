@@ -12,6 +12,8 @@ import org.json.JSONObject;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
+
+import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSessionResult;
 import com.cloudjay.cjay.model.DamageCode;
@@ -44,7 +46,6 @@ import com.koushikdutta.ion.Response;
 @SuppressLint("SimpleDateFormat")
 public class CJayClient implements ICJayClient {
 
-	private IHttpRequestWrapper requestWrapper;
 	private IDatabaseManager databaseManager;
 	private static CJayClient instance = null;
 
@@ -57,7 +58,6 @@ public class CJayClient implements ICJayClient {
 
 	private CJayClient(IHttpRequestWrapper requestWrapper,
 			IDatabaseManager databaseManager) {
-		this.requestWrapper = requestWrapper;
 		this.databaseManager = databaseManager;
 	}
 
@@ -110,8 +110,11 @@ public class CJayClient implements ICJayClient {
 
 		User user = null;
 		try {
-			user = Ion.with(ctx, CJayConstant.CURRENT_USER)
+			user = Ion
+					.with(ctx, CJayConstant.CURRENT_USER)
 					.setHeader("Authorization", "Token " + token)
+					.setHeader("CJAY_VERSION",
+							CJayApplication.getAppVersion(ctx))
 					.as(new TypeToken<User>() {
 					}).get();
 
@@ -143,6 +146,8 @@ public class CJayClient implements ICJayClient {
 			Response<List<Operator>> response = Ion
 					.with(ctx, CJayConstant.LIST_OPERATORS)
 					.setHeader("Authorization", "Token " + accessToken)
+					.setHeader("CJAY_VERSION",
+							CJayApplication.getAppVersion(ctx))
 					.addQuery("modified_after", date)
 					.as(new TypeToken<List<Operator>>() {
 					}).withResponse().get();
@@ -186,6 +191,8 @@ public class CJayClient implements ICJayClient {
 			Response<List<DamageCode>> response = Ion
 					.with(ctx, CJayConstant.LIST_DAMAGE_CODES)
 					.setHeader("Authorization", "Token " + accessToken)
+					.setHeader("CJAY_VERSION",
+							CJayApplication.getAppVersion(ctx))
 					.addQuery("modified_after", date)
 					.as(new TypeToken<List<DamageCode>>() {
 					}).withResponse().get();
@@ -229,6 +236,8 @@ public class CJayClient implements ICJayClient {
 			Response<List<RepairCode>> response = Ion
 					.with(ctx, CJayConstant.LIST_REPAIR_CODES)
 					.setHeader("Authorization", "Token " + accessToken)
+					.setHeader("CJAY_VERSION",
+							CJayApplication.getAppVersion(ctx))
 					.addQuery("modified_after", date)
 					.as(new TypeToken<List<RepairCode>>() {
 					}).withResponse().get();
@@ -272,6 +281,8 @@ public class CJayClient implements ICJayClient {
 			Response<List<ComponentCode>> response = Ion
 					.with(ctx, CJayConstant.LIST_COMPONENT_CODES)
 					.setHeader("Authorization", "Token " + accessToken)
+					.setHeader("CJAY_VERSION",
+							CJayApplication.getAppVersion(ctx))
 					.addQuery("modified_after", date)
 					.as(new TypeToken<List<ComponentCode>>() {
 					}).withResponse().get();
@@ -313,6 +324,8 @@ public class CJayClient implements ICJayClient {
 			Response<String> response = Ion
 					.with(ctx, CJayConstant.CONTAINER_SESSIONS)
 					.setHeader("Authorization", "Token " + accessToken)
+					.setHeader("CJAY_VERSION",
+							CJayApplication.getAppVersion(ctx))
 					.addQuery("page", Integer.toString(page))
 					.addQuery("created_after", date).asString().withResponse()
 					.get();
@@ -367,12 +380,16 @@ public class CJayClient implements ICJayClient {
 
 		String ret = "";
 		String accessToken = CJaySession.restore(ctx).getAccessToken();
+		String appVersion = CJayApplication.getAppVersion(ctx);
+
+		// Logger.e("Appversion " + appVersion);
 
 		try {
 
 			Response<String> response = Ion
 					.with(ctx, CJayConstant.CONTAINER_SESSIONS)
 					.setHeader("Authorization", "Token " + accessToken)
+					.setHeader("CJAY_VERSION", appVersion)
 					.setJsonObjectBody(item,
 							new TypeToken<TmpContainerSession>() {
 							}).asString().withResponse()
@@ -383,6 +400,10 @@ public class CJayClient implements ICJayClient {
 								Response<String> arg1) {
 						}
 					}).get();
+
+			Logger.e("Response code: "
+					+ response.getHeaders().getResponseMessage() + " | "
+					+ Integer.toString(response.getHeaders().getResponseCode()));
 
 			switch (response.getHeaders().getResponseCode()) {
 			case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
@@ -438,6 +459,8 @@ public class CJayClient implements ICJayClient {
 			Response<JsonObject> response = Ion
 					.with(ctx, CJayConstant.API_ADD_GCM_DEVICE)
 					.setHeader("Authorization ", accessToken)
+					.setHeader("CJAY_VERSION",
+							CJayApplication.getAppVersion(ctx))
 					.setJsonObjectBody(requestPacket).asJsonObject()
 					.withResponse()
 					.setCallback(new FutureCallback<Response<JsonObject>>() {

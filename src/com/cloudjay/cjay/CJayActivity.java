@@ -80,12 +80,13 @@ public class CJayActivity extends SherlockFragmentActivity {
 	public Context getContext() {
 		return this;
 	}
-	
+
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		menu.findItem(R.id.menu_username).setTitle(getCurrentUser().getFullName());
+		menu.findItem(R.id.menu_username).setTitle(
+				getCurrentUser().getFullName());
 		menu.findItem(R.id.menu_role).setTitle(getCurrentUser().getRoleName());
-		
+
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -107,11 +108,9 @@ public class CJayActivity extends SherlockFragmentActivity {
 									getApplicationContext());
 						} catch (NoConnectionException e) {
 
-							e.printStackTrace();
-							showCrouton(R.string.alert_no_network);
-
+							Logger.Log("No Internet Connection");
+							// showCrouton(R.string.alert_no_network);
 						} catch (NullSessionException e) {
-
 							CJayApplication.logOutInstantly(context);
 							finish();
 
@@ -142,7 +141,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 											getApplicationContext());
 
 						} catch (NoConnectionException e) {
-							e.printStackTrace();
+
 							showCrouton(R.string.alert_no_network);
 						} catch (SQLException e) {
 							e.printStackTrace();
@@ -303,7 +302,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 		crouton.show();
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {

@@ -110,11 +110,6 @@ public class UploadsFragment extends SherlockFragment implements
 		updateUI();
 	}
 
-	// public void onEvent(UploadStateChangedEvent event) {
-	// Logger.Log( "onEvent UploadStateChangedEvent");
-	// updateUI();
-	// }
-
 	@UiThread
 	void updateUI() {
 		listContainerSessions = DataCenter.getInstance()

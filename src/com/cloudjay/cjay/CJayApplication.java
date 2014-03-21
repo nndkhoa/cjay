@@ -10,6 +10,8 @@ import org.androidannotations.annotations.EApplication;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.util.Log;
@@ -174,6 +176,19 @@ public class CJayApplication extends Application {
 
 		ctx.startActivity(intent);
 
+	}
+
+	public static String getAppVersion(Context ctx) {
+
+		PackageInfo pInfo = null;
+		try {
+			pInfo = ctx.getPackageManager().getPackageInfo(
+					ctx.getPackageName(), 0);
+		} catch (NameNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return pInfo.versionName;
 	}
 
 	public static void startCJayHomeActivity(Context context) {

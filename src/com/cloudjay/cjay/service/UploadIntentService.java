@@ -155,7 +155,6 @@ public class UploadIntentService extends IntentService implements
 
 			EventBus.getDefault().post(
 					new ContainerSessionUploadedEvent(containerSession));
-
 			return;
 		} catch (NullSessionException e) {
 
@@ -163,17 +162,22 @@ public class UploadIntentService extends IntentService implements
 			onDestroy();
 
 		} catch (SQLException e) {
+
 			e.printStackTrace();
 			containerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+			containerSession.setUploadConfirmation(false);
+
 		} catch (NoConnectionException e) {
-			// Turn off alarm manager
+			Logger.Log("No Internet Connection");
 			containerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+			containerSession.setUploadConfirmation(false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			containerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+			containerSession.setUploadConfirmation(false);
 		}
 
 	}
