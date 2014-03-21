@@ -20,10 +20,7 @@ import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.fragment.GateExportListFragment;
-import com.cloudjay.cjay.fragment.GateExportListFragment_;
-import com.cloudjay.cjay.fragment.GateImportListFragment;
-import com.cloudjay.cjay.fragment.GateImportListFragment_;
-import com.cloudjay.cjay.fragment.UploadsFragment_;
+import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
 

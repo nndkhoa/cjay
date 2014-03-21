@@ -40,6 +40,7 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CountingInputStreamEntity;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Mapper;
+import com.cloudjay.cjay.util.MismatchDataException;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
 
@@ -52,9 +53,6 @@ public class UploadIntentService extends IntentService implements
 	int increment = 10;
 	int targetProgressBar = 0;
 	static final int NOTIFICATION_ID = 1000;
-
-	private String mNotificationSubtitle;
-	private int mNumberUploaded = 0;
 
 	private CJayImageDaoImpl cJayImageDaoImpl;
 	private ContainerSessionDaoImpl containerSessionDaoImpl;
@@ -93,29 +91,51 @@ public class UploadIntentService extends IntentService implements
 	}
 
 	public void onEventMainThread(UploadStateChangedEvent event) {
-		ContainerSession upload = event.getContainerSession();
+		ContainerSession containerSession = event.getContainerSession();
 
-		switch (upload.getUploadState()) {
+		switch (containerSession.getUploadState()) {
 		case ContainerSession.STATE_UPLOAD_IN_PROGRESS:
 			break;
 
 		case ContainerSession.STATE_UPLOAD_COMPLETED:
-			mNumberUploaded++;
-			// Fall through...
+			//
 
-			// case ContainerSession.STATE_UPLOAD_ERROR:
+		case ContainerSession.STATE_UPLOAD_ERROR:
 			// startNextUploadOrFinish();
 			// // Fall through...
 
 		case ContainerSession.STATE_UPLOAD_WAITING:
+
 			try {
-				Logger.Log("onEventMainThread(UploadStateChangedEvent event)");
-				containerSessionDaoImpl.update(upload);
+				Logger.Log("onEventMainThread UploadStateChangedEvent event");
+				containerSessionDaoImpl.update(containerSession);
+
 			} catch (SQLException e) {
+
 				e.printStackTrace();
+				Logger.e("Cannot update state for container "
+						+ containerSession.getContainerId());
+				Logger.e("Current state "
+						+ Integer.toString(containerSession.getUploadState()));
+
 			}
 			break;
 		}
+	}
+
+	public void rollbackContainerState(ContainerSession containerSession,
+			int type) {
+
+		switch (type) {
+		case 1:
+			break;
+
+		default:
+			break;
+		}
+
+		containerSession.setUploadConfirmation(false);
+		containerSession.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
 	}
 
 	/**
@@ -126,60 +146,65 @@ public class UploadIntentService extends IntentService implements
 	@Trace(level = Log.INFO)
 	synchronized void doUploadContainer(ContainerSession containerSession) {
 
-		Logger.Log("doUploadContainer: " + containerSession.getContainerId());
+		Logger.w("Uploading container: " + containerSession.getContainerId());
+		String response = "";
+
+		containerSession
+				.setUploadState(ContainerSession.STATE_UPLOAD_IN_PROGRESS);
 
 		try {
-			containerSession
-					.setUploadState(ContainerSession.STATE_UPLOAD_IN_PROGRESS);
 			containerSessionDaoImpl.update(containerSession);
+		} catch (SQLException e) {
+			Logger.e("Cannot change State to `IN PROGRESS`. Process will be stopped.");
+			e.printStackTrace();
+			return;
+		}
 
-			// Convert ContainerSession to TmpContainerSession for uploading
-			TmpContainerSession uploadItem = Mapper.getInstance()
-					.toTmpContainerSession(containerSession,
-							getApplicationContext());
+		// Convert ContainerSession to TmpContainerSession for uploading
+		TmpContainerSession uploadItem = Mapper.getInstance()
+				.toTmpContainerSession(containerSession,
+						getApplicationContext());
 
-			// Post to Server and notify event to UploadFragment
-			Logger.Log("Ready to post Container Session");
-			String returnJson = CJayClient.getInstance().postContainerSession(
+		try {
+			response = CJayClient.getInstance().postContainerSession(
 					getApplicationContext(), uploadItem);
 
-			Logger.Log(returnJson);
+		} catch (NoConnectionException e) {
 
-			// convert back then save containerSession
-			Mapper.getInstance().update(getApplicationContext(), returnJson,
-					containerSession);
+			Logger.Log("No Internet Connection");
+			rollbackContainerState(containerSession, 0);
 
-			containerSession
-					.setUploadState(ContainerSession.STATE_UPLOAD_COMPLETED);
-			containerSessionDaoImpl.update(containerSession);
-
-			EventBus.getDefault().post(
-					new ContainerSessionUploadedEvent(containerSession));
-			return;
 		} catch (NullSessionException e) {
 
+			e.printStackTrace();
+			rollbackContainerState(containerSession, 0);
+
+			// Log user out
 			CJayApplication.logOutInstantly(getApplicationContext());
 			onDestroy();
 
-		} catch (SQLException e) {
+		} catch (MismatchDataException e) {
 
 			e.printStackTrace();
+			// Set state to Error
 			containerSession
-					.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
-			containerSession.setUploadConfirmation(false);
+					.setUploadState(ContainerSession.STATE_UPLOAD_ERROR);
 
-		} catch (NoConnectionException e) {
-			Logger.Log("No Internet Connection");
-			containerSession
-					.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
-			containerSession.setUploadConfirmation(false);
 		} catch (Exception e) {
-			e.printStackTrace();
-			containerSession
-					.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
-			containerSession.setUploadConfirmation(false);
+			rollbackContainerState(containerSession, 0);
 		}
 
+		Logger.Log(response);
+
+		// convert back then save containerSession
+		Mapper.getInstance().update(getApplicationContext(), response,
+				containerSession);
+
+		containerSession
+				.setUploadState(ContainerSession.STATE_UPLOAD_COMPLETED);
+
+		EventBus.getDefault().post(
+				new ContainerSessionUploadedEvent(containerSession));
 	}
 
 	@Override
@@ -219,7 +244,6 @@ public class UploadIntentService extends IntentService implements
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-
 		return super.onStartCommand(intent, flags, startId);
 	}
 
@@ -273,6 +297,7 @@ public class UploadIntentService extends IntentService implements
 					in, fileDescriptor.getStatSize());
 			entity.setUploadListener(UploadIntentService.this);
 			entity.setContentType("image/jpeg");
+
 			post.setEntity(entity);
 
 			try {
@@ -295,15 +320,19 @@ public class UploadIntentService extends IntentService implements
 				e.printStackTrace();
 			}
 		} catch (SQLException e) {
+
 			// Set Status to Uploading
 			try {
 				// THIS IS SQL ERROR --> NO REPEAT
 				uploadItem.setUploadState(CJayImage.STATE_UPLOAD_ERROR);
 				cJayImageDaoImpl.update(uploadItem);
+
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
+
 			e.printStackTrace();
+
 		} catch (IOException e) {
 
 			// Set Status to Uploading

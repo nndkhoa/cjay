@@ -24,6 +24,7 @@ import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.MismatchDataException;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.CJaySession;
@@ -247,6 +248,7 @@ public class CJayClient implements ICJayClient {
 				throw new NullSessionException();
 
 			case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi
+
 				break;
 
 			case HttpStatus.SC_NOT_FOUND: // Không có dữ liệu tương ứng
@@ -371,7 +373,8 @@ public class CJayClient implements ICJayClient {
 
 	@Override
 	public String postContainerSession(Context ctx, TmpContainerSession item)
-			throws NoConnectionException, NullSessionException {
+			throws NoConnectionException, NullSessionException,
+			MismatchDataException {
 
 		if (Utils.hasNoConnection(ctx)) {
 			Logger.Log("Network is not available");
@@ -406,14 +409,20 @@ public class CJayClient implements ICJayClient {
 					+ Integer.toString(response.getHeaders().getResponseCode()));
 
 			switch (response.getHeaders().getResponseCode()) {
-			case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
+
+			// User không có quyền truy cập
+			case HttpStatus.SC_UNAUTHORIZED:
+			case HttpStatus.SC_FORBIDDEN:
 				throw new NullSessionException();
 
 			case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi
+				// Rollback
 				break;
 
 			case HttpStatus.SC_NOT_FOUND: // Không có dữ liệu tương ứng
-				break;
+				// Server will process it
+				// Set container to error
+				throw new MismatchDataException();
 
 			default:
 				ret = response.getResult();
@@ -454,13 +463,16 @@ public class CJayClient implements ICJayClient {
 		requestPacket.put("app_code", "CJAY");
 		requestPacket.put("name", android.os.Build.MODEL);
 
-		String accessToken = CJaySession.restore(ctx).getAccessToken();
+		User user = CJaySession.restore(ctx).getCurrentUser();
+		String accessToken = user.getAccessToken();
+
 		try {
 			Response<JsonObject> response = Ion
 					.with(ctx, CJayConstant.API_ADD_GCM_DEVICE)
 					.setHeader("Authorization ", accessToken)
 					.setHeader("CJAY_VERSION",
 							CJayApplication.getAppVersion(ctx))
+					.setHeader("CJAY_USERNAME", user.getUserName())
 					.setJsonObjectBody(requestPacket).asJsonObject()
 					.withResponse()
 					.setCallback(new FutureCallback<Response<JsonObject>>() {

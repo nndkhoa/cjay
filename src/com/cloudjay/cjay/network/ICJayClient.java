@@ -14,6 +14,7 @@ import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.util.MismatchDataException;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
 
@@ -40,7 +41,7 @@ public interface ICJayClient {
 			throws NoConnectionException, NullSessionException;
 
 	String postContainerSession(Context ctx, TmpContainerSession item)
-			throws NoConnectionException, NullSessionException;
+			throws NoConnectionException, NullSessionException, MismatchDataException;
 
 	ContainerSessionResult getContainerSessionsByPage(Context ctx, String date,
 			int page) throws NoConnectionException, NullSessionException;
