@@ -90,6 +90,8 @@ public class CJaySession {
 
 	public boolean deleteSession(Context context) {
 
+		Utils.backupDatabase(getCurrentUser().getUserName());
+
 		Logger.Log("deleting session ...");
 		databaseManager = CJayClient.getInstance().getDatabaseManager();
 		try {

@@ -1,6 +1,9 @@
 package com.cloudjay.cjay.util;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -237,6 +240,37 @@ public class Utils {
 	public static File getHiddentAppDirectoryFile() {
 		return new File(Environment.getExternalStorageDirectory(),
 				CJayConstant.HIDDEN_APP_DIRECTORY);
+	}
+
+	public static void backupDatabase(String username) {
+		try {
+			File sd = Environment.getExternalStorageDirectory();
+			File data = Environment.getDataDirectory();
+
+			if (sd.canWrite()) {
+				String currentDBPath = "//data//com.cloudjay.cjay//databases//cjay.db";
+				String backupDBPath = "cjay"
+						+ StringHelper
+								.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE)
+						+ username + ".db";
+				File currentDB = new File(data, currentDBPath);
+				File backupDB = new File(sd, backupDBPath);
+
+				if (currentDB.exists()) {
+					FileChannel src = new FileInputStream(currentDB)
+							.getChannel();
+					FileChannel dst = new FileOutputStream(backupDB)
+							.getChannel();
+					dst.transferFrom(src, 0, src.size());
+					src.close();
+					dst.close();
+				} else {
+					Logger.e("Current database do not exist");
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

@@ -486,12 +486,15 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		String depotCode = containerSession.getContainer().getDepot()
 				.getDepotCode();
 		String containerId = containerSession.getContainerId();
+		String operator = containerSession.getOperatorCode() == null ? ""
+				: containerSession.getOperatorCode() + "-";
 
 		// filename sample:
 		// [depot-code]-2013-12-19-[gate-in|gate-out|report]-[containerId]-[UUID].jpg
 		String fileName = depotCode + "-"
 				+ StringHelper.getCurrentTimestamp("yyyy-MM-dd") + "-"
-				+ imageType + "-" + containerId + "-" + uuid + ".jpg";
+				+ imageType + "-" + containerId + "-" + operator + uuid
+				+ ".jpg";
 
 		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
 		Logger.Log("Photo Path: " + photo.getAbsolutePath());
