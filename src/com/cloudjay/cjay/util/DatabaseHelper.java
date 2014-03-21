@@ -50,7 +50,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			CJayImage.class };
 
 	public static final String DATABASE_NAME = "cjay.db";
-	public static final int DATABASE_VERSION = 1;
+	public static final int DATABASE_VERSION = 2;
 
 	UserDaoImpl userDaoImpl = null;
 	OperatorDaoImpl operatorDaoImpl = null;
@@ -64,6 +64,37 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	ComponentCodeDaoImpl componentCodeDaoImpl = null;
 	UploadItemDaoImpl uploadItemDeoImpl = null;
 
+	private static class Patch {
+
+		public void apply(SQLiteDatabase db) {
+		}
+
+		public void revert(SQLiteDatabase db) {
+		}
+
+	}
+
+	private static final Patch[] PATCHES = new Patch[] { new Patch() {
+
+		public void apply(SQLiteDatabase db) {
+
+		}
+
+		public void revert(SQLiteDatabase db) {
+
+		}
+	}, new Patch() {
+			// version = 2
+
+		public void apply(SQLiteDatabase db) {
+			// Add column `upload_type` in table `container_session`
+			db.execSQL("ALTER TABLE container_session ADD COLUMN upload_type INTEGER DEFAULT 0");
+		}
+
+		public void revert(SQLiteDatabase db) {
+		}
+	} };
+
 	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
@@ -76,6 +107,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db, ConnectionSource connectionSource) {
 		try {
+
+			// for (int i = 0; i < PATCHES.length; i++) {
+			// PATCHES[i].apply(db);
+			// }
 
 			Logger.Log("onCreate DB");
 			for (Class<?> dataClass : DATA_CLASSES) {
@@ -141,7 +176,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 					+ " group by csi._id";
 
 			db.execSQL(sql);
-			
+
 			// view for validate container sessions before upload in Repair Mode
 			sql = "create view csi_repair_validation_view as"
 					+ " select csiview.*, count(issue._id) as fixed_issue_count"
@@ -150,9 +185,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 					+ " group by csiview._id";
 
 			db.execSQL(sql);
-
-			// insert NULL operator
-			// sql = ""
 
 		} catch (SQLException e) {
 			Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
@@ -168,17 +200,34 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource,
 			int oldVersion, int newVersion) {
-		try {
-			Logger.Log("onUpgrade");
-			for (Class<?> dataClass : DATA_CLASSES) {
-				TableUtils.dropTable(connectionSource, dataClass, true);
-			}
 
-			onCreate(db, connectionSource);
-		} catch (SQLException e) {
-			Log.e(DatabaseHelper.class.getName(), "Can't drop databases", e);
-			throw new RuntimeException(e);
+		for (int i = oldVersion; i < newVersion; i++) {
+			PATCHES[i].apply(db);
 		}
+
+		// try {
+		//
+		// Logger.Log("onUpgrade");
+		//
+		// for (Class<?> dataClass : DATA_CLASSES) {
+		// TableUtils.dropTable(connectionSource, dataClass, true);
+		// }
+		//
+		// onCreate(db, connectionSource);
+		// } catch (SQLException e) {
+		// Log.e(DatabaseHelper.class.getName(), "Can't drop databases", e);
+		// throw new RuntimeException(e);
+		// }
+	}
+
+	@Override
+	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+		// for (int i = oldVersion; i > newVersion; i++) {
+		// PATCHES[i - 1].revert(db);
+		// }
+
+		super.onDowngrade(db, oldVersion, newVersion);
 	}
 
 	/**
