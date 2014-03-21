@@ -240,8 +240,10 @@ public class GateImportListFragment extends SherlockFragment implements
 
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
-		
+
+		mSelectedContainerSession.setUploadType(ContainerSession.TYPE_IN);
 		mSelectedContainerSession.setOnLocal(false);
+
 		CJayApplication.uploadContainerSesison(getActivity(),
 				mSelectedContainerSession);
 		hideMenuItems();

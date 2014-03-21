@@ -287,6 +287,8 @@ public class GateExportListFragment extends SherlockFragment implements
 			if (null != mSelectedContainerSession) {
 
 				mSelectedContainerSession
+						.setUploadType(ContainerSession.TYPE_OUT);
+				mSelectedContainerSession
 						.setCheckOutTime(StringHelper
 								.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 

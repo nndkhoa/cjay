@@ -85,33 +85,12 @@ public class AuditorReportedListFragment extends SherlockFragment {
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 		if (mSelectedContainerSession != null) {
-			try {
+			mSelectedContainerSession
+					.setUploadType(ContainerSession.TYPE_AUDIT);
+			CJayApplication.uploadContainerSesison(getActivity(),
+					mSelectedContainerSession);
 
-				Logger.Log("Menu upload item clicked");
-
-				ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-						.getInstance().getDatabaseManager()
-						.getHelper(getActivity()).getContainerSessionDaoImpl();
-
-				// User confirm upload
-				mSelectedContainerSession.setUploadConfirmation(true);
-
-				mSelectedContainerSession
-						.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
-
-				containerSessionDaoImpl.update(mSelectedContainerSession);
-
-				// It will trigger `UploadsFragment` Adapter
-				// notifyDataSetChanged
-				EventBus.getDefault().post(
-						new ContainerSessionEnqueueEvent(
-								mSelectedContainerSession));
-
-				hideMenuItems();
-
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			hideMenuItems();
 		}
 	}
 

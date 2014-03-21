@@ -189,29 +189,12 @@ public class RepairContainerFixedListFragment extends SherlockFragment
 
 		synchronized (this) {
 			if (mSelectedContainerSession != null) {
-				try {
 
-					Logger.Log("Menu upload item clicked");
-
-					// User confirm upload
-					mSelectedContainerSession.setUploadConfirmation(true);
-
-					mSelectedContainerSession
-							.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
-
-					containerSessionDaoImpl.update(mSelectedContainerSession);
-
-					// It will trigger `UploadsFragment` Adapter
-					// notifyDataSetChanged
-					EventBus.getDefault().post(
-							new ContainerSessionEnqueueEvent(
-									mSelectedContainerSession));
-
-					hideMenuItems();
-
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
+				mSelectedContainerSession
+						.setUploadType(ContainerSession.TYPE_REPAIR);
+				CJayApplication.uploadContainerSesison(getActivity(),
+						mSelectedContainerSession);
+				hideMenuItems();
 			}
 		}
 	}

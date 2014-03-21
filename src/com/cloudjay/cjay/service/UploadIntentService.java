@@ -19,6 +19,7 @@ import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
 
+import android.R.integer;
 import android.app.IntentService;
 import android.content.Intent;
 import android.net.Uri;
@@ -50,10 +51,7 @@ import de.greenrobot.event.EventBus;
 public class UploadIntentService extends IntentService implements
 		CountingInputStreamEntity.UploadListener {
 
-	int increment = 10;
-	int targetProgressBar = 0;
 	static final int NOTIFICATION_ID = 1000;
-
 	private CJayImageDaoImpl cJayImageDaoImpl;
 	private ContainerSessionDaoImpl containerSessionDaoImpl;
 
@@ -123,13 +121,20 @@ public class UploadIntentService extends IntentService implements
 		}
 	}
 
-	public void rollbackContainerState(ContainerSession containerSession,
-			int type) {
+	public void rollbackContainerState(ContainerSession containerSession) {
 
+		int type = containerSession.getUploadType();
 		switch (type) {
-		case 1:
+		case ContainerSession.TYPE_IN:
+			containerSession.setOnLocal(false);
 			break;
 
+		case ContainerSession.TYPE_OUT:
+			containerSession.setCheckOutTime("");
+			break;
+
+		case ContainerSession.TYPE_AUDIT:
+		case ContainerSession.TYPE_REPAIR:
 		default:
 			break;
 		}
@@ -172,12 +177,12 @@ public class UploadIntentService extends IntentService implements
 		} catch (NoConnectionException e) {
 
 			Logger.Log("No Internet Connection");
-			rollbackContainerState(containerSession, 0);
+			rollbackContainerState(containerSession);
 
 		} catch (NullSessionException e) {
 
 			e.printStackTrace();
-			rollbackContainerState(containerSession, 0);
+			rollbackContainerState(containerSession);
 
 			// Log user out
 			CJayApplication.logOutInstantly(getApplicationContext());
@@ -191,7 +196,7 @@ public class UploadIntentService extends IntentService implements
 					.setUploadState(ContainerSession.STATE_UPLOAD_ERROR);
 
 		} catch (Exception e) {
-			rollbackContainerState(containerSession, 0);
+			rollbackContainerState(containerSession);
 		}
 
 		Logger.Log(response);

@@ -60,16 +60,17 @@ public class RepairContainerActivity extends CJayActivity implements
 
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
-		// TODO: validate container session
+
 		Logger.Log("Validating container :"
 				+ mContainerSession.getContainerId());
 
 		if (null != mContainerSession) {
 			try {
-
 				containerSessionDaoImpl.refresh(mContainerSession);
 
 				if (mContainerSession.isValidForUpload(CJayImage.TYPE_REPAIRED)) {
+					mContainerSession
+							.setUploadType(ContainerSession.TYPE_REPAIR);
 					CJayApplication.uploadContainerSesison(context,
 							mContainerSession);
 				} else {

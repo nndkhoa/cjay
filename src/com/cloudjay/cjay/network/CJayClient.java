@@ -28,6 +28,7 @@ import com.cloudjay.cjay.util.MismatchDataException;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.CJaySession;
+import com.cloudjay.cjay.util.ServerInternalErrorException;
 import com.cloudjay.cjay.util.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -374,7 +375,7 @@ public class CJayClient implements ICJayClient {
 	@Override
 	public String postContainerSession(Context ctx, TmpContainerSession item)
 			throws NoConnectionException, NullSessionException,
-			MismatchDataException {
+			MismatchDataException, ServerInternalErrorException {
 
 		if (Utils.hasNoConnection(ctx)) {
 			Logger.Log("Network is not available");
@@ -384,8 +385,6 @@ public class CJayClient implements ICJayClient {
 		String ret = "";
 		String accessToken = CJaySession.restore(ctx).getAccessToken();
 		String appVersion = CJayApplication.getAppVersion(ctx);
-
-		// Logger.e("Appversion " + appVersion);
 
 		try {
 
@@ -417,7 +416,7 @@ public class CJayClient implements ICJayClient {
 
 			case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi
 				// Rollback
-				break;
+				throw new ServerInternalErrorException();
 
 			case HttpStatus.SC_NOT_FOUND: // Không có dữ liệu tương ứng
 				// Server will process it

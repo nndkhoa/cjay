@@ -183,35 +183,17 @@ public class AuditorContainerActivity extends CJayActivity {
 
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemClicked() {
-		try {
-			Logger.Log("Menu upload item clicked");
+		Logger.Log("Menu upload item clicked");
 
-			if (mContainerSession.isValidForUpload(CJayImage.TYPE_REPAIRED)) {
+		if (mContainerSession.isValidForUpload(CJayImage.TYPE_REPORT)) {
 
-				// User confirm upload
-				mContainerSession.setUploadConfirmation(true);
-
-				mContainerSession
-						.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
-
-				ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-						.getInstance().getDatabaseManager().getHelper(this)
-						.getContainerSessionDaoImpl();
-
-				containerSessionDaoImpl.update(mContainerSession);
-
-				// It will trigger `UploadsFragment` Adapter
-				// notifyDataSetChanged
-				EventBus.getDefault().post(
-						new ContainerSessionEnqueueEvent(mContainerSession));
-			} else {
-				Crouton.cancelAllCroutons();
-				Crouton.makeText(this, R.string.alert_invalid_container,
-						Style.ALERT).show();
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
+			mContainerSession.setUploadType(ContainerSession.TYPE_AUDIT);
+			CJayApplication.uploadContainerSesison(getApplicationContext(),
+					mContainerSession);
+		} else {
+			Crouton.cancelAllCroutons();
+			Crouton.makeText(this, R.string.alert_invalid_container,
+					Style.ALERT).show();
 		}
 
 		// go back
@@ -224,7 +206,7 @@ public class AuditorContainerActivity extends CJayActivity {
 
 		menu.findItem(R.id.menu_trash).setVisible(isDisplayed);
 		menu.findItem(R.id.menu_upload).setVisible(
-				mContainerSession.isValidForUpload(CJayImage.TYPE_REPAIRED));
+				mContainerSession.isValidForUpload(CJayImage.TYPE_REPORT));
 		return super.onPrepareOptionsMenu(menu);
 	}
 

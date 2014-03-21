@@ -306,6 +306,8 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 						if (containerSession
 								.isValidForUpload(CJayImage.TYPE_REPAIRED)) {
 
+							containerSession
+									.setUploadType(ContainerSession.TYPE_REPAIR);
 							CJayApplication.uploadContainerSesison(
 									getActivity(), containerSession);
 

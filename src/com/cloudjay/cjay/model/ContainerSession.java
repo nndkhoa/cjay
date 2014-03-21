@@ -43,6 +43,8 @@ public class ContainerSession {
 	public static final String FIELD_STATE = "state";
 	public static final String FIELD_ID = "id";
 
+	public static final String FIELD_UPLOAD_TYPE = "upload_type";
+
 	// _id for cursor loader usage
 	public static final String FIELD_UUID = "_id";
 	public static final String FIELD_UPLOAD_CONFIRMATION = "upload_confirmation";
@@ -57,20 +59,27 @@ public class ContainerSession {
 	public static final int STATE_UPLOAD_WAITING = 1;
 	public static final int STATE_NONE = 0;
 
-	static final int MINI_THUMBNAIL_SIZE = 300;
-	static final int MICRO_THUMBNAIL_SIZE = 96;
+	public static final int TYPE_NONE = 0;
+	public static final int TYPE_IN = 1;
+	public static final int TYPE_AUDIT = 2;
+	public static final int TYPE_REPAIR = 3;
+	public static final int TYPE_OUT = 4;
 
 	@DatabaseField(columnName = FIELD_ID, index = true)
 	int id;
 
+	@DatabaseField(columnName = FIELD_UPLOAD_TYPE, defaultValue = "0")
+	int upload_type;
+
 	@DatabaseField(columnName = FIELD_UUID, id = true)
 	String uuid;
 
+	// Use to mark: cleared from upload fragment
 	@DatabaseField(columnName = FIELD_CLEARED, defaultValue = "false")
-	private boolean cleared;
+	boolean cleared;
 
 	@DatabaseField(columnName = FIELD_LOCAL, defaultValue = "false")
-	private boolean onLocal;
+	boolean onLocal;
 
 	@DatabaseField(columnName = FIELD_IMAGE_ID_PATH, defaultValue = "")
 	String image_id_path;
@@ -84,9 +93,11 @@ public class ContainerSession {
 	@DatabaseField(columnName = FIELD_STATE, defaultValue = "0", index = true)
 	int mState;
 
+	// Use to mark from pending --> fix
 	@DatabaseField(columnName = FIELD_FIXED, defaultValue = "false")
 	boolean fixed;
 
+	// Use to mark exported
 	@DatabaseField(columnName = FIELD_EXPORT, defaultValue = "false")
 	boolean export;
 
@@ -307,17 +318,6 @@ public class ContainerSession {
 		return check_in_time;
 	}
 
-	public String getFormattedCheckInTime() {
-		return StringHelper.getTimestamp(CJayConstant.CJAY_DATETIME_FORMAT,
-				CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE, check_in_time);
-	}
-
-	public String getFormattedCheckOutTime() {
-		return StringHelper.getTimestamp(CJayConstant.CJAY_DATETIME_FORMAT,
-				CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE, check_out_time);
-
-	}
-
 	public String getCheckOutTime() {
 
 		return StringHelper.getRelativeDate(
@@ -490,5 +490,13 @@ public class ContainerSession {
 
 	public void setExport(boolean export) {
 		this.export = export;
+	}
+
+	public int getUploadType() {
+		return upload_type;
+	}
+
+	public void setUploadType(int upload_type) {
+		this.upload_type = upload_type;
 	}
 }
