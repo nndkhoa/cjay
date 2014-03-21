@@ -454,28 +454,31 @@ public class ContainerSession {
 					return false;
 				}
 			}
-			
+
 			return true;
-			
+
 		case CJayImage.TYPE_REPAIRED:
+
 			// check if all issues have REPAIRED images
 			boolean issueHasNoImage;
 			for (Issue issue : issues) {
+
 				issueHasNoImage = true;
+
 				for (CJayImage cJayImage : issue.getCJayImages()) {
 					if (cJayImage.getType() == CJayImage.TYPE_REPAIRED) {
 						issueHasNoImage = false;
 						break;
 					}
 				}
-				
+
 				if (issueHasNoImage) {
 					return false;
 				}
 			}
-			
+
 			return true;
-			
+
 		default:
 			return true;
 		}

@@ -101,7 +101,7 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 		Intent intent = new Intent(getActivity(), CameraActivity_.class);
 		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
 				mContainerSession.getUuid());
-		intent.putExtra("type", CJayImage.TYPE_REPORT);
+		intent.putExtra("type", CJayImage.TYPE_REPAIRED);
 		intent.putExtra("tag", LOG_TAG);
 		startActivity(intent);
 	}

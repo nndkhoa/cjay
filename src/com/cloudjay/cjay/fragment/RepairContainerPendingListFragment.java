@@ -2,6 +2,7 @@ package com.cloudjay.cjay.fragment;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
@@ -55,6 +56,7 @@ import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerRepairedEvent;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
+import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.events.PostLoadDataEvent;
 import com.cloudjay.cjay.events.PreLoadDataEvent;
 import com.cloudjay.cjay.model.CJayImage;
@@ -70,6 +72,9 @@ import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.view.AddContainerDialog;
 
 import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Configuration;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 @EFragment(R.layout.fragment_repair_container_pending)
 @OptionsMenu(R.menu.menu_repair_container_pending)
@@ -296,11 +301,29 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 						}
 					}
 
+					List<ContainerSession> invalidContainerSessions = new ArrayList<ContainerSession>();
 					for (ContainerSession containerSession : mSelectedContainerSessions) {
-						if (containerSession.isValidForUpload(CJayImage.TYPE_REPAIRED)) {
-							CJayApplication.uploadContainerSesison(getActivity(),
-									containerSession);
+
+						if (containerSession
+								.isValidForUpload(CJayImage.TYPE_REPAIRED)) {
+
+							CJayApplication.uploadContainerSesison(
+									getActivity(), containerSession);
+
+						} else {
+							Logger.w("Container "
+									+ containerSession.getContainerId()
+									+ " is invalid for upload");
+							invalidContainerSessions.add(containerSession);
 						}
+					}
+
+					if (invalidContainerSessions.size() > 0) {
+
+						Crouton.makeText(getActivity(),
+								R.string.alert_no_issue_container, Style.ALERT)
+								.show();
+
 					}
 
 					mode.finish();
@@ -452,6 +475,10 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 		super.onPrepareOptionsMenu(menu);
 		// menu.findItem(R.id.menu_check).setVisible(false);
 		menu.findItem(R.id.menu_upload).setVisible(false);
+	}
+
+	public void onEventMainThread(ContainerSessionEnqueueEvent event) {
+		refresh();
 	}
 
 	@Override
