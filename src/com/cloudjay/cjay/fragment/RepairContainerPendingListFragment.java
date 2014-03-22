@@ -71,7 +71,6 @@ import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.view.AddContainerDialog;
 
 import de.greenrobot.event.EventBus;
-import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 

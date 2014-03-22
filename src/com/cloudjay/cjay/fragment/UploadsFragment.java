@@ -22,7 +22,6 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadsListBaseAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
-import com.cloudjay.cjay.events.ContainerSessionUploadedEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DataCenter;
@@ -102,11 +101,6 @@ public class UploadsFragment extends SherlockFragment implements
 
 	public void onEvent(ContainerSessionEnqueueEvent event) {
 		Logger.Log("onEvent ContainerSessionEnqueueEvent");
-		updateUI();
-	}
-
-	public void onEvent(ContainerSessionUploadedEvent event) {
-		Logger.Log("onEvent ContainerSessionUploadedEvent");
 		updateUI();
 	}
 

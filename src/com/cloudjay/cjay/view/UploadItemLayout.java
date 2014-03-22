@@ -9,8 +9,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.util.Logger;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import de.greenrobot.event.EventBus;
 
@@ -20,7 +22,6 @@ public class UploadItemLayout extends LinearLayout {
 
 	public UploadItemLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		EventBus.getDefault().register(this);
 	}
 
 	public TextView getCaptionTextView() {
@@ -43,12 +44,10 @@ public class UploadItemLayout extends LinearLayout {
 		return (TextView) findViewById(R.id.tv_photo_tags);
 	}
 
-	public void onEventMainThread(UploadStateChangedEvent event) {
-
-		if (mContainerSession == event.getContainerSession()) {
-			refreshUploadUi();
-		}
-
+	// Use to trigger refresh layout
+	public void onEvent(ContainerSessionUpdatedEvent event) {
+		Logger.Log("on Event ContainerSessionUpdatedEvent");
+		refreshUploadUi();
 	}
 
 	public void refreshUploadUi() {
@@ -128,9 +127,15 @@ public class UploadItemLayout extends LinearLayout {
 	}
 
 	@Override
+	protected void onAttachedToWindow() {
+		EventBus.getDefault().register(this);
+		super.onAttachedToWindow();
+	}
+
+	@Override
 	protected void onDetachedFromWindow() {
-		super.onDetachedFromWindow();
 		EventBus.getDefault().unregister(this);
+		super.onDetachedFromWindow();
 	}
 
 }

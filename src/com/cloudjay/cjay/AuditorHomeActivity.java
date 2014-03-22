@@ -18,9 +18,7 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
-import com.cloudjay.cjay.fragment.AuditorReportingListFragment;
-import com.cloudjay.cjay.fragment.AuditorReportingListFragment_;
-import com.cloudjay.cjay.fragment.UploadsFragment_;
+import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
 

@@ -85,7 +85,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		}
 	}, new Patch() {
 			// version = 2
-
 		public void apply(SQLiteDatabase db) {
 			// Add column `upload_type` in table `container_session`
 			db.execSQL("ALTER TABLE container_session ADD COLUMN upload_type INTEGER DEFAULT 0");

@@ -114,10 +114,10 @@ public class PhotoGridViewActivity extends CJayActivity implements
 
 			if (sourceTag.equals(GateImportListFragment.LOG_TAG)) {
 
-				mContainerSession.setUploadState(ContainerSession.TYPE_IN);
+				mContainerSession.setUploadType(ContainerSession.TYPE_IN);
 				mContainerSession.setOnLocal(false);
 			} else {
-				mContainerSession.setUploadState(ContainerSession.TYPE_OUT);
+				mContainerSession.setUploadType(ContainerSession.TYPE_OUT);
 				mContainerSession
 						.setCheckOutTime(StringHelper
 								.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));

@@ -5,7 +5,6 @@
 
 package com.cloudjay.cjay.fragment;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.androidannotations.annotations.AfterViews;
@@ -29,11 +28,9 @@ import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.*;
-import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;

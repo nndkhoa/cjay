@@ -19,7 +19,6 @@ import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
 
-import android.R.integer;
 import android.app.IntentService;
 import android.content.Intent;
 import android.net.Uri;
@@ -30,7 +29,7 @@ import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
-import com.cloudjay.cjay.events.ContainerSessionUploadedEvent;
+import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -88,7 +87,10 @@ public class UploadIntentService extends IntentService implements
 		}
 	}
 
-	public void onEventMainThread(UploadStateChangedEvent event) {
+	// Use to clear item
+	public void onEvent(UploadStateChangedEvent event) {
+
+		Logger.e("onEvent UploadStateChangedEvent");
 		ContainerSession containerSession = event.getContainerSession();
 
 		switch (containerSession.getUploadState()) {
@@ -96,12 +98,7 @@ public class UploadIntentService extends IntentService implements
 			break;
 
 		case ContainerSession.STATE_UPLOAD_COMPLETED:
-			//
-
 		case ContainerSession.STATE_UPLOAD_ERROR:
-			// startNextUploadOrFinish();
-			// // Fall through...
-
 		case ContainerSession.STATE_UPLOAD_WAITING:
 
 			try {
@@ -119,9 +116,15 @@ public class UploadIntentService extends IntentService implements
 			}
 			break;
 		}
+
+		EventBus.getDefault().post(
+				new ContainerSessionUpdatedEvent(containerSession));
+
 	}
 
 	public void rollbackContainerState(ContainerSession containerSession) {
+
+		Logger.w("Rolling back");
 
 		int type = containerSession.getUploadType();
 		switch (type) {
@@ -208,8 +211,13 @@ public class UploadIntentService extends IntentService implements
 		containerSession
 				.setUploadState(ContainerSession.STATE_UPLOAD_COMPLETED);
 
-		EventBus.getDefault().post(
-				new ContainerSessionUploadedEvent(containerSession));
+		// try {
+		// containerSessionDaoImpl.update(containerSession);
+		// } catch (SQLException e) {
+		// Logger.e("Cannot change State to `COMPLETE`. Process will be stopped.");
+		// e.printStackTrace();
+		// return;
+		// }
 	}
 
 	@Override

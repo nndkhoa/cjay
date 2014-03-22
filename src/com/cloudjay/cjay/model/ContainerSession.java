@@ -16,6 +16,7 @@ import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DatabaseHelper;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
@@ -222,6 +223,7 @@ public class ContainerSession {
 
 	public void setUploadState(int state) {
 
+		Logger.w("Change upload state to " + Integer.toString(state));
 		if (mState != state) {
 			mState = state;
 
@@ -240,6 +242,11 @@ public class ContainerSession {
 
 			notifyUploadStateListener();
 		}
+	}
+
+	private void notifyUploadStateListener() {
+		Logger.e("notifyUploadStateListener");
+		EventBus.getDefault().post(new UploadStateChangedEvent(this));
 	}
 
 	public void setUploadProgress(int progress) {
@@ -368,10 +375,6 @@ public class ContainerSession {
 
 	public void setUploadConfirmation(boolean uploadConfirmation) {
 		this.uploadConfirmation = uploadConfirmation;
-	}
-
-	private void notifyUploadStateListener() {
-		EventBus.getDefault().post(new UploadStateChangedEvent(this));
 	}
 
 	public boolean isCleared() {
