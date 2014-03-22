@@ -122,9 +122,9 @@ public class UploadIntentService extends IntentService implements
 
 	public void rollbackContainerState(ContainerSession containerSession) {
 
-		Logger.w("Rolling back");
-
 		int type = containerSession.getUploadType();
+		Logger.w("Rolling back type: " + Integer.toString(type));
+
 		switch (type) {
 		case ContainerSession.TYPE_IN:
 			containerSession.setOnLocal(false);
@@ -141,7 +141,7 @@ public class UploadIntentService extends IntentService implements
 		}
 
 		containerSession.setUploadConfirmation(false);
-		containerSession.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+		containerSession.setUploadState(ContainerSession.STATE_NONE);
 	}
 
 	/**

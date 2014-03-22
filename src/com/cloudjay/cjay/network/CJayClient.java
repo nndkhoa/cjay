@@ -377,10 +377,10 @@ public class CJayClient implements ICJayClient {
 			throws NoConnectionException, NullSessionException,
 			MismatchDataException, ServerInternalErrorException {
 
-		if (Utils.hasNoConnection(ctx)) {
-			Logger.Log("Network is not available");
-			throw new NoConnectionException();
-		}
+		// if (Utils.hasNoConnection(ctx)) {
+		// Logger.Log("Network is not available");
+		// throw new NoConnectionException();
+		// }
 
 		String ret = "";
 		String accessToken = CJaySession.restore(ctx).getAccessToken();
@@ -430,6 +430,7 @@ public class CJayClient implements ICJayClient {
 
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+			throw new NoConnectionException();
 		} catch (ExecutionException e) {
 			e.printStackTrace();
 		}

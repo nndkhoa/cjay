@@ -46,8 +46,9 @@ public class UploadsFragment extends SherlockFragment implements
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+		
 		EventBus.getDefault().register(this);
+		super.onCreate(savedInstanceState);
 
 		try {
 			if (null == containerSessionDaoImpl)
@@ -107,6 +108,7 @@ public class UploadsFragment extends SherlockFragment implements
 
 	public void onEvent(UploadStateChangedEvent event) {
 		Logger.Log("onEvent UploadStateChangedEvent");
+		Logger.e("Refrest UploadsFragment UI");
 		updateUI();
 	}
 

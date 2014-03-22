@@ -224,6 +224,7 @@ public class ContainerSession {
 	public void setUploadState(int state) {
 
 		Logger.w("Change upload state to " + Integer.toString(state));
+
 		if (mState != state) {
 			mState = state;
 
@@ -232,13 +233,10 @@ public class ContainerSession {
 				break;
 
 			case STATE_UPLOAD_COMPLETED:
-				// Set Container Big Picture Display = null
-
 				break;
+
 			case STATE_UPLOAD_WAITING:
 				mProgress = -1;
-				
-				
 				break;
 			}
 
@@ -247,8 +245,10 @@ public class ContainerSession {
 	}
 
 	private void notifyUploadStateListener() {
+
 		Logger.e("notifyUploadStateListener");
 		EventBus.getDefault().post(new UploadStateChangedEvent(this));
+
 	}
 
 	public void setUploadProgress(int progress) {
