@@ -237,6 +237,8 @@ public class ContainerSession {
 				break;
 			case STATE_UPLOAD_WAITING:
 				mProgress = -1;
+				
+				
 				break;
 			}
 
