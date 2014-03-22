@@ -102,9 +102,7 @@ public class UploadIntentService extends IntentService implements
 		case ContainerSession.STATE_UPLOAD_WAITING:
 
 			try {
-				Logger.Log("onEventMainThread UploadStateChangedEvent event");
 				containerSessionDaoImpl.update(containerSession);
-
 			} catch (SQLException e) {
 
 				e.printStackTrace();
@@ -240,6 +238,7 @@ public class UploadIntentService extends IntentService implements
 			e.printStackTrace();
 		}
 
+		EventBus.getDefault().register(this);
 		super.onCreate();
 	}
 
@@ -252,6 +251,7 @@ public class UploadIntentService extends IntentService implements
 			e.printStackTrace();
 		}
 
+		EventBus.getDefault().unregister(this);
 		super.onDestroy();
 	}
 

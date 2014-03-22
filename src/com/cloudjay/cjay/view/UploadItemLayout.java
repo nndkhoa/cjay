@@ -46,7 +46,7 @@ public class UploadItemLayout extends LinearLayout {
 
 	// Use to trigger refresh layout
 	public void onEvent(ContainerSessionUpdatedEvent event) {
-		Logger.Log("on Event ContainerSessionUpdatedEvent");
+		Logger.Log("onEvent ContainerSessionUpdatedEvent");
 		refreshUploadUi();
 	}
 

@@ -243,16 +243,18 @@ public class Utils {
 	}
 
 	public static void backupDatabase(String username) {
+
+		Logger.Log("Backing up database ...");
 		try {
 			File sd = Environment.getExternalStorageDirectory();
 			File data = Environment.getDataDirectory();
 
 			if (sd.canWrite()) {
 				String currentDBPath = "//data//com.cloudjay.cjay//databases//cjay.db";
-				String backupDBPath = "cjay"
+				String backupDBPath = "cjay-"
 						+ StringHelper
 								.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE)
-						+ username + ".db";
+						+ "-" + username + ".db";
 				File currentDB = new File(data, currentDBPath);
 				File backupDB = new File(sd, backupDBPath);
 
