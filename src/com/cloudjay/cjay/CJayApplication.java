@@ -55,7 +55,7 @@ public class CJayApplication extends Application {
 		// Configure Logger
 		Logger.getInstance().setDebuggable(true);
 		Ion.getDefault(getBaseContext()).configure()
-				.setLogging("Network Module", Log.DEBUG);
+				.setLogging("Network Module", Log.INFO);
 
 		super.onCreate();
 		databaseManager = new DatabaseManager();

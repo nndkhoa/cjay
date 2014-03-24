@@ -30,19 +30,21 @@ public class UpdateReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
+
 		Logger.Log("onReceive()");
 		mContext = context;
 
-		CJaySession session = CJaySession.restore(context);
-
-		if (null != session && Utils.checkPlayServices(context)) {
-			gcm = GoogleCloudMessaging.getInstance(context);
-			regid = Utils.getRegistrationId(context);
-
-			if (regid.isEmpty()) {
-				registerInBackground();
-			}
-		}
+		// CJaySession session = CJaySession.restore(context);
+		//
+		// if (null != session && Utils.checkPlayServices(context)) {
+		//
+		// gcm = GoogleCloudMessaging.getInstance(context);
+		// regid = Utils.getRegistrationId(context);
+		//
+		// if (regid.isEmpty()) {
+		// registerInBackground();
+		// }
+		// }
 	}
 
 	/**

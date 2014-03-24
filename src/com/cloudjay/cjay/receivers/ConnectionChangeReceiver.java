@@ -18,9 +18,10 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 
+		Logger.w("on Connection change receiver");
 		if (NetworkHelper.isConnected(context)) {
-			Logger.Log("Connected to Internet");
 
+			Logger.Log("Connected to Internet");
 			PreferencesUtil.storePrefsValue(context,
 					PreferencesUtil.PREF_NO_CONNECTION, false);
 
@@ -33,12 +34,14 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
 					.show();
 
 		} else {
+
 			Logger.Log("Not connect to Internet");
 
 			// Mark that device has no data connection
 			PreferencesUtil.storePrefsValue(context,
 					PreferencesUtil.PREF_NO_CONNECTION, true);
 
+			// BUG: alarm is always running :|
 			if (Utils.isAlarmUp(context)) {
 				Logger.Log("Alarm Manager is running.");
 				Utils.cancelAlarm(context);

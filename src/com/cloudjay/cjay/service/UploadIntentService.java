@@ -142,6 +142,14 @@ public class UploadIntentService extends IntentService implements
 
 		containerSession.setUploadConfirmation(false);
 		containerSession.setUploadState(ContainerSession.STATE_NONE);
+
+		try {
+			containerSessionDaoImpl.update(containerSession);
+		} catch (SQLException e) {
+			Logger.Log("Error when rolling back container "
+					+ containerSession.getContainerId());
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -209,13 +217,6 @@ public class UploadIntentService extends IntentService implements
 		containerSession
 				.setUploadState(ContainerSession.STATE_UPLOAD_COMPLETED);
 
-		// try {
-		// containerSessionDaoImpl.update(containerSession);
-		// } catch (SQLException e) {
-		// Logger.e("Cannot change State to `COMPLETE`. Process will be stopped.");
-		// e.printStackTrace();
-		// return;
-		// }
 	}
 
 	@Override
