@@ -190,10 +190,10 @@ public class Utils {
 	}
 
 	public static boolean hasNoConnection(final Context context) {
-		
+
 		return context.getSharedPreferences(PreferencesUtil.PREFS, 0)
 				.getBoolean(PreferencesUtil.PREF_NO_CONNECTION, false) == true;
-		
+
 	}
 
 	public static void startAlarm(Context context) {
@@ -204,6 +204,7 @@ public class Utils {
 		Intent intent = new Intent(context, QueueIntentService_.class);
 		PendingIntent pintent = PendingIntent.getService(context, 0, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
+
 		Calendar current = Calendar.getInstance();
 		AlarmManager alarm = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
@@ -218,8 +219,8 @@ public class Utils {
 		Logger.Log("stop Alarm Manager");
 
 		Intent intent = new Intent(context, QueueIntentService_.class);
-		PendingIntent sender = PendingIntent
-				.getBroadcast(context, 0, intent, 0);
+		PendingIntent sender = PendingIntent.getService(context, 0, intent,
+				PendingIntent.FLAG_UPDATE_CURRENT);
 
 		AlarmManager alarmManager = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
@@ -229,8 +230,9 @@ public class Utils {
 
 	public static boolean isAlarmUp(Context context) {
 
-		return PendingIntent.getService(context, 0, new Intent(context,
-				QueueIntentService_.class), PendingIntent.FLAG_NO_CREATE) != null;
+		Intent intent = new Intent(context, QueueIntentService_.class);
+		return PendingIntent.getService(context, 0, intent,
+				PendingIntent.FLAG_NO_CREATE) != null;
 
 	}
 
