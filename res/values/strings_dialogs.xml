@@ -1,5 +1,5 @@
 <resources>
-    
+
     <!-- Strings related to dialog -->
     <string name="dialog_new_container_title">Thông tin Container</string>
     <string name="dialog_new_container">Tạo Container</string>
@@ -7,15 +7,14 @@
     <string name="dialog_container_owner">Hãng tàu</string>
     <string name="dialog_container_cancel">Cancel</string>
     <string name="dialog_container_ok">OK</string>
-    
     <string name="dialog_container_id_required">Xin nhập Container ID</string>
+    <string name="dialog_container_id_invalid">Container ID không hợp lệ</string>
     <string name="dialog_container_owner_required">Xin chọn hãng tàu</string>
-    
     <string name="dialog_operator_title">Chọn hãng tàu</string>
-    
+
     <string-array name="dialog_container_owner_list">
         <item>CBHU</item>
         <item>TTNU</item>
     </string-array>
-    
+
 </resources>

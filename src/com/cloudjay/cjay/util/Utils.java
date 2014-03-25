@@ -9,6 +9,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -36,6 +38,19 @@ public class Utils {
 	private static final String PROPERTY_REG_ID = "registration_id";
 	private static final String PROPERTY_CURRENT_USER_ID = "current_user_id";
 	private static final String PROPERTY_APP_VERSION = "appVersion";
+
+	public static boolean validateContainerId(String containerId) {
+
+		// Pattern pattern = Pattern.compile("[^@]+@[^@]+");
+		Pattern pattern = Pattern.compile("^([A-Z]+)+(\\d+)$");
+		Matcher matcher = pattern.matcher(containerId);
+
+		if (!matcher.matches()) {
+			return false;
+		}
+
+		return true;
+	}
 
 	public static String replaceNullBySpace(String in) {
 		return (in == null || in.equals("") ? " " : in);

@@ -3,7 +3,6 @@ package com.cloudjay.cjay.receivers;
 import org.androidannotations.annotations.EReceiver;
 
 import com.aerilys.helpers.android.NetworkHelper;
-import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;

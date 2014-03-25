@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.util.Utils;
 
 @SuppressLint("DefaultLocale")
 public class AddContainerDialog extends SherlockDialogFragment {
@@ -94,6 +95,7 @@ public class AddContainerDialog extends SherlockDialogFragment {
 				}
 			}
 		});
+
 		mOperatorEditText.setOnTouchListener(new OnTouchListener() {
 			@Override
 			public boolean onTouch(View view, MotionEvent event) {
@@ -103,6 +105,7 @@ public class AddContainerDialog extends SherlockDialogFragment {
 				return true;
 			}
 		});
+
 		mOperatorEditText.setOnKeyListener(new OnKeyListener() {
 			@Override
 			public boolean onKey(View view, int keyCode, KeyEvent event) {
@@ -113,12 +116,21 @@ public class AddContainerDialog extends SherlockDialogFragment {
 				return false;
 			}
 		});
+
 		mOkButton.setOnClickListener(new OnClickListener() {
+
 			@Override
 			public void onClick(View v) {
+
 				mContainerId = mContainerEditText.getText().toString()
 						.toUpperCase();
 				mOperatorName = mOperatorEditText.getText().toString();
+
+				if (!Utils.validateContainerId(mContainerId)) {
+					mContainerEditText
+							.setError(getString(R.string.dialog_container_id_invalid));
+					return;
+				}
 
 				mContainerEditText.setError(null);
 				mOperatorEditText.setError(null);
@@ -126,10 +138,13 @@ public class AddContainerDialog extends SherlockDialogFragment {
 				if (TextUtils.isEmpty(mContainerId)) {
 					mContainerEditText
 							.setError(getString(R.string.dialog_container_id_required));
+
 				} else if (isOperatorRequired
 						&& TextUtils.isEmpty(mOperatorName)) {
+
 					mOperatorEditText
 							.setError(getString(R.string.dialog_container_owner_required));
+
 				} else {
 					mCallback = (AddContainerDialogListener) getActivity();
 					mCallback.OnContainerInputCompleted(mParent, mContainerId,
@@ -137,7 +152,9 @@ public class AddContainerDialog extends SherlockDialogFragment {
 					dismiss();
 				}
 			}
+
 		});
+
 		mCancelButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

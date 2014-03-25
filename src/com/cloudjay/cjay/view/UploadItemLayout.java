@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
-import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.util.Logger;
 import com.nostra13.universalimageloader.core.ImageLoader;
