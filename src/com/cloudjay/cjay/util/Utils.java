@@ -199,19 +199,24 @@ public class Utils {
 	public static void startAlarm(Context context) {
 
 		Logger.Log("start Alarm Manager");
-
-		// Making Alarm for Queue Worker
-		Intent intent = new Intent(context, QueueIntentService_.class);
-		PendingIntent pintent = PendingIntent.getService(context, 0, intent,
-				PendingIntent.FLAG_UPDATE_CURRENT);
-
-		Calendar current = Calendar.getInstance();
 		AlarmManager alarm = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
 
+		// Making Alarm for Queue Worker
+		Intent intent = new Intent(context, QueueIntentService_.class);
+		PendingIntent pintent = PendingIntent.getService(context,
+				CJayConstant.ALARM_ID, intent,
+				PendingIntent.FLAG_UPDATE_CURRENT);
+
+		Calendar cal = Calendar.getInstance();
+
+		// start 30 seconds after boot completed
+		cal.add(Calendar.SECOND, 30);
+
 		// Start every 10 seconds
-		alarm.setRepeating(AlarmManager.RTC_WAKEUP, current.getTimeInMillis(),
-				10 * 1000, pintent);
+		// InexactRepeating allows Android to optimize the energy consumption
+		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP,
+				cal.getTimeInMillis(), 10 * 1000, pintent);
 	}
 
 	public static void cancelAlarm(Context context) {
@@ -219,19 +224,26 @@ public class Utils {
 		Logger.Log("stop Alarm Manager");
 
 		Intent intent = new Intent(context, QueueIntentService_.class);
-		PendingIntent sender = PendingIntent.getService(context, 0, intent,
+		PendingIntent sender = PendingIntent.getService(context,
+				CJayConstant.ALARM_ID, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 
 		AlarmManager alarmManager = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
 
 		alarmManager.cancel(sender);
+		sender.cancel();
+
+		// Intent stopServiceIntent = new Intent(context,
+		// QueueIntentService_.class);
+		// context.stopService(stopServiceIntent);
 	}
 
 	public static boolean isAlarmUp(Context context) {
 
 		Intent intent = new Intent(context, QueueIntentService_.class);
-		return PendingIntent.getService(context, 0, intent,
+		// intent.setAction(CJayConstant.CUSTOM_INTENT);
+		return PendingIntent.getService(context, CJayConstant.ALARM_ID, intent,
 				PendingIntent.FLAG_NO_CREATE) != null;
 
 	}

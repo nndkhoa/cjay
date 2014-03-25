@@ -46,10 +46,14 @@ public class CJayApplication extends Application {
 
 	IDatabaseManager databaseManager = null;
 	IHttpRequestWrapper httpRequestWrapper = null;
+	static Context mContext = null;
+
+	public static Context getContext() {
+		return mContext;
+	}
 
 	@Override
 	public void onCreate() {
-
 		Logger.Log("Start Application");
 
 		// Configure Logger
@@ -89,9 +93,16 @@ public class CJayApplication extends Application {
 			CJayConstant.HIDDEN_APP_DIRECTORY_FILE.mkdir();
 
 		// Configure Alarm Manager
-		if (!Utils.isAlarmUp(getApplicationContext())) {
-			Logger.Log("Alarm Manager is not running.");
-			Utils.startAlarm(getApplicationContext());
+		mContext = getApplicationContext();
+		if (!Utils.isAlarmUp(mContext)) {
+
+			Logger.w("Alarm Manager is not running.");
+			Utils.startAlarm(mContext);
+
+		} else {
+			Logger.w("Alarm Manager is running");
+			Utils.cancelAlarm(mContext);
+
 		}
 
 		if (NetworkHelper.isConnected(this)) {
@@ -185,7 +196,6 @@ public class CJayApplication extends Application {
 			pInfo = ctx.getPackageManager().getPackageInfo(
 					ctx.getPackageName(), 0);
 		} catch (NameNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return pInfo.versionName;

@@ -2,7 +2,9 @@ package com.cloudjay.cjay.util;
 
 import java.io.File;
 
+import android.R.integer;
 import android.os.Environment;
+import android.view.ViewDebug.IntToString;
 
 public final class CJayConstant {
 
@@ -71,4 +73,8 @@ public final class CJayConstant {
 	public static final int CURSOR_LOADER_ID_REPAIR_PENDING = 4;
 	public static final int CURSOR_LOADER_ID_REPAIR_FIXED = 5;
 	public static final int CURSOR_LOADER_ID_PHOTO_GRIDVIEW = 6;
+
+	// ALARM ID
+	public static final int ALARM_ID = 49482;
+	public static final String CUSTOM_INTENT = "com.cloudjay.cjay.CUSTOM_INTENT";
 }

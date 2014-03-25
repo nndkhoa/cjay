@@ -3,6 +3,7 @@ package com.cloudjay.cjay.receivers;
 import org.androidannotations.annotations.EReceiver;
 
 import com.aerilys.helpers.android.NetworkHelper;
+import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
@@ -25,9 +26,9 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
 			PreferencesUtil.storePrefsValue(context,
 					PreferencesUtil.PREF_NO_CONNECTION, false);
 
-			if (!Utils.isAlarmUp(context)) {
+			if (!Utils.isAlarmUp(CJayApplication.getContext())) {
 				Logger.Log("Alarm Manager is not running.");
-				Utils.startAlarm(context);
+				Utils.startAlarm(CJayApplication.getContext());
 			}
 
 			Toast.makeText(context, "Connected to Internet", Toast.LENGTH_SHORT)
@@ -42,9 +43,9 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
 					PreferencesUtil.PREF_NO_CONNECTION, true);
 
 			// BUG: alarm is always running :|
-			if (Utils.isAlarmUp(context)) {
+			if (Utils.isAlarmUp(CJayApplication.getContext())) {
 				Logger.Log("Alarm Manager is running.");
-				Utils.cancelAlarm(context);
+				Utils.cancelAlarm(CJayApplication.getContext());
 			}
 
 			Toast.makeText(context, "Not connect to Internet",

@@ -469,7 +469,7 @@ public class CJayClient implements ICJayClient {
 		try {
 			Response<JsonObject> response = Ion
 					.with(ctx, CJayConstant.API_ADD_GCM_DEVICE)
-					.setHeader("Authorization ", accessToken)
+					.setHeader("Authorization ", "Token " + accessToken)
 					.setHeader("CJAY_VERSION",
 							CJayApplication.getAppVersion(ctx))
 					.setHeader("CJAY_USERNAME", user.getUserName())
