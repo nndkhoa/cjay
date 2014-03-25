@@ -156,6 +156,7 @@ public class CJayClient implements ICJayClient {
 
 			switch (response.getHeaders().getResponseCode()) {
 			case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
+			case HttpStatus.SC_UNAUTHORIZED:
 				throw new NullSessionException();
 
 			case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi
@@ -201,6 +202,7 @@ public class CJayClient implements ICJayClient {
 
 			switch (response.getHeaders().getResponseCode()) {
 			case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
+			case HttpStatus.SC_UNAUTHORIZED:
 				throw new NullSessionException();
 
 			case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi
@@ -246,6 +248,7 @@ public class CJayClient implements ICJayClient {
 
 			switch (response.getHeaders().getResponseCode()) {
 			case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
+			case HttpStatus.SC_UNAUTHORIZED:
 				throw new NullSessionException();
 
 			case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi
@@ -292,6 +295,7 @@ public class CJayClient implements ICJayClient {
 
 			switch (response.getHeaders().getResponseCode()) {
 			case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
+			case HttpStatus.SC_UNAUTHORIZED:
 				throw new NullSessionException();
 
 			case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi
@@ -335,6 +339,7 @@ public class CJayClient implements ICJayClient {
 
 			switch (response.getHeaders().getResponseCode()) {
 			case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
+			case HttpStatus.SC_UNAUTHORIZED:
 				throw new NullSessionException();
 
 			case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi
@@ -457,14 +462,14 @@ public class CJayClient implements ICJayClient {
 		UUID deviceUuid = new UUID(androidId.hashCode(), androidId.hashCode());
 		String deviceId = deviceUuid.toString();
 
-		JSONObject requestPacket = new JSONObject();
-		requestPacket.put("registration_id", regid);
-		requestPacket.put("device_id", deviceId);
-		requestPacket.put("app_code", "CJAY");
-		requestPacket.put("name", android.os.Build.MODEL);
-
 		User user = CJaySession.restore(ctx).getCurrentUser();
 		String accessToken = user.getAccessToken();
+
+		JsonObject requestPacket = new JsonObject();
+		requestPacket.addProperty("registration_id", regid);
+		requestPacket.addProperty("device_id", deviceId);
+		requestPacket.addProperty("app_code", "CJAY");
+		requestPacket.addProperty("name", android.os.Build.MODEL);
 
 		try {
 			Response<JsonObject> response = Ion
@@ -486,6 +491,7 @@ public class CJayClient implements ICJayClient {
 
 			switch (response.getHeaders().getResponseCode()) {
 			case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
+			case HttpStatus.SC_UNAUTHORIZED:
 				throw new NullSessionException();
 
 			case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi

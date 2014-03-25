@@ -58,6 +58,7 @@ public class UpdateReceiver extends BroadcastReceiver {
 		new AsyncTask<Void, Void, String>() {
 			@Override
 			protected String doInBackground(Void... params) {
+
 				String msg = "";
 				try {
 					if (gcm == null) {
