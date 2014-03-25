@@ -26,9 +26,11 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
 			PreferencesUtil.storePrefsValue(context,
 					PreferencesUtil.PREF_NO_CONNECTION, false);
 
-			if (!Utils.isAlarmUp(CJayApplication.getContext())) {
+			if (!Utils.isAlarmUp(context)) {
+
 				Logger.Log("Alarm Manager is not running.");
-				Utils.startAlarm(CJayApplication.getContext());
+				Utils.startAlarm(context);
+
 			}
 
 			Toast.makeText(context, "Connected to Internet", Toast.LENGTH_SHORT)
@@ -43,9 +45,11 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
 					PreferencesUtil.PREF_NO_CONNECTION, true);
 
 			// BUG: alarm is always running :|
-			if (Utils.isAlarmUp(CJayApplication.getContext())) {
+			if (Utils.isAlarmUp(context)) {
+
 				Logger.Log("Alarm Manager is running.");
-				Utils.cancelAlarm(CJayApplication.getContext());
+				Utils.cancelAlarm(context);
+
 			}
 
 			Toast.makeText(context, "Not connect to Internet",

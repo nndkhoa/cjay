@@ -99,10 +99,6 @@ public class CJayApplication extends Application {
 			Logger.w("Alarm Manager is not running.");
 			Utils.startAlarm(mContext);
 
-		} else {
-			Logger.w("Alarm Manager is running");
-			Utils.cancelAlarm(mContext);
-
 		}
 
 		if (NetworkHelper.isConnected(this)) {
