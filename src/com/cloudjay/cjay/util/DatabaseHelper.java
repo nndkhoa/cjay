@@ -2,6 +2,8 @@ package com.cloudjay.cjay.util;
 
 import java.sql.SQLException;
 
+import org.androidannotations.annotations.rest.Get;
+
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -18,6 +20,7 @@ import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.cloudjay.cjay.dao.UploadItem;
 import com.cloudjay.cjay.dao.UploadItemDaoImpl;
 import com.cloudjay.cjay.dao.UserDaoImpl;
+import com.cloudjay.cjay.dao.UserLogDaoImpl;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.Container;
@@ -64,6 +67,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	RepairCodeDaoImpl repairCodeDaoImpl = null;
 	ComponentCodeDaoImpl componentCodeDaoImpl = null;
 	UploadItemDaoImpl uploadItemDeoImpl = null;
+	UserLogDaoImpl userLogDaoImpl = null;
 
 	private static class Patch {
 
@@ -359,4 +363,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		return uploadItemDeoImpl;
 	}
 
+	public UserLogDaoImpl getUserLogDaoImpl() throws SQLException {
+
+		if (null == userLogDaoImpl) {
+			userLogDaoImpl = DaoManager.createDao(this.getConnectionSource(),
+					UserLog.class);
+		}
+
+		return userLogDaoImpl;
+	}
 }
