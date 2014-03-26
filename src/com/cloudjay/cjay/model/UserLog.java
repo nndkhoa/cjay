@@ -14,7 +14,7 @@ public class UserLog {
 	public static final String FIELD_CONTENT = "content";
 	public static final String FIELD_TIME = "time";
 
-	@DatabaseField(id = true, columnName = FIELD_ID)
+	@DatabaseField(generatedId = true, columnName = FIELD_ID, allowGeneratedIdInsert = true)
 	int id;
 
 	@DatabaseField(columnName = FIELD_CONTENT)

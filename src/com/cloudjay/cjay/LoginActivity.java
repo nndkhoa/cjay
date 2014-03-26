@@ -281,6 +281,8 @@ public class LoginActivity extends CJayActivity {
 
 				// Navigate user to Main Activity based on user role
 				Logger.Log("Login successfully");
+				DataCenter.getDatabaseHelper(LoginActivity.this).addUsageLog(
+						"user #login");
 				CJayApplication.startCJayHomeActivity(LoginActivity.this);
 				finish();
 

@@ -501,15 +501,20 @@ public class GateExportListFragment extends SherlockFragment implements
 			protected Void doInBackground(Void... params) {
 
 				Logger.Log("onRefreshStarted");
+
 				try {
 					DataCenter.getInstance().fetchData(getActivity());
 					DataCenter.getDatabaseHelper(getActivity()).addUsageLog(
 							"#refresh in fragment #GateExport");
+
 				} catch (NoConnectionException e) {
+
 					((CJayActivity) getActivity())
 							.showCrouton(R.string.alert_no_network);
 					e.printStackTrace();
+
 				} catch (NullSessionException e) {
+
 					CJayApplication.logOutInstantly(getActivity());
 					onDestroy();
 				}
@@ -519,6 +524,7 @@ public class GateExportListFragment extends SherlockFragment implements
 			@Override
 			protected void onPostExecute(Void result) {
 				super.onPostExecute(result);
+
 				// Notify PullToRefreshLayout that the refresh has finished
 				mPullToRefreshLayout.setRefreshComplete();
 			}

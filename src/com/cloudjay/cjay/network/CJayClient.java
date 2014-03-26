@@ -88,6 +88,8 @@ public class CJayClient implements ICJayClient {
 					.setBodyParameter("password", password).asJsonObject()
 					.get();
 
+			Logger.w(result.toString());
+
 			token = result.get("token").getAsString();
 
 		} catch (InterruptedException e) {
