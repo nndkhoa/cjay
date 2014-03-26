@@ -2,7 +2,6 @@ package com.cloudjay.cjay.util;
 
 import java.io.File;
 
-import android.R.integer;
 import android.os.Environment;
 
 public final class CJayConstant {
