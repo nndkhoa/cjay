@@ -8,26 +8,32 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
+import com.cloudjay.cjay.adapter.UserLogCursorAdapter;
+import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.CJayCursorLoader;
+import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.UploadCursorLoader;
+
 import android.os.Bundle;
-import android.app.Activity;
+import android.content.Loader;
 import android.database.Cursor;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.text.util.Linkify;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FilterQueryProvider;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 @EActivity(R.layout.activity_user_log)
-public class UserLogActivity extends Activity implements
-		LoaderCallbacks<Cursor> {
+public class UserLogActivity extends CJayActivity implements
+		android.app.LoaderManager.LoaderCallbacks<Cursor> {
 
 	@ViewById(R.id.btn_search)
 	Button searchButton;
@@ -40,6 +46,10 @@ public class UserLogActivity extends Activity implements
 
 	public static ArrayList<String> userLogs = new ArrayList<String>();
 	ArrayAdapter<String> adapter;
+
+	UserLogCursorAdapter cursorAdapter;
+	private int mItemLayout = R.layout.list_item_container;
+	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_USER_LOG;
 
 	@AfterViews
 	void initialize() {
@@ -75,6 +85,25 @@ public class UserLogActivity extends Activity implements
 		};
 
 		listView.setAdapter(adapter);
+
+		getLoaderManager().initLoader(LOADER_ID, null, this);
+
+		searchEditText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				if (cursorAdapter != null) {
+					cursorAdapter.getFilter().filter(arg0.toString());
+				}
+			}
+
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+			}
+
+			public void onTextChanged(CharSequence s, int start, int before,
+					int count) {
+			}
+		});
 	}
 
 	@Click(R.id.btn_search)
@@ -92,16 +121,56 @@ public class UserLogActivity extends Activity implements
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
-		return null;
+
+		return new UploadCursorLoader(this) {
+
+			@Override
+			public Cursor loadInBackground() {
+
+				Cursor cursor = DataCenter.getInstance().getUserLogCursor(
+						getContext());
+
+				if (cursor != null) {
+
+					// Ensure the cursor window is filled
+					cursor.getCount();
+					cursor.registerContentObserver(mObserver);
+				}
+
+				return cursor;
+			}
+		};
 	}
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor arg1) {
+		if (cursorAdapter == null) {
+			cursorAdapter = new UserLogCursorAdapter(this, mItemLayout, arg1, 0);
+
+			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+
+				@Override
+				public Cursor runQuery(CharSequence constraint) {
+					return null;
+
+					// return
+					// DataCenter.getInstance().filterCheckoutCursor(this,
+					// constraint);
+				}
+
+			});
+
+			listView.setAdapter(cursorAdapter);
+
+		} else {
+			cursorAdapter.swapCursor(arg1);
+		}
 
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> arg0) {
+		cursorAdapter.swapCursor(null);
 
 	}
 }

@@ -37,10 +37,12 @@ import de.greenrobot.event.EventBus;
 public class UploadsFragment extends SherlockFragment implements
 		OnDismissCallback, OnItemClickListener {
 
-	private UploadsListBaseAdapter mAdapter;
+	UploadsListBaseAdapter mAdapter;
 	ContainerSessionDaoImpl containerSessionDaoImpl = null;
 	List<ContainerSession> listContainerSessions = null;
 
+	
+	
 	public UploadsFragment() {
 	}
 

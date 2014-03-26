@@ -9,10 +9,14 @@ public class UserLog {
 
 	public static final String FIELD_ID = "_id";
 	public static final String FIELD_CONTENT = "content";
+	public static final String FIELD_TIME = "time";
 
 	@DatabaseField(id = true, columnName = FIELD_ID)
 	int id;
 
-	@DatabaseField(columnName = FIELD_CONTENT, index = true)
+	@DatabaseField(columnName = FIELD_CONTENT)
 	String content;
+
+	@DatabaseField(columnName = FIELD_TIME)
+	String time;
 }
