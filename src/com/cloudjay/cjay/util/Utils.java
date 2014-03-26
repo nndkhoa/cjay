@@ -3,6 +3,7 @@ package com.cloudjay.cjay.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -275,6 +276,9 @@ public class Utils {
 	public static void backupDatabase(String username) {
 
 		Logger.Log("Backing up database ...");
+
+		FileChannel src = null;
+		FileChannel dst = null;
 		try {
 			File sd = Environment.getExternalStorageDirectory();
 			File data = Environment.getDataDirectory();
@@ -289,19 +293,31 @@ public class Utils {
 				File backupDB = new File(sd, backupDBPath);
 
 				if (currentDB.exists()) {
-					FileChannel src = new FileInputStream(currentDB)
-							.getChannel();
-					FileChannel dst = new FileOutputStream(backupDB)
-							.getChannel();
+					src = new FileInputStream(currentDB).getChannel();
+
+					dst = new FileOutputStream(backupDB).getChannel();
+
 					dst.transferFrom(src, 0, src.size());
-					src.close();
-					dst.close();
 				} else {
 					Logger.e("Current database do not exist");
 				}
 			}
 		} catch (Exception e) {
+
 			e.printStackTrace();
+
+		} finally {
+			try {
+				src.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			try {
+				dst.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

@@ -289,6 +289,15 @@ public class DataCenter {
 				queryString, new String[] { constraint + "%" });
 	}
 
+	public Cursor filterUserLogCursor(Context context, CharSequence constraint) {
+
+		String queryString = "SELECT * FROM user_log"
+				+ " WHERE content LIKE ? ORDER BY content LIMIT 100";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] { constraint + "%" });
+	}
+
 	public Cursor filterCheckoutCursor(Context context, CharSequence constraint) {
 
 		String queryString = "SELECT * FROM cs_export_validation_view"
