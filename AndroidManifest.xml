@@ -160,6 +160,11 @@
                     android:scheme="package" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name="com.cloudjay.cjay.UserLogActivity_"
+            android:label="@string/title_activity_user_log" >
+        </activity>
     </application>
 
 </manifest>

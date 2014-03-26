@@ -126,7 +126,7 @@ public class AddContainerDialog extends SherlockDialogFragment {
 						.toUpperCase();
 				mOperatorName = mOperatorEditText.getText().toString();
 
-				if (!Utils.validateContainerId(mContainerId)) {
+				if (!Utils.isContainerIdValid(mContainerId)) {
 					mContainerEditText
 							.setError(getString(R.string.dialog_container_id_invalid));
 					return;

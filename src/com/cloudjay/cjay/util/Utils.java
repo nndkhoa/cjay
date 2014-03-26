@@ -39,9 +39,8 @@ public class Utils {
 	private static final String PROPERTY_CURRENT_USER_ID = "current_user_id";
 	private static final String PROPERTY_APP_VERSION = "appVersion";
 
-	public static boolean validateContainerId(String containerId) {
+	public static boolean isContainerIdValid(String containerId) {
 
-		// Pattern pattern = Pattern.compile("[^@]+@[^@]+");
 		Pattern pattern = Pattern.compile("^([A-Z]+)+(\\d+)$");
 		Matcher matcher = pattern.matcher(containerId);
 

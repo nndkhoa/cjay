@@ -307,11 +307,13 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 		if (mSelectedContainerSession != null) {
-			
-			Logger.Log("Menu upload item clicked");
-			if (mSelectedContainerSession.isValidForUpload(CJayImage.TYPE_REPORT)) {
 
-				mSelectedContainerSession.setUploadType(ContainerSession.TYPE_AUDIT);
+			Logger.Log("Menu upload item clicked");
+			if (mSelectedContainerSession
+					.isValidForUpload(CJayImage.TYPE_REPORT)) {
+
+				mSelectedContainerSession
+						.setUploadType(ContainerSession.TYPE_AUDIT);
 				CJayApplication.uploadContainerSesison(getActivity(),
 						mSelectedContainerSession);
 
@@ -507,7 +509,6 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 			Logger.Log("is not updating");
 			mLoadMoreDataLayout.setVisibility(View.GONE);
 		}
-
 		super.onResume();
 	}
 
