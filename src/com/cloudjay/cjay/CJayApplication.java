@@ -185,18 +185,6 @@ public class CJayApplication extends Application {
 
 	}
 
-	public static String getAppVersion(Context ctx) {
-
-		PackageInfo pInfo = null;
-		try {
-			pInfo = ctx.getPackageManager().getPackageInfo(
-					ctx.getPackageName(), 0);
-		} catch (NameNotFoundException e) {
-			e.printStackTrace();
-		}
-		return pInfo.versionName;
-	}
-
 	public static void startCJayHomeActivity(Context context) {
 
 		/**

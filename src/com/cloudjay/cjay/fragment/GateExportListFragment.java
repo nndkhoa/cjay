@@ -503,6 +503,8 @@ public class GateExportListFragment extends SherlockFragment implements
 				Logger.Log("onRefreshStarted");
 				try {
 					DataCenter.getInstance().fetchData(getActivity());
+					DataCenter.getDatabaseHelper(getActivity()).addUsageLog(
+							"#refresh in fragment #GateExport");
 				} catch (NoConnectionException e) {
 					((CJayActivity) getActivity())
 							.showCrouton(R.string.alert_no_network);

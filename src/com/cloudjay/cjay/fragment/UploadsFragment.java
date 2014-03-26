@@ -41,14 +41,12 @@ public class UploadsFragment extends SherlockFragment implements
 	ContainerSessionDaoImpl containerSessionDaoImpl = null;
 	List<ContainerSession> listContainerSessions = null;
 
-	
-	
 	public UploadsFragment() {
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		
+
 		EventBus.getDefault().register(this);
 		super.onCreate(savedInstanceState);
 
@@ -138,6 +136,9 @@ public class UploadsFragment extends SherlockFragment implements
 				e.printStackTrace();
 			}
 		}
+
+		DataCenter.getDatabaseHelper(getActivity()).addUsageLog(
+				"Clear list #upload");
 
 		updateUI();
 	}

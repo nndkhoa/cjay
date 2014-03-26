@@ -91,6 +91,7 @@ public class CJaySession {
 	public boolean deleteSession(Context context) {
 
 		Utils.backupDatabase(getCurrentUser().getUserName());
+		DataCenter.getDatabaseHelper(context).addUsageLog("#backup database");
 
 		Logger.Log("deleting session ...");
 		databaseManager = CJayClient.getInstance().getDatabaseManager();
@@ -117,6 +118,7 @@ public class CJaySession {
 				TableUtils.createTable(helper.getConnectionSource(), dataClass);
 			}
 
+			DataCenter.getDatabaseHelper(context).addUsageLog("User #logout");
 			return true;
 		} catch (SQLException e) {
 

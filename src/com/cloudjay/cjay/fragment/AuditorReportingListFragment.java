@@ -137,6 +137,8 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 
 				try {
 					DataCenter.getInstance().fetchData(getActivity());
+					DataCenter.getDatabaseHelper(getActivity()).addUsageLog(
+							"#refresh in fragment #AuditorReporting");
 				} catch (NoConnectionException e) {
 					((CJayActivity) getActivity())
 							.showCrouton(R.string.alert_no_network);
@@ -486,10 +488,6 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 		Logger.Log("onRefresh with LOADER_ID: " + Integer.toString(LOADER_ID));
 
 		getLoaderManager().restartLoader(LOADER_ID, null, this);
-
-		// mFeedListView.setAdapter(cursorAdapter);
-		// cursorAdapter.notifyDataSetChanged();
-		// mFeedListView.invalidateViews();
 
 	}
 

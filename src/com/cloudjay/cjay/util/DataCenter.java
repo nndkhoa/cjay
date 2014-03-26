@@ -87,6 +87,10 @@ public class DataCenter {
 		return instance;
 	}
 
+	public static DatabaseHelper getDatabaseHelper(Context context) {
+		return getInstance().getDatabaseManager().getHelper(context);
+	}
+
 	public void initialize(IDatabaseManager databaseManager) {
 		Logger.Log("initializing ...");
 		this.databaseManager = databaseManager;

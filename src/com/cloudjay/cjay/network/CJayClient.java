@@ -110,11 +110,9 @@ public class CJayClient implements ICJayClient {
 
 		User user = null;
 		try {
-			user = Ion
-					.with(ctx, CJayConstant.CURRENT_USER)
+			user = Ion.with(ctx, CJayConstant.CURRENT_USER)
 					.setHeader("Authorization", "Token " + token)
-					.setHeader("CJAY_VERSION",
-							CJayApplication.getAppVersion(ctx))
+					.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
 					.as(new TypeToken<User>() {
 					}).get();
 
@@ -146,8 +144,7 @@ public class CJayClient implements ICJayClient {
 			Response<List<Operator>> response = Ion
 					.with(ctx, CJayConstant.LIST_OPERATORS)
 					.setHeader("Authorization", "Token " + accessToken)
-					.setHeader("CJAY_VERSION",
-							CJayApplication.getAppVersion(ctx))
+					.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
 					.addQuery("modified_after", date)
 					.as(new TypeToken<List<Operator>>() {
 					}).withResponse().get();
@@ -192,8 +189,7 @@ public class CJayClient implements ICJayClient {
 			Response<List<DamageCode>> response = Ion
 					.with(ctx, CJayConstant.LIST_DAMAGE_CODES)
 					.setHeader("Authorization", "Token " + accessToken)
-					.setHeader("CJAY_VERSION",
-							CJayApplication.getAppVersion(ctx))
+					.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
 					.addQuery("modified_after", date)
 					.as(new TypeToken<List<DamageCode>>() {
 					}).withResponse().get();
@@ -238,8 +234,7 @@ public class CJayClient implements ICJayClient {
 			Response<List<RepairCode>> response = Ion
 					.with(ctx, CJayConstant.LIST_REPAIR_CODES)
 					.setHeader("Authorization", "Token " + accessToken)
-					.setHeader("CJAY_VERSION",
-							CJayApplication.getAppVersion(ctx))
+					.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
 					.addQuery("modified_after", date)
 					.as(new TypeToken<List<RepairCode>>() {
 					}).withResponse().get();
@@ -285,8 +280,7 @@ public class CJayClient implements ICJayClient {
 			Response<List<ComponentCode>> response = Ion
 					.with(ctx, CJayConstant.LIST_COMPONENT_CODES)
 					.setHeader("Authorization", "Token " + accessToken)
-					.setHeader("CJAY_VERSION",
-							CJayApplication.getAppVersion(ctx))
+					.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
 					.addQuery("modified_after", date)
 					.as(new TypeToken<List<ComponentCode>>() {
 					}).withResponse().get();
@@ -329,8 +323,7 @@ public class CJayClient implements ICJayClient {
 			Response<String> response = Ion
 					.with(ctx, CJayConstant.CONTAINER_SESSIONS)
 					.setHeader("Authorization", "Token " + accessToken)
-					.setHeader("CJAY_VERSION",
-							CJayApplication.getAppVersion(ctx))
+					.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
 					.addQuery("page", Integer.toString(page))
 					.addQuery("created_after", date).asString().withResponse()
 					.get();
@@ -380,14 +373,14 @@ public class CJayClient implements ICJayClient {
 			throws NoConnectionException, NullSessionException,
 			MismatchDataException, ServerInternalErrorException {
 
-		// if (Utils.hasNoConnection(ctx)) {
-		// Logger.Log("Network is not available");
-		// throw new NoConnectionException();
-		// }
+		if (Utils.hasNoConnection(ctx)) {
+			Logger.Log("Network is not available");
+			throw new NoConnectionException();
+		}
 
 		String ret = "";
 		String accessToken = CJaySession.restore(ctx).getAccessToken();
-		String appVersion = CJayApplication.getAppVersion(ctx);
+		String appVersion = Utils.getAppVersionName(ctx);
 
 		try {
 
@@ -409,6 +402,15 @@ public class CJayClient implements ICJayClient {
 			Logger.e("Response code: "
 					+ response.getHeaders().getResponseMessage() + " | "
 					+ Integer.toString(response.getHeaders().getResponseCode()));
+
+			getDatabaseManager().getHelper(ctx).addUsageLog(
+					"Container "
+							+ item.getContainerId()
+							+ " | #Response code: "
+							+ response.getHeaders().getResponseMessage()
+							+ " | "
+							+ Integer.toString(response.getHeaders()
+									.getResponseCode()));
 
 			switch (response.getHeaders().getResponseCode()) {
 
@@ -473,8 +475,7 @@ public class CJayClient implements ICJayClient {
 			Response<JsonObject> response = Ion
 					.with(ctx, CJayConstant.API_ADD_GCM_DEVICE)
 					.setHeader("Authorization ", "Token " + accessToken)
-					.setHeader("CJAY_VERSION",
-							CJayApplication.getAppVersion(ctx))
+					.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
 					.setHeader("CJAY_USERNAME", user.getUserName())
 					.setJsonObjectBody(requestPacket).asJsonObject()
 					.withResponse()

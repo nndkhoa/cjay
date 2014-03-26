@@ -221,11 +221,16 @@ public class CJayActivity extends SherlockFragmentActivity {
 		// Your implementation here.
 		try {
 			CJayClient.getInstance().addGCMDevice(regid, context);
+
 			if (TextUtils.isEmpty(regid)) {
-				Logger.Log("Cannot send Registration ID to Server");
+				Logger.e("Cannot send Registration ID to Server");
 			} else {
+
 				// When Submit Server Successfully, save it here!.
 				Utils.storeRegistrationId(context, regid);
+				DataCenter.getDatabaseHelper(context).addUsageLog(
+						"Register #GCM device");
+
 			}
 		} catch (JSONException e) {
 			Logger.e("Can't Register device with the Back-end!");

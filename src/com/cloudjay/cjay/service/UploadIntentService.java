@@ -38,6 +38,7 @@ import com.cloudjay.cjay.network.CJayClient;
 
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CountingInputStreamEntity;
+import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Mapper;
 import com.cloudjay.cjay.util.MismatchDataException;
@@ -161,6 +162,7 @@ public class UploadIntentService extends IntentService implements
 	synchronized void doUploadContainer(ContainerSession containerSession) {
 
 		Logger.w("Uploading container: " + containerSession.getContainerId());
+
 		String response = "";
 
 		containerSession
@@ -183,10 +185,13 @@ public class UploadIntentService extends IntentService implements
 			response = CJayClient.getInstance().postContainerSession(
 					getApplicationContext(), uploadItem);
 
+			Logger.Log(response);
+
 		} catch (NoConnectionException e) {
 
 			Logger.Log("No Internet Connection");
 			rollbackContainerState(containerSession);
+			return;
 
 		} catch (NullSessionException e) {
 
@@ -204,11 +209,20 @@ public class UploadIntentService extends IntentService implements
 			containerSession
 					.setUploadState(ContainerSession.STATE_UPLOAD_ERROR);
 
-		} catch (Exception e) {
-			rollbackContainerState(containerSession);
-		}
+			DataCenter.getDatabaseHelper(getApplicationContext())
+					.addUsageLog(
+							"#upload #failed container "
+									+ containerSession.getContainerId()
+									+ " | "
+									+ Integer.toString(containerSession
+											.getUploadType()));
+			return;
 
-		Logger.Log(response);
+		} catch (Exception e) {
+
+			rollbackContainerState(containerSession);
+			return;
+		}
 
 		// convert back then save containerSession
 		Mapper.getInstance().update(getApplicationContext(), response,
@@ -216,7 +230,10 @@ public class UploadIntentService extends IntentService implements
 
 		containerSession
 				.setUploadState(ContainerSession.STATE_UPLOAD_COMPLETED);
-
+		DataCenter.getDatabaseHelper(getApplicationContext()).addUsageLog(
+				"#upload #successfully container "
+						+ containerSession.getContainerId() + " | "
+						+ Integer.toString(containerSession.getUploadType()));
 	}
 
 	@Override

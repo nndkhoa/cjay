@@ -429,6 +429,8 @@ public class GateImportListFragment extends SherlockFragment implements
 
 				try {
 					DataCenter.getInstance().fetchData(getActivity());
+					DataCenter.getDatabaseHelper(getActivity()).addUsageLog(
+							"#refresh in fragment #GateImport");
 				} catch (NoConnectionException e) {
 					((CJayActivity) getActivity())
 							.showCrouton(R.string.alert_no_network);

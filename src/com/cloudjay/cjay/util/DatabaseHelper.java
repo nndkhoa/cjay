@@ -359,4 +359,15 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 		return userLogDaoImpl;
 	}
+
+	public void addUsageLog(String message) {
+
+		UserLog userLog = new UserLog(message);
+
+		try {
+			userLogDaoImpl.addLog(userLog);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 }

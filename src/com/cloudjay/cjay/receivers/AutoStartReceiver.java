@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.cloudjay.cjay.service.QueueIntentService_;
+import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Logger;
 
 @EReceiver
 public class AutoStartReceiver extends BroadcastReceiver {
@@ -18,7 +20,9 @@ public class AutoStartReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 
-		Log.i("AutoStart", "**********started************");
+		Logger.Log("**********started************");
+		DataCenter.getDatabaseHelper(context).addUsageLog(
+				"#autostart Application");
 
 		// Making Alarm for Queue Worker
 		intent = new Intent(context, QueueIntentService_.class);

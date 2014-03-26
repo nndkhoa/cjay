@@ -14,6 +14,7 @@ import android.util.Log;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.CJaySession;
@@ -33,7 +34,6 @@ public class UpdateReceiver extends BroadcastReceiver {
 
 		Logger.Log("onReceive()");
 		mContext = context;
-
 		CJaySession session = CJaySession.restore(context);
 
 		if (null != session && Utils.checkPlayServices(context)) {
@@ -45,6 +45,13 @@ public class UpdateReceiver extends BroadcastReceiver {
 				registerInBackground();
 			}
 		}
+
+		String appVersion = Utils.getAppVersionName(context);
+		int appVersionCode = Utils.getAppVersionCode(context);
+
+		DataCenter.getDatabaseHelper(context).addUsageLog(
+				"#update app to version " + appVersion + "|"
+						+ Integer.toString(appVersionCode));
 	}
 
 	/**

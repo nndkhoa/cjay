@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -29,7 +30,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.cloudjay.cjay.CJayActivity;
+import com.cloudjay.cjay.dao.UserLogDaoImpl;
 import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.model.UserLog;
 import com.cloudjay.cjay.service.QueueIntentService_;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -99,7 +102,7 @@ public class Utils {
 		int registeredCurrentUserId = prefs.getInt(PROPERTY_CURRENT_USER_ID,
 				Integer.MIN_VALUE);
 
-		int currentVersion = getAppVersion(context);
+		int currentVersion = getAppVersionCode(context);
 		if (registeredVersion != currentVersion
 				|| registeredCurrentUserId != CJaySession.restore(context)
 						.getCurrentUser().getID()) {
@@ -108,6 +111,19 @@ public class Utils {
 		}
 		return registrationId;
 	}
+	
+	public static String getAppVersionName(Context ctx) {
+
+		PackageInfo pInfo = null;
+		try {
+			pInfo = ctx.getPackageManager().getPackageInfo(
+					ctx.getPackageName(), 0);
+		} catch (NameNotFoundException e) {
+			e.printStackTrace();
+		}
+		return pInfo.versionName;
+	}
+
 
 	/**
 	 * @return Application's {@code SharedPreferences}.
@@ -121,11 +137,13 @@ public class Utils {
 	/**
 	 * @return Application's version code from the {@code PackageManager}.
 	 */
-	private static int getAppVersion(Context context) {
+	public static int getAppVersionCode(Context context) {
+
 		try {
 			PackageInfo packageInfo = context.getPackageManager()
 					.getPackageInfo(context.getPackageName(), 0);
 			return packageInfo.versionCode;
+
 		} catch (NameNotFoundException e) {
 			// should never happen
 			throw new RuntimeException("Could not get package name: " + e);
@@ -143,7 +161,7 @@ public class Utils {
 	 */
 	public static void storeRegistrationId(Context context, String regId) {
 		final SharedPreferences prefs = getGCMPreferences(context);
-		int appVersion = getAppVersion(context);
+		int appVersion = getAppVersionCode(context);
 
 		Logger.i("Saving regId on app version " + appVersion);
 		SharedPreferences.Editor editor = prefs.edit();
@@ -294,9 +312,7 @@ public class Utils {
 
 				if (currentDB.exists()) {
 					src = new FileInputStream(currentDB).getChannel();
-
 					dst = new FileOutputStream(backupDB).getChannel();
-
 					dst.transferFrom(src, 0, src.size());
 				} else {
 					Logger.e("Current database do not exist");
