@@ -5,10 +5,13 @@ import java.sql.SQLException;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
 import org.json.JSONException;
 
+import android.R.anim;
+import android.R.integer;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,6 +21,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -47,6 +51,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 	@Bean
 	DataCenter dataCenter;
 
+	int usernameMenuClickCount = 0;
 	GoogleCloudMessaging gcm;
 	Context context;
 	String regid;
@@ -85,9 +90,35 @@ public class CJayActivity extends SherlockFragmentActivity {
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		menu.findItem(R.id.menu_username).setTitle(
 				getCurrentUser().getFullName());
+
 		menu.findItem(R.id.menu_role).setTitle(getCurrentUser().getRoleName());
 
 		return super.onPrepareOptionsMenu(menu);
+	}
+
+	@OptionsItem(R.id.menu_username)
+	void usernameMenuItemSelected() {
+
+		usernameMenuClickCount++;
+		int left = CJayConstant.HIDDEN_LOG_THRESHOLD - usernameMenuClickCount;
+
+		if (left <= 3 && left > 0) {
+			Toast.makeText(
+					this,
+					"You have to click " + Integer.toString(left)
+							+ " to open Hidden Log Page", Toast.LENGTH_SHORT)
+					.show();
+		}
+
+		if (left == 0) {
+
+			// Open Log
+			Intent intent = new Intent(this, UserLogActivity_.class);
+			startActivity(intent);
+
+			usernameMenuClickCount = 0;
+		}
+
 	}
 
 	@Override

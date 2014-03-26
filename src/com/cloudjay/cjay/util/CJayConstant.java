@@ -2,6 +2,7 @@ package com.cloudjay.cjay.util;
 
 import java.io.File;
 
+import android.R.integer;
 import android.os.Environment;
 
 public final class CJayConstant {
@@ -76,4 +77,6 @@ public final class CJayConstant {
 	// ALARM ID
 	public static final int ALARM_ID = 49482;
 	public static final String CUSTOM_INTENT = "com.cloudjay.cjay.CUSTOM_INTENT";
+
+	public static final int HIDDEN_LOG_THRESHOLD = 7;
 }

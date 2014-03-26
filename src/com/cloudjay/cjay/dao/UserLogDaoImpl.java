@@ -1,11 +1,8 @@
 package com.cloudjay.cjay.dao;
 
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.UserLog;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;

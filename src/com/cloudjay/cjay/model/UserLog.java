@@ -1,10 +1,10 @@
 package com.cloudjay.cjay.model;
 
-import com.cloudjay.cjay.dao.OperatorDaoImpl;
+import com.cloudjay.cjay.dao.UserLogDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-@DatabaseTable(tableName = "user_log", daoClass = OperatorDaoImpl.class)
+@DatabaseTable(tableName = "user_log", daoClass = UserLogDaoImpl.class)
 public class UserLog {
 
 	public static final String FIELD_ID = "_id";

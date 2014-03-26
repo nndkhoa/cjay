@@ -2,19 +2,13 @@ package com.cloudjay.cjay.adapter;
 
 import com.cloudjay.cjay.R;
 
-import com.cloudjay.cjay.model.Container;
-import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.UserLog;
-import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.StringHelper;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

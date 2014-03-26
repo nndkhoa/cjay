@@ -50,6 +50,6 @@
     <string name="empty_issues">Đã sửa chữa hết các lỗi</string>
     <string name="logout">Logout %1$s</string>
     <string name="logout_prompt_title">Dữ liệu sẽ mất sau khi đăng xuất. Bạn có chắc chưa?</string>
-    <string name="title_activity_user_log">UserLogActivity</string>
+    <string name="title_activity_user_log">Usage Log</string>
 
 </resources>

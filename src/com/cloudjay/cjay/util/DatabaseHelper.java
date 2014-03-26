@@ -166,18 +166,18 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			// version = 2
 		public void apply(SQLiteDatabase db, ConnectionSource connectionSource) {
 
-			// Add column `upload_type` in table `container_session`
-			try {
-				db.execSQL("ALTER TABLE container_session ADD COLUMN upload_type INTEGER DEFAULT 0");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
 			// Add table UserLog
 			try {
 				TableUtils.createTable(connectionSource, UserLog.class);
 			} catch (SQLException e) {
 				e.printStackTrace();
+			}
+
+			// Add column `upload_type` in table `container_session`
+			try {
+				db.execSQL("ALTER TABLE container_session ADD COLUMN upload_type INTEGER DEFAULT 0");
+			} catch (Exception e) {
+				Logger.w("Column upload_type is already existed.");
 			}
 
 		}

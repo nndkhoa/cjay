@@ -3,7 +3,6 @@ package com.cloudjay.cjay.util;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.database.Cursor;
-import android.support.v4.content.AsyncTaskLoader;
 
 public abstract class UploadCursorLoader extends CursorLoader {
 
