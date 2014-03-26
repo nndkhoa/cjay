@@ -295,10 +295,13 @@ public class DataCenter {
 	public Cursor filterUserLogCursor(Context context, CharSequence constraint) {
 
 		String queryString = "SELECT * FROM user_log"
-				+ " WHERE content LIKE ? ORDER BY content LIMIT 100";
+				+ " WHERE (content LIKE ?) OR (time LIKE ?) ORDER BY time LIMIT 100";
 
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] { constraint + "%" });
+		return getDatabaseManager().getReadableDatabase(context)
+				.rawQuery(
+						queryString,
+						new String[] { "%" + constraint + "%",
+								"%" + constraint + "%" });
 	}
 
 	public Cursor filterCheckoutCursor(Context context, CharSequence constraint) {

@@ -3,7 +3,7 @@
     package="com.cloudjay.cjay"
     android:installLocation="auto"
     android:versionCode="2"
-    android:versionName="1.0.12.1" >
+    android:versionName="1.1" >
 
     <uses-sdk
         android:minSdkVersion="15"
