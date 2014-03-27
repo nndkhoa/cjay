@@ -460,6 +460,7 @@ public class DataCenter {
 				List<ContainerSession> containerSessions = new ArrayList<ContainerSession>();
 				ContainerSessionResult result = null;
 
+				long startTime = System.currentTimeMillis();
 				result = CJayClient.getInstance().getContainerSessionsByPage(
 						ctx, lastUpdate, page);
 
@@ -493,6 +494,10 @@ public class DataCenter {
 										containerSessions));
 					}
 				}
+
+				long difference = System.currentTimeMillis() - startTime;
+				Logger.w("---> Total time: " + Long.toString(difference));
+
 			} while (!TextUtils.isEmpty(nextUrl));
 
 			PreferencesUtil.storePrefsValue(ctx,
