@@ -48,14 +48,13 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
-import com.cloudjay.cjay.CJayActivity;
-import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerRepairedEvent;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
+import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.events.PostLoadDataEvent;
 import com.cloudjay.cjay.events.PreLoadDataEvent;
 import com.cloudjay.cjay.model.CJayImage;
@@ -123,6 +122,13 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 				.setup(mPullToRefreshLayout);
 	}
 
+	int totalItems = 0;
+
+	void setTotalItems(int val) {
+		totalItems = val;
+		EventBus.getDefault().post(new ListItemChangedEvent(0, totalItems));
+	}
+
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
 		Context context = getActivity();
@@ -135,7 +141,7 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 
 				if (cursor != null) {
 					// Ensure the cursor window is filled
-					cursor.getCount();
+					setTotalItems(cursor.getCount());
 					cursor.registerContentObserver(mObserver);
 				}
 

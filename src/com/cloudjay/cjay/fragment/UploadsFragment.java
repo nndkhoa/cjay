@@ -114,6 +114,7 @@ public class UploadsFragment extends SherlockFragment implements
 
 	@UiThread
 	void updateUI() {
+
 		listContainerSessions = DataCenter.getInstance()
 				.getListUploadContainerSessions(getActivity());
 

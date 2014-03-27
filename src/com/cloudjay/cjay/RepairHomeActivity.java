@@ -18,6 +18,7 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
+import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
@@ -64,6 +65,14 @@ public class RepairHomeActivity extends CJayActivity implements
 		locations = getResources().getStringArray(R.array.repair_home_tabs);
 		configureViewPager();
 		configureActionBar();
+	}
+
+	public void onEventMainThread(ListItemChangedEvent event) {
+
+		int currentTab = event.getPosition();
+		getSupportActionBar().getTabAt(currentTab).setText(
+				locations[currentTab] + " ("
+						+ Integer.toString(event.getCount()) + ")");
 	}
 
 	private void configureViewPager() {

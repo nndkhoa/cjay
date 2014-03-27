@@ -114,7 +114,7 @@ public class GateHomeActivity extends CJayActivity implements
 		}
 	}
 
-	public void onEvent(ListItemChangedEvent event) {
+	public void onEventMainThread(ListItemChangedEvent event) {
 
 		int currentTab = event.getPosition();
 		getSupportActionBar().getTabAt(currentTab).setText(
