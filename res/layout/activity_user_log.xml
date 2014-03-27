@@ -1,35 +1,26 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
 
     <EditText
         android:id="@+id/editText_search_content"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
+        android:layout_margin="3dp"
         android:ems="10"
-        android:hint="Enter your keyword" >
+        android:hint="Enter your keyword"
+        android:padding="3dp" >
 
         <requestFocus />
     </EditText>
-
-    <Button
-        android:id="@+id/btn_search"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/editText_search_content"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="15dp"
-        android:text="Search" />
 
     <ListView
         android:id="@+id/lv_user_log"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_search" >
+        android:layout_marginTop="3dp" >
     </ListView>
 
-</RelativeLayout>
+</LinearLayout>

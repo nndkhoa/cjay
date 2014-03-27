@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -30,9 +29,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.cloudjay.cjay.CJayActivity;
-import com.cloudjay.cjay.dao.UserLogDaoImpl;
 import com.cloudjay.cjay.model.User;
-import com.cloudjay.cjay.model.UserLog;
 import com.cloudjay.cjay.service.QueueIntentService_;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;

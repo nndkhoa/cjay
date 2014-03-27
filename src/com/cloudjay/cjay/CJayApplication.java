@@ -10,8 +10,6 @@ import org.androidannotations.annotations.EApplication;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.util.Log;

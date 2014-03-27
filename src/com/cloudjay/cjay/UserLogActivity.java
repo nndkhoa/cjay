@@ -1,7 +1,6 @@
 package com.cloudjay.cjay;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
@@ -14,20 +13,14 @@ import android.os.Bundle;
 import android.content.Loader;
 import android.database.Cursor;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
 import android.widget.ListView;
-import android.widget.Toast;
 
 @EActivity(R.layout.activity_user_log)
 public class UserLogActivity extends CJayActivity implements
 		android.app.LoaderManager.LoaderCallbacks<Cursor> {
-
-	@ViewById(R.id.btn_search)
-	Button searchButton;
 
 	@ViewById(R.id.editText_search_content)
 	EditText searchEditText;
@@ -57,7 +50,7 @@ public class UserLogActivity extends CJayActivity implements
 	void initialize() {
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		
+
 		listView.setAdapter(cursorAdapter);
 
 		getLoaderManager().initLoader(LOADER_ID, null, this);
@@ -80,19 +73,6 @@ public class UserLogActivity extends CJayActivity implements
 					int count) {
 			}
 		});
-	}
-
-	@Click(R.id.btn_search)
-	void searchButtonClicked() {
-
-		String searchText = searchEditText.getText().toString();
-
-		if (TextUtils.isEmpty(searchText)) {
-			return;
-		}
-
-		Toast.makeText(getApplicationContext(), "Keyword: " + searchText,
-				Toast.LENGTH_SHORT).show();
 	}
 
 	@Override

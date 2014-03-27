@@ -104,7 +104,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 			Toast.makeText(
 					this,
 					"You have to click " + Integer.toString(left)
-							+ " to open Hidden Log Page", Toast.LENGTH_SHORT)
+							+ " to open Secret Logs", Toast.LENGTH_SHORT)
 					.show();
 		}
 

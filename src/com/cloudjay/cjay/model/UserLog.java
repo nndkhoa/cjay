@@ -3,7 +3,6 @@ package com.cloudjay.cjay.model;
 import com.cloudjay.cjay.dao.UserLogDaoImpl;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.StringHelper;
-import com.cloudjay.cjay.util.Utils;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
