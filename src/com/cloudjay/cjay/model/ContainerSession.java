@@ -15,7 +15,6 @@ import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.DatabaseHelper;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
 import com.j256.ormlite.field.DatabaseField;
@@ -393,39 +392,6 @@ public class ContainerSession {
 
 	public void setOnLocal(boolean onLocal) {
 		this.onLocal = onLocal;
-	}
-
-	// TODO: need to refactor
-	public static ContainerSession editContainerSession(Context ctx,
-			ContainerSession containerSession, String containerId,
-			String operatorCode) throws SQLException {
-		if (containerSession.getContainerId().equals(containerId)
-				&& containerSession.getOperatorCode().equals(operatorCode)) {
-			// do nothing
-		} else {
-			DatabaseHelper databaseHelper = CJayClient.getInstance()
-					.getDatabaseManager().getHelper(ctx);
-			OperatorDaoImpl operatorDaoImpl = databaseHelper
-					.getOperatorDaoImpl();
-			ContainerDaoImpl containerDaoImpl = databaseHelper
-					.getContainerDaoImpl();
-			ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper
-					.getContainerSessionDaoImpl();
-
-			// find operator
-			Operator operator = operatorDaoImpl.findOperator(operatorCode);
-
-			// update container details
-			Container container = containerSession.getContainer();
-			container.setContainerId(containerId);
-			container.setOperator(operator);
-
-			// update database
-			containerDaoImpl.update(container);
-			containerSessionDaoImpl.update(containerSession);
-		}
-
-		return containerSession;
 	}
 
 	// 0 issue --> Failed

@@ -53,6 +53,7 @@ public class ContainerSessionDaoImpl extends
 		long startTime = System.currentTimeMillis();
 		Logger.Log("*** bulkInsertDataByCallBatchTasks ***");
 		if (containerSessions != null) {
+
 			this.callBatchTasks(new Callable<Void>() {
 				@Override
 				public Void call() throws Exception {
@@ -71,8 +72,10 @@ public class ContainerSessionDaoImpl extends
 
 	private void bulkInsertDataBySavePoint(
 			final List<ContainerSession> containerSessions) {
+
 		long startTime = System.currentTimeMillis();
 		Logger.Log("***bulkInsertDataBySavePoint***");
+
 		if (containerSessions != null) {
 
 			DatabaseConnection conn = null;

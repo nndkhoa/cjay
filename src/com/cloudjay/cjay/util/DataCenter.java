@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EBean.Scope;
 import org.androidannotations.annotations.Trace;
@@ -17,7 +18,9 @@ import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
+import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.DepotDaoImpl;
@@ -27,6 +30,7 @@ import com.cloudjay.cjay.dao.UserDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ComponentCode;
+import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.ContainerSessionResult;
 import com.cloudjay.cjay.model.DamageCode;
@@ -858,8 +862,61 @@ public class DataCenter {
 				.getBoolean(PreferencesUtil.PREF_IS_UPDATING_DATA, false) == true;
 	}
 
-	public List<CJayImage> getCheckOutImages() {
-		return null;
+	@Background
+	public void editContainerSession(Context ctx,
+			ContainerSession containerSession, String containerId,
+			String operatorCode) {
+
+		try {
+			if (containerSession.getContainerId().equals(containerId)
+					&& containerSession.getOperatorCode().equals(operatorCode)) {
+				// do nothing
+
+			} else {
+
+				DatabaseHelper databaseHelper = getDatabaseManager().getHelper(
+						ctx);
+
+				OperatorDaoImpl operatorDaoImpl = databaseHelper
+						.getOperatorDaoImpl();
+				ContainerDaoImpl containerDaoImpl = databaseHelper
+						.getContainerDaoImpl();
+				ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper
+						.getContainerSessionDaoImpl();
+				CJayImageDaoImpl cJayImageDaoImpl = databaseHelper
+						.getCJayImageDaoImpl();
+
+				// find operator
+				Operator operator = operatorDaoImpl.findOperator(operatorCode);
+
+				// update container details
+				Container container = containerSession.getContainer();
+				container.setContainerId(containerId);
+				container.setOperator(operator);
+
+				// update cjay image files name if they begin with file://
+				List<CJayImage> cJayImages = (List<CJayImage>) containerSession
+						.getCJayImages();
+
+				String replaceString = containerId + ".jpg";
+				for (CJayImage cJayImage : cJayImages) {
+
+					String filePath = cJayImage.getUri();
+					if (filePath.startsWith("file://")) {
+						filePath.replace(".jpg", replaceString);
+						cJayImageDaoImpl.update(cJayImage);
+					}
+
+				}
+
+				// update database
+				containerDaoImpl.update(container);
+				containerSessionDaoImpl.update(containerSession);
+
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
 	}
 }

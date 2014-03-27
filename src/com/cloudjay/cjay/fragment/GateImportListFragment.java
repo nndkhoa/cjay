@@ -383,12 +383,8 @@ public class GateImportListFragment extends SherlockFragment implements
 			break;
 
 		case AddContainerDialog.CONTAINER_DIALOG_EDIT:
-			try {
-				ContainerSession.editContainerSession(getActivity(),
-						mSelectedContainerSession, containerId, operatorCode);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			DataCenter.getInstance().editContainerSession(getActivity(),
+					mSelectedContainerSession, containerId, operatorCode);
 			break;
 		}
 
