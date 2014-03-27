@@ -15,6 +15,7 @@ import org.androidannotations.annotations.ViewById;
 import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+import android.R.integer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -41,6 +42,7 @@ import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
+import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -122,6 +124,13 @@ public class GateImportListFragment extends SherlockFragment implements
 		});
 	}
 
+	int totalItems = 0;
+
+	void setTotalItems(int val) {
+		totalItems = val;
+		EventBus.getDefault().post(new ListItemChangedEvent(0, totalItems));
+	}
+
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
 		Context context = getActivity();
@@ -134,7 +143,7 @@ public class GateImportListFragment extends SherlockFragment implements
 
 				if (cursor != null) {
 					// Ensure the cursor window is filled
-					cursor.getCount();
+					setTotalItems(cursor.getCount());
 					cursor.registerContentObserver(mObserver);
 				}
 
@@ -145,6 +154,7 @@ public class GateImportListFragment extends SherlockFragment implements
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+
 		if (cursorAdapter == null) {
 			cursorAdapter = new GateContainerCursorAdapter(getActivity(),
 					mItemLayout, cursor, 0);

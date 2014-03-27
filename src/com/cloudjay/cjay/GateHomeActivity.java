@@ -7,6 +7,7 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
+import android.R.integer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -19,10 +20,12 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
-import com.cloudjay.cjay.fragment.GateExportListFragment;
+import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
+
+import de.greenrobot.event.EventBus;
 
 @EActivity(R.layout.activity_gate_home)
 public class GateHomeActivity extends CJayActivity implements
@@ -68,6 +71,7 @@ public class GateHomeActivity extends CJayActivity implements
 		locations = getResources().getStringArray(R.array.gate_home_tabs);
 		configureViewPager();
 		configureActionBar();
+
 	}
 
 	private void configureViewPager() {
@@ -99,7 +103,8 @@ public class GateHomeActivity extends CJayActivity implements
 		getSupportActionBar().selectTab(tab);
 	}
 
-	private void configureActionBar() {
+	public void configureActionBar() {
+
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		for (String location : locations) {
 			Tab tab = getSupportActionBar().newTab();
@@ -107,6 +112,14 @@ public class GateHomeActivity extends CJayActivity implements
 			tab.setTabListener(this);
 			getSupportActionBar().addTab(tab);
 		}
+	}
+
+	public void onEvent(ListItemChangedEvent event) {
+
+		int currentTab = event.getPosition();
+		getSupportActionBar().getTabAt(currentTab).setText(
+				locations[currentTab] + " ("
+						+ Integer.toString(event.getCount()) + ")");
 	}
 
 	@Override

@@ -49,6 +49,7 @@ import com.cloudjay.cjay.adapter.GateContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
+import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.events.PostLoadDataEvent;
 import com.cloudjay.cjay.events.PreLoadDataEvent;
 import com.cloudjay.cjay.model.CJayImage;
@@ -127,6 +128,13 @@ public class GateExportListFragment extends SherlockFragment implements
 				.theseChildrenArePullable(R.id.container_list,
 						android.R.id.empty).listener(this)
 				.setup(mPullToRefreshLayout);
+	}
+
+	int totalItems = 0;
+
+	void setTotalItems(int val) {
+		totalItems = val;
+		EventBus.getDefault().post(new ListItemChangedEvent(1, totalItems));
 	}
 
 	@AfterViews
@@ -217,9 +225,11 @@ public class GateExportListFragment extends SherlockFragment implements
 				Cursor cursor = DataCenter.getInstance()
 						.getCheckOutContainerSessionCursor(getContext());
 
+				
+				
 				if (cursor != null) {
 					// Ensure the cursor window is filled
-					cursor.getCount();
+					setTotalItems(cursor.getCount());
 					cursor.registerContentObserver(mObserver);
 				}
 

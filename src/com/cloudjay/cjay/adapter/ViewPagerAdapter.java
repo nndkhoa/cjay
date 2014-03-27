@@ -9,8 +9,10 @@ public abstract class ViewPagerAdapter extends FragmentStatePagerAdapter {
 	private String[] locations;
 
 	public ViewPagerAdapter(FragmentManager fm, String[] locations) {
+
 		super(fm);
 		this.locations = locations;
+
 	}
 
 	public int getCount() {

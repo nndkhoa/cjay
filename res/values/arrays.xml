@@ -6,6 +6,7 @@
         <item>Xuất</item>
         <item>Tải lên</item>
     </string-array>
+    
     <string-array name="auditor_home_tabs">
         <item>Chưa báo cáo</item>
         <item>Đang báo cáo</item>

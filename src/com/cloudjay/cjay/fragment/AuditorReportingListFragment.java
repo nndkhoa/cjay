@@ -16,6 +16,7 @@ import org.androidannotations.annotations.ViewById;
 import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+import android.R.integer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -49,6 +50,7 @@ import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
+import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.events.PostLoadDataEvent;
 import com.cloudjay.cjay.events.PreLoadDataEvent;
 import com.cloudjay.cjay.model.CJayImage;
@@ -240,6 +242,22 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 		mFeedListView.setEmptyView(mEmptyElement);
 	}
 
+	int totalItems = 0;
+
+	void setTotalItems(int val) {
+		totalItems = val;
+		int position;
+
+		if (mState == STATE_REPORTING) {
+			position = 1;
+		} else {
+			position = 0;
+		}
+
+		EventBus.getDefault().post(
+				new ListItemChangedEvent(position, totalItems));
+	}
+
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
 		Context context = getActivity();
@@ -259,7 +277,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 
 				if (cursor != null) {
 					// Ensure the cursor window is filled
-					cursor.getCount();
+					setTotalItems(cursor.getCount());
 					cursor.registerContentObserver(mObserver);
 				}
 
