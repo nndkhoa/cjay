@@ -62,7 +62,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	DepotDaoImpl depotDaoImpl = null;
 	RepairCodeDaoImpl repairCodeDaoImpl = null;
 	ComponentCodeDaoImpl componentCodeDaoImpl = null;
-
 	UserLogDaoImpl userLogDaoImpl = null;
 
 	private static class Patch {

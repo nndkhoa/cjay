@@ -9,9 +9,12 @@ import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.ViewById;
 
+import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.ListView;
 
@@ -25,6 +28,7 @@ import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -46,11 +50,20 @@ public class AuditorIssueAssigmentActivity extends CJayActivity {
 
 	@ViewById(R.id.item_picture)
 	ImageView imageView;
+
 	@ViewById(R.id.feeds)
 	ListView mFeedListView;
 
+	@Override
+	protected void onCreate(Bundle arg0) {
+		// TODO Auto-generated method stub
+		super.onCreate(arg0);
+		Logger.w("onCreate");
+	}
+
 	@AfterViews
 	void afterViews() {
+
 		try {
 			imageLoader = ImageLoader.getInstance();
 
@@ -59,13 +72,7 @@ public class AuditorIssueAssigmentActivity extends CJayActivity {
 			mCJayImage = cJayImageDaoImpl.findByUuid(mCJayImageUUID);
 
 			if (mCJayImage != null) {
-
 				imageLoader.displayImage(mCJayImage.getUri(), imageView);
-
-				// imageView.setImageBitmap(Utils.decodeImage(
-				// getContentResolver(), mCJayImage.getOriginalPhotoUri(),
-				// Utils.MINI_THUMBNAIL_SIZE));
-
 				mContainerSession = mCJayImage.getContainerSession();
 			}
 
@@ -115,7 +122,11 @@ public class AuditorIssueAssigmentActivity extends CJayActivity {
 		return super.onPrepareOptionsMenu(menu);
 	}
 
-	private void initImageFeedAdapter(ArrayList<Issue> containers) {
+	@Trace(level = Log.INFO)
+	void initImageFeedAdapter(ArrayList<Issue> containers) {
+
+		Logger.Log("initImageFeedAdapter()");
+
 		BindDictionary<Issue> feedsDict = new BindDictionary<Issue>();
 		feedsDict.addStringField(R.id.issue_location_code,
 				new StringExtractor<Issue>() {
@@ -128,21 +139,24 @@ public class AuditorIssueAssigmentActivity extends CJayActivity {
 				new StringExtractor<Issue>() {
 					@Override
 					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item.getDamageCodeString());
+						return Utils.replaceNullBySpace(item
+								.getDamageCodeString());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_repair_code,
 				new StringExtractor<Issue>() {
 					@Override
 					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item.getRepairCodeString());
+						return Utils.replaceNullBySpace(item
+								.getRepairCodeString());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_component_code,
 				new StringExtractor<Issue>() {
 					@Override
 					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item.getComponentCodeString());
+						return Utils.replaceNullBySpace(item
+								.getComponentCodeString());
 					}
 				});
 		feedsDict.addStringField(R.id.issue_quantity,

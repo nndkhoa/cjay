@@ -5,7 +5,11 @@ import com.cloudjay.cjay.model.Issue;
 
 public abstract class IssueReportFragment extends SherlockFragment {
 	public abstract void setIssue(Issue issue);
+
 	public abstract boolean validateAndSaveData();
+
 	public abstract void showKeyboard();
+
 	public abstract void hideKeyboard();
+
 }

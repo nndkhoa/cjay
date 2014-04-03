@@ -11,12 +11,14 @@ import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ItemLongClick;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.ViewById;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -77,6 +79,7 @@ public class AuditorContainerActivity extends CJayActivity {
 		imageLoader = ImageLoader.getInstance();
 
 		initImageFeedAdapter(null);
+
 		mLongClickedCJayImage = null;
 		mSelectedCJayImage = null;
 		mNewImageCount = 0;
@@ -253,10 +256,13 @@ public class AuditorContainerActivity extends CJayActivity {
 		}
 	}
 
-	private void showReportDialog() {
+	@Trace(level = Log.INFO)
+	void showReportDialog() {
+		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this)
 				.setMessage(R.string.dialog_report_message)
 				.setTitle(R.string.dialog_report_title)
+				
 				.setPositiveButton(R.string.dialog_report_no,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
@@ -264,6 +270,7 @@ public class AuditorContainerActivity extends CJayActivity {
 								showIssueReport();
 							}
 						})
+						
 				.setNegativeButton(R.string.dialog_report_yes,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
@@ -290,7 +297,9 @@ public class AuditorContainerActivity extends CJayActivity {
 		startActivity(intent);
 	}
 
-	private void initImageFeedAdapter(ArrayList<CJayImage> containers) {
+	@Trace(level = Log.INFO)
+	void initImageFeedAdapter(ArrayList<CJayImage> containers) {
+
 		BindDictionary<CJayImage> feedsDict = new BindDictionary<CJayImage>();
 		feedsDict.addStringField(R.id.issue_location_code,
 				new StringExtractor<CJayImage>() {

@@ -55,28 +55,44 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 	private Issue mIssue;
 	private ImageLoader imageLoader;
 
+	CJayImageDaoImpl cJayImageDaoImpl = null;
+	IssueDaoImpl issueDaoImpl = null;
+
 	@Extra(CJAY_IMAGE_EXTRA)
 	String mCJayImageUUID = "";
 
 	@ViewById(R.id.pager)
 	ViewPager pager;
+
 	@ViewById(R.id.item_picture)
 	ImageView imageView;
 
 	@AfterViews
 	void afterViews() {
 		try {
+
 			imageLoader = ImageLoader.getInstance();
 
-			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance()
-					.getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
+			if (null == cJayImageDaoImpl) {
+				cJayImageDaoImpl = CJayClient.getInstance()
+						.getDatabaseManager().getHelper(this)
+						.getCJayImageDaoImpl();
+			}
+
+			if (null == issueDaoImpl) {
+				issueDaoImpl = CJayClient.getInstance().getDatabaseManager()
+						.getHelper(this).getIssueDaoImpl();
+			}
+
 			mCJayImage = cJayImageDaoImpl.findByUuid(mCJayImageUUID);
 			if (mCJayImage.getIssue() == null) {
 
 				mIssue = new Issue();
 				mIssue.setContainerSession(mCJayImage.getContainerSession());
 				mCJayImage.setIssue(mIssue);
+
 			} else {
+
 				mIssue = mCJayImage.getIssue();
 			}
 
@@ -88,12 +104,14 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 
 		locations = getResources().getStringArray(
 				R.array.auditor_issue_report_tabs);
+
 		configureViewPager();
 		configureActionBar();
 	}
 
 	@OptionsItem(R.id.menu_check)
 	void checkMenuItemClicked() {
+
 		// validate and save data
 		boolean isValidated = true;
 		for (int i = 0; i < mViewPagerAdapter.getCount(); i++) {
@@ -106,19 +124,14 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 			}
 		}
 		if (!isValidated) {
-			Toast.makeText(this, getString(R.string.issue_details_missing_warning), Toast.LENGTH_LONG).show();
+			Toast.makeText(this,
+					getString(R.string.issue_details_missing_warning),
+					Toast.LENGTH_LONG).show();
 			return;
 		}
 
 		// save db records
 		try {
-			IssueDaoImpl issueDaoImpl = CJayClient.getInstance()
-					.getDatabaseManager().getHelper(this).getIssueDaoImpl();
-
-			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance()
-					.getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
-
-			// issueDaoImpl.createOrUpdate(mCJayImage.getIssue());
 			issueDaoImpl.createOrUpdate(mIssue);
 			cJayImageDaoImpl.createOrUpdate(mCJayImage);
 

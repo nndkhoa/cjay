@@ -214,6 +214,27 @@ public class DataCenter {
 				queryString, new String[] {});
 	}
 
+	public Cursor getDamageCodesCursor(Context context) {
+
+		String queryString = "SELECT id as _id, display_name, code FROM damage_code";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] {});
+	}
+
+	public Cursor getRepairCodesCursor(Context context) {
+
+		String queryString = "SELECT id as _id, display_name, code FROM repair_code";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] {});
+	}
+
+	public Cursor getComponentCodesCursor(Context context) {
+
+		String queryString = "SELECT id as _id, display_name, code FROM component_code";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] {});
+	}
+
 	public Cursor getCheckOutContainerSessionCursor(Context context) {
 		String queryString = "SELECT * FROM cs_export_validation_view";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
@@ -315,6 +336,36 @@ public class DataCenter {
 
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
 				queryString, new String[] { constraint + "%" });
+	}
+
+	public Cursor filterDamageCodeCursor(Context context,
+			CharSequence constraint) {
+
+		String queryString = "SELECT id as _id, code, display_name FROM damage_code"
+				+ " WHERE code LIKE ? ORDER BY id LIMIT 100";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] { "%" + constraint + "%" });
+	}
+
+	public Cursor filterRepairCodeCursor(Context context,
+			CharSequence constraint) {
+
+		String queryString = "SELECT id as _id, code, display_name FROM repair_code"
+				+ " WHERE code LIKE ? ORDER BY id LIMIT 100";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] { "%" + constraint + "%" });
+	}
+
+	public Cursor filterComponentCodeCursor(Context context,
+			CharSequence constraint) {
+
+		String queryString = "SELECT id as _id, code, display_name FROM component_code"
+				+ " WHERE code LIKE ? ORDER BY id LIMIT 100";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] { "%" + constraint + "%" });
 	}
 
 	public Cursor filterNotReportedCursor(Context context,

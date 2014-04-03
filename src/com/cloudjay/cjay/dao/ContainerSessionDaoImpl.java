@@ -218,6 +218,8 @@ public class ContainerSessionDaoImpl extends
 						.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, true)
 						.prepare());
 
+		Logger.Log("Number of containers in queue: "
+				+ Integer.toString(containerSessions.size()));
 		for (ContainerSession containerSession : containerSessions) {
 
 			boolean flag = true;
@@ -225,7 +227,14 @@ public class ContainerSessionDaoImpl extends
 
 			for (CJayImage cJayImage : cJayImages) {
 				if (cJayImage.getUploadState() != CJayImage.STATE_UPLOAD_COMPLETED) {
-					Logger.e("Some cJayImages are still not uploaded");
+
+					// Logger.e(containerSession.getContainerId()
+					// + ": Some cJayImages are still not uploaded.");
+					//
+					// Logger.e("CJayImage Url: " + cJayImage.getUri());
+
+					// TODO: Try to upload CJayImage
+
 					flag = false;
 					break;
 				}
