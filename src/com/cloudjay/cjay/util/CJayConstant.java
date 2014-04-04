@@ -75,6 +75,7 @@ public final class CJayConstant {
 	public static final int CURSOR_LOADER_ID_DAMAGE_CODE = 8;
 	public static final int CURSOR_LOADER_ID_COMPONENT_CODE = 9;
 	public static final int CURSOR_LOADER_ID_REPAIR_CODE = 10;
+	public static final int CURSOR_LOADER_ID_ISSUE_ITEM = 11;
 
 	// ALARM ID
 	public static final int ALARM_ID = 49482;

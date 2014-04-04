@@ -139,7 +139,7 @@ public class PhotoGridViewActivity extends CJayActivity implements
 			@Override
 			public Cursor loadInBackground() {
 				Cursor cursor = DataCenter.getInstance()
-						.getCJayImagesByContainer(getContext(),
+						.getCJayImagesCursorByContainer(getContext(),
 								mContainerSessionUUID, mCJayImageType);
 
 				if (cursor != null) {

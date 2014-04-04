@@ -116,48 +116,6 @@ public class DataCenter {
 		return null;
 	}
 
-	public List<ComponentCode> getListComponents(Context context) {
-		Logger.Log("get list Components");
-
-		try {
-			return getDatabaseManager().getHelper(context)
-					.getComponentCodeDaoImpl().getAllComponentCodes();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public List<DamageCode> getListDamageCodes(Context context) {
-		Logger.Log("get list Damage Codes");
-
-		try {
-			return getDatabaseManager().getHelper(context)
-					.getDamageCodeDaoImpl().getAllDamageCodes();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	/**
-	 * Get List of repair codes
-	 * 
-	 * @param context
-	 * @return
-	 */
-	public List<RepairCode> getListRepairCodes(Context context) {
-		Logger.Log("get list Repair Codes");
-
-		try {
-			return getDatabaseManager().getHelper(context)
-					.getRepairCodeDaoImpl().getAllRepairCodes();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
 	/**
 	 * Save credential of user to local database. After that, user is verified
 	 * that signed in.
@@ -299,7 +257,17 @@ public class DataCenter {
 		return null;
 	}
 
-	public Cursor getCJayImagesByContainer(Context context,
+	public Cursor getIssueItemCursorByContainer(Context context,
+			String containerSessionUUID, int imageType) {
+
+		String queryString = "SELECT * FROM issue_item_view WHERE containerSession_id LIKE ? AND type = ?";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString,
+				new String[] { containerSessionUUID + "%",
+						String.valueOf(imageType) });
+	}
+
+	public Cursor getCJayImagesCursorByContainer(Context context,
 			String containerSessionUUID, int imageType) {
 		String queryString = "SELECT * FROM cjay_image WHERE containerSession_id LIKE ? AND type = ?";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
@@ -525,6 +493,8 @@ public class DataCenter {
 					if (null != tmpContainerSessions) {
 
 						for (TmpContainerSession tmpSession : tmpContainerSessions) {
+
+							// TODO: need to optimize Mapper
 							ContainerSession containerSession = Mapper
 									.getInstance().toContainerSession(
 											tmpSession, ctx);
@@ -532,6 +502,7 @@ public class DataCenter {
 							if (null != containerSession) {
 								containerSessions.add(containerSession);
 							}
+
 						}
 					}
 
@@ -540,9 +511,11 @@ public class DataCenter {
 
 					if (null != containerSessions
 							&& !containerSessions.isEmpty()) {
+
 						EventBus.getDefault().post(
 								new ContainerSessionChangedEvent(
 										containerSessions));
+
 					}
 				}
 

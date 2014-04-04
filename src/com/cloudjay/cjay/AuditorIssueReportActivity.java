@@ -51,6 +51,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 
 	private AuditorIssueReportTabPageAdaptor mViewPagerAdapter;
 	private String[] locations;
+	
 	private CJayImage mCJayImage;
 	private Issue mIssue;
 	private ImageLoader imageLoader;

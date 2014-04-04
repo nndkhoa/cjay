@@ -183,6 +183,27 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 		public void revert(SQLiteDatabase db, ConnectionSource connectionSource) {
 		}
+	}, new Patch() {
+			// version = 3
+		public void apply(SQLiteDatabase db, ConnectionSource connectionSource) {
+
+			// Add issue_info_view
+			String sql = "CREATE VIEW issue_info_view AS"
+					+ " select i.containerSession_id, i._id as issue_id, dc.code as damage_code, rc.code as repair_code, cc.code as component_code, i.height, i.length, i.quantity, i.locationCode as location_code"
+					+ " from issue as i, component_code as cc, repair_code as rc, damage_code as dc"
+					+ " where i.componentCode_id = cc.id and i.repairCode_id = rc.id and i.damageCode_id = dc.id";
+			db.execSQL(sql);
+
+			// Add issue item view
+			sql = "CREATE VIEW issue_item_view AS"
+					+ " SELECT cj.containerSession_id, cj.uuid, cj._id, cj.type, i.*"
+					+ " from cjay_image as cj LEFT JOIN issue_info_view as i on cj.issue_id = i.issue_id";
+			db.execSQL(sql);
+
+		}
+
+		public void revert(SQLiteDatabase db, ConnectionSource connectionSource) {
+		}
 	} };
 
 	public DatabaseHelper(Context context) {

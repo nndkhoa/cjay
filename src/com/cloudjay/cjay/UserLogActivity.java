@@ -7,7 +7,7 @@ import org.androidannotations.annotations.ViewById;
 import com.cloudjay.cjay.adapter.UserLogCursorAdapter;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
-import com.cloudjay.cjay.util.UploadCursorLoader;
+import com.cloudjay.cjay.util.CJayCustomCursorLoader;
 
 import android.os.Bundle;
 import android.content.Loader;
@@ -78,7 +78,7 @@ public class UserLogActivity extends CJayActivity implements
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
 
-		return new UploadCursorLoader(this) {
+		return new CJayCustomCursorLoader(this) {
 
 			@Override
 			public Cursor loadInBackground() {
