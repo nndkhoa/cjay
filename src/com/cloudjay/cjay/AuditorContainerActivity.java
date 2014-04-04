@@ -16,6 +16,7 @@ import org.androidannotations.annotations.ViewById;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
@@ -30,13 +31,20 @@ import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
+import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
+import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.model.CJayImage;
+import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Issue;
+import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.DatabaseHelper;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
@@ -56,6 +64,7 @@ public class AuditorContainerActivity extends CJayActivity {
 
 	private ArrayList<CJayImage> mFeeds;
 	private FunDapter<CJayImage> mFeedsAdapter;
+	
 	private ContainerSession mContainerSession;
 	private CJayImage mSelectedCJayImage;
 	private CJayImage mLongClickedCJayImage;
@@ -258,11 +267,11 @@ public class AuditorContainerActivity extends CJayActivity {
 
 	@Trace(level = Log.INFO)
 	void showReportDialog() {
-		
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(this)
 				.setMessage(R.string.dialog_report_message)
 				.setTitle(R.string.dialog_report_title)
-				
+
 				.setPositiveButton(R.string.dialog_report_no,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
@@ -270,7 +279,7 @@ public class AuditorContainerActivity extends CJayActivity {
 								showIssueReport();
 							}
 						})
-						
+
 				.setNegativeButton(R.string.dialog_report_yes,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
@@ -278,23 +287,110 @@ public class AuditorContainerActivity extends CJayActivity {
 								// to that issue
 								showIssueAssigment();
 							}
+						})
+				.setNeutralButton(R.string.dialog_report_neutral,
+						new OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+
+								try {
+
+									long startTime = System.currentTimeMillis();
+									Logger.Log("*** Create container ve sinh ***");
+
+									// Set issue vệ sinh
+									Issue issue = new Issue();
+
+									String val = "BXXX";
+									// BXXX
+									issue.setLocationCode(val);
+
+									// DB
+									val = "DB";
+									DamageCode damageCode = null;
+									if (val != null && !TextUtils.isEmpty(val)) {
+										DamageCodeDaoImpl damageCodeDaoImpl = DataCenter
+												.getDatabaseHelper(context)
+												.getDamageCodeDaoImpl();
+										damageCode = damageCodeDaoImpl
+												.findDamageCode(val);
+									}
+									issue.setDamageCode(damageCode);
+
+									// WW
+									val = "WW";
+									RepairCode repairCode = null;
+									if (val != null && !TextUtils.isEmpty(val)) {
+										RepairCodeDaoImpl repairCodeDaoImpl = DataCenter
+												.getDatabaseHelper(context)
+												.getRepairCodeDaoImpl();
+										repairCode = repairCodeDaoImpl
+												.findRepairCode(val);
+									}
+									issue.setRepairCode(repairCode);
+
+									// FWA
+									val = "FWA";
+									ComponentCode componentCode = null;
+									if (val != null && !TextUtils.isEmpty(val)) {
+										ComponentCodeDaoImpl componentCodeDaoImpl = DataCenter
+												.getDatabaseHelper(context)
+												.getComponentCodeDaoImpl();
+										componentCode = componentCodeDaoImpl
+												.findComponentCode(val);
+									}
+									issue.setComponentCode(componentCode);
+
+									issue.setQuantity("1");
+
+									issue.setContainerSession(mSelectedCJayImage
+											.getContainerSession());
+									mSelectedCJayImage.setIssue(issue);
+
+									IssueDaoImpl issueDaoImpl = DataCenter
+											.getDatabaseHelper(context)
+											.getIssueDaoImpl();
+									issueDaoImpl.createOrUpdate(issue);
+
+									CJayImageDaoImpl cJayImageDaoImpl = DataCenter
+											.getDatabaseHelper(context)
+											.getCJayImageDaoImpl();
+
+									cJayImageDaoImpl
+											.createOrUpdate(mSelectedCJayImage);
+
+									long difference = System
+											.currentTimeMillis() - startTime;
+									Logger.w("---> Total time: "
+											+ Long.toString(difference));
+
+								} catch (SQLException e) {
+									e.printStackTrace();
+								}
+							}
 						});
 
 		builder.show();
 	}
 
 	private void showIssueReport() {
+
 		Intent intent = new Intent(this, AuditorIssueReportActivity_.class);
 		intent.putExtra(AuditorIssueReportActivity_.CJAY_IMAGE_EXTRA,
 				mSelectedCJayImage.getUuid());
 		startActivity(intent);
+
 	}
 
 	private void showIssueAssigment() {
+
 		Intent intent = new Intent(this, AuditorIssueAssigmentActivity_.class);
 		intent.putExtra(AuditorIssueAssigmentActivity_.CJAY_IMAGE_EXTRA,
 				mSelectedCJayImage.getUuid());
 		startActivity(intent);
+
 	}
 
 	@Trace(level = Log.INFO)

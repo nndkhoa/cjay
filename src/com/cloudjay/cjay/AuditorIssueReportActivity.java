@@ -240,8 +240,10 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 	}
 
 	private void configureActionBar() {
+
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		for (String location : locations) {
+
 			Tab tab = getSupportActionBar().newTab();
 			tab.setText(location);
 			tab.setTabListener(this);
@@ -255,6 +257,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 		// go to next tab
 		int currPosition = getSupportActionBar().getSelectedNavigationIndex();
 		if (currPosition < getSupportActionBar().getTabCount() - 1) {
+
 			getSupportActionBar().selectTab(
 					getSupportActionBar().getTabAt(++currPosition));
 
@@ -300,7 +303,9 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 
 			break;
 		case TYPE_REPAIR_CODE:
+
 			try {
+
 				RepairCode repairCode = null;
 				if (val != null && !TextUtils.isEmpty(val)) {
 					RepairCodeDaoImpl repairCodeDaoImpl = CJayClient
@@ -308,6 +313,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 							.getRepairCodeDaoImpl();
 					repairCode = repairCodeDaoImpl.findRepairCode(val);
 				}
+
 				mCJayImage.getIssue().setRepairCode(repairCode);
 			} catch (SQLException e) {
 				e.printStackTrace();

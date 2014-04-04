@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <string name="issue_damage_code_0">BW</string>
+    <string name="issue_damage_code_1">CO</string>
+    <string name="issue_damage_code_2">BR</string>
+    <string name="issue_damage_code_3">BT</string>
+    <string name="issue_damage_code_4">MS</string>
+    <string name="issue_damage_code_5">CU</string>
+    <string name="issue_repair_code_0">GS</string>
+    <string name="issue_repair_code_1">WD</string>
+    <string name="issue_repair_code_2">RP</string>
+    <string name="issue_repair_code_3">GW</string>
+    <string name="issue_repair_code_4">WW</string>
+    <string name="issue_repair_code_5">RE</string>
     
-	<string name="issue_damage_code_0">BW</string>
-	<string name="issue_damage_code_1">CO</string>
-	<string name="issue_damage_code_2">BR</string>
-	<string name="issue_damage_code_3">BT</string>
-	<string name="issue_damage_code_4">MS</string>
-	<string name="issue_damage_code_5">CU</string>
-	
-	<string name="issue_repair_code_0">GS</string>
-	<string name="issue_repair_code_1">WD</string>
-	<string name="issue_repair_code_2">RP</string>
-	<string name="issue_repair_code_3">GW</string>
-	<string name="issue_repair_code_4">WW</string>
-	<string name="issue_repair_code_5">RE</string>
-	
+    <!--  -->
     <string name="label_issue_height">Rộng</string>
     <string name="label_issue_length">Dài</string>
     <string name="label_issue_quantity">Số lượng</string>
-    
     <string name="issue_location_code">CODE vị trí:</string>
     <string name="issue_damage_code">CODE hư hỏng:</string>
     <string name="issue_repair_code">CODE sửa chữa:</string>
@@ -27,20 +26,21 @@
     <string name="issue_height">Rộng:</string>
     <string name="issue_length">Dài:</string>
     <string name="issue_quantity">Số lượng:</string>
-    
     <string name="dialog_report_message">Lỗi này đã được báo cáo?</string>
     <string name="dialog_report_title">Báo cáo lỗi</string>
+    
+    <!--  -->
     <string name="dialog_report_yes">Rồi</string>
     <string name="dialog_report_no">Chưa</string>
+    <string name="dialog_report_neutral">Vệ sinh</string>
     
+    <!--  -->
     <string name="activity_select_issue_message">Chọn lỗi đã được báo cáo</string>
-    
     <string name="component_name_hint">Tên component</string>
     <string name="damage_name_hint">CODE hư hỏng</string>
     <string name="repair_name_hint">CODE sửa chữa</string>
     <string name="button_text_placeholder">X</string>
-    
     <string name="issue_details_missing_warning">Dữ liệu chưa hoàn chỉnh</string>
     <string name="issue_code_missing_warning">Xin vui lòng nhập code</string>
-    
+
 </resources>
