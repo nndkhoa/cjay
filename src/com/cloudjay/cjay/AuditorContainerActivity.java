@@ -71,6 +71,10 @@ public class AuditorContainerActivity extends CJayActivity implements
 	CJayImageDaoImpl cJayImageDaoImpl = null;
 	IssueDaoImpl issueDaoImpl = null;
 
+	int mItemLayout = R.layout.list_item_issue;
+	IssueItemCursorAdapter mCursorAdapter;
+	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_ISSUE_ITEM;
+
 	@ViewById(R.id.btn_add_new)
 	ImageButton mAddButton;
 
@@ -112,6 +116,26 @@ public class AuditorContainerActivity extends CJayActivity implements
 		mLongClickedCJayImage = null;
 		mSelectedCJayImage = null;
 		mNewImageCount = 0;
+
+		getOtherDao();
+	}
+
+	DamageCodeDaoImpl damageCodeDaoImpl = null;
+	RepairCodeDaoImpl repairCodeDaoImpl = null;
+	ComponentCodeDaoImpl componentCodeDaoImpl = null;
+
+	@Background
+	void getOtherDao() {
+		try {
+			damageCodeDaoImpl = DataCenter.getDatabaseHelper(context)
+					.getDamageCodeDaoImpl();
+			repairCodeDaoImpl = DataCenter.getDatabaseHelper(context)
+					.getRepairCodeDaoImpl();
+			componentCodeDaoImpl = DataCenter.getDatabaseHelper(context)
+					.getComponentCodeDaoImpl();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
 	}
 
@@ -303,8 +327,7 @@ public class AuditorContainerActivity extends CJayActivity implements
 			val = "DB";
 			DamageCode damageCode = null;
 			if (val != null && !TextUtils.isEmpty(val)) {
-				DamageCodeDaoImpl damageCodeDaoImpl = DataCenter
-						.getDatabaseHelper(context).getDamageCodeDaoImpl();
+
 				damageCode = damageCodeDaoImpl.findDamageCode(val);
 			}
 			issue.setDamageCode(damageCode);
@@ -313,8 +336,7 @@ public class AuditorContainerActivity extends CJayActivity implements
 			val = "WW";
 			RepairCode repairCode = null;
 			if (val != null && !TextUtils.isEmpty(val)) {
-				RepairCodeDaoImpl repairCodeDaoImpl = DataCenter
-						.getDatabaseHelper(context).getRepairCodeDaoImpl();
+
 				repairCode = repairCodeDaoImpl.findRepairCode(val);
 			}
 			issue.setRepairCode(repairCode);
@@ -323,12 +345,9 @@ public class AuditorContainerActivity extends CJayActivity implements
 			val = "FWA";
 			ComponentCode componentCode = null;
 			if (val != null && !TextUtils.isEmpty(val)) {
-				ComponentCodeDaoImpl componentCodeDaoImpl = DataCenter
-						.getDatabaseHelper(context).getComponentCodeDaoImpl();
 				componentCode = componentCodeDaoImpl.findComponentCode(val);
 			}
 			issue.setComponentCode(componentCode);
-
 			issue.setQuantity("1");
 
 			issue.setContainerSession(mSelectedCJayImage.getContainerSession());
@@ -338,6 +357,7 @@ public class AuditorContainerActivity extends CJayActivity implements
 			cJayImageDaoImpl.createOrUpdate(mSelectedCJayImage);
 
 			refresh();
+
 			// cost 3s
 			long difference = System.currentTimeMillis() - startTime;
 			Logger.w("---> Total time: " + Long.toString(difference));
@@ -409,10 +429,6 @@ public class AuditorContainerActivity extends CJayActivity implements
 			mNewImageCount++;
 		}
 	}
-
-	int mItemLayout = R.layout.list_item_issue;
-	IssueItemCursorAdapter mCursorAdapter;
-	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_ISSUE_ITEM;
 
 	@Override
 	public android.content.Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
