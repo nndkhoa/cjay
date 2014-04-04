@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
@@ -12,6 +13,7 @@ import org.androidannotations.annotations.ItemLongClick;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.Trace;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import android.app.AlertDialog;
@@ -64,7 +66,7 @@ public class AuditorContainerActivity extends CJayActivity {
 
 	private ArrayList<CJayImage> mFeeds;
 	private FunDapter<CJayImage> mFeedsAdapter;
-	
+
 	private ContainerSession mContainerSession;
 	private CJayImage mSelectedCJayImage;
 	private CJayImage mLongClickedCJayImage;
@@ -236,6 +238,7 @@ public class AuditorContainerActivity extends CJayActivity {
 		}
 	}
 
+	@UiThread
 	public void refresh() {
 		populateCjayImages();
 		mFeedsAdapter.updateData(mFeeds);
@@ -260,6 +263,73 @@ public class AuditorContainerActivity extends CJayActivity {
 					}
 				}
 			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Background
+	void setWWContainer() {
+		try {
+
+			long startTime = System.currentTimeMillis();
+			Logger.Log("*** Create container ve sinh ***");
+
+			// Set issue vệ sinh
+			Issue issue = new Issue();
+
+			String val = "BXXX";
+			// BXXX
+			issue.setLocationCode(val);
+
+			// DB
+			val = "DB";
+			DamageCode damageCode = null;
+			if (val != null && !TextUtils.isEmpty(val)) {
+				DamageCodeDaoImpl damageCodeDaoImpl = DataCenter
+						.getDatabaseHelper(context).getDamageCodeDaoImpl();
+				damageCode = damageCodeDaoImpl.findDamageCode(val);
+			}
+			issue.setDamageCode(damageCode);
+
+			// WW
+			val = "WW";
+			RepairCode repairCode = null;
+			if (val != null && !TextUtils.isEmpty(val)) {
+				RepairCodeDaoImpl repairCodeDaoImpl = DataCenter
+						.getDatabaseHelper(context).getRepairCodeDaoImpl();
+				repairCode = repairCodeDaoImpl.findRepairCode(val);
+			}
+			issue.setRepairCode(repairCode);
+
+			// FWA
+			val = "FWA";
+			ComponentCode componentCode = null;
+			if (val != null && !TextUtils.isEmpty(val)) {
+				ComponentCodeDaoImpl componentCodeDaoImpl = DataCenter
+						.getDatabaseHelper(context).getComponentCodeDaoImpl();
+				componentCode = componentCodeDaoImpl.findComponentCode(val);
+			}
+			issue.setComponentCode(componentCode);
+
+			issue.setQuantity("1");
+
+			issue.setContainerSession(mSelectedCJayImage.getContainerSession());
+			mSelectedCJayImage.setIssue(issue);
+
+			IssueDaoImpl issueDaoImpl = DataCenter.getDatabaseHelper(context)
+					.getIssueDaoImpl();
+			issueDaoImpl.createOrUpdate(issue);
+
+			CJayImageDaoImpl cJayImageDaoImpl = DataCenter.getDatabaseHelper(
+					context).getCJayImageDaoImpl();
+			cJayImageDaoImpl.createOrUpdate(mSelectedCJayImage);
+
+			refresh();
+			// cost 3s
+			long difference = System.currentTimeMillis() - startTime;
+			Logger.w("---> Total time: " + Long.toString(difference));
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -295,80 +365,7 @@ public class AuditorContainerActivity extends CJayActivity {
 							public void onClick(DialogInterface dialog,
 									int which) {
 
-								try {
-
-									long startTime = System.currentTimeMillis();
-									Logger.Log("*** Create container ve sinh ***");
-
-									// Set issue vệ sinh
-									Issue issue = new Issue();
-
-									String val = "BXXX";
-									// BXXX
-									issue.setLocationCode(val);
-
-									// DB
-									val = "DB";
-									DamageCode damageCode = null;
-									if (val != null && !TextUtils.isEmpty(val)) {
-										DamageCodeDaoImpl damageCodeDaoImpl = DataCenter
-												.getDatabaseHelper(context)
-												.getDamageCodeDaoImpl();
-										damageCode = damageCodeDaoImpl
-												.findDamageCode(val);
-									}
-									issue.setDamageCode(damageCode);
-
-									// WW
-									val = "WW";
-									RepairCode repairCode = null;
-									if (val != null && !TextUtils.isEmpty(val)) {
-										RepairCodeDaoImpl repairCodeDaoImpl = DataCenter
-												.getDatabaseHelper(context)
-												.getRepairCodeDaoImpl();
-										repairCode = repairCodeDaoImpl
-												.findRepairCode(val);
-									}
-									issue.setRepairCode(repairCode);
-
-									// FWA
-									val = "FWA";
-									ComponentCode componentCode = null;
-									if (val != null && !TextUtils.isEmpty(val)) {
-										ComponentCodeDaoImpl componentCodeDaoImpl = DataCenter
-												.getDatabaseHelper(context)
-												.getComponentCodeDaoImpl();
-										componentCode = componentCodeDaoImpl
-												.findComponentCode(val);
-									}
-									issue.setComponentCode(componentCode);
-
-									issue.setQuantity("1");
-
-									issue.setContainerSession(mSelectedCJayImage
-											.getContainerSession());
-									mSelectedCJayImage.setIssue(issue);
-
-									IssueDaoImpl issueDaoImpl = DataCenter
-											.getDatabaseHelper(context)
-											.getIssueDaoImpl();
-									issueDaoImpl.createOrUpdate(issue);
-
-									CJayImageDaoImpl cJayImageDaoImpl = DataCenter
-											.getDatabaseHelper(context)
-											.getCJayImageDaoImpl();
-
-									cJayImageDaoImpl
-											.createOrUpdate(mSelectedCJayImage);
-
-									long difference = System
-											.currentTimeMillis() - startTime;
-									Logger.w("---> Total time: "
-											+ Long.toString(difference));
-
-								} catch (SQLException e) {
-									e.printStackTrace();
-								}
+								setWWContainer();
 							}
 						});
 
