@@ -17,6 +17,7 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.Utils;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -102,7 +103,7 @@ public class ContainerSession {
 	boolean export;
 
 	@DatabaseField(columnName = FIELD_UPLOAD_CONFIRMATION, defaultValue = "false", index = true)
-	private boolean uploadConfirmation;
+	boolean uploadConfirmation;
 
 	// container_id
 	// operator_code
@@ -330,7 +331,7 @@ public class ContainerSession {
 
 		return StringHelper.getRelativeDate(
 				CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE,
-				check_out_time.toString());
+				Utils.stripNull(check_out_time));
 	}
 
 	public String getRawCheckOutTime() {
