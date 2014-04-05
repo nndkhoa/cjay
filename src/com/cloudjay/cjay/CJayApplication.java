@@ -12,7 +12,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -29,7 +28,6 @@ import com.cloudjay.cjay.util.DatabaseManager;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
-import com.koushikdutta.ion.Ion;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -170,13 +168,29 @@ public class CJayApplication extends Application {
 	}
 
 	public static void openPhotoGridView(Context ctx, String uuid,
-			int imageType, String containerId, String sourceTag) {
+			String containerId, int imageType, String sourceTag) {
 
-		Intent intent = new Intent(ctx, PhotoGridViewActivity_.class);
+		Intent intent = new Intent(ctx, PhotoExpandableListViewActivity_.class);
 		intent.putExtra(
-				PhotoGridViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA, uuid);
-		intent.putExtra(PhotoGridViewActivity_.CJAY_IMAGE_TYPE_1_EXTRA, imageType);
-		intent.putExtra(PhotoGridViewActivity_.CJAY_CONTAINER_ID_EXTRA,
+				PhotoExpandableListViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA, uuid);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_1_EXTRA, imageType);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_CONTAINER_ID_EXTRA,
+				containerId);
+		intent.putExtra("tag", sourceTag);
+
+		ctx.startActivity(intent);
+
+	}
+	
+	public static void openPhotoGridView(Context ctx, String uuid,
+			String containerId, int imageType1, int imageType2, String sourceTag) {
+
+		Intent intent = new Intent(ctx, PhotoExpandableListViewActivity_.class);
+		intent.putExtra(
+				PhotoExpandableListViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA, uuid);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_1_EXTRA, imageType1);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_2_EXTRA, imageType2);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_CONTAINER_ID_EXTRA,
 				containerId);
 		intent.putExtra("tag", sourceTag);
 

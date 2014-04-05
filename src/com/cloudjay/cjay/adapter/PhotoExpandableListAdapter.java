@@ -179,7 +179,7 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter implem
 			@Override
 			public Cursor loadInBackground() {
 				Cursor cursor = DataCenter.getInstance()
-						.getCJayImagesByContainer(getContext(),
+						.getCJayImagesCursorByContainer(getContext(),
 								mContainerSessionUUID, cursorLoaderImageType);
 
 				if (cursor != null) {

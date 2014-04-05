@@ -17,7 +17,6 @@ import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -37,7 +36,6 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.PhotoGridViewActivity_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateContainerCursorAdapter;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
@@ -278,17 +276,12 @@ public class GateImportListFragment extends SherlockFragment implements
 				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
 		String containerId = cursor.getString(cursor
 				.getColumnIndexOrThrow(Container.CONTAINER_ID));
-
-		Intent intent = new Intent(getActivity(), PhotoGridViewActivity_.class);
-		intent.putExtra(
-				PhotoGridViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA,
-				uuidString);
-		intent.putExtra(PhotoGridViewActivity_.CJAY_IMAGE_TYPE_1_EXTRA,
-				CJayImage.TYPE_IMPORT);
-		intent.putExtra(PhotoGridViewActivity_.CJAY_CONTAINER_ID_EXTRA,
-				containerId);
-
-		startActivity(intent);
+		
+		CJayApplication.openPhotoGridView(getActivity(),
+				uuidString,
+				containerId,
+				CJayImage.TYPE_IMPORT,
+				GateImportListFragment.LOG_TAG);
 	}
 
 	@ItemLongClick(R.id.feeds)
