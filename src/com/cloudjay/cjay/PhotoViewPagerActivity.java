@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.ViewById;
 
 import uk.co.senab.photoview.PhotoView;
@@ -40,25 +41,27 @@ public class PhotoViewPagerActivity extends CJayActivity {
 	@Extra(CJAY_IMAGE_TYPE_EXTRA)
 	int mCJayImageType = CJayImage.TYPE_IMPORT;
 	
+	@Extra("title")
+	String mTitle = "";
+	
 	@ViewById(R.id.view_pager)
 	HackyViewPager mViewPager;
-	
-//    @Override
-//	public void onCreate(Bundle savedInstanceState) {
-//		super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_view_pager);
-//        HackyViewPager mViewPager = (HackyViewPager) findViewById(R.id.view_pager);
-//		setContentView(mViewPager);
-//
-//		mViewPager.setAdapter(new PhotoPagerAdapter());  
-//	}
     
     @AfterViews
     void afterViews() {
+		// Set Activity Title
+		setTitle(mTitle);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		
 		mViewPager.setAdapter(new PhotoPagerAdapter(this, mContainerSessionUUID, mCJayImageType));
 		mViewPager.setCurrentItem(mStartPos);
     }
 
+	@OptionsItem(android.R.id.home)
+	void homeIconClicked() {
+		finish();
+	}
+	
 	static class PhotoPagerAdapter extends PagerAdapter {
 
 		private ArrayList<CJayImage> mCJayImages;

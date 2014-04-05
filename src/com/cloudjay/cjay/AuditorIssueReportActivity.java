@@ -30,7 +30,14 @@ import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
-import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.fragment.IssueReportComponentFragment_;
+import com.cloudjay.cjay.fragment.IssueReportDamageFragment_;
+import com.cloudjay.cjay.fragment.IssueReportDimensionFragment_;
+import com.cloudjay.cjay.fragment.IssueReportFragment;
+import com.cloudjay.cjay.fragment.IssueReportLocationFragment_;
+import com.cloudjay.cjay.fragment.IssueReportPhotoFragment_;
+import com.cloudjay.cjay.fragment.IssueReportQuantityFragment_;
+import com.cloudjay.cjay.fragment.IssueReportRepairFragment_;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ComponentCode;
@@ -38,7 +45,6 @@ import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.network.CJayClient;
-import com.cloudjay.cjay.util.Logger;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 // slide 20
@@ -51,42 +57,42 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 	public static final String CJAY_IMAGE_EXTRA = "cjay_image";
 
 	private AuditorIssueReportTabPageAdaptor mViewPagerAdapter;
-	private String[] locations;
+	private String[] mLocations;
 
 	private CJayImage mCJayImage;
 	private Issue mIssue;
-	private ImageLoader imageLoader;
+	private ImageLoader mImageLoader;
 
-	CJayImageDaoImpl cJayImageDaoImpl = null;
-	IssueDaoImpl issueDaoImpl = null;
+	CJayImageDaoImpl mCJayImageDaoImpl = null;
+	IssueDaoImpl mIssueDaoImpl = null;
 
 	@Extra(CJAY_IMAGE_EXTRA)
 	String mCJayImageUUID = "";
 
 	@ViewById(R.id.pager)
-	ViewPager pager;
+	ViewPager mPager;
 
 	@ViewById(R.id.item_picture)
-	ImageView imageView;
+	ImageView mImageView;
 
 	@AfterViews
 	void afterViews() {
 		try {
 
-			imageLoader = ImageLoader.getInstance();
+			mImageLoader = ImageLoader.getInstance();
 
-			if (null == cJayImageDaoImpl) {
-				cJayImageDaoImpl = CJayClient.getInstance()
+			if (null == mCJayImageDaoImpl) {
+				mCJayImageDaoImpl = CJayClient.getInstance()
 						.getDatabaseManager().getHelper(this)
 						.getCJayImageDaoImpl();
 			}
 
-			if (null == issueDaoImpl) {
-				issueDaoImpl = CJayClient.getInstance().getDatabaseManager()
+			if (null == mIssueDaoImpl) {
+				mIssueDaoImpl = CJayClient.getInstance().getDatabaseManager()
 						.getHelper(this).getIssueDaoImpl();
 			}
 
-			mCJayImage = cJayImageDaoImpl.findByUuid(mCJayImageUUID);
+			mCJayImage = mCJayImageDaoImpl.findByUuid(mCJayImageUUID);
 			if (mCJayImage.getIssue() == null) {
 
 				mIssue = new Issue();
@@ -98,17 +104,22 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 				mIssue = mCJayImage.getIssue();
 			}
 
-			imageLoader.displayImage(mCJayImage.getUri(), imageView);
+			mImageLoader.displayImage(mCJayImage.getUri(), mImageView);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
-		locations = getResources().getStringArray(
+		mLocations = getResources().getStringArray(
 				R.array.auditor_issue_report_tabs);
 
+		// load tabs
 		configureViewPager();
 		configureActionBar();
+		
+		// go to the 2nd tab
+		getSupportActionBar().selectTab(
+				getSupportActionBar().getTabAt(TAB_ISSUE_COMPONENT));
 	}
 
 	@OptionsItem(R.id.menu_check)
@@ -134,8 +145,8 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 
 		// save db records
 		try {
-			issueDaoImpl.createOrUpdate(mIssue);
-			cJayImageDaoImpl.createOrUpdate(mCJayImage);
+			mIssueDaoImpl.createOrUpdate(mIssue);
+			mCJayImageDaoImpl.createOrUpdate(mCJayImage);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -148,9 +159,9 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 	@Override
 	public void onTabSelected(Tab tab, FragmentTransaction ft) {
 		int position = tab.getPosition();
-		pager.setCurrentItem(position);
+		mPager.setCurrentItem(position);
 
-		LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) imageView
+		LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) mImageView
 				.getLayoutParams();
 
 		// show keyboard for specific tabs
@@ -159,7 +170,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 			// hide the small image because we are displaying a larger version
 			if (p.weight > 0) {
 				p.weight = 0;
-				imageView.setLayoutParams(p);
+				mImageView.setLayoutParams(p);
 			}
 			break;
 
@@ -174,7 +185,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 			// show the small image
 			if (p.weight == 0) {
 				p.weight = 3;
-				imageView.setLayoutParams(p);
+				mImageView.setLayoutParams(p);
 			}
 			break;
 
@@ -182,7 +193,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 			// show the small image
 			if (p.weight == 0) {
 				p.weight = 3;
-				imageView.setLayoutParams(p);
+				mImageView.setLayoutParams(p);
 			}
 			break;
 		}
@@ -235,16 +246,16 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 
 	private void configureViewPager() {
 		mViewPagerAdapter = new AuditorIssueReportTabPageAdaptor(
-				getSupportFragmentManager(), locations);
-		pager.setOffscreenPageLimit(5);
-		pager.setAdapter(mViewPagerAdapter);
-		pager.setOnPageChangeListener(this);
+				getSupportFragmentManager(), mLocations);
+		mPager.setOffscreenPageLimit(5);
+		mPager.setAdapter(mViewPagerAdapter);
+		mPager.setOnPageChangeListener(this);
 	}
 
 	private void configureActionBar() {
 
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		for (String location : locations) {
+		for (String location : mLocations) {
 
 			Tab tab = getSupportActionBar().newTab();
 			tab.setText(location);

@@ -18,7 +18,6 @@ import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -44,7 +43,9 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.CJayActivity;
+import com.cloudjay.cjay.CJayApplication;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
@@ -275,17 +276,13 @@ public class GateExportListFragment extends SherlockFragment implements
 	@OptionsItem(R.id.menu_edit_container)
 	void editMenuItemSelected() {
 		if (null != mSelectedContainerSession) {
-			Intent intent = new Intent(getActivity(),
-					PhotoGridViewActivity_.class);
-			intent.putExtra(
-					PhotoGridViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA,
-					mSelectedContainerSession.getUuid());
-			intent.putExtra(PhotoGridViewActivity_.CJAY_IMAGE_TYPE_EXTRA,
-					CJayImage.TYPE_EXPORT);
-			intent.putExtra(PhotoGridViewActivity_.CJAY_CONTAINER_ID_EXTRA,
-					mSelectedContainerSession.getContainerId());
-			startActivity(intent);
-
+			CJayApplication.openPhotoGridView(getActivity(),
+					mSelectedContainerSession.getUuid(),
+					mSelectedContainerSession.getContainerId(),
+					CJayImage.TYPE_EXPORT,
+					CJayImage.TYPE_REPAIRED,
+					GateExportListFragment.LOG_TAG);
+			
 			hideMenuItems();
 		}
 	}
@@ -313,7 +310,7 @@ public class GateExportListFragment extends SherlockFragment implements
 	@Click(R.id.add_button)
 	void addButtonClicked() {
 
-		// show add container dialog
+		// show add container dialog`
 		String containerId;
 		if (!TextUtils.isEmpty(mSearchEditText.getText().toString())) {
 			containerId = mSearchEditText.getText().toString();

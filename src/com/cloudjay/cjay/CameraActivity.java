@@ -581,15 +581,18 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			// Open GridView
 			if (sourceTag.equals(GateImportListFragment.LOG_TAG)) {
 				CJayApplication.openPhotoGridView(this,
-						containerSession.getUuid(), CJayImage.TYPE_IMPORT,
+						containerSession.getUuid(),
 						containerSession.getContainerId(),
+						CJayImage.TYPE_IMPORT,
 						GateImportListFragment.LOG_TAG);
 
 			} else if (sourceTag.equals(GateExportListFragment.LOG_TAG)) {
 
 				CJayApplication.openPhotoGridView(this,
-						containerSession.getUuid(), CJayImage.TYPE_EXPORT,
+						containerSession.getUuid(),
 						containerSession.getContainerId(),
+						CJayImage.TYPE_EXPORT,
+						CJayImage.TYPE_REPAIRED,
 						GateExportListFragment.LOG_TAG);
 			}
 		} catch (SQLException e) {

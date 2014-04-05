@@ -16,9 +16,9 @@ import java.util.regex.Pattern;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -29,6 +29,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.cloudjay.cjay.CJayActivity;
+import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.service.QueueIntentService_;
 import com.google.android.gms.common.ConnectionResult;
@@ -334,6 +336,23 @@ public class Utils {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	public static String getImageTypeDescription(Context ctx, int imageType) {
+		switch (imageType) {
+		case CJayImage.TYPE_IMPORT:
+			return ctx.getResources().getString(R.string.image_type_description_import);
+
+		case CJayImage.TYPE_EXPORT:
+			return ctx.getResources().getString(R.string.image_type_description_export);
+
+		case CJayImage.TYPE_REPORT:
+			return ctx.getResources().getString(R.string.image_type_description_report);
+
+		case CJayImage.TYPE_REPAIRED:
+		default:
+			return ctx.getResources().getString(R.string.image_type_description_repaired);
 		}
 	}
 
