@@ -314,40 +314,31 @@ public class AuditorContainerActivity extends CJayActivity implements
 		try {
 
 			long startTime = System.currentTimeMillis();
-			Logger.Log("*** Create container ve sinh ***");
+			Logger.Log("*** Create water wash issue***");
 
 			// Set issue vệ sinh
 			Issue issue = new Issue();
 
-			String val = "BXXX";
 			// BXXX
+			String val = "BXXX";
 			issue.setLocationCode(val);
 
 			// DB
 			val = "DB";
-			DamageCode damageCode = null;
-			if (val != null && !TextUtils.isEmpty(val)) {
-
-				damageCode = damageCodeDaoImpl.findDamageCode(val);
-			}
+			DamageCode damageCode = damageCodeDaoImpl.findDamageCode(val);
 			issue.setDamageCode(damageCode);
 
 			// WW
 			val = "WW";
-			RepairCode repairCode = null;
-			if (val != null && !TextUtils.isEmpty(val)) {
-
-				repairCode = repairCodeDaoImpl.findRepairCode(val);
-			}
+			RepairCode repairCode = repairCodeDaoImpl.findRepairCode(val);
 			issue.setRepairCode(repairCode);
 
 			// FWA
 			val = "FWA";
-			ComponentCode componentCode = null;
-			if (val != null && !TextUtils.isEmpty(val)) {
-				componentCode = componentCodeDaoImpl.findComponentCode(val);
-			}
+			ComponentCode componentCode = componentCodeDaoImpl
+					.findComponentCode(val);
 			issue.setComponentCode(componentCode);
+
 			issue.setQuantity("1");
 
 			issue.setContainerSession(mSelectedCJayImage.getContainerSession());
