@@ -7,7 +7,6 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
-import android.R.integer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -24,8 +23,6 @@ import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
-
-import de.greenrobot.event.EventBus;
 
 @EActivity(R.layout.activity_gate_home)
 public class GateHomeActivity extends CJayActivity implements

@@ -21,5 +21,5 @@ public interface IRepairCodeDao extends Dao<RepairCode, Integer> {
 
 	boolean isEmpty() throws SQLException;
 
-	RepairCode findRepairCode(String repairCode) throws SQLException;
+	RepairCode findByCode(String repairCode) throws SQLException;
 }

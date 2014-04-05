@@ -73,8 +73,10 @@ public class DataCenter {
 
 	public static AsyncTask<Void, Integer, Void> LoadDataTask;
 	public static AsyncTask<Void, Void, String> RegisterGCMTask;
+
 	private static DataCenter instance = null;
 	private IDatabaseManager databaseManager = null;
+	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
 
 	public DataCenter() {
 	}
@@ -110,48 +112,6 @@ public class DataCenter {
 		try {
 			return getDatabaseManager().getHelper(context).getOperatorDaoImpl()
 					.getAllOperators();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public List<ComponentCode> getListComponents(Context context) {
-		Logger.Log("get list Components");
-
-		try {
-			return getDatabaseManager().getHelper(context)
-					.getComponentCodeDaoImpl().getAllComponentCodes();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public List<DamageCode> getListDamageCodes(Context context) {
-		Logger.Log("get list Damage Codes");
-
-		try {
-			return getDatabaseManager().getHelper(context)
-					.getDamageCodeDaoImpl().getAllDamageCodes();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	/**
-	 * Get List of repair codes
-	 * 
-	 * @param context
-	 * @return
-	 */
-	public List<RepairCode> getListRepairCodes(Context context) {
-		Logger.Log("get list Repair Codes");
-
-		try {
-			return getDatabaseManager().getHelper(context)
-					.getRepairCodeDaoImpl().getAllRepairCodes();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -210,6 +170,27 @@ public class DataCenter {
 
 	public Cursor getUserLogCursor(Context context) {
 		String queryString = "SELECT * FROM user_log";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] {});
+	}
+
+	public Cursor getDamageCodesCursor(Context context) {
+
+		String queryString = "SELECT id as _id, display_name, code FROM damage_code";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] {});
+	}
+
+	public Cursor getRepairCodesCursor(Context context) {
+
+		String queryString = "SELECT id as _id, display_name, code FROM repair_code";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] {});
+	}
+
+	public Cursor getComponentCodesCursor(Context context) {
+
+		String queryString = "SELECT id as _id, display_name, code FROM component_code";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
 				queryString, new String[] {});
 	}
@@ -278,7 +259,17 @@ public class DataCenter {
 		return null;
 	}
 
-	public Cursor getCJayImagesByContainer(Context context,
+	public Cursor getIssueItemCursorByContainer(Context context,
+			String containerSessionUUID, int imageType) {
+
+		String queryString = "SELECT * FROM issue_item_view WHERE containerSession_id LIKE ? AND type = ?";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString,
+				new String[] { containerSessionUUID + "%",
+						String.valueOf(imageType) });
+	}
+
+	public Cursor getCJayImagesCursorByContainer(Context context,
 			String containerSessionUUID, int imageType) {
 		String queryString = "SELECT * FROM cjay_image WHERE containerSession_id LIKE ? AND type = ?";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
@@ -315,6 +306,36 @@ public class DataCenter {
 
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(
 				queryString, new String[] { constraint + "%" });
+	}
+
+	public Cursor filterDamageCodeCursor(Context context,
+			CharSequence constraint) {
+
+		String queryString = "SELECT id as _id, code, display_name FROM damage_code"
+				+ " WHERE code LIKE ? ORDER BY id LIMIT 100";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] { "%" + constraint + "%" });
+	}
+
+	public Cursor filterRepairCodeCursor(Context context,
+			CharSequence constraint) {
+
+		String queryString = "SELECT id as _id, code, display_name FROM repair_code"
+				+ " WHERE code LIKE ? ORDER BY id LIMIT 100";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] { "%" + constraint + "%" });
+	}
+
+	public Cursor filterComponentCodeCursor(Context context,
+			CharSequence constraint) {
+
+		String queryString = "SELECT id as _id, code, display_name FROM component_code"
+				+ " WHERE code LIKE ? ORDER BY id LIMIT 100";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(
+				queryString, new String[] { "%" + constraint + "%" });
 	}
 
 	public Cursor filterNotReportedCursor(Context context,
@@ -428,6 +449,7 @@ public class DataCenter {
 			throws NoConnectionException, SQLException, NullSessionException {
 
 		Logger.Log("*** UPDATE LIST CONTAINER SESSIONS ***");
+		long startTime = System.currentTimeMillis();
 		PreferencesUtil.storePrefsValue(ctx,
 				PreferencesUtil.PREF_IS_UPDATING_DATA, true);
 
@@ -460,7 +482,6 @@ public class DataCenter {
 				List<ContainerSession> containerSessions = new ArrayList<ContainerSession>();
 				ContainerSessionResult result = null;
 
-				long startTime = System.currentTimeMillis();
 				result = CJayClient.getInstance().getContainerSessionsByPage(
 						ctx, lastUpdate, page);
 
@@ -481,6 +502,7 @@ public class DataCenter {
 							if (null != containerSession) {
 								containerSessions.add(containerSession);
 							}
+
 						}
 					}
 
@@ -489,14 +511,13 @@ public class DataCenter {
 
 					if (null != containerSessions
 							&& !containerSessions.isEmpty()) {
+
 						EventBus.getDefault().post(
 								new ContainerSessionChangedEvent(
 										containerSessions));
+
 					}
 				}
-
-				long difference = System.currentTimeMillis() - startTime;
-				Logger.w("---> Total time: " + Long.toString(difference));
 
 			} while (!TextUtils.isEmpty(nextUrl));
 
@@ -525,6 +546,8 @@ public class DataCenter {
 					PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			e.printStackTrace();
 		}
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.w("---> Total time: " + Long.toString(difference));
 	}
 
 	/**
@@ -541,6 +564,7 @@ public class DataCenter {
 			SQLException, NullSessionException {
 
 		Logger.Log("*** UPDATE LIST OPERATORS ***");
+		long startTime = System.currentTimeMillis();
 
 		try {
 
@@ -575,8 +599,13 @@ public class DataCenter {
 					PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE,
 					nowString);
 
-			if (null != operators)
-				operatorDaoImpl.addListOperators(operators);
+			if (null != operators) {
+
+				operatorDaoImpl.bulkInsert(DataCenter.getDatabaseHelper(ctx)
+						.getWritableDatabase(), operators);
+
+				// operatorDaoImpl.addListOperators(operators);
+			}
 
 		} catch (NoConnectionException e) {
 			throw e;
@@ -587,6 +616,9 @@ public class DataCenter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.w("---> Total time: " + Long.toString(difference));
 	}
 
 	/**

@@ -23,5 +23,5 @@ public interface IComponentCodeDao extends Dao<ComponentCode, Integer> {
 
 	boolean isEmpty() throws SQLException;
 
-	ComponentCode findComponentCode(String componentCode) throws SQLException;
+	ComponentCode findByCode(String componentCode) throws SQLException;
 }

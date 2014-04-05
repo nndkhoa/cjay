@@ -38,6 +38,7 @@ import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.Logger;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 // slide 20
@@ -51,32 +52,49 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 
 	private AuditorIssueReportTabPageAdaptor mViewPagerAdapter;
 	private String[] locations;
+
 	private CJayImage mCJayImage;
 	private Issue mIssue;
 	private ImageLoader imageLoader;
+
+	CJayImageDaoImpl cJayImageDaoImpl = null;
+	IssueDaoImpl issueDaoImpl = null;
 
 	@Extra(CJAY_IMAGE_EXTRA)
 	String mCJayImageUUID = "";
 
 	@ViewById(R.id.pager)
 	ViewPager pager;
+
 	@ViewById(R.id.item_picture)
 	ImageView imageView;
 
 	@AfterViews
 	void afterViews() {
 		try {
+
 			imageLoader = ImageLoader.getInstance();
 
-			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance()
-					.getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
+			if (null == cJayImageDaoImpl) {
+				cJayImageDaoImpl = CJayClient.getInstance()
+						.getDatabaseManager().getHelper(this)
+						.getCJayImageDaoImpl();
+			}
+
+			if (null == issueDaoImpl) {
+				issueDaoImpl = CJayClient.getInstance().getDatabaseManager()
+						.getHelper(this).getIssueDaoImpl();
+			}
+
 			mCJayImage = cJayImageDaoImpl.findByUuid(mCJayImageUUID);
 			if (mCJayImage.getIssue() == null) {
 
 				mIssue = new Issue();
 				mIssue.setContainerSession(mCJayImage.getContainerSession());
 				mCJayImage.setIssue(mIssue);
+
 			} else {
+
 				mIssue = mCJayImage.getIssue();
 			}
 
@@ -88,12 +106,14 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 
 		locations = getResources().getStringArray(
 				R.array.auditor_issue_report_tabs);
+
 		configureViewPager();
 		configureActionBar();
 	}
 
 	@OptionsItem(R.id.menu_check)
 	void checkMenuItemClicked() {
+
 		// validate and save data
 		boolean isValidated = true;
 		for (int i = 0; i < mViewPagerAdapter.getCount(); i++) {
@@ -106,19 +126,14 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 			}
 		}
 		if (!isValidated) {
-			Toast.makeText(this, getString(R.string.issue_details_missing_warning), Toast.LENGTH_LONG).show();
+			Toast.makeText(this,
+					getString(R.string.issue_details_missing_warning),
+					Toast.LENGTH_LONG).show();
 			return;
 		}
 
 		// save db records
 		try {
-			IssueDaoImpl issueDaoImpl = CJayClient.getInstance()
-					.getDatabaseManager().getHelper(this).getIssueDaoImpl();
-
-			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance()
-					.getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
-
-			// issueDaoImpl.createOrUpdate(mCJayImage.getIssue());
 			issueDaoImpl.createOrUpdate(mIssue);
 			cJayImageDaoImpl.createOrUpdate(mCJayImage);
 
@@ -227,8 +242,10 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 	}
 
 	private void configureActionBar() {
+
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		for (String location : locations) {
+
 			Tab tab = getSupportActionBar().newTab();
 			tab.setText(location);
 			tab.setTabListener(this);
@@ -242,6 +259,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 		// go to next tab
 		int currPosition = getSupportActionBar().getSelectedNavigationIndex();
 		if (currPosition < getSupportActionBar().getTabCount() - 1) {
+
 			getSupportActionBar().selectTab(
 					getSupportActionBar().getTabAt(++currPosition));
 
@@ -278,7 +296,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 					DamageCodeDaoImpl damageCodeDaoImpl = CJayClient
 							.getInstance().getDatabaseManager().getHelper(this)
 							.getDamageCodeDaoImpl();
-					damageCode = damageCodeDaoImpl.findDamageCode(val);
+					damageCode = damageCodeDaoImpl.findByCode(val);
 				}
 				mCJayImage.getIssue().setDamageCode(damageCode);
 			} catch (SQLException e) {
@@ -287,14 +305,17 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 
 			break;
 		case TYPE_REPAIR_CODE:
+
 			try {
+
 				RepairCode repairCode = null;
 				if (val != null && !TextUtils.isEmpty(val)) {
 					RepairCodeDaoImpl repairCodeDaoImpl = CJayClient
 							.getInstance().getDatabaseManager().getHelper(this)
 							.getRepairCodeDaoImpl();
-					repairCode = repairCodeDaoImpl.findRepairCode(val);
+					repairCode = repairCodeDaoImpl.findByCode(val);
 				}
+
 				mCJayImage.getIssue().setRepairCode(repairCode);
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -308,7 +329,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 					ComponentCodeDaoImpl componentCodeDaoImpl = CJayClient
 							.getInstance().getDatabaseManager().getHelper(this)
 							.getComponentCodeDaoImpl();
-					componentCode = componentCodeDaoImpl.findComponentCode(val);
+					componentCode = componentCodeDaoImpl.findByCode(val);
 				}
 				mCJayImage.getIssue().setComponentCode(componentCode);
 			} catch (SQLException e) {

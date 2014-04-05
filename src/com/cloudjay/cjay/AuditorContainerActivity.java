@@ -1,9 +1,10 @@
 package com.cloudjay.cjay;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.UUID;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
@@ -11,34 +12,44 @@ import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ItemLongClick;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.Trace;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
+import android.R.integer;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.view.Menu;
-import com.ami.fundapter.BindDictionary;
-import com.ami.fundapter.FunDapter;
-import com.ami.fundapter.extractors.StringExtractor;
-import com.ami.fundapter.interfaces.DynamicImageLoader;
+import com.cloudjay.cjay.adapter.IssueItemCursorAdapter;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
+import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
+import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.model.CJayImage;
+import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Issue;
-import com.cloudjay.cjay.network.CJayClient;
-import com.cloudjay.cjay.util.DatabaseHelper;
+import com.cloudjay.cjay.model.RepairCode;
+import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.Utils;
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.cloudjay.cjay.util.CJayCustomCursorLoader;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
@@ -47,18 +58,27 @@ import de.keyboardsurfer.android.widget.crouton.Style;
 
 @EActivity(R.layout.activity_auditor_container)
 @OptionsMenu(R.menu.menu_auditor_container)
-public class AuditorContainerActivity extends CJayActivity {
+public class AuditorContainerActivity extends CJayActivity implements
+		android.app.LoaderManager.LoaderCallbacks<Cursor> {
 
 	private static final String LOG_TAG = "AuditorContainerActivity";
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
 
-	private ArrayList<CJayImage> mFeeds;
-	private FunDapter<CJayImage> mFeedsAdapter;
 	private ContainerSession mContainerSession;
 	private CJayImage mSelectedCJayImage;
 	private CJayImage mLongClickedCJayImage;
-	private ImageLoader imageLoader;
 	private int mNewImageCount;
+
+	private String mSelectedCJayImageUuid;
+	private String mLongClickedCJayImageUuid;
+
+	ContainerSessionDaoImpl containerSessionDaoImpl = null;
+	CJayImageDaoImpl cJayImageDaoImpl = null;
+	IssueDaoImpl issueDaoImpl = null;
+
+	int mItemLayout = R.layout.list_item_issue;
+	IssueItemCursorAdapter mCursorAdapter;
+	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_ISSUE_ITEM;
 
 	@ViewById(R.id.btn_add_new)
 	ImageButton mAddButton;
@@ -74,16 +94,59 @@ public class AuditorContainerActivity extends CJayActivity {
 
 	@AfterViews
 	void afterViews() {
-		imageLoader = ImageLoader.getInstance();
 
-		initImageFeedAdapter(null);
+		try {
+
+			if (null == containerSessionDaoImpl)
+				containerSessionDaoImpl = DataCenter.getDatabaseHelper(context)
+						.getContainerSessionDaoImpl();
+
+			mContainerSession = containerSessionDaoImpl
+					.queryForId(mContainerSessionUUID);
+
+			if (null == cJayImageDaoImpl)
+				cJayImageDaoImpl = DataCenter.getDatabaseHelper(context)
+						.getCJayImageDaoImpl();
+
+			if (null == issueDaoImpl)
+				issueDaoImpl = DataCenter.getDatabaseHelper(context)
+						.getIssueDaoImpl();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		getLoaderManager().initLoader(LOADER_ID, null, this);
+
 		mLongClickedCJayImage = null;
 		mSelectedCJayImage = null;
 		mNewImageCount = 0;
+
+		getOtherDao();
+	}
+
+	DamageCodeDaoImpl damageCodeDaoImpl = null;
+	RepairCodeDaoImpl repairCodeDaoImpl = null;
+	ComponentCodeDaoImpl componentCodeDaoImpl = null;
+
+	@Background
+	void getOtherDao() {
+		try {
+			damageCodeDaoImpl = DataCenter.getDatabaseHelper(context)
+					.getDamageCodeDaoImpl();
+			repairCodeDaoImpl = DataCenter.getDatabaseHelper(context)
+					.getRepairCodeDaoImpl();
+			componentCodeDaoImpl = DataCenter.getDatabaseHelper(context)
+					.getComponentCodeDaoImpl();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	@ItemClick(R.id.feeds)
 	void imageItemClicked(int position) {
+
 		// refresh highlighting
 		mFeedListView.setItemChecked(position, false);
 
@@ -91,40 +154,63 @@ public class AuditorContainerActivity extends CJayActivity {
 		mLongClickedCJayImage = null;
 		supportInvalidateOptionsMenu();
 
-		mSelectedCJayImage = mFeedsAdapter.getItem(position);
-		if (mSelectedCJayImage.getIssue() != null) {
-			// Already has issue, display that issue
-			showIssueReport();
+		Cursor cursor = (Cursor) mCursorAdapter.getItem(position);
+		mSelectedCJayImageUuid = cursor.getString(cursor
+				.getColumnIndexOrThrow("uuid"));
+
+		String issueId = cursor.getString(cursor
+				.getColumnIndexOrThrow("issue_id"));
+
+		Logger.e("Click on " + issueId);
+
+		if (!TextUtils.isEmpty(issueId)) {
+			showIssueReport(mSelectedCJayImageUuid);
 		} else {
-			// Don't have issue, ask to whether create new issue, or assign an
-			// issue
 			showReportDialog();
 		}
+
 	}
 
 	@ItemLongClick(R.id.feeds)
 	void imageItemLongClicked(int position) {
+
 		// refresh highlighting
 		mFeedListView.setItemChecked(position, true);
 
 		// refresh menu
-		mLongClickedCJayImage = mFeedsAdapter.getItem(position);
+		Cursor cursor = (Cursor) mCursorAdapter.getItem(position);
+		mLongClickedCJayImageUuid = cursor.getString(cursor
+				.getColumnIndexOrThrow("uuid"));
+
+		try {
+			mLongClickedCJayImage = cJayImageDaoImpl
+					.findByUuid(mLongClickedCJayImageUuid);
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		}
+
 		supportInvalidateOptionsMenu();
 	}
 
 	@Click(R.id.btn_add_new)
 	void cameraClicked() {
+
 		mNewImageCount = 0;
 		Intent intent = new Intent(this, CameraActivity_.class);
+
 		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
 				mContainerSession.getUuid());
+
 		intent.putExtra("type", CJayImage.TYPE_REPORT);
 		intent.putExtra("tag", LOG_TAG);
 		startActivity(intent);
+
 	}
 
 	@OptionsItem(R.id.menu_trash)
 	void trashMenuItemClicked() {
+
 		if (mLongClickedCJayImage != null) {
 			boolean issueDeleted = false;
 
@@ -149,13 +235,6 @@ public class AuditorContainerActivity extends CJayActivity {
 
 			// update records in db
 			try {
-				DatabaseHelper databaseHelper = CJayClient.getInstance()
-						.getDatabaseManager().getHelper(this);
-				ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper
-						.getContainerSessionDaoImpl();
-				CJayImageDaoImpl cJayImageDaoImpl = databaseHelper
-						.getCJayImageDaoImpl();
-				IssueDaoImpl issueDaoImpl = databaseHelper.getIssueDaoImpl();
 
 				containerSessionDaoImpl.update(mContainerSession);
 				if (issueDeleted) {
@@ -188,7 +267,9 @@ public class AuditorContainerActivity extends CJayActivity {
 			mContainerSession.setUploadType(ContainerSession.TYPE_AUDIT);
 			CJayApplication.uploadContainerSesison(getApplicationContext(),
 					mContainerSession);
+
 		} else {
+
 			Crouton.cancelAllCroutons();
 			Crouton.makeText(this, R.string.alert_invalid_container,
 					Style.ALERT).show();
@@ -210,165 +291,195 @@ public class AuditorContainerActivity extends CJayActivity {
 
 	@Override
 	public void onResume() {
+
 		super.onResume();
 
 		if (mNewImageCount > 1) {
+
 			// when more than one images were taken continuously,
 			// then go back to container list
 			mNewImageCount = 0;
 			this.onBackPressed();
 
 		} else {
+
 			// otherwise refresh the image list
-			refresh();
+			if (mCursorAdapter != null) {
+				refresh();
+			}
+
 		}
 	}
 
+	@UiThread
 	public void refresh() {
-		populateCjayImages();
-		mFeedsAdapter.updateData(mFeeds);
+		getLoaderManager().restartLoader(LOADER_ID, null, this);
 		supportInvalidateOptionsMenu();
 	}
 
-	private void populateCjayImages() {
-		mFeeds = new ArrayList<CJayImage>();
-		try {
-			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-					.getInstance().getDatabaseManager().getHelper(this)
-					.getContainerSessionDaoImpl();
-			mContainerSession = containerSessionDaoImpl
-					.queryForId(mContainerSessionUUID);
+	@Background
+	void setWWContainer() {
+		long startTime = System.currentTimeMillis();
+		Logger.Log("*** Create water wash issue***");
 
-			if (null != mContainerSession) {
-				containerIdTextView.setText(mContainerSession.getContainerId());
+		SQLiteDatabase db = DataCenter.getDatabaseHelper(context)
+				.getWritableDatabase();
 
-				for (CJayImage cJayImage : mContainerSession.getCJayImages()) {
-					if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
-						mFeeds.add(cJayImage);
-					}
-				}
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+		Cursor damageCursor = db.rawQuery(
+				"select id as _id from damage_code where code = ?",
+				new String[] { "DB" });
+
+		int damageId = 0;
+		if (damageCursor.moveToFirst()) {
+			damageId = damageCursor.getInt(damageCursor
+					.getColumnIndexOrThrow("_id"));
 		}
+
+		Cursor repairCursor = db.rawQuery(
+				"select id as _id from repair_code where code = ?",
+				new String[] { "WW" });
+
+		int repairId = 0;
+		if (repairCursor.moveToFirst()) {
+			repairId = repairCursor.getInt(repairCursor
+					.getColumnIndexOrThrow("_id"));
+		}
+
+		Cursor componentCursor = db.rawQuery(
+				"select id as _id from component_code where code = ?",
+				new String[] { "FWA" });
+
+		int componentId = 0;
+		if (componentCursor.moveToFirst()) {
+			componentId = componentCursor.getInt(componentCursor
+					.getColumnIndexOrThrow("_id"));
+		}
+
+		String issueId = UUID.randomUUID().toString();
+		db.execSQL("insert into issue VALUES (" + componentId + ", '"
+				+ mContainerSessionUUID + "', " + damageId + ", '" + issueId
+				+ "', NULL, " + repairId + ", NULL, 'BXXX', 1, 0, 0)");
+
+		String sqlString = "UPDATE cjay_image SET issue_id = '" + issueId
+				+ "' WHERE uuid = '" + mSelectedCJayImageUuid + "'";
+
+		db.execSQL(sqlString);
+
+		sqlString = "UPDATE cjay_image SET issue_id = '" + issueId
+				+ "' WHERE uuid = '" + mSelectedCJayImageUuid + "'";
+
+		refresh();
+
+		// cost 50ms
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.w("---> Total time: " + Long.toString(difference));
 	}
 
-	private void showReportDialog() {
+	@Trace(level = Log.INFO)
+	void showReportDialog() {
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(this)
 				.setMessage(R.string.dialog_report_message)
 				.setTitle(R.string.dialog_report_title)
+
 				.setPositiveButton(R.string.dialog_report_no,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
+
 								// Issue not reported, report issue
-								showIssueReport();
+								showIssueReport(mSelectedCJayImageUuid);
+
 							}
 						})
+
 				.setNegativeButton(R.string.dialog_report_yes,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
+
 								// The issue already reported, assign this image
 								// to that issue
-								showIssueAssigment();
+								showIssueAssigment(mSelectedCJayImageUuid);
+							}
+						})
+				.setNeutralButton(R.string.dialog_report_neutral,
+						new OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+
+								setWWContainer();
 							}
 						});
 
 		builder.show();
 	}
 
-	private void showIssueReport() {
+	private void showIssueReport(String imageUuid) {
+
 		Intent intent = new Intent(this, AuditorIssueReportActivity_.class);
-		intent.putExtra(AuditorIssueReportActivity_.CJAY_IMAGE_EXTRA,
-				mSelectedCJayImage.getUuid());
+		intent.putExtra(AuditorIssueReportActivity_.CJAY_IMAGE_EXTRA, imageUuid);
 		startActivity(intent);
+
 	}
 
-	private void showIssueAssigment() {
+	private void showIssueAssigment(String imageUuid) {
+
 		Intent intent = new Intent(this, AuditorIssueAssigmentActivity_.class);
 		intent.putExtra(AuditorIssueAssigmentActivity_.CJAY_IMAGE_EXTRA,
-				mSelectedCJayImage.getUuid());
+				imageUuid);
 		startActivity(intent);
-	}
 
-	private void initImageFeedAdapter(ArrayList<CJayImage> containers) {
-		BindDictionary<CJayImage> feedsDict = new BindDictionary<CJayImage>();
-		feedsDict.addStringField(R.id.issue_location_code,
-				new StringExtractor<CJayImage>() {
-					@Override
-					public String getStringValue(CJayImage item, int position) {
-						return Utils.replaceNullBySpace(item
-								.getIssueLocationCode());
-					}
-				});
-		feedsDict.addStringField(R.id.issue_damage_code,
-				new StringExtractor<CJayImage>() {
-					@Override
-					public String getStringValue(CJayImage item, int position) {
-						return Utils.replaceNullBySpace(item
-								.getIssueDamageCode());
-					}
-				});
-		feedsDict.addStringField(R.id.issue_repair_code,
-				new StringExtractor<CJayImage>() {
-					@Override
-					public String getStringValue(CJayImage item, int position) {
-						return Utils.replaceNullBySpace(item
-								.getIssueRepairCode());
-					}
-				});
-		feedsDict.addStringField(R.id.issue_component_code,
-				new StringExtractor<CJayImage>() {
-					@Override
-					public String getStringValue(CJayImage item, int position) {
-						return Utils.replaceNullBySpace(item
-								.getIssueComponentCode());
-					}
-				});
-		feedsDict.addStringField(R.id.issue_quantity,
-				new StringExtractor<CJayImage>() {
-					@Override
-					public String getStringValue(CJayImage item, int position) {
-						return Utils.replaceNullBySpace(item.getIssueQuantity());
-					}
-				});
-		feedsDict.addStringField(R.id.issue_length,
-				new StringExtractor<CJayImage>() {
-					@Override
-					public String getStringValue(CJayImage item, int position) {
-						return Utils.replaceNullBySpace(item.getIssueLength());
-					}
-				});
-		feedsDict.addStringField(R.id.issue_height,
-				new StringExtractor<CJayImage>() {
-					@Override
-					public String getStringValue(CJayImage item, int position) {
-						return Utils.replaceNullBySpace(item.getIssueHeight());
-					}
-				});
-		feedsDict.addDynamicImageField(R.id.issue_picture,
-				new StringExtractor<CJayImage>() {
-					@Override
-					public String getStringValue(CJayImage item, int position) {
-						return item.getUri();
-					}
-				}, new DynamicImageLoader() {
-					@Override
-					public void loadImage(String url, ImageView view) {
-						if (url != null && !TextUtils.isEmpty(url)) {
-							imageLoader.displayImage(url, view);
-						} else {
-							view.setImageResource(R.drawable.ic_app);
-						}
-					}
-				});
-		mFeedsAdapter = new FunDapter<CJayImage>(this, containers,
-				R.layout.list_item_issue, feedsDict);
-		mFeedListView.setAdapter(mFeedsAdapter);
 	}
 
 	public void onEvent(CJayImageAddedEvent event) {
 		if (event.getTag().equals(LOG_TAG)) {
 			mNewImageCount++;
 		}
+	}
+
+	@Override
+	public android.content.Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+
+		Context context = this;
+		return new CJayCustomCursorLoader(context) {
+
+			@Override
+			public Cursor loadInBackground() {
+				Cursor cursor = DataCenter.getInstance()
+						.getIssueItemCursorByContainer(getContext(),
+								mContainerSessionUUID, CJayImage.TYPE_REPORT);
+
+				if (cursor != null) {
+					// Ensure the cursor window is filled
+					cursor.getCount();
+					cursor.registerContentObserver(mObserver);
+				}
+
+				return cursor;
+			}
+		};
+	}
+
+	@Override
+	public void onLoadFinished(android.content.Loader<Cursor> loader,
+			Cursor cursor) {
+
+		final Context context = this;
+
+		if (mCursorAdapter == null) {
+			mCursorAdapter = new IssueItemCursorAdapter(context, mItemLayout,
+					cursor, 0);
+			mFeedListView.setAdapter(mCursorAdapter);
+
+		} else {
+			mCursorAdapter.swapCursor(cursor);
+		}
+
+	}
+
+	@Override
+	public void onLoaderReset(android.content.Loader<Cursor> loader) {
+		mCursorAdapter.swapCursor(null);
 	}
 }

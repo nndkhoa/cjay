@@ -61,8 +61,7 @@ public class ComponentCodeDaoImpl extends BaseDaoImpl<ComponentCode, Integer>
 	}
 
 	@Override
-	public ComponentCode findComponentCode(String componentCode)
-			throws SQLException {
+	public ComponentCode findByCode(String componentCode) throws SQLException {
 		List<ComponentCode> listComponentCodes = queryForEq(ComponentCode.CODE,
 				componentCode);
 

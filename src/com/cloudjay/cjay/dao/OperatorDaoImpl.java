@@ -5,7 +5,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
+
 import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.util.DataCenter;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
@@ -29,6 +33,26 @@ public class OperatorDaoImpl extends BaseDaoImpl<Operator, Integer> implements
 		});
 
 		return operators;
+	}
+
+	public void bulkInsert(SQLiteDatabase db, List<Operator> operators) {
+
+		try {
+			db.beginTransaction();
+
+			for (Operator operator : operators) {
+
+				ContentValues values = new ContentValues();
+				values.put(Operator.FIELD_CODE, operator.getCode());
+				values.put(Operator.FIELD_NAME, operator.getName());
+				db.insert("operator", null, values);
+
+			}
+
+			db.setTransactionSuccessful();
+		} finally {
+			db.endTransaction();
+		}
 	}
 
 	@Override
@@ -59,10 +83,11 @@ public class OperatorDaoImpl extends BaseDaoImpl<Operator, Integer> implements
 
 		return false;
 	}
-	
+
 	public Operator findOperator(String operatorCode) throws SQLException {
-		List<Operator> listOperators = queryForEq(Operator.FIELD_CODE, operatorCode);
-		
+		List<Operator> listOperators = queryForEq(Operator.FIELD_CODE,
+				operatorCode);
+
 		if (listOperators.isEmpty()) {
 			return null;
 		} else {

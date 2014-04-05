@@ -7,6 +7,8 @@ import com.cloudjay.cjay.model.CJayImage;
 import com.j256.ormlite.dao.Dao;
 
 public interface ICJayImageDao extends Dao<CJayImage, String> {
+
+
 	List<CJayImage> getAllCJayImages() throws SQLException;
 
 	void addListCJayImages(List<CJayImage> cJayImages) throws SQLException;

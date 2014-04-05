@@ -4,12 +4,12 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.database.Cursor;
 
-public abstract class UploadCursorLoader extends CursorLoader {
+public abstract class CJayCustomCursorLoader extends CursorLoader {
 
 	private Cursor mCursor;
 	protected final ForceLoadContentObserver mObserver = new ForceLoadContentObserver();
 
-	public UploadCursorLoader(Context context) {
+	public CJayCustomCursorLoader(Context context) {
 		super(context);
 	}
 

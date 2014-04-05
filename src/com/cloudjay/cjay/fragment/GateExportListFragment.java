@@ -74,9 +74,11 @@ public class GateExportListFragment extends SherlockFragment implements
 
 	public final static String LOG_TAG = "GateExportListFragment";
 	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_GATE_EXPORT;
+
 	private ArrayList<Operator> mOperators;
 	private ContainerSession mSelectedContainerSession = null;
 	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
+
 	private int mItemLayout = R.layout.list_item_container;
 	private int mCurrentPosition = -1;
 
@@ -225,8 +227,6 @@ public class GateExportListFragment extends SherlockFragment implements
 				Cursor cursor = DataCenter.getInstance()
 						.getCheckOutContainerSessionCursor(getContext());
 
-				
-				
 				if (cursor != null) {
 					// Ensure the cursor window is filled
 					setTotalItems(cursor.getCount());

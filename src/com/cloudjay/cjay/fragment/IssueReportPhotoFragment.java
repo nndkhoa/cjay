@@ -22,7 +22,12 @@ public class IssueReportPhotoFragment extends IssueReportFragment {
 	@AfterViews
 	void afterViews() {
 		mImageLoader = ImageLoader.getInstance();
-		mImageLoader.displayImage(mCJayImage.getUri(), mImageView);
+		try {
+			mImageLoader.displayImage(mCJayImage.getUri(), mImageView);	
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	@Override

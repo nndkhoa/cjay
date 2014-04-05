@@ -50,7 +50,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			CJayImage.class };
 
 	public static final String DATABASE_NAME = "cjay.db";
-	public static final int DATABASE_VERSION = 2;
+	public static final int DATABASE_VERSION = 3;
 
 	UserDaoImpl userDaoImpl = null;
 	OperatorDaoImpl operatorDaoImpl = null;
@@ -62,7 +62,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	DepotDaoImpl depotDaoImpl = null;
 	RepairCodeDaoImpl repairCodeDaoImpl = null;
 	ComponentCodeDaoImpl componentCodeDaoImpl = null;
-
 	UserLogDaoImpl userLogDaoImpl = null;
 
 	private static class Patch {
@@ -79,6 +78,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 		public void apply(SQLiteDatabase db, ConnectionSource connectionSource) {
 
+			Logger.Log("create core tables");
 			for (Class<?> dataClass : DATA_CLASSES) {
 				try {
 					TableUtils.createTable(connectionSource, dataClass);
@@ -91,6 +91,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 			// Create view
 			// csview --> join table operator + container + container_session
+			Logger.Log("create view csview");
 			String sql = "CREATE VIEW csview AS"
 					+ " SELECT cs._id, cs.check_out_time, cs.check_in_time, cs.image_id_path, cs.on_local, cs.fixed, cs.export, cs.upload_confirmation, cs.state, cs.cleared, c.container_id, o.operator_name"
 					+ " FROM container_session AS cs, container AS c"
@@ -99,6 +100,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			db.execSQL(sql);
 
 			// view for validate container sessions before upload in Gate Import
+			Logger.Log("create view cs_import_validation_view");
 			sql = "CREATE VIEW cs_import_validation_view as"
 					+ " SELECT cs.*, count(cjay_image._id) as import_image_count "
 					+ " FROM csview cs"
@@ -108,6 +110,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			db.execSQL(sql);
 
 			// view for validate container sessions before upload in Gate Export
+			Logger.Log("create view cs_export_validation_view");
 			sql = "CREATE VIEW cs_export_validation_view as"
 					+ " SELECT cs.*, count(cjay_image._id) as export_image_count "
 					+ " FROM csview cs"
@@ -117,6 +120,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			db.execSQL(sql);
 
 			// csiview --> csview + issue_count
+			Logger.Log("create view csiview");
 			sql = "CREATE VIEW csiview AS"
 					+ " SELECT csview.*, count(issue.containerSession_id) as issue_count"
 					+ " FROM issue JOIN csview ON issue.containerSession_id = csview._id"
@@ -133,6 +137,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			db.execSQL(sql);
 
 			// view for validate container sessions before upload in Auditor
+			Logger.Log("create view csi_auditor_validation_view");
 			sql = "create view csi_auditor_validation_view as"
 					+ " select csi.*, count(image._id) as auditor_image_no_issue_count"
 					+ " from"
@@ -150,6 +155,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			db.execSQL(sql);
 
 			// view for validate container sessions before upload in Repair Mode
+			Logger.Log("create view csi_repair_validation_view");
 			sql = "create view csi_repair_validation_view as"
 					+ " select csiview.*, count(issue._id) as fixed_issue_count"
 					+ " from csiview"
@@ -168,6 +174,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 			// Add table UserLog
 			try {
+				Logger.Log("add table UserLog");
 				TableUtils.createTable(connectionSource, UserLog.class);
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -175,10 +182,34 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 			// Add column `upload_type` in table `container_session`
 			try {
+				Logger.Log("add column `upload_type` in table `container_session`");
 				db.execSQL("ALTER TABLE container_session ADD COLUMN upload_type INTEGER DEFAULT 0");
 			} catch (Exception e) {
 				Logger.w("Column upload_type is already existed.");
 			}
+
+		}
+
+		public void revert(SQLiteDatabase db, ConnectionSource connectionSource) {
+		}
+	}, new Patch() {
+			// version = 3
+		public void apply(SQLiteDatabase db, ConnectionSource connectionSource) {
+
+			// Add issue_info_view
+			Logger.Log("create view issue_info_view");
+			String sql = "CREATE VIEW issue_info_view AS"
+					+ " select i.containerSession_id, i._id as issue_id, dc.code as damage_code, rc.code as repair_code, cc.code as component_code, i.height, i.length, i.quantity, i.locationCode as location_code"
+					+ " from issue as i, component_code as cc, repair_code as rc, damage_code as dc"
+					+ " where i.componentCode_id = cc.id and i.repairCode_id = rc.id and i.damageCode_id = dc.id";
+			db.execSQL(sql);
+
+			// Add issue item view
+			Logger.Log("create view issue_item_view");
+			sql = "CREATE VIEW issue_item_view AS"
+					+ " SELECT cj.containerSession_id, cj.uuid, cj._id, cj.type, i.*"
+					+ " from cjay_image as cj LEFT JOIN issue_info_view as i on cj.issue_id = i.issue_id";
+			db.execSQL(sql);
 
 		}
 
@@ -214,6 +245,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource,
 			int oldVersion, int newVersion) {
+
+		Logger.Log("on upgrading database from version "
+				+ Integer.toString(oldVersion) + " to version "
+				+ Integer.toString(newVersion));
 
 		for (int i = oldVersion; i < newVersion; i++) {
 			PATCHES[i].apply(db, connectionSource);
