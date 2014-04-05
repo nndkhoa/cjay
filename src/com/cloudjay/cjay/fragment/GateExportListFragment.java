@@ -280,8 +280,10 @@ public class GateExportListFragment extends SherlockFragment implements
 			intent.putExtra(
 					PhotoGridViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA,
 					mSelectedContainerSession.getUuid());
-			intent.putExtra(PhotoGridViewActivity_.CJAY_IMAGE_TYPE_EXTRA,
+			intent.putExtra(PhotoGridViewActivity_.CJAY_IMAGE_TYPE_1_EXTRA,
 					CJayImage.TYPE_EXPORT);
+			intent.putExtra(PhotoGridViewActivity_.CJAY_IMAGE_TYPE_2_EXTRA,
+					CJayImage.TYPE_REPAIRED);
 			intent.putExtra(PhotoGridViewActivity_.CJAY_CONTAINER_ID_EXTRA,
 					mSelectedContainerSession.getContainerId());
 			startActivity(intent);
@@ -313,7 +315,7 @@ public class GateExportListFragment extends SherlockFragment implements
 	@Click(R.id.add_button)
 	void addButtonClicked() {
 
-		// show add container dialog
+		// show add container dialog`
 		String containerId;
 		if (!TextUtils.isEmpty(mSearchEditText.getText().toString())) {
 			containerId = mSearchEditText.getText().toString();

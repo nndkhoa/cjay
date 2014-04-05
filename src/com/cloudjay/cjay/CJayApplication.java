@@ -174,7 +174,7 @@ public class CJayApplication extends Application {
 		Intent intent = new Intent(ctx, PhotoGridViewActivity_.class);
 		intent.putExtra(
 				PhotoGridViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA, uuid);
-		intent.putExtra(PhotoGridViewActivity_.CJAY_IMAGE_TYPE_EXTRA, imageType);
+		intent.putExtra(PhotoGridViewActivity_.CJAY_IMAGE_TYPE_1_EXTRA, imageType);
 		intent.putExtra(PhotoGridViewActivity_.CJAY_CONTAINER_ID_EXTRA,
 				containerId);
 		intent.putExtra("tag", sourceTag);

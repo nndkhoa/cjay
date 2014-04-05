@@ -9,39 +9,28 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
-import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
-import android.os.Bundle;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.GridView;
+import android.widget.ExpandableListView;
 
-import com.cloudjay.cjay.adapter.PhotoGridViewCursorAdapter;
+import com.cloudjay.cjay.adapter.PhotoExpandableListAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.fragment.GateImportListFragment;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.CJayCursorLoader;
-import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.StringHelper;
 
 @EActivity(R.layout.activity_photo_gridview)
 @OptionsMenu(R.menu.menu_photo_grid_view)
-public class PhotoGridViewActivity extends CJayActivity implements
-		LoaderCallbacks<Cursor> {
-
-	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW;
+public class PhotoGridViewActivity extends CJayActivity {
+	
 	public static final String CJAY_CONTAINER_SESSION_UUID_EXTRA = "cjay_container_session_uuid";
 	public static final String CJAY_CONTAINER_ID_EXTRA = "cjay_container_id";
-	public static final String CJAY_IMAGE_TYPE_EXTRA = "cjay_image_type";
-
-	PhotoGridViewCursorAdapter mCursorAdapter;
+	public static final String CJAY_IMAGE_TYPE_1_EXTRA = "cjay_image_type1";
+	public static final String CJAY_IMAGE_TYPE_2_EXTRA = "cjay_image_type2";
+	
+//	ArrayList<PhotoGridViewCursorAdapter> mCursorAdapters;
+	PhotoExpandableListAdapter mListAdapter;
 	ContainerSession mContainerSession;
 	int mItemLayout;
 	ContainerSessionDaoImpl containerSessionDaoImpl;
@@ -49,14 +38,20 @@ public class PhotoGridViewActivity extends CJayActivity implements
 	@Extra(CJAY_CONTAINER_SESSION_UUID_EXTRA)
 	String mContainerSessionUUID = "";
 
-	@Extra(CJAY_IMAGE_TYPE_EXTRA)
-	int mCJayImageType = CJayImage.TYPE_IMPORT;
+	@Extra(CJAY_IMAGE_TYPE_1_EXTRA)
+	int mCJayImageTypeA = CJayImage.TYPE_IMPORT;
+	
+	@Extra(CJAY_IMAGE_TYPE_2_EXTRA)
+	int mCJayImageTypeB = -1;
 
 	@Extra(CJAY_CONTAINER_ID_EXTRA)
 	String mContainerId = "";
 
-	@ViewById(R.id.gridview)
-	GridView mGridView;
+//	@ViewById(R.id.gridview)
+//	GridView mGridView;
+	
+	@ViewById(R.id.expandable_listview)
+	ExpandableListView mListView;
 
 	@Extra("tag")
 	String sourceTag = "";
@@ -74,27 +69,36 @@ public class PhotoGridViewActivity extends CJayActivity implements
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		mItemLayout = R.layout.grid_item_image;
-		getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+		
+		// init expandable list adapter
+		int[] imageTypes;
+		if (mCJayImageTypeB < 0) {
+			 imageTypes = new int[1];
+			 imageTypes[0] = mCJayImageTypeA;
+		} else {
+			 imageTypes = new int[2];
+			 imageTypes[0] = mCJayImageTypeA;
+			 imageTypes[1] = mCJayImageTypeB;
+		}
+		mListAdapter = new PhotoExpandableListAdapter(this, mContainerSessionUUID, imageTypes);
+		mListView.setAdapter(mListAdapter);
+		mListView.setEmptyView(findViewById(android.R.id.empty));
+		
+		// init cursor adapters
+//		mCursorAdapters = new ArrayList<PhotoGridViewCursorAdapter>();
+//		if (mCJayImageTypeA >= 0) {
+//			getSupportLoaderManager().initLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1, null, this);
+//			mCursorAdapters.add(null);
+//		}
+//		if (mCJayImageTypeB >= 0) {
+//			getSupportLoaderManager().initLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_2, null, this);
+//			mCursorAdapters.add(null);
+//		}
 
-		final Context ctx = this;
-		mGridView.setOnItemClickListener(new OnItemClickListener() {
-
-			public void onItemClick(AdapterView<?> parent, View v,
-					int position, long id) {
-				Intent intent = new Intent(ctx, PhotoViewPagerActivity_.class);
-				intent.putExtra(PhotoViewPagerActivity_.START_POSITION,
-						position);
-				intent.putExtra(
-						PhotoViewPagerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-						mContainerSessionUUID);
-				intent.putExtra(PhotoViewPagerActivity_.CJAY_IMAGE_TYPE_EXTRA,
-						mCJayImageType);
-				startActivity(intent);
-			}
-		});
-
-		mGridView.setEmptyView(findViewById(android.R.id.empty));
-
+		for (int i = 0; i < imageTypes.length; i++) {
+			mListView.expandGroup(i);
+		}
+		
 		try {
 			containerSessionDaoImpl = CJayClient.getInstance()
 					.getDatabaseManager().getHelper(this)
@@ -131,44 +135,78 @@ public class PhotoGridViewActivity extends CJayActivity implements
 		}
 	}
 
-	@Override
-	public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-		Context context = this;
-
-		return new CJayCursorLoader(context) {
-			@Override
-			public Cursor loadInBackground() {
-				Cursor cursor = DataCenter.getInstance()
-						.getCJayImagesByContainer(getContext(),
-								mContainerSessionUUID, mCJayImageType);
-
-				if (cursor != null) {
-					// Ensure the cursor window is filled
-					cursor.getCount();
-					cursor.registerContentObserver(mObserver);
-				}
-
-				return cursor;
-			}
-		};
-	}
-
-	@Override
-	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
-		final Context context = this;
-
-		if (mCursorAdapter == null) {
-			mCursorAdapter = new PhotoGridViewCursorAdapter(context,
-					mItemLayout, cursor, 0);
-			mGridView.setAdapter(mCursorAdapter);
-
-		} else {
-			mCursorAdapter.swapCursor(cursor);
-		}
-	}
-
-	@Override
-	public void onLoaderReset(Loader<Cursor> arg0) {
-		mCursorAdapter.swapCursor(null);
-	}
+//	@Override
+//	public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+//		Context context = this;
+//		int imageType = -1;
+//
+//		switch (id) {
+//		case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1:
+//			imageType = mCJayImageTypeA;
+//			break;
+//
+//		case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_2:
+//			imageType = mCJayImageTypeB;
+//			break;
+//		}
+//		
+//		final int cursorLoaderImageType = imageType;
+//		
+//		return new CJayCursorLoader(context) {
+//			@Override
+//			public Cursor loadInBackground() {
+//				Cursor cursor = DataCenter.getInstance()
+//						.getCJayImagesByContainer(getContext(),
+//								mContainerSessionUUID, cursorLoaderImageType);
+//
+//				if (cursor != null) {
+//					// Ensure the cursor window is filled
+//					cursor.registerContentObserver(mObserver);
+//				}
+//
+//				return cursor;
+//			}
+//		};
+//	}
+//
+//	@Override
+//	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+//		final Context context = this;
+//		int adapterId = 0;
+//		
+//		switch (loader.getId()) {
+//		case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1:
+//			adapterId = 0;		
+//			break;
+//
+//		case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_2:
+//			adapterId = 1;		
+//			break;
+//		}
+//		
+//		if (mCursorAdapters.get(adapterId) == null) {
+//			mCursorAdapters.set(adapterId, new PhotoGridViewCursorAdapter(context,
+//					mItemLayout, cursor, 0));
+//			
+//			GridView gridView = mListAdapter.getPhotoGridView(adapterId);
+//			gridView.setAdapter(mCursorAdapters.get(adapterId));
+//			
+//		} else {
+//			mCursorAdapters.get(adapterId).swapCursor(cursor);
+//		}
+//	}
+//
+//	@Override
+//	public void onLoaderReset(Loader<Cursor> loader) {
+//		
+//		switch (loader.getId()) {
+//		case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1:
+//			mCursorAdapters.get(0).swapCursor(null);			
+//			break;
+//
+//		case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_2:
+//			mCursorAdapters.get(1).swapCursor(null);			
+//			break;
+//		}
+//	}
 }

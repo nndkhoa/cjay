@@ -15,7 +15,6 @@ import org.androidannotations.annotations.ViewById;
 import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
-import android.R.integer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -36,7 +35,10 @@ import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.CJayActivity;
+import com.cloudjay.cjay.CJayApplication;
+import com.cloudjay.cjay.PhotoGridViewActivity_;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateContainerCursorAdapter;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -281,7 +283,7 @@ public class GateImportListFragment extends SherlockFragment implements
 		intent.putExtra(
 				PhotoGridViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA,
 				uuidString);
-		intent.putExtra(PhotoGridViewActivity_.CJAY_IMAGE_TYPE_EXTRA,
+		intent.putExtra(PhotoGridViewActivity_.CJAY_IMAGE_TYPE_1_EXTRA,
 				CJayImage.TYPE_IMPORT);
 		intent.putExtra(PhotoGridViewActivity_.CJAY_CONTAINER_ID_EXTRA,
 				containerId);
