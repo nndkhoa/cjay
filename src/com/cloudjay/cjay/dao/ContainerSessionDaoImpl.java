@@ -232,6 +232,10 @@ public class ContainerSessionDaoImpl extends
 					// + ": Some cJayImages are still not uploaded.");
 					//
 					// Logger.e("CJayImage Url: " + cJayImage.getUri());
+					// Logger.e("CJayImage Type: "
+					// + Integer.toString(cJayImage.getType()));
+					// Logger.e("CJayImage Upload State: "
+					// + Integer.toString(cJayImage.getUploadState()));
 
 					// TODO: Try to upload CJayImage
 

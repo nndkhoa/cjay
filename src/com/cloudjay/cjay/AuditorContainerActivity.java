@@ -1,6 +1,8 @@
 package com.cloudjay.cjay;
 
 import java.sql.SQLException;
+import java.util.UUID;
+
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
@@ -14,12 +16,14 @@ import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
+import android.R.integer;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -46,6 +50,7 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.CJayCustomCursorLoader;
+
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
@@ -141,6 +146,7 @@ public class AuditorContainerActivity extends CJayActivity implements
 
 	@ItemClick(R.id.feeds)
 	void imageItemClicked(int position) {
+
 		// refresh highlighting
 		mFeedListView.setItemChecked(position, false);
 
@@ -150,12 +156,14 @@ public class AuditorContainerActivity extends CJayActivity implements
 
 		Cursor cursor = (Cursor) mCursorAdapter.getItem(position);
 		mSelectedCJayImageUuid = cursor.getString(cursor
-				.getColumnIndexOrThrow("_id"));
+				.getColumnIndexOrThrow("uuid"));
 
 		String issueId = cursor.getString(cursor
 				.getColumnIndexOrThrow("issue_id"));
 
-		if (TextUtils.isEmpty(issueId)) {
+		Logger.e("Click on " + issueId);
+
+		if (!TextUtils.isEmpty(issueId)) {
 			showIssueReport(mSelectedCJayImageUuid);
 		} else {
 			showReportDialog();
@@ -172,7 +180,7 @@ public class AuditorContainerActivity extends CJayActivity implements
 		// refresh menu
 		Cursor cursor = (Cursor) mCursorAdapter.getItem(position);
 		mLongClickedCJayImageUuid = cursor.getString(cursor
-				.getColumnIndexOrThrow("_id"));
+				.getColumnIndexOrThrow("uuid"));
 
 		try {
 			mLongClickedCJayImage = cJayImageDaoImpl
@@ -311,51 +319,60 @@ public class AuditorContainerActivity extends CJayActivity implements
 
 	@Background
 	void setWWContainer() {
-		try {
+		long startTime = System.currentTimeMillis();
+		Logger.Log("*** Create water wash issue***");
 
-			long startTime = System.currentTimeMillis();
-			Logger.Log("*** Create water wash issue***");
+		SQLiteDatabase db = DataCenter.getDatabaseHelper(context)
+				.getWritableDatabase();
 
-			// Set issue vệ sinh
-			Issue issue = new Issue();
+		Cursor damageCursor = db.rawQuery(
+				"select id as _id from damage_code where code = ?",
+				new String[] { "DB" });
 
-			// BXXX
-			String val = "BXXX";
-			issue.setLocationCode(val);
-
-			// DB
-			val = "DB";
-			DamageCode damageCode = damageCodeDaoImpl.findDamageCode(val);
-			issue.setDamageCode(damageCode);
-
-			// WW
-			val = "WW";
-			RepairCode repairCode = repairCodeDaoImpl.findRepairCode(val);
-			issue.setRepairCode(repairCode);
-
-			// FWA
-			val = "FWA";
-			ComponentCode componentCode = componentCodeDaoImpl
-					.findComponentCode(val);
-			issue.setComponentCode(componentCode);
-
-			issue.setQuantity("1");
-
-			issue.setContainerSession(mSelectedCJayImage.getContainerSession());
-			mSelectedCJayImage.setIssue(issue);
-
-			issueDaoImpl.createOrUpdate(issue);
-			cJayImageDaoImpl.createOrUpdate(mSelectedCJayImage);
-
-			refresh();
-
-			// cost 3s
-			long difference = System.currentTimeMillis() - startTime;
-			Logger.w("---> Total time: " + Long.toString(difference));
-
-		} catch (SQLException e) {
-			e.printStackTrace();
+		int damageId = 0;
+		if (damageCursor.moveToFirst()) {
+			damageId = damageCursor.getInt(damageCursor
+					.getColumnIndexOrThrow("_id"));
 		}
+
+		Cursor repairCursor = db.rawQuery(
+				"select id as _id from repair_code where code = ?",
+				new String[] { "WW" });
+
+		int repairId = 0;
+		if (repairCursor.moveToFirst()) {
+			repairId = repairCursor.getInt(repairCursor
+					.getColumnIndexOrThrow("_id"));
+		}
+
+		Cursor componentCursor = db.rawQuery(
+				"select id as _id from component_code where code = ?",
+				new String[] { "FWA" });
+
+		int componentId = 0;
+		if (componentCursor.moveToFirst()) {
+			componentId = componentCursor.getInt(componentCursor
+					.getColumnIndexOrThrow("_id"));
+		}
+
+		String issueId = UUID.randomUUID().toString();
+		db.execSQL("insert into issue VALUES (" + componentId + ", '"
+				+ mContainerSessionUUID + "', " + damageId + ", '" + issueId
+				+ "', NULL, " + repairId + ", NULL, 'BXXX', 1, 0, 0)");
+
+		String sqlString = "UPDATE cjay_image SET issue_id = '" + issueId
+				+ "' WHERE uuid = '" + mSelectedCJayImageUuid + "'";
+
+		db.execSQL(sqlString);
+
+		sqlString = "UPDATE cjay_image SET issue_id = '" + issueId
+				+ "' WHERE uuid = '" + mSelectedCJayImageUuid + "'";
+
+		refresh();
+
+		// cost 50ms
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.w("---> Total time: " + Long.toString(difference));
 	}
 
 	@Trace(level = Log.INFO)

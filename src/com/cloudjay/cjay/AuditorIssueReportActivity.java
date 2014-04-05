@@ -38,6 +38,7 @@ import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.Logger;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 // slide 20
@@ -51,7 +52,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 
 	private AuditorIssueReportTabPageAdaptor mViewPagerAdapter;
 	private String[] locations;
-	
+
 	private CJayImage mCJayImage;
 	private Issue mIssue;
 	private ImageLoader imageLoader;
@@ -295,7 +296,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 					DamageCodeDaoImpl damageCodeDaoImpl = CJayClient
 							.getInstance().getDatabaseManager().getHelper(this)
 							.getDamageCodeDaoImpl();
-					damageCode = damageCodeDaoImpl.findDamageCode(val);
+					damageCode = damageCodeDaoImpl.findByCode(val);
 				}
 				mCJayImage.getIssue().setDamageCode(damageCode);
 			} catch (SQLException e) {
@@ -312,7 +313,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 					RepairCodeDaoImpl repairCodeDaoImpl = CJayClient
 							.getInstance().getDatabaseManager().getHelper(this)
 							.getRepairCodeDaoImpl();
-					repairCode = repairCodeDaoImpl.findRepairCode(val);
+					repairCode = repairCodeDaoImpl.findByCode(val);
 				}
 
 				mCJayImage.getIssue().setRepairCode(repairCode);
@@ -328,7 +329,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 					ComponentCodeDaoImpl componentCodeDaoImpl = CJayClient
 							.getInstance().getDatabaseManager().getHelper(this)
 							.getComponentCodeDaoImpl();
-					componentCode = componentCodeDaoImpl.findComponentCode(val);
+					componentCode = componentCodeDaoImpl.findByCode(val);
 				}
 				mCJayImage.getIssue().setComponentCode(componentCode);
 			} catch (SQLException e) {

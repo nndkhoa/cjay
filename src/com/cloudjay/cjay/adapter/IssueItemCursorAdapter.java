@@ -99,8 +99,9 @@ public class IssueItemCursorAdapter extends CursorAdapter implements Filterable 
 				.getString(cursor.getColumnIndexOrThrow("length"));
 		String height = cursor
 				.getString(cursor.getColumnIndexOrThrow("height"));
+		
 		String url = cursor
-				.getString(cursor.getColumnIndexOrThrow("image_url"));
+				.getString(cursor.getColumnIndexOrThrow("_id"));
 
 		holder.locationTextView.setText(location);
 

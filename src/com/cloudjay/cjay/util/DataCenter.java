@@ -73,8 +73,10 @@ public class DataCenter {
 
 	public static AsyncTask<Void, Integer, Void> LoadDataTask;
 	public static AsyncTask<Void, Void, String> RegisterGCMTask;
+
 	private static DataCenter instance = null;
 	private IDatabaseManager databaseManager = null;
+	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
 
 	public DataCenter() {
 	}
@@ -493,8 +495,6 @@ public class DataCenter {
 					if (null != tmpContainerSessions) {
 
 						for (TmpContainerSession tmpSession : tmpContainerSessions) {
-
-							// TODO: need to optimize Mapper
 							ContainerSession containerSession = Mapper
 									.getInstance().toContainerSession(
 											tmpSession, ctx);
