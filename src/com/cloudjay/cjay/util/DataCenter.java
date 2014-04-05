@@ -449,6 +449,7 @@ public class DataCenter {
 			throws NoConnectionException, SQLException, NullSessionException {
 
 		Logger.Log("*** UPDATE LIST CONTAINER SESSIONS ***");
+		long startTime = System.currentTimeMillis();
 		PreferencesUtil.storePrefsValue(ctx,
 				PreferencesUtil.PREF_IS_UPDATING_DATA, true);
 
@@ -481,7 +482,6 @@ public class DataCenter {
 				List<ContainerSession> containerSessions = new ArrayList<ContainerSession>();
 				ContainerSessionResult result = null;
 
-				long startTime = System.currentTimeMillis();
 				result = CJayClient.getInstance().getContainerSessionsByPage(
 						ctx, lastUpdate, page);
 
@@ -519,9 +519,6 @@ public class DataCenter {
 					}
 				}
 
-				long difference = System.currentTimeMillis() - startTime;
-				Logger.w("---> Total time: " + Long.toString(difference));
-
 			} while (!TextUtils.isEmpty(nextUrl));
 
 			PreferencesUtil.storePrefsValue(ctx,
@@ -549,6 +546,8 @@ public class DataCenter {
 					PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			e.printStackTrace();
 		}
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.w("---> Total time: " + Long.toString(difference));
 	}
 
 	/**
@@ -565,6 +564,7 @@ public class DataCenter {
 			SQLException, NullSessionException {
 
 		Logger.Log("*** UPDATE LIST OPERATORS ***");
+		long startTime = System.currentTimeMillis();
 
 		try {
 
@@ -599,8 +599,13 @@ public class DataCenter {
 					PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE,
 					nowString);
 
-			if (null != operators)
-				operatorDaoImpl.addListOperators(operators);
+			if (null != operators) {
+
+				operatorDaoImpl.bulkInsert(DataCenter.getDatabaseHelper(ctx)
+						.getWritableDatabase(), operators);
+
+				// operatorDaoImpl.addListOperators(operators);
+			}
 
 		} catch (NoConnectionException e) {
 			throw e;
@@ -611,6 +616,9 @@ public class DataCenter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.w("---> Total time: " + Long.toString(difference));
 	}
 
 	/**

@@ -232,6 +232,7 @@ public class LoginActivity extends CJayActivity {
 						mEmail, mPassword, LoginActivity.this);
 
 				if (TextUtils.isEmpty(userToken)) {
+
 					// Wrong credential --> return and display error alert
 					return false;
 				} else {
@@ -253,8 +254,10 @@ public class LoginActivity extends CJayActivity {
 				}
 
 			} catch (NullSessionException e) {
+
 				CJayApplication.logOutInstantly(context);
 				finish();
+
 			} catch (NoConnectionException e) {
 				showCrouton(R.string.alert_no_network);
 				cancel(isFinishing());
@@ -264,6 +267,9 @@ public class LoginActivity extends CJayActivity {
 				showCrouton(R.string.alert_try_again);
 				cancel(isFinishing());
 
+			} catch (NullPointerException e) {
+
+				return false;
 			} catch (Exception e) {
 				e.printStackTrace();
 				showCrouton(R.string.alert_try_again);
@@ -288,9 +294,9 @@ public class LoginActivity extends CJayActivity {
 
 			} else {
 				Logger.Log("Incorrect Username|Password");
-				mPasswordView
+				mEmailView
 						.setError(getString(R.string.error_incorrect_password));
-				mPasswordView.requestFocus();
+				mEmailView.requestFocus();
 			}
 		}
 

@@ -92,8 +92,11 @@ public class CJayClient implements ICJayClient {
 			token = result.get("token").getAsString();
 
 		} catch (InterruptedException e) {
+
 			e.printStackTrace();
+
 		} catch (ExecutionException e) {
+
 			e.printStackTrace();
 		}
 
@@ -320,7 +323,7 @@ public class CJayClient implements ICJayClient {
 
 		String result = "";
 		try {
-			
+
 			String accessToken = CJaySession.restore(ctx).getAccessToken();
 			Response<String> response = Ion
 					.with(ctx, CJayConstant.CONTAINER_SESSIONS)
