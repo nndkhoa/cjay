@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-<!--     <item
+    <!--
+         <item
         android:id="@+id/menu_camera"
         android:icon="@drawable/ic_menu_camera"
         android:showAsAction="always"
@@ -36,20 +37,27 @@
         android:id="@+id/menu_more"
         android:icon="@android:drawable/ic_menu_more"
         android:showAsAction="never"
-        android:title="More"/> -->
- 	<item
-	    android:id="@+id/menu_username"
-		android:showAsAction="never"
-	    android:title="@string/menu_username_title"
-	    android:menuCategory="secondary" />
- 	<item
-	    android:id="@+id/menu_role"
-		android:showAsAction="never"
-	    android:title="@string/menu_role_title"
-	    android:menuCategory="secondary" /> 	
- 	<item
-	    android:id="@+id/menu_logout"
-		android:showAsAction="never"
-	    android:title="@string/menu_logout_title"
-	    android:menuCategory="secondary" />
+        android:title="More"/>
+    -->
+
+    <item
+        android:id="@+id/menu_setting"
+        android:showAsAction="never"
+        android:title="@string/action_settings"/>
+    <item
+        android:id="@+id/menu_username"
+        android:menuCategory="secondary"
+        android:showAsAction="never"
+        android:title="@string/menu_username_title"/>
+    <item
+        android:id="@+id/menu_role"
+        android:menuCategory="secondary"
+        android:showAsAction="never"
+        android:title="@string/menu_role_title"/>
+    <item
+        android:id="@+id/menu_logout"
+        android:menuCategory="secondary"
+        android:showAsAction="never"
+        android:title="@string/menu_logout_title"/>
+
 </menu>

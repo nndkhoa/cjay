@@ -6,7 +6,7 @@
     <string name="menu_settings">Settings</string>
     <string name="btn_login">Đăng nhập</string>
     <string name="title_activity_splash_screen">SplashScreenActivity</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Cấu hình</string>
     <string name="default_container_id">Untitled</string>
     <string name="container_not_found">KHÔNG TÌM THẤY CONTAINER.\nCLICK + ĐỂ TẠO MỚI </string>
     <string name="camera_button_tooltip">Chụp hình</string>
