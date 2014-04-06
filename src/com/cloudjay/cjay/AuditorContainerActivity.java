@@ -198,7 +198,7 @@ public class AuditorContainerActivity extends CJayActivity implements
 		// go to camera
 		mNewImageCount = 0;	
 		mNewImageUUID = "";
-		CJayApplication.gotoCamera(this, mContainerSession, CJayImage.TYPE_REPORT, LOG_TAG, CameraActivity_.CAPTURE_MODE_SINGLE);
+		CJayApplication.gotoCamera(this, mContainerSession, CJayImage.TYPE_REPORT, LOG_TAG);
 	}
 
 	@OptionsItem(R.id.menu_trash)

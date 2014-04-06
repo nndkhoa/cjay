@@ -44,10 +44,9 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.AuditorContainerActivity_;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.CameraActivity_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -468,7 +467,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 					new ContainerSessionChangedEvent(containerSession));
 
 			CJayApplication.gotoCamera(activity, containerSession,
-					CJayImage.TYPE_REPORT, LOG_TAG, CameraActivity_.CAPTURE_MODE_SINGLE);
+					CJayImage.TYPE_REPORT, LOG_TAG);
 
 			break;
 
