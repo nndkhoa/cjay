@@ -30,14 +30,7 @@ import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
-import com.cloudjay.cjay.fragment.IssueReportComponentFragment_;
-import com.cloudjay.cjay.fragment.IssueReportDamageFragment_;
-import com.cloudjay.cjay.fragment.IssueReportDimensionFragment_;
-import com.cloudjay.cjay.fragment.IssueReportFragment;
-import com.cloudjay.cjay.fragment.IssueReportLocationFragment_;
-import com.cloudjay.cjay.fragment.IssueReportPhotoFragment_;
-import com.cloudjay.cjay.fragment.IssueReportQuantityFragment_;
-import com.cloudjay.cjay.fragment.IssueReportRepairFragment_;
+import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ComponentCode;
@@ -106,7 +99,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		// Set Activity Title
 		setTitle(mCJayImage.getContainerSession().getContainerId());
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -127,7 +120,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 	void homeIconClicked() {
 		finish();
 	}
-	
+
 	@OptionsItem(R.id.menu_check)
 	void checkMenuItemClicked() {
 

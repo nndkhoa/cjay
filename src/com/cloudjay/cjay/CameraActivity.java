@@ -44,6 +44,7 @@ import android.view.KeyEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
@@ -61,8 +62,10 @@ import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.GateReportImage;
+import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.CJaySession;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringHelper;
@@ -95,7 +98,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
 	public static final String CJAY_IMAGE_TYPE_EXTRA = "type";
 	public static final String SOURCE_TAG_EXTRA = "tag";
-	public static final String CAPTURE_MODE_EXTRA = "camera_mode";
 
 	Camera mCamera = null;
 	MediaPlayer mShootMediaPlayer = null;
@@ -171,6 +173,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			PreferencesUtil.storePrefsValue(this,
 					PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false);
 		}
+
 	}
 
 	SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
@@ -212,13 +215,17 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
+
 			savePhoto(data);
 			camera.startPreview();
 			mInPreview = true;
 
+			// check Camera capture mode
 			if (!PreferencesUtil.getPrefsValue(getApplicationContext(),
 					PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, true)) {
+
 				onBackPressed();
+
 			}
 		}
 	};
@@ -260,9 +267,25 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		mCameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
 		this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-		captureModeToggleButton.setChecked(PreferencesUtil.getPrefsValue(
-				getApplicationContext(),
-				PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false));
+		try {
+			if (CJaySession.restore(this).getUserRole() == User.ROLE_AUDITOR) {
+
+				captureModeToggleButton.setChecked(PreferencesUtil
+						.getPrefsValue(getApplicationContext(),
+								PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS,
+								false));
+
+			} else {
+
+				captureModeToggleButton.setVisibility(View.GONE);
+				captureModeToggleButton.setChecked(true);
+				PreferencesUtil.storePrefsValue(this,
+						PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, true);
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@AfterViews
@@ -488,61 +511,65 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	}
 
-	// @Background
-	synchronized void savePhoto(byte[] data) {
-		// Convert rotated byte[] to Bitmap
-		Bitmap capturedBitmap = saveToBitmap(data);
+	@Background
+	void savePhoto(byte[] data) {
 
-		// Save Bitmap to Files
-		String uuid = UUID.randomUUID().toString();
+		synchronized (this) {
+			// Convert rotated byte[] to Bitmap
+			Bitmap capturedBitmap = saveToBitmap(data);
 
-		String imageType;
-		switch (mType) {
-		case CJayImage.TYPE_IMPORT:
-			imageType = "gate-in";
-			break;
+			// Save Bitmap to Files
+			String uuid = UUID.randomUUID().toString();
 
-		case CJayImage.TYPE_EXPORT:
-			imageType = "gate-out";
-			break;
+			String imageType;
+			switch (mType) {
+			case CJayImage.TYPE_IMPORT:
+				imageType = "gate-in";
+				break;
 
-		case CJayImage.TYPE_REPORT:
-			imageType = "auditor";
-			break;
+			case CJayImage.TYPE_EXPORT:
+				imageType = "gate-out";
+				break;
 
-		case CJayImage.TYPE_REPAIRED:
-		default:
-			imageType = "repair";
-			break;
+			case CJayImage.TYPE_REPORT:
+				imageType = "auditor";
+				break;
+
+			case CJayImage.TYPE_REPAIRED:
+			default:
+				imageType = "repair";
+				break;
+			}
+
+			String depotCode = mContainerSession.getContainer().getDepot()
+					.getDepotCode();
+			String containerId = mContainerSession.getContainerId();
+			String operator = mContainerSession.getOperatorCode() == null ? ""
+					: mContainerSession.getOperatorCode() + "-";
+
+			// file name example:
+			// [depot-code]-2013-12-19-[gate-in|gate-out|report]-[containerId]-[UUID].jpg
+			String fileName = depotCode + "-"
+					+ StringHelper.getCurrentTimestamp("yyyy-MM-dd") + "-"
+					+ imageType + "-" + containerId + "-" + operator + uuid
+					+ ".jpg";
+
+			File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
+			Logger.Log("Photo Path: " + photo.getAbsolutePath());
+
+			// Save Bitmap to JPEG
+			saveBitmapToFile(capturedBitmap, photo);
+
+			// Upload image
+			uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
+
+			if (capturedBitmap != null) {
+				capturedBitmap.recycle();
+				capturedBitmap = null;
+				System.gc();
+			}
 		}
 
-		String depotCode = mContainerSession.getContainer().getDepot()
-				.getDepotCode();
-		String containerId = mContainerSession.getContainerId();
-		String operator = mContainerSession.getOperatorCode() == null ? ""
-				: mContainerSession.getOperatorCode() + "-";
-
-		// filename sample:
-		// [depot-code]-2013-12-19-[gate-in|gate-out|report]-[containerId]-[UUID].jpg
-		String fileName = depotCode + "-"
-				+ StringHelper.getCurrentTimestamp("yyyy-MM-dd") + "-"
-				+ imageType + "-" + containerId + "-" + operator + uuid
-				+ ".jpg";
-
-		File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
-		Logger.Log("Photo Path: " + photo.getAbsolutePath());
-
-		// Save Bitmap to JPEG
-		saveBitmapToFile(capturedBitmap, photo);
-
-		// Upload image
-		uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
-
-		if (capturedBitmap != null) {
-			capturedBitmap.recycle();
-			capturedBitmap = null;
-			System.gc();
-		}
 	}
 
 	private synchronized void uploadImage(String uuid, String uri,
@@ -825,13 +852,17 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 				// Submit focus area to camera
 				if (supportedFocusMode
 						.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+
 					cameraParameters
 							.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
 					mCamera.setParameters(cameraParameters);
 					mCamera.autoFocus(this);
+
 				} else {
+
 					Logger.Log("No auto focus mode supported, now just take picture");
 					mCamera.takePicture(shutterCallback, null, photoCallback);
+
 				}
 
 				mInPreview = false;
