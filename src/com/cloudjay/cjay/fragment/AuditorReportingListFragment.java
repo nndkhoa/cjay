@@ -44,7 +44,7 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.AuditorContainerActivity_;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
@@ -466,9 +466,16 @@ public class AuditorReportingListFragment extends SherlockFragment implements
 			EventBus.getDefault().post(
 					new ContainerSessionChangedEvent(containerSession));
 
-			CJayApplication.gotoCamera(activity, containerSession,
-					CJayImage.TYPE_REPORT, LOG_TAG);
+//			CJayApplication.gotoCamera(activity, containerSession,
+//					CJayImage.TYPE_REPORT, LOG_TAG);
 
+			Intent intent = new Intent(getActivity(),
+					AuditorContainerActivity_.class);
+			intent.putExtra(AuditorContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
+					containerSession.getUuid());
+			intent.putExtra(AuditorContainerActivity_.START_CAMERA_EXTRA, true);
+			startActivity(intent);
+			
 			break;
 
 		case AddContainerDialog.CONTAINER_DIALOG_EDIT:

@@ -36,6 +36,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
@@ -92,66 +93,65 @@ import de.greenrobot.event.EventBus;
 public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
-	// public static final String CJAY_ISSUE_EXTRA = "cjay_issue";
+	public static final String CJAY_IMAGE_TYPE_EXTRA = "type";
+	public static final String SOURCE_TAG_EXTRA = "tag";
+	public static final String CAPTURE_MODE_EXTRA = "camera_mode";
 
-	Camera camera = null;
-	MediaPlayer shootMediaPlayer = null;
-	private SurfaceHolder previewHolder = null;
-	private boolean inPreview = false;
-	private boolean cameraConfigured = false;
+	Camera mCamera = null;
+	MediaPlayer mShootMediaPlayer = null;
+	private SurfaceHolder mPreviewHolder = null;
+	private boolean mInPreview = false;
+	private boolean mCameraConfigured = false;
 
-	String flashMode;
-	int cameraMode;
+	String mFlashMode;
+	int mCameraMode;
 
-	List<GateReportImage> gateReportImages = new ArrayList<GateReportImage>();
-	List<AuditReportItem> auditReportItems = new ArrayList<AuditReportItem>();
-	List<CJayImage> cJayImages = new ArrayList<CJayImage>();
+	List<GateReportImage> mGateReportImages = new ArrayList<GateReportImage>();
+	List<AuditReportItem> mAuditReportItems = new ArrayList<AuditReportItem>();
+	List<CJayImage> mCJayImages = new ArrayList<CJayImage>();
 
 	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
 	private static final int PREVIEW_SIZE_MAX_WIDTH = 1280;
 
 	@ViewById(R.id.camera_preview)
-	SurfaceView preview;
+	SurfaceView mPreview;
 
 	@ViewById(R.id.btn_back)
-	ImageButton backButton;
+	ImageButton mBackButton;
 
 	@ViewById(R.id.btn_switch_camera)
-	ImageButton switchCameraButton;
+	ImageButton mSwitchCameraButton;
 
 	@ViewById(R.id.btn_toggle_flash)
-	ImageButton toggleFlashButton;
+	ImageButton mToggleFlashButton;
 
 	@ViewById(R.id.btn_capture)
-	ImageButton captureButton;
+	ImageButton mCaptureButton;
 
 	@ViewById(R.id.btn_camera_done)
-	Button doneButton;
+	Button mDoneButton;
 
 	@ViewById(R.id.rl_camera_done)
-	RelativeLayout cameraDoneLayout;
+	RelativeLayout mCameraDoneLayout;
 
 	@ViewById(R.id.btn_capture_mode)
 	ToggleButton captureModeToggleButton;
 
 	@SystemService
-	AudioManager audioManager;
+	AudioManager mAudioManager;
 
-	ContainerSession containerSession = null;
-	ContainerSessionDaoImpl containerSessionDaoImpl = null;
-	CJayImageDaoImpl cJayImageDaoImpl = null;
+	ContainerSession mContainerSession = null;
+	ContainerSessionDaoImpl mContainerSessionDaoImpl = null;
+	CJayImageDaoImpl mCJayImageDaoImpl = null;
 
 	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
-	String containerSessionUUID = "";
+	String mContainerSessionUUID = "";
 
-	// @Extra()
-	// String issueId = "";
+	@Extra(CJAY_IMAGE_TYPE_EXTRA)
+	int mType = 0;
 
-	@Extra("type")
-	int type = 0;
-
-	@Extra("tag")
-	String sourceTag = "";
+	@Extra(SOURCE_TAG_EXTRA)
+	String mSourceTag = "";
 
 	// endregion
 
@@ -178,7 +178,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		public void surfaceCreated(SurfaceHolder holder) {
 			// no-op -- wait until surfaceChanged()
 			Logger.Log("onSurfaceCreated");
-			inPreview = true;
+			mInPreview = true;
 		}
 
 		public void surfaceChanged(SurfaceHolder holder, int format, int width,
@@ -214,7 +214,12 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		public void onPictureTaken(byte[] data, Camera camera) {
 			savePhoto(data);
 			camera.startPreview();
-			inPreview = true;
+			mInPreview = true;
+
+			if (!PreferencesUtil.getPrefsValue(getApplicationContext(),
+					PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, true)) {
+				onBackPressed();
+			}
 		}
 	};
 
@@ -222,17 +227,17 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		@Override
 		public void onShutter() {
-			int volume = audioManager
+			int volume = mAudioManager
 					.getStreamVolume(AudioManager.STREAM_NOTIFICATION);
 
 			if (volume != 0) {
-				if (shootMediaPlayer == null)
-					shootMediaPlayer = MediaPlayer
+				if (mShootMediaPlayer == null)
+					mShootMediaPlayer = MediaPlayer
 							.create(getApplicationContext(),
 									Uri.parse("file:///system/media/audio/ui/camera_click.ogg"));
 
-				if (shootMediaPlayer != null)
-					shootMediaPlayer.start();
+				if (mShootMediaPlayer != null)
+					mShootMediaPlayer.start();
 			}
 
 			// Logger.Log( "onShutter");
@@ -246,36 +251,40 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		// WARNING: this block should be run before onResume()
 		// Setup Surface Holder
-		previewHolder = preview.getHolder();
-		previewHolder.addCallback(surfaceCallback);
-		previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+		mPreviewHolder = mPreview.getHolder();
+		mPreviewHolder.addCallback(surfaceCallback);
+		mPreviewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
 		// Restore camera state from database or somewhere else
-		flashMode = Camera.Parameters.FLASH_MODE_AUTO;
-		cameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
+		mFlashMode = Camera.Parameters.FLASH_MODE_AUTO;
+		mCameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
 		this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+		captureModeToggleButton.setChecked(PreferencesUtil.getPrefsValue(
+				getApplicationContext(),
+				PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false));
 	}
 
 	@AfterViews
 	void initContainerSession() {
 		try {
 
-			if (null == containerSessionDaoImpl) {
-				containerSessionDaoImpl = CJayClient.getInstance()
+			if (null == mContainerSessionDaoImpl) {
+				mContainerSessionDaoImpl = CJayClient.getInstance()
 						.getDatabaseManager().getHelper(this)
 						.getContainerSessionDaoImpl();
 
 			}
 
-			if (null == cJayImageDaoImpl) {
-				cJayImageDaoImpl = CJayClient.getInstance()
+			if (null == mCJayImageDaoImpl) {
+				mCJayImageDaoImpl = CJayClient.getInstance()
 						.getDatabaseManager().getHelper(this)
 						.getCJayImageDaoImpl();
 			}
 
-			if (containerSession == null) {
-				containerSession = containerSessionDaoImpl
-						.queryForId(containerSessionUUID);
+			if (mContainerSession == null) {
+				mContainerSession = mContainerSessionDaoImpl
+						.queryForId(mContainerSessionUUID);
 
 			}
 
@@ -288,10 +297,10 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	void initPreview(int width, int height) {
 		Logger.Log("initPreview()");
 
-		if (camera != null && previewHolder.getSurface() != null) {
+		if (mCamera != null && mPreviewHolder.getSurface() != null) {
 			try {
 				Logger.Log("setPreviewDisplay");
-				camera.setPreviewDisplay(previewHolder);
+				mCamera.setPreviewDisplay(mPreviewHolder);
 				// camera.setPreviewCallback(null);
 				// camera.setOneShotPreviewCallback(null);
 
@@ -300,11 +309,11 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 				Toast.makeText(this, t.getMessage(), Toast.LENGTH_LONG).show();
 			}
 
-			if (!cameraConfigured) {
+			if (!mCameraConfigured) {
 
 				Logger.Log("config Camera");
 
-				Camera.Parameters parameters = camera.getParameters();
+				Camera.Parameters parameters = mCamera.getParameters();
 				Camera.Size size = determineBestPreviewSize(parameters);
 				Camera.Size pictureSize = determineBestPictureSize(parameters);
 
@@ -324,12 +333,12 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 								pictureSize.height);
 
 						parameters.setPictureFormat(ImageFormat.JPEG);
-						parameters.setFlashMode(flashMode);
+						parameters.setFlashMode(mFlashMode);
 						parameters
 								.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
 
-						camera.setParameters(parameters);
-						cameraConfigured = true;
+						mCamera.setParameters(parameters);
+						mCameraConfigured = true;
 					}
 				} catch (NotFoundException e) {
 					e.printStackTrace();
@@ -341,11 +350,11 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	void startPreview() {
 		Logger.Log("----> startPreview");
 
-		if (cameraConfigured && camera != null) {
+		if (mCameraConfigured && mCamera != null) {
 
 			Logger.Log("cameraConfigured and camera != null");
-			camera.startPreview();
-			inPreview = true;
+			mCamera.startPreview();
+			mInPreview = true;
 		}
 	}
 
@@ -404,7 +413,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 						(data != null) ? data.length : 0);
 
 				android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
-				android.hardware.Camera.getCameraInfo(cameraMode, info);
+				android.hardware.Camera.getCameraInfo(mCameraMode, info);
 
 				int rotation = getWindowManager().getDefaultDisplay()
 						.getRotation();
@@ -479,8 +488,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	}
 
-	@Background
-	void savePhoto(byte[] data) {
+	// @Background
+	synchronized void savePhoto(byte[] data) {
 		// Convert rotated byte[] to Bitmap
 		Bitmap capturedBitmap = saveToBitmap(data);
 
@@ -488,7 +497,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		String uuid = UUID.randomUUID().toString();
 
 		String imageType;
-		switch (type) {
+		switch (mType) {
 		case CJayImage.TYPE_IMPORT:
 			imageType = "gate-in";
 			break;
@@ -507,11 +516,11 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			break;
 		}
 
-		String depotCode = containerSession.getContainer().getDepot()
+		String depotCode = mContainerSession.getContainer().getDepot()
 				.getDepotCode();
-		String containerId = containerSession.getContainerId();
-		String operator = containerSession.getOperatorCode() == null ? ""
-				: containerSession.getOperatorCode() + "-";
+		String containerId = mContainerSession.getContainerId();
+		String operator = mContainerSession.getOperatorCode() == null ? ""
+				: mContainerSession.getOperatorCode() + "-";
 
 		// filename sample:
 		// [depot-code]-2013-12-19-[gate-in|gate-out|report]-[containerId]-[UUID].jpg
@@ -543,7 +552,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		CJayImage uploadItem = new CJayImage();
 
 		// Set Uploading Status
-		uploadItem.setType(type);
+		uploadItem.setType(mType);
 		uploadItem
 				.setTimePosted(StringHelper
 						.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
@@ -551,29 +560,34 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		uploadItem.setUuid(uuid);
 		uploadItem.setUri(uri);
 		uploadItem.setImageName(image_name);
-		uploadItem.setContainerSession(containerSession);
+		uploadItem.setContainerSession(mContainerSession);
 
 		try {
 
-			if (TextUtils.isEmpty(containerSession.getImageIdPath())) {
+			if (TextUtils.isEmpty(mContainerSession.getImageIdPath())) {
 
 				Logger.e("Set container image_id_path: " + uri);
-				containerSession.setImageIdPath(uri);
-				containerSessionDaoImpl.addContainerSession(containerSession);
+				mContainerSession.setImageIdPath(uri);
+				mContainerSessionDaoImpl.addContainerSession(mContainerSession);
 
 			}
 
-			cJayImages.add(uploadItem);
-			cJayImageDaoImpl.addCJayImage(uploadItem);
+			mCJayImages.add(uploadItem);
+			mCJayImageDaoImpl.addCJayImage(uploadItem);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
+		Logger.Log("Source tag: " + mSourceTag);
+
 		// tell people that an image has been created
-		if (!TextUtils.isEmpty(sourceTag)) {
+		if (!TextUtils.isEmpty(mSourceTag)) {
+			SystemClock.sleep(300);
+			Logger.Log("issue_report - " + uploadItem.getUuid()
+					+ " - Trigger cjayimage added");
 			EventBus.getDefault().post(
-					new CJayImageAddedEvent(uploadItem, sourceTag));
+					new CJayImageAddedEvent(uploadItem, mSourceTag));
 		}
 	}
 
@@ -598,23 +612,22 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	public void onBackPressed() {
 		try {
 
-			containerSessionDaoImpl.addContainerSession(containerSession);
+			mContainerSessionDaoImpl.addContainerSession(mContainerSession);
 			EventBus.getDefault().post(
-					new ContainerSessionChangedEvent(containerSession));
+					new ContainerSessionChangedEvent(mContainerSession));
 
 			// Open GridView
-			if (sourceTag.equals(GateImportListFragment.LOG_TAG)) {
+			if (mSourceTag.equals(GateImportListFragment.LOG_TAG)) {
 
 				CJayApplication.openPhotoGridView(this,
-						containerSession.getUuid(),
-						containerSession.getContainerId(),
+						mContainerSession.getUuid(),
+						mContainerSession.getContainerId(),
 						CJayImage.TYPE_IMPORT, GateImportListFragment.LOG_TAG);
 
-			} else if (sourceTag.equals(GateExportListFragment.LOG_TAG)) {
-
+			} else if (mSourceTag.equals(GateExportListFragment.LOG_TAG)) {
 				CJayApplication.openPhotoGridView(this,
-						containerSession.getUuid(),
-						containerSession.getContainerId(),
+						mContainerSession.getUuid(),
+						mContainerSession.getContainerId(),
 						CJayImage.TYPE_EXPORT, CJayImage.TYPE_REPAIRED,
 						GateExportListFragment.LOG_TAG);
 			}
@@ -641,8 +654,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	void openCamera() {
 
-		if (camera != null) {
-			camera.release();
+		if (mCamera != null) {
+			mCamera.release();
 		}
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
@@ -651,18 +664,18 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			for (int i = 0; i < Camera.getNumberOfCameras(); i++) {
 
 				Camera.getCameraInfo(i, info);
-				if (info.facing == cameraMode) {
+				if (info.facing == mCameraMode) {
 					Logger.Log("inside onResume: camera != null");
 
-					camera = Camera.open(i);
-					setCameraDisplayOrientation(this, cameraMode, camera);
+					mCamera = Camera.open(i);
+					setCameraDisplayOrientation(this, mCameraMode, mCamera);
 				}
 			}
 		}
 
-		if (camera == null) {
+		if (mCamera == null) {
 			Logger.Log("inside onResume: camera == null");
-			camera = Camera.open(cameraMode);
+			mCamera = Camera.open(mCameraMode);
 		}
 
 		startPreview();
@@ -670,23 +683,23 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	void releaseCamera() {
 
-		if (camera != null) {
+		if (mCamera != null) {
 
 			Logger.Log("Release camera ... ");
 
-			if (inPreview) {
+			if (mInPreview) {
 				Logger.Log("Stop Preview ... ");
-				camera.stopPreview();
+				mCamera.stopPreview();
 				// preview.getHolder().removeCallback(null);
 			}
 
 			// camera.setPreviewCallback(null);
-			camera.release();
-			camera = null;
+			mCamera.release();
+			mCamera = null;
 
 			// WARNING: lots of bugs may appear
-			inPreview = false;
-			cameraConfigured = false;
+			mInPreview = false;
+			mCameraConfigured = false;
 
 			Logger.Log("Release camera complete");
 		}
@@ -717,31 +730,31 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	void switchCameraButtonClicked() {
 
 		Logger.Log("switchCameraButtonClicked()");
-		if (inPreview && camera != null) {
+		if (mInPreview && mCamera != null) {
 			if (Camera.getNumberOfCameras() > 1) {
 
-				if (inPreview) {
-					camera.stopPreview();
+				if (mInPreview) {
+					mCamera.stopPreview();
 				}
-				camera.release();
+				mCamera.release();
 
-				if (cameraMode == CameraInfo.CAMERA_FACING_BACK) {
-					cameraMode = CameraInfo.CAMERA_FACING_FRONT;
+				if (mCameraMode == CameraInfo.CAMERA_FACING_BACK) {
+					mCameraMode = CameraInfo.CAMERA_FACING_FRONT;
 					Logger.Log("CameraInfo.CAMERA_FACING_FRONT");
 				} else {
-					cameraMode = CameraInfo.CAMERA_FACING_BACK;
+					mCameraMode = CameraInfo.CAMERA_FACING_BACK;
 					Logger.Log("CameraInfo.CAMERA_FACING_BACK");
 				}
 
-				camera = Camera.open(cameraMode);
-				setCameraDisplayOrientation(this, cameraMode, camera);
+				mCamera = Camera.open(mCameraMode);
+				setCameraDisplayOrientation(this, mCameraMode, mCamera);
 
 				try {
-					camera.setPreviewDisplay(previewHolder);
+					mCamera.setPreviewDisplay(mPreviewHolder);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				camera.startPreview();
+				mCamera.startPreview();
 
 			} else {
 				UIHelper.toast(this, "Device has only one camera");
@@ -760,23 +773,23 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		// Logger.Log( "toggleFlashButtonClicked()");
 
-		if (inPreview && camera != null) {
-			Parameters params = camera.getParameters();
-			flashMode = params.getFlashMode();
+		if (mInPreview && mCamera != null) {
+			Parameters params = mCamera.getParameters();
+			mFlashMode = params.getFlashMode();
 
-			if (flashMode.equalsIgnoreCase(Parameters.FLASH_MODE_OFF)) {
+			if (mFlashMode.equalsIgnoreCase(Parameters.FLASH_MODE_OFF)) {
 
-				toggleFlashButton.setImageResource(R.drawable.ic_flash_auto);
+				mToggleFlashButton.setImageResource(R.drawable.ic_flash_auto);
 				params.setFlashMode(Parameters.FLASH_MODE_AUTO);
 
-			} else if (flashMode.equalsIgnoreCase(Parameters.FLASH_MODE_AUTO)) {
+			} else if (mFlashMode.equalsIgnoreCase(Parameters.FLASH_MODE_AUTO)) {
 
-				toggleFlashButton.setImageResource(R.drawable.ic_flash_on);
+				mToggleFlashButton.setImageResource(R.drawable.ic_flash_on);
 				params.setFlashMode(Parameters.FLASH_MODE_ON);
 
-			} else if (flashMode.equalsIgnoreCase(Parameters.FLASH_MODE_ON)) {
+			} else if (mFlashMode.equalsIgnoreCase(Parameters.FLASH_MODE_ON)) {
 
-				toggleFlashButton.setImageResource(R.drawable.ic_flash_off);
+				mToggleFlashButton.setImageResource(R.drawable.ic_flash_off);
 				params.setFlashMode(Parameters.FLASH_MODE_OFF);
 
 			} else {
@@ -784,8 +797,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			}
 
 			// Update camera and camera setting
-			camera.setParameters(params);
-			flashMode = params.getFlashMode();
+			mCamera.setParameters(params);
+			mFlashMode = params.getFlashMode();
 
 		} else {
 			Logger.Log("Camera does not open");
@@ -800,11 +813,11 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	@Background
 	void takePicture() {
 
-		if (inPreview) {
+		if (mInPreview) {
 
 			try {
 				// Logger.Log( "Prepare to take picture");
-				Camera.Parameters cameraParameters = camera.getParameters();
+				Camera.Parameters cameraParameters = mCamera.getParameters();
 
 				List<String> supportedFocusMode = cameraParameters
 						.getSupportedFocusModes();
@@ -814,14 +827,14 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 						.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
 					cameraParameters
 							.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-					camera.setParameters(cameraParameters);
-					camera.autoFocus(this);
+					mCamera.setParameters(cameraParameters);
+					mCamera.autoFocus(this);
 				} else {
 					Logger.Log("No auto focus mode supported, now just take picture");
-					camera.takePicture(shutterCallback, null, photoCallback);
+					mCamera.takePicture(shutterCallback, null, photoCallback);
 				}
 
-				inPreview = false;
+				mInPreview = false;
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -902,7 +915,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	@Override
 	public void onAutoFocus(boolean arg0, Camera arg1) {
 		// Logger.Log("Auto focused, now take picture");
-		camera.takePicture(shutterCallback, null, photoCallback);
+		mCamera.takePicture(shutterCallback, null, photoCallback);
 	}
 
 	@Override

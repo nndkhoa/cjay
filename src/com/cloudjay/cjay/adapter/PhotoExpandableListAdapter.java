@@ -233,7 +233,7 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter
 				p.height = (gridView.getMeasuredWidth() / 2)
 						* (int) ((cursor.getCount() + 1) / 2);
 				gridView.setLayoutParams(p);
-			}
+			} 
 
 		} else {
 			mCursorAdapters.get(Integer.valueOf(adapterId)).swapCursor(cursor);

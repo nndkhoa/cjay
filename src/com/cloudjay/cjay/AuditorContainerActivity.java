@@ -16,7 +16,6 @@ import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
-import android.R.integer;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -41,15 +40,12 @@ import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.model.CJayImage;
-import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Issue;
-import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.CJayCustomCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.CJayCustomCursorLoader;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
@@ -63,11 +59,12 @@ public class AuditorContainerActivity extends CJayActivity implements
 
 	private static final String LOG_TAG = "AuditorContainerActivity";
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
+	public static final String START_CAMERA_EXTRA = "start_camera";
 
 	private ContainerSession mContainerSession;
-	private CJayImage mSelectedCJayImage;
 	private CJayImage mLongClickedCJayImage;
 	private int mNewImageCount;
+	private String mNewImageUUID;
 
 	private String mSelectedCJayImageUuid;
 	private String mLongClickedCJayImageUuid;
@@ -91,6 +88,9 @@ public class AuditorContainerActivity extends CJayActivity implements
 
 	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
 	String mContainerSessionUUID = "";
+	
+	@Extra(START_CAMERA_EXTRA)
+	boolean mStartCamera = false;
 
 	@AfterViews
 	void afterViews() {
@@ -116,13 +116,20 @@ public class AuditorContainerActivity extends CJayActivity implements
 			e.printStackTrace();
 		}
 
+		// Set Activity Title
+		setTitle(mContainerSession.getContainerId());
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 		getLoaderManager().initLoader(LOADER_ID, null, this);
 
 		mLongClickedCJayImage = null;
-		mSelectedCJayImage = null;
 		mNewImageCount = 0;
 
 		getOtherDao();
+		
+		if (mStartCamera) {
+			cameraClicked();
+		}
 	}
 
 	DamageCodeDaoImpl damageCodeDaoImpl = null;
@@ -195,19 +202,22 @@ public class AuditorContainerActivity extends CJayActivity implements
 
 	@Click(R.id.btn_add_new)
 	void cameraClicked() {
-
-		mNewImageCount = 0;
-		Intent intent = new Intent(this, CameraActivity_.class);
-
-		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-				mContainerSession.getUuid());
-
-		intent.putExtra("type", CJayImage.TYPE_REPORT);
-		intent.putExtra("tag", LOG_TAG);
-		startActivity(intent);
-
+		// refresh highlighting and clear current selection
+		mFeedListView.setItemChecked(-1, true);
+		mLongClickedCJayImage = null;
+		supportInvalidateOptionsMenu();
+		
+		// go to camera
+		mNewImageCount = 0;	
+		mNewImageUUID = "";
+		CJayApplication.gotoCamera(this, mContainerSession, CJayImage.TYPE_REPORT, LOG_TAG);
 	}
 
+	@OptionsItem(android.R.id.home)
+	void homeIconClicked() {
+		finish();
+	}
+	
 	@OptionsItem(R.id.menu_trash)
 	void trashMenuItemClicked() {
 
@@ -291,23 +301,31 @@ public class AuditorContainerActivity extends CJayActivity implements
 
 	@Override
 	public void onResume() {
-
+		
 		super.onResume();
 
+		Logger.Log("issue_report - " + mNewImageUUID + " - start - imageCount=" + mNewImageCount);
+		
+		mSelectedCJayImageUuid = "";
+		
 		if (mNewImageCount > 1) {
-
 			// when more than one images were taken continuously,
 			// then go back to container list
 			mNewImageCount = 0;
 			this.onBackPressed();
 
 		} else {
-
-			// otherwise refresh the image list
-			if (mCursorAdapter != null) {
+			Logger.Log("issue_report - refresh");
+			
+			if (mCursorAdapter != null) {				
+				// otherwise refresh the image list
 				refresh();
 			}
-
+			
+			if (mNewImageCount == 1 && !TextUtils.isEmpty(mNewImageUUID)) {
+				// go to report issue after taking one picture				
+				showReportDialogForNewImage();
+			}
 		}
 	}
 
@@ -388,10 +406,8 @@ public class AuditorContainerActivity extends CJayActivity implements
 
 								// Issue not reported, report issue
 								showIssueReport(mSelectedCJayImageUuid);
-
 							}
 						})
-
 				.setNegativeButton(R.string.dialog_report_yes,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
@@ -431,13 +447,41 @@ public class AuditorContainerActivity extends CJayActivity implements
 		startActivity(intent);
 
 	}
-
-	public void onEvent(CJayImageAddedEvent event) {
-		if (event.getTag().equals(LOG_TAG)) {
-			mNewImageCount++;
+	
+	private void showReportDialogForNewImage() {
+		if (isRunning() && mNewImageCount == 1 && !TextUtils.isEmpty(mNewImageUUID)) {
+			Logger.Log("issue_report"); 
+		
+			// go to report issue after taking one picture				
+			mSelectedCJayImageUuid = mNewImageUUID;
+			mNewImageCount = 0;
+			mNewImageUUID = "";	
+			
+			showReportDialog();			
 		}
 	}
 
+	public void onEvent(CJayImageAddedEvent event) {
+		Logger.Log("issue_report - " + event.getCJayImage().getUuid() + " - cjayimage added - " + event.getTag());
+		if (event.getTag().equals(LOG_TAG)) {
+			mNewImageCount++;
+			mNewImageUUID = event.getCJayImage().getUuid();
+			
+			Logger.Log("issue_report - isRunning=" + isRunning()); 
+			if (isRunning()) {
+				if (mCursorAdapter != null) {
+					Logger.Log("issue_report - refresh");
+					
+					// otherwise refresh the image list
+					refresh();
+				}
+				
+				Logger.Log("issue_report - " + mNewImageUUID + " - start - imageCount=" + mNewImageCount);
+				showReportDialogForNewImage();
+			}
+		}
+	}
+	
 	@Override
 	public android.content.Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
 
@@ -475,7 +519,6 @@ public class AuditorContainerActivity extends CJayActivity implements
 		} else {
 			mCursorAdapter.swapCursor(cursor);
 		}
-
 	}
 
 	@Override

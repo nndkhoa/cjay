@@ -53,6 +53,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 	GoogleCloudMessaging gcm;
 	Context context;
 	String regid;
+	boolean isActivityRunning;
 
 	public DataCenter getDataCenter() {
 		return dataCenter;
@@ -71,6 +72,10 @@ public class CJayActivity extends SherlockFragmentActivity {
 			session = CJaySession.restore(getApplicationContext());
 
 		return session.getCurrentUser();
+	}
+	
+	public boolean isRunning() {
+		return isActivityRunning;
 	}
 
 	@Override
@@ -199,8 +204,17 @@ public class CJayActivity extends SherlockFragmentActivity {
 				}
 			}
 		}
+		
+		isActivityRunning = true;
 
 		super.onResume();
+	}
+	
+	@Override
+	protected void onPause() {
+		isActivityRunning = false;
+		
+		super.onPause();
 	}
 
 	public void onEvent(UserLoggedOutEvent event) {

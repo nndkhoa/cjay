@@ -289,6 +289,7 @@ public class UploadIntentService extends IntentService implements
 
 		try {
 			// Try New Upload Method
+			cJayImageDaoImpl.refresh(uploadItem);
 			uploadItem.setUploadState(CJayImage.STATE_UPLOAD_IN_PROGRESS);
 			// Set Status to Uploading
 			cJayImageDaoImpl.update(uploadItem);
@@ -340,6 +341,7 @@ public class UploadIntentService extends IntentService implements
 						|| resp.getStatusLine().getStatusCode() == HttpStatus.SC_ACCEPTED) {
 
 					// Set Status Success
+					cJayImageDaoImpl.refresh(uploadItem);
 					uploadItem.setUploadState(CJayImage.STATE_UPLOAD_COMPLETED);
 					cJayImageDaoImpl.update(uploadItem);
 				} else {
@@ -355,6 +357,7 @@ public class UploadIntentService extends IntentService implements
 			// Set Status to Uploading
 			try {
 				// THIS IS SQL ERROR --> NO REPEAT
+				cJayImageDaoImpl.refresh(uploadItem);
 				uploadItem.setUploadState(CJayImage.STATE_UPLOAD_ERROR);
 				cJayImageDaoImpl.update(uploadItem);
 
@@ -368,6 +371,7 @@ public class UploadIntentService extends IntentService implements
 
 			// Set Status to Uploading
 			try {
+				cJayImageDaoImpl.refresh(uploadItem);
 				uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
 				cJayImageDaoImpl.update(uploadItem);
 			} catch (SQLException e1) {

@@ -158,10 +158,10 @@ public class CJayApplication extends Application {
 		Intent intent = new Intent(ctx, CameraActivity_.class);
 		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
 				containerSession.getUuid());
-		intent.putExtra("type", imageType);
+		intent.putExtra(CameraActivity_.CJAY_IMAGE_TYPE_EXTRA, imageType);
 
 		if (activityTag != null && !TextUtils.isEmpty(activityTag)) {
-			intent.putExtra("tag", activityTag);
+			intent.putExtra(CameraActivity_.SOURCE_TAG_EXTRA, activityTag);
 		}
 
 		ctx.startActivity(intent);
