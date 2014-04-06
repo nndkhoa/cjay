@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical" >
- 
+
     <GridView
         android:id="@+id/gridview"
         android:layout_width="match_parent"
@@ -12,14 +12,13 @@
         android:layout_marginLeft="3dp"
         android:layout_marginRight="3dp"
         android:layout_marginTop="3dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
         android:horizontalSpacing="3dp"
         android:numColumns="2"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
         android:stretchMode="columnWidth"
         android:verticalSpacing="3dp" />
-    
-    <!-- 
-        android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft" -->
- 
+
+<!--         android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft" -->
+
 </LinearLayout>

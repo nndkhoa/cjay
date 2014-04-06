@@ -45,6 +45,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.aerilys.helpers.android.UIHelper;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
@@ -60,6 +61,7 @@ import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringHelper;
 
 import de.greenrobot.event.EventBus;
@@ -127,6 +129,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	@ViewById(R.id.rl_camera_done)
 	RelativeLayout cameraDoneLayout;
 
+	@ViewById(R.id.btn_capture_mode)
+	ToggleButton captureModeToggleButton;
+
 	@SystemService
 	AudioManager audioManager;
 
@@ -147,6 +152,24 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	String sourceTag = "";
 
 	// endregion
+
+	@Click(R.id.btn_capture_mode)
+	void captureModeToggleButtonClicked() {
+
+		if (captureModeToggleButton.isChecked()) {
+			Toast.makeText(this, "Kích hoạt chế độ chụp liên tục",
+					Toast.LENGTH_SHORT).show();
+
+			PreferencesUtil.storePrefsValue(this,
+					PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, true);
+		} else {
+			Toast.makeText(this, "Đã dừng chế độ chụp liên tục",
+					Toast.LENGTH_SHORT).show();
+
+			PreferencesUtil.storePrefsValue(this,
+					PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false);
+		}
+	}
 
 	SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
 
@@ -583,16 +606,14 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 				CJayApplication.openPhotoGridView(this,
 						containerSession.getUuid(),
 						containerSession.getContainerId(),
-						CJayImage.TYPE_IMPORT,
-						GateImportListFragment.LOG_TAG);
+						CJayImage.TYPE_IMPORT, GateImportListFragment.LOG_TAG);
 
 			} else if (sourceTag.equals(GateExportListFragment.LOG_TAG)) {
 
 				CJayApplication.openPhotoGridView(this,
 						containerSession.getUuid(),
 						containerSession.getContainerId(),
-						CJayImage.TYPE_EXPORT,
-						CJayImage.TYPE_REPAIRED,
+						CJayImage.TYPE_EXPORT, CJayImage.TYPE_REPAIRED,
 						GateExportListFragment.LOG_TAG);
 			}
 		} catch (SQLException e) {

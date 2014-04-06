@@ -340,6 +340,7 @@ public class Utils {
 	}
 	
 	public static String getImageTypeDescription(Context ctx, int imageType) {
+		
 		switch (imageType) {
 		case CJayImage.TYPE_IMPORT:
 			return ctx.getResources().getString(R.string.image_type_description_import);
