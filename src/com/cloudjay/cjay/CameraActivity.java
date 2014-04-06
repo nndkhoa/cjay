@@ -267,6 +267,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		mCameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
 		this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
+		// Only Auditor user can see captureModeToggleButton
 		try {
 			if (CJaySession.restore(this).getUserRole() == User.ROLE_AUDITOR) {
 

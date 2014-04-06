@@ -4,6 +4,7 @@ import org.androidannotations.annotations.EIntentService;
 import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.Trace;
 
+import android.R.integer;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -19,11 +20,14 @@ import android.util.Log;
 
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.UserLogActivity;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.receivers.GcmBroadcastReceiver;
+import com.cloudjay.cjay.util.CJaySession;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NullSessionException;
+import com.google.android.gms.common.data.e;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 /**
@@ -142,6 +146,17 @@ public class GcmIntentService extends IntentService {
 			mNotificationManager = (NotificationManager) this
 					.getSystemService(Context.NOTIFICATION_SERVICE);
 
+			int userRole = 0;
+
+			try {
+				userRole = CJaySession.restore(getApplicationContext())
+						.getUserRole();
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				return;
+			}
+
 			int id = -1;
 			try {
 				id = Integer.parseInt(extras.getString("id"));
@@ -150,9 +165,22 @@ public class GcmIntentService extends IntentService {
 			}
 
 			String type = extras.getString("type");
-
 			Logger.Log("Notification got Type = " + type + " | Id = "
 					+ Integer.toString(id));
+
+			switch (userRole) {
+			case User.ROLE_GATE_KEEPER:
+				break;
+
+			case User.ROLE_AUDITOR:
+				break;
+
+			case User.ROLE_REPAIR_STAFF:
+				break;
+
+			default:
+				break;
+			}
 
 			if (type.equalsIgnoreCase("NEW_CONTAINER")) {
 
@@ -160,7 +188,11 @@ public class GcmIntentService extends IntentService {
 				// Received Roles: GATE | AUDIT
 				// --> Get more data from Server
 
-				DataCenter.getInstance().updateListContainerSessions(this);
+				if (userRole == User.ROLE_GATE_KEEPER
+						|| userRole == User.ROLE_AUDITOR) {
+					DataCenter.getInstance().updateListContainerSessions(this);
+
+				}
 
 			} else if (type.equalsIgnoreCase("EXPORT_CONTAINER")) {
 				// Received: Container xuất khỏi Depot ở CỔNG
@@ -171,7 +203,7 @@ public class GcmIntentService extends IntentService {
 
 			} else if (type.equalsIgnoreCase("NEW_ERROR_LIST")) {
 				// Received: AUDIT post new Issue List
-				// Received Roles: REPAIR
+				// Received Roles: REPAIR, (new) GATE
 				// Đối với ROLE == AUDIT, kèm `id` để remove
 
 				User user = com.cloudjay.cjay.util.CJaySession.restore(this)
@@ -194,14 +226,20 @@ public class GcmIntentService extends IntentService {
 				// thêm lỗi mới
 				// Received Roles: REPAIR
 				// --> Get more data from Server
-				DataCenter.getInstance().updateListContainerSessions(this);
+
+				if (userRole == User.ROLE_REPAIR_STAFF) {
+					DataCenter.getInstance().updateListContainerSessions(this);
+				}
 
 			} else if (type.equalsIgnoreCase("CONTAINER_REPAIRED")) {
 
 				// Received: Sau khi post báo cáo `Sau sửa chữa` từ REPAIR
 				// Received Roles: REPAIR with attached `id`
 				// --> Remove Container Session having this `id`
-				DataCenter.getInstance().removeContainerSession(this, id);
+
+				if (userRole == User.ROLE_REPAIR_STAFF) {
+					DataCenter.getInstance().removeContainerSession(this, id);
+				}
 
 			} else if (type.equalsIgnoreCase("UPDATE_DAMAGE_CODE")) {
 				DataCenter.getInstance().updateListDamageCodes(this);
@@ -231,36 +269,6 @@ public class GcmIntentService extends IntentService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		// Intent previewIntent = new Intent(this, ItemDetailActivity_.class);
-		// previewIntent.putExtra("feed_id", extras.getString("feed_id"));
-		// PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-		// previewIntent, 0);
-		//
-		// try {
-		// NotificationCompat.Builder mBuilder =
-		// new NotificationCompat.Builder(this)
-		// .setSmallIcon(R.drawable.logo_small)
-		// .setContentTitle(extras.getString("team_name"))
-		// .setStyle(new NotificationCompat.BigTextStyle()
-		// .bigText(extras.getString("msg")))
-		// .setContentText(extras.getString("msg"))
-		// .setDefaults(Notification.DEFAULT_SOUND)
-		// .setDefaults(Notification.DEFAULT_LIGHTS)
-		// .setDefaults(Notification.DEFAULT_VIBRATE);
-		//
-		// Uri alarmSound =
-		// RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-		// mBuilder.setSound(alarmSound);
-		//
-		//
-		//
-		// mBuilder.setContentIntent(contentIntent);
-		// mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-		// }
-		// catch (NotFoundException e) {
-		// Log.e("GCM", e.getMessage());
-		// }
 	}
 
 	private void sendNotification(String msg) {
