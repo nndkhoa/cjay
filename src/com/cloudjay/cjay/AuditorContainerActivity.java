@@ -59,6 +59,7 @@ public class AuditorContainerActivity extends CJayActivity implements
 
 	private static final String LOG_TAG = "AuditorContainerActivity";
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
+	public static final String START_CAMERA_EXTRA = "start_camera";
 
 	private ContainerSession mContainerSession;
 	private CJayImage mLongClickedCJayImage;
@@ -87,6 +88,9 @@ public class AuditorContainerActivity extends CJayActivity implements
 
 	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
 	String mContainerSessionUUID = "";
+	
+	@Extra(START_CAMERA_EXTRA)
+	boolean mStartCamera = false;
 
 	@AfterViews
 	void afterViews() {
@@ -112,12 +116,20 @@ public class AuditorContainerActivity extends CJayActivity implements
 			e.printStackTrace();
 		}
 
+		// Set Activity Title
+		setTitle(mContainerSession.getContainerId());
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 		getLoaderManager().initLoader(LOADER_ID, null, this);
 
 		mLongClickedCJayImage = null;
 		mNewImageCount = 0;
 
 		getOtherDao();
+		
+		if (mStartCamera) {
+			cameraClicked();
+		}
 	}
 
 	DamageCodeDaoImpl damageCodeDaoImpl = null;
@@ -201,6 +213,11 @@ public class AuditorContainerActivity extends CJayActivity implements
 		CJayApplication.gotoCamera(this, mContainerSession, CJayImage.TYPE_REPORT, LOG_TAG);
 	}
 
+	@OptionsItem(android.R.id.home)
+	void homeIconClicked() {
+		finish();
+	}
+	
 	@OptionsItem(R.id.menu_trash)
 	void trashMenuItemClicked() {
 
@@ -284,9 +301,11 @@ public class AuditorContainerActivity extends CJayActivity implements
 
 	@Override
 	public void onResume() {
-
+		
 		super.onResume();
 
+		Logger.Log("issue_report - " + mNewImageUUID + " - start - imageCount=" + mNewImageCount);
+		
 		mSelectedCJayImageUuid = "";
 		
 		if (mNewImageCount > 1) {
@@ -296,19 +315,16 @@ public class AuditorContainerActivity extends CJayActivity implements
 			this.onBackPressed();
 
 		} else {
-
-			if (mNewImageCount == 1 && !TextUtils.isEmpty(mNewImageUUID)) {
-				// go to report issue after taking one picture				
-				mSelectedCJayImageUuid = mNewImageUUID;
-				showReportDialog();
-				
-				mNewImageCount = 0;
-				mNewImageUUID = "";	
-			}
+			Logger.Log("issue_report - refresh");
 			
-			if (mCursorAdapter != null) {
+			if (mCursorAdapter != null) {				
 				// otherwise refresh the image list
 				refresh();
+			}
+			
+			if (mNewImageCount == 1 && !TextUtils.isEmpty(mNewImageUUID)) {
+				// go to report issue after taking one picture				
+				showReportDialogForNewImage();
 			}
 		}
 	}
@@ -431,14 +447,41 @@ public class AuditorContainerActivity extends CJayActivity implements
 		startActivity(intent);
 
 	}
-
-	public void onEvent(CJayImageAddedEvent event) {
-		if (event.getTag().equals(LOG_TAG)) {
-			mNewImageCount++;
-			mNewImageUUID = event.getCJayImage().getUuid();
+	
+	private void showReportDialogForNewImage() {
+		if (isRunning() && mNewImageCount == 1 && !TextUtils.isEmpty(mNewImageUUID)) {
+			Logger.Log("issue_report"); 
+		
+			// go to report issue after taking one picture				
+			mSelectedCJayImageUuid = mNewImageUUID;
+			mNewImageCount = 0;
+			mNewImageUUID = "";	
+			
+			showReportDialog();			
 		}
 	}
 
+	public void onEvent(CJayImageAddedEvent event) {
+		Logger.Log("issue_report - " + event.getCJayImage().getUuid() + " - cjayimage added - " + event.getTag());
+		if (event.getTag().equals(LOG_TAG)) {
+			mNewImageCount++;
+			mNewImageUUID = event.getCJayImage().getUuid();
+			
+			Logger.Log("issue_report - isRunning=" + isRunning()); 
+			if (isRunning()) {
+				if (mCursorAdapter != null) {
+					Logger.Log("issue_report - refresh");
+					
+					// otherwise refresh the image list
+					refresh();
+				}
+				
+				Logger.Log("issue_report - " + mNewImageUUID + " - start - imageCount=" + mNewImageCount);
+				showReportDialogForNewImage();
+			}
+		}
+	}
+	
 	@Override
 	public android.content.Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
 

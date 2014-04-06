@@ -30,8 +30,14 @@ import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
+import com.cloudjay.cjay.fragment.IssueReportComponentFragment_;
+import com.cloudjay.cjay.fragment.IssueReportDamageFragment_;
+import com.cloudjay.cjay.fragment.IssueReportDimensionFragment_;
 import com.cloudjay.cjay.fragment.IssueReportFragment;
-import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.fragment.IssueReportLocationFragment_;
+import com.cloudjay.cjay.fragment.IssueReportPhotoFragment_;
+import com.cloudjay.cjay.fragment.IssueReportQuantityFragment_;
+import com.cloudjay.cjay.fragment.IssueReportRepairFragment_;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ComponentCode;
@@ -39,7 +45,6 @@ import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.network.CJayClient;
-import com.cloudjay.cjay.util.Logger;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 // slide 20
@@ -49,7 +54,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 public class AuditorIssueReportActivity extends CJayActivity implements
 		OnPageChangeListener, TabListener, AuditorIssueReportListener {
 
-	public static final String LOG_TAG = "AuditorIssueReportActivity";
 	public static final String CJAY_IMAGE_EXTRA = "cjay_image";
 
 	private AuditorIssueReportTabPageAdaptor mViewPagerAdapter;
@@ -96,15 +100,16 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 			} else {
 				mIssue = mCJayImage.getIssue();
 			}
-			
-			Logger.Log(LOG_TAG, "cjayimage uuid = " + mCJayImageUUID);
-			Logger.Log(LOG_TAG, "    issue uuid = " + mIssue.getUuid());
 
 			mImageLoader.displayImage(mCJayImage.getUri(), mImageView);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
+		// Set Activity Title
+		setTitle(mCJayImage.getContainerSession().getContainerId());
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		mLocations = getResources().getStringArray(
 				R.array.auditor_issue_report_tabs);
@@ -118,6 +123,11 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 				getSupportActionBar().getTabAt(TAB_ISSUE_COMPONENT));
 	}
 
+	@OptionsItem(android.R.id.home)
+	void homeIconClicked() {
+		finish();
+	}
+	
 	@OptionsItem(R.id.menu_check)
 	void checkMenuItemClicked() {
 
@@ -141,7 +151,6 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 
 		// save db records
 		try {
-			Logger.Log(LOG_TAG, "checkMenuItemClicked - saving");
 			mIssueDaoImpl.createOrUpdate(mIssue);
 			mCJayImageDaoImpl.createOrUpdate(mCJayImage);
 

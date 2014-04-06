@@ -18,7 +18,6 @@ import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.ViewById;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources.NotFoundException;
 import android.database.Cursor;
@@ -36,6 +35,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -155,7 +155,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Click(R.id.btn_capture_mode)
 	void captureModeToggleButtonClicked() {
-
+		
 		if (captureModeToggleButton.isChecked()) {
 			Toast.makeText(this, "Kích hoạt chế độ chụp liên tục",
 					Toast.LENGTH_SHORT).show();
@@ -214,7 +214,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			camera.startPreview();
 			mInPreview = true;
 
-			if (Boolean.valueOf(PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS))) {
+			if (!PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, true)) {
 				onBackPressed();
 			}
 		}
@@ -257,6 +257,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		mFlashMode = Camera.Parameters.FLASH_MODE_AUTO;
 		mCameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
 		this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+		
+		captureModeToggleButton.setChecked(PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false));
 	}
 
 	@AfterViews
@@ -482,8 +484,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	}
 
-	@Background
-	void savePhoto(byte[] data) {
+//	@Background
+	synchronized void savePhoto(byte[] data) {
 		// Convert rotated byte[] to Bitmap
 		Bitmap capturedBitmap = saveToBitmap(data);
 
@@ -572,9 +574,13 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
+		
+		Logger.Log("Source tag: " + mSourceTag);
+		
 		// tell people that an image has been created
 		if (!TextUtils.isEmpty(mSourceTag)) {
+			SystemClock.sleep(300);
+			Logger.Log("issue_report - " + uploadItem.getUuid() + " - Trigger cjayimage added");
 			EventBus.getDefault().post(
 					new CJayImageAddedEvent(uploadItem, mSourceTag));
 		}
