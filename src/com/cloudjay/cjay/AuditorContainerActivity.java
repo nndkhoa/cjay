@@ -471,8 +471,6 @@ public class AuditorContainerActivity extends CJayActivity implements
 			if (isRunning()) {
 				if (mCursorAdapter != null) {
 					Logger.Log("issue_report - refresh");
-					
-					// otherwise refresh the image list
 					refresh();
 				}
 				

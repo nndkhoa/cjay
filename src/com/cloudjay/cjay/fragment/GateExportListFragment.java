@@ -54,6 +54,7 @@ import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.events.PostLoadDataEvent;
 import com.cloudjay.cjay.events.PreLoadDataEvent;
 import com.cloudjay.cjay.model.CJayImage;
+import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.network.CJayClient;
@@ -273,20 +274,6 @@ public class GateExportListFragment extends SherlockFragment implements
 
 	}
 
-	@OptionsItem(R.id.menu_edit_container)
-	void editMenuItemSelected() {
-		if (null != mSelectedContainerSession) {
-			CJayApplication.openPhotoGridView(getActivity(),
-					mSelectedContainerSession.getUuid(),
-					mSelectedContainerSession.getContainerId(),
-					CJayImage.TYPE_EXPORT,
-					CJayImage.TYPE_REPAIRED,
-					GateExportListFragment.LOG_TAG);
-			
-			hideMenuItems();
-		}
-	}
-
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 
@@ -324,27 +311,42 @@ public class GateExportListFragment extends SherlockFragment implements
 
 	@ItemClick(R.id.container_list)
 	void listItemClicked(int position) {
-
-		mCurrentPosition = position;
-		// mFeedListView.setItemChecked(mCurrentPosition, true);
-
-		// clear current selection
 		hideMenuItems();
-
-		// get the selected container session and open camera
-		Cursor cursor = (Cursor) cursorAdapter.getItem(mCurrentPosition);
+		
+		mCurrentPosition = position;
+		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
 		String uuidString = cursor.getString(cursor
 				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+		String containerId = cursor.getString(cursor
+				.getColumnIndexOrThrow(Container.CONTAINER_ID));
+		
+		CJayApplication.openPhotoGridView(getActivity(),
+				uuidString,
+				containerId,					
+				CJayImage.TYPE_EXPORT,
+				CJayImage.TYPE_REPAIRED,
+				GateImportListFragment.LOG_TAG);
 
-		try {
-			mSelectedContainerSession = containerSessionDaoImpl
-					.findByUuid(uuidString);
-			CJayApplication.gotoCamera(getActivity(),
-					mSelectedContainerSession, CJayImage.TYPE_EXPORT, LOG_TAG);
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+//		mCurrentPosition = position;
+//		// mFeedListView.setItemChecked(mCurrentPosition, true);
+//
+//		// clear current selection
+//		hideMenuItems();
+//
+//		// get the selected container session and open camera
+//		Cursor cursor = (Cursor) cursorAdapter.getItem(mCurrentPosition);
+//		String uuidString = cursor.getString(cursor
+//				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+//
+//		try {
+//			mSelectedContainerSession = containerSessionDaoImpl
+//					.findByUuid(uuidString);
+//			CJayApplication.gotoCamera(getActivity(),
+//					mSelectedContainerSession, CJayImage.TYPE_EXPORT, LOG_TAG);
+//
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	@ItemLongClick(R.id.container_list)
@@ -372,7 +374,6 @@ public class GateExportListFragment extends SherlockFragment implements
 
 		boolean isDisplayed = !(mSelectedContainerSession == null);
 		menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
-		menu.findItem(R.id.menu_edit_container).setVisible(isDisplayed);
 	}
 
 	@Override
