@@ -345,6 +345,11 @@ public class CJayActivity extends SherlockFragmentActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		// case R.id.menu_setting:
+		// Intent intent = new Intent(this, SettingsActivity.class);
+		// startActivity(intent);
+		//	return true;
+
 		case R.id.menu_logout:
 			showLogoutPrompt();
 			return true;

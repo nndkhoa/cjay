@@ -18,6 +18,7 @@ import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.ViewById;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources.NotFoundException;
 import android.database.Cursor;
@@ -45,6 +46,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.aerilys.helpers.android.UIHelper;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
@@ -60,6 +62,7 @@ import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringHelper;
 
 import de.greenrobot.event.EventBus;
@@ -92,9 +95,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	public static final String SOURCE_TAG_EXTRA = "tag";
 	public static final String CAPTURE_MODE_EXTRA = "camera_mode";
 	
-	public static final int CAPTURE_MODE_CONTINUOUS = 0;
-	public static final int CAPTURE_MODE_SINGLE = 1;
-
 	Camera mCamera = null;
 	MediaPlayer mShootMediaPlayer = null;
 	private SurfaceHolder mPreviewHolder = null;
@@ -132,6 +132,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	@ViewById(R.id.rl_camera_done)
 	RelativeLayout mCameraDoneLayout;
 
+	@ViewById(R.id.btn_capture_mode)
+	ToggleButton captureModeToggleButton;
+
 	@SystemService
 	AudioManager mAudioManager;
 
@@ -147,11 +150,26 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Extra(SOURCE_TAG_EXTRA)
 	String mSourceTag = "";
-	
-	@Extra(CAPTURE_MODE_EXTRA)
-	int mCaptureMode = CAPTURE_MODE_CONTINUOUS;
 
 	// endregion
+
+	@Click(R.id.btn_capture_mode)
+	void captureModeToggleButtonClicked() {
+
+		if (captureModeToggleButton.isChecked()) {
+			Toast.makeText(this, "Kích hoạt chế độ chụp liên tục",
+					Toast.LENGTH_SHORT).show();
+
+			PreferencesUtil.storePrefsValue(this,
+					PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, true);
+		} else {
+			Toast.makeText(this, "Đã dừng chế độ chụp liên tục",
+					Toast.LENGTH_SHORT).show();
+
+			PreferencesUtil.storePrefsValue(this,
+					PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false);
+		}
+	}
 
 	SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
 
@@ -196,7 +214,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			camera.startPreview();
 			mInPreview = true;
 
-			if (mCaptureMode == CAPTURE_MODE_SINGLE) {
+			if (Boolean.valueOf(PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS))) {
 				onBackPressed();
 			}
 		}
@@ -239,12 +257,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		mFlashMode = Camera.Parameters.FLASH_MODE_AUTO;
 		mCameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
 		this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
-		
-		if (mCaptureMode == CAPTURE_MODE_CONTINUOUS) {
-			mDoneButton.setVisibility(Button.VISIBLE);		
-		} else {
-			mDoneButton.setVisibility(Button.INVISIBLE);
-		}
 	}
 
 	@AfterViews
@@ -598,16 +610,13 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 				CJayApplication.openPhotoGridView(this,
 						mContainerSession.getUuid(),
 						mContainerSession.getContainerId(),
-						CJayImage.TYPE_IMPORT,
-						GateImportListFragment.LOG_TAG);
+						CJayImage.TYPE_IMPORT, GateImportListFragment.LOG_TAG);
 
 			} else if (mSourceTag.equals(GateExportListFragment.LOG_TAG)) {
-
 				CJayApplication.openPhotoGridView(this,
 						mContainerSession.getUuid(),
 						mContainerSession.getContainerId(),
-						CJayImage.TYPE_EXPORT,
-						CJayImage.TYPE_REPAIRED,
+						CJayImage.TYPE_EXPORT, CJayImage.TYPE_REPAIRED,
 						GateExportListFragment.LOG_TAG);
 			}
 		} catch (SQLException e) {

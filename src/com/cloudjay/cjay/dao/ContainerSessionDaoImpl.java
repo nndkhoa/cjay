@@ -7,10 +7,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Utils;
 import com.j256.ormlite.android.AndroidDatabaseResults;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.CloseableIterator;
@@ -47,7 +52,72 @@ public class ContainerSessionDaoImpl extends
 		Logger.Log("---> Total time: " + Long.toString(difference));
 	}
 
-	private void bulkInsertDataByCallBatchTasks(
+	public void bulkInsert(SQLiteDatabase db,
+			List<ContainerSession> containerSessions) {
+
+		try {
+			db.beginTransaction();
+
+			for (ContainerSession containerSession : containerSessions) {
+
+				if (containerSession != null) {
+
+					int containerSessionId = containerSession.getId();
+
+					if (containerSessionId != 0) {
+						String sql = "select " + ContainerSession.FIELD_UUID
+								+ " from container_session where "
+								+ ContainerSession.FIELD_ID + " = "
+								+ containerSessionId;
+
+						Cursor cursor = db.rawQuery(sql, new String[] {});
+
+						if (cursor.moveToFirst()) {
+							String containerSessionUuid = cursor
+									.getString(cursor
+											.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+
+							containerSession.setUuid(containerSessionUuid);
+						}
+					}
+				}
+
+				String sql = "insert or replace into container_session VALUES ('"
+						+ containerSession.getRawCheckInTime()
+						+ "', '"
+						+ Utils.stripNull(containerSession.getRawCheckOutTime())
+						+ "', '"
+						+ containerSession.getUuid()
+						+ "', "
+						+ containerSession.getContainer().getId()
+						+ ", '"
+						+ Utils.stripNull(containerSession.getImageIdPath())
+						+ "', "
+						+ containerSession.getId()
+						+ ", "
+						+ Utils.toInt(containerSession.isFixed())
+						+ ", "
+						+ Utils.toInt(containerSession.isExport())
+						+ ", "
+						+ containerSession.getUploadState()
+						+ ", "
+						+ Utils.toInt(containerSession.isOnLocal())
+						+ ", "
+						+ Utils.toInt(containerSession.hasUploadConfirmed())
+						+ ", "
+						+ Utils.toInt(containerSession.isCleared())
+						+ ", " + containerSession.getUploadType() + ")";
+
+				db.execSQL(sql);
+			}
+
+			db.setTransactionSuccessful();
+		} finally {
+			db.endTransaction();
+		}
+	}
+
+	public void bulkInsertDataByCallBatchTasks(
 			final List<ContainerSession> containerSessions) throws SQLException {
 
 		long startTime = System.currentTimeMillis();
@@ -70,7 +140,7 @@ public class ContainerSessionDaoImpl extends
 		Logger.Log("---> Total time: " + Long.toString(difference));
 	}
 
-	private void bulkInsertDataBySavePoint(
+	public void bulkInsertDataBySavePoint(
 			final List<ContainerSession> containerSessions) {
 
 		long startTime = System.currentTimeMillis();
@@ -81,11 +151,14 @@ public class ContainerSessionDaoImpl extends
 			DatabaseConnection conn = null;
 			Savepoint savepoint = null;
 			try {
+
 				conn = this.startThreadConnection();
 				savepoint = conn.setSavePoint("bulk_insert");
+
 				for (ContainerSession containerSession : containerSessions) {
 					addContainerSession(containerSession);
 				}
+
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} finally {

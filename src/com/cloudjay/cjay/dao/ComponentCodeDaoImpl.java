@@ -3,7 +3,11 @@ package com.cloudjay.cjay.dao;
 import java.sql.SQLException;
 import java.util.List;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
+
 import com.cloudjay.cjay.model.ComponentCode;
+import com.cloudjay.cjay.model.DamageCode;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
@@ -13,6 +17,24 @@ public class ComponentCodeDaoImpl extends BaseDaoImpl<ComponentCode, Integer>
 	public ComponentCodeDaoImpl(ConnectionSource connectionSource)
 			throws SQLException {
 		super(connectionSource, ComponentCode.class);
+	}
+
+	public void bulkInsert(SQLiteDatabase db, List<ComponentCode> componentCodes) {
+
+		try {
+			db.beginTransaction();
+
+			for (ComponentCode componentCode : componentCodes) {
+				ContentValues values = new ContentValues();
+				values.put(ComponentCode.CODE, componentCode.getCode());
+				values.put(ComponentCode.DISPLAY_NAME, componentCode.getName());
+				db.insert("component_code", null, values);
+			}
+
+			db.setTransactionSuccessful();
+		} finally {
+			db.endTransaction();
+		}
 	}
 
 	@Override

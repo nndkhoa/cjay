@@ -34,9 +34,6 @@ public final class CJayConstant {
 	public static final String CONTAINER_SESSIONS = API_ROOT
 			+ "cjay/container-sessions.json";
 
-	public static final String LIST_CONTAINER_SESSIONS_WITH_DATETIME_AND_PAGE = API_ROOT
-			+ "cjay/container-sessions.json?created_after=%s&page=%s";
-
 	public static final String CJAY_TMP_STORAGE = "https://www.googleapis.com/upload/storage/v1beta2/b/cjaytmp/o?uploadType=media&name=%s";
 
 	// File path

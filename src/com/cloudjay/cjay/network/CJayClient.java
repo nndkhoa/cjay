@@ -7,11 +7,13 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.http.HttpStatus;
 import org.json.JSONException;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
 
 import com.cloudjay.cjay.model.ComponentCode;
+import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.ContainerSessionResult;
 import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.IDatabaseManager;
@@ -311,6 +313,50 @@ public class CJayClient implements ICJayClient {
 			e.printStackTrace();
 		}
 		return items;
+	}
+
+	public List<TmpContainerSession> getContainerSessions(Context ctx,
+			String date) throws NoConnectionException, NullSessionException {
+
+		if (Utils.hasNoConnection(ctx)) {
+			throw new NoConnectionException();
+		}
+
+		String accessToken = CJaySession.restore(ctx).getAccessToken();
+
+		try {
+			Response<List<TmpContainerSession>> response = Ion
+					.with(ctx, CJayConstant.CONTAINER_SESSIONS)
+					.setHeader("Authorization", "Token " + accessToken)
+					.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
+					.addQuery("created_after", date)
+					.as(new TypeToken<List<TmpContainerSession>>() {
+					}).withResponse().get();
+
+			switch (response.getHeaders().getResponseCode()) {
+			case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
+			case HttpStatus.SC_UNAUTHORIZED:
+				throw new NullSessionException();
+
+			case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi
+				break;
+
+			case HttpStatus.SC_NOT_FOUND: // Không có dữ liệu tương ứng
+				break;
+
+			default:
+				return response.getResult();
+			}
+
+		} catch (InterruptedException e) {
+
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+
+			e.printStackTrace();
+		}
+		return null;
+
 	}
 
 	public ContainerSessionResult getContainerSessionsByPage(Context ctx,

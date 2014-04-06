@@ -16,6 +16,7 @@ public class PreferencesUtil {
 	public static final String PREF_RESOURCE_OPERATOR_LAST_UPDATE = "resource_operator_last_update";
 	public static final String PREF_RESOURCE_COMPONENT_LAST_UPDATE = "resource_component_last_update";
 	public static final String PREF_CONTAINER_SESSION_LAST_UPDATE = "container_session_last_update";
+	public static final String PREF_CAMERA_MODE_CONTINUOUS = "pref_camera_mode_continuous";
 	public static final String PREF_NO_CONNECTION = "pref_no_connection";
 	public static final String PREF_IS_FETCHING_DATA = "pref_is_fetching_data";
 	public static final String PREF_IS_UPDATING_DATA = "pref_is_updating_data";

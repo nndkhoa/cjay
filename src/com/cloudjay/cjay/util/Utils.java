@@ -62,6 +62,10 @@ public class Utils {
 		return (in == null ? "" : in);
 	}
 
+	public static int toInt(boolean val) {
+		return val ? 1 : 0;
+	}
+
 	public static void isStillRunning(Context ctx, String packageName) {
 
 		ActivityManager activityManager = (ActivityManager) ctx
@@ -110,7 +114,7 @@ public class Utils {
 		}
 		return registrationId;
 	}
-	
+
 	public static String getAppVersionName(Context ctx) {
 
 		PackageInfo pInfo = null;
@@ -122,7 +126,6 @@ public class Utils {
 		}
 		return pInfo.versionName;
 	}
-
 
 	/**
 	 * @return Application's {@code SharedPreferences}.
@@ -337,6 +340,7 @@ public class Utils {
 	}
 	
 	public static String getImageTypeDescription(Context ctx, int imageType) {
+		
 		switch (imageType) {
 		case CJayImage.TYPE_IMPORT:
 			return ctx.getResources().getString(R.string.image_type_description_import);

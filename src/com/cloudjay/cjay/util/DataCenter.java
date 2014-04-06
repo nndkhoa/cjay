@@ -76,7 +76,6 @@ public class DataCenter {
 
 	private static DataCenter instance = null;
 	private IDatabaseManager databaseManager = null;
-	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
 
 	public DataCenter() {
 	}
@@ -507,7 +506,10 @@ public class DataCenter {
 					}
 
 					containerSessionDaoImpl
-							.addListContainerSessions(containerSessions);
+							.bulkInsertDataBySavePoint(containerSessions);
+
+					// containerSessionDaoImpl
+					// .bulkInsertDataByCallBatchTasks(containerSessions);
 
 					if (null != containerSessions
 							&& !containerSessions.isEmpty()) {
@@ -520,6 +522,28 @@ public class DataCenter {
 				}
 
 			} while (!TextUtils.isEmpty(nextUrl));
+
+			
+			// List<ContainerSession> containerSessions = new
+			// ArrayList<ContainerSession>();
+			// List<TmpContainerSession> tmpContainerSessions = CJayClient
+			// .getInstance().getContainerSessions(ctx, lastUpdate);
+			//
+			// if (null != tmpContainerSessions) {
+			//
+			// for (TmpContainerSession tmpSession : tmpContainerSessions) {
+			// ContainerSession containerSession = Mapper.getInstance()
+			// .toContainerSession(tmpSession, ctx);
+			//
+			// if (null != containerSession) {
+			// containerSessions.add(containerSession);
+			// }
+			//
+			// }
+			// }
+			//
+			// containerSessionDaoImpl
+			// .bulkInsertDataBySavePoint(containerSessions);
 
 			PreferencesUtil.storePrefsValue(ctx,
 					PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
@@ -600,11 +624,9 @@ public class DataCenter {
 					nowString);
 
 			if (null != operators) {
-
 				operatorDaoImpl.bulkInsert(DataCenter.getDatabaseHelper(ctx)
 						.getWritableDatabase(), operators);
 
-				// operatorDaoImpl.addListOperators(operators);
 			}
 
 		} catch (NoConnectionException e) {
@@ -633,6 +655,7 @@ public class DataCenter {
 			throws NoConnectionException, SQLException {
 
 		Logger.Log("*** UPDATE LIST DAMAGE ***");
+		long startTime = System.currentTimeMillis();
 		try {
 			// 2013-11-10T21:05:24 (do not have timezone info)
 			SimpleDateFormat dateFormat = new SimpleDateFormat(
@@ -666,8 +689,10 @@ public class DataCenter {
 						+ " new damage codes");
 			}
 
-			if (null != damageCodes)
-				damageCodeDaoImpl.addListDamageCodes(damageCodes);
+			if (null != damageCodes) {
+				damageCodeDaoImpl.bulkInsert(DataCenter.getDatabaseHelper(ctx)
+						.getWritableDatabase(), damageCodes);
+			}
 
 		} catch (NoConnectionException e) {
 			throw e;
@@ -676,6 +701,8 @@ public class DataCenter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.w("---> Total time: " + Long.toString(difference));
 	}
 
 	/**
@@ -691,7 +718,7 @@ public class DataCenter {
 			throws NoConnectionException, SQLException, NullSessionException {
 
 		Logger.Log("*** UPDATE LIST COMPONENT ***");
-
+		long startTime = System.currentTimeMillis();
 		try {
 			// 2013-11-10T21:05:24 (do not have timezone info)
 			SimpleDateFormat dateFormat = new SimpleDateFormat(
@@ -725,8 +752,12 @@ public class DataCenter {
 						+ " new component codes");
 			}
 
-			if (null != componentCodes)
-				componentCodeDaoImpl.addListComponentCodes(componentCodes);
+			if (null != componentCodes) {
+				componentCodeDaoImpl
+						.bulkInsert(DataCenter.getDatabaseHelper(ctx)
+								.getWritableDatabase(), componentCodes);
+
+			}
 
 		} catch (NoConnectionException e) {
 			throw e;
@@ -737,6 +768,8 @@ public class DataCenter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.w("---> Total time: " + Long.toString(difference));
 	}
 
 	/**
@@ -751,6 +784,7 @@ public class DataCenter {
 			throws NoConnectionException, SQLException {
 
 		Logger.Log("*** UPDATE LIST REPAIR ***");
+		long startTime = System.currentTimeMillis();
 		try {
 			// 2013-11-10T21:05:24 (do not have timezone info)
 			SimpleDateFormat dateFormat = new SimpleDateFormat(
@@ -786,8 +820,10 @@ public class DataCenter {
 						+ " new repair codes");
 			}
 
-			if (null != repairCodes)
-				repairCodeDaoImpl.addListRepairCodes(repairCodes);
+			if (null != repairCodes) {
+				repairCodeDaoImpl.bulkInsert(DataCenter.getDatabaseHelper(ctx)
+						.getWritableDatabase(), repairCodes);
+			}
 
 		} catch (NoConnectionException e) {
 			throw e;
@@ -796,6 +832,8 @@ public class DataCenter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.w("---> Total time: " + Long.toString(difference));
 	}
 
 	/**
@@ -811,6 +849,8 @@ public class DataCenter {
 			SQLException, NullSessionException {
 
 		Logger.Log("*** UPDATE ALL ISO CODE ***");
+		long startTime = System.currentTimeMillis();
+
 		try {
 
 			updateListOperators(ctx);
@@ -827,6 +867,8 @@ public class DataCenter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.w("---> Total time: " + Long.toString(difference));
 	}
 
 	/**

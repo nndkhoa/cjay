@@ -6,7 +6,7 @@
     <string name="menu_settings">Settings</string>
     <string name="btn_login">Đăng nhập</string>
     <string name="title_activity_splash_screen">SplashScreenActivity</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Cấu hình</string>
     <string name="default_container_id">Untitled</string>
     <string name="container_not_found">KHÔNG TÌM THẤY CONTAINER.\nCLICK + ĐỂ TẠO MỚI </string>
     <string name="camera_button_tooltip">Chụp hình</string>
@@ -52,9 +52,13 @@
     <string name="logout_prompt_title">Dữ liệu sẽ mất sau khi đăng xuất. Bạn có chắc chưa?</string>
     <string name="title_activity_user_log">Usage Log</string>
     
-    <string name="image_type_description_import">Nhập</string>
-    <string name="image_type_description_export">Xuất</string>
-    <string name="image_type_description_report">Giám Định</string>
-    <string name="image_type_description_repaired">Sửa Chửa</string>
+    <!--  -->
+    <string name="image_type_description_import">Hình Nhập</string>
+    <string name="image_type_description_export">Hình Xuất</string>
+    <string name="image_type_description_report">Hình Giám Định</string>
+    <string name="image_type_description_repaired">Hình Sửa Chữa</string>
+    
+    <!--  -->
+    
 
 </resources>

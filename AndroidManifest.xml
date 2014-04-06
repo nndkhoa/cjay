@@ -163,8 +163,11 @@
 
         <activity
             android:name="com.cloudjay.cjay.UserLogActivity_"
-            android:label="@string/title_activity_user_log" 
-            >
+            android:label="@string/title_activity_user_log" >
+        </activity>
+        <activity
+            android:name="com.cloudjay.cjay.SettingsActivity"
+            android:label="@string/title_activity_settings" >
         </activity>
     </application>
 
