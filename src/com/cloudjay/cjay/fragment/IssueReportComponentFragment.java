@@ -119,8 +119,7 @@ public class IssueReportComponentFragment extends IssueReportFragment implements
 
 		mComponentCode = cursor.getString(cursor
 				.getColumnIndexOrThrow(DamageCode.CODE));
-
-		mComponentCode = cursor.getString(cursor
+		mComponentName = cursor.getString(cursor
 				.getColumnIndexOrThrow(DamageCode.DISPLAY_NAME));
 
 		ignoreSearch = true;

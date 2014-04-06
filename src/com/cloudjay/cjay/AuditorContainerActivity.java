@@ -16,7 +16,6 @@ import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
-import android.R.integer;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -41,15 +40,12 @@ import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.model.CJayImage;
-import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Issue;
-import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.CJayCustomCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.CJayCustomCursorLoader;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
@@ -65,9 +61,9 @@ public class AuditorContainerActivity extends CJayActivity implements
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
 
 	private ContainerSession mContainerSession;
-	private CJayImage mSelectedCJayImage;
 	private CJayImage mLongClickedCJayImage;
 	private int mNewImageCount;
+	private String mNewImageUUID;
 
 	private String mSelectedCJayImageUuid;
 	private String mLongClickedCJayImageUuid;
@@ -119,7 +115,6 @@ public class AuditorContainerActivity extends CJayActivity implements
 		getLoaderManager().initLoader(LOADER_ID, null, this);
 
 		mLongClickedCJayImage = null;
-		mSelectedCJayImage = null;
 		mNewImageCount = 0;
 
 		getOtherDao();
@@ -195,17 +190,15 @@ public class AuditorContainerActivity extends CJayActivity implements
 
 	@Click(R.id.btn_add_new)
 	void cameraClicked() {
-
-		mNewImageCount = 0;
-		Intent intent = new Intent(this, CameraActivity_.class);
-
-		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-				mContainerSession.getUuid());
-
-		intent.putExtra("type", CJayImage.TYPE_REPORT);
-		intent.putExtra("tag", LOG_TAG);
-		startActivity(intent);
-
+		// refresh highlighting and clear current selection
+		mFeedListView.setItemChecked(-1, true);
+		mLongClickedCJayImage = null;
+		supportInvalidateOptionsMenu();
+		
+		// go to camera
+		mNewImageCount = 0;	
+		mNewImageUUID = "";
+		CJayApplication.gotoCamera(this, mContainerSession, CJayImage.TYPE_REPORT, LOG_TAG, CameraActivity_.CAPTURE_MODE_SINGLE);
 	}
 
 	@OptionsItem(R.id.menu_trash)
@@ -294,8 +287,9 @@ public class AuditorContainerActivity extends CJayActivity implements
 
 		super.onResume();
 
+		mSelectedCJayImageUuid = "";
+		
 		if (mNewImageCount > 1) {
-
 			// when more than one images were taken continuously,
 			// then go back to container list
 			mNewImageCount = 0;
@@ -303,11 +297,19 @@ public class AuditorContainerActivity extends CJayActivity implements
 
 		} else {
 
-			// otherwise refresh the image list
+			if (mNewImageCount == 1 && !TextUtils.isEmpty(mNewImageUUID)) {
+				// go to report issue after taking one picture				
+				mSelectedCJayImageUuid = mNewImageUUID;
+				showReportDialog();
+				
+				mNewImageCount = 0;
+				mNewImageUUID = "";	
+			}
+			
 			if (mCursorAdapter != null) {
+				// otherwise refresh the image list
 				refresh();
 			}
-
 		}
 	}
 
@@ -388,10 +390,8 @@ public class AuditorContainerActivity extends CJayActivity implements
 
 								// Issue not reported, report issue
 								showIssueReport(mSelectedCJayImageUuid);
-
 							}
 						})
-
 				.setNegativeButton(R.string.dialog_report_yes,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
@@ -435,6 +435,7 @@ public class AuditorContainerActivity extends CJayActivity implements
 	public void onEvent(CJayImageAddedEvent event) {
 		if (event.getTag().equals(LOG_TAG)) {
 			mNewImageCount++;
+			mNewImageUUID = event.getCJayImage().getUuid();
 		}
 	}
 
@@ -475,7 +476,6 @@ public class AuditorContainerActivity extends CJayActivity implements
 		} else {
 			mCursorAdapter.swapCursor(cursor);
 		}
-
 	}
 
 	@Override

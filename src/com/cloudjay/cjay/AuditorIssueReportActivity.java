@@ -45,6 +45,7 @@ import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.Logger;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 // slide 20
@@ -54,6 +55,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 public class AuditorIssueReportActivity extends CJayActivity implements
 		OnPageChangeListener, TabListener, AuditorIssueReportListener {
 
+	public static final String LOG_TAG = "AuditorIssueReportActivity";
 	public static final String CJAY_IMAGE_EXTRA = "cjay_image";
 
 	private AuditorIssueReportTabPageAdaptor mViewPagerAdapter;
@@ -94,15 +96,15 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 
 			mCJayImage = mCJayImageDaoImpl.findByUuid(mCJayImageUUID);
 			if (mCJayImage.getIssue() == null) {
-
 				mIssue = new Issue();
 				mIssue.setContainerSession(mCJayImage.getContainerSession());
 				mCJayImage.setIssue(mIssue);
-
 			} else {
-
 				mIssue = mCJayImage.getIssue();
 			}
+			
+			Logger.Log(LOG_TAG, "cjayimage uuid = " + mCJayImageUUID);
+			Logger.Log(LOG_TAG, "    issue uuid = " + mIssue.getUuid());
 
 			mImageLoader.displayImage(mCJayImage.getUri(), mImageView);
 
@@ -145,6 +147,7 @@ public class AuditorIssueReportActivity extends CJayActivity implements
 
 		// save db records
 		try {
+			Logger.Log(LOG_TAG, "checkMenuItemClicked - saving");
 			mIssueDaoImpl.createOrUpdate(mIssue);
 			mCJayImageDaoImpl.createOrUpdate(mCJayImage);
 
