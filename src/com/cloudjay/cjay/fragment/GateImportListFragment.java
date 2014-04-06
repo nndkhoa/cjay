@@ -276,11 +276,9 @@ public class GateImportListFragment extends SherlockFragment implements
 				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
 		String containerId = cursor.getString(cursor
 				.getColumnIndexOrThrow(Container.CONTAINER_ID));
-		
-		CJayApplication.openPhotoGridView(getActivity(),
-				uuidString,
-				containerId,
-				CJayImage.TYPE_IMPORT,
+
+		CJayApplication.openPhotoGridView(getActivity(), uuidString,
+				containerId, CJayImage.TYPE_IMPORT,
 				GateImportListFragment.LOG_TAG);
 	}
 

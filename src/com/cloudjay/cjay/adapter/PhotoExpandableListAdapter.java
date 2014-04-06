@@ -30,32 +30,25 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
 	private String mContainerSessionUUID;
 	private int[] mImageTypes;
 	private Hashtable<Integer, GridView> mGridViews;
-//	private Hashtable<Integer, PhotoGridViewCursorAdapter> mCursorAdapters;
-//	private int mItemLayout;
 
 	public PhotoExpandableListAdapter(Context context,
 			String containerSessionUUID, int[] imageTypes) {
+
 		mContext = context;
-//		mItemLayout = R.layout.grid_item_image;
 		mGridViews = new Hashtable<Integer, GridView>();
-//		mCursorAdapters = new Hashtable<Integer, PhotoGridViewCursorAdapter>();
 		mSectionHeaders = new ArrayList<String>();
 
 		mImageTypes = imageTypes;
 		mContainerSessionUUID = containerSessionUUID;
 
 		for (int i = 0; i < mImageTypes.length; i++) {
+
 			mSectionHeaders.add(Utils.getImageTypeDescription(mContext,
 					mImageTypes[i]));
+			
 		}
 	}
 	
-//	public void refreshCursorLoader() {
-//		if (mCursorAdapters.get(Integer.valueOf(0)) != null) {
-//			((FragmentActivity) mContext).getSupportLoaderManager().restartLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1, null, this);
-//		}
-//	}
-
 	public GridView getPhotoGridView(int groupPosition) {
 		return mGridViews.get(Integer.valueOf(groupPosition));
 	}
@@ -166,86 +159,4 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
 	public boolean isChildSelectable(int groupPosition, int childPosition) {
 		return false;
 	}
-
-//	@Override
-//	public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-//		int imageType = -1;
-//
-//		switch (id) {
-//		case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1:
-//			imageType = mImageTypes[0];
-//			break;
-//
-//		case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_2:
-//			imageType = mImageTypes[1];
-//			break;
-//		}
-//
-//		final int cursorLoaderImageType = imageType;
-//
-//		return new CJayCursorLoader(mContext) {
-//			@Override
-//			public Cursor loadInBackground() {
-//				Cursor cursor = DataCenter.getInstance()
-//						.getCJayImagesCursorByContainer(getContext(),
-//								mContainerSessionUUID, cursorLoaderImageType);
-//
-//				if (cursor != null) {
-//					// Ensure the cursor window is filled
-//					cursor.registerContentObserver(mObserver);
-//				}
-//
-//				return cursor;
-//			}
-//		};
-//	}
-//
-//	@Override
-//	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-//		int adapterId = 0;
-//
-//		switch (loader.getId()) {
-//		case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1:
-//			adapterId = 0;
-//			break;
-//
-//		case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_2:
-//			adapterId = 1;
-//			break;
-//		}
-//
-//		if (mCursorAdapters.get(Integer.valueOf(adapterId)) == null) {
-//			mCursorAdapters.put(Integer.valueOf(adapterId),
-//					new PhotoGridViewCursorAdapter(mContext, mItemLayout,
-//							cursor, 0));
-//
-//			GridView gridView = this.getPhotoGridView(adapterId);
-//			gridView.setAdapter(mCursorAdapters.get(Integer.valueOf(adapterId)));
-//
-//			if (cursor.getCount() > 0) {
-//				LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) gridView
-//						.getLayoutParams();
-//				p.height = (gridView.getMeasuredWidth() / 2)
-//						* (int) ((cursor.getCount() + 1) / 2);
-//				gridView.setLayoutParams(p);
-//			}
-//
-//		} else {
-//			mCursorAdapters.get(Integer.valueOf(adapterId)).swapCursor(cursor);
-//		}
-//	}
-//
-//	@Override
-//	public void onLoaderReset(Loader<Cursor> loader) {
-//
-//		switch (loader.getId()) {
-//		case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1:
-//			mCursorAdapters.get(Integer.valueOf(0)).swapCursor(null);
-//			break;
-//
-//		case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_2:
-//			mCursorAdapters.get(Integer.valueOf(1)).swapCursor(null);
-//			break;
-//		}
-//	}
 }

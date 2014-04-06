@@ -15,6 +15,7 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.NoTitle;
 import org.androidannotations.annotations.SystemService;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.ViewById;
 
 import android.app.Activity;
@@ -38,6 +39,7 @@ import android.os.Build;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -94,7 +96,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	public static final String CJAY_IMAGE_TYPE_EXTRA = "type";
 	public static final String SOURCE_TAG_EXTRA = "tag";
 	public static final String CAPTURE_MODE_EXTRA = "camera_mode";
-	
+
 	Camera mCamera = null;
 	MediaPlayer mShootMediaPlayer = null;
 	private SurfaceHolder mPreviewHolder = null;
@@ -155,7 +157,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Click(R.id.btn_capture_mode)
 	void captureModeToggleButtonClicked() {
-		
+
 		if (captureModeToggleButton.isChecked()) {
 			Toast.makeText(this, "Kích hoạt chế độ chụp liên tục",
 					Toast.LENGTH_SHORT).show();
@@ -214,7 +216,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			camera.startPreview();
 			mInPreview = true;
 
-			if (!PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, true)) {
+			if (!PreferencesUtil.getPrefsValue(getApplicationContext(),
+					PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, true)) {
 				onBackPressed();
 			}
 		}
@@ -241,7 +244,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		}
 	};
 
-	@SuppressWarnings({})
 	@AfterViews
 	void initCamera() {
 
@@ -257,8 +259,10 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		mFlashMode = Camera.Parameters.FLASH_MODE_AUTO;
 		mCameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
 		this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
-		
-		captureModeToggleButton.setChecked(PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false));
+
+		captureModeToggleButton.setChecked(PreferencesUtil.getPrefsValue(
+				getApplicationContext(),
+				PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false));
 	}
 
 	@AfterViews
@@ -290,7 +294,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	}
 
-	private void initPreview(int width, int height) {
+	void initPreview(int width, int height) {
 		Logger.Log("initPreview()");
 
 		if (mCamera != null && mPreviewHolder.getSurface() != null) {
@@ -343,7 +347,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		}
 	}
 
-	private void startPreview() {
+	void startPreview() {
 		Logger.Log("----> startPreview");
 
 		if (mCameraConfigured && mCamera != null) {
@@ -484,7 +488,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	}
 
-//	@Background
+	// @Background
 	synchronized void savePhoto(byte[] data) {
 		// Convert rotated byte[] to Bitmap
 		Bitmap capturedBitmap = saveToBitmap(data);
@@ -574,13 +578,14 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		Logger.Log("Source tag: " + mSourceTag);
-		
+
 		// tell people that an image has been created
 		if (!TextUtils.isEmpty(mSourceTag)) {
 			SystemClock.sleep(300);
-			Logger.Log("issue_report - " + uploadItem.getUuid() + " - Trigger cjayimage added");
+			Logger.Log("issue_report - " + uploadItem.getUuid()
+					+ " - Trigger cjayimage added");
 			EventBus.getDefault().post(
 					new CJayImageAddedEvent(uploadItem, mSourceTag));
 		}
@@ -613,6 +618,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			// Open GridView
 			if (mSourceTag.equals(GateImportListFragment.LOG_TAG)) {
+
 				CJayApplication.openPhotoGridView(this,
 						mContainerSession.getUuid(),
 						mContainerSession.getContainerId(),

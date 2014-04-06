@@ -40,6 +40,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 	public static final String LOG_TAG = "PhotoExpandableListViewActivity";
 	public static final String CJAY_CONTAINER_SESSION_UUID_EXTRA = "cjay_container_session_uuid";
 	public static final String CJAY_CONTAINER_ID_EXTRA = "cjay_container_id";
+
 	public static final String CJAY_IMAGE_TYPE_1_EXTRA = "cjay_image_type1";
 	public static final String CJAY_IMAGE_TYPE_2_EXTRA = "cjay_image_type2";
 
@@ -98,6 +99,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		mCursorAdapters = new Hashtable<Integer, PhotoGridViewCursorAdapter>();
 		mListAdapter = new PhotoExpandableListAdapter(this,
 				mContainerSessionUUID, mImageTypes);
+		
 		mListView.setAdapter(mListAdapter);
 		mListView.setEmptyView(findViewById(android.R.id.empty));
 
