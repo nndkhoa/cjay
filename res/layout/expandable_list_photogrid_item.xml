@@ -14,11 +14,11 @@
         android:layout_marginTop="3dp"
         android:horizontalSpacing="3dp"
         android:numColumns="2"
-        android:paddingBottom="5dp"
-        android:paddingTop="5dp"
+        android:paddingBottom="6dp"
+        android:paddingTop="6dp"
         android:stretchMode="columnWidth"
         android:verticalSpacing="3dp" />
 
-<!--         android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft" -->
+    <!-- android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft" -->
 
 </LinearLayout>

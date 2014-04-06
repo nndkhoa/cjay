@@ -42,9 +42,11 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter
 
 	public PhotoExpandableListAdapter(Context context,
 			String containerSessionUUID, int[] imageTypes) {
+
 		mContext = context;
 		mItemLayout = R.layout.grid_item_image;
 		mGridViews = new Hashtable<Integer, GridView>();
+		
 		mCursorAdapters = new Hashtable<Integer, PhotoGridViewCursorAdapter>();
 		mSectionHeaders = new ArrayList<String>();
 
@@ -52,8 +54,10 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter
 		mContainerSessionUUID = containerSessionUUID;
 
 		for (int i = 0; i < mImageTypes.length; i++) {
+
 			mSectionHeaders.add(Utils.getImageTypeDescription(mContext,
 					mImageTypes[i]));
+			
 		}
 	}
 

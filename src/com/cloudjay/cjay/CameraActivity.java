@@ -15,6 +15,7 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.NoTitle;
 import org.androidannotations.annotations.SystemService;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.ViewById;
 
 import android.app.Activity;
@@ -37,6 +38,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -237,7 +239,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		}
 	};
 
-	@SuppressWarnings({})
 	@AfterViews
 	void initCamera() {
 
@@ -284,7 +285,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	}
 
-	private void initPreview(int width, int height) {
+	void initPreview(int width, int height) {
 		Logger.Log("initPreview()");
 
 		if (camera != null && previewHolder.getSurface() != null) {
@@ -337,7 +338,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		}
 	}
 
-	private void startPreview() {
+	void startPreview() {
 		Logger.Log("----> startPreview");
 
 		if (cameraConfigured && camera != null) {
@@ -603,6 +604,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			// Open GridView
 			if (sourceTag.equals(GateImportListFragment.LOG_TAG)) {
+
 				CJayApplication.openPhotoGridView(this,
 						containerSession.getUuid(),
 						containerSession.getContainerId(),

@@ -26,6 +26,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity {
 
 	public static final String CJAY_CONTAINER_SESSION_UUID_EXTRA = "cjay_container_session_uuid";
 	public static final String CJAY_CONTAINER_ID_EXTRA = "cjay_container_id";
+
 	public static final String CJAY_IMAGE_TYPE_1_EXTRA = "cjay_image_type1";
 	public static final String CJAY_IMAGE_TYPE_2_EXTRA = "cjay_image_type2";
 
@@ -71,13 +72,17 @@ public class PhotoExpandableListViewActivity extends CJayActivity {
 		if (mCJayImageTypeB < 0) {
 			imageTypes = new int[1];
 			imageTypes[0] = mCJayImageTypeA;
+
 		} else {
+
 			imageTypes = new int[2];
 			imageTypes[0] = mCJayImageTypeA;
 			imageTypes[1] = mCJayImageTypeB;
 		}
+
 		mListAdapter = new PhotoExpandableListAdapter(this,
 				mContainerSessionUUID, imageTypes);
+
 		mListView.setAdapter(mListAdapter);
 		mListView.setEmptyView(findViewById(android.R.id.empty));
 
