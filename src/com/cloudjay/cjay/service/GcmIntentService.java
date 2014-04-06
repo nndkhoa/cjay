@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
@@ -153,7 +154,16 @@ public class GcmIntentService extends IntentService {
 						.getUserRole();
 
 			} catch (Exception e) {
-				e.printStackTrace();
+
+				DataCenter.getDatabaseHelper(getApplicationContext())
+						.addUsageLog("NullSessionException");
+
+				Toast.makeText(getApplicationContext(),
+						"Tài khoản có vấn đề. Xin hãy đăng nhập lại.",
+						Toast.LENGTH_LONG).show();
+
+				CJayApplication.logOutInstantly(getApplicationContext());
+				onDestroy();
 				return;
 			}
 
@@ -167,20 +177,6 @@ public class GcmIntentService extends IntentService {
 			String type = extras.getString("type");
 			Logger.Log("Notification got Type = " + type + " | Id = "
 					+ Integer.toString(id));
-
-			switch (userRole) {
-			case User.ROLE_GATE_KEEPER:
-				break;
-
-			case User.ROLE_AUDITOR:
-				break;
-
-			case User.ROLE_REPAIR_STAFF:
-				break;
-
-			default:
-				break;
-			}
 
 			if (type.equalsIgnoreCase("NEW_CONTAINER")) {
 
@@ -206,10 +202,7 @@ public class GcmIntentService extends IntentService {
 				// Received Roles: REPAIR, (new) GATE
 				// Đối với ROLE == AUDIT, kèm `id` để remove
 
-				User user = com.cloudjay.cjay.util.CJaySession.restore(this)
-						.getCurrentUser();
-
-				if (user.getRole() == User.ROLE_AUDITOR) {
+				if (userRole == User.ROLE_AUDITOR) {
 
 					// If role is AUDIT -> remove Container Session having `id`
 					DataCenter.getInstance().removeContainerSession(this, id);
