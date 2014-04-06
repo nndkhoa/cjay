@@ -1,5 +1,9 @@
 package com.cloudjay.cjay.view;
 
+import org.androidannotations.annotations.EView;
+import org.androidannotations.annotations.EViewGroup;
+import org.androidannotations.annotations.UiThread;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
@@ -13,8 +17,10 @@ import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.util.Logger;
 import com.nostra13.universalimageloader.core.ImageLoader;
+
 import de.greenrobot.event.EventBus;
 
+@EViewGroup
 public class UploadItemLayout extends LinearLayout {
 
 	private ContainerSession mContainerSession;
@@ -44,11 +50,13 @@ public class UploadItemLayout extends LinearLayout {
 	}
 
 	// Use to trigger refresh layout
-	public void onEvent(ContainerSessionUpdatedEvent event) {
+	public void onEventMainThread(ContainerSessionUpdatedEvent event) {
+
 		Logger.Log("onEvent ContainerSessionUpdatedEvent");
 		refreshUploadUi();
 	}
 
+	@UiThread
 	public void refreshUploadUi() {
 		if (null == mContainerSession) {
 			return;

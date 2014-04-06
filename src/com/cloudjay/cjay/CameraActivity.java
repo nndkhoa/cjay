@@ -166,12 +166,16 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			PreferencesUtil.storePrefsValue(this,
 					PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, true);
+
+			mDoneButton.setVisibility(View.VISIBLE);
 		} else {
 			Toast.makeText(this, "Đã dừng chế độ chụp liên tục",
 					Toast.LENGTH_SHORT).show();
 
 			PreferencesUtil.storePrefsValue(this,
 					PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false);
+
+			mDoneButton.setVisibility(View.GONE);
 		}
 
 	}
@@ -271,10 +275,18 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		try {
 			if (CJaySession.restore(this).getUserRole() == User.ROLE_AUDITOR) {
 
-				captureModeToggleButton.setChecked(PreferencesUtil
-						.getPrefsValue(getApplicationContext(),
-								PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS,
-								false));
+				boolean isContinuous = PreferencesUtil.getPrefsValue(
+						getApplicationContext(),
+						PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false);
+
+				if (isContinuous == false) {
+					PreferencesUtil.storePrefsValue(getApplicationContext(),
+							PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false);
+
+					mDoneButton.setVisibility(View.GONE);
+				}
+
+				captureModeToggleButton.setChecked(isContinuous);
 
 			} else {
 

@@ -523,7 +523,6 @@ public class DataCenter {
 
 			} while (!TextUtils.isEmpty(nextUrl));
 
-			
 			// List<ContainerSession> containerSessions = new
 			// ArrayList<ContainerSession>();
 			// List<TmpContainerSession> tmpContainerSessions = CJayClient

@@ -11,6 +11,8 @@
     <string name="container_not_found">KHÔNG TÌM THẤY CONTAINER.\nCLICK + ĐỂ TẠO MỚI </string>
     <string name="camera_button_tooltip">Chụp hình</string>
     <string name="progress">Loading ...</string>
+    <string name="list_items">Danh sách container</string>
+    <string name="list_issues">Danh sách lỗi</string>
 
     <!-- ACRA -->
     <string name="crash_toast_text">Ooooops! I crashed, but a report has been sent to my developer to help fix the issue!</string>
@@ -51,14 +53,13 @@
     <string name="logout">Logout %1$s</string>
     <string name="logout_prompt_title">Dữ liệu sẽ mất sau khi đăng xuất. Bạn có chắc chưa?</string>
     <string name="title_activity_user_log">Usage Log</string>
-    
+
     <!--  -->
     <string name="image_type_description_import">Hình Nhập</string>
     <string name="image_type_description_export">Hình Xuất</string>
     <string name="image_type_description_report">Hình Giám Định</string>
     <string name="image_type_description_repaired">Hình Sửa Chữa</string>
-    
+
     <!--  -->
-    
 
 </resources>
