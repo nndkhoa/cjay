@@ -7,7 +7,6 @@ import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.cloudjay.cjay.model.DamageCode;
-import com.cloudjay.cjay.model.Operator;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
@@ -27,6 +26,7 @@ public class DamageCodeDaoImpl extends BaseDaoImpl<DamageCode, Integer>
 			for (DamageCode damageCode : damageCodes) {
 
 				ContentValues values = new ContentValues();
+				values.put(DamageCode.ID, damageCode.getId());
 				values.put(DamageCode.CODE, damageCode.getCode());
 				values.put(DamageCode.DISPLAY_NAME, damageCode.getName());
 				db.insert("damage_code", null, values);

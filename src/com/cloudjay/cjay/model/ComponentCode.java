@@ -15,7 +15,7 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "component_code", daoClass = ComponentCodeDaoImpl.class)
 public class ComponentCode {
 
-	private static final String ID = "id";
+	public static final String ID = "id";
 	public static final String DISPLAY_NAME = "display_name";
 	public static final String CODE = "code";
 

@@ -11,9 +11,9 @@ import org.json.JSONException;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
+import android.util.Log;
 
 import com.cloudjay.cjay.model.ComponentCode;
-import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.ContainerSessionResult;
 import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.IDatabaseManager;
@@ -435,8 +435,18 @@ public class CJayClient implements ICJayClient {
 
 		try {
 
+			Gson gson = new GsonBuilder().setDateFormat(
+					CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE).create();
+
+			Type listType = new TypeToken<TmpContainerSession>() {
+			}.getType();
+
+			String resultString = gson.toJson(item, listType);
+			Logger.Log(resultString);
+
 			Response<String> response = Ion
 					.with(ctx, CJayConstant.CONTAINER_SESSIONS)
+					.setLogging("Ion", Log.VERBOSE)
 					.setHeader("Authorization", "Token " + accessToken)
 					.setHeader("CJAY_VERSION", appVersion)
 					.setJsonObjectBody(item,
@@ -475,6 +485,7 @@ public class CJayClient implements ICJayClient {
 				throw new ServerInternalErrorException();
 
 			case HttpStatus.SC_NOT_FOUND: // Không có dữ liệu tương ứng
+			case HttpStatus.SC_BAD_REQUEST:
 				// Server will process it
 				// Set container to error
 				throw new MismatchDataException();

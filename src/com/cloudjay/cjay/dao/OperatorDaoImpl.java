@@ -9,7 +9,6 @@ import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.cloudjay.cjay.model.Operator;
-import com.cloudjay.cjay.util.DataCenter;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 

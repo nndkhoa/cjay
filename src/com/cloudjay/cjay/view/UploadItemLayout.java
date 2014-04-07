@@ -1,6 +1,5 @@
 package com.cloudjay.cjay.view;
 
-import org.androidannotations.annotations.EView;
 import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.UiThread;
 
@@ -54,6 +53,7 @@ public class UploadItemLayout extends LinearLayout {
 
 		Logger.Log("onEvent ContainerSessionUpdatedEvent");
 		refreshUploadUi();
+		
 	}
 
 	@UiThread

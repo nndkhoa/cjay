@@ -4,7 +4,6 @@ import org.androidannotations.annotations.EIntentService;
 import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.Trace;
 
-import android.R.integer;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -21,14 +20,12 @@ import android.widget.Toast;
 
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.UserLogActivity;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.receivers.GcmBroadcastReceiver;
 import com.cloudjay.cjay.util.CJaySession;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NullSessionException;
-import com.google.android.gms.common.data.e;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 /**

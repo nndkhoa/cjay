@@ -297,6 +297,7 @@ public class AuditorContainerActivity extends CJayActivity implements
 		menu.findItem(R.id.menu_trash).setVisible(isDisplayed);
 		menu.findItem(R.id.menu_upload).setVisible(
 				mContainerSession.isValidForUpload(CJayImage.TYPE_REPORT));
+
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -333,8 +334,11 @@ public class AuditorContainerActivity extends CJayActivity implements
 
 	@UiThread
 	public void refresh() {
+
 		getLoaderManager().restartLoader(LOADER_ID, null, this);
 		supportInvalidateOptionsMenu();
+		invalidateOptionsMenu();
+
 	}
 
 	@Background

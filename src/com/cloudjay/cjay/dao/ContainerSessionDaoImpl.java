@@ -7,13 +7,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.j256.ormlite.android.AndroidDatabaseResults;

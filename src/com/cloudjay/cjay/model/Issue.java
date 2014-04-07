@@ -214,9 +214,11 @@ public class Issue {
 		if (o.getClass() == AuditReportItem.class) {
 			AuditReportItem tmp = (AuditReportItem) o;
 
+			// TODO: BUG HERE
 			boolean isEqual = this.damageCode.getId() == tmp.getDamageId()
 					&& this.repairCode.getId() == tmp.getRepairId()
 					&& this.getComponentCode().getId() == tmp.getComponentId()
+					&& this.getLocationCode() == tmp.getLocationCode()
 					&& Float.parseFloat(this.length) == Float.parseFloat(tmp
 							.getLength())
 					&& Float.parseFloat(this.height) == Float.parseFloat(tmp

@@ -7,7 +7,6 @@ import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.cloudjay.cjay.model.ComponentCode;
-import com.cloudjay.cjay.model.DamageCode;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
@@ -26,8 +25,12 @@ public class ComponentCodeDaoImpl extends BaseDaoImpl<ComponentCode, Integer>
 
 			for (ComponentCode componentCode : componentCodes) {
 				ContentValues values = new ContentValues();
+				values.put(ComponentCode.ID, componentCode.getId());
 				values.put(ComponentCode.CODE, componentCode.getCode());
 				values.put(ComponentCode.DISPLAY_NAME, componentCode.getName());
+				
+				
+				
 				db.insert("component_code", null, values);
 			}
 

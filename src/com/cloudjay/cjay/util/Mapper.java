@@ -138,17 +138,18 @@ public class Mapper {
 				if (auditReportItems != null) {
 					for (AuditReportItem auditReportItem : auditReportItems) {
 						for (Issue issue : issues) {
+
 							if (issue.equals(auditReportItem)) {
 								issue.setId(auditReportItem.getId());
 
 								List<AuditReportImage> auditReportImages = auditReportItem
 										.getAuditReportImages();
-
 								Collection<CJayImage> issueImages = issue
 										.getCJayImages();
 
 								for (AuditReportImage auditReportImage : auditReportImages) {
 									for (CJayImage cJayImage : issueImages) {
+
 										String auditReportImageName = auditReportImage
 												.getImageName();
 										String cJayImageName = cJayImage

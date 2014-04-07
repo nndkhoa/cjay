@@ -6,8 +6,8 @@ import java.util.List;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.RepairCode;
+import com.cloudjay.cjay.util.Logger;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
@@ -26,8 +26,11 @@ public class RepairCodeDaoImpl extends BaseDaoImpl<RepairCode, Integer>
 
 			for (RepairCode repairCode : repairCodes) {
 				ContentValues values = new ContentValues();
+
+				values.put(RepairCode.ID, repairCode.getId());
 				values.put(RepairCode.CODE, repairCode.getCode());
 				values.put(RepairCode.DISPLAY_NAME, repairCode.getName());
+
 				db.insert("repair_code", null, values);
 			}
 			db.setTransactionSuccessful();

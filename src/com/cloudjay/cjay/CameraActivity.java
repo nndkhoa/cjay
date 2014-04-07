@@ -15,7 +15,6 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.NoTitle;
 import org.androidannotations.annotations.SystemService;
-import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.ViewById;
 
 import android.app.Activity;
@@ -39,7 +38,6 @@ import android.os.Build;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -562,12 +560,23 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			// file name example:
 			// [depot-code]-2013-12-19-[gate-in|gate-out|report]-[containerId]-[UUID].jpg
-			String fileName = depotCode + "-"
-					+ StringHelper.getCurrentTimestamp("yyyy-MM-dd") + "-"
+			String currentTimestamp = StringHelper
+					.getCurrentTimestamp("yyyy-MM-dd");
+
+			String fileName = depotCode + "-" + currentTimestamp + "-"
 					+ imageType + "-" + containerId + "-" + operator + uuid
 					+ ".jpg";
 
-			File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
+			File newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE,
+					depotCode + "/" + currentTimestamp + "/" + imageType + "/"
+							+ containerId);
+
+			if (!newDirectory.exists())
+				newDirectory.mkdirs();
+
+			File photo = new File(newDirectory, fileName);
+
+			// File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
 			Logger.Log("Photo Path: " + photo.getAbsolutePath());
 
 			// Save Bitmap to JPEG

@@ -230,6 +230,7 @@ public class UploadIntentService extends IntentService implements
 
 		containerSession
 				.setUploadState(ContainerSession.STATE_UPLOAD_COMPLETED);
+
 		DataCenter.getDatabaseHelper(getApplicationContext()).addUsageLog(
 				"#upload #successfully container "
 						+ containerSession.getContainerId() + " | "
