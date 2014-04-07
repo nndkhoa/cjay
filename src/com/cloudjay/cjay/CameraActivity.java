@@ -35,6 +35,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.text.TextUtils;
@@ -54,6 +55,7 @@ import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
+import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
 import com.cloudjay.cjay.fragment.GateExportListFragment;
 import com.cloudjay.cjay.fragment.GateImportListFragment;
 import com.cloudjay.cjay.model.AuditReportItem;
@@ -154,6 +156,18 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	String mSourceTag = "";
 
 	// endregion
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		EventBus.getDefault().register(this);
+		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	protected void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
 
 	@Click(R.id.btn_capture_mode)
 	void captureModeToggleButtonClicked() {
@@ -657,10 +671,24 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	}
 
+	public void onEventMainThread(ContainerSessionUpdatedEvent event) {
+		Logger.Log("onEvent ContainerSessionUpdatedEvent");
+
+		if (event.getTarget().getContainerId() == mContainerSession
+				.getContainerId()) {
+			try {
+				mContainerSessionDaoImpl.refresh(mContainerSession);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+
 	@Override
 	public void onBackPressed() {
-		try {
 
+		try {
 			mContainerSessionDaoImpl.addContainerSession(mContainerSession);
 			EventBus.getDefault().post(
 					new ContainerSessionChangedEvent(mContainerSession));

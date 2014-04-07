@@ -235,6 +235,9 @@ public class UploadIntentService extends IntentService implements
 		// convert back then save containerSession
 		Mapper.getInstance().update(getApplicationContext(), response,
 				containerSession);
+		
+		EventBus.getDefault().post(
+				new ContainerSessionUpdatedEvent(containerSession));
 
 		containerSession
 				.setUploadState(ContainerSession.STATE_UPLOAD_COMPLETED);

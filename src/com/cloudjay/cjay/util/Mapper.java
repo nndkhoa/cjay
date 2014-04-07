@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.androidannotations.annotations.EBean;
+
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
@@ -38,7 +40,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-@SuppressWarnings("unused")
+@EBean
 public class Mapper {
 
 	private static IDatabaseManager databaseManager = null;
@@ -183,6 +185,8 @@ public class Mapper {
 						}
 					}
 				}
+
+				// Post ContainerSessionUpdatedEvent
 
 			}
 		} catch (SQLException e) {
