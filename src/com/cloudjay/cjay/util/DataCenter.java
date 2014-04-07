@@ -444,7 +444,7 @@ public class DataCenter {
 	 * @throws NullSessionException
 	 */
 	@Trace(level = Log.INFO)
-	public void updateListContainerSessions(Context ctx)
+	public void updateListContainerSessions(Context ctx, int type)
 			throws NoConnectionException, SQLException, NullSessionException {
 
 		Logger.Log("*** UPDATE LIST CONTAINER SESSIONS ***");
@@ -482,7 +482,7 @@ public class DataCenter {
 				ContainerSessionResult result = null;
 
 				result = CJayClient.getInstance().getContainerSessionsByPage(
-						ctx, lastUpdate, page);
+						ctx, lastUpdate, page, type);
 
 				if (null != result) {
 					page = page + 1;
@@ -893,7 +893,8 @@ public class DataCenter {
 						PreferencesUtil.PREF_IS_FETCHING_DATA, true);
 
 				updateListISOCode(ctx);
-				updateListContainerSessions(ctx);
+				updateListContainerSessions(ctx,
+						CJayClient.REQUEST_TYPE_CREATED);
 
 				PreferencesUtil.storePrefsValue(ctx,
 						PreferencesUtil.PREF_IS_FETCHING_DATA, false);

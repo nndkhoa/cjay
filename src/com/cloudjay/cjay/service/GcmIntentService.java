@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.receivers.GcmBroadcastReceiver;
 import com.cloudjay.cjay.util.CJaySession;
 import com.cloudjay.cjay.util.DataCenter;
@@ -183,9 +184,15 @@ public class GcmIntentService extends IntentService {
 
 				if (userRole == User.ROLE_GATE_KEEPER
 						|| userRole == User.ROLE_AUDITOR) {
-					DataCenter.getInstance().updateListContainerSessions(this);
-
+					DataCenter.getInstance().updateListContainerSessions(this,
+							CJayClient.REQUEST_TYPE_CREATED);
 				}
+
+			} else if (type.equalsIgnoreCase("NEW_TEMP_CONTAINER")) {
+
+				Logger.Log("Received notification: NEW_TEMP_CONTAINER");
+				DataCenter.getInstance().updateListContainerSessions(this,
+						CJayClient.REQUEST_TYPE_CREATED);
 
 			} else if (type.equalsIgnoreCase("EXPORT_CONTAINER")) {
 				// Received: Container xuất khỏi Depot ở CỔNG
@@ -198,6 +205,7 @@ public class GcmIntentService extends IntentService {
 				// Received: AUDIT post new Issue List
 				// Received Roles: REPAIR, (new) GATE
 				// Đối với ROLE == AUDIT, kèm `id` để remove
+				// use MODIFIED_AFTER
 
 				if (userRole == User.ROLE_AUDITOR) {
 
@@ -207,7 +215,9 @@ public class GcmIntentService extends IntentService {
 				} else {
 
 					// Get more data from Server
-					DataCenter.getInstance().updateListContainerSessions(this);
+					//
+					DataCenter.getInstance().updateListContainerSessions(this,
+							CJayClient.REQUEST_TYPE_MODIFIED);
 				}
 
 			} else if (type.equalsIgnoreCase("UPDATE_ERROR_LIST")) {
@@ -216,9 +226,11 @@ public class GcmIntentService extends IntentService {
 				// thêm lỗi mới
 				// Received Roles: REPAIR
 				// --> Get more data from Server
+				// use MODIFIED_AFTER
 
 				if (userRole == User.ROLE_REPAIR_STAFF) {
-					DataCenter.getInstance().updateListContainerSessions(this);
+					DataCenter.getInstance().updateListContainerSessions(this,
+							CJayClient.REQUEST_TYPE_MODIFIED);
 				}
 
 			} else if (type.equalsIgnoreCase("CONTAINER_REPAIRED")) {

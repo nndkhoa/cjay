@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
 import org.apache.http.HttpStatus;
 import org.json.JSONException;
 
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
@@ -359,8 +360,11 @@ public class CJayClient implements ICJayClient {
 
 	}
 
+	public static final int REQUEST_TYPE_CREATED = 0;
+	public static final int REQUEST_TYPE_MODIFIED = 1;
+
 	public ContainerSessionResult getContainerSessionsByPage(Context ctx,
-			String date, int page) throws NoConnectionException,
+			String date, int page, int type) throws NoConnectionException,
 			NullSessionException {
 
 		if (Utils.hasNoConnection(ctx)) {
@@ -371,13 +375,29 @@ public class CJayClient implements ICJayClient {
 		try {
 
 			String accessToken = CJaySession.restore(ctx).getAccessToken();
-			Response<String> response = Ion
-					.with(ctx, CJayConstant.CONTAINER_SESSIONS)
-					.setHeader("Authorization", "Token " + accessToken)
-					.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
-					.addQuery("page", Integer.toString(page))
-					.addQuery("created_after", date).asString().withResponse()
-					.get();
+
+			Response<String> response = null;
+			if (type == REQUEST_TYPE_CREATED) {
+
+				response = Ion
+						.with(ctx, CJayConstant.CONTAINER_SESSIONS)
+						.setHeader("Authorization", "Token " + accessToken)
+						.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
+						.addQuery("page", Integer.toString(page))
+						.addQuery("created_after", date).asString()
+						.withResponse().get();
+
+			} else {
+
+				response = Ion
+						.with(ctx, CJayConstant.CONTAINER_SESSIONS)
+						.setHeader("Authorization", "Token " + accessToken)
+						.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
+						.addQuery("page", Integer.toString(page))
+						.addQuery("modified_after", date).asString()
+						.withResponse().get();
+
+			}
 
 			switch (response.getHeaders().getResponseCode()) {
 			case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập

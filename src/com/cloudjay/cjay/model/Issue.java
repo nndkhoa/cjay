@@ -214,7 +214,7 @@ public class Issue {
 		if (o.getClass() == AuditReportItem.class) {
 			AuditReportItem tmp = (AuditReportItem) o;
 
-			// TODO: BUG HERE
+			// TODO: BUG HERE. Cannot parseFloat
 			boolean isEqual = this.damageCode.getId() == tmp.getDamageId()
 					&& this.repairCode.getId() == tmp.getRepairId()
 					&& this.getComponentCode().getId() == tmp.getComponentId()

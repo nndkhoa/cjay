@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.json.JSONException;
 
+import android.R.integer;
 import android.content.Context;
 
 import com.cloudjay.cjay.model.ComponentCode;
@@ -46,5 +47,6 @@ public interface ICJayClient {
 			MismatchDataException, ServerInternalErrorException;
 
 	ContainerSessionResult getContainerSessionsByPage(Context ctx, String date,
-			int page) throws NoConnectionException, NullSessionException;
+			int page, int type) throws NoConnectionException,
+			NullSessionException;
 }

@@ -3,6 +3,7 @@ package com.cloudjay.cjay.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 
@@ -35,7 +36,6 @@ import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
-
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CountingInputStreamEntity;
 import com.cloudjay.cjay.util.DataCenter;
@@ -44,6 +44,7 @@ import com.cloudjay.cjay.util.Mapper;
 import com.cloudjay.cjay.util.MismatchDataException;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
+import com.cloudjay.cjay.util.ServerInternalErrorException;
 
 import de.greenrobot.event.EventBus;
 
@@ -164,16 +165,17 @@ public class UploadIntentService extends IntentService implements
 		Logger.w("Uploading container: " + containerSession.getContainerId());
 
 		String response = "";
-
 		containerSession
 				.setUploadState(ContainerSession.STATE_UPLOAD_IN_PROGRESS);
 
 		try {
 			containerSessionDaoImpl.update(containerSession);
 		} catch (SQLException e) {
+
 			Logger.e("Cannot change State to `IN PROGRESS`. Process will be stopped.");
 			e.printStackTrace();
 			return;
+
 		}
 
 		// Convert ContainerSession to TmpContainerSession for uploading
@@ -185,7 +187,7 @@ public class UploadIntentService extends IntentService implements
 			response = CJayClient.getInstance().postContainerSession(
 					getApplicationContext(), uploadItem);
 
-			Logger.Log(response);
+			Logger.Log("Response from server: " + response);
 
 		} catch (NoConnectionException e) {
 
@@ -218,6 +220,12 @@ public class UploadIntentService extends IntentService implements
 											.getUploadType()));
 			return;
 
+		} catch (ServerInternalErrorException e) {
+
+			Logger.e("Server Internal Error cmnr");
+			rollbackContainerState(containerSession);
+			return;
+
 		} catch (Exception e) {
 
 			rollbackContainerState(containerSession);
@@ -235,6 +243,22 @@ public class UploadIntentService extends IntentService implements
 				"#upload #successfully container "
 						+ containerSession.getContainerId() + " | "
 						+ Integer.toString(containerSession.getUploadType()));
+
+		synchronized (containerSession) {
+
+			if (containerSession.getUploadType() == ContainerSession.TYPE_NONE) {
+
+				containerSession.setUploadConfirmation(false);
+				containerSession.setUploadState(ContainerSession.STATE_NONE);
+
+				try {
+					containerSessionDaoImpl.update(containerSession);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
 	}
 
 	@Override

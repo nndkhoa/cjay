@@ -172,25 +172,35 @@ public class CJayApplication extends Application {
 
 		Intent intent = new Intent(ctx, PhotoExpandableListViewActivity_.class);
 		intent.putExtra(
-				PhotoExpandableListViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA, uuid);
-		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_1_EXTRA, imageType);
-		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_CONTAINER_ID_EXTRA,
+				PhotoExpandableListViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA,
+				uuid);
+		intent.putExtra(
+				PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_1_EXTRA,
+				imageType);
+		intent.putExtra(
+				PhotoExpandableListViewActivity_.CJAY_CONTAINER_ID_EXTRA,
 				containerId);
 		intent.putExtra("tag", sourceTag);
 
 		ctx.startActivity(intent);
 
 	}
-	
+
 	public static void openPhotoGridView(Context ctx, String uuid,
 			String containerId, int imageType1, int imageType2, String sourceTag) {
 
 		Intent intent = new Intent(ctx, PhotoExpandableListViewActivity_.class);
 		intent.putExtra(
-				PhotoExpandableListViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA, uuid);
-		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_1_EXTRA, imageType1);
-		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_2_EXTRA, imageType2);
-		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_CONTAINER_ID_EXTRA,
+				PhotoExpandableListViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA,
+				uuid);
+		intent.putExtra(
+				PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_1_EXTRA,
+				imageType1);
+		intent.putExtra(
+				PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_2_EXTRA,
+				imageType2);
+		intent.putExtra(
+				PhotoExpandableListViewActivity_.CJAY_CONTAINER_ID_EXTRA,
 				containerId);
 		intent.putExtra("tag", sourceTag);
 

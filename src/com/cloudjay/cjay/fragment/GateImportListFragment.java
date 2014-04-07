@@ -325,6 +325,7 @@ public class GateImportListFragment extends SherlockFragment implements
 
 	public void showContainerDetailDialog(String containerId,
 			String operatorName, int mode) {
+
 		FragmentManager fm = getActivity().getSupportFragmentManager();
 		AddContainerDialog addContainerDialog = new AddContainerDialog();
 		addContainerDialog.setContainerId(containerId);
@@ -332,6 +333,7 @@ public class GateImportListFragment extends SherlockFragment implements
 		addContainerDialog.setMode(mode);
 		addContainerDialog.setParent(this);
 		addContainerDialog.show(fm, "add_container_dialog");
+
 	}
 
 	public void OnOperatorSelected(String containerId, String operatorName,
@@ -371,17 +373,21 @@ public class GateImportListFragment extends SherlockFragment implements
 					containerId, operatorCode, currentTimeStamp, depotCode);
 			containerSession.setOnLocal(true);
 
+			EventBus.getDefault().post(
+					new ContainerSessionChangedEvent(containerSession));
+
 			try {
 				containerSessionDaoImpl.addContainerSession(containerSession);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 
-			EventBus.getDefault().post(
-					new ContainerSessionChangedEvent(containerSession));
-
 			CJayApplication.gotoCamera(activity, containerSession,
 					CJayImage.TYPE_IMPORT, LOG_TAG);
+
+			// TODO: Temporary post container to server
+			CJayApplication.uploadContainerSesison(getActivity(),
+					containerSession);
 
 			break;
 

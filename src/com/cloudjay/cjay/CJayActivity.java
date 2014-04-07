@@ -73,7 +73,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 		return session.getCurrentUser();
 	}
-	
+
 	public boolean isRunning() {
 		return isActivityRunning;
 	}
@@ -173,7 +173,8 @@ public class CJayActivity extends SherlockFragmentActivity {
 						try {
 							DataCenter_.getInstance()
 									.updateListContainerSessions(
-											getApplicationContext());
+											getApplicationContext(),
+											CJayClient.REQUEST_TYPE_CREATED);
 
 						} catch (NoConnectionException e) {
 
@@ -204,16 +205,16 @@ public class CJayActivity extends SherlockFragmentActivity {
 				}
 			}
 		}
-		
+
 		isActivityRunning = true;
 
 		super.onResume();
 	}
-	
+
 	@Override
 	protected void onPause() {
 		isActivityRunning = false;
-		
+
 		super.onPause();
 	}
 
@@ -362,7 +363,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 		// case R.id.menu_setting:
 		// Intent intent = new Intent(this, SettingsActivity.class);
 		// startActivity(intent);
-		//	return true;
+		// return true;
 
 		case R.id.menu_logout:
 			showLogoutPrompt();
