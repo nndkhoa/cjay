@@ -671,7 +671,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	}
 
-	public void onEventMainThread(ContainerSessionUpdatedEvent event) {
+	public void onEvent(ContainerSessionUpdatedEvent event) {
 		Logger.Log("onEvent ContainerSessionUpdatedEvent");
 
 		if (event.getTarget().getContainerId() == mContainerSession
