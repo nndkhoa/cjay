@@ -627,9 +627,12 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		try {
 
-			if (TextUtils.isEmpty(mContainerSession.getImageIdPath())) {
+			if (TextUtils.isEmpty(mContainerSession.getImageIdPath())
+					|| mContainerSession
+							.getImageIdPath()
+							.equals("https://storage.googleapis.com/storage-cjay.cloudjay.com/")) {
 
-				Logger.e("Set container image_id_path: " + uri);
+				Logger.Log("Set container image_id_path: " + uri);
 				mContainerSession.setImageIdPath(uri);
 				mContainerSessionDaoImpl.addContainerSession(mContainerSession);
 
@@ -672,11 +675,14 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	}
 
 	public void onEvent(ContainerSessionUpdatedEvent event) {
-		Logger.Log("onEvent ContainerSessionUpdatedEvent");
 
-		if (event.getTarget().getContainerId() == mContainerSession
-				.getContainerId()) {
+		String eventContainerId = event.getTarget().getContainerId();
+		String currentContainerId = mContainerSession.getContainerId();
+
+		if (eventContainerId.equals(currentContainerId)) {
+
 			try {
+				Logger.Log("onEvent ContainerSessionUpdated");
 				mContainerSessionDaoImpl.refresh(mContainerSession);
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -689,6 +695,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	public void onBackPressed() {
 
 		try {
+
 			mContainerSessionDaoImpl.addContainerSession(mContainerSession);
 			EventBus.getDefault().post(
 					new ContainerSessionChangedEvent(mContainerSession));
@@ -702,11 +709,13 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 						CJayImage.TYPE_IMPORT, GateImportListFragment.LOG_TAG);
 
 			} else if (mSourceTag.equals(GateExportListFragment.LOG_TAG)) {
+
 				CJayApplication.openPhotoGridView(this,
 						mContainerSession.getUuid(),
 						mContainerSession.getContainerId(),
 						CJayImage.TYPE_EXPORT, CJayImage.TYPE_REPAIRED,
 						GateExportListFragment.LOG_TAG);
+
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
