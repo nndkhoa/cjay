@@ -45,10 +45,10 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
 
 			mSectionHeaders.add(Utils.getImageTypeDescription(mContext,
 					mImageTypes[i]));
-			
+
 		}
 	}
-	
+
 	public GridView getPhotoGridView(int groupPosition) {
 		return mGridViews.get(Integer.valueOf(groupPosition));
 	}
@@ -67,22 +67,31 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
 	public View getChildView(int groupPosition, final int childPosition,
 			boolean isLastChild, View convertView, ViewGroup parent) {
 
+		// TODO: Inflate layout for child group view based on ```imageType```
+		// Import/Export --> GridView (R.layout.expandable_list_photogrid_item)
+		// Auditor --> ListView (R.layout.fragment_auditor_reporting)
+		// Consider to apply ViewHolder Pattern
+
 		if (convertView == null) {
 			LayoutInflater infalInflater = (LayoutInflater) this.mContext
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
 			convertView = infalInflater.inflate(
 					R.layout.expandable_list_photogrid_item, null);
 		}
 
 		final int imageType = mImageTypes[groupPosition];
 		final String title = mSectionHeaders.get(groupPosition);
+
 		GridView gridView = (GridView) convertView.findViewById(R.id.gridview);
 		gridView.setEmptyView(((FragmentActivity) mContext)
 				.findViewById(android.R.id.empty));
+
 		gridView.setOnItemClickListener(new OnItemClickListener() {
 
 			public void onItemClick(AdapterView<?> parent, View v,
 					int position, long id) {
+				
 				Intent intent = new Intent(mContext,
 						PhotoViewPagerActivity_.class);
 				intent.putExtra(PhotoViewPagerActivity_.START_POSITION,
@@ -93,16 +102,19 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
 				intent.putExtra(PhotoViewPagerActivity_.CJAY_IMAGE_TYPE_EXTRA,
 						imageType);
 				intent.putExtra("title", title);
+				
 				mContext.startActivity(intent);
 			}
 		});
 
 		if (groupPosition == 0) {
 			((FragmentActivity) mContext).getSupportLoaderManager().initLoader(
-					CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1, null, (PhotoExpandableListViewActivity)mContext);
+					CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1, null,
+					(PhotoExpandableListViewActivity) mContext);
 		} else if (groupPosition == 1) {
 			((FragmentActivity) mContext).getSupportLoaderManager().initLoader(
-					CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_2, null, (PhotoExpandableListViewActivity)mContext);
+					CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_2, null,
+					(PhotoExpandableListViewActivity) mContext);
 		}
 
 		mGridViews.put(Integer.valueOf(groupPosition), gridView);

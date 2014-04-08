@@ -363,7 +363,7 @@ public class Mapper {
 			if (null != container)
 				containerSession.setContainer(container);
 
-			// TODO: may cause bugs
+			// TODO: NOTE: may cause bugs
 			// process audit report item
 			List<AuditReportItem> auditReportItems = tmpSession
 					.getAuditReportItems();

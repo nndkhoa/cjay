@@ -35,7 +35,8 @@ import com.cloudjay.cjay.util.StringHelper;
 
 @EActivity(R.layout.activity_photo_expandablelistview)
 @OptionsMenu(R.menu.menu_photo_grid_view)
-public class PhotoExpandableListViewActivity extends CJayActivity implements LoaderCallbacks<Cursor> {
+public class PhotoExpandableListViewActivity extends CJayActivity implements
+		LoaderCallbacks<Cursor> {
 
 	public static final String LOG_TAG = "PhotoExpandableListViewActivity";
 	public static final String CJAY_CONTAINER_SESSION_UUID_EXTRA = "cjay_container_session_uuid";
@@ -66,10 +67,10 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 	@ViewById(R.id.expandable_listview)
 	ExpandableListView mListView;
-	
+
 	@ViewById(R.id.btn_add_new)
 	ImageButton mAddButton;
-	
+
 	@Extra("tag")
 	String sourceTag = "";
 
@@ -94,12 +95,12 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 			mImageTypes[0] = mCJayImageTypeA;
 			mImageTypes[1] = mCJayImageTypeB;
 		}
-		
+
 		mItemLayout = R.layout.grid_item_image;
 		mCursorAdapters = new Hashtable<Integer, PhotoGridViewCursorAdapter>();
 		mListAdapter = new PhotoExpandableListAdapter(this,
 				mContainerSessionUUID, mImageTypes);
-		
+
 		mListView.setAdapter(mListAdapter);
 		mListView.setEmptyView(findViewById(android.R.id.empty));
 
@@ -119,23 +120,26 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
-		
+
 		if (mCursorAdapters != null && mNewImageCount > 0) {
 			if (mCursorAdapters.get(Integer.valueOf(0)) != null) {
-				getSupportLoaderManager().restartLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1, null, this);
-			}			
+				getSupportLoaderManager().restartLoader(
+						CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1, null,
+						this);
+			}
 		}
 	}
-	
+
 	@Click(R.id.btn_add_new)
 	void cameraClicked() {
 		// go to camera
 		mNewImageCount = 0;
-		CJayApplication.gotoCamera(this, mContainerSession, mCJayImageTypeA, LOG_TAG);
+		CJayApplication.gotoCamera(this, mContainerSession, mCJayImageTypeA,
+				LOG_TAG);
 	}
 
 	@OptionsItem(R.id.menu_upload)
@@ -162,7 +166,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 			showCrouton(R.string.alert_invalid_container);
 		}
 	}
-	
+
 	public void onEvent(CJayImageAddedEvent event) {
 		if (event.getTag().equals(LOG_TAG)) {
 			mNewImageCount++;
@@ -205,7 +209,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 		int adapterId = 0;
-		
+
 		switch (loader.getId()) {
 		case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1:
 			adapterId = 0;
@@ -217,13 +221,14 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		}
 
 		if (mCursorAdapters.get(Integer.valueOf(adapterId)) == null) {
-			mCursorAdapters.put(Integer.valueOf(adapterId),
-					new PhotoGridViewCursorAdapter(this, mItemLayout,
-							cursor, 0));
+			mCursorAdapters
+					.put(Integer.valueOf(adapterId),
+							new PhotoGridViewCursorAdapter(this, mItemLayout,
+									cursor, 0));
 		} else {
 			mCursorAdapters.get(Integer.valueOf(adapterId)).swapCursor(cursor);
 		}
-		
+
 		GridView gridView = mListAdapter.getPhotoGridView(adapterId);
 		gridView.setAdapter(mCursorAdapters.get(Integer.valueOf(adapterId)));
 

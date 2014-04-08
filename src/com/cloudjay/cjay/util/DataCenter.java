@@ -495,6 +495,7 @@ public class DataCenter {
 					if (null != tmpContainerSessions) {
 
 						for (TmpContainerSession tmpSession : tmpContainerSessions) {
+
 							ContainerSession containerSession = Mapper
 									.getInstance().toContainerSession(
 											tmpSession, ctx);
