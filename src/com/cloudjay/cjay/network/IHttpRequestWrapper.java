@@ -15,24 +15,21 @@ import com.cloudjay.cjay.util.NoConnectionException;
  */
 public interface IHttpRequestWrapper {
 
-	String sendPost(String url, String data) throws SocketTimeoutException,
-			NoConnectionException;
-
-	String sendJSONPost(String url, JSONObject data)
-			throws SocketTimeoutException, NoConnectionException;
-
-	String sendJSONPost(String url, JSONObject data, Map<String, String> headers)
-			throws SocketTimeoutException, NoConnectionException;
-
-	String sendPost(String url, String data, String contentType)
-			throws SocketTimeoutException, NoConnectionException;
-
-	String sendPost(String url, String data, String contentType,
-			Map<String, String> headers) throws SocketTimeoutException,
-			NoConnectionException;
-
 	String sendGet(String url) throws NoConnectionException;
 
-	String sendGet(String url, Map<String, String> headers)
-			throws NoConnectionException;
+	String sendGet(String url, Map<String, String> headers) throws NoConnectionException;
+
+	String sendJSONPost(String url, JSONObject data) throws SocketTimeoutException, NoConnectionException;
+
+	String sendJSONPost(String url, JSONObject data, Map<String, String> headers) throws SocketTimeoutException,
+																					NoConnectionException;
+
+	String sendPost(String url, String data) throws SocketTimeoutException, NoConnectionException;
+
+	String sendPost(String url, String data, String contentType) throws SocketTimeoutException, NoConnectionException;
+
+			String
+			sendPost(String url, String data, String contentType, Map<String, String> headers)
+																								throws SocketTimeoutException,
+																								NoConnectionException;
 }

@@ -76,9 +76,9 @@ public class DataCenter {
 	public static AsyncTask<Void, Void, String> RegisterGCMTask;
 
 	private static DataCenter instance = null;
-	private IDatabaseManager databaseManager = null;
 
-	public DataCenter() {
+	public static DatabaseHelper getDatabaseHelper(Context context) {
+		return getInstance().getDatabaseManager().getHelper(context);
 	}
 
 	/**
@@ -93,8 +93,329 @@ public class DataCenter {
 		return instance;
 	}
 
-	public static DatabaseHelper getDatabaseHelper(Context context) {
-		return getInstance().getDatabaseManager().getHelper(context);
+	private IDatabaseManager databaseManager = null;
+
+	public DataCenter() {
+	}
+
+	@Background
+	public void editContainerSession(Context ctx, ContainerSession containerSession, String containerId,
+										String operatorCode) {
+
+		try {
+			if (containerSession.getContainerId().equals(containerId)
+					&& containerSession.getOperatorCode().equals(operatorCode)) {
+				// do nothing
+
+			} else {
+
+				DatabaseHelper databaseHelper = getDatabaseManager().getHelper(ctx);
+
+				OperatorDaoImpl operatorDaoImpl = databaseHelper.getOperatorDaoImpl();
+				ContainerDaoImpl containerDaoImpl = databaseHelper.getContainerDaoImpl();
+				ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper.getContainerSessionDaoImpl();
+				CJayImageDaoImpl cJayImageDaoImpl = databaseHelper.getCJayImageDaoImpl();
+
+				// find operator
+				Operator operator = operatorDaoImpl.findOperator(operatorCode);
+
+				// update container details
+				Container container = containerSession.getContainer();
+				container.setContainerId(containerId);
+				container.setOperator(operator);
+
+				// update cjay image files name if they begin with file://
+				List<CJayImage> cJayImages = (List<CJayImage>) containerSession.getCJayImages();
+
+				String replaceString = containerId + ".jpg";
+				for (CJayImage cJayImage : cJayImages) {
+
+					String filePath = cJayImage.getUri();
+					if (filePath.startsWith("file://")) {
+						filePath.replace(".jpg", replaceString);
+						cJayImageDaoImpl.update(cJayImage);
+					}
+
+				}
+
+				// update database
+				containerDaoImpl.update(container);
+				containerSessionDaoImpl.update(containerSession);
+
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * Fetch data from server based on current user role.
+	 * 
+	 * @param ctx
+	 * @throws NoConnectionException
+	 *             if there is no connection to internet
+	 * @throws NullSessionException
+	 */
+	public void fetchData(Context ctx) throws NoConnectionException, NullSessionException {
+
+		Logger.Log("*** FETCHING DATA ... ***");
+
+		if (isFetchingData(ctx)) {
+			Logger.Log("fetchData() is already running");
+			return;
+		} else {
+			try {
+				// Mark that Application
+				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, true);
+
+				updateListISOCode(ctx);
+				updateListContainerSessions(ctx, CJayClient.REQUEST_TYPE_CREATED);
+
+				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, false);
+
+			} catch (NoConnectionException e) {
+				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, false);
+				throw e;
+			} catch (SQLException e) {
+				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, false);
+				e.printStackTrace();
+			} catch (NullSessionException e) {
+				throw e;
+			} catch (Exception e) {
+				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, false);
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public Cursor filterCheckoutCursor(Context context, CharSequence constraint) {
+
+		String queryString = "SELECT * FROM cs_export_validation_view"
+				+ " WHERE container_id LIKE ? ORDER BY container_id LIMIT 100";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
+																			new String[] { constraint + "%" });
+	}
+
+	public Cursor filterComponentCodeCursor(Context context, CharSequence constraint) {
+
+		String queryString = "SELECT id as _id, code, display_name FROM component_code"
+				+ " WHERE code LIKE ? ORDER BY id LIMIT 100";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
+																			new String[] { "%" + constraint + "%" });
+	}
+
+	public Cursor filterDamageCodeCursor(Context context, CharSequence constraint) {
+
+		String queryString = "SELECT id as _id, code, display_name FROM damage_code"
+				+ " WHERE code LIKE ? ORDER BY id LIMIT 100";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
+																			new String[] { "%" + constraint + "%" });
+	}
+
+	public Cursor filterFixedCursor(Context context, CharSequence constraint) {
+		String queryString = "SELECT * FROM csi_repair_validation_view cs"
+				+ " WHERE cs.upload_confirmation = 0 AND cs.fixed = 1 AND cs.state <> 4 AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
+																			new String[] { constraint + "%" });
+	}
+
+	public Cursor filterLocalCursor(Context context, CharSequence constraint) {
+
+		String queryString = "SELECT * FROM cs_import_validation_view"
+				+ " WHERE container_id LIKE ? ORDER BY container_id LIMIT 100";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
+																			new String[] { constraint + "%" });
+	}
+
+	public Cursor filterNotReportedCursor(Context context, CharSequence constraint) {
+
+		String queryString = "SELECT cs.* FROM csi_auditor_validation_view AS cs"
+				+ " WHERE cs.upload_confirmation = 0 AND cs._id NOT IN " + " (SELECT container_session._id"
+				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
+				+ " WHERE cjay_image.type = 2) AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
+																			new String[] { constraint + "%" });
+	}
+
+	public Cursor filterPendingCursor(Context context, CharSequence constraint) {
+
+		String queryString = "SELECT * FROM csi_repair_validation_view cs"
+				+ " WHERE cs.upload_confirmation = 0 AND cs.fixed = 0 AND cs.state <> 4 AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
+																			new String[] { constraint + "%" });
+	}
+
+	public Cursor filterRepairCodeCursor(Context context, CharSequence constraint) {
+
+		String queryString = "SELECT id as _id, code, display_name FROM repair_code"
+				+ " WHERE code LIKE ? ORDER BY id LIMIT 100";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
+																			new String[] { "%" + constraint + "%" });
+	}
+
+	public Cursor filterReportingCursor(Context context, CharSequence constraint) {
+
+		String queryString = "SELECT cs.* FROM csi_auditor_validation_view AS cs"
+				+ " WHERE cs.upload_confirmation = 0 AND cs._id IN " + " (SELECT container_session._id"
+				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
+				+ " WHERE cjay_image.type = 2) AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
+																			new String[] { constraint + "%" });
+	}
+
+	public Cursor filterUserLogCursor(Context context, CharSequence constraint) {
+
+		String queryString = "SELECT * FROM user_log"
+				+ " WHERE (content LIKE ?) OR (time LIKE ?) ORDER BY time LIMIT 100";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
+																			new String[] { "%" + constraint + "%",
+																					"%" + constraint + "%" });
+	}
+
+	public Cursor getAllContainersCursor(Context context) {
+
+		try {
+			return getDatabaseManager().getHelper(context).getContainerDaoImpl().getAllContainersCursor();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public Cursor getCheckOutContainerSessionCursor(Context context) {
+		String queryString = "SELECT * FROM cs_export_validation_view";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
+	}
+
+	public Cursor getCJayImagesCursorByContainer(Context context, String containerSessionUUID, int imageType) {
+		String queryString = "SELECT * FROM cjay_image WHERE containerSession_id LIKE ? AND type = ?";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
+																			new String[] { containerSessionUUID + "%",
+																					String.valueOf(imageType) });
+	}
+
+	public Cursor getComponentCodesCursor(Context context) {
+
+		String queryString = "SELECT id as _id, display_name, code FROM component_code";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
+	}
+
+	public Cursor getDamageCodesCursor(Context context) {
+
+		String queryString = "SELECT id as _id, display_name, code FROM damage_code";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
+	}
+
+	public IDatabaseManager getDatabaseManager() {
+		return databaseManager;
+	}
+
+	public Cursor getFixedContainerSessionCursor(Context context) {
+		String queryString = "SELECT * FROM csi_repair_validation_view cs WHERE cs.upload_confirmation = 0 AND cs.fixed = 1 AND cs.state <> 4";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
+	}
+
+	public Cursor getIssueItemCursorByContainer(Context context, String containerSessionUUID, int imageType) {
+
+		String queryString = "SELECT * FROM issue_item_view WHERE containerSession_id LIKE ? AND type = ?";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
+																			new String[] { containerSessionUUID + "%",
+																					String.valueOf(imageType) });
+	}
+
+	public List<Operator> getListOperators(Context context) {
+		Logger.Log("get list Operators");
+
+		try {
+			return getDatabaseManager().getHelper(context).getOperatorDaoImpl().getAllOperators();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public List<ContainerSession> getListReportedContainerSessions(Context context) {
+		Logger.Log("get list reported Container sessions");
+		try {
+			return getDatabaseManager().getHelper(context).getContainerSessionDaoImpl()
+										.getListReportedContainerSessions();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public List<ContainerSession> getListUploadContainerSessions(Context context) {
+		try {
+
+			List<ContainerSession> result = getDatabaseManager().getHelper(context).getContainerSessionDaoImpl()
+																.getListUploadContainerSessions();
+
+			if (result != null) {
+				Logger.Log("Upload list number of items: " + Integer.toString(result.size()));
+			}
+
+			return result;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public Cursor getLocalContainerSessionCursor(Context context) {
+		String queryString = "SELECT * FROM cs_import_validation_view";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
+	}
+
+	public Cursor getNotReportedContainerSessionCursor(Context context) {
+
+		// String queryString = "SELECT cs.* FROM csiview AS cs"
+		// + " WHERE cs.upload_confirmation = 0 AND cs._id NOT IN ("
+		// + " SELECT csview._id"
+		// +
+		// " FROM cjay_image JOIN csview ON cjay_image.containerSession_id = csview._id"
+		// + " WHERE cjay_image.type = 2)";
+
+		String queryString = "SELECT cs.* FROM csi_auditor_validation_view AS cs"
+				+ " WHERE cs.upload_confirmation = 0 AND cs._id NOT IN (" + " SELECT container_session._id"
+				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
+				+ " WHERE cjay_image.type = 2)";
+
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
+	}
+
+	public Cursor getPendingContainerSessionCursor(Context context) {
+		String queryString = "SELECT * FROM csi_repair_validation_view cs WHERE cs.upload_confirmation = 0 AND cs.state <> 4";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
+	}
+
+	public Cursor getRepairCodesCursor(Context context) {
+
+		String queryString = "SELECT id as _id, display_name, code FROM repair_code";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
+	}
+
+	public Cursor getReportingContainerSessionCursor(Context context) {
+		String queryString = "SELECT cs.* FROM csi_auditor_validation_view AS cs"
+				+ " WHERE cs.upload_confirmation = 0 AND cs._id IN (" + " SELECT container_session._id"
+				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
+				+ " WHERE cjay_image.type = 2)";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
+	}
+
+	public Cursor getUserLogCursor(Context context) {
+		String queryString = "SELECT * FROM user_log";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
 	}
 
 	public void initialize(IDatabaseManager databaseManager) {
@@ -102,20 +423,51 @@ public class DataCenter {
 		this.databaseManager = databaseManager;
 	}
 
-	public IDatabaseManager getDatabaseManager() {
-		return databaseManager;
+	/**
+	 * Indicate that {@link #fetchData(Context)} is running or not
+	 * 
+	 * @param context
+	 * @return {@code PreferencesUtil.PREF_IS_FETCHING_DATA} value
+	 */
+	public boolean isFetchingData(Context context) {
+		return context.getSharedPreferences(PreferencesUtil.PREFS, 0).getBoolean(PreferencesUtil.PREF_IS_FETCHING_DATA,
+																					false) == true;
 	}
 
-	public List<Operator> getListOperators(Context context) {
-		Logger.Log("get list Operators");
+	/**
+	 * 
+	 * Indicate that {@link #updateListContainerSessions(Context)} is running or
+	 * not
+	 * 
+	 * @param context
+	 * @return
+	 */
+	public boolean isUpdating(Context context) {
+		return context.getSharedPreferences(PreferencesUtil.PREFS, 0).getBoolean(PreferencesUtil.PREF_IS_UPDATING_DATA,
+																					false) == true;
+	}
 
+	/**
+	 * Remove Container Session that have following {@code id}
+	 * 
+	 * @param context
+	 * @param id
+	 *            {@code id} of container Session
+	 * @return {@code true} if remove completed. {@code false} if error happen.
+	 * @see ContainerSession
+	 * @since 1.0
+	 */
+	public boolean removeContainerSession(Context context, int id) {
+		Logger.Log("remove Container Session with Id = " + Integer.toString(id));
 		try {
-			return getDatabaseManager().getHelper(context).getOperatorDaoImpl()
-					.getAllOperators();
+
+			getDatabaseManager().getHelper(context).getContainerSessionDaoImpl().delete(id);
+			return true;
+
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		}
-		return null;
 	}
 
 	/**
@@ -129,22 +481,18 @@ public class DataCenter {
 	public User saveCredential(Context context, String token) {
 		try {
 
-			User currentUser = CJayClient.getInstance().getCurrentUser(token,
-					context);
+			User currentUser = CJayClient.getInstance().getCurrentUser(token, context);
 
 			currentUser.setAccessToken(token);
 			currentUser.setMainAccount(true);
 
 			Logger.Log("User role: " + currentUser.getRoleName());
-			DepotDaoImpl depotDaoImpl = getDatabaseManager().getHelper(context)
-					.getDepotDaoImpl();
-			UserDaoImpl userDaoImpl = getDatabaseManager().getHelper(context)
-					.getUserDaoImpl();
+			DepotDaoImpl depotDaoImpl = getDatabaseManager().getHelper(context).getDepotDaoImpl();
+			UserDaoImpl userDaoImpl = getDatabaseManager().getHelper(context).getUserDaoImpl();
 
-			Depot result = depotDaoImpl
-					.queryForFirst(depotDaoImpl.queryBuilder().where()
-							.eq(Depot.DEPOT_CODE, currentUser.getDepotCode())
-							.prepare());
+			Depot result = depotDaoImpl.queryForFirst(depotDaoImpl.queryBuilder().where()
+																	.eq(Depot.DEPOT_CODE, currentUser.getDepotCode())
+																	.prepare());
 
 			if (null != result) {
 				currentUser.setDepot(result);
@@ -168,271 +516,61 @@ public class DataCenter {
 		return null;
 	}
 
-	public Cursor getUserLogCursor(Context context) {
-		String queryString = "SELECT * FROM user_log";
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] {});
-	}
+	/**
+	 * Get new component codes from server
+	 * 
+	 * @param ctx
+	 * @throws NoConnectionException
+	 *             if there is no connection to internet
+	 * @throws SQLException
+	 * @throws NullSessionException
+	 */
+	public void updateListComponentCodes(Context ctx) throws NoConnectionException, SQLException, NullSessionException {
 
-	public Cursor getDamageCodesCursor(Context context) {
-
-		String queryString = "SELECT id as _id, display_name, code FROM damage_code";
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] {});
-	}
-
-	public Cursor getRepairCodesCursor(Context context) {
-
-		String queryString = "SELECT id as _id, display_name, code FROM repair_code";
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] {});
-	}
-
-	public Cursor getComponentCodesCursor(Context context) {
-
-		String queryString = "SELECT id as _id, display_name, code FROM component_code";
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] {});
-	}
-
-	public Cursor getCheckOutContainerSessionCursor(Context context) {
-		String queryString = "SELECT * FROM cs_export_validation_view";
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] {});
-	}
-
-	public Cursor getLocalContainerSessionCursor(Context context) {
-		String queryString = "SELECT * FROM cs_import_validation_view";
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] {});
-	}
-
-	public Cursor getNotReportedContainerSessionCursor(Context context) {
-
-		// String queryString = "SELECT cs.* FROM csiview AS cs"
-		// + " WHERE cs.upload_confirmation = 0 AND cs._id NOT IN ("
-		// + " SELECT csview._id"
-		// +
-		// " FROM cjay_image JOIN csview ON cjay_image.containerSession_id = csview._id"
-		// + " WHERE cjay_image.type = 2)";
-
-		String queryString = "SELECT cs.* FROM csi_auditor_validation_view AS cs"
-				+ " WHERE cs.upload_confirmation = 0 AND cs._id NOT IN ("
-				+ " SELECT container_session._id"
-				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
-				+ " WHERE cjay_image.type = 2)";
-
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] {});
-	}
-
-	public Cursor getReportingContainerSessionCursor(Context context) {
-		String queryString = "SELECT cs.* FROM csi_auditor_validation_view AS cs"
-				+ " WHERE cs.upload_confirmation = 0 AND cs._id IN ("
-				+ " SELECT container_session._id"
-				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
-				+ " WHERE cjay_image.type = 2)";
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] {});
-	}
-
-	public Cursor getPendingContainerSessionCursor(Context context) {
-		String queryString = "SELECT * FROM csi_repair_validation_view cs WHERE cs.upload_confirmation = 0 AND cs.state <> 4";
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] {});
-	}
-
-	public Cursor getFixedContainerSessionCursor(Context context) {
-		String queryString = "SELECT * FROM csi_repair_validation_view cs WHERE cs.upload_confirmation = 0 AND cs.fixed = 1 AND cs.state <> 4";
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] {});
-	}
-
-	public Cursor getAllContainersCursor(Context context) {
-
+		Logger.Log("*** UPDATE LIST COMPONENT ***");
+		long startTime = System.currentTimeMillis();
 		try {
-			return getDatabaseManager().getHelper(context)
-					.getContainerDaoImpl().getAllContainersCursor();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+			// 2013-11-10T21:05:24 (do not have timezone info)
+			SimpleDateFormat dateFormat = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+			String nowString = dateFormat.format(new Date());
 
-	public Cursor getIssueItemCursorByContainer(Context context,
-			String containerSessionUUID, int imageType) {
+			ComponentCodeDaoImpl componentCodeDaoImpl = databaseManager.getHelper(ctx).getComponentCodeDaoImpl();
 
-		String queryString = "SELECT * FROM issue_item_view WHERE containerSession_id LIKE ? AND type = ?";
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString,
-				new String[] { containerSessionUUID + "%",
-						String.valueOf(imageType) });
-	}
+			// Get list Component
+			List<ComponentCode> componentCodes = null;
+			String lastUpdate = "";
+			if (componentCodeDaoImpl.isEmpty()) {
 
-	public Cursor getCJayImagesCursorByContainer(Context context,
-			String containerSessionUUID, int imageType) {
-		String queryString = "SELECT * FROM cjay_image WHERE containerSession_id LIKE ? AND type = ?";
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString,
-				new String[] { containerSessionUUID + "%",
-						String.valueOf(imageType) });
-	}
-
-	public Cursor filterLocalCursor(Context context, CharSequence constraint) {
-
-		String queryString = "SELECT * FROM cs_import_validation_view"
-				+ " WHERE container_id LIKE ? ORDER BY container_id LIMIT 100";
-
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] { constraint + "%" });
-	}
-
-	public Cursor filterUserLogCursor(Context context, CharSequence constraint) {
-
-		String queryString = "SELECT * FROM user_log"
-				+ " WHERE (content LIKE ?) OR (time LIKE ?) ORDER BY time LIMIT 100";
-
-		return getDatabaseManager().getReadableDatabase(context)
-				.rawQuery(
-						queryString,
-						new String[] { "%" + constraint + "%",
-								"%" + constraint + "%" });
-	}
-
-	public Cursor filterCheckoutCursor(Context context, CharSequence constraint) {
-
-		String queryString = "SELECT * FROM cs_export_validation_view"
-				+ " WHERE container_id LIKE ? ORDER BY container_id LIMIT 100";
-
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] { constraint + "%" });
-	}
-
-	public Cursor filterDamageCodeCursor(Context context,
-			CharSequence constraint) {
-
-		String queryString = "SELECT id as _id, code, display_name FROM damage_code"
-				+ " WHERE code LIKE ? ORDER BY id LIMIT 100";
-
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] { "%" + constraint + "%" });
-	}
-
-	public Cursor filterRepairCodeCursor(Context context,
-			CharSequence constraint) {
-
-		String queryString = "SELECT id as _id, code, display_name FROM repair_code"
-				+ " WHERE code LIKE ? ORDER BY id LIMIT 100";
-
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] { "%" + constraint + "%" });
-	}
-
-	public Cursor filterComponentCodeCursor(Context context,
-			CharSequence constraint) {
-
-		String queryString = "SELECT id as _id, code, display_name FROM component_code"
-				+ " WHERE code LIKE ? ORDER BY id LIMIT 100";
-
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] { "%" + constraint + "%" });
-	}
-
-	public Cursor filterNotReportedCursor(Context context,
-			CharSequence constraint) {
-
-		String queryString = "SELECT cs.* FROM csi_auditor_validation_view AS cs"
-				+ " WHERE cs.upload_confirmation = 0 AND cs._id NOT IN "
-				+ " (SELECT container_session._id"
-				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
-				+ " WHERE cjay_image.type = 2) AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
-
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] { constraint + "%" });
-	}
-
-	public Cursor filterReportingCursor(Context context, CharSequence constraint) {
-
-		String queryString = "SELECT cs.* FROM csi_auditor_validation_view AS cs"
-				+ " WHERE cs.upload_confirmation = 0 AND cs._id IN "
-				+ " (SELECT container_session._id"
-				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
-				+ " WHERE cjay_image.type = 2) AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
-
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] { constraint + "%" });
-	}
-
-	public Cursor filterPendingCursor(Context context, CharSequence constraint) {
-
-		String queryString = "SELECT * FROM csi_repair_validation_view cs"
-				+ " WHERE cs.upload_confirmation = 0 AND cs.fixed = 0 AND cs.state <> 4 AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] { constraint + "%" });
-	}
-
-	public Cursor filterFixedCursor(Context context, CharSequence constraint) {
-		String queryString = "SELECT * FROM csi_repair_validation_view cs"
-				+ " WHERE cs.upload_confirmation = 0 AND cs.fixed = 1 AND cs.state <> 4 AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
-
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(
-				queryString, new String[] { constraint + "%" });
-	}
-
-	public List<ContainerSession> getListReportedContainerSessions(
-			Context context) {
-		Logger.Log("get list reported Container sessions");
-		try {
-			return getDatabaseManager().getHelper(context)
-					.getContainerSessionDaoImpl()
-					.getListReportedContainerSessions();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public List<ContainerSession> getListUploadContainerSessions(Context context) {
-		try {
-
-			List<ContainerSession> result = getDatabaseManager()
-					.getHelper(context).getContainerSessionDaoImpl()
-					.getListUploadContainerSessions();
-
-			if (result != null) {
-				Logger.Log("Upload list number of items: "
-						+ Integer.toString(result.size()));
+			} else {
+				lastUpdate = PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE);
 			}
 
-			return result;
+			componentCodes = CJayClient.getInstance().getComponentCodes(ctx, lastUpdate);
+
+			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE, nowString);
+
+			if (componentCodes == null) {
+				Logger.w("----> NO new component codes");
+			} else {
+				Logger.w("----> Has " + Integer.toString(componentCodes.size()) + " new component codes");
+			}
+
+			if (null != componentCodes) {
+				componentCodeDaoImpl.bulkInsert(DataCenter.getDatabaseHelper(ctx).getWritableDatabase(), componentCodes);
+
+			}
+
+		} catch (NoConnectionException e) {
+			throw e;
 		} catch (SQLException e) {
+			throw e;
+		} catch (NullSessionException e) {
+			throw e;
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
-	}
-
-	/**
-	 * Remove Container Session that have following {@code id}
-	 * 
-	 * @param context
-	 * @param id
-	 *            {@code id} of container Session
-	 * @return {@code true} if remove completed. {@code false} if error happen.
-	 * @see ContainerSession
-	 * @since 1.0
-	 */
-	public boolean removeContainerSession(Context context, int id) {
-		Logger.Log("remove Container Session with Id = " + Integer.toString(id));
-		try {
-
-			getDatabaseManager().getHelper(context)
-					.getContainerSessionDaoImpl().delete(id);
-			return true;
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.w("---> Total time: " + Long.toString(difference));
 	}
 
 	/**
@@ -445,22 +583,20 @@ public class DataCenter {
 	 * @throws NullSessionException
 	 */
 	@Trace(level = Log.INFO)
-	public void updateListContainerSessions(Context ctx, int type)
-			throws NoConnectionException, SQLException, NullSessionException {
+	public void updateListContainerSessions(Context ctx, int type) throws NoConnectionException, SQLException,
+																	NullSessionException {
 
 		Logger.Log("*** UPDATE LIST CONTAINER SESSIONS ***");
 		long startTime = System.currentTimeMillis();
-		PreferencesUtil.storePrefsValue(ctx,
-				PreferencesUtil.PREF_IS_UPDATING_DATA, true);
+		PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, true);
 
 		try {
 			// 2013-11-10T21:05:24 (do not have timezone info)
-			SimpleDateFormat dateFormat = new SimpleDateFormat(
-					CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+			SimpleDateFormat dateFormat = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 			String nowString = dateFormat.format(new Date());
 
-			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager
-					.getHelper(ctx).getContainerSessionDaoImpl();
+			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager.getHelper(ctx)
+																				.getContainerSessionDaoImpl();
 
 			// 3. Update list ContainerSessions
 			int page = 1;
@@ -471,34 +607,29 @@ public class DataCenter {
 
 			} else {
 
-				lastUpdate = PreferencesUtil.getPrefsValue(ctx,
-						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE);
+				lastUpdate = PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE);
 
-				Logger.Log("get updated list container sessions from last time: "
-						+ lastUpdate);
+				Logger.Log("get updated list container sessions from last time: " + lastUpdate);
 			}
 
 			do {
 				List<ContainerSession> containerSessions = new ArrayList<ContainerSession>();
 				ContainerSessionResult result = null;
 
-				result = CJayClient.getInstance().getContainerSessionsByPage(
-						ctx, lastUpdate, page, type);
+				result = CJayClient.getInstance().getContainerSessionsByPage(ctx, lastUpdate, page, type);
 
 				if (null != result) {
 					page = page + 1;
 					nextUrl = result.getNext();
 
-					List<TmpContainerSession> tmpContainerSessions = result
-							.getResults();
+					List<TmpContainerSession> tmpContainerSessions = result.getResults();
 
 					if (null != tmpContainerSessions) {
 
 						for (TmpContainerSession tmpSession : tmpContainerSessions) {
 
-							ContainerSession containerSession = Mapper
-									.getInstance().toContainerSession(
-											tmpSession, ctx);
+							ContainerSession containerSession = Mapper.getInstance()
+																		.toContainerSession(tmpSession, ctx);
 
 							if (null != containerSession) {
 								containerSessions.add(containerSession);
@@ -507,18 +638,14 @@ public class DataCenter {
 						}
 					}
 
-					containerSessionDaoImpl
-							.bulkInsertDataBySavePoint(containerSessions);
+					containerSessionDaoImpl.bulkInsertDataBySavePoint(containerSessions);
 
 					// containerSessionDaoImpl
 					// .bulkInsertDataByCallBatchTasks(containerSessions);
 
-					if (null != containerSessions
-							&& !containerSessions.isEmpty()) {
+					if (null != containerSessions && !containerSessions.isEmpty()) {
 
-						EventBus.getDefault().post(
-								new ContainerSessionChangedEvent(
-										containerSessions));
+						EventBus.getDefault().post(new ContainerSessionChangedEvent(containerSessions));
 
 					}
 				}
@@ -546,100 +673,24 @@ public class DataCenter {
 			// containerSessionDaoImpl
 			// .bulkInsertDataBySavePoint(containerSessions);
 
-			PreferencesUtil.storePrefsValue(ctx,
-					PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
-					nowString);
+			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE, nowString);
 
-			PreferencesUtil.storePrefsValue(ctx,
-					PreferencesUtil.PREF_IS_UPDATING_DATA, false);
+			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 
 		} catch (NoConnectionException e) {
-			PreferencesUtil.storePrefsValue(ctx,
-					PreferencesUtil.PREF_IS_UPDATING_DATA, false);
+			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			throw e;
 		} catch (SQLException e) {
-			PreferencesUtil.storePrefsValue(ctx,
-					PreferencesUtil.PREF_IS_UPDATING_DATA, false);
+			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			throw e;
 		} catch (NullSessionException e) {
 
-			PreferencesUtil.storePrefsValue(ctx,
-					PreferencesUtil.PREF_IS_UPDATING_DATA, false);
+			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			throw e;
 		} catch (Exception e) {
-			PreferencesUtil.storePrefsValue(ctx,
-					PreferencesUtil.PREF_IS_UPDATING_DATA, false);
+			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			e.printStackTrace();
 		}
-		long difference = System.currentTimeMillis() - startTime;
-		Logger.w("---> Total time: " + Long.toString(difference));
-	}
-
-	/**
-	 * Get new operators from server
-	 * 
-	 * @param ctx
-	 * @throws NoConnectionException
-	 *             if there is no connection to internet
-	 * @throws SQLException
-	 * @throws NullSessionException
-	 */
-	@SuppressLint("SimpleDateFormat")
-	public void updateListOperators(Context ctx) throws NoConnectionException,
-			SQLException, NullSessionException {
-
-		Logger.Log("*** UPDATE LIST OPERATORS ***");
-		long startTime = System.currentTimeMillis();
-
-		try {
-
-			// 2013-11-10T21:05:24 (do not have timezone info)
-			SimpleDateFormat dateFormat = new SimpleDateFormat(
-					CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-			String nowString = dateFormat.format(new Date());
-
-			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx)
-					.getOperatorDaoImpl();
-
-			List<Operator> operators = null;
-			String lastUpdate = "";
-
-			if (operatorDaoImpl.isEmpty()) {
-
-			} else {
-				lastUpdate = PreferencesUtil.getPrefsValue(ctx,
-						PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE);
-			}
-
-			operators = CJayClient.getInstance().getOperators(ctx, lastUpdate);
-
-			if (operators == null) {
-				Logger.w("----> NO new operators");
-			} else {
-				Logger.w("----> Has " + Integer.toString(operators.size())
-						+ " new operators");
-			}
-
-			PreferencesUtil.storePrefsValue(ctx,
-					PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE,
-					nowString);
-
-			if (null != operators) {
-				operatorDaoImpl.bulkInsert(DataCenter.getDatabaseHelper(ctx)
-						.getWritableDatabase(), operators);
-
-			}
-
-		} catch (NoConnectionException e) {
-			throw e;
-		} catch (NullSessionException e) {
-			throw e;
-		} catch (SQLException e) {
-			throw e;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
 		long difference = System.currentTimeMillis() - startTime;
 		Logger.w("---> Total time: " + Long.toString(difference));
 	}
@@ -652,18 +703,15 @@ public class DataCenter {
 	 *             if there is no connection to internet
 	 * @throws SQLException
 	 */
-	public void updateListDamageCodes(Context ctx)
-			throws NoConnectionException, SQLException {
+	public void updateListDamageCodes(Context ctx) throws NoConnectionException, SQLException {
 
 		Logger.Log("*** UPDATE LIST DAMAGE ***");
 		long startTime = System.currentTimeMillis();
 		try {
 			// 2013-11-10T21:05:24 (do not have timezone info)
-			SimpleDateFormat dateFormat = new SimpleDateFormat(
-					CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+			SimpleDateFormat dateFormat = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 			String nowString = dateFormat.format(new Date());
-			DamageCodeDaoImpl damageCodeDaoImpl = databaseManager
-					.getHelper(ctx).getDamageCodeDaoImpl();
+			DamageCodeDaoImpl damageCodeDaoImpl = databaseManager.getHelper(ctx).getDamageCodeDaoImpl();
 
 			// Get list damage
 			List<DamageCode> damageCodes = null;
@@ -671,159 +719,21 @@ public class DataCenter {
 			if (damageCodeDaoImpl.isEmpty()) {
 
 			} else {
-				lastUpdate = PreferencesUtil.getPrefsValue(ctx,
-						PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE);
+				lastUpdate = PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE);
 			}
 
-			damageCodes = CJayClient.getInstance().getDamageCodes(ctx,
-					lastUpdate);
+			damageCodes = CJayClient.getInstance().getDamageCodes(ctx, lastUpdate);
 
-			PreferencesUtil
-					.storePrefsValue(ctx,
-							PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE,
-							nowString);
+			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE, nowString);
 
 			if (damageCodes == null) {
 				Logger.w("----> NO new damage codes");
 			} else {
-				Logger.w("----> Has " + Integer.toString(damageCodes.size())
-						+ " new damage codes");
+				Logger.w("----> Has " + Integer.toString(damageCodes.size()) + " new damage codes");
 			}
 
 			if (null != damageCodes) {
-				damageCodeDaoImpl.bulkInsert(DataCenter.getDatabaseHelper(ctx)
-						.getWritableDatabase(), damageCodes);
-			}
-
-		} catch (NoConnectionException e) {
-			throw e;
-		} catch (SQLException e) {
-			throw e;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		long difference = System.currentTimeMillis() - startTime;
-		Logger.w("---> Total time: " + Long.toString(difference));
-	}
-
-	/**
-	 * Get new component codes from server
-	 * 
-	 * @param ctx
-	 * @throws NoConnectionException
-	 *             if there is no connection to internet
-	 * @throws SQLException
-	 * @throws NullSessionException
-	 */
-	public void updateListComponentCodes(Context ctx)
-			throws NoConnectionException, SQLException, NullSessionException {
-
-		Logger.Log("*** UPDATE LIST COMPONENT ***");
-		long startTime = System.currentTimeMillis();
-		try {
-			// 2013-11-10T21:05:24 (do not have timezone info)
-			SimpleDateFormat dateFormat = new SimpleDateFormat(
-					CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-			String nowString = dateFormat.format(new Date());
-
-			ComponentCodeDaoImpl componentCodeDaoImpl = databaseManager
-					.getHelper(ctx).getComponentCodeDaoImpl();
-
-			// Get list Component
-			List<ComponentCode> componentCodes = null;
-			String lastUpdate = "";
-			if (componentCodeDaoImpl.isEmpty()) {
-
-			} else {
-				lastUpdate = PreferencesUtil.getPrefsValue(ctx,
-						PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE);
-			}
-
-			componentCodes = CJayClient.getInstance().getComponentCodes(ctx,
-					lastUpdate);
-
-			PreferencesUtil.storePrefsValue(ctx,
-					PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE,
-					nowString);
-
-			if (componentCodes == null) {
-				Logger.w("----> NO new component codes");
-			} else {
-				Logger.w("----> Has " + Integer.toString(componentCodes.size())
-						+ " new component codes");
-			}
-
-			if (null != componentCodes) {
-				componentCodeDaoImpl
-						.bulkInsert(DataCenter.getDatabaseHelper(ctx)
-								.getWritableDatabase(), componentCodes);
-
-			}
-
-		} catch (NoConnectionException e) {
-			throw e;
-		} catch (SQLException e) {
-			throw e;
-		} catch (NullSessionException e) {
-			throw e;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		long difference = System.currentTimeMillis() - startTime;
-		Logger.w("---> Total time: " + Long.toString(difference));
-	}
-
-	/**
-	 * Get new repair codes from server
-	 * 
-	 * @param ctx
-	 * @throws NoConnectionException
-	 *             if there is no connection to internet
-	 * @throws SQLException
-	 */
-	public void updateListRepairCodes(Context ctx)
-			throws NoConnectionException, SQLException {
-
-		Logger.Log("*** UPDATE LIST REPAIR ***");
-		long startTime = System.currentTimeMillis();
-		try {
-			// 2013-11-10T21:05:24 (do not have timezone info)
-			SimpleDateFormat dateFormat = new SimpleDateFormat(
-					CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-			String nowString = dateFormat.format(new Date());
-
-			RepairCodeDaoImpl repairCodeDaoImpl = databaseManager
-					.getHelper(ctx).getRepairCodeDaoImpl();
-
-			// Get list Repair
-			List<RepairCode> repairCodes = null;
-			String lastUpdate = "";
-			if (repairCodeDaoImpl.isEmpty()) {
-
-			} else {
-
-				lastUpdate = PreferencesUtil.getPrefsValue(ctx,
-						PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE);
-			}
-
-			repairCodes = CJayClient.getInstance().getRepairCodes(ctx,
-					lastUpdate);
-
-			PreferencesUtil
-					.storePrefsValue(ctx,
-							PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE,
-							nowString);
-
-			if (repairCodes == null) {
-				Logger.w("----> NO new repair codes");
-			} else {
-				Logger.w("----> Has " + Integer.toString(repairCodes.size())
-						+ " new repair codes");
-			}
-
-			if (null != repairCodes) {
-				repairCodeDaoImpl.bulkInsert(DataCenter.getDatabaseHelper(ctx)
-						.getWritableDatabase(), repairCodes);
+				damageCodeDaoImpl.bulkInsert(DataCenter.getDatabaseHelper(ctx).getWritableDatabase(), damageCodes);
 			}
 
 		} catch (NoConnectionException e) {
@@ -846,8 +756,7 @@ public class DataCenter {
 	 * @throws SQLException
 	 * @throws NullSessionException
 	 */
-	public void updateListISOCode(Context ctx) throws NoConnectionException,
-			SQLException, NullSessionException {
+	public void updateListISOCode(Context ctx) throws NoConnectionException, SQLException, NullSessionException {
 
 		Logger.Log("*** UPDATE ALL ISO CODE ***");
 		long startTime = System.currentTimeMillis();
@@ -873,131 +782,117 @@ public class DataCenter {
 	}
 
 	/**
-	 * Fetch data from server based on current user role.
+	 * Get new operators from server
 	 * 
 	 * @param ctx
 	 * @throws NoConnectionException
 	 *             if there is no connection to internet
+	 * @throws SQLException
 	 * @throws NullSessionException
 	 */
-	public void fetchData(Context ctx) throws NoConnectionException,
-			NullSessionException {
+	@SuppressLint("SimpleDateFormat")
+	public void updateListOperators(Context ctx) throws NoConnectionException, SQLException, NullSessionException {
 
-		Logger.Log("*** FETCHING DATA ... ***");
-
-		if (isFetchingData(ctx)) {
-			Logger.Log("fetchData() is already running");
-			return;
-		} else {
-			try {
-				// Mark that Application
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_IS_FETCHING_DATA, true);
-
-				updateListISOCode(ctx);
-				updateListContainerSessions(ctx,
-						CJayClient.REQUEST_TYPE_CREATED);
-
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_IS_FETCHING_DATA, false);
-
-			} catch (NoConnectionException e) {
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_IS_FETCHING_DATA, false);
-				throw e;
-			} catch (SQLException e) {
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_IS_FETCHING_DATA, false);
-				e.printStackTrace();
-			} catch (NullSessionException e) {
-				throw e;
-			} catch (Exception e) {
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_IS_FETCHING_DATA, false);
-				e.printStackTrace();
-			}
-		}
-	}
-
-	/**
-	 * Indicate that {@link #fetchData(Context)} is running or not
-	 * 
-	 * @param context
-	 * @return {@code PreferencesUtil.PREF_IS_FETCHING_DATA} value
-	 */
-	public boolean isFetchingData(Context context) {
-		return context.getSharedPreferences(PreferencesUtil.PREFS, 0)
-				.getBoolean(PreferencesUtil.PREF_IS_FETCHING_DATA, false) == true;
-	}
-
-	/**
-	 * 
-	 * Indicate that {@link #updateListContainerSessions(Context)} is running or
-	 * not
-	 * 
-	 * @param context
-	 * @return
-	 */
-	public boolean isUpdating(Context context) {
-		return context.getSharedPreferences(PreferencesUtil.PREFS, 0)
-				.getBoolean(PreferencesUtil.PREF_IS_UPDATING_DATA, false) == true;
-	}
-
-	@Background
-	public void editContainerSession(Context ctx,
-			ContainerSession containerSession, String containerId,
-			String operatorCode) {
+		Logger.Log("*** UPDATE LIST OPERATORS ***");
+		long startTime = System.currentTimeMillis();
 
 		try {
-			if (containerSession.getContainerId().equals(containerId)
-					&& containerSession.getOperatorCode().equals(operatorCode)) {
-				// do nothing
+
+			// 2013-11-10T21:05:24 (do not have timezone info)
+			SimpleDateFormat dateFormat = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+			String nowString = dateFormat.format(new Date());
+
+			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx).getOperatorDaoImpl();
+
+			List<Operator> operators = null;
+			String lastUpdate = "";
+
+			if (operatorDaoImpl.isEmpty()) {
 
 			} else {
+				lastUpdate = PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE);
+			}
 
-				DatabaseHelper databaseHelper = getDatabaseManager().getHelper(
-						ctx);
+			operators = CJayClient.getInstance().getOperators(ctx, lastUpdate);
 
-				OperatorDaoImpl operatorDaoImpl = databaseHelper
-						.getOperatorDaoImpl();
-				ContainerDaoImpl containerDaoImpl = databaseHelper
-						.getContainerDaoImpl();
-				ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper
-						.getContainerSessionDaoImpl();
-				CJayImageDaoImpl cJayImageDaoImpl = databaseHelper
-						.getCJayImageDaoImpl();
+			if (operators == null) {
+				Logger.w("----> NO new operators");
+			} else {
+				Logger.w("----> Has " + Integer.toString(operators.size()) + " new operators");
+			}
 
-				// find operator
-				Operator operator = operatorDaoImpl.findOperator(operatorCode);
+			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE, nowString);
 
-				// update container details
-				Container container = containerSession.getContainer();
-				container.setContainerId(containerId);
-				container.setOperator(operator);
-
-				// update cjay image files name if they begin with file://
-				List<CJayImage> cJayImages = (List<CJayImage>) containerSession
-						.getCJayImages();
-
-				String replaceString = containerId + ".jpg";
-				for (CJayImage cJayImage : cJayImages) {
-
-					String filePath = cJayImage.getUri();
-					if (filePath.startsWith("file://")) {
-						filePath.replace(".jpg", replaceString);
-						cJayImageDaoImpl.update(cJayImage);
-					}
-
-				}
-
-				// update database
-				containerDaoImpl.update(container);
-				containerSessionDaoImpl.update(containerSession);
+			if (null != operators) {
+				operatorDaoImpl.bulkInsert(DataCenter.getDatabaseHelper(ctx).getWritableDatabase(), operators);
 
 			}
+
+		} catch (NoConnectionException e) {
+			throw e;
+		} catch (NullSessionException e) {
+			throw e;
 		} catch (SQLException e) {
+			throw e;
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.w("---> Total time: " + Long.toString(difference));
+	}
+
+	/**
+	 * Get new repair codes from server
+	 * 
+	 * @param ctx
+	 * @throws NoConnectionException
+	 *             if there is no connection to internet
+	 * @throws SQLException
+	 */
+	public void updateListRepairCodes(Context ctx) throws NoConnectionException, SQLException {
+
+		Logger.Log("*** UPDATE LIST REPAIR ***");
+		long startTime = System.currentTimeMillis();
+		try {
+			// 2013-11-10T21:05:24 (do not have timezone info)
+			SimpleDateFormat dateFormat = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+			String nowString = dateFormat.format(new Date());
+
+			RepairCodeDaoImpl repairCodeDaoImpl = databaseManager.getHelper(ctx).getRepairCodeDaoImpl();
+
+			// Get list Repair
+			List<RepairCode> repairCodes = null;
+			String lastUpdate = "";
+			if (repairCodeDaoImpl.isEmpty()) {
+
+			} else {
+
+				lastUpdate = PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE);
+			}
+
+			repairCodes = CJayClient.getInstance().getRepairCodes(ctx, lastUpdate);
+
+			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE, nowString);
+
+			if (repairCodes == null) {
+				Logger.w("----> NO new repair codes");
+			} else {
+				Logger.w("----> Has " + Integer.toString(repairCodes.size()) + " new repair codes");
+			}
+
+			if (null != repairCodes) {
+				repairCodeDaoImpl.bulkInsert(DataCenter.getDatabaseHelper(ctx).getWritableDatabase(), repairCodes);
+			}
+
+		} catch (NoConnectionException e) {
+			throw e;
+		} catch (SQLException e) {
+			throw e;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.w("---> Total time: " + Long.toString(difference));
 	}
 }

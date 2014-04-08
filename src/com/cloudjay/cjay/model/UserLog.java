@@ -26,21 +26,20 @@ public class UserLog {
 	}
 
 	public UserLog(String message) {
-		this.time = StringHelper
-				.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-		this.content = message;
+		time = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+		content = message;
 	}
 
 	public String getContent() {
 		return content;
 	}
 
-	public void setContent(String content) {
-		this.content = content;
-	}
-
 	public String getTime() {
 		return time;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
 	}
 
 	public void setTime(String time) {

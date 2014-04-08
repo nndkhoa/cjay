@@ -26,36 +26,36 @@ public class Operator {
 	@DatabaseField(columnName = FIELD_NAME)
 	String operator_name;
 
-	public String getName() {
-		return operator_name;
+	public Operator() {
+
 	}
 
-	public void setName(String name) {
-		this.operator_name = name;
+	public Operator(String operatorCode, String operatorName) {
+		operator_code = operatorCode;
+		operator_name = operatorName;
 	}
 
 	public String getCode() {
 		return operator_code;
 	}
 
-	public void setCode(String code) {
-		this.operator_code = code;
-	}
-
 	public int getId() {
 		return id;
 	}
 
+	public String getName() {
+		return operator_name;
+	}
+
+	public void setCode(String code) {
+		operator_code = code;
+	}
+
 	public void setId(int operatorId) {
-		this.id = operatorId;
+		id = operatorId;
 	}
 
-	public Operator() {
-
-	}
-
-	public Operator(String operatorCode, String operatorName) {
-		this.operator_code = operatorCode;
-		this.operator_name = operatorName;
+	public void setName(String name) {
+		operator_name = name;
 	}
 }

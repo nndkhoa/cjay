@@ -23,48 +23,6 @@ public class CJaySession {
 
 	private static IDatabaseManager databaseManager;
 	private static IUserDao userDao;
-	private User currentUser;
-
-	public CJaySession() {
-
-	}
-
-	public User getCurrentUser() {
-		if (currentUser == null) {
-			Logger.Log("Current user is null ??");
-		}
-
-		return currentUser;
-	}
-
-	public void setCurrentUser(User user) {
-		currentUser = user;
-	}
-
-	public Depot getDepot() {
-
-		if (null != currentUser) {
-			return currentUser.getDepot();
-		}
-
-		return null;
-	}
-
-	public int getUserRole() {
-		return currentUser.getRole();
-	}
-
-	public String getAccessToken() {
-		return currentUser.getAccessToken();
-	}
-
-	public int getFilterStatus() {
-		return currentUser.getFilterStatus();
-	}
-
-	public static void save(Context context) {
-
-	}
 
 	public static CJaySession restore(Context context) {
 		// Logger.Log("restoring session ... ");
@@ -88,6 +46,16 @@ public class CJaySession {
 		return null;
 	}
 
+	public static void save(Context context) {
+
+	}
+
+	private User currentUser;
+
+	public CJaySession() {
+
+	}
+
 	public boolean deleteSession(Context context) {
 
 		Utils.backupDatabase(getCurrentUser().getUserName());
@@ -106,12 +74,11 @@ public class CJaySession {
 				user.setMainAccount(false);
 				user.setAccessToken("");
 				userDao.update(user);
-				this.currentUser = null;
+				currentUser = null;
 			}
 
 			for (Class<?> dataClass : DatabaseHelper.DROP_CLASSES) {
-				TableUtils.dropTable(helper.getConnectionSource(), dataClass,
-						true);
+				TableUtils.dropTable(helper.getConnectionSource(), dataClass, true);
 			}
 
 			for (Class<?> dataClass : DatabaseHelper.DROP_CLASSES) {
@@ -130,5 +97,36 @@ public class CJaySession {
 
 	public void extendAccessTokenIfNeeded(Context applicationContext) {
 		Logger.Log("extending user access token ...");
+	}
+
+	public String getAccessToken() {
+		return currentUser.getAccessToken();
+	}
+
+	public User getCurrentUser() {
+		if (currentUser == null) {
+			Logger.Log("Current user is null ??");
+		}
+
+		return currentUser;
+	}
+
+	public Depot getDepot() {
+
+		if (null != currentUser) return currentUser.getDepot();
+
+		return null;
+	}
+
+	public int getFilterStatus() {
+		return currentUser.getFilterStatus();
+	}
+
+	public int getUserRole() {
+		return currentUser.getRole();
+	}
+
+	public void setCurrentUser(User user) {
+		currentUser = user;
 	}
 }

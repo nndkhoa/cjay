@@ -11,11 +11,11 @@ import com.j256.ormlite.dao.Dao;
  */
 
 public interface IContainerDao extends Dao<Container, Integer> {
-	List<Container> getAllContainers() throws SQLException;
+	void addContainer(Container container) throws SQLException;
 
 	void addListContainers(List<Container> containers) throws SQLException;
 
-	void addContainer(Container container) throws SQLException;
-
 	void deleteAllContainers() throws SQLException;
+
+	List<Container> getAllContainers() throws SQLException;
 }

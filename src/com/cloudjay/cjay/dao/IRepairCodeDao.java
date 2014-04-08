@@ -11,15 +11,15 @@ import com.j256.ormlite.dao.Dao;
  */
 
 public interface IRepairCodeDao extends Dao<RepairCode, Integer> {
-	List<RepairCode> getAllRepairCodes() throws SQLException;
-
 	void addListRepairCodes(List<RepairCode> repairCodes) throws SQLException;
 
 	void addRepairCode(RepairCode repairCode) throws SQLException;
 
 	void deleteAllRepairCodes() throws SQLException;
 
-	boolean isEmpty() throws SQLException;
-
 	RepairCode findByCode(String repairCode) throws SQLException;
+
+	List<RepairCode> getAllRepairCodes() throws SQLException;
+
+	boolean isEmpty() throws SQLException;
 }

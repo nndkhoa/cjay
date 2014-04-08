@@ -7,28 +7,22 @@ import com.cloudjay.cjay.model.Depot;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
-public class DepotDaoImpl extends BaseDaoImpl<Depot, Integer> implements
-		IDepotDao {
+public class DepotDaoImpl extends BaseDaoImpl<Depot, Integer> implements IDepotDao {
 
 	public DepotDaoImpl(ConnectionSource connectionSource) throws SQLException {
 		super(connectionSource, Depot.class);
 	}
 
 	@Override
-	public List<Depot> getAllDepots() throws SQLException {
-		return this.queryForAll();
+	public void addDepot(Depot depot) throws SQLException {
+		createOrUpdate(depot);
 	}
 
 	@Override
 	public void addListDepots(List<Depot> depots) throws SQLException {
 		for (Depot depot : depots) {
-			this.createOrUpdate(depot);
+			createOrUpdate(depot);
 		}
-	}
-
-	@Override
-	public void addDepot(Depot depot) throws SQLException {
-		this.createOrUpdate(depot);
 	}
 
 	@Override
@@ -37,6 +31,11 @@ public class DepotDaoImpl extends BaseDaoImpl<Depot, Integer> implements
 		for (Depot depot : depots) {
 			this.delete(depot);
 		}
+	}
+
+	@Override
+	public List<Depot> getAllDepots() throws SQLException {
+		return queryForAll();
 	}
 
 }

@@ -27,7 +27,10 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.AuditorContainerActivity;
+import com.cloudjay.cjay.AuditorContainerActivity_;
+import com.cloudjay.cjay.CJayApplication;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -59,6 +62,69 @@ public class AuditorReportedListFragment extends SherlockFragment {
 		mSelectedContainerSession = null;
 	}
 
+	void hideMenuItems() {
+		mSelectedContainerSession = null;
+		mFeedListView.setItemChecked(-1, true);
+		getActivity().supportInvalidateOptionsMenu();
+	}
+
+	private void initContainerFeedAdapter(ArrayList<ContainerSession> containers) {
+		BindDictionary<ContainerSession> feedsDict = new BindDictionary<ContainerSession>();
+		feedsDict.addStringField(R.id.feed_item_container_id, new StringExtractor<ContainerSession>() {
+			@Override
+			public String getStringValue(ContainerSession item, int position) {
+				return Utils.replaceNullBySpace(item.getContainerId());
+			}
+		});
+		feedsDict.addStringField(R.id.feed_item_container_owner, new StringExtractor<ContainerSession>() {
+			@Override
+			public String getStringValue(ContainerSession item, int position) {
+				return Utils.replaceNullBySpace(item.getOperatorName());
+			}
+		});
+		feedsDict.addStringField(R.id.feed_item_container_import_date, new StringExtractor<ContainerSession>() {
+			@Override
+			public String getStringValue(ContainerSession item, int position) {
+				return Utils.replaceNullBySpace(item.getCheckInTime());
+			}
+		});
+		feedsDict.addStringField(R.id.feed_item_container_issues, new StringExtractor<ContainerSession>() {
+			@Override
+			public String getStringValue(ContainerSession item, int position) {
+				return Utils.replaceNullBySpace(item.getIssueCount());
+			}
+		});
+		feedsDict.addDynamicImageField(R.id.feed_item_picture, new StringExtractor<ContainerSession>() {
+			@Override
+			public String getStringValue(ContainerSession item, int position) {
+				return Utils.stripNull(item.getImageIdPath());
+			}
+		}, new DynamicImageLoader() {
+			@Override
+			public void loadImage(String url, ImageView view) {
+				if (!TextUtils.isEmpty(url)) {
+					imageLoader.displayImage(url, view);
+				} else {
+					view.setImageResource(R.drawable.ic_app);
+				}
+			}
+		});
+		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(), containers, R.layout.list_item_audit_container,
+														feedsDict);
+		mFeedListView.setAdapter(mFeedsAdapter);
+	}
+
+	@ItemClick(R.id.container_list)
+	void listItemClicked(int position) {
+		// clear current selection
+		hideMenuItems();
+
+		Intent intent = new Intent(getActivity(), AuditorContainerActivity_.class);
+		intent.putExtra(AuditorContainerActivity.CJAY_CONTAINER_SESSION_EXTRA, mFeedsAdapter.getItem(position)
+																							.getUuid());
+		startActivity(intent);
+	}
+
 	@ItemLongClick(R.id.container_list)
 	void listItemLongClicked(int position) {
 		// refresh highlighting and menu
@@ -67,34 +133,26 @@ public class AuditorReportedListFragment extends SherlockFragment {
 		getActivity().supportInvalidateOptionsMenu();
 	}
 
-	@ItemClick(R.id.container_list)
-	void listItemClicked(int position) {
-		// clear current selection
-		hideMenuItems();
-
-		Intent intent = new Intent(getActivity(),
-				AuditorContainerActivity_.class);
-		intent.putExtra(AuditorContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-				mFeedsAdapter.getItem(position).getUuid());
-		startActivity(intent);
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		EventBus.getDefault().register(this);
+		super.onCreate(savedInstanceState);
 	}
 
-	@OptionsItem(R.id.menu_upload)
-	void uploadMenuItemSelected() {
-		if (mSelectedContainerSession != null) {
-			mSelectedContainerSession
-					.setUploadType(ContainerSession.TYPE_AUDIT);
-			CJayApplication.uploadContainerSesison(getActivity(),
-					mSelectedContainerSession);
-
-			hideMenuItems();
-		}
+	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
 	}
 
-	void hideMenuItems() {
-		mSelectedContainerSession = null;
-		mFeedListView.setItemChecked(-1, true);
-		getActivity().supportInvalidateOptionsMenu();
+	public void onEvent(ContainerSessionEnqueueEvent event) {
+		Logger.Log("onEvent ContainerSessionEnqueueEvent");
+		refresh();
+	}
+
+	public void onEventMainThread(ContainerSessionChangedEvent event) {
+		Logger.Log("onEvent ContainerSessionChangedEvent");
+		refresh();
 	}
 
 	@Override
@@ -113,88 +171,19 @@ public class AuditorReportedListFragment extends SherlockFragment {
 		super.onResume();
 	}
 
-	@Override
-	public void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		EventBus.getDefault().register(this);
-		super.onCreate(savedInstanceState);
-	}
-
-	private void initContainerFeedAdapter(ArrayList<ContainerSession> containers) {
-		BindDictionary<ContainerSession> feedsDict = new BindDictionary<ContainerSession>();
-		feedsDict.addStringField(R.id.feed_item_container_id,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.replaceNullBySpace(item.getContainerId());
-					}
-				});
-		feedsDict.addStringField(R.id.feed_item_container_owner,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.replaceNullBySpace(item.getOperatorName());
-					}
-				});
-		feedsDict.addStringField(R.id.feed_item_container_import_date,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.replaceNullBySpace(item.getCheckInTime());
-					}
-				});
-		feedsDict.addStringField(R.id.feed_item_container_issues,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.replaceNullBySpace(item.getIssueCount());
-					}
-				});
-		feedsDict.addDynamicImageField(R.id.feed_item_picture,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.stripNull(item.getImageIdPath());
-					}
-				}, new DynamicImageLoader() {
-					@Override
-					public void loadImage(String url, ImageView view) {
-						if (!TextUtils.isEmpty(url)) {
-							imageLoader.displayImage(url, view);
-						} else {
-							view.setImageResource(R.drawable.ic_app);
-						}
-					}
-				});
-		mFeedsAdapter = new FunDapter<ContainerSession>(getActivity(),
-				containers, R.layout.list_item_audit_container, feedsDict);
-		mFeedListView.setAdapter(mFeedsAdapter);
-	}
-
-	public void onEvent(ContainerSessionEnqueueEvent event) {
-		Logger.Log("onEvent ContainerSessionEnqueueEvent");
-		refresh();
-	}
-
-	public void onEventMainThread(ContainerSessionChangedEvent event) {
-		Logger.Log("onEvent ContainerSessionChangedEvent");
-		refresh();
-	}
-
 	public void refresh() {
 		Logger.Log("refresh");
-		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance()
-				.getListReportedContainerSessions(getActivity());
+		mFeeds = (ArrayList<ContainerSession>) DataCenter.getInstance().getListReportedContainerSessions(getActivity());
 		mFeedsAdapter.updateData(mFeeds);
+	}
+
+	@OptionsItem(R.id.menu_upload)
+	void uploadMenuItemSelected() {
+		if (mSelectedContainerSession != null) {
+			mSelectedContainerSession.setUploadType(ContainerSession.TYPE_AUDIT);
+			CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
+
+			hideMenuItems();
+		}
 	}
 }

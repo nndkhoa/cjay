@@ -12,26 +12,22 @@ import com.cloudjay.cjay.model.Operator;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
-public class OperatorDaoImpl extends BaseDaoImpl<Operator, Integer> implements
-		IOperatorDao {
+public class OperatorDaoImpl extends BaseDaoImpl<Operator, Integer> implements IOperatorDao {
 
-	public OperatorDaoImpl(ConnectionSource connectionSource)
-			throws SQLException {
+	public OperatorDaoImpl(ConnectionSource connectionSource) throws SQLException {
 		super(connectionSource, Operator.class);
 	}
 
 	@Override
-	public List<Operator> getAllOperators() throws SQLException {
-		List<Operator> operators = this.queryForAll();
+	public void addListOperators(List<Operator> operators) throws SQLException {
+		for (Operator operator : operators) {
+			createOrUpdate(operator);
+		}
+	}
 
-		Collections.sort(operators, new Comparator<Operator>() {
-			@Override
-			public int compare(Operator lhs, Operator rhs) {
-				return lhs.getCode().compareToIgnoreCase(rhs.getCode());
-			}
-		});
-
-		return operators;
+	@Override
+	public void addOperator(Operator operator) throws SQLException {
+		createOrUpdate(operator);
 	}
 
 	public void bulkInsert(SQLiteDatabase db, List<Operator> operators) {
@@ -55,18 +51,6 @@ public class OperatorDaoImpl extends BaseDaoImpl<Operator, Integer> implements
 	}
 
 	@Override
-	public void addListOperators(List<Operator> operators) throws SQLException {
-		for (Operator operator : operators) {
-			this.createOrUpdate(operator);
-		}
-	}
-
-	@Override
-	public void addOperator(Operator operator) throws SQLException {
-		this.createOrUpdate(operator);
-	}
-
-	@Override
 	public void deleteAllOperators() throws SQLException {
 		List<Operator> operators = getAllOperators();
 		for (Operator operator : operators) {
@@ -74,23 +58,34 @@ public class OperatorDaoImpl extends BaseDaoImpl<Operator, Integer> implements
 		}
 	}
 
-	@Override
-	public boolean isEmpty() throws SQLException {
-		Operator operator = this.queryForFirst(this.queryBuilder().prepare());
-		if (null == operator)
-			return true;
+	public Operator findOperator(String operatorCode) throws SQLException {
+		List<Operator> listOperators = queryForEq(Operator.FIELD_CODE, operatorCode);
 
-		return false;
+		if (listOperators.isEmpty())
+			return null;
+		else
+			return listOperators.get(0);
 	}
 
-	public Operator findOperator(String operatorCode) throws SQLException {
-		List<Operator> listOperators = queryForEq(Operator.FIELD_CODE,
-				operatorCode);
+	@Override
+	public List<Operator> getAllOperators() throws SQLException {
+		List<Operator> operators = queryForAll();
 
-		if (listOperators.isEmpty()) {
-			return null;
-		} else {
-			return listOperators.get(0);
-		}
+		Collections.sort(operators, new Comparator<Operator>() {
+			@Override
+			public int compare(Operator lhs, Operator rhs) {
+				return lhs.getCode().compareToIgnoreCase(rhs.getCode());
+			}
+		});
+
+		return operators;
+	}
+
+	@Override
+	public boolean isEmpty() throws SQLException {
+		Operator operator = queryForFirst(queryBuilder().prepare());
+		if (null == operator) return true;
+
+		return false;
 	}
 }

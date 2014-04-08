@@ -22,22 +22,47 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.support.DatabaseConnection;
 
-public class ContainerSessionDaoImpl extends
-		BaseDaoImpl<ContainerSession, String> implements IContainerSessionDao {
+public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, String> implements IContainerSessionDao {
 
-	public ContainerSessionDaoImpl(ConnectionSource connectionSource)
-			throws SQLException {
+	public ContainerSessionDaoImpl(ConnectionSource connectionSource) throws SQLException {
 		super(connectionSource, ContainerSession.class);
 	}
 
 	@Override
-	public List<ContainerSession> getAllContainerSessions() throws SQLException {
-		return this.queryForAll();
+	public void addContainerSession(ContainerSession containerSession) throws SQLException {
+
+		if (containerSession != null) {
+			int containerSessionId = containerSession.getId();
+
+			if (containerSessionId == 0) { // new Container Session
+				Logger.Log(
+
+				"Insert new Container with ID: " + Integer.toString(containerSessionId) + " Name: "
+						+ containerSession.getContainerId());
+				createOrUpdate(containerSession);
+
+			} else { // existed Container Session
+
+				ContainerSession result = queryForFirst(queryBuilder().where()
+																		.eq(ContainerSession.FIELD_ID,
+																			containerSession.getId()).prepare());
+
+				// update UUID if needed
+				if (null != result) {
+					Logger.Log("Update container session UUID");
+					containerSession.setUuid(result.getUuid());
+				}
+
+				Logger.Log("Update Container Session with ID: " + Integer.toString(containerSessionId) + " | Name: "
+						+ containerSession.getContainerId());
+
+				createOrUpdate(containerSession);
+			}
+		}
 	}
 
 	@Override
-	public void addListContainerSessions(
-			List<ContainerSession> containerSessions) throws SQLException {
+	public void addListContainerSessions(List<ContainerSession> containerSessions) throws SQLException {
 
 		long startTime = System.currentTimeMillis();
 		Logger.Log("*** add List of Container Sessions ***");
@@ -50,8 +75,7 @@ public class ContainerSessionDaoImpl extends
 		Logger.Log("---> Total time: " + Long.toString(difference));
 	}
 
-	public void bulkInsert(SQLiteDatabase db,
-			List<ContainerSession> containerSessions) {
+	public void bulkInsert(SQLiteDatabase db, List<ContainerSession> containerSessions) {
 
 		try {
 			db.beginTransaction();
@@ -63,17 +87,13 @@ public class ContainerSessionDaoImpl extends
 					int containerSessionId = containerSession.getId();
 
 					if (containerSessionId != 0) {
-						String sql = "select " + ContainerSession.FIELD_UUID
-								+ " from container_session where "
-								+ ContainerSession.FIELD_ID + " = "
-								+ containerSessionId;
+						String sql = "select " + ContainerSession.FIELD_UUID + " from container_session where "
+								+ ContainerSession.FIELD_ID + " = " + containerSessionId;
 
 						Cursor cursor = db.rawQuery(sql, new String[] {});
 
 						if (cursor.moveToFirst()) {
-							String containerSessionUuid = cursor
-									.getString(cursor
-											.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+							String containerSessionUuid = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
 
 							containerSession.setUuid(containerSessionUuid);
 						}
@@ -81,30 +101,14 @@ public class ContainerSessionDaoImpl extends
 				}
 
 				String sql = "insert or replace into container_session VALUES ('"
-						+ containerSession.getRawCheckInTime()
-						+ "', '"
-						+ Utils.stripNull(containerSession.getRawCheckOutTime())
-						+ "', '"
-						+ containerSession.getUuid()
-						+ "', "
-						+ containerSession.getContainer().getId()
-						+ ", '"
-						+ Utils.stripNull(containerSession.getImageIdPath())
-						+ "', "
-						+ containerSession.getId()
-						+ ", "
-						+ Utils.toInt(containerSession.isFixed())
-						+ ", "
-						+ Utils.toInt(containerSession.isExport())
-						+ ", "
-						+ containerSession.getUploadState()
-						+ ", "
-						+ Utils.toInt(containerSession.isOnLocal())
-						+ ", "
-						+ Utils.toInt(containerSession.hasUploadConfirmed())
-						+ ", "
-						+ Utils.toInt(containerSession.isCleared())
-						+ ", " + containerSession.getUploadType() + ")";
+						+ containerSession.getRawCheckInTime() + "', '"
+						+ Utils.stripNull(containerSession.getRawCheckOutTime()) + "', '" + containerSession.getUuid()
+						+ "', " + containerSession.getContainer().getId() + ", '"
+						+ Utils.stripNull(containerSession.getImageIdPath()) + "', " + containerSession.getId() + ", "
+						+ Utils.toInt(containerSession.isFixed()) + ", " + Utils.toInt(containerSession.isExport())
+						+ ", " + containerSession.getUploadState() + ", " + Utils.toInt(containerSession.isOnLocal())
+						+ ", " + Utils.toInt(containerSession.hasUploadConfirmed()) + ", "
+						+ Utils.toInt(containerSession.isCleared()) + ", " + containerSession.getUploadType() + ")";
 
 				db.execSQL(sql);
 			}
@@ -115,8 +119,7 @@ public class ContainerSessionDaoImpl extends
 		}
 	}
 
-	public void bulkInsertDataByCallBatchTasks(
-			final List<ContainerSession> containerSessions) throws SQLException {
+	public void bulkInsertDataByCallBatchTasks(final List<ContainerSession> containerSessions) throws SQLException {
 
 		long startTime = System.currentTimeMillis();
 		Logger.Log("*** bulkInsertDataByCallBatchTasks ***");
@@ -138,8 +141,7 @@ public class ContainerSessionDaoImpl extends
 		Logger.Log("---> Total time: " + Long.toString(difference));
 	}
 
-	public void bulkInsertDataBySavePoint(
-			final List<ContainerSession> containerSessions) {
+	public void bulkInsertDataBySavePoint(final List<ContainerSession> containerSessions) {
 
 		long startTime = System.currentTimeMillis();
 		Logger.Log("***bulkInsertDataBySavePoint***");
@@ -150,7 +152,7 @@ public class ContainerSessionDaoImpl extends
 			Savepoint savepoint = null;
 			try {
 
-				conn = this.startThreadConnection();
+				conn = startThreadConnection();
 				savepoint = conn.setSavePoint("bulk_insert");
 
 				for (ContainerSession containerSession : containerSessions) {
@@ -163,7 +165,7 @@ public class ContainerSessionDaoImpl extends
 				if (conn != null) {
 					try {
 						conn.commit(savepoint);
-						this.endThreadConnection(conn);
+						endThreadConnection(conn);
 					} catch (SQLException e) {
 						e.printStackTrace();
 					}
@@ -176,40 +178,17 @@ public class ContainerSessionDaoImpl extends
 	}
 
 	@Override
-	public void addContainerSession(ContainerSession containerSession)
-			throws SQLException {
+	public void delete(int id) throws SQLException {
 
-		if (containerSession != null) {
-			int containerSessionId = containerSession.getId();
+		if (id == -1) {
+			Logger.Log("Container Session ID = -1");
 
-			if (containerSessionId == 0) { // new Container Session
-				Logger.Log(
+		} else { // existed Container Session
 
-				"Insert new Container with ID: "
-						+ Integer.toString(containerSessionId) + " Name: "
-						+ containerSession.getContainerId());
-				this.createOrUpdate(containerSession);
+			ContainerSession result = queryForFirst(queryBuilder().where().eq(ContainerSession.FIELD_ID, id).prepare());
 
-			} else { // existed Container Session
-
-				ContainerSession result = this
-						.queryForFirst(this
-								.queryBuilder()
-								.where()
-								.eq(ContainerSession.FIELD_ID,
-										containerSession.getId()).prepare());
-
-				// update UUID if needed
-				if (null != result) {
-					Logger.Log("Update container session UUID");
-					containerSession.setUuid(result.getUuid());
-				}
-
-				Logger.Log("Update Container Session with ID: "
-						+ Integer.toString(containerSessionId) + " | Name: "
-						+ containerSession.getContainerId());
-
-				this.createOrUpdate(containerSession);
+			if (null != result) {
+				this.delete(result);
 			}
 		}
 	}
@@ -225,165 +204,73 @@ public class ContainerSessionDaoImpl extends
 		}
 	}
 
-	@Override
-	public void delete(int id) throws SQLException {
+	public Cursor filterCheckOutCursor(CharSequence constraint) throws SQLException {
 
-		if (id == -1) {
-			Logger.Log("Container Session ID = -1");
+		Cursor cursor = null;
 
-		} else { // existed Container Session
+		QueryBuilder<ContainerSession, String> queryBuilder = queryBuilder();
 
-			ContainerSession result = this.queryForFirst(this.queryBuilder()
-					.where().eq(ContainerSession.FIELD_ID, id).prepare());
+		queryBuilder.where().eq(ContainerSession.FIELD_CHECK_OUT_TIME, "").and()
+					.eq(ContainerSession.FIELD_LOCAL, false);
 
-			if (null != result) {
-				this.delete(result);
-			}
+		CloseableIterator<ContainerSession> iterator = this.iterator(queryBuilder.prepare());
+
+		try {
+			// get the raw results which can be cast under Android
+			AndroidDatabaseResults results = (AndroidDatabaseResults) iterator.getRawResults();
+			cursor = results.getRawCursor();
+
+		} finally {
+
+			// iterator.closeQuietly();
 		}
-	}
 
-	@Override
-	public boolean isEmpty() throws SQLException {
-		ContainerSession containerSession = this.queryForFirst(this
-				.queryBuilder().prepare());
-		if (null == containerSession)
-			return true;
-
-		return false;
+		return cursor;
 	}
 
 	@Override
 	public ContainerSession findByUuid(String uuid) throws SQLException {
-		List<ContainerSession> result = this.queryForEq(
-				ContainerSession.FIELD_UUID, uuid);
-		if (result != null && result.size() > 0) {
-			return result.get(0);
-		}
+		List<ContainerSession> result = queryForEq(ContainerSession.FIELD_UUID, uuid);
+		if (result != null && result.size() > 0) return result.get(0);
 
 		return null;
 	}
 
-	/**
-	 * 
-	 * return ContainerSession obj that has
-	 * 
-	 * - upload_confirmation = true
-	 * 
-	 * - upload state = WAITING
-	 * 
-	 * - all cjayimages are uploaded
-	 * 
-	 */
 	@Override
-	public ContainerSession getNextWaiting() throws SQLException {
-
-		// Logger.Log( "getNextWaiting() at ContainerSessionDaoImpl");
-
-		ContainerSession result = null;
-		List<ContainerSession> containerSessions = this
-				.query(this
-						.queryBuilder()
-						.where()
-						.eq(ContainerSession.FIELD_STATE,
-								ContainerSession.STATE_UPLOAD_WAITING).and()
-						.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, true)
-						.prepare());
-
-		if (containerSessions.size() > 0) {
-			Logger.Log("Number of containers in queue: "
-					+ Integer.toString(containerSessions.size()));
-		}
-
-		for (ContainerSession containerSession : containerSessions) {
-
-			boolean flag = true;
-			Collection<CJayImage> cJayImages = containerSession.getCJayImages();
-
-			for (CJayImage cJayImage : cJayImages) {
-				if (cJayImage.getUploadState() != CJayImage.STATE_UPLOAD_COMPLETED) {
-
-					Logger.e(containerSession.getContainerId()
-							+ ": Some cJayImages are still not uploaded.");
-
-					Logger.e("CJayImage Url: " + cJayImage.getUri());
-					Logger.e("CJayImage Type: "
-							+ Integer.toString(cJayImage.getType()));
-					Logger.e("CJayImage Upload State: "
-							+ Integer.toString(cJayImage.getUploadState()));
-
-					// TODO: Try to upload CJayImage
-
-					flag = false;
-					break;
-				}
-			}
-
-			if (flag == true) {
-				result = containerSession;
-			}
-		}
-
-		return result;
+	public List<ContainerSession> getAllContainerSessions() throws SQLException {
+		return queryForAll();
 	}
 
-	/**
-	 * Get all container session items should be show on Upload Fragment.
-	 * 
-	 * - Have uploaded
-	 * 
-	 * - Clear state = false
-	 * 
-	 * @return
-	 * @throws SQLException
-	 */
-	@Override
-	public List<ContainerSession> getListUploadContainerSessions()
-			throws SQLException {
+	public Cursor getCheckOutContainerSessionCursor() throws SQLException {
 
-		long startTime = System.currentTimeMillis();
-		Logger.Log("*** get List UPLOAD Container Sessions ***");
+		Cursor cursor = null;
 
-		List<ContainerSession> containerSessions = this.query(this
-				.queryBuilder().where()
-				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, true).and()
-				.eq(ContainerSession.FIELD_CLEARED, false).prepare());
+		QueryBuilder<ContainerSession, String> queryBuilder = queryBuilder();
 
-		long difference = System.currentTimeMillis() - startTime;
-		Logger.Log("---> Total time: " + Long.toString(difference) + " ms");
+		queryBuilder.where().eq(ContainerSession.FIELD_CHECK_OUT_TIME, "").and()
+					.eq(ContainerSession.FIELD_LOCAL, false);
 
-		return containerSessions;
+		// ContainerDaoImpl containerDaoImpl = new ContainerDaoImpl(
+		// connectionSource);
+		// QueryBuilder<Container, Integer> containerQueryBuilder =
+		// containerDaoImpl
+		// .queryBuilder();
+		//
+		// queryBuilder.join(containerQueryBuilder);
 
-	}
+		CloseableIterator<ContainerSession> iterator = this.iterator(queryBuilder.prepare());
 
-	/**
-	 * Get all containers which available on Import Fragment.
-	 * 
-	 * - Upload confirmation = false
-	 * 
-	 * - Upload state <> complete
-	 * 
-	 * - Local = true
-	 */
-	@Override
-	public List<ContainerSession> getLocalContainerSessions()
-			throws SQLException {
+		try {
+			// get the raw results which can be cast under Android
+			AndroidDatabaseResults results = (AndroidDatabaseResults) iterator.getRawResults();
+			cursor = results.getRawCursor();
 
-		long startTime = System.currentTimeMillis();
-		Logger.Log("*** get list LOCAL Container sessions ***");
-		List<ContainerSession> containerSessions = this.query(this
-				.queryBuilder()
-				.where()
-				.eq(ContainerSession.FIELD_LOCAL, true)
-				.and()
-				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
-				.and()
-				.ne(ContainerSession.FIELD_STATE,
-						ContainerSession.STATE_UPLOAD_COMPLETED).prepare());
+		} finally {
 
-		long difference = System.currentTimeMillis() - startTime;
-		Logger.Log("---> Total time: " + Long.toString(difference) + " ms");
+			// iterator.closeQuietly();
+		}
 
-		return containerSessions;
+		return cursor;
 	}
 
 	/**
@@ -394,16 +281,15 @@ public class ContainerSessionDaoImpl extends
 	 * -
 	 */
 	@Override
-	public List<ContainerSession> getListCheckOutContainerSessions()
-			throws SQLException {
+	public List<ContainerSession> getListCheckOutContainerSessions() throws SQLException {
 
 		long startTime = System.currentTimeMillis();
 
 		Logger.Log("*** get List CHECKOUT Container Sessions ***");
-		List<ContainerSession> containerSessions = this.query(this
-				.queryBuilder().where()
-				.eq(ContainerSession.FIELD_CHECK_OUT_TIME, "").and()
-				.eq(ContainerSession.FIELD_LOCAL, false).prepare());
+		List<ContainerSession> containerSessions = query(queryBuilder().where()
+																		.eq(ContainerSession.FIELD_CHECK_OUT_TIME, "")
+																		.and().eq(ContainerSession.FIELD_LOCAL, false)
+																		.prepare());
 
 		long difference = System.currentTimeMillis() - startTime;
 		Logger.Log("---> Total time: " + Long.toString(difference));
@@ -411,80 +297,79 @@ public class ContainerSessionDaoImpl extends
 		return containerSessions;
 	}
 
-	public PreparedQuery<ContainerSession> getListCheckOutPreparedQuery()
-			throws SQLException {
+	public PreparedQuery<ContainerSession> getListCheckOutPreparedQuery() throws SQLException {
 
-		return this.queryBuilder().where()
-				.eq(ContainerSession.FIELD_CHECK_OUT_TIME, "").and()
-				.eq(ContainerSession.FIELD_LOCAL, false).prepare();
-	}
-
-	public Cursor filterCheckOutCursor(CharSequence constraint)
-			throws SQLException {
-
-		Cursor cursor = null;
-
-		QueryBuilder<ContainerSession, String> queryBuilder = this
-				.queryBuilder();
-
-		queryBuilder.where().eq(ContainerSession.FIELD_CHECK_OUT_TIME, "")
-				.and().eq(ContainerSession.FIELD_LOCAL, false);
-
-		CloseableIterator<ContainerSession> iterator = this
-				.iterator(queryBuilder.prepare());
-
-		try {
-			// get the raw results which can be cast under Android
-			AndroidDatabaseResults results = (AndroidDatabaseResults) iterator
-					.getRawResults();
-			cursor = results.getRawCursor();
-
-		} finally {
-
-			// iterator.closeQuietly();
-		}
-
-		return cursor;
-	}
-
-	public Cursor getCheckOutContainerSessionCursor() throws SQLException {
-
-		Cursor cursor = null;
-
-		QueryBuilder<ContainerSession, String> queryBuilder = this
-				.queryBuilder();
-
-		queryBuilder.where().eq(ContainerSession.FIELD_CHECK_OUT_TIME, "")
-				.and().eq(ContainerSession.FIELD_LOCAL, false);
-
-		// ContainerDaoImpl containerDaoImpl = new ContainerDaoImpl(
-		// connectionSource);
-		// QueryBuilder<Container, Integer> containerQueryBuilder =
-		// containerDaoImpl
-		// .queryBuilder();
-		//
-		// queryBuilder.join(containerQueryBuilder);
-
-		CloseableIterator<ContainerSession> iterator = this
-				.iterator(queryBuilder.prepare());
-
-		try {
-			// get the raw results which can be cast under Android
-			AndroidDatabaseResults results = (AndroidDatabaseResults) iterator
-					.getRawResults();
-			cursor = results.getRawCursor();
-
-		} finally {
-
-			// iterator.closeQuietly();
-		}
-
-		return cursor;
+		return queryBuilder().where().eq(ContainerSession.FIELD_CHECK_OUT_TIME, "").and()
+								.eq(ContainerSession.FIELD_LOCAL, false).prepare();
 	}
 
 	@Override
-	public List<ContainerSession> getListReportedContainerSessions()
-			throws SQLException {
+	public List<ContainerSession> getListFixedContainerSessions() throws SQLException {
+
+		long startTime = System.currentTimeMillis();
+		Logger.Log("*** get List FIXED Container Sessions ***");
+
+		List<ContainerSession> containerSessions = query(queryBuilder().where()
+																		.eq(ContainerSession.FIELD_FIXED, true)
+																		.and()
+																		.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION,
+																			false)
+																		.and()
+																		.ne(ContainerSession.FIELD_STATE,
+																			ContainerSession.STATE_UPLOAD_COMPLETED)
+																		.prepare());
+
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.Log("---> Total time: " + Long.toString(difference));
+
+		return containerSessions;
+	}
+
+	@Override
+	public List<ContainerSession> getListNotReportedContainerSessions() throws SQLException {
+		Logger.Log("*** get List NOT REPORTED Container Sessions ***");
+
+		List<ContainerSession> containerSessions = getNotUploadedContainerSessions();
+		List<ContainerSession> reportingContainerSessions = new ArrayList<ContainerSession>();
+
+		for (ContainerSession containerSession : containerSessions) {
+			boolean hasReportTypeImages = false;
+			for (CJayImage cJayImage : containerSession.getCJayImages()) {
+				if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
+					hasReportTypeImages = true;
+					break;
+				}
+			}
+
+			// unreported container sessions:
+			// - containers don't have report images
+			if (!hasReportTypeImages) {
+				reportingContainerSessions.add(containerSession);
+			}
+		}
+
+		return reportingContainerSessions;
+	}
+
+	@Override
+	public List<ContainerSession> getListPendingContainerSessions() throws SQLException {
+		Logger.Log("*** get List PENDING Container Sessions ***");
+
+		List<ContainerSession> containerSessions = query(queryBuilder().where()
+																		.eq(ContainerSession.FIELD_FIXED, false)
+																		.and()
+																		.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION,
+																			false)
+																		.and()
+																		.ne(ContainerSession.FIELD_STATE,
+																			ContainerSession.STATE_UPLOAD_COMPLETED)
+																		.prepare());
+
+		return containerSessions;
+	}
+
+	@Override
+	public List<ContainerSession> getListReportedContainerSessions() throws SQLException {
 		// Logger.Log( "getListReportedContainerSessions()");
 		//
 		// List<ContainerSession> containerSessions =
@@ -520,35 +405,7 @@ public class ContainerSessionDaoImpl extends
 	}
 
 	@Override
-	public List<ContainerSession> getListNotReportedContainerSessions()
-			throws SQLException {
-		Logger.Log("*** get List NOT REPORTED Container Sessions ***");
-
-		List<ContainerSession> containerSessions = getNotUploadedContainerSessions();
-		List<ContainerSession> reportingContainerSessions = new ArrayList<ContainerSession>();
-
-		for (ContainerSession containerSession : containerSessions) {
-			boolean hasReportTypeImages = false;
-			for (CJayImage cJayImage : containerSession.getCJayImages()) {
-				if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
-					hasReportTypeImages = true;
-					break;
-				}
-			}
-
-			// unreported container sessions:
-			// - containers don't have report images
-			if (!hasReportTypeImages) {
-				reportingContainerSessions.add(containerSession);
-			}
-		}
-
-		return reportingContainerSessions;
-	}
-
-	@Override
-	public List<ContainerSession> getListReportingContainerSessions()
-			throws SQLException {
+	public List<ContainerSession> getListReportingContainerSessions() throws SQLException {
 
 		Logger.Log("*** get List REPORTING Container Sessions ***");
 
@@ -574,53 +431,133 @@ public class ContainerSessionDaoImpl extends
 		return reportingContainerSessions;
 	}
 
+	/**
+	 * Get all container session items should be show on Upload Fragment.
+	 * 
+	 * - Have uploaded
+	 * 
+	 * - Clear state = false
+	 * 
+	 * @return
+	 * @throws SQLException
+	 */
 	@Override
-	public List<ContainerSession> getListPendingContainerSessions()
-			throws SQLException {
-		Logger.Log("*** get List PENDING Container Sessions ***");
-
-		List<ContainerSession> containerSessions = this.query(this
-				.queryBuilder()
-				.where()
-				.eq(ContainerSession.FIELD_FIXED, false)
-				.and()
-				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
-				.and()
-				.ne(ContainerSession.FIELD_STATE,
-						ContainerSession.STATE_UPLOAD_COMPLETED).prepare());
-
-		return containerSessions;
-	}
-
-	@Override
-	public List<ContainerSession> getListFixedContainerSessions()
-			throws SQLException {
+	public List<ContainerSession> getListUploadContainerSessions() throws SQLException {
 
 		long startTime = System.currentTimeMillis();
-		Logger.Log("*** get List FIXED Container Sessions ***");
+		Logger.Log("*** get List UPLOAD Container Sessions ***");
 
-		List<ContainerSession> containerSessions = this.query(this
-				.queryBuilder()
-				.where()
-				.eq(ContainerSession.FIELD_FIXED, true)
-				.and()
-				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
-				.and()
-				.ne(ContainerSession.FIELD_STATE,
-						ContainerSession.STATE_UPLOAD_COMPLETED).prepare());
+		List<ContainerSession> containerSessions = query(queryBuilder().where()
+																		.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION,
+																			true).and()
+																		.eq(ContainerSession.FIELD_CLEARED, false)
+																		.prepare());
 
 		long difference = System.currentTimeMillis() - startTime;
-		Logger.Log("---> Total time: " + Long.toString(difference));
+		Logger.Log("---> Total time: " + Long.toString(difference) + " ms");
+
+		return containerSessions;
+
+	}
+
+	/**
+	 * Get all containers which available on Import Fragment.
+	 * 
+	 * - Upload confirmation = false
+	 * 
+	 * - Upload state <> complete
+	 * 
+	 * - Local = true
+	 */
+	@Override
+	public List<ContainerSession> getLocalContainerSessions() throws SQLException {
+
+		long startTime = System.currentTimeMillis();
+		Logger.Log("*** get list LOCAL Container sessions ***");
+		List<ContainerSession> containerSessions = query(queryBuilder().where()
+																		.eq(ContainerSession.FIELD_LOCAL, true)
+																		.and()
+																		.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION,
+																			false)
+																		.and()
+																		.ne(ContainerSession.FIELD_STATE,
+																			ContainerSession.STATE_UPLOAD_COMPLETED)
+																		.prepare());
+
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.Log("---> Total time: " + Long.toString(difference) + " ms");
 
 		return containerSessions;
 	}
 
+	/**
+	 * 
+	 * return ContainerSession obj that has
+	 * 
+	 * - upload_confirmation = true
+	 * 
+	 * - upload state = WAITING
+	 * 
+	 * - all cjayimages are uploaded
+	 * 
+	 */
 	@Override
-	public List<ContainerSession> getNotUploadedContainerSessions()
-			throws SQLException {
+	public ContainerSession getNextWaiting() throws SQLException {
+
+		// Logger.Log( "getNextWaiting() at ContainerSessionDaoImpl");
+
+		ContainerSession result = null;
+		List<ContainerSession> containerSessions = query(queryBuilder().where()
+																		.eq(ContainerSession.FIELD_STATE,
+																			ContainerSession.STATE_UPLOAD_WAITING)
+																		.and()
+																		.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION,
+																			true).prepare());
+
+		if (containerSessions.size() > 0) {
+			Logger.Log("Number of containers in queue: " + Integer.toString(containerSessions.size()));
+		}
+
+		for (ContainerSession containerSession : containerSessions) {
+
+			boolean flag = true;
+			Collection<CJayImage> cJayImages = containerSession.getCJayImages();
+
+			for (CJayImage cJayImage : cJayImages) {
+				if (cJayImage.getUploadState() != CJayImage.STATE_UPLOAD_COMPLETED) {
+
+					Logger.e(containerSession.getContainerId() + ": Some cJayImages are still not uploaded.");
+
+					Logger.e("CJayImage Url: " + cJayImage.getUri());
+					Logger.e("CJayImage Type: " + Integer.toString(cJayImage.getType()));
+					Logger.e("CJayImage Upload State: " + Integer.toString(cJayImage.getUploadState()));
+
+					// TODO: Try to upload CJayImage
+
+					flag = false;
+					break;
+				}
+			}
+
+			if (flag == true) {
+				result = containerSession;
+			}
+		}
+
+		return result;
+	}
+
+	@Override
+	public List<ContainerSession> getNotUploadedContainerSessions() throws SQLException {
 		Logger.Log("*** get List NOT UPLOADED Container Sessions ***");
-		return this.query(this.queryBuilder().where()
-				.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false)
-				.prepare());
+		return query(queryBuilder().where().eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, false).prepare());
+	}
+
+	@Override
+	public boolean isEmpty() throws SQLException {
+		ContainerSession containerSession = queryForFirst(queryBuilder().prepare());
+		if (null == containerSession) return true;
+
+		return false;
 	}
 }

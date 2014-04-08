@@ -54,21 +54,14 @@ public class AuditorIssueAssigmentActivity extends CJayActivity {
 	@ViewById(R.id.feeds)
 	ListView mFeedListView;
 
-	@Override
-	protected void onCreate(Bundle arg0) {
-		// TODO Auto-generated method stub
-		super.onCreate(arg0);
-		Logger.w("onCreate");
-	}
-
 	@AfterViews
 	void afterViews() {
 
 		try {
 			imageLoader = ImageLoader.getInstance();
 
-			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance()
-					.getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
+			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this)
+															.getCJayImageDaoImpl();
 			mCJayImage = cJayImageDaoImpl.findByUuid(mCJayImageUUID);
 
 			if (mCJayImage != null) {
@@ -95,15 +88,84 @@ public class AuditorIssueAssigmentActivity extends CJayActivity {
 
 		// save db records
 		try {
-			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance()
-					.getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
+			CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this)
+															.getCJayImageDaoImpl();
 			cJayImageDaoImpl.update(mCJayImage);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
 		// go back
-		this.onBackPressed();
+		onBackPressed();
+	}
+
+	@Trace(level = Log.INFO)
+	void initImageFeedAdapter(ArrayList<Issue> containers) {
+
+		Logger.Log("initImageFeedAdapter()");
+
+		BindDictionary<Issue> feedsDict = new BindDictionary<Issue>();
+		feedsDict.addStringField(R.id.issue_location_code, new StringExtractor<Issue>() {
+			@Override
+			public String getStringValue(Issue item, int position) {
+				return Utils.replaceNullBySpace(item.getLocationCode());
+			}
+		});
+		feedsDict.addStringField(R.id.issue_damage_code, new StringExtractor<Issue>() {
+			@Override
+			public String getStringValue(Issue item, int position) {
+				return Utils.replaceNullBySpace(item.getDamageCodeString());
+			}
+		});
+		feedsDict.addStringField(R.id.issue_repair_code, new StringExtractor<Issue>() {
+			@Override
+			public String getStringValue(Issue item, int position) {
+				return Utils.replaceNullBySpace(item.getRepairCodeString());
+			}
+		});
+		feedsDict.addStringField(R.id.issue_component_code, new StringExtractor<Issue>() {
+			@Override
+			public String getStringValue(Issue item, int position) {
+				return Utils.replaceNullBySpace(item.getComponentCodeString());
+			}
+		});
+		feedsDict.addStringField(R.id.issue_quantity, new StringExtractor<Issue>() {
+			@Override
+			public String getStringValue(Issue item, int position) {
+				return Utils.replaceNullBySpace(item.getQuantity());
+			}
+		});
+		feedsDict.addStringField(R.id.issue_length, new StringExtractor<Issue>() {
+			@Override
+			public String getStringValue(Issue item, int position) {
+				return Utils.replaceNullBySpace(item.getLength());
+			}
+		});
+		feedsDict.addStringField(R.id.issue_height, new StringExtractor<Issue>() {
+			@Override
+			public String getStringValue(Issue item, int position) {
+				return Utils.replaceNullBySpace(item.getHeight());
+			}
+		});
+		feedsDict.addDynamicImageField(R.id.issue_picture, new StringExtractor<Issue>() {
+			@Override
+			public String getStringValue(Issue item, int position) {
+				for (CJayImage cJayImage : item.getCJayImages())
+					return cJayImage.getUri();
+				return null;
+			}
+		}, new DynamicImageLoader() {
+			@Override
+			public void loadImage(String url, ImageView view) {
+				if (url != null && !TextUtils.isEmpty(url)) {
+					imageLoader.displayImage(url, view);
+				} else {
+					view.setImageResource(R.drawable.ic_app);
+				}
+			}
+		});
+		mFeedsAdapter = new FunDapter<Issue>(this, containers, R.layout.list_item_issue, feedsDict);
+		mFeedListView.setAdapter(mFeedsAdapter);
 	}
 
 	@ItemClick(R.id.feeds)
@@ -115,92 +177,17 @@ public class AuditorIssueAssigmentActivity extends CJayActivity {
 	}
 
 	@Override
+	protected void onCreate(Bundle arg0) {
+		// TODO Auto-generated method stub
+		super.onCreate(arg0);
+		Logger.w("onCreate");
+	}
+
+	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		boolean isDisplayed = !(mSelectedIssue == null);
 		menu.findItem(R.id.menu_check).setVisible(isDisplayed);
 
 		return super.onPrepareOptionsMenu(menu);
-	}
-
-	@Trace(level = Log.INFO)
-	void initImageFeedAdapter(ArrayList<Issue> containers) {
-
-		Logger.Log("initImageFeedAdapter()");
-
-		BindDictionary<Issue> feedsDict = new BindDictionary<Issue>();
-		feedsDict.addStringField(R.id.issue_location_code,
-				new StringExtractor<Issue>() {
-					@Override
-					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item.getLocationCode());
-					}
-				});
-		feedsDict.addStringField(R.id.issue_damage_code,
-				new StringExtractor<Issue>() {
-					@Override
-					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item
-								.getDamageCodeString());
-					}
-				});
-		feedsDict.addStringField(R.id.issue_repair_code,
-				new StringExtractor<Issue>() {
-					@Override
-					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item
-								.getRepairCodeString());
-					}
-				});
-		feedsDict.addStringField(R.id.issue_component_code,
-				new StringExtractor<Issue>() {
-					@Override
-					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item
-								.getComponentCodeString());
-					}
-				});
-		feedsDict.addStringField(R.id.issue_quantity,
-				new StringExtractor<Issue>() {
-					@Override
-					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item.getQuantity());
-					}
-				});
-		feedsDict.addStringField(R.id.issue_length,
-				new StringExtractor<Issue>() {
-					@Override
-					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item.getLength());
-					}
-				});
-		feedsDict.addStringField(R.id.issue_height,
-				new StringExtractor<Issue>() {
-					@Override
-					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item.getHeight());
-					}
-				});
-		feedsDict.addDynamicImageField(R.id.issue_picture,
-				new StringExtractor<Issue>() {
-					@Override
-					public String getStringValue(Issue item, int position) {
-						for (CJayImage cJayImage : item.getCJayImages()) {
-							return cJayImage.getUri();
-						}
-						return null;
-					}
-				}, new DynamicImageLoader() {
-					@Override
-					public void loadImage(String url, ImageView view) {
-						if (url != null && !TextUtils.isEmpty(url)) {
-							imageLoader.displayImage(url, view);
-						} else {
-							view.setImageResource(R.drawable.ic_app);
-						}
-					}
-				});
-		mFeedsAdapter = new FunDapter<Issue>(this, containers,
-				R.layout.list_item_issue, feedsDict);
-		mFeedListView.setAdapter(mFeedsAdapter);
 	}
 }

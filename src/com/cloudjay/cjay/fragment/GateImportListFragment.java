@@ -62,8 +62,7 @@ import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_gate_import)
 @OptionsMenu(R.menu.menu_gate_import)
-public class GateImportListFragment extends SherlockFragment implements
-		OnRefreshListener, LoaderCallbacks<Cursor> {
+public class GateImportListFragment extends SherlockFragment implements OnRefreshListener, LoaderCallbacks<Cursor> {
 
 	public final static String LOG_TAG = "GateImportListFragment";
 	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_GATE_IMPORT;
@@ -83,22 +82,28 @@ public class GateImportListFragment extends SherlockFragment implements
 	PullToRefreshLayout mPullToRefreshLayout;
 	GateContainerCursorAdapter cursorAdapter;
 
+	int totalItems = 0;
+
 	public GateImportListFragment() {
+	}
+
+	@Click(R.id.btn_add_new)
+	void addContainerClicked() {
+		// getResources().getString(R.string.default_container_id)
+		showContainerDetailDialog("", "", AddContainerDialog.CONTAINER_DIALOG_ADD);
 	}
 
 	@AfterViews
 	void afterViews() {
 
 		try {
-			containerSessionDaoImpl = CJayClient.getInstance()
-					.getDatabaseManager().getHelper(getActivity())
-					.getContainerSessionDaoImpl();
+			containerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity())
+												.getContainerSessionDaoImpl();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
-		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
-				.getListOperators(getActivity());
+		mOperators = (ArrayList<Operator>) DataCenter.getInstance().getListOperators(getActivity());
 
 		// initContainerFeedAdapter(null);
 		getLoaderManager().initLoader(LOADER_ID, null, this);
@@ -107,28 +112,126 @@ public class GateImportListFragment extends SherlockFragment implements
 		mFeedListView.setOnScrollListener(new OnScrollListener() {
 
 			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+			}
+
+			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				if (scrollState != 0) {
 					((GateContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
 				} else {
 					((GateContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
-					((GateContainerCursorAdapter) mFeedListView.getAdapter())
-							.notifyDataSetChanged();
+					((GateContainerCursorAdapter) mFeedListView.getAdapter()).notifyDataSetChanged();
 				}
-			}
-
-			@Override
-			public void onScroll(AbsListView view, int firstVisibleItem,
-					int visibleItemCount, int totalItemCount) {
 			}
 		});
 	}
 
-	int totalItems = 0;
+	@OptionsItem(R.id.menu_camera)
+	void cameraMenuItemSelected() {
+		Logger.Log("Menu camera item clicked");
+		CJayApplication.gotoCamera(getActivity(), mSelectedContainerSession, CJayImage.TYPE_IMPORT, LOG_TAG);
+	}
 
-	void setTotalItems(int val) {
-		totalItems = val;
-		EventBus.getDefault().post(new ListItemChangedEvent(0, totalItems));
+	@OptionsItem(R.id.menu_edit_container)
+	void editMenuItemSelected() {
+		Logger.Log("Menu edit item clicked");
+
+		// Open dialog for editing details
+		showContainerDetailDialog(	mSelectedContainerSession.getContainerId(),
+									mSelectedContainerSession.getOperatorName(),
+									AddContainerDialog.CONTAINER_DIALOG_EDIT);
+	}
+
+	void hideMenuItems() {
+		mSelectedContainerSession = null;
+		mFeedListView.setItemChecked(-1, true);
+		getActivity().supportInvalidateOptionsMenu();
+	}
+
+	@ItemClick(R.id.feeds)
+	void listItemClicked(int position) {
+		Logger.Log("Clicked item at position: " + position);
+		hideMenuItems();
+
+		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
+		String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+		String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
+
+		CJayApplication.openPhotoGridView(	getActivity(), uuidString, containerId, CJayImage.TYPE_IMPORT,
+											GateImportListFragment.LOG_TAG);
+	}
+
+	@ItemLongClick(R.id.feeds)
+	void listItemLongClicked(int position) {
+		// refresh highlighting and menu
+		mFeedListView.setItemChecked(position, true);
+
+		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
+		String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+		try {
+			mSelectedContainerSession = containerSessionDaoImpl.findByUuid(uuidString);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		getActivity().supportInvalidateOptionsMenu();
+	}
+
+	public void OnContainerInputCompleted(String containerId, String operatorName, int mode) {
+
+		String operatorCode = "";
+		for (Operator operator : mOperators) {
+			if (operator.getName().equals(operatorName)) {
+				operatorCode = operator.getCode();
+				break;
+			}
+		}
+
+		if (TextUtils.isEmpty(containerId) || TextUtils.isEmpty(operatorCode)) return;
+
+		switch (mode) {
+			case AddContainerDialog.CONTAINER_DIALOG_ADD:
+
+				Activity activity = getActivity();
+				String currentTimeStamp = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+
+				String depotCode = "";
+				if (getActivity() instanceof CJayActivity) {
+					depotCode = ((CJayActivity) activity).getSession().getDepot().getDepotCode();
+				}
+
+				ContainerSession containerSession = new ContainerSession(activity, containerId, operatorCode,
+																			currentTimeStamp, depotCode);
+				containerSession.setOnLocal(true);
+
+				EventBus.getDefault().post(new ContainerSessionChangedEvent(containerSession));
+
+				try {
+					containerSessionDaoImpl.addContainerSession(containerSession);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+
+				CJayApplication.gotoCamera(activity, containerSession, CJayImage.TYPE_IMPORT, LOG_TAG);
+
+				// TODO: Temporary post container to server
+				CJayApplication.uploadContainerSesison(getActivity(), containerSession);
+
+				break;
+
+			case AddContainerDialog.CONTAINER_DIALOG_EDIT:
+				DataCenter.getInstance().editContainerSession(getActivity(), mSelectedContainerSession, containerId,
+																operatorCode);
+				break;
+		}
+
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		EventBus.getDefault().register(this);
+		super.onCreate(savedInstanceState);
 	}
 
 	@Override
@@ -138,8 +241,7 @@ public class GateImportListFragment extends SherlockFragment implements
 		return new CJayCursorLoader(context) {
 			@Override
 			public Cursor loadInBackground() {
-				Cursor cursor = DataCenter.getInstance()
-						.getLocalContainerSessionCursor(getContext());
+				Cursor cursor = DataCenter.getInstance().getLocalContainerSessionCursor(getContext());
 
 				if (cursor != null) {
 					// Ensure the cursor window is filled
@@ -153,250 +255,9 @@ public class GateImportListFragment extends SherlockFragment implements
 	}
 
 	@Override
-	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
-
-		if (cursorAdapter == null) {
-			cursorAdapter = new GateContainerCursorAdapter(getActivity(),
-					mItemLayout, cursor, 0);
-
-			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
-				@Override
-				public Cursor runQuery(CharSequence constraint) {
-					return DataCenter.getInstance().filterLocalCursor(
-							getActivity(), constraint);
-				}
-			});
-
-			mFeedListView.setAdapter(cursorAdapter);
-
-		} else {
-			cursorAdapter.swapCursor(cursor);
-		}
-	}
-
-	@Override
-	public void onLoaderReset(Loader<Cursor> arg0) {
-		cursorAdapter.swapCursor(null);
-	}
-
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-
-		ViewGroup viewGroup = (ViewGroup) view;
-		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
-		ActionBarPullToRefresh.from(getActivity()).insertLayoutInto(viewGroup)
-				.theseChildrenArePullable(R.id.feeds, android.R.id.empty)
-				.listener(this).setup(mPullToRefreshLayout);
-	}
-
-	@OptionsItem(R.id.menu_camera)
-	void cameraMenuItemSelected() {
-		Logger.Log("Menu camera item clicked");
-		CJayApplication.gotoCamera(getActivity(), mSelectedContainerSession,
-				CJayImage.TYPE_IMPORT, LOG_TAG);
-	}
-
-	@OptionsItem(R.id.menu_edit_container)
-	void editMenuItemSelected() {
-		Logger.Log("Menu edit item clicked");
-
-		// Open dialog for editing details
-		showContainerDetailDialog(mSelectedContainerSession.getContainerId(),
-				mSelectedContainerSession.getOperatorName(),
-				AddContainerDialog.CONTAINER_DIALOG_EDIT);
-	}
-
-	void hideMenuItems() {
-		mSelectedContainerSession = null;
-		mFeedListView.setItemChecked(-1, true);
-		getActivity().supportInvalidateOptionsMenu();
-	}
-
-	@OptionsItem(R.id.menu_trash)
-	void trashMenuItemSelected() {
-		if (mSelectedContainerSession != null
-				&& mSelectedContainerSession.isOnLocal()) {
-			try {
-				// delete selected container session from database
-				DatabaseHelper databaseHelper = CJayClient.getInstance()
-						.getDatabaseManager().getHelper(getActivity());
-				ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper
-						.getContainerSessionDaoImpl();
-				CJayImageDaoImpl cJayImageDaoImpl = databaseHelper
-						.getCJayImageDaoImpl();
-
-				// delete images from database
-				for (CJayImage cJayImage : mSelectedContainerSession
-						.getCJayImages()) {
-					mSelectedContainerSession.getCJayImages().remove(cJayImage);
-					cJayImageDaoImpl.delete(cJayImage);
-				}
-
-				// delete container session from database
-				containerSessionDaoImpl.delete(mSelectedContainerSession);
-
-				EventBus.getDefault().post(
-						new ContainerSessionChangedEvent(
-								mSelectedContainerSession));
-
-				hideMenuItems();
-
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	@OptionsItem(R.id.menu_upload)
-	void uploadMenuItemSelected() {
-
-		mSelectedContainerSession.setUploadType(ContainerSession.TYPE_IN);
-		mSelectedContainerSession.setOnLocal(false);
-
-		CJayApplication.uploadContainerSesison(getActivity(),
-				mSelectedContainerSession);
-		hideMenuItems();
-	}
-
-	@Click(R.id.btn_add_new)
-	void addContainerClicked() {
-		// getResources().getString(R.string.default_container_id)
-		showContainerDetailDialog("", "",
-				AddContainerDialog.CONTAINER_DIALOG_ADD);
-	}
-
-	@ItemClick(R.id.feeds)
-	void listItemClicked(int position) {
-		Logger.Log("Clicked item at position: " + position);
-		hideMenuItems();
-
-		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
-		String uuidString = cursor.getString(cursor
-				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
-		String containerId = cursor.getString(cursor
-				.getColumnIndexOrThrow(Container.CONTAINER_ID));
-
-		CJayApplication.openPhotoGridView(getActivity(), uuidString,
-				containerId, CJayImage.TYPE_IMPORT,
-				GateImportListFragment.LOG_TAG);
-	}
-
-	@ItemLongClick(R.id.feeds)
-	void listItemLongClicked(int position) {
-		// refresh highlighting and menu
-		mFeedListView.setItemChecked(position, true);
-
-		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
-		String uuidString = cursor.getString(cursor
-				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
-		try {
-			mSelectedContainerSession = containerSessionDaoImpl
-					.findByUuid(uuidString);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		getActivity().supportInvalidateOptionsMenu();
-	}
-
-	@Override
-	public void onPrepareOptionsMenu(Menu menu) {
-		super.onPrepareOptionsMenu(menu);
-
-		boolean isDisplayed = !(mSelectedContainerSession == null);
-		menu.findItem(R.id.menu_camera).setVisible(isDisplayed);
-		menu.findItem(R.id.menu_edit_container).setVisible(isDisplayed);
-		menu.findItem(R.id.menu_trash).setVisible(isDisplayed);
-		menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
-	}
-
-	@Override
 	public void onDestroy() {
 		EventBus.getDefault().unregister(this);
 		super.onDestroy();
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		EventBus.getDefault().register(this);
-		super.onCreate(savedInstanceState);
-	}
-
-	public void showContainerDetailDialog(String containerId,
-			String operatorName, int mode) {
-
-		FragmentManager fm = getActivity().getSupportFragmentManager();
-		AddContainerDialog addContainerDialog = new AddContainerDialog();
-		addContainerDialog.setContainerId(containerId);
-		addContainerDialog.setOperatorName(operatorName);
-		addContainerDialog.setMode(mode);
-		addContainerDialog.setParent(this);
-		addContainerDialog.show(fm, "add_container_dialog");
-
-	}
-
-	public void OnOperatorSelected(String containerId, String operatorName,
-			int mode) {
-		showContainerDetailDialog(containerId, operatorName, mode);
-	}
-
-	public void OnContainerInputCompleted(String containerId,
-			String operatorName, int mode) {
-
-		String operatorCode = "";
-		for (Operator operator : mOperators) {
-			if (operator.getName().equals(operatorName)) {
-				operatorCode = operator.getCode();
-				break;
-			}
-		}
-
-		if (TextUtils.isEmpty(containerId) || TextUtils.isEmpty(operatorCode)) {
-			return;
-		}
-
-		switch (mode) {
-		case AddContainerDialog.CONTAINER_DIALOG_ADD:
-
-			Activity activity = getActivity();
-			String currentTimeStamp = StringHelper
-					.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-
-			String depotCode = "";
-			if (getActivity() instanceof CJayActivity) {
-				depotCode = ((CJayActivity) activity).getSession().getDepot()
-						.getDepotCode();
-			}
-
-			ContainerSession containerSession = new ContainerSession(activity,
-					containerId, operatorCode, currentTimeStamp, depotCode);
-			containerSession.setOnLocal(true);
-
-			EventBus.getDefault().post(
-					new ContainerSessionChangedEvent(containerSession));
-
-			try {
-				containerSessionDaoImpl.addContainerSession(containerSession);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-
-			CJayApplication.gotoCamera(activity, containerSession,
-					CJayImage.TYPE_IMPORT, LOG_TAG);
-
-			// TODO: Temporary post container to server
-			CJayApplication.uploadContainerSesison(getActivity(),
-					containerSession);
-
-			break;
-
-		case AddContainerDialog.CONTAINER_DIALOG_EDIT:
-			DataCenter.getInstance().editContainerSession(getActivity(),
-					mSelectedContainerSession, containerId, operatorCode);
-			break;
-		}
-
 	}
 
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
@@ -408,16 +269,44 @@ public class GateImportListFragment extends SherlockFragment implements
 		refresh();
 	}
 
-	public void refresh() {
-		getLoaderManager().restartLoader(LOADER_ID, null, this);
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		cursorAdapter.swapCursor(null);
 	}
 
 	@Override
-	public void onResume() {
-		if (cursorAdapter != null) {
-			refresh();
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+
+		if (cursorAdapter == null) {
+			cursorAdapter = new GateContainerCursorAdapter(getActivity(), mItemLayout, cursor, 0);
+
+			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+				@Override
+				public Cursor runQuery(CharSequence constraint) {
+					return DataCenter.getInstance().filterLocalCursor(getActivity(), constraint);
+				}
+			});
+
+			mFeedListView.setAdapter(cursorAdapter);
+
+		} else {
+			cursorAdapter.swapCursor(cursor);
 		}
-		super.onResume();
+	}
+
+	public void OnOperatorSelected(String containerId, String operatorName, int mode) {
+		showContainerDetailDialog(containerId, operatorName, mode);
+	}
+
+	@Override
+	public void onPrepareOptionsMenu(Menu menu) {
+		super.onPrepareOptionsMenu(menu);
+
+		boolean isDisplayed = !(mSelectedContainerSession == null);
+		menu.findItem(R.id.menu_camera).setVisible(isDisplayed);
+		menu.findItem(R.id.menu_edit_container).setVisible(isDisplayed);
+		menu.findItem(R.id.menu_trash).setVisible(isDisplayed);
+		menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
 	}
 
 	@Override
@@ -434,11 +323,9 @@ public class GateImportListFragment extends SherlockFragment implements
 
 				try {
 					DataCenter.getInstance().fetchData(getActivity());
-					DataCenter.getDatabaseHelper(getSherlockActivity())
-							.addUsageLog("#refresh in fragment #GateImport");
+					DataCenter.getDatabaseHelper(getSherlockActivity()).addUsageLog("#refresh in fragment #GateImport");
 				} catch (NoConnectionException e) {
-					((CJayActivity) getActivity())
-							.showCrouton(R.string.alert_no_network);
+					((CJayActivity) getActivity()).showCrouton(R.string.alert_no_network);
 					e.printStackTrace();
 				} catch (NullSessionException e) {
 					CJayApplication.logOutInstantly(getActivity());
@@ -455,5 +342,83 @@ public class GateImportListFragment extends SherlockFragment implements
 				mPullToRefreshLayout.setRefreshComplete();
 			}
 		}.execute();
+	}
+
+	@Override
+	public void onResume() {
+		if (cursorAdapter != null) {
+			refresh();
+		}
+		super.onResume();
+	}
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+
+		ViewGroup viewGroup = (ViewGroup) view;
+		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
+		ActionBarPullToRefresh.from(getActivity()).insertLayoutInto(viewGroup)
+								.theseChildrenArePullable(R.id.feeds, android.R.id.empty).listener(this)
+								.setup(mPullToRefreshLayout);
+	}
+
+	public void refresh() {
+		getLoaderManager().restartLoader(LOADER_ID, null, this);
+	}
+
+	void setTotalItems(int val) {
+		totalItems = val;
+		EventBus.getDefault().post(new ListItemChangedEvent(0, totalItems));
+	}
+
+	public void showContainerDetailDialog(String containerId, String operatorName, int mode) {
+
+		FragmentManager fm = getActivity().getSupportFragmentManager();
+		AddContainerDialog addContainerDialog = new AddContainerDialog();
+		addContainerDialog.setContainerId(containerId);
+		addContainerDialog.setOperatorName(operatorName);
+		addContainerDialog.setMode(mode);
+		addContainerDialog.setParent(this);
+		addContainerDialog.show(fm, "add_container_dialog");
+
+	}
+
+	@OptionsItem(R.id.menu_trash)
+	void trashMenuItemSelected() {
+		if (mSelectedContainerSession != null && mSelectedContainerSession.isOnLocal()) {
+			try {
+				// delete selected container session from database
+				DatabaseHelper databaseHelper = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity());
+				ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper.getContainerSessionDaoImpl();
+				CJayImageDaoImpl cJayImageDaoImpl = databaseHelper.getCJayImageDaoImpl();
+
+				// delete images from database
+				for (CJayImage cJayImage : mSelectedContainerSession.getCJayImages()) {
+					mSelectedContainerSession.getCJayImages().remove(cJayImage);
+					cJayImageDaoImpl.delete(cJayImage);
+				}
+
+				// delete container session from database
+				containerSessionDaoImpl.delete(mSelectedContainerSession);
+
+				EventBus.getDefault().post(new ContainerSessionChangedEvent(mSelectedContainerSession));
+
+				hideMenuItems();
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	@OptionsItem(R.id.menu_upload)
+	void uploadMenuItemSelected() {
+
+		mSelectedContainerSession.setUploadType(ContainerSession.TYPE_IN);
+		mSelectedContainerSession.setOnLocal(false);
+
+		CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
+		hideMenuItems();
 	}
 }

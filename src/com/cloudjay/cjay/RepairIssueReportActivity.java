@@ -22,7 +22,7 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
-import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.fragment.RepairIssueImageListFragment_;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
@@ -36,15 +36,47 @@ import com.cloudjay.cjay.network.CJayClient;
  */
 @EActivity(R.layout.activity_repair_issue_report)
 @OptionsMenu(R.menu.menu_repair_issue_report)
-public class RepairIssueReportActivity extends CJayActivity implements
-		OnPageChangeListener, TabListener {
+public class RepairIssueReportActivity extends CJayActivity implements OnPageChangeListener, TabListener {
+
+	public class AuditorHomeTabPageAdaptor extends FragmentPagerAdapter {
+		private String[] locations;
+
+		public AuditorHomeTabPageAdaptor(FragmentManager fm, String[] locations) {
+			super(fm);
+			this.locations = locations;
+		}
+
+		@Override
+		public int getCount() {
+			return locations.length;
+		}
+
+		@Override
+		public Fragment getItem(int position) {
+			RepairIssueImageListFragment_ fragment;
+			switch (position) {
+				case 0:
+					fragment = new RepairIssueImageListFragment_();
+					fragment.setIssueUUID(mIssueUUID);
+					fragment.setType(CJayImage.TYPE_REPORT);
+					return fragment;
+				case 1:
+				default:
+					fragment = new RepairIssueImageListFragment_();
+					fragment.setIssueUUID(mIssueUUID);
+					fragment.setType(CJayImage.TYPE_REPAIRED);
+					return fragment;
+			}
+		}
+	}
 
 	public static final String CJAY_ISSUE_EXTRA = "issue";
 	private Issue mIssue;
-	private String[] locations;
 
+	private String[] locations;
 	@ViewById
 	ViewPager pager;
+
 	@ViewById(R.id.container_id_textview)
 	TextView containerIdTextView;
 
@@ -57,15 +89,12 @@ public class RepairIssueReportActivity extends CJayActivity implements
 	@AfterViews
 	void afterViews() {
 		try {
-			IssueDaoImpl issueDaoImpl = CJayClient.getInstance()
-					.getDatabaseManager().getHelper(this).getIssueDaoImpl();
+			IssueDaoImpl issueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getIssueDaoImpl();
 			mIssue = issueDaoImpl.queryForId(mIssueUUID);
 
 			if (null != mIssue) {
-				containerIdTextView.setText(mIssue.getContainerSession()
-						.getContainerId());
-				issueTextView.setText(mIssue.getLocationCode() + " "
-						+ mIssue.getDamageCodeString() + " "
+				containerIdTextView.setText(mIssue.getContainerSession().getContainerId());
+				issueTextView.setText(mIssue.getLocationCode() + " " + mIssue.getDamageCodeString() + " "
 						+ mIssue.getRepairCodeString());
 			}
 
@@ -73,8 +102,7 @@ public class RepairIssueReportActivity extends CJayActivity implements
 			e.printStackTrace();
 		}
 
-		locations = getResources().getStringArray(
-				R.array.repair_issue_report_tabs);
+		locations = getResources().getStringArray(R.array.repair_issue_report_tabs);
 		configureViewPager();
 		configureActionBar();
 	}
@@ -86,15 +114,51 @@ public class RepairIssueReportActivity extends CJayActivity implements
 
 		// save db records
 		try {
-			IssueDaoImpl issueDaoImpl = CJayClient.getInstance()
-					.getDatabaseManager().getHelper(this).getIssueDaoImpl();
+			IssueDaoImpl issueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getIssueDaoImpl();
 			issueDaoImpl.createOrUpdate(mIssue);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
 		// go back
-		this.onBackPressed();
+		onBackPressed();
+	}
+
+	// @Override
+	// public void onResume() {
+	// invalidateOptionsMenu();
+	// super.onResume();
+	// }
+
+	private void configureActionBar() {
+		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		for (String location : locations) {
+			Tab tab = getSupportActionBar().newTab();
+			tab.setText(location);
+			tab.setTabListener(this);
+			getSupportActionBar().addTab(tab);
+		}
+	}
+
+	private void configureViewPager() {
+		AuditorHomeTabPageAdaptor viewPagerAdapter = new AuditorHomeTabPageAdaptor(getSupportFragmentManager(),
+																					locations);
+		pager.setAdapter(viewPagerAdapter);
+		pager.setOnPageChangeListener(this);
+	}
+
+	@Override
+	public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+	}
+
+	@Override
+	public void onPageScrollStateChanged(int position) {
+	}
+
+	@Override
+	public void onPageSelected(int position) {
+		Tab tab = getSupportActionBar().getTabAt(position);
+		getSupportActionBar().selectTab(tab);
 	}
 
 	@Override
@@ -105,8 +169,7 @@ public class RepairIssueReportActivity extends CJayActivity implements
 		if (null != mIssue) {
 			IssueDaoImpl issueDaoImpl;
 			try {
-				issueDaoImpl = CJayClient.getInstance().getDatabaseManager()
-						.getHelper(this).getIssueDaoImpl();
+				issueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getIssueDaoImpl();
 				mIssue = issueDaoImpl.queryForId(mIssueUUID);
 				issueDaoImpl.refresh(mIssue);
 			} catch (SQLException e) {
@@ -125,32 +188,8 @@ public class RepairIssueReportActivity extends CJayActivity implements
 		return super.onPrepareOptionsMenu(menu);
 	}
 
-	// @Override
-	// public void onResume() {
-	// invalidateOptionsMenu();
-	// super.onResume();
-	// }
-
-	private void configureViewPager() {
-		AuditorHomeTabPageAdaptor viewPagerAdapter = new AuditorHomeTabPageAdaptor(
-				getSupportFragmentManager(), locations);
-		pager.setAdapter(viewPagerAdapter);
-		pager.setOnPageChangeListener(this);
-	}
-
-	public void onPageSelected(int position) {
-		Tab tab = getSupportActionBar().getTabAt(position);
-		getSupportActionBar().selectTab(tab);
-	}
-
-	private void configureActionBar() {
-		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		for (String location : locations) {
-			Tab tab = getSupportActionBar().newTab();
-			tab.setText(location);
-			tab.setTabListener(this);
-			getSupportActionBar().addTab(tab);
-		}
+	@Override
+	public void onTabReselected(Tab tab, FragmentTransaction ft) {
 	}
 
 	@Override
@@ -160,49 +199,6 @@ public class RepairIssueReportActivity extends CJayActivity implements
 	}
 
 	@Override
-	public void onPageScrollStateChanged(int position) {
-	}
-
-	@Override
-	public void onPageScrolled(int position, float positionOffset,
-			int positionOffsetPixels) {
-	}
-
-	@Override
 	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-	}
-
-	@Override
-	public void onTabReselected(Tab tab, FragmentTransaction ft) {
-	}
-
-	public class AuditorHomeTabPageAdaptor extends FragmentPagerAdapter {
-		private String[] locations;
-
-		public AuditorHomeTabPageAdaptor(FragmentManager fm, String[] locations) {
-			super(fm);
-			this.locations = locations;
-		}
-
-		public int getCount() {
-			return locations.length;
-		}
-
-		public Fragment getItem(int position) {
-			RepairIssueImageListFragment_ fragment;
-			switch (position) {
-			case 0:
-				fragment = new RepairIssueImageListFragment_();
-				fragment.setIssueUUID(mIssueUUID);
-				fragment.setType(CJayImage.TYPE_REPORT);
-				return fragment;
-			case 1:
-			default:
-				fragment = new RepairIssueImageListFragment_();
-				fragment.setIssueUUID(mIssueUUID);
-				fragment.setType(CJayImage.TYPE_REPAIRED);
-				return fragment;
-			}
-		}
 	}
 }

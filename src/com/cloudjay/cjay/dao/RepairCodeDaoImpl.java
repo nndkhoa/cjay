@@ -7,16 +7,25 @@ import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.cloudjay.cjay.model.RepairCode;
-import com.cloudjay.cjay.util.Logger;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
-public class RepairCodeDaoImpl extends BaseDaoImpl<RepairCode, Integer>
-		implements IRepairCodeDao {
+public class RepairCodeDaoImpl extends BaseDaoImpl<RepairCode, Integer> implements IRepairCodeDao {
 
-	public RepairCodeDaoImpl(ConnectionSource connectionSource)
-			throws SQLException {
+	public RepairCodeDaoImpl(ConnectionSource connectionSource) throws SQLException {
 		super(connectionSource, RepairCode.class);
+	}
+
+	@Override
+	public void addListRepairCodes(List<RepairCode> repairCodes) throws SQLException {
+		for (RepairCode repairCode : repairCodes) {
+			createOrUpdate(repairCode);
+		}
+	}
+
+	@Override
+	public void addRepairCode(RepairCode repairCode) throws SQLException {
+		create(repairCode);
 	}
 
 	public void bulkInsert(SQLiteDatabase db, List<RepairCode> repairCodes) {
@@ -40,24 +49,6 @@ public class RepairCodeDaoImpl extends BaseDaoImpl<RepairCode, Integer>
 	}
 
 	@Override
-	public List<RepairCode> getAllRepairCodes() throws SQLException {
-		return this.queryForAll();
-	}
-
-	@Override
-	public void addListRepairCodes(List<RepairCode> repairCodes)
-			throws SQLException {
-		for (RepairCode repairCode : repairCodes) {
-			this.createOrUpdate(repairCode);
-		}
-	}
-
-	@Override
-	public void addRepairCode(RepairCode repairCode) throws SQLException {
-		this.create(repairCode);
-	}
-
-	@Override
 	public void deleteAllRepairCodes() throws SQLException {
 		List<RepairCode> repairCodes = getAllRepairCodes();
 		for (RepairCode repairCode : repairCodes) {
@@ -66,23 +57,25 @@ public class RepairCodeDaoImpl extends BaseDaoImpl<RepairCode, Integer>
 	}
 
 	@Override
-	public boolean isEmpty() throws SQLException {
-		RepairCode repairCode = this.queryForFirst(this.queryBuilder()
-				.prepare());
-		if (null == repairCode)
-			return true;
+	public RepairCode findByCode(String repairCode) throws SQLException {
+		List<RepairCode> listRepairCodes = queryForEq(RepairCode.CODE, repairCode);
 
-		return false;
+		if (listRepairCodes.isEmpty())
+			return null;
+		else
+			return listRepairCodes.get(0);
 	}
 
-	public RepairCode findByCode(String repairCode) throws SQLException {
-		List<RepairCode> listRepairCodes = queryForEq(RepairCode.CODE,
-				repairCode);
+	@Override
+	public List<RepairCode> getAllRepairCodes() throws SQLException {
+		return queryForAll();
+	}
 
-		if (listRepairCodes.isEmpty()) {
-			return null;
-		} else {
-			return listRepairCodes.get(0);
-		}
+	@Override
+	public boolean isEmpty() throws SQLException {
+		RepairCode repairCode = queryForFirst(queryBuilder().prepare());
+		if (null == repairCode) return true;
+
+		return false;
 	}
 }

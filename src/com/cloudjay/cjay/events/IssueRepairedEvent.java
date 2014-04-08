@@ -17,26 +17,24 @@ public class IssueRepairedEvent {
 
 	private final List<Issue> listIssues;
 
-	public IssueRepairedEvent(List<Issue> Issues) {
-		listIssues = Issues;
-	}
-
 	public IssueRepairedEvent(Issue Issue) {
 		listIssues = new ArrayList<Issue>();
 		listIssues.add(Issue);
 	}
 
-	public List<Issue> getTargets() {
-		return listIssues;
+	public IssueRepairedEvent(List<Issue> Issues) {
+		listIssues = Issues;
 	}
 
 	public Issue getTarget() {
-		if (isSingleChange()) {
+		if (isSingleChange())
 			return listIssues.get(0);
-		} else {
-			throw new IllegalStateException(
-					"Can only call this when isSingleChange returns true");
-		}
+		else
+			throw new IllegalStateException("Can only call this when isSingleChange returns true");
+	}
+
+	public List<Issue> getTargets() {
+		return listIssues;
 	}
 
 	public boolean isSingleChange() {

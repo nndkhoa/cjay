@@ -11,38 +11,38 @@ import com.j256.ormlite.dao.Dao;
  */
 
 public interface IContainerSessionDao extends Dao<ContainerSession, String> {
-	List<ContainerSession> getAllContainerSessions() throws SQLException;
+	void addContainerSession(ContainerSession containerSession) throws SQLException;
 
-	List<ContainerSession> getLocalContainerSessions() throws SQLException;
-
-	List<ContainerSession> getListUploadContainerSessions() throws SQLException;
-
-	List<ContainerSession> getListCheckOutContainerSessions() throws SQLException;
-	
-	List<ContainerSession> getListReportedContainerSessions() throws SQLException;
-	
-	List<ContainerSession> getListReportingContainerSessions() throws SQLException;
-	
-	List<ContainerSession> getListNotReportedContainerSessions() throws SQLException;
-	
-	List<ContainerSession> getListPendingContainerSessions() throws SQLException;
-	
-	List<ContainerSession> getNotUploadedContainerSessions() throws SQLException;
-	
-	List<ContainerSession> getListFixedContainerSessions() throws SQLException;
-	
 	void addListContainerSessions(List<ContainerSession> containerSessions) throws SQLException;
 
-	void addContainerSession(ContainerSession containerSession) throws SQLException;
+	void delete(int id) throws SQLException;
 
 	void deleteAllContainerSessions() throws SQLException;
 
-	boolean isEmpty() throws SQLException;
-
 	ContainerSession findByUuid(String uuid) throws SQLException;
+
+	List<ContainerSession> getAllContainerSessions() throws SQLException;
+
+	List<ContainerSession> getListCheckOutContainerSessions() throws SQLException;
+
+	List<ContainerSession> getListFixedContainerSessions() throws SQLException;
+
+	List<ContainerSession> getListNotReportedContainerSessions() throws SQLException;
+
+	List<ContainerSession> getListPendingContainerSessions() throws SQLException;
+
+	List<ContainerSession> getListReportedContainerSessions() throws SQLException;
+
+	List<ContainerSession> getListReportingContainerSessions() throws SQLException;
+
+	List<ContainerSession> getListUploadContainerSessions() throws SQLException;
+
+	List<ContainerSession> getLocalContainerSessions() throws SQLException;
 
 	ContainerSession getNextWaiting() throws SQLException;
 
-	void delete(int id) throws SQLException;
+	List<ContainerSession> getNotUploadedContainerSessions() throws SQLException;
+
+	boolean isEmpty() throws SQLException;
 
 }

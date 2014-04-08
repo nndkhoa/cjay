@@ -16,16 +16,16 @@ public class CJayImageAddedEvent {
 	private final String mTag;
 
 	public CJayImageAddedEvent(CJayImage cJayImage, String tag) {
-		this.mCJayImage = cJayImage;
-		this.mTag = tag;
+		mCJayImage = cJayImage;
+		mTag = tag;
 	}
 
 	public CJayImage getCJayImage() {
-		return this.mCJayImage;
+		return mCJayImage;
 	}
 
 	public String getTag() {
-		return this.mTag;
+		return mTag;
 	}
 
 }

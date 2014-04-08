@@ -1,15 +1,5 @@
 package com.cloudjay.cjay.adapter;
 
-import com.cloudjay.cjay.R;
-
-import com.cloudjay.cjay.model.Container;
-import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.model.Operator;
-import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.StringHelper;
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
@@ -21,27 +11,16 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class UploadCursorAdapter extends CursorAdapter implements
-		Filterable {
+import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.model.Container;
+import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.StringHelper;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
-	private int layout;
-	private LayoutInflater inflater;
-	private ImageLoader imageLoader;
-	public boolean isScrolling;
-
-	@SuppressWarnings("deprecation")
-	public UploadCursorAdapter(Context context, Cursor c) {
-		super(context, c);
-	}
-
-	public UploadCursorAdapter(Context context, int layout, Cursor c,
-			int flags) {
-		super(context, c, flags);
-		this.layout = layout;
-		this.inflater = LayoutInflater.from(context);
-		this.mCursor = c;
-		this.imageLoader = ImageLoader.getInstance();
-	}
+public class UploadCursorAdapter extends CursorAdapter implements Filterable {
 
 	private static class ViewHolder {
 
@@ -52,6 +31,25 @@ public class UploadCursorAdapter extends CursorAdapter implements
 		public ImageView itemPictureView;
 		public ImageView validationImageView;
 
+	}
+
+	private int layout;
+	private LayoutInflater inflater;
+	private ImageLoader imageLoader;
+
+	public boolean isScrolling;
+
+	@SuppressWarnings("deprecation")
+	public UploadCursorAdapter(Context context, Cursor c) {
+		super(context, c);
+	}
+
+	public UploadCursorAdapter(Context context, int layout, Cursor c, int flags) {
+		super(context, c, flags);
+		this.layout = layout;
+		inflater = LayoutInflater.from(context);
+		mCursor = c;
+		imageLoader = ImageLoader.getInstance();
 	}
 
 	@Override
@@ -66,38 +64,27 @@ public class UploadCursorAdapter extends CursorAdapter implements
 			Logger.Log("Holder inside bindView is NULL");
 
 			holder = new ViewHolder();
-			holder.containerIdView = (TextView) view
-					.findViewById(R.id.feed_item_container_id);
-			holder.containerOwnerView = (TextView) view
-					.findViewById(R.id.feed_item_container_owner);
-			holder.importDateView = (TextView) view
-					.findViewById(R.id.feed_item_container_import_date);
-			holder.exportDateView = (TextView) view
-					.findViewById(R.id.feed_item_container_export_date);
-			holder.itemPictureView = (ImageView) view
-					.findViewById(R.id.feed_item_picture);
-			holder.validationImageView = (ImageView) view
-					.findViewById(R.id.feed_item_validator);
+			holder.containerIdView = (TextView) view.findViewById(R.id.feed_item_container_id);
+			holder.containerOwnerView = (TextView) view.findViewById(R.id.feed_item_container_owner);
+			holder.importDateView = (TextView) view.findViewById(R.id.feed_item_container_import_date);
+			holder.exportDateView = (TextView) view.findViewById(R.id.feed_item_container_export_date);
+			holder.itemPictureView = (ImageView) view.findViewById(R.id.feed_item_picture);
+			holder.validationImageView = (ImageView) view.findViewById(R.id.feed_item_validator);
 			view.setTag(holder);
 		}
 
 		// get data from cursor and bind to holder
-		String importDate = cursor.getString(cursor
-				.getColumnIndexOrThrow(ContainerSession.FIELD_CHECK_IN_TIME));
-		importDate = StringHelper.getRelativeDate(
-				CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE, importDate);
+		String importDate = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_CHECK_IN_TIME));
+		importDate = StringHelper.getRelativeDate(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE, importDate);
 		holder.importDateView.setText(importDate);
 
-		String containerId = cursor.getString(cursor
-				.getColumnIndexOrThrow(Container.CONTAINER_ID));
+		String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
 		holder.containerIdView.setText(containerId);
 
-		String operator = cursor.getString(cursor
-				.getColumnIndexOrThrow(Operator.FIELD_NAME));
+		String operator = cursor.getString(cursor.getColumnIndexOrThrow(Operator.FIELD_NAME));
 		holder.containerOwnerView.setText(operator);
 
-		String url = cursor.getString(cursor
-				.getColumnIndexOrThrow(ContainerSession.FIELD_IMAGE_ID_PATH));
+		String url = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_IMAGE_ID_PATH));
 		if (!TextUtils.isEmpty(url)) {
 			imageLoader.displayImage(url, holder.itemPictureView);
 		} else {
@@ -106,16 +93,14 @@ public class UploadCursorAdapter extends CursorAdapter implements
 
 		boolean isValidForUpload = false;
 		if (cursor.getColumnIndex("export_image_count") >= 0) {
-			isValidForUpload = cursor.getInt(cursor
-					.getColumnIndexOrThrow("export_image_count")) > 0;
+			isValidForUpload = cursor.getInt(cursor.getColumnIndexOrThrow("export_image_count")) > 0;
 		} else if (cursor.getColumnIndex("import_image_count") >= 0) {
-			isValidForUpload = cursor.getInt(cursor
-					.getColumnIndexOrThrow("import_image_count")) > 0;
+			isValidForUpload = cursor.getInt(cursor.getColumnIndexOrThrow("import_image_count")) > 0;
 		}
 		if (isValidForUpload) {
-			holder.validationImageView.setVisibility(ImageView.VISIBLE);
+			holder.validationImageView.setVisibility(View.VISIBLE);
 		} else {
-			holder.validationImageView.setVisibility(ImageView.INVISIBLE);
+			holder.validationImageView.setVisibility(View.INVISIBLE);
 		}
 	}
 
@@ -124,18 +109,12 @@ public class UploadCursorAdapter extends CursorAdapter implements
 		View v = inflater.inflate(layout, parent, false);
 
 		ViewHolder holder = new ViewHolder();
-		holder.containerIdView = (TextView) v
-				.findViewById(R.id.feed_item_container_id);
-		holder.containerOwnerView = (TextView) v
-				.findViewById(R.id.feed_item_container_owner);
-		holder.importDateView = (TextView) v
-				.findViewById(R.id.feed_item_container_import_date);
-		holder.exportDateView = (TextView) v
-				.findViewById(R.id.feed_item_container_export_date);
-		holder.itemPictureView = (ImageView) v
-				.findViewById(R.id.feed_item_picture);
-		holder.validationImageView = (ImageView) v
-				.findViewById(R.id.feed_item_validator);
+		holder.containerIdView = (TextView) v.findViewById(R.id.feed_item_container_id);
+		holder.containerOwnerView = (TextView) v.findViewById(R.id.feed_item_container_owner);
+		holder.importDateView = (TextView) v.findViewById(R.id.feed_item_container_import_date);
+		holder.exportDateView = (TextView) v.findViewById(R.id.feed_item_container_export_date);
+		holder.itemPictureView = (ImageView) v.findViewById(R.id.feed_item_picture);
+		holder.validationImageView = (ImageView) v.findViewById(R.id.feed_item_validator);
 
 		v.setTag(holder);
 

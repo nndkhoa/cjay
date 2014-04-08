@@ -11,13 +11,13 @@ import com.j256.ormlite.dao.Dao;
  */
 
 public interface IUserLogDao extends Dao<UserLog, Integer> {
-	List<UserLog> getAllLogs() throws SQLException;
-
 	void addListLogs(List<UserLog> userLogs) throws SQLException;
 
 	void addLog(UserLog userLog) throws SQLException;
 
 	void deleteAllLogs() throws SQLException;
+
+	List<UserLog> getAllLogs() throws SQLException;
 
 	boolean isEmpty() throws SQLException;
 }

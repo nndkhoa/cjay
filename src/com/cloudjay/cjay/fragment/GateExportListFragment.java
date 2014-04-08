@@ -71,8 +71,7 @@ import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_gate_export)
 @OptionsMenu(R.menu.menu_gate_export)
-public class GateExportListFragment extends SherlockFragment implements
-		OnRefreshListener, LoaderCallbacks<Cursor> {
+public class GateExportListFragment extends SherlockFragment implements OnRefreshListener, LoaderCallbacks<Cursor> {
 
 	public final static String LOG_TAG = "GateExportListFragment";
 	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_GATE_EXPORT;
@@ -81,7 +80,7 @@ public class GateExportListFragment extends SherlockFragment implements
 	private ContainerSession mSelectedContainerSession = null;
 	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
 
-	private int mItemLayout = R.layout.list_item_container;
+	private final int mItemLayout = R.layout.list_item_container;
 	private int mCurrentPosition = -1;
 
 	@SystemService
@@ -108,190 +107,9 @@ public class GateExportListFragment extends SherlockFragment implements
 	PullToRefreshLayout mPullToRefreshLayout;
 	GateContainerCursorAdapter cursorAdapter;
 
-	public GateExportListFragment() {
-	}
-
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-
-		ViewGroup viewGroup = (ViewGroup) view;
-
-		// As we're using a ListFragment we create a PullToRefreshLayout
-		// manually
-		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
-
-		// We can now setup the PullToRefreshLayout
-		ActionBarPullToRefresh
-				.from(getActivity())
-				// We need to insert the PullToRefreshLayout into the Fragment's
-				// ViewGroup
-				.insertLayoutInto(viewGroup)
-				// Here we mark just the ListView and it's Empty View as
-				// pullable
-				.theseChildrenArePullable(R.id.container_list,
-						android.R.id.empty).listener(this)
-				.setup(mPullToRefreshLayout);
-	}
-
 	int totalItems = 0;
 
-	void setTotalItems(int val) {
-		totalItems = val;
-		EventBus.getDefault().post(new ListItemChangedEvent(1, totalItems));
-	}
-
-	@AfterViews
-	void afterViews() {
-
-		try {
-			containerSessionDaoImpl = CJayClient.getInstance()
-					.getDatabaseManager().getHelper(getActivity())
-					.getContainerSessionDaoImpl();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		mSearchEditText.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void afterTextChanged(Editable arg0) {
-				if (cursorAdapter != null) {
-					cursorAdapter.getFilter().filter(arg0.toString());
-				}
-			}
-
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-			}
-
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-			}
-		});
-
-		mSearchEditText
-				.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-
-					@Override
-					public boolean onEditorAction(TextView textView, int id,
-							KeyEvent keyEvent) {
-						if (id == EditorInfo.IME_ACTION_SEARCH) {
-
-							inputMethodManager.hideSoftInputFromWindow(
-									mSearchEditText.getWindowToken(), 0);
-
-							return true;
-						}
-						return false;
-					}
-
-				});
-
-		mOperators = (ArrayList<Operator>) DataCenter.getInstance()
-				.getListOperators(getActivity());
-
-		getLoaderManager().initLoader(LOADER_ID, null, this);
-
-		mFeedListView.setTextFilterEnabled(true);
-		mFeedListView.setScrollingCacheEnabled(false);
-		mFeedListView.setOnScrollListener(new OnScrollListener() {
-
-			@Override
-			public void onScrollStateChanged(AbsListView view, int scrollState) {
-				if (scrollState != 0) {
-					((GateContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
-				} else {
-					((GateContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
-					((GateContainerCursorAdapter) mFeedListView.getAdapter())
-							.notifyDataSetChanged();
-				}
-
-				inputMethodManager.hideSoftInputFromWindow(
-						mSearchEditText.getWindowToken(), 0);
-			}
-
-			@Override
-			public void onScroll(AbsListView view, int firstVisibleItem,
-					int visibleItemCount, int totalItemCount) {
-			}
-		});
-
-		mFeedListView.setEmptyView(mEmptyElement);
-	}
-
-	@Override
-	public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-		Context context = getActivity();
-
-		return new CJayCursorLoader(context) {
-			@Override
-			public Cursor loadInBackground() {
-				Cursor cursor = DataCenter.getInstance()
-						.getCheckOutContainerSessionCursor(getContext());
-
-				if (cursor != null) {
-					// Ensure the cursor window is filled
-					setTotalItems(cursor.getCount());
-					cursor.registerContentObserver(mObserver);
-				}
-
-				return cursor;
-			}
-		};
-	}
-
-	@Override
-	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
-		if (cursorAdapter == null) {
-			cursorAdapter = new GateContainerCursorAdapter(getActivity(),
-					mItemLayout, cursor, 0);
-
-			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
-				@Override
-				public Cursor runQuery(CharSequence constraint) {
-					return DataCenter.getInstance().filterCheckoutCursor(
-							getActivity(), constraint);
-				}
-			});
-
-			mFeedListView.setAdapter(cursorAdapter);
-
-		} else {
-			cursorAdapter.swapCursor(cursor);
-		}
-	}
-
-	@Override
-	public void onLoaderReset(Loader<Cursor> arg0) {
-		cursorAdapter.swapCursor(null);
-	}
-
-	void hideMenuItems() {
-
-		mSelectedContainerSession = null;
-		mFeedListView.setItemChecked(-1, true);
-		getActivity().supportInvalidateOptionsMenu();
-
-	}
-
-	@OptionsItem(R.id.menu_upload)
-	void uploadMenuItemSelected() {
-
-		synchronized (this) {
-			if (null != mSelectedContainerSession) {
-
-				mSelectedContainerSession
-						.setUploadType(ContainerSession.TYPE_OUT);
-				mSelectedContainerSession
-						.setCheckOutTime(StringHelper
-								.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
-
-				CJayApplication.uploadContainerSesison(getActivity(),
-						mSelectedContainerSession);
-
-				hideMenuItems();
-			}
-		}
+	public GateExportListFragment() {
 	}
 
 	@Click(R.id.add_button)
@@ -305,48 +123,98 @@ public class GateExportListFragment extends SherlockFragment implements
 			containerId = "";
 		}
 
-		showContainerDetailDialog(containerId, "",
-				AddContainerDialog.CONTAINER_DIALOG_ADD);
+		showContainerDetailDialog(containerId, "", AddContainerDialog.CONTAINER_DIALOG_ADD);
+	}
+
+	@AfterViews
+	void afterViews() {
+
+		try {
+			containerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity())
+												.getContainerSessionDaoImpl();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		mSearchEditText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				if (cursorAdapter != null) {
+					cursorAdapter.getFilter().filter(arg0.toString());
+				}
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			}
+		});
+
+		mSearchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+			@Override
+			public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+				if (id == EditorInfo.IME_ACTION_SEARCH) {
+
+					inputMethodManager.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
+
+					return true;
+				}
+				return false;
+			}
+
+		});
+
+		mOperators = (ArrayList<Operator>) DataCenter.getInstance().getListOperators(getActivity());
+
+		getLoaderManager().initLoader(LOADER_ID, null, this);
+
+		mFeedListView.setTextFilterEnabled(true);
+		mFeedListView.setScrollingCacheEnabled(false);
+		mFeedListView.setOnScrollListener(new OnScrollListener() {
+
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+			}
+
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				if (scrollState != 0) {
+					((GateContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
+				} else {
+					((GateContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
+					((GateContainerCursorAdapter) mFeedListView.getAdapter()).notifyDataSetChanged();
+				}
+
+				inputMethodManager.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
+			}
+		});
+
+		mFeedListView.setEmptyView(mEmptyElement);
+	}
+
+	void hideMenuItems() {
+
+		mSelectedContainerSession = null;
+		mFeedListView.setItemChecked(-1, true);
+		getActivity().supportInvalidateOptionsMenu();
+
 	}
 
 	@ItemClick(R.id.container_list)
 	void listItemClicked(int position) {
 		hideMenuItems();
-		
+
 		mCurrentPosition = position;
 		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
-		String uuidString = cursor.getString(cursor
-				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
-		String containerId = cursor.getString(cursor
-				.getColumnIndexOrThrow(Container.CONTAINER_ID));
-		
-		CJayApplication.openPhotoGridView(getActivity(),
-				uuidString,
-				containerId,					
-				CJayImage.TYPE_EXPORT,
-				CJayImage.TYPE_REPAIRED,
-				GateImportListFragment.LOG_TAG);
+		String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+		String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
 
-//		mCurrentPosition = position;
-//		// mFeedListView.setItemChecked(mCurrentPosition, true);
-//
-//		// clear current selection
-//		hideMenuItems();
-//
-//		// get the selected container session and open camera
-//		Cursor cursor = (Cursor) cursorAdapter.getItem(mCurrentPosition);
-//		String uuidString = cursor.getString(cursor
-//				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
-//
-//		try {
-//			mSelectedContainerSession = containerSessionDaoImpl
-//					.findByUuid(uuidString);
-//			CJayApplication.gotoCamera(getActivity(),
-//					mSelectedContainerSession, CJayImage.TYPE_EXPORT, LOG_TAG);
-//
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
+		CJayApplication.openPhotoGridView(	getActivity(), uuidString, containerId, CJayImage.TYPE_EXPORT,
+											CJayImage.TYPE_REPORT, GateImportListFragment.LOG_TAG);
 	}
 
 	@ItemLongClick(R.id.container_list)
@@ -356,16 +224,137 @@ public class GateExportListFragment extends SherlockFragment implements
 		mFeedListView.setItemChecked(position, true);
 
 		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
-		String uuidString = cursor.getString(cursor
-				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+		String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
 		try {
-			mSelectedContainerSession = containerSessionDaoImpl
-					.findByUuid(uuidString);
+			mSelectedContainerSession = containerSessionDaoImpl.findByUuid(uuidString);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
 		getActivity().supportInvalidateOptionsMenu();
+	}
+
+	public void OnContainerInputCompleted(String containerId, String operatorName, int mode) {
+
+		// Get the container id and container operator code
+		String operatorCode = "";
+		for (Operator operator : mOperators) {
+			if (operator.getName().equals(operatorName)) {
+				operatorCode = operator.getCode();
+				break;
+			}
+		}
+
+		if (TextUtils.isEmpty(containerId) || TextUtils.isEmpty(operatorCode)) return;
+
+		switch (mode) {
+			case AddContainerDialog.CONTAINER_DIALOG_ADD:
+
+				Activity activity = getActivity();
+				String currentTimeStamp = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+
+				String depotCode = "";
+				if (getActivity() instanceof CJayActivity) {
+					depotCode = ((CJayActivity) activity).getSession().getDepot().getDepotCode();
+				}
+
+				ContainerSession containerSession = new ContainerSession(activity, containerId, operatorCode,
+																			currentTimeStamp, depotCode);
+				containerSession.setOnLocal(true);
+				containerSession.setExport(true);
+
+				try {
+					containerSessionDaoImpl.addContainerSession(containerSession);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+
+				EventBus.getDefault().post(new ContainerSessionChangedEvent(containerSession));
+
+				CJayApplication.gotoCamera(activity, containerSession, CJayImage.TYPE_EXPORT, LOG_TAG);
+
+				break;
+		}
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		EventBus.getDefault().register(this);
+		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+		Context context = getActivity();
+
+		return new CJayCursorLoader(context) {
+			@Override
+			public Cursor loadInBackground() {
+				Cursor cursor = DataCenter.getInstance().getCheckOutContainerSessionCursor(getContext());
+
+				if (cursor != null) {
+					// Ensure the cursor window is filled
+					setTotalItems(cursor.getCount());
+					cursor.registerContentObserver(mObserver);
+				}
+
+				return cursor;
+			}
+		};
+	}
+
+	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
+
+	public void onEvent(ContainerSessionEnqueueEvent event) {
+		Logger.Log("ContainerSessionEnqueueEvent");
+		refresh();
+	}
+
+	public void onEvent(PostLoadDataEvent event) {
+		Logger.Log("PostLoadDataEvent");
+		mLoadMoreDataLayout.setVisibility(View.GONE);
+	}
+
+	public void onEvent(PreLoadDataEvent event) {
+		Logger.Log("PreLoadDataEvent");
+		mLoadMoreDataLayout.setVisibility(View.VISIBLE);
+	}
+
+	public void onEventMainThread(ContainerSessionChangedEvent event) {
+		Logger.Log("ContainerSessionChangedEvent");
+		refresh();
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		cursorAdapter.swapCursor(null);
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+		if (cursorAdapter == null) {
+			cursorAdapter = new GateContainerCursorAdapter(getActivity(), mItemLayout, cursor, 0);
+
+			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+				@Override
+				public Cursor runQuery(CharSequence constraint) {
+					return DataCenter.getInstance().filterCheckoutCursor(getActivity(), constraint);
+				}
+			});
+
+			mFeedListView.setAdapter(cursorAdapter);
+
+		} else {
+			cursorAdapter.swapCursor(cursor);
+		}
+	}
+
+	public void OnOperatorSelected(String containerId, String operatorName, int mode) {
+		showContainerDetailDialog(containerId, operatorName, mode);
 	}
 
 	@Override
@@ -377,107 +366,39 @@ public class GateExportListFragment extends SherlockFragment implements
 	}
 
 	@Override
-	public void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
-	}
+	public void onRefreshStarted(View view) {
+		new AsyncTask<Void, Void, Void>() {
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		EventBus.getDefault().register(this);
-		super.onCreate(savedInstanceState);
-	}
+			@Override
+			protected Void doInBackground(Void... params) {
 
-	public void showContainerDetailDialog(String containerId,
-			String operatorName, int mode) {
+				Logger.Log("onRefreshStarted");
 
-		FragmentManager fm = getActivity().getSupportFragmentManager();
-		AddContainerDialog addContainerDialog = new AddContainerDialog();
-		addContainerDialog.setContainerId(containerId);
-		addContainerDialog.setOperatorName(operatorName);
-		addContainerDialog.setMode(mode);
-		addContainerDialog.setParent(this);
-		addContainerDialog.show(fm, "add_container_dialog");
+				try {
+					DataCenter.getInstance().fetchData(getActivity());
+					DataCenter.getDatabaseHelper(getActivity()).addUsageLog("#refresh in fragment #GateExport");
 
-	}
+				} catch (NoConnectionException e) {
 
-	public void OnOperatorSelected(String containerId, String operatorName,
-			int mode) {
-		showContainerDetailDialog(containerId, operatorName, mode);
-	}
+					((CJayActivity) getActivity()).showCrouton(R.string.alert_no_network);
+					e.printStackTrace();
 
-	public void OnContainerInputCompleted(String containerId,
-			String operatorName, int mode) {
+				} catch (NullSessionException e) {
 
-		// Get the container id and container operator code
-		String operatorCode = "";
-		for (Operator operator : mOperators) {
-			if (operator.getName().equals(operatorName)) {
-				operatorCode = operator.getCode();
-				break;
-			}
-		}
-
-		if (TextUtils.isEmpty(containerId) || TextUtils.isEmpty(operatorCode)) {
-			return;
-		}
-
-		switch (mode) {
-		case AddContainerDialog.CONTAINER_DIALOG_ADD:
-
-			Activity activity = getActivity();
-			String currentTimeStamp = StringHelper
-					.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-
-			String depotCode = "";
-			if (getActivity() instanceof CJayActivity) {
-				depotCode = ((CJayActivity) activity).getSession().getDepot()
-						.getDepotCode();
+					CJayApplication.logOutInstantly(getActivity());
+					onDestroy();
+				}
+				return null;
 			}
 
-			ContainerSession containerSession = new ContainerSession(activity,
-					containerId, operatorCode, currentTimeStamp, depotCode);
-			containerSession.setOnLocal(true);
-			containerSession.setExport(true);
+			@Override
+			protected void onPostExecute(Void result) {
+				super.onPostExecute(result);
 
-			try {
-				containerSessionDaoImpl.addContainerSession(containerSession);
-			} catch (SQLException e) {
-				e.printStackTrace();
+				// Notify PullToRefreshLayout that the refresh has finished
+				mPullToRefreshLayout.setRefreshComplete();
 			}
-
-			EventBus.getDefault().post(
-					new ContainerSessionChangedEvent(containerSession));
-
-			CJayApplication.gotoCamera(activity, containerSession,
-					CJayImage.TYPE_EXPORT, LOG_TAG);
-
-			break;
-		}
-	}
-
-	public void onEvent(PreLoadDataEvent event) {
-		Logger.Log("PreLoadDataEvent");
-		mLoadMoreDataLayout.setVisibility(View.VISIBLE);
-	}
-
-	public void onEvent(PostLoadDataEvent event) {
-		Logger.Log("PostLoadDataEvent");
-		mLoadMoreDataLayout.setVisibility(View.GONE);
-	}
-
-	public void onEvent(ContainerSessionEnqueueEvent event) {
-		Logger.Log("ContainerSessionEnqueueEvent");
-		refresh();
-	}
-
-	public void onEventMainThread(ContainerSessionChangedEvent event) {
-		Logger.Log("ContainerSessionChangedEvent");
-		refresh();
-	}
-
-	public void refresh() {
-		getLoaderManager().restartLoader(LOADER_ID, null, this);
+		}.execute();
 	}
 
 	@Override
@@ -502,40 +423,60 @@ public class GateExportListFragment extends SherlockFragment implements
 	}
 
 	@Override
-	public void onRefreshStarted(View view) {
-		new AsyncTask<Void, Void, Void>() {
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
 
-			@Override
-			protected Void doInBackground(Void... params) {
+		ViewGroup viewGroup = (ViewGroup) view;
 
-				Logger.Log("onRefreshStarted");
+		// As we're using a ListFragment we create a PullToRefreshLayout
+		// manually
+		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
 
-				try {
-					DataCenter.getInstance().fetchData(getActivity());
-					DataCenter.getDatabaseHelper(getActivity()).addUsageLog(
-							"#refresh in fragment #GateExport");
+		// We can now setup the PullToRefreshLayout
+		ActionBarPullToRefresh.from(getActivity())
+								// We need to insert the PullToRefreshLayout into the Fragment's
+								// ViewGroup
+								.insertLayoutInto(viewGroup)
+								// Here we mark just the ListView and it's Empty View as
+								// pullable
+								.theseChildrenArePullable(R.id.container_list, android.R.id.empty).listener(this)
+								.setup(mPullToRefreshLayout);
+	}
 
-				} catch (NoConnectionException e) {
+	public void refresh() {
+		getLoaderManager().restartLoader(LOADER_ID, null, this);
+	}
 
-					((CJayActivity) getActivity())
-							.showCrouton(R.string.alert_no_network);
-					e.printStackTrace();
+	void setTotalItems(int val) {
+		totalItems = val;
+		EventBus.getDefault().post(new ListItemChangedEvent(1, totalItems));
+	}
 
-				} catch (NullSessionException e) {
+	public void showContainerDetailDialog(String containerId, String operatorName, int mode) {
 
-					CJayApplication.logOutInstantly(getActivity());
-					onDestroy();
-				}
-				return null;
+		FragmentManager fm = getActivity().getSupportFragmentManager();
+		AddContainerDialog addContainerDialog = new AddContainerDialog();
+		addContainerDialog.setContainerId(containerId);
+		addContainerDialog.setOperatorName(operatorName);
+		addContainerDialog.setMode(mode);
+		addContainerDialog.setParent(this);
+		addContainerDialog.show(fm, "add_container_dialog");
+
+	}
+
+	@OptionsItem(R.id.menu_upload)
+	void uploadMenuItemSelected() {
+
+		synchronized (this) {
+			if (null != mSelectedContainerSession) {
+
+				mSelectedContainerSession.setUploadType(ContainerSession.TYPE_OUT);
+				mSelectedContainerSession.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+
+				CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
+
+				hideMenuItems();
 			}
-
-			@Override
-			protected void onPostExecute(Void result) {
-				super.onPostExecute(result);
-
-				// Notify PullToRefreshLayout that the refresh has finished
-				mPullToRefreshLayout.setRefreshComplete();
-			}
-		}.execute();
+		}
 	}
 }

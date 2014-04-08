@@ -23,31 +23,31 @@ public class IssueReportPhotoFragment extends IssueReportFragment {
 	void afterViews() {
 		mImageLoader = ImageLoader.getInstance();
 		try {
-			mImageLoader.displayImage(mCJayImage.getUri(), mImageView);	
+			mImageLoader.displayImage(mCJayImage.getUri(), mImageView);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	@Override
-	public void setIssue(Issue issue) {
+	public void hideKeyboard() {
 	}
-	
+
 	public void setCJayImage(CJayImage cJayImage) {
 		mCJayImage = cJayImage;
 	}
 
 	@Override
-	public boolean validateAndSaveData() {
-		return true;
+	public void setIssue(Issue issue) {
 	}
 
 	@Override
 	public void showKeyboard() {
 	}
-	
+
 	@Override
-	public void hideKeyboard() {
+	public boolean validateAndSaveData() {
+		return true;
 	}
 }

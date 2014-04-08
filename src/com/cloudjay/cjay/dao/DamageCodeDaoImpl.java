@@ -10,12 +10,22 @@ import com.cloudjay.cjay.model.DamageCode;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
-public class DamageCodeDaoImpl extends BaseDaoImpl<DamageCode, Integer>
-		implements IDamageCodeDao {
+public class DamageCodeDaoImpl extends BaseDaoImpl<DamageCode, Integer> implements IDamageCodeDao {
 
-	public DamageCodeDaoImpl(ConnectionSource connectionSource)
-			throws SQLException {
+	public DamageCodeDaoImpl(ConnectionSource connectionSource) throws SQLException {
 		super(connectionSource, DamageCode.class);
+	}
+
+	@Override
+	public void addDamageCode(DamageCode damageCode) throws SQLException {
+		createOrUpdate(damageCode);
+	}
+
+	@Override
+	public void addListDamageCodes(List<DamageCode> damageCodes) throws SQLException {
+		for (DamageCode damageCode : damageCodes) {
+			createOrUpdate(damageCode);
+		}
 	}
 
 	public void bulkInsert(SQLiteDatabase db, List<DamageCode> damageCodes) {
@@ -40,24 +50,6 @@ public class DamageCodeDaoImpl extends BaseDaoImpl<DamageCode, Integer>
 	}
 
 	@Override
-	public List<DamageCode> getAllDamageCodes() throws SQLException {
-		return this.queryForAll();
-	}
-
-	@Override
-	public void addListDamageCodes(List<DamageCode> damageCodes)
-			throws SQLException {
-		for (DamageCode damageCode : damageCodes) {
-			this.createOrUpdate(damageCode);
-		}
-	}
-
-	@Override
-	public void addDamageCode(DamageCode damageCode) throws SQLException {
-		this.createOrUpdate(damageCode);
-	}
-
-	@Override
 	public void deleteAllDamageCodes() throws SQLException {
 		List<DamageCode> damageCodes = getAllDamageCodes();
 		for (DamageCode damageCode : damageCodes) {
@@ -65,24 +57,25 @@ public class DamageCodeDaoImpl extends BaseDaoImpl<DamageCode, Integer>
 		}
 	}
 
-	@Override
-	public boolean isEmpty() throws SQLException {
-		DamageCode damageCode = this.queryForFirst(this.queryBuilder()
-				.prepare());
-		if (null == damageCode)
-			return true;
+	public DamageCode findByCode(String damageCode) throws SQLException {
+		List<DamageCode> listDamageCodes = queryForEq(DamageCode.CODE, damageCode);
 
-		return false;
+		if (listDamageCodes.isEmpty())
+			return null;
+		else
+			return listDamageCodes.get(0);
 	}
 
-	public DamageCode findByCode(String damageCode) throws SQLException {
-		List<DamageCode> listDamageCodes = queryForEq(DamageCode.CODE,
-				damageCode);
+	@Override
+	public List<DamageCode> getAllDamageCodes() throws SQLException {
+		return queryForAll();
+	}
 
-		if (listDamageCodes.isEmpty()) {
-			return null;
-		} else {
-			return listDamageCodes.get(0);
-		}
+	@Override
+	public boolean isEmpty() throws SQLException {
+		DamageCode damageCode = queryForFirst(queryBuilder().prepare());
+		if (null == damageCode) return true;
+
+		return false;
 	}
 }

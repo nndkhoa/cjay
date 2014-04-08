@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.model;
 
 import java.util.Collection;
+
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
@@ -11,13 +12,6 @@ public class Container {
 
 	public static final String ID = "_id";
 	public static final String CONTAINER_ID = "container_id";
-
-	public Container(String container_id) {
-		this.container_id = container_id;
-	}
-
-	public Container() {
-	}
 
 	@DatabaseField(columnName = ID, generatedId = true, allowGeneratedIdInsert = true)
 	int id;
@@ -34,55 +28,62 @@ public class Container {
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	Depot depot;
 
-	public Depot getDepot() {
-		return depot;
+	public Container() {
 	}
 
-	public void setDepot(Depot depot) {
-		this.depot = depot;
-	}
-
-	public String getFullContainerId() {
-		if (operator != null) {
-			return operator.getId() + container_id;
-		} else {
-			return container_id;
-		}
+	public Container(String container_id) {
+		this.container_id = container_id;
 	}
 
 	public String getContainerId() {
 		return container_id;
 	}
 
-	public void setContainerId(String containerId) {
-		this.container_id = containerId;
-	}
-
-	public Operator getOperator() {
-		return operator;
-	}
-
-	public void setOperator(Operator operator) {
-		this.operator = operator;
-	}
-
 	public Collection<ContainerSession> getContainerSessions() {
 		return containerSessions;
 	}
 
-	public void setContainerSessions(Collection<ContainerSession> newSessions) {
-		this.containerSessions = newSessions;
+	public Depot getDepot() {
+		return depot;
 	}
 
-	public String toString() {
-		return operator.getId() + container_id;
+	public String getFullContainerId() {
+		if (operator != null)
+			return operator.getId() + container_id;
+		else
+			return container_id;
 	}
 
 	public int getId() {
 		return id;
 	}
 
+	public Operator getOperator() {
+		return operator;
+	}
+
+	public void setContainerId(String containerId) {
+		container_id = containerId;
+	}
+
+	public void setContainerSessions(Collection<ContainerSession> newSessions) {
+		containerSessions = newSessions;
+	}
+
+	public void setDepot(Depot depot) {
+		this.depot = depot;
+	}
+
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public void setOperator(Operator operator) {
+		this.operator = operator;
+	}
+
+	@Override
+	public String toString() {
+		return operator.getId() + container_id;
 	}
 }

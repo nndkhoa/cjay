@@ -23,39 +23,36 @@ public class UploadsListBaseAdapter extends BaseAdapter {
 	public UploadsListBaseAdapter(Context context) {
 		mContext = context;
 		mLayoutInflater = LayoutInflater.from(mContext);
-		mItems = DataCenter.getInstance().getListUploadContainerSessions(
-				mContext);
+		mItems = DataCenter.getInstance().getListUploadContainerSessions(mContext);
 	}
 
-	public UploadsListBaseAdapter(Context context,
-			List<ContainerSession> listItems) {
+	public UploadsListBaseAdapter(Context context, List<ContainerSession> listItems) {
 		mContext = context;
 		mLayoutInflater = LayoutInflater.from(mContext);
 		mItems = listItems;
 
 	}
 
-	public void setContainerSessions(List<ContainerSession> listItems) {
-		this.mItems = listItems;
-	}
-
+	@Override
 	public int getCount() {
 		return null != mItems ? mItems.size() : 0;
 	}
 
-	public long getItemId(int position) {
-		return position;
-	}
-
+	@Override
 	public ContainerSession getItem(int position) {
 		return mItems.get(position);
 	}
 
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
+
+	@Override
 	public View getView(int position, View view, ViewGroup parent) {
 
 		if (null == view) {
-			view = mLayoutInflater.inflate(R.layout.item_list_upload, parent,
-					false);
+			view = mLayoutInflater.inflate(R.layout.item_list_upload, parent, false);
 		}
 
 		ContainerSession containerSession = getItem(position);
@@ -64,5 +61,9 @@ public class UploadsListBaseAdapter extends BaseAdapter {
 		layout.setContainerSession(containerSession);
 
 		return view;
+	}
+
+	public void setContainerSessions(List<ContainerSession> listItems) {
+		mItems = listItems;
 	}
 }

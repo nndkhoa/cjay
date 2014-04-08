@@ -13,10 +13,6 @@ public abstract class CJayCursorLoader extends AsyncTaskLoader<Cursor> {
 		super(context);
 	}
 
-	/* Runs on a worker thread */
-	@Override
-	public abstract Cursor loadInBackground();
-
 	/* Runs on the UI thread */
 	@Override
 	public void deliverResult(Cursor cursor) {
@@ -40,6 +36,30 @@ public abstract class CJayCursorLoader extends AsyncTaskLoader<Cursor> {
 		if (oldCursor != null && oldCursor != cursor && !oldCursor.isClosed()) {
 			oldCursor.close();
 		}
+	}
+
+	/* Runs on a worker thread */
+	@Override
+	public abstract Cursor loadInBackground();
+
+	@Override
+	public void onCanceled(Cursor cursor) {
+		if (cursor != null && !cursor.isClosed()) {
+			cursor.close();
+		}
+	}
+
+	@Override
+	protected void onReset() {
+		super.onReset();
+
+		// Ensure the loader is stopped
+		onStopLoading();
+
+		if (mCursor != null && !mCursor.isClosed()) {
+			mCursor.close();
+		}
+		mCursor = null;
 	}
 
 	/**
@@ -67,26 +87,6 @@ public abstract class CJayCursorLoader extends AsyncTaskLoader<Cursor> {
 	protected void onStopLoading() {
 		// Attempt to cancel the current load task if possible.
 		cancelLoad();
-	}
-
-	@Override
-	public void onCanceled(Cursor cursor) {
-		if (cursor != null && !cursor.isClosed()) {
-			cursor.close();
-		}
-	}
-
-	@Override
-	protected void onReset() {
-		super.onReset();
-
-		// Ensure the loader is stopped
-		onStopLoading();
-
-		if (mCursor != null && !mCursor.isClosed()) {
-			mCursor.close();
-		}
-		mCursor = null;
 	}
 
 }

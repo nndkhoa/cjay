@@ -48,7 +48,11 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.CJayActivity;
+import com.cloudjay.cjay.CJayApplication;
+import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.RepairContainerActivity;
+import com.cloudjay.cjay.RepairContainerActivity_;
 import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerRepairedEvent;
@@ -75,8 +79,8 @@ import de.keyboardsurfer.android.widget.crouton.Style;
 
 @EFragment(R.layout.fragment_repair_container_pending)
 @OptionsMenu(R.menu.menu_repair_container_pending)
-public class RepairContainerPendingListFragment extends SherlockFragment
-		implements OnRefreshListener, LoaderCallbacks<Cursor> {
+public class RepairContainerPendingListFragment extends SherlockFragment implements OnRefreshListener,
+																		LoaderCallbacks<Cursor> {
 
 	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_REPAIR_PENDING;
 
@@ -108,25 +112,226 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 	@ViewById(R.id.notfound_textview)
 	TextView mNotfoundTextView;
 
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-
-		ViewGroup viewGroup = (ViewGroup) view;
-		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
-		ActionBarPullToRefresh
-				.from(getActivity())
-				.insertLayoutInto(viewGroup)
-				.theseChildrenArePullable(R.id.container_list,
-						android.R.id.empty).listener(this)
-				.setup(mPullToRefreshLayout);
-	}
-
 	int totalItems = 0;
 
-	void setTotalItems(int val) {
-		totalItems = val;
-		EventBus.getDefault().post(new ListItemChangedEvent(0, totalItems));
+	@Click(R.id.add_button)
+	void addButtonClicked() {
+
+		// show add container dialog
+		String containerId;
+		if (!TextUtils.isEmpty(mSearchEditText.getText().toString())) {
+			containerId = mSearchEditText.getText().toString();
+		} else {
+			containerId = "";
+		}
+		showContainerDetailDialog(containerId, "", AddContainerDialog.CONTAINER_DIALOG_ADD);
+	}
+
+	@AfterViews
+	void afterViews() {
+
+		try {
+			containerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity())
+												.getContainerSessionDaoImpl();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		mSearchEditText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				if (cursorAdapter != null) {
+					cursorAdapter.getFilter().filter(arg0.toString());
+				}
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			}
+		});
+
+		mSearchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+			@Override
+			public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+				if (id == EditorInfo.IME_ACTION_SEARCH) {
+
+					inputMethodManager.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
+
+					return true;
+				}
+				return false;
+			}
+
+		});
+
+		mFeedListView.setMultiChoiceModeListener(new MultiChoiceModeListener() {
+
+			@Override
+			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+				// Respond to clicks on the actions in the CAB
+				switch (item.getItemId()) {
+				// case R.id.menu_check:
+				// setSelectedContainersFixed();
+				// mode.finish(); // Action picked, so close the CAB
+				// return true;
+
+					case R.id.menu_upload:
+
+						SparseBooleanArray selected = mFeedListView.getCheckedItemPositions();
+						mSelectedContainerSessions = new ArrayList<ContainerSession>();
+
+						for (int i = 0; i < selected.size(); i++) {
+							if (selected.valueAt(i) == true) {
+
+								Cursor cursor = (Cursor) cursorAdapter.getItem(selected.keyAt(i));
+								String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+								ContainerSession containerSession;
+								try {
+									containerSession = containerSessionDaoImpl.findByUuid(uuidString);
+									mSelectedContainerSessions.add(containerSession);
+								} catch (SQLException e) {
+									e.printStackTrace();
+								}
+							}
+						}
+
+						List<ContainerSession> invalidContainerSessions = new ArrayList<ContainerSession>();
+						for (ContainerSession containerSession : mSelectedContainerSessions) {
+
+							if (containerSession.isValidForUpload(CJayImage.TYPE_REPAIRED)) {
+
+								containerSession.setUploadType(ContainerSession.TYPE_REPAIR);
+								CJayApplication.uploadContainerSesison(getActivity(), containerSession);
+
+							} else {
+								Logger.w("Container " + containerSession.getContainerId() + " is invalid for upload");
+								invalidContainerSessions.add(containerSession);
+							}
+						}
+
+						if (invalidContainerSessions.size() > 0) {
+
+							Crouton.makeText(getActivity(), R.string.alert_no_issue_container, Style.ALERT).show();
+
+						}
+
+						mode.finish();
+						return true;
+					default:
+						return false;
+				}
+			}
+
+			@Override
+			public boolean onCreateActionMode(ActionMode mode, android.view.Menu menu) {
+
+				// Inflate the menu for the CAB
+				MenuInflater inflater = mode.getMenuInflater();
+				inflater.inflate(R.menu.menu_repair_container_pending, menu);
+				return true;
+
+			}
+
+			@Override
+			public void onDestroyActionMode(ActionMode mode) {
+				// Here you can make any necessary updates to the activity when
+				// the CAB is removed. By default, selected items are
+				// deselected/unchecked.
+			}
+
+			@Override
+			public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+				// Here you can do something when items are
+				// selected/de-selected,
+				// such as update the title in the CAB
+				mode.setTitle(String.valueOf(mFeedListView.getCheckedItemCount()));
+			}
+
+			@Override
+			public boolean onPrepareActionMode(ActionMode mode, android.view.Menu menu) {
+				// Here you can perform updates to the CAB due to
+				// an invalidate() request
+				return false;
+			}
+		});
+
+		getLoaderManager().initLoader(LOADER_ID, null, this);
+
+		mFeedListView.setTextFilterEnabled(true);
+		mFeedListView.setScrollingCacheEnabled(false);
+		mFeedListView.setOnScrollListener(new OnScrollListener() {
+
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+			}
+
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				if (scrollState != 0) {
+					((IssueContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
+				} else {
+					((IssueContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
+					((IssueContainerCursorAdapter) mFeedListView.getAdapter()).notifyDataSetChanged();
+				}
+
+				inputMethodManager.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
+			}
+		});
+
+		mFeedListView.setEmptyView(mEmptyElement);
+	}
+
+	@ItemClick(R.id.container_list)
+	void listItemClicked(int position) {
+		Intent intent = new Intent(getActivity(), RepairContainerActivity_.class);
+
+		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
+		String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+
+		intent.putExtra(RepairContainerActivity.CJAY_CONTAINER_SESSION_EXTRA, uuidString);
+
+		startActivity(intent);
+	}
+
+	public void OnContainerInputCompleted(String containerId, String operatorName, int mode) {
+		String operatorCode = "";
+
+		switch (mode) {
+			case AddContainerDialog.CONTAINER_DIALOG_ADD:
+
+				Activity activity = getActivity();
+				String currentTimeStamp = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+
+				String depotCode = "";
+				if (getActivity() instanceof CJayActivity) {
+					depotCode = ((CJayActivity) activity).getSession().getDepot().getDepotCode();
+				}
+
+				ContainerSession containerSession = new ContainerSession(activity, containerId, operatorCode,
+																			currentTimeStamp, depotCode);
+				containerSession.setOnLocal(true);
+
+				try {
+					containerSessionDaoImpl.addContainerSession(containerSession);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+
+				EventBus.getDefault().post(new ContainerSessionChangedEvent(containerSession));
+
+				break;
+		}
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		EventBus.getDefault().register(this);
+		super.onCreate(savedInstanceState);
 	}
 
 	@Override
@@ -136,8 +341,7 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 		return new CJayCursorLoader(context) {
 			@Override
 			public Cursor loadInBackground() {
-				Cursor cursor = DataCenter.getInstance()
-						.getPendingContainerSessionCursor(getContext());
+				Cursor cursor = DataCenter.getInstance().getPendingContainerSessionCursor(getContext());
 
 				if (cursor != null) {
 					// Ensure the cursor window is filled
@@ -151,16 +355,49 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 	}
 
 	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
+
+	public void onEvent(ContainerRepairedEvent event) {
+		Logger.Log("onEvent ContainerRepairedEvent");
+		refresh();
+	}
+
+	public void onEvent(PostLoadDataEvent event) {
+		Logger.Log("onEvent PostLoadDataEvent");
+		mLoadMoreDataLayout.setVisibility(View.GONE);
+	}
+
+	public void onEvent(PreLoadDataEvent event) {
+		Logger.Log("onEvent PreLoadDataEvent");
+		mLoadMoreDataLayout.setVisibility(View.VISIBLE);
+	}
+
+	public void onEventMainThread(ContainerSessionChangedEvent event) {
+		Logger.Log("onEvent ContainerSessionChangedEvent");
+		refresh();
+	}
+
+	public void onEventMainThread(ContainerSessionEnqueueEvent event) {
+		refresh();
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		cursorAdapter.swapCursor(null);
+	}
+
+	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 		if (cursorAdapter == null) {
-			cursorAdapter = new IssueContainerCursorAdapter(getActivity(),
-					mItemLayout, cursor, 0);
+			cursorAdapter = new IssueContainerCursorAdapter(getActivity(), mItemLayout, cursor, 0);
 
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
 				@Override
 				public Cursor runQuery(CharSequence constraint) {
-					return DataCenter.getInstance().filterPendingCursor(
-							getActivity(), constraint);
+					return DataCenter.getInstance().filterPendingCursor(getActivity(), constraint);
 				}
 			});
 
@@ -172,9 +409,16 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 
 	}
 
+	public void OnOperatorSelected(String containerId, String operatorName, int mode) {
+		showContainerDetailDialog(containerId, operatorName, mode);
+	}
+
 	@Override
-	public void onLoaderReset(Loader<Cursor> arg0) {
-		cursorAdapter.swapCursor(null);
+	public void onPrepareOptionsMenu(Menu menu) {
+
+		super.onPrepareOptionsMenu(menu);
+		// menu.findItem(R.id.menu_check).setVisible(false);
+		menu.findItem(R.id.menu_upload).setVisible(false);
 	}
 
 	@Override
@@ -191,11 +435,10 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 
 				try {
 					DataCenter.getInstance().fetchData(getActivity());
-					DataCenter.getDatabaseHelper(getActivity()).addUsageLog(
-							"#refresh in fragment #RepairContainerPending");
+					DataCenter.getDatabaseHelper(getActivity())
+								.addUsageLog("#refresh in fragment #RepairContainerPending");
 				} catch (NoConnectionException e) {
-					((CJayActivity) getActivity())
-							.showCrouton(R.string.alert_no_network);
+					((CJayActivity) getActivity()).showCrouton(R.string.alert_no_network);
 					e.printStackTrace();
 
 				} catch (NullSessionException e) {
@@ -215,292 +458,6 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 		}.execute();
 	}
 
-	@AfterViews
-	void afterViews() {
-
-		try {
-			containerSessionDaoImpl = CJayClient.getInstance()
-					.getDatabaseManager().getHelper(getActivity())
-					.getContainerSessionDaoImpl();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		mSearchEditText.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void afterTextChanged(Editable arg0) {
-				if (cursorAdapter != null) {
-					cursorAdapter.getFilter().filter(arg0.toString());
-				}
-			}
-
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-			}
-
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-			}
-		});
-
-		mSearchEditText
-				.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-
-					@Override
-					public boolean onEditorAction(TextView textView, int id,
-							KeyEvent keyEvent) {
-						if (id == EditorInfo.IME_ACTION_SEARCH) {
-
-							inputMethodManager.hideSoftInputFromWindow(
-									mSearchEditText.getWindowToken(), 0);
-
-							return true;
-						}
-						return false;
-					}
-
-				});
-
-		mFeedListView.setMultiChoiceModeListener(new MultiChoiceModeListener() {
-
-			@Override
-			public void onItemCheckedStateChanged(ActionMode mode,
-					int position, long id, boolean checked) {
-				// Here you can do something when items are
-				// selected/de-selected,
-				// such as update the title in the CAB
-				mode.setTitle(String.valueOf(mFeedListView
-						.getCheckedItemCount()));
-			}
-
-			@Override
-			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-				// Respond to clicks on the actions in the CAB
-				switch (item.getItemId()) {
-				// case R.id.menu_check:
-				// setSelectedContainersFixed();
-				// mode.finish(); // Action picked, so close the CAB
-				// return true;
-
-				case R.id.menu_upload:
-
-					SparseBooleanArray selected = mFeedListView
-							.getCheckedItemPositions();
-					mSelectedContainerSessions = new ArrayList<ContainerSession>();
-
-					for (int i = 0; i < selected.size(); i++) {
-						if (selected.valueAt(i) == true) {
-
-							Cursor cursor = (Cursor) cursorAdapter
-									.getItem(selected.keyAt(i));
-							String uuidString = cursor.getString(cursor
-									.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
-							ContainerSession containerSession;
-							try {
-								containerSession = containerSessionDaoImpl
-										.findByUuid(uuidString);
-								mSelectedContainerSessions
-										.add(containerSession);
-							} catch (SQLException e) {
-								e.printStackTrace();
-							}
-						}
-					}
-
-					List<ContainerSession> invalidContainerSessions = new ArrayList<ContainerSession>();
-					for (ContainerSession containerSession : mSelectedContainerSessions) {
-
-						if (containerSession
-								.isValidForUpload(CJayImage.TYPE_REPAIRED)) {
-
-							containerSession
-									.setUploadType(ContainerSession.TYPE_REPAIR);
-							CJayApplication.uploadContainerSesison(
-									getActivity(), containerSession);
-
-						} else {
-							Logger.w("Container "
-									+ containerSession.getContainerId()
-									+ " is invalid for upload");
-							invalidContainerSessions.add(containerSession);
-						}
-					}
-
-					if (invalidContainerSessions.size() > 0) {
-
-						Crouton.makeText(getActivity(),
-								R.string.alert_no_issue_container, Style.ALERT)
-								.show();
-
-					}
-
-					mode.finish();
-					return true;
-				default:
-					return false;
-				}
-			}
-
-			@Override
-			public boolean onCreateActionMode(ActionMode mode,
-					android.view.Menu menu) {
-
-				// Inflate the menu for the CAB
-				MenuInflater inflater = mode.getMenuInflater();
-				inflater.inflate(R.menu.menu_repair_container_pending, menu);
-				return true;
-
-			}
-
-			@Override
-			public void onDestroyActionMode(ActionMode mode) {
-				// Here you can make any necessary updates to the activity when
-				// the CAB is removed. By default, selected items are
-				// deselected/unchecked.
-			}
-
-			@Override
-			public boolean onPrepareActionMode(ActionMode mode,
-					android.view.Menu menu) {
-				// Here you can perform updates to the CAB due to
-				// an invalidate() request
-				return false;
-			}
-		});
-
-		getLoaderManager().initLoader(LOADER_ID, null, this);
-
-		mFeedListView.setTextFilterEnabled(true);
-		mFeedListView.setScrollingCacheEnabled(false);
-		mFeedListView.setOnScrollListener(new OnScrollListener() {
-
-			@Override
-			public void onScrollStateChanged(AbsListView view, int scrollState) {
-				if (scrollState != 0) {
-					((IssueContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
-				} else {
-					((IssueContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
-					((IssueContainerCursorAdapter) mFeedListView.getAdapter())
-							.notifyDataSetChanged();
-				}
-
-				inputMethodManager.hideSoftInputFromWindow(
-						mSearchEditText.getWindowToken(), 0);
-			}
-
-			@Override
-			public void onScroll(AbsListView view, int firstVisibleItem,
-					int visibleItemCount, int totalItemCount) {
-			}
-		});
-
-		mFeedListView.setEmptyView(mEmptyElement);
-	}
-
-	@Click(R.id.add_button)
-	void addButtonClicked() {
-
-		// show add container dialog
-		String containerId;
-		if (!TextUtils.isEmpty(mSearchEditText.getText().toString())) {
-			containerId = mSearchEditText.getText().toString();
-		} else {
-			containerId = "";
-		}
-		showContainerDetailDialog(containerId, "",
-				AddContainerDialog.CONTAINER_DIALOG_ADD);
-	}
-
-	public void showContainerDetailDialog(String containerId,
-			String operatorName, int mode) {
-		FragmentManager fm = getActivity().getSupportFragmentManager();
-		AddContainerDialog addContainerDialog = new AddContainerDialog();
-		addContainerDialog.setContainerId(containerId);
-		addContainerDialog.setOperatorName(operatorName);
-		addContainerDialog.setMode(mode);
-		addContainerDialog.setParent(this);
-		addContainerDialog.isOperatorRequired = false;
-		addContainerDialog.show(fm, "add_container_dialog");
-	}
-
-	public void OnOperatorSelected(String containerId, String operatorName,
-			int mode) {
-		showContainerDetailDialog(containerId, operatorName, mode);
-	}
-
-	public void OnContainerInputCompleted(String containerId,
-			String operatorName, int mode) {
-		String operatorCode = "";
-
-		switch (mode) {
-		case AddContainerDialog.CONTAINER_DIALOG_ADD:
-
-			Activity activity = getActivity();
-			String currentTimeStamp = StringHelper
-					.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-
-			String depotCode = "";
-			if (getActivity() instanceof CJayActivity) {
-				depotCode = ((CJayActivity) activity).getSession().getDepot()
-						.getDepotCode();
-			}
-
-			ContainerSession containerSession = new ContainerSession(activity,
-					containerId, operatorCode, currentTimeStamp, depotCode);
-			containerSession.setOnLocal(true);
-
-			try {
-				containerSessionDaoImpl.addContainerSession(containerSession);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-
-			EventBus.getDefault().post(
-					new ContainerSessionChangedEvent(containerSession));
-
-			break;
-		}
-	}
-
-	@ItemClick(R.id.container_list)
-	void listItemClicked(int position) {
-		Intent intent = new Intent(getActivity(),
-				RepairContainerActivity_.class);
-
-		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
-		String uuidString = cursor.getString(cursor
-				.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
-
-		intent.putExtra(RepairContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-				uuidString);
-
-		startActivity(intent);
-	}
-
-	@Override
-	public void onPrepareOptionsMenu(Menu menu) {
-
-		super.onPrepareOptionsMenu(menu);
-		// menu.findItem(R.id.menu_check).setVisible(false);
-		menu.findItem(R.id.menu_upload).setVisible(false);
-	}
-
-	public void onEventMainThread(ContainerSessionEnqueueEvent event) {
-		refresh();
-	}
-
-	@Override
-	public void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		EventBus.getDefault().register(this);
-		super.onCreate(savedInstanceState);
-	}
-
 	@Override
 	public void onResume() {
 
@@ -516,38 +473,19 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 		super.onResume();
 	}
 
-	void setSelectedContainersFixed() {
-		// loop through all the selected container sessions
-		// and set each of them as fixed
-		SparseBooleanArray selected = mFeedListView.getCheckedItemPositions();
-		mSelectedContainerSessions = new ArrayList<ContainerSession>();
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
 
-		for (int i = 0; i < selected.size(); i++) {
-			if (selected.valueAt(i) == true) {
+		ViewGroup viewGroup = (ViewGroup) view;
+		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
+		ActionBarPullToRefresh.from(getActivity()).insertLayoutInto(viewGroup)
+								.theseChildrenArePullable(R.id.container_list, android.R.id.empty).listener(this)
+								.setup(mPullToRefreshLayout);
+	}
 
-				Cursor cursor = (Cursor) cursorAdapter.getItem(selected
-						.keyAt(i));
-				String uuidString = cursor.getString(cursor
-						.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
-				ContainerSession containerSession;
-				try {
-					containerSession = containerSessionDaoImpl
-							.findByUuid(uuidString);
-					mSelectedContainerSessions.add(containerSession);
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-		for (ContainerSession containerSession : mSelectedContainerSessions) {
-			setContainerFixed(containerSession);
-		}
-
-		// TODO: does it need to force refresh
-		EventBus.getDefault().post(
-				new ContainerRepairedEvent(mSelectedContainerSessions)); // Force
-																			// refresh
+	public void refresh() {
+		getLoaderManager().restartLoader(LOADER_ID, null, this);
 	}
 
 	void setContainerFixed(ContainerSession containerSession) {
@@ -562,28 +500,50 @@ public class RepairContainerPendingListFragment extends SherlockFragment
 		}
 	}
 
-	public void refresh() {
-		getLoaderManager().restartLoader(LOADER_ID, null, this);
+	void setSelectedContainersFixed() {
+		// loop through all the selected container sessions
+		// and set each of them as fixed
+		SparseBooleanArray selected = mFeedListView.getCheckedItemPositions();
+		mSelectedContainerSessions = new ArrayList<ContainerSession>();
+
+		for (int i = 0; i < selected.size(); i++) {
+			if (selected.valueAt(i) == true) {
+
+				Cursor cursor = (Cursor) cursorAdapter.getItem(selected.keyAt(i));
+				String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+				ContainerSession containerSession;
+				try {
+					containerSession = containerSessionDaoImpl.findByUuid(uuidString);
+					mSelectedContainerSessions.add(containerSession);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		for (ContainerSession containerSession : mSelectedContainerSessions) {
+			setContainerFixed(containerSession);
+		}
+
+		// TODO: does it need to force refresh
+		EventBus.getDefault().post(new ContainerRepairedEvent(mSelectedContainerSessions)); // Force
+																							// refresh
 	}
 
-	public void onEvent(ContainerRepairedEvent event) {
-		Logger.Log("onEvent ContainerRepairedEvent");
-		refresh();
+	void setTotalItems(int val) {
+		totalItems = val;
+		EventBus.getDefault().post(new ListItemChangedEvent(0, totalItems));
 	}
 
-	public void onEventMainThread(ContainerSessionChangedEvent event) {
-		Logger.Log("onEvent ContainerSessionChangedEvent");
-		refresh();
-	}
-
-	public void onEvent(PreLoadDataEvent event) {
-		Logger.Log("onEvent PreLoadDataEvent");
-		mLoadMoreDataLayout.setVisibility(View.VISIBLE);
-	}
-
-	public void onEvent(PostLoadDataEvent event) {
-		Logger.Log("onEvent PostLoadDataEvent");
-		mLoadMoreDataLayout.setVisibility(View.GONE);
+	public void showContainerDetailDialog(String containerId, String operatorName, int mode) {
+		FragmentManager fm = getActivity().getSupportFragmentManager();
+		AddContainerDialog addContainerDialog = new AddContainerDialog();
+		addContainerDialog.setContainerId(containerId);
+		addContainerDialog.setOperatorName(operatorName);
+		addContainerDialog.setMode(mode);
+		addContainerDialog.setParent(this);
+		addContainerDialog.isOperatorRequired = false;
+		addContainerDialog.show(fm, "add_container_dialog");
 	}
 
 }

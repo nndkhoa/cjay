@@ -12,16 +12,15 @@ import com.j256.ormlite.dao.Dao;
 
 public interface IComponentCodeDao extends Dao<ComponentCode, Integer> {
 
-	List<ComponentCode> getAllComponentCodes() throws SQLException;
-
-	void addListComponentCodes(List<ComponentCode> componentCodes)
-			throws SQLException;
-
 	void addComponentCode(ComponentCode componentCode) throws SQLException;
+
+	void addListComponentCodes(List<ComponentCode> componentCodes) throws SQLException;
 
 	void deleteAllComponentCodes() throws SQLException;
 
-	boolean isEmpty() throws SQLException;
-
 	ComponentCode findByCode(String componentCode) throws SQLException;
+
+	List<ComponentCode> getAllComponentCodes() throws SQLException;
+
+	boolean isEmpty() throws SQLException;
 }

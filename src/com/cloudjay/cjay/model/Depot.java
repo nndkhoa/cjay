@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.model;
 
 import java.util.Collection;
+
 import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
@@ -25,24 +26,19 @@ public class Depot {
 	@ForeignCollectionField(eager = true)
 	Collection<Container> containers;
 
-	public void setDepotCode(String depotCode) {
-		this.depot_code = depotCode;
+	public Depot() {
+	}
+
+	public Collection<Container> getContainers() {
+		return containers;
 	}
 
 	public String getDepotCode() {
 		return depot_code;
 	}
 
-	public void setDepotName(String depotName) {
-		this.depot_name = depotName;
-	}
-
 	public String getDepotName() {
-		return this.depot_name;
-	}
-
-	public void setId(int id) {
-		this.id = id;
+		return depot_name;
 	}
 
 	public int getId() {
@@ -53,10 +49,15 @@ public class Depot {
 		this.containers = containers;
 	}
 
-	public Collection<Container> getContainers() {
-		return this.containers;
+	public void setDepotCode(String depotCode) {
+		depot_code = depotCode;
 	}
 
-	public Depot() {
+	public void setDepotName(String depotName) {
+		depot_name = depotName;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }

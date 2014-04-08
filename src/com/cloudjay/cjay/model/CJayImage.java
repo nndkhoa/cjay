@@ -28,28 +28,6 @@ public class CJayImage {
 	public static final String FIELD_URI = "_id";
 	public static final String FIELD_UUID = "uuid";
 
-	public CJayImage() {
-
-	}
-
-	public CJayImage(int id, int type, String created_at, String image_name) {
-		this.id = id;
-		this.type = type;
-		this.image_name = image_name;
-		this.time_posted = created_at;
-		this.uuid = UUID.randomUUID().toString();
-		this.mUri = image_name;
-	}
-
-	public CJayImage(int id, int type, String image_name) {
-		this.id = id;
-		this.type = type;
-		this.image_name = image_name;
-		this.uuid = UUID.randomUUID().toString();
-		time_posted = "";
-		this.mUri = image_name;
-	}
-
 	@DatabaseField(columnName = ID, defaultValue = "0")
 	private int id;
 
@@ -80,60 +58,76 @@ public class CJayImage {
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	Issue issue;
 
+	public CJayImage() {
+
+	}
+
+	public CJayImage(int id, int type, String image_name) {
+		this.id = id;
+		this.type = type;
+		this.image_name = image_name;
+		uuid = UUID.randomUUID().toString();
+		time_posted = "";
+		mUri = image_name;
+	}
+
+	public CJayImage(int id, int type, String created_at, String image_name) {
+		this.id = id;
+		this.type = type;
+		this.image_name = image_name;
+		time_posted = created_at;
+		uuid = UUID.randomUUID().toString();
+		mUri = image_name;
+	}
+
+	public ContainerSession getContainerSession() {
+		return containerSession;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public String getImageName() {
+		return image_name;
+	}
+
 	public Issue getIssue() {
 		return issue;
 	}
 
-	public void setIssue(Issue issue) {
-		this.issue = issue;
-	}
-
-	public String getIssueLocationCode() {
-		if (issue != null) {
-			return issue.getLocationCode();
-		}
-		return null;
-	}
-
 	public String getIssueComponentCode() {
-		if (issue != null) {
-			return issue.getComponentCodeString();
-		}
-		return null;
-	}
-
-	public String getIssueRepairCode() {
-		if (issue != null) {
-			return issue.getRepairCodeString();
-		}
+		if (issue != null) return issue.getComponentCodeString();
 		return null;
 	}
 
 	public String getIssueDamageCode() {
-		if (issue != null) {
-			return issue.getDamageCodeString();
-		}
-		return null;
-	}
-
-	public String getIssueQuantity() {
-		if (issue != null) {
-			return String.valueOf(issue.getQuantity());
-		}
-		return null;
-	}
-
-	public String getIssueLength() {
-		if (issue != null) {
-			return String.valueOf(issue.getLength());
-		}
+		if (issue != null) return issue.getDamageCodeString();
 		return null;
 	}
 
 	public String getIssueHeight() {
-		if (issue != null) {
-			return String.valueOf(issue.getHeight());
-		}
+		if (issue != null) return String.valueOf(issue.getHeight());
+		return null;
+	}
+
+	public String getIssueLength() {
+		if (issue != null) return String.valueOf(issue.getLength());
+		return null;
+	}
+
+	public String getIssueLocationCode() {
+		if (issue != null) return issue.getLocationCode();
+		return null;
+	}
+
+	public String getIssueQuantity() {
+		if (issue != null) return String.valueOf(issue.getQuantity());
+		return null;
+	}
+
+	public String getIssueRepairCode() {
+		if (issue != null) return issue.getRepairCodeString();
 		return null;
 	}
 
@@ -141,63 +135,55 @@ public class CJayImage {
 		return time_posted;
 	}
 
-	public void setTimePosted(String time_posted) {
-		this.time_posted = time_posted;
-	}
-
 	public int getType() {
 		return type;
-	}
-
-	public void setType(int type) {
-		this.type = type;
-	}
-
-	public ContainerSession getContainerSession() {
-		return containerSession;
-	}
-
-	public void setContainerSession(ContainerSession containerSession) {
-		this.containerSession = containerSession;
-	}
-
-	public String getImageName() {
-		return image_name;
-	}
-
-	public void setImageName(String image_name) {
-		this.image_name = image_name;
-	}
-
-	public String getUuid() {
-		return uuid;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
 	}
 
 	public int getUploadState() {
 		return mState;
 	}
 
-	public void setUploadState(int state) {
-		mState = state;
-	}
-
 	public String getUri() {
 		return mUri;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setContainerSession(ContainerSession containerSession) {
+		this.containerSession = containerSession;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public void setImageName(String image_name) {
+		this.image_name = image_name;
+	}
+
+	public void setIssue(Issue issue) {
+		this.issue = issue;
+	}
+
+	public void setTimePosted(String time_posted) {
+		this.time_posted = time_posted;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	public void setUploadState(int state) {
+		mState = state;
 	}
 
 	public void setUri(String uri) {
 		mUri = uri;
 	}
 
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 }

@@ -19,7 +19,9 @@ import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
-import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.fragment.RepairContainerPendingListFragment;
+import com.cloudjay.cjay.fragment.RepairContainerPendingListFragment_;
+import com.cloudjay.cjay.fragment.UploadsFragment_;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
 
@@ -31,10 +33,9 @@ import com.cloudjay.cjay.view.SearchOperatorDialog;
  * 
  */
 @EActivity(R.layout.activity_repair_home)
-public class RepairHomeActivity extends CJayActivity implements
-		OnPageChangeListener, TabListener,
-		AddContainerDialog.AddContainerDialogListener,
-		SearchOperatorDialog.SearchOperatorDialogListener {
+public class RepairHomeActivity extends CJayActivity implements OnPageChangeListener, TabListener,
+													AddContainerDialog.AddContainerDialogListener,
+													SearchOperatorDialog.SearchOperatorDialogListener {
 
 	private String[] locations;
 	private ViewPagerAdapter viewPagerAdapter;
@@ -42,72 +43,11 @@ public class RepairHomeActivity extends CJayActivity implements
 	@ViewById
 	ViewPager pager;
 
-	@Override
-	protected void onCreate(Bundle arg0) {
-
-		// Below code to show `More Action` item on menu
-		try {
-			ViewConfiguration config = ViewConfiguration.get(this);
-			Field menuKeyField = ViewConfiguration.class
-					.getDeclaredField("sHasPermanentMenuKey");
-			if (menuKeyField != null) {
-				menuKeyField.setAccessible(true);
-				menuKeyField.setBoolean(config, false);
-			}
-		} catch (Exception ex) {
-
-		}
-		super.onCreate(arg0);
-	}
-
 	@AfterViews
 	void afterViews() {
 		locations = getResources().getStringArray(R.array.repair_home_tabs);
 		configureViewPager();
 		configureActionBar();
-	}
-
-	public void onEventMainThread(ListItemChangedEvent event) {
-
-		int currentTab = event.getPosition();
-		getSupportActionBar().getTabAt(currentTab).setText(
-				locations[currentTab] + " ("
-						+ Integer.toString(event.getCount()) + ")");
-	}
-
-	private void configureViewPager() {
-
-		viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(),
-				locations) {
-
-			@Override
-			public Fragment getItem(int position) {
-				switch (position) {
-				case 0:
-					Fragment pendingFragment = new RepairContainerPendingListFragment_();
-					return pendingFragment;
-
-					// case 1:
-					// Fragment fixedFragment = new
-					// RepairContainerFixedListFragment_();
-					// return fixedFragment;
-
-				case 1:
-				default:
-					Fragment uploadFragment = new UploadsFragment_();
-					return uploadFragment;
-				}
-
-			}
-		};
-
-		pager.setAdapter(viewPagerAdapter);
-		pager.setOnPageChangeListener(this);
-	}
-
-	public void onPageSelected(int position) {
-		Tab tab = getSupportActionBar().getTabAt(position);
-		getSupportActionBar().selectTab(tab);
 	}
 
 	private void configureActionBar() {
@@ -120,10 +60,57 @@ public class RepairHomeActivity extends CJayActivity implements
 		}
 	}
 
+	private void configureViewPager() {
+
+		viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), locations) {
+
+			@Override
+			public Fragment getItem(int position) {
+				switch (position) {
+					case 0:
+						Fragment pendingFragment = new RepairContainerPendingListFragment_();
+						return pendingFragment;
+
+						// case 1:
+						// Fragment fixedFragment = new
+						// RepairContainerFixedListFragment_();
+						// return fixedFragment;
+
+					case 1:
+					default:
+						Fragment uploadFragment = new UploadsFragment_();
+						return uploadFragment;
+				}
+
+			}
+		};
+
+		pager.setAdapter(viewPagerAdapter);
+		pager.setOnPageChangeListener(this);
+	}
+
 	@Override
-	public void onTabSelected(Tab tab, FragmentTransaction ft) {
-		int position = tab.getPosition();
-		pager.setCurrentItem(position);
+	public void OnContainerInputCompleted(Fragment parent, String containerId, String operatorName, int mode) {
+		if (parent instanceof RepairContainerPendingListFragment) {
+			((RepairContainerPendingListFragment) parent).OnContainerInputCompleted(containerId, operatorName, mode);
+		}
+	}
+
+	@Override
+	protected void onCreate(Bundle arg0) {
+
+		// Below code to show `More Action` item on menu
+		try {
+			ViewConfiguration config = ViewConfiguration.get(this);
+			Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+			if (menuKeyField != null) {
+				menuKeyField.setAccessible(true);
+				menuKeyField.setBoolean(config, false);
+			}
+		} catch (Exception ex) {
+
+		}
+		super.onCreate(arg0);
 	}
 
 	@Override
@@ -132,17 +119,32 @@ public class RepairHomeActivity extends CJayActivity implements
 		return true;
 	}
 
+	public void onEventMainThread(ListItemChangedEvent event) {
+
+		int currentTab = event.getPosition();
+		getSupportActionBar().getTabAt(currentTab).setText(	locations[currentTab] + " ("
+																	+ Integer.toString(event.getCount()) + ")");
+	}
+
+	@Override
+	public void OnOperatorSelected(Fragment parent, String containerId, String operatorName, int mode) {
+		if (parent instanceof RepairContainerPendingListFragment) {
+			((RepairContainerPendingListFragment) parent).OnOperatorSelected(containerId, operatorName, mode);
+		}
+	}
+
+	@Override
+	public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+	}
+
 	@Override
 	public void onPageScrollStateChanged(int position) {
 	}
 
 	@Override
-	public void onPageScrolled(int position, float positionOffset,
-			int positionOffsetPixels) {
-	}
-
-	@Override
-	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+	public void onPageSelected(int position) {
+		Tab tab = getSupportActionBar().getTabAt(position);
+		getSupportActionBar().selectTab(tab);
 	}
 
 	@Override
@@ -150,20 +152,12 @@ public class RepairHomeActivity extends CJayActivity implements
 	}
 
 	@Override
-	public void OnOperatorSelected(Fragment parent, String containerId,
-			String operatorName, int mode) {
-		if (parent instanceof RepairContainerPendingListFragment) {
-			((RepairContainerPendingListFragment) parent).OnOperatorSelected(
-					containerId, operatorName, mode);
-		}
+	public void onTabSelected(Tab tab, FragmentTransaction ft) {
+		int position = tab.getPosition();
+		pager.setCurrentItem(position);
 	}
 
 	@Override
-	public void OnContainerInputCompleted(Fragment parent, String containerId,
-			String operatorName, int mode) {
-		if (parent instanceof RepairContainerPendingListFragment) {
-			((RepairContainerPendingListFragment) parent)
-					.OnContainerInputCompleted(containerId, operatorName, mode);
-		}
+	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 	}
 }

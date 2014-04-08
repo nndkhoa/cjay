@@ -15,9 +15,11 @@ public abstract class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
 	}
 
+	@Override
 	public int getCount() {
 		return locations.length;
 	}
 
+	@Override
 	abstract public Fragment getItem(int position);
 }

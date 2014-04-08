@@ -8,16 +8,15 @@ import com.j256.ormlite.dao.Dao;
 
 public interface ICJayImageDao extends Dao<CJayImage, String> {
 
-
-	List<CJayImage> getAllCJayImages() throws SQLException;
+	void addCJayImage(CJayImage cJayImage) throws SQLException;
 
 	void addListCJayImages(List<CJayImage> cJayImages) throws SQLException;
-
-	void addCJayImage(CJayImage cJayImage) throws SQLException;
 
 	void deleteAllCJayImages() throws SQLException;
 
 	CJayImage findByUuid(String uuid) throws SQLException;
+
+	List<CJayImage> getAllCJayImages() throws SQLException;
 
 	CJayImage getNextWaiting() throws SQLException;
 }

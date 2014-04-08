@@ -36,12 +36,133 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
 import de.greenrobot.event.EventBus;
 
-@ReportsCrashes(formKey = "", formUri = CJayConstant.ACRA, mode = ReportingInteractionMode.TOAST, resToastText = R.string.crash_toast_text, resDialogText = R.string.crash_dialog_text, resDialogIcon = android.R.drawable.ic_dialog_info, resDialogTitle = R.string.crash_dialog_title, resDialogCommentPrompt = R.string.crash_dialog_comment_prompt, resDialogOkToast = R.string.crash_dialog_ok_toast)
+@ReportsCrashes(formKey = "",
+				formUri = CJayConstant.ACRA,
+				mode = ReportingInteractionMode.TOAST,
+				resToastText = R.string.crash_toast_text,
+				resDialogText = R.string.crash_dialog_text,
+				resDialogIcon = android.R.drawable.ic_dialog_info,
+				resDialogTitle = R.string.crash_dialog_title,
+				resDialogCommentPrompt = R.string.crash_dialog_comment_prompt,
+				resDialogOkToast = R.string.crash_dialog_ok_toast)
 @EApplication
 public class CJayApplication extends Application {
 
+	public static void gotoCamera(Context ctx, ContainerSession containerSession, int imageType, String activityTag) {
+
+		Intent intent = new Intent(ctx, CameraActivity_.class);
+		intent.putExtra(CameraActivity.CJAY_CONTAINER_SESSION_EXTRA, containerSession.getUuid());
+		intent.putExtra(CameraActivity.CJAY_IMAGE_TYPE_EXTRA, imageType);
+
+		if (activityTag != null && !TextUtils.isEmpty(activityTag)) {
+			intent.putExtra(CameraActivity.SOURCE_TAG_EXTRA, activityTag);
+		}
+
+		ctx.startActivity(intent);
+	}
+
+	public static void logOutInstantly(Context ctx) {
+
+		Logger.w("Access Token is expired");
+		CJaySession session = CJaySession.restore(ctx);
+		session.deleteSession(ctx);
+
+		Intent intent = new Intent(ctx, LoginActivity_.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		ctx.startActivity(intent);
+
+		// http://stackoverflow.com/questions/3007998/on-logout-clear-activity-history-stack-preventing-back-button-from-opening-l
+		// Intent intent = new Intent();
+		// broadcastIntent.setAction("com.package.ACTION_LOGOUT");
+		// sendBroadcast(broadcastIntent);
+	}
+
+	public static void openPhotoGridView(Context ctx, String uuid, String containerId, int imageType1, int imageType2,
+											String sourceTag) {
+
+		Intent intent = new Intent(ctx, PhotoExpandableListViewActivity_.class);
+
+		intent.putExtra(PhotoExpandableListViewActivity.CJAY_CONTAINER_SESSION_UUID_EXTRA, uuid);
+		intent.putExtra(PhotoExpandableListViewActivity.CJAY_CONTAINER_ID_EXTRA, containerId);
+		intent.putExtra(PhotoExpandableListViewActivity.CJAY_IMAGE_TYPE_1_EXTRA, imageType1);
+		intent.putExtra(PhotoExpandableListViewActivity.CJAY_IMAGE_TYPE_2_EXTRA, imageType2);
+		intent.putExtra("tag", sourceTag);
+
+		Logger.w("Open Photo Grid View with imageType: " + Integer.toString(imageType1) + " | "
+				+ Integer.toString(imageType2));
+
+		ctx.startActivity(intent);
+	}
+
+	public static void openPhotoGridView(Context ctx, String uuid, String containerId, int imageType, String sourceTag) {
+
+		Intent intent = new Intent(ctx, PhotoExpandableListViewActivity_.class);
+		intent.putExtra(PhotoExpandableListViewActivity.CJAY_CONTAINER_SESSION_UUID_EXTRA, uuid);
+		intent.putExtra(PhotoExpandableListViewActivity.CJAY_IMAGE_TYPE_1_EXTRA, imageType);
+		intent.putExtra(PhotoExpandableListViewActivity.CJAY_CONTAINER_ID_EXTRA, containerId);
+		intent.putExtra("tag", sourceTag);
+
+		ctx.startActivity(intent);
+
+	}
+
+	public static void startCJayHomeActivity(Context context) {
+
+		/**
+		 * Gate: 6 | Audit: 1 | Repair: 4
+		 */
+
+		Logger.Log("start CJayHome Activity");
+		int userRole = ((CJayActivity) context).getCurrentUser().getRole();
+
+		Intent intent = null;
+		switch (userRole) {
+			case 1:
+				intent = new Intent(context, AuditorHomeActivity_.class);
+				break;
+
+			case 4:
+				intent = new Intent(context, RepairHomeActivity_.class);
+				break;
+
+			case 6:
+			default:
+				intent = new Intent(context, GateHomeActivity_.class);
+				break;
+		}
+		context.startActivity(intent);
+	}
+
+	public static void uploadContainerSesison(Context ctx, ContainerSession containerSession) {
+
+		ContainerSessionDaoImpl containerSessionDaoImpl = null;
+
+		// User confirm upload
+		containerSession.setUploadConfirmation(true);
+		containerSession.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+
+		if (null == containerSessionDaoImpl) {
+			try {
+				containerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(ctx)
+													.getContainerSessionDaoImpl();
+
+				containerSessionDaoImpl.update(containerSession);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		// It will trigger `UploadsFragment` Adapter
+		// notifyDataSetChanged
+		EventBus.getDefault().post(new ContainerSessionEnqueueEvent(containerSession));
+
+	}
+
 	IDatabaseManager databaseManager = null;
+
 	IHttpRequestWrapper httpRequestWrapper = null;
+
 	static Context mContext = null;
 
 	public static Context getContext() {
@@ -62,18 +183,19 @@ public class CJayApplication extends Application {
 		databaseManager = new DatabaseManager();
 		httpRequestWrapper = new HttpRequestWrapper();
 
-		DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
-				.cacheInMemory(true).cacheOnDisc(true)
-				.bitmapConfig(Bitmap.Config.RGB_565)
-				.imageScaleType(ImageScaleType.IN_SAMPLE_INT)
-				.showImageForEmptyUri(R.drawable.ic_app).build();
+		DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder().cacheInMemory(true)
+																				.cacheOnDisc(true)
+																				.bitmapConfig(Bitmap.Config.RGB_565)
+																				.imageScaleType(ImageScaleType.IN_SAMPLE_INT)
+																				.showImageForEmptyUri(R.drawable.ic_app)
+																				.build();
 
-		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
-				getApplicationContext())
-				.defaultDisplayImageOptions(defaultOptions)
-				.discCacheSize(100 * 1024 * 1024)
-				.memoryCache(new WeakMemoryCache()).threadPoolSize(3)
-				.threadPriority(Thread.MAX_PRIORITY).build();
+		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext()).defaultDisplayImageOptions(	defaultOptions)
+																										.discCacheSize(	100 * 1024 * 1024)
+																										.memoryCache(	new WeakMemoryCache())
+																										.threadPoolSize(3)
+																										.threadPriority(Thread.MAX_PRIORITY)
+																										.build();
 
 		ACRA.init(CJayApplication.this);
 		ACRA.getErrorReporter().checkReportsOnApplicationStart();
@@ -83,11 +205,13 @@ public class CJayApplication extends Application {
 		DataCenter.getInstance().initialize(databaseManager);
 		databaseManager.getHelper(getApplicationContext());
 
-		if (!CJayConstant.APP_DIRECTORY_FILE.exists())
+		if (!CJayConstant.APP_DIRECTORY_FILE.exists()) {
 			CJayConstant.APP_DIRECTORY_FILE.mkdir();
+		}
 
-		if (!CJayConstant.HIDDEN_APP_DIRECTORY_FILE.exists())
+		if (!CJayConstant.HIDDEN_APP_DIRECTORY_FILE.exists()) {
 			CJayConstant.HIDDEN_APP_DIRECTORY_FILE.mkdir();
+		}
 
 		// Configure Alarm Manager
 		mContext = getApplicationContext();
@@ -99,139 +223,9 @@ public class CJayApplication extends Application {
 		}
 
 		if (NetworkHelper.isConnected(this)) {
-			PreferencesUtil.storePrefsValue(this,
-					PreferencesUtil.PREF_NO_CONNECTION, false);
+			PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_NO_CONNECTION, false);
 		} else {
-			PreferencesUtil.storePrefsValue(this,
-					PreferencesUtil.PREF_NO_CONNECTION, true);
+			PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_NO_CONNECTION, true);
 		}
-	}
-
-	public static void uploadContainerSesison(Context ctx,
-			ContainerSession containerSession) {
-
-		ContainerSessionDaoImpl containerSessionDaoImpl = null;
-
-		// User confirm upload
-		containerSession.setUploadConfirmation(true);
-		containerSession.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
-
-		if (null == containerSessionDaoImpl) {
-			try {
-				containerSessionDaoImpl = CJayClient.getInstance()
-						.getDatabaseManager().getHelper(ctx)
-						.getContainerSessionDaoImpl();
-
-				containerSessionDaoImpl.update(containerSession);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-
-		// It will trigger `UploadsFragment` Adapter
-		// notifyDataSetChanged
-		EventBus.getDefault().post(
-				new ContainerSessionEnqueueEvent(containerSession));
-
-	}
-
-	public static void logOutInstantly(Context ctx) {
-
-		Logger.w("Access Token is expired");
-		CJaySession session = CJaySession.restore(ctx);
-		session.deleteSession(ctx);
-
-		Intent intent = new Intent(ctx, LoginActivity_.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		ctx.startActivity(intent);
-
-		// http://stackoverflow.com/questions/3007998/on-logout-clear-activity-history-stack-preventing-back-button-from-opening-l
-		// Intent intent = new Intent();
-		// broadcastIntent.setAction("com.package.ACTION_LOGOUT");
-		// sendBroadcast(broadcastIntent);
-	}
-
-	public static void gotoCamera(Context ctx,
-			ContainerSession containerSession, int imageType, String activityTag) {
-
-		Intent intent = new Intent(ctx, CameraActivity_.class);
-		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA,
-				containerSession.getUuid());
-		intent.putExtra(CameraActivity_.CJAY_IMAGE_TYPE_EXTRA, imageType);
-
-		if (activityTag != null && !TextUtils.isEmpty(activityTag)) {
-			intent.putExtra(CameraActivity_.SOURCE_TAG_EXTRA, activityTag);
-		}
-
-		ctx.startActivity(intent);
-	}
-
-	public static void openPhotoGridView(Context ctx, String uuid,
-			String containerId, int imageType, String sourceTag) {
-
-		Intent intent = new Intent(ctx, PhotoExpandableListViewActivity_.class);
-		intent.putExtra(
-				PhotoExpandableListViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA,
-				uuid);
-		intent.putExtra(
-				PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_1_EXTRA,
-				imageType);
-		intent.putExtra(
-				PhotoExpandableListViewActivity_.CJAY_CONTAINER_ID_EXTRA,
-				containerId);
-		intent.putExtra("tag", sourceTag);
-
-		ctx.startActivity(intent);
-
-	}
-
-	public static void openPhotoGridView(Context ctx, String uuid,
-			String containerId, int imageType1, int imageType2, String sourceTag) {
-
-		Intent intent = new Intent(ctx, PhotoExpandableListViewActivity_.class);
-		intent.putExtra(
-				PhotoExpandableListViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA,
-				uuid);
-		intent.putExtra(
-				PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_1_EXTRA,
-				imageType1);
-		intent.putExtra(
-				PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_2_EXTRA,
-				imageType2);
-		intent.putExtra(
-				PhotoExpandableListViewActivity_.CJAY_CONTAINER_ID_EXTRA,
-				containerId);
-		intent.putExtra("tag", sourceTag);
-
-		ctx.startActivity(intent);
-
-	}
-
-	public static void startCJayHomeActivity(Context context) {
-
-		/**
-		 * Gate: 6 | Audit: 1 | Repair: 4
-		 */
-
-		Logger.Log("start CJayHome Activity");
-		int userRole = ((CJayActivity) context).getCurrentUser().getRole();
-
-		Intent intent = null;
-		switch (userRole) {
-		case 1:
-			intent = new Intent(context, AuditorHomeActivity_.class);
-			break;
-
-		case 4:
-			intent = new Intent(context, RepairHomeActivity_.class);
-			break;
-
-		case 6:
-		default:
-			intent = new Intent(context, GateHomeActivity_.class);
-			break;
-		}
-		context.startActivity(intent);
 	}
 }

@@ -20,27 +20,7 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-public class IssueContainerCursorAdapter extends CursorAdapter implements
-		Filterable {
-
-	private int layout;
-	private LayoutInflater inflater;
-	private ImageLoader imageLoader;
-	public boolean isScrolling;
-
-	@SuppressWarnings("deprecation")
-	public IssueContainerCursorAdapter(Context context, Cursor c) {
-		super(context, c);
-	}
-
-	public IssueContainerCursorAdapter(Context context, int layout, Cursor c,
-			int flags) {
-		super(context, c, flags);
-		this.layout = layout;
-		this.inflater = LayoutInflater.from(context);
-		this.mCursor = c;
-		this.imageLoader = ImageLoader.getInstance();
-	}
+public class IssueContainerCursorAdapter extends CursorAdapter implements Filterable {
 
 	private static class ViewHolder {
 		public TextView containerIdView;
@@ -49,6 +29,25 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements
 		public TextView containerIssuesView;
 		public ImageView itemPictureView;
 		public ImageView validationImageView;
+	}
+
+	private int layout;
+	private LayoutInflater inflater;
+	private ImageLoader imageLoader;
+
+	public boolean isScrolling;
+
+	@SuppressWarnings("deprecation")
+	public IssueContainerCursorAdapter(Context context, Cursor c) {
+		super(context, c);
+	}
+
+	public IssueContainerCursorAdapter(Context context, int layout, Cursor c, int flags) {
+		super(context, c, flags);
+		this.layout = layout;
+		inflater = LayoutInflater.from(context);
+		mCursor = c;
+		imageLoader = ImageLoader.getInstance();
 	}
 
 	@Override
@@ -63,42 +62,30 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements
 			Logger.Log("Holder inside bindView is NULL");
 
 			holder = new ViewHolder();
-			holder.containerIdView = (TextView) view
-					.findViewById(R.id.feed_item_container_id);
-			holder.containerOwnerView = (TextView) view
-					.findViewById(R.id.feed_item_container_owner);
-			holder.importDateView = (TextView) view
-					.findViewById(R.id.feed_item_container_import_date);
-			holder.containerIssuesView = (TextView) view
-					.findViewById(R.id.feed_item_container_issues);
-			holder.itemPictureView = (ImageView) view
-					.findViewById(R.id.feed_item_picture);
-			holder.validationImageView = (ImageView) view
-					.findViewById(R.id.feed_item_validator);
+			holder.containerIdView = (TextView) view.findViewById(R.id.feed_item_container_id);
+			holder.containerOwnerView = (TextView) view.findViewById(R.id.feed_item_container_owner);
+			holder.importDateView = (TextView) view.findViewById(R.id.feed_item_container_import_date);
+			holder.containerIssuesView = (TextView) view.findViewById(R.id.feed_item_container_issues);
+			holder.itemPictureView = (ImageView) view.findViewById(R.id.feed_item_picture);
+			holder.validationImageView = (ImageView) view.findViewById(R.id.feed_item_validator);
 			view.setTag(holder);
 		}
 
 		// get data from cursor and bind to holder
-		String importDate = cursor.getString(cursor
-				.getColumnIndexOrThrow(ContainerSession.FIELD_CHECK_IN_TIME));
-		importDate = StringHelper.getRelativeDate(
-				CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE, importDate);
+		String importDate = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_CHECK_IN_TIME));
+		importDate = StringHelper.getRelativeDate(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE, importDate);
 		holder.importDateView.setText(importDate);
 
-		String containerId = cursor.getString(cursor
-				.getColumnIndexOrThrow(Container.CONTAINER_ID));
+		String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
 		holder.containerIdView.setText(containerId);
 
-		String operator = cursor.getString(cursor
-				.getColumnIndexOrThrow(Operator.FIELD_NAME));
+		String operator = cursor.getString(cursor.getColumnIndexOrThrow(Operator.FIELD_NAME));
 		holder.containerOwnerView.setText(operator);
 
-		String issueCount = cursor.getString(cursor
-				.getColumnIndexOrThrow("issue_count"));
+		String issueCount = cursor.getString(cursor.getColumnIndexOrThrow("issue_count"));
 		holder.containerIssuesView.setText(issueCount);
 
-		String url = cursor.getString(cursor
-				.getColumnIndexOrThrow(ContainerSession.FIELD_IMAGE_ID_PATH));
+		String url = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_IMAGE_ID_PATH));
 		if (!TextUtils.isEmpty(url)) {
 			imageLoader.displayImage(url, holder.itemPictureView);
 		} else {
@@ -109,28 +96,20 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements
 
 			boolean isValidForUpload = false;
 			if (cursor.getColumnIndex("auditor_image_no_issue_count") >= 0
-					&& cursor.getColumnIndex("invalid_issue_count") >= 0
-					&& cursor.getColumnIndex("issue_count") >= 0) {
-				int imageWithoutIssueCount = cursor.getInt(cursor
-						.getColumnIndexOrThrow("auditor_image_no_issue_count"));
-				int invalidIssueCount = cursor.getInt(cursor
-						.getColumnIndexOrThrow("invalid_issue_count"));
-				int validIssueCount = cursor.getInt(cursor
-						.getColumnIndexOrThrow("issue_count"));
-				if (imageWithoutIssueCount > 1 || validIssueCount == 0
-						|| invalidIssueCount > 0) {
+					&& cursor.getColumnIndex("invalid_issue_count") >= 0 && cursor.getColumnIndex("issue_count") >= 0) {
+				int imageWithoutIssueCount = cursor.getInt(cursor.getColumnIndexOrThrow("auditor_image_no_issue_count"));
+				int invalidIssueCount = cursor.getInt(cursor.getColumnIndexOrThrow("invalid_issue_count"));
+				int validIssueCount = cursor.getInt(cursor.getColumnIndexOrThrow("issue_count"));
+				if (imageWithoutIssueCount > 1 || validIssueCount == 0 || invalidIssueCount > 0) {
 					isValidForUpload = false;
 				} else {
 					isValidForUpload = true;
 				}
 			}
-			
-			if (cursor.getColumnIndex("fixed_issue_count") >= 0
-					&& cursor.getColumnIndex("issue_count") >= 0) {
-				int fixedIssueCount = cursor.getInt(cursor
-						.getColumnIndexOrThrow("fixed_issue_count"));
-				int validIssueCount = cursor.getInt(cursor
-						.getColumnIndexOrThrow("issue_count"));
+
+			if (cursor.getColumnIndex("fixed_issue_count") >= 0 && cursor.getColumnIndex("issue_count") >= 0) {
+				int fixedIssueCount = cursor.getInt(cursor.getColumnIndexOrThrow("fixed_issue_count"));
+				int validIssueCount = cursor.getInt(cursor.getColumnIndexOrThrow("issue_count"));
 				if (fixedIssueCount < validIssueCount || validIssueCount == 0) {
 					isValidForUpload = false;
 				} else {
@@ -139,9 +118,9 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements
 			}
 
 			if (!isValidForUpload) {
-				holder.validationImageView.setVisibility(ImageView.INVISIBLE);
+				holder.validationImageView.setVisibility(View.INVISIBLE);
 			} else {
-				holder.validationImageView.setVisibility(ImageView.VISIBLE);
+				holder.validationImageView.setVisibility(View.VISIBLE);
 			}
 		}
 
@@ -152,18 +131,12 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements
 		View v = inflater.inflate(layout, parent, false);
 
 		ViewHolder holder = new ViewHolder();
-		holder.containerIdView = (TextView) v
-				.findViewById(R.id.feed_item_container_id);
-		holder.containerOwnerView = (TextView) v
-				.findViewById(R.id.feed_item_container_owner);
-		holder.importDateView = (TextView) v
-				.findViewById(R.id.feed_item_container_import_date);
-		holder.containerIssuesView = (TextView) v
-				.findViewById(R.id.feed_item_container_issues);
-		holder.itemPictureView = (ImageView) v
-				.findViewById(R.id.feed_item_picture);
-		holder.validationImageView = (ImageView) v
-				.findViewById(R.id.feed_item_validator);
+		holder.containerIdView = (TextView) v.findViewById(R.id.feed_item_container_id);
+		holder.containerOwnerView = (TextView) v.findViewById(R.id.feed_item_container_owner);
+		holder.importDateView = (TextView) v.findViewById(R.id.feed_item_container_import_date);
+		holder.containerIssuesView = (TextView) v.findViewById(R.id.feed_item_container_issues);
+		holder.itemPictureView = (ImageView) v.findViewById(R.id.feed_item_picture);
+		holder.validationImageView = (ImageView) v.findViewById(R.id.feed_item_validator);
 
 		v.setTag(holder);
 

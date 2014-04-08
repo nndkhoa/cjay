@@ -2,16 +2,16 @@ package com.cloudjay.cjay.receivers;
 
 import org.androidannotations.annotations.EReceiver;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.widget.Toast;
+
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
-
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.widget.Toast;
 
 @EReceiver
 public class ConnectionChangeReceiver extends BroadcastReceiver {
@@ -23,11 +23,9 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
 		if (NetworkHelper.isConnected(context)) {
 
 			Logger.Log("Connected to Internet");
-			DataCenter.getDatabaseHelper(context).addUsageLog(
-					"#connected to internet");
+			DataCenter.getDatabaseHelper(context).addUsageLog("#connected to internet");
 
-			PreferencesUtil.storePrefsValue(context,
-					PreferencesUtil.PREF_NO_CONNECTION, false);
+			PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_NO_CONNECTION, false);
 
 			if (!Utils.isAlarmUp(context)) {
 
@@ -36,18 +34,15 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
 
 			}
 
-			Toast.makeText(context, "Connected to Internet", Toast.LENGTH_SHORT)
-					.show();
+			Toast.makeText(context, "Connected to Internet", Toast.LENGTH_SHORT).show();
 
 		} else {
 
 			Logger.Log("Not connect to Internet");
-			DataCenter.getDatabaseHelper(context).addUsageLog(
-					"#disconnected from internet");
+			DataCenter.getDatabaseHelper(context).addUsageLog("#disconnected from internet");
 
 			// Mark that device has no data connection
-			PreferencesUtil.storePrefsValue(context,
-					PreferencesUtil.PREF_NO_CONNECTION, true);
+			PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_NO_CONNECTION, true);
 
 			if (Utils.isAlarmUp(context)) {
 
@@ -56,8 +51,7 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
 
 			}
 
-			Toast.makeText(context, "Not connect to Internet",
-					Toast.LENGTH_SHORT).show();
+			Toast.makeText(context, "Not connect to Internet", Toast.LENGTH_SHORT).show();
 		}
 	}
 }

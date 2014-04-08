@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.json.JSONException;
 
-import android.R.integer;
 import android.content.Context;
 
 import com.cloudjay.cjay.model.ComponentCode;
@@ -22,31 +21,26 @@ import com.cloudjay.cjay.util.ServerInternalErrorException;
 
 public interface ICJayClient {
 
-	String getUserToken(String username, String password, Context ctx)
-			throws SocketTimeoutException, NoConnectionException;
+	void addGCMDevice(String regid, Context ctx) throws NoConnectionException, NullSessionException, JSONException;
 
-	void addGCMDevice(String regid, Context ctx) throws NoConnectionException,
-			NullSessionException, JSONException;
+	List<ComponentCode> getComponentCodes(Context ctx, String date) throws NoConnectionException, NullSessionException;
+
+	ContainerSessionResult
+			getContainerSessionsByPage(Context ctx, String date, int page, int type) throws NoConnectionException,
+																					NullSessionException;
 
 	User getCurrentUser(String token, Context ctx) throws NoConnectionException;
 
-	List<Operator> getOperators(Context ctx, String modifiedAfter)
-			throws NoConnectionException, NullSessionException;
+	List<DamageCode> getDamageCodes(Context ctx, String date) throws NoConnectionException, NullSessionException;
 
-	List<DamageCode> getDamageCodes(Context ctx, String date)
-			throws NoConnectionException, NullSessionException;
+	List<Operator> getOperators(Context ctx, String modifiedAfter) throws NoConnectionException, NullSessionException;
 
-	List<RepairCode> getRepairCodes(Context ctx, String date)
-			throws NoConnectionException, NullSessionException;
+	List<RepairCode> getRepairCodes(Context ctx, String date) throws NoConnectionException, NullSessionException;
 
-	List<ComponentCode> getComponentCodes(Context ctx, String date)
-			throws NoConnectionException, NullSessionException;
+	String getUserToken(String username, String password, Context ctx) throws SocketTimeoutException,
+																		NoConnectionException;
 
-	String postContainerSession(Context ctx, TmpContainerSession item)
-			throws NoConnectionException, NullSessionException,
-			MismatchDataException, ServerInternalErrorException;
-
-	ContainerSessionResult getContainerSessionsByPage(Context ctx, String date,
-			int page, int type) throws NoConnectionException,
-			NullSessionException;
+	String postContainerSession(Context ctx, TmpContainerSession item) throws NoConnectionException,
+																		NullSessionException, MismatchDataException,
+																		ServerInternalErrorException;
 }

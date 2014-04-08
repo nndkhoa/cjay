@@ -28,8 +28,7 @@ import com.cloudjay.cjay.util.Utils;
 public class AddContainerDialog extends SherlockDialogFragment {
 
 	public interface AddContainerDialogListener {
-		void OnContainerInputCompleted(Fragment parent, String containerId,
-				String operatorName, int mode);
+		void OnContainerInputCompleted(Fragment parent, String containerId, String operatorName, int mode);
 	}
 
 	private AddContainerDialogListener mCallback;
@@ -49,36 +48,15 @@ public class AddContainerDialog extends SherlockDialogFragment {
 	Button mCancelButton;
 	Button mOkButton;
 
-	public void setContainerId(String containerId) {
-		mContainerId = containerId;
-	}
-
-	public void setOperatorName(String operatorName) {
-		mOperatorName = operatorName;
-	}
-
-	public void setMode(int mode) {
-		mMode = mode;
-	}
-
-	public void setParent(Fragment parent) {
-		mParent = parent;
-	}
-
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.dialog_new_container, container);
 
-		mContainerEditText = (EditText) view
-				.findViewById(R.id.dialog_new_container_id);
-		mOperatorEditText = (EditText) view
-				.findViewById(R.id.dialog_new_container_owner);
-		mCancelButton = (Button) view
-				.findViewById(R.id.dialog_new_container_cancel);
+		mContainerEditText = (EditText) view.findViewById(R.id.dialog_new_container_id);
+		mOperatorEditText = (EditText) view.findViewById(R.id.dialog_new_container_owner);
+		mCancelButton = (Button) view.findViewById(R.id.dialog_new_container_cancel);
 		mOkButton = (Button) view.findViewById(R.id.dialog_new_container_ok);
-		mOperatorLabel = (TextView) view
-				.findViewById(R.id.dialog_new_container_owner_label);
+		mOperatorLabel = (TextView) view.findViewById(R.id.dialog_new_container_owner_label);
 
 		if (mContainerId != null) {
 			mContainerEditText.setText(mContainerId);
@@ -122,13 +100,11 @@ public class AddContainerDialog extends SherlockDialogFragment {
 			@Override
 			public void onClick(View v) {
 
-				mContainerId = mContainerEditText.getText().toString()
-						.toUpperCase();
+				mContainerId = mContainerEditText.getText().toString().toUpperCase();
 				mOperatorName = mOperatorEditText.getText().toString();
 
 				if (!Utils.isContainerIdValid(mContainerId)) {
-					mContainerEditText
-							.setError(getString(R.string.dialog_container_id_invalid));
+					mContainerEditText.setError(getString(R.string.dialog_container_id_invalid));
 					return;
 				}
 
@@ -136,19 +112,15 @@ public class AddContainerDialog extends SherlockDialogFragment {
 				mOperatorEditText.setError(null);
 
 				if (TextUtils.isEmpty(mContainerId)) {
-					mContainerEditText
-							.setError(getString(R.string.dialog_container_id_required));
+					mContainerEditText.setError(getString(R.string.dialog_container_id_required));
 
-				} else if (isOperatorRequired
-						&& TextUtils.isEmpty(mOperatorName)) {
+				} else if (isOperatorRequired && TextUtils.isEmpty(mOperatorName)) {
 
-					mOperatorEditText
-							.setError(getString(R.string.dialog_container_owner_required));
+					mOperatorEditText.setError(getString(R.string.dialog_container_owner_required));
 
 				} else {
 					mCallback = (AddContainerDialogListener) getActivity();
-					mCallback.OnContainerInputCompleted(mParent, mContainerId,
-							mOperatorName, mMode);
+					mCallback.OnContainerInputCompleted(mParent, mContainerId, mOperatorName, mMode);
 					dismiss();
 				}
 			}
@@ -162,16 +134,13 @@ public class AddContainerDialog extends SherlockDialogFragment {
 			}
 		});
 
-		getDialog().setTitle(
-				getResources().getString(R.string.dialog_new_container_title));
+		getDialog().setTitle(getResources().getString(R.string.dialog_new_container_title));
 
 		// show keyboard
-		getDialog().getWindow().setSoftInputMode(
-				WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+		getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 
 		if (!isOperatorRequired) {
-			LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) mOperatorEditText
-					.getLayoutParams();
+			LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) mOperatorEditText.getLayoutParams();
 			p.height = 0;
 			mOperatorEditText.setLayoutParams(p);
 			p = (LinearLayout.LayoutParams) mOperatorLabel.getLayoutParams();
@@ -182,10 +151,20 @@ public class AddContainerDialog extends SherlockDialogFragment {
 		return view;
 	}
 
-	private void startSearchOperator() {
-		mContainerId = mContainerEditText.getText().toString();
-		dismiss();
-		showDialogSearchOperator(mMode);
+	public void setContainerId(String containerId) {
+		mContainerId = containerId;
+	}
+
+	public void setMode(int mode) {
+		mMode = mode;
+	}
+
+	public void setOperatorName(String operatorName) {
+		mOperatorName = operatorName;
+	}
+
+	public void setParent(Fragment parent) {
+		mParent = parent;
 	}
 
 	private void showDialogSearchOperator(int mode) {
@@ -196,5 +175,11 @@ public class AddContainerDialog extends SherlockDialogFragment {
 		searchOperatorDialog.setMode(mMode);
 		searchOperatorDialog.setParent(mParent);
 		searchOperatorDialog.show(fm, "search_operator_dialog");
+	}
+
+	private void startSearchOperator() {
+		mContainerId = mContainerEditText.getText().toString();
+		dismiss();
+		showDialogSearchOperator(mMode);
 	}
 }

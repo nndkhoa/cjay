@@ -19,7 +19,9 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.RepairIssueReportActivity;
+import com.cloudjay.cjay.RepairIssueReportActivity_;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
@@ -58,11 +60,92 @@ public class RepairIssueFixedListFragment extends SherlockFragment {
 		mFeedListView.setItemChecked(-1, true);
 
 		// show issue report activity
-		Intent intent = new Intent(getActivity(),
-				RepairIssueReportActivity_.class);
-		intent.putExtra(RepairIssueReportActivity_.CJAY_ISSUE_EXTRA,
-				mSelectedIssue.getUuid());
+		Intent intent = new Intent(getActivity(), RepairIssueReportActivity_.class);
+		intent.putExtra(RepairIssueReportActivity.CJAY_ISSUE_EXTRA, mSelectedIssue.getUuid());
 		startActivity(intent);
+	}
+
+	private void initIssueFeedAdapter(ArrayList<Issue> containers) {
+		BindDictionary<Issue> feedsDict = new BindDictionary<Issue>();
+		feedsDict.addStringField(R.id.issue_location_code, new StringExtractor<Issue>() {
+			@Override
+			public String getStringValue(Issue item, int position) {
+				return Utils.replaceNullBySpace(item.getLocationCode());
+			}
+		});
+		feedsDict.addStringField(R.id.issue_damage_code, new StringExtractor<Issue>() {
+			@Override
+			public String getStringValue(Issue item, int position) {
+				return Utils.replaceNullBySpace(item.getDamageCodeString());
+			}
+		});
+		feedsDict.addStringField(R.id.issue_repair_code, new StringExtractor<Issue>() {
+			@Override
+			public String getStringValue(Issue item, int position) {
+				return Utils.replaceNullBySpace(item.getRepairCodeString());
+			}
+		});
+		feedsDict.addStringField(R.id.issue_component_code, new StringExtractor<Issue>() {
+			@Override
+			public String getStringValue(Issue item, int position) {
+				return Utils.replaceNullBySpace(item.getComponentCodeString());
+			}
+		});
+		feedsDict.addStringField(R.id.issue_quantity, new StringExtractor<Issue>() {
+			@Override
+			public String getStringValue(Issue item, int position) {
+				return Utils.replaceNullBySpace(item.getQuantity());
+			}
+		});
+		feedsDict.addStringField(R.id.issue_length, new StringExtractor<Issue>() {
+			@Override
+			public String getStringValue(Issue item, int position) {
+				return Utils.replaceNullBySpace(item.getLength());
+			}
+		});
+		feedsDict.addStringField(R.id.issue_height, new StringExtractor<Issue>() {
+			@Override
+			public String getStringValue(Issue item, int position) {
+				return Utils.replaceNullBySpace(item.getHeight());
+			}
+		});
+		feedsDict.addDynamicImageField(R.id.issue_picture, new StringExtractor<Issue>() {
+			@Override
+			public String getStringValue(Issue item, int position) {
+				for (CJayImage cJayImage : item.getCJayImages()) {
+					if (!TextUtils.isEmpty(cJayImage.getUri())) return Utils.stripNull(cJayImage.getUri());
+				}
+				return Utils.stripNull(null);
+			}
+		}, new DynamicImageLoader() {
+			@Override
+			public void loadImage(String url, ImageView view) {
+				if (!TextUtils.isEmpty(url)) {
+					imageLoader.displayImage(url, view);
+				} else {
+					view.setImageResource(R.drawable.ic_app);
+				}
+			}
+		});
+		mFeedsAdapter = new FunDapter<Issue>(getActivity(), containers, R.layout.list_item_issue, feedsDict);
+		mFeedListView.setAdapter(mFeedsAdapter);
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		EventBus.getDefault().register(this);
+		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
+
+	public void onEventMainThread(ContainerSessionChangedEvent event) {
+		Logger.Log("onEvent ContainerSessionChangedEvent");
+		refresh();
 	}
 
 	@Override
@@ -73,35 +156,13 @@ public class RepairIssueFixedListFragment extends SherlockFragment {
 		super.onResume();
 	}
 
-	@Override
-	public void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		EventBus.getDefault().register(this);
-		super.onCreate(savedInstanceState);
-	}
-
-	public void setContainerSessionUUID(String containerSessionUUID) {
-		mContainerSessionUUID = containerSessionUUID;
-	}
-
-	public void refresh() {
-		populateIssueList();
-		mFeedsAdapter.updateData(mFeeds);
-	}
-
 	private void populateIssueList() {
 		mFeeds = new ArrayList<Issue>();
 		try {
-			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient
-					.getInstance().getDatabaseManager()
-					.getHelper(getActivity()).getContainerSessionDaoImpl();
-			mContainerSession = containerSessionDaoImpl
-					.queryForId(mContainerSessionUUID);
+			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager()
+																		.getHelper(getActivity())
+																		.getContainerSessionDaoImpl();
+			mContainerSession = containerSessionDaoImpl.queryForId(mContainerSessionUUID);
 
 			if (null != mContainerSession) {
 				for (Issue issue : mContainerSession.getIssues()) {
@@ -115,88 +176,12 @@ public class RepairIssueFixedListFragment extends SherlockFragment {
 		}
 	}
 
-	private void initIssueFeedAdapter(ArrayList<Issue> containers) {
-		BindDictionary<Issue> feedsDict = new BindDictionary<Issue>();
-		feedsDict.addStringField(R.id.issue_location_code,
-				new StringExtractor<Issue>() {
-					@Override
-					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item.getLocationCode());
-					}
-				});
-		feedsDict.addStringField(R.id.issue_damage_code,
-				new StringExtractor<Issue>() {
-					@Override
-					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item
-								.getDamageCodeString());
-					}
-				});
-		feedsDict.addStringField(R.id.issue_repair_code,
-				new StringExtractor<Issue>() {
-					@Override
-					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item
-								.getRepairCodeString());
-					}
-				});
-		feedsDict.addStringField(R.id.issue_component_code,
-				new StringExtractor<Issue>() {
-					@Override
-					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item
-								.getComponentCodeString());
-					}
-				});
-		feedsDict.addStringField(R.id.issue_quantity,
-				new StringExtractor<Issue>() {
-					@Override
-					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item.getQuantity());
-					}
-				});
-		feedsDict.addStringField(R.id.issue_length,
-				new StringExtractor<Issue>() {
-					@Override
-					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item.getLength());
-					}
-				});
-		feedsDict.addStringField(R.id.issue_height,
-				new StringExtractor<Issue>() {
-					@Override
-					public String getStringValue(Issue item, int position) {
-						return Utils.replaceNullBySpace(item.getHeight());
-					}
-				});
-		feedsDict.addDynamicImageField(R.id.issue_picture,
-				new StringExtractor<Issue>() {
-					@Override
-					public String getStringValue(Issue item, int position) {
-						for (CJayImage cJayImage : item.getCJayImages()) {
-							if (!TextUtils.isEmpty(cJayImage.getUri())) {
-								return Utils.stripNull(cJayImage.getUri());
-							}
-						}
-						return Utils.stripNull(null);
-					}
-				}, new DynamicImageLoader() {
-					@Override
-					public void loadImage(String url, ImageView view) {
-						if (!TextUtils.isEmpty(url)) {
-							imageLoader.displayImage(url, view);
-						} else {
-							view.setImageResource(R.drawable.ic_app);
-						}
-					}
-				});
-		mFeedsAdapter = new FunDapter<Issue>(getActivity(), containers,
-				R.layout.list_item_issue, feedsDict);
-		mFeedListView.setAdapter(mFeedsAdapter);
+	public void refresh() {
+		populateIssueList();
+		mFeedsAdapter.updateData(mFeeds);
 	}
 
-	public void onEventMainThread(ContainerSessionChangedEvent event) {
-		Logger.Log("onEvent ContainerSessionChangedEvent");
-		refresh();
+	public void setContainerSessionUUID(String containerSessionUUID) {
+		mContainerSessionUUID = containerSessionUUID;
 	}
 }

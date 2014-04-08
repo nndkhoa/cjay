@@ -8,8 +8,8 @@ import android.os.Handler;
 import android.widget.ImageView;
 
 import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.CJaySession;
+import com.cloudjay.cjay.util.Logger;
 
 public class SplashScreenActivity extends CJayActivity {
 
@@ -32,18 +32,17 @@ public class SplashScreenActivity extends CJayActivity {
 			if (isNight) {
 				Logger.Log("at Night");
 
-				backgroundImageView
-						.setImageResource(R.drawable.container_terminal_night);
+				backgroundImageView.setImageResource(R.drawable.container_terminal_night);
 			} else {
 				Logger.Log("at Daytime");
-				backgroundImageView
-						.setImageResource(R.drawable.container_terminal_day);
+				backgroundImageView.setImageResource(R.drawable.container_terminal_day);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		new Handler().postDelayed(new Runnable() {
+			@Override
 			public void run() {
 
 				CJaySession session = getSession();
@@ -51,16 +50,14 @@ public class SplashScreenActivity extends CJayActivity {
 
 					// user did not sign in
 					Logger.Log("Session is NULL. User did not sign in.");
-					startActivity(new Intent(SplashScreenActivity.this,
-							LoginActivity_.class));
+					startActivity(new Intent(SplashScreenActivity.this, LoginActivity_.class));
 
 				} else {
 
 					// user signed in
 					Logger.Log("User signed in");
 					session.extendAccessTokenIfNeeded(getApplicationContext());
-					CJayApplication
-							.startCJayHomeActivity(SplashScreenActivity.this);
+					CJayApplication.startCJayHomeActivity(SplashScreenActivity.this);
 
 				}
 

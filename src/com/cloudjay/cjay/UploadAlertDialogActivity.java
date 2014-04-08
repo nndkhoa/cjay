@@ -13,6 +13,41 @@ public class UploadAlertDialogActivity extends CJayActivity {
 	private String uuid;
 	private String tmpImgUri;
 
+	private void displayAlert() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.lbl_confirm_reupload_delete).setCancelable(false)
+				.setPositiveButton(R.string.btn_reupload, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+
+						Intent uploadIntent = new Intent(UploadAlertDialogActivity.this, UploadIntentService.class);
+						uploadIntent.putExtra("uuid", uuid);
+						uploadIntent.putExtra("tmpImgUri", tmpImgUri);
+						startService(uploadIntent);
+
+						dialog.dismiss();
+						UploadAlertDialogActivity.this.finish();
+					}
+				}).setNegativeButton(R.string.btn_cancel, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+						UploadAlertDialogActivity.this.finish();
+						// nm.cancel(notificationTag, 0);
+					}
+				}).setNeutralButton(R.string.btn_delete, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+						dialog.dismiss();
+						nm.cancel(uuid, 0);
+						UploadAlertDialogActivity.this.finish();
+					}
+				}).setMessage(R.string.btn_retry_message);
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
@@ -25,46 +60,6 @@ public class UploadAlertDialogActivity extends CJayActivity {
 		}
 
 		displayAlert();
-	}
-
-	private void displayAlert() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string.lbl_confirm_reupload_delete)
-				.setCancelable(false)
-				.setPositiveButton(R.string.btn_reupload,
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-
-								Intent uploadIntent = new Intent(
-										UploadAlertDialogActivity.this,
-										UploadIntentService.class);
-								uploadIntent.putExtra("uuid", uuid);
-								uploadIntent.putExtra("tmpImgUri", tmpImgUri);
-								startService(uploadIntent);
-
-								dialog.dismiss();
-								UploadAlertDialogActivity.this.finish();
-							}
-						})
-				.setNegativeButton(R.string.btn_cancel,
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								dialog.dismiss();
-								UploadAlertDialogActivity.this.finish();
-								// nm.cancel(notificationTag, 0);
-							}
-						})
-				.setNeutralButton(R.string.btn_delete,
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								dialog.cancel();
-								dialog.dismiss();
-								nm.cancel(uuid, 0);
-								UploadAlertDialogActivity.this.finish();
-							}
-						}).setMessage(R.string.btn_retry_message);
-		AlertDialog alert = builder.create();
-		alert.show();
 	}
 
 	@Override

@@ -28,20 +28,17 @@ public class IssueReportDimensionFragment extends IssueReportFragment {
 
 	@AfterViews
 	void afterViews() {
-		mHeightEditText
-				.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-					@Override
-					public boolean onEditorAction(TextView textView, int id,
-							KeyEvent keyEvent) {
-						if (id == EditorInfo.IME_ACTION_DONE) {
-							// move to next tab
-							mCallback
-									.onReportPageCompleted(AuditorIssueReportListener.TAB_ISSUE_DIMENSION);
-							return true;
-						}
-						return false;
-					}
-				});
+		mHeightEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+				if (id == EditorInfo.IME_ACTION_DONE) {
+					// move to next tab
+					mCallback.onReportPageCompleted(AuditorIssueReportListener.TAB_ISSUE_DIMENSION);
+					return true;
+				}
+				return false;
+			}
+		});
 
 		// initialize with issue
 		if (mIssue != null) {
@@ -51,13 +48,19 @@ public class IssueReportDimensionFragment extends IssueReportFragment {
 	}
 
 	@Override
+	public void hideKeyboard() {
+		// show keyboard
+		InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(mLengthEditText.getWindowToken(), 0);
+	}
+
+	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		try {
 			mCallback = (AuditorIssueReportListener) activity;
 		} catch (ClassCastException e) {
-			throw new ClassCastException(activity.toString()
-					+ " must implement AuditorIssueReportListener");
+			throw new ClassCastException(activity.toString() + " must implement AuditorIssueReportListener");
 		}
 	}
 
@@ -67,29 +70,18 @@ public class IssueReportDimensionFragment extends IssueReportFragment {
 	}
 
 	@Override
-	public boolean validateAndSaveData() {
-		// save data
-		mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_LENGTH,
-				mLengthEditText.getText().toString());
-		mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_HEIGHT,
-				mHeightEditText.getText().toString());
-		return true;
-	}
-	
-	@Override
 	public void showKeyboard() {
 		// show keyboard
 		mLengthEditText.requestFocus();
-		InputMethodManager imm = (InputMethodManager) getActivity()
-				.getSystemService(Context.INPUT_METHOD_SERVICE);
+		InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.showSoftInput(mLengthEditText, 0);
 	}
-	
+
 	@Override
-	public void hideKeyboard() {
-		// show keyboard
-		InputMethodManager imm = (InputMethodManager) getActivity()
-				.getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.hideSoftInputFromWindow(mLengthEditText.getWindowToken(), 0);
+	public boolean validateAndSaveData() {
+		// save data
+		mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_LENGTH, mLengthEditText.getText().toString());
+		mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_HEIGHT, mHeightEditText.getText().toString());
+		return true;
 	}
 }

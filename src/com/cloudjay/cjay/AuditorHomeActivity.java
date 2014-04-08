@@ -19,15 +19,16 @@ import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
-import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.fragment.AuditorReportingListFragment;
+import com.cloudjay.cjay.fragment.AuditorReportingListFragment_;
+import com.cloudjay.cjay.fragment.UploadsFragment_;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
 
 @EActivity(R.layout.activity_auditor_home)
-public class AuditorHomeActivity extends CJayActivity implements
-		OnPageChangeListener, TabListener,
-		AddContainerDialog.AddContainerDialogListener,
-		SearchOperatorDialog.SearchOperatorDialogListener {
+public class AuditorHomeActivity extends CJayActivity implements OnPageChangeListener, TabListener,
+														AddContainerDialog.AddContainerDialogListener,
+														SearchOperatorDialog.SearchOperatorDialogListener {
 
 	private ViewPagerAdapter viewPagerAdapter;
 	private String[] locations;
@@ -35,74 +36,11 @@ public class AuditorHomeActivity extends CJayActivity implements
 	@ViewById
 	ViewPager pager;
 
-	@Override
-	protected void onCreate(Bundle arg0) {
-
-		// Below code to show `More Action` item on menu
-		try {
-			ViewConfiguration config = ViewConfiguration.get(this);
-			Field menuKeyField = ViewConfiguration.class
-					.getDeclaredField("sHasPermanentMenuKey");
-			if (menuKeyField != null) {
-				menuKeyField.setAccessible(true);
-				menuKeyField.setBoolean(config, false);
-			}
-		} catch (Exception ex) {
-
-		}
-		super.onCreate(arg0);
-	}
-
 	@AfterViews
 	void afterViews() {
 		locations = getResources().getStringArray(R.array.auditor_home_tabs);
 		configureViewPager();
 		configureActionBar();
-	}
-
-	public void onEventMainThread(ListItemChangedEvent event) {
-
-		int currentTab = event.getPosition();
-		getSupportActionBar().getTabAt(currentTab).setText(
-				locations[currentTab] + " ("
-						+ Integer.toString(event.getCount()) + ")");
-	}
-
-	private void configureViewPager() {
-		viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(),
-				locations) {
-
-			@Override
-			public Fragment getItem(int position) {
-				switch (position) {
-				case 0:
-					// containers that have no 'report images'
-					Fragment notReportedFragment = new AuditorReportingListFragment_();
-					((AuditorReportingListFragment_) notReportedFragment)
-							.setState(AuditorReportingListFragment_.STATE_NOT_REPORTED);
-					return notReportedFragment;
-
-				case 1:
-					// containers that have 'report images'
-					Fragment reportingFragment = new AuditorReportingListFragment_();
-					((AuditorReportingListFragment_) reportingFragment)
-							.setState(AuditorReportingListFragment_.STATE_REPORTING);
-					return reportingFragment;
-
-				case 2:
-				default:
-					Fragment uploadFragment = new UploadsFragment_();
-					return uploadFragment;
-				}
-			}
-		};
-		pager.setAdapter(viewPagerAdapter);
-		pager.setOnPageChangeListener(this);
-	}
-
-	public void onPageSelected(int position) {
-		Tab tab = getSupportActionBar().getTabAt(position);
-		getSupportActionBar().selectTab(tab);
 	}
 
 	private void configureActionBar() {
@@ -115,10 +53,57 @@ public class AuditorHomeActivity extends CJayActivity implements
 		}
 	}
 
+	private void configureViewPager() {
+		viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), locations) {
+
+			@Override
+			public Fragment getItem(int position) {
+				switch (position) {
+					case 0:
+						// containers that have no 'report images'
+						Fragment notReportedFragment = new AuditorReportingListFragment_();
+						((AuditorReportingListFragment_) notReportedFragment).setState(AuditorReportingListFragment.STATE_NOT_REPORTED);
+						return notReportedFragment;
+
+					case 1:
+						// containers that have 'report images'
+						Fragment reportingFragment = new AuditorReportingListFragment_();
+						((AuditorReportingListFragment_) reportingFragment).setState(AuditorReportingListFragment.STATE_REPORTING);
+						return reportingFragment;
+
+					case 2:
+					default:
+						Fragment uploadFragment = new UploadsFragment_();
+						return uploadFragment;
+				}
+			}
+		};
+		pager.setAdapter(viewPagerAdapter);
+		pager.setOnPageChangeListener(this);
+	}
+
 	@Override
-	public void onTabSelected(Tab tab, FragmentTransaction ft) {
-		int position = tab.getPosition();
-		pager.setCurrentItem(position);
+	public void OnContainerInputCompleted(Fragment parent, String containerId, String operatorName, int mode) {
+		if (parent instanceof AuditorReportingListFragment) {
+			((AuditorReportingListFragment) parent).OnContainerInputCompleted(containerId, operatorName, mode);
+		}
+	}
+
+	@Override
+	protected void onCreate(Bundle arg0) {
+
+		// Below code to show `More Action` item on menu
+		try {
+			ViewConfiguration config = ViewConfiguration.get(this);
+			Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+			if (menuKeyField != null) {
+				menuKeyField.setAccessible(true);
+				menuKeyField.setBoolean(config, false);
+			}
+		} catch (Exception ex) {
+
+		}
+		super.onCreate(arg0);
 	}
 
 	@Override
@@ -127,17 +112,32 @@ public class AuditorHomeActivity extends CJayActivity implements
 		return true;
 	}
 
+	public void onEventMainThread(ListItemChangedEvent event) {
+
+		int currentTab = event.getPosition();
+		getSupportActionBar().getTabAt(currentTab).setText(	locations[currentTab] + " ("
+																	+ Integer.toString(event.getCount()) + ")");
+	}
+
+	@Override
+	public void OnOperatorSelected(Fragment parent, String containerId, String operatorName, int mode) {
+		if (parent instanceof AuditorReportingListFragment) {
+			((AuditorReportingListFragment) parent).OnOperatorSelected(containerId, operatorName, mode);
+		}
+	}
+
+	@Override
+	public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+	}
+
 	@Override
 	public void onPageScrollStateChanged(int position) {
 	}
 
 	@Override
-	public void onPageScrolled(int position, float positionOffset,
-			int positionOffsetPixels) {
-	}
-
-	@Override
-	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+	public void onPageSelected(int position) {
+		Tab tab = getSupportActionBar().getTabAt(position);
+		getSupportActionBar().selectTab(tab);
 	}
 
 	@Override
@@ -145,21 +145,13 @@ public class AuditorHomeActivity extends CJayActivity implements
 	}
 
 	@Override
-	public void OnOperatorSelected(Fragment parent, String containerId,
-			String operatorName, int mode) {
-		if (parent instanceof AuditorReportingListFragment) {
-			((AuditorReportingListFragment) parent).OnOperatorSelected(
-					containerId, operatorName, mode);
-		}
+	public void onTabSelected(Tab tab, FragmentTransaction ft) {
+		int position = tab.getPosition();
+		pager.setCurrentItem(position);
 	}
 
 	@Override
-	public void OnContainerInputCompleted(Fragment parent, String containerId,
-			String operatorName, int mode) {
-		if (parent instanceof AuditorReportingListFragment) {
-			((AuditorReportingListFragment) parent).OnContainerInputCompleted(
-					containerId, operatorName, mode);
-		}
+	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 	}
 
 }

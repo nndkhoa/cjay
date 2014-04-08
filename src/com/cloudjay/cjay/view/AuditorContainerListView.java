@@ -23,64 +23,53 @@ public class AuditorContainerListView extends CJayListView<ContainerSession> {
 		super(context, attrs);
 	}
 
-	public AuditorContainerListView(Context context, AttributeSet attrs,
-			int defStyle) {
+	public AuditorContainerListView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 	}
 
 	@Override
 	public void initAdapter() {
 		BindDictionary<ContainerSession> feedsDict = new BindDictionary<ContainerSession>();
-		feedsDict.addStringField(R.id.feed_item_container_id,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.replaceNullBySpace(item.getContainerId());
-					}
-				});
-		feedsDict.addStringField(R.id.feed_item_container_owner,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.replaceNullBySpace(item.getOperatorName());
-					}
-				});
-		feedsDict.addStringField(R.id.feed_item_container_import_date,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.replaceNullBySpace(item.getCheckInTime());
-					}
-				});
-		feedsDict.addStringField(R.id.feed_item_container_issues,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.replaceNullBySpace(item.getIssueCount());
-					}
-				});
-		feedsDict.addDynamicImageField(R.id.feed_item_picture,
-				new StringExtractor<ContainerSession>() {
-					@Override
-					public String getStringValue(ContainerSession item,
-							int position) {
-						return Utils.stripNull(item.getImageIdPath());
-					}
-				}, new DynamicImageLoader() {
-					@Override
-					public void loadImage(String url, ImageView view) {
-						if (!TextUtils.isEmpty(url.trim())) {
-							getImageLoader().displayImage(url, view);
-						} else {
-							view.setImageResource(R.drawable.ic_app);
-						}
-					}
-				});
-		setFeedsAdapter(new FunDapter<ContainerSession>(getContext(), null,
-				R.layout.list_item_audit_container, feedsDict));
+		feedsDict.addStringField(R.id.feed_item_container_id, new StringExtractor<ContainerSession>() {
+			@Override
+			public String getStringValue(ContainerSession item, int position) {
+				return Utils.replaceNullBySpace(item.getContainerId());
+			}
+		});
+		feedsDict.addStringField(R.id.feed_item_container_owner, new StringExtractor<ContainerSession>() {
+			@Override
+			public String getStringValue(ContainerSession item, int position) {
+				return Utils.replaceNullBySpace(item.getOperatorName());
+			}
+		});
+		feedsDict.addStringField(R.id.feed_item_container_import_date, new StringExtractor<ContainerSession>() {
+			@Override
+			public String getStringValue(ContainerSession item, int position) {
+				return Utils.replaceNullBySpace(item.getCheckInTime());
+			}
+		});
+		feedsDict.addStringField(R.id.feed_item_container_issues, new StringExtractor<ContainerSession>() {
+			@Override
+			public String getStringValue(ContainerSession item, int position) {
+				return Utils.replaceNullBySpace(item.getIssueCount());
+			}
+		});
+		feedsDict.addDynamicImageField(R.id.feed_item_picture, new StringExtractor<ContainerSession>() {
+			@Override
+			public String getStringValue(ContainerSession item, int position) {
+				return Utils.stripNull(item.getImageIdPath());
+			}
+		}, new DynamicImageLoader() {
+			@Override
+			public void loadImage(String url, ImageView view) {
+				if (!TextUtils.isEmpty(url.trim())) {
+					getImageLoader().displayImage(url, view);
+				} else {
+					view.setImageResource(R.drawable.ic_app);
+				}
+			}
+		});
+		setFeedsAdapter(new FunDapter<ContainerSession>(getContext(), null, R.layout.list_item_audit_container,
+														feedsDict));
 	}
 }

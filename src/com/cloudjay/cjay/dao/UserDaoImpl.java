@@ -15,21 +15,16 @@ public class UserDaoImpl extends BaseDaoImpl<User, Integer> implements IUserDao 
 	}
 
 	@Override
-	public List<User> getAllUsers() throws SQLException {
-		return this.queryForAll();
-	}
-
-	@Override
 	public void addListUsers(List<User> users) throws SQLException {
 		for (User user : users) {
-			this.createOrUpdate(user);
+			createOrUpdate(user);
 		}
 	}
 
 	@Override
 	public void addUser(User user) throws SQLException {
 		Logger.Log("add User");
-		this.createOrUpdate(user);
+		createOrUpdate(user);
 	}
 
 	@Override
@@ -41,14 +36,19 @@ public class UserDaoImpl extends BaseDaoImpl<User, Integer> implements IUserDao 
 	}
 
 	@Override
+	public List<User> getAllUsers() throws SQLException {
+		return queryForAll();
+	}
+
+	@Override
 	public User getMainUser() throws SQLException {
 
 		User user = null;
-		List<User> users = this.query(this.queryBuilder().where()
-				.eq(User.IS_MAIN_ACCOUNT, true).prepare());
+		List<User> users = query(queryBuilder().where().eq(User.IS_MAIN_ACCOUNT, true).prepare());
 
-		if (!users.isEmpty())
+		if (!users.isEmpty()) {
 			user = users.get(0);
+		}
 
 		return user;
 	}

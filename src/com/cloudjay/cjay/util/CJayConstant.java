@@ -13,26 +13,19 @@ public final class CJayConstant {
 
 	public static final String ACRA = "https://cloudjay-web.appspot.com/acra/";
 
-	public static final String API_ADD_GCM_DEVICE = API_ROOT
-			+ "mobile/gcm-devices.json";
+	public static final String API_ADD_GCM_DEVICE = API_ROOT + "mobile/gcm-devices.json";
 
-	public static final String CURRENT_USER = API_ROOT
-			+ "cjay/current-user.json";
+	public static final String CURRENT_USER = API_ROOT + "cjay/current-user.json";
 
-	public static final String LIST_OPERATORS = API_ROOT
-			+ "cjay/container-operators.json";
+	public static final String LIST_OPERATORS = API_ROOT + "cjay/container-operators.json";
 
-	public static final String LIST_DAMAGE_CODES = API_ROOT
-			+ "cjay/damage-codes.json";
+	public static final String LIST_DAMAGE_CODES = API_ROOT + "cjay/damage-codes.json";
 
-	public static final String LIST_REPAIR_CODES = API_ROOT
-			+ "cjay/repair-codes.json";
+	public static final String LIST_REPAIR_CODES = API_ROOT + "cjay/repair-codes.json";
 
-	public static final String LIST_COMPONENT_CODES = API_ROOT
-			+ "cjay/component-codes.json";
+	public static final String LIST_COMPONENT_CODES = API_ROOT + "cjay/component-codes.json";
 
-	public static final String CONTAINER_SESSIONS = API_ROOT
-			+ "cjay/container-sessions.json";
+	public static final String CONTAINER_SESSIONS = API_ROOT + "cjay/container-sessions.json";
 
 	public static final String CJAY_TMP_STORAGE = "https://www.googleapis.com/upload/storage/v1beta2/b/cjaytmp/o?uploadType=media&name=%s";
 
@@ -42,15 +35,13 @@ public final class CJayConstant {
 
 	// `/sdcard/DCMI/CJay/`
 	public static final File APP_DIRECTORY_FILE = new File(
-			Environment
-					.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
-			CJayConstant.APP_DIRECTORY);
+															Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
+															CJayConstant.APP_DIRECTORY);
 
 	// `/sdcard/Pictures/.CJay/`
 	public static final File HIDDEN_APP_DIRECTORY_FILE = new File(
-			Environment
-					.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-			CJayConstant.HIDDEN_APP_DIRECTORY);
+																	Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+																	CJayConstant.HIDDEN_APP_DIRECTORY);
 
 	public static final int SPLASH_TIME_OUT = 2000;
 	public static final String CJAY_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";

@@ -15,12 +15,16 @@ import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.util.Logger;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-public class PhotoGridViewCursorAdapter extends CursorAdapter implements
-		Filterable {
+public class PhotoGridViewCursorAdapter extends CursorAdapter implements Filterable {
+
+	private static class ViewHolder {
+		public ImageView imageView;
+	}
 
 	private int layout;
 	private LayoutInflater inflater;
 	private ImageLoader imageLoader;
+
 	public boolean isScrolling;
 
 	@SuppressWarnings("deprecation")
@@ -28,17 +32,12 @@ public class PhotoGridViewCursorAdapter extends CursorAdapter implements
 		super(context, c);
 	}
 
-	public PhotoGridViewCursorAdapter(Context context, int layout, Cursor c,
-			int flags) {
+	public PhotoGridViewCursorAdapter(Context context, int layout, Cursor c, int flags) {
 		super(context, c, flags);
 		this.layout = layout;
-		this.inflater = LayoutInflater.from(context);
-		this.mCursor = c;
-		this.imageLoader = ImageLoader.getInstance();
-	}
-
-	private static class ViewHolder {
-		public ImageView imageView;
+		inflater = LayoutInflater.from(context);
+		mCursor = c;
+		imageLoader = ImageLoader.getInstance();
 	}
 
 	@Override
@@ -57,8 +56,7 @@ public class PhotoGridViewCursorAdapter extends CursorAdapter implements
 			view.setTag(holder);
 		}
 
-		String url = cursor.getString(cursor
-				.getColumnIndexOrThrow(CJayImage.FIELD_URI));
+		String url = cursor.getString(cursor.getColumnIndexOrThrow(CJayImage.FIELD_URI));
 		if (!TextUtils.isEmpty(url)) {
 			imageLoader.displayImage(url, holder.imageView);
 		} else {

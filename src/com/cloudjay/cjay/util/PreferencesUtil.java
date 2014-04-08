@@ -23,24 +23,11 @@ public class PreferencesUtil {
 	public static final String PREF_USERNAME = "pref_username";
 	public static final String PREF_APP_VERSION = "pref_app_version";
 
-	public static void storePrefsValue(Context context, String key,
-			String content) {
-		SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
-		Editor editor = prefs.edit();
+	public static void clearPrefs(Context context) {
 
-		// Clear Prefs User Data
-		editor.putString(key, content);
+		SharedPreferences settings = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+		settings.edit().clear().commit();
 
-		// Commit Changed Data
-		editor.commit();
-	}
-
-	public static void storePrefsValue(final Context context, String key,
-			final boolean value) {
-		SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
-		Editor editor = prefs.edit();
-		editor.putBoolean(key, value);
-		editor.commit();
 	}
 
 	public static String getPrefsValue(Context context, String key) {
@@ -49,18 +36,27 @@ public class PreferencesUtil {
 		return value;
 	}
 
-	public static boolean getPrefsValue(Context context, String key,
-			boolean defVal) {
+	public static boolean getPrefsValue(Context context, String key, boolean defVal) {
 		SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
 		boolean value = prefs.getBoolean(key, defVal);
 		return value;
 	}
 
-	public static void clearPrefs(Context context) {
+	public static void storePrefsValue(final Context context, String key, final boolean value) {
+		SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
+		Editor editor = prefs.edit();
+		editor.putBoolean(key, value);
+		editor.commit();
+	}
 
-		SharedPreferences settings = context.getSharedPreferences(PREFS,
-				Context.MODE_PRIVATE);
-		settings.edit().clear().commit();
+	public static void storePrefsValue(Context context, String key, String content) {
+		SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
+		Editor editor = prefs.edit();
 
+		// Clear Prefs User Data
+		editor.putString(key, content);
+
+		// Commit Changed Data
+		editor.commit();
 	}
 }

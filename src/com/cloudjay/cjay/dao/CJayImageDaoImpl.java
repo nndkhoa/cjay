@@ -10,30 +10,22 @@ import com.cloudjay.cjay.util.Logger;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
-public class CJayImageDaoImpl extends BaseDaoImpl<CJayImage, String> implements
-		ICJayImageDao {
+public class CJayImageDaoImpl extends BaseDaoImpl<CJayImage, String> implements ICJayImageDao {
 
-	public CJayImageDaoImpl(ConnectionSource connectionSource)
-			throws SQLException {
+	public CJayImageDaoImpl(ConnectionSource connectionSource) throws SQLException {
 		super(connectionSource, CJayImage.class);
 	}
 
 	@Override
-	public List<CJayImage> getAllCJayImages() throws SQLException {
-		return this.queryForAll();
-	}
-
-	@Override
-	public void addListCJayImages(List<CJayImage> cJayImages)
-			throws SQLException {
-		for (CJayImage cJayImage : cJayImages) {
-			this.createOrUpdate(cJayImage);
-		}
-	}
-
-	@Override
 	public void addCJayImage(CJayImage cJayImage) throws SQLException {
-		this.createOrUpdate(cJayImage);
+		createOrUpdate(cJayImage);
+	}
+
+	@Override
+	public void addListCJayImages(List<CJayImage> cJayImages) throws SQLException {
+		for (CJayImage cJayImage : cJayImages) {
+			createOrUpdate(cJayImage);
+		}
 	}
 
 	@Override
@@ -45,10 +37,22 @@ public class CJayImageDaoImpl extends BaseDaoImpl<CJayImage, String> implements
 	}
 
 	@Override
+	public CJayImage findByUuid(String uuid) throws SQLException {
+		List<CJayImage> result = queryForEq("uuid", uuid);
+		if (result != null && result.size() > 0) return result.get(0);
+
+		return null;
+	}
+
+	@Override
+	public List<CJayImage> getAllCJayImages() throws SQLException {
+		return queryForAll();
+	}
+
+	@Override
 	public CJayImage getNextWaiting() throws SQLException {
 
-		List<CJayImage> result = this.queryForEq("state",
-				CJayImage.STATE_UPLOAD_WAITING);
+		List<CJayImage> result = queryForEq("state", CJayImage.STATE_UPLOAD_WAITING);
 
 		if (result != null && result.size() > 0) {
 			Logger.Log("getNextWaiting " + result.toString() + Log.INFO);
@@ -56,16 +60,6 @@ public class CJayImageDaoImpl extends BaseDaoImpl<CJayImage, String> implements
 		}
 
 		// Logger.Log( "getNextWaiting return NULL", Log.ERROR);
-		return null;
-	}
-
-	@Override
-	public CJayImage findByUuid(String uuid) throws SQLException {
-		List<CJayImage> result = this.queryForEq("uuid", uuid);
-		if (result != null && result.size() > 0) {
-			return result.get(0);
-		}
-
 		return null;
 	}
 }

@@ -71,157 +71,157 @@ public class User {
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	private Depot depot;
 
-	public Depot getDepot() {
-		return depot;
-	}
-
-	public void setDepot(Depot depot) {
-		this.depot = depot;
-	}
-
 	// use for json parsing purpose
 	private String depot_code;
-
-	public int getExpire() {
-		return expire_in;
-	}
-
-	public void setExpire(int day) {
-		this.expire_in = day;
-	}
 
 	public String getAccessToken() {
 		return access_token;
 	}
 
-	public void setAccessToken(String accessToken) {
-		this.access_token = accessToken;
-	}
-
-	public String getUserName() {
-		return username;
-	}
-
-	public void setUserName(String userName) {
-		this.username = userName;
-	}
-
-	public int getID() {
-		return id;
-	}
-
-	public void setID(int id) {
-		this.id = id;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getFirstName() {
-		return first_name;
-	}
-
-	public void setFirstName(String firstName) {
-		this.first_name = firstName;
-	}
-
-	public String getLastName() {
-		return last_name;
-	}
-
-	public void setLastName(String lastName) {
-		this.last_name = lastName;
-	}
-
-	public boolean isMainAccount() {
-		return is_main_account;
-	}
-
-	public void setMainAccount(boolean isMainAccount) {
-		this.is_main_account = isMainAccount;
-	}
-
-	public String getFullName() {
-		return full_name;
-	}
-
-	public void setFullName(String fullName) {
-		this.full_name = fullName;
-	}
-
 	public String getAvatar() {
-		return this.avatar_url;
+		return avatar_url;
 	}
 
-	public void setAvatar(String avatarUrl) {
-		this.avatar_url = avatarUrl;
-	}
-
-	public String getRoleName() {
-		return role_name;
-	}
-
-	public void setRoleName(String roleName) {
-		this.role_name = roleName;
-	}
-
-	public int getRole() {
-		return role;
-	}
-
-	public void setRole(int role) {
-		this.role = role;
-	}
-
-	public int getDialingCode() {
-		return dialing_code;
-	}
-
-	public void setDialingCode(int dialingCode) {
-		this.dialing_code = dialingCode;
-	}
-
-	public int getPhone() {
-		return phone;
-	}
-
-	public void setPhone(int phone) {
-		this.phone = phone;
-	}
-
-	public int getFilterStatus() {
-		int result = 0;
-
-		switch (this.role) {
-		case User.ROLE_GATE_KEEPER:
-			result = 5; // repaired containers
-			break;
-
-		case User.ROLE_AUDITOR:
-			result = 0; // checked in containers
-			break;
-
-		case User.ROLE_REPAIR_STAFF:
-			result = 4; // repair confirmed containers
-			// result = 1; // temporary
-			break;
-
-		default:
-			break;
-		}
-		return result;
+	public Depot getDepot() {
+		return depot;
 	}
 
 	public String getDepotCode() {
 		return depot_code;
 	}
 
+	public int getDialingCode() {
+		return dialing_code;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public int getExpire() {
+		return expire_in;
+	}
+
+	public int getFilterStatus() {
+		int result = 0;
+
+		switch (role) {
+			case User.ROLE_GATE_KEEPER:
+				result = 5; // repaired containers
+				break;
+
+			case User.ROLE_AUDITOR:
+				result = 0; // checked in containers
+				break;
+
+			case User.ROLE_REPAIR_STAFF:
+				result = 4; // repair confirmed containers
+				// result = 1; // temporary
+				break;
+
+			default:
+				break;
+		}
+		return result;
+	}
+
+	public String getFirstName() {
+		return first_name;
+	}
+
+	public String getFullName() {
+		return full_name;
+	}
+
+	public int getID() {
+		return id;
+	}
+
+	public String getLastName() {
+		return last_name;
+	}
+
+	public int getPhone() {
+		return phone;
+	}
+
+	public int getRole() {
+		return role;
+	}
+
+	public String getRoleName() {
+		return role_name;
+	}
+
+	public String getUserName() {
+		return username;
+	}
+
+	public boolean isMainAccount() {
+		return is_main_account;
+	}
+
+	public void setAccessToken(String accessToken) {
+		access_token = accessToken;
+	}
+
+	public void setAvatar(String avatarUrl) {
+		avatar_url = avatarUrl;
+	}
+
+	public void setDepot(Depot depot) {
+		this.depot = depot;
+	}
+
 	public void setDepotCode(String depot_code) {
 		this.depot_code = depot_code;
+	}
+
+	public void setDialingCode(int dialingCode) {
+		dialing_code = dialingCode;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public void setExpire(int day) {
+		expire_in = day;
+	}
+
+	public void setFirstName(String firstName) {
+		first_name = firstName;
+	}
+
+	public void setFullName(String fullName) {
+		full_name = fullName;
+	}
+
+	public void setID(int id) {
+		this.id = id;
+	}
+
+	public void setLastName(String lastName) {
+		last_name = lastName;
+	}
+
+	public void setMainAccount(boolean isMainAccount) {
+		is_main_account = isMainAccount;
+	}
+
+	public void setPhone(int phone) {
+		this.phone = phone;
+	}
+
+	public void setRole(int role) {
+		this.role = role;
+	}
+
+	public void setRoleName(String roleName) {
+		role_name = roleName;
+	}
+
+	public void setUserName(String userName) {
+		username = userName;
 	}
 }

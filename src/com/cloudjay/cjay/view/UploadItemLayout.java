@@ -48,54 +48,64 @@ public class UploadItemLayout extends LinearLayout {
 		return (TextView) findViewById(R.id.tv_photo_tags);
 	}
 
+	@Override
+	protected void onAttachedToWindow() {
+		EventBus.getDefault().register(this);
+		super.onAttachedToWindow();
+	}
+
+	@Override
+	protected void onDetachedFromWindow() {
+		EventBus.getDefault().unregister(this);
+		super.onDetachedFromWindow();
+	}
+
 	// Use to trigger refresh layout
 	public void onEventMainThread(ContainerSessionUpdatedEvent event) {
 
 		Logger.Log("onEvent ContainerSessionUpdatedEvent");
 		refreshUploadUi();
-		
+
 	}
 
 	@UiThread
 	public void refreshUploadUi() {
-		if (null == mContainerSession) {
-			return;
-		}
+		if (null == mContainerSession) return;
 
 		ProgressBar pb = getProgressBar();
 		ImageView resultIv = getResultImageView();
 
 		switch (mContainerSession.getUploadState()) {
-		case ContainerSession.STATE_UPLOAD_COMPLETED:
-			pb.setVisibility(View.GONE);
-			resultIv.setImageResource(R.drawable.ic_success);
-			resultIv.setVisibility(View.VISIBLE);
-			break;
+			case ContainerSession.STATE_UPLOAD_COMPLETED:
+				pb.setVisibility(View.GONE);
+				resultIv.setImageResource(R.drawable.ic_success);
+				resultIv.setVisibility(View.VISIBLE);
+				break;
 
-		case ContainerSession.STATE_UPLOAD_ERROR:
-			pb.setVisibility(View.GONE);
-			resultIv.setImageResource(R.drawable.ic_error);
-			resultIv.setVisibility(View.VISIBLE);
-			break;
+			case ContainerSession.STATE_UPLOAD_ERROR:
+				pb.setVisibility(View.GONE);
+				resultIv.setImageResource(R.drawable.ic_error);
+				resultIv.setVisibility(View.VISIBLE);
+				break;
 
-		case ContainerSession.STATE_UPLOAD_IN_PROGRESS:
-			pb.setVisibility(View.VISIBLE);
-			resultIv.setVisibility(View.GONE);
+			case ContainerSession.STATE_UPLOAD_IN_PROGRESS:
+				pb.setVisibility(View.VISIBLE);
+				resultIv.setVisibility(View.GONE);
 
-			final int progress = mContainerSession.getUploadProgress();
-			if (progress <= 0) {
+				final int progress = mContainerSession.getUploadProgress();
+				if (progress <= 0) {
+					pb.setIndeterminate(true);
+				} else {
+					pb.setIndeterminate(false);
+					pb.setProgress(progress);
+				}
+				break;
+
+			case ContainerSession.STATE_UPLOAD_WAITING:
+				pb.setVisibility(View.VISIBLE);
+				resultIv.setVisibility(View.GONE);
 				pb.setIndeterminate(true);
-			} else {
-				pb.setIndeterminate(false);
-				pb.setProgress(progress);
-			}
-			break;
-
-		case ContainerSession.STATE_UPLOAD_WAITING:
-			pb.setVisibility(View.VISIBLE);
-			resultIv.setVisibility(View.GONE);
-			pb.setIndeterminate(true);
-			break;
+				break;
 		}
 
 		requestLayout();
@@ -112,16 +122,14 @@ public class UploadItemLayout extends LinearLayout {
 			if (null != iv) {
 				// iv.requestThumbnail(mSelection, false);
 				try {
-					ImageLoader.getInstance().displayImage(
-							mContainerSession.getImageIdPath(), iv);
+					ImageLoader.getInstance().displayImage(mContainerSession.getImageIdPath(), iv);
 				} catch (Exception e) {
 
 				}
 			}
 
 			TextView tv = getCaptionTextView();
-			tv.setText(mContainerSession.getOperatorName() + " -- "
-					+ mContainerSession.getContainerId());
+			tv.setText(mContainerSession.getOperatorName() + " -- " + mContainerSession.getContainerId());
 
 			/**
 			 * Refresh Progress Bar
@@ -131,18 +139,6 @@ public class UploadItemLayout extends LinearLayout {
 
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	protected void onAttachedToWindow() {
-		EventBus.getDefault().register(this);
-		super.onAttachedToWindow();
-	}
-
-	@Override
-	protected void onDetachedFromWindow() {
-		EventBus.getDefault().unregister(this);
-		super.onDetachedFromWindow();
 	}
 
 }

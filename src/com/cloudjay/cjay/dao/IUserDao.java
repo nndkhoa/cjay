@@ -12,13 +12,13 @@ import com.j256.ormlite.dao.Dao;
  * 
  */
 public interface IUserDao extends Dao<User, Integer> {
-	List<User> getAllUsers() throws SQLException;
-
 	void addListUsers(List<User> users) throws SQLException;
 
 	void addUser(User user) throws SQLException;
 
 	void deleteAllUsers() throws SQLException;
+
+	List<User> getAllUsers() throws SQLException;
 
 	User getMainUser() throws SQLException;
 }

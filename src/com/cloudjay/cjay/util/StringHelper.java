@@ -3,35 +3,12 @@ package com.cloudjay.cjay.util;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import android.annotation.SuppressLint;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 
 public class StringHelper {
-
-	@SuppressLint("SimpleDateFormat")
-	public static String getTimestamp(String format, Date date) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat(format);
-		String timeStamp = dateFormat.format(date);
-		return timeStamp;
-	}
-
-	@SuppressLint("SimpleDateFormat")
-	public static String getTimestamp(String oldFormat, String newFormat,
-			String date) {
-
-		if (TextUtils.isEmpty(date)) {
-			return "";
-		}
-
-		Logger.Log(oldFormat);
-		Logger.Log(newFormat);
-		Logger.Log(date);
-
-		SimpleDateFormat formatter = new SimpleDateFormat(newFormat);
-		String timeStamp = formatter.format(date);
-		return timeStamp;
-	}
 
 	@SuppressLint("SimpleDateFormat")
 	public static String getCurrentTimestamp(String format) {
@@ -47,9 +24,7 @@ public class StringHelper {
 	@SuppressLint("SimpleDateFormat")
 	public static String getRelativeDate(String format, String date) {
 
-		if (TextUtils.isEmpty(date)) {
-			return "";
-		}
+		if (TextUtils.isEmpty(date)) return "";
 
 		Date now = new Date();
 
@@ -64,11 +39,31 @@ public class StringHelper {
 			return "";
 		}
 
-		String timeString = DateUtils.getRelativeTimeSpanString(
-				convertedDate.getTime(), now.getTime(),
-				DateUtils.SECOND_IN_MILLIS).toString();
+		String timeString = DateUtils.getRelativeTimeSpanString(convertedDate.getTime(), now.getTime(),
+																DateUtils.SECOND_IN_MILLIS).toString();
 
 		return timeString;
 
+	}
+
+	@SuppressLint("SimpleDateFormat")
+	public static String getTimestamp(String format, Date date) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+		String timeStamp = dateFormat.format(date);
+		return timeStamp;
+	}
+
+	@SuppressLint("SimpleDateFormat")
+	public static String getTimestamp(String oldFormat, String newFormat, String date) {
+
+		if (TextUtils.isEmpty(date)) return "";
+
+		Logger.Log(oldFormat);
+		Logger.Log(newFormat);
+		Logger.Log(date);
+
+		SimpleDateFormat formatter = new SimpleDateFormat(newFormat);
+		String timeStamp = formatter.format(date);
+		return timeStamp;
 	}
 }

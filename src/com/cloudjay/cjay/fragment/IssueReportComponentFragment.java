@@ -19,9 +19,9 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.FilterQueryProvider;
 import android.widget.ListView;
-import android.widget.AbsListView.OnScrollListener;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.CodeCursorAdapter;
@@ -33,8 +33,7 @@ import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 
 @EFragment(R.layout.fragment_issue_component_code)
-public class IssueReportComponentFragment extends IssueReportFragment implements
-		LoaderCallbacks<Cursor> {
+public class IssueReportComponentFragment extends IssueReportFragment implements LoaderCallbacks<Cursor> {
 	private AuditorIssueReportListener mCallback;
 	private Issue mIssue;
 
@@ -48,6 +47,15 @@ public class IssueReportComponentFragment extends IssueReportFragment implements
 	@ViewById(R.id.component_list)
 	ListView mComponentListView;
 
+	@SystemService
+	InputMethodManager inputMethodManager;
+
+	private int mItemLayout = R.layout.list_item_issue_code;
+
+	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_GATE_EXPORT;
+
+	CodeCursorAdapter cursorAdapter;
+
 	@AfterViews
 	void afterViews() {
 
@@ -57,12 +65,12 @@ public class IssueReportComponentFragment extends IssueReportFragment implements
 				search(arg0.toString());
 			}
 
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 			}
 
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
 			}
 		});
 
@@ -92,22 +100,19 @@ public class IssueReportComponentFragment extends IssueReportFragment implements
 		mComponentListView.setOnScrollListener(new OnScrollListener() {
 
 			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+			}
+
+			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				if (scrollState != 0) {
 					((CodeCursorAdapter) mComponentListView.getAdapter()).isScrolling = true;
 				} else {
 					((CodeCursorAdapter) mComponentListView.getAdapter()).isScrolling = false;
-					((CodeCursorAdapter) mComponentListView.getAdapter())
-							.notifyDataSetChanged();
+					((CodeCursorAdapter) mComponentListView.getAdapter()).notifyDataSetChanged();
 				}
 
-				inputMethodManager.hideSoftInputFromWindow(
-						mComponentListView.getWindowToken(), 0);
-			}
-
-			@Override
-			public void onScroll(AbsListView view, int firstVisibleItem,
-					int visibleItemCount, int totalItemCount) {
+				inputMethodManager.hideSoftInputFromWindow(mComponentListView.getWindowToken(), 0);
 			}
 		});
 	}
@@ -117,22 +122,23 @@ public class IssueReportComponentFragment extends IssueReportFragment implements
 
 		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
 
-		mComponentCode = cursor.getString(cursor
-				.getColumnIndexOrThrow(DamageCode.CODE));
-		mComponentName = cursor.getString(cursor
-				.getColumnIndexOrThrow(DamageCode.DISPLAY_NAME));
+		mComponentCode = cursor.getString(cursor.getColumnIndexOrThrow(DamageCode.CODE));
+		mComponentName = cursor.getString(cursor.getColumnIndexOrThrow(DamageCode.DISPLAY_NAME));
 
 		ignoreSearch = true;
 		mComponentEditText.setText(mComponentName);
 		ignoreSearch = false;
 
 		// hide keyboard
-		inputMethodManager.hideSoftInputFromWindow(
-				mComponentEditText.getWindowToken(), 0);
+		inputMethodManager.hideSoftInputFromWindow(mComponentEditText.getWindowToken(), 0);
 
 		// move to next tab
-		mCallback
-				.onReportPageCompleted(AuditorIssueReportListener.TAB_ISSUE_COMPONENT);
+		mCallback.onReportPageCompleted(AuditorIssueReportListener.TAB_ISSUE_COMPONENT);
+	}
+
+	@Override
+	public void hideKeyboard() {
+
 	}
 
 	@Override
@@ -141,57 +147,9 @@ public class IssueReportComponentFragment extends IssueReportFragment implements
 		try {
 			mCallback = (AuditorIssueReportListener) activity;
 		} catch (ClassCastException e) {
-			throw new ClassCastException(activity.toString()
-					+ " must implement AuditorIssueReportListener");
+			throw new ClassCastException(activity.toString() + " must implement AuditorIssueReportListener");
 		}
 	}
-
-	@Override
-	public void setIssue(Issue issue) {
-		mIssue = issue;
-	}
-
-	@Override
-	public boolean validateAndSaveData() {
-		if (!TextUtils.isEmpty(mComponentCode)) {
-			mComponentEditText.setError(null);
-			mCallback.onReportValueChanged(
-					AuditorIssueReportListener.TYPE_COMPONENT_CODE,
-					mComponentCode);
-			return true;
-
-		} else {
-			mComponentEditText
-					.setError(getString(R.string.issue_code_missing_warning));
-			return false;
-		}
-	}
-
-	@Override
-	public void showKeyboard() {
-	}
-
-	@Override
-	public void hideKeyboard() {
-
-	}
-
-	private void search(String searchText) {
-		if (searchText.equals("") || ignoreSearch) {
-
-		} else {
-			if (cursorAdapter != null) {
-				cursorAdapter.getFilter().filter(searchText);
-			}
-		}
-	}
-
-	@SystemService
-	InputMethodManager inputMethodManager;
-
-	private int mItemLayout = R.layout.list_item_issue_code;
-	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_GATE_EXPORT;
-	CodeCursorAdapter cursorAdapter;
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
@@ -201,8 +159,7 @@ public class IssueReportComponentFragment extends IssueReportFragment implements
 		return new CJayCursorLoader(context) {
 			@Override
 			public Cursor loadInBackground() {
-				Cursor cursor = DataCenter.getInstance()
-						.getComponentCodesCursor(getContext());
+				Cursor cursor = DataCenter.getInstance().getComponentCodesCursor(getContext());
 
 				if (cursor != null) {
 					// Ensure the cursor window is filled
@@ -216,17 +173,21 @@ public class IssueReportComponentFragment extends IssueReportFragment implements
 	}
 
 	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		cursorAdapter.swapCursor(null);
+
+	}
+
+	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 
 		if (cursorAdapter == null) {
-			cursorAdapter = new CodeCursorAdapter(getActivity(), mItemLayout,
-					cursor, 0);
+			cursorAdapter = new CodeCursorAdapter(getActivity(), mItemLayout, cursor, 0);
 
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
 				@Override
 				public Cursor runQuery(CharSequence constraint) {
-					return DataCenter.getInstance().filterComponentCodeCursor(
-							getActivity(), constraint);
+					return DataCenter.getInstance().filterComponentCodeCursor(getActivity(), constraint);
 				}
 			});
 
@@ -238,9 +199,35 @@ public class IssueReportComponentFragment extends IssueReportFragment implements
 
 	}
 
-	@Override
-	public void onLoaderReset(Loader<Cursor> arg0) {
-		cursorAdapter.swapCursor(null);
+	private void search(String searchText) {
+		if (searchText.equals("") || ignoreSearch) {
 
+		} else {
+			if (cursorAdapter != null) {
+				cursorAdapter.getFilter().filter(searchText);
+			}
+		}
+	}
+
+	@Override
+	public void setIssue(Issue issue) {
+		mIssue = issue;
+	}
+
+	@Override
+	public void showKeyboard() {
+	}
+
+	@Override
+	public boolean validateAndSaveData() {
+		if (!TextUtils.isEmpty(mComponentCode)) {
+			mComponentEditText.setError(null);
+			mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_COMPONENT_CODE, mComponentCode);
+			return true;
+
+		} else {
+			mComponentEditText.setError(getString(R.string.issue_code_missing_warning));
+			return false;
+		}
 	}
 }

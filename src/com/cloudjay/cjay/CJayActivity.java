@@ -29,7 +29,14 @@ import com.cloudjay.cjay.events.PreLoadDataEvent;
 import com.cloudjay.cjay.events.UserLoggedOutEvent;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
-import com.cloudjay.cjay.util.*;
+import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.CJaySession;
+import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.NoConnectionException;
+import com.cloudjay.cjay.util.NullSessionException;
+import com.cloudjay.cjay.util.PreferencesUtil;
+import com.cloudjay.cjay.util.Utils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -55,23 +62,42 @@ public class CJayActivity extends SherlockFragmentActivity {
 	String regid;
 	boolean isActivityRunning;
 
+	private boolean checkPlayServices() {
+		Logger.Log("checkPlayServices()");
+
+		int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+
+		if (resultCode != ConnectionResult.SUCCESS) {
+			if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+				GooglePlayServicesUtil.getErrorDialog(resultCode, this, CJayConstant.PLAY_SERVICES_RESOLUTION_REQUEST)
+										.show();
+			} else {
+				Log.e("DEVICE_UNSUPPORTED", "This device is not supported.");
+				finish();
+			}
+			return false;
+		}
+		return true;
+	}
+
+	public Context getContext() {
+		return this;
+	}
+
+	public User getCurrentUser() {
+		if (null == session) {
+			session = CJaySession.restore(getApplicationContext());
+		}
+
+		return session.getCurrentUser();
+	}
+
 	public DataCenter getDataCenter() {
 		return dataCenter;
 	}
 
-	public void setDataCenter(DataCenter dataCenter) {
-		this.dataCenter = dataCenter;
-	}
-
 	public CJaySession getSession() {
 		return session;
-	}
-
-	public User getCurrentUser() {
-		if (null == session)
-			session = CJaySession.restore(getApplicationContext());
-
-		return session.getCurrentUser();
 	}
 
 	public boolean isRunning() {
@@ -85,43 +111,58 @@ public class CJayActivity extends SherlockFragmentActivity {
 		session = CJaySession.restore(getApplicationContext());
 	}
 
-	public Context getContext() {
-		return this;
+	@Override
+	protected void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		Crouton.cancelAllCroutons();
+		super.onDestroy();
+	}
+
+	public void onEvent(UserLoggedOutEvent event) {
+
+		Logger.Log("onEvent UserLoggedOutEvent");
+
+		if (DataCenter.LoadDataTask.getStatus() == AsyncTask.Status.RUNNING) {
+			Logger.Log("BGTask is running");
+			DataCenter.LoadDataTask.cancel(true);
+		}
+
+		if (DataCenter.LoadDataTask.getStatus() == AsyncTask.Status.RUNNING) {
+			Logger.Log("BGTask is still running ????");
+		}
+
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		// case R.id.menu_setting:
+		// Intent intent = new Intent(this, SettingsActivity.class);
+		// startActivity(intent);
+		// return true;
+
+			case R.id.menu_logout:
+				showLogoutPrompt();
+				return true;
+		}
+
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	protected void onPause() {
+		isActivityRunning = false;
+
+		super.onPause();
 	}
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		menu.findItem(R.id.menu_username).setTitle(
-				getCurrentUser().getFullName());
+		menu.findItem(R.id.menu_username).setTitle(getCurrentUser().getFullName());
 
 		menu.findItem(R.id.menu_role).setTitle(getCurrentUser().getRoleName());
 
 		return super.onPrepareOptionsMenu(menu);
-	}
-
-	@OptionsItem(R.id.menu_username)
-	void usernameMenuItemSelected() {
-
-		usernameMenuClickCount++;
-		int left = CJayConstant.HIDDEN_LOG_THRESHOLD - usernameMenuClickCount;
-
-		if (left <= 3 && left > 0) {
-			Toast.makeText(
-					this,
-					"You have to click " + Integer.toString(left)
-							+ " to open Secret Logs", Toast.LENGTH_SHORT)
-					.show();
-		}
-
-		if (left == 0) {
-
-			// Open Log
-			Intent intent = new Intent(this, UserLogActivity_.class);
-			startActivity(intent);
-
-			usernameMenuClickCount = 0;
-		}
-
 	}
 
 	@Override
@@ -138,8 +179,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 					protected Void doInBackground(Void... params) {
 
 						try {
-							DataCenter_.getInstance().fetchData(
-									getApplicationContext());
+							DataCenter.getInstance().fetchData(getApplicationContext());
 						} catch (NoConnectionException e) {
 
 							Logger.Log("No Internet Connection");
@@ -155,26 +195,14 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 			} else {
 
-				DataCenter_.LoadDataTask = new AsyncTask<Void, Integer, Void>() {
-
-					@Override
-					protected void onPreExecute() {
-						EventBus.getDefault().post(new PreLoadDataEvent());
-					};
-
-					@Override
-					protected void onPostExecute(Void result) {
-						EventBus.getDefault().post(new PostLoadDataEvent());
-					};
+				DataCenter.LoadDataTask = new AsyncTask<Void, Integer, Void>() {
 
 					@Override
 					protected Void doInBackground(Void... params) {
 
 						try {
-							DataCenter_.getInstance()
-									.updateListContainerSessions(
-											getApplicationContext(),
-											CJayClient.REQUEST_TYPE_CREATED);
+							DataCenter.getInstance().updateListContainerSessions(getApplicationContext(),
+																					CJayClient.REQUEST_TYPE_CREATED);
 
 						} catch (NoConnectionException e) {
 
@@ -186,11 +214,21 @@ public class CJayActivity extends SherlockFragmentActivity {
 							finish();
 						}
 						return null;
+					};
+
+					@Override
+					protected void onPostExecute(Void result) {
+						EventBus.getDefault().post(new PostLoadDataEvent());
+					};
+
+					@Override
+					protected void onPreExecute() {
+						EventBus.getDefault().post(new PreLoadDataEvent());
 					}
 
 				};
 
-				DataCenter_.LoadDataTask.execute();
+				DataCenter.LoadDataTask.execute();
 			}
 
 			context = getApplicationContext();
@@ -211,57 +249,10 @@ public class CJayActivity extends SherlockFragmentActivity {
 		super.onResume();
 	}
 
-	@Override
-	protected void onPause() {
-		isActivityRunning = false;
-
-		super.onPause();
-	}
-
-	public void onEvent(UserLoggedOutEvent event) {
-
-		Logger.Log("onEvent UserLoggedOutEvent");
-
-		if (DataCenter.LoadDataTask.getStatus() == AsyncTask.Status.RUNNING) {
-			Logger.Log("BGTask is running");
-			DataCenter.LoadDataTask.cancel(true);
-		}
-
-		if (DataCenter.LoadDataTask.getStatus() == AsyncTask.Status.RUNNING) {
-			Logger.Log("BGTask is still running ????");
-		}
-
-	}
-
-	private void sendRegistrationIdToBackend() {
-		// Your implementation here.
-		try {
-			CJayClient.getInstance().addGCMDevice(regid, context);
-
-			if (TextUtils.isEmpty(regid)) {
-				Logger.e("Cannot send Registration ID to Server");
-			} else {
-
-				// When Submit Server Successfully, save it here!.
-				Utils.storeRegistrationId(context, regid);
-				DataCenter.getDatabaseHelper(context).addUsageLog(
-						"Register #GCM device");
-
-			}
-		} catch (JSONException e) {
-			Logger.e("Can't Register device with the Back-end!");
-		} catch (NoConnectionException e) {
-			showCrouton(R.string.alert_no_network);
-		} catch (NullSessionException e) {
-			e.printStackTrace();
-		}
-	}
-
 	/**
 	 * Registers the application with GCM servers asynchronously.
 	 * <p>
-	 * Stores the registration ID and the app versionCode in the application's
-	 * shared preferences.
+	 * Stores the registration ID and the app versionCode in the application's shared preferences.
 	 */
 	private void registerInBackground() {
 
@@ -313,39 +304,39 @@ public class CJayActivity extends SherlockFragmentActivity {
 		DataCenter.RegisterGCMTask.execute(null, null, null);
 	}
 
-	private boolean checkPlayServices() {
-		Logger.Log("checkPlayServices()");
+	private void sendRegistrationIdToBackend() {
+		// Your implementation here.
+		try {
+			CJayClient.getInstance().addGCMDevice(regid, context);
 
-		int resultCode = GooglePlayServicesUtil
-				.isGooglePlayServicesAvailable(this);
-
-		if (resultCode != ConnectionResult.SUCCESS) {
-			if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-				GooglePlayServicesUtil.getErrorDialog(resultCode, this,
-						CJayConstant.PLAY_SERVICES_RESOLUTION_REQUEST).show();
+			if (TextUtils.isEmpty(regid)) {
+				Logger.e("Cannot send Registration ID to Server");
 			} else {
-				Log.e("DEVICE_UNSUPPORTED", "This device is not supported.");
-				finish();
+
+				// When Submit Server Successfully, save it here!.
+				Utils.storeRegistrationId(context, regid);
+				DataCenter.getDatabaseHelper(context).addUsageLog("Register #GCM device");
+
 			}
-			return false;
+		} catch (JSONException e) {
+			Logger.e("Can't Register device with the Back-end!");
+		} catch (NoConnectionException e) {
+			showCrouton(R.string.alert_no_network);
+		} catch (NullSessionException e) {
+			e.printStackTrace();
 		}
-		return true;
 	}
 
-	@Override
-	protected void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		Crouton.cancelAllCroutons();
-		super.onDestroy();
+	public void setDataCenter(DataCenter dataCenter) {
+		this.dataCenter = dataCenter;
 	}
 
 	@UiThread
 	public void showCrouton(int textResId) {
 		Crouton.cancelAllCroutons();
 		final Crouton crouton = Crouton.makeText(this, textResId, Style.ALERT)
-				.setConfiguration(
-						new Configuration.Builder().setDuration(
-								Configuration.DURATION_INFINITE).build());
+										.setConfiguration(	new Configuration.Builder().setDuration(Configuration.DURATION_INFINITE)
+																						.build());
 
 		crouton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -357,29 +348,12 @@ public class CJayActivity extends SherlockFragmentActivity {
 		crouton.show();
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		// case R.id.menu_setting:
-		// Intent intent = new Intent(this, SettingsActivity.class);
-		// startActivity(intent);
-		// return true;
-
-		case R.id.menu_logout:
-			showLogoutPrompt();
-			return true;
-		}
-
-		return super.onOptionsItemSelected(item);
-	}
-
 	@UiThread
 	protected void showCrouton(String message) {
 		Crouton.cancelAllCroutons();
 		final Crouton crouton = Crouton.makeText(this, message, Style.ALERT)
-				.setConfiguration(
-						new Configuration.Builder().setDuration(
-								Configuration.DURATION_INFINITE).build());
+										.setConfiguration(	new Configuration.Builder().setDuration(Configuration.DURATION_INFINITE)
+																						.build());
 
 		crouton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -396,21 +370,42 @@ public class CJayActivity extends SherlockFragmentActivity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.logout_prompt_title);
 
-		builder.setPositiveButton(android.R.string.yes,
-				new DialogInterface.OnClickListener() {
+		builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
-					public void onClick(DialogInterface dialog, int which) {
-						getSession().deleteSession(getApplicationContext());
-						startActivity(new Intent(getApplicationContext(),
-								LoginActivity_.class));
-						finish();
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				getSession().deleteSession(getApplicationContext());
+				startActivity(new Intent(getApplicationContext(), LoginActivity_.class));
+				finish();
 
-						PreferencesUtil.clearPrefs(context);
-						dialog.dismiss();
-					}
-				});
+				PreferencesUtil.clearPrefs(context);
+				dialog.dismiss();
+			}
+		});
 		builder.setNegativeButton(android.R.string.cancel, null);
 
 		builder.show();
+	}
+
+	@OptionsItem(R.id.menu_username)
+	void usernameMenuItemSelected() {
+
+		usernameMenuClickCount++;
+		int left = CJayConstant.HIDDEN_LOG_THRESHOLD - usernameMenuClickCount;
+
+		if (left <= 3 && left > 0) {
+			Toast.makeText(this, "You have to click " + Integer.toString(left) + " to open Secret Logs",
+							Toast.LENGTH_SHORT).show();
+		}
+
+		if (left == 0) {
+
+			// Open Log
+			Intent intent = new Intent(this, UserLogActivity_.class);
+			startActivity(intent);
+
+			usernameMenuClickCount = 0;
+		}
+
 	}
 }

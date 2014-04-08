@@ -1,11 +1,5 @@
 package com.cloudjay.cjay.adapter;
 
-import com.cloudjay.cjay.R;
-
-import com.cloudjay.cjay.model.UserLog;
-import com.cloudjay.cjay.util.Logger;
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
@@ -16,11 +10,24 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.model.UserLog;
+import com.cloudjay.cjay.util.Logger;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 public class UserLogCursorAdapter extends CursorAdapter implements Filterable {
+
+	private static class ViewHolder {
+
+		public TextView logContentTextView;
+		public ImageView logTypeImageView;
+
+	}
 
 	private int layout;
 	private LayoutInflater inflater;
 	private ImageLoader imageLoader;
+
 	public boolean isScrolling;
 
 	@SuppressWarnings("deprecation")
@@ -31,16 +38,9 @@ public class UserLogCursorAdapter extends CursorAdapter implements Filterable {
 	public UserLogCursorAdapter(Context context, int layout, Cursor c, int flags) {
 		super(context, c, flags);
 		this.layout = layout;
-		this.inflater = LayoutInflater.from(context);
-		this.mCursor = c;
-		this.imageLoader = ImageLoader.getInstance();
-	}
-
-	private static class ViewHolder {
-
-		public TextView logContentTextView;
-		public ImageView logTypeImageView;
-
+		inflater = LayoutInflater.from(context);
+		mCursor = c;
+		imageLoader = ImageLoader.getInstance();
 	}
 
 	@Override
@@ -55,19 +55,15 @@ public class UserLogCursorAdapter extends CursorAdapter implements Filterable {
 			Logger.Log("Holder inside bindView is NULL");
 
 			holder = new ViewHolder();
-			holder.logContentTextView = (TextView) view
-					.findViewById(R.id.tv_log_content);
-			holder.logTypeImageView = (ImageView) view
-					.findViewById(R.id.iv_log_type);
+			holder.logContentTextView = (TextView) view.findViewById(R.id.tv_log_content);
+			holder.logTypeImageView = (ImageView) view.findViewById(R.id.iv_log_type);
 			view.setTag(holder);
 		}
 
 		// get data from cursor and bind to holder
-		String time = cursor.getString(cursor
-				.getColumnIndexOrThrow(UserLog.FIELD_TIME));
+		String time = cursor.getString(cursor.getColumnIndexOrThrow(UserLog.FIELD_TIME));
 
-		String content = cursor.getString(cursor
-				.getColumnIndexOrThrow(UserLog.FIELD_CONTENT));
+		String content = cursor.getString(cursor.getColumnIndexOrThrow(UserLog.FIELD_CONTENT));
 
 		holder.logContentTextView.setText(time + " - " + content);
 	}
@@ -77,8 +73,7 @@ public class UserLogCursorAdapter extends CursorAdapter implements Filterable {
 		View v = inflater.inflate(layout, parent, false);
 
 		ViewHolder holder = new ViewHolder();
-		holder.logContentTextView = (TextView) v
-				.findViewById(R.id.tv_log_content);
+		holder.logContentTextView = (TextView) v.findViewById(R.id.tv_log_content);
 		holder.logTypeImageView = (ImageView) v.findViewById(R.id.iv_log_type);
 
 		v.setTag(holder);

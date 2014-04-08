@@ -14,10 +14,10 @@ import android.util.Log;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.CJaySession;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
-import com.cloudjay.cjay.util.CJaySession;
 import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.Utils;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -49,16 +49,14 @@ public class UpdateReceiver extends BroadcastReceiver {
 		String appVersion = Utils.getAppVersionName(context);
 		int appVersionCode = Utils.getAppVersionCode(context);
 
-		DataCenter.getDatabaseHelper(context).addUsageLog(
-				"#update app to version " + appVersion + " | "
-						+ Integer.toString(appVersionCode));
+		DataCenter.getDatabaseHelper(context).addUsageLog(	"#update app to version " + appVersion + " | "
+																	+ Integer.toString(appVersionCode));
 	}
 
 	/**
 	 * Registers the application with GCM servers asynchronously.
 	 * <p>
-	 * Stores the registration ID and the app versionCode in the application's
-	 * shared preferences.
+	 * Stores the registration ID and the app versionCode in the application's shared preferences.
 	 */
 	public void registerInBackground() {
 

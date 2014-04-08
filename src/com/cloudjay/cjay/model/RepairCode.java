@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.model;
 
 import java.util.Collection;
+
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
@@ -31,27 +32,27 @@ public class RepairCode {
 	@ForeignCollectionField(eager = true)
 	Collection<Issue> issues;
 
-	public String getName() {
-		return display_name;
-	}
-
-	public void setName(String name) {
-		this.display_name = name;
-	}
-
 	public String getCode() {
 		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
 	}
 
 	public int getId() {
 		return id;
 	}
 
+	public String getName() {
+		return display_name;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
 	public void setId(int operatorId) {
-		this.id = operatorId;
+		id = operatorId;
+	}
+
+	public void setName(String name) {
+		display_name = name;
 	}
 }

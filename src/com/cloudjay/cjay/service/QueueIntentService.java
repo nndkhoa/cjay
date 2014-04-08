@@ -11,31 +11,21 @@ import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.util.CountingInputStreamEntity;
 
 @EIntentService
-public class QueueIntentService extends IntentService implements
-		CountingInputStreamEntity.UploadListener {
-	private boolean isUploadIntentServiceRunning() {
-		ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-		for (RunningServiceInfo service : manager
-				.getRunningServices(Integer.MAX_VALUE)) {
-			if ("com.cloudjay.cjay.network.UploadIntentService"
-					.equals(service.service.getClassName())) {
-				return true;
-			}
-		}
-		return false;
-	}
-
+public class QueueIntentService extends IntentService implements CountingInputStreamEntity.UploadListener {
 	public QueueIntentService() {
 		super("QueueIntentService");
 	}
 
-	@Override
-	protected void onHandleIntent(Intent intent) {
-		if (isUploadIntentServiceRunning() == false
-				&& NetworkHelper.isConnected(getApplicationContext())) {
-			Intent uploadIntent = new Intent(this, UploadIntentService_.class);
-			startService(uploadIntent);
+	private boolean isUploadIntentServiceRunning() {
+		ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+			if ("com.cloudjay.cjay.network.UploadIntentService".equals(service.service.getClassName())) return true;
 		}
+		return false;
+	}
+
+	@Override
+	public void onChange(int percent) {
 	}
 
 	@Override
@@ -49,6 +39,10 @@ public class QueueIntentService extends IntentService implements
 	}
 
 	@Override
-	public void onChange(int percent) {
+	protected void onHandleIntent(Intent intent) {
+		if (isUploadIntentServiceRunning() == false && NetworkHelper.isConnected(getApplicationContext())) {
+			Intent uploadIntent = new Intent(this, UploadIntentService_.class);
+			startService(uploadIntent);
+		}
 	}
 }

@@ -1,7 +1,7 @@
 package com.cloudjay.cjay.listener;
 
 public interface AuditorIssueReportListener {
-	
+
 	public static final int TAB_ISSUE_PHOTO = 0;
 	public static final int TAB_ISSUE_COMPONENT = 1;
 	public static final int TAB_ISSUE_LOCATION = 2;

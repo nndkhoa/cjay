@@ -54,158 +54,37 @@ public class Issue {
 	@ForeignCollectionField(eager = true)
 	Collection<CJayImage> cJayImages;
 
-	public Issue(int id, DamageCode damageCode, RepairCode repairCode,
-			ComponentCode componentCode, String location_code, String length,
-			String height, String quantity, Collection<CJayImage> cJayImages) {
-		this.id = id;
-		this.damageCode = damageCode;
-		this.repairCode = repairCode;
-		this.componentCode = componentCode;
-		this.locationCode = location_code;
-		this.length = length;
-		this.height = height;
-		this.quantity = quantity;
-		this.cJayImages = cJayImages;
-		this.uuid = UUID.randomUUID().toString();
-	}
-
-	public Issue(int id, DamageCode damageCode, RepairCode repairCode,
-			ComponentCode componentCode, String location_code, String length,
-			String height, String quantity) {
-
-		this.id = id;
-		this.damageCode = damageCode;
-		this.repairCode = repairCode;
-		this.componentCode = componentCode;
-		this.locationCode = location_code;
-		this.length = length;
-		this.height = height;
-		this.quantity = quantity;
-		this.uuid = UUID.randomUUID().toString();
-	}
-
 	public Issue() {
-		this.setUuid(UUID.randomUUID().toString());
+		setUuid(UUID.randomUUID().toString());
 	}
 
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
+	public Issue(int id, DamageCode damageCode, RepairCode repairCode, ComponentCode componentCode,
+					String location_code, String length, String height, String quantity) {
 
-	public String getUuid() {
-		return this.uuid;
-	}
-
-	public void setFixed(boolean fixed) {
-		this.fixed = fixed;
-	}
-
-	public boolean isFixed() {
-		return fixed;
-	}
-
-	public void setLocationCode(String locationCode) {
-		this.locationCode = locationCode;
-	}
-
-	public String getLocationCode() {
-		return this.locationCode;
-	}
-
-	public void setRepairCode(RepairCode repairCode) {
-		this.repairCode = repairCode;
-	}
-
-	public RepairCode getRepairCode() {
-		return this.repairCode;
-	}
-
-	public String getRepairCodeString() {
-		if (this.repairCode != null) {
-			return this.repairCode.getCode();
-		} else {
-			return null;
-		}
-	}
-
-	public void setComponentCode(ComponentCode componentCode) {
-		this.componentCode = componentCode;
-	}
-
-	public ComponentCode getComponentCode() {
-		return this.componentCode;
-	}
-
-	public String getComponentCodeString() {
-		if (this.componentCode != null) {
-			return this.componentCode.getCode();
-		} else {
-			return null;
-		}
-	}
-
-	public void setDamageCode(DamageCode damageCode) {
-		this.damageCode = damageCode;
-	}
-
-	public DamageCode getDamageCode() {
-		return this.damageCode;
-	}
-
-	public String getDamageCodeString() {
-		if (this.damageCode != null) {
-			return this.damageCode.getCode();
-		} else {
-			return null;
-		}
-	}
-
-	public void setLength(String length) {
-		this.length = length;
-	}
-
-	public String getLength() {
-		return Utils.stripNull(this.length);
-	}
-
-	public void setHeight(String height) {
-		this.height = height;
-	}
-
-	public String getHeight() {
-		return Utils.stripNull(this.height);
-	}
-
-	public void setQuantity(String quantity) {
-		this.quantity = quantity;
-	}
-
-	public String getQuantity() {
-		return Utils.stripNull(this.quantity);
-	}
-
-	public void setContainerSession(ContainerSession containerSession) {
-		this.containerSession = containerSession;
-	}
-
-	public ContainerSession getContainerSession() {
-		return this.containerSession;
-	}
-
-	public void setCJayImages(Collection<CJayImage> cJayImages) {
-		this.cJayImages = cJayImages;
-	}
-
-	public Collection<CJayImage> getCJayImages() {
-		return cJayImages;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
 		this.id = id;
+		this.damageCode = damageCode;
+		this.repairCode = repairCode;
+		this.componentCode = componentCode;
+		locationCode = location_code;
+		this.length = length;
+		this.height = height;
+		this.quantity = quantity;
+		uuid = UUID.randomUUID().toString();
+	}
+
+	public Issue(int id, DamageCode damageCode, RepairCode repairCode, ComponentCode componentCode,
+					String location_code, String length, String height, String quantity,
+					Collection<CJayImage> cJayImages) {
+		this.id = id;
+		this.damageCode = damageCode;
+		this.repairCode = repairCode;
+		this.componentCode = componentCode;
+		locationCode = location_code;
+		this.length = length;
+		this.height = height;
+		this.quantity = quantity;
+		this.cJayImages = cJayImages;
+		uuid = UUID.randomUUID().toString();
 	}
 
 	@Override
@@ -215,16 +94,11 @@ public class Issue {
 			AuditReportItem tmp = (AuditReportItem) o;
 
 			// TODO: BUG HERE. Cannot parseFloat
-			boolean isEqual = this.damageCode.getId() == tmp.getDamageId()
-					&& this.repairCode.getId() == tmp.getRepairId()
-					&& this.getComponentCode().getId() == tmp.getComponentId()
-					&& this.getLocationCode() == tmp.getLocationCode()
-					&& Float.parseFloat(this.length) == Float.parseFloat(tmp
-							.getLength())
-					&& Float.parseFloat(this.height) == Float.parseFloat(tmp
-							.getHeight())
-					&& Integer.parseInt(this.quantity) == Integer.parseInt(tmp
-							.getQuantity());
+			boolean isEqual = damageCode.getId() == tmp.getDamageId() && repairCode.getId() == tmp.getRepairId()
+					&& getComponentCode().getId() == tmp.getComponentId() && getLocationCode() == tmp.getLocationCode()
+					&& Float.parseFloat(length) == Float.parseFloat(tmp.getLength())
+					&& Float.parseFloat(height) == Float.parseFloat(tmp.getHeight())
+					&& Integer.parseInt(quantity) == Integer.parseInt(tmp.getQuantity());
 
 			return isEqual;
 		}
@@ -232,14 +106,129 @@ public class Issue {
 		return super.equals(o);
 	}
 
+	public Collection<CJayImage> getCJayImages() {
+		return cJayImages;
+	}
+
+	public ComponentCode getComponentCode() {
+		return componentCode;
+	}
+
+	public String getComponentCodeString() {
+		if (componentCode != null)
+			return componentCode.getCode();
+		else
+			return null;
+	}
+
+	public ContainerSession getContainerSession() {
+		return containerSession;
+	}
+
+	public DamageCode getDamageCode() {
+		return damageCode;
+	}
+
+	public String getDamageCodeString() {
+		if (damageCode != null)
+			return damageCode.getCode();
+		else
+			return null;
+	}
+
+	public String getHeight() {
+		return Utils.stripNull(height);
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public String getLength() {
+		return Utils.stripNull(length);
+	}
+
+	public String getLocationCode() {
+		return locationCode;
+	}
+
+	public String getQuantity() {
+		return Utils.stripNull(quantity);
+	}
+
+	public RepairCode getRepairCode() {
+		return repairCode;
+	}
+
+	public String getRepairCodeString() {
+		if (repairCode != null)
+			return repairCode.getCode();
+		else
+			return null;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public boolean isFixed() {
+		return fixed;
+	}
+
 	public boolean isValid() {
 
-		if (componentCode == null && repairCode == null
-				&& TextUtils.isEmpty(locationCode) && damageCode == null) {
+		if (componentCode == null && repairCode == null && TextUtils.isEmpty(locationCode) && damageCode == null)
 			return false;
-		}
 
 		return true;
 
+	}
+
+	public void setCJayImages(Collection<CJayImage> cJayImages) {
+		this.cJayImages = cJayImages;
+	}
+
+	public void setComponentCode(ComponentCode componentCode) {
+		this.componentCode = componentCode;
+	}
+
+	public void setContainerSession(ContainerSession containerSession) {
+		this.containerSession = containerSession;
+	}
+
+	public void setDamageCode(DamageCode damageCode) {
+		this.damageCode = damageCode;
+	}
+
+	public void setFixed(boolean fixed) {
+		this.fixed = fixed;
+	}
+
+	public void setHeight(String height) {
+		this.height = height;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public void setLength(String length) {
+		this.length = length;
+	}
+
+	public void setLocationCode(String locationCode) {
+		this.locationCode = locationCode;
+	}
+
+	public void setQuantity(String quantity) {
+		this.quantity = quantity;
+	}
+
+	public void setRepairCode(RepairCode repairCode) {
+		this.repairCode = repairCode;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 }

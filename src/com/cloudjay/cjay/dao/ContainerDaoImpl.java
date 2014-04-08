@@ -11,49 +11,22 @@ import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.CloseableIterator;
 import com.j256.ormlite.support.ConnectionSource;
 
-public class ContainerDaoImpl extends BaseDaoImpl<Container, Integer> implements
-		IContainerDao {
+public class ContainerDaoImpl extends BaseDaoImpl<Container, Integer> implements IContainerDao {
 
-	public ContainerDaoImpl(ConnectionSource connectionSource)
-			throws SQLException {
+	public ContainerDaoImpl(ConnectionSource connectionSource) throws SQLException {
 		super(connectionSource, Container.class);
 	}
 
 	@Override
-	public List<Container> getAllContainers() throws SQLException {
-		return this.queryForAll();
-	}
-
-	@Override
-	public void addListContainers(List<Container> containers)
-			throws SQLException {
-		for (Container container : containers) {
-			this.createOrUpdate(container);
-		}
-	}
-
-	@Override
 	public void addContainer(Container container) throws SQLException {
-		this.createOrUpdate(container);
+		createOrUpdate(container);
 	}
 
-	public Cursor getAllContainersCursor() throws SQLException {
-		Cursor cursor = null;
-
-		CloseableIterator<Container> iterator = this.iterator(this
-				.queryBuilder().prepare());
-
-		try {
-			// get the raw results which can be cast under Android
-			AndroidDatabaseResults results = (AndroidDatabaseResults) iterator
-					.getRawResults();
-			cursor = results.getRawCursor();
-
-		} finally {
-			// iterator.closeQuietly();
+	@Override
+	public void addListContainers(List<Container> containers) throws SQLException {
+		for (Container container : containers) {
+			createOrUpdate(container);
 		}
-
-		return cursor;
 	}
 
 	@Override
@@ -62,6 +35,28 @@ public class ContainerDaoImpl extends BaseDaoImpl<Container, Integer> implements
 		for (Container container : containers) {
 			this.delete(container);
 		}
+	}
+
+	@Override
+	public List<Container> getAllContainers() throws SQLException {
+		return queryForAll();
+	}
+
+	public Cursor getAllContainersCursor() throws SQLException {
+		Cursor cursor = null;
+
+		CloseableIterator<Container> iterator = this.iterator(queryBuilder().prepare());
+
+		try {
+			// get the raw results which can be cast under Android
+			AndroidDatabaseResults results = (AndroidDatabaseResults) iterator.getRawResults();
+			cursor = results.getRawCursor();
+
+		} finally {
+			// iterator.closeQuietly();
+		}
+
+		return cursor;
 	}
 
 }

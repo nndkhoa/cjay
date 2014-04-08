@@ -40,30 +40,6 @@ import com.j256.ormlite.table.TableUtils;
  */
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
-	private static final Class<?>[] DATA_CLASSES = { DamageCode.class,
-			ComponentCode.class, RepairCode.class, Operator.class, User.class,
-			Depot.class, Container.class, ContainerSession.class, Issue.class,
-			CJayImage.class };
-
-	public static final Class<?>[] DROP_CLASSES = { User.class, Depot.class,
-			Container.class, ContainerSession.class, Issue.class,
-			CJayImage.class };
-
-	public static final String DATABASE_NAME = "cjay.db";
-	public static final int DATABASE_VERSION = 3;
-
-	UserDaoImpl userDaoImpl = null;
-	OperatorDaoImpl operatorDaoImpl = null;
-	IssueDaoImpl issueDaoImpl = null;
-	CJayImageDaoImpl cJayImageDaoImpl = null;
-	ContainerDaoImpl containerDaoImpl = null;
-	ContainerSessionDaoImpl containerSessionDaoImpl = null;
-	DamageCodeDaoImpl damageCodeDaoImpl = null;
-	DepotDaoImpl depotDaoImpl = null;
-	RepairCodeDaoImpl repairCodeDaoImpl = null;
-	ComponentCodeDaoImpl componentCodeDaoImpl = null;
-	UserLogDaoImpl userLogDaoImpl = null;
-
 	private static class Patch {
 
 		public void apply(SQLiteDatabase db, ConnectionSource connectionSource) {
@@ -74,8 +50,31 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 	}
 
+	private static final Class<?>[] DATA_CLASSES = { DamageCode.class, ComponentCode.class, RepairCode.class,
+			Operator.class, User.class, Depot.class, Container.class, ContainerSession.class, Issue.class,
+			CJayImage.class };
+
+	public static final Class<?>[] DROP_CLASSES = { User.class, Depot.class, Container.class, ContainerSession.class,
+			Issue.class, CJayImage.class };
+	public static final String DATABASE_NAME = "cjay.db";
+
+	public static final int DATABASE_VERSION = 3;
+	UserDaoImpl userDaoImpl = null;
+	OperatorDaoImpl operatorDaoImpl = null;
+	IssueDaoImpl issueDaoImpl = null;
+	CJayImageDaoImpl cJayImageDaoImpl = null;
+	ContainerDaoImpl containerDaoImpl = null;
+	ContainerSessionDaoImpl containerSessionDaoImpl = null;
+	DamageCodeDaoImpl damageCodeDaoImpl = null;
+	DepotDaoImpl depotDaoImpl = null;
+	RepairCodeDaoImpl repairCodeDaoImpl = null;
+	ComponentCodeDaoImpl componentCodeDaoImpl = null;
+
+	UserLogDaoImpl userLogDaoImpl = null;
+
 	private static final Patch[] PATCHES = new Patch[] { new Patch() {
 
+		@Override
 		public void apply(SQLiteDatabase db, ConnectionSource connectionSource) {
 
 			Logger.Log("create core tables");
@@ -83,8 +82,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 				try {
 					TableUtils.createTable(connectionSource, dataClass);
 				} catch (SQLException e) {
-					Log.e(DatabaseHelper.class.getName(),
-							"Can't create database", e);
+					Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
 					throw new RuntimeException(e);
 				}
 			}
@@ -95,15 +93,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			String sql = "CREATE VIEW csview AS"
 					+ " SELECT cs._id, cs.check_out_time, cs.check_in_time, cs.image_id_path, cs.on_local, cs.fixed, cs.export, cs.upload_confirmation, cs.state, cs.cleared, c.container_id, o.operator_name"
 					+ " FROM container_session AS cs, container AS c"
-					+ " LEFT JOIN operator AS o ON c.operator_id = o._id"
-					+ " WHERE cs.container_id = c._id";
+					+ " LEFT JOIN operator AS o ON c.operator_id = o._id" + " WHERE cs.container_id = c._id";
 			db.execSQL(sql);
 
 			// view for validate container sessions before upload in Gate Import
 			Logger.Log("create view cs_import_validation_view");
 			sql = "CREATE VIEW cs_import_validation_view as"
-					+ " SELECT cs.*, count(cjay_image._id) as import_image_count "
-					+ " FROM csview cs"
+					+ " SELECT cs.*, count(cjay_image._id) as import_image_count " + " FROM csview cs"
 					+ " LEFT JOIN cjay_image ON cjay_image.containerSession_id = cs._id AND cjay_image.type = 0"
 					+ " WHERE cs.upload_confirmation = 0 AND cs.on_local = 1 AND cs.export = 0 AND cs.state <> 4"
 					+ " GROUP BY cs._id";
@@ -112,27 +108,19 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			// view for validate container sessions before upload in Gate Export
 			Logger.Log("create view cs_export_validation_view");
 			sql = "CREATE VIEW cs_export_validation_view as"
-					+ " SELECT cs.*, count(cjay_image._id) as export_image_count "
-					+ " FROM csview cs"
+					+ " SELECT cs.*, count(cjay_image._id) as export_image_count " + " FROM csview cs"
 					+ " LEFT JOIN cjay_image ON cjay_image.containerSession_id = cs._id AND cjay_image.type = 1"
-					+ " WHERE cs.check_out_time = '' AND (cs.export = 1) OR (cs.on_local = 0)"
-					+ " GROUP BY cs._id";
+					+ " WHERE cs.check_out_time = '' AND (cs.export = 1) OR (cs.on_local = 0)" + " GROUP BY cs._id";
 			db.execSQL(sql);
 
 			// csiview --> csview + issue_count
 			Logger.Log("create view csiview");
-			sql = "CREATE VIEW csiview AS"
-					+ " SELECT csview.*, count(issue.containerSession_id) as issue_count"
+			sql = "CREATE VIEW csiview AS" + " SELECT csview.*, count(issue.containerSession_id) as issue_count"
 					+ " FROM issue JOIN csview ON issue.containerSession_id = csview._id"
-					+ " GROUP BY containerSession_id"
-					+ " UNION ALL"
-					+ " SELECT csview.*, 0 as issue_count"
-					+ " FROM csview"
-					+ " WHERE csview.container_id NOT IN"
-					+ " (SELECT csview.container_id"
+					+ " GROUP BY containerSession_id" + " UNION ALL" + " SELECT csview.*, 0 as issue_count"
+					+ " FROM csview" + " WHERE csview.container_id NOT IN" + " (SELECT csview.container_id"
 					+ " FROM issue JOIN csview ON issue.containerSession_id = csview._id"
-					+ " GROUP BY containerSession_id"
-					+ " HAVING count(containerSession_id) > 0)";
+					+ " GROUP BY containerSession_id" + " HAVING count(containerSession_id) > 0)";
 
 			db.execSQL(sql);
 
@@ -157,19 +145,20 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			// view for validate container sessions before upload in Repair Mode
 			Logger.Log("create view csi_repair_validation_view");
 			sql = "create view csi_repair_validation_view as"
-					+ " select csiview.*, count(issue._id) as fixed_issue_count"
-					+ " from csiview"
+					+ " select csiview.*, count(issue._id) as fixed_issue_count" + " from csiview"
 					+ " left join issue on csiview._id = issue.containerSession_id and coalesce(issue.fixed, 0) = 1"
 					+ " group by csiview._id";
 
 			db.execSQL(sql);
 		}
 
+		@Override
 		public void revert(SQLiteDatabase db, ConnectionSource connectionSource) {
 
 		}
 	}, new Patch() {
 			// version = 2
+		@Override
 		public void apply(SQLiteDatabase db, ConnectionSource connectionSource) {
 
 			// Add table UserLog
@@ -190,10 +179,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 		}
 
+		@Override
 		public void revert(SQLiteDatabase db, ConnectionSource connectionSource) {
 		}
 	}, new Patch() {
 			// version = 3
+		@Override
 		public void apply(SQLiteDatabase db, ConnectionSource connectionSource) {
 
 			// Add issue_info_view
@@ -206,13 +197,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 			// Add issue item view
 			Logger.Log("create view issue_item_view");
-			sql = "CREATE VIEW issue_item_view AS"
-					+ " SELECT cj.containerSession_id, cj.uuid, cj._id, cj.type, i.*"
+			sql = "CREATE VIEW issue_item_view AS" + " SELECT cj.containerSession_id, cj.uuid, cj._id, cj.type, i.*"
 					+ " from cjay_image as cj LEFT JOIN issue_info_view as i on cj.issue_id = i.issue_id";
 			db.execSQL(sql);
 
 		}
 
+		@Override
 		public void revert(SQLiteDatabase db, ConnectionSource connectionSource) {
 		}
 	} };
@@ -223,60 +214,15 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 	}
 
-	/**
-	 * This is called when the database is first created. Usually you should
-	 * call createTable statements here to create the tables that will store
-	 * your data.
-	 */
-	@Override
-	public void onCreate(SQLiteDatabase db, ConnectionSource connectionSource) {
+	public void addUsageLog(String message) {
 
-		Logger.Log("onCreate DB");
-		for (int i = 0; i < PATCHES.length; i++) {
-			PATCHES[i].apply(db, connectionSource);
+		UserLog userLog = new UserLog(message);
+
+		try {
+			getUserLogDaoImpl().addLog(userLog);
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * This is called when your application is upgraded and it has a higher
-	 * version number. This allows you to adjust the various data to match the
-	 * new version number.
-	 */
-	@Override
-	public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource,
-			int oldVersion, int newVersion) {
-
-		Logger.Log("on upgrading database from version "
-				+ Integer.toString(oldVersion) + " to version "
-				+ Integer.toString(newVersion));
-
-		for (int i = oldVersion; i < newVersion; i++) {
-			PATCHES[i].apply(db, connectionSource);
-		}
-
-		// try {
-		//
-		// Logger.Log("onUpgrade");
-		//
-		// for (Class<?> dataClass : DATA_CLASSES) {
-		// TableUtils.dropTable(connectionSource, dataClass, true);
-		// }
-		//
-		// onCreate(db, connectionSource);
-		// } catch (SQLException e) {
-		// Log.e(DatabaseHelper.class.getName(), "Can't drop databases", e);
-		// throw new RuntimeException(e);
-		// }
-	}
-
-	@Override
-	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-		// for (int i = oldVersion; i > newVersion; i++) {
-		// PATCHES[i - 1].revert(db);
-		// }
-
-		super.onDowngrade(db, oldVersion, newVersion);
 	}
 
 	/**
@@ -297,112 +243,143 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			repairCodeDaoImpl = null;
 			componentCodeDaoImpl = null;
 
-			this.connectionSource.close();
+			connectionSource.close();
 			super.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public UserDaoImpl getUserDaoImpl() throws SQLException {
-		if (userDaoImpl == null) {
-			userDaoImpl = DaoManager.createDao(this.getConnectionSource(),
-					User.class);
-		}
-		return userDaoImpl;
-	}
-
-	public OperatorDaoImpl getOperatorDaoImpl() throws SQLException {
-		if (null == operatorDaoImpl) {
-			operatorDaoImpl = DaoManager.createDao(this.getConnectionSource(),
-					Operator.class);
-		}
-		return operatorDaoImpl;
-	}
-
 	public CJayImageDaoImpl getCJayImageDaoImpl() throws SQLException {
 		if (null == cJayImageDaoImpl) {
-			cJayImageDaoImpl = DaoManager.createDao(this.getConnectionSource(),
-					CJayImage.class);
+			cJayImageDaoImpl = DaoManager.createDao(getConnectionSource(), CJayImage.class);
 		}
 		return cJayImageDaoImpl;
 	}
 
+	public ComponentCodeDaoImpl getComponentCodeDaoImpl() throws SQLException {
+		if (null == componentCodeDaoImpl) {
+			componentCodeDaoImpl = DaoManager.createDao(getConnectionSource(), ComponentCode.class);
+		}
+		return componentCodeDaoImpl;
+	}
+
 	public ContainerDaoImpl getContainerDaoImpl() throws SQLException {
 		if (null == containerDaoImpl) {
-			containerDaoImpl = DaoManager.createDao(this.getConnectionSource(),
-					Container.class);
+			containerDaoImpl = DaoManager.createDao(getConnectionSource(), Container.class);
 		}
 		return containerDaoImpl;
 	}
 
-	public ContainerSessionDaoImpl getContainerSessionDaoImpl()
-			throws SQLException {
+	public ContainerSessionDaoImpl getContainerSessionDaoImpl() throws SQLException {
 		if (null == containerSessionDaoImpl) {
-			containerSessionDaoImpl = DaoManager.createDao(
-					this.getConnectionSource(), ContainerSession.class);
+			containerSessionDaoImpl = DaoManager.createDao(getConnectionSource(), ContainerSession.class);
 		}
 		return containerSessionDaoImpl;
 	}
 
+	public DamageCodeDaoImpl getDamageCodeDaoImpl() throws SQLException {
+		if (null == damageCodeDaoImpl) {
+			damageCodeDaoImpl = DaoManager.createDao(getConnectionSource(), DamageCode.class);
+		}
+		return damageCodeDaoImpl;
+	}
+
 	public DepotDaoImpl getDepotDaoImpl() throws SQLException {
 		if (null == depotDaoImpl) {
-			depotDaoImpl = DaoManager.createDao(this.getConnectionSource(),
-					Depot.class);
+			depotDaoImpl = DaoManager.createDao(getConnectionSource(), Depot.class);
 		}
 		return depotDaoImpl;
 	}
 
 	public IssueDaoImpl getIssueDaoImpl() throws SQLException {
 		if (null == issueDaoImpl) {
-			issueDaoImpl = DaoManager.createDao(this.getConnectionSource(),
-					Issue.class);
+			issueDaoImpl = DaoManager.createDao(getConnectionSource(), Issue.class);
 		}
 		return issueDaoImpl;
 	}
 
+	public OperatorDaoImpl getOperatorDaoImpl() throws SQLException {
+		if (null == operatorDaoImpl) {
+			operatorDaoImpl = DaoManager.createDao(getConnectionSource(), Operator.class);
+		}
+		return operatorDaoImpl;
+	}
+
 	public RepairCodeDaoImpl getRepairCodeDaoImpl() throws SQLException {
 		if (null == repairCodeDaoImpl) {
-			repairCodeDaoImpl = DaoManager.createDao(
-					this.getConnectionSource(), RepairCode.class);
+			repairCodeDaoImpl = DaoManager.createDao(getConnectionSource(), RepairCode.class);
 		}
 		return repairCodeDaoImpl;
 	}
 
-	public DamageCodeDaoImpl getDamageCodeDaoImpl() throws SQLException {
-		if (null == damageCodeDaoImpl) {
-			damageCodeDaoImpl = DaoManager.createDao(
-					this.getConnectionSource(), DamageCode.class);
+	public UserDaoImpl getUserDaoImpl() throws SQLException {
+		if (userDaoImpl == null) {
+			userDaoImpl = DaoManager.createDao(getConnectionSource(), User.class);
 		}
-		return damageCodeDaoImpl;
-	}
-
-	public ComponentCodeDaoImpl getComponentCodeDaoImpl() throws SQLException {
-		if (null == componentCodeDaoImpl) {
-			componentCodeDaoImpl = DaoManager.createDao(
-					this.getConnectionSource(), ComponentCode.class);
-		}
-		return componentCodeDaoImpl;
+		return userDaoImpl;
 	}
 
 	public UserLogDaoImpl getUserLogDaoImpl() throws SQLException {
 
 		if (null == userLogDaoImpl) {
-			userLogDaoImpl = DaoManager.createDao(this.getConnectionSource(),
-					UserLog.class);
+			userLogDaoImpl = DaoManager.createDao(getConnectionSource(), UserLog.class);
 		}
 
 		return userLogDaoImpl;
 	}
 
-	public void addUsageLog(String message) {
+	/**
+	 * This is called when the database is first created. Usually you should
+	 * call createTable statements here to create the tables that will store
+	 * your data.
+	 */
+	@Override
+	public void onCreate(SQLiteDatabase db, ConnectionSource connectionSource) {
 
-		UserLog userLog = new UserLog(message);
-
-		try {
-			getUserLogDaoImpl().addLog(userLog);
-		} catch (SQLException e) {
-			e.printStackTrace();
+		Logger.Log("onCreate DB");
+		for (int i = 0; i < PATCHES.length; i++) {
+			PATCHES[i].apply(db, connectionSource);
 		}
+	}
+
+	@Override
+	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+		// for (int i = oldVersion; i > newVersion; i++) {
+		// PATCHES[i - 1].revert(db);
+		// }
+
+		super.onDowngrade(db, oldVersion, newVersion);
+	}
+
+	/**
+	 * This is called when your application is upgraded and it has a higher
+	 * version number. This allows you to adjust the various data to match the
+	 * new version number.
+	 */
+	@Override
+	public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion, int newVersion) {
+
+		Logger.Log("on upgrading database from version " + Integer.toString(oldVersion) + " to version "
+				+ Integer.toString(newVersion));
+
+		for (int i = oldVersion; i < newVersion; i++) {
+			PATCHES[i].apply(db, connectionSource);
+		}
+
+		// try {
+		//
+		// Logger.Log("onUpgrade");
+		//
+		// for (Class<?> dataClass : DATA_CLASSES) {
+		// TableUtils.dropTable(connectionSource, dataClass, true);
+		// }
+		//
+		// onCreate(db, connectionSource);
+		// } catch (SQLException e) {
+		// Log.e(DatabaseHelper.class.getName(), "Can't drop databases", e);
+		// throw new RuntimeException(e);
+		// }
 	}
 }

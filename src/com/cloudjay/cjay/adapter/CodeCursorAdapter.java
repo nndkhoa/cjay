@@ -1,8 +1,5 @@
 package com.cloudjay.cjay.adapter;
 
-import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.model.DamageCode;
-import com.cloudjay.cjay.util.Logger;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
@@ -12,10 +9,21 @@ import android.view.ViewGroup;
 import android.widget.Filterable;
 import android.widget.TextView;
 
+import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.model.DamageCode;
+import com.cloudjay.cjay.util.Logger;
+
 public class CodeCursorAdapter extends CursorAdapter implements Filterable {
+
+	private static class ViewHolder {
+
+		public TextView codeTextView;
+
+	}
 
 	private int layout;
 	private LayoutInflater inflater;
+
 	public boolean isScrolling;
 
 	@SuppressWarnings("deprecation")
@@ -26,14 +34,8 @@ public class CodeCursorAdapter extends CursorAdapter implements Filterable {
 	public CodeCursorAdapter(Context context, int layout, Cursor c, int flags) {
 		super(context, c, flags);
 		this.layout = layout;
-		this.inflater = LayoutInflater.from(context);
-		this.mCursor = c;
-	}
-
-	private static class ViewHolder {
-
-		public TextView codeTextView;
-
+		inflater = LayoutInflater.from(context);
+		mCursor = c;
 	}
 
 	@Override
@@ -53,8 +55,7 @@ public class CodeCursorAdapter extends CursorAdapter implements Filterable {
 		}
 
 		// get data from cursor and bind to holder
-		String name = cursor.getString(cursor
-				.getColumnIndexOrThrow(DamageCode.DISPLAY_NAME));
+		String name = cursor.getString(cursor.getColumnIndexOrThrow(DamageCode.DISPLAY_NAME));
 
 		holder.codeTextView.setText(name);
 	}

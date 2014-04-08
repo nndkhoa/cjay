@@ -21,7 +21,9 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.CameraActivity;
+import com.cloudjay.cjay.CameraActivity_;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
@@ -56,8 +58,7 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 	void afterViews() {
 		// show or hide camera button
 		if (mType == CJayImage.TYPE_REPORT) {
-			RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) mCameraButton
-					.getLayoutParams();
+			RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) mCameraButton.getLayoutParams();
 			p.height = 0;
 			mCameraButton.setLayoutParams(p);
 		}
@@ -74,11 +75,37 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 		}
 
 		Intent intent = new Intent(getActivity(), CameraActivity_.class);
-		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA, mIssue
-				.getContainerSession().getUuid());
+		intent.putExtra(CameraActivity.CJAY_CONTAINER_SESSION_EXTRA, mIssue.getContainerSession().getUuid());
 		intent.putExtra("type", CJayImage.TYPE_REPAIRED);
 		intent.putExtra("tag", LOG_TAG);
 		startActivity(intent);
+	}
+
+	private void initImageFeedAdapter(ArrayList<CJayImage> containers) {
+		BindDictionary<CJayImage> feedsDict = new BindDictionary<CJayImage>();
+		feedsDict.addDynamicImageField(R.id.item_picture, new StringExtractor<CJayImage>() {
+			@Override
+			public String getStringValue(CJayImage item, int position) {
+				return Utils.stripNull(item.getUri());
+			}
+		}, new DynamicImageLoader() {
+			@Override
+			public void loadImage(String url, ImageView view) {
+				if (!TextUtils.isEmpty(url)) {
+					imageLoader.displayImage(url, view);
+				} else {
+					view.setImageResource(R.drawable.ic_app);
+				}
+			}
+		});
+		mFeedsAdapter = new FunDapter<CJayImage>(getActivity(), containers, R.layout.list_item_image, feedsDict);
+		mFeedListView.setAdapter(mFeedsAdapter);
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		EventBus.getDefault().register(this);
+		super.onCreate(savedInstanceState);
 	}
 
 	@Override
@@ -87,10 +114,21 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 		super.onDestroy();
 	}
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		EventBus.getDefault().register(this);
-		super.onCreate(savedInstanceState);
+	public void onEvent(CJayImageAddedEvent event) {
+
+		if (event == null) {
+			Logger.Log("Event is null");
+		} else {
+			// retrieve image
+			try {
+				if (event.getTag().equals(LOG_TAG) && mTakenImages != null) {
+					mTakenImages.add(event.getCJayImage());
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 	@Override
@@ -101,9 +139,8 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 		Logger.Log("onResume");
 		if (mTakenImages != null && mTakenImages.size() > 0) {
 			try {
-				CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance()
-						.getDatabaseManager().getHelper(getActivity())
-						.getCJayImageDaoImpl();
+				CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager()
+																.getHelper(getActivity()).getCJayImageDaoImpl();
 
 				for (CJayImage cJayImage : mTakenImages) {
 					cJayImageDaoImpl.refresh(cJayImage);
@@ -130,25 +167,11 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 		super.onResume();
 	}
 
-	public void refresh() {
-		populateCJayImages();
-		mFeedsAdapter.updateData(mFeeds);
-	}
-
-	public void setIssueUUID(String issueUUID) {
-		mIssueUUID = issueUUID;
-	}
-
-	public void setType(int type) {
-		mType = type;
-	}
-
 	private void populateCJayImages() {
 		mFeeds = new ArrayList<CJayImage>();
 		try {
-			IssueDaoImpl issueDaoImpl = CJayClient.getInstance()
-					.getDatabaseManager().getHelper(getActivity())
-					.getIssueDaoImpl();
+			IssueDaoImpl issueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity())
+													.getIssueDaoImpl();
 			mIssue = issueDaoImpl.queryForId(mIssueUUID);
 
 			if (null != mIssue) {
@@ -163,43 +186,16 @@ public class RepairIssueImageListFragment extends SherlockFragment {
 		}
 	}
 
-	public void onEvent(CJayImageAddedEvent event) {
-
-		if (event == null) {
-			Logger.Log("Event is null");
-		} else {
-			// retrieve image
-			try {
-				if (event.getTag().equals(LOG_TAG) && mTakenImages != null) {
-					mTakenImages.add(event.getCJayImage());
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
+	public void refresh() {
+		populateCJayImages();
+		mFeedsAdapter.updateData(mFeeds);
 	}
 
-	private void initImageFeedAdapter(ArrayList<CJayImage> containers) {
-		BindDictionary<CJayImage> feedsDict = new BindDictionary<CJayImage>();
-		feedsDict.addDynamicImageField(R.id.item_picture,
-				new StringExtractor<CJayImage>() {
-					@Override
-					public String getStringValue(CJayImage item, int position) {
-						return Utils.stripNull(item.getUri());
-					}
-				}, new DynamicImageLoader() {
-					@Override
-					public void loadImage(String url, ImageView view) {
-						if (!TextUtils.isEmpty(url)) {
-							imageLoader.displayImage(url, view);
-						} else {
-							view.setImageResource(R.drawable.ic_app);
-						}
-					}
-				});
-		mFeedsAdapter = new FunDapter<CJayImage>(getActivity(), containers,
-				R.layout.list_item_image, feedsDict);
-		mFeedListView.setAdapter(mFeedsAdapter);
+	public void setIssueUUID(String issueUUID) {
+		mIssueUUID = issueUUID;
+	}
+
+	public void setType(int type) {
+		mType = type;
 	}
 }

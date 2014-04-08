@@ -17,25 +17,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class IssueItemCursorAdapter extends CursorAdapter implements Filterable {
 
-	private int layout;
-	private LayoutInflater inflater;
-	private ImageLoader imageLoader;
-	public boolean isScrolling;
-
-	@SuppressWarnings("deprecation")
-	public IssueItemCursorAdapter(Context context, Cursor c) {
-		super(context, c);
-	}
-
-	public IssueItemCursorAdapter(Context context, int layout, Cursor c,
-			int flags) {
-		super(context, c, flags);
-		this.layout = layout;
-		this.inflater = LayoutInflater.from(context);
-		this.mCursor = c;
-		this.imageLoader = ImageLoader.getInstance();
-	}
-
 	private static class ViewHolder {
 
 		public TextView locationTextView;
@@ -47,6 +28,25 @@ public class IssueItemCursorAdapter extends CursorAdapter implements Filterable 
 		public TextView heightTextView;
 		public ImageView itemPictureView;
 
+	}
+
+	private int layout;
+	private LayoutInflater inflater;
+	private ImageLoader imageLoader;
+
+	public boolean isScrolling;
+
+	@SuppressWarnings("deprecation")
+	public IssueItemCursorAdapter(Context context, Cursor c) {
+		super(context, c);
+	}
+
+	public IssueItemCursorAdapter(Context context, int layout, Cursor c, int flags) {
+		super(context, c, flags);
+		this.layout = layout;
+		inflater = LayoutInflater.from(context);
+		mCursor = c;
+		imageLoader = ImageLoader.getInstance();
 	}
 
 	@Override
@@ -61,47 +61,31 @@ public class IssueItemCursorAdapter extends CursorAdapter implements Filterable 
 			Logger.Log("Holder inside bindView is NULL");
 
 			holder = new ViewHolder();
-			holder.locationTextView = (TextView) view
-					.findViewById(R.id.issue_location_code);
+			holder.locationTextView = (TextView) view.findViewById(R.id.issue_location_code);
 
-			holder.damageTextView = (TextView) view
-					.findViewById(R.id.issue_damage_code);
-			holder.repairTextView = (TextView) view
-					.findViewById(R.id.issue_repair_code);
-			holder.componenTextView = (TextView) view
-					.findViewById(R.id.issue_component_code);
+			holder.damageTextView = (TextView) view.findViewById(R.id.issue_damage_code);
+			holder.repairTextView = (TextView) view.findViewById(R.id.issue_repair_code);
+			holder.componenTextView = (TextView) view.findViewById(R.id.issue_component_code);
 
-			holder.quantityTextView = (TextView) view
-					.findViewById(R.id.issue_quantity);
-			holder.lengthTextView = (TextView) view
-					.findViewById(R.id.issue_length);
-			holder.heightTextView = (TextView) view
-					.findViewById(R.id.issue_height);
+			holder.quantityTextView = (TextView) view.findViewById(R.id.issue_quantity);
+			holder.lengthTextView = (TextView) view.findViewById(R.id.issue_length);
+			holder.heightTextView = (TextView) view.findViewById(R.id.issue_height);
 
-			holder.itemPictureView = (ImageView) view
-					.findViewById(R.id.issue_picture);
+			holder.itemPictureView = (ImageView) view.findViewById(R.id.issue_picture);
 
 			view.setTag(holder);
 		}
 
 		// get data from cursor and bind to holder
-		String location = cursor.getString(cursor
-				.getColumnIndexOrThrow("location_code"));
-		String damage = cursor.getString(cursor
-				.getColumnIndexOrThrow("damage_code"));
-		String repair = cursor.getString(cursor
-				.getColumnIndexOrThrow("repair_code"));
-		String component = cursor.getString(cursor
-				.getColumnIndexOrThrow("component_code"));
-		String quantity = cursor.getString(cursor
-				.getColumnIndexOrThrow("quantity"));
-		String length = cursor
-				.getString(cursor.getColumnIndexOrThrow("length"));
-		String height = cursor
-				.getString(cursor.getColumnIndexOrThrow("height"));
-		
-		String url = cursor
-				.getString(cursor.getColumnIndexOrThrow("_id"));
+		String location = cursor.getString(cursor.getColumnIndexOrThrow("location_code"));
+		String damage = cursor.getString(cursor.getColumnIndexOrThrow("damage_code"));
+		String repair = cursor.getString(cursor.getColumnIndexOrThrow("repair_code"));
+		String component = cursor.getString(cursor.getColumnIndexOrThrow("component_code"));
+		String quantity = cursor.getString(cursor.getColumnIndexOrThrow("quantity"));
+		String length = cursor.getString(cursor.getColumnIndexOrThrow("length"));
+		String height = cursor.getString(cursor.getColumnIndexOrThrow("height"));
+
+		String url = cursor.getString(cursor.getColumnIndexOrThrow("_id"));
 
 		holder.locationTextView.setText(location);
 
@@ -126,16 +110,11 @@ public class IssueItemCursorAdapter extends CursorAdapter implements Filterable 
 		View v = inflater.inflate(layout, parent, false);
 
 		ViewHolder holder = new ViewHolder();
-		holder.locationTextView = (TextView) v
-				.findViewById(R.id.issue_location_code);
-		holder.damageTextView = (TextView) v
-				.findViewById(R.id.issue_damage_code);
-		holder.repairTextView = (TextView) v
-				.findViewById(R.id.issue_repair_code);
-		holder.componenTextView = (TextView) v
-				.findViewById(R.id.issue_component_code);
-		holder.quantityTextView = (TextView) v
-				.findViewById(R.id.issue_quantity);
+		holder.locationTextView = (TextView) v.findViewById(R.id.issue_location_code);
+		holder.damageTextView = (TextView) v.findViewById(R.id.issue_damage_code);
+		holder.repairTextView = (TextView) v.findViewById(R.id.issue_repair_code);
+		holder.componenTextView = (TextView) v.findViewById(R.id.issue_component_code);
+		holder.quantityTextView = (TextView) v.findViewById(R.id.issue_quantity);
 		holder.lengthTextView = (TextView) v.findViewById(R.id.issue_length);
 		holder.heightTextView = (TextView) v.findViewById(R.id.issue_height);
 		holder.itemPictureView = (ImageView) v.findViewById(R.id.issue_picture);

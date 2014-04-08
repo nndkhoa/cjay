@@ -19,9 +19,9 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.FilterQueryProvider;
 import android.widget.ListView;
-import android.widget.AbsListView.OnScrollListener;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.CodeCursorAdapter;
@@ -33,8 +33,7 @@ import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 
 @EFragment(R.layout.fragment_issue_repair_code)
-public class IssueReportRepairFragment extends IssueReportFragment implements
-		LoaderCallbacks<Cursor> {
+public class IssueReportRepairFragment extends IssueReportFragment implements LoaderCallbacks<Cursor> {
 
 	private AuditorIssueReportListener mCallback;
 	private Issue mIssue;
@@ -49,6 +48,15 @@ public class IssueReportRepairFragment extends IssueReportFragment implements
 	@ViewById(R.id.repair_list)
 	ListView mRepairListView;
 
+	@SystemService
+	InputMethodManager inputMethodManager;
+
+	private int mItemLayout = R.layout.list_item_issue_code;
+
+	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_GATE_EXPORT;
+
+	CodeCursorAdapter cursorAdapter;
+
 	@AfterViews
 	void afterViews() {
 
@@ -58,12 +66,12 @@ public class IssueReportRepairFragment extends IssueReportFragment implements
 				search(arg0.toString());
 			}
 
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 			}
 
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
 			}
 		});
 
@@ -93,82 +101,21 @@ public class IssueReportRepairFragment extends IssueReportFragment implements
 		mRepairListView.setOnScrollListener(new OnScrollListener() {
 
 			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+			}
+
+			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				if (scrollState != 0) {
 					((CodeCursorAdapter) mRepairListView.getAdapter()).isScrolling = true;
 				} else {
 					((CodeCursorAdapter) mRepairListView.getAdapter()).isScrolling = false;
-					((CodeCursorAdapter) mRepairListView.getAdapter())
-							.notifyDataSetChanged();
+					((CodeCursorAdapter) mRepairListView.getAdapter()).notifyDataSetChanged();
 				}
 
-				inputMethodManager.hideSoftInputFromWindow(
-						mRepairListView.getWindowToken(), 0);
-			}
-
-			@Override
-			public void onScroll(AbsListView view, int firstVisibleItem,
-					int visibleItemCount, int totalItemCount) {
+				inputMethodManager.hideSoftInputFromWindow(mRepairListView.getWindowToken(), 0);
 			}
 		});
-	}
-
-	@ItemClick(R.id.repair_list)
-	void repairItemClicked(int position) {
-
-		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
-
-		mRepairCode = cursor.getString(cursor
-				.getColumnIndexOrThrow(DamageCode.CODE));
-		mRepairName = cursor.getString(cursor
-				.getColumnIndexOrThrow(DamageCode.DISPLAY_NAME));
-
-		ignoreSearch = true;
-		mRepairEditText.setText(mRepairName);
-		ignoreSearch = false;
-
-		// hide keyboard
-		inputMethodManager.hideSoftInputFromWindow(
-				mRepairEditText.getWindowToken(), 0);
-
-		// move to next tab
-		mCallback
-				.onReportPageCompleted(AuditorIssueReportListener.TAB_ISSUE_REPAIR);
-	}
-
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		try {
-			mCallback = (AuditorIssueReportListener) activity;
-		} catch (ClassCastException e) {
-			throw new ClassCastException(activity.toString()
-					+ " must implement AuditorIssueReportListener");
-		}
-	}
-
-	@Override
-	public void setIssue(Issue issue) {
-		mIssue = issue;
-	}
-
-	@Override
-	public boolean validateAndSaveData() {
-		if (!TextUtils.isEmpty(mRepairCode)) {
-			mRepairEditText.setError(null);
-			mCallback.onReportValueChanged(
-					AuditorIssueReportListener.TYPE_REPAIR_CODE, mRepairCode);
-			return true;
-
-		} else {
-			mRepairEditText
-					.setError(getString(R.string.issue_code_missing_warning));
-			return false;
-		}
-	}
-
-	@Override
-	public void showKeyboard() {
 	}
 
 	@Override
@@ -177,22 +124,15 @@ public class IssueReportRepairFragment extends IssueReportFragment implements
 
 	}
 
-	private void search(String searchText) {
-		if (searchText.equals("") || ignoreSearch) {
-
-		} else {
-			if (cursorAdapter != null) {
-				cursorAdapter.getFilter().filter(searchText);
-			}
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		try {
+			mCallback = (AuditorIssueReportListener) activity;
+		} catch (ClassCastException e) {
+			throw new ClassCastException(activity.toString() + " must implement AuditorIssueReportListener");
 		}
 	}
-
-	@SystemService
-	InputMethodManager inputMethodManager;
-
-	private int mItemLayout = R.layout.list_item_issue_code;
-	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_GATE_EXPORT;
-	CodeCursorAdapter cursorAdapter;
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
@@ -201,8 +141,7 @@ public class IssueReportRepairFragment extends IssueReportFragment implements
 		return new CJayCursorLoader(context) {
 			@Override
 			public Cursor loadInBackground() {
-				Cursor cursor = DataCenter.getInstance().getRepairCodesCursor(
-						getContext());
+				Cursor cursor = DataCenter.getInstance().getRepairCodesCursor(getContext());
 
 				if (cursor != null) {
 					// Ensure the cursor window is filled
@@ -215,17 +154,20 @@ public class IssueReportRepairFragment extends IssueReportFragment implements
 	}
 
 	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		cursorAdapter.swapCursor(null);
+	}
+
+	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 
 		if (cursorAdapter == null) {
-			cursorAdapter = new CodeCursorAdapter(getActivity(), mItemLayout,
-					cursor, 0);
+			cursorAdapter = new CodeCursorAdapter(getActivity(), mItemLayout, cursor, 0);
 
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
 				@Override
 				public Cursor runQuery(CharSequence constraint) {
-					return DataCenter.getInstance().filterRepairCodeCursor(
-							getActivity(), constraint);
+					return DataCenter.getInstance().filterRepairCodeCursor(getActivity(), constraint);
 				}
 			});
 
@@ -237,8 +179,54 @@ public class IssueReportRepairFragment extends IssueReportFragment implements
 
 	}
 
+	@ItemClick(R.id.repair_list)
+	void repairItemClicked(int position) {
+
+		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
+
+		mRepairCode = cursor.getString(cursor.getColumnIndexOrThrow(DamageCode.CODE));
+		mRepairName = cursor.getString(cursor.getColumnIndexOrThrow(DamageCode.DISPLAY_NAME));
+
+		ignoreSearch = true;
+		mRepairEditText.setText(mRepairName);
+		ignoreSearch = false;
+
+		// hide keyboard
+		inputMethodManager.hideSoftInputFromWindow(mRepairEditText.getWindowToken(), 0);
+
+		// move to next tab
+		mCallback.onReportPageCompleted(AuditorIssueReportListener.TAB_ISSUE_REPAIR);
+	}
+
+	private void search(String searchText) {
+		if (searchText.equals("") || ignoreSearch) {
+
+		} else {
+			if (cursorAdapter != null) {
+				cursorAdapter.getFilter().filter(searchText);
+			}
+		}
+	}
+
 	@Override
-	public void onLoaderReset(Loader<Cursor> arg0) {
-		cursorAdapter.swapCursor(null);
+	public void setIssue(Issue issue) {
+		mIssue = issue;
+	}
+
+	@Override
+	public void showKeyboard() {
+	}
+
+	@Override
+	public boolean validateAndSaveData() {
+		if (!TextUtils.isEmpty(mRepairCode)) {
+			mRepairEditText.setError(null);
+			mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_REPAIR_CODE, mRepairCode);
+			return true;
+
+		} else {
+			mRepairEditText.setError(getString(R.string.issue_code_missing_warning));
+			return false;
+		}
 	}
 }

@@ -17,26 +17,24 @@ public class ContainerSessionEnqueueEvent {
 
 	private final List<ContainerSession> listContainerSessions;
 
-	public ContainerSessionEnqueueEvent(List<ContainerSession> uploads) {
-		listContainerSessions = uploads;
-	}
-
 	public ContainerSessionEnqueueEvent(ContainerSession upload) {
 		listContainerSessions = new ArrayList<ContainerSession>();
 		listContainerSessions.add(upload);
 	}
 
-	public List<ContainerSession> getTargets() {
-		return listContainerSessions;
+	public ContainerSessionEnqueueEvent(List<ContainerSession> uploads) {
+		listContainerSessions = uploads;
 	}
 
 	public ContainerSession getTarget() {
-		if (isSingleChange()) {
+		if (isSingleChange())
 			return listContainerSessions.get(0);
-		} else {
-			throw new IllegalStateException(
-					"Can only call this when isSingleChange returns true");
-		}
+		else
+			throw new IllegalStateException("Can only call this when isSingleChange returns true");
+	}
+
+	public List<ContainerSession> getTargets() {
+		return listContainerSessions;
 	}
 
 	public boolean isSingleChange() {

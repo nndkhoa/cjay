@@ -11,7 +11,6 @@ import org.androidannotations.annotations.EBean;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
@@ -46,12 +45,6 @@ public class Mapper {
 	private static IDatabaseManager databaseManager = null;
 	private static Mapper instance = null;
 
-	public Mapper() {
-		if (null == databaseManager) {
-			databaseManager = CJayClient.getInstance().getDatabaseManager();
-		}
-	}
-
 	public static Mapper getInstance() {
 		if (instance == null) {
 			instance = new Mapper();
@@ -60,14 +53,242 @@ public class Mapper {
 		return instance;
 	}
 
-	public synchronized void update(Context ctx, String jsonString,
-			ContainerSession main) {
+	public Mapper() {
+		if (null == databaseManager) {
+			databaseManager = CJayClient.getInstance().getDatabaseManager();
+		}
+	}
+
+	/**
+	 * 
+	 * Sử dụng để convert data lấy từ server thành local data
+	 * 
+	 * @param tmpSession
+	 * @param ctx
+	 * @return
+	 */
+	public synchronized ContainerSession toContainerSession(TmpContainerSession tmpSession, Context ctx) {
+
+		try {
+
+			DepotDaoImpl depotDaoImpl = databaseManager.getHelper(ctx).getDepotDaoImpl();
+			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx).getOperatorDaoImpl();
+			ContainerDaoImpl containerDaoImpl = databaseManager.getHelper(ctx).getContainerDaoImpl();
+			CJayImageDaoImpl cJayImageDaoImpl = databaseManager.getHelper(ctx).getCJayImageDaoImpl();
+			DamageCodeDaoImpl damageCodeDaoImpl = databaseManager.getHelper(ctx).getDamageCodeDaoImpl();
+			RepairCodeDaoImpl repairCodeDaoImpl = databaseManager.getHelper(ctx).getRepairCodeDaoImpl();
+			ComponentCodeDaoImpl componentCodeDaoImpl = databaseManager.getHelper(ctx).getComponentCodeDaoImpl();
+			IssueDaoImpl issueDaoImpl = databaseManager.getHelper(ctx).getIssueDaoImpl();
+
+			String operatorCode = tmpSession.getOperatorCode();
+			String containerId = tmpSession.getContainerId();
+
+			Operator operator = null;
+			if (TextUtils.isEmpty(operatorCode)) {
+				Logger.e("Container " + containerId + " does not have Operator");
+			} else {
+				List<Operator> listOperators = operatorDaoImpl.queryForEq(Operator.FIELD_CODE, operatorCode);
+
+				if (listOperators.isEmpty()) {
+					operator = new Operator();
+					operator.setCode(tmpSession.getOperatorCode());
+					operator.setName(tmpSession.getOperatorCode());
+					operatorDaoImpl.addOperator(operator);
+				} else {
+					operator = listOperators.get(0);
+				}
+			}
+
+			// Create `depot` object if needed
+			Depot depot = null;
+			List<Depot> listDepots = depotDaoImpl.queryForEq(Depot.DEPOT_CODE, tmpSession.getDepotCode());
+			if (listDepots.isEmpty()) {
+				depot = new Depot();
+				depot.setDepotCode(tmpSession.getDepotCode());
+				depot.setDepotName(tmpSession.getDepotCode());
+				depotDaoImpl.addDepot(depot);
+			} else {
+				depot = listDepots.get(0);
+			}
+
+			// Create `container` object if needed
+			Container container = null;
+			List<Container> listContainers = containerDaoImpl.queryForEq(	Container.CONTAINER_ID,
+																			tmpSession.getContainerId());
+			if (listContainers.isEmpty()) {
+				container = new Container();
+				container.setContainerId(tmpSession.getContainerId());
+				if (null != operator) {
+					container.setOperator(operator);
+				}
+
+				if (null != depot) {
+					container.setDepot(depot);
+				}
+
+				containerDaoImpl.addContainer(container);
+			} else {
+				container = listContainers.get(0);
+			}
+
+			// Create `container session` object
+
+			String uuid = UUID.randomUUID().toString();
+
+			// UUID is primary key
+			ContainerSession containerSession = new ContainerSession();
+			containerSession.setId(tmpSession.getId());
+			containerSession.setCheckInTime(tmpSession.getCheckInTime());
+			containerSession.setCheckOutTime(tmpSession.getCheckOutTime());
+			containerSession.setImageIdPath(tmpSession.getImageIdPath());
+			containerSession.setUuid(uuid);
+
+			if (null != container) {
+				containerSession.setContainer(container);
+			}
+
+			// TODO: NOTE: may cause bugs
+			// process audit report item
+			List<AuditReportItem> auditReportItems = tmpSession.getAuditReportItems();
+			Collection<Issue> issues = new ArrayList<Issue>();
+
+			if (null != auditReportItems) {
+				for (AuditReportItem auditReportItem : auditReportItems) {
+
+					DamageCode damageCode = damageCodeDaoImpl.queryForId(auditReportItem.getDamageId());
+					RepairCode repairCode = repairCodeDaoImpl.queryForId(auditReportItem.getRepairId());
+					ComponentCode componentCode = componentCodeDaoImpl.queryForId(auditReportItem.getComponentId());
+
+					Issue issue = new Issue(auditReportItem.getId(), damageCode, repairCode, componentCode,
+											auditReportItem.getLocationCode(), auditReportItem.getLength(),
+											auditReportItem.getHeight(), auditReportItem.getQuantity());
+
+					if (issue != null) {
+						issue.setContainerSession(containerSession);
+
+						List<AuditReportImage> auditReportImages = auditReportItem.getAuditReportImages();
+						Collection<CJayImage> cJayImages = new ArrayList<CJayImage>();
+						for (AuditReportImage item : auditReportImages) {
+							CJayImage tmpCJayImage = new CJayImage(item.getId(), item.getType(), item.getImageName());
+
+							tmpCJayImage.setIssue(issue);
+
+							cJayImages.add(tmpCJayImage);
+							cJayImageDaoImpl.addCJayImage(tmpCJayImage);
+						}
+
+						if (null != cJayImages) {
+							issue.setCJayImages(cJayImages);
+						}
+
+						issues.add(issue);
+						issueDaoImpl.addIssue(issue);
+					}
+				}
+			}
+
+			// process gate report images
+			List<GateReportImage> gateReportImages = tmpSession.getGateReportImages();
+			List<CJayImage> listImages = new ArrayList<CJayImage>();
+			if (null != gateReportImages) {
+				for (GateReportImage gateReportImage : gateReportImages) {
+
+					CJayImage image = new CJayImage(gateReportImage.getId(), gateReportImage.getType(),
+													gateReportImage.getCreatedAt(), gateReportImage.getImageName());
+
+					// set default value
+					image.setUploadState(CJayImage.STATE_UPLOAD_COMPLETED);
+
+					if (null != image) {
+						image.setContainerSession(containerSession);
+					}
+
+					cJayImageDaoImpl.addCJayImage(image);
+					listImages.add(image);
+				}
+			}
+
+			// TODO: Không cần add chiều xuôi??
+			// if (null != listImages)
+			// containerSession.setCJayImages(listImages);
+			//
+			// if (null != issues)
+			// containerSession.setIssues(issues);
+
+			return containerSession;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public TmpContainerSession toTmpContainerSession(ContainerSession containerSession, Context ctx) {
+
+		TmpContainerSession tmpContainerSession = new TmpContainerSession();
+		tmpContainerSession.setId(containerSession.getId());
+		tmpContainerSession.setOperatorCode(containerSession.getOperatorName());
+		tmpContainerSession.setOperatorId(containerSession.getOperatorId());
+		tmpContainerSession.setDepotCode(containerSession.getContainer().getDepot().getDepotCode());
+		tmpContainerSession.setContainerId(containerSession.getContainerId());
+
+		tmpContainerSession.setCheckInTime(containerSession.getRawCheckInTime());
+
+		tmpContainerSession.setCheckOutTime(containerSession.getRawCheckOutTime());
+
+		tmpContainerSession.setImageIdPath(containerSession.getImageIdPath());
+
+		Collection<CJayImage> cJayImages = containerSession.getCJayImages();
+
+		List<GateReportImage> gateReportImages = new ArrayList<GateReportImage>();
+
+		for (CJayImage cJayImage : cJayImages) {
+			if (cJayImage.getType() == CJayImage.TYPE_IMPORT || cJayImage.getType() == CJayImage.TYPE_EXPORT) {
+
+				if (cJayImage.getId() != 0) {
+					gateReportImages.add(new GateReportImage(cJayImage.getId(), cJayImage.getType(),
+																cJayImage.getTimePosted(), cJayImage.getImageName()));
+				} else {
+					gateReportImages.add(new GateReportImage(cJayImage.getType(), cJayImage.getTimePosted(),
+																cJayImage.getImageName()));
+				}
+			}
+		}
+
+		tmpContainerSession.setGateReportImages(gateReportImages);
+
+		if (TextUtils.isEmpty(tmpContainerSession.getImageIdPath()) && gateReportImages.isEmpty() == false) {
+			tmpContainerSession.setImageIdPath(gateReportImages.get(0).getImageName());
+		}
+
+		List<AuditReportItem> auditReportItems = new ArrayList<AuditReportItem>();
+		Collection<Issue> issues = containerSession.getIssues();
+
+		if (null != issues) {
+			for (Issue issue : issues) {
+				auditReportItems.add(new AuditReportItem(issue));
+			}
+		}
+
+		// TODO: only handle for app Auditor
+		for (CJayImage cJayImage : cJayImages) {
+			if (cJayImage.getType() == CJayImage.TYPE_REPORT && cJayImage.getIssue() == null) {
+
+				Logger.Log("Container Id Image: " + cJayImage.getImageName());
+				tmpContainerSession.setContainerIdImage(cJayImage.getImageName());
+				break;
+			}
+		}
+
+		tmpContainerSession.setAuditReportItems(auditReportItems);
+		return tmpContainerSession;
+	}
+
+	public synchronized void update(Context ctx, String jsonString, ContainerSession main) {
 
 		try {
 
 			TmpContainerSession tmp = null;
-			Gson gson = new GsonBuilder().setDateFormat(
-					CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE).create();
+			Gson gson = new GsonBuilder().setDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE).create();
 
 			Type listType = new TypeToken<TmpContainerSession>() {
 			}.getType();
@@ -81,46 +302,35 @@ public class Mapper {
 			}
 
 			if (null != tmp) {
-				CJayImageDaoImpl cJayImageDaoImpl = databaseManager.getHelper(
-						ctx).getCJayImageDaoImpl();
+				CJayImageDaoImpl cJayImageDaoImpl = databaseManager.getHelper(ctx).getCJayImageDaoImpl();
 
-				IssueDaoImpl issueDaoImpl = databaseManager.getHelper(ctx)
-						.getIssueDaoImpl();
+				IssueDaoImpl issueDaoImpl = databaseManager.getHelper(ctx).getIssueDaoImpl();
 
 				main.setId(tmp.getId());
 				main.setImageIdPath(tmp.getImageIdPath());
 				main.setCheckInTime(tmp.getCheckInTime());
 
-				PreferencesUtil.storePrefsValue(ctx,
-						PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
-						tmp.getCheckInTime());
+				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
+												tmp.getCheckInTime());
 
-				List<GateReportImage> gateReportImages = tmp
-						.getGateReportImages();
+				List<GateReportImage> gateReportImages = tmp.getGateReportImages();
 				Collection<CJayImage> cJayImages = main.getCJayImages();
 
 				if (gateReportImages != null) {
 					for (GateReportImage gateReportImage : gateReportImages) {
 						for (CJayImage cJayImage : cJayImages) {
 
-							String gateReportImageName = gateReportImage
-									.getImageName();
+							String gateReportImageName = gateReportImage.getImageName();
 							String cJayImageName = cJayImage.getImageName();
 
 							if (gateReportImageName.contains(cJayImageName)) {
 
 								Logger.Log(
 
-								"Gate Report Image Id: "
-										+ Integer.toString(gateReportImage
-												.getId())
-										+ "\nGate Report Image Name: "
-										+ gateReportImageName
-										+ "\nGate Report Image Type: "
-										+ Integer.toString(gateReportImage
-												.getType())
-										+ "\nGate Report Image Time: "
-										+ gateReportImage.getCreatedAt());
+								"Gate Report Image Id: " + Integer.toString(gateReportImage.getId())
+										+ "\nGate Report Image Name: " + gateReportImageName
+										+ "\nGate Report Image Type: " + Integer.toString(gateReportImage.getType())
+										+ "\nGate Report Image Time: " + gateReportImage.getCreatedAt());
 
 								cJayImage.setId(gateReportImage.getId());
 								cJayImage.setImageName(gateReportImageName);
@@ -132,8 +342,7 @@ public class Mapper {
 					}
 				}
 
-				List<AuditReportItem> auditReportItems = tmp
-						.getAuditReportItems();
+				List<AuditReportItem> auditReportItems = tmp.getAuditReportItems();
 
 				Collection<Issue> issues = main.getIssues();
 
@@ -144,34 +353,23 @@ public class Mapper {
 							if (issue.equals(auditReportItem)) {
 								issue.setId(auditReportItem.getId());
 
-								List<AuditReportImage> auditReportImages = auditReportItem
-										.getAuditReportImages();
-								Collection<CJayImage> issueImages = issue
-										.getCJayImages();
+								List<AuditReportImage> auditReportImages = auditReportItem.getAuditReportImages();
+								Collection<CJayImage> issueImages = issue.getCJayImages();
 
 								for (AuditReportImage auditReportImage : auditReportImages) {
 									for (CJayImage cJayImage : issueImages) {
 
-										String auditReportImageName = auditReportImage
-												.getImageName();
-										String cJayImageName = cJayImage
-												.getImageName();
-										if (auditReportImageName
-												.contains(cJayImageName)) {
+										String auditReportImageName = auditReportImage.getImageName();
+										String cJayImageName = cJayImage.getImageName();
+										if (auditReportImageName.contains(cJayImageName)) {
 
-											cJayImage.setId(auditReportImage
-													.getId());
-											cJayImage
-													.setImageName(auditReportImageName);
+											cJayImage.setId(auditReportImage.getId());
+											cJayImage.setImageName(auditReportImageName);
 
 											Logger.Log(
 
-											"Audit Report Image Id: "
-													+ Integer
-															.toString(cJayImage
-																	.getId())
-													+ "\nAudit Report Image Name: "
-													+ cJayImage);
+											"Audit Report Image Id: " + Integer.toString(cJayImage.getId())
+													+ "\nAudit Report Image Name: " + cJayImage);
 
 											cJayImageDaoImpl.update(cJayImage);
 											break;
@@ -194,258 +392,5 @@ public class Mapper {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	public TmpContainerSession toTmpContainerSession(
-			ContainerSession containerSession, Context ctx) {
-
-		TmpContainerSession tmpContainerSession = new TmpContainerSession();
-		tmpContainerSession.setId(containerSession.getId());
-		tmpContainerSession.setOperatorCode(containerSession.getOperatorName());
-		tmpContainerSession.setOperatorId(containerSession.getOperatorId());
-		tmpContainerSession.setDepotCode(containerSession.getContainer()
-				.getDepot().getDepotCode());
-		tmpContainerSession.setContainerId(containerSession.getContainerId());
-
-		tmpContainerSession
-				.setCheckInTime(containerSession.getRawCheckInTime());
-
-		tmpContainerSession.setCheckOutTime(containerSession
-				.getRawCheckOutTime());
-
-		tmpContainerSession.setImageIdPath(containerSession.getImageIdPath());
-
-		Collection<CJayImage> cJayImages = containerSession.getCJayImages();
-
-		List<GateReportImage> gateReportImages = new ArrayList<GateReportImage>();
-
-		for (CJayImage cJayImage : cJayImages) {
-			if (cJayImage.getType() == CJayImage.TYPE_IMPORT
-					|| cJayImage.getType() == CJayImage.TYPE_EXPORT) {
-
-				if (cJayImage.getId() != 0) {
-					gateReportImages.add(new GateReportImage(cJayImage.getId(),
-							cJayImage.getType(), cJayImage.getTimePosted(),
-							cJayImage.getImageName()));
-				} else {
-					gateReportImages.add(new GateReportImage(cJayImage
-							.getType(), cJayImage.getTimePosted(), cJayImage
-							.getImageName()));
-				}
-			}
-		}
-
-		tmpContainerSession.setGateReportImages(gateReportImages);
-
-		if (TextUtils.isEmpty(tmpContainerSession.getImageIdPath())
-				&& gateReportImages.isEmpty() == false)
-			tmpContainerSession.setImageIdPath(gateReportImages.get(0)
-					.getImageName());
-
-		List<AuditReportItem> auditReportItems = new ArrayList<AuditReportItem>();
-		Collection<Issue> issues = containerSession.getIssues();
-
-		if (null != issues) {
-			for (Issue issue : issues) {
-				auditReportItems.add(new AuditReportItem(issue));
-			}
-		}
-
-		// TODO: only handle for app Auditor
-		for (CJayImage cJayImage : cJayImages) {
-			if (cJayImage.getType() == CJayImage.TYPE_REPORT
-					&& cJayImage.getIssue() == null) {
-
-				Logger.Log("Container Id Image: " + cJayImage.getImageName());
-				tmpContainerSession.setContainerIdImage(cJayImage
-						.getImageName());
-				break;
-			}
-		}
-
-		tmpContainerSession.setAuditReportItems(auditReportItems);
-		return tmpContainerSession;
-	}
-
-	/**
-	 * 
-	 * Sử dụng để convert data lấy từ server thành local data
-	 * 
-	 * @param tmpSession
-	 * @param ctx
-	 * @return
-	 */
-	public synchronized ContainerSession toContainerSession(
-			TmpContainerSession tmpSession, Context ctx) {
-
-		try {
-
-			DepotDaoImpl depotDaoImpl = databaseManager.getHelper(ctx)
-					.getDepotDaoImpl();
-			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx)
-					.getOperatorDaoImpl();
-			ContainerDaoImpl containerDaoImpl = databaseManager.getHelper(ctx)
-					.getContainerDaoImpl();
-			CJayImageDaoImpl cJayImageDaoImpl = databaseManager.getHelper(ctx)
-					.getCJayImageDaoImpl();
-			DamageCodeDaoImpl damageCodeDaoImpl = databaseManager
-					.getHelper(ctx).getDamageCodeDaoImpl();
-			RepairCodeDaoImpl repairCodeDaoImpl = databaseManager
-					.getHelper(ctx).getRepairCodeDaoImpl();
-			ComponentCodeDaoImpl componentCodeDaoImpl = databaseManager
-					.getHelper(ctx).getComponentCodeDaoImpl();
-			IssueDaoImpl issueDaoImpl = databaseManager.getHelper(ctx)
-					.getIssueDaoImpl();
-
-			String operatorCode = tmpSession.getOperatorCode();
-			String containerId = tmpSession.getContainerId();
-
-			Operator operator = null;
-			if (TextUtils.isEmpty(operatorCode)) {
-				Logger.e("Container " + containerId + " does not have Operator");
-			} else {
-				List<Operator> listOperators = operatorDaoImpl.queryForEq(
-						Operator.FIELD_CODE, operatorCode);
-
-				if (listOperators.isEmpty()) {
-					operator = new Operator();
-					operator.setCode(tmpSession.getOperatorCode());
-					operator.setName(tmpSession.getOperatorCode());
-					operatorDaoImpl.addOperator(operator);
-				} else {
-					operator = listOperators.get(0);
-				}
-			}
-
-			// Create `depot` object if needed
-			Depot depot = null;
-			List<Depot> listDepots = depotDaoImpl.queryForEq(Depot.DEPOT_CODE,
-					tmpSession.getDepotCode());
-			if (listDepots.isEmpty()) {
-				depot = new Depot();
-				depot.setDepotCode(tmpSession.getDepotCode());
-				depot.setDepotName(tmpSession.getDepotCode());
-				depotDaoImpl.addDepot(depot);
-			} else {
-				depot = listDepots.get(0);
-			}
-
-			// Create `container` object if needed
-			Container container = null;
-			List<Container> listContainers = containerDaoImpl.queryForEq(
-					Container.CONTAINER_ID, tmpSession.getContainerId());
-			if (listContainers.isEmpty()) {
-				container = new Container();
-				container.setContainerId(tmpSession.getContainerId());
-				if (null != operator)
-					container.setOperator(operator);
-
-				if (null != depot)
-					container.setDepot(depot);
-
-				containerDaoImpl.addContainer(container);
-			} else {
-				container = listContainers.get(0);
-			}
-
-			// Create `container session` object
-
-			String uuid = UUID.randomUUID().toString();
-
-			// UUID is primary key
-			ContainerSession containerSession = new ContainerSession();
-			containerSession.setId(tmpSession.getId());
-			containerSession.setCheckInTime(tmpSession.getCheckInTime());
-			containerSession.setCheckOutTime(tmpSession.getCheckOutTime());
-			containerSession.setImageIdPath(tmpSession.getImageIdPath());
-			containerSession.setUuid(uuid);
-
-			if (null != container)
-				containerSession.setContainer(container);
-
-			// TODO: NOTE: may cause bugs
-			// process audit report item
-			List<AuditReportItem> auditReportItems = tmpSession
-					.getAuditReportItems();
-			Collection<Issue> issues = new ArrayList<Issue>();
-
-			if (null != auditReportItems) {
-				for (AuditReportItem auditReportItem : auditReportItems) {
-
-					DamageCode damageCode = damageCodeDaoImpl
-							.queryForId(auditReportItem.getDamageId());
-					RepairCode repairCode = repairCodeDaoImpl
-							.queryForId(auditReportItem.getRepairId());
-					ComponentCode componentCode = componentCodeDaoImpl
-							.queryForId(auditReportItem.getComponentId());
-
-					Issue issue = new Issue(auditReportItem.getId(),
-							damageCode, repairCode, componentCode,
-							auditReportItem.getLocationCode(),
-							auditReportItem.getLength(),
-							auditReportItem.getHeight(),
-							auditReportItem.getQuantity());
-
-					if (issue != null) {
-						issue.setContainerSession(containerSession);
-
-						List<AuditReportImage> auditReportImages = auditReportItem
-								.getAuditReportImages();
-						Collection<CJayImage> cJayImages = new ArrayList<CJayImage>();
-						for (AuditReportImage item : auditReportImages) {
-							CJayImage tmpCJayImage = new CJayImage(
-									item.getId(), item.getType(),
-									item.getImageName());
-
-							tmpCJayImage.setIssue(issue);
-
-							cJayImages.add(tmpCJayImage);
-							cJayImageDaoImpl.addCJayImage(tmpCJayImage);
-						}
-
-						if (null != cJayImages)
-							issue.setCJayImages(cJayImages);
-
-						issues.add(issue);
-						issueDaoImpl.addIssue(issue);
-					}
-				}
-			}
-
-			// process gate report images
-			List<GateReportImage> gateReportImages = tmpSession
-					.getGateReportImages();
-			List<CJayImage> listImages = new ArrayList<CJayImage>();
-			if (null != gateReportImages) {
-				for (GateReportImage gateReportImage : gateReportImages) {
-
-					CJayImage image = new CJayImage(gateReportImage.getId(),
-							gateReportImage.getType(),
-							gateReportImage.getCreatedAt(),
-							gateReportImage.getImageName());
-
-					// set default value
-					image.setUploadState(CJayImage.STATE_UPLOAD_COMPLETED);
-
-					if (null != image)
-						image.setContainerSession(containerSession);
-
-					cJayImageDaoImpl.addCJayImage(image);
-					listImages.add(image);
-				}
-			}
-
-			// TODO: Không cần add chiều xuôi??
-			// if (null != listImages)
-			// containerSession.setCJayImages(listImages);
-			//
-			// if (null != issues)
-			// containerSession.setIssues(issues);
-
-			return containerSession;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 }

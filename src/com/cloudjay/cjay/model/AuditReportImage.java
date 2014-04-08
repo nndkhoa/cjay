@@ -14,8 +14,7 @@ public class AuditReportImage {
 
 	}
 
-	public AuditReportImage(int id, int type, String time_posted,
-			String image_name) {
+	public AuditReportImage(int id, int type, String time_posted, String image_name) {
 		this.id = id;
 		this.type = type;
 		this.time_posted = time_posted;
@@ -32,31 +31,31 @@ public class AuditReportImage {
 		return id;
 	}
 
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public int getType() {
-		return type;
-	}
-
-	public void setType(int type) {
-		this.type = type;
+	public String getImageName() {
+		return image_name;
 	}
 
 	public String getTimePosted() {
 		return time_posted;
 	}
 
-	public void setTimePosted(String time_posted) {
-		this.time_posted = time_posted;
+	public int getType() {
+		return type;
 	}
 
-	public String getImageName() {
-		return image_name;
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public void setImageName(String image_name) {
 		this.image_name = image_name;
+	}
+
+	public void setTimePosted(String time_posted) {
+		this.time_posted = time_posted;
+	}
+
+	public void setType(int type) {
+		this.type = type;
 	}
 }

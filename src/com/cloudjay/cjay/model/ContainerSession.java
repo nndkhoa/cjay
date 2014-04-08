@@ -128,24 +128,19 @@ public class ContainerSession {
 		mState = 0;
 	}
 
-	public ContainerSession(Context ctx, String containerId,
-			String operatorCode, String checkInTime, String depotCode) {
+	public ContainerSession(Context ctx, String containerId, String operatorCode, String checkInTime, String depotCode) {
 
-		IDatabaseManager databaseManager = CJayClient.getInstance()
-				.getDatabaseManager();
+		IDatabaseManager databaseManager = CJayClient.getInstance().getDatabaseManager();
 
 		DepotDaoImpl depotDaoImpl;
 		try {
 			depotDaoImpl = databaseManager.getHelper(ctx).getDepotDaoImpl();
-			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx)
-					.getOperatorDaoImpl();
-			ContainerDaoImpl containerDaoImpl = databaseManager.getHelper(ctx)
-					.getContainerDaoImpl();
+			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx).getOperatorDaoImpl();
+			ContainerDaoImpl containerDaoImpl = databaseManager.getHelper(ctx).getContainerDaoImpl();
 
 			Operator operator = null;
 			if (!TextUtils.isEmpty(operatorCode)) {
-				List<Operator> listOperators = operatorDaoImpl.queryForEq(
-						Operator.FIELD_CODE, operatorCode);
+				List<Operator> listOperators = operatorDaoImpl.queryForEq(Operator.FIELD_CODE, operatorCode);
 				if (listOperators.isEmpty()) {
 					operator = new Operator();
 					operator.setCode(operatorCode);
@@ -158,8 +153,7 @@ public class ContainerSession {
 
 			// Create `depot` object if needed
 			Depot depot = null;
-			List<Depot> listDepots = depotDaoImpl.queryForEq(Depot.DEPOT_CODE,
-					depotCode);
+			List<Depot> listDepots = depotDaoImpl.queryForEq(Depot.DEPOT_CODE, depotCode);
 			if (listDepots.isEmpty()) {
 				depot = new Depot();
 				depot.setDepotCode(depotCode);
@@ -171,16 +165,17 @@ public class ContainerSession {
 
 			// Create `container` object if needed
 			Container container = null;
-			List<Container> listContainers = containerDaoImpl.queryForEq(
-					Container.CONTAINER_ID, containerId);
+			List<Container> listContainers = containerDaoImpl.queryForEq(Container.CONTAINER_ID, containerId);
 			if (listContainers.isEmpty()) {
 				container = new Container();
 				container.setContainerId(containerId);
-				if (null != operator)
+				if (null != operator) {
 					container.setOperator(operator);
+				}
 
-				if (null != depot)
+				if (null != depot) {
 					container.setDepot(depot);
+				}
 
 				containerDaoImpl.addContainer(container);
 			} else {
@@ -190,57 +185,173 @@ public class ContainerSession {
 			// Create `container session` object
 			// UUID is primary key
 			String uuid = UUID.randomUUID().toString();
-			this.setCheckInTime(checkInTime);
-			this.setUuid(uuid);
+			setCheckInTime(checkInTime);
+			setUuid(uuid);
 
-			if (null != container)
-				this.setContainer(container);
+			if (null != container) {
+				setContainer(container);
+			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public String getUuid() {
-		return uuid;
+	public String getCheckInTime() {
+		return StringHelper.getRelativeDate(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE, check_in_time.toString());
 	}
 
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
+	public String getCheckOutTime() {
+
+		return StringHelper.getRelativeDate(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE,
+											Utils.stripNull(check_out_time));
 	}
 
-	public void setFixed(boolean fixed) {
-		this.fixed = fixed;
+	public Collection<CJayImage> getCJayImages() {
+		return cJayImages;
 	}
 
-	public boolean isFixed() {
-		return fixed;
+	public Container getContainer() {
+		return container;
+	}
+
+	public String getContainerId() {
+		if (getContainer() != null) return getContainer().getContainerId();
+		return null;
+	}
+
+	public String getFullContainerId() {
+		if (getContainer() != null) return getContainer().getFullContainerId();
+		return null;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public String getImageIdPath() {
+		return image_id_path;
+	}
+
+	public String getIssueCount() {
+		return String.valueOf(getIssues().size());
+	}
+
+	public Collection<Issue> getIssues() {
+		return issues;
+	}
+
+	public String getOperatorCode() {
+		if (getContainer() != null && getContainer().getOperator() != null)
+			return getContainer().getOperator().getCode();
+		return null;
+	}
+
+	public int getOperatorId() {
+		if (getContainer() != null && getContainer().getOperator() != null)
+			return getContainer().getOperator().getId();
+		return 0;
+	}
+
+	public String getOperatorName() {
+		if (getContainer() != null && getContainer().getOperator() != null)
+			return getContainer().getOperator().getName();
+		return null;
+	}
+
+	public String getRawCheckInTime() {
+		return check_in_time;
+	}
+
+	public String getRawCheckOutTime() {
+		return check_out_time;
+	}
+
+	public int getUploadProgress() {
+		return mProgress;
 	}
 
 	public int getUploadState() {
 		return mState;
 	}
 
-	public void setUploadState(int state) {
+	public int getUploadType() {
+		return upload_type;
+	}
 
-		Logger.w("Change upload state to " + Integer.toString(state));
+	public String getUuid() {
+		return uuid;
+	}
 
-		if (mState != state) {
-			mState = state;
+	public boolean hasUploadConfirmed() {
+		return uploadConfirmation;
+	}
 
-			switch (state) {
-			case STATE_UPLOAD_ERROR:
-				break;
+	public boolean isCleared() {
+		return cleared;
+	}
 
-			case STATE_UPLOAD_COMPLETED:
-				break;
+	public boolean isExport() {
+		return export;
+	}
 
-			case STATE_UPLOAD_WAITING:
-				mProgress = -1;
-				break;
-			}
+	public boolean isFixed() {
+		return fixed;
+	}
 
-			notifyUploadStateListener();
+	public boolean isOnLocal() {
+		return onLocal;
+	}
+
+	// 0 issue --> Failed
+	// > 0 issues:
+	// image without issue <= 1 && all issue is valid --> OK
+	public boolean isValidForUpload(int imageType) {
+
+		if (issues.isEmpty()) return false;
+
+		switch (imageType) {
+			case CJayImage.TYPE_REPORT:
+				// check if all REPORT image assigned to issues
+				int imageWithoutIssueCount = 0;
+
+				// count images without issues
+				for (CJayImage cJayImage : cJayImages) {
+					if (cJayImage.getType() == CJayImage.TYPE_REPORT && cJayImage.getIssue() == null) {
+						imageWithoutIssueCount++;
+						if (imageWithoutIssueCount > 1) return false;
+					}
+				}
+
+				// count invalid issues
+				for (Issue issue : issues) {
+					if (!issue.isValid()) return false;
+				}
+
+				return true;
+
+			case CJayImage.TYPE_REPAIRED:
+
+				// check if all issues have REPAIRED images
+				boolean issueHasNoImage;
+				for (Issue issue : issues) {
+
+					issueHasNoImage = true;
+
+					for (CJayImage cJayImage : issue.getCJayImages()) {
+						if (cJayImage.getType() == CJayImage.TYPE_REPAIRED) {
+							issueHasNoImage = false;
+							break;
+						}
+					}
+
+					if (issueHasNoImage) return false;
+				}
+
+				return true;
+
+			default:
+				return true;
 		}
 	}
 
@@ -249,101 +360,6 @@ public class ContainerSession {
 		Logger.e("notifyUploadStateListener");
 		EventBus.getDefault().post(new UploadStateChangedEvent(this));
 
-	}
-
-	public void setUploadProgress(int progress) {
-		if (progress != mProgress) {
-			mProgress = progress;
-			notifyUploadStateListener();
-		}
-	}
-
-	public int getUploadProgress() {
-		return mProgress;
-	}
-
-	public void setIssues(Collection<Issue> issues) {
-		this.issues = issues;
-	}
-
-	public Collection<Issue> getIssues() {
-		return issues;
-	}
-
-	public String getIssueCount() {
-		return String.valueOf(getIssues().size());
-	}
-
-	public void setCJayImages(Collection<CJayImage> cJayImages) {
-		this.cJayImages = cJayImages;
-	}
-
-	public Collection<CJayImage> getCJayImages() {
-		return cJayImages;
-	}
-
-	public String getOperatorCode() {
-		if (getContainer() != null && getContainer().getOperator() != null) {
-			return getContainer().getOperator().getCode();
-		}
-		return null;
-	}
-
-	public int getOperatorId() {
-		if (getContainer() != null && getContainer().getOperator() != null) {
-			return getContainer().getOperator().getId();
-		}
-		return 0;
-	}
-
-	public String getOperatorName() {
-		if (getContainer() != null && getContainer().getOperator() != null) {
-			return getContainer().getOperator().getName();
-		}
-		return null;
-	}
-
-	public String getContainerId() {
-		if (getContainer() != null) {
-			return getContainer().getContainerId();
-		}
-		return null;
-	}
-
-	public String getFullContainerId() {
-		if (getContainer() != null) {
-			return getContainer().getFullContainerId();
-		}
-		return null;
-	}
-
-	public String getCheckInTime() {
-		return StringHelper.getRelativeDate(
-				CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE,
-				check_in_time.toString());
-	}
-
-	public String getRawCheckInTime() {
-		return check_in_time;
-	}
-
-	public String getCheckOutTime() {
-
-		return StringHelper.getRelativeDate(
-				CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE,
-				Utils.stripNull(check_out_time));
-	}
-
-	public String getRawCheckOutTime() {
-		return check_out_time;
-	}
-
-	public String getImageIdPath() {
-		return image_id_path;
-	}
-
-	public void setImageIdPath(String image_id_path) {
-		this.image_id_path = image_id_path;
 	}
 
 	public void setCheckInTime(String check_in_time) {
@@ -355,120 +371,81 @@ public class ContainerSession {
 		this.check_out_time = check_out_time;
 	}
 
-	public Container getContainer() {
-		return container;
-	}
-
-	public void setContainer(Container container) {
-		this.container = container;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public boolean hasUploadConfirmed() {
-		return uploadConfirmation;
-	}
-
-	public void setUploadConfirmation(boolean uploadConfirmation) {
-		this.uploadConfirmation = uploadConfirmation;
-	}
-
-	public boolean isCleared() {
-		return cleared;
+	public void setCJayImages(Collection<CJayImage> cJayImages) {
+		this.cJayImages = cJayImages;
 	}
 
 	public void setCleared(boolean cleared) {
 		this.cleared = cleared;
 	}
 
-	public boolean isOnLocal() {
-		return onLocal;
-	}
-
-	public void setOnLocal(boolean onLocal) {
-		this.onLocal = onLocal;
-	}
-
-	// 0 issue --> Failed
-	// > 0 issues:
-	// image without issue <= 1 && all issue is valid --> OK
-	public boolean isValidForUpload(int imageType) {
-
-		if (issues.isEmpty()) {
-			return false;
-		}
-
-		switch (imageType) {
-		case CJayImage.TYPE_REPORT:
-			// check if all REPORT image assigned to issues
-			int imageWithoutIssueCount = 0;
-
-			// count images without issues
-			for (CJayImage cJayImage : cJayImages) {
-				if (cJayImage.getType() == CJayImage.TYPE_REPORT
-						&& cJayImage.getIssue() == null) {
-					imageWithoutIssueCount++;
-					if (imageWithoutIssueCount > 1) {
-						return false;
-					}
-				}
-			}
-
-			// count invalid issues
-			for (Issue issue : issues) {
-				if (!issue.isValid()) {
-					return false;
-				}
-			}
-
-			return true;
-
-		case CJayImage.TYPE_REPAIRED:
-
-			// check if all issues have REPAIRED images
-			boolean issueHasNoImage;
-			for (Issue issue : issues) {
-
-				issueHasNoImage = true;
-
-				for (CJayImage cJayImage : issue.getCJayImages()) {
-					if (cJayImage.getType() == CJayImage.TYPE_REPAIRED) {
-						issueHasNoImage = false;
-						break;
-					}
-				}
-
-				if (issueHasNoImage) {
-					return false;
-				}
-			}
-
-			return true;
-
-		default:
-			return true;
-		}
-	}
-
-	public boolean isExport() {
-		return export;
+	public void setContainer(Container container) {
+		this.container = container;
 	}
 
 	public void setExport(boolean export) {
 		this.export = export;
 	}
 
-	public int getUploadType() {
-		return upload_type;
+	public void setFixed(boolean fixed) {
+		this.fixed = fixed;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public void setImageIdPath(String image_id_path) {
+		this.image_id_path = image_id_path;
+	}
+
+	public void setIssues(Collection<Issue> issues) {
+		this.issues = issues;
+	}
+
+	public void setOnLocal(boolean onLocal) {
+		this.onLocal = onLocal;
+	}
+
+	public void setUploadConfirmation(boolean uploadConfirmation) {
+		this.uploadConfirmation = uploadConfirmation;
+	}
+
+	public void setUploadProgress(int progress) {
+		if (progress != mProgress) {
+			mProgress = progress;
+			notifyUploadStateListener();
+		}
+	}
+
+	public void setUploadState(int state) {
+
+		Logger.w("Change upload state to " + Integer.toString(state));
+
+		if (mState != state) {
+			mState = state;
+
+			switch (state) {
+				case STATE_UPLOAD_ERROR:
+					break;
+
+				case STATE_UPLOAD_COMPLETED:
+					break;
+
+				case STATE_UPLOAD_WAITING:
+					mProgress = -1;
+					break;
+			}
+
+			notifyUploadStateListener();
+		}
 	}
 
 	public void setUploadType(int upload_type) {
 		this.upload_type = upload_type;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 }
