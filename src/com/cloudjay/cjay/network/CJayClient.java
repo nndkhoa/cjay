@@ -381,6 +381,7 @@ public class CJayClient implements ICJayClient {
 
 				response = Ion
 						.with(ctx, CJayConstant.CONTAINER_SESSIONS)
+						.setLogging("Ion", Log.INFO)
 						.setHeader("Authorization", "Token " + accessToken)
 						.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
 						.addQuery("page", Integer.toString(page))
@@ -391,6 +392,7 @@ public class CJayClient implements ICJayClient {
 
 				response = Ion
 						.with(ctx, CJayConstant.CONTAINER_SESSIONS)
+						.setLogging("Ion", Log.INFO)
 						.setHeader("Authorization", "Token " + accessToken)
 						.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
 						.addQuery("page", Integer.toString(page))
@@ -412,6 +414,7 @@ public class CJayClient implements ICJayClient {
 
 			default:
 				result = response.getResult();
+
 				break;
 			}
 
@@ -421,8 +424,7 @@ public class CJayClient implements ICJayClient {
 			e.printStackTrace();
 		}
 
-		// Logger.Log(result);
-
+		Logger.w("Result: " + result);
 		Gson gson = new GsonBuilder().setDateFormat(
 				CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE).create();
 

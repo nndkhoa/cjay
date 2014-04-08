@@ -48,10 +48,19 @@ public class PreferencesUtil {
 		String value = prefs.getString(key, "");
 		return value;
 	}
-	
-	public static boolean getPrefsValue(Context context, String key, boolean defVal) {
+
+	public static boolean getPrefsValue(Context context, String key,
+			boolean defVal) {
 		SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
 		boolean value = prefs.getBoolean(key, defVal);
 		return value;
+	}
+
+	public static void clearPrefs(Context context) {
+
+		SharedPreferences settings = context.getSharedPreferences(PREFS,
+				Context.MODE_PRIVATE);
+		settings.edit().clear().commit();
+
 	}
 }

@@ -184,8 +184,10 @@ public class GcmIntentService extends IntentService {
 
 				if (userRole == User.ROLE_GATE_KEEPER
 						|| userRole == User.ROLE_AUDITOR) {
+
 					DataCenter.getInstance().updateListContainerSessions(this,
 							CJayClient.REQUEST_TYPE_CREATED);
+
 				}
 
 			} else if (type.equalsIgnoreCase("NEW_TEMP_CONTAINER")) {

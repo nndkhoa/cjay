@@ -404,6 +404,8 @@ public class CJayActivity extends SherlockFragmentActivity {
 						startActivity(new Intent(getApplicationContext(),
 								LoginActivity_.class));
 						finish();
+
+						PreferencesUtil.clearPrefs(context);
 						dialog.dismiss();
 					}
 				});
