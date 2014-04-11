@@ -159,18 +159,20 @@ public class UploadIntentService extends IntentService implements CountingInputS
 	synchronized void doUploadContainer(ContainerSession containerSession) {
 
 		Logger.w("Uploading container: " + containerSession.getContainerId());
+		DataCenter.getDatabaseHelper(getApplicationContext())
+					.addUsageLog("Begin to #upload container: " + containerSession.getContainerId());
 
 		String response = "";
 		containerSession.setUploadState(ContainerSession.STATE_UPLOAD_IN_PROGRESS);
 
 		try {
+
 			containerSessionDaoImpl.update(containerSession);
 		} catch (SQLException e) {
 
 			Logger.e("Cannot change State to `IN PROGRESS`. Process will be stopped.");
 			e.printStackTrace();
 			return;
-
 		}
 
 		// Convert ContainerSession to TmpContainerSession for uploading
@@ -179,7 +181,6 @@ public class UploadIntentService extends IntentService implements CountingInputS
 
 		try {
 			response = CJayClient.getInstance().postContainerSession(getApplicationContext(), uploadItem);
-
 			Logger.Log("Response from server: " + response);
 
 		} catch (NoConnectionException e) {
@@ -202,7 +203,6 @@ public class UploadIntentService extends IntentService implements CountingInputS
 			e.printStackTrace();
 			// Set state to Error
 			containerSession.setUploadState(ContainerSession.STATE_UPLOAD_ERROR);
-
 			DataCenter.getDatabaseHelper(getApplicationContext())
 						.addUsageLog(	"#upload #failed container " + containerSession.getContainerId() + " | "
 												+ Integer.toString(containerSession.getUploadType()));
@@ -215,7 +215,6 @@ public class UploadIntentService extends IntentService implements CountingInputS
 			return;
 
 		} catch (Exception e) {
-
 			rollbackContainerState(containerSession);
 			return;
 		}
@@ -224,7 +223,6 @@ public class UploadIntentService extends IntentService implements CountingInputS
 		Mapper.getInstance().update(getApplicationContext(), response, containerSession);
 
 		containerSession.setUploadState(ContainerSession.STATE_UPLOAD_COMPLETED);
-
 		DataCenter.getDatabaseHelper(getApplicationContext())
 					.addUsageLog(	"#upload #successfully container " + containerSession.getContainerId() + " | "
 											+ Integer.toString(containerSession.getUploadType()));
@@ -353,6 +351,10 @@ public class UploadIntentService extends IntentService implements CountingInputS
 	}
 
 	public void rollbackContainerState(ContainerSession containerSession) {
+
+		DataCenter.getDatabaseHelper(getApplicationContext())
+					.addUsageLog(	"#rollback " + containerSession.getContainerId() + " | "
+											+ Integer.toString(containerSession.getUploadType()));
 
 		int type = containerSession.getUploadType();
 		Logger.w("Rolling back type: " + Integer.toString(type));

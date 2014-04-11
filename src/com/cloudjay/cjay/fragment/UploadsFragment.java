@@ -1,30 +1,33 @@
 package com.cloudjay.cjay.fragment;
 
-import java.sql.SQLException;
-import java.util.List;
-
+import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
-import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.ViewById;
 
+import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.adapter.UploadsListBaseAdapter;
-import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.adapter.UploadContainerCursorAdapter;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
+import com.cloudjay.cjay.events.ListItemChangedEvent;
+import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener;
@@ -32,13 +35,10 @@ import com.example.android.swipedismiss.SwipeDismissListViewTouchListener.OnDism
 
 import de.greenrobot.event.EventBus;
 
-@EFragment
+@EFragment(R.layout.fragment_uploads)
 @OptionsMenu(R.menu.menu_upload)
-public class UploadsFragment extends SherlockFragment implements OnDismissCallback, OnItemClickListener {
-
-	UploadsListBaseAdapter mAdapter;
-	ContainerSessionDaoImpl containerSessionDaoImpl = null;
-	List<ContainerSession> listContainerSessions = null;
+public class UploadsFragment extends SherlockFragment implements OnDismissCallback, OnItemClickListener,
+														LoaderCallbacks<Cursor> {
 
 	public UploadsFragment() {
 	}
@@ -46,33 +46,23 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 	@Override
 	public boolean canDismiss(AbsListView listView, int position) {
 		try {
-			ContainerSession upload = (ContainerSession) listView.getItemAtPosition(position);
-			return upload.getUploadState() != ContainerSession.STATE_UPLOAD_IN_PROGRESS;
+
+			Cursor cursor = (Cursor) listView.getItemAtPosition(position);
+			int uploadState = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_STATE));
+			return uploadState == ContainerSession.STATE_UPLOAD_COMPLETED;
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		return false;
 	}
 
 	@OptionsItem(R.id.menu_clear_uploaded)
 	void clearUploadsMenuItemSelected() {
-		Logger.Log("Menu clear upload items clicked");
-
-		for (ContainerSession containerSession : listContainerSessions) {
-			try {
-
-				// just clear items from UI
-				containerSession.setCleared(true);
-				containerSessionDaoImpl.update(containerSession);
-
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-
-		DataCenter.getDatabaseHelper(getActivity()).addUsageLog("Clear list #upload");
-
-		updateUI();
+		DataCenter.getInstance().clearListUpload(DataCenter.getDatabaseHelper(getActivity()).getWritableDatabase());
+		EventBus.getDefault().post(new LogUserActivityEvent("Clear list #upload"));
+		refresh();
 	}
 
 	@Override
@@ -80,36 +70,31 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 
 		EventBus.getDefault().register(this);
 		super.onCreate(savedInstanceState);
-
-		try {
-			if (null == containerSessionDaoImpl) {
-				containerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity())
-													.getContainerSessionDaoImpl();
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		listContainerSessions = DataCenter.getInstance().getListUploadContainerSessions(getActivity());
-
-		mAdapter = new UploadsListBaseAdapter(getActivity(), listContainerSessions);
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_uploads, container, false);
+	public void onResume() {
+		if (cursorAdapter != null) {
+			refresh();
+		}
+		super.onResume();
+	}
 
-		ListView listView = (ListView) view.findViewById(android.R.id.list);
-		SwipeDismissListViewTouchListener swipeListener = new SwipeDismissListViewTouchListener(listView, this);
+	@ViewById(android.R.id.list)
+	ListView mListView;
 
-		listView.setOnItemClickListener(this);
-		listView.setOnTouchListener(swipeListener);
-		listView.setOnScrollListener(swipeListener.makeScrollListener());
-		listView.setSelector(R.drawable.selectable_background_photup);
-		listView.setAdapter(mAdapter);
-		listView.setEmptyView(view.findViewById(android.R.id.empty));
+	@ViewById(android.R.id.empty)
+	TextView mEmptyElement;
 
-		return view;
+	@AfterViews
+	void initListView() {
+		getLoaderManager().initLoader(LOADER_ID, null, this);
+
+		SwipeDismissListViewTouchListener swipeListener = new SwipeDismissListViewTouchListener(mListView, this);
+		mListView.setOnTouchListener(swipeListener);
+		mListView.setOnScrollListener(swipeListener.makeScrollListener());
+		mListView.setSelector(R.drawable.selectable_background_photup);
+		mListView.setEmptyView(mEmptyElement);
 	}
 
 	@Override
@@ -125,32 +110,35 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 		// set item Cleared = true then call updateUI()
 		try {
 			for (int i = 0, z = reverseSortedPositions.length; i < z; i++) {
-				ContainerSession item = (ContainerSession) listView.getItemAtPosition(reverseSortedPositions[i]);
-
-				// remove from Upload Fragment
-				item.setCleared(true);
-				containerSessionDaoImpl.update(item);
+				Cursor cursor = (Cursor) listView.getItemAtPosition(reverseSortedPositions[i]);
+				String containerId = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+				DataCenter.getInstance()
+							.removeContainerFromListUpload(	DataCenter.getDatabaseHelper(getActivity())
+																		.getWritableDatabase(), containerId);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		updateUI();
+		refresh();
 	}
 
 	public void onEvent(ContainerSessionEnqueueEvent event) {
 		Logger.Log("onEvent ContainerSessionEnqueueEvent");
-		updateUI();
+		refresh();
 	}
 
 	public void onEvent(UploadStateChangedEvent event) {
 		Logger.Log("onEvent UploadStateChangedEvent");
-		updateUI();
+		refresh();
 	}
 
 	@Override
 	public void onItemClick(AdapterView<?> l, View view, int position, long id) {
+
+		// Retry if error happened
 		Logger.Log("onItemClick at index: " + Integer.toString(position));
+
 	}
 
 	@Override
@@ -158,13 +146,56 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 		super.onStop();
 	}
 
-	@UiThread
-	void updateUI() {
+	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_UPLOAD;
+	int totalItems = 0;
+	UploadContainerCursorAdapter cursorAdapter;
+	private final int mItemLayout = R.layout.item_list_upload;
 
+	public void refresh() {
 		Logger.e("Refresh UploadsFragment UI");
-		listContainerSessions = DataCenter.getInstance().getListUploadContainerSessions(getActivity());
+		getLoaderManager().restartLoader(LOADER_ID, null, this);
+	}
 
-		mAdapter.setContainerSessions(listContainerSessions);
-		mAdapter.notifyDataSetChanged();
+	void setTotalItems(int val) {
+		totalItems = val;
+		EventBus.getDefault().post(new ListItemChangedEvent(1, totalItems));
+	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+
+		Context context = getActivity();
+
+		return new CJayCursorLoader(context) {
+			@Override
+			public Cursor loadInBackground() {
+				Cursor cursor = DataCenter.getInstance().getUploadContainerSessionCursor(getContext());
+
+				if (cursor != null) {
+					// Ensure the cursor window is filled
+					// setTotalItems(cursor.getCount());
+					cursor.registerContentObserver(mObserver);
+				}
+
+				return cursor;
+			}
+		};
+
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		cursorAdapter.swapCursor(null);
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+		if (cursorAdapter == null) {
+			cursorAdapter = new UploadContainerCursorAdapter(getActivity(), mItemLayout, cursor, 0);
+			mListView.setAdapter(cursorAdapter);
+
+		} else {
+			cursorAdapter.swapCursor(cursor);
+		}
 	}
 }

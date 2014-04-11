@@ -534,7 +534,7 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 			for (CJayImage cJayImage : cJayImages) {
 
 				int uploadState = cJayImage.getUploadState();
-				if (uploadState != CJayImage.STATE_UPLOAD_COMPLETED && uploadState != CJayImage.STATE_UPLOAD_WAITING) {
+				if (uploadState != CJayImage.STATE_UPLOAD_COMPLETED) {
 
 					// Logger.e(containerSession.getContainerId() + " | CJayImage: "
 					// + Integer.toString(cJayImage.getUploadState()) + " | " + cJayImage.getUri());

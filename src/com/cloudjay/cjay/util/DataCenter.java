@@ -14,6 +14,7 @@ import org.androidannotations.annotations.Trace;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
@@ -80,6 +81,8 @@ public class DataCenter {
 	public static DatabaseHelper getDatabaseHelper(Context context) {
 		return getInstance().getDatabaseManager().getHelper(context);
 	}
+
+	SQLiteDatabase db;
 
 	/**
 	 * Apply Singleton Pattern and return only one instance of class DataCenter
@@ -292,6 +295,11 @@ public class DataCenter {
 		return null;
 	}
 
+	public Cursor getUploadContainerSessionCursor(Context context) {
+		String queryString = "SELECT * FROM csview WHERE upload_confirmation = 1 AND cleared = 0";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
+	}
+
 	public Cursor getCheckOutContainerSessionCursor(Context context) {
 		String queryString = "SELECT * FROM cs_export_validation_view";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
@@ -331,6 +339,17 @@ public class DataCenter {
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
 																			new String[] { containerSessionUUID + "%",
 																					String.valueOf(imageType) });
+	}
+
+	public void clearListUpload(SQLiteDatabase db) {
+		String sql = "UPDATE container_session SET cleared = 1 WHERE cleared = 0 AND upload_confirmation = 1 ";
+		db.execSQL(sql);
+	}
+
+	public void removeContainerFromListUpload(SQLiteDatabase db, String uuid) {
+		String sql = "UPDATE container_session SET cleared = 1 WHERE cleared = 0 AND upload_confirmation = 1 AND _id = '"
+				+ uuid + "'";
+		db.execSQL(sql);
 	}
 
 	public List<Operator> getListOperators(Context context) {
