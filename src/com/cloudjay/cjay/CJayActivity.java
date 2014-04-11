@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.events.PostLoadDataEvent;
 import com.cloudjay.cjay.events.PreLoadDataEvent;
 import com.cloudjay.cjay.events.UserLoggedOutEvent;
@@ -116,6 +117,10 @@ public class CJayActivity extends SherlockFragmentActivity {
 		EventBus.getDefault().unregister(this);
 		Crouton.cancelAllCroutons();
 		super.onDestroy();
+	}
+
+	public void onEvent(LogUserActivityEvent event) {
+		DataCenter.getDatabaseHelper(context).addUsageLog(event.getTarget());
 	}
 
 	public void onEvent(UserLoggedOutEvent event) {

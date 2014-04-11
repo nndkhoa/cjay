@@ -4,15 +4,19 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
 import com.j256.ormlite.android.AndroidDatabaseResults;
 import com.j256.ormlite.dao.BaseDaoImpl;
@@ -21,6 +25,8 @@ import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.support.DatabaseConnection;
+
+import de.greenrobot.event.EventBus;
 
 public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, String> implements IContainerSessionDao {
 
@@ -490,6 +496,8 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 		return containerSessions;
 	}
 
+	HashMap<String, Integer> retryCountHashMap = new HashMap<String, Integer>();
+
 	/**
 	 * 
 	 * return ContainerSession obj that has
@@ -502,7 +510,7 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 	 * 
 	 */
 	@Override
-	public ContainerSession getNextWaiting() throws SQLException {
+	public ContainerSession getNextWaiting(SQLiteDatabase db) throws SQLException {
 
 		// Logger.Log( "getNextWaiting() at ContainerSessionDaoImpl");
 
@@ -524,15 +532,45 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 			Collection<CJayImage> cJayImages = containerSession.getCJayImages();
 
 			for (CJayImage cJayImage : cJayImages) {
-				if (cJayImage.getUploadState() != CJayImage.STATE_UPLOAD_COMPLETED) {
 
-					Logger.e(containerSession.getContainerId() + ": Some cJayImages are still not uploaded.");
+				int uploadState = cJayImage.getUploadState();
+				if (uploadState != CJayImage.STATE_UPLOAD_COMPLETED && uploadState != CJayImage.STATE_UPLOAD_WAITING) {
 
-					Logger.e("CJayImage Url: " + cJayImage.getUri());
-					Logger.e("CJayImage Type: " + Integer.toString(cJayImage.getType()));
-					Logger.e("CJayImage Upload State: " + Integer.toString(cJayImage.getUploadState()));
+					// Logger.e(containerSession.getContainerId() + " | CJayImage: "
+					// + Integer.toString(cJayImage.getUploadState()) + " | " + cJayImage.getUri());
 
-					// TODO: Try to upload CJayImage
+					// Increase retry count
+					String key = cJayImage.getUuid();
+					if (retryCountHashMap.containsKey(key)) {
+
+						int count = retryCountHashMap.get(key);
+						count++;
+						retryCountHashMap.put(key, count);
+						Logger.e(containerSession.getContainerId() + " | Retry count: " + Integer.toString(count));
+
+						if (count >= 10) {
+
+							Logger.Log("Retry to upload CJayImage : " + cJayImage.getImageName());
+							EventBus.getDefault().post(	new LogUserActivityEvent("#Retry to upload CJayImage: "
+																+ cJayImage.getImageName() + " | Container: "
+																+ containerSession.getContainerId()));
+
+							// Refresh cjay_image type
+							// UPDATE cjay_image SET state = 1, time_posted = '2014-03-21T15:33:01' WHERE uuid =
+							// '<uuid>'
+							String sql = "UPDATE cjay_image SET state = " + CJayImage.STATE_UPLOAD_WAITING
+									+ ", time_posted = '"
+									+ StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE)
+									+ "' WHERE " + CJayImage.FIELD_UUID + " = '" + key + "'";
+
+							db.execSQL(sql);
+							retryCountHashMap.remove(key);
+						}
+
+					} else {
+						Logger.Log("Assign value");
+						retryCountHashMap.put(cJayImage.getUuid(), 0);
+					}
 
 					flag = false;
 					break;

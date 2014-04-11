@@ -358,7 +358,8 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 
 		db.execSQL(sqlString);
 
-		sqlString = "UPDATE cjay_image SET issue_id = '" + issueId + "' WHERE uuid = '" + mSelectedCJayImageUuid + "'";
+		// sqlString = "UPDATE cjay_image SET issue_id = '" + issueId + "' WHERE uuid = '" + mSelectedCJayImageUuid +
+		// "'";
 
 		refresh();
 

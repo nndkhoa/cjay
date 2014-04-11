@@ -41,16 +41,17 @@ public class ContainerSession {
 	public static final String FIELD_CHECK_OUT_TIME = "check_out_time";
 	public static final String FIELD_CHECK_IN_TIME = "check_in_time";
 	public static final String FIELD_IMAGE_ID_PATH = "image_id_path";
-	public static final String FIELD_STATE = "state";
+
+	public static final String FIELD_STATE = "state"; // 1
 	public static final String FIELD_ID = "id";
 
 	public static final String FIELD_UPLOAD_TYPE = "upload_type";
 
 	// _id for cursor loader usage
 	public static final String FIELD_UUID = "_id";
-	public static final String FIELD_UPLOAD_CONFIRMATION = "upload_confirmation";
+	public static final String FIELD_UPLOAD_CONFIRMATION = "upload_confirmation"; // 1
 	public static final String FIELD_CLEARED = "cleared";
-	public static final String FIELD_LOCAL = "on_local";
+	public static final String FIELD_LOCAL = "on_local"; // 1
 	public static final String FIELD_FIXED = "fixed";
 	public static final String FIELD_EXPORT = "export";
 
