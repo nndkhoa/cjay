@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadContainerCursorAdapter;
+import com.cloudjay.cjay.adapter.UploadCursorAdapter;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.events.LogUserActivityEvent;
@@ -110,6 +111,7 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 		// set item Cleared = true then call updateUI()
 		try {
 			for (int i = 0, z = reverseSortedPositions.length; i < z; i++) {
+
 				Cursor cursor = (Cursor) listView.getItemAtPosition(reverseSortedPositions[i]);
 				String containerId = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
 				DataCenter.getInstance()
@@ -148,7 +150,7 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 
 	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_UPLOAD;
 	int totalItems = 0;
-	UploadContainerCursorAdapter cursorAdapter;
+	UploadCursorAdapter cursorAdapter;
 	private final int mItemLayout = R.layout.item_list_upload;
 
 	public void refresh() {
@@ -191,7 +193,7 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 		if (cursorAdapter == null) {
-			cursorAdapter = new UploadContainerCursorAdapter(getActivity(), mItemLayout, cursor, 0);
+			cursorAdapter = new UploadCursorAdapter(getActivity(), mItemLayout, cursor, 0);
 			mListView.setAdapter(cursorAdapter);
 
 		} else {

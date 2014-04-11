@@ -71,13 +71,14 @@ public class UploadCursorAdapter extends CursorAdapter implements Filterable {
 		// get data from cursor and bind to holder
 		// Container caption
 		String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
-		String operator = cursor.getString(cursor.getColumnIndexOrThrow(Operator.FIELD_NAME));
+		// String operator = cursor.getString(cursor.getColumnIndexOrThrow(Operator.FIELD_NAME));
 
-		if (TextUtils.isEmpty(operator)) {
-			holder.containerIdView.setText("Container: " + containerId);
-		} else {
-			holder.containerIdView.setText("Container: " + containerId + " | Operator: " + operator);
-		}
+		holder.containerIdView.setText("Container: " + containerId);
+		// if (TextUtils.isEmpty(operator)) {
+		// holder.containerIdView.setText("Container: " + containerId);
+		// } else {
+		// holder.containerIdView.setText("Container: " + containerId + " | Operator: " + operator);
+		// }
 
 		// Image Id Path
 		String url = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_IMAGE_ID_PATH));
