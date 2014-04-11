@@ -11,6 +11,7 @@ import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EBean.Scope;
 import org.androidannotations.annotations.Trace;
 
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
@@ -29,6 +30,7 @@ import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.cloudjay.cjay.dao.UserDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
+import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.Container;
@@ -339,6 +341,38 @@ public class DataCenter {
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
 																			new String[] { containerSessionUUID + "%",
 																					String.valueOf(imageType) });
+	}
+
+	public void rollback(SQLiteDatabase db, String uuid) {
+		Cursor cursor = db.rawQuery("select * from container_session where _id = ?", new String[] { uuid });
+		if (cursor.moveToFirst()) {
+
+			Logger.Log("Manually rolling back container session upload state.");
+			EventBus.getDefault().post(new LogUserActivityEvent("#Manually #rollback upload state container: "));
+
+			int uploadType = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UPLOAD_TYPE));
+			String sql = "";
+			switch (uploadType) {
+				case ContainerSession.TYPE_IN:
+					sql = "UPDATE container_session SET on_local = 1, upload_confirmation = 0, state = 0, cleared = 0 WHERE _id = '"
+							+ uuid + "'";
+					break;
+
+				case ContainerSession.TYPE_OUT:
+					sql = "UPDATE container_session SET check_out_time = '', upload_confirmation = 0, state = 0, cleared = 0 WHERE _id = '"
+							+ uuid + "'";
+					break;
+
+				case ContainerSession.TYPE_AUDIT:
+				case ContainerSession.TYPE_REPAIR:
+				default:
+					sql = "UPDATE container_session SET upload_confirmation = 0, state = 0, cleared = 0 WHERE _id = '"
+							+ uuid + "'";
+					break;
+			}
+
+			db.execSQL(sql);
+		}
 	}
 
 	public void clearListUpload(SQLiteDatabase db) {

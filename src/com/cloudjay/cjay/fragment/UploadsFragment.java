@@ -6,6 +6,7 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
+import android.R.integer;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -20,7 +21,6 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.adapter.UploadContainerCursorAdapter;
 import com.cloudjay.cjay.adapter.UploadCursorAdapter;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
@@ -47,7 +47,6 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 	@Override
 	public boolean canDismiss(AbsListView listView, int position) {
 		try {
-
 			Cursor cursor = (Cursor) listView.getItemAtPosition(position);
 			int uploadState = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_STATE));
 			return uploadState == ContainerSession.STATE_UPLOAD_COMPLETED;
@@ -138,8 +137,27 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 	@Override
 	public void onItemClick(AdapterView<?> l, View view, int position, long id) {
 
-		// Retry if error happened
 		Logger.Log("onItemClick at index: " + Integer.toString(position));
+		int viewId = view.getId();
+
+		Cursor cursor = (Cursor) mListView.getItemAtPosition(position);
+		int uploadState = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_STATE));
+		String containerUuid = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+
+		switch (viewId) {
+			case R.id.iv_upload_result:
+				Logger.Log("User click on retry button");
+				if (uploadState == ContainerSession.STATE_UPLOAD_ERROR) {
+					DataCenter.getInstance().rollback(	DataCenter.getDatabaseHelper(getActivity())
+																	.getWritableDatabase(), containerUuid);
+
+					refresh();
+				}
+				break;
+
+			default:
+				break;
+		}
 
 	}
 
