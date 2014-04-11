@@ -186,12 +186,15 @@ public class UploadIntentService extends IntentService implements CountingInputS
 		} catch (NoConnectionException e) {
 
 			Logger.Log("No Internet Connection");
+			DataCenter.getDatabaseHelper(getApplicationContext())
+						.addUsageLog("No connection | #rollback | Container: " + containerSession.getContainerId());
 			rollbackContainerState(containerSession);
 			return;
 
 		} catch (NullSessionException e) {
 
-			e.printStackTrace();
+			DataCenter.getDatabaseHelper(getApplicationContext())
+						.addUsageLog("Null Session | #rollback | Container: " + containerSession.getContainerId());
 			rollbackContainerState(containerSession);
 
 			// Log user out
@@ -211,10 +214,15 @@ public class UploadIntentService extends IntentService implements CountingInputS
 		} catch (ServerInternalErrorException e) {
 
 			Logger.e("Server Internal Error cmnr");
+			DataCenter.getDatabaseHelper(getApplicationContext())
+						.addUsageLog(	"Server Internal Error | #rollback | Container: "
+												+ containerSession.getContainerId());
 			rollbackContainerState(containerSession);
 			return;
 
 		} catch (Exception e) {
+			DataCenter.getDatabaseHelper(getApplicationContext())
+						.addUsageLog("Unknown Exception | #rollback | Container: " + containerSession.getContainerId());
 			rollbackContainerState(containerSession);
 			return;
 		}
