@@ -19,9 +19,7 @@ import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
-import com.cloudjay.cjay.fragment.RepairContainerPendingListFragment;
-import com.cloudjay.cjay.fragment.RepairContainerPendingListFragment_;
-import com.cloudjay.cjay.fragment.UploadsFragment_;
+import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
 
@@ -91,8 +89,8 @@ public class RepairHomeActivity extends CJayActivity implements OnPageChangeList
 
 	@Override
 	public void OnContainerInputCompleted(Fragment parent, String containerId, String operatorName, int mode) {
-		if (parent instanceof RepairContainerPendingListFragment) {
-			((RepairContainerPendingListFragment) parent).OnContainerInputCompleted(containerId, operatorName, mode);
+		if (parent instanceof RepairContainerPendingListFragment_) {
+			((RepairContainerPendingListFragment_) parent).OnContainerInputCompleted(containerId, operatorName, mode);
 		}
 	}
 
@@ -128,8 +126,8 @@ public class RepairHomeActivity extends CJayActivity implements OnPageChangeList
 
 	@Override
 	public void OnOperatorSelected(Fragment parent, String containerId, String operatorName, int mode) {
-		if (parent instanceof RepairContainerPendingListFragment) {
-			((RepairContainerPendingListFragment) parent).OnOperatorSelected(containerId, operatorName, mode);
+		if (parent instanceof RepairContainerPendingListFragment_) {
+			((RepairContainerPendingListFragment_) parent).OnOperatorSelected(containerId, operatorName, mode);
 		}
 	}
 

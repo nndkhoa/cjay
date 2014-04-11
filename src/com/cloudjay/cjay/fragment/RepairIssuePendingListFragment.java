@@ -24,9 +24,7 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.CameraActivity;
-import com.cloudjay.cjay.CameraActivity_;
-import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
@@ -92,7 +90,7 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 		}
 
 		Intent intent = new Intent(getActivity(), CameraActivity_.class);
-		intent.putExtra(CameraActivity.CJAY_CONTAINER_SESSION_EXTRA, mContainerSession.getUuid());
+		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA, mContainerSession.getUuid());
 		intent.putExtra("type", CJayImage.TYPE_REPORT);
 		intent.putExtra("tag", LOG_TAG);
 		startActivity(intent);
@@ -116,7 +114,7 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 		}
 
 		Intent intent = new Intent(getActivity(), CameraActivity_.class);
-		intent.putExtra(CameraActivity.CJAY_CONTAINER_SESSION_EXTRA, mContainerSession.getUuid());
+		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA, mContainerSession.getUuid());
 		intent.putExtra("type", CJayImage.TYPE_REPAIRED);
 		intent.putExtra("tag", LOG_TAG);
 		startActivity(intent);

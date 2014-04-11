@@ -44,8 +44,7 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
-import com.cloudjay.cjay.AuditorContainerActivity;
-import com.cloudjay.cjay.AuditorContainerActivity_;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
@@ -214,7 +213,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 
 		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
 		String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
-		intent.putExtra(AuditorContainerActivity.CJAY_CONTAINER_SESSION_EXTRA, uuidString);
+		intent.putExtra(AuditorContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA, uuidString);
 		startActivity(intent);
 	}
 
@@ -270,8 +269,8 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 				// CJayImage.TYPE_REPORT, LOG_TAG);
 
 				Intent intent = new Intent(getActivity(), AuditorContainerActivity_.class);
-				intent.putExtra(AuditorContainerActivity.CJAY_CONTAINER_SESSION_EXTRA, containerSession.getUuid());
-				intent.putExtra(AuditorContainerActivity.START_CAMERA_EXTRA, true);
+				intent.putExtra(AuditorContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA, containerSession.getUuid());
+				intent.putExtra(AuditorContainerActivity_.START_CAMERA_EXTRA, true);
 				startActivity(intent);
 
 				break;

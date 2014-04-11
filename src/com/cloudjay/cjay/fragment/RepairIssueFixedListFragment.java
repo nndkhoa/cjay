@@ -19,9 +19,7 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.RepairIssueReportActivity;
-import com.cloudjay.cjay.RepairIssueReportActivity_;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
@@ -61,7 +59,7 @@ public class RepairIssueFixedListFragment extends SherlockFragment {
 
 		// show issue report activity
 		Intent intent = new Intent(getActivity(), RepairIssueReportActivity_.class);
-		intent.putExtra(RepairIssueReportActivity.CJAY_ISSUE_EXTRA, mSelectedIssue.getUuid());
+		intent.putExtra(RepairIssueReportActivity_.CJAY_ISSUE_EXTRA, mSelectedIssue.getUuid());
 		startActivity(intent);
 	}
 

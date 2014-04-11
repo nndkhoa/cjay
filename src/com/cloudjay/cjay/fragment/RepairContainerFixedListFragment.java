@@ -32,8 +32,7 @@ import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.RepairContainerActivity;
-import com.cloudjay.cjay.RepairContainerActivity_;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerRepairedEvent;
@@ -115,7 +114,7 @@ public class RepairContainerFixedListFragment extends SherlockFragment implement
 		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
 		String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
 
-		intent.putExtra(RepairContainerActivity.CJAY_CONTAINER_SESSION_EXTRA, uuidString);
+		intent.putExtra(RepairContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA, uuidString);
 
 		startActivity(intent);
 	}

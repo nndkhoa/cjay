@@ -20,11 +20,7 @@ import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
-import com.cloudjay.cjay.fragment.GateExportListFragment;
-import com.cloudjay.cjay.fragment.GateExportListFragment_;
-import com.cloudjay.cjay.fragment.GateImportListFragment;
-import com.cloudjay.cjay.fragment.GateImportListFragment_;
-import com.cloudjay.cjay.fragment.UploadsFragment_;
+import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
 
@@ -92,13 +88,13 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 
 	@Override
 	public void OnContainerInputCompleted(Fragment parent, String containerId, String operatorName, int mode) {
-		if (parent instanceof GateImportListFragment) {
+		if (parent instanceof GateImportListFragment_) {
 
-			((GateImportListFragment) parent).OnContainerInputCompleted(containerId, operatorName, mode);
+			((GateImportListFragment_) parent).OnContainerInputCompleted(containerId, operatorName, mode);
 
-		} else if (parent instanceof GateExportListFragment) {
+		} else if (parent instanceof GateExportListFragment_) {
 
-			((GateExportListFragment) parent).OnContainerInputCompleted(containerId, operatorName, mode);
+			((GateExportListFragment_) parent).OnContainerInputCompleted(containerId, operatorName, mode);
 
 		}
 	}
@@ -135,10 +131,10 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 
 	@Override
 	public void OnOperatorSelected(Fragment parent, String containerId, String operatorName, int mode) {
-		if (parent instanceof GateImportListFragment) {
-			((GateImportListFragment) parent).OnOperatorSelected(containerId, operatorName, mode);
-		} else if (parent instanceof GateExportListFragment) {
-			((GateExportListFragment) parent).OnOperatorSelected(containerId, operatorName, mode);
+		if (parent instanceof GateImportListFragment_) {
+			((GateImportListFragment_) parent).OnOperatorSelected(containerId, operatorName, mode);
+		} else if (parent instanceof GateExportListFragment_) {
+			((GateExportListFragment_) parent).OnOperatorSelected(containerId, operatorName, mode);
 		}
 	}
 

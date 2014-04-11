@@ -27,8 +27,7 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.AuditorContainerActivity;
-import com.cloudjay.cjay.AuditorContainerActivity_;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
@@ -120,8 +119,8 @@ public class AuditorReportedListFragment extends SherlockFragment {
 		hideMenuItems();
 
 		Intent intent = new Intent(getActivity(), AuditorContainerActivity_.class);
-		intent.putExtra(AuditorContainerActivity.CJAY_CONTAINER_SESSION_EXTRA, mFeedsAdapter.getItem(position)
-																							.getUuid());
+		intent.putExtra(AuditorContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA, mFeedsAdapter.getItem(position)
+																								.getUuid());
 		startActivity(intent);
 	}
 

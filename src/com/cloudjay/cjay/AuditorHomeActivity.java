@@ -19,9 +19,7 @@ import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
-import com.cloudjay.cjay.fragment.AuditorReportingListFragment;
-import com.cloudjay.cjay.fragment.AuditorReportingListFragment_;
-import com.cloudjay.cjay.fragment.UploadsFragment_;
+import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
 
@@ -62,13 +60,13 @@ public class AuditorHomeActivity extends CJayActivity implements OnPageChangeLis
 					case 0:
 						// containers that have no 'report images'
 						Fragment notReportedFragment = new AuditorReportingListFragment_();
-						((AuditorReportingListFragment_) notReportedFragment).setState(AuditorReportingListFragment.STATE_NOT_REPORTED);
+						((AuditorReportingListFragment_) notReportedFragment).setState(AuditorReportingListFragment_.STATE_NOT_REPORTED);
 						return notReportedFragment;
 
 					case 1:
 						// containers that have 'report images'
 						Fragment reportingFragment = new AuditorReportingListFragment_();
-						((AuditorReportingListFragment_) reportingFragment).setState(AuditorReportingListFragment.STATE_REPORTING);
+						((AuditorReportingListFragment_) reportingFragment).setState(AuditorReportingListFragment_.STATE_REPORTING);
 						return reportingFragment;
 
 					case 2:
@@ -84,8 +82,8 @@ public class AuditorHomeActivity extends CJayActivity implements OnPageChangeLis
 
 	@Override
 	public void OnContainerInputCompleted(Fragment parent, String containerId, String operatorName, int mode) {
-		if (parent instanceof AuditorReportingListFragment) {
-			((AuditorReportingListFragment) parent).OnContainerInputCompleted(containerId, operatorName, mode);
+		if (parent instanceof AuditorReportingListFragment_) {
+			((AuditorReportingListFragment_) parent).OnContainerInputCompleted(containerId, operatorName, mode);
 		}
 	}
 
@@ -121,8 +119,8 @@ public class AuditorHomeActivity extends CJayActivity implements OnPageChangeLis
 
 	@Override
 	public void OnOperatorSelected(Fragment parent, String containerId, String operatorName, int mode) {
-		if (parent instanceof AuditorReportingListFragment) {
-			((AuditorReportingListFragment) parent).OnOperatorSelected(containerId, operatorName, mode);
+		if (parent instanceof AuditorReportingListFragment_) {
+			((AuditorReportingListFragment_) parent).OnOperatorSelected(containerId, operatorName, mode);
 		}
 	}
 
