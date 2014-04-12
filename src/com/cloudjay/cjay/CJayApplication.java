@@ -16,6 +16,7 @@ import android.text.TextUtils;
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
+import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.network.CJayClient;
@@ -148,6 +149,7 @@ public class CJayApplication extends Application {
 													.getContainerSessionDaoImpl();
 
 				containerSessionDaoImpl.update(containerSession);
+
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -155,7 +157,8 @@ public class CJayApplication extends Application {
 
 		// It will trigger `UploadsFragment` Adapter
 		EventBus.getDefault().post(new ContainerSessionEnqueueEvent(containerSession));
-
+		EventBus.getDefault().post(	new LogUserActivityEvent("Add container " + containerSession.getContainer()
+											+ " to upload queue"));
 	}
 
 	IDatabaseManager databaseManager = null;

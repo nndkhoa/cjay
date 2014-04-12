@@ -4,6 +4,8 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
+    <include layout="@layout/layout_empty_items" />
+
     <GridView
         android:id="@+id/gridview"
         android:layout_width="match_parent"

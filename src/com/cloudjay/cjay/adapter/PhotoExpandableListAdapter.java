@@ -24,6 +24,13 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Utils;
 
+/**
+ * 
+ * Expandable Item detail (GridView)
+ * 
+ * @author quocvule
+ * 
+ */
 public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
 
 	private final Context mContext;
@@ -80,8 +87,10 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
 		final int imageType = mImageTypes[groupPosition];
 		final String title = mSectionHeaders.get(groupPosition);
 
+		TextView emptyTextView = (TextView) convertView.findViewById(android.R.id.empty);
 		GridView gridView = (GridView) convertView.findViewById(R.id.gridview);
-		gridView.setEmptyView(((FragmentActivity) mContext).findViewById(android.R.id.empty));
+		// gridView.setEmptyView(((FragmentActivity) mContext).findViewById(android.R.id.empty));
+		gridView.setEmptyView(emptyTextView);
 
 		gridView.setOnItemClickListener(new OnItemClickListener() {
 

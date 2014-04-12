@@ -51,6 +51,7 @@ import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
+import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.events.PostLoadDataEvent;
 import com.cloudjay.cjay.events.PreLoadDataEvent;
 import com.cloudjay.cjay.events.UploadStateRestoredEvent;
@@ -478,6 +479,9 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 				mSelectedContainerSession.setUploadType(ContainerSession.TYPE_OUT);
 				mSelectedContainerSession.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+
+				EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #OUT container with ID "
+													+ mSelectedContainerSession.getContainerId() + "to upload queue"));
 
 				CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
 

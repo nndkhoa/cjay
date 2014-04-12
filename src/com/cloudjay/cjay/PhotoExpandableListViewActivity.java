@@ -19,11 +19,13 @@ import android.widget.ExpandableListView;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.cloudjay.cjay.adapter.PhotoExpandableListAdapter;
 import com.cloudjay.cjay.adapter.PhotoGridViewCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
+import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.fragment.GateImportListFragment;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -32,6 +34,8 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.StringHelper;
+
+import de.greenrobot.event.EventBus;
 
 @EActivity(R.layout.activity_photo_expandablelistview)
 @OptionsMenu(R.menu.menu_photo_grid_view)
@@ -69,6 +73,9 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 	@ViewById(R.id.btn_add_new)
 	ImageButton mAddButton;
+
+	@ViewById(android.R.id.empty)
+	TextView mEmptyElement;
 
 	@Extra("tag")
 	String sourceTag = "";
@@ -231,15 +238,21 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 				mContainerSession.setUploadType(ContainerSession.TYPE_IN);
 				mContainerSession.setOnLocal(false);
 
+				EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #IN container with ID "
+													+ mContainerSession.getContainerId() + "to upload queue"));
+
 			} else {
 
 				mContainerSession.setUploadType(ContainerSession.TYPE_OUT);
 				mContainerSession.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+
+				EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #OUT container with ID "
+													+ mContainerSession.getContainerId() + "to upload queue"));
 			}
 
 			CJayApplication.uploadContainerSesison(context, mContainerSession);
-
 			finish();
+
 		} else {
 			showCrouton(R.string.alert_invalid_container);
 		}

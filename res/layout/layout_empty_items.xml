@@ -8,4 +8,6 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:drawableTop="@drawable/ic_empty_uploads"
+    android:paddingBottom="6dp"
+    android:paddingTop="6dp"
     android:text="@string/empty_items" />

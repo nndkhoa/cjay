@@ -44,6 +44,7 @@ import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
+import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.events.UploadStateRestoredEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Container;
@@ -423,6 +424,8 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 
 		mSelectedContainerSession.setUploadType(ContainerSession.TYPE_IN);
 		mSelectedContainerSession.setOnLocal(false);
+		EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #IN container with ID "
+											+ mSelectedContainerSession.getContainerId() + "to upload queue"));
 
 		CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
 		hideMenuItems();
