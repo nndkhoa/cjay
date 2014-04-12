@@ -85,7 +85,7 @@ public class GateContainerCursorAdapter extends CursorAdapter implements Filtera
 		holder.containerOwnerView.setText(operator);
 
 		String url = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_IMAGE_ID_PATH));
-		if (!TextUtils.isEmpty(url)) {
+		if (!TextUtils.isEmpty(url) && !url.equals("https://storage.googleapis.com/storage-cjay.cloudjay.com/")) {
 			imageLoader.displayImage(url, holder.itemPictureView);
 		} else {
 			holder.itemPictureView.setImageResource(R.drawable.ic_app);
