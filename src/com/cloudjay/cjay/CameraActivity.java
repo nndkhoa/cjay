@@ -528,6 +528,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 													CJayImage.TYPE_REPAIRED, GateExportListFragment.LOG_TAG);
 
 			}
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

@@ -154,7 +154,6 @@ public class CJayApplication extends Application {
 		}
 
 		// It will trigger `UploadsFragment` Adapter
-		// notifyDataSetChanged
 		EventBus.getDefault().post(new ContainerSessionEnqueueEvent(containerSession));
 
 	}

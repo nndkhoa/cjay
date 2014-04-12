@@ -32,6 +32,7 @@ import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
+import com.cloudjay.cjay.events.UploadStateRestoredEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.TmpContainerSession;
@@ -235,6 +236,7 @@ public class UploadIntentService extends IntentService implements CountingInputS
 					.addUsageLog(	"#upload #successfully container " + containerSession.getContainerId() + " | "
 											+ Integer.toString(containerSession.getUploadType()));
 
+		// Restore container upload state to NORMAL if upload_type = NONE (temporary upload at GateImport)
 		synchronized (containerSession) {
 
 			if (containerSession.getUploadType() == ContainerSession.TYPE_NONE) {
@@ -248,8 +250,11 @@ public class UploadIntentService extends IntentService implements CountingInputS
 					e.printStackTrace();
 				}
 
-				Logger.w("Notify ContainerSessionUpdated Event");
-				EventBus.getDefault().post(new ContainerSessionUpdatedEvent(containerSession));
+				// - Clear upload from upload fragment
+				// - Refresh container in CameraActivity
+				// - Refresh list item in GateImport
+				Logger.w("Notify UploadStateRestored Event");
+				EventBus.getDefault().post(new UploadStateRestoredEvent(containerSession));
 
 			}
 		}

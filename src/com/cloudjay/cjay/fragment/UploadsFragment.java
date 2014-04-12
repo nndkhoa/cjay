@@ -26,6 +26,8 @@ import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
+import com.cloudjay.cjay.events.UploadStateRestoredEvent;
+import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJayCursorLoader;
@@ -134,6 +136,11 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 		refresh();
 	}
 
+	public void onEvent(UploadStateRestoredEvent event) {
+		Logger.Log("on upload state restore: refresh list item");
+		refresh();
+	}
+
 	@Override
 	public void onItemClick(AdapterView<?> l, View view, int position, long id) {
 
@@ -142,11 +149,13 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 
 		Cursor cursor = (Cursor) mListView.getItemAtPosition(position);
 		int uploadState = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_STATE));
+		String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
 		String containerUuid = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
 
 		switch (viewId) {
 			case R.id.iv_upload_result:
 				Logger.Log("User click on retry button");
+				EventBus.getDefault().post(new LogUserActivityEvent(containerId + " | User #retry manually"));
 				if (uploadState == ContainerSession.STATE_UPLOAD_ERROR) {
 					DataCenter.getInstance().rollback(	DataCenter.getDatabaseHelper(getActivity())
 																	.getWritableDatabase(), containerUuid);

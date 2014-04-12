@@ -348,7 +348,7 @@ public class DataCenter {
 		if (cursor.moveToFirst()) {
 
 			Logger.Log("Manually rolling back container session upload state.");
-			EventBus.getDefault().post(new LogUserActivityEvent("#Manually #rollback upload state container: "));
+			EventBus.getDefault().post(new LogUserActivityEvent("#Manually #rollback upload state container"));
 
 			int uploadType = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UPLOAD_TYPE));
 			String sql = "";

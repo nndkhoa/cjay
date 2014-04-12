@@ -53,6 +53,7 @@ import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.events.PostLoadDataEvent;
 import com.cloudjay.cjay.events.PreLoadDataEvent;
+import com.cloudjay.cjay.events.UploadStateRestoredEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -326,6 +327,11 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
 		Logger.Log("ContainerSessionChangedEvent");
+		refresh();
+	}
+
+	public void onEvent(UploadStateRestoredEvent event) {
+		Logger.Log("on upload state restore: refresh list item");
 		refresh();
 	}
 

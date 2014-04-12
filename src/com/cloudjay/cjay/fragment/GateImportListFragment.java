@@ -42,7 +42,9 @@ import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
+import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
+import com.cloudjay.cjay.events.UploadStateRestoredEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -205,17 +207,16 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 																			currentTimeStamp, depotCode);
 				containerSession.setOnLocal(true);
 
-				EventBus.getDefault().post(new ContainerSessionChangedEvent(containerSession));
-
 				try {
 					containerSessionDaoImpl.addContainerSession(containerSession);
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
 
+				EventBus.getDefault().post(new ContainerSessionChangedEvent(containerSession));
 				CJayApplication.gotoCamera(activity, containerSession, CJayImage.TYPE_IMPORT, LOG_TAG);
 
-				// TODO: Temporary post container to server
+				// temporary upload with upload_type = NONE;
 				CJayApplication.uploadContainerSesison(getActivity(), containerSession);
 
 				break;
@@ -226,6 +227,11 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 				break;
 		}
 
+	}
+
+	public void onEvent(UploadStateRestoredEvent event) {
+		Logger.Log("on upload state restore: refresh list item");
+		refresh();
 	}
 
 	@Override
