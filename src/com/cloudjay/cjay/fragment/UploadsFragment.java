@@ -109,7 +109,7 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 	public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
 		Logger.Log("onSwipeDismiss");
 
-		// set item Cleared = true then call updateUI()
+		// set item Cleared = true then call refresh()
 		try {
 			for (int i = 0, z = reverseSortedPositions.length; i < z; i++) {
 
@@ -155,11 +155,13 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 		switch (viewId) {
 			case R.id.iv_upload_result:
 				Logger.Log("User click on retry button");
+
 				EventBus.getDefault().post(new LogUserActivityEvent(containerId + " | User #retry manually"));
 				if (uploadState == ContainerSession.STATE_UPLOAD_ERROR) {
 					DataCenter.getInstance().rollback(	DataCenter.getDatabaseHelper(getActivity())
 																	.getWritableDatabase(), containerUuid);
 
+					// TODO: post new Event to refresh other fragment
 					refresh();
 				}
 				break;

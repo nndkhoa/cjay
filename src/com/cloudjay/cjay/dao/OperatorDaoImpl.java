@@ -8,6 +8,7 @@ import java.util.List;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Operator;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
@@ -38,6 +39,7 @@ public class OperatorDaoImpl extends BaseDaoImpl<Operator, Integer> implements I
 			for (Operator operator : operators) {
 
 				ContentValues values = new ContentValues();
+				values.put(Operator.FIELD_ID, operator.getId());
 				values.put(Operator.FIELD_CODE, operator.getCode());
 				values.put(Operator.FIELD_NAME, operator.getName());
 				db.insert("operator", null, values);

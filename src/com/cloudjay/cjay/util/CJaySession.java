@@ -25,6 +25,7 @@ public class CJaySession {
 	private static IUserDao userDao;
 
 	public static CJaySession restore(Context context) {
+
 		// Logger.Log("restoring session ... ");
 		databaseManager = CJayClient.getInstance().getDatabaseManager();
 		try {

@@ -9,6 +9,7 @@
     <string name="action_settings">Cấu hình</string>
     <string name="default_container_id">Untitled</string>
     <string name="container_not_found">KHÔNG TÌM THẤY CONTAINER.\nCLICK + ĐỂ TẠO MỚI </string>
+    <string name="container_not_found_no_add_more">KHÔNG TÌM THẤY CONTAINER.\nLIÊN HỆ CỔNG.</string>
     <string name="camera_button_tooltip">Chụp hình</string>
     <string name="progress">Loading ...</string>
     <string name="list_items">Danh sách container</string>

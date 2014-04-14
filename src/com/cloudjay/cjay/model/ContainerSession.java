@@ -358,7 +358,7 @@ public class ContainerSession {
 
 	private void notifyUploadStateListener() {
 
-		Logger.e("notifyUploadStateListener");
+		Logger.Log("notifyUploadStateListener");
 		EventBus.getDefault().post(new UploadStateChangedEvent(this));
 
 	}

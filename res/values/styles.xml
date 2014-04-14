@@ -30,30 +30,30 @@
         <item name="android:shadowDy">1</item>
         <item name="android:shadowRadius">2</item>
     </style>
-    
+
     <style name="IssueReportLocationCodeEditText">
-    	<item name="android:layout_width">0dp</item>
+        <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_marginLeft">10dp</item>
         <item name="android:layout_marginRight">10dp</item>
-	    <item name="android:gravity">center</item>
-	    <item name="android:textSize">40sp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">40sp</item>
         <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
-	    <item name="android:background">@drawable/textview_location_background</item>
+        <item name="android:background">@drawable/textview_location_background</item>
     </style>
-    
+
     <style name="IssueReportLocationCodeButton">
-    	<item name="android:layout_width">0dp</item>
+        <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_marginLeft">2dp</item>
         <item name="android:layout_marginRight">2dp</item>
         <item name="android:text">@string/button_text_placeholder</item>
     </style>
-    
+
     <style name="IssueReportDamageCodeButton">
-    	<item name="android:layout_width">0dp</item>
+        <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">50dp</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_marginLeft">8dp</item>
@@ -69,13 +69,13 @@
         <item name="android:padding">@dimen/double_spacing</item>
         <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
     </style>
-    
+
     <style name="SearchEditTextStyle">
         <item name="android:imeOptions">actionSearch</item>
         <item name="android:inputType">textCapCharacters</item>
         <item name="android:singleLine">true</item>
     </style>
-    
+
     <style name="NotFoundTextViewStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -84,24 +84,23 @@
         <item name="android:background">@color/blue_dark</item>
         <item name="android:shadowDx">2</item>
         <item name="android:shadowColor">@color/item_bg_dark</item>
-        <item name="android:text">@string/container_not_found</item>
         <item name="android:textSize">20sp</item>
     </style>
-    
+
     <style name="ListItemIssueLabel">
-		<item name="android:layout_width">0dp</item>
-		<item name="android:layout_height">match_parent</item>
-		<item name="android:layout_weight">4</item>
-	</style>
-    
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">4</item>
+    </style>
+
     <style name="ListItemIssueValue">
-		<item name="android:layout_width">0dp</item>
-		<item name="android:layout_height">fill_parent</item>
-		<item name="android:layout_weight">3</item>
-		<item name="android:gravity">right</item>
-		<item name="android:textColor">@color/blue_light</item>
-	</style>
-	
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:layout_weight">3</item>
+        <item name="android:gravity">right</item>
+        <item name="android:textColor">@color/blue_light</item>
+    </style>
+
     <style name="ContainerIDTitle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -113,11 +112,12 @@
         <item name="android:textSize">20sp</item>
         <item name="android:textStyle">bold</item>
     </style>
-    
+
     <style name="CJayListView">
         <item name="android:scrollbars">none</item>
         <item name="android:layout_centerHorizontal">true</item>
         <item name="android:choiceMode">singleChoice</item>
         <item name="android:textAppearance">@android:attr/textAppearanceListItem</item>
     </style>
+
 </resources>

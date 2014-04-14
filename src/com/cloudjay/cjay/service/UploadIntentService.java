@@ -167,7 +167,6 @@ public class UploadIntentService extends IntentService implements CountingInputS
 		containerSession.setUploadState(ContainerSession.STATE_UPLOAD_IN_PROGRESS);
 
 		try {
-
 			containerSessionDaoImpl.update(containerSession);
 		} catch (SQLException e) {
 
@@ -177,8 +176,19 @@ public class UploadIntentService extends IntentService implements CountingInputS
 		}
 
 		// Convert ContainerSession to TmpContainerSession for uploading
-		TmpContainerSession uploadItem = Mapper.getInstance().toTmpContainerSession(containerSession,
-																					getApplicationContext());
+		TmpContainerSession uploadItem = null;
+		try {
+			uploadItem = Mapper.getInstance().toTmpContainerSession(containerSession, getApplicationContext());
+
+		} catch (Exception e) {
+
+			containerSession.setUploadState(ContainerSession.STATE_UPLOAD_ERROR);
+			DataCenter.getDatabaseHelper(getApplicationContext())
+						.addUsageLog(	"#upload #failed container " + containerSession.getContainerId() + " | "
+												+ Integer.toString(containerSession.getUploadType())
+												+ " | #error on #conversion to Upload Format");
+			e.printStackTrace();
+		}
 
 		try {
 			response = CJayClient.getInstance().postContainerSession(getApplicationContext(), uploadItem);
@@ -302,7 +312,7 @@ public class UploadIntentService extends IntentService implements CountingInputS
 	// Use to clear item
 	public void onEvent(UploadStateChangedEvent event) {
 
-		Logger.e("onEvent UploadStateChangedEvent");
+		Logger.Log("onEvent UploadStateChangedEvent");
 		ContainerSession containerSession = event.getContainerSession();
 
 		switch (containerSession.getUploadState()) {

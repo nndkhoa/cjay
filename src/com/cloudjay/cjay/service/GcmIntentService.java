@@ -172,10 +172,9 @@ public class GcmIntentService extends IntentService {
 				// Received Roles: GATE | AUDIT
 				// --> Get more data from Server
 
-				if (userRole == User.ROLE_GATE_KEEPER || userRole == User.ROLE_AUDITOR) {
-
+				if (userRole == User.ROLE_GATE_KEEPER || userRole == User.ROLE_AUDITOR
+						|| userRole == User.ROLE_REPAIR_STAFF) {
 					DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_CREATED);
-
 				}
 
 			} else if (type.equalsIgnoreCase("NEW_TEMP_CONTAINER")) {
@@ -243,9 +242,7 @@ public class GcmIntentService extends IntentService {
 				DataCenter.getInstance().updateListOperators(this);
 
 			} else if (type.equalsIgnoreCase("USER_INFO_UPDATED")) {
-
 				User user = com.cloudjay.cjay.util.CJaySession.restore(this).getCurrentUser();
-
 				DataCenter.getInstance().saveCredential(this, user.getAccessToken());
 			}
 		} catch (NullSessionException e) {

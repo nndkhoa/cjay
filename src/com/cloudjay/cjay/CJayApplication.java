@@ -66,7 +66,13 @@ public class CJayApplication extends Application {
 
 		Logger.w("Access Token is expired");
 		CJaySession session = CJaySession.restore(ctx);
-		session.deleteSession(ctx);
+
+		// TODO: Bugs
+		try {
+			session.deleteSession(ctx);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		Intent intent = new Intent(ctx, LoginActivity_.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
