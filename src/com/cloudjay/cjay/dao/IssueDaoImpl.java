@@ -37,5 +37,12 @@ public class IssueDaoImpl extends BaseDaoImpl<Issue, String> implements IIssueDa
 	public List<Issue> getAllIssues() throws SQLException {
 		return queryForAll();
 	}
+	
+	@Override
+	public Issue findByUuid(String uuid) throws SQLException {
+		List<Issue> result = queryForEq(Issue.FIELD_UUID, uuid);
+		if (result != null && result.size() > 0) return result.get(0);
 
+		return null;
+	}
 }

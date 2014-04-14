@@ -277,7 +277,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 
 		menu.findItem(R.id.menu_trash).setVisible(isDisplayed);
 		menu.findItem(R.id.menu_upload).setVisible(mContainerSession.isValidForUpload(CJayImage.TYPE_REPORT));
-
+		
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -299,6 +299,12 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		} else {
 			Logger.Log("issue_report - refresh");
 
+			try {
+				containerSessionDaoImpl.refresh(mContainerSession);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			
 			if (mCursorAdapter != null) {
 				// otherwise refresh the image list
 				refresh();
@@ -313,11 +319,8 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 
 	@UiThread
 	public void refresh() {
-
 		getLoaderManager().restartLoader(LOADER_ID, null, this);
 		supportInvalidateOptionsMenu();
-		invalidateOptionsMenu();
-
 	}
 
 	@Background
@@ -341,8 +344,8 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 			repairId = repairCursor.getInt(repairCursor.getColumnIndexOrThrow("_id"));
 		}
 
-		Cursor componentCursor = db.rawQuery(	"select id as _id from component_code where code = ?",
-												new String[] { "FWA" });
+		Cursor componentCursor = db.rawQuery("select id as _id from component_code where code = ?",
+				new String[] { "FWA" });
 
 		int componentId = 0;
 		if (componentCursor.moveToFirst()) {
@@ -350,20 +353,25 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		}
 
 		String issueId = UUID.randomUUID().toString();
-		db.execSQL("insert into issue VALUES (" + componentId + ", '" + mContainerSessionUUID + "', " + damageId
-				+ ", '" + issueId + "', NULL, " + repairId + ", NULL, 'BXXX', 1, 0, 0)");
-
-		String sqlString = "UPDATE cjay_image SET issue_id = '" + issueId + "' WHERE uuid = '" + mSelectedCJayImageUuid
+		String sql = "insert into issue "
+				+ "(componentCode_id, containerSession_id, damageCode_id, _id, height, repairCode_id, length, locationCode, quantity, id, fixed) "
+				+ " VALUES "
+				+ "("+componentId+", '"+mContainerSessionUUID+"', "+damageId+", '"+issueId+"', NULL, "+repairId+", NULL, 'BXXX', 1, 0, 0)";
+		db.execSQL(sql);
+		
+		sql = "UPDATE cjay_image SET issue_id = '" + issueId + "' WHERE uuid = '" + mSelectedCJayImageUuid
 				+ "'";
-
-		db.execSQL(sqlString);
-
-		// sqlString = "UPDATE cjay_image SET issue_id = '" + issueId + "' WHERE uuid = '" + mSelectedCJayImageUuid +
-		// "'";
-
+		db.execSQL(sql);
+		
+		try {
+			containerSessionDaoImpl.refresh(mContainerSession);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 		refresh();
 
-		// cost 50ms
+		// cost 50ms - Vu: updated cost: ~150-170ms
 		long difference = System.currentTimeMillis() - startTime;
 		Logger.w("---> Total time: " + Long.toString(difference));
 	}
@@ -388,48 +396,31 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 	void showReportDialog() {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this).setMessage(R.string.dialog_report_message)
-																	.setTitle(R.string.dialog_report_title)
-
-																	.setPositiveButton(	R.string.dialog_report_no,
-																						new DialogInterface.OnClickListener() {
-																							@Override
-																							public
-																									void
-																									onClick(DialogInterface dialog,
-																											int id) {
-
-																								// Issue not reported,
-																								// report issue
-																								showIssueReport(mSelectedCJayImageUuid);
-																							}
-																						})
-																	.setNegativeButton(	R.string.dialog_report_yes,
-																						new DialogInterface.OnClickListener() {
-																							@Override
-																							public
-																									void
-																									onClick(DialogInterface dialog,
-																											int id) {
-
-																								// The issue already
-																								// reported, assign this
-																								// image
-																								// to that issue
-																								showIssueAssigment(mSelectedCJayImageUuid);
-																							}
-																						})
-																	.setNeutralButton(R.string.dialog_report_neutral,
-																						new OnClickListener() {
-
-																							@Override
-																							public
-																									void
-																									onClick(DialogInterface dialog,
-																											int which) {
-
-																								setWWContainer();
-																							}
-																						});
+			.setTitle(R.string.dialog_report_title)
+	
+			.setPositiveButton(	R.string.dialog_report_no, new DialogInterface.OnClickListener() {
+									@Override
+									public void	onClick(DialogInterface dialog,	int id) {
+	
+										// Issue not reported, report issue
+										showIssueReport(mSelectedCJayImageUuid);
+									}
+								})
+			.setNegativeButton(	R.string.dialog_report_yes,	new DialogInterface.OnClickListener() {
+									@Override
+									public void	onClick(DialogInterface dialog, int id) {
+	
+										// The issue already reported, assign this image to that issue
+										showIssueAssigment(mSelectedCJayImageUuid);
+									}
+								})
+			.setNeutralButton(R.string.dialog_report_neutral, new OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+	
+										setWWContainer();
+									}
+								});
 
 		builder.show();
 	}

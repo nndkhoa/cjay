@@ -15,4 +15,5 @@ public interface IIssueDao extends Dao<Issue, String> {
 
 	List<Issue> getAllIssues() throws SQLException;
 
+	Issue findByUuid(String uuid) throws SQLException;
 }
