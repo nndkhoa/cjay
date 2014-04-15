@@ -58,7 +58,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			Issue.class, CJayImage.class };
 	public static final String DATABASE_NAME = "cjay.db";
 
-	public static final int DATABASE_VERSION = 3;
 	UserDaoImpl userDaoImpl = null;
 	OperatorDaoImpl operatorDaoImpl = null;
 	IssueDaoImpl issueDaoImpl = null;
@@ -206,7 +205,27 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		@Override
 		public void revert(SQLiteDatabase db, ConnectionSource connectionSource) {
 		}
+	}, new Patch() {
+			// version = 4
+		@Override
+		public void apply(SQLiteDatabase db, ConnectionSource connectionSource) {
+
+			// Add cs_full_info_view
+			Logger.Log("create view cs_full_info_view");
+			String sql = "CREATE VIEW cs_full_info_view AS"
+					+ " SELECT cs._id, cs.check_out_time, cs.check_in_time, cs.image_id_path, cs.on_local, cs.fixed, cs.export, cs.upload_confirmation, cs.upload_type, cs.state, cs.cleared, c.container_id, o.operator_name, o.operator_code, d.depot_code"
+					+ " FROM container_session AS cs, depot AS d, container AS c LEFT JOIN operator AS o ON c.operator_id = o._id"
+					+ " WHERE cs.container_id = c._id AND d.id = c.depot_id";
+
+			db.execSQL(sql);
+		}
+
+		@Override
+		public void revert(SQLiteDatabase db, ConnectionSource connectionSource) {
+		}
 	} };
+
+	public static final int DATABASE_VERSION = 4;
 
 	public DatabaseHelper(Context context) {
 

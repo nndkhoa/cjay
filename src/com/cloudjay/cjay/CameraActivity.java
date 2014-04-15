@@ -415,6 +415,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@AfterViews
 	void initContainerSession() {
+
 		try {
 
 			if (null == mContainerSessionDaoImpl) {
@@ -429,7 +430,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			if (mContainerSession == null) {
 				mContainerSession = mContainerSessionDaoImpl.queryForId(mContainerSessionUUID);
-
 			}
 
 		} catch (SQLException e) {
