@@ -163,8 +163,10 @@ public class LoginActivity extends CJayActivity {
 	@Override
 	protected void onCreate(Bundle arg0) {
 
-		// UpdateChecker checker = new UpdateChecker(this);
-		// checker.start();
+		if (PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_AUTO_CHECK_UPDATE, true)) {
+			UpdateChecker checker = new UpdateChecker(this);
+			checker.start();
+		}
 
 		super.onCreate(arg0);
 	}

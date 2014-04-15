@@ -8,6 +8,7 @@ import org.androidannotations.annotations.ViewById;
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
@@ -21,6 +22,7 @@ import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
 import com.rampo.updatechecker.UpdateChecker;
@@ -114,8 +116,10 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 		} catch (Exception ex) {
 		}
 
-		// UpdateChecker checker = new UpdateChecker(this);
-		// checker.start();
+		if (PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_AUTO_CHECK_UPDATE, true)) {
+			UpdateChecker checker = new UpdateChecker(this);
+			checker.start();
+		}
 
 		super.onCreate(arg0);
 	}

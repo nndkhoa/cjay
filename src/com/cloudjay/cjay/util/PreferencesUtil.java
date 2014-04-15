@@ -22,6 +22,7 @@ public class PreferencesUtil {
 	public static final String PREF_IS_UPDATING_DATA = "pref_is_updating_data";
 	public static final String PREF_USERNAME = "pref_username";
 	public static final String PREF_APP_VERSION = "pref_app_version";
+	public static final String PREF_AUTO_CHECK_UPDATE = "pref_auto_check_update";
 
 	public static void clearPrefs(Context context) {
 
