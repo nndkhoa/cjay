@@ -31,7 +31,7 @@
             android:ellipsize="end"
             android:hint="@string/dialog_container_id"
             android:imeOptions="actionNext"
-            android:inputType="textCapCharacters"
+            android:inputType="textCapCharacters|textNoSuggestions"
             android:lines="1"
             android:selectAllOnFocus="true"
             android:singleLine="true"
@@ -63,6 +63,7 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:hint="@string/dialog_container_owner"
+            android:inputType="text|textNoSuggestions"
             android:lines="1"
             android:singleLine="true" />
     </LinearLayout>

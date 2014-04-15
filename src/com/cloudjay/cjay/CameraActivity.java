@@ -15,6 +15,7 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.NoTitle;
 import org.androidannotations.annotations.SystemService;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.ViewById;
 
 import android.app.Activity;
@@ -39,6 +40,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.provider.MediaStore.MediaColumns;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -56,6 +58,7 @@ import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
+import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.fragment.GateExportListFragment;
 import com.cloudjay.cjay.fragment.GateImportListFragment;
 import com.cloudjay.cjay.model.AuditReportItem;
@@ -151,7 +154,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	List<GateReportImage> mGateReportImages = new ArrayList<GateReportImage>();
 	List<AuditReportItem> mAuditReportItems = new ArrayList<AuditReportItem>();
 
-	List<CJayImage> mCJayImages = new ArrayList<CJayImage>();
+	// List<CJayImage> mCJayImages = new ArrayList<CJayImage>();
 	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
 
 	private static final int PREVIEW_SIZE_MAX_WIDTH = 1280;
@@ -365,20 +368,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		onBackPressed();
 	}
 
-	public String getPath(Uri uri) {
-		String[] projection = { MediaColumns.DATA };
-		Cursor cursor = managedQuery(uri, projection, null, null, null);
-		if (cursor != null) {
-
-			// HERE YOU WILL GET A NULLPOINTER IF CURSOR IS NULL
-			// THIS CAN BE, IF YOU USED OI FILE MANAGER FOR PICKING THE MEDIA
-			int column_index = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
-			cursor.moveToFirst();
-			return cursor.getString(column_index);
-		} else
-			return null;
-	}
-
 	@AfterViews
 	void initCamera() {
 
@@ -502,12 +491,14 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Override
 	public void onAutoFocus(boolean arg0, Camera arg1) {
-		// Logger.Log("Auto focused, now take picture");
+		Logger.Log("Auto focused, now take picture");
 		mCamera.takePicture(shutterCallback, null, photoCallback);
 	}
 
 	@Override
 	public void onBackPressed() {
+
+		Logger.Log("onBackPressed");
 
 		try {
 
@@ -957,16 +948,20 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 										.equals("https://storage.googleapis.com/storage-cjay.cloudjay.com/")) {
 
 				Logger.Log("Set container image_id_path: " + uri);
+
 				mContainerSession.setImageIdPath(uri);
 				mContainerSessionDaoImpl.addContainerSession(mContainerSession);
 
 			}
 
-			mCJayImages.add(uploadItem);
+			// mCJayImages.add(uploadItem);
 			mCJayImageDaoImpl.addCJayImage(uploadItem);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+			EventBus.getDefault().post(	new LogUserActivityEvent("#error when update captured image | "
+												+ mContainerSession.getContainerId()));
+			Logger.e("#error when update captured image | " + mContainerSession.getContainerId());
 		}
 
 		Logger.Log("Source tag: " + mSourceTag);
@@ -974,6 +969,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		// tell people that an image has been created
 		if (!TextUtils.isEmpty(mSourceTag)) {
 			SystemClock.sleep(300);
+
 			Logger.Log("issue_report - " + uploadItem.getUuid() + " - Trigger cjayimage added");
 			EventBus.getDefault().post(new CJayImageAddedEvent(uploadItem, mSourceTag));
 		}

@@ -17,6 +17,7 @@
 	        	android:gravity="right"
 		        android:text="@string/label_issue_length"
 		        android:textStyle="bold" />
+        	
        	 	<EditText
 		        android:id="@+id/length"
 		        android:layout_width="0dp"

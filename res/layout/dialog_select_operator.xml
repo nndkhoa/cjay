@@ -9,7 +9,8 @@
         android:id="@+id/dialog_operator_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/dialog_container_owner" />
+        android:hint="@string/dialog_container_owner"
+        android:inputType="textNoSuggestions" />
 
     <ListView
         android:id="@+id/dialog_operator_list"

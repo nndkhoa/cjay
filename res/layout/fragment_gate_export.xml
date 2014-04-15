@@ -28,7 +28,7 @@
                 android:layout_marginTop="10dp"
                 android:ems="10"
                 android:hint="@string/container_search"
-                android:inputType="textCapCharacters"
+                android:inputType="textCapCharacters|textNoSuggestions"
                 android:lines="1"
                 android:selectAllOnFocus="true"
                 android:singleLine="true"

@@ -4,7 +4,10 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -22,7 +25,9 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
+import com.j256.ormlite.stmt.query.In;
 
 @SuppressLint("DefaultLocale")
 public class AddContainerDialog extends SherlockDialogFragment {
@@ -64,6 +69,37 @@ public class AddContainerDialog extends SherlockDialogFragment {
 		if (mOperatorName != null) {
 			mOperatorEditText.setText(mOperatorName);
 		}
+
+		mContainerEditText.addTextChangedListener(new TextWatcher() {
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				if (s.length() < 4) {
+					if (mContainerEditText.getInputType() != InputType.TYPE_CLASS_TEXT) {
+						mContainerEditText.setInputType(InputType.TYPE_CLASS_TEXT
+								| InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+					}
+
+				} else {
+					if (mContainerEditText.getInputType() != InputType.TYPE_CLASS_NUMBER) {
+						mContainerEditText.setInputType(InputType.TYPE_CLASS_NUMBER
+								| InputType.TYPE_NUMBER_VARIATION_NORMAL);
+					}
+				}
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				// TODO Auto-generated method stub
+
+			}
+		});
 
 		mOperatorEditText.setOnFocusChangeListener(new OnFocusChangeListener() {
 			@Override
