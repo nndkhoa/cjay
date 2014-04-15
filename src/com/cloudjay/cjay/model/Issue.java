@@ -96,8 +96,8 @@ public class Issue {
 			// TODO: BUG HERE. Cannot parseFloat
 			boolean isEqual = damageCode.getId() == tmp.getDamageId() && repairCode.getId() == tmp.getRepairId()
 					&& getComponentCode().getId() == tmp.getComponentId() && getLocationCode() == tmp.getLocationCode()
-					&& Float.parseFloat(length) == Float.parseFloat(tmp.getLength())
-					&& Float.parseFloat(height) == Float.parseFloat(tmp.getHeight())
+					&& Math.abs(Float.parseFloat(length) - Float.parseFloat(tmp.getLength())) < 0.01
+					&& Math.abs(Float.parseFloat(height) - Float.parseFloat(tmp.getHeight())) < 0.01
 					&& Integer.parseInt(quantity) == Integer.parseInt(tmp.getQuantity());
 
 			return isEqual;
