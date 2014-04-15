@@ -297,8 +297,11 @@ public class CJayClient implements ICJayClient {
 						}).get();
 
 		} catch (InterruptedException e) {
+
+			Logger.Log("InterruptedException");
 			e.printStackTrace();
 		} catch (ExecutionException e) {
+			Logger.Log("ExecutionException");
 			e.printStackTrace();
 		}
 

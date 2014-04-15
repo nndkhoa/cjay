@@ -22,6 +22,7 @@ import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
+import com.rampo.updatechecker.UpdateChecker;
 
 /**
  * 
@@ -108,6 +109,10 @@ public class RepairHomeActivity extends CJayActivity implements OnPageChangeList
 		} catch (Exception ex) {
 
 		}
+
+		// UpdateChecker checker = new UpdateChecker(this);
+		// checker.start();
+
 		super.onCreate(arg0);
 	}
 

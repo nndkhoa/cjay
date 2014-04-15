@@ -23,6 +23,7 @@ import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
+import com.rampo.updatechecker.UpdateChecker;
 
 @EActivity(R.layout.activity_gate_home)
 public class GateHomeActivity extends CJayActivity implements OnPageChangeListener, TabListener,
@@ -112,6 +113,9 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 			}
 		} catch (Exception ex) {
 		}
+
+		// UpdateChecker checker = new UpdateChecker(this);
+		// checker.start();
 
 		super.onCreate(arg0);
 	}

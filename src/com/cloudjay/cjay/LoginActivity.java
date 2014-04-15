@@ -15,6 +15,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -30,6 +31,7 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.rampo.updatechecker.UpdateChecker;
 
 /**
  * 
@@ -157,6 +159,15 @@ public class LoginActivity extends CJayActivity {
 
 	@ViewById(R.id.sign_in_button)
 	Button loginButton;
+
+	@Override
+	protected void onCreate(Bundle arg0) {
+
+		// UpdateChecker checker = new UpdateChecker(this);
+		// checker.start();
+
+		super.onCreate(arg0);
+	}
 
 	/**
 	 * Attempts to sign in or register the account specified by the login form.

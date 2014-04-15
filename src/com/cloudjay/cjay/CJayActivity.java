@@ -10,6 +10,7 @@ import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
 import org.json.JSONException;
 
+import android.R.integer;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -108,10 +109,6 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 	@Override
 	protected void onCreate(Bundle arg0) {
-
-		UpdateChecker checker = new UpdateChecker(this);
-		checker.start();
-
 		EventBus.getDefault().register(this);
 		super.onCreate(arg0);
 		session = CJaySession.restore(getApplicationContext());
@@ -396,6 +393,28 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 		builder.show();
 	}
+
+	int userRoleMenuClickCount = 0;
+
+	// @OptionsItem(R.id.menu_role)
+	// void userRoleMenuItemSelected() {
+	// userRoleMenuClickCount++;
+	//
+	// int left = CJayConstant.HIDDEN_LOG_THRESHOLD - userRoleMenuClickCount;
+	//
+	// if (left <= 3 && left > 0) {
+	// Toast.makeText(this, "You have to click " + Integer.toString(left) + " to check update", Toast.LENGTH_SHORT)
+	// .show();
+	// }
+	//
+	// if (left == 0) {
+	//
+	// UpdateChecker checker = new UpdateChecker(this);
+	// checker.start();
+	//
+	// userRoleMenuClickCount = 0;
+	// }
+	// }
 
 	@OptionsItem(R.id.menu_username)
 	void usernameMenuItemSelected() {
