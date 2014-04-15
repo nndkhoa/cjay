@@ -39,7 +39,7 @@ public class DamageCodeDaoImpl extends BaseDaoImpl<DamageCode, Integer> implemen
 				values.put(DamageCode.ID, damageCode.getId());
 				values.put(DamageCode.CODE, damageCode.getCode());
 				values.put(DamageCode.DISPLAY_NAME, damageCode.getName());
-				db.insert("damage_code", null, values);
+				db.insertWithOnConflict("damage_code", null, values, SQLiteDatabase.CONFLICT_REPLACE);
 
 			}
 

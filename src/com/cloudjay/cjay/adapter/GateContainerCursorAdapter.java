@@ -38,6 +38,7 @@ public class GateContainerCursorAdapter extends CursorAdapter implements Filtera
 	private ImageLoader imageLoader;
 
 	public boolean isScrolling;
+	private int state = 0;
 
 	@SuppressWarnings("deprecation")
 	public GateContainerCursorAdapter(Context context, Cursor c) {
@@ -103,6 +104,24 @@ public class GateContainerCursorAdapter extends CursorAdapter implements Filtera
 			holder.validationImageView.setVisibility(View.INVISIBLE);
 		}
 	}
+
+	// @Override
+	// public boolean isEnabled(int position) {
+	//
+	// if (position % 2 == 0) { return false; }
+	//
+	// return super.isEnabled(position);
+	// }
+	//
+	// @Override
+	// public View getView(int arg0, View arg1, ViewGroup arg2) {
+	//
+	// if (isEnabled(arg0)) {
+	//
+	// }
+	//
+	// return super.getView(arg0, arg1, arg2);
+	// }
 
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {

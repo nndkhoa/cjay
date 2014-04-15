@@ -241,11 +241,6 @@ public class LoginActivity extends CJayActivity {
 	@AfterViews
 	void initialize() {
 
-		if (PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_AUTO_CHECK_UPDATE, true)) {
-			UpdateChecker checker = new UpdateChecker(this);
-			checker.start();
-		}
-
 		if (TextUtils.isEmpty(mEmail)) {
 			mEmail = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_USERNAME);
 		}

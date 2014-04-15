@@ -205,7 +205,7 @@ public class DataCenter {
 	public Cursor filterComponentCodeCursor(Context context, CharSequence constraint) {
 
 		String queryString = "SELECT id as _id, code, display_name FROM component_code"
-				+ " WHERE code LIKE ? ORDER BY id LIMIT 100";
+				+ " WHERE code LIKE ? ORDER BY _id LIMIT 100";
 
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
 																			new String[] { "%" + constraint + "%" });
@@ -214,7 +214,7 @@ public class DataCenter {
 	public Cursor filterDamageCodeCursor(Context context, CharSequence constraint) {
 
 		String queryString = "SELECT id as _id, code, display_name FROM damage_code"
-				+ " WHERE code LIKE ? ORDER BY id LIMIT 100";
+				+ " WHERE code LIKE ? ORDER BY _id LIMIT 100";
 
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
 																			new String[] { "%" + constraint + "%" });
@@ -259,7 +259,7 @@ public class DataCenter {
 	public Cursor filterRepairCodeCursor(Context context, CharSequence constraint) {
 
 		String queryString = "SELECT id as _id, code, display_name FROM repair_code"
-				+ " WHERE code LIKE ? ORDER BY id LIMIT 100";
+				+ " WHERE code LIKE ? ORDER BY _id LIMIT 100";
 
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
 																			new String[] { "%" + constraint + "%" });
@@ -270,7 +270,8 @@ public class DataCenter {
 		String queryString = "SELECT cs.* FROM csi_auditor_validation_view AS cs"
 				+ " WHERE cs.upload_confirmation = 0 AND cs._id IN " + " (SELECT container_session._id"
 				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
-				+ " WHERE cjay_image.type = 2) AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
+				+ " WHERE cjay_image.type = 2) AND cs.container_id LIKE ?"
+				+ " ORDER BY cs.container_id, check_in_time ORDER BY check_in_time DESC LIMIT 100";
 
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
 																			new String[] { constraint + "%" });
@@ -302,12 +303,12 @@ public class DataCenter {
 	}
 
 	public Cursor getCheckOutContainerSessionCursor(Context context) {
-		String queryString = "SELECT * FROM cs_export_validation_view";
+		String queryString = "SELECT * FROM cs_export_validation_view ORDER BY check_in_time DESC";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
 	}
 
 	public Cursor getCJayImagesCursorByContainer(Context context, String containerSessionUUID, int imageType) {
-		String queryString = "SELECT * FROM cjay_image WHERE containerSession_id LIKE ? AND type = ?";
+		String queryString = "SELECT * FROM cjay_image WHERE containerSession_id LIKE ? AND type = ? ORDER BY check_in_time DESC";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
 																			new String[] { containerSessionUUID + "%",
 																					String.valueOf(imageType) });
@@ -330,7 +331,8 @@ public class DataCenter {
 	}
 
 	public Cursor getFixedContainerSessionCursor(Context context) {
-		String queryString = "SELECT * FROM csi_repair_validation_view cs WHERE cs.upload_confirmation = 0 AND cs.fixed = 1 AND cs.state <> 4";
+		String queryString = "SELECT * FROM csi_repair_validation_view cs"
+				+ " WHERE cs.upload_confirmation = 0 AND cs.fixed = 1 AND cs.state <> 4 ORDER BY check_in_time DESC";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
 	}
 
@@ -425,7 +427,7 @@ public class DataCenter {
 	}
 
 	public Cursor getLocalContainerSessionCursor(Context context) {
-		String queryString = "SELECT * FROM cs_import_validation_view";
+		String queryString = "SELECT * FROM cs_import_validation_view ORDER BY check_in_time DESC";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
 	}
 
@@ -441,13 +443,13 @@ public class DataCenter {
 		String queryString = "SELECT cs.* FROM csi_auditor_validation_view AS cs"
 				+ " WHERE cs.upload_confirmation = 0 AND cs._id NOT IN (" + " SELECT container_session._id"
 				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
-				+ " WHERE cjay_image.type = 2)";
+				+ " WHERE cjay_image.type = 2) ORDER BY check_in_time DESC";
 
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
 	}
 
 	public Cursor getPendingContainerSessionCursor(Context context) {
-		String queryString = "SELECT * FROM csi_repair_validation_view cs WHERE cs.upload_confirmation = 0 AND cs.state <> 4";
+		String queryString = "SELECT * FROM csi_repair_validation_view cs WHERE cs.upload_confirmation = 0 AND cs.state <> 4 ORDER BY check_in_time DESC";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
 	}
 
@@ -461,12 +463,12 @@ public class DataCenter {
 		String queryString = "SELECT cs.* FROM csi_auditor_validation_view AS cs"
 				+ " WHERE cs.upload_confirmation = 0 AND cs._id IN (" + " SELECT container_session._id"
 				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
-				+ " WHERE cjay_image.type = 2)";
+				+ " WHERE cjay_image.type = 2) ORDER BY check_in_time DESC";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
 	}
 
 	public Cursor getUserLogCursor(Context context) {
-		String queryString = "SELECT * FROM user_log";
+		String queryString = "SELECT * FROM user_log ORDER BY _id DESC";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
 	}
 

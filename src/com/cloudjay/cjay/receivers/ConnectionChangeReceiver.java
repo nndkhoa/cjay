@@ -23,7 +23,7 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
 		if (NetworkHelper.isConnected(context)) {
 
 			Logger.Log("Connected to Internet");
-			DataCenter.getDatabaseHelper(context).addUsageLog("#connected to internet");
+			// DataCenter.getDatabaseHelper(context).addUsageLog("#connected to internet");
 
 			PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_NO_CONNECTION, false);
 
@@ -39,7 +39,7 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
 		} else {
 
 			Logger.Log("Not connect to Internet");
-			DataCenter.getDatabaseHelper(context).addUsageLog("#disconnected from internet");
+			// DataCenter.getDatabaseHelper(context).addUsageLog("#disconnected from internet");
 
 			// Mark that device has no data connection
 			PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_NO_CONNECTION, true);

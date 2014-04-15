@@ -41,8 +41,14 @@ public class OperatorDaoImpl extends BaseDaoImpl<Operator, Integer> implements I
 				values.put(Operator.FIELD_ID, operator.getId());
 				values.put(Operator.FIELD_CODE, operator.getCode());
 				values.put(Operator.FIELD_NAME, operator.getName());
-				db.insert("operator", null, values);
 
+				// db.insert("operator", null, values);
+				db.insertWithOnConflict("operator", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+				// long id = db.insertWithOnConflict("operator", null, values, SQLiteDatabase.CONFLICT_IGNORE);
+				// if (id == -1) {
+				// db.update("operator", values, "_id=?", new String[] { 1 });
+				// }
 			}
 
 			db.setTransactionSuccessful();

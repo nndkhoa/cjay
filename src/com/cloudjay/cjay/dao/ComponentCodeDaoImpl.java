@@ -44,7 +44,7 @@ public class ComponentCodeDaoImpl extends BaseDaoImpl<ComponentCode, Integer> im
 				values.put(ComponentCode.CODE, componentCode.getCode());
 				values.put(ComponentCode.DISPLAY_NAME, componentCode.getName());
 
-				db.insert("component_code", null, values);
+				db.insertWithOnConflict("component_code", null, values, SQLiteDatabase.CONFLICT_REPLACE);
 			}
 
 			db.setTransactionSuccessful();

@@ -39,8 +39,7 @@ public class RepairCodeDaoImpl extends BaseDaoImpl<RepairCode, Integer> implemen
 				values.put(RepairCode.ID, repairCode.getId());
 				values.put(RepairCode.CODE, repairCode.getCode());
 				values.put(RepairCode.DISPLAY_NAME, repairCode.getName());
-
-				db.insert("repair_code", null, values);
+				db.insertWithOnConflict("repair_code", null, values, SQLiteDatabase.CONFLICT_REPLACE);
 			}
 			db.setTransactionSuccessful();
 		} finally {

@@ -33,6 +33,7 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
 
 import de.greenrobot.event.EventBus;
@@ -223,10 +224,13 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		super.onResume();
 
 		if (mCursorAdapters != null && mNewImageCount > 0) {
+
+			Logger.e("Refresh cursor loader");
 			if (mCursorAdapters.get(Integer.valueOf(0)) != null) {
 				getSupportLoaderManager().restartLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1, null, this);
 			}
 		}
+
 	}
 
 	@OptionsItem(R.id.menu_upload)

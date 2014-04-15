@@ -11,6 +11,7 @@ import org.androidannotations.annotations.EBean;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
@@ -224,18 +225,29 @@ public class Mapper {
 
 	public TmpContainerSession toTmpContainerSession(ContainerSession containerSession, Context ctx) {
 
+		String containerId = containerSession.getContainerId();
+		String checkoutTime = containerSession.getRawCheckOutTime();
+		String imageIdPath = containerSession.getImageIdPath();
+
 		TmpContainerSession tmpContainerSession = new TmpContainerSession();
 		tmpContainerSession.setId(containerSession.getId());
 		tmpContainerSession.setOperatorCode(containerSession.getOperatorName());
 		tmpContainerSession.setOperatorId(containerSession.getOperatorId());
 		tmpContainerSession.setDepotCode(containerSession.getContainer().getDepot().getDepotCode());
-		tmpContainerSession.setContainerId(containerSession.getContainerId());
-
+		tmpContainerSession.setContainerId(containerId);
 		tmpContainerSession.setCheckInTime(containerSession.getRawCheckInTime());
 
-		tmpContainerSession.setCheckOutTime(containerSession.getRawCheckOutTime());
+		if (TextUtils.isEmpty(checkoutTime)) {
+			Logger.e(containerId + " | Checkout Time is NULL");
+		} else {
+			tmpContainerSession.setCheckOutTime(checkoutTime);
+		}
 
-		tmpContainerSession.setImageIdPath(containerSession.getImageIdPath());
+		if (TextUtils.isEmpty(imageIdPath)) {
+			Logger.e(containerId + " | Image Id Path is NULL");
+		} else {
+			tmpContainerSession.setImageIdPath(imageIdPath);
+		}
 
 		Collection<CJayImage> cJayImages = containerSession.getCJayImages();
 
