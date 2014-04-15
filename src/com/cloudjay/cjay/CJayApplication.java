@@ -185,7 +185,8 @@ public class CJayApplication extends Application {
 		Logger.getInstance().setDebuggable(true);
 
 		// Enable auto update
-		PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_AUTO_CHECK_UPDATE, false);
+		Utils.setEnableAutoCheckForUpdate(true);
+		// PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_AUTO_CHECK_UPDATE, false);
 
 		// Ion.getDefault(getBaseContext()).configure()
 		// .setLogging("Network Module", Log.INFO);
@@ -238,5 +239,6 @@ public class CJayApplication extends Application {
 		} else {
 			PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_NO_CONNECTION, true);
 		}
+
 	}
 }

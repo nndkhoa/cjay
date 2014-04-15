@@ -25,9 +25,7 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
-import com.j256.ormlite.stmt.query.In;
 
 @SuppressLint("DefaultLocale")
 public class AddContainerDialog extends SherlockDialogFragment {

@@ -6,7 +6,6 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
-import android.R.integer;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;

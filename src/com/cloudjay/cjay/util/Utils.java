@@ -25,6 +25,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Environment;
+import android.provider.VoicemailContract;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -41,6 +42,15 @@ public class Utils {
 	private static final String PROPERTY_REG_ID = "registration_id";
 	private static final String PROPERTY_CURRENT_USER_ID = "current_user_id";
 	private static final String PROPERTY_APP_VERSION = "appVersion";
+	private static boolean isEnableAutoCheckForUpdate = true;
+
+	public static boolean enableAutoCheckForUpdate() {
+		return isEnableAutoCheckForUpdate;
+	}
+
+	public static void setEnableAutoCheckForUpdate(boolean value) {
+		isEnableAutoCheckForUpdate = value;
+	}
 
 	public static void backupDatabase(String username) {
 

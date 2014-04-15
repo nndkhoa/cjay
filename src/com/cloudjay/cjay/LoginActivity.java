@@ -31,6 +31,7 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.cloudjay.cjay.util.Utils;
 import com.rampo.updatechecker.UpdateChecker;
 
 /**
@@ -162,13 +163,12 @@ public class LoginActivity extends CJayActivity {
 
 	@Override
 	protected void onCreate(Bundle arg0) {
+		super.onCreate(arg0);
 
-		if (PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_AUTO_CHECK_UPDATE, true)) {
+		if (Utils.enableAutoCheckForUpdate()) {
 			UpdateChecker checker = new UpdateChecker(this);
 			checker.start();
 		}
-
-		super.onCreate(arg0);
 	}
 
 	/**
@@ -240,6 +240,11 @@ public class LoginActivity extends CJayActivity {
 
 	@AfterViews
 	void initialize() {
+
+		if (PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_AUTO_CHECK_UPDATE, true)) {
+			UpdateChecker checker = new UpdateChecker(this);
+			checker.start();
+		}
 
 		if (TextUtils.isEmpty(mEmail)) {
 			mEmail = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_USERNAME);

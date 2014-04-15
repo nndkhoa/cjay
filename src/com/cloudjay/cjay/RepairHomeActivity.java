@@ -21,6 +21,7 @@ import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
 import com.rampo.updatechecker.UpdateChecker;
@@ -48,6 +49,7 @@ public class RepairHomeActivity extends CJayActivity implements OnPageChangeList
 		locations = getResources().getStringArray(R.array.repair_home_tabs);
 		configureViewPager();
 		configureActionBar();
+
 	}
 
 	private void configureActionBar() {
@@ -111,10 +113,11 @@ public class RepairHomeActivity extends CJayActivity implements OnPageChangeList
 
 		}
 
-		if (PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_AUTO_CHECK_UPDATE, true)) {
+		if (Utils.enableAutoCheckForUpdate()) {
 			UpdateChecker checker = new UpdateChecker(this);
 			checker.start();
 		}
+
 		super.onCreate(arg0);
 	}
 
