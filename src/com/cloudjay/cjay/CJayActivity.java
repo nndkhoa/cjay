@@ -41,6 +41,7 @@ import com.cloudjay.cjay.util.Utils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.rampo.updatechecker.UpdateChecker;
 
 import de.greenrobot.event.EventBus;
 import de.keyboardsurfer.android.widget.crouton.Configuration;
@@ -107,6 +108,10 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 	@Override
 	protected void onCreate(Bundle arg0) {
+
+		UpdateChecker checker = new UpdateChecker(this);
+		checker.start();
+
 		EventBus.getDefault().register(this);
 		super.onCreate(arg0);
 		session = CJaySession.restore(getApplicationContext());
