@@ -163,7 +163,7 @@ public class CJayApplication extends Application {
 
 		// It will trigger `UploadsFragment` Adapter
 		EventBus.getDefault().post(new ContainerSessionEnqueueEvent(containerSession));
-		EventBus.getDefault().post(	new LogUserActivityEvent("Add container " + containerSession.getContainer()
+		EventBus.getDefault().post(	new LogUserActivityEvent("Add container " + containerSession.getContainerId()
 											+ " to upload queue"));
 	}
 
