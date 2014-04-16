@@ -543,10 +543,14 @@ public class CJayClient implements ICJayClient {
 			}
 
 		} catch (InterruptedException e) {
+
 			e.printStackTrace();
 			throw new NoConnectionException();
+
 		} catch (ExecutionException e) {
+
 			e.printStackTrace();
+			throw new NoConnectionException();
 		}
 
 		return ret;

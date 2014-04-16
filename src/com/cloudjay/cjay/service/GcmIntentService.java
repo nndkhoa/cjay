@@ -4,6 +4,7 @@ import org.androidannotations.annotations.EIntentService;
 import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.Trace;
 
+import android.R.integer;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -144,7 +145,14 @@ public class GcmIntentService extends IntentService {
 			UserRole userRole = UserRole.NONE;
 
 			try {
-				userRole = UserRole.values()[CJaySession.restore(getApplicationContext()).getUserRole()];
+				User currentUser = CJaySession.restore(getApplicationContext()).getCurrentUser();
+
+				if (currentUser == null) {
+					Logger.e("Current User is NULL");
+				}
+
+				int role = currentUser.getRole();
+				userRole = UserRole.values()[role];
 
 			} catch (Exception e) {
 

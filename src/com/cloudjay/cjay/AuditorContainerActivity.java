@@ -291,7 +291,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		getLoaderManager().restartLoader(LOADER_ID, null, this);
 		supportInvalidateOptionsMenu();
 	}
@@ -310,7 +310,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 					issueDaoImpl.refresh(issue);
 					if (issue.getCJayImages().size() == 0) {
 						issueDaoImpl.delete(issue);
-					}					
+					}
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -324,7 +324,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 			mFeedListView.setItemChecked(-1, true);
 			supportInvalidateOptionsMenu();
 		}
-		
+
 		long difference = System.currentTimeMillis() - startTime;
 		Logger.w("---> Total time: " + Long.toString(difference));
 	}

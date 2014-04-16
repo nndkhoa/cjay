@@ -6,8 +6,7 @@ import java.util.List;
 import com.cloudjay.cjay.model.ContainerSession;
 
 /**
- * Trigger when Upload State of ContainerSession changed to
- * STATE_UPLOAD_COMPLETED
+ * 
  * 
  * @author tieubao
  * 

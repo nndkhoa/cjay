@@ -349,13 +349,6 @@ public class ContainerSession {
 		}
 	}
 
-	private void notifyUploadStateListener() {
-
-		Logger.Log("notifyUploadStateListener");
-		EventBus.getDefault().post(new UploadStateChangedEvent(this));
-
-	}
-
 	public void setCheckInTime(String check_in_time) {
 
 		this.check_in_time = check_in_time;
@@ -405,15 +398,9 @@ public class ContainerSession {
 		this.uploadConfirmation = uploadConfirmation;
 	}
 
-	public void setUploadProgress(int progress) {
-		if (progress != mProgress) {
-			mProgress = progress;
-			notifyUploadStateListener();
-		}
-	}
-
 	public void setUploadState(UploadState state) {
-		Logger.w("Change upload state to " + state.name());
+
+		Logger.w("Change upload state from " + UploadState.values()[mState].name() + " to " + state.name());
 		int val = state.getValue();
 
 		if (mState != val) {
@@ -430,7 +417,7 @@ public class ContainerSession {
 					break;
 			}
 
-			notifyUploadStateListener();
+			EventBus.getDefault().post(new UploadStateChangedEvent(this));
 		}
 	}
 

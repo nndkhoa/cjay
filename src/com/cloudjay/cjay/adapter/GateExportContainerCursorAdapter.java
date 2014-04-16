@@ -78,13 +78,13 @@ public class GateExportContainerCursorAdapter extends CursorAdapter implements F
 
 		ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
 		if (state == ContainerState.IMPORTED || state == ContainerState.REPAIRED) {
+			holder.warningImageView.setVisibility(View.GONE);
+			view.setEnabled(false);
+
+		} else {
 			holder.warningImageView.setVisibility(View.VISIBLE);
 			view.setEnabled(true);
 
-		} else {
-
-			holder.warningImageView.setVisibility(View.GONE);
-			view.setEnabled(false);
 		}
 
 		String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
@@ -127,9 +127,9 @@ public class GateExportContainerCursorAdapter extends CursorAdapter implements F
 		Cursor cursor = (Cursor) getItem(position);
 		ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
 		if (state == ContainerState.IMPORTED || state == ContainerState.REPAIRED) {
-			return false;
-		} else {
 
+		} else {
+			return false;
 		}
 
 		return super.isEnabled(position);

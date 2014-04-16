@@ -217,7 +217,7 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 		String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
 
 		CJayApplication.openPhotoGridView(	getActivity(), uuidString, containerId, CJayImage.TYPE_EXPORT,
-											CJayImage.TYPE_REPORT, GateImportListFragment.LOG_TAG);
+											CJayImage.TYPE_REPORT, GateExportListFragment_.LOG_TAG);
 	}
 
 	@ItemLongClick(R.id.container_list)

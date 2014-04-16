@@ -185,7 +185,6 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 	private final int mItemLayout = R.layout.item_list_upload;
 
 	public void refresh() {
-		Logger.e("Refresh UploadsFragment UI");
 		getLoaderManager().restartLoader(LOADER_ID, null, this);
 	}
 

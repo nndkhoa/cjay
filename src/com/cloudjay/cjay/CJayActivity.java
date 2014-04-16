@@ -85,6 +85,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 	}
 
 	public User getCurrentUser() {
+
 		if (null == session) {
 			session = CJaySession.restore(getApplicationContext());
 		}

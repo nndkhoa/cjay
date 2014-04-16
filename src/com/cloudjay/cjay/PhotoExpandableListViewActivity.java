@@ -50,6 +50,8 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 	public static final String CJAY_IMAGE_TYPE_1_EXTRA = "cjay_image_type1";
 	public static final String CJAY_IMAGE_TYPE_2_EXTRA = "cjay_image_type2";
 
+	public static final String SOURCE_TAG_EXTRA = "tag";
+
 	PhotoExpandableListAdapter mListAdapter;
 	ContainerSession mContainerSession;
 	int mItemLayout;
@@ -79,7 +81,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 	@ViewById(android.R.id.empty)
 	TextView mEmptyElement;
 
-	@Extra("tag")
+	@Extra(SOURCE_TAG_EXTRA)
 	String sourceTag = "";
 
 	@AfterViews
@@ -239,7 +241,6 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		if (null != mContainerSession) {
 
 			if (sourceTag.equals(GateImportListFragment.LOG_TAG)) {
-
 				mContainerSession.setUploadType(UploadType.IN);
 				mContainerSession.setOnLocal(false);
 
@@ -247,10 +248,12 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 													+ mContainerSession.getContainerId() + "to upload queue"));
 
 			} else {
+				String checkOutTime = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 
 				mContainerSession.setUploadType(UploadType.OUT);
-				mContainerSession.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+				mContainerSession.setCheckOutTime(checkOutTime);
 
+				Logger.Log("Prepare to upload EXPORT container " + mContainerSession.getContainerId());
 				EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #OUT container with ID "
 													+ mContainerSession.getContainerId() + "to upload queue"));
 			}

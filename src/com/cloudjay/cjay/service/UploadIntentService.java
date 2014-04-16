@@ -244,14 +244,18 @@ public class UploadIntentService extends IntentService implements CountingInputS
 		Mapper.getInstance().update(getApplicationContext(), response, containerSession);
 
 		containerSession.setUploadState(UploadState.COMPLETED);
-		DataCenter.getDatabaseHelper(getApplicationContext())
-					.addUsageLog(	"#upload #successfully container " + containerSession.getContainerId() + " | "
-											+ Integer.toString(containerSession.getUploadType()));
+
+		UploadType uploadType = UploadType.values()[containerSession.getUploadType()];
+
+		Logger.Log("Upload successfully container " + containerSession.getContainerId() + " | " + uploadType.name());
+		DataCenter.getDatabaseHelper(getApplicationContext()).addUsageLog(	"#upload #successfully container "
+																					+ containerSession.getContainerId()
+																					+ " | " + uploadType.name());
 
 		// Restore container upload state to NORMAL if upload_type = NONE (temporary upload at GateImport)
 		synchronized (containerSession) {
 
-			if (containerSession.getUploadType() == UploadType.NONE.getValue()) {
+			if (uploadType == UploadType.NONE) {
 
 				containerSession.setUploadConfirmation(false);
 				containerSession.setUploadState(UploadState.NONE);
@@ -265,9 +269,11 @@ public class UploadIntentService extends IntentService implements CountingInputS
 				// - Clear upload from upload fragment
 				// - Refresh container in CameraActivity
 				// - Refresh list item in GateImport
-				Logger.w("Notify UploadStateRestored Event");
+				Logger.w("Notify UploadState RESTORED Event");
 				EventBus.getDefault().post(new UploadStateRestoredEvent(containerSession));
 
+			} else {
+				Logger.e("Cannot restore container upload state");
 			}
 		}
 	}

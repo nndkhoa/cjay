@@ -234,15 +234,13 @@ public class Mapper {
 
 		if (TextUtils.isEmpty(checkoutTime)) {
 			Logger.e(containerId + " | Checkout Time is NULL");
-		} else {
-			tmpContainerSession.setCheckOutTime(checkoutTime);
 		}
+		tmpContainerSession.setCheckOutTime(checkoutTime);
 
 		if (TextUtils.isEmpty(imageIdPath)) {
 			Logger.e(containerId + " | Image Id Path is NULL");
-		} else {
-			tmpContainerSession.setImageIdPath(imageIdPath);
 		}
+		tmpContainerSession.setImageIdPath(imageIdPath);
 
 		Collection<CJayImage> cJayImages = containerSession.getCJayImages();
 

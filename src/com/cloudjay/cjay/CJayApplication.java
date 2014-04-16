@@ -91,11 +91,11 @@ public class CJayApplication extends Application {
 
 		Intent intent = new Intent(ctx, PhotoExpandableListViewActivity_.class);
 
-		intent.putExtra(PhotoExpandableListViewActivity.CJAY_CONTAINER_SESSION_UUID_EXTRA, uuid);
-		intent.putExtra(PhotoExpandableListViewActivity.CJAY_CONTAINER_ID_EXTRA, containerId);
-		intent.putExtra(PhotoExpandableListViewActivity.CJAY_IMAGE_TYPE_1_EXTRA, imageType1);
-		intent.putExtra(PhotoExpandableListViewActivity.CJAY_IMAGE_TYPE_2_EXTRA, imageType2);
-		intent.putExtra("tag", sourceTag);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA, uuid);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_CONTAINER_ID_EXTRA, containerId);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_1_EXTRA, imageType1);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_2_EXTRA, imageType2);
+		intent.putExtra(PhotoExpandableListViewActivity_.SOURCE_TAG_EXTRA, sourceTag);
 
 		Logger.w("Open Photo Grid View with imageType: " + Integer.toString(imageType1) + " | "
 				+ Integer.toString(imageType2));
@@ -106,13 +106,11 @@ public class CJayApplication extends Application {
 	public static void openPhotoGridView(Context ctx, String uuid, String containerId, int imageType, String sourceTag) {
 
 		Intent intent = new Intent(ctx, PhotoExpandableListViewActivity_.class);
-		intent.putExtra(PhotoExpandableListViewActivity.CJAY_CONTAINER_SESSION_UUID_EXTRA, uuid);
-		intent.putExtra(PhotoExpandableListViewActivity.CJAY_IMAGE_TYPE_1_EXTRA, imageType);
-		intent.putExtra(PhotoExpandableListViewActivity.CJAY_CONTAINER_ID_EXTRA, containerId);
-		intent.putExtra("tag", sourceTag);
-
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA, uuid);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_1_EXTRA, imageType);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_CONTAINER_ID_EXTRA, containerId);
+		intent.putExtra(PhotoExpandableListViewActivity_.SOURCE_TAG_EXTRA, sourceTag);
 		ctx.startActivity(intent);
-
 	}
 
 	public static void startCJayHomeActivity(Context context) {
@@ -144,6 +142,7 @@ public class CJayApplication extends Application {
 
 	public static void uploadContainerSesison(Context ctx, ContainerSession containerSession) {
 
+		Logger.w("Checkout Time: " + containerSession.getCheckOutTime());
 		ContainerSessionDaoImpl containerSessionDaoImpl = null;
 
 		// User confirm upload

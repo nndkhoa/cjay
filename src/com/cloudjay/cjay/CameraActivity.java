@@ -244,12 +244,12 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			mInPreview = true;
 
 			// check Camera capture mode
-//			if (!PreferencesUtil.getPrefsValue(	getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS,
-//												true)) {
-//
-//				onBackPressed();
-//
-//			}
+			// if (!PreferencesUtil.getPrefsValue( getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS,
+			// true)) {
+			//
+			// onBackPressed();
+			//
+			// }
 		}
 	};
 
@@ -287,13 +287,13 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, true);
 
-//			mDoneButton.setVisibility(View.VISIBLE);
+			// mDoneButton.setVisibility(View.VISIBLE);
 		} else {
 			Toast.makeText(this, "Đã dừng chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
 
 			PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false);
 
-//			mDoneButton.setVisibility(View.GONE);
+			// mDoneButton.setVisibility(View.GONE);
 		}
 
 	}
@@ -394,7 +394,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 					PreferencesUtil.storePrefsValue(getApplicationContext(),
 													PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false);
 
-//					mDoneButton.setVisibility(View.GONE);
+					// mDoneButton.setVisibility(View.GONE);
 				}
 
 				captureModeToggleButton.setChecked(isContinuous);
@@ -924,7 +924,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			Logger.Log("Camera does not open");
 		}
 	}
-	
+
 	private synchronized void uploadImage(String uuid, String uri, String image_name) {
 
 		// Create Database Entity Object
@@ -970,15 +970,16 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			Logger.Log("issue_report - " + uploadItem.getUuid() + " - Trigger cjayimage added");
 			EventBus.getDefault().post(new CJayImageAddedEvent(uploadItem, mSourceTag));
-			
-			if (!PreferencesUtil.getPrefsValue(	getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, true)) {
-				ShowIssueReportDialog(uploadItem.getUuid());
+
+			if (!PreferencesUtil.getPrefsValue(	getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS,
+												true)) {
+				showIssueReportDialog(uploadItem.getUuid());
 			}
 		}
 	}
-	
+
 	@UiThread
-	public void ShowIssueReportDialog(String cjayImageUuid) {
+	public void showIssueReportDialog(String cjayImageUuid) {
 		if (mSourceTag.equals("AuditorContainerActivity")) {
 			IssueReportHelper.showReportDialog(this, cjayImageUuid, mContainerSessionUUID);
 		}
