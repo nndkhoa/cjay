@@ -33,6 +33,7 @@ public class GateContainerCursorAdapter extends CursorAdapter implements Filtera
 		public TextView exportDateView;
 		public ImageView itemPictureView;
 		public ImageView validationImageView;
+		public ImageView warningImageView;
 
 	}
 
@@ -73,13 +74,18 @@ public class GateContainerCursorAdapter extends CursorAdapter implements Filtera
 			holder.exportDateView = (TextView) view.findViewById(R.id.feed_item_container_export_date);
 			holder.itemPictureView = (ImageView) view.findViewById(R.id.feed_item_picture);
 			holder.validationImageView = (ImageView) view.findViewById(R.id.feed_item_validator);
+			holder.warningImageView = (ImageView) view.findViewById(R.id.feed_item_warning);
 			view.setTag(holder);
 		}
 
 		ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
 		if (state == ContainerState.IMPORTED || state == ContainerState.REPAIRED) {
+			holder.warningImageView.setVisibility(View.VISIBLE);
 			view.setEnabled(true);
+
 		} else {
+
+			holder.warningImageView.setVisibility(View.GONE);
 			view.setEnabled(false);
 		}
 
@@ -123,9 +129,9 @@ public class GateContainerCursorAdapter extends CursorAdapter implements Filtera
 		Cursor cursor = (Cursor) getItem(position);
 		ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
 		if (state == ContainerState.IMPORTED || state == ContainerState.REPAIRED) {
-
-		} else {
 			return false;
+		} else {
+
 		}
 
 		return super.isEnabled(position);
@@ -144,6 +150,7 @@ public class GateContainerCursorAdapter extends CursorAdapter implements Filtera
 		holder.exportDateView = (TextView) v.findViewById(R.id.feed_item_container_export_date);
 		holder.itemPictureView = (ImageView) v.findViewById(R.id.feed_item_picture);
 		holder.validationImageView = (ImageView) v.findViewById(R.id.feed_item_validator);
+		holder.warningImageView = (ImageView) v.findViewById(R.id.feed_item_warning);
 
 		v.setTag(holder);
 
