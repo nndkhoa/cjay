@@ -172,9 +172,11 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 	}
 
 	public void onEvent(CJayImageAddedEvent event) {
+
 		if (event.getTag().equals(LOG_TAG)) {
 			mNewImageCount++;
 		}
+
 	}
 
 	@Override

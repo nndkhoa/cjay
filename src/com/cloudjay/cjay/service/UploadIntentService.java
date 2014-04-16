@@ -346,7 +346,6 @@ public class UploadIntentService extends IntentService implements CountingInputS
 		}
 
 		EventBus.getDefault().post(new ContainerSessionUpdatedEvent(containerSession));
-
 	}
 
 	/**

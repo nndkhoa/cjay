@@ -145,16 +145,10 @@ public class GcmIntentService extends IntentService {
 			UserRole userRole = UserRole.NONE;
 
 			try {
-				User currentUser = CJaySession.restore(getApplicationContext()).getCurrentUser();
-
-				if (currentUser == null) {
-					Logger.e("Current User is NULL");
-				}
-
-				int role = currentUser.getRole();
-				userRole = UserRole.values()[role];
-
+				userRole = UserRole.values()[CJaySession.restore(this).getUserRole()];
 			} catch (Exception e) {
+
+				e.printStackTrace();
 
 				DataCenter.getDatabaseHelper(getApplicationContext()).addUsageLog("NullSessionException");
 
