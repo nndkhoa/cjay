@@ -217,7 +217,8 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 		if (cursor.getCount() > 0) {
 			LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) gridView.getLayoutParams();
-			p.height = gridView.getMeasuredWidth() / gridView.getNumColumns() * ((cursor.getCount() + 1) / 2);
+			int gridViewWidth = gridView.getMeasuredWidth() > 0 ? gridView.getMeasuredWidth() : gridView.getEmptyView().getMeasuredWidth();
+			p.height = gridViewWidth / gridView.getNumColumns() * ((cursor.getCount() + 1) / 2);
 			gridView.setLayoutParams(p);
 		}
 	}
