@@ -46,7 +46,7 @@ import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.adapter.GateContainerCursorAdapter;
+import com.cloudjay.cjay.adapter.GateExportContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
@@ -108,7 +108,7 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	TextView mNotfoundTextView;
 
 	PullToRefreshLayout mPullToRefreshLayout;
-	GateContainerCursorAdapter cursorAdapter;
+	GateExportContainerCursorAdapter cursorAdapter;
 
 	int totalItems = 0;
 
@@ -186,10 +186,10 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				if (scrollState != 0) {
-					((GateContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
+					((GateExportContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
 				} else {
-					((GateContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
-					((GateContainerCursorAdapter) mFeedListView.getAdapter()).notifyDataSetChanged();
+					((GateExportContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
+					((GateExportContainerCursorAdapter) mFeedListView.getAdapter()).notifyDataSetChanged();
 				}
 
 				inputMethodManager.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
@@ -345,7 +345,7 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 		if (cursorAdapter == null) {
-			cursorAdapter = new GateContainerCursorAdapter(getActivity(), mItemLayout, cursor, 0);
+			cursorAdapter = new GateExportContainerCursorAdapter(getActivity(), mItemLayout, cursor, 0);
 
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
 				@Override

@@ -241,7 +241,7 @@ public class Utils {
 
 	public static boolean isContainerIdValid(String containerId) {
 
-		Pattern pattern = Pattern.compile("^([A-Z]+)+(\\d+)$");
+		Pattern pattern = Pattern.compile("^([A-Z]+){4,4}+(\\d+){7,7}$");
 		Matcher matcher = pattern.matcher(containerId);
 
 		if (!matcher.matches()) return false;
@@ -336,7 +336,7 @@ public class Utils {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static String sqlString(String input) {
 		return "'" + input.replace("'", "''") + "'";
 	}

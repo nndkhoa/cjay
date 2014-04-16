@@ -1,9 +1,7 @@
 package com.cloudjay.cjay.adapter;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -23,17 +21,15 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-public class GateContainerCursorAdapter extends CursorAdapter implements Filterable {
+public class GateImportContainerCursorAdapter extends CursorAdapter implements Filterable {
 
 	private static class ViewHolder {
 
 		public TextView containerIdView;
 		public TextView containerOwnerView;
 		public TextView importDateView;
-		public TextView exportDateView;
 		public ImageView itemPictureView;
 		public ImageView validationImageView;
-		public ImageView warningImageView;
 
 	}
 
@@ -44,11 +40,11 @@ public class GateContainerCursorAdapter extends CursorAdapter implements Filtera
 	public boolean isScrolling;
 
 	@SuppressWarnings("deprecation")
-	public GateContainerCursorAdapter(Context context, Cursor c) {
+	public GateImportContainerCursorAdapter(Context context, Cursor c) {
 		super(context, c);
 	}
 
-	public GateContainerCursorAdapter(Context context, int layout, Cursor c, int flags) {
+	public GateImportContainerCursorAdapter(Context context, int layout, Cursor c, int flags) {
 		super(context, c, flags);
 		this.layout = layout;
 		inflater = LayoutInflater.from(context);
@@ -71,22 +67,9 @@ public class GateContainerCursorAdapter extends CursorAdapter implements Filtera
 			holder.containerIdView = (TextView) view.findViewById(R.id.feed_item_container_id);
 			holder.containerOwnerView = (TextView) view.findViewById(R.id.feed_item_container_owner);
 			holder.importDateView = (TextView) view.findViewById(R.id.feed_item_container_import_date);
-			holder.exportDateView = (TextView) view.findViewById(R.id.feed_item_container_export_date);
 			holder.itemPictureView = (ImageView) view.findViewById(R.id.feed_item_picture);
 			holder.validationImageView = (ImageView) view.findViewById(R.id.feed_item_validator);
-			holder.warningImageView = (ImageView) view.findViewById(R.id.feed_item_warning);
 			view.setTag(holder);
-		}
-
-		ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
-		if (state == ContainerState.IMPORTED || state == ContainerState.REPAIRED) {
-			holder.warningImageView.setVisibility(View.VISIBLE);
-			view.setEnabled(true);
-
-		} else {
-
-			holder.warningImageView.setVisibility(View.GONE);
-			view.setEnabled(false);
 		}
 
 		String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
@@ -123,20 +106,6 @@ public class GateContainerCursorAdapter extends CursorAdapter implements Filtera
 
 	}
 
-	@Override
-	public boolean isEnabled(int position) {
-
-		Cursor cursor = (Cursor) getItem(position);
-		ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
-		if (state == ContainerState.IMPORTED || state == ContainerState.REPAIRED) {
-			return false;
-		} else {
-
-		}
-
-		return super.isEnabled(position);
-	}
-
 	// get --> new --> bind
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
@@ -147,10 +116,8 @@ public class GateContainerCursorAdapter extends CursorAdapter implements Filtera
 		holder.containerIdView = (TextView) v.findViewById(R.id.feed_item_container_id);
 		holder.containerOwnerView = (TextView) v.findViewById(R.id.feed_item_container_owner);
 		holder.importDateView = (TextView) v.findViewById(R.id.feed_item_container_import_date);
-		holder.exportDateView = (TextView) v.findViewById(R.id.feed_item_container_export_date);
 		holder.itemPictureView = (ImageView) v.findViewById(R.id.feed_item_picture);
 		holder.validationImageView = (ImageView) v.findViewById(R.id.feed_item_validator);
-		holder.warningImageView = (ImageView) v.findViewById(R.id.feed_item_warning);
 
 		v.setTag(holder);
 

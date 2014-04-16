@@ -36,22 +36,23 @@
 
             <LinearLayout
                 android:id="@+id/ll_empty_element"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/search_edittext"
                 android:orientation="vertical" >
 
                 <TextView
                     android:id="@+id/notfound_textview"
-                    android:text="@string/container_not_found"
-                    style="@style/NotFoundTextViewStyle" />
+                    style="@style/NotFoundTextViewStyle"
+                    android:text="@string/container_not_found" />
 
                 <Button
                     android:id="@+id/add_button"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:layout_gravity="center"
-                    android:background="@drawable/btn_add_more" />
+                    android:background="@drawable/btn_add_more"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <ListView

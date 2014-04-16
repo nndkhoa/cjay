@@ -195,7 +195,7 @@ public class DataCenter {
 
 	public Cursor filterCheckoutCursor(Context context, CharSequence constraint) {
 
-		String queryString = "SELECT * FROM cs_export_validation_view"
+		String queryString = "SELECT * FROM cs_full_info_export_validation_view"
 				+ " WHERE container_id LIKE ? ORDER BY container_id LIMIT 100";
 
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
