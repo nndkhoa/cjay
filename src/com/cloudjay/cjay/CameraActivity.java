@@ -15,6 +15,7 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.NoTitle;
 import org.androidannotations.annotations.SystemService;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import android.app.Activity;
@@ -64,6 +65,7 @@ import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJaySession;
+import com.cloudjay.cjay.util.IssueReportHelper;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringHelper;
@@ -242,12 +244,12 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			mInPreview = true;
 
 			// check Camera capture mode
-			if (!PreferencesUtil.getPrefsValue(	getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS,
-												true)) {
-
-				onBackPressed();
-
-			}
+//			if (!PreferencesUtil.getPrefsValue(	getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS,
+//												true)) {
+//
+//				onBackPressed();
+//
+//			}
 		}
 	};
 
@@ -285,13 +287,13 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, true);
 
-			mDoneButton.setVisibility(View.VISIBLE);
+//			mDoneButton.setVisibility(View.VISIBLE);
 		} else {
 			Toast.makeText(this, "Đã dừng chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
 
 			PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false);
 
-			mDoneButton.setVisibility(View.GONE);
+//			mDoneButton.setVisibility(View.GONE);
 		}
 
 	}
@@ -392,7 +394,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 					PreferencesUtil.storePrefsValue(getApplicationContext(),
 													PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false);
 
-					mDoneButton.setVisibility(View.GONE);
+//					mDoneButton.setVisibility(View.GONE);
 				}
 
 				captureModeToggleButton.setChecked(isContinuous);
@@ -922,7 +924,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			Logger.Log("Camera does not open");
 		}
 	}
-
+	
 	private synchronized void uploadImage(String uuid, String uri, String image_name) {
 
 		// Create Database Entity Object
@@ -968,6 +970,17 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			Logger.Log("issue_report - " + uploadItem.getUuid() + " - Trigger cjayimage added");
 			EventBus.getDefault().post(new CJayImageAddedEvent(uploadItem, mSourceTag));
+			
+			if (!PreferencesUtil.getPrefsValue(	getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, true)) {
+				ShowIssueReportDialog(uploadItem.getUuid());
+			}
+		}
+	}
+	
+	@UiThread
+	public void ShowIssueReportDialog(String cjayImageUuid) {
+		if (mSourceTag.equals("AuditorContainerActivity")) {
+			IssueReportHelper.showReportDialog(this, cjayImageUuid, mContainerSessionUUID);
 		}
 	}
 }

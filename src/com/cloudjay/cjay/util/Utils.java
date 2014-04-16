@@ -336,5 +336,9 @@ public class Utils {
 			e.printStackTrace();
 		}
 	}
+	
+	public static String sqlString(String input) {
+		return "'" + input.replace("'", "''") + "'";
+	}
 
 }
