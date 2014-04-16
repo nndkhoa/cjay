@@ -172,9 +172,11 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 	}
 
 	public void onEvent(CJayImageAddedEvent event) {
+
 		if (event.getTag().equals(LOG_TAG)) {
 			mNewImageCount++;
 		}
+
 	}
 
 	@Override
@@ -215,11 +217,11 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		GridView gridView = mListAdapter.getPhotoGridView(adapterId);
 		gridView.setAdapter(mCursorAdapters.get(Integer.valueOf(adapterId)));
 
-		if (cursor.getCount() > 0) {
-			LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) gridView.getLayoutParams();
-			p.height = gridView.getMeasuredWidth() / gridView.getNumColumns() * ((cursor.getCount() + 1) / 2);
-			gridView.setLayoutParams(p);
-		}
+		// if (cursor.getCount() > 0) {
+		// LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) gridView.getLayoutParams();
+		// p.height = gridView.getMeasuredWidth() / gridView.getNumColumns() * ((cursor.getCount() + 1) / 2);
+		// gridView.setLayoutParams(p);
+		// }
 	}
 
 	@Override

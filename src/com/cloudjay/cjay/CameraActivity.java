@@ -56,6 +56,7 @@ import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
 import com.cloudjay.cjay.events.LogUserActivityEvent;
+import com.cloudjay.cjay.events.UploadStateRestoredEvent;
 import com.cloudjay.cjay.fragment.GateExportListFragment;
 import com.cloudjay.cjay.fragment.GateImportListFragment;
 import com.cloudjay.cjay.model.AuditReportItem;
@@ -551,8 +552,27 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		super.onDestroy();
 	}
 
+	public void onEvent(UploadStateRestoredEvent event) {
+
+		Logger.w("on Event CS Restored Event");
+
+		String eventContainerId = event.getContainerSession().getContainerId();
+		String currentContainerId = mContainerSession.getContainerId();
+
+		if (eventContainerId.equals(currentContainerId)) {
+
+			try {
+				Logger.Log("onEvent UploadStateRestoredEvent");
+				mContainerSessionDaoImpl.refresh(mContainerSession);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	public void onEvent(ContainerSessionUpdatedEvent event) {
 
+		Logger.w("on Event CS Updated Event");
 		String eventContainerId = event.getTarget().getContainerId();
 		String currentContainerId = mContainerSession.getContainerId();
 
@@ -565,7 +585,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 				e.printStackTrace();
 			}
 		}
-
 	}
 
 	@Override
