@@ -544,7 +544,8 @@ public class DataCenter {
 			currentUser.setAccessToken(token);
 			currentUser.setMainAccount(true);
 
-			Logger.Log("User role: " + currentUser.getRoleName());
+			Logger.Log("User role name: " + currentUser.getRoleName());
+			Logger.Log("User role: " + currentUser.getRole());
 			DepotDaoImpl depotDaoImpl = getDatabaseManager().getHelper(context).getDepotDaoImpl();
 			UserDaoImpl userDaoImpl = getDatabaseManager().getHelper(context).getUserDaoImpl();
 
