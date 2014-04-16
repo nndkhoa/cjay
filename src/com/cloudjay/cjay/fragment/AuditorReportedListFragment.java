@@ -28,13 +28,12 @@ import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
 import com.cloudjay.cjay.*;
-import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.UploadType;
 import com.cloudjay.cjay.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -179,7 +178,8 @@ public class AuditorReportedListFragment extends SherlockFragment {
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 		if (mSelectedContainerSession != null) {
-			mSelectedContainerSession.setUploadType(ContainerSession.TYPE_AUDIT);
+
+			mSelectedContainerSession.setUploadType(UploadType.AUDIT);
 			CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
 
 			hideMenuItems();

@@ -61,13 +61,13 @@ import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.GateReportImage;
-import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJaySession;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.UserRole;
 
 import de.greenrobot.event.EventBus;
 
@@ -382,7 +382,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		// Only Auditor user can see captureModeToggleButton
 		try {
-			if (CJaySession.restore(this).getUserRole() == User.ROLE_AUDITOR) {
+			if (CJaySession.restore(this).getUserRole() == UserRole.AUDITOR.getValue()) {
 
 				boolean isContinuous = PreferencesUtil.getPrefsValue(	getApplicationContext(),
 																		PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS,

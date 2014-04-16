@@ -32,6 +32,7 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.UploadState;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener.OnDismissCallback;
 
@@ -49,8 +50,9 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 	public boolean canDismiss(AbsListView listView, int position) {
 		try {
 			Cursor cursor = (Cursor) listView.getItemAtPosition(position);
-			int uploadState = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_STATE));
-			return uploadState == ContainerSession.STATE_UPLOAD_COMPLETED;
+			UploadState uploadState = UploadState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_STATE))];
+			// int uploadState = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_STATE));
+			return uploadState == UploadState.COMPLETED;
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -147,7 +149,8 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 		int viewId = view.getId();
 
 		Cursor cursor = (Cursor) mListView.getItemAtPosition(position);
-		int uploadState = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_STATE));
+		// int uploadState = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_STATE));
+		UploadState uploadState = UploadState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_STATE))];
 		String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
 		String containerUuid = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
 
@@ -156,7 +159,7 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 				Logger.Log("User click on retry button");
 
 				EventBus.getDefault().post(new LogUserActivityEvent(containerId + " | User #retry manually"));
-				if (uploadState == ContainerSession.STATE_UPLOAD_ERROR) {
+				if (uploadState == UploadState.ERROR) {
 					DataCenter.getInstance().rollback(	DataCenter.getDatabaseHelper(getActivity())
 																	.getWritableDatabase(), containerUuid);
 

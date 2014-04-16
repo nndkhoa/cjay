@@ -45,9 +45,6 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.*;
-import com.cloudjay.cjay.CJayActivity;
-import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
@@ -66,6 +63,7 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.UploadType;
 import com.cloudjay.cjay.view.AddContainerDialog;
 
 import de.greenrobot.event.EventBus;
@@ -492,7 +490,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 			Logger.Log("Menu upload item clicked");
 			if (mSelectedContainerSession.isValidForUpload(CJayImage.TYPE_REPORT)) {
 
-				mSelectedContainerSession.setUploadType(ContainerSession.TYPE_AUDIT);
+				mSelectedContainerSession.setUploadType(UploadType.AUDIT);
 				CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
 
 				// hide menu items

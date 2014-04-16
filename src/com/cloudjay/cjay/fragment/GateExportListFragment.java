@@ -67,6 +67,7 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.UploadType;
 import com.cloudjay.cjay.view.AddContainerDialog;
 
 import de.greenrobot.event.EventBus;
@@ -477,7 +478,7 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 		synchronized (this) {
 			if (null != mSelectedContainerSession) {
 
-				mSelectedContainerSession.setUploadType(ContainerSession.TYPE_OUT);
+				mSelectedContainerSession.setUploadType(UploadType.OUT);
 				mSelectedContainerSession.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 
 				EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #OUT container with ID "

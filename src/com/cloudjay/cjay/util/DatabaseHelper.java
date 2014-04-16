@@ -213,10 +213,24 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			// Add cs_full_info_view
 			Logger.Log("create view cs_full_info_view");
 			String sql = "CREATE VIEW cs_full_info_view AS"
-					+ " SELECT cs._id, cs.check_out_time, cs.check_in_time, cs.image_id_path, cs.on_local, cs.fixed, cs.export, cs.upload_confirmation, cs.upload_type, cs.state, cs.cleared, c.container_id, o.operator_name, o.operator_code, d.depot_code"
+					+ " SELECT cs._id, cs.check_out_time, cs.check_in_time, cs.image_id_path, cs.server_state, cs.on_local, cs.fixed, cs.export, cs.upload_confirmation, cs.upload_type, cs.state, cs.cleared, c.container_id, o.operator_name, o.operator_code, d.depot_code"
 					+ " FROM container_session AS cs, depot AS d, container AS c LEFT JOIN operator AS o ON c.operator_id = o._id"
 					+ " WHERE cs.container_id = c._id AND d.id = c.depot_id";
 
+			db.execSQL(sql);
+
+			try {
+				Logger.Log("add column `server_state` in table `container_session`");
+				db.execSQL("ALTER TABLE container_session ADD COLUMN server_state INTEGER DEFAULT -1");
+			} catch (Exception e) {
+				Logger.w("Column server_state is already existed.");
+			}
+
+			Logger.Log("create view cs_full_info_export_validation_view");
+			sql = "CREATE VIEW cs_full_info_export_validation_view as"
+					+ " SELECT cs.*, count(cjay_image._id) as export_image_count " + " FROM cs_full_info_view cs"
+					+ " LEFT JOIN cjay_image ON cjay_image.containerSession_id = cs._id AND cjay_image.type = 1"
+					+ " WHERE cs.check_out_time = '' AND (cs.export = 1) OR (cs.on_local = 0)" + " GROUP BY cs._id";
 			db.execSQL(sql);
 		}
 

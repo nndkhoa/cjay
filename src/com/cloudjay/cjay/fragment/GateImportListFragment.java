@@ -58,6 +58,7 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.UploadType;
 import com.cloudjay.cjay.view.AddContainerDialog;
 
 import de.greenrobot.event.EventBus;
@@ -421,7 +422,7 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 
-		mSelectedContainerSession.setUploadType(ContainerSession.TYPE_IN);
+		mSelectedContainerSession.setUploadType(UploadType.IN);
 		mSelectedContainerSession.setOnLocal(false);
 		EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #IN container with ID "
 											+ mSelectedContainerSession.getContainerId() + "to upload queue"));

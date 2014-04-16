@@ -303,12 +303,13 @@ public class DataCenter {
 	}
 
 	public Cursor getCheckOutContainerSessionCursor(Context context) {
-		String queryString = "SELECT * FROM cs_export_validation_view ORDER BY check_in_time DESC";
+		// String queryString = "SELECT * FROM cs_export_validation_view ORDER BY check_in_time DESC";
+		String queryString = "SELECT * FROM cs_full_info_export_validation_view ORDER BY check_in_time DESC";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
 	}
 
 	public Cursor getCJayImagesCursorByContainer(Context context, String containerSessionUUID, int imageType) {
-		String queryString = "SELECT * FROM cjay_image WHERE containerSession_id LIKE ? AND type = ? ORDER BY check_in_time DESC";
+		String queryString = "SELECT * FROM cjay_image WHERE containerSession_id LIKE ? AND type = ?";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
 																			new String[] { containerSessionUUID + "%",
 																					String.valueOf(imageType) });
@@ -348,24 +349,27 @@ public class DataCenter {
 		Cursor cursor = db.rawQuery("select * from container_session where _id = ?", new String[] { uuid });
 		if (cursor.moveToFirst()) {
 
+			// int uploadType = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UPLOAD_TYPE));
+			UploadType uploadType = UploadType.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UPLOAD_TYPE))];
+
 			Logger.Log("Manually rolling back container session upload state.");
 			EventBus.getDefault().post(new LogUserActivityEvent("#Manually #rollback upload state container"));
 
-			int uploadType = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UPLOAD_TYPE));
 			String sql = "";
+
 			switch (uploadType) {
-				case ContainerSession.TYPE_IN:
+				case IN:
 					sql = "UPDATE container_session SET on_local = 1, upload_confirmation = 0, state = 0, cleared = 0 WHERE _id = '"
 							+ uuid + "'";
 					break;
 
-				case ContainerSession.TYPE_OUT:
+				case OUT:
 					sql = "UPDATE container_session SET check_out_time = '', upload_confirmation = 0, state = 0, cleared = 0 WHERE _id = '"
 							+ uuid + "'";
 					break;
 
-				case ContainerSession.TYPE_AUDIT:
-				case ContainerSession.TYPE_REPAIR:
+				case AUDIT:
+				case REPAIR:
 				default:
 					sql = "UPDATE container_session SET upload_confirmation = 0, state = 0, cleared = 0 WHERE _id = '"
 							+ uuid + "'";

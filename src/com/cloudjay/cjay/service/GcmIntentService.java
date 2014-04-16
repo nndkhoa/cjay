@@ -27,6 +27,7 @@ import com.cloudjay.cjay.util.CJaySession;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NullSessionException;
+import com.cloudjay.cjay.util.UserRole;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 /**
@@ -139,10 +140,11 @@ public class GcmIntentService extends IntentService {
 		try {
 			mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-			int userRole = 0;
+			// int userRole = 0;
+			UserRole userRole = UserRole.NONE;
 
 			try {
-				userRole = CJaySession.restore(getApplicationContext()).getUserRole();
+				userRole = UserRole.values()[CJaySession.restore(getApplicationContext()).getUserRole()];
 
 			} catch (Exception e) {
 
@@ -172,8 +174,8 @@ public class GcmIntentService extends IntentService {
 				// Received Roles: GATE | AUDIT
 				// --> Get more data from Server
 
-				if (userRole == User.ROLE_GATE_KEEPER || userRole == User.ROLE_AUDITOR
-						|| userRole == User.ROLE_REPAIR_STAFF) {
+				if (userRole == UserRole.GATE_KEEPER || userRole == UserRole.AUDITOR
+						|| userRole == UserRole.REPAIR_STAFF) {
 					DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_CREATED);
 				}
 
@@ -195,7 +197,7 @@ public class GcmIntentService extends IntentService {
 				// Đối với ROLE == AUDIT, kèm `id` để remove
 				// use MODIFIED_AFTER
 
-				if (userRole == User.ROLE_AUDITOR) {
+				if (userRole == UserRole.AUDITOR) {
 
 					// If role is AUDIT -> remove Container Session having `id`
 					DataCenter.getInstance().removeContainerSession(this, id);
@@ -215,7 +217,7 @@ public class GcmIntentService extends IntentService {
 				// --> Get more data from Server
 				// use MODIFIED_AFTER
 
-				if (userRole == User.ROLE_REPAIR_STAFF) {
+				if (userRole == UserRole.REPAIR_STAFF) {
 					DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_MODIFIED);
 				}
 
@@ -225,7 +227,7 @@ public class GcmIntentService extends IntentService {
 				// Received Roles: REPAIR with attached `id`
 				// --> Remove Container Session having this `id`
 
-				if (userRole == User.ROLE_REPAIR_STAFF) {
+				if (userRole == UserRole.REPAIR_STAFF) {
 					DataCenter.getInstance().removeContainerSession(this, id);
 				}
 

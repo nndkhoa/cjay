@@ -119,10 +119,6 @@ public class CJaySession {
 		return null;
 	}
 
-	public int getFilterStatus() {
-		return currentUser.getFilterStatus();
-	}
-
 	public int getUserRole() {
 		return currentUser.getRole();
 	}

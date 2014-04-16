@@ -46,6 +46,7 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJayCustomCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.UploadType;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
@@ -507,7 +508,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 
 		if (mContainerSession.isValidForUpload(CJayImage.TYPE_REPORT)) {
 
-			mContainerSession.setUploadType(ContainerSession.TYPE_AUDIT);
+			mContainerSession.setUploadType(UploadType.AUDIT);
 			CJayApplication.uploadContainerSesison(getApplicationContext(), mContainerSession);
 
 		} else {

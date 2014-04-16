@@ -35,6 +35,7 @@ import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.UploadType;
 
 import de.greenrobot.event.EventBus;
 
@@ -239,7 +240,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 			if (sourceTag.equals(GateImportListFragment.LOG_TAG)) {
 
-				mContainerSession.setUploadType(ContainerSession.TYPE_IN);
+				mContainerSession.setUploadType(UploadType.IN);
 				mContainerSession.setOnLocal(false);
 
 				EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #IN container with ID "
@@ -247,7 +248,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 			} else {
 
-				mContainerSession.setUploadType(ContainerSession.TYPE_OUT);
+				mContainerSession.setUploadType(UploadType.OUT);
 				mContainerSession.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 
 				EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #OUT container with ID "

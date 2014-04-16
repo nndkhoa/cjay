@@ -28,6 +28,7 @@ import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.DatabaseManager;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.cloudjay.cjay.util.UploadState;
 import com.cloudjay.cjay.util.Utils;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -147,7 +148,7 @@ public class CJayApplication extends Application {
 
 		// User confirm upload
 		containerSession.setUploadConfirmation(true);
-		containerSession.setUploadState(ContainerSession.STATE_UPLOAD_WAITING);
+		containerSession.setUploadState(UploadState.WAITING);
 
 		if (null == containerSessionDaoImpl) {
 			try {

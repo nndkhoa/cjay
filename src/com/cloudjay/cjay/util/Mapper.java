@@ -11,8 +11,6 @@ import org.androidannotations.annotations.EBean;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
-
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
@@ -148,6 +146,10 @@ public class Mapper {
 				containerSession.setContainer(container);
 			}
 
+			// Get server state
+			containerSession.setServerState(tmpSession.getStatus());
+			// Logger.Log(containerId + " | " + ContainerState.values()[tmpSession.getStatus()].name());
+
 			// TODO: NOTE: may cause bugs
 			// process audit report item
 			List<AuditReportItem> auditReportItems = tmpSession.getAuditReportItems();
@@ -208,13 +210,6 @@ public class Mapper {
 					listImages.add(image);
 				}
 			}
-
-			// TODO: Không cần add chiều xuôi??
-			// if (null != listImages)
-			// containerSession.setCJayImages(listImages);
-			//
-			// if (null != issues)
-			// containerSession.setIssues(issues);
 
 			return containerSession;
 		} catch (SQLException e) {

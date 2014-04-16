@@ -46,6 +46,8 @@ import com.cloudjay.cjay.util.MismatchDataException;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.ServerInternalErrorException;
+import com.cloudjay.cjay.util.UploadState;
+import com.cloudjay.cjay.util.UploadType;
 
 import de.greenrobot.event.EventBus;
 
@@ -164,7 +166,7 @@ public class UploadIntentService extends IntentService implements CountingInputS
 					.addUsageLog("Begin to #upload container: " + containerSession.getContainerId());
 
 		String response = "";
-		containerSession.setUploadState(ContainerSession.STATE_UPLOAD_IN_PROGRESS);
+		containerSession.setUploadState(UploadState.IN_PROGRESS);
 
 		try {
 			containerSessionDaoImpl.update(containerSession);
@@ -182,7 +184,7 @@ public class UploadIntentService extends IntentService implements CountingInputS
 
 		} catch (Exception e) {
 
-			containerSession.setUploadState(ContainerSession.STATE_UPLOAD_ERROR);
+			containerSession.setUploadState(UploadState.ERROR);
 			DataCenter.getDatabaseHelper(getApplicationContext())
 						.addUsageLog(	"#upload #failed container " + containerSession.getContainerId() + " | "
 												+ Integer.toString(containerSession.getUploadType())
@@ -216,7 +218,7 @@ public class UploadIntentService extends IntentService implements CountingInputS
 
 			e.printStackTrace();
 			// Set state to Error
-			containerSession.setUploadState(ContainerSession.STATE_UPLOAD_ERROR);
+			containerSession.setUploadState(UploadState.ERROR);
 			DataCenter.getDatabaseHelper(getApplicationContext())
 						.addUsageLog(	"#upload #failed container " + containerSession.getContainerId() + " | "
 												+ Integer.toString(containerSession.getUploadType()));
@@ -241,7 +243,7 @@ public class UploadIntentService extends IntentService implements CountingInputS
 		// convert back then save containerSession
 		Mapper.getInstance().update(getApplicationContext(), response, containerSession);
 
-		containerSession.setUploadState(ContainerSession.STATE_UPLOAD_COMPLETED);
+		containerSession.setUploadState(UploadState.COMPLETED);
 		DataCenter.getDatabaseHelper(getApplicationContext())
 					.addUsageLog(	"#upload #successfully container " + containerSession.getContainerId() + " | "
 											+ Integer.toString(containerSession.getUploadType()));
@@ -249,10 +251,10 @@ public class UploadIntentService extends IntentService implements CountingInputS
 		// Restore container upload state to NORMAL if upload_type = NONE (temporary upload at GateImport)
 		synchronized (containerSession) {
 
-			if (containerSession.getUploadType() == ContainerSession.TYPE_NONE) {
+			if (containerSession.getUploadType() == UploadType.NONE.getValue()) {
 
 				containerSession.setUploadConfirmation(false);
-				containerSession.setUploadState(ContainerSession.STATE_NONE);
+				containerSession.setUploadState(UploadState.NONE);
 
 				try {
 					containerSessionDaoImpl.update(containerSession);
@@ -314,14 +316,12 @@ public class UploadIntentService extends IntentService implements CountingInputS
 
 		Logger.Log("onEvent UploadStateChangedEvent");
 		ContainerSession containerSession = event.getContainerSession();
+		UploadState uploadState = UploadState.values()[containerSession.getUploadState()];
 
-		switch (containerSession.getUploadState()) {
-			case ContainerSession.STATE_UPLOAD_IN_PROGRESS:
-				break;
-
-			case ContainerSession.STATE_UPLOAD_COMPLETED:
-			case ContainerSession.STATE_UPLOAD_ERROR:
-			case ContainerSession.STATE_UPLOAD_WAITING:
+		switch (uploadState) {
+			case COMPLETED:
+			case ERROR:
+			case WAITING:
 
 				try {
 					containerSessionDaoImpl.update(containerSession);
@@ -332,6 +332,10 @@ public class UploadIntentService extends IntentService implements CountingInputS
 					Logger.e("Current state " + Integer.toString(containerSession.getUploadState()));
 
 				}
+				break;
+
+			case IN_PROGRESS:
+			default:
 				break;
 		}
 
@@ -375,30 +379,29 @@ public class UploadIntentService extends IntentService implements CountingInputS
 
 	public void rollbackContainerState(ContainerSession containerSession) {
 
-		DataCenter.getDatabaseHelper(getApplicationContext())
-					.addUsageLog(	"#rollback " + containerSession.getContainerId() + " | "
-											+ Integer.toString(containerSession.getUploadType()));
+		UploadType uploadType = UploadType.values()[containerSession.getUploadType()];
+		DataCenter.getDatabaseHelper(getApplicationContext()).addUsageLog(	"#rollback "
+																					+ containerSession.getContainerId()
+																					+ " | " + uploadType.name());
 
-		int type = containerSession.getUploadType();
-		Logger.w("Rolling back type: " + Integer.toString(type));
-
-		switch (type) {
-			case ContainerSession.TYPE_IN:
+		Logger.w("Rolling back type: " + uploadType.name());
+		switch (uploadType) {
+			case IN:
 				containerSession.setOnLocal(false);
 				break;
 
-			case ContainerSession.TYPE_OUT:
+			case OUT:
 				containerSession.setCheckOutTime("");
 				break;
 
-			case ContainerSession.TYPE_AUDIT:
-			case ContainerSession.TYPE_REPAIR:
+			case AUDIT:
+			case REPAIR:
 			default:
 				break;
 		}
 
 		containerSession.setUploadConfirmation(false);
-		containerSession.setUploadState(ContainerSession.STATE_NONE);
+		containerSession.setUploadState(UploadState.NONE);
 
 		try {
 			containerSessionDaoImpl.update(containerSession);

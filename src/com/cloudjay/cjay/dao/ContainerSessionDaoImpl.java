@@ -17,6 +17,7 @@ import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.UploadState;
 import com.cloudjay.cjay.util.Utils;
 import com.j256.ormlite.android.AndroidDatabaseResults;
 import com.j256.ormlite.dao.BaseDaoImpl;
@@ -322,8 +323,7 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 																			false)
 																		.and()
 																		.ne(ContainerSession.FIELD_STATE,
-																			ContainerSession.STATE_UPLOAD_COMPLETED)
-																		.prepare());
+																			UploadState.COMPLETED.getValue()).prepare());
 
 		long difference = System.currentTimeMillis() - startTime;
 		Logger.Log("---> Total time: " + Long.toString(difference));
@@ -368,8 +368,7 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 																			false)
 																		.and()
 																		.ne(ContainerSession.FIELD_STATE,
-																			ContainerSession.STATE_UPLOAD_COMPLETED)
-																		.prepare());
+																			UploadState.COMPLETED.getValue()).prepare());
 
 		return containerSessions;
 	}
@@ -487,8 +486,7 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 																			false)
 																		.and()
 																		.ne(ContainerSession.FIELD_STATE,
-																			ContainerSession.STATE_UPLOAD_COMPLETED)
-																		.prepare());
+																			UploadState.COMPLETED.getValue()).prepare());
 
 		long difference = System.currentTimeMillis() - startTime;
 		Logger.Log("---> Total time: " + Long.toString(difference) + " ms");
@@ -517,7 +515,7 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 		ContainerSession result = null;
 		List<ContainerSession> containerSessions = query(queryBuilder().where()
 																		.eq(ContainerSession.FIELD_STATE,
-																			ContainerSession.STATE_UPLOAD_WAITING)
+																			UploadState.WAITING.getValue())
 																		.and()
 																		.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION,
 																			true).prepare());

@@ -25,6 +25,7 @@ import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.UploadType;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
@@ -152,7 +153,7 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 
 				if (mContainerSession.isValidForUpload(CJayImage.TYPE_REPAIRED)) {
 
-					mContainerSession.setUploadType(ContainerSession.TYPE_REPAIR);
+					mContainerSession.setUploadType(UploadType.REPAIR);
 					CJayApplication.uploadContainerSesison(context, mContainerSession);
 
 					finish();

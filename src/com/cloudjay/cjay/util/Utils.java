@@ -25,7 +25,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Environment;
-import android.provider.VoicemailContract;
 import android.util.Log;
 import android.widget.Toast;
 

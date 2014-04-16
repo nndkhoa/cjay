@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.widget.Toast;
 
 import com.aerilys.helpers.android.NetworkHelper;
-import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;

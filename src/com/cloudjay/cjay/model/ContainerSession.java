@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import android.R.integer;
 import android.content.Context;
 import android.text.TextUtils;
 
@@ -17,6 +18,8 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.UploadState;
+import com.cloudjay.cjay.util.UploadType;
 import com.cloudjay.cjay.util.Utils;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
@@ -38,34 +41,22 @@ import de.greenrobot.event.EventBus;
 @DatabaseTable(tableName = "container_session", daoClass = ContainerSessionDaoImpl.class)
 public class ContainerSession {
 
-	public static final String FIELD_CHECK_OUT_TIME = "check_out_time";
-	public static final String FIELD_CHECK_IN_TIME = "check_in_time";
-	public static final String FIELD_IMAGE_ID_PATH = "image_id_path";
+	public static final String FIELD_ID = "id";
+	public static final String FIELD_UUID = "_id";
 
 	public static final String FIELD_STATE = "state"; // 1
-	public static final String FIELD_ID = "id";
-
 	public static final String FIELD_UPLOAD_TYPE = "upload_type";
+	public static final String FIELD_SERVER_STATE = "server_state";
 
-	// _id for cursor loader usage
-	public static final String FIELD_UUID = "_id";
 	public static final String FIELD_UPLOAD_CONFIRMATION = "upload_confirmation"; // 1
 	public static final String FIELD_CLEARED = "cleared";
 	public static final String FIELD_LOCAL = "on_local"; // 1
 	public static final String FIELD_FIXED = "fixed";
 	public static final String FIELD_EXPORT = "export";
 
-	public static final int STATE_UPLOAD_COMPLETED = 4;
-	public static final int STATE_UPLOAD_ERROR = 3;
-	public static final int STATE_UPLOAD_IN_PROGRESS = 2;
-	public static final int STATE_UPLOAD_WAITING = 1;
-	public static final int STATE_NONE = 0;
-
-	public static final int TYPE_NONE = 0;
-	public static final int TYPE_IN = 1;
-	public static final int TYPE_AUDIT = 2;
-	public static final int TYPE_REPAIR = 3;
-	public static final int TYPE_OUT = 4;
+	public static final String FIELD_CHECK_OUT_TIME = "check_out_time";
+	public static final String FIELD_CHECK_IN_TIME = "check_in_time";
+	public static final String FIELD_IMAGE_ID_PATH = "image_id_path";
 
 	@DatabaseField(columnName = FIELD_ID, index = true)
 	int id;
@@ -105,6 +96,9 @@ public class ContainerSession {
 
 	@DatabaseField(columnName = FIELD_UPLOAD_CONFIRMATION, defaultValue = "false", index = true)
 	boolean uploadConfirmation;
+
+	@DatabaseField(columnName = FIELD_SERVER_STATE, defaultValue = "6")
+	private int serverState;
 
 	// container_id
 	// operator_code
@@ -419,22 +413,21 @@ public class ContainerSession {
 		}
 	}
 
-	public void setUploadState(int state) {
+	public void setUploadState(UploadState state) {
+		Logger.w("Change upload state to " + state.name());
+		int val = state.getValue();
 
-		Logger.w("Change upload state to " + Integer.toString(state));
-
-		if (mState != state) {
-			mState = state;
+		if (mState != val) {
+			mState = val;
 
 			switch (state) {
-				case STATE_UPLOAD_ERROR:
-					break;
-
-				case STATE_UPLOAD_COMPLETED:
-					break;
-
-				case STATE_UPLOAD_WAITING:
+				case WAITING:
 					mProgress = -1;
+					break;
+
+				case ERROR:
+				case COMPLETED:
+				default:
 					break;
 			}
 
@@ -446,7 +439,19 @@ public class ContainerSession {
 		this.upload_type = upload_type;
 	}
 
+	public void setUploadType(UploadType type) {
+		this.upload_type = type.getValue();
+	}
+
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
+	}
+
+	public int getServerState() {
+		return serverState;
+	}
+
+	public void setServerState(int serverState) {
+		this.serverState = serverState;
 	}
 }

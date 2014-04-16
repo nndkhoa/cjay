@@ -29,9 +29,6 @@ import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
-import com.cloudjay.cjay.CJayActivity;
-import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -46,6 +43,7 @@ import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
+import com.cloudjay.cjay.util.UploadType;
 
 import de.greenrobot.event.EventBus;
 
@@ -278,7 +276,7 @@ public class RepairContainerFixedListFragment extends SherlockFragment implement
 		synchronized (this) {
 			if (mSelectedContainerSession != null) {
 
-				mSelectedContainerSession.setUploadType(ContainerSession.TYPE_REPAIR);
+				mSelectedContainerSession.setUploadType(UploadType.REPAIR);
 				CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
 				hideMenuItems();
 			}

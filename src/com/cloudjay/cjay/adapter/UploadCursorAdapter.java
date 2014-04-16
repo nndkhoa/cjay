@@ -16,6 +16,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.UploadState;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class UploadCursorAdapter extends CursorAdapter implements Filterable {
@@ -88,25 +89,28 @@ public class UploadCursorAdapter extends CursorAdapter implements Filterable {
 		}
 
 		// Progress Bar
-		int uploadState = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_STATE));
+		// int uploadState = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_STATE));
+		UploadState uploadState = UploadState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_STATE))];
 		switch (uploadState) {
-			case ContainerSession.STATE_UPLOAD_COMPLETED:
+			case COMPLETED:
 				holder.progressBar.setVisibility(View.GONE);
 				holder.uploadResultImageView.setImageResource(R.drawable.ic_success);
 				holder.uploadResultImageView.setVisibility(View.VISIBLE);
 				break;
 
-			case ContainerSession.STATE_UPLOAD_ERROR:
+			case ERROR:
 				holder.progressBar.setVisibility(View.GONE);
 				holder.uploadResultImageView.setImageResource(R.drawable.ic_error);
 				holder.uploadResultImageView.setVisibility(View.VISIBLE);
 				break;
 
-			case ContainerSession.STATE_UPLOAD_IN_PROGRESS:
-			case ContainerSession.STATE_UPLOAD_WAITING:
+			case IN_PROGRESS:
+			case WAITING:
 				holder.progressBar.setVisibility(View.VISIBLE);
 				holder.uploadResultImageView.setVisibility(View.GONE);
 				holder.progressBar.setIndeterminate(true);
+				break;
+			default:
 				break;
 		}
 	}
