@@ -33,6 +33,7 @@ public final class CJayConstant {
 	// File path
 	public static final String APP_DIRECTORY = "CJay";
 	public static final String HIDDEN_APP_DIRECTORY = ".CJay";
+	public static final String BACK_UP_DIRECTORY = ".backup";
 
 	// `/sdcard/DCMI/CJay/`
 	public static final File APP_DIRECTORY_FILE = new File(
@@ -43,6 +44,9 @@ public final class CJayConstant {
 	public static final File HIDDEN_APP_DIRECTORY_FILE = new File(
 																	Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
 																	CJayConstant.HIDDEN_APP_DIRECTORY);
+
+	public static final File BACK_UP_DIRECTORY_FILE = new File(Environment.getExternalStorageDirectory(),
+																BACK_UP_DIRECTORY);
 
 	public static final int SPLASH_TIME_OUT = 2000;
 	public static final String CJAY_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";

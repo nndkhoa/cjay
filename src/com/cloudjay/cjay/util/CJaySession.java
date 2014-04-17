@@ -10,7 +10,9 @@ import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EBean.Scope;
 
 import android.content.Context;
+import android.os.AsyncTask;
 
+import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.dao.IUserDao;
 import com.cloudjay.cjay.model.Depot;
 import com.cloudjay.cjay.model.IDatabaseManager;
@@ -57,43 +59,51 @@ public class CJaySession {
 
 	}
 
-	public boolean deleteSession(Context context) {
+	public void deleteSession(final Context context) {
 
-		Utils.backupDatabase(getCurrentUser().getUserName());
-		DataCenter.getDatabaseHelper(context).addUsageLog("#backup database");
+		new AsyncTask<Void, Boolean, Void>() {
 
-		Logger.Log("deleting session ...");
-		databaseManager = CJayClient.getInstance().getDatabaseManager();
-		try {
+			@Override
+			protected Void doInBackground(Void... params) {
 
-			DatabaseHelper helper = databaseManager.getHelper(context);
+				Utils.backupDatabase(getCurrentUser().getUserName());
+				DataCenter.getDatabaseHelper(context).addUsageLog("#backup database");
 
-			userDao = helper.getUserDaoImpl();
-			User user = userDao.getMainUser();
+				Logger.Log("deleting session ...");
+				databaseManager = CJayClient.getInstance().getDatabaseManager();
+				try {
 
-			if (null != user) {
-				user.setMainAccount(false);
-				user.setAccessToken("");
-				userDao.update(user);
-				currentUser = null;
+					DatabaseHelper helper = databaseManager.getHelper(context);
+
+					// userDao = helper.getUserDaoImpl();
+					// User user = userDao.getMainUser();
+					//
+					// if (null != user) {
+					// user.setMainAccount(false);
+					// user.setAccessToken("");
+					// userDao.update(user);
+					// currentUser = null;
+					// }
+
+					for (Class<?> dataClass : DatabaseHelper.DROP_CLASSES) {
+						TableUtils.dropTable(helper.getConnectionSource(), dataClass, true);
+					}
+
+					for (Class<?> dataClass : DatabaseHelper.DROP_CLASSES) {
+						TableUtils.createTable(helper.getConnectionSource(), dataClass);
+					}
+
+					DataCenter.getDatabaseHelper(context).addUsageLog("User #logout");
+				} catch (SQLException e) {
+
+					e.printStackTrace();
+					context.deleteDatabase(DatabaseHelper.DATABASE_NAME);
+				}
+
+				return null;
 			}
+		}.execute();
 
-			for (Class<?> dataClass : DatabaseHelper.DROP_CLASSES) {
-				TableUtils.dropTable(helper.getConnectionSource(), dataClass, true);
-			}
-
-			for (Class<?> dataClass : DatabaseHelper.DROP_CLASSES) {
-				TableUtils.createTable(helper.getConnectionSource(), dataClass);
-			}
-
-			DataCenter.getDatabaseHelper(context).addUsageLog("User #logout");
-			return true;
-		} catch (SQLException e) {
-
-			e.printStackTrace();
-			context.deleteDatabase(DatabaseHelper.DATABASE_NAME);
-			return false;
-		}
 	}
 
 	public void extendAccessTokenIfNeeded(Context applicationContext) {

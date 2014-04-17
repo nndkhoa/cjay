@@ -60,23 +60,19 @@ public class Utils {
 		FileChannel src = null;
 		FileChannel dst = null;
 		try {
-			File sd = Environment.getExternalStorageDirectory();
+			File sd = CJayConstant.BACK_UP_DIRECTORY_FILE;
 			File data = Environment.getDataDirectory();
 
 			if (sd.canWrite()) {
 
 				String currentDBPath = "//data//com.cloudjay.cjay//databases//cjay.db";
 
-				String backupDBPath = ".backup//cjay-"
+				String backupDBPath = "cjay-"
 						+ StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE) + "-"
 						+ username + ".db";
+
 				File currentDB = new File(data, currentDBPath);
 				File backupDB = new File(sd, backupDBPath);
-
-				// TODO: cannot create back up dir
-				if (!backupDB.exists()) {
-					backupDB.mkdirs();
-				}
 
 				if (currentDB.exists()) {
 					src = new FileInputStream(currentDB).getChannel();
@@ -226,11 +222,18 @@ public class Utils {
 		int registeredCurrentUserId = prefs.getInt(PROPERTY_CURRENT_USER_ID, Integer.MIN_VALUE);
 
 		int currentVersion = getAppVersionCode(context);
-		if (registeredVersion != currentVersion
-				|| registeredCurrentUserId != CJaySession.restore(context).getCurrentUser().getID()) {
-			Logger.i("App version changed.");
+
+		try {
+			if (registeredVersion != currentVersion
+					|| registeredCurrentUserId != CJaySession.restore(context).getCurrentUser().getID()) {
+				Logger.i("App version changed.");
+				return "";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 			return "";
 		}
+
 		return registrationId;
 	}
 
@@ -250,7 +253,7 @@ public class Utils {
 
 	public static boolean isContainerIdValid(String containerId) {
 
-		Pattern pattern = Pattern.compile("^([A-Z]+){4,4}+(\\d+){7,7}$");
+		Pattern pattern = Pattern.compile("^([A-Z]+){4,4}+(\\d{7,7}+)$");
 		Matcher matcher = pattern.matcher(containerId);
 
 		if (!matcher.matches()) return false;

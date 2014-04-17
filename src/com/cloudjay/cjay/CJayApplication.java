@@ -255,6 +255,10 @@ public class CJayApplication extends Application {
 			CJayConstant.HIDDEN_APP_DIRECTORY_FILE.mkdir();
 		}
 
+		if (!CJayConstant.BACK_UP_DIRECTORY_FILE.exists()) {
+			CJayConstant.BACK_UP_DIRECTORY_FILE.mkdir();
+		}
+
 		// Configure Alarm Manager
 		mContext = getApplicationContext();
 		if (!Utils.isAlarmUp(mContext)) {
