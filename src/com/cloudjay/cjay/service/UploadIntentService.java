@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import org.androidannotations.annotations.EIntentService;
 import org.androidannotations.annotations.Trace;
+
 import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
@@ -13,6 +14,7 @@ import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
+import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.events.UploadStateRestoredEvent;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -28,6 +30,7 @@ import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.ServerInternalErrorException;
 import com.cloudjay.cjay.util.UploadState;
 import com.cloudjay.cjay.util.UploadType;
+
 import de.greenrobot.event.EventBus;
 
 @EIntentService
@@ -129,12 +132,21 @@ public class UploadIntentService extends IntentService implements CountingInputS
 		}
 
 		// convert back then save containerSession
-		Mapper.getInstance().update(getApplicationContext(), response, containerSession);
+		try {
+			Mapper.getInstance().update(getApplicationContext(), response, containerSession);
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		} catch (Exception e) {
+			EventBus.getDefault()
+					.post(	new LogUserActivityEvent((containerSession.getContainerId()
+									+ " | #error when update response data | Stack trace: " + e.getMessage())));
+			e.printStackTrace();
+		}
 
 		containerSession.setUploadState(UploadState.COMPLETED);
 
 		UploadType uploadType = UploadType.values()[containerSession.getUploadType()];
-
 		Logger.Log("Upload successfully container " + containerSession.getContainerId() + " | " + uploadType.name());
 		DataCenter.getDatabaseHelper(getApplicationContext()).addUsageLog(	"#upload #successfully container "
 																					+ containerSession.getContainerId()
@@ -243,12 +255,18 @@ public class UploadIntentService extends IntentService implements CountingInputS
 
 		if (NetworkHelper.isConnected(getApplicationContext())) {
 			try {
-				// CJayImage uploadItem = cJayImageDaoImpl.getNextWaiting();
-				// if (uploadItem != null) {
-				// doFileUpload(uploadItem);
+				// ContainerSession containerSession = null;
+				// do {
+				// containerSession = containerSessionDaoImpl.getNextWaiting(DataCenter.getDatabaseHelper(this)
+				// .getWritableDatabase());
+				//
+				// if (null != containerSession) {
+				// doUploadContainer(containerSession);
 				// }
-
+				//
+				// } while (containerSession != null);
 				// It will return container which `upload confirmation = true`
+
 				ContainerSession containerSession = containerSessionDaoImpl.getNextWaiting(DataCenter.getDatabaseHelper(this)
 																										.getWritableDatabase());
 
@@ -260,6 +278,8 @@ public class UploadIntentService extends IntentService implements CountingInputS
 				e.printStackTrace();
 			}
 		}
+
+		stopSelf();
 	}
 
 	@Override

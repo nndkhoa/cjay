@@ -11,6 +11,7 @@ import org.androidannotations.annotations.EBean;
 
 import android.content.Context;
 import android.text.TextUtils;
+
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
@@ -288,7 +289,7 @@ public class Mapper {
 		return tmpContainerSession;
 	}
 
-	public synchronized void update(Context ctx, String jsonString, ContainerSession main) {
+	public synchronized void update(Context ctx, String jsonString, ContainerSession main) throws Exception {
 
 		try {
 
@@ -393,9 +394,10 @@ public class Mapper {
 
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw e;
+
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw e;
 		}
 	}
 }

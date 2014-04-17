@@ -108,7 +108,7 @@ public class PhotoUploadService extends Service {
 			mUpload = upload;
 		}
 
-		synchronized public void doFileUpload(Context ctx, CJayImage uploadItem) {
+		synchronized public void doFileUpload(Context ctx, final CJayImage uploadItem) {
 
 			Logger.Log("doFileUpload: " + uploadItem.getImageName());
 
@@ -143,7 +143,14 @@ public class PhotoUploadService extends Service {
 				InputStream in = ctx.getContentResolver().openInputStream(Uri.parse(uploadItem.getUri()));
 
 				CountingInputStreamEntity entity = new CountingInputStreamEntity(in, fileDescriptor.getStatSize());
-				// entity.setUploadListener(PhotoUploadService.this);
+				entity.setUploadListener(new CountingInputStreamEntity.UploadListener() {
+
+					@Override
+					public void onChange(int percent) {
+						uploadItem.setUploadProgress(percent);
+					}
+
+				});
 				entity.setContentType("image/jpeg");
 				post.setEntity(entity);
 

@@ -14,13 +14,9 @@ import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
-import android.util.Log;
-
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;

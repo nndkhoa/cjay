@@ -33,10 +33,8 @@ import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.User;
-import com.cloudjay.cjay.service.PhotoUploadService;
 import com.cloudjay.cjay.service.PhotoUploadService_;
 import com.cloudjay.cjay.service.QueueIntentService_;
-import com.cloudjay.cjay.service.UploadIntentService_;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
