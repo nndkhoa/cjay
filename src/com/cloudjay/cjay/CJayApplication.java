@@ -72,7 +72,7 @@ public class CJayApplication extends Application {
 	}
 
 	public static final String THREAD_FILTERS = "filters_thread";
-	private ExecutorService mMultiThreadExecutor, mSingleThreadExecutor, mDatabaseThreadExecutor;
+	private ExecutorService mSingleThreadExecutor;
 	private BitmapLruCache mImageCache;
 
 	public BitmapLruCache getImageCache() {

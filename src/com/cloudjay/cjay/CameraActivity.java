@@ -975,8 +975,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			// mCJayImages.add(uploadItem);
 			mCJayImageDaoImpl.addCJayImage(uploadItem);
-			// EventBus.getDefault().post(new NewCJayImageEvent(uploadItem));
 
+			// 1. start broadcast receiver
 			Intent i = new Intent();
 			i.setAction(CJayConstant.INTENT_PHOTO_TAKEN);
 			sendBroadcast(i);

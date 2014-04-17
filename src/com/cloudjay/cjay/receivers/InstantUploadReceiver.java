@@ -3,6 +3,7 @@ package com.cloudjay.cjay.receivers;
 import org.androidannotations.annotations.EReceiver;
 
 import com.aerilys.helpers.android.NetworkHelper;
+import com.cloudjay.cjay.service.PhotoUploadService_;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
@@ -26,9 +27,16 @@ public class InstantUploadReceiver extends BroadcastReceiver {
 		mContext = ctx;
 
 		if (intent.getAction().equals(CJayConstant.INTENT_PHOTO_TAKEN)) {
-			Logger.Log("Start PhotoUpload service");
-			ctx.startService(Utils.getUploadAllIntent(ctx));
+			//
+			if (Utils.isRunning(mContext, PhotoUploadService_.class.getName())) {
 
+				Logger.Log("Start PhotoUpload service");
+				ctx.startService(Utils.getUploadAllIntent(ctx));
+
+			} else {
+
+				Logger.w("Photo Upload service is already running");
+			}
 		}
 
 	}

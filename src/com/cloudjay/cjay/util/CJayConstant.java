@@ -81,4 +81,5 @@ public final class CJayConstant {
 	public static final String INTENT_PHOTO_TAKEN = "cjay.intent.action.PHOTO_TAKEN";
 	public static final String INTENT_LOGOUT = "cjay.intent.action.LOGOUT";
 	public static final float IMAGE_CACHE_HEAP_PERCENTAGE = 1f / 6f;
+
 }

@@ -38,13 +38,13 @@ public class QueueIntentService extends IntentService implements CountingInputSt
 			startService(uploadIntent);
 		}
 
-		// if (!Utils.isRunning(this, PhotoUploadService_.class.getName())) {
-		//
-		// Logger.w("PhotoUploadService is not Running");
-		// startService(Utils.getUploadAllIntent(this));
-		//
-		// } else {
-		// Logger.w("PhotoUploadService is Running");
-		// }
+		if (!Utils.isRunning(this, PhotoUploadService_.class.getName())) {
+
+			// Logger.w("PhotoUploadService is not running");
+			startService(Utils.getUploadAllIntent(this));
+
+		} else {
+			// Logger.w("PhotoUploadService is already running");
+		}
 	}
 }

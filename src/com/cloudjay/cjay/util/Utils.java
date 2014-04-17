@@ -66,13 +66,16 @@ public class Utils {
 			File data = Environment.getDataDirectory();
 
 			if (sd.canWrite()) {
+
 				String currentDBPath = "//data//com.cloudjay.cjay//databases//cjay.db";
+
 				String backupDBPath = ".backup//cjay-"
 						+ StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE) + "-"
 						+ username + ".db";
 				File currentDB = new File(data, currentDBPath);
 				File backupDB = new File(sd, backupDBPath);
 
+				// TODO: cannot create back up dir
 				if (!backupDB.exists()) {
 					backupDB.mkdirs();
 				}
@@ -84,6 +87,7 @@ public class Utils {
 				} else {
 					Logger.e("Current database do not exist");
 				}
+
 			}
 		} catch (Exception e) {
 

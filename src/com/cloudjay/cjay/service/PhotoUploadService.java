@@ -69,6 +69,35 @@ public class PhotoUploadService extends Service {
 
 	}
 
+	public void onEvent(CJayImageUploadStateChangedEvent event) {
+
+		// Logger.e("on event CJayImageUploadStateChangedEvent");
+		CJayImage upload = event.getTarget();
+
+		try {
+			cJayImageDaoImpl.update(upload);
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+
+		switch (upload.getUploadState()) {
+			case CJayImage.STATE_UPLOAD_IN_PROGRESS:
+				updateNotification(upload);
+				break;
+
+			case CJayImage.STATE_UPLOAD_COMPLETED:
+				mNumberUploaded++;
+				// Fall through...
+
+			case CJayImage.STATE_UPLOAD_ERROR:
+				startNextUploadOrFinish();
+				// Fall through...
+
+			case CJayImage.STATE_UPLOAD_WAITING:
+				break;
+		}
+	}
+
 	private static class UploadPhotoRunnable extends PhotupThreadRunnable {
 
 		private final WeakReference<Context> mContextRef;
@@ -79,11 +108,13 @@ public class PhotoUploadService extends Service {
 			mUpload = upload;
 		}
 
-		public void doFileUpload(Context ctx, CJayImage uploadItem) {
+		synchronized public void doFileUpload(Context ctx, CJayImage uploadItem) {
 
 			Logger.Log("doFileUpload: " + uploadItem.getImageName());
 
 			try {
+				uploadItem.setUploadState(CJayImage.STATE_UPLOAD_IN_PROGRESS);
+
 				// Try New Upload Method
 				String uploadUrl = String.format(CJayConstant.CJAY_TMP_STORAGE, uploadItem.getImageName());
 
@@ -127,9 +158,9 @@ public class PhotoUploadService extends Service {
 							|| resp.getStatusLine().getStatusCode() == HttpStatus.SC_ACCEPTED) {
 
 						// Set Status Success
-						cJayImageDaoImpl.refresh(uploadItem);
+						// cJayImageDaoImpl.refresh(uploadItem);
 						uploadItem.setUploadState(CJayImage.STATE_UPLOAD_COMPLETED);
-						cJayImageDaoImpl.update(uploadItem);
+						// cJayImageDaoImpl.update(uploadItem);
 					} else {
 						Log.i("FOO", "Screw up with http - " + resp.getStatusLine().getStatusCode());
 					}
@@ -138,31 +169,11 @@ public class PhotoUploadService extends Service {
 					e.printStackTrace();
 				}
 
-			} catch (SQLException e) {
-
-				// Set Status to Uploading
-				try {
-					// THIS IS SQL ERROR --> NO REPEAT
-					cJayImageDaoImpl.refresh(uploadItem);
-					uploadItem.setUploadState(CJayImage.STATE_UPLOAD_ERROR);
-					cJayImageDaoImpl.update(uploadItem);
-
-				} catch (SQLException e1) {
-					e1.printStackTrace();
-				}
-
-				e.printStackTrace();
-
 			} catch (IOException e) {
 
-				// Set Status to Uploading
-				try {
-					cJayImageDaoImpl.refresh(uploadItem);
-					uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
-					cJayImageDaoImpl.update(uploadItem);
-				} catch (SQLException e1) {
-					e1.printStackTrace();
-				}
+				// cJayImageDaoImpl.refresh(uploadItem);
+				uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
+				// cJayImageDaoImpl.update(uploadItem);
 				e.printStackTrace();
 			}
 		}
@@ -171,7 +182,6 @@ public class PhotoUploadService extends Service {
 			final Context context = mContextRef.get();
 			if (null == context) { return; }
 			doFileUpload(context, mUpload);
-
 		}
 
 		protected boolean isInterrupted() {
@@ -238,41 +248,18 @@ public class PhotoUploadService extends Service {
 		super.onDestroy();
 	}
 
-	public void onEventMainThread(CJayImageUploadStateChangedEvent event) {
-		CJayImage upload = event.getTarget();
-
-		switch (upload.getUploadState()) {
-			case CJayImage.STATE_UPLOAD_IN_PROGRESS:
-				updateNotification(upload);
-				break;
-
-			case CJayImage.STATE_UPLOAD_COMPLETED:
-				mNumberUploaded++;
-				// Fall through...
-
-			case CJayImage.STATE_UPLOAD_ERROR:
-				startNextUploadOrFinish();
-				// Fall through...
-
-			case CJayImage.STATE_UPLOAD_WAITING:
-
-				try {
-					cJayImageDaoImpl.update(upload);
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-				break;
-		}
-	}
-
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 
-		if (null == intent || CJayConstant.INTENT_SERVICE_UPLOAD_ALL.equals(intent.getAction())) {
-			if (uploadAll()) { return START_STICKY; }
-		}
+		uploadAll();
+		return super.onStartCommand(intent, flags, startId);
 
-		return START_NOT_STICKY;
+		//
+		// if (null == intent || CJayConstant.INTENT_SERVICE_UPLOAD_ALL.equals(intent.getAction())) {
+		// if (uploadAll()) { return START_STICKY; }
+		// }
+		//
+		// return START_NOT_STICKY;
 	}
 
 	void finishedNotification() {
@@ -291,6 +278,8 @@ public class PhotoUploadService extends Service {
 	}
 
 	void startNextUploadOrFinish() {
+
+		Logger.e("Get next waiting");
 		CJayImage nextUpload = null;
 
 		try {
@@ -300,19 +289,24 @@ public class PhotoUploadService extends Service {
 		}
 
 		if (null != nextUpload && canUpload()) {
+
+			Logger.Log("start uploading next images");
 			startUpload(nextUpload);
 
 		} else {
 
+			Logger.e("stop Photo Upload Service");
 			mCurrentlyUploading = false;
 			stopSelf();
 		}
 	}
 
 	void stopUploading() {
+
 		if (null != mCurrentUploadRunnable) {
 			mCurrentUploadRunnable.cancel(true);
 		}
+
 		mCurrentlyUploading = false;
 		stopSelf();
 	}
@@ -384,10 +378,9 @@ public class PhotoUploadService extends Service {
 
 		trimCache();
 		updateNotification(upload);
-
-		// mCurrentUploadRunnable = mExecutor.submit(new UploadPhotoRunnable(this, upload, mSession));
 		mCurrentUploadRunnable = mExecutor.submit(new UploadPhotoRunnable(this, upload));
 		mCurrentlyUploading = true;
+
 	}
 
 	private void trimCache() {
@@ -395,10 +388,12 @@ public class PhotoUploadService extends Service {
 	}
 
 	private boolean uploadAll() {
+
 		// If we're currently uploading, ignore call
 		if (mCurrentlyUploading) { return true; }
 
 		if (canUpload()) {
+
 			CJayImage uploadItem = null;
 			try {
 				uploadItem = cJayImageDaoImpl.getNextWaiting();
@@ -408,7 +403,7 @@ public class PhotoUploadService extends Service {
 
 			if (uploadItem != null) {
 
-				Logger.Log("Begin to upload cjay images");
+				Logger.e("Begin to upload cjay images");
 
 				startForeground();
 				startUpload(uploadItem);

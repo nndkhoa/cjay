@@ -200,8 +200,11 @@ public class CJayImage {
 			}
 
 			notifyUploadStateListener();
-			// setRequiresSaveFlag();
 		}
+	}
+
+	private void notifyUploadStateListener() {
+		EventBus.getDefault().post(new CJayImageUploadStateChangedEvent(this));
 	}
 
 	public void setUri(String uri) {
@@ -269,9 +272,5 @@ public class CJayImage {
 			mProgress = progress;
 			notifyUploadStateListener();
 		}
-	}
-
-	private void notifyUploadStateListener() {
-		EventBus.getDefault().post(new CJayImageUploadStateChangedEvent(this));
 	}
 }

@@ -13,10 +13,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.cloudjay.cjay.AuditorContainerActivity_;
-import com.cloudjay.cjay.AuditorIssueAssigmentActivity_;
-import com.cloudjay.cjay.AuditorIssueReportActivity_;
-import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.*;
 
 @EBean(scope = Scope.Singleton)
 public class IssueReportHelper {
