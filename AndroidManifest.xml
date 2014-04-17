@@ -126,6 +126,7 @@
         <service android:name="com.cloudjay.cjay.service.UploadIntentService_" />
         <service android:name="com.cloudjay.cjay.service.QueueIntentService_" />
         <service android:name="com.cloudjay.cjay.service.GcmIntentService_" />
+        <service android:name="com.cloudjay.cjay.service.PhotoUploadService_" />
 
         <receiver
             android:name="com.cloudjay.cjay.receivers.GcmBroadcastReceiver_"
@@ -158,6 +159,14 @@
                 <data
                     android:path="com.cloudjay.cjay"
                     android:scheme="package" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.cloudjay.cjay.receivers.InstantUploadReceiver_" >
+            <intent-filter>
+                <action android:name="cjay.intent.action.PHOTO_TAKEN" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
 

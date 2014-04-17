@@ -82,7 +82,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 					TableUtils.createTable(connectionSource, dataClass);
 				} catch (SQLException e) {
 					Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
-					throw new RuntimeException(e);
+					// throw new RuntimeException(e);
 				}
 			}
 
@@ -210,6 +210,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		@Override
 		public void apply(SQLiteDatabase db, ConnectionSource connectionSource) {
 
+			try {
+				Logger.Log("add column `server_state` in table `container_session`");
+				db.execSQL("ALTER TABLE container_session ADD COLUMN server_state INTEGER DEFAULT 6");
+			} catch (Exception e) {
+				Logger.w("Column server_state is already existed.");
+			}
+
 			// Add cs_full_info_view
 			Logger.Log("create view cs_full_info_view");
 			String sql = "CREATE VIEW cs_full_info_view AS"
@@ -217,13 +224,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 					+ " FROM container_session AS cs, depot AS d, container AS c LEFT JOIN operator AS o ON c.operator_id = o._id"
 					+ " WHERE cs.container_id = c._id AND d.id = c.depot_id";
 			db.execSQL(sql);
-
-			try {
-				Logger.Log("add column `server_state` in table `container_session`");
-				db.execSQL("ALTER TABLE container_session ADD COLUMN server_state INTEGER DEFAULT -1");
-			} catch (Exception e) {
-				Logger.w("Column server_state is already existed.");
-			}
 
 			Logger.Log("create view cs_full_info_export_validation_view");
 			sql = "CREATE VIEW cs_full_info_export_validation_view as"
@@ -399,19 +399,5 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		for (int i = oldVersion; i < newVersion; i++) {
 			PATCHES[i].apply(db, connectionSource);
 		}
-
-		// try {
-		//
-		// Logger.Log("onUpgrade");
-		//
-		// for (Class<?> dataClass : DATA_CLASSES) {
-		// TableUtils.dropTable(connectionSource, dataClass, true);
-		// }
-		//
-		// onCreate(db, connectionSource);
-		// } catch (SQLException e) {
-		// Log.e(DatabaseHelper.class.getName(), "Can't drop databases", e);
-		// throw new RuntimeException(e);
-		// }
 	}
 }

@@ -28,6 +28,7 @@ public final class CJayConstant {
 	public static final String CONTAINER_SESSIONS = API_ROOT + "cjay/container-sessions.json";
 
 	public static final String CJAY_TMP_STORAGE = "https://www.googleapis.com/upload/storage/v1beta2/b/cjaytmp/o?uploadType=media&name=%s";
+	// public static final String CJAY_TMP_STORAGE = "https://www.googleapis.com/upload/storage/v1beta2/b/cjaytmp/o";
 
 	// File path
 	public static final String APP_DIRECTORY = "CJay";
@@ -69,7 +70,15 @@ public final class CJayConstant {
 
 	// ALARM ID
 	public static final int ALARM_ID = 49482;
+	public static final int ALARM_INTERVAL = 10;
 	public static final String CUSTOM_INTENT = "com.cloudjay.cjay.CUSTOM_INTENT";
 
 	public static final int HIDDEN_LOG_THRESHOLD = 5;
+
+	public static final int RETRY_THRESHOLD = 5;
+
+	public static final String INTENT_SERVICE_UPLOAD_ALL = "cjay.intent.action.UPLOAD_ALL";
+	public static final String INTENT_PHOTO_TAKEN = "cjay.intent.action.PHOTO_TAKEN";
+	public static final String INTENT_LOGOUT = "cjay.intent.action.LOGOUT";
+	public static final float IMAGE_CACHE_HEAP_PERCENTAGE = 1f / 6f;
 }

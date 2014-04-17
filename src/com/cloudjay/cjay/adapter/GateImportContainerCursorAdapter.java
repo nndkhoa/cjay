@@ -16,7 +16,6 @@ import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.ContainerState;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
 import com.nostra13.universalimageloader.core.ImageLoader;

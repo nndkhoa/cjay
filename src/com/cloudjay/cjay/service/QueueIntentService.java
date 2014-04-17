@@ -8,20 +8,20 @@ import android.app.IntentService;
 import android.content.Intent;
 
 import com.aerilys.helpers.android.NetworkHelper;
+import com.cloudjay.cjay.events.CJayImageAddedEvent;
+import com.cloudjay.cjay.events.NewCJayImageEvent;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CountingInputStreamEntity;
+import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Utils;
+
+import de.greenrobot.event.EventBus;
 
 @EIntentService
 public class QueueIntentService extends IntentService implements CountingInputStreamEntity.UploadListener {
+
 	public QueueIntentService() {
 		super("QueueIntentService");
-	}
-
-	private boolean isUploadIntentServiceRunning() {
-		ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-			if ("com.cloudjay.cjay.network.UploadIntentService".equals(service.service.getClassName())) return true;
-		}
-		return false;
 	}
 
 	@Override
@@ -29,20 +29,22 @@ public class QueueIntentService extends IntentService implements CountingInputSt
 	}
 
 	@Override
-	public void onCreate() {
-		super.onCreate();
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-	}
-
-	@Override
 	protected void onHandleIntent(Intent intent) {
-		if (isUploadIntentServiceRunning() == false && NetworkHelper.isConnected(getApplicationContext())) {
+
+		if (!Utils.isRunning(this, UploadIntentService_.class.getName())
+				&& NetworkHelper.isConnected(getApplicationContext())) {
+
 			Intent uploadIntent = new Intent(this, UploadIntentService_.class);
 			startService(uploadIntent);
 		}
+
+		// if (!Utils.isRunning(this, PhotoUploadService_.class.getName())) {
+		//
+		// Logger.w("PhotoUploadService is not Running");
+		// startService(Utils.getUploadAllIntent(this));
+		//
+		// } else {
+		// Logger.w("PhotoUploadService is Running");
+		// }
 	}
 }

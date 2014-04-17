@@ -1,5 +1,7 @@
 package com.cloudjay.cjay.network;
 
+import java.io.File;
+import java.io.RandomAccessFile;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.UUID;
@@ -13,6 +15,7 @@ import android.content.Context;
 import android.provider.Settings.Secure;
 import android.util.Log;
 
+import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.ContainerSessionResult;
 import com.cloudjay.cjay.model.DamageCode;
@@ -99,8 +102,8 @@ public class CJayClient implements ICJayClient {
 												.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
 												.setHeader("CJAY_USERNAME", user.getUserName())
 												.setJsonObjectBody(requestPacket).asJsonObject().withResponse()
-												.setCallback(new FutureCallback<Response<JsonObject>>() {
 
+												.setCallback(new FutureCallback<Response<JsonObject>>() {
 													@Override
 													public void onCompleted(Exception arg0, Response<JsonObject> arg1) {
 
@@ -470,6 +473,47 @@ public class CJayClient implements ICJayClient {
 
 	public void init(IHttpRequestWrapper requestWrapper, IDatabaseManager databaseManager) {
 		instance = new CJayClient(requestWrapper, databaseManager);
+	}
+
+	public Response<String> uploadFile(Context ctx, CJayImage uploadItem) throws NoConnectionException {
+
+		if (Utils.hasNoConnection(ctx)) {
+			Logger.Log("Network is not available");
+			throw new NoConnectionException();
+		}
+
+		String appVersion = Utils.getAppVersionName(ctx);
+		File f = ctx.getFileStreamPath(uploadItem.getUuid());
+
+		try {
+			RandomAccessFile rf = new RandomAccessFile(f, "rw");
+			rf.setLength(1024 * 1024 * 2);
+
+		} catch (Exception e) {
+			System.err.println(e);
+		}
+
+		try {
+			Response<String> response = Ion.with(	ctx,
+													String.format(	CJayConstant.CJAY_TMP_STORAGE,
+																	uploadItem.getImageName()))
+											.setLogging("Upload File", Log.VERBOSE)
+											.setHeader("CJAY_VERSION", appVersion)
+											.addHeader("Content-Type", "image/jpeg")
+											.setMultipartFile(uploadItem.getImageName(), f).asString().withResponse()
+											.get();
+
+			Logger.w("Response code: " + response.getHeaders().getResponseMessage() + " | "
+					+ Integer.toString(response.getHeaders().getResponseCode()));
+
+			return response;
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			throw new NoConnectionException();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+			throw new NoConnectionException();
+		}
 	}
 
 	@Override

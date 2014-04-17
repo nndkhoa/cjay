@@ -19,6 +19,7 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources.NotFoundException;
 import android.graphics.Bitmap;
@@ -56,6 +57,7 @@ import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
 import com.cloudjay.cjay.events.LogUserActivityEvent;
+import com.cloudjay.cjay.events.NewCJayImageEvent;
 import com.cloudjay.cjay.events.UploadStateRestoredEvent;
 import com.cloudjay.cjay.fragment.GateExportListFragment;
 import com.cloudjay.cjay.fragment.GateImportListFragment;
@@ -973,6 +975,11 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			// mCJayImages.add(uploadItem);
 			mCJayImageDaoImpl.addCJayImage(uploadItem);
+			// EventBus.getDefault().post(new NewCJayImageEvent(uploadItem));
+
+			Intent i = new Intent();
+			i.setAction(CJayConstant.INTENT_PHOTO_TAKEN);
+			sendBroadcast(i);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -985,9 +992,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		// tell people that an image has been created
 		if (!TextUtils.isEmpty(mSourceTag)) {
-			SystemClock.sleep(300);
 
-			Logger.Log("issue_report - " + uploadItem.getUuid() + " - Trigger cjayimage added");
+			SystemClock.sleep(300);
+			// Logger.Log("issue_report - " + uploadItem.getUuid() + " - Trigger cjayimage added");
 			EventBus.getDefault().post(new CJayImageAddedEvent(uploadItem, mSourceTag));
 
 			if (!PreferencesUtil.getPrefsValue(	getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS,

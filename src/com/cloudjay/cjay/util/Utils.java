@@ -17,6 +17,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -32,7 +33,10 @@ import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.service.PhotoUploadService;
+import com.cloudjay.cjay.service.PhotoUploadService_;
 import com.cloudjay.cjay.service.QueueIntentService_;
+import com.cloudjay.cjay.service.UploadIntentService_;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
@@ -63,11 +67,15 @@ public class Utils {
 
 			if (sd.canWrite()) {
 				String currentDBPath = "//data//com.cloudjay.cjay//databases//cjay.db";
-				String backupDBPath = "cjay-"
+				String backupDBPath = ".backup//cjay-"
 						+ StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE) + "-"
 						+ username + ".db";
 				File currentDB = new File(data, currentDBPath);
 				File backupDB = new File(sd, backupDBPath);
+
+				if (!backupDB.exists()) {
+					backupDB.mkdirs();
+				}
 
 				if (currentDB.exists()) {
 					src = new FileInputStream(currentDB).getChannel();
@@ -234,7 +242,6 @@ public class Utils {
 	public static boolean isAlarmUp(Context context) {
 
 		Intent intent = new Intent(context, QueueIntentService_.class);
-		// intent.setAction(CJayConstant.CUSTOM_INTENT);
 		return PendingIntent.getService(context, CJayConstant.ALARM_ID, intent, PendingIntent.FLAG_NO_CREATE) != null;
 
 	}
@@ -249,6 +256,11 @@ public class Utils {
 		return true;
 	}
 
+	/**
+	 * 
+	 * @param ctx
+	 * @param packageName
+	 */
 	public static void isStillRunning(Context ctx, String packageName) {
 
 		ActivityManager activityManager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
@@ -258,6 +270,16 @@ public class Utils {
 				Toast.makeText(ctx, packageName + "is running", Toast.LENGTH_LONG).show();
 			}
 		}
+	}
+
+	public static boolean isRunning(Context ctx, String serviceName) {
+
+		ActivityManager manager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
+		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+			if (service.service.getClassName().equals(serviceName)) { return true; }
+		}
+
+		return false;
 	}
 
 	public static String replaceNullBySpace(String in) {
@@ -277,11 +299,12 @@ public class Utils {
 		Calendar cal = Calendar.getInstance();
 
 		// start 30 seconds after boot completed
-		cal.add(Calendar.SECOND, 30);
+		cal.add(Calendar.SECOND, 20);
 
 		// Start every 10 seconds
 		// InexactRepeating allows Android to optimize the energy consumption
-		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 10 * 1000, pintent);
+		alarm.setInexactRepeating(	AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), CJayConstant.ALARM_INTERVAL * 1000,
+									pintent);
 	}
 
 	/**
@@ -339,6 +362,12 @@ public class Utils {
 
 	public static String sqlString(String input) {
 		return "'" + input.replace("'", "''") + "'";
+	}
+
+	public static Intent getUploadAllIntent(Context context) {
+		Intent intent = new Intent(context, PhotoUploadService_.class);
+		intent.setAction(CJayConstant.INTENT_SERVICE_UPLOAD_ALL);
+		return intent;
 	}
 
 }

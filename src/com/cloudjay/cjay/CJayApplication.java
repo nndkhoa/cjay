@@ -1,17 +1,25 @@
 package com.cloudjay.cjay;
 
 import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 import org.androidannotations.annotations.EApplication;
 
+import uk.co.senab.bitmapcache.BitmapLruCache;
 import android.app.Application;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -22,6 +30,8 @@ import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.network.HttpRequestWrapper;
 import com.cloudjay.cjay.network.IHttpRequestWrapper;
+import com.cloudjay.cjay.receivers.InstantUploadReceiver;
+import com.cloudjay.cjay.tasks.PhotupThreadFactory;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJaySession;
 import com.cloudjay.cjay.util.DataCenter;
@@ -49,6 +59,30 @@ import de.greenrobot.event.EventBus;
 				resDialogOkToast = R.string.crash_dialog_ok_toast)
 @EApplication
 public class CJayApplication extends Application {
+
+	public static CJayApplication getApplication(Context context) {
+		return (CJayApplication) context.getApplicationContext();
+	}
+
+	public ExecutorService getPhotoFilterThreadExecutorService() {
+		if (null == mSingleThreadExecutor || mSingleThreadExecutor.isShutdown()) {
+			mSingleThreadExecutor = Executors.newSingleThreadExecutor(new PhotupThreadFactory(THREAD_FILTERS));
+		}
+		return mSingleThreadExecutor;
+	}
+
+	public static final String THREAD_FILTERS = "filters_thread";
+	private ExecutorService mMultiThreadExecutor, mSingleThreadExecutor, mDatabaseThreadExecutor;
+	private BitmapLruCache mImageCache;
+
+	public BitmapLruCache getImageCache() {
+
+		if (null == mImageCache) {
+			mImageCache = new BitmapLruCache(this, CJayConstant.IMAGE_CACHE_HEAP_PERCENTAGE);
+		}
+		return mImageCache;
+
+	}
 
 	public static void gotoCamera(Context ctx, ContainerSession containerSession, int imageType, String activityTag) {
 
@@ -240,5 +274,30 @@ public class CJayApplication extends Application {
 			PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_NO_CONNECTION, true);
 		}
 
+	}
+
+	public void checkInstantUploadReceiverState() {
+		// SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		// final boolean enabled = prefs.getBoolean(PreferenceConstants.PREF_INSTANT_UPLOAD_ENABLED, false);
+
+		final ComponentName component = new ComponentName(this, InstantUploadReceiver.class);
+		final PackageManager pkgMgr = getPackageManager();
+
+		switch (pkgMgr.getComponentEnabledSetting(component)) {
+			case PackageManager.COMPONENT_ENABLED_STATE_DISABLED:
+				pkgMgr.setComponentEnabledSetting(	component, PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+													PackageManager.DONT_KILL_APP);
+				Logger.Log("Enabled Instant Upload Receiver");
+				break;
+
+			case PackageManager.COMPONENT_ENABLED_STATE_DEFAULT:
+			case PackageManager.COMPONENT_ENABLED_STATE_ENABLED:
+				// if (!enabled) {
+				// pkgMgr.setComponentEnabledSetting( component, PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+				// PackageManager.DONT_KILL_APP);
+				// Logger.Log("Disabled Instant Upload Receiver");
+				// }
+				break;
+		}
 	}
 }

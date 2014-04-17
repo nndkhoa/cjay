@@ -4,7 +4,6 @@ import org.androidannotations.annotations.EIntentService;
 import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.Trace;
 
-import android.R.integer;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;

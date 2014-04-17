@@ -2,9 +2,18 @@ package com.cloudjay.cjay.model;
 
 import java.util.UUID;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
+import com.cloudjay.cjay.events.CJayImageUploadStateChangedEvent;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
+import de.greenrobot.event.EventBus;
 
 @DatabaseTable(tableName = "cjay_image", daoClass = CJayImageDaoImpl.class)
 public class CJayImage {
@@ -176,7 +185,23 @@ public class CJayImage {
 	}
 
 	public void setUploadState(int state) {
-		mState = state;
+		if (mState != state) {
+			mState = state;
+
+			switch (state) {
+				case STATE_UPLOAD_ERROR:
+				case STATE_UPLOAD_COMPLETED:
+					mBigPictureNotificationBmp = null;
+					break;
+
+				case STATE_UPLOAD_WAITING:
+					mProgress = -1;
+					break;
+			}
+
+			notifyUploadStateListener();
+			// setRequiresSaveFlag();
+		}
 	}
 
 	public void setUri(String uri) {
@@ -185,5 +210,68 @@ public class CJayImage {
 
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
+	}
+
+	public Bitmap getBigPictureNotificationBmp() {
+		return mBigPictureNotificationBmp;
+	}
+
+	public void setBigPictureNotificationBmp(Context context, Bitmap bigPictureNotificationBmp) {
+		if (null == bigPictureNotificationBmp) {
+			mBigPictureNotificationBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_logo);
+		} else {
+			mBigPictureNotificationBmp = bigPictureNotificationBmp;
+		}
+	}
+
+	private Bitmap mBigPictureNotificationBmp;
+
+	public Bitmap getThumbnailImage(Context context) {
+
+		return ImageLoader.getInstance().loadImageSync(mUri);
+
+		// if (ContentResolver.SCHEME_CONTENT.equals(getOriginalPhotoUri().getScheme())) { return
+		// getThumbnailImageFromMediaStore(context); }
+		//
+		// final Resources res = context.getResources();
+		// int size = res.getBoolean(R.bool.load_mini_thumbnails) ? MINI_THUMBNAIL_SIZE : MICRO_THUMBNAIL_SIZE;
+		// if (size == MINI_THUMBNAIL_SIZE && res.getBoolean(R.bool.sample_mini_thumbnails)) {
+		// size /= 2;
+		// }
+		//
+		// try {
+		// Bitmap bitmap = Utils.decodeImage(context.getContentResolver(), getOriginalPhotoUri(), size);
+		// bitmap = Utils.rotate(bitmap, getExifRotation(context));
+		// return bitmap;
+		// } catch (FileNotFoundException e) {
+		// e.printStackTrace();
+		// return null;
+		// }
+	}
+
+	public Bitmap processBitmap(Bitmap bitmap, final boolean fullSize, final boolean modifyOriginal) {
+		return bitmap;
+		// if (requiresProcessing(fullSize)) {
+		// return processBitmapUsingFilter(bitmap, mFilter, fullSize, modifyOriginal);
+		// } else {
+		// return bitmap;
+		// }
+	}
+
+	private int mProgress;
+
+	public int getUploadProgress() {
+		return mProgress;
+	}
+
+	public void setUploadProgress(int progress) {
+		if (progress != mProgress) {
+			mProgress = progress;
+			notifyUploadStateListener();
+		}
+	}
+
+	private void notifyUploadStateListener() {
+		EventBus.getDefault().post(new CJayImageUploadStateChangedEvent(this));
 	}
 }

@@ -151,7 +151,7 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 	public void bulkInsertDataBySavePoint(final List<ContainerSession> containerSessions) {
 
 		long startTime = System.currentTimeMillis();
-		Logger.Log("***bulkInsertDataBySavePoint***");
+		// Logger.Log("***bulkInsertDataBySavePoint***");
 
 		if (containerSessions != null) {
 
@@ -545,8 +545,7 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 						count++;
 						retryCountHashMap.put(key, count);
 						Logger.e(containerSession.getContainerId() + " | Retry count: " + Integer.toString(count));
-
-						if (count >= 10) {
+						if (count >= CJayConstant.RETRY_THRESHOLD) {
 
 							Logger.Log("Retry to upload CJayImage : " + cJayImage.getImageName());
 							EventBus.getDefault().post(	new LogUserActivityEvent("#Retry to upload CJayImage: "
@@ -566,7 +565,7 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 						}
 
 					} else {
-						Logger.Log("Assign value");
+						// Logger.Log("Assign value");
 						retryCountHashMap.put(cJayImage.getUuid(), 0);
 					}
 

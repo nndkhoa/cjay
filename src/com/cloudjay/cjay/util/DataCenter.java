@@ -163,7 +163,7 @@ public class DataCenter {
 	 */
 	public void fetchData(Context ctx) throws NoConnectionException, NullSessionException {
 
-		Logger.Log("*** FETCHING DATA ... ***");
+		// Logger.Log("*** FETCHING DATA ... ***");
 
 		if (isFetchingData(ctx)) {
 			Logger.Log("fetchData() is already running");
@@ -586,7 +586,7 @@ public class DataCenter {
 	 */
 	public void updateListComponentCodes(Context ctx) throws NoConnectionException, SQLException, NullSessionException {
 
-		Logger.Log("*** UPDATE LIST COMPONENT ***");
+		// Logger.Log("*** UPDATE LIST COMPONENT ***");
 		long startTime = System.currentTimeMillis();
 		try {
 			// 2013-11-10T21:05:24 (do not have timezone info)
@@ -645,7 +645,7 @@ public class DataCenter {
 	public void updateListContainerSessions(Context ctx, int type) throws NoConnectionException, SQLException,
 																	NullSessionException {
 
-		Logger.Log("*** UPDATE LIST CONTAINER SESSIONS ***");
+		// Logger.Log("*** UPDATE LIST CONTAINER SESSIONS ***");
 		long startTime = System.currentTimeMillis();
 		PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, true);
 
@@ -764,7 +764,7 @@ public class DataCenter {
 	 */
 	public void updateListDamageCodes(Context ctx) throws NoConnectionException, SQLException {
 
-		Logger.Log("*** UPDATE LIST DAMAGE ***");
+		// Logger.Log("*** UPDATE LIST DAMAGE ***");
 		long startTime = System.currentTimeMillis();
 		try {
 			// 2013-11-10T21:05:24 (do not have timezone info)
@@ -817,7 +817,7 @@ public class DataCenter {
 	 */
 	public void updateListISOCode(Context ctx) throws NoConnectionException, SQLException, NullSessionException {
 
-		Logger.Log("*** UPDATE ALL ISO CODE ***");
+		// Logger.Log("*** UPDATE ALL ISO CODE ***");
 		long startTime = System.currentTimeMillis();
 
 		try {
@@ -852,7 +852,7 @@ public class DataCenter {
 	@SuppressLint("SimpleDateFormat")
 	public void updateListOperators(Context ctx) throws NoConnectionException, SQLException, NullSessionException {
 
-		Logger.Log("*** UPDATE LIST OPERATORS ***");
+		// Logger.Log("*** UPDATE LIST OPERATORS ***");
 		long startTime = System.currentTimeMillis();
 
 		try {
@@ -911,7 +911,7 @@ public class DataCenter {
 	 */
 	public void updateListRepairCodes(Context ctx) throws NoConnectionException, SQLException {
 
-		Logger.Log("*** UPDATE LIST REPAIR ***");
+		// Logger.Log("*** UPDATE LIST REPAIR ***");
 		long startTime = System.currentTimeMillis();
 		try {
 			// 2013-11-10T21:05:24 (do not have timezone info)

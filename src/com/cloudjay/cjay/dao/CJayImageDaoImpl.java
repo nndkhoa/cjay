@@ -55,9 +55,10 @@ public class CJayImageDaoImpl extends BaseDaoImpl<CJayImage, String> implements 
 		if (result != null && result.size() > 0) {
 
 			Logger.e("Total item in ImageQueue: " + result.size());
-			for (CJayImage cJayImage : result) {
-				Logger.Log(cJayImage.getImageName());
-			}
+
+			// for (CJayImage cJayImage : result) {
+			// Logger.Log(cJayImage.getImageName());
+			// }
 
 			return result.get(0);
 
