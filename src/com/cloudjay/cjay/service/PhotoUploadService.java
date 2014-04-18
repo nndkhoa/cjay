@@ -156,10 +156,10 @@ public class PhotoUploadService extends Service {
 				if (isInterrupted()) { return; }
 
 				try {
-					Logger.i("About to call httpClient.execute");
+					Logger.Log("About to call httpClient.execute");
 					resp = httpClient.execute(post);
 
-					Logger.i(resp.getStatusLine().getReasonPhrase());
+					Logger.Log(resp.getStatusLine().getReasonPhrase());
 					if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_OK
 							|| resp.getStatusLine().getStatusCode() == HttpStatus.SC_ACCEPTED) {
 
@@ -167,22 +167,23 @@ public class PhotoUploadService extends Service {
 						uploadItem.setUploadState(CJayImage.STATE_UPLOAD_COMPLETED);
 
 					} else {
-						Log.w("FOO", "Screw up with http - " + resp.getStatusLine().getStatusCode());
-						uploadItem.setUploadState(CJayImage.STATE_UPLOAD_ERROR);
+						Logger.w("Screw up with http - " + resp.getStatusLine().getStatusCode());
+						uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
 					}
+
 					resp.getEntity().consumeContent();
 
 				} catch (ClientProtocolException e) {
 
 					Logger.e("ClientProtocolException: " + e.getMessage());
-					uploadItem.setUploadState(CJayImage.STATE_UPLOAD_ERROR);
+					uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
 				}
 
-			} catch (IOException e) {
+			} catch (IOException e) { // Rớt mạng
 
-				// Rớt mạng
 				Logger.e("IOException: " + e.getMessage());
-				uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
+				uploadItem.setUploadState(CJayImage.STATE_UPLOAD_ERROR);
+				return;
 			}
 		}
 
