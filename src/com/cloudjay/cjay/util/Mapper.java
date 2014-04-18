@@ -289,7 +289,8 @@ public class Mapper {
 		return tmpContainerSession;
 	}
 
-	public synchronized void update(Context ctx, String jsonString, ContainerSession main) throws Exception {
+	public synchronized void
+			update(Context ctx, String jsonString, ContainerSession main, boolean updateImageIdPath) throws Exception {
 
 		try {
 
@@ -313,7 +314,14 @@ public class Mapper {
 				IssueDaoImpl issueDaoImpl = databaseManager.getHelper(ctx).getIssueDaoImpl();
 
 				main.setId(tmp.getId());
-				main.setImageIdPath(tmp.getImageIdPath());
+				if (updateImageIdPath) {
+					if (!TextUtils.isEmpty(tmp.getImageIdPath())
+							&& !tmp.getImageIdPath()
+									.equals("https://storage.googleapis.com/storage-cjay.cloudjay.com/")) {
+						main.setImageIdPath(tmp.getImageIdPath());
+					}
+
+				}
 				main.setCheckInTime(tmp.getCheckInTime());
 
 				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
@@ -399,5 +407,10 @@ public class Mapper {
 		} catch (Exception e) {
 			throw e;
 		}
+
+	}
+
+	public synchronized void update(Context ctx, String jsonString, ContainerSession main) throws Exception {
+		update(ctx, jsonString, main, false);
 	}
 }

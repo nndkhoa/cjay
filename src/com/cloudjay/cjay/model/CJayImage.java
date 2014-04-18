@@ -187,6 +187,7 @@ public class CJayImage {
 	}
 
 	public void setUploadState(int state) {
+
 		if (mState != state) {
 
 			Logger.Log("Set CJayImage upload state from " + UploadState.values()[mState] + " to "

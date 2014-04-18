@@ -961,6 +961,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		try {
 
+			Logger.w("Image Id Path: " + mContainerSession.getImageIdPath());
 			if (TextUtils.isEmpty(mContainerSession.getImageIdPath())
 					|| mContainerSession.getImageIdPath()
 										.equals("https://storage.googleapis.com/storage-cjay.cloudjay.com/")) {

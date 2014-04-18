@@ -60,7 +60,7 @@ public class CJayApplication extends Application {
 		return (CJayApplication) context.getApplicationContext();
 	}
 
-	public ExecutorService getPhotoFilterThreadExecutorService() {
+	public ExecutorService getSingleThreadExecutorService() {
 		if (null == mSingleThreadExecutor || mSingleThreadExecutor.isShutdown()) {
 			mSingleThreadExecutor = Executors.newSingleThreadExecutor(new PhotupThreadFactory(THREAD_FILTERS));
 		}

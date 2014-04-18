@@ -90,8 +90,10 @@ public class PhotoUploadService extends Service {
 			case CJayImage.STATE_UPLOAD_ERROR:
 				startNextUploadOrFinish();
 				// Fall through...
+				break;
 
 			case CJayImage.STATE_UPLOAD_WAITING:
+				// NOTE: if call stopSelf() here, ImageQueue will loop forever
 				break;
 		}
 	}
@@ -139,7 +141,6 @@ public class PhotoUploadService extends Service {
 				ParcelFileDescriptor fileDescriptor = ctx.getContentResolver()
 															.openFileDescriptor(Uri.parse(uploadItem.getUri()), "r");
 				InputStream in = ctx.getContentResolver().openInputStream(Uri.parse(uploadItem.getUri()));
-
 				CountingInputStreamEntity entity = new CountingInputStreamEntity(in, fileDescriptor.getStatSize());
 				entity.setUploadListener(new CountingInputStreamEntity.UploadListener() {
 
@@ -167,24 +168,21 @@ public class PhotoUploadService extends Service {
 
 					} else {
 						Log.w("FOO", "Screw up with http - " + resp.getStatusLine().getStatusCode());
-						uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
+						uploadItem.setUploadState(CJayImage.STATE_UPLOAD_ERROR);
 					}
 					resp.getEntity().consumeContent();
 
 				} catch (ClientProtocolException e) {
 
-					uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
-
 					Logger.e("ClientProtocolException: " + e.getMessage());
-					e.printStackTrace();
+					uploadItem.setUploadState(CJayImage.STATE_UPLOAD_ERROR);
 				}
 
 			} catch (IOException e) {
 
+				// Rớt mạng
 				Logger.e("IOException: " + e.getMessage());
 				uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
-
-				e.printStackTrace();
 			}
 		}
 
@@ -197,6 +195,7 @@ public class PhotoUploadService extends Service {
 		protected boolean isInterrupted() {
 
 			if (super.isInterrupted()) {
+
 				mUpload.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
 				return true;
 			}
@@ -211,6 +210,7 @@ public class PhotoUploadService extends Service {
 	private boolean mCurrentlyUploading;
 	private ExecutorService mExecutor;
 	private int mNumberUploaded = 0;
+
 	private NotificationManager mNotificationMgr;
 	private NotificationCompat.Builder mNotificationBuilder;
 	private NotificationCompat.BigPictureStyle mBigPicStyle;
@@ -236,7 +236,7 @@ public class PhotoUploadService extends Service {
 		}
 
 		CJayApplication app = CJayApplication.getApplication(this);
-		mExecutor = app.getPhotoFilterThreadExecutorService();
+		mExecutor = app.getSingleThreadExecutorService();
 		mNotificationMgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		setCurrentlyUploading(false);
 	}
@@ -314,10 +314,9 @@ public class PhotoUploadService extends Service {
 		String text;
 
 		if (VERSION.SDK_INT >= VERSION_CODES.BASE) {
+
 			final Bitmap uploadBigPic = upload.getBigPictureNotificationBmp();
-
 			if (null == uploadBigPic) {
-
 				mExecutor.submit(new UpdateBigPictureStyleRunnable(upload));
 			}
 			mBigPicStyle.bigPicture(uploadBigPic);

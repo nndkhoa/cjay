@@ -19,6 +19,7 @@ encoding//src/com/cloudjay/cjay/model/RepairCode.java=UTF-8
 encoding//src/com/cloudjay/cjay/model/UserLog.java=UTF-8
 encoding//src/com/cloudjay/cjay/network/CJayClient.java=UTF-8
 encoding//src/com/cloudjay/cjay/service/GcmIntentService.java=UTF-8
+encoding//src/com/cloudjay/cjay/service/PhotoUploadService.java=UTF-8
 encoding//src/com/cloudjay/cjay/util/DataCenter.java=UTF-8
 encoding//src/com/cloudjay/cjay/util/DatabaseHelper.java=UTF-8
 encoding//src/com/cloudjay/cjay/util/Mapper.java=UTF-8

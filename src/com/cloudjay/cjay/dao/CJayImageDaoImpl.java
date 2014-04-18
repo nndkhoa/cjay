@@ -53,18 +53,9 @@ public class CJayImageDaoImpl extends BaseDaoImpl<CJayImage, String> implements 
 		List<CJayImage> result = queryForEq("state", CJayImage.STATE_UPLOAD_WAITING);
 
 		if (result != null && result.size() > 0) {
-
-			Logger.e("Total item in ImageQueue: " + result.size());
-
-			// for (CJayImage cJayImage : result) {
-			// Logger.Log(cJayImage.getImageName());
-			// }
-
+			Logger.w("Total items in ImageQueue: " + result.size());
 			return result.get(0);
-
 		}
-
-		// Logger.Log("No images to upload");
 		return null;
 	}
 }

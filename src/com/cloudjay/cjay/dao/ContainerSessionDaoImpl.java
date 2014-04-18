@@ -525,7 +525,7 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 																			true).prepare());
 
 		if (containerSessions.size() > 0) {
-			Logger.Log("ContainerQueue: " + Integer.toString(containerSessions.size()) + " item(s)");
+			Logger.w("Total items in ContainerQueue: " + Integer.toString(containerSessions.size()));
 		}
 
 		for (ContainerSession containerSession : containerSessions) {
@@ -534,7 +534,7 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 			// and it should only activate in Gate app
 			if (containerSession.isOnLocal() && containerSession.getUploadType() == UploadType.NONE.getValue()) {
 
-				Logger.Log("Temporary upload detected. Return " + containerSession.getContainerId());
+				Logger.w("Temporary upload detected. Return " + containerSession.getContainerId());
 				EventBus.getDefault().post(	new LogUserActivityEvent(containerSession.getContainerId()
 													+ " | #Temporary upload detected."));
 
@@ -558,13 +558,13 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 						count++;
 						retryCountHashMap.put(key, count);
 
-						Logger.e(containerSession.getContainerId() + " | Retry count: " + Integer.toString(count));
+						Logger.Log(containerSession.getContainerId() + " | Retry count: " + Integer.toString(count));
 
 						// Retry to upload cjayimage
 						if (count >= CJayConstant.RETRY_THRESHOLD
 								&& !Utils.isRunning(ctx, PhotoUploadService_.class.getName())) {
 
-							Logger.Log("Retry to upload CJayImage : " + cJayImage.getImageName());
+							Logger.w("Retry to upload CJayImage : " + cJayImage.getImageName());
 							EventBus.getDefault().post(	new LogUserActivityEvent("#Retry to upload CJayImage: "
 																+ cJayImage.getImageName() + " | Container: "
 																+ containerSession.getContainerId()));
@@ -580,6 +580,10 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 							db.execSQL(sql);
 							retryCountHashMap.remove(key);
 
+						} else {
+
+							// Re-assign value
+							retryCountHashMap.put(cJayImage.getUuid(), 0);
 						}
 
 					} else {
