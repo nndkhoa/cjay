@@ -26,6 +26,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -287,10 +288,6 @@ public class Utils {
 		return false;
 	}
 
-	public static String replaceNullBySpace(String in) {
-		return in == null || in.equals("") ? " " : in;
-	}
-
 	public static void startAlarm(Context context) {
 
 		Logger.Log("start Alarm Manager");
@@ -335,6 +332,14 @@ public class Utils {
 		editor.putInt(PROPERTY_CURRENT_USER_ID, CURRENT_USER_ID);
 		editor.putInt(PROPERTY_APP_VERSION, appVersion);
 		editor.commit();
+	}
+	
+	public static String replaceNull(String in, String replace) {
+		return TextUtils.isEmpty(in) ? replace : in;
+	}
+
+	public static String replaceNullBySpace(String in) {
+		return in == null || in.equals("") ? " " : in;
 	}
 
 	public static String stripNull(String in) {
