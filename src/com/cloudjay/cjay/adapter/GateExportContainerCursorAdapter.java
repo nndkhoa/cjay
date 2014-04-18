@@ -124,6 +124,7 @@ public class GateExportContainerCursorAdapter extends CursorAdapter implements F
 	@Override
 	public boolean isEnabled(int position) {
 
+		// TODO: enable this block to disable wrong state container session
 		Cursor cursor = (Cursor) getItem(position);
 		ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
 		if (state == ContainerState.IMPORTED || state == ContainerState.REPAIRED) {

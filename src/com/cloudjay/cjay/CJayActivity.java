@@ -388,31 +388,8 @@ public class CJayActivity extends SherlockFragmentActivity {
 			}
 		});
 		builder.setNegativeButton(android.R.string.cancel, null);
-
 		builder.show();
 	}
-
-	int userRoleMenuClickCount = 0;
-
-	// @OptionsItem(R.id.menu_role)
-	// void userRoleMenuItemSelected() {
-	// userRoleMenuClickCount++;
-	//
-	// int left = CJayConstant.HIDDEN_LOG_THRESHOLD - userRoleMenuClickCount;
-	//
-	// if (left <= 3 && left > 0) {
-	// Toast.makeText(this, "You have to click " + Integer.toString(left) + " to check update", Toast.LENGTH_SHORT)
-	// .show();
-	// }
-	//
-	// if (left == 0) {
-	//
-	// UpdateChecker checker = new UpdateChecker(this);
-	// checker.start();
-	//
-	// userRoleMenuClickCount = 0;
-	// }
-	// }
 
 	@OptionsItem(R.id.menu_username)
 	void usernameMenuItemSelected() {
@@ -428,7 +405,8 @@ public class CJayActivity extends SherlockFragmentActivity {
 		if (left == 0) {
 
 			// Open Log
-			Intent intent = new Intent(this, UserLogActivity_.class);
+			// Intent intent = new Intent(this, UserLogActivity_.class);
+			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivity(intent);
 
 			usernameMenuClickCount = 0;
