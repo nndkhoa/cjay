@@ -3,6 +3,7 @@ package com.cloudjay.cjay.dao;
 import java.sql.SQLException;
 import java.util.List;
 
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.cloudjay.cjay.model.ContainerSession;
@@ -45,6 +46,6 @@ public interface IContainerSessionDao extends Dao<ContainerSession, String> {
 
 	boolean isEmpty() throws SQLException;
 
-	ContainerSession getNextWaiting(SQLiteDatabase db) throws SQLException;
+	ContainerSession getNextWaiting(Context ctx, SQLiteDatabase db) throws SQLException;
 
 }

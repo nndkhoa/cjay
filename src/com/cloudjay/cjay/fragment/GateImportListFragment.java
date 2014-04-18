@@ -335,12 +335,21 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 				try {
 					DataCenter.getInstance().fetchData(getActivity());
 					DataCenter.getDatabaseHelper(getSherlockActivity()).addUsageLog("#refresh in fragment #GateImport");
+
 				} catch (NoConnectionException e) {
+
 					((CJayActivity) getActivity()).showCrouton(R.string.alert_no_network);
 					e.printStackTrace();
+
 				} catch (NullSessionException e) {
+
 					CJayApplication.logOutInstantly(getActivity());
 					onDestroy();
+
+				} catch (Exception e) {
+
+					((CJayActivity) getActivity()).showCrouton(R.string.alert_try_again);
+					e.printStackTrace();
 				}
 				return null;
 			}

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -511,7 +512,7 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 	 * 
 	 */
 	@Override
-	public ContainerSession getNextWaiting(SQLiteDatabase db) throws SQLException {
+	public ContainerSession getNextWaiting(Context ctx, SQLiteDatabase db) throws SQLException {
 
 		// Logger.Log( "getNextWaiting() at ContainerSessionDaoImpl");
 
@@ -524,16 +525,21 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 																			true).prepare());
 
 		if (containerSessions.size() > 0) {
-			Logger.Log("Number of containers in queue: " + Integer.toString(containerSessions.size()));
+			Logger.Log("ContainerQueue: " + Integer.toString(containerSessions.size()) + " item(s)");
 		}
 
 		for (ContainerSession containerSession : containerSessions) {
 
-			// imma return if it's temp container
-			// and it should only activate in Gate App
+			// imma return if it's temporary container
+			// and it should only activate in Gate app
 			if (containerSession.isOnLocal() && containerSession.getUploadType() == UploadType.NONE.getValue()) {
+
 				Logger.Log("Temporary upload detected. Return " + containerSession.getContainerId());
+				EventBus.getDefault().post(	new LogUserActivityEvent(containerSession.getContainerId()
+													+ " | #Temporary upload detected."));
+
 				return containerSession;
+
 			}
 
 			boolean flag = true;
@@ -551,8 +557,12 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 						int count = retryCountHashMap.get(key);
 						count++;
 						retryCountHashMap.put(key, count);
+
 						Logger.e(containerSession.getContainerId() + " | Retry count: " + Integer.toString(count));
-						if (count >= CJayConstant.RETRY_THRESHOLD) {
+
+						// Retry to upload cjayimage
+						if (count >= CJayConstant.RETRY_THRESHOLD
+								&& !Utils.isRunning(ctx, PhotoUploadService_.class.getName())) {
 
 							Logger.Log("Retry to upload CJayImage : " + cJayImage.getImageName());
 							EventBus.getDefault().post(	new LogUserActivityEvent("#Retry to upload CJayImage: "
@@ -569,6 +579,7 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 
 							db.execSQL(sql);
 							retryCountHashMap.remove(key);
+
 						}
 
 					} else {

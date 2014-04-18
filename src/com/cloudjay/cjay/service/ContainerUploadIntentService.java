@@ -300,7 +300,8 @@ public class ContainerUploadIntentService extends IntentService implements Count
 				// } while (containerSession != null);
 				// It will return container which `upload confirmation = true`
 
-				ContainerSession containerSession = containerSessionDaoImpl.getNextWaiting(DataCenter.getDatabaseHelper(this)
+				ContainerSession containerSession = containerSessionDaoImpl.getNextWaiting(	this,
+																							DataCenter.getDatabaseHelper(	this)
 																										.getWritableDatabase());
 
 				if (null != containerSession) {
