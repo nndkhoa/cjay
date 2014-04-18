@@ -53,6 +53,18 @@ public class ContainerSession {
 	public static final String FIELD_FIXED = "fixed";
 	public static final String FIELD_EXPORT = "export";
 
+	// public static final String FIELD_IS_TEMP = "is_temp";
+	// @DatabaseField(columnName = FIELD_IS_TEMP, defaultValue = "0")
+	// private boolean is_temp;
+	//
+	// public boolean isTemporary() {
+	// return is_temp;
+	// }
+	//
+	// public void setTemporary(boolean is_temp) {
+	// this.is_temp = is_temp;
+	// }
+
 	public static final String FIELD_CHECK_OUT_TIME = "check_out_time";
 	public static final String FIELD_CHECK_IN_TIME = "check_in_time";
 	public static final String FIELD_IMAGE_ID_PATH = "image_id_path";
@@ -440,4 +452,5 @@ public class ContainerSession {
 	public void setServerState(int serverState) {
 		this.serverState = serverState;
 	}
+
 }

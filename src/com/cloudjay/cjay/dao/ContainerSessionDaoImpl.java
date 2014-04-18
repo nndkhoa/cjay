@@ -11,13 +11,16 @@ import java.util.concurrent.Callable;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.service.PhotoUploadService_;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadState;
+import com.cloudjay.cjay.util.UploadType;
 import com.cloudjay.cjay.util.Utils;
 import com.j256.ormlite.android.AndroidDatabaseResults;
 import com.j256.ormlite.dao.BaseDaoImpl;
@@ -526,6 +529,13 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 
 		for (ContainerSession containerSession : containerSessions) {
 
+			// imma return if it's temp container
+			// and it should only activate in Gate App
+			if (containerSession.isOnLocal() && containerSession.getUploadType() == UploadType.NONE.getValue()) {
+				Logger.Log("Temporary upload detected. Return " + containerSession.getContainerId());
+				return containerSession;
+			}
+
 			boolean flag = true;
 			Collection<CJayImage> cJayImages = containerSession.getCJayImages();
 
@@ -533,9 +543,6 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 
 				int uploadState = cJayImage.getUploadState();
 				if (uploadState != CJayImage.STATE_UPLOAD_COMPLETED) {
-
-					// Logger.e(containerSession.getContainerId() + " | CJayImage: "
-					// + Integer.toString(cJayImage.getUploadState()) + " | " + cJayImage.getUri());
 
 					// Increase retry count
 					String key = cJayImage.getUuid();
@@ -565,7 +572,6 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 						}
 
 					} else {
-						// Logger.Log("Assign value");
 						retryCountHashMap.put(cJayImage.getUuid(), 0);
 					}
 

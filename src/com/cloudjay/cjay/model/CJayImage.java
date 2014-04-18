@@ -9,6 +9,8 @@ import android.graphics.BitmapFactory;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.events.CJayImageUploadStateChangedEvent;
+import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.UploadState;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -186,6 +188,9 @@ public class CJayImage {
 
 	public void setUploadState(int state) {
 		if (mState != state) {
+
+			Logger.Log("Set CJayImage upload state from " + UploadState.values()[mState] + " to "
+					+ UploadState.values()[state]);
 			mState = state;
 
 			switch (state) {

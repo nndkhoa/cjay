@@ -12,7 +12,6 @@ import org.androidannotations.annotations.EBean.Scope;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.dao.IUserDao;
 import com.cloudjay.cjay.model.Depot;
 import com.cloudjay.cjay.model.IDatabaseManager;

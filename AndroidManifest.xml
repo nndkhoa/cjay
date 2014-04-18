@@ -123,10 +123,10 @@
             android:theme="@style/AppTheme.NoTitleBar" >
         </activity>
 
-        <service android:name="com.cloudjay.cjay.service.UploadIntentService_" />
         <service android:name="com.cloudjay.cjay.service.QueueIntentService_" />
-        <service android:name="com.cloudjay.cjay.service.GcmIntentService_" />
+        <service android:name="com.cloudjay.cjay.service.ContainerUploadIntentService_" />
         <service android:name="com.cloudjay.cjay.service.PhotoUploadService_" />
+        <service android:name="com.cloudjay.cjay.service.GcmIntentService_" />
 
         <receiver
             android:name="com.cloudjay.cjay.receivers.GcmBroadcastReceiver_"

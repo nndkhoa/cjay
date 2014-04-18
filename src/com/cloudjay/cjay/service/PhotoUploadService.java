@@ -70,8 +70,6 @@ public class PhotoUploadService extends Service {
 	}
 
 	public void onEvent(CJayImageUploadStateChangedEvent event) {
-
-		// Logger.e("on event CJayImageUploadStateChangedEvent");
 		CJayImage upload = event.getTarget();
 
 		try {
@@ -165,22 +163,27 @@ public class PhotoUploadService extends Service {
 							|| resp.getStatusLine().getStatusCode() == HttpStatus.SC_ACCEPTED) {
 
 						// Set Status Success
-						// cJayImageDaoImpl.refresh(uploadItem);
 						uploadItem.setUploadState(CJayImage.STATE_UPLOAD_COMPLETED);
-						// cJayImageDaoImpl.update(uploadItem);
+
 					} else {
-						Log.i("FOO", "Screw up with http - " + resp.getStatusLine().getStatusCode());
+						Log.w("FOO", "Screw up with http - " + resp.getStatusLine().getStatusCode());
+						uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
 					}
 					resp.getEntity().consumeContent();
+
 				} catch (ClientProtocolException e) {
+
+					uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
+
+					Logger.e("ClientProtocolException: " + e.getMessage());
 					e.printStackTrace();
 				}
 
 			} catch (IOException e) {
 
-				// cJayImageDaoImpl.refresh(uploadItem);
+				Logger.e("IOException: " + e.getMessage());
 				uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
-				// cJayImageDaoImpl.update(uploadItem);
+
 				e.printStackTrace();
 			}
 		}
@@ -194,7 +197,6 @@ public class PhotoUploadService extends Service {
 		protected boolean isInterrupted() {
 
 			if (super.isInterrupted()) {
-				// Set Upload State back to Waiting
 				mUpload.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
 				return true;
 			}
@@ -236,12 +238,12 @@ public class PhotoUploadService extends Service {
 		CJayApplication app = CJayApplication.getApplication(this);
 		mExecutor = app.getPhotoFilterThreadExecutorService();
 		mNotificationMgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		mCurrentlyUploading = false;
+		setCurrentlyUploading(false);
 	}
 
 	@Override
 	public void onDestroy() {
-		mCurrentlyUploading = false;
+		setCurrentlyUploading(false);
 		EventBus.getDefault().unregister(this);
 
 		try {
@@ -257,16 +259,8 @@ public class PhotoUploadService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-
 		uploadAll();
 		return super.onStartCommand(intent, flags, startId);
-
-		//
-		// if (null == intent || CJayConstant.INTENT_SERVICE_UPLOAD_ALL.equals(intent.getAction())) {
-		// if (uploadAll()) { return START_STICKY; }
-		// }
-		//
-		// return START_NOT_STICKY;
 	}
 
 	void finishedNotification() {
@@ -285,8 +279,6 @@ public class PhotoUploadService extends Service {
 	}
 
 	void startNextUploadOrFinish() {
-
-		Logger.e("Get next waiting");
 		CJayImage nextUpload = null;
 
 		try {
@@ -296,14 +288,13 @@ public class PhotoUploadService extends Service {
 		}
 
 		if (null != nextUpload && canUpload()) {
-
-			Logger.Log("start uploading next images");
+			Logger.Log("Start uploading next image: " + nextUpload.getImageName());
 			startUpload(nextUpload);
 
 		} else {
 
-			Logger.e("stop Photo Upload Service");
-			mCurrentlyUploading = false;
+			Logger.e("ImageQueue is empty. Stopped PhotoUploadService.");
+			setCurrentlyUploading(false);
 			stopSelf();
 		}
 	}
@@ -314,7 +305,7 @@ public class PhotoUploadService extends Service {
 			mCurrentUploadRunnable.cancel(true);
 		}
 
-		mCurrentlyUploading = false;
+		setCurrentlyUploading(false);
 		stopSelf();
 	}
 
@@ -386,7 +377,7 @@ public class PhotoUploadService extends Service {
 		trimCache();
 		updateNotification(upload);
 		mCurrentUploadRunnable = mExecutor.submit(new UploadPhotoRunnable(this, upload));
-		mCurrentlyUploading = true;
+		setCurrentlyUploading(true);
 
 	}
 
@@ -397,7 +388,7 @@ public class PhotoUploadService extends Service {
 	private boolean uploadAll() {
 
 		// If we're currently uploading, ignore call
-		if (mCurrentlyUploading) { return true; }
+		if (isCurrentlyUploading()) { return true; }
 
 		if (canUpload()) {
 
@@ -419,10 +410,18 @@ public class PhotoUploadService extends Service {
 		}
 
 		// If we reach here, there's no need to keep us running
-		mCurrentlyUploading = false;
+		setCurrentlyUploading(false);
 		stopSelf();
 
 		return false;
+	}
+
+	public boolean isCurrentlyUploading() {
+		return mCurrentlyUploading;
+	}
+
+	public void setCurrentlyUploading(boolean mCurrentlyUploading) {
+		this.mCurrentlyUploading = mCurrentlyUploading;
 	}
 
 }

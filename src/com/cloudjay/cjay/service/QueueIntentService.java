@@ -6,38 +6,28 @@ import android.app.IntentService;
 import android.content.Intent;
 
 import com.aerilys.helpers.android.NetworkHelper;
-import com.cloudjay.cjay.util.CountingInputStreamEntity;
 import com.cloudjay.cjay.util.Utils;
 
 @EIntentService
-public class QueueIntentService extends IntentService implements CountingInputStreamEntity.UploadListener {
+public class QueueIntentService extends IntentService {
 
 	public QueueIntentService() {
 		super("QueueIntentService");
 	}
 
 	@Override
-	public void onChange(int percent) {
-	}
-
-	@Override
 	protected void onHandleIntent(Intent intent) {
 
-		if (!Utils.isRunning(this, UploadIntentService_.class.getName())
+		if (!Utils.isRunning(this, ContainerUploadIntentService_.class.getName())
 				&& NetworkHelper.isConnected(getApplicationContext())) {
 
-			Intent uploadIntent = new Intent(this, UploadIntentService_.class);
+			Intent uploadIntent = new Intent(this, ContainerUploadIntentService_.class);
 			startService(uploadIntent);
 
 		}
 
 		if (!Utils.isRunning(this, PhotoUploadService_.class.getName())) {
-
-			// Logger.w("PhotoUploadService is not running");
 			startService(Utils.getUploadAllIntent(this));
-
-		} else {
-			// Logger.w("PhotoUploadService is already running");
 		}
 	}
 }

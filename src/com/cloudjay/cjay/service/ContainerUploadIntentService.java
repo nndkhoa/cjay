@@ -2,9 +2,10 @@ package com.cloudjay.cjay.service;
 
 import java.sql.SQLException;
 
-import org.androidannotations.annotations.EIntentService;
+import org.androidannotations.annotations.EService;
 import org.androidannotations.annotations.Trace;
 
+import android.R.integer;
 import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
@@ -33,14 +34,14 @@ import com.cloudjay.cjay.util.UploadType;
 
 import de.greenrobot.event.EventBus;
 
-@EIntentService
-public class UploadIntentService extends IntentService implements CountingInputStreamEntity.UploadListener {
+@EService
+public class ContainerUploadIntentService extends IntentService implements CountingInputStreamEntity.UploadListener {
 
 	static final int NOTIFICATION_ID = 1000;
 	private CJayImageDaoImpl cJayImageDaoImpl;
 	private ContainerSessionDaoImpl containerSessionDaoImpl;
 
-	public UploadIntentService() {
+	public ContainerUploadIntentService() {
 		super("UploadIntentService");
 	}
 
@@ -56,6 +57,7 @@ public class UploadIntentService extends IntentService implements CountingInputS
 		DataCenter.getDatabaseHelper(getApplicationContext())
 					.addUsageLog("Begin to #upload container: " + containerSession.getContainerId());
 
+		UploadType uploadType = UploadType.values()[containerSession.getUploadType()];
 		String response = "";
 		containerSession.setUploadState(UploadState.IN_PROGRESS);
 
@@ -131,9 +133,33 @@ public class UploadIntentService extends IntentService implements CountingInputS
 			return;
 		}
 
+		boolean isInterruptedByOfficialUpload = false;
+		// this is temporary upload
+		if (uploadType == UploadType.NONE) {
+
+			try {
+				Logger.Log("Refresh container session " + containerSession.getContainerId());
+				containerSessionDaoImpl.refresh(containerSession);
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			UploadType newUploadType = UploadType.values()[containerSession.getUploadType()];
+
+			// but while the upload is in progress, user want to upload official version
+			// so we don't need to restored session state.
+			if (containerSession.isOnLocal() == false && newUploadType == UploadType.IN) {
+				isInterruptedByOfficialUpload = true;
+				Logger.w("is interrupted by official upload");
+			}
+		}
+
 		// convert back then save containerSession
 		try {
+
 			Mapper.getInstance().update(getApplicationContext(), response, containerSession);
+
 		} catch (SQLException e) {
 
 			e.printStackTrace();
@@ -146,7 +172,6 @@ public class UploadIntentService extends IntentService implements CountingInputS
 
 		containerSession.setUploadState(UploadState.COMPLETED);
 
-		UploadType uploadType = UploadType.values()[containerSession.getUploadType()];
 		Logger.Log("Upload successfully container " + containerSession.getContainerId() + " | " + uploadType.name());
 		DataCenter.getDatabaseHelper(getApplicationContext()).addUsageLog(	"#upload #successfully container "
 																					+ containerSession.getContainerId()
@@ -155,23 +180,34 @@ public class UploadIntentService extends IntentService implements CountingInputS
 		// Restore container upload state to NORMAL if upload_type = NONE (temporary upload at GateImport)
 		synchronized (containerSession) {
 
-			if (uploadType == UploadType.NONE) {
+			switch (uploadType) {
+				case NONE:
+					if (isInterruptedByOfficialUpload) {
 
-				containerSession.setUploadConfirmation(false);
-				containerSession.setUploadState(UploadState.NONE);
+						Logger.Log("User trigger upload on GateImportFragment. It will be uploaded again.");
+						containerSession.setUploadState(UploadState.WAITING);
 
-				try {
-					containerSessionDaoImpl.update(containerSession);
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
+					} else {
 
-				// - Clear upload from upload fragment
-				// - Refresh container in CameraActivity
-				// - Refresh list item in GateImport
-				Logger.w("Notify UploadState RESTORED Event");
-				EventBus.getDefault().post(new UploadStateRestoredEvent(containerSession));
+						containerSession.setUploadConfirmation(false);
+						containerSession.setUploadState(UploadState.NONE);
 
+						try {
+							containerSessionDaoImpl.update(containerSession);
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
+
+						// - Clear upload from upload fragment
+						// - Refresh container in CameraActivity
+						// - Refresh list item in GateImport
+						Logger.w("Notify UploadState RESTORED Event");
+						EventBus.getDefault().post(new UploadStateRestoredEvent(containerSession));
+					}
+					break;
+
+				default:
+					break;
 			}
 		}
 	}
@@ -218,10 +254,10 @@ public class UploadIntentService extends IntentService implements CountingInputS
 	// Use to clear item
 	public void onEvent(UploadStateChangedEvent event) {
 
-		Logger.Log("onEvent UploadStateChangedEvent");
 		ContainerSession containerSession = event.getContainerSession();
 		UploadState uploadState = UploadState.values()[containerSession.getUploadState()];
 
+		Logger.Log("onEvent UploadStateChangedEvent | " + uploadState.name());
 		switch (uploadState) {
 			case COMPLETED:
 			case ERROR:
@@ -230,12 +266,11 @@ public class UploadIntentService extends IntentService implements CountingInputS
 				try {
 					containerSessionDaoImpl.update(containerSession);
 				} catch (SQLException e) {
-
 					e.printStackTrace();
 					Logger.e("Cannot update state for container " + containerSession.getContainerId());
 					Logger.e("Current state " + Integer.toString(containerSession.getUploadState()));
-
 				}
+
 				break;
 
 			case IN_PROGRESS:
@@ -251,8 +286,6 @@ public class UploadIntentService extends IntentService implements CountingInputS
 	 */
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		// Logger.Log("onHandleIntent");
-
 		if (NetworkHelper.isConnected(getApplicationContext())) {
 			try {
 				// ContainerSession containerSession = null;

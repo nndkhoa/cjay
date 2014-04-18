@@ -214,7 +214,14 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 				Logger.Log("add column `server_state` in table `container_session`");
 				db.execSQL("ALTER TABLE container_session ADD COLUMN server_state INTEGER DEFAULT 6");
 			} catch (Exception e) {
-				Logger.w("Column server_state is already existed.");
+				Logger.w("Column `server_state` is already existed.");
+			}
+
+			try {
+				Logger.Log("add column `is_temp` in table `container_session`");
+				db.execSQL("ALTER TABLE container_session ADD COLUMN is_temp INTEGER DEFAULT 0");
+			} catch (Exception e) {
+				Logger.w("Column `is_temp` is already existed.");
 			}
 
 			// Add cs_full_info_view
@@ -237,6 +244,23 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		public void revert(SQLiteDatabase db, ConnectionSource connectionSource) {
 		}
 	} };
+
+	// , new Patch() {
+	// @Override
+	// public void apply(SQLiteDatabase db, ConnectionSource connectionSource) {
+	//
+	// try {
+	// Logger.Log("add column `is_temp` in table `container_session`");
+	// db.execSQL("ALTER TABLE container_session ADD COLUMN is_temp INTEGER DEFAULT 0");
+	// } catch (Exception e) {
+	// Logger.w("Column `is_temp` is already existed.");
+	// }
+	// }
+	//
+	// @Override
+	// public void revert(SQLiteDatabase db, ConnectionSource connectionSource) {
+	// }
+	// }
 
 	public static final int DATABASE_VERSION = 4;
 
