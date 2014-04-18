@@ -92,14 +92,17 @@ public class Issue {
 
 		if (o.getClass() == AuditReportItem.class) {
 			AuditReportItem tmp = (AuditReportItem) o;
-
-			// TODO: BUG HERE. Cannot parseFloat
-			boolean isEqual = damageCode.getId() == tmp.getDamageId() && repairCode.getId() == tmp.getRepairId()
-					&& getComponentCode().getId() == tmp.getComponentId() && getLocationCode() == tmp.getLocationCode()
-					&& Math.abs(Float.parseFloat(length) - Float.parseFloat(tmp.getLength())) < 0.01
-					&& Math.abs(Float.parseFloat(height) - Float.parseFloat(tmp.getHeight())) < 0.01
-					&& Integer.parseInt(quantity) == Integer.parseInt(tmp.getQuantity());
-
+			
+			boolean isEqual = (damageCode != null ? damageCode.getId() : 0) == tmp.getDamageId()
+					&& (repairCode != null ? repairCode.getId() : 0) == tmp.getRepairId()
+					&& (componentCode != null ? componentCode.getId() : 0) == tmp.getComponentId()
+					&& locationCode == tmp.getLocationCode();
+			isEqual = isEqual && Integer.parseInt(Utils.replaceNull(quantity, "0")) 
+					== Integer.parseInt(Utils.replaceNull(tmp.getQuantity(), "0"));
+			isEqual = isEqual && Math.abs((Float.parseFloat(Utils.replaceNull(length, "0")))
+					- (Float.parseFloat(Utils.replaceNull(tmp.getLength(), "0")))) < 0.0001;
+			isEqual = isEqual && Math.abs((Float.parseFloat(Utils.replaceNull(height, "0"))) 
+					- (Float.parseFloat(Utils.replaceNull(tmp.getHeight(), "0")))) < 0.0001;
 			return isEqual;
 		}
 

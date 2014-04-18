@@ -6,7 +6,8 @@
         
    	<TextView
         android:id="@+id/container_id_textview"
-        style="@style/ContainerIDTitle" />
+        style="@style/ContainerIDTitle"
+        android:visibility="gone" />
    	
    	<ImageButton
         android:id="@+id/btn_add_new"

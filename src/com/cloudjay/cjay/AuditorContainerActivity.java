@@ -111,8 +111,10 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
+		
+		// Set Activity Title
 		containerIdTextView.setText(mContainerSession.getContainerId());
+		setTitle(mContainerSession.getContainerId());
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		getLoaderManager().initLoader(LOADER_ID, null, this);
