@@ -43,7 +43,7 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.fragment_repair_issue_pending)
 public class RepairIssuePendingListFragment extends SherlockFragment {
 
-	private final String LOG_TAG = "RepairPendingIssueListFragment";
+	private final String LOG_TAG = "RepairIssuePendingListFragment";
 	private ArrayList<Issue> mFeeds;
 	private FunDapter<Issue> mFeedsAdapter;
 
@@ -79,21 +79,18 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 		mSelectedIssue = null;
 	}
 
-	@Deprecated
 	@Click(R.id.btn_add_new)
 	void cameraClicked() {
 		Logger.Log("cameraClicked()");
+		mSelectedIssue = null;
+		mFeedListView.setItemChecked(-1, true);
 
 		if (mTakenImages == null) {
 			Logger.Log("mTakenImages is NULL. Init mTakenImages");
 			mTakenImages = new ArrayList<CJayImage>();
 		}
 
-		Intent intent = new Intent(getActivity(), CameraActivity_.class);
-		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA, mContainerSession.getUuid());
-		intent.putExtra("type", CJayImage.TYPE_REPORT);
-		intent.putExtra("tag", LOG_TAG);
-		startActivity(intent);
+		CJayApplication.gotoCamera(getActivity(), mContainerSession, CJayImage.TYPE_REPORT, LOG_TAG);
 	}
 
 	/**
@@ -234,7 +231,7 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 	public void onResume() {
 		super.onResume();
 
-		if (mTakenImages != null && mTakenImages.size() > 0) {
+		if (mSelectedIssue != null && mTakenImages != null && mTakenImages.size() > 0) {
 
 			// Update list cjay images of selected Issue
 			try {
@@ -267,7 +264,7 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager()
 																		.getHelper(getActivity())
 																		.getContainerSessionDaoImpl();
-			mContainerSession = containerSessionDaoImpl.queryForId(mContainerSessionUUID);
+			mContainerSession = containerSessionDaoImpl.findByUuid(mContainerSessionUUID);
 
 			if (null != mContainerSession) {
 				for (Issue issue : mContainerSession.getIssues()) {

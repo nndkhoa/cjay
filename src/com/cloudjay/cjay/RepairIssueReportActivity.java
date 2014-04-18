@@ -93,6 +93,7 @@ public class RepairIssueReportActivity extends CJayActivity implements OnPageCha
 			mIssue = issueDaoImpl.queryForId(mIssueUUID);
 
 			if (null != mIssue) {
+				setTitle(mIssue.getContainerSession().getContainerId());
 				containerIdTextView.setText(mIssue.getContainerSession().getContainerId());
 				issueTextView.setText(mIssue.getLocationCode() + " " + mIssue.getDamageCodeString() + " "
 						+ mIssue.getRepairCodeString());
@@ -105,6 +106,8 @@ public class RepairIssueReportActivity extends CJayActivity implements OnPageCha
 		locations = getResources().getStringArray(R.array.repair_issue_report_tabs);
 		configureViewPager();
 		configureActionBar();
+		
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
 	@OptionsItem(R.id.menu_check)

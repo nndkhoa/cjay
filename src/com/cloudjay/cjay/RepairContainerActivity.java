@@ -67,6 +67,7 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 			mContainerSession = containerSessionDaoImpl.queryForId(mContainerSessionUUID);
 
 			if (null != mContainerSession) {
+				setTitle(mContainerSession.getContainerId());
 				containerIdTextView.setText(mContainerSession.getContainerId());
 			}
 
@@ -77,6 +78,8 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 		locations = getResources().getStringArray(R.array.repair_container_tabs);
 		configureViewPager();
 		configureActionBar();
+
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
 	private void configureActionBar() {

@@ -435,4 +435,9 @@ public class CJayActivity extends SherlockFragmentActivity {
 		}
 
 	}
+	
+	@OptionsItem(android.R.id.home)
+	void homeIconClicked() {
+		finish();
+	}
 }

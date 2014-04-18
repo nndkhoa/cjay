@@ -77,6 +77,10 @@ public class AuditorIssueAssigmentActivity extends CJayActivity {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
+		// Set Activity Title
+		setTitle(mContainerSession.getContainerId());
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		mSelectedIssue = null;
 	}

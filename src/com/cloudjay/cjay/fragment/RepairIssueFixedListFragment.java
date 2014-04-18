@@ -160,7 +160,7 @@ public class RepairIssueFixedListFragment extends SherlockFragment {
 			ContainerSessionDaoImpl containerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager()
 																		.getHelper(getActivity())
 																		.getContainerSessionDaoImpl();
-			mContainerSession = containerSessionDaoImpl.queryForId(mContainerSessionUUID);
+			mContainerSession = containerSessionDaoImpl.findByUuid(mContainerSessionUUID);
 
 			if (null != mContainerSession) {
 				for (Issue issue : mContainerSession.getIssues()) {

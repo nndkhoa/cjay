@@ -240,18 +240,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
-
 			savePhoto(data);
 			camera.startPreview();
 			mInPreview = true;
-
-			// check Camera capture mode
-			// if (!PreferencesUtil.getPrefsValue( getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS,
-			// true)) {
-			//
-			// onBackPressed();
-			//
-			// }
 		}
 	};
 
@@ -286,16 +277,10 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		if (captureModeToggleButton.isChecked()) {
 			Toast.makeText(this, "Kích hoạt chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
-
 			PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, true);
-
-			// mDoneButton.setVisibility(View.VISIBLE);
 		} else {
 			Toast.makeText(this, "Đã dừng chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
-
 			PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false);
-
-			// mDoneButton.setVisibility(View.GONE);
 		}
 
 	}
@@ -384,23 +369,27 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		mCameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-		// Only Auditor user can see captureModeToggleButton
+		// TYPE_REPORT images can be captured in single mode (non-continuous)
+		// Only two users use this:
+		// -Auditor: can see captureModeToggleButton, can set mode to single/continuous
+		// -Repair: can NOT see captureModeToggleButton, mode always is single, 
+		//			user is forced to report issue after capturing an image
 		try {
-			if (CJaySession.restore(this).getUserRole() == UserRole.AUDITOR.getValue()) {
-
-				boolean isContinuous = PreferencesUtil.getPrefsValue(	getApplicationContext(),
-																		PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS,
-																		false);
-
-				if (isContinuous == false) {
-					PreferencesUtil.storePrefsValue(getApplicationContext(),
-													PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false);
-
-					// mDoneButton.setVisibility(View.GONE);
+			if (mType == CJayImage.TYPE_REPORT) {
+				boolean isContinuous;
+				if (CJaySession.restore(this).getUserRole() == UserRole.AUDITOR.getValue()) {
+					isContinuous = PreferencesUtil.getPrefsValue(getApplicationContext(),
+																PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS,
+																false);
+					captureModeToggleButton.setVisibility(View.VISIBLE);
+				} else {
+					isContinuous = false;
+					PreferencesUtil.storePrefsValue(getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false);
+					captureModeToggleButton.setVisibility(View.GONE);
 				}
 
 				captureModeToggleButton.setChecked(isContinuous);
-
+				
 			} else {
 
 				captureModeToggleButton.setVisibility(View.GONE);
@@ -992,21 +981,22 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		// tell people that an image has been created
 		if (!TextUtils.isEmpty(mSourceTag)) {
-
+			if (!PreferencesUtil.getPrefsValue(	getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS,
+					true)) {
+				showIssueReportDialog(uploadItem.getUuid());
+			}
+			
 			SystemClock.sleep(300);
 			// Logger.Log("issue_report - " + uploadItem.getUuid() + " - Trigger cjayimage added");
 			EventBus.getDefault().post(new CJayImageAddedEvent(uploadItem, mSourceTag));
-
-			if (!PreferencesUtil.getPrefsValue(	getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS,
-												true)) {
-				showIssueReportDialog(uploadItem.getUuid());
-			}
 		}
 	}
 
 	@UiThread
 	public void showIssueReportDialog(String cjayImageUuid) {
 		if (mSourceTag.equals("AuditorContainerActivity")) {
+			IssueReportHelper.showReportDialog(this, cjayImageUuid, mContainerSessionUUID);
+		} else if (mSourceTag.equals("RepairIssuePendingListFragment")) {
 			IssueReportHelper.showReportDialog(this, cjayImageUuid, mContainerSessionUUID);
 		}
 	}

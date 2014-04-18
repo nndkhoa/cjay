@@ -131,11 +131,6 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		CJayApplication.gotoCamera(this, mContainerSession, mCJayImageTypeA, LOG_TAG);
 	}
 
-	@OptionsItem(android.R.id.home)
-	void homeIconClicked() {
-		finish();
-	}
-
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
 		int imageType = -1;

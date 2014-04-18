@@ -5,7 +5,8 @@
         
    	<TextView
         android:id="@+id/container_id_textview"
-        style="@style/ContainerIDTitle" />
+        style="@style/ContainerIDTitle"
+        android:visibility="gone" />
    	
    	<TextView
         android:id="@+id/issue_textview"        
