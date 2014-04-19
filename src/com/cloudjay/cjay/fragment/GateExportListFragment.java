@@ -318,22 +318,18 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	}
 
 	public void onEvent(PostLoadDataEvent event) {
-		Logger.Log("PostLoadDataEvent");
 		mLoadMoreDataLayout.setVisibility(View.GONE);
 	}
 
 	public void onEvent(PreLoadDataEvent event) {
-		Logger.Log("PreLoadDataEvent");
 		mLoadMoreDataLayout.setVisibility(View.VISIBLE);
 	}
 
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
-		Logger.Log("ContainerSessionChangedEvent");
 		refresh();
 	}
 
 	public void onEvent(UploadStateRestoredEvent event) {
-		Logger.Log("on upload state restore: refresh list item");
 		refresh();
 	}
 

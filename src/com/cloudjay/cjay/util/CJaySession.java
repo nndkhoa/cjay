@@ -114,8 +114,10 @@ public class CJaySession {
 	}
 
 	public User getCurrentUser() {
+
 		if (currentUser == null) {
 			Logger.Log("Current user is null ??");
+			return null;
 		}
 
 		return currentUser;

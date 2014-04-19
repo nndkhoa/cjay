@@ -239,7 +239,6 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 	}
 
 	public void onEvent(UploadStateRestoredEvent event) {
-		Logger.Log("on upload state restore: refresh list item");
 		refresh();
 	}
 

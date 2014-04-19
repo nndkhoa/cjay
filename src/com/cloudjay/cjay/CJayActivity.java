@@ -242,10 +242,11 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 			// Check device for Play Services APK.
 			if (checkPlayServices()) {
+
 				gcm = GoogleCloudMessaging.getInstance(this);
 				regid = Utils.getRegistrationId(context);
 
-				if (regid.isEmpty()) {
+				if (TextUtils.isEmpty(regid)) {
 					registerInBackground();
 				}
 			}
@@ -267,6 +268,8 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 			@Override
 			protected String doInBackground(Void... params) {
+
+				Logger.Log("begin to register GCM device in background");
 				String msg = "";
 				try {
 					if (gcm == null) {
@@ -327,8 +330,10 @@ public class CJayActivity extends SherlockFragmentActivity {
 			}
 		} catch (JSONException e) {
 			Logger.e("Can't Register device with the Back-end!");
+
 		} catch (NoConnectionException e) {
 			showCrouton(R.string.alert_no_network);
+
 		} catch (NullSessionException e) {
 			e.printStackTrace();
 		}

@@ -88,6 +88,8 @@ public class CJayClient implements ICJayClient {
 		String deviceId = deviceUuid.toString();
 
 		User user = CJaySession.restore(ctx).getCurrentUser();
+		if (null == user) { throw new NullSessionException(); }
+
 		String accessToken = user.getAccessToken();
 
 		JsonObject requestPacket = new JsonObject();

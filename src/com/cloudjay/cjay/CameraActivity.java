@@ -240,9 +240,16 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
-			savePhoto(data);
-			camera.startPreview();
-			mInPreview = true;
+			try {
+				savePhoto(data);
+				camera.startPreview();
+				mInPreview = true;
+			} catch (Exception e) {
+
+				e.printStackTrace();
+				releaseCamera();
+
+			}
 		}
 	};
 
@@ -372,24 +379,24 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		// TYPE_REPORT images can be captured in single mode (non-continuous)
 		// Only two users use this:
 		// -Auditor: can see captureModeToggleButton, can set mode to single/continuous
-		// -Repair: can NOT see captureModeToggleButton, mode always is single, 
-		//			user is forced to report issue after capturing an image
+		// -Repair: can NOT see captureModeToggleButton, mode always is single,
+		// user is forced to report issue after capturing an image
 		try {
 			if (mType == CJayImage.TYPE_REPORT) {
 				boolean isContinuous;
 				if (CJaySession.restore(this).getUserRole() == UserRole.AUDITOR.getValue()) {
-					isContinuous = PreferencesUtil.getPrefsValue(getApplicationContext(),
-																PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS,
-																false);
+					isContinuous = PreferencesUtil.getPrefsValue(	getApplicationContext(),
+																	PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false);
 					captureModeToggleButton.setVisibility(View.VISIBLE);
 				} else {
 					isContinuous = false;
-					PreferencesUtil.storePrefsValue(getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false);
+					PreferencesUtil.storePrefsValue(getApplicationContext(),
+													PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false);
 					captureModeToggleButton.setVisibility(View.GONE);
 				}
 
 				captureModeToggleButton.setChecked(isContinuous);
-				
+
 			} else {
 
 				captureModeToggleButton.setVisibility(View.GONE);
@@ -480,8 +487,13 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Override
 	public void onAutoFocus(boolean arg0, Camera arg1) {
-		Logger.Log("Auto focused, now take picture");
-		mCamera.takePicture(shutterCallback, null, photoCallback);
+
+		try {
+			Logger.Log("Auto focused, now take picture");
+			mCamera.takePicture(shutterCallback, null, photoCallback);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -982,10 +994,10 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		// tell people that an image has been created
 		if (!TextUtils.isEmpty(mSourceTag)) {
 			if (!PreferencesUtil.getPrefsValue(	getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS,
-					true)) {
+												true)) {
 				showIssueReportDialog(uploadItem.getUuid());
 			}
-			
+
 			SystemClock.sleep(300);
 			// Logger.Log("issue_report - " + uploadItem.getUuid() + " - Trigger cjayimage added");
 			EventBus.getDefault().post(new CJayImageAddedEvent(uploadItem, mSourceTag));

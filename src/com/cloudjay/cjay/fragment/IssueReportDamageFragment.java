@@ -145,7 +145,6 @@ public class IssueReportDamageFragment extends IssueReportFragment implements Lo
 
 	@Override
 	public void hideKeyboard() {
-		// TODO Auto-generated method stub
 
 	}
 

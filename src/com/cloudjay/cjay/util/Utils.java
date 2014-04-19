@@ -209,8 +209,9 @@ public class Utils {
 	public static String getRegistrationId(Context context) {
 		final SharedPreferences prefs = getGCMPreferences(context);
 		String registrationId = prefs.getString(PROPERTY_REG_ID, "");
+
 		if (registrationId.isEmpty()) {
-			Logger.i("Registration not found.");
+			Logger.w("Registration not found.");
 			return "";
 		}
 

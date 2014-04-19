@@ -77,7 +77,7 @@ public class AuditorIssueAssigmentActivity extends CJayActivity {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		// Set Activity Title
 		setTitle(mContainerSession.getContainerId());
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -178,13 +178,6 @@ public class AuditorIssueAssigmentActivity extends CJayActivity {
 
 		// refresh menu
 		supportInvalidateOptionsMenu();
-	}
-
-	@Override
-	protected void onCreate(Bundle arg0) {
-		// TODO Auto-generated method stub
-		super.onCreate(arg0);
-		Logger.w("onCreate");
 	}
 
 	@Override
