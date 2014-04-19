@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.content.AsyncTaskLoader;
 
+// custom cursor loader
 public abstract class CJayCursorLoader extends AsyncTaskLoader<Cursor> {
 
 	private Cursor mCursor;

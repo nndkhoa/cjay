@@ -26,6 +26,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -44,14 +45,12 @@ public class Utils {
 	private static final String PROPERTY_REG_ID = "registration_id";
 	private static final String PROPERTY_CURRENT_USER_ID = "current_user_id";
 	private static final String PROPERTY_APP_VERSION = "appVersion";
-	private static boolean isEnableAutoCheckForUpdate = true;
 
-	public static boolean enableAutoCheckForUpdate() {
-		return isEnableAutoCheckForUpdate;
-	}
+	public static boolean enableAutoCheckForUpdate(Context context) {
 
-	public static void setEnableAutoCheckForUpdate(boolean value) {
-		isEnableAutoCheckForUpdate = value;
+		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+		return pref.getBoolean(context.getString(R.string.pref_key_auto_check_update_checkbox), false);
+
 	}
 
 	public static void backupDatabase(String username) {
@@ -333,7 +332,7 @@ public class Utils {
 		editor.putInt(PROPERTY_APP_VERSION, appVersion);
 		editor.commit();
 	}
-	
+
 	public static String replaceNull(String in, String replace) {
 		return TextUtils.isEmpty(in) ? replace : in;
 	}

@@ -2,13 +2,20 @@
 
     <CheckBoxPreference
         android:defaultValue="false"
-        android:key="auto_check_update_checkbox"
+        android:key="@string/pref_key_auto_check_update_checkbox"
         android:summary="@string/pref_description_auto_check_update"
         android:title="@string/pref_title_auto_check_update" />
+    
     <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="enable_logger_checkbox"
+        android:defaultValue="false"
+        android:key="@string/pref_key_enable_logger_checkbox"
         android:summary="@string/pref_description_enable_logger"
         android:title="@string/pref_title_enable_logger" />
+
+    <Preference
+        android:key="secret_log"
+        android:summary="@string/pref_description_secret_log"
+        android:title="@string/pref_title_secret_log" >
+    </Preference>
 
 </PreferenceScreen>

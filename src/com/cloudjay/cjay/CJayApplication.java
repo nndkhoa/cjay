@@ -16,7 +16,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
+
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
@@ -212,11 +214,9 @@ public class CJayApplication extends Application {
 		Logger.Log("Start Application");
 
 		// Configure Logger
-		Logger.getInstance().setDebuggable(true);
-
-		// Enable auto update
-		Utils.setEnableAutoCheckForUpdate(true);
-		// PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_AUTO_CHECK_UPDATE, false);
+		boolean debuggable = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox), false);
+		Logger.getInstance().setDebuggable(debuggable);
 
 		// Ion.getDefault(getBaseContext()).configure()
 		// .setLogging("Network Module", Log.INFO);

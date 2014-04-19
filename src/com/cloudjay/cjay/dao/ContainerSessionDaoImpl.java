@@ -579,11 +579,6 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 
 							db.execSQL(sql);
 							retryCountHashMap.remove(key);
-
-						} else {
-
-							// Re-assign value
-							retryCountHashMap.put(cJayImage.getUuid(), 0);
 						}
 
 					} else {

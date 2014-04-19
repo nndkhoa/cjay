@@ -112,7 +112,7 @@ public class RepairHomeActivity extends CJayActivity implements OnPageChangeList
 
 		}
 
-		if (Utils.enableAutoCheckForUpdate()) {
+		if (Utils.enableAutoCheckForUpdate(this)) {
 			UpdateChecker checker = new UpdateChecker(this);
 			checker.start();
 		}

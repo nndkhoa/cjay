@@ -114,7 +114,7 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 		} catch (Exception ex) {
 		}
 
-		if (Utils.enableAutoCheckForUpdate()) {
+		if (Utils.enableAutoCheckForUpdate(this)) {
 			UpdateChecker checker = new UpdateChecker(this);
 			checker.start();
 		}

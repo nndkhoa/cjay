@@ -104,7 +104,7 @@ public class AuditorHomeActivity extends CJayActivity implements OnPageChangeLis
 
 		}
 
-		if (Utils.enableAutoCheckForUpdate()) {
+		if (Utils.enableAutoCheckForUpdate(this)) {
 			UpdateChecker checker = new UpdateChecker(this);
 			checker.start();
 		}

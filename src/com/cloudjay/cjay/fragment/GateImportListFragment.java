@@ -66,6 +66,7 @@ import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_gate_import)
 @OptionsMenu(R.menu.menu_gate_import)
+// 2.
 public class GateImportListFragment extends SherlockFragment implements OnRefreshListener, LoaderCallbacks<Cursor> {
 
 	public final static String LOG_TAG = "GateImportListFragment";
@@ -84,6 +85,8 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 	private int mItemLayout = R.layout.list_item_container;
 
 	PullToRefreshLayout mPullToRefreshLayout;
+
+	// 1.
 	GateImportContainerCursorAdapter cursorAdapter;
 
 	int totalItems = 0;
@@ -110,6 +113,7 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance().getListOperators(getActivity());
 
 		// initContainerFeedAdapter(null);
+		// 3.
 		getLoaderManager().initLoader(LOADER_ID, null, this);
 
 		mFeedListView.setScrollingCacheEnabled(false);
@@ -245,11 +249,13 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 		super.onCreate(savedInstanceState);
 	}
 
+	// 4.
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
 		Context context = getActivity();
 
 		return new CJayCursorLoader(context) {
+
 			@Override
 			public Cursor loadInBackground() {
 				Cursor cursor = DataCenter.getInstance().getLocalContainerSessionCursor(getContext());
@@ -289,6 +295,7 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 
 		if (cursorAdapter == null) {
+
 			cursorAdapter = new GateImportContainerCursorAdapter(getActivity(), mItemLayout, cursor, 0);
 
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
@@ -301,6 +308,7 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 			mFeedListView.setAdapter(cursorAdapter);
 
 		} else {
+
 			cursorAdapter.swapCursor(cursor);
 		}
 	}

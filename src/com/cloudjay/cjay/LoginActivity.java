@@ -165,7 +165,7 @@ public class LoginActivity extends CJayActivity {
 	protected void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
 
-		if (Utils.enableAutoCheckForUpdate()) {
+		if (Utils.enableAutoCheckForUpdate(this)) {
 			UpdateChecker checker = new UpdateChecker(this);
 			checker.start();
 		}

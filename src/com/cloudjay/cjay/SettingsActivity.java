@@ -3,21 +3,27 @@ package com.cloudjay.cjay;
 import java.util.List;
 
 import com.cloudjay.cjay.util.Logger;
+import com.koushikdutta.ion.builder.Builders.Any.IF;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
 
@@ -69,13 +75,16 @@ public class SettingsActivity extends PreferenceActivity {
 	 * A preference value change listener that updates the preference's summary
 	 * to reflect its new value.
 	 */
+
 	private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
 
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object value) {
 
-			String stringValue = value.toString();
-			Logger.Log(stringValue);
+			String key = preference.getKey();
+			if (key.equals("enable_logger_checkbox")) {
+				Logger.getInstance().setDebuggable((Boolean) value);
+			}
 
 			// if (preference instanceof ListPreference) {
 			// // For list preferences, look up the correct display value in
@@ -113,6 +122,7 @@ public class SettingsActivity extends PreferenceActivity {
 			// preference.setSummary(stringValue);
 			//
 			// }
+
 			return true;
 		}
 	};
@@ -131,14 +141,18 @@ public class SettingsActivity extends PreferenceActivity {
 		// Set the listener to watch for value changes.
 		preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 
-		// Trigger the listener immediately with the preference's
-		// current value.
-		sBindPreferenceSummaryToValueListener.onPreferenceChange(	preference,
-																	PreferenceManager.getDefaultSharedPreferences(	preference.getContext())
-																						.getBoolean(preference.getKey(),
-																									false));
-		// .getString(preference.getKey(),
-		// ""));
+		Object newValue = null;
+
+		if (preference instanceof CheckBoxPreference) {
+			newValue = PreferenceManager.getDefaultSharedPreferences(preference.getContext())
+										.getBoolean(preference.getKey(), false);
+		} else {
+			newValue = PreferenceManager.getDefaultSharedPreferences(preference.getContext())
+										.getString(preference.getKey(), "");
+		}
+
+		// Trigger the listener immediately with the preference's current value.
+		sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, newValue);
 	}
 
 	/**
@@ -150,6 +164,13 @@ public class SettingsActivity extends PreferenceActivity {
 	 */
 	private static boolean isSimplePreferences(Context context) {
 		return ALWAYS_SIMPLE_PREFS || Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB || !isXLargeTablet(context);
+
+	}
+
+	@Override
+	public SharedPreferences getSharedPreferences(String name, int mode) {
+
+		return super.getSharedPreferences(name, mode);
 	}
 
 	/**
@@ -186,14 +207,23 @@ public class SettingsActivity extends PreferenceActivity {
 	 * device configuration dictates that a simplified, single-pane UI should be
 	 * shown.
 	 */
+	@SuppressWarnings("deprecation")
 	private void setupSimplePreferencesScreen() {
 		if (!isSimplePreferences(this)) return;
 
-		// In the simplified UI, fragments are not used at all and we instead
-		// use the older PreferenceActivity APIs.
-
 		addPreferencesFromResource(R.xml.pref_general);
-		bindPreferenceSummaryToValue(findPreference("auto_check_update_checkbox"));
-		bindPreferenceSummaryToValue(findPreference("enable_logger_checkbox"));
+		bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_key_auto_check_update_checkbox)));
+		bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_key_enable_logger_checkbox)));
+		Preference findPreference = findPreference("secret_log");
+
+		findPreference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+				Intent intent = new Intent(SettingsActivity.this, UserLogActivity_.class);
+				startActivity(intent);
+				return false;
+			}
+		});
 	}
 }

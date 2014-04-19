@@ -398,14 +398,13 @@ public class CJayActivity extends SherlockFragmentActivity {
 		int left = CJayConstant.HIDDEN_LOG_THRESHOLD - usernameMenuClickCount;
 
 		if (left <= 3 && left > 0) {
-			Toast.makeText(this, "You have to click " + Integer.toString(left) + " to open Secret Logs",
+			Toast.makeText(this, "You have to click " + Integer.toString(left) + " to open Settings",
 							Toast.LENGTH_SHORT).show();
 		}
 
 		if (left == 0) {
 
-			// Open Log
-			// Intent intent = new Intent(this, UserLogActivity_.class);
+			// Open Settings
 			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivity(intent);
 
@@ -413,7 +412,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 		}
 
 	}
-	
+
 	@OptionsItem(android.R.id.home)
 	void homeIconClicked() {
 		finish();
