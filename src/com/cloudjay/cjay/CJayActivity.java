@@ -68,6 +68,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 		int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 
 		if (resultCode != ConnectionResult.SUCCESS) {
+
 			if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
 				GooglePlayServicesUtil.getErrorDialog(resultCode, this, CJayConstant.PLAY_SERVICES_RESOLUTION_REQUEST)
 										.show();
@@ -75,6 +76,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 				Log.e("DEVICE_UNSUPPORTED", "This device is not supported.");
 				finish();
 			}
+
 			return false;
 		}
 		return true;
@@ -397,7 +399,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 		usernameMenuClickCount++;
 		int left = CJayConstant.HIDDEN_LOG_THRESHOLD - usernameMenuClickCount;
 
-		if (left <= 3 && left > 0) {
+		if (left <= 2 && left > 0) {
 			Toast.makeText(this, "You have to click " + Integer.toString(left) + " to open Settings",
 							Toast.LENGTH_SHORT).show();
 		}

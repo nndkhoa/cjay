@@ -215,7 +215,7 @@ public class CJayApplication extends Application {
 
 		// Configure Logger
 		boolean debuggable = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox), false);
+												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox), true);
 		Logger.getInstance().setDebuggable(debuggable);
 
 		// Ion.getDefault(getBaseContext()).configure()

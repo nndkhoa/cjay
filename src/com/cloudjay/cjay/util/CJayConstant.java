@@ -77,7 +77,7 @@ public final class CJayConstant {
 	public static final int ALARM_INTERVAL = 10;
 	public static final String CUSTOM_INTENT = "com.cloudjay.cjay.CUSTOM_INTENT";
 
-	public static final int HIDDEN_LOG_THRESHOLD = 5;
+	public static final int HIDDEN_LOG_THRESHOLD = 4;
 
 	public static final int RETRY_THRESHOLD = 5;
 

@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.WakefulBroadcastReceiver;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -101,6 +102,8 @@ public class GcmIntentService extends IntentService {
 					Logger.Log("Last case - " + extras.toString());
 					Logger.Log("MessageType: " + messageType);
 
+					String registrationId = extras.getString("registration_id");
+
 					int id = -1;
 					try {
 						id = Integer.parseInt(extras.getString("id"));
@@ -114,6 +117,22 @@ public class GcmIntentService extends IntentService {
 					Logger.Log("Notification got Type = " + type + " | MSG = " + msg + " | Id = "
 							+ Integer.toString(id));
 
+					if (!TextUtils.isEmpty(registrationId)) {
+						Logger.Log("Registration Id: " + registrationId);
+
+					} else {
+
+						// Alert cannot register GCM device
+						Logger.Log("Cannot register GCM device. Please log out and try again.");
+						DataCenter.getDatabaseHelper(getApplicationContext())
+									.addUsageLog("Cannot register #GCM device. Please log out and try again.");
+
+						Toast.makeText(this, "Server đang gặp sự cố.\nHãy đăng xuất và thử lại sau 5 phút nữa.",
+										Toast.LENGTH_LONG).show();
+
+						// TODO: Log user out.
+						// CJayApplication.logOutInstantly(getApplicationContext());
+					}
 				}
 
 			} else {
