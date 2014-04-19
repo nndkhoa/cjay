@@ -132,10 +132,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 	@Click(R.id.btn_add_new)
 	void cameraClicked() {
 		// refresh highlighting and clear current selection
-		mFeedListView.setItemChecked(-1, true);
-		mLongClickedCJayImage = null;
-
-		supportInvalidateOptionsMenu();
+		hideMenuItems();
 
 		// go to camera
 		mNewImageCount = 0;
@@ -155,20 +152,11 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 
 	}
 
-	@OptionsItem(android.R.id.home)
-	void homeIconClicked() {
-		finish();
-	}
-
 	@ItemClick(R.id.feeds)
 	void imageItemClicked(int position) {
 
-		// refresh highlighting
-		mFeedListView.setItemChecked(position, false);
-
-		// clear current selection
-		mLongClickedCJayImage = null;
-		supportInvalidateOptionsMenu();
+		// refresh highlighting and clear current selection
+		hideMenuItems();
 
 		Cursor cursor = (Cursor) mCursorAdapter.getItem(position);
 		mSelectedCJayImageUuid = cursor.getString(cursor.getColumnIndexOrThrow("uuid"));
@@ -297,6 +285,13 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		getLoaderManager().restartLoader(LOADER_ID, null, this);
 		supportInvalidateOptionsMenu();
 	}
+	
+	@OptionsItem(R.id.menu_import)
+	void importMenuItemClicked() {
+		hideMenuItems();
+
+		CJayApplication.openPhotoGridView(this, mContainerSessionUUID, mContainerSession.getContainerId(), CJayImage.TYPE_IMPORT, LOG_TAG);
+	}
 
 	@OptionsItem(R.id.menu_trash)
 	void trashMenuItemClicked() {
@@ -322,9 +317,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 			refresh();
 
 			// hide menu items
-			mLongClickedCJayImage = null;
-			mFeedListView.setItemChecked(-1, true);
-			supportInvalidateOptionsMenu();
+			hideMenuItems();
 		}
 
 		long difference = System.currentTimeMillis() - startTime;
@@ -348,5 +341,11 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 
 		// go back
 		onBackPressed();
+	}
+	
+	private void hideMenuItems() {
+		mLongClickedCJayImage = null;
+		mFeedListView.setItemChecked(-1, true);
+		supportInvalidateOptionsMenu();
 	}
 }
