@@ -404,8 +404,7 @@ public class DataCenter {
 	}
 
 	public List<Operator> getListOperators(Context context) {
-		Logger.Log("get list Operators");
-
+		// Logger.Log("get list Operators");
 		try {
 			return getDatabaseManager().getHelper(context).getOperatorDaoImpl().getAllOperators();
 		} catch (SQLException e) {

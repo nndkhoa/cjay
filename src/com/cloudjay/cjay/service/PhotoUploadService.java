@@ -110,8 +110,6 @@ public class PhotoUploadService extends Service {
 
 		synchronized public void doFileUpload(Context ctx, final CJayImage uploadItem) {
 
-			Logger.Log("doFileUpload: " + uploadItem.getImageName());
-
 			try {
 				uploadItem.setUploadState(CJayImage.STATE_UPLOAD_IN_PROGRESS);
 
@@ -156,7 +154,8 @@ public class PhotoUploadService extends Service {
 				if (isInterrupted()) { return; }
 
 				try {
-					Logger.Log("About to call httpClient.execute");
+					// Logger.Log("About to call httpClient.execute");
+					Logger.Log("doFileUpload: " + uploadItem.getImageName());
 					resp = httpClient.execute(post);
 
 					Logger.Log(resp.getStatusLine().getReasonPhrase());
@@ -178,7 +177,6 @@ public class PhotoUploadService extends Service {
 					Logger.e("ClientProtocolException: " + e.getMessage());
 					uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
 				}
-
 			} catch (IOException e) { // Rớt mạng
 
 				Logger.e("IOException: " + e.getMessage());
@@ -294,7 +292,7 @@ public class PhotoUploadService extends Service {
 
 		} else {
 
-			Logger.e("ImageQueue is empty. Stopped PhotoUploadService.");
+			Logger.Log("ImageQueue is empty. Stopped PhotoUploadService.");
 			setCurrentlyUploading(false);
 			stopSelf();
 		}
@@ -401,8 +399,7 @@ public class PhotoUploadService extends Service {
 
 			if (uploadItem != null) {
 
-				Logger.e("Begin to upload cjay images");
-
+				Logger.Log("Begin to upload cjay images.");
 				startForeground();
 				startUpload(uploadItem);
 				return true;

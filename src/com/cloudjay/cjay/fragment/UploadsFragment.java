@@ -22,6 +22,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadCursorAdapter;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
+import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
@@ -132,23 +133,28 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 		refresh();
 	}
 
-	public void onEvent(UploadStateChangedEvent event) {
-		Logger.Log("onEvent UploadStateChangedEvent");
+	public void onEvent(ContainerSessionUpdatedEvent event) {
+		Logger.Log("onEvent ContainerSessionUpdatedEvent | "
+				+ UploadState.values()[event.getTarget().getUploadState()].name());
 		refresh();
 	}
 
+	// public void onEvent(UploadStateChangedEvent event) {
+	// Logger.Log("onEvent UploadStateChangedEvent | "
+	// + UploadState.values()[event.getTarget().getUploadState()].name());
+	// refresh();
+	// }
+
 	public void onEvent(UploadStateRestoredEvent event) {
-		Logger.Log("on upload state restore: refresh list item");
 		refresh();
 	}
 
 	@Override
 	public void onItemClick(AdapterView<?> l, View view, int position, long id) {
-
-		Logger.Log("onItemClick at index: " + Integer.toString(position));
 		int viewId = view.getId();
 
 		Cursor cursor = (Cursor) mListView.getItemAtPosition(position);
+
 		// int uploadState = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_STATE));
 		UploadState uploadState = UploadState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_STATE))];
 		String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));

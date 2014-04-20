@@ -18,7 +18,7 @@ public class UploadStateChangedEvent {
 		containerSession = upload;
 	}
 
-	public ContainerSession getContainerSession() {
+	public ContainerSession getTarget() {
 		return containerSession;
 	}
 

@@ -154,8 +154,6 @@ public class GcmIntentService extends IntentService {
 	@Trace(level = Log.INFO)
 	void sendNotification(Bundle extras) {
 
-		Logger.Log("sendNotification");
-
 		try {
 			mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 

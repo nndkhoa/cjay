@@ -171,7 +171,6 @@ public class ContainerUploadIntentService extends IntentService implements Count
 		}
 
 		containerSession.setUploadState(UploadState.COMPLETED);
-
 		Logger.Log("Upload successfully container " + containerSession.getContainerId() + " | " + uploadType.name());
 		DataCenter.getDatabaseHelper(getApplicationContext()).addUsageLog(	"#upload #successfully container "
 																					+ containerSession.getContainerId()
@@ -254,7 +253,7 @@ public class ContainerUploadIntentService extends IntentService implements Count
 	// Use to clear item
 	public void onEvent(UploadStateChangedEvent event) {
 
-		ContainerSession containerSession = event.getContainerSession();
+		ContainerSession containerSession = event.getTarget();
 		UploadState uploadState = UploadState.values()[containerSession.getUploadState()];
 
 		Logger.Log("onEvent UploadStateChangedEvent | " + uploadState.name());

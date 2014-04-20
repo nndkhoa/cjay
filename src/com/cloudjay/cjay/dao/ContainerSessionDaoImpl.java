@@ -46,10 +46,9 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 			int containerSessionId = containerSession.getId();
 
 			if (containerSessionId == 0) { // new Container Session
-				Logger.Log(
 
-				"Insert new Container with ID: " + Integer.toString(containerSessionId) + " Name: "
-						+ containerSession.getContainerId());
+				// Logger.Log("Insert new Container with ID: " + Integer.toString(containerSessionId) + " Name: "
+				// + containerSession.getContainerId());
 				createOrUpdate(containerSession);
 
 			} else { // existed Container Session
@@ -60,12 +59,12 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 
 				// update UUID if needed
 				if (null != result) {
-					Logger.Log("Update container session UUID");
+					// Logger.Log("Update container session UUID");
 					containerSession.setUuid(result.getUuid());
 				}
 
-				Logger.Log("Update Container Session with ID: " + Integer.toString(containerSessionId) + " | Name: "
-						+ containerSession.getContainerId());
+				// Logger.Log("Update Container Session with ID: " + Integer.toString(containerSessionId) + " | Name: "
+				// + containerSession.getContainerId());
 
 				createOrUpdate(containerSession);
 			}
@@ -183,17 +182,17 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 				}
 			}
 		}
-		long difference = System.currentTimeMillis() - startTime;
-		Logger.Log("---> Total time: " + Long.toString(difference));
 
+		long difference = System.currentTimeMillis() - startTime;
+		// Logger.Log("---> Total time: " + Long.toString(difference));
 	}
 
 	@Override
 	public void delete(int id) throws SQLException {
 
 		if (id == -1) {
-			Logger.Log("Container Session ID = -1");
-
+			Logger.e("Container Session ID = -1");
+			return;
 		} else { // existed Container Session
 
 			ContainerSession result = queryForFirst(queryBuilder().where().eq(ContainerSession.FIELD_ID, id).prepare());

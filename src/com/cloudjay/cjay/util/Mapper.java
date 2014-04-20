@@ -339,12 +339,10 @@ public class Mapper {
 
 							if (gateReportImageName.contains(cJayImageName)) {
 
-								Logger.Log(
-
-								"Gate Report Image Id: " + Integer.toString(gateReportImage.getId())
-										+ "\nGate Report Image Name: " + gateReportImageName
-										+ "\nGate Report Image Type: " + Integer.toString(gateReportImage.getType())
-										+ "\nGate Report Image Time: " + gateReportImage.getCreatedAt());
+								// Logger.Log("Gate Report Image Id: " + Integer.toString(gateReportImage.getId())
+								// + "\nGate Report Image Name: " + gateReportImageName
+								// + "\nGate Report Image Type: " + Integer.toString(gateReportImage.getType())
+								// + "\nGate Report Image Time: " + gateReportImage.getCreatedAt());
 
 								cJayImage.setId(gateReportImage.getId());
 								cJayImage.setImageName(gateReportImageName);

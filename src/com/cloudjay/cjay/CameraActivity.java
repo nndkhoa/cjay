@@ -574,14 +574,14 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	public void onEvent(ContainerSessionUpdatedEvent event) {
 
-		Logger.w("on Event CS Updated Event");
+		Logger.w("onEvent CS Updated Event");
 		String eventContainerId = event.getTarget().getContainerId();
 		String currentContainerId = mContainerSession.getContainerId();
 
 		if (eventContainerId.equals(currentContainerId)) {
 
 			try {
-				Logger.Log("onEvent ContainerSessionUpdated");
+				Logger.Log("refresh Container Session");
 				mContainerSessionDaoImpl.refresh(mContainerSession);
 			} catch (SQLException e) {
 				e.printStackTrace();

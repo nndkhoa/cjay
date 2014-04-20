@@ -63,8 +63,6 @@ public class CJayActivity extends SherlockFragmentActivity {
 	boolean isActivityRunning;
 
 	private boolean checkPlayServices() {
-		Logger.Log("checkPlayServices()");
-
 		int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 
 		if (resultCode != ConnectionResult.SUCCESS) {

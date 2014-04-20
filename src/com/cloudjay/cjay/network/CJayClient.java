@@ -234,7 +234,7 @@ public class CJayClient implements ICJayClient {
 			Response<String> response = null;
 			if (type == REQUEST_TYPE_CREATED) {
 
-				response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS).setLogging("Ion", Log.INFO)
+				response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS)
 								.setHeader("Authorization", "Token " + accessToken)
 								.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
 								.addQuery("page", Integer.toString(page)).addQuery("created_after", date).asString()
@@ -242,7 +242,7 @@ public class CJayClient implements ICJayClient {
 
 			} else {
 
-				response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS).setLogging("Ion", Log.INFO)
+				response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS)
 								.setHeader("Authorization", "Token " + accessToken)
 								.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
 								.addQuery("page", Integer.toString(page)).addQuery("modified_after", date).asString()
@@ -273,7 +273,7 @@ public class CJayClient implements ICJayClient {
 			e.printStackTrace();
 		}
 
-		Logger.w("Result: " + result);
+		// Logger.w("Result: " + result);
 		Gson gson = new GsonBuilder().setDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE).create();
 
 		Type listType = new TypeToken<ContainerSessionResult>() {
@@ -501,7 +501,6 @@ public class CJayClient implements ICJayClient {
 			Response<String> response = Ion.with(	ctx,
 													String.format(	CJayConstant.CJAY_TMP_STORAGE,
 																	uploadItem.getImageName()))
-											.setLogging("Upload File", Log.VERBOSE)
 											.setHeader("CJAY_VERSION", appVersion)
 											.addHeader("Content-Type", "image/jpeg")
 											.setMultipartFile(uploadItem.getImageName(), f).asString().withResponse()
@@ -545,7 +544,7 @@ public class CJayClient implements ICJayClient {
 			String resultString = gson.toJson(item, listType);
 			Logger.Log(resultString);
 
-			Response<String> response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS).setLogging("Ion", Log.VERBOSE)
+			Response<String> response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS)
 											.setHeader("Authorization", "Token " + accessToken)
 											.setHeader("CJAY_VERSION", appVersion)
 											.setJsonObjectBody(item, new TypeToken<TmpContainerSession>() {
@@ -557,7 +556,7 @@ public class CJayClient implements ICJayClient {
 												}
 											}).get();
 
-			Logger.e("Response code: " + response.getHeaders().getResponseMessage() + " | "
+			Logger.w("Response code: " + response.getHeaders().getResponseMessage() + " | "
 					+ Integer.toString(response.getHeaders().getResponseCode()));
 
 			getDatabaseManager().getHelper(ctx).addUsageLog("Container "
