@@ -672,6 +672,8 @@ public class DataCenter {
 			}
 
 			do {
+
+				long beginParseTime = System.currentTimeMillis();
 				List<ContainerSession> containerSessions = new ArrayList<ContainerSession>();
 				ContainerSessionResult result = null;
 
@@ -703,11 +705,12 @@ public class DataCenter {
 					// .bulkInsertDataByCallBatchTasks(containerSessions);
 
 					if (null != containerSessions && !containerSessions.isEmpty()) {
-
 						EventBus.getDefault().post(new ContainerSessionChangedEvent(containerSessions));
-
 					}
 				}
+
+				long delta = System.currentTimeMillis() - beginParseTime;
+				Logger.w("--> One round duration: " + Long.toString(delta));
 
 			} while (!TextUtils.isEmpty(nextUrl));
 

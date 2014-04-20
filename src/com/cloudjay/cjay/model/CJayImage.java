@@ -57,7 +57,7 @@ public class CJayImage {
 	@DatabaseField(columnName = FIELD_TYPE)
 	int type;
 
-	@DatabaseField(columnName = FIELD_STATE, index = true)
+	@DatabaseField(columnName = FIELD_STATE, index = true, defaultValue = "4")
 	int mState;
 
 	@DatabaseField(columnName = FIELD_URI, id = true)

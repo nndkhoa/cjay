@@ -201,7 +201,7 @@ public class Mapper {
 													gateReportImage.getCreatedAt(), gateReportImage.getImageName());
 
 					// set default value
-					image.setUploadState(CJayImage.STATE_UPLOAD_COMPLETED);
+					// image.setUploadState(CJayImage.STATE_UPLOAD_COMPLETED);
 
 					if (null != image) {
 						image.setContainerSession(containerSession);
