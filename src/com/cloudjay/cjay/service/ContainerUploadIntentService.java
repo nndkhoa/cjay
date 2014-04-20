@@ -73,7 +73,14 @@ public class ContainerUploadIntentService extends IntentService implements Count
 		// Convert ContainerSession to TmpContainerSession for uploading
 		TmpContainerSession uploadItem = null;
 		try {
-			uploadItem = Mapper.getInstance().toTmpContainerSession(containerSession, getApplicationContext());
+
+			// Temporary upload, use different type of mapping
+			if (uploadType == UploadType.NONE) {
+				uploadItem = Mapper.getInstance().toTmpContainerSession(getApplicationContext(), containerSession,
+																		false);
+			} else {
+				uploadItem = Mapper.getInstance().toTmpContainerSession(getApplicationContext(), containerSession);
+			}
 
 		} catch (Exception e) {
 
@@ -134,6 +141,7 @@ public class ContainerUploadIntentService extends IntentService implements Count
 		}
 
 		boolean isInterruptedByOfficialUpload = false;
+
 		// this is temporary upload
 		if (uploadType == UploadType.NONE) {
 

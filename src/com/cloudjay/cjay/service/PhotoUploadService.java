@@ -88,14 +88,13 @@ public class PhotoUploadService extends Service {
 				// Fall through...
 
 			case CJayImage.STATE_UPLOAD_ERROR:
-			case CJayImage.STATE_UPLOAD_WAITING:
 				startNextUploadOrFinish();
 				// Fall through...
 				break;
 
-		// case CJayImage.STATE_UPLOAD_WAITING:
-		// // NOTE: if call stopSelf() here, ImageQueue will loop forever
-		// break;
+			case CJayImage.STATE_UPLOAD_WAITING:
+				// // NOTE: if call stopSelf() here, ImageQueue will loop forever
+				break;
 		}
 	}
 
@@ -152,7 +151,10 @@ public class PhotoUploadService extends Service {
 				entity.setContentType("image/jpeg");
 				post.setEntity(entity);
 
-				if (isInterrupted()) { return; }
+				if (isInterrupted()) {
+					Logger.e("isInterrupted");
+					return;
+				}
 
 				try {
 					// Logger.Log("About to call httpClient.execute");
@@ -206,7 +208,7 @@ public class PhotoUploadService extends Service {
 	static final int MAX_NUMBER_RETRIES = 3;
 	static final int NOTIFICATION_ID = 1000;
 
-	private boolean mCurrentlyUploading;
+	private static boolean mCurrentlyUploading;
 	private ExecutorService mExecutor;
 	private int mNumberUploaded = 0;
 
@@ -324,7 +326,7 @@ public class PhotoUploadService extends Service {
 		switch (upload.getUploadState()) {
 			case CJayImage.STATE_UPLOAD_WAITING:
 				text = getString(	R.string.notification_uploading_photo, mNumberUploaded + 1,
-									CJayImageDaoImpl.totalNumber);
+									CJayImageDaoImpl.totalNumber + mNumberUploaded);
 				mNotificationBuilder.setContentTitle(text);
 				mNotificationBuilder.setTicker(text);
 				mNotificationBuilder.setProgress(0, 0, true);
@@ -335,7 +337,7 @@ public class PhotoUploadService extends Service {
 
 				if (upload.getUploadProgress() >= 0) {
 					text = getString(	R.string.notification_uploading_photo_progress, mNumberUploaded + 1,
-										upload.getUploadProgress(), CJayImageDaoImpl.totalNumber);
+										upload.getUploadProgress(), CJayImageDaoImpl.totalNumber + mNumberUploaded);
 					mNotificationBuilder.setContentTitle(text);
 					mNotificationBuilder.setProgress(100, upload.getUploadProgress(), false);
 				}
@@ -414,12 +416,12 @@ public class PhotoUploadService extends Service {
 		return false;
 	}
 
-	public boolean isCurrentlyUploading() {
+	public static boolean isCurrentlyUploading() {
 		return mCurrentlyUploading;
 	}
 
 	public void setCurrentlyUploading(boolean mCurrentlyUploading) {
-		this.mCurrentlyUploading = mCurrentlyUploading;
+		PhotoUploadService.mCurrentlyUploading = mCurrentlyUploading;
 	}
 
 }

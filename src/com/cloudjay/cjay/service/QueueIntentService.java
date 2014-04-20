@@ -6,6 +6,7 @@ import android.app.IntentService;
 import android.content.Intent;
 
 import com.aerilys.helpers.android.NetworkHelper;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 
 @EIntentService
@@ -28,6 +29,13 @@ public class QueueIntentService extends IntentService {
 
 		if (!Utils.isRunning(this, PhotoUploadService_.class.getName())) {
 			startService(Utils.getUploadAllIntent(this));
+		} else {
+
+			if (PhotoUploadService_.isCurrentlyUploading() == false) {
+				Logger.w("Force stop PhotoUploadService");
+				stopService(Utils.getUploadAllIntent(this));
+				startService(Utils.getUploadAllIntent(this));
+			}
 		}
 	}
 }

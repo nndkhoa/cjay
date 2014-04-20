@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import org.androidannotations.annotations.EBean;
 
+import android.R.integer;
 import android.content.Context;
 import android.text.TextUtils;
 
@@ -219,7 +220,8 @@ public class Mapper {
 		return null;
 	}
 
-	public TmpContainerSession toTmpContainerSession(ContainerSession containerSession, Context ctx) {
+	public TmpContainerSession toTmpContainerSession(Context ctx, ContainerSession containerSession,
+														boolean officialUpload) {
 
 		String containerId = containerSession.getContainerId();
 		String checkoutTime = containerSession.getRawCheckOutTime();
@@ -238,55 +240,64 @@ public class Mapper {
 		}
 		tmpContainerSession.setCheckOutTime(checkoutTime);
 
-		if (TextUtils.isEmpty(imageIdPath)) {
-			Logger.e(containerId + " | Image Id Path is NULL");
-		}
-		tmpContainerSession.setImageIdPath(imageIdPath);
+		if (officialUpload) {
 
-		Collection<CJayImage> cJayImages = containerSession.getCJayImages();
+			if (TextUtils.isEmpty(imageIdPath)) {
+				Logger.e(containerId + " | Image Id Path is NULL");
+			}
+			tmpContainerSession.setImageIdPath(imageIdPath);
 
-		List<GateReportImage> gateReportImages = new ArrayList<GateReportImage>();
+			List<GateReportImage> gateReportImages = new ArrayList<GateReportImage>();
+			Collection<CJayImage> cJayImages = containerSession.getCJayImages();
 
-		for (CJayImage cJayImage : cJayImages) {
-			if (cJayImage.getType() == CJayImage.TYPE_IMPORT || cJayImage.getType() == CJayImage.TYPE_EXPORT) {
+			for (CJayImage cJayImage : cJayImages) {
+				if (cJayImage.getType() == CJayImage.TYPE_IMPORT || cJayImage.getType() == CJayImage.TYPE_EXPORT) {
 
-				if (cJayImage.getId() != 0) {
-					gateReportImages.add(new GateReportImage(cJayImage.getId(), cJayImage.getType(),
-																cJayImage.getTimePosted(), cJayImage.getImageName()));
-				} else {
-					gateReportImages.add(new GateReportImage(cJayImage.getType(), cJayImage.getTimePosted(),
-																cJayImage.getImageName()));
+					if (cJayImage.getId() != 0) {
+						gateReportImages.add(new GateReportImage(cJayImage.getId(), cJayImage.getType(),
+																	cJayImage.getTimePosted(), cJayImage.getImageName()));
+					} else {
+						gateReportImages.add(new GateReportImage(cJayImage.getType(), cJayImage.getTimePosted(),
+																	cJayImage.getImageName()));
+					}
 				}
 			}
-		}
+			tmpContainerSession.setGateReportImages(gateReportImages);
 
-		tmpContainerSession.setGateReportImages(gateReportImages);
-
-		if (TextUtils.isEmpty(tmpContainerSession.getImageIdPath()) && gateReportImages.isEmpty() == false) {
-			tmpContainerSession.setImageIdPath(gateReportImages.get(0).getImageName());
-		}
-
-		List<AuditReportItem> auditReportItems = new ArrayList<AuditReportItem>();
-		Collection<Issue> issues = containerSession.getIssues();
-
-		if (null != issues) {
-			for (Issue issue : issues) {
-				auditReportItems.add(new AuditReportItem(issue));
+			if (TextUtils.isEmpty(tmpContainerSession.getImageIdPath()) && gateReportImages.isEmpty() == false) {
+				tmpContainerSession.setImageIdPath(gateReportImages.get(0).getImageName());
 			}
-		}
 
-		// TODO: only handle for app Auditor
-		for (CJayImage cJayImage : cJayImages) {
-			if (cJayImage.getType() == CJayImage.TYPE_REPORT && cJayImage.getIssue() == null) {
+			//
 
-				Logger.Log("Container Id Image: " + cJayImage.getImageName());
-				tmpContainerSession.setContainerIdImage(cJayImage.getImageName());
-				break;
+			List<AuditReportItem> auditReportItems = new ArrayList<AuditReportItem>();
+			Collection<Issue> issues = containerSession.getIssues();
+
+			if (null != issues) {
+				for (Issue issue : issues) {
+					auditReportItems.add(new AuditReportItem(issue));
+				}
 			}
+
+			// TODO: only handle for app Auditor
+			for (CJayImage cJayImage : cJayImages) {
+				if (cJayImage.getType() == CJayImage.TYPE_REPORT && cJayImage.getIssue() == null) {
+
+					Logger.Log("Container Id Image: " + cJayImage.getImageName());
+					tmpContainerSession.setContainerIdImage(cJayImage.getImageName());
+					break;
+				}
+			}
+
+			tmpContainerSession.setAuditReportItems(auditReportItems);
 		}
 
-		tmpContainerSession.setAuditReportItems(auditReportItems);
 		return tmpContainerSession;
+
+	}
+
+	public TmpContainerSession toTmpContainerSession(Context ctx, ContainerSession containerSession) {
+		return toTmpContainerSession(ctx, containerSession, true);
 	}
 
 	public synchronized void
