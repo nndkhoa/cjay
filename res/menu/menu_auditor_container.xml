@@ -13,7 +13,8 @@
         android:title="@string/menu_upload_title"/>
 	<item
         android:id="@+id/menu_import"
-        android:showAsAction="never"
+        android:icon="@drawable/ic_action_import_export"
+        android:showAsAction="always"
         android:title="@string/menu_import_title"/>
 <!--     <item
         android:id="@+id/menu_logout"
