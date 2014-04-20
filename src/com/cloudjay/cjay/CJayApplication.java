@@ -233,15 +233,11 @@ public class CJayApplication extends Application {
 																				.showImageForEmptyUri(R.drawable.ic_app)
 																				.build();
 
-		// Remove imageDownloader to return to default configuration
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext()).defaultDisplayImageOptions(	defaultOptions)
 																										.discCacheSize(	100 * 1024 * 1024)
 																										.memoryCache(	new WeakMemoryCache())
 																										.threadPoolSize(3)
 																										.threadPriority(Thread.MAX_PRIORITY)
-																										.imageDownloader(	new HttpClientImageDownloader(
-																																							mContext,
-																																							new DefaultHttpClient()))
 																										.build();
 
 		ACRA.init(CJayApplication.this);

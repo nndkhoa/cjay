@@ -110,6 +110,7 @@ public class CJaySession {
 	}
 
 	public String getAccessToken() {
+		if (currentUser == null) { return ""; }
 		return currentUser.getAccessToken();
 	}
 

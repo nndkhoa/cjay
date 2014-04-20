@@ -13,6 +13,7 @@ import org.json.JSONException;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.cloudjay.cjay.model.CJayImage;
@@ -228,6 +229,7 @@ public class CJayClient implements ICJayClient {
 		try {
 
 			String accessToken = CJaySession.restore(ctx).getAccessToken();
+			if (TextUtils.isEmpty(accessToken)) { throw new NullSessionException(); }
 
 			Response<String> response = null;
 			if (type == REQUEST_TYPE_CREATED) {
