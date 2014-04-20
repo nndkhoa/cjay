@@ -118,7 +118,7 @@ public class IssueReportHelper {
 						// The issue already
 						// reported, assign this
 						// image to that issue
-						showIssueAssigment(	ctx, cJayImageUuid);
+						showIssueAssigment(ctx, cJayImageUuid);
 					}
 				})
 			.setNeutralButton(R.string.dialog_report_neutral,
@@ -126,7 +126,7 @@ public class IssueReportHelper {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 
-						setWWContainer(	ctx, cJayImageUuid, containerSessionUUID);
+						setWWContainer(ctx, cJayImageUuid, containerSessionUUID);
 					}
 				});
 		builder.show();

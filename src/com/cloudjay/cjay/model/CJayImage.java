@@ -48,7 +48,7 @@ public class CJayImage {
 	@DatabaseField(columnName = FIELD_TIME_POSTED)
 	String time_posted;
 
-	@DatabaseField(columnName = FIELD_UUID)
+	@DatabaseField(columnName = FIELD_UUID, id = true)
 	String uuid;
 
 	/**
@@ -60,7 +60,7 @@ public class CJayImage {
 	@DatabaseField(columnName = FIELD_STATE, index = true)
 	int mState;
 
-	@DatabaseField(columnName = FIELD_URI, id = true)
+	@DatabaseField(columnName = FIELD_URI)
 	String mUri;
 
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)

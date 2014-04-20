@@ -49,9 +49,7 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
 		mContainerSessionUUID = containerSessionUUID;
 
 		for (int i = 0; i < mImageTypes.length; i++) {
-
 			mSectionHeaders.add(Utils.getImageTypeDescription(mContext, mImageTypes[i]));
-
 		}
 	}
 

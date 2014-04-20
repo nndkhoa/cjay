@@ -145,6 +145,18 @@ public class CJayApplication extends Application {
 		intent.putExtra(PhotoExpandableListViewActivity_.SOURCE_TAG_EXTRA, sourceTag);
 		ctx.startActivity(intent);
 	}
+	
+	public static void openPhotoGridViewForImport(Context ctx, String uuid, String containerId, int fromType, int toType, String sourceTag) {
+
+		Intent intent = new Intent(ctx, PhotoExpandableListViewActivity_.class);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA, uuid);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_1_EXTRA, fromType);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_COPY_TO_EXTRA, toType);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_CONTAINER_ID_EXTRA, containerId);
+		intent.putExtra(PhotoExpandableListViewActivity_.SOURCE_TAG_EXTRA, sourceTag);
+		intent.putExtra(PhotoExpandableListViewActivity_.VIEW_MODE_EXTRA, PhotoExpandableListViewActivity_.MODE_IMPORT);
+		ctx.startActivity(intent);
+	}
 
 	public static void startCJayHomeActivity(Context context) {
 

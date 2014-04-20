@@ -290,7 +290,12 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 	void importMenuItemClicked() {
 		hideMenuItems();
 
-		CJayApplication.openPhotoGridView(this, mContainerSessionUUID, mContainerSession.getContainerId(), CJayImage.TYPE_IMPORT, LOG_TAG);
+		CJayApplication.openPhotoGridViewForImport(this, 
+													mContainerSessionUUID, 
+													mContainerSession.getContainerId(), 
+													CJayImage.TYPE_IMPORT,
+													CJayImage.TYPE_REPORT,
+													LOG_TAG);
 	}
 
 	@OptionsItem(R.id.menu_trash)
