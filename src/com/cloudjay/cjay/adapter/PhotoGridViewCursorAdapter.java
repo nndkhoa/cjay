@@ -89,6 +89,7 @@ public class PhotoGridViewCursorAdapter extends CursorAdapter implements Filtera
 		layout.setShowCheckbox(mCheckable);
 		layout.setParentAdapter(this);
 		layout.setCJayImageUuid(cJayImageUuid);
+		layout.setChecked(mCheckedCJayImageUuids.contains(cJayImageUuid));
 	}
 
 	@Override
@@ -110,6 +111,10 @@ public class PhotoGridViewCursorAdapter extends CursorAdapter implements Filtera
 
 	public void removeCheckedCJayImage(String cJayImageUuid) {
 		mCheckedCJayImageUuids.remove(cJayImageUuid);
+	}
+	
+	public void setCheckedCJayImageUuids(ArrayList<String> checkedCJayImageUuids) {
+		mCheckedCJayImageUuids = checkedCJayImageUuids;
 	}
 	
 	public List<String> getCheckedCJayImageUuids() {

@@ -15,7 +15,6 @@
         android:layout_marginRight="3dp"
         android:layout_marginTop="3dp"
         android:horizontalSpacing="3dp"
-        android:numColumns="2"
         android:paddingBottom="6dp"
         android:paddingTop="6dp"
         android:stretchMode="columnWidth"

@@ -12,7 +12,6 @@ import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.ViewById;
 
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ImageView;

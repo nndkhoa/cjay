@@ -29,11 +29,11 @@
     
     <com.cloudjay.cjay.view.CheckableImageView
         android:id="@+id/check_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_gravity="top|right"
         android:padding="@dimen/spacing"
-        android:scaleType="center"
+        android:scaleType="fitXY"
         android:src="@drawable/btn_selection" />
 
 </merge>

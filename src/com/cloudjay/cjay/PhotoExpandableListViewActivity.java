@@ -1,6 +1,7 @@
 package com.cloudjay.cjay;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +26,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.adapter.PhotoExpandableListAdapter;
 import com.cloudjay.cjay.adapter.PhotoGridViewCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -45,7 +47,7 @@ import com.cloudjay.cjay.util.Utils;
 import de.greenrobot.event.EventBus;
 
 @EActivity(R.layout.activity_photo_expandablelistview)
-@OptionsMenu(R.menu.menu_photo_grid_view)
+@OptionsMenu(R.menu.menu_photo_expandable_list_view)
 public class PhotoExpandableListViewActivity extends CJayActivity implements LoaderCallbacks<Cursor> {
 
 	public static final String LOG_TAG = "PhotoExpandableListViewActivity";
@@ -55,6 +57,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 	public static final String CJAY_IMAGE_TYPE_2_EXTRA = "cjay_image_type2";
 	public static final String CJAY_IMAGE_TYPE_COPY_TO_EXTRA = "cjay_image_typeCopyTo";
 	public static final String VIEW_MODE_EXTRA = "view_mode";
+	public static final String NUM_COLS_EXTRA = "num_columns";
 	
 	public static final int MODE_UPLOAD = 0;
 	public static final int MODE_IMPORT = 1;
@@ -86,6 +89,9 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 	
 	@Extra(VIEW_MODE_EXTRA)
 	int mViewMode = MODE_UPLOAD;
+	
+	@Extra(NUM_COLS_EXTRA)
+	int mNumCols = 2;
 
 	@ViewById(R.id.expandable_listview)
 	ExpandableListView mListView;
@@ -158,11 +164,11 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		int imageType = -1;
 
 		switch (id) {
-			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1:
+			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_1:
 				imageType = mImageTypes[0];
 				break;
 
-			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_2:
+			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_2:
 				imageType = mImageTypes[1];
 				break;
 		}
@@ -203,11 +209,11 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 	public void onLoaderReset(Loader<Cursor> loader) {
 
 		switch (loader.getId()) {
-			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1:
+			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_1:
 				mCursorAdapters.get(Integer.valueOf(0)).swapCursor(null);
 				break;
 
-			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_2:
+			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_2:
 				mCursorAdapters.get(Integer.valueOf(1)).swapCursor(null);
 				break;
 		}
@@ -218,11 +224,11 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		int adapterId = 0;
 
 		switch (loader.getId()) {
-			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1:
+			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_1:
 				adapterId = 0;
 				break;
 
-			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_2:
+			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_2:
 				adapterId = 1;
 				break;
 		}
@@ -236,11 +242,12 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 		GridView gridView = mListAdapter.getPhotoGridView(adapterId);
 		gridView.setAdapter(mCursorAdapters.get(Integer.valueOf(adapterId)));
+		gridView.setNumColumns(mNumCols);
 		
 		if (cursor.getCount() > 0) {
 			LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) gridView.getLayoutParams();
 			int gridViewWidth = gridView.getMeasuredWidth() > 0 ? gridView.getMeasuredWidth() : gridView.getEmptyView().getMeasuredWidth();
-			p.height = gridViewWidth / 2 * ((cursor.getCount() + 1) / 2);
+			p.height = gridViewWidth / mNumCols * ((cursor.getCount() + 1) / 2);
 //			p.height = gridViewWidth / gridView.getNumColumns() * ((cursor.getCount() + 1) / 2);
 			gridView.setLayoutParams(p);
 		}
@@ -252,8 +259,44 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		if (mCursorAdapters != null && mNewImageCount > 0) {
 			Logger.e("Refresh cursor loader");
 			if (mCursorAdapters.get(Integer.valueOf(0)) != null) {
-				getSupportLoaderManager().restartLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1, null, this);
+				getSupportLoaderManager().restartLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_1, null, this);
 			}
+		}
+	}
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		menu.findItem(R.id.menu_select_all).setVisible(mViewMode == MODE_IMPORT);
+		menu.findItem(R.id.menu_select_none).setVisible(mViewMode == MODE_IMPORT);
+		return super.onPrepareOptionsMenu(menu);
+	}
+	
+	@OptionsItem(R.id.menu_select_all)
+	void selectAll() {
+		PhotoGridViewCursorAdapter adapter = mCursorAdapters.get(Integer.valueOf(0));
+		
+		if (adapter != null && mViewMode == MODE_IMPORT) {
+			Cursor cursor = adapter.getCursor();
+			ArrayList<String> cJayImageUuids = new ArrayList<String>(cursor.getCount());
+			
+			if (cursor.moveToFirst()) {
+				do {
+					cJayImageUuids.add(cursor.getString(cursor.getColumnIndexOrThrow(CJayImage.FIELD_UUID)));
+				} while (cursor.moveToNext());
+			}
+			
+			adapter.setCheckedCJayImageUuids(cJayImageUuids);
+			getSupportLoaderManager().restartLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_1, null, this);
+		}
+	}
+	
+	@OptionsItem(R.id.menu_select_none)
+	void selectNone() {
+		PhotoGridViewCursorAdapter adapter = mCursorAdapters.get(Integer.valueOf(0));
+		
+		if (adapter != null && mViewMode == MODE_IMPORT) {
+			adapter.setCheckedCJayImageUuids(new ArrayList<String>());
+			getSupportLoaderManager().restartLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_1, null, this);
 		}
 	}
 

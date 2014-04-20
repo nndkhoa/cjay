@@ -30,6 +30,8 @@
     <string name="menu_upload_title">Tải lên</string>
     <string name="menu_trash_title">Xoá</string>
     <string name="menu_logout_title">Đăng xuất</string>
+    <string name="menu_select_all">Chọn tất cả</string>
+    <string name="menu_select_none">Bỏ chọn tất cả</string>
     <string name="menu_more_title">Thêm</string>
     <string name="menu_username_title">Username</string>
     <string name="menu_role_title">Role</string>

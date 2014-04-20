@@ -63,8 +63,8 @@ public final class CJayConstant {
 	public static final int CURSOR_LOADER_ID_AUDITOR_NOT_REPORTED = 3;
 	public static final int CURSOR_LOADER_ID_REPAIR_PENDING = 4;
 	public static final int CURSOR_LOADER_ID_REPAIR_FIXED = 5;
-	public static final int CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1 = 6;
-	public static final int CURSOR_LOADER_ID_PHOTO_GRIDVIEW_2 = 7;
+	public static final int CURSOR_LOADER_ID_PHOTO_GD_1 = 6;
+	public static final int CURSOR_LOADER_ID_PHOTO_GD_2 = 7;
 	public static final int CURSOR_LOADER_ID_USER_LOG = 8;
 	public static final int CURSOR_LOADER_ID_DAMAGE_CODE = 9;
 	public static final int CURSOR_LOADER_ID_COMPONENT_CODE = 10;

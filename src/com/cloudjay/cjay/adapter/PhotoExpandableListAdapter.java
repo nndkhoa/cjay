@@ -107,11 +107,11 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
 
 		if (groupPosition == 0) {
 			((FragmentActivity) mContext).getSupportLoaderManager()
-											.initLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1, null,
+											.initLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_1, null,
 														(PhotoExpandableListViewActivity) mContext);
 		} else if (groupPosition == 1) {
 			((FragmentActivity) mContext).getSupportLoaderManager()
-											.initLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_2, null,
+											.initLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_2, null,
 														(PhotoExpandableListViewActivity) mContext);
 		}
 
