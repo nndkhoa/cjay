@@ -8,6 +8,7 @@ import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 import org.androidannotations.annotations.EApplication;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import uk.co.senab.bitmapcache.BitmapLruCache;
 import android.app.Application;
@@ -43,7 +44,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-
+import com.nostra13.universalimageloader.core.download.HttpClientImageDownloader;
 import de.greenrobot.event.EventBus;
 
 @ReportsCrashes(formKey = "",
@@ -232,11 +233,15 @@ public class CJayApplication extends Application {
 																				.showImageForEmptyUri(R.drawable.ic_app)
 																				.build();
 
+		// Remove imageDownloader to return to default configuration
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext()).defaultDisplayImageOptions(	defaultOptions)
 																										.discCacheSize(	100 * 1024 * 1024)
 																										.memoryCache(	new WeakMemoryCache())
 																										.threadPoolSize(3)
 																										.threadPriority(Thread.MAX_PRIORITY)
+																										.imageDownloader(	new HttpClientImageDownloader(
+																																							mContext,
+																																							new DefaultHttpClient()))
 																										.build();
 
 		ACRA.init(CJayApplication.this);
