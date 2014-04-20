@@ -314,8 +314,9 @@ public class DataCenter {
 																			new String[] { containerSessionUUID + "%",
 																					String.valueOf(imageType) });
 	}
-	
-	public Cursor getCJayImagesCursorByContainerForCopy(Context context, String containerSessionUUID, int fromType, int toType) {
+
+	public Cursor getCJayImagesCursorByContainerForCopy(Context context, String containerSessionUUID, int fromType,
+														int toType) {
 		String queryString = "SELECT * FROM cjay_image c1 WHERE containerSession_id LIKE ? AND type = ? "
 				+ "AND not exists "
 				+ "(select uuid from cjay_image c2 where c2.image_name = c1.image_name and containerSession_id LIKE ? and type = ?)";
@@ -323,7 +324,7 @@ public class DataCenter {
 																			new String[] { containerSessionUUID + "%",
 																					String.valueOf(fromType),
 																					containerSessionUUID + "%",
-																					String.valueOf(toType)});
+																					String.valueOf(toType) });
 	}
 
 	public Cursor getComponentCodesCursor(Context context) {

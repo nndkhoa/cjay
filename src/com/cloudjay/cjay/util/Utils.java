@@ -207,6 +207,7 @@ public class Utils {
 	 *         registration ID.
 	 */
 	public static String getRegistrationId(Context context) {
+
 		final SharedPreferences prefs = getGCMPreferences(context);
 		String registrationId = prefs.getString(PROPERTY_REG_ID, "");
 
@@ -318,10 +319,12 @@ public class Utils {
 	 *            registration ID
 	 */
 	public static void storeRegistrationId(Context context, String regId) {
+
+		Logger.Log("regId: " + regId);
 		final SharedPreferences prefs = getGCMPreferences(context);
 		int appVersion = getAppVersionCode(context);
 
-		Logger.i("Saving regId on app version " + appVersion);
+		Logger.Log("Saving regId on app version " + appVersion);
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putString(PROPERTY_REG_ID, regId);
 
