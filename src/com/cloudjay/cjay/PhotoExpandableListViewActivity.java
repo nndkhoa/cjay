@@ -272,7 +272,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		if (cursor.getCount() > 0) {
 			LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) gridView.getLayoutParams();
 			int gridViewWidth = gridView.getMeasuredWidth() > 0 ? gridView.getMeasuredWidth() : gridView.getEmptyView().getMeasuredWidth();
-			p.height = gridViewWidth / mNumCols * ((cursor.getCount() + 1) / 2);
+			p.height = gridViewWidth / mNumCols * ((cursor.getCount() + 1) / mNumCols);
 //			p.height = gridViewWidth / gridView.getNumColumns() * ((cursor.getCount() + 1) / 2);
 			gridView.setLayoutParams(p);
 		}
@@ -292,7 +292,6 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		menu.findItem(R.id.menu_select_all).setVisible(mViewMode == MODE_IMPORT);
-		menu.findItem(R.id.menu_select_none).setVisible(mViewMode == MODE_IMPORT);
 		return super.onPrepareOptionsMenu(menu);
 	}
 	
@@ -302,25 +301,24 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		
 		if (adapter != null && mViewMode == MODE_IMPORT) {
 			Cursor cursor = adapter.getCursor();
-			ArrayList<String> cJayImageUuids = new ArrayList<String>(cursor.getCount());
+			ArrayList<String> cJayImageUuids;
 			
-			if (cursor.moveToFirst()) {
-				do {
-					cJayImageUuids.add(cursor.getString(cursor.getColumnIndexOrThrow(CJayImage.FIELD_UUID)));
-				} while (cursor.moveToNext());
+			if (adapter.getCheckedCJayImageUuids().size() < cursor.getCount()) {
+				// select all
+				cJayImageUuids = new ArrayList<String>(cursor.getCount());
+				
+				if (cursor.moveToFirst()) {
+					do {
+						cJayImageUuids.add(cursor.getString(cursor.getColumnIndexOrThrow(CJayImage.FIELD_UUID)));
+					} while (cursor.moveToNext());
+				}
+				
+			} else {
+				// select none
+				cJayImageUuids = new ArrayList<String>();
 			}
-			
+
 			adapter.setCheckedCJayImageUuids(cJayImageUuids);
-			getSupportLoaderManager().restartLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_1, null, this);
-		}
-	}
-	
-	@OptionsItem(R.id.menu_select_none)
-	void selectNone() {
-		PhotoGridViewCursorAdapter adapter = mCursorAdapters.get(Integer.valueOf(0));
-		
-		if (adapter != null && mViewMode == MODE_IMPORT) {
-			adapter.setCheckedCJayImageUuids(new ArrayList<String>());
 			getSupportLoaderManager().restartLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_1, null, this);
 		}
 	}
