@@ -14,12 +14,16 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ExpandableListView;
 import android.widget.GridView;
 import android.widget.ImageButton;
@@ -43,6 +47,7 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadType;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.view.CheckablePhotoItemLayout;
 
 import de.greenrobot.event.EventBus;
 
@@ -240,9 +245,29 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 			mCursorAdapters.get(Integer.valueOf(adapterId)).swapCursor(cursor);
 		}
 
+		final Context ctx = this;
+		final int imageType = mImageTypes[adapterId];
+		final String title = Utils.getImageTypeDescription(this, mImageTypes[adapterId]);
+		
 		GridView gridView = mListAdapter.getPhotoGridView(adapterId);
 		gridView.setAdapter(mCursorAdapters.get(Integer.valueOf(adapterId)));
 		gridView.setNumColumns(mNumCols);
+		gridView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+				if (mViewMode == MODE_IMPORT) {
+					CheckablePhotoItemLayout layout = (CheckablePhotoItemLayout) v.findViewById(R.id.photo_layout);
+					layout.toggle();
+				} else {
+					Intent intent = new Intent(ctx, PhotoViewPagerActivity_.class);
+					intent.putExtra(PhotoViewPagerActivity.START_POSITION, position);
+					intent.putExtra(PhotoViewPagerActivity.CJAY_CONTAINER_SESSION_EXTRA, mContainerSessionUUID);
+					intent.putExtra(PhotoViewPagerActivity.CJAY_IMAGE_TYPE_EXTRA, imageType);
+					intent.putExtra("title", title);
+					ctx.startActivity(intent);
+				}
+			}
+		});
 		
 		if (cursor.getCount() > 0) {
 			LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) gridView.getLayoutParams();

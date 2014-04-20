@@ -16,7 +16,6 @@
 package com.cloudjay.cjay.view;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,8 +24,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.PhotoGridViewCursorAdapter;
 
 
-public class CheckablePhotoItemLayout extends CheckableFrameLayout implements
-		View.OnClickListener {
+public class CheckablePhotoItemLayout extends CheckableFrameLayout {
 
 	private final SquareImageView mImageView;
 	private final CheckableImageView mButton;
@@ -42,7 +40,7 @@ public class CheckablePhotoItemLayout extends CheckableFrameLayout implements
 
 		mImageView = (SquareImageView) findViewById(R.id.picture);
 		mButton = (CheckableImageView) findViewById(R.id.check_button);
-		mButton.setOnClickListener(this);
+//		mButton.setOnClickListener(this);
 	}
 
 	public SquareImageView getImageView() {
@@ -52,24 +50,35 @@ public class CheckablePhotoItemLayout extends CheckableFrameLayout implements
 	public void setShowCheckbox(boolean visible) {
 		if (visible) {
 			mButton.setVisibility(View.VISIBLE);
-			mButton.setOnClickListener(this);
+//			mButton.setOnClickListener(this);
 		} else {
 			mButton.setVisibility(View.GONE);
-			mButton.setOnClickListener(null);
+//			mButton.setOnClickListener(null);
 		}
 	}
 
-	public void onClick(View v) {
-		if (!TextUtils.isEmpty(mCJayImageUuid)) {
-			// Toggle check to show new state
-			toggle();
-
-			// Update the controller
-			if (isChecked()) {
-				mParentAdapter.addCheckedCJayImage(mCJayImageUuid);
-			} else {
-				mParentAdapter.removeCheckedCJayImage(mCJayImageUuid);
-			}
+//	public void onClick(View v) {
+//		if (!TextUtils.isEmpty(mCJayImageUuid)) {
+//			// Toggle check to show new state
+//			toggle();
+//
+//			// Update the controller
+//			if (isChecked()) {
+//				mParentAdapter.addCheckedCJayImage(mCJayImageUuid);
+//			} else {
+//				mParentAdapter.removeCheckedCJayImage(mCJayImageUuid);
+//			}
+//		}
+//	}
+	
+	@Override
+	public void toggle() {
+		super.toggle();
+		
+		if (isChecked()) {
+			mParentAdapter.addCheckedCJayImage(mCJayImageUuid);
+		} else {
+			mParentAdapter.removeCheckedCJayImage(mCJayImageUuid);
 		}
 	}
 
