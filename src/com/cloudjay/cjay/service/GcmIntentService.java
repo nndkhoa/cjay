@@ -58,8 +58,6 @@ public class GcmIntentService extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		try {
-			Logger.i("onHandleIntent()");
-
 			Bundle extras = intent.getExtras();
 			GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
 
@@ -69,8 +67,6 @@ public class GcmIntentService extends IntentService {
 			String messageType = gcm.getMessageType(intent);
 
 			if (!extras.isEmpty()) { // has effect of unparcelling Bundle
-
-				Logger.Log("Extra is not empty");
 				Logger.Log("Message Type: " + messageType);
 
 				/*
@@ -86,7 +82,6 @@ public class GcmIntentService extends IntentService {
 					sendNotification("Send error: " + extras.toString());
 
 				} else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
-
 					Logger.Log("Deleted messages on server: " + extras.toString());
 
 					sendNotification("Deleted messages on server: " + extras.toString());

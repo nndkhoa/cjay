@@ -74,7 +74,7 @@ public final class CJayConstant {
 
 	// ALARM ID
 	public static final int ALARM_ID = 49482;
-	public static final int ALARM_INTERVAL = 10;
+	public static final int ALARM_INTERVAL = 25;
 	public static final String CUSTOM_INTENT = "com.cloudjay.cjay.CUSTOM_INTENT";
 
 	public static final int HIDDEN_LOG_THRESHOLD = 4;
