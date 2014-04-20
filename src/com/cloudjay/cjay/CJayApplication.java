@@ -8,7 +8,6 @@ import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 import org.androidannotations.annotations.EApplication;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 import uk.co.senab.bitmapcache.BitmapLruCache;
 import android.app.Application;
@@ -44,7 +43,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-import com.nostra13.universalimageloader.core.download.HttpClientImageDownloader;
+
 import de.greenrobot.event.EventBus;
 
 @ReportsCrashes(formKey = "",
@@ -143,6 +142,19 @@ public class CJayApplication extends Application {
 		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_1_EXTRA, imageType);
 		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_CONTAINER_ID_EXTRA, containerId);
 		intent.putExtra(PhotoExpandableListViewActivity_.SOURCE_TAG_EXTRA, sourceTag);
+		ctx.startActivity(intent);
+	}
+	
+	public static void openPhotoGridViewForImport(Context ctx, String uuid, String containerId, int fromType, int toType, String sourceTag) {
+
+		Intent intent = new Intent(ctx, PhotoExpandableListViewActivity_.class);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA, uuid);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_1_EXTRA, fromType);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_COPY_TO_EXTRA, toType);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_CONTAINER_ID_EXTRA, containerId);
+		intent.putExtra(PhotoExpandableListViewActivity_.SOURCE_TAG_EXTRA, sourceTag);
+		intent.putExtra(PhotoExpandableListViewActivity_.VIEW_MODE_EXTRA, PhotoExpandableListViewActivity_.MODE_IMPORT);
+		intent.putExtra(PhotoExpandableListViewActivity_.NUM_COLS_EXTRA, 3);
 		ctx.startActivity(intent);
 	}
 

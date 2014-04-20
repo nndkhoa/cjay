@@ -1,7 +1,10 @@
 package com.cloudjay.cjay;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.UUID;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
@@ -12,15 +15,18 @@ import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.adapter.PhotoExpandableListAdapter;
 import com.cloudjay.cjay.adapter.PhotoGridViewCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -36,19 +42,25 @@ import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadType;
+import com.cloudjay.cjay.util.Utils;
 
 import de.greenrobot.event.EventBus;
 
 @EActivity(R.layout.activity_photo_expandablelistview)
-@OptionsMenu(R.menu.menu_photo_grid_view)
+@OptionsMenu(R.menu.menu_photo_expandable_list_view)
 public class PhotoExpandableListViewActivity extends CJayActivity implements LoaderCallbacks<Cursor> {
 
 	public static final String LOG_TAG = "PhotoExpandableListViewActivity";
 	public static final String CJAY_CONTAINER_SESSION_UUID_EXTRA = "cjay_container_session_uuid";
 	public static final String CJAY_CONTAINER_ID_EXTRA = "cjay_container_id";
-
 	public static final String CJAY_IMAGE_TYPE_1_EXTRA = "cjay_image_type1";
 	public static final String CJAY_IMAGE_TYPE_2_EXTRA = "cjay_image_type2";
+	public static final String CJAY_IMAGE_TYPE_COPY_TO_EXTRA = "cjay_image_typeCopyTo";
+	public static final String VIEW_MODE_EXTRA = "view_mode";
+	public static final String NUM_COLS_EXTRA = "num_columns";
+	
+	public static final int MODE_UPLOAD = 0;
+	public static final int MODE_IMPORT = 1;
 
 	public static final String SOURCE_TAG_EXTRA = "tag";
 
@@ -68,9 +80,18 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 	@Extra(CJAY_IMAGE_TYPE_2_EXTRA)
 	int mCJayImageTypeB = -1;
+	
+	@Extra(CJAY_IMAGE_TYPE_COPY_TO_EXTRA)
+	int mCJayImageTypeCopyTo = -1;
 
 	@Extra(CJAY_CONTAINER_ID_EXTRA)
 	String mContainerId = "";
+	
+	@Extra(VIEW_MODE_EXTRA)
+	int mViewMode = MODE_UPLOAD;
+	
+	@Extra(NUM_COLS_EXTRA)
+	int mNumCols = 2;
 
 	@ViewById(R.id.expandable_listview)
 	ExpandableListView mListView;
@@ -91,6 +112,13 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		setTitle(mContainerId);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+		// init camera
+		if (mViewMode == MODE_UPLOAD) {
+			mAddButton.setVisibility(View.VISIBLE);
+		} else {
+			mAddButton.setVisibility(View.GONE);
+		}
+		
 		// init expandable list adapter
 		if (mCJayImageTypeB < 0) {
 			mImageTypes = new int[1];
@@ -136,11 +164,11 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		int imageType = -1;
 
 		switch (id) {
-			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1:
+			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_1:
 				imageType = mImageTypes[0];
 				break;
 
-			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_2:
+			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_2:
 				imageType = mImageTypes[1];
 				break;
 		}
@@ -148,41 +176,44 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		final int cursorLoaderImageType = imageType;
 
 		return new CJayCursorLoader(this) {
-
 			@Override
 			public Cursor loadInBackground() {
-				Cursor cursor = DataCenter.getInstance().getCJayImagesCursorByContainer(getContext(),
-																						mContainerSessionUUID,
-																						cursorLoaderImageType);
-
+				Cursor cursor;
+				if (mViewMode == MODE_IMPORT) {
+					cursor = DataCenter.getInstance().getCJayImagesCursorByContainerForCopy(getContext(),
+																							mContainerSessionUUID,
+																							cursorLoaderImageType, 	
+																							mCJayImageTypeCopyTo);
+				} else {
+					cursor = DataCenter.getInstance().getCJayImagesCursorByContainer(getContext(),
+																					mContainerSessionUUID,
+																					cursorLoaderImageType);
+				}
+				
 				if (cursor != null) {
 					// Ensure the cursor window is filled
 					cursor.registerContentObserver(mObserver);
 				}
-
 				return cursor;
 			}
-
 		};
 	}
 
 	public void onEvent(CJayImageAddedEvent event) {
-
 		if (event.getTag().equals(LOG_TAG)) {
 			mNewImageCount++;
 		}
-
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
 
 		switch (loader.getId()) {
-			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1:
+			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_1:
 				mCursorAdapters.get(Integer.valueOf(0)).swapCursor(null);
 				break;
 
-			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_2:
+			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_2:
 				mCursorAdapters.get(Integer.valueOf(1)).swapCursor(null);
 				break;
 		}
@@ -193,29 +224,30 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		int adapterId = 0;
 
 		switch (loader.getId()) {
-			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1:
+			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_1:
 				adapterId = 0;
 				break;
 
-			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_2:
+			case CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_2:
 				adapterId = 1;
 				break;
 		}
 
 		if (mCursorAdapters.get(Integer.valueOf(adapterId)) == null) {
 			mCursorAdapters.put(Integer.valueOf(adapterId),
-								new PhotoGridViewCursorAdapter(this, mItemLayout, cursor, 0));
+								new PhotoGridViewCursorAdapter(this, mItemLayout, cursor, 0, mViewMode == MODE_IMPORT));
 		} else {
 			mCursorAdapters.get(Integer.valueOf(adapterId)).swapCursor(cursor);
 		}
 
 		GridView gridView = mListAdapter.getPhotoGridView(adapterId);
 		gridView.setAdapter(mCursorAdapters.get(Integer.valueOf(adapterId)));
+		gridView.setNumColumns(mNumCols);
 		
 		if (cursor.getCount() > 0) {
 			LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) gridView.getLayoutParams();
 			int gridViewWidth = gridView.getMeasuredWidth() > 0 ? gridView.getMeasuredWidth() : gridView.getEmptyView().getMeasuredWidth();
-			p.height = gridViewWidth / 2 * ((cursor.getCount() + 1) / 2);
+			p.height = gridViewWidth / mNumCols * ((cursor.getCount() + 1) / 2);
 //			p.height = gridViewWidth / gridView.getNumColumns() * ((cursor.getCount() + 1) / 2);
 			gridView.setLayoutParams(p);
 		}
@@ -224,41 +256,95 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 	@Override
 	public void onResume() {
 		super.onResume();
-
 		if (mCursorAdapters != null && mNewImageCount > 0) {
-
 			Logger.e("Refresh cursor loader");
 			if (mCursorAdapters.get(Integer.valueOf(0)) != null) {
-				getSupportLoaderManager().restartLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GRIDVIEW_1, null, this);
+				getSupportLoaderManager().restartLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_1, null, this);
 			}
 		}
-
+	}
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		menu.findItem(R.id.menu_select_all).setVisible(mViewMode == MODE_IMPORT);
+		menu.findItem(R.id.menu_select_none).setVisible(mViewMode == MODE_IMPORT);
+		return super.onPrepareOptionsMenu(menu);
+	}
+	
+	@OptionsItem(R.id.menu_select_all)
+	void selectAll() {
+		PhotoGridViewCursorAdapter adapter = mCursorAdapters.get(Integer.valueOf(0));
+		
+		if (adapter != null && mViewMode == MODE_IMPORT) {
+			Cursor cursor = adapter.getCursor();
+			ArrayList<String> cJayImageUuids = new ArrayList<String>(cursor.getCount());
+			
+			if (cursor.moveToFirst()) {
+				do {
+					cJayImageUuids.add(cursor.getString(cursor.getColumnIndexOrThrow(CJayImage.FIELD_UUID)));
+				} while (cursor.moveToNext());
+			}
+			
+			adapter.setCheckedCJayImageUuids(cJayImageUuids);
+			getSupportLoaderManager().restartLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_1, null, this);
+		}
+	}
+	
+	@OptionsItem(R.id.menu_select_none)
+	void selectNone() {
+		PhotoGridViewCursorAdapter adapter = mCursorAdapters.get(Integer.valueOf(0));
+		
+		if (adapter != null && mViewMode == MODE_IMPORT) {
+			adapter.setCheckedCJayImageUuids(new ArrayList<String>());
+			getSupportLoaderManager().restartLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_1, null, this);
+		}
 	}
 
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 		if (null != mContainerSession) {
-
-			if (sourceTag.equals(GateImportListFragment.LOG_TAG)) {
-				mContainerSession.setUploadType(UploadType.IN);
-				mContainerSession.setOnLocal(false);
-
-				EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #IN container with ID "
-													+ mContainerSession.getContainerId() + "to upload queue"));
-
-			} else {
-				String checkOutTime = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-
-				mContainerSession.setUploadType(UploadType.OUT);
-				mContainerSession.setCheckOutTime(checkOutTime);
-
-				Logger.Log("Prepare to upload EXPORT container " + mContainerSession.getContainerId());
-				EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #OUT container with ID "
-													+ mContainerSession.getContainerId() + "to upload queue"));
+			
+			if (mViewMode == MODE_UPLOAD) {
+				if (sourceTag.equals(GateImportListFragment.LOG_TAG)) {
+					mContainerSession.setUploadType(UploadType.IN);
+					mContainerSession.setOnLocal(false);
+	
+					EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #IN container with ID "
+														+ mContainerSession.getContainerId() + "to upload queue"));
+	
+				} else {
+					String checkOutTime = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+	
+					mContainerSession.setUploadType(UploadType.OUT);
+					mContainerSession.setCheckOutTime(checkOutTime);
+	
+					Logger.Log("Prepare to upload EXPORT container " + mContainerSession.getContainerId());
+					EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #OUT container with ID "
+														+ mContainerSession.getContainerId() + "to upload queue"));
+				}
+	
+				CJayApplication.uploadContainerSesison(context, mContainerSession);
+				finish();
+			
+			} else if (mViewMode == MODE_IMPORT) {
+				
+				if (mCursorAdapters.get(Integer.valueOf(0)) != null) {
+					SQLiteDatabase db = DataCenter.getDatabaseHelper(this.getApplicationContext()).getWritableDatabase();
+					List<String> selectedCJayImageUuidsList = mCursorAdapters.get(Integer.valueOf(0)).getCheckedCJayImageUuids();
+					
+					if (selectedCJayImageUuidsList != null) {
+						for (String cJayImageUuid : selectedCJayImageUuidsList) {
+							String newUuid = UUID.randomUUID().toString();
+							String sql = "insert into cjay_image (containerSession_id, issue_id, _id, image_name, time_posted, state, id, uuid, type) "
+									+ " select containerSession_id, issue_id, _id, image_name, time_posted, state, id, " 
+									+ Utils.sqlString(newUuid) + "," + mCJayImageTypeCopyTo
+									+ " from cjay_image where uuid = " + Utils.sqlString(cJayImageUuid);
+							db.execSQL(sql);
+						}
+					}
+				}
+				finish();
 			}
-
-			CJayApplication.uploadContainerSesison(context, mContainerSession);
-			finish();
 
 		} else {
 			showCrouton(R.string.alert_invalid_container);

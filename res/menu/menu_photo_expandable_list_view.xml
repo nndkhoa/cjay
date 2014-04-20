@@ -6,6 +6,14 @@
         android:icon="@drawable/ic_action_upload"
         android:showAsAction="always"
         android:title="@string/menu_upload_title"/>
+     <item
+        android:id="@+id/menu_select_all"
+        android:showAsAction="never"
+        android:title="@string/menu_select_all"/>
+     <item
+        android:id="@+id/menu_select_none"
+        android:showAsAction="never"
+        android:title="@string/menu_select_none"/>
 <!--     <item
         android:id="@+id/menu_logout"
         android:showAsAction="never"
