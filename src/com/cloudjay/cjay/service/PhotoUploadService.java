@@ -88,13 +88,14 @@ public class PhotoUploadService extends Service {
 				// Fall through...
 
 			case CJayImage.STATE_UPLOAD_ERROR:
+			case CJayImage.STATE_UPLOAD_WAITING:
 				startNextUploadOrFinish();
 				// Fall through...
 				break;
 
-			case CJayImage.STATE_UPLOAD_WAITING:
-				// NOTE: if call stopSelf() here, ImageQueue will loop forever
-				break;
+		// case CJayImage.STATE_UPLOAD_WAITING:
+		// // NOTE: if call stopSelf() here, ImageQueue will loop forever
+		// break;
 		}
 	}
 
@@ -167,15 +168,14 @@ public class PhotoUploadService extends Service {
 
 					} else {
 						Logger.w("Screw up with http - " + resp.getStatusLine().getStatusCode());
-						uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
+						uploadItem.setUploadState(CJayImage.STATE_UPLOAD_ERROR);
 					}
 
 					resp.getEntity().consumeContent();
 
 				} catch (ClientProtocolException e) {
-
 					Logger.e("ClientProtocolException: " + e.getMessage());
-					uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
+					uploadItem.setUploadState(CJayImage.STATE_UPLOAD_ERROR);
 				}
 			} catch (IOException e) { // Rớt mạng
 
@@ -323,7 +323,8 @@ public class PhotoUploadService extends Service {
 
 		switch (upload.getUploadState()) {
 			case CJayImage.STATE_UPLOAD_WAITING:
-				text = getString(R.string.notification_uploading_photo, mNumberUploaded + 1);
+				text = getString(	R.string.notification_uploading_photo, mNumberUploaded + 1,
+									CJayImageDaoImpl.totalNumber);
 				mNotificationBuilder.setContentTitle(text);
 				mNotificationBuilder.setTicker(text);
 				mNotificationBuilder.setProgress(0, 0, true);
@@ -334,7 +335,7 @@ public class PhotoUploadService extends Service {
 
 				if (upload.getUploadProgress() >= 0) {
 					text = getString(	R.string.notification_uploading_photo_progress, mNumberUploaded + 1,
-										upload.getUploadProgress());
+										upload.getUploadProgress(), CJayImageDaoImpl.totalNumber);
 					mNotificationBuilder.setContentTitle(text);
 					mNotificationBuilder.setProgress(100, upload.getUploadProgress(), false);
 				}

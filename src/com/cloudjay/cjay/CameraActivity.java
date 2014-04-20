@@ -743,7 +743,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			File photo = new File(newDirectory, fileName);
 
 			// File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
-			Logger.Log("Photo Path: " + photo.getAbsolutePath());
+			// Logger.Log("Photo Path: " + photo.getAbsolutePath());
 
 			// Save Bitmap to JPEG
 			saveBitmapToFile(capturedBitmap, photo);
@@ -962,7 +962,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		try {
 
-			Logger.w("Image Id Path: " + mContainerSession.getImageIdPath());
+			// Logger.w("Image Id Path: " + mContainerSession.getImageIdPath());
 			if (TextUtils.isEmpty(mContainerSession.getImageIdPath())
 					|| mContainerSession.getImageIdPath()
 										.equals("https://storage.googleapis.com/storage-cjay.cloudjay.com/")) {
@@ -989,7 +989,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			Logger.e("#error when update captured image | " + mContainerSession.getContainerId());
 		}
 
-		Logger.Log("Source tag: " + mSourceTag);
+		// Logger.Log("Source tag: " + mSourceTag);
 
 		// tell people that an image has been created
 		if (!TextUtils.isEmpty(mSourceTag)) {

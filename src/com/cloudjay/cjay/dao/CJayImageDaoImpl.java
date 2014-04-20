@@ -10,6 +10,8 @@ import com.j256.ormlite.support.ConnectionSource;
 
 public class CJayImageDaoImpl extends BaseDaoImpl<CJayImage, String> implements ICJayImageDao {
 
+	public static int totalNumber = 0;
+
 	public CJayImageDaoImpl(ConnectionSource connectionSource) throws SQLException {
 		super(connectionSource, CJayImage.class);
 	}
@@ -53,6 +55,7 @@ public class CJayImageDaoImpl extends BaseDaoImpl<CJayImage, String> implements 
 		List<CJayImage> result = queryForEq("state", CJayImage.STATE_UPLOAD_WAITING);
 
 		if (result != null && result.size() > 0) {
+			totalNumber = result.size();
 			Logger.w("Total items in ImageQueue: " + result.size());
 			return result.get(0);
 		}
