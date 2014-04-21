@@ -318,6 +318,14 @@ public class DataCenter {
 																			new String[] { containerSessionUUID + "%",
 																					String.valueOf(imageType) });
 	}
+	
+	public Cursor getCJayImagesCursorByContainer(Context context, String containerSessionUUID, String issueUUID, int imageType) {
+		String queryString = "SELECT * FROM cjay_image WHERE containerSession_id LIKE ? AND issue_id LIKE ? AND type = ?";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
+																			new String[] { containerSessionUUID + "%",
+																					issueUUID + "%",
+																					String.valueOf(imageType) });
+	}
 
 	public Cursor getCJayImagesCursorByContainerForCopy(Context context, String containerSessionUUID, int fromType,
 														int toType) {

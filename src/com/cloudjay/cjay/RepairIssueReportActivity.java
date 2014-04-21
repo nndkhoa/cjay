@@ -9,6 +9,7 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -22,7 +23,8 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
-import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.fragment.RepairIssueImageListFragment;
+import com.cloudjay.cjay.fragment.RepairIssueImageListFragment_;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
@@ -55,17 +57,21 @@ public class RepairIssueReportActivity extends CJayActivity implements OnPageCha
 		@Override
 		public Fragment getItem(int position) {
 			RepairIssueImageListFragment_ fragment;
-			switch (position) {
+			Bundle bundle = new Bundle();
+			
+			switch (position) {				
 				case 0:
+					bundle.putString(RepairIssueImageListFragment.CJAY_ISSUE_UUID, mIssueUUID);
+					bundle.putInt(RepairIssueImageListFragment.CJAY_IMAGE_TYPE, CJayImage.TYPE_REPORT);
 					fragment = new RepairIssueImageListFragment_();
-					fragment.setIssueUUID(mIssueUUID);
-					fragment.setType(CJayImage.TYPE_REPORT);
+					fragment.setArguments(bundle);
 					return fragment;
 				case 1:
 				default:
+					bundle.putString(RepairIssueImageListFragment.CJAY_ISSUE_UUID, mIssueUUID);
+					bundle.putInt(RepairIssueImageListFragment.CJAY_IMAGE_TYPE, CJayImage.TYPE_REPAIRED);
 					fragment = new RepairIssueImageListFragment_();
-					fragment.setIssueUUID(mIssueUUID);
-					fragment.setType(CJayImage.TYPE_REPAIRED);
+					fragment.setArguments(bundle);
 					return fragment;
 			}
 		}

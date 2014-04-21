@@ -244,7 +244,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		boolean isDisplayed = !(mLongClickedCJayImage == null);
 
 		menu.findItem(R.id.menu_trash).setVisible(isDisplayed);
-		menu.findItem(R.id.menu_upload).setVisible(mContainerSession.isValidForUpload(CJayImage.TYPE_REPORT));
+		menu.findItem(R.id.menu_upload).setVisible(mContainerSession.isValidForUpload(this, CJayImage.TYPE_REPORT));
 
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -331,7 +331,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 	void uploadMenuItemClicked() {
 		Logger.Log("Menu upload item clicked");
 
-		if (mContainerSession.isValidForUpload(CJayImage.TYPE_REPORT)) {
+		if (mContainerSession.isValidForUpload(this, CJayImage.TYPE_REPORT)) {
 
 			mContainerSession.setUploadType(UploadType.AUDIT);
 			CJayApplication.uploadContainerSesison(getApplicationContext(), mContainerSession);

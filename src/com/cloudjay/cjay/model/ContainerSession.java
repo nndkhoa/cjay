@@ -312,7 +312,7 @@ public class ContainerSession {
 	// 0 issue --> Failed
 	// > 0 issues:
 	// image without issue <= 1 && all issue is valid --> OK
-	public boolean isValidForUpload(int imageType) {
+	public boolean isValidForUpload(Context ctx, int imageType) {
 
 		if (issues.isEmpty()) return false;
 
@@ -355,6 +355,22 @@ public class ContainerSession {
 				}
 
 				return true;
+				
+//				String sql = "SELECT COUNT(img.uuid) AS img_count FROM container_session cs "
+//						+ "INNER JOIN issue i ON cs._id = i.containerSession_id "
+//						+ "LEFT JOIN cjay_image img ON i._id = img.issue_id and img.type = 2 "
+//						+ "WHERE cs._id LIKE ? GROUP BY i._id";
+//				SQLiteDatabase db = DataCenter.getDatabaseHelper(ctx.getApplicationContext()).getReadableDatabase();
+//				Cursor cursor = db.rawQuery(sql, new String[] { uuid + "%" });
+//				if (cursor.moveToFirst()) {
+//					do {
+//						if (cursor.getInt(cursor.getColumnIndexOrThrow("img_count")) == 0) {
+//							return false;
+//						}
+//					} while (cursor.moveToNext());
+//				}
+//				
+//				return true;
 
 			default:
 				return true;
