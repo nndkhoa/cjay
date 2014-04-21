@@ -1,16 +1,14 @@
 package com.cloudjay.cjay.service;
 
-import com.aerilys.helpers.android.NetworkHelper;
-import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.dao.CJayImageDaoImpl;
-import com.cloudjay.cjay.events.CJayImageUploadStateChangedEvent;
-import com.cloudjay.cjay.model.CJayImage;
-import com.cloudjay.cjay.tasks.PhotupThreadRunnable;
-import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.CountingInputStreamEntity;
-import com.cloudjay.cjay.util.DataCenter;
-import com.cloudjay.cjay.util.Logger;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.ref.WeakReference;
+import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 
 import org.androidannotations.annotations.EService;
 import org.apache.http.HttpResponse;
@@ -35,17 +33,21 @@ import android.os.Build.VERSION_CODES;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
+import android.text.TextUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.ref.WeakReference;
-import java.sql.SQLException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
+import com.aerilys.helpers.android.NetworkHelper;
+import com.cloudjay.cjay.CJayApplication;
+import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.dao.CJayImageDaoImpl;
+import com.cloudjay.cjay.events.CJayImageUploadProgressChangedEvent;
+import com.cloudjay.cjay.events.CJayImageUploadStateChangedEvent;
+import com.cloudjay.cjay.model.CJayImage;
+import com.cloudjay.cjay.tasks.PhotupThreadRunnable;
+import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.CountingInputStreamEntity;
+import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Utils;
 
 import de.greenrobot.event.EventBus;
 
@@ -68,12 +70,20 @@ public class PhotoUploadService extends Service {
 		}
 
 	}
+	
+	public void onEvent(CJayImageUploadProgressChangedEvent event) {
+		updateNotification(event.getTarget());
+	}
 
 	public void onEvent(CJayImageUploadStateChangedEvent event) {
 		CJayImage upload = event.getTarget();
 
 		try {
-			cJayImageDaoImpl.update(upload);
+			Logger.Log("CJayImageUploadStateChangedEvent " + (upload.getIssue() != null ? upload.getIssue().getUuid() : ""));
+			if (!TextUtils.isEmpty(upload.getUuid())) {
+				cJayImageDaoImpl.updateRaw("UPDATE cjay_image SET state = " + upload.getUploadState() + " WHERE uuid LIKE " + Utils.sqlString(upload.getUuid()));
+				cJayImageDaoImpl.refresh(upload);
+			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
@@ -202,6 +212,7 @@ public class PhotoUploadService extends Service {
 
 			if (super.isInterrupted()) {
 
+				Logger.Log("7. CJayImage.STATE_UPLOAD_WAITING");
 				mUpload.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
 				return true;
 			}

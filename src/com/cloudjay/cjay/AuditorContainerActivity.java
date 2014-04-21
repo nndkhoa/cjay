@@ -211,7 +211,6 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 
 				if (cursor != null) {
 					// Ensure the cursor window is filled
-					cursor.getCount();
 					cursor.registerContentObserver(mObserver);
 				}
 
