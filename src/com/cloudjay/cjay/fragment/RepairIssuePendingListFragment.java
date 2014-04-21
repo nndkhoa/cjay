@@ -12,7 +12,6 @@ import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.ViewById;
 
 import android.content.ContentValues;
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -26,7 +25,8 @@ import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
 import com.ami.fundapter.extractors.StringExtractor;
 import com.ami.fundapter.interfaces.DynamicImageLoader;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.CJayApplication;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
@@ -88,10 +88,7 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 		mSelectedIssue = null;
 		mFeedListView.setItemChecked(-1, true);
 
-		if (mTakenImages == null) {
-			Logger.Log("mTakenImages is NULL. Init mTakenImages");
-			mTakenImages = new ArrayList<CJayImage>();
-		}
+		mTakenImages = new ArrayList<CJayImage>();
 
 		CJayApplication.gotoCamera(getActivity(), mContainerSession, CJayImage.TYPE_REPORT, LOG_TAG);
 	}
@@ -107,17 +104,9 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 		mSelectedIssue = mFeedsAdapter.getItem(position);
 		mFeedListView.setItemChecked(-1, true);
 
-		// Open Camera
-		if (mTakenImages == null) {
-			Logger.Log("mTakenImages is NULL. Init mTakenImages");
-			mTakenImages = new ArrayList<CJayImage>();
-		}
+		mTakenImages = new ArrayList<CJayImage>();
 
-		Intent intent = new Intent(getActivity(), CameraActivity_.class);
-		intent.putExtra(CameraActivity_.CJAY_CONTAINER_SESSION_EXTRA, mContainerSession.getUuid());
-		intent.putExtra("type", CJayImage.TYPE_REPAIRED);
-		intent.putExtra("tag", LOG_TAG);
-		startActivity(intent);
+		CJayApplication.gotoCamera(getActivity(), mContainerSession, CJayImage.TYPE_REPAIRED, LOG_TAG);
 	}
 
 	private void initIssueFeedAdapter(ArrayList<Issue> containers) {
@@ -237,33 +226,32 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 		if (mSelectedIssue != null && mTakenImages != null && mTakenImages.size() > 0) {
 
 			// Update list cjay images of selected Issue
-//			try {
+			try {
 				SQLiteDatabase db = DataCenter.getDatabaseHelper(getActivity().getApplicationContext()).getWritableDatabase();	
 				ContentValues values;
 				
-				for (CJayImage cJayImage : mTakenImages) {
-//					cJayImage.setIssue(mSelectedIssue);
-//					cJayImage.setContainerSession(mContainerSession);
-//					cJayImageDaoImpl.createOrUpdate(cJayImage);
-									
+				issueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity()).getIssueDaoImpl();
+				cJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity())
+												.getCJayImageDaoImpl();
+				
+				for (CJayImage cJayImage : mTakenImages) {									
 					values = new ContentValues();
 					values.put("issue_id", mSelectedIssue.getUuid());
 					values.put("containerSession_id", mContainerSession.getUuid());
 					db.update("cjay_image", values, "uuid LIKE ? ", new String[] { cJayImage.getUuid() });
+					cJayImageDaoImpl.refresh(cJayImage);
 				}
 
 				values = new ContentValues();
 				values.put("fixed", 1);
 				db.update("issue", values, "_id LIKE ? ", new String[] { mSelectedIssue.getUuid() });
-				
-//				mSelectedIssue.setFixed(true);
-//				issueDaoImpl.createOrUpdate(mSelectedIssue);
+				issueDaoImpl.refresh(mSelectedIssue);
 
 				refresh();
 
-//			} catch (SQLException e) {
-//				e.printStackTrace();
-//			}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 
 			mTakenImages.clear();
 			mTakenImages = null;
