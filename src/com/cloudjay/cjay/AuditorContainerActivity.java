@@ -111,7 +111,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		// Set Activity Title
 		containerIdTextView.setText(mContainerSession.getContainerId());
 		setTitle(mContainerSession.getContainerId());
@@ -285,17 +285,15 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		getLoaderManager().restartLoader(LOADER_ID, null, this);
 		supportInvalidateOptionsMenu();
 	}
-	
+
 	@OptionsItem(R.id.menu_import)
 	void importMenuItemClicked() {
-		hideMenuItems();
 
-		CJayApplication.openPhotoGridViewForImport(this, 
-													mContainerSessionUUID, 
-													mContainerSession.getContainerId(), 
-													CJayImage.TYPE_IMPORT,
-													CJayImage.TYPE_REPORT,
-													LOG_TAG);
+		Logger.Log("container session id: " + mContainerSessionUUID);
+
+		hideMenuItems();
+		CJayApplication.openPhotoGridViewForImport(	this, mContainerSessionUUID, mContainerSession.getContainerId(),
+													CJayImage.TYPE_IMPORT, CJayImage.TYPE_REPORT, LOG_TAG);
 	}
 
 	@OptionsItem(R.id.menu_trash)
@@ -347,7 +345,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		// go back
 		onBackPressed();
 	}
-	
+
 	private void hideMenuItems() {
 		mLongClickedCJayImage = null;
 		mFeedListView.setItemChecked(-1, true);

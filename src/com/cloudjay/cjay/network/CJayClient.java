@@ -240,7 +240,7 @@ public class CJayClient implements ICJayClient {
 								.withResponse().get();
 
 			} else {
-
+				Logger.Log("Request based on modified time");
 				response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS)
 								.setHeader("Authorization", "Token " + accessToken)
 								.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))

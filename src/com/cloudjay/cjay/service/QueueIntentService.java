@@ -21,10 +21,10 @@ public class QueueIntentService extends IntentService {
 
 		if (!Utils.isRunning(this, ContainerUploadIntentService_.class.getName())
 				&& NetworkHelper.isConnected(getApplicationContext())) {
-
 			Intent uploadIntent = new Intent(this, ContainerUploadIntentService_.class);
 			startService(uploadIntent);
-
+		} else {
+			Logger.w("ContainerUploadIntentService is already running");
 		}
 
 		if (!Utils.isRunning(this, PhotoUploadService_.class.getName())) {

@@ -11,7 +11,6 @@ import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EBean.Scope;
 import org.androidannotations.annotations.Trace;
 
-import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
@@ -179,7 +178,7 @@ public class DataCenter {
 				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, true);
 
 				updateListISOCode(ctx);
-				updateListContainerSessions(ctx, CJayClient.REQUEST_TYPE_CREATED);
+				updateListContainerSessions(ctx, CJayClient.REQUEST_TYPE_CREATED, InvokeType.FIRST_TIME);
 
 				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, false);
 
@@ -322,9 +321,11 @@ public class DataCenter {
 
 	public Cursor getCJayImagesCursorByContainerForCopy(Context context, String containerSessionUUID, int fromType,
 														int toType) {
+
 		String queryString = "SELECT * FROM cjay_image c1 WHERE containerSession_id LIKE ? AND type = ? "
 				+ "AND not exists "
 				+ "(select uuid from cjay_image c2 where c2.image_name = c1.image_name and containerSession_id LIKE ? and type = ?)";
+
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
 																			new String[] { containerSessionUUID + "%",
 																					String.valueOf(fromType),
@@ -658,10 +659,17 @@ public class DataCenter {
 	 * @throws NullSessionException
 	 */
 	@Trace(level = Log.INFO)
-	public void updateListContainerSessions(Context ctx, int type) throws NoConnectionException, SQLException,
-																	NullSessionException {
+	public void updateListContainerSessions(Context ctx, int type, InvokeType invokeType) throws NoConnectionException,
+																							SQLException,
+																							NullSessionException {
 
-		if (PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, false)) { return; }
+		switch (invokeType) {
+			case FIRST_TIME:
+				return;
+
+			default:
+				break;
+		}
 
 		// Logger.Log("*** UPDATE LIST CONTAINER SESSIONS ***");
 		long startTime = System.currentTimeMillis();
@@ -679,6 +687,7 @@ public class DataCenter {
 			int page = 1;
 			String nextUrl = "";
 			String lastUpdate = "";
+			String requestedTime = "";
 
 			if (containerSessionDaoImpl.isEmpty()) {
 
@@ -698,8 +707,10 @@ public class DataCenter {
 				result = CJayClient.getInstance().getContainerSessionsByPage(ctx, lastUpdate, page, type);
 
 				if (null != result) {
+
 					page = page + 1;
 					nextUrl = result.getNext();
+					requestedTime = result.getRequestedTime();
 
 					List<TmpContainerSession> tmpContainerSessions = result.getResults();
 					Logger.Log("Total items: " + tmpContainerSessions.size());
@@ -707,6 +718,9 @@ public class DataCenter {
 					if (null != tmpContainerSessions) {
 
 						for (TmpContainerSession tmpSession : tmpContainerSessions) {
+
+							// if tmpSession was existed somewhere in database
+							// --> update
 
 							ContainerSession containerSession = Mapper.getInstance()
 																		.toContainerSession(tmpSession, ctx);
@@ -729,6 +743,9 @@ public class DataCenter {
 						EventBus.getDefault().post(new ContainerSessionChangedEvent(containerSessions));
 					}
 				}
+
+				Logger.Log("Requested Time: " + requestedTime);
+				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE, requestedTime);
 
 				long delta = System.currentTimeMillis() - beginParseTime;
 				Logger.w("--> One round duration: " + Long.toString(delta));
@@ -756,11 +773,11 @@ public class DataCenter {
 			// containerSessionDaoImpl
 			// .bulkInsertDataBySavePoint(containerSessions);
 
-			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE, nowString);
-
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 
-			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, true);
+			if (invokeType != InvokeType.FIRST_TIME) {
+				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, true);
+			}
 
 		} catch (NoConnectionException e) {
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
