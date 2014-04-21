@@ -18,6 +18,10 @@ public class ContainerSessionChangedEvent {
 
 	private final List<ContainerSession> listContainerSessions;
 
+	public ContainerSessionChangedEvent() {
+		listContainerSessions = new ArrayList<ContainerSession>();
+	}
+
 	public ContainerSessionChangedEvent(ContainerSession containerSession) {
 		listContainerSessions = new ArrayList<ContainerSession>();
 		listContainerSessions.add(containerSession);

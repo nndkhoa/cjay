@@ -74,22 +74,22 @@ public class CJayImage {
 
 	}
 
-	public CJayImage(int id, int type, String image_name) {
+	public CJayImage(int id, int type, String image_name, String image_url) {
 		this.id = id;
 		this.type = type;
 		this.image_name = image_name;
 		uuid = UUID.randomUUID().toString();
 		time_posted = "";
-		mUri = image_name;
+		mUri = image_url;
 	}
 
-	public CJayImage(int id, int type, String created_at, String image_name) {
+	public CJayImage(int id, int type, String created_at, String image_name, String image_url) {
 		this.id = id;
 		this.type = type;
 		this.image_name = image_name;
 		time_posted = created_at;
 		uuid = UUID.randomUUID().toString();
-		mUri = image_name;
+		mUri = image_url;
 	}
 
 	public ContainerSession getContainerSession() {
@@ -213,7 +213,7 @@ public class CJayImage {
 	private void notifyUploadStateListener() {
 		EventBus.getDefault().post(new CJayImageUploadStateChangedEvent(this));
 	}
-	
+
 	private void notifyUploadProgressListener() {
 		EventBus.getDefault().post(new CJayImageUploadProgressChangedEvent(this));
 	}

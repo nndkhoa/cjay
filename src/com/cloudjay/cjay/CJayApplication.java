@@ -8,6 +8,7 @@ import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 import org.androidannotations.annotations.EApplication;
+import org.androidannotations.annotations.EService;
 
 import uk.co.senab.bitmapcache.BitmapLruCache;
 import android.app.Application;

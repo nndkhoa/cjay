@@ -26,6 +26,7 @@ import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
+import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.model.AuditReportImage;
 import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
@@ -44,6 +45,8 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+
+import de.greenrobot.event.EventBus;
 
 @EBean
 public class Mapper {
@@ -178,9 +181,9 @@ public class Mapper {
 						List<AuditReportImage> auditReportImages = auditReportItem.getAuditReportImages();
 						Collection<CJayImage> cJayImages = new ArrayList<CJayImage>();
 						for (AuditReportImage item : auditReportImages) {
-							CJayImage tmpCJayImage = new CJayImage(item.getId(), item.getType(), item.getImageUrl());
+							CJayImage tmpCJayImage = new CJayImage(item.getId(), item.getType(), item.getImageName(),
+																	item.getImageUrl());
 							tmpCJayImage.setIssue(issue);
-
 							cJayImages.add(tmpCJayImage);
 							cJayImageDaoImpl.addCJayImage(tmpCJayImage);
 						}
@@ -202,7 +205,8 @@ public class Mapper {
 				for (GateReportImage gateReportImage : gateReportImages) {
 
 					CJayImage image = new CJayImage(gateReportImage.getId(), gateReportImage.getType(),
-													gateReportImage.getCreatedAt(), gateReportImage.getImageUrl());
+													gateReportImage.getCreatedAt(), gateReportImage.getImageName(),
+													gateReportImage.getImageUrl());
 
 					// set default value
 					// image.setUploadState(CJayImage.STATE_UPLOAD_COMPLETED);
@@ -324,11 +328,6 @@ public class Mapper {
 
 				SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
 
-				String sqlString = "UPDATE container_session SET id = " + tmp.getId() + ", check_in_time = '"
-						+ tmp.getCheckInTime() + "', image_id_path = '" + tmp.getImageIdPath() + "', server_state = "
-						+ tmp.getStatus() + " WHERE _id = '" + main.getUuid() + "'";
-				db.execSQL(sqlString);
-
 				// // Update imageIdPath
 				// main.setId(tmp.getId());
 				// if (updateImageIdPath) {
@@ -372,7 +371,7 @@ public class Mapper {
 
 							String uuid = UUID.randomUUID().toString();
 							sql = "INSERT INTO cjay_image VALUES ('" + main.getUuid() + "', '" + uuid + "', '"
-									+ gateReportImage.getImageUrl() + "', NULL, '" + gateReportImage.getCreatedAt()
+									+ gateReportImage.getImageName() + "', NULL, '" + gateReportImage.getCreatedAt()
 									+ "', '" + gateReportImage.getImageUrl() + "', 4," + gateReportImage.getType()
 									+ ", " + gateReportImage.getId() + ")";
 
@@ -438,10 +437,10 @@ public class Mapper {
 
 										String auditImageUuid = UUID.randomUUID().toString();
 										sql = "INSERT INTO cjay_image VALUES ('" + main.getUuid() + "', '"
-												+ auditImageUuid + "', '" + auditReportImage.getImageUrl() + "', '"
-												+ auditImageUuid + "', '" + nowString + "', '"
-												+ auditReportImage.getImageUrl() + "', 4," + auditReportImage.getType()
-												+ ", " + auditReportImage.getId() + ")";
+												+ auditImageUuid + "', '" + auditReportImage.getImageName() + "', '"
+												+ uuid + "', '" + nowString + "', '" + auditReportImage.getImageUrl()
+												+ "', 4," + auditReportImage.getType() + ", "
+												+ auditReportImage.getId() + ")";
 
 										db.execSQL(sql);
 										Logger.Log("Create new CJayImage based on AuditReportImage");
@@ -451,14 +450,85 @@ public class Mapper {
 							}
 
 						} else { // create
-							Logger.e("You really need to create new Issue record");
+							Logger.Log("Create new Issue object");
+							List<AuditReportImage> auditReportImages = auditReportItem.getAuditReportImages();
+							if (auditReportImages != null) {
+
+								String height = "NULL";
+								String length = "NULL";
+
+								if (!TextUtils.isEmpty(auditReportItem.getHeight())) {
+									height = auditReportItem.getHeight();
+								}
+
+								if (!TextUtils.isEmpty(auditReportItem.getLength())) {
+									length = auditReportItem.getLength();
+								}
+
+								String issueUuid = UUID.randomUUID().toString();
+								sql = "INSERT INTO issue VALUES (" + componentId + ", '" + main.getUuid() + "', "
+										+ damageId + ", '" + issueUuid + "', " + height + ", '" + repairId + "', "
+										+ length + ", '" + auditReportItem.getLocationCode() + "', "
+										+ auditReportItem.getQuantity() + ", " + auditReportItem.getId() + ", 0)";
+
+								db.execSQL(sql);
+
+								// update audit report images
+								List<AuditReportImage> auditReportImages1 = auditReportItem.getAuditReportImages();
+								if (auditReportImages1 != null) {
+									for (AuditReportImage auditReportImage : auditReportImages1) {
+
+										String auditReportImageName = auditReportImage.getImageName();
+										sql = "SELECT * FROM cjay_image WHERE image_name LIKE ?";
+										Cursor auditCursor = db.rawQuery(	sql,
+																			new String[] { "%" + auditReportImageName });
+
+										// existed
+										if (cursor.moveToFirst()) { // update
+
+											String auditImageUuid = auditCursor.getString(auditCursor.getColumnIndexOrThrow(CJayImage.FIELD_UUID));
+											String imageName = auditCursor.getString(auditCursor.getColumnIndexOrThrow(CJayImage.FIELD_IMAGE_NAME));
+
+											sql = "UPDATE cjay_image SET id = " + auditReportImage.getId()
+													+ " WHERE uuid = '" + auditImageUuid + "'";
+											db.execSQL(sql);
+											Logger.Log("Update CJayImage UUID: " + auditImageUuid + " | Image name: "
+													+ imageName);
+
+										} else { // create
+
+											SimpleDateFormat dateFormat = new SimpleDateFormat(
+																								CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+											String nowString = dateFormat.format(new Date());
+
+											String auditImageUuid = UUID.randomUUID().toString();
+											sql = "INSERT INTO cjay_image VALUES ('" + main.getUuid() + "', '"
+													+ auditImageUuid + "', '" + auditReportImage.getImageName()
+													+ "', '" + issueUuid + "', '" + nowString + "', '"
+													+ auditReportImage.getImageUrl() + "', 4,"
+													+ auditReportImage.getType() + ", " + auditReportImage.getId()
+													+ ")";
+
+											db.execSQL(sql);
+											Logger.Log("Create new CJayImage based on AuditReportImage");
+
+										}
+									}
+								}
+							}
 						}
 					}
 				} else {
 					Logger.e("AuditReportItems is NULL");
 				}
 
+				String sqlString = "UPDATE container_session SET id = " + tmp.getId() + ", check_in_time = '"
+						+ tmp.getCheckInTime() + "', image_id_path = '" + tmp.getImageIdPath() + "', server_state = "
+						+ tmp.getStatus() + " WHERE _id = '" + main.getUuid() + "'";
+				db.execSQL(sqlString);
+
 				// Post ContainerSessionUpdatedEvent
+				EventBus.getDefault().post(new ContainerSessionChangedEvent());
 			}
 		} catch (Exception e) {
 			throw e;
