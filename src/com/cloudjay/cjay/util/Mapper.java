@@ -393,9 +393,7 @@ public class Mapper {
 
 						String sql = "select * from issue where componentCode_id = " + componentId
 								+ " and damageCode_id = " + damageId + " and repairCode_id = " + repairId
-								+ " and locationCode LIKE ? and containerSession_id = ? and coalesce(length, 0) = "
-								+ auditReportItem.getLength() + " and coalesce(height, 0) = "
-								+ auditReportItem.getHeight();
+								+ " and locationCode LIKE ? and containerSession_id = ?";
 
 						Cursor cursor = db.rawQuery(sql,
 													new String[] { auditReportItem.getLocationCode(), main.getUuid() });
@@ -414,11 +412,11 @@ public class Mapper {
 								for (AuditReportImage auditReportImage : auditReportImages) {
 
 									String auditReportImageName = auditReportImage.getImageName();
-									sql = "SELECT * FROM cjay_image WHERE image_name LIKE ?";
+									sql = "SELECT * FROM cjay_image WHERE image_name LIKE ? ";
 									Cursor auditCursor = db.rawQuery(sql, new String[] { "%" + auditReportImageName });
 
 									// existed
-									if (cursor.moveToFirst()) { // update
+									if (auditCursor.moveToFirst()) { // update
 
 										String auditImageUuid = auditCursor.getString(auditCursor.getColumnIndexOrThrow(CJayImage.FIELD_UUID));
 										String imageName = auditCursor.getString(auditCursor.getColumnIndexOrThrow(CJayImage.FIELD_IMAGE_NAME));
