@@ -1,6 +1,7 @@
 package com.cloudjay.cjay;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
@@ -187,9 +188,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 						try {
 							DataCenter.getInstance().fetchData(getApplicationContext());
 						} catch (NoConnectionException e) {
-
-							Logger.Log("No Internet Connection");
-							// showCrouton(R.string.alert_no_network);
+							showCrouton(R.string.alert_no_network);
 						} catch (NullSessionException e) {
 							CJayApplication.logOutInstantly(context);
 							finish();
@@ -206,19 +205,17 @@ public class CJayActivity extends SherlockFragmentActivity {
 					@Override
 					protected Void doInBackground(Void... params) {
 
-//						try {
-//							DataCenter.getInstance().updateListContainerSessions(getApplicationContext(),
-//																					CJayClient.REQUEST_TYPE_CREATED);
-//
-//						} catch (NoConnectionException e) {
-//
-//							showCrouton(R.string.alert_no_network);
-//						} catch (SQLException e) {
-//							e.printStackTrace();
-//						} catch (NullSessionException e) {
-//							CJayApplication.logOutInstantly(context);
-//							finish();
-//						}
+						try {
+							DataCenter.getInstance().updateListContainerSessions(getApplicationContext(),
+																					CJayClient.REQUEST_TYPE_CREATED);
+						} catch (NoConnectionException e) {
+							showCrouton(R.string.alert_no_network);
+						} catch (SQLException e) {
+							e.printStackTrace();
+						} catch (NullSessionException e) {
+							CJayApplication.logOutInstantly(context);
+							finish();
+						}
 						return null;
 					};
 
@@ -254,7 +251,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 		isActivityRunning = true;
 
 		super.onResume();
-		
+
 		long difference = System.currentTimeMillis() - startTime;
 		Logger.w("---> Total time: " + Long.toString(difference));
 	}

@@ -398,7 +398,8 @@ public class PhotoUploadService extends Service {
 
 		if (canUpload()) {
 
-			// set c
+			// rollback stuck images
+			DataCenter.getInstance().rollbackStuckImages();
 
 			CJayImage uploadItem = null;
 			try {

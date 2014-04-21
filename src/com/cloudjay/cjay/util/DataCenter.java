@@ -103,6 +103,10 @@ public class DataCenter {
 	public DataCenter() {
 	}
 
+	public void rollbackStuckImages() {
+
+	}
+
 	@Background
 	public void editContainerSession(Context ctx, ContainerSession containerSession, String containerId,
 										String operatorCode) {
@@ -657,6 +661,8 @@ public class DataCenter {
 	public void updateListContainerSessions(Context ctx, int type) throws NoConnectionException, SQLException,
 																	NullSessionException {
 
+		if (PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, false)) { return; }
+
 		// Logger.Log("*** UPDATE LIST CONTAINER SESSIONS ***");
 		long startTime = System.currentTimeMillis();
 		PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, true);
@@ -700,15 +706,12 @@ public class DataCenter {
 
 					if (null != tmpContainerSessions) {
 
-						int count = 0;
 						for (TmpContainerSession tmpSession : tmpContainerSessions) {
 
-							count++;
 							ContainerSession containerSession = Mapper.getInstance()
 																		.toContainerSession(tmpSession, ctx);
 
 							if (null != containerSession) {
-								Logger.Log(Integer.toString(count));
 								containerSessions.add(containerSession);
 							} else {
 								Logger.e("WTF " + tmpSession.getContainerId());
@@ -756,6 +759,8 @@ public class DataCenter {
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE, nowString);
 
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
+
+			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, true);
 
 		} catch (NoConnectionException e) {
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);

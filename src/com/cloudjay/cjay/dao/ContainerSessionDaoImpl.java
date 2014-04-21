@@ -519,12 +519,12 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 		// Logger.Log( "getNextWaiting() at ContainerSessionDaoImpl");
 
 		ContainerSession result = null;
-		List<ContainerSession> containerSessions = query(queryBuilder().where()
-																		.eq(ContainerSession.FIELD_STATE,
-																			UploadState.WAITING.getValue())
-																		.and()
-																		.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION,
-																			true).prepare());
+
+		QueryBuilder<ContainerSession, String> queryBuilder = queryBuilder();
+		queryBuilder.where().eq(ContainerSession.FIELD_STATE, UploadState.WAITING.getValue()).and()
+					.eq(ContainerSession.FIELD_UPLOAD_CONFIRMATION, true);
+		queryBuilder.orderBy(ContainerSession.FIELD_CHECK_IN_TIME, false);
+		List<ContainerSession> containerSessions = query(queryBuilder.prepare());
 
 		if (containerSessions.size() > 0) {
 			Logger.w("Total items in ContainerQueue: " + Integer.toString(containerSessions.size()));
@@ -550,9 +550,19 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 					int uploadState = cJayImage.getUploadState();
 					if (uploadState != CJayImage.STATE_UPLOAD_COMPLETED) {
 
-						Logger.Log(cJayImage.getImageName() + " | " + UploadState.values()[uploadState]);
-						// Increase retry count
 						String key = cJayImage.getUuid();
+						Logger.Log(cJayImage.getImageName() + " | " + UploadState.values()[uploadState]);
+						if (uploadState == CJayImage.STATE_NONE && cJayImage.getUri().startsWith("http")) {
+
+							Logger.w("This cjay image is already stay in server.");
+							String sql = "UPDATE cjay_image SET state = " + CJayImage.STATE_UPLOAD_COMPLETED
+									+ " WHERE " + CJayImage.FIELD_UUID + " = '" + key + "'";
+
+							db.execSQL(sql);
+							break;
+						}
+
+						// Increase retry count
 						if (retryCountHashMap.containsKey(key)) {
 
 							int count = retryCountHashMap.get(key);
@@ -601,6 +611,7 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 
 			if (flag == true) {
 				result = containerSession;
+				Logger.Log("Result: " + containerSession.getContainerId());
 			}
 		}
 
