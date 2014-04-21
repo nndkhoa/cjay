@@ -279,7 +279,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 			LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) gridView.getLayoutParams();
 			int gridViewWidth = gridView.getMeasuredWidth() > 0 ? gridView.getMeasuredWidth()
 					: gridView.getEmptyView().getMeasuredWidth();
-			p.height = (int) (gridViewWidth / mNumCols * Math.ceil(1.0 * (cursor.getCount() + 1) / mNumCols));
+			p.height = gridViewWidth / mNumCols * (int)((cursor.getCount() + 1) / mNumCols + 0.5);
 			gridView.setLayoutParams(p);
 		}
 	}
@@ -366,8 +366,8 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 					if (selectedCJayImageUuidsList != null) {
 						for (String cJayImageUuid : selectedCJayImageUuidsList) {
 							String newUuid = UUID.randomUUID().toString();
-							String sql = "insert into cjay_image (containerSession_id, issue_id, _id, image_name, time_posted, state, id, uuid, type) "
-									+ " select containerSession_id, issue_id, _id, image_name, time_posted, state, id, "
+							String sql = "insert into cjay_image (containerSession_id, image_name, time_posted, state, id, uuid, type) "
+									+ " select containerSession_id, image_name, time_posted, state, id, "
 									+ Utils.sqlString(newUuid)
 									+ ","
 									+ mCJayImageTypeCopyTo
