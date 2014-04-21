@@ -18,6 +18,7 @@
         android:paddingBottom="6dp"
         android:paddingTop="6dp"
         android:stretchMode="columnWidth"
+        android:scrollbars="none"
         android:verticalSpacing="3dp" />
 
     <!-- android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft" -->
