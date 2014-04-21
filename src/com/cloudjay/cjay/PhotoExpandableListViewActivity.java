@@ -366,8 +366,8 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 					if (selectedCJayImageUuidsList != null) {
 						for (String cJayImageUuid : selectedCJayImageUuidsList) {
 							String newUuid = UUID.randomUUID().toString();
-							String sql = "insert into cjay_image (containerSession_id, image_name, time_posted, state, id, uuid, type) "
-									+ " select containerSession_id, image_name, time_posted, state, id, "
+							String sql = "insert into cjay_image (containerSession_id, image_name, time_posted, state, _id, uuid, type) "
+									+ " select containerSession_id, image_name, time_posted, state, _id, "
 									+ Utils.sqlString(newUuid)
 									+ ","
 									+ mCJayImageTypeCopyTo
