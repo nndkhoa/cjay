@@ -178,8 +178,7 @@ public class Mapper {
 						List<AuditReportImage> auditReportImages = auditReportItem.getAuditReportImages();
 						Collection<CJayImage> cJayImages = new ArrayList<CJayImage>();
 						for (AuditReportImage item : auditReportImages) {
-							CJayImage tmpCJayImage = new CJayImage(item.getId(), item.getType(), item.getImageName());
-
+							CJayImage tmpCJayImage = new CJayImage(item.getId(), item.getType(), item.getImageUrl());
 							tmpCJayImage.setIssue(issue);
 
 							cJayImages.add(tmpCJayImage);
@@ -203,7 +202,7 @@ public class Mapper {
 				for (GateReportImage gateReportImage : gateReportImages) {
 
 					CJayImage image = new CJayImage(gateReportImage.getId(), gateReportImage.getType(),
-													gateReportImage.getCreatedAt(), gateReportImage.getImageName());
+													gateReportImage.getCreatedAt(), gateReportImage.getImageUrl());
 
 					// set default value
 					// image.setUploadState(CJayImage.STATE_UPLOAD_COMPLETED);
