@@ -8,13 +8,17 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
@@ -26,7 +30,6 @@ import com.cloudjay.cjay.PhotoViewPagerActivity;
 import com.cloudjay.cjay.PhotoViewPagerActivity_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.PhotoGridViewCursorAdapter;
-import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.model.CJayImage;
@@ -45,6 +48,9 @@ public class RepairIssueImageListFragment extends SherlockFragment implements Lo
 
 	private final String LOG_TAG = "RepairIssueImageListFragment";
 	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_1;
+	
+	public final static String CJAY_ISSUE_UUID = "issueUUID";
+	public final static String CJAY_IMAGE_TYPE = "imageType";
 
 	private ArrayList<CJayImage> mTakenImages;
 	private Issue mIssue;
@@ -58,7 +64,14 @@ public class RepairIssueImageListFragment extends SherlockFragment implements Lo
 	
 	@ViewById(R.id.btn_add_new)
 	ImageButton mCameraButton;
-
+	
+	@Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		mIssueUUID = getArguments().getString(CJAY_ISSUE_UUID);
+		mType = getArguments().getInt(CJAY_IMAGE_TYPE);
+        return null;
+    }
+	
 	@AfterViews
 	void afterViews() {
 		// show or hide camera button
@@ -87,6 +100,7 @@ public class RepairIssueImageListFragment extends SherlockFragment implements Lo
 				Intent intent = new Intent(ctx, PhotoViewPagerActivity_.class);
 				intent.putExtra(PhotoViewPagerActivity.START_POSITION, position);
 				intent.putExtra(PhotoViewPagerActivity.CJAY_CONTAINER_SESSION_EXTRA, mIssue.getContainerSession().getUuid());
+				intent.putExtra(PhotoViewPagerActivity.CJAY_ISSUE_TYPE_EXTRA, mIssueUUID);
 				intent.putExtra(PhotoViewPagerActivity.CJAY_IMAGE_TYPE_EXTRA, mType);
 				intent.putExtra("title", Utils.getImageTypeDescription(ctx, mType));
 				ctx.startActivity(intent);
@@ -100,7 +114,7 @@ public class RepairIssueImageListFragment extends SherlockFragment implements Lo
 			mTakenImages = new ArrayList<CJayImage>();
 		}
 
-		CJayApplication.gotoCamera(getActivity(), mIssue.getContainerSession(), CJayImage.TYPE_REPAIRED, LOG_TAG);
+		CJayApplication.gotoCamera(getActivity(), mIssue.getContainerSession(), mType, LOG_TAG);
 	}
 
 	@Override
@@ -135,23 +149,22 @@ public class RepairIssueImageListFragment extends SherlockFragment implements Lo
 		// update new images and database
 		Logger.Log("onResume");
 		if (mTakenImages != null && mTakenImages.size() > 0) {
-			try {
-				CJayImageDaoImpl cJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager()
-																.getHelper(getActivity()).getCJayImageDaoImpl();
 
-				for (CJayImage cJayImage : mTakenImages) {
-					cJayImageDaoImpl.refresh(cJayImage);
-					cJayImage.setIssue(mIssue);
-					cJayImage.setContainerSession(mIssue.getContainerSession());
-					cJayImageDaoImpl.update(cJayImage);
-				}
-
-				// refresh menu
-				getActivity().supportInvalidateOptionsMenu();
-
-			} catch (SQLException e) {
-				e.printStackTrace();
+			for (CJayImage cJayImage : mTakenImages) {
+				SQLiteDatabase db = DataCenter.getDatabaseHelper(getActivity().getApplicationContext()).getWritableDatabase();					
+				ContentValues values = new ContentValues();
+				values.put("issue_id", mIssueUUID);
+				values.put("containerSession_id", mIssue.getContainerSession().getUuid());
+				db.update("cjay_image", values, "uuid LIKE ? ", new String[] { cJayImage.getUuid() });
+//				Logger.Log("updated cjayimage issue_id: " + mIssueUUID);
+//				Logger.Log("updated cjayimage containerSession_id: " + mIssue.getContainerSession().getUuid());
+//				Logger.Log("updated cjayimage cjay_image: " + cJayImage.getUuid());
+//				Logger.Log("updated cjayimage: " + rows);
 			}
+
+			// refresh menu
+			getActivity().supportInvalidateOptionsMenu();
+
 
 			mTakenImages.clear();
 			mTakenImages = null;
@@ -159,7 +172,7 @@ public class RepairIssueImageListFragment extends SherlockFragment implements Lo
 
 		// refresh list
 		if (mCursorAdapter != null) {
-			getActivity().getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
+			getLoaderManager().restartLoader(LOADER_ID, null, this);
 		}
 		super.onResume();
 	}
@@ -171,6 +184,7 @@ public class RepairIssueImageListFragment extends SherlockFragment implements Lo
 			public Cursor loadInBackground() {
 				Cursor cursor = DataCenter.getInstance().getCJayImagesCursorByContainer(getContext(),
 																						mIssue.getContainerSession().getUuid(),
+																						mIssueUUID,
 																						mType);
 				
 				if (cursor != null) {
@@ -195,13 +209,5 @@ public class RepairIssueImageListFragment extends SherlockFragment implements Lo
 		} else {
 			mCursorAdapter.swapCursor(cursor);
 		}
-	}
-
-	public void setIssueUUID(String issueUUID) {
-		mIssueUUID = issueUUID;
-	}
-
-	public void setType(int type) {
-		mType = type;
 	}
 }

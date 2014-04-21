@@ -9,6 +9,7 @@ import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -30,7 +31,14 @@ import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
-import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.fragment.IssueReportComponentFragment_;
+import com.cloudjay.cjay.fragment.IssueReportDamageFragment_;
+import com.cloudjay.cjay.fragment.IssueReportDimensionFragment_;
+import com.cloudjay.cjay.fragment.IssueReportFragment;
+import com.cloudjay.cjay.fragment.IssueReportLocationFragment_;
+import com.cloudjay.cjay.fragment.IssueReportPhotoFragment_;
+import com.cloudjay.cjay.fragment.IssueReportQuantityFragment_;
+import com.cloudjay.cjay.fragment.IssueReportRepairFragment_;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ComponentCode;
@@ -38,6 +46,7 @@ import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.DataCenter;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 // slide 20
@@ -198,7 +207,11 @@ public class AuditorIssueReportActivity extends CJayActivity implements OnPageCh
 		// save db records
 		try {
 			mIssueDaoImpl.createOrUpdate(mIssue);
-			mCJayImageDaoImpl.createOrUpdate(mCJayImage);
+//			mCJayImageDaoImpl.refresh(mCJayImage);
+//			mCJayImage.setIssue(mIssue);
+//			mCJayImageDaoImpl.createOrUpdate(mCJayImage);
+			SQLiteDatabase db = DataCenter.getDatabaseHelper(this.getApplicationContext()).getWritableDatabase();
+			db.execSQL("UPDATE cjay_image SET issue_id = ? WHERE _id LIKE ? ", new String[] { mIssue.getUuid(), mCJayImageUUID });
 
 		} catch (SQLException e) {
 			e.printStackTrace();

@@ -11,7 +11,6 @@ import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EBean.Scope;
 import org.androidannotations.annotations.Trace;
 
-import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
@@ -317,6 +316,14 @@ public class DataCenter {
 		String queryString = "SELECT * FROM cjay_image WHERE containerSession_id LIKE ? AND type = ?";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
 																			new String[] { containerSessionUUID + "%",
+																					String.valueOf(imageType) });
+	}
+	
+	public Cursor getCJayImagesCursorByContainer(Context context, String containerSessionUUID, String issueUUID, int imageType) {
+		String queryString = "SELECT * FROM cjay_image WHERE containerSession_id LIKE ? AND issue_id LIKE ? AND type = ?";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
+																			new String[] { containerSessionUUID + "%",
+																					issueUUID + "%",
 																					String.valueOf(imageType) });
 	}
 

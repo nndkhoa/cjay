@@ -154,7 +154,7 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 			try {
 				containerSessionDaoImpl.refresh(mContainerSession);
 
-				if (mContainerSession.isValidForUpload(CJayImage.TYPE_REPAIRED)) {
+				if (mContainerSession.isValidForUpload(this, CJayImage.TYPE_REPAIRED)) {
 
 					mContainerSession.setUploadType(UploadType.REPAIR);
 					CJayApplication.uploadContainerSesison(context, mContainerSession);

@@ -126,6 +126,7 @@ public class RepairContainerPendingListFragment extends SherlockFragment impleme
 
 	@AfterViews
 	void afterViews() {
+		final Context ctx = getActivity();
 
 		try {
 			containerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity())
@@ -200,7 +201,7 @@ public class RepairContainerPendingListFragment extends SherlockFragment impleme
 						List<ContainerSession> invalidContainerSessions = new ArrayList<ContainerSession>();
 						for (ContainerSession containerSession : mSelectedContainerSessions) {
 
-							if (containerSession.isValidForUpload(CJayImage.TYPE_REPAIRED)) {
+							if (containerSession.isValidForUpload(ctx, CJayImage.TYPE_REPAIRED)) {
 
 								containerSession.setUploadType(UploadType.REPAIR);
 								CJayApplication.uploadContainerSesison(getActivity(), containerSession);
