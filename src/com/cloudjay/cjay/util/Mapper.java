@@ -2,14 +2,19 @@ package com.cloudjay.cjay.util;
 
 import java.lang.reflect.Type;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import org.androidannotations.annotations.EBean;
+import org.droidparts.contract.DB;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
@@ -317,8 +322,8 @@ public class Mapper {
 
 		try {
 			if (null != tmp) {
-				CJayImageDaoImpl cJayImageDaoImpl = databaseManager.getHelper(ctx).getCJayImageDaoImpl();
-				IssueDaoImpl issueDaoImpl = databaseManager.getHelper(ctx).getIssueDaoImpl();
+
+				SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
 
 				// Update imageIdPath
 				main.setId(tmp.getId());
@@ -340,80 +345,115 @@ public class Mapper {
 
 				// Update GateReportImages
 				List<GateReportImage> gateReportImages = tmp.getGateReportImages();
-				Collection<CJayImage> cJayImages = main.getCJayImages();
 
 				if (gateReportImages != null) {
 					for (GateReportImage gateReportImage : gateReportImages) {
-						for (CJayImage cJayImage : cJayImages) {
 
-							String gateReportImageName = gateReportImage.getImageName();
-							String cJayImageName = cJayImage.getImageName();
+						String gateImageName = gateReportImage.getImageName();
+						String sql = "SELECT * FROM cjay_image WHERE image_name LIKE ?";
+						Cursor cursor = db.rawQuery(sql, new String[] { "%" + gateImageName });
 
-							if (gateReportImageName.contains(cJayImageName)) {
+						// existed
+						if (cursor.moveToFirst()) { // update
 
-								// Logger.Log("Gate Report Image Id: " + Integer.toString(gateReportImage.getId())
-								// + "\nGate Report Image Name: " + gateReportImageName
-								// + "\nGate Report Image Type: " + Integer.toString(gateReportImage.getType())
-								// + "\nGate Report Image Time: " + gateReportImage.getCreatedAt());
+							String uuid = cursor.getString(cursor.getColumnIndexOrThrow(CJayImage.FIELD_UUID));
+							String imageName = cursor.getString(cursor.getColumnIndexOrThrow(CJayImage.FIELD_IMAGE_NAME));
+							sql = "UPDATE cjay_image SET id = " + gateReportImage.getId() + " WHERE uuid = '" + uuid
+									+ "'";
 
-								cJayImage.setId(gateReportImage.getId());
-								cJayImage.setImageName(gateReportImageName);
-								cJayImageDaoImpl.update(cJayImage);
+							db.execSQL(sql);
+							Logger.Log("Update CJayImage UUID: " + uuid + " | Image name: " + imageName);
 
-								break;
-							}
+						} else { // create
+
+							String uuid = UUID.randomUUID().toString();
+							sql = "INSERT INTO cjay_image VALUES ('" + main.getUuid() + "', '" + uuid + "', '"
+									+ gateReportImage.getImageUrl() + "', NULL, '" + gateReportImage.getCreatedAt()
+									+ "', '" + gateReportImage.getImageUrl() + "', 4," + gateReportImage.getType()
+									+ ", " + gateReportImage.getId() + ")";
+
+							db.execSQL(sql);
+							Logger.Log("Create new CJayImage");
+
 						}
 					}
 				}
 
 				// Update AuditReportItems
 				List<AuditReportItem> auditReportItems = tmp.getAuditReportItems();
-				Collection<Issue> issues = main.getIssues();
-
 				if (auditReportItems != null) {
 					for (AuditReportItem auditReportItem : auditReportItems) {
-						for (Issue issue : issues) {
 
-							if (issue.equals(auditReportItem)) {
-								issue.setId(auditReportItem.getId());
+						int componentId = auditReportItem.getComponentId();
+						int damageId = auditReportItem.getDamageId();
+						int repairId = auditReportItem.getRepairId();
 
-								List<AuditReportImage> auditReportImages = auditReportItem.getAuditReportImages();
-								Collection<CJayImage> issueImages = issue.getCJayImages();
+						String sql = "select * from issue where componentCode_id = " + componentId
+								+ " and damageCode_id = " + damageId + " and repairCode_id = " + repairId
+								+ " and locationCode LIKE ? and containerSession_id = ? and coalesce(length, 0) = "
+								+ auditReportItem.getLength() + " and coalesce(height, 0) = "
+								+ auditReportItem.getHeight();
 
+						Cursor cursor = db.rawQuery(sql,
+													new String[] { auditReportItem.getLocationCode(), main.getUuid() });
+
+						if (cursor.moveToFirst()) { // existed
+
+							// update issue_id
+							String uuid = cursor.getString(cursor.getColumnIndexOrThrow(Issue.FIELD_UUID));
+							sql = "UPDATE issue SET id = " + auditReportItem.getId() + " WHERE _id = '" + uuid + "'";
+							db.execSQL(sql);
+							Logger.Log("Update Issue with id: " + auditReportItem.getId());
+
+							// update audit report images
+							List<AuditReportImage> auditReportImages = auditReportItem.getAuditReportImages();
+							if (auditReportImages != null) {
 								for (AuditReportImage auditReportImage : auditReportImages) {
-									for (CJayImage cJayImage : issueImages) {
 
-										String auditReportImageName = auditReportImage.getImageName();
-										String cJayImageName = cJayImage.getImageName();
-										if (auditReportImageName.contains(cJayImageName)) {
+									String auditReportImageName = auditReportImage.getImageName();
+									sql = "SELECT * FROM cjay_image WHERE image_name LIKE ?";
+									Cursor auditCursor = db.rawQuery(sql, new String[] { "%" + auditReportImageName });
 
-											cJayImage.setId(auditReportImage.getId());
-											cJayImage.setImageName(auditReportImageName);
+									// existed
+									if (cursor.moveToFirst()) { // update
 
-											Logger.Log(
+										String auditImageUuid = auditCursor.getString(auditCursor.getColumnIndexOrThrow(CJayImage.FIELD_UUID));
+										String imageName = auditCursor.getString(auditCursor.getColumnIndexOrThrow(CJayImage.FIELD_IMAGE_NAME));
 
-											"Audit Report Image Id: " + Integer.toString(cJayImage.getId())
-													+ "\nAudit Report Image Name: " + cJayImage);
+										sql = "UPDATE cjay_image SET id = " + auditReportImage.getId()
+												+ " WHERE uuid = '" + auditImageUuid + "'";
+										db.execSQL(sql);
+										Logger.Log("Update CJayImage UUID: " + auditImageUuid + " | Image name: "
+												+ imageName);
 
-											cJayImageDaoImpl.update(cJayImage);
-											break;
-										}
+									} else { // create
+
+										SimpleDateFormat dateFormat = new SimpleDateFormat(
+																							CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+										String nowString = dateFormat.format(new Date());
+
+										String auditImageUuid = UUID.randomUUID().toString();
+										sql = "INSERT INTO cjay_image VALUES ('" + main.getUuid() + "', '"
+												+ auditImageUuid + "', '" + auditReportImage.getImageUrl() + "', '"
+												+ auditImageUuid + "', '" + nowString + "', '"
+												+ auditReportImage.getImageUrl() + "', 4," + auditReportImage.getType()
+												+ ", " + auditReportImage.getId() + ")";
+
+										db.execSQL(sql);
+										Logger.Log("Create new CJayImage based on AuditReportImage");
+
 									}
 								}
-
-								issueDaoImpl.update(issue);
-								break;
 							}
+
+						} else { // create
+							Logger.e("You really need to create new Issue record");
 						}
 					}
 				}
 
 				// Post ContainerSessionUpdatedEvent
-
 			}
-		} catch (SQLException e) {
-			throw e;
-
 		} catch (Exception e) {
 			throw e;
 		}

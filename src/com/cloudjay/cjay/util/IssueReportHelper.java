@@ -49,6 +49,7 @@ public class IssueReportHelper {
 		String sql = "select _id from issue where componentCode_id = " + componentId + " and damageCode_id = "
 				+ damageId + " and repairCode_id = " + repairId + " and locationCode = ? and containerSession_id = ?";
 		Cursor issueCursor = db.rawQuery(sql, new String[] { "BXXX", containerSessionUuid });
+
 		if (issueCursor.moveToFirst()) {
 			// a WW issue already exists. Update quantity
 			issueId = issueCursor.getString(repairCursor.getColumnIndexOrThrow("_id"));
