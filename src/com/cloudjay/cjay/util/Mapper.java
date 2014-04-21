@@ -9,7 +9,6 @@ import java.util.UUID;
 
 import org.androidannotations.annotations.EBean;
 
-import android.R.integer;
 import android.content.Context;
 import android.text.TextUtils;
 
