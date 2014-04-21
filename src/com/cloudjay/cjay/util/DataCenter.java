@@ -741,10 +741,13 @@ public class DataCenter {
 								String uuid = cursor.getString(cursor.getColumnIndex("_id"));
 
 								if (TextUtils.isEmpty(uuid)) {
+
 									Logger.e("WTF. CS existed but cannot find _id");
 								} else {
 									Mapper.getInstance().update(ctx, tmpSession, uuid);
 								}
+
+								break;
 
 							} else { // --> create
 								containerSession = Mapper.getInstance().toContainerSession(tmpSession, ctx);

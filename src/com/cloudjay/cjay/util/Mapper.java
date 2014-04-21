@@ -325,23 +325,28 @@ public class Mapper {
 
 				SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
 
-				// Update imageIdPath
-				main.setId(tmp.getId());
-				if (updateImageIdPath) {
-					if (!TextUtils.isEmpty(tmp.getImageIdPath())
-							&& !tmp.getImageIdPath()
-									.equals("https://storage.googleapis.com/storage-cjay.cloudjay.com/")) {
-						main.setImageIdPath(tmp.getImageIdPath());
-					}
+				String sqlString = "UPDATE container_session SET id = " + tmp.getId() + ", check_in_time = '"
+						+ tmp.getCheckInTime() + "', image_id_path = '" + tmp.getImageIdPath() + "' WHERE _id = '"
+						+ main.getUuid() + "'";
+				db.execSQL(sqlString);
 
-				}
-
-				// Update check in time
-				main.setCheckInTime(tmp.getCheckInTime());
-
-				// Update check out time
-				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
-												tmp.getCheckInTime());
+				// // Update imageIdPath
+				// main.setId(tmp.getId());
+				// if (updateImageIdPath) {
+				// if (!TextUtils.isEmpty(tmp.getImageIdPath())
+				// && !tmp.getImageIdPath()
+				// .equals("https://storage.googleapis.com/storage-cjay.cloudjay.com/")) {
+				// main.setImageIdPath(tmp.getImageIdPath());
+				// }
+				//
+				// }
+				//
+				// // Update check in time
+				// main.setCheckInTime(tmp.getCheckInTime());
+				//
+				// // Update check out time
+				// PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
+				// tmp.getCheckInTime());
 
 				// Update GateReportImages
 				List<GateReportImage> gateReportImages = tmp.getGateReportImages();
@@ -373,7 +378,7 @@ public class Mapper {
 									+ ", " + gateReportImage.getId() + ")";
 
 							db.execSQL(sql);
-							Logger.Log("Create new CJayImage");
+							Logger.Log("Create new CJayImage: " + gateReportImage.getImageName());
 
 						}
 					}
