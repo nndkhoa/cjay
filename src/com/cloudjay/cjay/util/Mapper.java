@@ -326,8 +326,8 @@ public class Mapper {
 				SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
 
 				String sqlString = "UPDATE container_session SET id = " + tmp.getId() + ", check_in_time = '"
-						+ tmp.getCheckInTime() + "', image_id_path = '" + tmp.getImageIdPath() + "' WHERE _id = '"
-						+ main.getUuid() + "'";
+						+ tmp.getCheckInTime() + "', image_id_path = '" + tmp.getImageIdPath() + "', server_state = "
+						+ tmp.getStatus() + " WHERE _id = '" + main.getUuid() + "'";
 				db.execSQL(sqlString);
 
 				// // Update imageIdPath
@@ -455,6 +455,8 @@ public class Mapper {
 							Logger.e("You really need to create new Issue record");
 						}
 					}
+				} else {
+					Logger.e("AuditReportItems is NULL");
 				}
 
 				// Post ContainerSessionUpdatedEvent
