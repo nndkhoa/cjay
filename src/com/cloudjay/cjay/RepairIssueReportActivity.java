@@ -79,8 +79,9 @@ public class RepairIssueReportActivity extends CJayActivity implements OnPageCha
 
 	public static final String CJAY_ISSUE_EXTRA = "issue";
 	private Issue mIssue;
-
+	private IssueDaoImpl mIssueDaoImpl;
 	private String[] locations;
+	
 	@ViewById
 	ViewPager pager;
 
@@ -98,8 +99,8 @@ public class RepairIssueReportActivity extends CJayActivity implements OnPageCha
 		long startTime = System.currentTimeMillis();
 		
 		try {
-			IssueDaoImpl issueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getIssueDaoImpl();
-			mIssue = issueDaoImpl.queryForId(mIssueUUID);
+			mIssueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getIssueDaoImpl();
+			mIssue = mIssueDaoImpl.queryForId(mIssueUUID);
 
 			if (null != mIssue) {
 				setTitle(mIssue.getContainerSession().getContainerId());
@@ -182,11 +183,8 @@ public class RepairIssueReportActivity extends CJayActivity implements OnPageCha
 		boolean hasRepaired = false;
 
 		if (null != mIssue) {
-			IssueDaoImpl issueDaoImpl;
 			try {
-				issueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getIssueDaoImpl();
-				mIssue = issueDaoImpl.queryForId(mIssueUUID);
-				issueDaoImpl.refresh(mIssue);
+				mIssueDaoImpl.refresh(mIssue);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
