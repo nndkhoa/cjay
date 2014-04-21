@@ -11,6 +11,7 @@ import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EBean.Scope;
 import org.androidannotations.annotations.Trace;
 
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
@@ -695,16 +696,22 @@ public class DataCenter {
 					nextUrl = result.getNext();
 
 					List<TmpContainerSession> tmpContainerSessions = result.getResults();
+					Logger.Log("Total items: " + tmpContainerSessions.size());
 
 					if (null != tmpContainerSessions) {
 
+						int count = 0;
 						for (TmpContainerSession tmpSession : tmpContainerSessions) {
 
+							count++;
 							ContainerSession containerSession = Mapper.getInstance()
 																		.toContainerSession(tmpSession, ctx);
 
 							if (null != containerSession) {
+								Logger.Log(Integer.toString(count));
 								containerSessions.add(containerSession);
+							} else {
+								Logger.e("WTF " + tmpSession.getContainerId());
 							}
 
 						}

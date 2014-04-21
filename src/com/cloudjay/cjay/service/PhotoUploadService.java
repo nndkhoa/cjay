@@ -113,6 +113,11 @@ public class PhotoUploadService extends Service {
 			try {
 				uploadItem.setUploadState(CJayImage.STATE_UPLOAD_IN_PROGRESS);
 
+				if (uploadItem.getUri().startsWith("http")) {
+					uploadItem.setUploadState(CJayImage.STATE_UPLOAD_COMPLETED);
+					return;
+				}
+
 				// Try New Upload Method
 				String uploadUrl = String.format(CJayConstant.CJAY_TMP_STORAGE, uploadItem.getImageName());
 
@@ -392,6 +397,8 @@ public class PhotoUploadService extends Service {
 		if (isCurrentlyUploading()) { return true; }
 
 		if (canUpload()) {
+
+			// set c
 
 			CJayImage uploadItem = null;
 			try {

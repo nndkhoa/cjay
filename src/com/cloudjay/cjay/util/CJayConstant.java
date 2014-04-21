@@ -74,12 +74,12 @@ public final class CJayConstant {
 
 	// ALARM ID
 	public static final int ALARM_ID = 49482;
-	public static final int ALARM_INTERVAL = 25;
+	public static final int ALARM_INTERVAL = 5;
 	public static final String CUSTOM_INTENT = "com.cloudjay.cjay.CUSTOM_INTENT";
 
 	public static final int HIDDEN_LOG_THRESHOLD = 4;
 
-	public static final int RETRY_THRESHOLD = 5;
+	public static final int RETRY_THRESHOLD = 4;
 
 	public static final String INTENT_SERVICE_UPLOAD_ALL = "cjay.intent.action.UPLOAD_ALL";
 	public static final String INTENT_PHOTO_TAKEN = "cjay.intent.action.PHOTO_TAKEN";

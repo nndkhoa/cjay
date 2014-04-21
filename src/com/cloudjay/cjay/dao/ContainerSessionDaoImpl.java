@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -76,11 +77,13 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 
 		long startTime = System.currentTimeMillis();
 		Logger.Log("*** add List of Container Sessions ***");
+
 		if (containerSessions != null) {
 			for (ContainerSession containerSession : containerSessions) {
 				addContainerSession(containerSession);
 			}
 		}
+
 		long difference = System.currentTimeMillis() - startTime;
 		Logger.Log("---> Total time: " + Long.toString(difference));
 	}
@@ -536,57 +539,64 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 				Logger.w("Temporary upload detected. Return " + containerSession.getContainerId());
 				EventBus.getDefault().post(	new LogUserActivityEvent(containerSession.getContainerId()
 													+ " | #Temporary upload detected."));
-
 				return containerSession;
-
 			}
 
 			boolean flag = true;
 			Collection<CJayImage> cJayImages = containerSession.getCJayImages();
-
 			for (CJayImage cJayImage : cJayImages) {
 
-				int uploadState = cJayImage.getUploadState();
-				if (uploadState != CJayImage.STATE_UPLOAD_COMPLETED) {
+				synchronized (cJayImage) {
+					int uploadState = cJayImage.getUploadState();
+					if (uploadState != CJayImage.STATE_UPLOAD_COMPLETED) {
 
-					// Increase retry count
-					String key = cJayImage.getUuid();
-					if (retryCountHashMap.containsKey(key)) {
+						Logger.Log(cJayImage.getImageName() + " | " + UploadState.values()[uploadState]);
+						// Increase retry count
+						String key = cJayImage.getUuid();
+						if (retryCountHashMap.containsKey(key)) {
 
-						int count = retryCountHashMap.get(key);
-						count++;
-						retryCountHashMap.put(key, count);
+							int count = retryCountHashMap.get(key);
+							count++;
+							retryCountHashMap.put(key, count);
 
-						Logger.Log(containerSession.getContainerId() + " | Retry count: " + Integer.toString(count));
+							Logger.Log(containerSession.getContainerId() + " | Retry count: " + Integer.toString(count));
 
-						// Retry to upload cjayimage
-						if (count >= CJayConstant.RETRY_THRESHOLD
-								&& !Utils.isRunning(ctx, PhotoUploadService_.class.getName())) {
+							// Retry to upload cjayimage
+							if (count >= CJayConstant.RETRY_THRESHOLD
+									&& !Utils.isRunning(ctx, PhotoUploadService_.class.getName())) {
 
-							Logger.w("Retry to upload CJayImage : " + cJayImage.getImageName());
-							EventBus.getDefault().post(	new LogUserActivityEvent("#Retry to upload CJayImage: "
-																+ cJayImage.getImageName() + " | Container: "
-																+ containerSession.getContainerId()));
+								Logger.w("Retry to upload CJayImage : " + cJayImage.getImageName());
+								EventBus.getDefault().post(	new LogUserActivityEvent("#Retry to upload CJayImage: "
+																	+ cJayImage.getImageName() + " | Container: "
+																	+ containerSession.getContainerId()));
 
-							// Refresh cjay_image type
-							// UPDATE cjay_image SET state = 1, time_posted = '2014-03-21T15:33:01' WHERE uuid =
-							// '<uuid>'
-							String sql = "UPDATE cjay_image SET state = " + CJayImage.STATE_UPLOAD_WAITING
-									+ ", time_posted = '"
-									+ StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE)
-									+ "' WHERE " + CJayImage.FIELD_UUID + " = '" + key + "'";
+								// Refresh cjay_image type
+								// UPDATE cjay_image SET state = 1, time_posted = '2014-03-21T15:33:01' WHERE uuid =
+								// '<uuid>'
+								String sql = "UPDATE cjay_image SET state = "
+										+ CJayImage.STATE_UPLOAD_WAITING
+										+ ", time_posted = '"
+										+ StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE)
+										+ "' WHERE " + CJayImage.FIELD_UUID + " = '" + key + "'";
 
-							db.execSQL(sql);
-							retryCountHashMap.remove(key);
+								db.execSQL(sql);
+
+								Intent i = new Intent();
+								i.setAction(CJayConstant.INTENT_PHOTO_TAKEN);
+								ctx.sendBroadcast(i);
+
+								retryCountHashMap.remove(key);
+							}
+
+						} else {
+							retryCountHashMap.put(cJayImage.getUuid(), 0);
 						}
 
-					} else {
-						retryCountHashMap.put(cJayImage.getUuid(), 0);
+						flag = false;
+						break;
 					}
-
-					flag = false;
-					break;
 				}
+
 			}
 
 			if (flag == true) {

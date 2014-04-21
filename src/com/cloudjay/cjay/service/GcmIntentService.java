@@ -217,6 +217,7 @@ public class GcmIntentService extends IntentService {
 
 				} else {
 
+					Logger.Log("NEW_ERROR_LIST | Other roles");
 					// Get more data from Server
 					//
 					DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_MODIFIED);
@@ -242,6 +243,8 @@ public class GcmIntentService extends IntentService {
 
 				if (userRole == UserRole.REPAIR_STAFF) {
 					DataCenter.getInstance().removeContainerSession(this, id);
+				} else {
+					DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_MODIFIED);
 				}
 
 			} else if (type.equalsIgnoreCase("UPDATE_DAMAGE_CODE")) {
