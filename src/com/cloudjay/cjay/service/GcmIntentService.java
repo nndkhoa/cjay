@@ -26,6 +26,7 @@ import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJaySession;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.InvokeType;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.UserRole;
@@ -187,15 +188,14 @@ public class GcmIntentService extends IntentService {
 				// Received Roles: GATE | AUDIT
 				// --> Get more data from Server
 
-				if (userRole == UserRole.GATE_KEEPER || userRole == UserRole.AUDITOR
-						|| userRole == UserRole.REPAIR_STAFF) {
-					DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_CREATED);
-				}
+				DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_MODIFIED,
+																		InvokeType.NOTIFICATION);
 
 			} else if (type.equalsIgnoreCase("NEW_TEMP_CONTAINER")) {
 
 				Logger.Log("Received notification: NEW_TEMP_CONTAINER");
-				DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_CREATED);
+				DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_CREATED,
+																		InvokeType.NOTIFICATION);
 
 			} else if (type.equalsIgnoreCase("EXPORT_CONTAINER")) {
 				// Received: Container xuất khỏi Depot ở CỔNG
@@ -220,7 +220,8 @@ public class GcmIntentService extends IntentService {
 					Logger.Log("NEW_ERROR_LIST | Other roles");
 					// Get more data from Server
 					//
-					DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_MODIFIED);
+					DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_MODIFIED,
+																			InvokeType.NOTIFICATION);
 				}
 
 			} else if (type.equalsIgnoreCase("UPDATE_ERROR_LIST")) {
@@ -232,7 +233,8 @@ public class GcmIntentService extends IntentService {
 				// use MODIFIED_AFTER
 
 				if (userRole == UserRole.REPAIR_STAFF) {
-					DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_MODIFIED);
+					DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_MODIFIED,
+																			InvokeType.NOTIFICATION);
 				}
 
 			} else if (type.equalsIgnoreCase("CONTAINER_REPAIRED")) {
@@ -241,10 +243,11 @@ public class GcmIntentService extends IntentService {
 				// Received Roles: REPAIR with attached `id`
 				// --> Remove Container Session having this `id`
 
-				if (userRole == UserRole.REPAIR_STAFF) {
+				if (userRole == UserRole.REPAIR_STAFF || userRole == UserRole.AUDITOR) {
 					DataCenter.getInstance().removeContainerSession(this, id);
 				} else {
-					DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_MODIFIED);
+					DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_MODIFIED,
+																			InvokeType.NOTIFICATION);
 				}
 
 			} else if (type.equalsIgnoreCase("UPDATE_DAMAGE_CODE")) {

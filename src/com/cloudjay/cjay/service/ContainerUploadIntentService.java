@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import org.androidannotations.annotations.EService;
 import org.androidannotations.annotations.Trace;
 
-import android.R.integer;
 import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;

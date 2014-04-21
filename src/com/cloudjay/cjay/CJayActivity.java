@@ -33,6 +33,7 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJaySession;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.InvokeType;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
@@ -205,9 +206,22 @@ public class CJayActivity extends SherlockFragmentActivity {
 					@Override
 					protected Void doInBackground(Void... params) {
 
+						boolean firstTime = PreferencesUtil.getPrefsValue(	context, PreferencesUtil.PREF_INITIALIZED,
+																			false);
+
 						try {
-							DataCenter.getInstance().updateListContainerSessions(getApplicationContext(),
-																					CJayClient.REQUEST_TYPE_CREATED);
+							if (firstTime) {
+								DataCenter.getInstance()
+											.updateListContainerSessions(getApplicationContext(),
+																			CJayClient.REQUEST_TYPE_CREATED,
+																			InvokeType.FIRST_TIME);
+							} else {
+								DataCenter.getInstance()
+											.updateListContainerSessions(getApplicationContext(),
+																			CJayClient.REQUEST_TYPE_CREATED,
+																			InvokeType.FOLLOWING);
+							}
+
 						} catch (NoConnectionException e) {
 							showCrouton(R.string.alert_no_network);
 						} catch (SQLException e) {

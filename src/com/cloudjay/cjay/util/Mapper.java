@@ -207,6 +207,7 @@ public class Mapper {
 						image.setContainerSession(containerSession);
 					}
 
+					Logger.Log("Add cjay image " + image.getImageName());
 					cJayImageDaoImpl.addCJayImage(image);
 					listImages.add(image);
 				}
@@ -299,30 +300,16 @@ public class Mapper {
 		return toTmpContainerSession(ctx, containerSession, true);
 	}
 
-	public synchronized void
-			update(Context ctx, String jsonString, ContainerSession main, boolean updateImageIdPath) throws Exception {
+	public synchronized void update(Context ctx, TmpContainerSession tmp, ContainerSession main,
+									boolean updateImageIdPath) throws Exception {
 
 		try {
-
-			TmpContainerSession tmp = null;
-			Gson gson = new GsonBuilder().setDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE).create();
-
-			Type listType = new TypeToken<TmpContainerSession>() {
-			}.getType();
-
-			try {
-				tmp = gson.fromJson(jsonString, listType);
-			} catch (Exception e) {
-				Logger.Log("jsonString is on wrong format");
-				e.printStackTrace();
-				return;
-			}
-
 			if (null != tmp) {
 				CJayImageDaoImpl cJayImageDaoImpl = databaseManager.getHelper(ctx).getCJayImageDaoImpl();
 
 				IssueDaoImpl issueDaoImpl = databaseManager.getHelper(ctx).getIssueDaoImpl();
 
+				// Update imageIdPath
 				main.setId(tmp.getId());
 				if (updateImageIdPath) {
 					if (!TextUtils.isEmpty(tmp.getImageIdPath())
@@ -332,11 +319,16 @@ public class Mapper {
 					}
 
 				}
+
+				// Update check in time
 				main.setCheckInTime(tmp.getCheckInTime());
+
+				// Update check out time
 
 				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
 												tmp.getCheckInTime());
 
+				// Update GateReportImages
 				List<GateReportImage> gateReportImages = tmp.getGateReportImages();
 				Collection<CJayImage> cJayImages = main.getCJayImages();
 
@@ -364,8 +356,129 @@ public class Mapper {
 					}
 				}
 
+				// Update AuditReportItems
 				List<AuditReportItem> auditReportItems = tmp.getAuditReportItems();
+				Collection<Issue> issues = main.getIssues();
 
+				if (auditReportItems != null) {
+					for (AuditReportItem auditReportItem : auditReportItems) {
+						for (Issue issue : issues) {
+
+							if (issue.equals(auditReportItem)) {
+								issue.setId(auditReportItem.getId());
+
+								List<AuditReportImage> auditReportImages = auditReportItem.getAuditReportImages();
+								Collection<CJayImage> issueImages = issue.getCJayImages();
+
+								for (AuditReportImage auditReportImage : auditReportImages) {
+									for (CJayImage cJayImage : issueImages) {
+
+										String auditReportImageName = auditReportImage.getImageName();
+										String cJayImageName = cJayImage.getImageName();
+										if (auditReportImageName.contains(cJayImageName)) {
+
+											cJayImage.setId(auditReportImage.getId());
+											cJayImage.setImageName(auditReportImageName);
+
+											Logger.Log(
+
+											"Audit Report Image Id: " + Integer.toString(cJayImage.getId())
+													+ "\nAudit Report Image Name: " + cJayImage);
+
+											cJayImageDaoImpl.update(cJayImage);
+											break;
+										}
+									}
+								}
+
+								issueDaoImpl.update(issue);
+								break;
+							}
+						}
+					}
+				}
+
+				// Post ContainerSessionUpdatedEvent
+
+			}
+		} catch (SQLException e) {
+			throw e;
+
+		} catch (Exception e) {
+			throw e;
+		}
+
+	}
+
+	public synchronized void
+			update(Context ctx, String jsonString, ContainerSession main, boolean updateImageIdPath) throws Exception {
+
+		try {
+
+			TmpContainerSession tmp = null;
+			Gson gson = new GsonBuilder().setDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE).create();
+
+			Type listType = new TypeToken<TmpContainerSession>() {
+			}.getType();
+
+			try {
+				tmp = gson.fromJson(jsonString, listType);
+			} catch (Exception e) {
+				Logger.Log("jsonString is on wrong format");
+				e.printStackTrace();
+				return;
+			}
+
+			if (null != tmp) {
+				CJayImageDaoImpl cJayImageDaoImpl = databaseManager.getHelper(ctx).getCJayImageDaoImpl();
+
+				IssueDaoImpl issueDaoImpl = databaseManager.getHelper(ctx).getIssueDaoImpl();
+
+				// Uodate imageIdPath
+				main.setId(tmp.getId());
+				if (updateImageIdPath) {
+					if (!TextUtils.isEmpty(tmp.getImageIdPath())
+							&& !tmp.getImageIdPath()
+									.equals("https://storage.googleapis.com/storage-cjay.cloudjay.com/")) {
+						main.setImageIdPath(tmp.getImageIdPath());
+					}
+
+				}
+				main.setCheckInTime(tmp.getCheckInTime());
+
+				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
+												tmp.getCheckInTime());
+
+				// Update GateReportImages
+				List<GateReportImage> gateReportImages = tmp.getGateReportImages();
+				Collection<CJayImage> cJayImages = main.getCJayImages();
+
+				if (gateReportImages != null) {
+					for (GateReportImage gateReportImage : gateReportImages) {
+						for (CJayImage cJayImage : cJayImages) {
+
+							String gateReportImageName = gateReportImage.getImageName();
+							String cJayImageName = cJayImage.getImageName();
+
+							if (gateReportImageName.contains(cJayImageName)) {
+
+								// Logger.Log("Gate Report Image Id: " + Integer.toString(gateReportImage.getId())
+								// + "\nGate Report Image Name: " + gateReportImageName
+								// + "\nGate Report Image Type: " + Integer.toString(gateReportImage.getType())
+								// + "\nGate Report Image Time: " + gateReportImage.getCreatedAt());
+
+								cJayImage.setId(gateReportImage.getId());
+								cJayImage.setImageName(gateReportImageName);
+								cJayImageDaoImpl.update(cJayImage);
+
+								break;
+							}
+						}
+					}
+				}
+
+				// Update AuditReportItems
+				List<AuditReportItem> auditReportItems = tmp.getAuditReportItems();
 				Collection<Issue> issues = main.getIssues();
 
 				if (auditReportItems != null) {

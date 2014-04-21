@@ -26,7 +26,6 @@ import android.widget.ImageButton;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.PhotoViewPagerActivity;
 import com.cloudjay.cjay.PhotoViewPagerActivity_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.PhotoGridViewCursorAdapter;
@@ -48,7 +47,7 @@ public class RepairIssueImageListFragment extends SherlockFragment implements Lo
 
 	private final String LOG_TAG = "RepairIssueImageListFragment";
 	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_1;
-	
+
 	public final static String CJAY_ISSUE_UUID = "issueUUID";
 	public final static String CJAY_IMAGE_TYPE = "imageType";
 
@@ -61,17 +60,17 @@ public class RepairIssueImageListFragment extends SherlockFragment implements Lo
 
 	@ViewById(R.id.gridview)
 	GridView mGridView;
-	
+
 	@ViewById(R.id.btn_add_new)
 	ImageButton mCameraButton;
-	
+
 	@Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		mIssueUUID = getArguments().getString(CJAY_ISSUE_UUID);
 		mType = getArguments().getInt(CJAY_IMAGE_TYPE);
-        return null;
-    }
-	
+		return null;
+	}
+
 	@AfterViews
 	void afterViews() {
 		// show or hide camera button
@@ -80,16 +79,17 @@ public class RepairIssueImageListFragment extends SherlockFragment implements Lo
 		} else {
 			mCameraButton.setVisibility(View.VISIBLE);
 		}
-		
+
 		try {
-			IssueDaoImpl issueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity()).getIssueDaoImpl();
+			IssueDaoImpl issueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity())
+													.getIssueDaoImpl();
 			mIssue = issueDaoImpl.queryForId(mIssueUUID);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
 		getLoaderManager().initLoader(LOADER_ID, null, this);
-		
+
 		mItemLayout = R.layout.grid_item_image;
 
 		final Context ctx = getActivity();
@@ -98,10 +98,12 @@ public class RepairIssueImageListFragment extends SherlockFragment implements Lo
 			@Override
 			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 				Intent intent = new Intent(ctx, PhotoViewPagerActivity_.class);
-				intent.putExtra(PhotoViewPagerActivity.START_POSITION, position);
-				intent.putExtra(PhotoViewPagerActivity.CJAY_CONTAINER_SESSION_EXTRA, mIssue.getContainerSession().getUuid());
-				intent.putExtra(PhotoViewPagerActivity.CJAY_ISSUE_TYPE_EXTRA, mIssueUUID);
-				intent.putExtra(PhotoViewPagerActivity.CJAY_IMAGE_TYPE_EXTRA, mType);
+
+				intent.putExtra(PhotoViewPagerActivity_.START_POSITION, position);
+				intent.putExtra(PhotoViewPagerActivity_.CJAY_CONTAINER_SESSION_EXTRA, mIssue.getContainerSession()
+																							.getUuid());
+				intent.putExtra(PhotoViewPagerActivity_.CJAY_ISSUE_TYPE_EXTRA, mIssueUUID);
+				intent.putExtra(PhotoViewPagerActivity_.CJAY_IMAGE_TYPE_EXTRA, mType);
 				intent.putExtra("title", Utils.getImageTypeDescription(ctx, mType));
 				ctx.startActivity(intent);
 			}
@@ -151,20 +153,20 @@ public class RepairIssueImageListFragment extends SherlockFragment implements Lo
 		if (mTakenImages != null && mTakenImages.size() > 0) {
 
 			for (CJayImage cJayImage : mTakenImages) {
-				SQLiteDatabase db = DataCenter.getDatabaseHelper(getActivity().getApplicationContext()).getWritableDatabase();					
+				SQLiteDatabase db = DataCenter.getDatabaseHelper(getActivity().getApplicationContext())
+												.getWritableDatabase();
 				ContentValues values = new ContentValues();
 				values.put("issue_id", mIssueUUID);
 				values.put("containerSession_id", mIssue.getContainerSession().getUuid());
 				db.update("cjay_image", values, "uuid LIKE ? ", new String[] { cJayImage.getUuid() });
-//				Logger.Log("updated cjayimage issue_id: " + mIssueUUID);
-//				Logger.Log("updated cjayimage containerSession_id: " + mIssue.getContainerSession().getUuid());
-//				Logger.Log("updated cjayimage cjay_image: " + cJayImage.getUuid());
-//				Logger.Log("updated cjayimage: " + rows);
+				// Logger.Log("updated cjayimage issue_id: " + mIssueUUID);
+				// Logger.Log("updated cjayimage containerSession_id: " + mIssue.getContainerSession().getUuid());
+				// Logger.Log("updated cjayimage cjay_image: " + cJayImage.getUuid());
+				// Logger.Log("updated cjayimage: " + rows);
 			}
 
 			// refresh menu
 			getActivity().supportInvalidateOptionsMenu();
-
 
 			mTakenImages.clear();
 			mTakenImages = null;
@@ -176,17 +178,17 @@ public class RepairIssueImageListFragment extends SherlockFragment implements Lo
 		}
 		super.onResume();
 	}
-	
+
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
 		return new CJayCursorLoader(getActivity()) {
 			@Override
 			public Cursor loadInBackground() {
 				Cursor cursor = DataCenter.getInstance().getCJayImagesCursorByContainer(getContext(),
-																						mIssue.getContainerSession().getUuid(),
-																						mIssueUUID,
+																						mIssue.getContainerSession()
+																								.getUuid(), mIssueUUID,
 																						mType);
-				
+
 				if (cursor != null) {
 					// Ensure the cursor window is filled
 					cursor.registerContentObserver(mObserver);
