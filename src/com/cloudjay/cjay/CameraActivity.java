@@ -37,7 +37,6 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.Surface;
@@ -995,14 +994,13 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		// tell people that an image has been created
 		if (!TextUtils.isEmpty(mSourceTag)) {
+//			SystemClock.sleep(300);
+//			Logger.Log("issue_report - " + uploadItem.getUuid() + " - Trigger cjayimage added");
+			EventBus.getDefault().post(new CJayImageAddedEvent(uploadItem, mSourceTag));
 			if (!PreferencesUtil.getPrefsValue(	getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS,
-												true)) {
+								true)) {
 				showIssueReportDialog(uploadItem.getUuid());
 			}
-
-			SystemClock.sleep(300);
-			// Logger.Log("issue_report - " + uploadItem.getUuid() + " - Trigger cjayimage added");
-			EventBus.getDefault().post(new CJayImageAddedEvent(uploadItem, mSourceTag));
 		}
 	}
 

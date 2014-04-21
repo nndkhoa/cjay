@@ -47,6 +47,8 @@ import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Utils;
+import com.koushikdutta.async.Util;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 // slide 20
@@ -210,8 +212,8 @@ public class AuditorIssueReportActivity extends CJayActivity implements OnPageCh
 //			mCJayImageDaoImpl.refresh(mCJayImage);
 //			mCJayImage.setIssue(mIssue);
 //			mCJayImageDaoImpl.createOrUpdate(mCJayImage);
-			SQLiteDatabase db = DataCenter.getDatabaseHelper(this.getApplicationContext()).getWritableDatabase();
-			db.execSQL("UPDATE cjay_image SET issue_id = ? WHERE _id LIKE ? ", new String[] { mIssue.getUuid(), mCJayImageUUID });
+			mCJayImageDaoImpl.updateRaw("UPDATE cjay_image SET issue_id = " + Utils.sqlString(mIssue.getUuid()) 
+										+ " WHERE uuid LIKE " + Utils.sqlString(mCJayImageUUID));
 
 		} catch (SQLException e) {
 			e.printStackTrace();

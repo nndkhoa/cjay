@@ -6,6 +6,7 @@ import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EBean.Scope;
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -13,7 +14,10 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.AuditorContainerActivity_;
+import com.cloudjay.cjay.AuditorIssueAssigmentActivity_;
+import com.cloudjay.cjay.AuditorIssueReportActivity_;
+import com.cloudjay.cjay.R;
 
 @EBean(scope = Scope.Singleton)
 public class IssueReportHelper {
@@ -66,8 +70,12 @@ public class IssueReportHelper {
 		}
 
 		// link issue to cjayimage
-		sql = "UPDATE cjay_image SET issue_id = '" + issueId + "' WHERE uuid = '" + imageUuid + "'";
-		db.execSQL(sql);
+		ContentValues values = new ContentValues();
+		values.put("issue_id", issueId);
+		int rows = db.update("cjay_image", values, "uuid LIKE ? ", new String[] { imageUuid });
+		Logger.Log("rows=" + rows + "; imageUUID=" + imageUuid + "; issueID=" + issueId);
+		
+//		db.execSQL(sql);
 
 		if (ctx.getClass() == AuditorContainerActivity_.class) {
 			((AuditorContainerActivity_) ctx).refresh();
@@ -79,19 +87,15 @@ public class IssueReportHelper {
 	}
 
 	public static void showIssueAssigment(Context ctx, String imageUuid) {
-
 		Intent intent = new Intent(ctx, AuditorIssueAssigmentActivity_.class);
 		intent.putExtra(AuditorIssueAssigmentActivity_.CJAY_IMAGE_EXTRA, imageUuid);
 		ctx.startActivity(intent);
-
 	}
 
 	public static void showIssueReport(Context ctx, String imageUuid) {
-
 		Intent intent = new Intent(ctx, AuditorIssueReportActivity_.class);
 		intent.putExtra(AuditorIssueReportActivity_.CJAY_IMAGE_EXTRA, imageUuid);
 		ctx.startActivity(intent);
-
 	}
 
 	public static void

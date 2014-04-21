@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
+import com.cloudjay.cjay.events.CJayImageUploadProgressChangedEvent;
 import com.cloudjay.cjay.events.CJayImageUploadStateChangedEvent;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.UploadState;
@@ -212,6 +213,10 @@ public class CJayImage {
 	private void notifyUploadStateListener() {
 		EventBus.getDefault().post(new CJayImageUploadStateChangedEvent(this));
 	}
+	
+	private void notifyUploadProgressListener() {
+		EventBus.getDefault().post(new CJayImageUploadProgressChangedEvent(this));
+	}
 
 	public void setUri(String uri) {
 		mUri = uri;
@@ -276,7 +281,7 @@ public class CJayImage {
 	public void setUploadProgress(int progress) {
 		if (progress != mProgress) {
 			mProgress = progress;
-			notifyUploadStateListener();
+			notifyUploadProgressListener();
 		}
 	}
 }

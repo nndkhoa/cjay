@@ -11,7 +11,9 @@ import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.ViewById;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -34,6 +36,7 @@ import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -234,21 +237,33 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 		if (mSelectedIssue != null && mTakenImages != null && mTakenImages.size() > 0) {
 
 			// Update list cjay images of selected Issue
-			try {
+//			try {
+				SQLiteDatabase db = DataCenter.getDatabaseHelper(getActivity().getApplicationContext()).getWritableDatabase();	
+				ContentValues values;
+				
 				for (CJayImage cJayImage : mTakenImages) {
-					cJayImage.setIssue(mSelectedIssue);
-					cJayImage.setContainerSession(mContainerSession);
-					cJayImageDaoImpl.createOrUpdate(cJayImage);
+//					cJayImage.setIssue(mSelectedIssue);
+//					cJayImage.setContainerSession(mContainerSession);
+//					cJayImageDaoImpl.createOrUpdate(cJayImage);
+									
+					values = new ContentValues();
+					values.put("issue_id", mSelectedIssue.getUuid());
+					values.put("containerSession_id", mContainerSession.getUuid());
+					db.update("cjay_image", values, "uuid LIKE ? ", new String[] { cJayImage.getUuid() });
 				}
 
-				mSelectedIssue.setFixed(true);
-				issueDaoImpl.createOrUpdate(mSelectedIssue);
+				values = new ContentValues();
+				values.put("fixed", 1);
+				db.update("issue", values, "_id LIKE ? ", new String[] { mSelectedIssue.getUuid() });
+				
+//				mSelectedIssue.setFixed(true);
+//				issueDaoImpl.createOrUpdate(mSelectedIssue);
 
 				refresh();
 
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+//			} catch (SQLException e) {
+//				e.printStackTrace();
+//			}
 
 			mTakenImages.clear();
 			mTakenImages = null;
