@@ -546,6 +546,7 @@ public class DataCenter {
 		try {
 
 			getDatabaseManager().getHelper(context).getContainerSessionDaoImpl().delete(id);
+			EventBus.getDefault().post(new ContainerSessionChangedEvent());
 			return true;
 
 		} catch (SQLException e) {
