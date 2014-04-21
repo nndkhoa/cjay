@@ -26,6 +26,7 @@ import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.Logger;
 
 /**
  * 
@@ -88,6 +89,8 @@ public class RepairIssueReportActivity extends CJayActivity implements OnPageCha
 
 	@AfterViews
 	void afterViews() {
+		long startTime = System.currentTimeMillis();
+		
 		try {
 			IssueDaoImpl issueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getIssueDaoImpl();
 			mIssue = issueDaoImpl.queryForId(mIssueUUID);
@@ -102,6 +105,9 @@ public class RepairIssueReportActivity extends CJayActivity implements OnPageCha
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.w("---> Total time: " + Long.toString(difference));
 
 		locations = getResources().getStringArray(R.array.repair_issue_report_tabs);
 		configureViewPager();

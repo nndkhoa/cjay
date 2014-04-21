@@ -1,7 +1,6 @@
 package com.cloudjay.cjay;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
@@ -41,6 +40,7 @@ import com.cloudjay.cjay.util.Utils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+
 import de.greenrobot.event.EventBus;
 import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
@@ -174,6 +174,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 	protected void onResume() {
 
 		Logger.Log("*** onResume - DataCenter.reload ***");
+		long startTime = System.currentTimeMillis();
 
 		if (null != session) {
 
@@ -205,19 +206,19 @@ public class CJayActivity extends SherlockFragmentActivity {
 					@Override
 					protected Void doInBackground(Void... params) {
 
-						try {
-							DataCenter.getInstance().updateListContainerSessions(getApplicationContext(),
-																					CJayClient.REQUEST_TYPE_CREATED);
-
-						} catch (NoConnectionException e) {
-
-							showCrouton(R.string.alert_no_network);
-						} catch (SQLException e) {
-							e.printStackTrace();
-						} catch (NullSessionException e) {
-							CJayApplication.logOutInstantly(context);
-							finish();
-						}
+//						try {
+//							DataCenter.getInstance().updateListContainerSessions(getApplicationContext(),
+//																					CJayClient.REQUEST_TYPE_CREATED);
+//
+//						} catch (NoConnectionException e) {
+//
+//							showCrouton(R.string.alert_no_network);
+//						} catch (SQLException e) {
+//							e.printStackTrace();
+//						} catch (NullSessionException e) {
+//							CJayApplication.logOutInstantly(context);
+//							finish();
+//						}
 						return null;
 					};
 
@@ -253,6 +254,9 @@ public class CJayActivity extends SherlockFragmentActivity {
 		isActivityRunning = true;
 
 		super.onResume();
+		
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.w("---> Total time: " + Long.toString(difference));
 	}
 
 	/**

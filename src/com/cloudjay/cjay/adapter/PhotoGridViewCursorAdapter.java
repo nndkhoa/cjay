@@ -84,12 +84,14 @@ public class PhotoGridViewCursorAdapter extends CursorAdapter implements Filtera
 		} else {
 			holder.imageView.setImageResource(R.drawable.ic_app);
 		}
-		
+
 		CheckablePhotoItemLayout layout = (CheckablePhotoItemLayout) holder.photoLayout;
 		layout.setShowCheckbox(mCheckable);
-		layout.setParentAdapter(this);
-		layout.setCJayImageUuid(cJayImageUuid);
-		layout.setChecked(mCheckedCJayImageUuids.contains(cJayImageUuid));
+		if (mCheckable) {
+			layout.setParentAdapter(this);
+			layout.setCJayImageUuid(cJayImageUuid);
+			layout.setChecked(mCheckedCJayImageUuids.contains(cJayImageUuid));
+		}
 	}
 
 	@Override

@@ -14,7 +14,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ComponentCode;
@@ -492,6 +491,7 @@ public class CJayClient implements ICJayClient {
 		try {
 			RandomAccessFile rf = new RandomAccessFile(f, "rw");
 			rf.setLength(1024 * 1024 * 2);
+			rf.close();
 
 		} catch (Exception e) {
 			System.err.println(e);

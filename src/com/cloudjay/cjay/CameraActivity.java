@@ -395,6 +395,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 					captureModeToggleButton.setVisibility(View.GONE);
 				}
 
+				 PreferencesUtil.storePrefsValue(	getApplicationContext(),
+													PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, isContinuous);
 				captureModeToggleButton.setChecked(isContinuous);
 
 			} else {

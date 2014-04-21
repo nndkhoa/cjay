@@ -15,12 +15,31 @@
     	android:contentDescription="@string/camera_button_tooltip"
         android:src="@drawable/btn_camera" />
 
-    <ListView
+<!--     <ListView
         android:id="@+id/feeds"
     	android:layout_width="match_parent"
     	android:layout_height="match_parent"
     	android:layout_below="@id/btn_add_new"
    	 	android:minHeight="260dp"
-		style="@style/CJayListView" />
+		style="@style/CJayListView" /> -->
+    
+    <GridView
+        android:id="@+id/gridview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="3dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:layout_marginTop="3dp"
+        android:horizontalSpacing="3dp"
+        android:paddingBottom="6dp"
+        android:paddingTop="6dp"
+        android:stretchMode="columnWidth"
+        android:scrollbars="none"
+        android:numColumns="2"
+    	android:layout_below="@id/btn_add_new"
+        android:verticalSpacing="3dp" />
+    
+	<!-- <include layout="@layout/layout_empty_items" /> -->
     
 </RelativeLayout>
