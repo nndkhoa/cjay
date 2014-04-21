@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
+import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
@@ -132,7 +133,6 @@ public class Mapper {
 			}
 
 			// Create `container session` object
-
 			String uuid = UUID.randomUUID().toString();
 
 			// UUID is primary key
@@ -300,13 +300,24 @@ public class Mapper {
 		return toTmpContainerSession(ctx, containerSession, true);
 	}
 
+	public synchronized void update(Context ctx, TmpContainerSession tmp, String uuid) {
+		try {
+			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager.getHelper(ctx)
+																				.getContainerSessionDaoImpl();
+			ContainerSession main = containerSessionDaoImpl.queryForId(uuid);
+			update(ctx, tmp, main, true);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public synchronized void update(Context ctx, TmpContainerSession tmp, ContainerSession main,
 									boolean updateImageIdPath) throws Exception {
 
 		try {
 			if (null != tmp) {
 				CJayImageDaoImpl cJayImageDaoImpl = databaseManager.getHelper(ctx).getCJayImageDaoImpl();
-
 				IssueDaoImpl issueDaoImpl = databaseManager.getHelper(ctx).getIssueDaoImpl();
 
 				// Update imageIdPath
@@ -324,7 +335,6 @@ public class Mapper {
 				main.setCheckInTime(tmp.getCheckInTime());
 
 				// Update check out time
-
 				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
 												tmp.getCheckInTime());
 

@@ -83,7 +83,7 @@ public class DataCenter {
 		return getInstance().getDatabaseManager().getHelper(context);
 	}
 
-	SQLiteDatabase db;
+	// SQLiteDatabase db;
 
 	/**
 	 * Apply Singleton Pattern and return only one instance of class DataCenter
@@ -318,8 +318,9 @@ public class DataCenter {
 																			new String[] { containerSessionUUID + "%",
 																					String.valueOf(imageType) });
 	}
-	
-	public Cursor getCJayImagesCursorByContainer(Context context, String containerSessionUUID, String issueUUID, int imageType) {
+
+	public Cursor getCJayImagesCursorByContainer(Context context, String containerSessionUUID, String issueUUID,
+													int imageType) {
 		String queryString = "SELECT * FROM cjay_image WHERE containerSession_id LIKE ? AND issue_id LIKE ? AND type = ?";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
 																			new String[] { containerSessionUUID + "%",
@@ -688,6 +689,7 @@ public class DataCenter {
 			SimpleDateFormat dateFormat = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 			String nowString = dateFormat.format(new Date());
 
+			SQLiteDatabase db = DataCenter.getDatabaseHelper(ctx.getApplicationContext()).getWritableDatabase();
 			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager.getHelper(ctx)
 																				.getContainerSessionDaoImpl();
 
@@ -727,11 +729,26 @@ public class DataCenter {
 
 						for (TmpContainerSession tmpSession : tmpContainerSessions) {
 
-							// if tmpSession was existed somewhere in database
-							// --> update
+							ContainerSession containerSession = null;
+							String containerSessionId = tmpSession.getContainerId();
+							Cursor cursor = db.rawQuery("select _id from csview where container_id = ?",
+														new String[] { containerSessionId });
 
-							ContainerSession containerSession = Mapper.getInstance()
-																		.toContainerSession(tmpSession, ctx);
+							// if tmpSession was existed somewhere in database --> update
+							if (cursor.moveToFirst()) {
+
+								Logger.Log("Container Session is existed. Prepare to update.");
+								String uuid = cursor.getString(cursor.getColumnIndex("_id"));
+
+								if (TextUtils.isEmpty(uuid)) {
+									Logger.e("WTF. CS existed but cannot find _id");
+								} else {
+									Mapper.getInstance().update(ctx, tmpSession, uuid);
+								}
+
+							} else { // --> create
+								containerSession = Mapper.getInstance().toContainerSession(tmpSession, ctx);
+							}
 
 							if (null != containerSession) {
 								containerSessions.add(containerSession);

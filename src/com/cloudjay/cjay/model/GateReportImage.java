@@ -2,13 +2,11 @@ package com.cloudjay.cjay.model;
 
 public class GateReportImage {
 
-	public static final String FIELD_STATE = "state";
-	static final String FIELD_URI = "uri";
-
 	private int id;
 	private int type;
 	private String created_at;
 	private String image_name;
+	private String image_url;
 
 	public GateReportImage() {
 
@@ -57,5 +55,13 @@ public class GateReportImage {
 
 	public void setType(int type) {
 		this.type = type;
+	}
+
+	public String getImageUrl() {
+		return image_url;
+	}
+
+	public void setImageUrl(String image_url) {
+		this.image_url = image_url;
 	}
 }

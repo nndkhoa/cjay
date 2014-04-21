@@ -14,6 +14,7 @@ public class AuditReportItem {
 	private String length;
 	private String height;
 	private String quantity;
+	private String time_posted;
 
 	private List<AuditReportImage> audit_report_images;
 
@@ -116,6 +117,14 @@ public class AuditReportItem {
 
 	public void setRepairId(int repair_id) {
 		this.repair_id = repair_id;
+	}
+
+	public String getTimePosted() {
+		return time_posted;
+	}
+
+	public void setTimePosted(String time_posted) {
+		this.time_posted = time_posted;
 	}
 
 }

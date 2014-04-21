@@ -67,7 +67,8 @@ public class PhotoUploadService extends Service {
 
 	}
 
-	public void onEvent(CJayImageUploadStateChangedEvent event) {
+	public synchronized void onEvent(CJayImageUploadStateChangedEvent event) {
+
 		CJayImage upload = event.getTarget();
 
 		try {
