@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.cloudjay.cjay.util.Logger;
+
 public class AuditReportItem {
 
 	private int id;
@@ -23,6 +25,7 @@ public class AuditReportItem {
 	}
 
 	public AuditReportItem(Issue issue) {
+
 		if (null != issue) {
 			setId(issue.getId());
 			setDamageId(issue.getDamageCode().getId());
@@ -33,18 +36,33 @@ public class AuditReportItem {
 			setQuantity(issue.getQuantity());
 			setLocationCode(issue.getLocationCode());
 
-			setAuditReportImages(new ArrayList<AuditReportImage>());
+			ArrayList<AuditReportImage> auditReportImages = new ArrayList<AuditReportImage>();
 			Collection<CJayImage> cJayImages = issue.getCJayImages();
 			if (null != cJayImages) {
 				for (CJayImage cJayImage : cJayImages) {
+
 					if (cJayImage.getType() == CJayImage.TYPE_REPORT || cJayImage.getType() == CJayImage.TYPE_REPAIRED) {
-						getAuditReportImages().add(	new AuditReportImage(cJayImage.getId(), cJayImage.getType(),
-																			cJayImage.getTimePosted(),
-																			cJayImage.getImageName()));
+						AuditReportImage image = new AuditReportImage(cJayImage.getId(), cJayImage.getType(),
+																		cJayImage.getTimePosted(),
+																		cJayImage.getImageName(), cJayImage.getUri());
+						auditReportImages.add(image);
 					}
 				}
+
+				if (auditReportImages.size() > 0) {
+					setAuditReportImages(auditReportImages);
+				} else {
+					Logger.e("audit_report_images is NULL.");
+				}
+
+			} else {
+				Logger.e("Issue do not have CJayImages. audit_report_images will be NULL.");
 			}
+
+		} else {
+			Logger.e("Issue is NULL");
 		}
+
 	}
 
 	public List<AuditReportImage> getAuditReportImages() {

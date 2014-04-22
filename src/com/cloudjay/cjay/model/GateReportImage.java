@@ -12,17 +12,25 @@ public class GateReportImage {
 
 	}
 
-	public GateReportImage(int id, int type, String time_posted, String image_name) {
+	public GateReportImage(int id, int type, String time_posted, String image_name, String image_url) {
+
+		this(type, time_posted, image_name, image_url);
 		this.id = id;
-		this.type = type;
-		created_at = time_posted;
-		this.image_name = image_name;
+
+		// this.type = type;
+		// created_at = time_posted;
+		// this.image_name = image_name;
+		// this.image_url = image_url;
+
 	}
 
-	public GateReportImage(int type, String time_posted, String image_name) {
+	public GateReportImage(int type, String time_posted, String image_name, String image_url) {
+
 		this.type = type;
 		created_at = time_posted;
 		this.image_name = image_name;
+		this.image_url = image_url;
+
 	}
 
 	public String getCreatedAt() {

@@ -253,51 +253,57 @@ public class Mapper {
 			if (TextUtils.isEmpty(imageIdPath)) {
 				Logger.e(containerId + " | Image Id Path is NULL");
 			}
+
 			tmpContainerSession.setImageIdPath(imageIdPath);
 
+			// Create `gate_report_images`
 			List<GateReportImage> gateReportImages = new ArrayList<GateReportImage>();
 			Collection<CJayImage> cJayImages = containerSession.getCJayImages();
-
 			for (CJayImage cJayImage : cJayImages) {
+
 				if (cJayImage.getType() == CJayImage.TYPE_IMPORT || cJayImage.getType() == CJayImage.TYPE_EXPORT) {
 
+					GateReportImage gateImage;
 					if (cJayImage.getId() != 0) {
-						gateReportImages.add(new GateReportImage(cJayImage.getId(), cJayImage.getType(),
-																	cJayImage.getTimePosted(), cJayImage.getImageName()));
+						gateImage = new GateReportImage(cJayImage.getId(), cJayImage.getType(),
+														cJayImage.getTimePosted(), cJayImage.getImageName(),
+														cJayImage.getUri());
+
 					} else {
-						gateReportImages.add(new GateReportImage(cJayImage.getType(), cJayImage.getTimePosted(),
-																	cJayImage.getImageName()));
+						gateImage = new GateReportImage(cJayImage.getType(), cJayImage.getTimePosted(),
+														cJayImage.getImageName(), cJayImage.getUri());
 					}
+					gateReportImages.add(gateImage);
 				}
+
 			}
 			tmpContainerSession.setGateReportImages(gateReportImages);
 
+			// Re-set image_id_path
 			if (TextUtils.isEmpty(tmpContainerSession.getImageIdPath()) && gateReportImages.isEmpty() == false) {
 				tmpContainerSession.setImageIdPath(gateReportImages.get(0).getImageName());
 			}
 
-			//
-
+			// Create `audit_report_items`
 			List<AuditReportItem> auditReportItems = new ArrayList<AuditReportItem>();
 			Collection<Issue> issues = containerSession.getIssues();
-
 			if (null != issues) {
 				for (Issue issue : issues) {
 					auditReportItems.add(new AuditReportItem(issue));
 				}
 			}
+			tmpContainerSession.setAuditReportItems(auditReportItems);
 
+			// Set container Id Image
 			// TODO: only handle for app Auditor
 			for (CJayImage cJayImage : cJayImages) {
 				if (cJayImage.getType() == CJayImage.TYPE_REPORT && cJayImage.getIssue() == null) {
-
 					Logger.Log("Container Id Image: " + cJayImage.getImageName());
 					tmpContainerSession.setContainerIdImage(cJayImage.getImageName());
 					break;
 				}
-			}
 
-			tmpContainerSession.setAuditReportItems(auditReportItems);
+			}
 		}
 
 		return tmpContainerSession;
