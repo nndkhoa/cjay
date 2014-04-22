@@ -8,9 +8,11 @@ import java.util.List;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EBean;
+import org.androidannotations.annotations.EService;
 import org.androidannotations.annotations.EBean.Scope;
 import org.androidannotations.annotations.Trace;
 
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
@@ -172,13 +174,23 @@ public class DataCenter {
 		if (isFetchingData(ctx)) {
 			Logger.Log("fetchData() is already running");
 			return;
+
 		} else {
 			try {
 				// Mark that Application
 				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, true);
 
 				updateListISOCode(ctx);
-				updateListContainerSessions(ctx, CJayClient.REQUEST_TYPE_CREATED, InvokeType.FIRST_TIME);
+
+				if (PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, false)) {
+
+					Logger.Log("fetch data for first time");
+					updateListContainerSessions(ctx, CJayClient.REQUEST_TYPE_MODIFIED, InvokeType.FIRST_TIME);
+
+				} else {
+					Logger.Log("fetch data following time");
+					updateListContainerSessions(ctx, CJayClient.REQUEST_TYPE_MODIFIED, InvokeType.FOLLOWING);
+				}
 
 				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, false);
 
@@ -507,6 +519,14 @@ public class DataCenter {
 		this.databaseManager = databaseManager;
 	}
 
+	public void updateContainerStatus(Context ctx, int id, int status) {
+		try {
+			getDatabaseHelper(ctx).getContainerSessionDaoImpl().updateServerState(id, status);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Indicate that {@link #fetchData(Context)} is running or not
 	 * 
@@ -673,12 +693,10 @@ public class DataCenter {
 																							SQLException,
 																							NullSessionException {
 
-		switch (invokeType) {
-			case FIRST_TIME:
-				return;
-
-			default:
-				break;
+		boolean initialized = PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, false);
+		if (invokeType == InvokeType.FIRST_TIME && initialized) {
+			Logger.Log("Better return");
+			return;
 		}
 
 		// Logger.Log("*** UPDATE LIST CONTAINER SESSIONS ***");
@@ -706,7 +724,8 @@ public class DataCenter {
 
 				lastUpdate = PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE);
 
-				Logger.Log("get updated list container sessions from last time: " + lastUpdate);
+				Logger.Log("get updated list container sessions from LastTime: " + lastUpdate + " | InvokeType: "
+						+ invokeType.name() + " | RequestType: " + type);
 			}
 
 			do {
@@ -781,31 +800,11 @@ public class DataCenter {
 
 			} while (!TextUtils.isEmpty(nextUrl));
 
-			// List<ContainerSession> containerSessions = new
-			// ArrayList<ContainerSession>();
-			// List<TmpContainerSession> tmpContainerSessions = CJayClient
-			// .getInstance().getContainerSessions(ctx, lastUpdate);
-			//
-			// if (null != tmpContainerSessions) {
-			//
-			// for (TmpContainerSession tmpSession : tmpContainerSessions) {
-			// ContainerSession containerSession = Mapper.getInstance()
-			// .toContainerSession(tmpSession, ctx);
-			//
-			// if (null != containerSession) {
-			// containerSessions.add(containerSession);
-			// }
-			//
-			// }
-			// }
-			//
-			// containerSessionDaoImpl
-			// .bulkInsertDataBySavePoint(containerSessions);
-
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
+			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, true);
 
-			if (invokeType != InvokeType.FIRST_TIME) {
-				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, true);
+			if (!initialized) {
+				Logger.Log("not initialize");
 			}
 
 		} catch (NoConnectionException e) {

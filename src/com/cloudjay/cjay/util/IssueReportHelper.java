@@ -74,8 +74,8 @@ public class IssueReportHelper {
 		values.put("issue_id", issueId);
 		int rows = db.update("cjay_image", values, "uuid LIKE ? ", new String[] { imageUuid });
 		Logger.Log("rows=" + rows + "; imageUUID=" + imageUuid + "; issueID=" + issueId);
-		
-//		db.execSQL(sql);
+
+		// db.execSQL(sql);
 
 		if (ctx.getClass() == AuditorContainerActivity_.class) {
 			((AuditorContainerActivity_) ctx).refresh();

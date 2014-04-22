@@ -209,11 +209,11 @@ public class AuditorIssueReportActivity extends CJayActivity implements OnPageCh
 		// save db records
 		try {
 			mIssueDaoImpl.createOrUpdate(mIssue);
-//			mCJayImageDaoImpl.refresh(mCJayImage);
-//			mCJayImage.setIssue(mIssue);
-//			mCJayImageDaoImpl.createOrUpdate(mCJayImage);
-			mCJayImageDaoImpl.updateRaw("UPDATE cjay_image SET issue_id = " + Utils.sqlString(mIssue.getUuid()) 
-										+ " WHERE uuid LIKE " + Utils.sqlString(mCJayImageUUID));
+			// mCJayImageDaoImpl.refresh(mCJayImage);
+			// mCJayImage.setIssue(mIssue);
+			// mCJayImageDaoImpl.createOrUpdate(mCJayImage);
+			mCJayImageDaoImpl.updateRaw("UPDATE cjay_image SET issue_id = " + Utils.sqlString(mIssue.getUuid())
+					+ " WHERE uuid LIKE " + Utils.sqlString(mCJayImageUUID));
 
 		} catch (SQLException e) {
 			e.printStackTrace();

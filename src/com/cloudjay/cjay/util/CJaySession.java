@@ -65,6 +65,7 @@ public class CJaySession {
 			@Override
 			protected Void doInBackground(Void... params) {
 
+				PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_INITIALIZED, false);
 				Utils.backupDatabase(getCurrentUser().getUserName());
 				DataCenter.getDatabaseHelper(context).addUsageLog("#backup database");
 

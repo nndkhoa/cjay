@@ -206,19 +206,23 @@ public class CJayActivity extends SherlockFragmentActivity {
 					@Override
 					protected Void doInBackground(Void... params) {
 
-						boolean firstTime = PreferencesUtil.getPrefsValue(	context, PreferencesUtil.PREF_INITIALIZED,
+						boolean initialize = PreferencesUtil.getPrefsValue(	context, PreferencesUtil.PREF_INITIALIZED,
 																			false);
 
 						try {
-							if (firstTime) {
+							if (!initialize) {
+								Logger.Log("update List CS FIRST TIME");
 								DataCenter.getInstance()
 											.updateListContainerSessions(getApplicationContext(),
-																			CJayClient.REQUEST_TYPE_CREATED,
+																			CJayClient.REQUEST_TYPE_MODIFIED,
 																			InvokeType.FIRST_TIME);
+
 							} else {
+
+								Logger.Log("update List CS FOLLOWING TIME");
 								DataCenter.getInstance()
 											.updateListContainerSessions(getApplicationContext(),
-																			CJayClient.REQUEST_TYPE_CREATED,
+																			CJayClient.REQUEST_TYPE_MODIFIED,
 																			InvokeType.FOLLOWING);
 							}
 

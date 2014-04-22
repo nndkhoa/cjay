@@ -432,6 +432,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 			Logger.Log("is not updating");
 			mLoadMoreDataLayout.setVisibility(View.GONE);
 		}
+
 		super.onResume();
 	}
 

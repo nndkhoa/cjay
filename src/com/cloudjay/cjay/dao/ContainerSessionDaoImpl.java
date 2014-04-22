@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import android.R.integer;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -202,6 +203,24 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 			if (null != result) {
 				this.delete(result);
 			}
+		}
+	}
+
+	public void updateServerState(int id, int state) throws SQLException {
+
+		if (id == -1) {
+			Logger.e("Container Session ID = -1");
+			return;
+		} else {
+
+			ContainerSession result = queryForFirst(queryBuilder().where().eq(ContainerSession.FIELD_ID, id).prepare());
+			if (null != result) {
+
+				Logger.Log("update server state of container " + result.getContainerId() + " to: " + state);
+				result.setServerState(state);
+				this.update(result);
+			}
+
 		}
 	}
 

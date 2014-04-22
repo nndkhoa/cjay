@@ -48,4 +48,6 @@ public interface IContainerSessionDao extends Dao<ContainerSession, String> {
 
 	ContainerSession getNextWaiting(Context ctx, SQLiteDatabase db) throws SQLException;
 
+	void updateServerState(int id, int state) throws SQLException;
+
 }

@@ -4,6 +4,7 @@ import org.androidannotations.annotations.EIntentService;
 import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.Trace;
 
+import android.R.integer;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -204,6 +205,19 @@ public class GcmIntentService extends IntentService {
 
 				DataCenter.getInstance().removeContainerSession(this, id);
 
+			} else if (type.equalsIgnoreCase("UPDATE_CONTAINER_STATUS")) {
+
+				int status = -1;
+				status = Integer.parseInt(extras.getString("status"));
+
+				if (id == -1 || status == -1) {
+					Logger.e("Cannot not update container status");
+				} else {
+
+					Logger.Log("Id: " + id + " | Status: " + status);
+					DataCenter.getInstance().updateContainerStatus(this, id, status);
+				}
+
 			} else if (type.equalsIgnoreCase("NEW_ERROR_LIST")) {
 				// Received: AUDIT post new Issue List
 				// Received Roles: REPAIR, (new) GATE
@@ -232,7 +246,7 @@ public class GcmIntentService extends IntentService {
 				// --> Get more data from Server
 				// use MODIFIED_AFTER
 
-				if (userRole == UserRole.REPAIR_STAFF) {
+				if (userRole == UserRole.REPAIR_STAFF && userRole == UserRole.GATE_KEEPER) {
 					DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_MODIFIED,
 																			InvokeType.NOTIFICATION);
 				}
