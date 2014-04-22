@@ -26,7 +26,6 @@ public class InstantUploadReceiver extends BroadcastReceiver {
 			if (canStartUpload() && !Utils.isRunning(mContext, PhotoUploadService_.class.getName())) {
 				Logger.Log("Start PhotoUpload service");
 				ctx.startService(Utils.getUploadAllIntent(ctx));
-
 			}
 		}
 	}

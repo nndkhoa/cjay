@@ -26,8 +26,7 @@ import android.widget.ImageButton;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.cloudjay.cjay.CJayApplication;
-import com.cloudjay.cjay.PhotoViewPagerActivity_;
-import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.*;
 import com.cloudjay.cjay.adapter.PhotoGridViewCursorAdapter;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;

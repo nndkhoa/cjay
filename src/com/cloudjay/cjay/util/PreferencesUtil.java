@@ -25,6 +25,9 @@ public class PreferencesUtil {
 	public static final String PREF_AUTO_CHECK_UPDATE = "pref_auto_check_update";
 	public static final String PREF_INITIALIZED = "pref_initialized";
 
+	public static final String PREF_EMPTY_CONTAINER_QUEUE = "pref_empty_container_queue";
+	public static final String PREF_EMPTY_PHOTO_QUEUE = "pref_empty_photo_queue";
+
 	public static void clearPrefs(Context context) {
 
 		SharedPreferences settings = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);

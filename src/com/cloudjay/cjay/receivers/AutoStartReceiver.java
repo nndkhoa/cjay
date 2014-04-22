@@ -1,18 +1,16 @@
 package com.cloudjay.cjay.receivers;
 
-import java.util.Calendar;
-
 import org.androidannotations.annotations.EReceiver;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.cloudjay.cjay.service.QueueIntentService_;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.Utils;
 
 @EReceiver
 public class AutoStartReceiver extends BroadcastReceiver {
@@ -23,14 +21,18 @@ public class AutoStartReceiver extends BroadcastReceiver {
 		Logger.Log("**********started************");
 		DataCenter.getDatabaseHelper(context).addUsageLog("#autostart Application");
 
+		// TODO: refactor if needed
 		// Making Alarm for Queue Worker
-		intent = new Intent(context, QueueIntentService_.class);
-		PendingIntent pintent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-		Calendar current = Calendar.getInstance();
+		if (!Utils.isAlarmUp(context)) {
 
-		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+			Logger.Log("Alarm Manager is not running.");
+			Utils.startAlarm(context);
 
-		// Start every 30 seconds
-		alarm.setRepeating(AlarmManager.RTC_WAKEUP, current.getTimeInMillis(), 10 * 1000, pintent);
+		} else {
+			Logger.Log("Alarm is already running "
+					+ StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+		}
+
+		// Utils.cancelThenStartAlarm(context);
 	}
 }

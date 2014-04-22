@@ -102,8 +102,10 @@ public class DataCenter {
 	private IDatabaseManager databaseManager = null;
 
 	public DataCenter() {
+
 	}
 
+	// TODO: find image that its upload state == IN_PROGRESS
 	public void rollbackStuckImages() {
 
 	}
@@ -182,8 +184,8 @@ public class DataCenter {
 
 				updateListISOCode(ctx);
 
-				if (PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, false)) {
-
+				boolean initialized = PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, false);
+				if (!initialized) {
 					Logger.Log("fetch data for first time");
 					updateListContainerSessions(ctx, CJayClient.REQUEST_TYPE_MODIFIED, InvokeType.FIRST_TIME);
 
@@ -191,6 +193,8 @@ public class DataCenter {
 					Logger.Log("fetch data following time");
 					updateListContainerSessions(ctx, CJayClient.REQUEST_TYPE_MODIFIED, InvokeType.FOLLOWING);
 				}
+
+				// Remove container session that exported
 
 				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, false);
 
@@ -677,6 +681,10 @@ public class DataCenter {
 		}
 		long difference = System.currentTimeMillis() - startTime;
 		Logger.w("---> Total time: " + Long.toString(difference));
+	}
+
+	public void removeListExportedContainerSessions(Context ctx, int type) {
+
 	}
 
 	/**

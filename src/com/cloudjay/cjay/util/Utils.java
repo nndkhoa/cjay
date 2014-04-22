@@ -115,9 +115,28 @@ public class Utils {
 		alarmManager.cancel(sender);
 		sender.cancel();
 
+		// --------
 		// Intent stopServiceIntent = new Intent(context,
 		// QueueIntentService_.class);
 		// context.stopService(stopServiceIntent);
+	}
+
+	public static void cancelThenStartAlarm(Context context) {
+
+		Intent intent = new Intent(context, QueueIntentService_.class);
+		PendingIntent sender = PendingIntent.getService(context, CJayConstant.ALARM_ID, intent,
+														PendingIntent.FLAG_UPDATE_CURRENT);
+
+		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+		alarmManager.cancel(sender);
+
+		Calendar cal = Calendar.getInstance();
+
+		// Start every 10 seconds
+		// InexactRepeating allows Android to optimize the energy consumption
+		alarmManager.setInexactRepeating(	AlarmManager.ELAPSED_REALTIME_WAKEUP, cal.getTimeInMillis(),
+											CJayConstant.ALARM_INTERVAL * 1000, sender);
 	}
 
 	public static boolean checkPlayServices(Context context) {
@@ -248,6 +267,7 @@ public class Utils {
 
 	public static boolean isAlarmUp(Context context) {
 
+		Logger.Log("isAlarmUp");
 		Intent intent = new Intent(context, QueueIntentService_.class);
 		return PendingIntent.getService(context, CJayConstant.ALARM_ID, intent, PendingIntent.FLAG_NO_CREATE) != null;
 
@@ -302,10 +322,11 @@ public class Utils {
 		Calendar cal = Calendar.getInstance();
 
 		// start 30 seconds after boot completed
-		cal.add(Calendar.SECOND, 20);
+		cal.add(Calendar.SECOND, 10);
 
 		// Start every 10 seconds
 		// InexactRepeating allows Android to optimize the energy consumption
+		// TODO: replace setRepeating
 		alarm.setInexactRepeating(	AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), CJayConstant.ALARM_INTERVAL * 1000,
 									pintent);
 	}
@@ -383,4 +404,11 @@ public class Utils {
 		return intent;
 	}
 
+	public static boolean canStopAlarm(Context context) {
+
+		if (PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_EMPTY_CONTAINER_QUEUE, false)
+				&& PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_EMPTY_PHOTO_QUEUE, false)) { return true; }
+
+		return false;
+	}
 }

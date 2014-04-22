@@ -158,7 +158,10 @@ public class GcmIntentService extends IntentService {
 			UserRole userRole = UserRole.NONE;
 
 			try {
+
+				Logger.Log("User role: " + CJaySession.restore(this).getUserRole());
 				userRole = UserRole.values()[CJaySession.restore(this).getUserRole()];
+
 			} catch (Exception e) {
 
 				e.printStackTrace();

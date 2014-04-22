@@ -3,6 +3,8 @@ package com.cloudjay.cjay.dao;
 import java.sql.SQLException;
 import java.util.List;
 
+import android.content.Context;
+
 import com.cloudjay.cjay.model.CJayImage;
 import com.j256.ormlite.dao.Dao;
 
@@ -18,5 +20,7 @@ public interface ICJayImageDao extends Dao<CJayImage, String> {
 
 	List<CJayImage> getAllCJayImages() throws SQLException;
 
-	CJayImage getNextWaiting() throws SQLException;
+	// CJayImage getNextWaiting() throws SQLException;
+
+	CJayImage getNextWaiting(Context ctx) throws SQLException;
 }

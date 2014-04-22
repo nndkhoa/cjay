@@ -71,6 +71,7 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UserRole;
+import com.cloudjay.cjay.util.Utils;
 
 import de.greenrobot.event.EventBus;
 
@@ -394,8 +395,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 					captureModeToggleButton.setVisibility(View.GONE);
 				}
 
-				 PreferencesUtil.storePrefsValue(	getApplicationContext(),
-													PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, isContinuous);
+				PreferencesUtil.storePrefsValue(getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS,
+												isContinuous);
 				captureModeToggleButton.setChecked(isContinuous);
 
 			} else {
@@ -983,6 +984,10 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			i.setAction(CJayConstant.INTENT_PHOTO_TAKEN);
 			sendBroadcast(i);
 
+			if (!Utils.isAlarmUp(this)) {
+				Utils.startAlarm(this);
+			}
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 			EventBus.getDefault().post(	new LogUserActivityEvent("#error when update captured image | "
@@ -994,11 +999,11 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		// tell people that an image has been created
 		if (!TextUtils.isEmpty(mSourceTag)) {
-//			SystemClock.sleep(300);
-//			Logger.Log("issue_report - " + uploadItem.getUuid() + " - Trigger cjayimage added");
+			// SystemClock.sleep(300);
+			// Logger.Log("issue_report - " + uploadItem.getUuid() + " - Trigger cjayimage added");
 			EventBus.getDefault().post(new CJayImageAddedEvent(uploadItem, mSourceTag));
 			if (!PreferencesUtil.getPrefsValue(	getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS,
-								true)) {
+												true)) {
 				showIssueReportDialog(uploadItem.getUuid());
 			}
 		}

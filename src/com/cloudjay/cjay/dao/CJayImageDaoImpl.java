@@ -3,8 +3,12 @@ package com.cloudjay.cjay.dao;
 import java.sql.SQLException;
 import java.util.List;
 
+import android.content.Context;
+
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.PreferencesUtil;
+import com.cloudjay.cjay.util.Utils;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
@@ -50,13 +54,24 @@ public class CJayImageDaoImpl extends BaseDaoImpl<CJayImage, String> implements 
 	}
 
 	@Override
-	public CJayImage getNextWaiting() throws SQLException {
+	public CJayImage getNextWaiting(Context ctx) throws SQLException {
 
 		List<CJayImage> result = queryForEq("state", CJayImage.STATE_UPLOAD_WAITING);
 
-		if (result != null && result.size() > 0) {
-			totalNumber = result.size();
+		if (result == null || result.size() <= 0) {
+			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_EMPTY_PHOTO_QUEUE, true);
+
+			if (Utils.canStopAlarm(ctx) && Utils.isAlarmUp(ctx)) {
+				Logger.Log("No more item to upload. Stop Alarm.");
+				Utils.cancelAlarm(ctx);
+			}
+
+		} else {
+
 			Logger.w("Total items in ImageQueue: " + result.size());
+
+			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_EMPTY_PHOTO_QUEUE, false);
+			totalNumber = result.size();
 			return result.get(0);
 		}
 		return null;

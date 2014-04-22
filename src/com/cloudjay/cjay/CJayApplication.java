@@ -37,6 +37,7 @@ import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.DatabaseManager;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadState;
 import com.cloudjay.cjay.util.Utils;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
@@ -208,6 +209,11 @@ public class CJayApplication extends Application {
 			}
 		}
 
+		// TODO: refactor if needed
+		if (!Utils.isAlarmUp(ctx)) {
+			Utils.startAlarm(ctx);
+		}
+
 		// It will trigger `UploadsFragment` Adapter
 		EventBus.getDefault().post(new ContainerSessionEnqueueEvent(containerSession));
 		EventBus.getDefault().post(	new LogUserActivityEvent("Add container " + containerSession.getContainerId()
@@ -275,13 +281,19 @@ public class CJayApplication extends Application {
 		}
 
 		// Configure Alarm Manager
+		// TODO: refactor if needed
 		mContext = getApplicationContext();
 		if (!Utils.isAlarmUp(mContext)) {
 
 			Logger.w("Alarm Manager is not running.");
 			Utils.startAlarm(mContext);
 
+		} else {
+			Logger.Log("Alarm is already running "
+					+ StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 		}
+
+		// Utils.cancelThenStartAlarm(mContext);
 
 		if (NetworkHelper.isConnected(this)) {
 			PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_NO_CONNECTION, false);

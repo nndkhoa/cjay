@@ -87,9 +87,10 @@ public class CJayClient implements ICJayClient {
 		UUID deviceUuid = new UUID(androidId.hashCode(), androidId.hashCode());
 		String deviceId = deviceUuid.toString();
 
-		User user = CJaySession.restore(ctx).getCurrentUser();
-		if (null == user) { throw new NullSessionException(); }
+		CJaySession session = CJaySession.restore(ctx);
+		if (session == null) { throw new NullSessionException(); }
 
+		User user = session.getCurrentUser();
 		String accessToken = user.getAccessToken();
 
 		JsonObject requestPacket = new JsonObject();
@@ -215,6 +216,81 @@ public class CJayClient implements ICJayClient {
 		}
 		return null;
 
+	}
+
+	// TODO: merge it with the existed
+	public
+			ContainerSessionResult
+			getContainerSessionsByPageAndStatus(Context ctx, String date, int page, int filterStatus, int type)
+																												throws NoConnectionException,
+																												NullSessionException {
+
+		if (Utils.hasNoConnection(ctx)) throw new NoConnectionException();
+
+		String result = "";
+		try {
+
+			String accessToken = CJaySession.restore(ctx).getAccessToken();
+			if (TextUtils.isEmpty(accessToken)) { throw new NullSessionException(); }
+
+			Response<String> response = null;
+			if (type == REQUEST_TYPE_CREATED) {
+
+				response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS)
+								.setHeader("Authorization", "Token " + accessToken)
+								.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
+								.addQuery("page", Integer.toString(page))
+								.addQuery("filter_status", Integer.toString(filterStatus))
+								.addQuery("created_after", date).asString().withResponse().get();
+
+			} else {
+				Logger.Log("Request based on modified time");
+				response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS)
+								.setHeader("Authorization", "Token " + accessToken)
+								.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
+								.addQuery("page", Integer.toString(page))
+								.addQuery("filter_status", Integer.toString(filterStatus))
+								.addQuery("modified_after", date).asString().withResponse().get();
+
+			}
+
+			switch (response.getHeaders().getResponseCode()) {
+				case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
+				case HttpStatus.SC_UNAUTHORIZED:
+					throw new NullSessionException();
+
+				case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi
+					break;
+
+				case HttpStatus.SC_NOT_FOUND: // Không có dữ liệu tương ứng
+					break;
+
+				default:
+					result = response.getResult();
+
+					break;
+			}
+
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+
+		// Logger.w("Result: " + result);
+		Gson gson = new GsonBuilder().setDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE).create();
+
+		Type listType = new TypeToken<ContainerSessionResult>() {
+		}.getType();
+
+		ContainerSessionResult item = null;
+		try {
+			item = gson.fromJson(result, listType);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return item;
 	}
 
 	@Override

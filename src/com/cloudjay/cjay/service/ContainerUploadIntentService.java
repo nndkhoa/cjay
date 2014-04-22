@@ -294,18 +294,6 @@ public class ContainerUploadIntentService extends IntentService implements Count
 	protected void onHandleIntent(Intent intent) {
 		if (NetworkHelper.isConnected(getApplicationContext())) {
 			try {
-				// ContainerSession containerSession = null;
-				// do {
-				// containerSession = containerSessionDaoImpl.getNextWaiting(DataCenter.getDatabaseHelper(this)
-				// .getWritableDatabase());
-				//
-				// if (null != containerSession) {
-				// doUploadContainer(containerSession);
-				// }
-				//
-				// } while (containerSession != null);
-				// It will return container which `upload confirmation = true`
-
 				ContainerSession containerSession = containerSessionDaoImpl.getNextWaiting(	this,
 																							DataCenter.getDatabaseHelper(	this)
 																										.getWritableDatabase());

@@ -70,7 +70,7 @@ public class PhotoUploadService extends Service {
 		}
 
 	}
-	
+
 	public void onEvent(CJayImageUploadProgressChangedEvent event) {
 		updateNotification(event.getTarget());
 	}
@@ -80,9 +80,11 @@ public class PhotoUploadService extends Service {
 		CJayImage upload = event.getTarget();
 
 		try {
-			Logger.Log("CJayImageUploadStateChangedEvent " + (upload.getIssue() != null ? upload.getIssue().getUuid() : ""));
+			Logger.Log("CJayImageUploadStateChangedEvent "
+					+ (upload.getIssue() != null ? upload.getIssue().getUuid() : ""));
 			if (!TextUtils.isEmpty(upload.getUuid())) {
-				cJayImageDaoImpl.updateRaw("UPDATE cjay_image SET state = " + upload.getUploadState() + " WHERE uuid LIKE " + Utils.sqlString(upload.getUuid()));
+				cJayImageDaoImpl.updateRaw("UPDATE cjay_image SET state = " + upload.getUploadState()
+						+ " WHERE uuid LIKE " + Utils.sqlString(upload.getUuid()));
 				cJayImageDaoImpl.refresh(upload);
 			}
 		} catch (SQLException e1) {
@@ -300,7 +302,7 @@ public class PhotoUploadService extends Service {
 		CJayImage nextUpload = null;
 
 		try {
-			nextUpload = cJayImageDaoImpl.getNextWaiting();
+			nextUpload = cJayImageDaoImpl.getNextWaiting(this);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -415,7 +417,7 @@ public class PhotoUploadService extends Service {
 
 			CJayImage uploadItem = null;
 			try {
-				uploadItem = cJayImageDaoImpl.getNextWaiting();
+				uploadItem = cJayImageDaoImpl.getNextWaiting(this);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

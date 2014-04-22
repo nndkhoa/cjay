@@ -20,6 +20,7 @@ import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.service.PhotoUploadService_;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadState;
 import com.cloudjay.cjay.util.UploadType;
@@ -201,7 +202,10 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 			ContainerSession result = queryForFirst(queryBuilder().where().eq(ContainerSession.FIELD_ID, id).prepare());
 
 			if (null != result) {
+
+				Logger.Log("Remove container " + result.getContainerId());
 				this.delete(result);
+
 			}
 		}
 	}
@@ -216,7 +220,7 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 			ContainerSession result = queryForFirst(queryBuilder().where().eq(ContainerSession.FIELD_ID, id).prepare());
 			if (null != result) {
 
-				Logger.Log("update server state of container " + result.getContainerId() + " to: " + state);
+				Logger.Log("Update ServerState of container " + result.getContainerId() + " to: " + state);
 				result.setServerState(state);
 				this.update(result);
 			}
@@ -544,7 +548,18 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 		queryBuilder.orderBy(ContainerSession.FIELD_CHECK_IN_TIME, false);
 		List<ContainerSession> containerSessions = query(queryBuilder.prepare());
 
-		if (containerSessions.size() > 0) {
+		if (containerSessions == null || containerSessions.size() <= 0) {
+			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_EMPTY_CONTAINER_QUEUE, true);
+
+			if (Utils.canStopAlarm(ctx) && Utils.isAlarmUp(ctx)) {
+				Logger.Log("No more item to upload. Stop Alarm.");
+				Utils.cancelAlarm(ctx);
+			}
+
+			return null;
+		} else {
+
+			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_EMPTY_CONTAINER_QUEUE, false);
 			Logger.w("Total items in ContainerQueue: " + Integer.toString(containerSessions.size()));
 		}
 
