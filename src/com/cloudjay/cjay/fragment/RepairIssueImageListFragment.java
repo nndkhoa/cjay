@@ -183,11 +183,8 @@ public class RepairIssueImageListFragment extends SherlockFragment implements Lo
 		return new CJayCursorLoader(getActivity()) {
 			@Override
 			public Cursor loadInBackground() {
-				Cursor cursor = DataCenter.getInstance().getCJayImagesCursorByContainer(getContext(),
-																						mIssue.getContainerSession()
-																								.getUuid(), mIssueUUID,
-																						mType);
-
+				Cursor cursor = DataCenter.getInstance().getCJayImagesCursorByIssue(getContext(), mIssueUUID, mType);
+				
 				if (cursor != null) {
 					// Ensure the cursor window is filled
 					cursor.registerContentObserver(mObserver);
