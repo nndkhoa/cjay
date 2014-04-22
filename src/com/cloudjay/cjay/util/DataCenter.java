@@ -8,11 +8,9 @@ import java.util.List;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EBean;
-import org.androidannotations.annotations.EService;
 import org.androidannotations.annotations.EBean.Scope;
 import org.androidannotations.annotations.Trace;
 
-import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;

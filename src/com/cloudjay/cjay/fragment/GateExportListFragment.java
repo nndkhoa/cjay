@@ -19,6 +19,7 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -213,11 +214,26 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 		mCurrentPosition = position;
 		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
-		String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+		String containerSessionUuid = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
 		String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
+		
+		// find the last role that took picture of this issue
+		SQLiteDatabase db = DataCenter.getDatabaseHelper(getActivity().getApplicationContext()).getWritableDatabase();
+		String sql = "SELECT type FROM cjay_image WHERE containerSession_id LIKE ? AND type <> ? ORDER BY time_posted DESC LIMIT 1";
+		Cursor imageCursor = db.rawQuery(sql, new String[] { containerSessionUuid, String.valueOf(CJayImage.TYPE_EXPORT) });
+		int lastRole = -1;
+		if (imageCursor.moveToFirst()) {
+			lastRole = imageCursor.getInt(imageCursor.getColumnIndexOrThrow("type"));
+		}
 
-		CJayApplication.openPhotoGridView(	getActivity(), uuidString, containerId, CJayImage.TYPE_EXPORT,
-											CJayImage.TYPE_REPORT, GateExportListFragment_.LOG_TAG);
+		// show images
+		if (lastRole >= 0 && lastRole != CJayImage.TYPE_EXPORT) {
+			CJayApplication.openPhotoGridView(	getActivity(), containerSessionUuid, containerId, CJayImage.TYPE_EXPORT,
+												lastRole, GateExportListFragment_.LOG_TAG);
+		} else {
+			CJayApplication.openPhotoGridView(	getActivity(), containerSessionUuid, containerId, CJayImage.TYPE_EXPORT,
+												GateExportListFragment_.LOG_TAG);
+		}
 	}
 
 	@ItemLongClick(R.id.container_list)

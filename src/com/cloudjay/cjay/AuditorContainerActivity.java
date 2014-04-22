@@ -163,8 +163,6 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 
 		String issueId = cursor.getString(cursor.getColumnIndexOrThrow("issue_id"));
 
-		Logger.e("Click on " + issueId);
-
 		if (!TextUtils.isEmpty(issueId)) {
 			IssueReportHelper.showIssueReport(this, mSelectedCJayImageUuid);
 		} else {
