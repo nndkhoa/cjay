@@ -450,19 +450,9 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 		super.onViewCreated(view, savedInstanceState);
 
 		ViewGroup viewGroup = (ViewGroup) view;
-
-		// As we're using a ListFragment we create a PullToRefreshLayout
-		// manually
 		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
-
-		// We can now setup the PullToRefreshLayout
-		ActionBarPullToRefresh.from(getActivity())
-								// We need to insert the PullToRefreshLayout into the Fragment's
-								// ViewGroup
-								.insertLayoutInto(viewGroup)
-								// Here we mark just the ListView and it's Empty View as
-								// pullable
-								.theseChildrenArePullable(R.id.container_list, android.R.id.empty).listener(this)
+		ActionBarPullToRefresh.from(getActivity()).insertLayoutInto(viewGroup)
+								.theseChildrenArePullable(R.id.container_list).listener(this)
 								.setup(mPullToRefreshLayout);
 	}
 

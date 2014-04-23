@@ -63,7 +63,7 @@ public class CJayImageDaoImpl extends BaseDaoImpl<CJayImage, String> implements 
 
 			if (Utils.canStopAlarm(ctx) && Utils.isAlarmUp(ctx)) {
 				Logger.Log("No more item to upload. Stop Alarm.");
-				Utils.cancelAlarm(ctx);
+				// Utils.cancelAlarm(ctx);
 			}
 
 		} else {

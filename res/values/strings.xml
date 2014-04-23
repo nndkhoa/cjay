@@ -8,7 +8,7 @@
     <string name="title_activity_splash_screen">SplashScreenActivity</string>
     <string name="action_settings">Cấu hình</string>
     <string name="default_container_id">Untitled</string>
-    <string name="container_not_found">KHÔNG TÌM THẤY CONTAINER.\nCLICK + ĐỂ TẠO MỚI </string>
+    <string name="container_not_found">KHÔNG TÌM THẤY CONTAINER.</string>
     <string name="container_not_found_no_add_more">KHÔNG TÌM THẤY CONTAINER.\nLIÊN HỆ CỔNG.</string>
     <string name="camera_button_tooltip">Chụp hình</string>
     <string name="progress">Loading ...</string>
@@ -34,6 +34,7 @@
     <string name="menu_select_none">Bỏ chọn tất cả</string>
     <string name="menu_more_title">Thêm</string>
     <string name="menu_username_title">Username</string>
+    <string name="menu_refresh">Tải lại</string>
     <string name="menu_role_title">Role</string>
     <string name="menu_clear_uploaded_title">Đăng xuất</string>
     <string name="menu_issue_report_check_title">Báo cáo xong</string>

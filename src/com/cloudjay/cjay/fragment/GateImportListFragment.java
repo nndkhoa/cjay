@@ -14,7 +14,6 @@ import org.androidannotations.annotations.ViewById;
 
 import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.Options;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 import android.app.Activity;
 import android.content.Context;
@@ -387,6 +386,7 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 
 		ViewGroup viewGroup = (ViewGroup) view;
 		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
+
 		ActionBarPullToRefresh.from(getActivity()).insertLayoutInto(viewGroup)
 								.theseChildrenArePullable(R.id.feeds, android.R.id.empty).listener(this)
 								.setup(mPullToRefreshLayout);

@@ -92,6 +92,7 @@ public class ContainerUploadIntentService extends IntentService implements Count
 		}
 
 		try {
+
 			response = CJayClient.getInstance().postContainerSession(getApplicationContext(), uploadItem);
 			Logger.Log("Response from server: " + response);
 
@@ -292,7 +293,9 @@ public class ContainerUploadIntentService extends IntentService implements Count
 	 */
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		if (NetworkHelper.isConnected(getApplicationContext())) {
+
+		if (NetworkHelper.isConnected(this)) {
+
 			try {
 				ContainerSession containerSession = containerSessionDaoImpl.getNextWaiting(	this,
 																							DataCenter.getDatabaseHelper(	this)

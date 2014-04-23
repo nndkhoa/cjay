@@ -40,11 +40,19 @@
         android:title="More"/>
     -->
 
-    <!-- <item
+
+    <!--
+         <item
         android:id="@+id/menu_setting"
         android:showAsAction="never"
-        android:title="@string/action_settings"/> -->
-        
+        android:title="@string/action_settings"/>
+    -->
+
+    <item
+        android:id="@+id/menu_refresh"
+        android:menuCategory="secondary"
+        android:showAsAction="never"
+        android:title="@string/menu_refresh"/>
     <item
         android:id="@+id/menu_username"
         android:menuCategory="secondary"

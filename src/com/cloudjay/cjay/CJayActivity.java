@@ -3,6 +3,7 @@ package com.cloudjay.cjay;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsItem;
@@ -193,7 +194,6 @@ public class CJayActivity extends SherlockFragmentActivity {
 						} catch (NullSessionException e) {
 							CJayApplication.logOutInstantly(context);
 							finish();
-
 						}
 						return null;
 					}
@@ -352,7 +352,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 			showCrouton(R.string.alert_no_network);
 
 		} catch (NullSessionException e) {
-			e.printStackTrace();
+			Logger.Log("Session is NULL");
 		}
 	}
 
@@ -435,6 +435,57 @@ public class CJayActivity extends SherlockFragmentActivity {
 			usernameMenuClickCount = 0;
 		}
 
+	}
+
+	@Background
+	void refresh() {
+		try {
+			DataCenter.getInstance().fetchData(this, true);
+		} catch (NoConnectionException e) {
+			showCrouton(R.string.alert_no_network);
+		} catch (NullSessionException e) {
+			CJayApplication.logOutInstantly(this);
+			onDestroy();
+		} catch (Exception e) {
+			showCrouton(R.string.alert_try_again);
+			e.printStackTrace();
+		}
+	}
+
+	@OptionsItem(R.id.menu_refresh)
+	void refreshItemSelected() {
+		new AsyncTask<Void, Integer, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... params) {
+
+				try {
+					DataCenter.getInstance().fetchData(getApplicationContext(), true);
+				} catch (NoConnectionException e) {
+					showCrouton(R.string.alert_no_network);
+
+				} catch (NullSessionException e) {
+					CJayApplication.logOutInstantly(getApplicationContext());
+					onDestroy();
+
+				} catch (Exception e) {
+					showCrouton(R.string.alert_try_again);
+					e.printStackTrace();
+				}
+				return null;
+			};
+
+			@Override
+			protected void onPostExecute(Void result) {
+				EventBus.getDefault().post(new PostLoadDataEvent());
+			};
+
+			@Override
+			protected void onPreExecute() {
+				EventBus.getDefault().post(new PreLoadDataEvent());
+			}
+
+		}.execute();
 	}
 
 	@OptionsItem(android.R.id.home)

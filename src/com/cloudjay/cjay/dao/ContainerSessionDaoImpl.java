@@ -549,11 +549,11 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 		List<ContainerSession> containerSessions = query(queryBuilder.prepare());
 
 		if (containerSessions == null || containerSessions.size() <= 0) {
-			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_EMPTY_CONTAINER_QUEUE, true);
 
+			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_EMPTY_CONTAINER_QUEUE, true);
 			if (Utils.canStopAlarm(ctx) && Utils.isAlarmUp(ctx)) {
 				Logger.Log("No more item to upload. Stop Alarm.");
-				Utils.cancelAlarm(ctx);
+				// Utils.cancelAlarm(ctx);
 			}
 
 			return null;

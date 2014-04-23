@@ -266,8 +266,6 @@ public class Utils {
 	}
 
 	public static boolean isAlarmUp(Context context) {
-
-		Logger.Log("isAlarmUp");
 		Intent intent = new Intent(context, QueueIntentService_.class);
 		return PendingIntent.getService(context, CJayConstant.ALARM_ID, intent, PendingIntent.FLAG_NO_CREATE) != null;
 

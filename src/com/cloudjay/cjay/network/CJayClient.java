@@ -13,6 +13,7 @@ import org.json.JSONException;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
+import android.service.textservice.SpellCheckerService.Session;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.model.CJayImage;
@@ -302,6 +303,9 @@ public class CJayClient implements ICJayClient {
 
 		String result = "";
 		try {
+
+			CJaySession session = CJaySession.restore(ctx);
+			if (null == session) { throw new NullSessionException(); }
 
 			String accessToken = CJaySession.restore(ctx).getAccessToken();
 			if (TextUtils.isEmpty(accessToken)) { throw new NullSessionException(); }

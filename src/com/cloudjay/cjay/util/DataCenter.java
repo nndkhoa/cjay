@@ -176,6 +176,7 @@ public class DataCenter {
 		// Logger.Log("*** FETCHING DATA ... ***");
 
 		if (isFetchingData(ctx)) {
+
 			Logger.Log("fetchData() is already running");
 			return;
 

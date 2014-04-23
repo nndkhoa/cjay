@@ -48,7 +48,9 @@ public class QueueIntentService extends IntentService {
 
 			Logger.Log("Start PhotoUploadService at "
 					+ StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+
 			startService(Utils.getUploadAllIntent(this));
+
 		} else {
 
 			if (PhotoUploadService_.isCurrentlyUploading() == false) {
