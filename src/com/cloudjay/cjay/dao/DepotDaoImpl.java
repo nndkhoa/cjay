@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.cloudjay.cjay.model.Depot;
+import com.cloudjay.cjay.model.Operator;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 
@@ -38,4 +39,7 @@ public class DepotDaoImpl extends BaseDaoImpl<Depot, Integer> implements IDepotD
 		return queryForAll();
 	}
 
+	public Depot findDepot(String depotCode) throws SQLException {
+		return queryForFirst(this.queryBuilder().where().eq(Depot.DEPOT_CODE, depotCode).prepare());
+	}
 }

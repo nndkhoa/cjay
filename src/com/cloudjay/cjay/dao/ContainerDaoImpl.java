@@ -59,4 +59,7 @@ public class ContainerDaoImpl extends BaseDaoImpl<Container, Integer> implements
 		return cursor;
 	}
 
+	public Container findContainer(String containerId) throws SQLException {
+		return queryForFirst(queryBuilder().where().eq(Container.CONTAINER_ID, containerId).prepare());
+	}
 }

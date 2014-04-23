@@ -102,7 +102,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	public static final String CJAY_IMAGE_TYPE_EXTRA = "type";
 	public static final String SOURCE_TAG_EXTRA = "tag";
 
-	@SuppressWarnings("null")
 	public static void setCameraDisplayOrientation(Activity activity, int cameraId, android.hardware.Camera camera) {
 
 		if (camera != null) {

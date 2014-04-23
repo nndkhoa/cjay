@@ -66,18 +66,13 @@ public class OperatorDaoImpl extends BaseDaoImpl<Operator, Integer> implements I
 	}
 
 	public Operator findOperator(String operatorCode) throws SQLException {
-		List<Operator> listOperators = queryForEq(Operator.FIELD_CODE, operatorCode);
-
-		if (listOperators.isEmpty())
-			return null;
-		else
-			return listOperators.get(0);
+		return queryForFirst(this.queryBuilder().where().eq(Operator.FIELD_CODE, operatorCode).prepare());
 	}
 
 	@Override
 	public List<Operator> getAllOperators() throws SQLException {
-		List<Operator> operators = queryForAll();
 
+		List<Operator> operators = queryForAll();
 		Collections.sort(operators, new Comparator<Operator>() {
 			@Override
 			public int compare(Operator lhs, Operator rhs) {

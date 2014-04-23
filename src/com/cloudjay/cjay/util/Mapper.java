@@ -89,44 +89,43 @@ public class Mapper {
 			ComponentCodeDaoImpl componentCodeDaoImpl = databaseManager.getHelper(ctx).getComponentCodeDaoImpl();
 			IssueDaoImpl issueDaoImpl = databaseManager.getHelper(ctx).getIssueDaoImpl();
 
+			SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
+
 			String operatorCode = tmpSession.getOperatorCode();
 			String containerId = tmpSession.getContainerId();
 
+			// Get Operator. Create `operator` if needed
 			Operator operator = null;
 			if (TextUtils.isEmpty(operatorCode)) {
 				Logger.e("Container " + containerId + " does not have Operator");
 			} else {
-				List<Operator> listOperators = operatorDaoImpl.queryForEq(Operator.FIELD_CODE, operatorCode);
+				operator = operatorDaoImpl.findOperator(operatorCode);
 
-				if (listOperators.isEmpty()) {
+				if (null == operator) {
 					operator = new Operator();
 					operator.setCode(tmpSession.getOperatorCode());
-					operator.setName(tmpSession.getOperatorCode());
+					operator.setName(tmpSession.getOperatorName());
 					operatorDaoImpl.addOperator(operator);
-				} else {
-					operator = listOperators.get(0);
+					Logger.Log("Create new Operator: " + tmpSession.getOperatorCode());
 				}
 			}
 
-			// Create `depot` object if needed
-			Depot depot = null;
-			List<Depot> listDepots = depotDaoImpl.queryForEq(Depot.DEPOT_CODE, tmpSession.getDepotCode());
-			if (listDepots.isEmpty()) {
+			// Get Depot. Create `depot` object if needed
+			Depot depot = depotDaoImpl.findDepot(tmpSession.getDepotCode());
+			if (null == depot) {
 				depot = new Depot();
 				depot.setDepotCode(tmpSession.getDepotCode());
 				depot.setDepotName(tmpSession.getDepotCode());
 				depotDaoImpl.addDepot(depot);
-			} else {
-				depot = listDepots.get(0);
+				Logger.Log("Create new depot: " + tmpSession.getDepotCode());
 			}
 
 			// Create `container` object if needed
-			Container container = null;
-			List<Container> listContainers = containerDaoImpl.queryForEq(	Container.CONTAINER_ID,
-																			tmpSession.getContainerId());
-			if (listContainers.isEmpty()) {
+			Container container = containerDaoImpl.findContainer(tmpSession.getContainerId());
+			if (null == container) {
 				container = new Container();
 				container.setContainerId(tmpSession.getContainerId());
+
 				if (null != operator) {
 					container.setOperator(operator);
 				}
@@ -136,8 +135,7 @@ public class Mapper {
 				}
 
 				containerDaoImpl.addContainer(container);
-			} else {
-				container = listContainers.get(0);
+				Logger.Log("Create new container: " + tmpSession.getContainerId());
 			}
 
 			// Create `container session` object
@@ -157,7 +155,6 @@ public class Mapper {
 
 			// Get server state
 			containerSession.setServerState(tmpSession.getStatus());
-			// Logger.Log(containerId + " | " + ContainerState.values()[tmpSession.getStatus()].name());
 
 			// TODO: NOTE: may cause bugs
 			// process audit report item
@@ -170,10 +167,11 @@ public class Mapper {
 					DamageCode damageCode = damageCodeDaoImpl.queryForId(auditReportItem.getDamageId());
 					RepairCode repairCode = repairCodeDaoImpl.queryForId(auditReportItem.getRepairId());
 					ComponentCode componentCode = componentCodeDaoImpl.queryForId(auditReportItem.getComponentId());
+					String locationCode = auditReportItem.getLocationCode();
 
 					Issue issue = new Issue(auditReportItem.getId(), damageCode, repairCode, componentCode,
-											auditReportItem.getLocationCode(), auditReportItem.getLength(),
-											auditReportItem.getHeight(), auditReportItem.getQuantity());
+											locationCode, auditReportItem.getLength(), auditReportItem.getHeight(),
+											auditReportItem.getQuantity());
 
 					if (issue != null) {
 						issue.setContainerSession(containerSession);
@@ -184,6 +182,7 @@ public class Mapper {
 							CJayImage tmpCJayImage = new CJayImage(item.getId(), item.getType(), item.getImageName(),
 																	item.getImageUrl());
 							tmpCJayImage.setIssue(issue);
+							tmpCJayImage.setContainerSession(containerSession);
 							cJayImages.add(tmpCJayImage);
 							cJayImageDaoImpl.addCJayImage(tmpCJayImage);
 						}
@@ -198,12 +197,12 @@ public class Mapper {
 				}
 			}
 
-			// process gate report images
+			// process GateReportImages
 			List<GateReportImage> gateReportImages = tmpSession.getGateReportImages();
 			List<CJayImage> listImages = new ArrayList<CJayImage>();
+
 			if (null != gateReportImages) {
 				for (GateReportImage gateReportImage : gateReportImages) {
-
 					CJayImage image = new CJayImage(gateReportImage.getId(), gateReportImage.getType(),
 													gateReportImage.getCreatedAt(), gateReportImage.getImageName(),
 													gateReportImage.getImageUrl());
@@ -333,24 +332,6 @@ public class Mapper {
 			if (null != tmp) {
 
 				SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
-
-				// // Update imageIdPath
-				// main.setId(tmp.getId());
-				// if (updateImageIdPath) {
-				// if (!TextUtils.isEmpty(tmp.getImageIdPath())
-				// && !tmp.getImageIdPath()
-				// .equals("https://storage.googleapis.com/storage-cjay.cloudjay.com/")) {
-				// main.setImageIdPath(tmp.getImageIdPath());
-				// }
-				//
-				// }
-				//
-				// // Update check in time
-				// main.setCheckInTime(tmp.getCheckInTime());
-				//
-				// // Update check out time
-				// PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
-				// tmp.getCheckInTime());
 
 				// Update GateReportImages
 				List<GateReportImage> gateReportImages = tmp.getGateReportImages();
@@ -591,16 +572,9 @@ public class Mapper {
 							String cJayImageName = cJayImage.getImageName();
 
 							if (gateReportImageName.contains(cJayImageName)) {
-
-								// Logger.Log("Gate Report Image Id: " + Integer.toString(gateReportImage.getId())
-								// + "\nGate Report Image Name: " + gateReportImageName
-								// + "\nGate Report Image Type: " + Integer.toString(gateReportImage.getType())
-								// + "\nGate Report Image Time: " + gateReportImage.getCreatedAt());
-
 								cJayImage.setId(gateReportImage.getId());
 								cJayImage.setImageName(gateReportImageName);
 								cJayImageDaoImpl.update(cJayImage);
-
 								break;
 							}
 						}
