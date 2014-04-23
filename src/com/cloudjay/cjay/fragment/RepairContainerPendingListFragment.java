@@ -432,7 +432,7 @@ public class RepairContainerPendingListFragment extends SherlockFragment impleme
 				Logger.Log("onRefreshStarted");
 
 				try {
-					DataCenter.getInstance().fetchData(getActivity());
+					DataCenter.getInstance().fetchData(getActivity(), true);
 					DataCenter.getDatabaseHelper(getActivity())
 								.addUsageLog("#refresh in fragment #RepairContainerPending");
 				} catch (NoConnectionException e) {

@@ -216,11 +216,12 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
 		String containerSessionUuid = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
 		String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
-		
+
 		// find the last role that took picture of this issue
 		SQLiteDatabase db = DataCenter.getDatabaseHelper(getActivity().getApplicationContext()).getWritableDatabase();
 		String sql = "SELECT type FROM cjay_image WHERE containerSession_id LIKE ? AND type <> ? ORDER BY time_posted DESC LIMIT 1";
-		Cursor imageCursor = db.rawQuery(sql, new String[] { containerSessionUuid, String.valueOf(CJayImage.TYPE_EXPORT) });
+		Cursor imageCursor = db.rawQuery(	sql,
+											new String[] { containerSessionUuid, String.valueOf(CJayImage.TYPE_EXPORT) });
 		int lastRole = -1;
 		if (imageCursor.moveToFirst()) {
 			lastRole = imageCursor.getInt(imageCursor.getColumnIndexOrThrow("type"));
@@ -228,10 +229,12 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 		// show images
 		if (lastRole >= 0 && lastRole != CJayImage.TYPE_EXPORT) {
-			CJayApplication.openPhotoGridView(	getActivity(), containerSessionUuid, containerId, CJayImage.TYPE_EXPORT,
+			CJayApplication.openPhotoGridView(	getActivity(), containerSessionUuid, containerId,
+												CJayImage.TYPE_EXPORT,
 												lastRole, GateExportListFragment_.LOG_TAG);
 		} else {
-			CJayApplication.openPhotoGridView(	getActivity(), containerSessionUuid, containerId, CJayImage.TYPE_EXPORT,
+			CJayApplication.openPhotoGridView(	getActivity(), containerSessionUuid, containerId,
+												CJayImage.TYPE_EXPORT,
 												GateExportListFragment_.LOG_TAG);
 		}
 	}
@@ -395,7 +398,7 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 				Logger.Log("onRefreshStarted");
 
 				try {
-					DataCenter.getInstance().fetchData(getActivity());
+					DataCenter.getInstance().fetchData(getActivity(), true);
 					DataCenter.getDatabaseHelper(getActivity()).addUsageLog("#refresh in fragment #GateExport");
 
 				} catch (NoConnectionException e) {

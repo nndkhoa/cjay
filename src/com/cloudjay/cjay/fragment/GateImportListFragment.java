@@ -14,6 +14,7 @@ import org.androidannotations.annotations.ViewById;
 
 import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.Options;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 import android.app.Activity;
 import android.content.Context;
@@ -340,7 +341,8 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 				Logger.Log("onRefreshStarted");
 
 				try {
-					DataCenter.getInstance().fetchData(getActivity());
+
+					DataCenter.getInstance().fetchData(getActivity(), true);
 					DataCenter.getDatabaseHelper(getSherlockActivity()).addUsageLog("#refresh in fragment #GateImport");
 
 				} catch (NoConnectionException e) {

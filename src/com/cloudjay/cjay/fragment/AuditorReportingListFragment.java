@@ -400,7 +400,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 				Logger.Log("onRefreshStarted");
 
 				try {
-					DataCenter.getInstance().fetchData(getActivity());
+					DataCenter.getInstance().fetchData(getActivity(), true);
 					DataCenter.getDatabaseHelper(getActivity()).addUsageLog("#refresh in fragment #AuditorReporting");
 				} catch (NoConnectionException e) {
 					((CJayActivity) getActivity()).showCrouton(R.string.alert_no_network);

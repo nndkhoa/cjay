@@ -24,6 +24,11 @@
             android:layout_below="@id/btn_add_new"
             android:minHeight="300dp" />
 
+        <RelativeLayout
+            android:id="@android:id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
         <include
             layout="@layout/loading_data"
             android:visibility="gone" />

@@ -159,6 +159,10 @@ public class DataCenter {
 
 	}
 
+	public void fetchData(Context ctx) throws NoConnectionException, NullSessionException {
+		fetchData(ctx, false);
+	}
+
 	/**
 	 * Fetch data from server based on current user role.
 	 * 
@@ -167,7 +171,7 @@ public class DataCenter {
 	 *             if there is no connection to internet
 	 * @throws NullSessionException
 	 */
-	public void fetchData(Context ctx) throws NoConnectionException, NullSessionException {
+	public void fetchData(Context ctx, boolean forced) throws NoConnectionException, NullSessionException {
 
 		// Logger.Log("*** FETCHING DATA ... ***");
 
@@ -176,23 +180,30 @@ public class DataCenter {
 			return;
 
 		} else {
-			try {
-				// Mark that Application
-				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, true);
 
+			try {
+				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, true);
 				updateListISOCode(ctx);
 
-				boolean initialized = PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, false);
-				if (!initialized) {
-					Logger.Log("fetch data for first time");
-					updateListContainerSessions(ctx, CJayClient.REQUEST_TYPE_MODIFIED, InvokeType.FIRST_TIME);
+				if (forced) {
+
+					Logger.Log("Force to fetch new data from: "
+							+ StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+					updateListContainerSessions(ctx, CJayClient.REQUEST_TYPE_MODIFIED, InvokeType.FORCE_REFRESH);
 
 				} else {
-					Logger.Log("fetch data following time");
-					updateListContainerSessions(ctx, CJayClient.REQUEST_TYPE_MODIFIED, InvokeType.FOLLOWING);
+					boolean initialized = PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, false);
+					if (!initialized) {
+						Logger.Log("fetch data for first time");
+						updateListContainerSessions(ctx, CJayClient.REQUEST_TYPE_MODIFIED, InvokeType.FIRST_TIME);
+
+					} else {
+						Logger.Log("fetch data following time");
+						updateListContainerSessions(ctx, CJayClient.REQUEST_TYPE_MODIFIED, InvokeType.FOLLOWING);
+					}
 				}
 
-				// Remove container session that exported
+				// TODO: Remove container session that exported
 
 				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, false);
 
@@ -332,7 +343,7 @@ public class DataCenter {
 																			new String[] { containerSessionUUID + "%",
 																					String.valueOf(imageType) });
 	}
-	
+
 	public Cursor getCJayImagesCursorByContainer(Context context, String containerSessionUUID, String issueUUID,
 													int imageType) {
 		String queryString = "SELECT * FROM cjay_image WHERE containerSession_id LIKE ? AND issue_id LIKE ? AND type = ?";
@@ -341,11 +352,11 @@ public class DataCenter {
 																					issueUUID + "%",
 																					String.valueOf(imageType) });
 	}
-	
+
 	public Cursor getCJayImagesCursorByIssue(Context context, String issueUUID, int imageType) {
 		String queryString = "SELECT * FROM cjay_image WHERE issue_id LIKE ? AND type = ?";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
-																			new String[] { issueUUID + "%",	
+																			new String[] { issueUUID + "%",
 																					String.valueOf(imageType) });
 	}
 
@@ -706,11 +717,16 @@ public class DataCenter {
 																							SQLException,
 																							NullSessionException {
 
-		boolean initialized = PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, false);
-		if (invokeType == InvokeType.FIRST_TIME && initialized) {
-			Logger.Log("Better return");
+		if (invokeType == InvokeType.FOLLOWING) {
+			Logger.Log("Call for following time, better return.");
 			return;
 		}
+
+		// boolean initialized = PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, false);
+		// if (invokeType == InvokeType.FIRST_TIME && initialized) {
+		// Logger.Log("Better return");
+		// return;
+		// }
 
 		// Logger.Log("*** UPDATE LIST CONTAINER SESSIONS ***");
 		long startTime = System.currentTimeMillis();
@@ -814,10 +830,10 @@ public class DataCenter {
 			} while (!TextUtils.isEmpty(nextUrl));
 
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
-			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, true);
 
-			if (!initialized) {
-				Logger.Log("not initialize");
+			// chưa được gán INITIALIZED
+			if (PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, false) == false) {
+				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, true);
 			}
 
 		} catch (NoConnectionException e) {

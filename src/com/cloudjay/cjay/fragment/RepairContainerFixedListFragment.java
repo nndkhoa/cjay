@@ -225,7 +225,7 @@ public class RepairContainerFixedListFragment extends SherlockFragment implement
 				Logger.Log("onRefreshStarted");
 
 				try {
-					DataCenter.getInstance().fetchData(getActivity());
+					DataCenter.getInstance().fetchData(getActivity(), true);
 				} catch (NoConnectionException e) {
 					((CJayActivity) getActivity()).showCrouton(R.string.alert_no_network);
 					e.printStackTrace();

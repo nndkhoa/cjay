@@ -1,7 +1,11 @@
 package com.cloudjay.cjay.util;
 
 public enum InvokeType {
-	FIRST_TIME(0), FOLLOWING(1), NOTIFICATION(2);
+
+	FIRST_TIME(0), // get data
+	FOLLOWING(1), // return
+	NOTIFICATION(2), // get data
+	FORCE_REFRESH(3); // get data
 
 	private int value;
 
