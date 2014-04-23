@@ -42,6 +42,7 @@ public class ContainerDaoImpl extends BaseDaoImpl<Container, Integer> implements
 		return queryForAll();
 	}
 
+	@Override
 	public Cursor getAllContainersCursor() throws SQLException {
 		Cursor cursor = null;
 
@@ -59,6 +60,7 @@ public class ContainerDaoImpl extends BaseDaoImpl<Container, Integer> implements
 		return cursor;
 	}
 
+	@Override
 	public Container findContainer(String containerId) throws SQLException {
 		return queryForFirst(queryBuilder().where().eq(Container.CONTAINER_ID, containerId).prepare());
 	}

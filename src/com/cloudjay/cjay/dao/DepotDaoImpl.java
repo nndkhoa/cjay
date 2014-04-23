@@ -39,6 +39,7 @@ public class DepotDaoImpl extends BaseDaoImpl<Depot, Integer> implements IDepotD
 		return queryForAll();
 	}
 
+	@Override
 	public Depot findDepot(String depotCode) throws SQLException {
 		return queryForFirst(this.queryBuilder().where().eq(Depot.DEPOT_CODE, depotCode).prepare());
 	}

@@ -65,6 +65,7 @@ public class OperatorDaoImpl extends BaseDaoImpl<Operator, Integer> implements I
 		}
 	}
 
+	@Override
 	public Operator findOperator(String operatorCode) throws SQLException {
 		return queryForFirst(this.queryBuilder().where().eq(Operator.FIELD_CODE, operatorCode).prepare());
 	}

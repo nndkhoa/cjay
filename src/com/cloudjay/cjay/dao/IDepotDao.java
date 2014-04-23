@@ -15,4 +15,6 @@ public interface IDepotDao extends Dao<Depot, Integer> {
 
 	List<Depot> getAllDepots() throws SQLException;
 
+	Depot findDepot(String depotCode) throws SQLException;
+
 }

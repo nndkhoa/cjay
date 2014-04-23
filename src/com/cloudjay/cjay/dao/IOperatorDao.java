@@ -20,4 +20,6 @@ public interface IOperatorDao extends Dao<Operator, Integer> {
 	List<Operator> getAllOperators() throws SQLException;
 
 	boolean isEmpty() throws SQLException;
+
+	Operator findOperator(String operatorCode) throws SQLException;
 }

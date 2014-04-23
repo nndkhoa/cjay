@@ -156,8 +156,7 @@ public class Mapper {
 			// Get server state
 			containerSession.setServerState(tmpSession.getStatus());
 
-			// TODO: NOTE: may cause bugs
-			// process audit report item
+			// process AuditReportItems
 			List<AuditReportItem> auditReportItems = tmpSession.getAuditReportItems();
 			Collection<Issue> issues = new ArrayList<Issue>();
 
@@ -176,6 +175,7 @@ public class Mapper {
 					if (issue != null) {
 						issue.setContainerSession(containerSession);
 
+						// process AuditReportImages
 						List<AuditReportImage> auditReportImages = auditReportItem.getAuditReportImages();
 						Collection<CJayImage> cJayImages = new ArrayList<CJayImage>();
 						for (AuditReportImage item : auditReportImages) {
@@ -184,17 +184,20 @@ public class Mapper {
 							tmpCJayImage.setIssue(issue);
 							tmpCJayImage.setContainerSession(containerSession);
 							cJayImages.add(tmpCJayImage);
-							cJayImageDaoImpl.addCJayImage(tmpCJayImage);
+
 						}
+
+						cJayImageDaoImpl.addListCJayImages((List<CJayImage>) cJayImages);
 
 						if (null != cJayImages) {
 							issue.setCJayImages(cJayImages);
 						}
 
 						issues.add(issue);
-						issueDaoImpl.addIssue(issue);
 					}
 				}
+
+				issueDaoImpl.addListIssues((List<Issue>) issues);
 			}
 
 			// process GateReportImages
@@ -207,17 +210,13 @@ public class Mapper {
 													gateReportImage.getCreatedAt(), gateReportImage.getImageName(),
 													gateReportImage.getImageUrl());
 
-					// set default value
-					// image.setUploadState(CJayImage.STATE_UPLOAD_COMPLETED);
-
 					if (null != image) {
 						image.setContainerSession(containerSession);
 					}
 
-					Logger.Log("Add cjay image " + image.getImageName());
-					cJayImageDaoImpl.addCJayImage(image);
 					listImages.add(image);
 				}
+				cJayImageDaoImpl.addListCJayImages(listImages);
 			}
 
 			return containerSession;
