@@ -16,6 +16,7 @@ public class TmpContainerSession {
 	private String depot_code;
 	private String container_id_image;
 	private int status;
+
 	private List<AuditReportItem> audit_report_items;
 	private List<GateReportImage> gate_report_images;
 

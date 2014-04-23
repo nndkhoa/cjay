@@ -195,11 +195,11 @@ public class DataCenter {
 				} else {
 					boolean initialized = PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, false);
 					if (!initialized) {
-						Logger.Log("fetch data for first time");
+						// Logger.Log("fetch data for first time");
 						updateListContainerSessions(ctx, CJayClient.REQUEST_TYPE_MODIFIED, InvokeType.FIRST_TIME);
 
 					} else {
-						Logger.Log("fetch data following time");
+						// Logger.Log("fetch data following time");
 						updateListContainerSessions(ctx, CJayClient.REQUEST_TYPE_MODIFIED, InvokeType.FOLLOWING);
 					}
 				}
@@ -719,15 +719,9 @@ public class DataCenter {
 																							NullSessionException {
 
 		if (invokeType == InvokeType.FOLLOWING) {
-			Logger.Log("Call for following time, better return.");
+			// Logger.Log("Call for following time, better return.");
 			return;
 		}
-
-		// boolean initialized = PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, false);
-		// if (invokeType == InvokeType.FIRST_TIME && initialized) {
-		// Logger.Log("Better return");
-		// return;
-		// }
 
 		// Logger.Log("*** UPDATE LIST CONTAINER SESSIONS ***");
 		long startTime = System.currentTimeMillis();

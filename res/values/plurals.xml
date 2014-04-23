@@ -5,5 +5,9 @@
         <item quantity="one">Uploaded %d image</item>
         <item quantity="other">Uploaded %d images</item>
     </plurals>
+    <plurals name="notification_uploaded_container">
+        <item quantity="one">Uploaded %d container</item>
+        <item quantity="other">Uploaded %d containers</item>
+    </plurals>
 
 </resources>

@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.text.TextUtils;
 import android.view.ViewConfiguration;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -20,6 +21,7 @@ import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
@@ -50,6 +52,12 @@ public class AuditorHomeActivity extends CJayActivity implements OnPageChangeLis
 			tab.setText(location);
 			tab.setTabListener(this);
 			getSupportActionBar().addTab(tab);
+		}
+
+		if (!TextUtils.isEmpty(getIntent().getAction())) {
+			if (getIntent().getAction().equals(CJayConstant.INTENT_OPEN_TAB_UPLOAD)) {
+				getSupportActionBar().selectTab(getSupportActionBar().getTabAt(2));
+			}
 		}
 	}
 

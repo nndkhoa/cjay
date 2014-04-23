@@ -1,25 +1,35 @@
 package com.cloudjay.cjay.service;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.androidannotations.annotations.EService;
 import org.androidannotations.annotations.Trace;
 
 import android.app.IntentService;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.CJayApplication;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
 import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.events.UploadStateRestoredEvent;
+import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CountingInputStreamEntity;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
@@ -28,15 +38,17 @@ import com.cloudjay.cjay.util.MismatchDataException;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.ServerInternalErrorException;
+import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadState;
 import com.cloudjay.cjay.util.UploadType;
+import com.cloudjay.cjay.util.Utils;
 
 import de.greenrobot.event.EventBus;
 
 @EService
 public class ContainerUploadIntentService extends IntentService implements CountingInputStreamEntity.UploadListener {
 
-	static final int NOTIFICATION_ID = 1000;
+	static final int NOTIFICATION_ID = 2000;
 	private CJayImageDaoImpl cJayImageDaoImpl;
 	private ContainerSessionDaoImpl containerSessionDaoImpl;
 
@@ -58,16 +70,8 @@ public class ContainerUploadIntentService extends IntentService implements Count
 
 		UploadType uploadType = UploadType.values()[containerSession.getUploadType()];
 		String response = "";
+
 		containerSession.setUploadState(UploadState.IN_PROGRESS);
-
-		try {
-			containerSessionDaoImpl.update(containerSession);
-		} catch (SQLException e) {
-
-			Logger.e("Cannot change State to `IN PROGRESS`. Process will be stopped.");
-			e.printStackTrace();
-			return;
-		}
 
 		// Convert ContainerSession to TmpContainerSession for uploading
 		TmpContainerSession uploadItem = null;
@@ -89,6 +93,7 @@ public class ContainerUploadIntentService extends IntentService implements Count
 												+ Integer.toString(containerSession.getUploadType())
 												+ " | #error on #conversion to Upload Format");
 			e.printStackTrace();
+			return;
 		}
 
 		try {
@@ -241,6 +246,7 @@ public class ContainerUploadIntentService extends IntentService implements Count
 			e.printStackTrace();
 		}
 
+		mNotificationMgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		EventBus.getDefault().register(this);
 		super.onCreate();
 	}
@@ -250,6 +256,7 @@ public class ContainerUploadIntentService extends IntentService implements Count
 
 		try {
 			stopForeground(true);
+			finishedNotification();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -263,24 +270,52 @@ public class ContainerUploadIntentService extends IntentService implements Count
 
 		ContainerSession containerSession = event.getTarget();
 		UploadState uploadState = UploadState.values()[containerSession.getUploadState()];
-
 		Logger.Log("onEvent UploadStateChangedEvent | " + uploadState.name());
+
+		if (uploadState == UploadState.NONE) {
+			try {
+				containerSessionDaoImpl.update(containerSession);
+			} catch (SQLException e) {
+				Logger.Log("Error when rolling back container " + containerSession.getContainerId());
+				e.printStackTrace();
+			}
+			return;
+		}
+
+		try {
+
+			if (!TextUtils.isEmpty(containerSession.getUuid())) {
+
+				containerSessionDaoImpl.updateRaw("UPDATE container_session SET state = "
+						+ containerSession.getUploadState() + " WHERE _id LIKE "
+						+ Utils.sqlString(containerSession.getUuid()));
+				containerSessionDaoImpl.refresh(containerSession);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			Logger.e("Cannot update state for container " + containerSession.getContainerId());
+			Logger.e("Current state " + Integer.toString(containerSession.getUploadState()));
+		}
+
 		switch (uploadState) {
-			case COMPLETED:
-			case ERROR:
-			case WAITING:
-
-				try {
-					containerSessionDaoImpl.update(containerSession);
-				} catch (SQLException e) {
-					e.printStackTrace();
-					Logger.e("Cannot update state for container " + containerSession.getContainerId());
-					Logger.e("Current state " + Integer.toString(containerSession.getUploadState()));
-				}
-
-				break;
 
 			case IN_PROGRESS:
+				updateNotification(containerSession);
+				break;
+
+			case COMPLETED:
+				mNumberUploaded++;
+				uploadedContainer.add(containerSession.getContainerId());
+				// Fall through
+
+			case ERROR:
+				// get Next Item if needed
+				break;
+
+			case WAITING:
+				break;
+
 			default:
 				break;
 		}
@@ -302,6 +337,7 @@ public class ContainerUploadIntentService extends IntentService implements Count
 																										.getWritableDatabase());
 
 				if (null != containerSession) {
+					startForeground();
 					doUploadContainer(containerSession);
 				}
 
@@ -316,6 +352,86 @@ public class ContainerUploadIntentService extends IntentService implements Count
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		return super.onStartCommand(intent, flags, startId);
+	}
+
+	private NotificationManager mNotificationMgr;
+	private NotificationCompat.Builder mNotificationBuilder;
+	private int mNumberUploaded = 0;
+
+	private void startForeground() {
+
+		if (null == mNotificationBuilder) {
+			mNotificationBuilder = new NotificationCompat.Builder(this);
+			mNotificationBuilder.setSmallIcon(R.drawable.ic_stat_upload);
+			mNotificationBuilder.setContentTitle(getString(R.string.app_name));
+			mNotificationBuilder.setOngoing(true);
+			mNotificationBuilder.setWhen(System.currentTimeMillis());
+
+			Intent intent = null;
+			try {
+				intent = new Intent(this, CJayApplication.getHomeActivity(this));
+			} catch (NullSessionException e) {
+				e.printStackTrace();
+			}
+
+			if (intent != null) {
+				intent.setAction(CJayConstant.INTENT_OPEN_TAB_UPLOAD);
+				PendingIntent pendingintent = PendingIntent.getActivity(this, 2, intent,
+																		PendingIntent.FLAG_UPDATE_CURRENT);
+				mNotificationBuilder.setContentIntent(pendingintent);
+			}
+
+		}
+
+		startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
+	}
+
+	void finishedNotification() {
+		if (null != mNotificationBuilder) {
+			String text = getResources().getQuantityString(R.plurals.notification_uploaded_container, mNumberUploaded,
+															mNumberUploaded);
+
+			mNotificationBuilder.setOngoing(false);
+			mNotificationBuilder.setProgress(0, 0, false);
+			mNotificationBuilder.setWhen(System.currentTimeMillis());
+			mNotificationBuilder.setContentTitle(text);
+			mNotificationBuilder.setTicker(text);
+			mNotificationBuilder.setContentText(StringHelper.concatStringsWSep(uploadedContainer, ","));
+
+			mNotificationMgr.notify(NOTIFICATION_ID, mNotificationBuilder.build());
+		}
+	}
+
+	List<String> uploadedContainer = new ArrayList<String>();
+
+	void updateNotification(final ContainerSession upload) {
+
+		String text;
+
+		switch (upload.getUploadState()) {
+
+			case CJayImage.STATE_UPLOAD_WAITING:
+				text = getString(R.string.notification_uploading_container, upload.getContainerId());
+
+				mNotificationBuilder.setContentTitle(text);
+				mNotificationBuilder.setTicker(text);
+				mNotificationBuilder.setProgress(0, 0, true);
+				mNotificationBuilder.setWhen(System.currentTimeMillis());
+				break;
+
+			case CJayImage.STATE_UPLOAD_IN_PROGRESS:
+
+				if (upload.getUploadProgress() >= 0) {
+
+					text = getString(R.string.notification_uploading_container_progress, upload.getContainerId());
+					mNotificationBuilder.setContentTitle(text);
+					mNotificationBuilder.setProgress(0, 0, true);
+
+				}
+				break;
+		}
+
+		mNotificationMgr.notify(NOTIFICATION_ID, mNotificationBuilder.build());
 	}
 
 	public void rollbackContainerState(ContainerSession containerSession) {
@@ -343,12 +459,5 @@ public class ContainerUploadIntentService extends IntentService implements Count
 
 		containerSession.setUploadConfirmation(false);
 		containerSession.setUploadState(UploadState.NONE);
-
-		try {
-			containerSessionDaoImpl.update(containerSession);
-		} catch (SQLException e) {
-			Logger.Log("Error when rolling back container " + containerSession.getContainerId());
-			e.printStackTrace();
-		}
 	}
 }

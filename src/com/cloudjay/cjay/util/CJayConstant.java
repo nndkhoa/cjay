@@ -84,6 +84,7 @@ public final class CJayConstant {
 	public static final String INTENT_SERVICE_UPLOAD_ALL = "cjay.intent.action.UPLOAD_ALL";
 	public static final String INTENT_PHOTO_TAKEN = "cjay.intent.action.PHOTO_TAKEN";
 	public static final String INTENT_LOGOUT = "cjay.intent.action.LOGOUT";
+	public static final String INTENT_OPEN_TAB_UPLOAD = "cjay.intent.action.OPEN_TAB_UPLOAD";
 	public static final float IMAGE_CACHE_HEAP_PERCENTAGE = 1f / 6f;
 
 }

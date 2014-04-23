@@ -80,13 +80,16 @@ public class PhotoUploadService extends Service {
 		CJayImage upload = event.getTarget();
 
 		try {
+
 			Logger.Log("CJayImageUploadStateChangedEvent "
 					+ (upload.getIssue() != null ? upload.getIssue().getUuid() : ""));
+
 			if (!TextUtils.isEmpty(upload.getUuid())) {
 				cJayImageDaoImpl.updateRaw("UPDATE cjay_image SET state = " + upload.getUploadState()
 						+ " WHERE uuid LIKE " + Utils.sqlString(upload.getUuid()));
 				cJayImageDaoImpl.refresh(upload);
 			}
+
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}

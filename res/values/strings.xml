@@ -39,8 +39,13 @@
     <string name="menu_clear_uploaded_title">Đăng xuất</string>
     <string name="menu_issue_report_check_title">Báo cáo xong</string>
     <string name="menu_import_title">Import hình ảnh</string>
+
+    <!--  -->
     <string name="notification_uploading_photo">Uploading Photo %1$s/%2$d</string>
     <string name="notification_uploading_photo_progress">Uploading %1$d/%3$d | %2$d%%</string>
+    
+    <string name="notification_uploading_container">Uploading %1$s</string>
+    <string name="notification_uploading_container_progress">Uploading %1$s</string>
 
     <!-- exception alert -->
     <string name="alert_try_again">Có lỗi phát sinh. Hãy thử lại lần nữa</string>

@@ -10,6 +10,8 @@ import org.acra.annotation.ReportsCrashes;
 import org.androidannotations.annotations.EApplication;
 
 import uk.co.senab.bitmapcache.BitmapLruCache;
+import android.R.integer;
+import android.app.Activity;
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
@@ -17,6 +19,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
+import android.service.textservice.SpellCheckerService.Session;
 import android.text.TextUtils;
 
 import com.aerilys.helpers.android.NetworkHelper;
@@ -35,9 +38,11 @@ import com.cloudjay.cjay.util.CJaySession;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.DatabaseManager;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadState;
+import com.cloudjay.cjay.util.UserRole;
 import com.cloudjay.cjay.util.Utils;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -160,6 +165,37 @@ public class CJayApplication extends Application {
 		ctx.startActivity(intent);
 	}
 
+	public static Class<?> getHomeActivity(Context context) throws NullSessionException {
+
+		CJaySession session = CJaySession.restore(context);
+		if (session == null) { throw new NullSessionException(); }
+
+		int userRole = 6;
+
+		try {
+			userRole = session.getCurrentUser().getRole();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		UserRole role = UserRole.values()[userRole];
+
+		switch (role) {
+			case GATE_KEEPER:
+				return GateHomeActivity_.class;
+
+			case AUDITOR:
+				return AuditorHomeActivity_.class;
+
+			case REPAIR_STAFF:
+				return RepairHomeActivity_.class;
+
+			default:
+				break;
+		}
+		return null;
+	}
+
 	public static void startCJayHomeActivity(Context context) {
 
 		/**
@@ -167,24 +203,14 @@ public class CJayApplication extends Application {
 		 */
 
 		Logger.Log("start CJayHome Activity");
-		int userRole = ((CJayActivity) context).getCurrentUser().getRole();
-
 		Intent intent = null;
-		switch (userRole) {
-			case 1:
-				intent = new Intent(context, AuditorHomeActivity_.class);
-				break;
-
-			case 4:
-				intent = new Intent(context, RepairHomeActivity_.class);
-				break;
-
-			case 6:
-			default:
-				intent = new Intent(context, GateHomeActivity_.class);
-				break;
+		try {
+			intent = new Intent(context, getHomeActivity(context));
+		} catch (NullSessionException e) {
+			e.printStackTrace();
 		}
-		context.startActivity(intent);
+
+		if (intent != null) context.startActivity(intent);
 	}
 
 	public static void uploadContainerSesison(Context ctx, ContainerSession containerSession) {

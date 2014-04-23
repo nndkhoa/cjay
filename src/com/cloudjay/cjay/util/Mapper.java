@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.androidannotations.annotations.EBean;
-import org.droidparts.contract.DB;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -234,6 +232,7 @@ public class Mapper {
 		String imageIdPath = containerSession.getImageIdPath();
 
 		TmpContainerSession tmpContainerSession = new TmpContainerSession();
+
 		tmpContainerSession.setId(containerSession.getId());
 		tmpContainerSession.setOperatorCode(containerSession.getOperatorName());
 		tmpContainerSession.setOperatorId(containerSession.getOperatorId());

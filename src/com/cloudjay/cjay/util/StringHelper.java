@@ -3,6 +3,7 @@ package com.cloudjay.cjay.util;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.text.TextUtils;
@@ -65,5 +66,15 @@ public class StringHelper {
 		SimpleDateFormat formatter = new SimpleDateFormat(newFormat);
 		String timeStamp = formatter.format(date);
 		return timeStamp;
+	}
+
+	public static String concatStringsWSep(List<String> strings, String separator) {
+		StringBuilder sb = new StringBuilder();
+		String sep = "";
+		for (String s : strings) {
+			sb.append(sep).append(s);
+			sep = separator;
+		}
+		return sb.toString();
 	}
 }

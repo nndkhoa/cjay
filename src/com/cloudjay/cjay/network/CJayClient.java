@@ -13,7 +13,6 @@ import org.json.JSONException;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
-import android.service.textservice.SpellCheckerService.Session;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.model.CJayImage;
@@ -617,11 +616,15 @@ public class CJayClient implements ICJayClient {
 		try {
 
 			Gson gson = new GsonBuilder().setDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE).create();
-
 			Type listType = new TypeToken<TmpContainerSession>() {
 			}.getType();
 
 			String resultString = gson.toJson(item, listType);
+
+			if (TextUtils.isEmpty(resultString)) {
+				Logger.e("Cannot parse container " + item.getContainerId());
+				throw new MismatchDataException();
+			}
 			Logger.Log(resultString);
 
 			Response<String> response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS)
@@ -634,6 +637,7 @@ public class CJayClient implements ICJayClient {
 												@Override
 												public void onCompleted(Exception arg0, Response<String> arg1) {
 												}
+
 											}).get();
 
 			Logger.w("Response code: " + response.getHeaders().getResponseMessage() + " | "

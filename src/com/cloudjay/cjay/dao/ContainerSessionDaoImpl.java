@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import android.R.integer;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -552,7 +551,7 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_EMPTY_CONTAINER_QUEUE, true);
 			if (Utils.canStopAlarm(ctx) && Utils.isAlarmUp(ctx)) {
-				Logger.Log("No more item to upload. Stop Alarm.");
+				// Logger.Log("No more item to upload. Stop Alarm.");
 				// Utils.cancelAlarm(ctx);
 			}
 

@@ -62,7 +62,7 @@ public class CJayImageDaoImpl extends BaseDaoImpl<CJayImage, String> implements 
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_EMPTY_PHOTO_QUEUE, true);
 
 			if (Utils.canStopAlarm(ctx) && Utils.isAlarmUp(ctx)) {
-				Logger.Log("No more item to upload. Stop Alarm.");
+				// Logger.Log("No more item to upload. Stop Alarm.");
 				// Utils.cancelAlarm(ctx);
 			}
 
