@@ -729,8 +729,8 @@ public class DataCenter {
 
 		try {
 			// 2013-11-10T21:05:24 (do not have timezone info)
-			SimpleDateFormat dateFormat = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-			String nowString = dateFormat.format(new Date());
+			// SimpleDateFormat dateFormat = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+			// String nowString = dateFormat.format(new Date());
 
 			SQLiteDatabase db = DataCenter.getDatabaseHelper(ctx.getApplicationContext()).getWritableDatabase();
 			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager.getHelper(ctx)
@@ -745,9 +745,7 @@ public class DataCenter {
 			if (containerSessionDaoImpl.isEmpty()) {
 
 			} else {
-
 				lastUpdate = PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE);
-
 				Logger.Log("get updated list container sessions from LastTime: " + lastUpdate + " | InvokeType: "
 						+ invokeType.name() + " | RequestType: " + type);
 			}
@@ -774,23 +772,21 @@ public class DataCenter {
 						for (TmpContainerSession tmpSession : tmpContainerSessions) {
 
 							ContainerSession containerSession = null;
-							String containerSessionId = tmpSession.getContainerId();
-							Cursor cursor = db.rawQuery("select _id from csview where container_id = ?",
-														new String[] { containerSessionId });
+							Cursor cursor = db.rawQuery("select * from container_session where id = ?",
+														new String[] { Integer.toString(tmpSession.getId()) });
 
 							// if tmpSession was existed somewhere in database --> update
+							// note: it will use rawQuery to update
 							if (cursor.moveToFirst()) {
 
 								Logger.Log("Container Session is existed. Prepare to update.");
 								String uuid = cursor.getString(cursor.getColumnIndex("_id"));
 
 								if (TextUtils.isEmpty(uuid)) {
-
-									Logger.e("WTF. CS existed but cannot find _id");
+									Logger.e("WTF? ContainerSession existed but cannot find _id");
 								} else {
 									Mapper.getInstance().update(ctx, tmpSession, uuid);
 								}
-
 								break;
 
 							} else { // --> create
@@ -806,6 +802,7 @@ public class DataCenter {
 						}
 					}
 
+					// note: it will use ormlite to create, so do not need to recheck any condition
 					containerSessionDaoImpl.bulkInsertDataBySavePoint(containerSessions);
 
 					// containerSessionDaoImpl

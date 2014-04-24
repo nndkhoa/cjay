@@ -2,7 +2,6 @@ package com.cloudjay.cjay.model;
 
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 import android.content.Context;
@@ -144,37 +143,33 @@ public class ContainerSession {
 			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx).getOperatorDaoImpl();
 			ContainerDaoImpl containerDaoImpl = databaseManager.getHelper(ctx).getContainerDaoImpl();
 
+			// Create operator object if needed
 			Operator operator = null;
 			if (!TextUtils.isEmpty(operatorCode)) {
-				List<Operator> listOperators = operatorDaoImpl.queryForEq(Operator.FIELD_CODE, operatorCode);
-				if (listOperators.isEmpty()) {
+				operator = operatorDaoImpl.findOperator(operatorCode);
+				if (null == operator) {
 					operator = new Operator();
 					operator.setCode(operatorCode);
 					operator.setName(operatorCode);
 					operatorDaoImpl.addOperator(operator);
-				} else {
-					operator = listOperators.get(0);
 				}
 			}
 
 			// Create `depot` object if needed
-			Depot depot = null;
-			List<Depot> listDepots = depotDaoImpl.queryForEq(Depot.DEPOT_CODE, depotCode);
-			if (listDepots.isEmpty()) {
+			Depot depot = depotDaoImpl.findDepot(depotCode);
+			if (null == depot) {
 				depot = new Depot();
 				depot.setDepotCode(depotCode);
 				depot.setDepotName(depotCode);
 				depotDaoImpl.addDepot(depot);
-			} else {
-				depot = listDepots.get(0);
 			}
 
 			// Create `container` object if needed
-			Container container = null;
-			List<Container> listContainers = containerDaoImpl.queryForEq(Container.CONTAINER_ID, containerId);
-			if (listContainers.isEmpty()) {
+			Container container = containerDaoImpl.findContainer(containerId);
+			if (null == container) {
 				container = new Container();
 				container.setContainerId(containerId);
+
 				if (null != operator) {
 					container.setOperator(operator);
 				}
@@ -184,8 +179,6 @@ public class ContainerSession {
 				}
 
 				containerDaoImpl.addContainer(container);
-			} else {
-				container = listContainers.get(0);
 			}
 
 			// Create `container session` object
@@ -355,22 +348,22 @@ public class ContainerSession {
 				}
 
 				return true;
-				
-//				String sql = "SELECT COUNT(img.uuid) AS img_count FROM container_session cs "
-//						+ "INNER JOIN issue i ON cs._id = i.containerSession_id "
-//						+ "LEFT JOIN cjay_image img ON i._id = img.issue_id and img.type = 2 "
-//						+ "WHERE cs._id LIKE ? GROUP BY i._id";
-//				SQLiteDatabase db = DataCenter.getDatabaseHelper(ctx.getApplicationContext()).getReadableDatabase();
-//				Cursor cursor = db.rawQuery(sql, new String[] { uuid + "%" });
-//				if (cursor.moveToFirst()) {
-//					do {
-//						if (cursor.getInt(cursor.getColumnIndexOrThrow("img_count")) == 0) {
-//							return false;
-//						}
-//					} while (cursor.moveToNext());
-//				}
-//				
-//				return true;
+
+				// String sql = "SELECT COUNT(img.uuid) AS img_count FROM container_session cs "
+				// + "INNER JOIN issue i ON cs._id = i.containerSession_id "
+				// + "LEFT JOIN cjay_image img ON i._id = img.issue_id and img.type = 2 "
+				// + "WHERE cs._id LIKE ? GROUP BY i._id";
+				// SQLiteDatabase db = DataCenter.getDatabaseHelper(ctx.getApplicationContext()).getReadableDatabase();
+				// Cursor cursor = db.rawQuery(sql, new String[] { uuid + "%" });
+				// if (cursor.moveToFirst()) {
+				// do {
+				// if (cursor.getInt(cursor.getColumnIndexOrThrow("img_count")) == 0) {
+				// return false;
+				// }
+				// } while (cursor.moveToNext());
+				// }
+				//
+				// return true;
 
 			default:
 				return true;

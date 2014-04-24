@@ -315,6 +315,7 @@ public class Mapper {
 		try {
 			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager.getHelper(ctx)
 																				.getContainerSessionDaoImpl();
+
 			ContainerSession main = containerSessionDaoImpl.queryForId(uuid);
 			update(ctx, tmp, main, true);
 
@@ -505,10 +506,26 @@ public class Mapper {
 					Logger.e("AuditReportItems is NULL");
 				}
 
-				String sqlString = "UPDATE container_session SET id = " + tmp.getId() + ", check_in_time = '"
-						+ tmp.getCheckInTime() + "', image_id_path = '" + tmp.getImageIdPath() + "', server_state = "
-						+ tmp.getStatus() + " WHERE _id = '" + main.getUuid() + "'";
+				String sqlString = "";
+				if (updateImageIdPath) {
+					if (!TextUtils.isEmpty(tmp.getImageIdPath())
+							&& !tmp.getImageIdPath()
+									.matches("^https://storage\\.googleapis\\.com/storage-cjay\\.cloudjay\\.com/\\s+$")) {
+
+						sqlString = "UPDATE container_session SET id = " + tmp.getId() + ", check_in_time = '"
+								+ tmp.getCheckInTime() + "', image_id_path = '" + tmp.getImageIdPath()
+								+ "', server_state = " + tmp.getStatus() + " WHERE _id = '" + main.getUuid() + "'";
+					}
+				} else {
+					sqlString = "UPDATE container_session SET id = " + tmp.getId() + ", check_in_time = '"
+							+ tmp.getCheckInTime() + "', server_state = " + tmp.getStatus() + " WHERE _id = '"
+							+ main.getUuid() + "'";
+				}
+
 				db.execSQL(sqlString);
+
+				// PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
+				// tmp.getCheckInTime());
 
 				// Post ContainerSessionUpdatedEvent
 				EventBus.getDefault().post(new ContainerSessionChangedEvent());
@@ -519,6 +536,27 @@ public class Mapper {
 
 	}
 
+	public synchronized void update(Context ctx, String jsonString, ContainerSession main) throws Exception {
+
+		TmpContainerSession tmp = null;
+		Gson gson = new GsonBuilder().setDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE).create();
+		Type listType = new TypeToken<TmpContainerSession>() {
+		}.getType();
+
+		try {
+			tmp = gson.fromJson(jsonString, listType);
+		} catch (Exception e) {
+			Logger.Log("jsonString is on wrong format");
+			e.printStackTrace();
+			return;
+		}
+
+		Logger.Log("ContainerSession is already existed. Prepare to update.");
+		update(ctx, tmp, main, false);
+		// update(ctx, jsonString, main, false);
+	}
+
+	@Deprecated
 	public synchronized void
 			update(Context ctx, String jsonString, ContainerSession main, boolean updateImageIdPath) throws Exception {
 
@@ -540,7 +578,6 @@ public class Mapper {
 
 			if (null != tmp) {
 				CJayImageDaoImpl cJayImageDaoImpl = databaseManager.getHelper(ctx).getCJayImageDaoImpl();
-
 				IssueDaoImpl issueDaoImpl = databaseManager.getHelper(ctx).getIssueDaoImpl();
 
 				// Uodate imageIdPath
@@ -602,12 +639,6 @@ public class Mapper {
 
 											cJayImage.setId(auditReportImage.getId());
 											cJayImage.setImageName(auditReportImageName);
-
-											Logger.Log(
-
-											"Audit Report Image Id: " + Integer.toString(cJayImage.getId())
-													+ "\nAudit Report Image Name: " + cJayImage);
-
 											cJayImageDaoImpl.update(cJayImage);
 											break;
 										}
@@ -633,7 +664,4 @@ public class Mapper {
 
 	}
 
-	public synchronized void update(Context ctx, String jsonString, ContainerSession main) throws Exception {
-		update(ctx, jsonString, main, false);
-	}
 }

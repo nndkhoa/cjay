@@ -5,15 +5,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
@@ -31,8 +27,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.cloudjay.cjay.AuditorHomeActivity_;
 import com.cloudjay.cjay.CJayActivity;
+import com.cloudjay.cjay.GateHomeActivity_;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.RepairHomeActivity_;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.service.PhotoUploadService_;
@@ -372,28 +371,39 @@ public class Utils {
 		return val ? 1 : 0;
 	}
 
-	@SuppressLint("SimpleDateFormat")
-	public static void updatePreferenceData(Context ctx, String candidateString) {
-
-		String lastDateString = PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE);
-
-		try {
-			Date lastDate = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE).parse(lastDateString);
-
-			Date candidate = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE).parse(candidateString);
-
-			if (candidate.after(lastDate)) {
-				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
-												candidateString);
-			}
-
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public static String sqlString(String input) {
 		return "'" + input.replace("'", "''") + "'";
+	}
+
+	public static Class<?> getHomeActivity(Context context) throws NullSessionException {
+
+		CJaySession session = CJaySession.restore(context);
+		if (session == null) { throw new NullSessionException(); }
+
+		int userRole = 6;
+
+		try {
+			userRole = session.getCurrentUser().getRole();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		UserRole role = UserRole.values()[userRole];
+
+		switch (role) {
+			case GATE_KEEPER:
+				return GateHomeActivity_.class;
+
+			case AUDITOR:
+				return AuditorHomeActivity_.class;
+
+			case REPAIR_STAFF:
+				return RepairHomeActivity_.class;
+
+			default:
+				break;
+		}
+		return null;
 	}
 
 	public static Intent getUploadAllIntent(Context context) {

@@ -42,34 +42,35 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 
 	@Override
 	public void addContainerSession(ContainerSession containerSession) throws SQLException {
+		createOrUpdate(containerSession);
 
-		if (containerSession != null) {
-			int containerSessionId = containerSession.getId();
-
-			if (containerSessionId == 0) { // new Container Session
-
-				// Logger.Log("Insert new Container with ID: " + Integer.toString(containerSessionId) + " Name: "
-				// + containerSession.getContainerId());
-				createOrUpdate(containerSession);
-
-			} else { // existed Container Session
-
-				ContainerSession result = queryForFirst(queryBuilder().where()
-																		.eq(ContainerSession.FIELD_ID,
-																			containerSession.getId()).prepare());
-
-				// update UUID if needed
-				if (null != result) {
-					// Logger.Log("Update container session UUID");
-					containerSession.setUuid(result.getUuid());
-				}
-
-				// Logger.Log("Update Container Session with ID: " + Integer.toString(containerSessionId) + " | Name: "
-				// + containerSession.getContainerId());
-
-				createOrUpdate(containerSession);
-			}
-		}
+		// if (containerSession != null) {
+		// int containerSessionId = containerSession.getId();
+		//
+		// if (containerSessionId == 0) { // new Container Session
+		//
+		// // Logger.Log("Insert new Container with ID: " + Integer.toString(containerSessionId) + " Name: "
+		// // + containerSession.getContainerId());
+		// createOrUpdate(containerSession);
+		//
+		// } else { // existed Container Session
+		//
+		// ContainerSession result = queryForFirst(queryBuilder().where()
+		// .eq(ContainerSession.FIELD_ID,
+		// containerSession.getId()).prepare());
+		//
+		// // update UUID if needed
+		// if (null != result) {
+		// // Logger.Log("Update container session UUID");
+		// containerSession.setUuid(result.getUuid());
+		// }
+		//
+		// // Logger.Log("Update Container Session with ID: " + Integer.toString(containerSessionId) + " | Name: "
+		// // + containerSession.getContainerId());
+		//
+		// createOrUpdate(containerSession);
+		// }
+		// }
 	}
 
 	@Override

@@ -505,7 +505,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		try {
 
-			mContainerSessionDaoImpl.addContainerSession(mContainerSession);
+			mContainerSessionDaoImpl.update(mContainerSession);
 			EventBus.getDefault().post(new ContainerSessionChangedEvent(mContainerSession));
 
 			// Open GridView
@@ -970,10 +970,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 										.equals("https://storage.googleapis.com/storage-cjay.cloudjay.com/")) {
 
 				Logger.Log("Set container image_id_path: " + uri);
-
 				mContainerSession.setImageIdPath(uri);
-				mContainerSessionDaoImpl.addContainerSession(mContainerSession);
-
+				mContainerSessionDaoImpl.update(mContainerSession);
 			}
 
 			// mCJayImages.add(uploadItem);

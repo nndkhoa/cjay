@@ -369,7 +369,7 @@ public class ContainerUploadIntentService extends IntentService implements Count
 
 			Intent intent = null;
 			try {
-				intent = new Intent(this, CJayApplication.getHomeActivity(this));
+				intent = new Intent(this, Utils.getHomeActivity(this));
 			} catch (NullSessionException e) {
 				e.printStackTrace();
 			}
