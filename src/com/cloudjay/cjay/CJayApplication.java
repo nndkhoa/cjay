@@ -226,7 +226,6 @@ public class CJayApplication extends Application {
 			try {
 				containerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(ctx)
 													.getContainerSessionDaoImpl();
-
 				containerSessionDaoImpl.update(containerSession);
 
 			} catch (SQLException e) {
@@ -234,7 +233,6 @@ public class CJayApplication extends Application {
 			}
 		}
 
-		// TODO: refactor if needed
 		if (!Utils.isAlarmUp(ctx)) {
 			Utils.startAlarm(ctx);
 		}
@@ -261,7 +259,7 @@ public class CJayApplication extends Application {
 
 		// Configure Logger
 		boolean debuggable = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox), true);
+												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox), false);
 
 		Logger.getInstance().setDebuggable(debuggable);
 

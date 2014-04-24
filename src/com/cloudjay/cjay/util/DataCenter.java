@@ -301,7 +301,7 @@ public class DataCenter {
 				+ " WHERE cs.upload_confirmation = 0 AND cs._id IN " + " (SELECT container_session._id"
 				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
 				+ " WHERE cjay_image.type = 2) AND cs.container_id LIKE ?"
-				+ " ORDER BY cs.container_id, check_in_time ORDER BY check_in_time DESC LIMIT 100";
+				+ " ORDER BY cs.container_id, check_in_time DESC LIMIT 100";
 
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
 																			new String[] { constraint + "%" });

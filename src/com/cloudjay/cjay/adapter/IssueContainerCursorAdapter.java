@@ -54,7 +54,7 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 	public void bindView(View view, Context context, Cursor cursor) {
 
 		if (cursor == null) {
-			Logger.Log("-----> BUG");
+			Logger.e("-----> BUG");
 		}
 
 		ViewHolder holder = (ViewHolder) view.getTag();
@@ -86,7 +86,11 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 		holder.containerIssuesView.setText(issueCount);
 
 		String url = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_IMAGE_ID_PATH));
-		if (!TextUtils.isEmpty(url) && !url.equals("https://storage.googleapis.com/storage-cjay.cloudjay.com/")) {
+
+		// if (!TextUtils.isEmpty(url) && !url.equals("https://storage.googleapis.com/storage-cjay.cloudjay.com/")) {
+
+		if (!TextUtils.isEmpty(url)
+				&& !url.matches("^https://storage\\.googleapis\\.com/storage-cjay\\.cloudjay\\.com/\\s+$")) {
 			imageLoader.displayImage(url, holder.itemPictureView);
 		} else {
 			holder.itemPictureView.setImageResource(R.drawable.ic_app);
