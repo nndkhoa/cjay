@@ -40,6 +40,9 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 		super(connectionSource, ContainerSession.class);
 	}
 
+	/**
+	 * Chỉ gọi hàm này khi tạo mới local container session
+	 */
 	@Override
 	public void addContainerSession(ContainerSession containerSession) throws SQLException {
 		createOrUpdate(containerSession);

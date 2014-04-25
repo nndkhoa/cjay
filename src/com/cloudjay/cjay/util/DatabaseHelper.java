@@ -424,4 +424,5 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			PATCHES[i].apply(db, connectionSource);
 		}
 	}
+
 }

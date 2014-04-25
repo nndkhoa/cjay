@@ -163,14 +163,14 @@ public class ContainerUploadIntentService extends IntentService implements Count
 			// but while the upload is in progress, user want to upload official version
 			// so we don't need to restored session state.
 			if (containerSession.isOnLocal() == false && newUploadType == UploadType.IN) {
+
 				isInterruptedByOfficialUpload = true;
 				Logger.w("is interrupted by official upload");
 			}
 		}
 
-		// convert back then save containerSession
 		try {
-
+			// convert back then save containerSessio
 			Mapper.getInstance().update(getApplicationContext(), response, containerSession);
 
 		} catch (SQLException e) {

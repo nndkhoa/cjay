@@ -4,7 +4,7 @@ public class AuditReportImage {
 
 	private int id;
 	private int type;
-	private String time_posted;
+	private String created_at;
 	private String image_name;
 	private String image_url;
 
@@ -12,9 +12,9 @@ public class AuditReportImage {
 
 	}
 
-	public AuditReportImage(int id, int type, String time_posted, String image_name, String image_url) {
+	public AuditReportImage(int id, int type, String created_at, String image_name, String image_url) {
 
-		this(type, time_posted, image_name, image_url);
+		this(type, created_at, image_name, image_url);
 		this.id = id;
 
 		// this.type = type;
@@ -22,9 +22,9 @@ public class AuditReportImage {
 		// this.image_name = image_name;
 	}
 
-	public AuditReportImage(int type, String time_posted, String image_name, String image_url) {
+	public AuditReportImage(int type, String created_at, String image_name, String image_url) {
 		this.type = type;
-		this.time_posted = time_posted;
+		this.created_at = created_at;
 		this.image_name = image_name;
 		this.image_url = image_url;
 	}
@@ -37,8 +37,8 @@ public class AuditReportImage {
 		return image_name;
 	}
 
-	public String getTimePosted() {
-		return time_posted;
+	public String getCreatedAt() {
+		return created_at;
 	}
 
 	public int getType() {
@@ -53,8 +53,8 @@ public class AuditReportImage {
 		this.image_name = image_name;
 	}
 
-	public void setTimePosted(String time_posted) {
-		this.time_posted = time_posted;
+	public void setCreatedAt(String time_posted) {
+		this.created_at = time_posted;
 	}
 
 	public void setType(int type) {

@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.UUID;
 
 import org.androidannotations.annotations.EBean;
+
+import android.R.integer;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -78,143 +81,117 @@ public class Mapper {
 
 		try {
 
-			DepotDaoImpl depotDaoImpl = databaseManager.getHelper(ctx).getDepotDaoImpl();
-			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx).getOperatorDaoImpl();
-			ContainerDaoImpl containerDaoImpl = databaseManager.getHelper(ctx).getContainerDaoImpl();
-			CJayImageDaoImpl cJayImageDaoImpl = databaseManager.getHelper(ctx).getCJayImageDaoImpl();
-			DamageCodeDaoImpl damageCodeDaoImpl = databaseManager.getHelper(ctx).getDamageCodeDaoImpl();
-			RepairCodeDaoImpl repairCodeDaoImpl = databaseManager.getHelper(ctx).getRepairCodeDaoImpl();
-			ComponentCodeDaoImpl componentCodeDaoImpl = databaseManager.getHelper(ctx).getComponentCodeDaoImpl();
-			IssueDaoImpl issueDaoImpl = databaseManager.getHelper(ctx).getIssueDaoImpl();
-
+			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager.getHelper(ctx)
+																				.getContainerSessionDaoImpl();
 			SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
 
 			String operatorCode = tmpSession.getOperatorCode();
-			String containerId = tmpSession.getContainerId();
+			String depotCode = tmpSession.getDepotCode();
 
-			// Get Operator. Create `operator` if needed
-			Operator operator = null;
-			if (TextUtils.isEmpty(operatorCode)) {
-				Logger.e("Container " + containerId + " does not have Operator");
+			long operatorId = -1;
+			Cursor cursor = db.rawQuery("select * from operator where operator_code = ?", new String[] { operatorCode });
+			if (cursor.moveToFirst()) {
+				operatorId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
 			} else {
-				operator = operatorDaoImpl.findOperator(operatorCode);
-
-				if (null == operator) {
-					operator = new Operator();
-					operator.setCode(tmpSession.getOperatorCode());
-					operator.setName(tmpSession.getOperatorName());
-					operatorDaoImpl.addOperator(operator);
-					Logger.Log("Create new Operator: " + tmpSession.getOperatorCode());
-				}
+				ContentValues values = new ContentValues();
+				values.put(Operator.FIELD_CODE, operatorCode);
+				values.put(Operator.FIELD_NAME, operatorCode);
+				operatorId = db.insertWithOnConflict("operator", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+				// Logger.Log("Create new Operator: " + operatorCode);
 			}
 
-			// Get Depot. Create `depot` object if needed
-			Depot depot = depotDaoImpl.findDepot(tmpSession.getDepotCode());
-			if (null == depot) {
-				depot = new Depot();
-				depot.setDepotCode(tmpSession.getDepotCode());
-				depot.setDepotName(tmpSession.getDepotCode());
-				depotDaoImpl.addDepot(depot);
-				Logger.Log("Create new depot: " + tmpSession.getDepotCode());
+			long depotId = -1;
+			cursor = db.rawQuery(	"select id as _id, depot_code, depot_name from depot where depot_code = ?",
+									new String[] { depotCode });
+			if (cursor.moveToFirst()) {
+				depotId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+			} else {
+				ContentValues values = new ContentValues();
+				values.put(Depot.DEPOT_CODE, depotCode);
+				values.put(Depot.DEPOT_NAME, depotCode);
+				depotId = db.insertWithOnConflict("depot", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+				// Logger.Log("Create new depot: " + depotCode);
 			}
 
-			// Create `container` object if needed
-			Container container = containerDaoImpl.findContainer(tmpSession.getContainerId());
-			if (null == container) {
-				container = new Container();
-				container.setContainerId(tmpSession.getContainerId());
+			long containerId = -1;
+			cursor = db.rawQuery(	"select * from container where container_id = ?",
+									new String[] { tmpSession.getContainerId() });
+			if (cursor.moveToFirst()) {
+				containerId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+			} else {
 
-				if (null != operator) {
-					container.setOperator(operator);
-				}
-
-				if (null != depot) {
-					container.setDepot(depot);
-				}
-
-				containerDaoImpl.addContainer(container);
-				Logger.Log("Create new container: " + tmpSession.getContainerId());
+				ContentValues values = new ContentValues();
+				values.put(Container.CONTAINER_ID, tmpSession.getContainerId());
+				values.put("operator_id", operatorId);
+				values.put("depot_id", depotId);
+				containerId = db.insertWithOnConflict("container", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+				// Logger.Log("Create new container: " + tmpSession.getContainerId());
 			}
 
 			// Create `container session` object
 			String uuid = UUID.randomUUID().toString();
 
-			// UUID is primary key
-			ContainerSession containerSession = new ContainerSession();
-			containerSession.setId(tmpSession.getId());
-			containerSession.setCheckInTime(tmpSession.getCheckInTime());
-			containerSession.setCheckOutTime(tmpSession.getCheckOutTime());
-			containerSession.setImageIdPath(tmpSession.getImageIdPath());
-			containerSession.setUuid(uuid);
+			ContentValues csValues = new ContentValues();
+			csValues.put("check_in_time", tmpSession.getCheckInTime());
+			csValues.put("check_out_time", tmpSession.getCheckOutTime());
+			csValues.put("_id", uuid);
+			csValues.put("container_id", containerId);
+			csValues.put("image_id_path", tmpSession.getImageIdPath());
+			csValues.put("id", tmpSession.getId());
+			csValues.put("server_state", tmpSession.getStatus());
+			db.insertWithOnConflict("container_session", null, csValues, SQLiteDatabase.CONFLICT_REPLACE);
 
-			if (null != container) {
-				containerSession.setContainer(container);
-			}
-
-			// Get server state
-			containerSession.setServerState(tmpSession.getStatus());
-
-			// process AuditReportItems
+			// process AuditReportItems --> create issues
 			List<AuditReportItem> auditReportItems = tmpSession.getAuditReportItems();
-			Collection<Issue> issues = new ArrayList<Issue>();
-
 			if (null != auditReportItems) {
 				for (AuditReportItem auditReportItem : auditReportItems) {
 
-					DamageCode damageCode = damageCodeDaoImpl.queryForId(auditReportItem.getDamageId());
-					RepairCode repairCode = repairCodeDaoImpl.queryForId(auditReportItem.getRepairId());
-					ComponentCode componentCode = componentCodeDaoImpl.queryForId(auditReportItem.getComponentId());
-					String locationCode = auditReportItem.getLocationCode();
+					String issueUuid = UUID.randomUUID().toString();
+					ContentValues values = new ContentValues();
+					values.put("id", auditReportItem.getId());
+					values.put("_id", issueUuid);
+					values.put("componentCode_id", auditReportItem.getComponentId());
+					values.put("damageCode_id", auditReportItem.getDamageId());
+					values.put("repairCode_id", auditReportItem.getRepairId());
+					values.put("locationCode", auditReportItem.getLocationCode());
+					values.put("containerSession_id", uuid);
+					values.put("quantity", auditReportItem.getQuantity());
+					values.put("length", auditReportItem.getLength());
+					values.put("height", auditReportItem.getHeight());
+					db.insertWithOnConflict("issue", null, values, SQLiteDatabase.CONFLICT_REPLACE);
 
-					Issue issue = new Issue(auditReportItem.getId(), damageCode, repairCode, componentCode,
-											locationCode, auditReportItem.getLength(), auditReportItem.getHeight(),
-											auditReportItem.getQuantity());
-
-					if (issue != null) {
-						issue.setContainerSession(containerSession);
-
-						// process AuditReportImages
-						List<AuditReportImage> auditReportImages = auditReportItem.getAuditReportImages();
-						Collection<CJayImage> cJayImages = new ArrayList<CJayImage>();
-						for (AuditReportImage item : auditReportImages) {
-							CJayImage tmpCJayImage = new CJayImage(item.getId(), item.getType(), item.getImageName(),
-																	item.getImageUrl());
-							tmpCJayImage.setIssue(issue);
-							tmpCJayImage.setContainerSession(containerSession);
-							cJayImages.add(tmpCJayImage);
-
-						}
-
-						cJayImageDaoImpl.addListCJayImages((List<CJayImage>) cJayImages);
-
-						if (null != cJayImages) {
-							issue.setCJayImages(cJayImages);
-						}
-
-						issues.add(issue);
+					List<AuditReportImage> auditReportImages = auditReportItem.getAuditReportImages();
+					for (AuditReportImage image : auditReportImages) {
+						ContentValues imageValues = new ContentValues();
+						imageValues.put("id", image.getId());
+						imageValues.put("_id", image.getImageUrl());
+						imageValues.put("uuid", UUID.randomUUID().toString());
+						imageValues.put("issue_id", issueUuid);
+						imageValues.put("type", image.getType());
+						imageValues.put("containerSession_id", uuid);
+						imageValues.put("image_name", image.getImageName());
+						imageValues.put("time_posted", image.getCreatedAt());
+						db.insertWithOnConflict("cjay_image", null, imageValues, SQLiteDatabase.CONFLICT_REPLACE);
 					}
 				}
-
-				issueDaoImpl.addListIssues((List<Issue>) issues);
 			}
 
-			// process GateReportImages
 			List<GateReportImage> gateReportImages = tmpSession.getGateReportImages();
-			List<CJayImage> listImages = new ArrayList<CJayImage>();
+			for (GateReportImage image : gateReportImages) {
+				ContentValues values = new ContentValues();
+				values.put("id", image.getId());
+				values.put("_id", image.getImageUrl());
+				values.put("uuid", UUID.randomUUID().toString());
+				values.put("type", image.getType());
+				values.put("containerSession_id", uuid);
+				values.put("image_name", image.getImageName());
+				values.put("time_posted", image.getCreatedAt());
+				db.insertWithOnConflict("cjay_image", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+			}
 
-			if (null != gateReportImages) {
-				for (GateReportImage gateReportImage : gateReportImages) {
-					CJayImage image = new CJayImage(gateReportImage.getId(), gateReportImage.getType(),
-													gateReportImage.getCreatedAt(), gateReportImage.getImageName(),
-													gateReportImage.getImageUrl());
-
-					if (null != image) {
-						image.setContainerSession(containerSession);
-					}
-
-					listImages.add(image);
-				}
-				cJayImageDaoImpl.addListCJayImages(listImages);
+			ContainerSession containerSession = containerSessionDaoImpl.queryForId(uuid);
+			if (containerSession == null) {
+				Logger.e("Cannot find container " + tmpSession.getContainerId() + " after conversion");
 			}
 
 			return containerSession;
