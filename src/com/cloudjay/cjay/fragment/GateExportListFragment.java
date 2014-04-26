@@ -293,7 +293,7 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 				EventBus.getDefault().post(new ContainerSessionChangedEvent(containerSession));
 
-				CJayApplication.gotoCamera(activity, containerSession, CJayImage.TYPE_EXPORT, LOG_TAG);
+				CJayApplication.openCamera(activity, containerSession, CJayImage.TYPE_EXPORT, LOG_TAG);
 
 				break;
 		}

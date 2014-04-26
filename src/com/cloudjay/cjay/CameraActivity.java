@@ -66,7 +66,6 @@ import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJaySession;
-import com.cloudjay.cjay.util.IssueReportHelper;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringHelper;
@@ -1010,9 +1009,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	@UiThread
 	public void showIssueReportDialog(String cjayImageUuid) {
 		if (mSourceTag.equals("AuditorContainerActivity")) {
-			IssueReportHelper.showReportDialog(this, cjayImageUuid, mContainerSessionUUID);
+			CJayApplication.openReportDialog(this, cjayImageUuid, mContainerSessionUUID);
 		} else if (mSourceTag.equals("RepairIssuePendingListFragment")) {
-			IssueReportHelper.showReportDialog(this, cjayImageUuid, mContainerSessionUUID);
+			CJayApplication.openReportDialog(this, cjayImageUuid, mContainerSessionUUID);
 		}
 	}
 }

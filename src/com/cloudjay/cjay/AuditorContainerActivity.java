@@ -36,7 +36,6 @@ import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJayCustomCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
-import com.cloudjay.cjay.util.IssueReportHelper;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.UploadType;
 
@@ -137,7 +136,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		// go to camera
 		mNewImageCount = 0;
 		mNewImageUUID = "";
-		CJayApplication.gotoCamera(this, mContainerSession, CJayImage.TYPE_REPORT, LOG_TAG);
+		CJayApplication.openCamera(this, mContainerSession, CJayImage.TYPE_REPORT, LOG_TAG);
 	}
 
 	@Background
@@ -164,9 +163,9 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		String issueId = cursor.getString(cursor.getColumnIndexOrThrow("issue_id"));
 
 		if (!TextUtils.isEmpty(issueId)) {
-			IssueReportHelper.showIssueReport(this, mSelectedCJayImageUuid);
+			CJayApplication.openIssueReport(this, mSelectedCJayImageUuid);
 		} else {
-			IssueReportHelper.showReportDialog(this, mSelectedCJayImageUuid, mContainerSessionUUID);
+			CJayApplication.openReportDialog(this, mSelectedCJayImageUuid, mContainerSessionUUID);
 		}
 
 	}

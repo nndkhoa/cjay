@@ -161,7 +161,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 	void cameraClicked() {
 		// go to camera
 		mNewImageCount = 0;
-		CJayApplication.gotoCamera(this, mContainerSession, mCJayImageTypeA, LOG_TAG);
+		CJayApplication.openCamera(this, mContainerSession, mCJayImageTypeA, LOG_TAG);
 	}
 
 	@Override

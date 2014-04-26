@@ -34,6 +34,7 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJaySession;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.DatabaseManager;
+import com.cloudjay.cjay.util.IssueReportHelper;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -84,19 +85,6 @@ public class CJayApplication extends Application {
 
 	}
 
-	public static void gotoCamera(Context ctx, ContainerSession containerSession, int imageType, String activityTag) {
-
-		Intent intent = new Intent(ctx, CameraActivity_.class);
-		intent.putExtra(CameraActivity.CJAY_CONTAINER_SESSION_EXTRA, containerSession.getUuid());
-		intent.putExtra(CameraActivity.CJAY_IMAGE_TYPE_EXTRA, imageType);
-
-		if (activityTag != null && !TextUtils.isEmpty(activityTag)) {
-			intent.putExtra(CameraActivity.SOURCE_TAG_EXTRA, activityTag);
-		}
-
-		ctx.startActivity(intent);
-	}
-
 	public static void logOutInstantly(Context ctx) {
 
 		Logger.w("Access Token is expired");
@@ -120,20 +108,28 @@ public class CJayApplication extends Application {
 		// sendBroadcast(broadcastIntent);
 	}
 
+	public static void openCamera(Context ctx, ContainerSession containerSession, int imageType, String activityTag) {
+
+		Intent intent = new Intent(ctx, CameraActivity_.class);
+		intent.putExtra(CameraActivity.CJAY_CONTAINER_SESSION_EXTRA, containerSession.getUuid());
+		intent.putExtra(CameraActivity.CJAY_IMAGE_TYPE_EXTRA, imageType);
+
+		if (activityTag != null && !TextUtils.isEmpty(activityTag)) {
+			intent.putExtra(CameraActivity.SOURCE_TAG_EXTRA, activityTag);
+		}
+
+		ctx.startActivity(intent);
+	}
+
 	public static void openPhotoGridView(Context ctx, String uuid, String containerId, int imageType1, int imageType2,
 											String sourceTag) {
 
 		Intent intent = new Intent(ctx, PhotoExpandableListViewActivity_.class);
-
 		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA, uuid);
 		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_CONTAINER_ID_EXTRA, containerId);
 		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_1_EXTRA, imageType1);
 		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_2_EXTRA, imageType2);
 		intent.putExtra(PhotoExpandableListViewActivity_.SOURCE_TAG_EXTRA, sourceTag);
-
-		Logger.w("Open Photo Grid View with imageType: " + Integer.toString(imageType1) + " | "
-				+ Integer.toString(imageType2));
-
 		ctx.startActivity(intent);
 	}
 
@@ -159,6 +155,18 @@ public class CJayApplication extends Application {
 		intent.putExtra(PhotoExpandableListViewActivity_.VIEW_MODE_EXTRA, PhotoExpandableListViewActivity_.MODE_IMPORT);
 		intent.putExtra(PhotoExpandableListViewActivity_.NUM_COLS_EXTRA, 3);
 		ctx.startActivity(intent);
+	}
+	
+	public static void openReportDialog(Context ctx, String cJayImageUuid, String containerSessionUUID) {
+		IssueReportHelper.showReportDialog(ctx, cJayImageUuid, containerSessionUUID);
+	}
+	
+	public static void openIssueAssigment(Context ctx, String imageUuid) {
+		IssueReportHelper.showIssueAssigment(ctx, imageUuid);
+	}
+
+	public static void openIssueReport(Context ctx, String imageUuid) {
+		IssueReportHelper.showIssueReport(ctx, imageUuid);
 	}
 
 	public static void startCJayHomeActivity(Context context) {

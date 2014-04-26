@@ -100,51 +100,40 @@ public class IssueReportHelper {
 	public static void
 			showReportDialog(final Context ctx, final String cJayImageUuid, final String containerSessionUUID) {
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(ctx).setCancelable(false)
-																	.setMessage(R.string.dialog_report_message)
-																	.setTitle(R.string.dialog_report_title)
-																	.setPositiveButton(	R.string.dialog_report_no,
-																						new DialogInterface.OnClickListener() {
-																							@Override
-																							public
-																									void
-																									onClick(DialogInterface dialog,
-																											int id) {
+		AlertDialog.Builder builder = 
+				new AlertDialog.Builder(ctx)
+					.setCancelable(false)
+					.setMessage(R.string.dialog_report_message)
+					.setTitle(R.string.dialog_report_title)
+					.setPositiveButton(	R.string.dialog_report_no,
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int id) {
 
-																								// Issue not reported,
-																								// report issue
-																								showIssueReport(ctx,
-																												cJayImageUuid);
-																							}
-																						})
-																	.setNegativeButton(	R.string.dialog_report_yes,
-																						new DialogInterface.OnClickListener() {
-																							@Override
-																							public
-																									void
-																									onClick(DialogInterface dialog,
-																											int id) {
+								// Issue not reported,
+								// report issue
+								showIssueReport(ctx, cJayImageUuid);
+							}
+						})
+					.setNegativeButton(	R.string.dialog_report_yes,
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int id) {
+	
+								// The issue already
+								// reported, assign this
+								// image to that issue
+								showIssueAssigment(	ctx, cJayImageUuid);
+							}
+						})
+					.setNeutralButton(R.string.dialog_report_neutral,
+						new OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
 
-																								// The issue already
-																								// reported, assign this
-																								// image to that issue
-																								showIssueAssigment(	ctx,
-																													cJayImageUuid);
-																							}
-																						})
-																	.setNeutralButton(R.string.dialog_report_neutral,
-																						new OnClickListener() {
-																							@Override
-																							public
-																									void
-																									onClick(DialogInterface dialog,
-																											int which) {
-
-																								setWWContainer(	ctx,
-																												cJayImageUuid,
-																												containerSessionUUID);
-																							}
-																						});
+								setWWContainer(	ctx, cJayImageUuid, containerSessionUUID);
+							}
+						});
 		builder.show();
 	}
 }

@@ -90,7 +90,7 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 
 		mTakenImages = new ArrayList<CJayImage>();
 
-		CJayApplication.gotoCamera(getActivity(), mContainerSession, CJayImage.TYPE_REPORT, LOG_TAG);
+		CJayApplication.openCamera(getActivity(), mContainerSession, CJayImage.TYPE_REPORT, LOG_TAG);
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 
 		mTakenImages = new ArrayList<CJayImage>();
 
-		CJayApplication.gotoCamera(getActivity(), mContainerSession, CJayImage.TYPE_REPAIRED, LOG_TAG);
+		CJayApplication.openCamera(getActivity(), mContainerSession, CJayImage.TYPE_REPAIRED, LOG_TAG);
 	}
 
 	private void initIssueFeedAdapter(ArrayList<Issue> containers) {
