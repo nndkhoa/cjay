@@ -197,7 +197,7 @@ public class GcmIntentService extends IntentService {
 			} else if (type.equalsIgnoreCase("NEW_TEMP_CONTAINER")) {
 
 				Logger.Log("Received notification: NEW_TEMP_CONTAINER");
-				DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_CREATED,
+				DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_MODIFIED,
 																		InvokeType.NOTIFICATION);
 
 			} else if (type.equalsIgnoreCase("EXPORT_CONTAINER")) {

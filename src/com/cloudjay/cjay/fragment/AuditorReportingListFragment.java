@@ -16,6 +16,7 @@ import org.androidannotations.annotations.ViewById;
 import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+import android.R.integer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -382,8 +383,12 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 		if (mState == STATE_REPORTING) {
 			boolean isDisplayed = mSelectedContainerSession != null;
 			menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
+			menu.findItem(R.id.menu_refresh_item).setVisible(false);
 		} else {
+
+			boolean isDisplayed = mSelectedContainerSession != null;
 			menu.findItem(R.id.menu_upload).setVisible(false);
+			menu.findItem(R.id.menu_refresh_item).setVisible(isDisplayed);
 		}
 	}
 
@@ -500,6 +505,39 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 				Crouton.cancelAllCroutons();
 				Crouton.makeText(getActivity(), R.string.alert_no_issue_container, Style.ALERT).show();
 			}
+		}
+	}
+
+	@OptionsItem(R.id.menu_refresh_item)
+	void refreshMenuItemSelected() {
+		if (mSelectedContainerSession != null) {
+
+			Logger.Log("Menu upload item clicked");
+
+			// getContainerSessionById
+			final int id = mSelectedContainerSession.getId();
+			final String uuid = mSelectedContainerSession.getUuid();
+
+			new AsyncTask<Void, Integer, Void>() {
+				@Override
+				protected Void doInBackground(Void... params) {
+
+					try {
+						DataCenter.getInstance().updateContainerSessionById(getActivity(), id, uuid);
+					} catch (NoConnectionException e) {
+						Crouton.cancelAllCroutons();
+						Crouton.makeText(getActivity(), R.string.alert_no_network, Style.ALERT).show();
+
+					} catch (NullSessionException e) {
+						CJayApplication.logOutInstantly(getActivity());
+						getActivity().finish();
+					}
+
+					return null;
+				}
+			}.execute();
+
+			hideMenuItems();
 		}
 	}
 }

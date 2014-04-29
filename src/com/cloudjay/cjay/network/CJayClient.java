@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutionException;
 import org.apache.http.HttpStatus;
 import org.json.JSONException;
 
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
@@ -177,82 +178,24 @@ public class CJayClient implements ICJayClient {
 		return items;
 	}
 
-	public List<TmpContainerSession> getContainerSessions(Context ctx, String date) throws NoConnectionException,
-																					NullSessionException {
+	public TmpContainerSession getContainerSessionById(Context ctx, int id) throws NoConnectionException,
+																			NullSessionException {
 
+		if (id == 0) return null;
 		if (Utils.hasNoConnection(ctx)) throw new NoConnectionException();
 
+		CJaySession session = CJaySession.restore(ctx);
+		if (null == session) { throw new NullSessionException(); }
 		String accessToken = CJaySession.restore(ctx).getAccessToken();
-
-		try {
-			Response<List<TmpContainerSession>> response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS)
-																.setHeader("Authorization", "Token " + accessToken)
-																.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
-																.addQuery("created_after", date)
-																.as(new TypeToken<List<TmpContainerSession>>() {
-																}).withResponse().get();
-
-			switch (response.getHeaders().getResponseCode()) {
-				case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
-				case HttpStatus.SC_UNAUTHORIZED:
-					throw new NullSessionException();
-
-				case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi
-					break;
-
-				case HttpStatus.SC_NOT_FOUND: // Không có dữ liệu tương ứng
-					break;
-
-				default:
-					return response.getResult();
-			}
-
-		} catch (InterruptedException e) {
-
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-
-			e.printStackTrace();
-		}
-		return null;
-
-	}
-
-	// TODO: merge it with the existed
-	public
-			ContainerSessionResult
-			getContainerSessionsByPageAndStatus(Context ctx, String date, int page, int filterStatus, int type)
-																												throws NoConnectionException,
-																												NullSessionException {
-
-		if (Utils.hasNoConnection(ctx)) throw new NoConnectionException();
+		if (TextUtils.isEmpty(accessToken)) { throw new NullSessionException(); }
 
 		String result = "";
+		Response<String> response = null;
 		try {
 
-			String accessToken = CJaySession.restore(ctx).getAccessToken();
-			if (TextUtils.isEmpty(accessToken)) { throw new NullSessionException(); }
-
-			Response<String> response = null;
-			if (type == REQUEST_TYPE_CREATED) {
-
-				response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS)
-								.setHeader("Authorization", "Token " + accessToken)
-								.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
-								.addQuery("page", Integer.toString(page))
-								.addQuery("filter_status", Integer.toString(filterStatus))
-								.addQuery("created_after", date).asString().withResponse().get();
-
-			} else {
-				Logger.Log("Request based on modified time");
-				response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS)
-								.setHeader("Authorization", "Token " + accessToken)
-								.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
-								.addQuery("page", Integer.toString(page))
-								.addQuery("filter_status", Integer.toString(filterStatus))
-								.addQuery("modified_after", date).asString().withResponse().get();
-
-			}
+			response = Ion.with(ctx, String.format(CJayConstant.CONTAINER_SESSION_ITEM, Integer.toString(id)))
+							.setHeader("Authorization", "Token " + accessToken)
+							.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx)).asString().withResponse().get();
 
 			switch (response.getHeaders().getResponseCode()) {
 				case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
@@ -267,7 +210,6 @@ public class CJayClient implements ICJayClient {
 
 				default:
 					result = response.getResult();
-
 					break;
 			}
 
@@ -277,13 +219,12 @@ public class CJayClient implements ICJayClient {
 			e.printStackTrace();
 		}
 
-		// Logger.w("Result: " + result);
+		Logger.w("Result: " + result);
 		Gson gson = new GsonBuilder().setDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE).create();
-
-		Type listType = new TypeToken<ContainerSessionResult>() {
+		Type listType = new TypeToken<TmpContainerSession>() {
 		}.getType();
 
-		ContainerSessionResult item = null;
+		TmpContainerSession item = null;
 		try {
 			item = gson.fromJson(result, listType);
 		} catch (Exception e) {
@@ -686,4 +627,119 @@ public class CJayClient implements ICJayClient {
 
 		return ret;
 	}
+
+	// public List<TmpContainerSession> getContainerSessions(Context ctx, String date) throws NoConnectionException,
+	// NullSessionException {
+	//
+	// if (Utils.hasNoConnection(ctx)) throw new NoConnectionException();
+	//
+	// String accessToken = CJaySession.restore(ctx).getAccessToken();
+	//
+	// try {
+	// Response<List<TmpContainerSession>> response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS)
+	// .setHeader("Authorization", "Token " + accessToken)
+	// .setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
+	// .addQuery("created_after", date)
+	// .as(new TypeToken<List<TmpContainerSession>>() {
+	// }).withResponse().get();
+	//
+	// switch (response.getHeaders().getResponseCode()) {
+	// case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
+	// case HttpStatus.SC_UNAUTHORIZED:
+	// throw new NullSessionException();
+	//
+	// case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi
+	// break;
+	//
+	// case HttpStatus.SC_NOT_FOUND: // Không có dữ liệu tương ứng
+	// break;
+	//
+	// default:
+	// return response.getResult();
+	// }
+	//
+	// } catch (InterruptedException e) {
+	//
+	// e.printStackTrace();
+	// } catch (ExecutionException e) {
+	//
+	// e.printStackTrace();
+	// }
+	// return null;
+	//
+	// }
+
+	// public
+	// ContainerSessionResult
+	// getContainerSessionsByPageAndStatus(Context ctx, String date, int page, int filterStatus, int type)
+	// throws NoConnectionException,
+	// NullSessionException {
+	//
+	// if (Utils.hasNoConnection(ctx)) throw new NoConnectionException();
+	//
+	// String result = "";
+	// try {
+	//
+	// String accessToken = CJaySession.restore(ctx).getAccessToken();
+	// if (TextUtils.isEmpty(accessToken)) { throw new NullSessionException(); }
+	//
+	// Response<String> response = null;
+	// if (type == REQUEST_TYPE_CREATED) {
+	//
+	// response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS)
+	// .setHeader("Authorization", "Token " + accessToken)
+	// .setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
+	// .addQuery("page", Integer.toString(page))
+	// .addQuery("filter_status", Integer.toString(filterStatus))
+	// .addQuery("created_after", date).asString().withResponse().get();
+	//
+	// } else {
+	// Logger.Log("Request based on modified time");
+	// response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS)
+	// .setHeader("Authorization", "Token " + accessToken)
+	// .setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
+	// .addQuery("page", Integer.toString(page))
+	// .addQuery("filter_status", Integer.toString(filterStatus))
+	// .addQuery("modified_after", date).asString().withResponse().get();
+	//
+	// }
+	//
+	// switch (response.getHeaders().getResponseCode()) {
+	// case HttpStatus.SC_FORBIDDEN: // User không có quyền truy cập
+	// case HttpStatus.SC_UNAUTHORIZED:
+	// throw new NullSessionException();
+	//
+	// case HttpStatus.SC_INTERNAL_SERVER_ERROR: // Server bị vãi
+	// break;
+	//
+	// case HttpStatus.SC_NOT_FOUND: // Không có dữ liệu tương ứng
+	// break;
+	//
+	// default:
+	// result = response.getResult();
+	//
+	// break;
+	// }
+	//
+	// } catch (InterruptedException e) {
+	// e.printStackTrace();
+	// } catch (ExecutionException e) {
+	// e.printStackTrace();
+	// }
+	//
+	// // Logger.w("Result: " + result);
+	// Gson gson = new GsonBuilder().setDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE).create();
+	//
+	// Type listType = new TypeToken<ContainerSessionResult>() {
+	// }.getType();
+	//
+	// ContainerSessionResult item = null;
+	// try {
+	// item = gson.fromJson(result, listType);
+	// } catch (Exception e) {
+	// e.printStackTrace();
+	// }
+	//
+	// return item;
+	// }
 }

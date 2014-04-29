@@ -674,8 +674,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	void saveBitmapToFile(Bitmap bitmap, File filename) {
 
-		Logger.Log("===== On SaveBitmap =====");
-		Logger.Log("Width/Height: " + Integer.toString(bitmap.getWidth()) + "/" + Integer.toString(bitmap.getHeight()));
+		// Logger.Log("===== On SaveBitmap =====");
+		// Logger.Log("Width/Height: " + Integer.toString(bitmap.getWidth()) + "/" +
+		// Integer.toString(bitmap.getHeight()));
 
 		try {
 

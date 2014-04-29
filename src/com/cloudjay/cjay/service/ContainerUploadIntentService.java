@@ -170,11 +170,9 @@ public class ContainerUploadIntentService extends IntentService implements Count
 		}
 
 		try {
-			// convert back then save containerSessio
+			// convert back then save containerSession
 			Mapper.getInstance().update(getApplicationContext(), response, containerSession);
-
 		} catch (SQLException e) {
-
 			e.printStackTrace();
 		} catch (Exception e) {
 			EventBus.getDefault()

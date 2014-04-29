@@ -289,6 +289,7 @@ public class Mapper {
 	}
 
 	public synchronized void update(Context ctx, TmpContainerSession tmp, String uuid) {
+
 		try {
 			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager.getHelper(ctx)
 																				.getContainerSessionDaoImpl();
