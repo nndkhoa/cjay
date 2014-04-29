@@ -211,7 +211,7 @@ public class Mapper {
 		TmpContainerSession tmpContainerSession = new TmpContainerSession();
 
 		tmpContainerSession.setId(containerSession.getId());
-		tmpContainerSession.setOperatorCode(containerSession.getOperatorName());
+		tmpContainerSession.setOperatorCode(containerSession.getOperatorCode());
 		tmpContainerSession.setOperatorId(containerSession.getOperatorId());
 		tmpContainerSession.setDepotCode(containerSession.getContainer().getDepot().getDepotCode());
 		tmpContainerSession.setContainerId(containerId);

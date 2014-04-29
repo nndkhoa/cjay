@@ -156,11 +156,11 @@ public class CJayApplication extends Application {
 		intent.putExtra(PhotoExpandableListViewActivity_.NUM_COLS_EXTRA, 3);
 		ctx.startActivity(intent);
 	}
-	
+
 	public static void openReportDialog(Context ctx, String cJayImageUuid, String containerSessionUUID) {
 		IssueReportHelper.showReportDialog(ctx, cJayImageUuid, containerSessionUUID);
 	}
-	
+
 	public static void openIssueAssigment(Context ctx, String imageUuid) {
 		IssueReportHelper.showIssueAssigment(ctx, imageUuid);
 	}
@@ -232,7 +232,7 @@ public class CJayApplication extends Application {
 
 		// Configure Logger
 		boolean debuggable = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox), false);
+												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox), true);
 
 		Logger.getInstance().setDebuggable(debuggable);
 

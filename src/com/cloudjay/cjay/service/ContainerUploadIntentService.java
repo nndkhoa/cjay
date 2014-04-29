@@ -218,6 +218,14 @@ public class ContainerUploadIntentService extends IntentService implements Count
 					}
 					break;
 
+				case IN:
+					containerSession.setOnLocal(false);
+					try {
+						containerSessionDaoImpl.update(containerSession);
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+					break;
 				default:
 					break;
 			}

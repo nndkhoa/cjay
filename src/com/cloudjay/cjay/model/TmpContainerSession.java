@@ -9,7 +9,6 @@ public class TmpContainerSession {
 	private String container_id;
 	private String image_id_path;
 	private String operator_code;
-	private String operator_name;
 	private int operator_id;
 	private String check_in_time;
 	private String check_out_time;
@@ -120,13 +119,4 @@ public class TmpContainerSession {
 	public void setStatus(int status) {
 		this.status = status;
 	}
-
-	public String getOperatorName() {
-		return operator_name;
-	}
-
-	public void setOperatorName(String operator_name) {
-		this.operator_name = operator_name;
-	}
-
 }

@@ -38,7 +38,7 @@ import de.greenrobot.event.EventBus;
 
 @DatabaseTable(tableName = "container_session", daoClass = ContainerSessionDaoImpl.class)
 public class ContainerSession {
-	
+
 	public static final int REMARK_AV = 0;
 	public static final int REMARK_B = 1;
 	public static final int REMARK_C = 2;
@@ -310,11 +310,11 @@ public class ContainerSession {
 	public boolean isOnLocal() {
 		return onLocal;
 	}
-	
+
 	public void setRemark(int remark) {
 		mRemark = remark;
 	}
-	
+
 	public int getRemark() {
 		return mRemark;
 	}
@@ -351,7 +351,6 @@ public class ContainerSession {
 				// check if all issues have REPAIRED images
 				boolean issueHasNoImage;
 				for (Issue issue : issues) {
-
 					issueHasNoImage = true;
 
 					for (CJayImage cJayImage : issue.getCJayImages()) {
