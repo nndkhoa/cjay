@@ -16,8 +16,6 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.cloudjay.cjay.*;
 
-;
-
 @EBean(scope = Scope.Singleton)
 public class IssueReportHelper {
 

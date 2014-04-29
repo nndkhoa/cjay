@@ -22,7 +22,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.text.Editable;
@@ -44,7 +43,10 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
-import com.cloudjay.cjay.*;
+import com.cloudjay.cjay.AuditorContainerActivity_;
+import com.cloudjay.cjay.CJayActivity;
+import com.cloudjay.cjay.CJayApplication;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
@@ -122,7 +124,8 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 		} else {
 			containerId = "";
 		}
-		showContainerDetailDialog(containerId, "", AddContainerDialog.CONTAINER_DIALOG_ADD);
+
+		CJayApplication.openContainerDetailDialog(this, containerId, "", false, AddContainerDialog.CONTAINER_DIALOG_ADD);
 	}
 
 	@AfterViews
@@ -347,7 +350,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 
 		if (cursorAdapter == null) {
-			cursorAdapter = new IssueContainerCursorAdapter(getActivity(), mItemLayout, cursor, 0);
+			cursorAdapter = new IssueContainerCursorAdapter(getActivity(), mItemLayout, cursor, 0, true);
 
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
 				@Override
@@ -372,7 +375,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 	}
 
 	public void OnOperatorSelected(String containerId, String operatorName, int mode) {
-		showContainerDetailDialog(containerId, operatorName, mode);
+		CJayApplication.openContainerDetailDialog(this, containerId, operatorName, false, mode);
 	}
 
 	@Override
@@ -470,18 +473,6 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 		}
 
 		EventBus.getDefault().post(new ListItemChangedEvent(position, totalItems));
-	}
-
-	public void showContainerDetailDialog(String containerId, String operatorName, int mode) {
-
-		FragmentManager fm = getActivity().getSupportFragmentManager();
-		AddContainerDialog addContainerDialog = new AddContainerDialog();
-		addContainerDialog.setContainerId(containerId);
-		addContainerDialog.setOperatorName(operatorName);
-		addContainerDialog.setMode(mode);
-		addContainerDialog.setParent(this);
-		addContainerDialog.isOperatorRequired = false;
-		addContainerDialog.show(fm, "add_container_dialog");
 	}
 
 	@OptionsItem(R.id.menu_upload)

@@ -24,7 +24,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.PhotoGridViewCursorAdapter;
 
 
-public class CheckablePhotoItemLayout extends CheckableFrameLayout {
+public class CheckablePhotoGridItemLayout extends CheckableFrameLayout {
 
 	private final SquareImageView mImageView;
 	private final CheckableImageView mButton;
@@ -32,7 +32,7 @@ public class CheckablePhotoItemLayout extends CheckableFrameLayout {
 	private PhotoGridViewCursorAdapter mParentAdapter;
 	private String mCJayImageUuid;
 
-	public CheckablePhotoItemLayout(Context context, AttributeSet attrs) {
+	public CheckablePhotoGridItemLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);
 
 		LayoutInflater.from(context).inflate(R.layout.grid_item_checkable_layout,

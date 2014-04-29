@@ -47,7 +47,7 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadType;
 import com.cloudjay.cjay.util.Utils;
-import com.cloudjay.cjay.view.CheckablePhotoItemLayout;
+import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
 
 import de.greenrobot.event.EventBus;
 
@@ -262,7 +262,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 			@Override
 			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 				if (mViewMode == MODE_IMPORT) {
-					CheckablePhotoItemLayout layout = (CheckablePhotoItemLayout) v.findViewById(R.id.photo_layout);
+					CheckablePhotoGridItemLayout layout = (CheckablePhotoGridItemLayout) v.findViewById(R.id.photo_layout);
 					layout.toggle();
 				} else {
 					Intent intent = new Intent(ctx, PhotoViewPagerActivity_.class);

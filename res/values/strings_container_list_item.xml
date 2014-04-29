@@ -1,10 +1,10 @@
 <resources>
     
     <!-- Strings related to feeds -->
-    <string name="container_id">Container ID:</string>
+    <string name="container_id">ID:</string>
     <string name="container_owner">Hãng tàu:</string>
-    <string name="container_import_date">Ngày nhập:</string>
-    <string name="container_export_date">Ngày xuất:</string>
+    <string name="container_import_date">Nhập:</string>
+    <string name="container_export_date">Xuất:</string>
     <string name="container_issues">Số lỗi:</string>
     <string name="container_search">Tìm container</string>
     <string name="container_add">Thêm</string>

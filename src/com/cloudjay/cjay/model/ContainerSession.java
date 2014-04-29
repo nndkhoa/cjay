@@ -38,11 +38,6 @@ import de.greenrobot.event.EventBus;
 
 @DatabaseTable(tableName = "container_session", daoClass = ContainerSessionDaoImpl.class)
 public class ContainerSession {
-	
-	public static final int REMARK_AV = 0;
-	public static final int REMARK_B = 1;
-	public static final int REMARK_C = 2;
-	public static final int REMARK_NULL = 4;
 
 	public static final String FIELD_ID = "id";
 	public static final String FIELD_UUID = "_id";
@@ -56,7 +51,7 @@ public class ContainerSession {
 	public static final String FIELD_LOCAL = "on_local"; // 1
 	public static final String FIELD_FIXED = "fixed";
 	public static final String FIELD_EXPORT = "export";
-	public static final String FIELD_REMARK = "remark";
+	public static final String FIELD_AVAILABLE = "is_available";
 
 	// public static final String FIELD_IS_TEMP = "is_temp";
 	// @DatabaseField(columnName = FIELD_IS_TEMP, defaultValue = "0")
@@ -102,8 +97,9 @@ public class ContainerSession {
 	@DatabaseField(columnName = FIELD_STATE, defaultValue = "0", index = true)
 	int mState;
 
-	@DatabaseField(columnName = FIELD_REMARK, defaultValue = "4", index = true)
-	int mRemark;
+	// remark = true -> container available
+	@DatabaseField(columnName = FIELD_AVAILABLE, defaultValue = "false", index = true)
+	boolean mAvailable;
 
 	// Use to mark from pending --> fix
 	@DatabaseField(columnName = FIELD_FIXED, defaultValue = "false")
@@ -311,12 +307,12 @@ public class ContainerSession {
 		return onLocal;
 	}
 	
-	public void setRemark(int remark) {
-		mRemark = remark;
+	public void setAvailable(boolean available) {
+		mAvailable = available;
 	}
 	
-	public int getRemark() {
-		return mRemark;
+	public boolean getIsAvailable() {
+		return mAvailable;
 	}
 
 	// 0 issue --> Failed

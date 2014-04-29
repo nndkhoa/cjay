@@ -22,7 +22,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.text.Editable;
@@ -127,7 +126,7 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 			containerId = "";
 		}
 
-		showContainerDetailDialog(containerId, "", AddContainerDialog.CONTAINER_DIALOG_ADD);
+		CJayApplication.openContainerDetailDialog(this, containerId, "", AddContainerDialog.CONTAINER_DIALOG_ADD);
 	}
 
 	@AfterViews
@@ -377,7 +376,7 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	}
 
 	public void OnOperatorSelected(String containerId, String operatorName, int mode) {
-		showContainerDetailDialog(containerId, operatorName, mode);
+		CJayApplication.openContainerDetailDialog(this, containerId, operatorName, mode);
 	}
 
 	@Override
@@ -463,18 +462,6 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	void setTotalItems(int val) {
 		totalItems = val;
 		EventBus.getDefault().post(new ListItemChangedEvent(1, totalItems));
-	}
-
-	public void showContainerDetailDialog(String containerId, String operatorName, int mode) {
-
-		FragmentManager fm = getActivity().getSupportFragmentManager();
-		AddContainerDialog addContainerDialog = new AddContainerDialog();
-		addContainerDialog.setContainerId(containerId);
-		addContainerDialog.setOperatorName(operatorName);
-		addContainerDialog.setMode(mode);
-		addContainerDialog.setParent(this);
-		addContainerDialog.show(fm, "add_container_dialog");
-
 	}
 
 	@OptionsItem(R.id.menu_upload)

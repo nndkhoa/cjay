@@ -17,6 +17,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 
 import com.aerilys.helpers.android.NetworkHelper;
@@ -41,6 +43,7 @@ import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadState;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.view.AddContainerDialog;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -167,6 +170,21 @@ public class CJayApplication extends Application {
 
 	public static void openIssueReport(Context ctx, String imageUuid) {
 		IssueReportHelper.showIssueReport(ctx, imageUuid);
+	}
+	
+	public static void openContainerDetailDialog(Fragment parent, String containerId, String operatorName, int mode) {
+		openContainerDetailDialog(parent, containerId, operatorName, true, mode);
+	}
+	
+	public static void openContainerDetailDialog(Fragment parent, String containerId, String operatorName, boolean operatorRequired, int mode) {
+		FragmentManager fm = parent.getActivity().getSupportFragmentManager();
+		AddContainerDialog addContainerDialog = new AddContainerDialog();
+		addContainerDialog.setContainerId(containerId);
+		addContainerDialog.setOperatorName(operatorName);
+		addContainerDialog.setMode(mode);
+		addContainerDialog.setParent(parent);
+		addContainerDialog.isOperatorRequired = operatorRequired;
+		addContainerDialog.show(fm, "add_container_dialog");
 	}
 
 	public static void startCJayHomeActivity(Context context) {

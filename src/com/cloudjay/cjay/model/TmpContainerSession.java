@@ -15,6 +15,7 @@ public class TmpContainerSession {
 	private String check_out_time;
 	private String depot_code;
 	private String container_id_image;
+	private boolean is_available;
 	private int status;
 
 	private List<AuditReportItem> audit_report_items;
@@ -127,6 +128,14 @@ public class TmpContainerSession {
 
 	public void setOperatorName(String operator_name) {
 		this.operator_name = operator_name;
+	}
+	
+	public boolean getIsAvailable() {
+		return is_available;
+	}
+	
+	public void setIsAvailable(boolean is_available) {
+		this.is_available = is_available;
 	}
 
 }

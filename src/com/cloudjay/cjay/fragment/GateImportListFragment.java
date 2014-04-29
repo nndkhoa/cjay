@@ -20,7 +20,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
@@ -97,7 +96,7 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 	@Click(R.id.btn_add_new)
 	void addContainerClicked() {
 		// getResources().getString(R.string.default_container_id)
-		showContainerDetailDialog("", "", AddContainerDialog.CONTAINER_DIALOG_ADD);
+		CJayApplication.openContainerDetailDialog(this, "", "", AddContainerDialog.CONTAINER_DIALOG_ADD);
 	}
 
 	@AfterViews
@@ -126,10 +125,10 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				if (scrollState != 0) {
-					((GateExportContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
+					((GateImportContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = true;
 				} else {
-					((GateExportContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
-					((GateExportContainerCursorAdapter) mFeedListView.getAdapter()).notifyDataSetChanged();
+					((GateImportContainerCursorAdapter) mFeedListView.getAdapter()).isScrolling = false;
+					((GateImportContainerCursorAdapter) mFeedListView.getAdapter()).notifyDataSetChanged();
 				}
 			}
 		});
@@ -146,9 +145,10 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 		Logger.Log("Menu edit item clicked");
 
 		// Open dialog for editing details
-		showContainerDetailDialog(	mSelectedContainerSession.getContainerId(),
-									mSelectedContainerSession.getOperatorName(),
-									AddContainerDialog.CONTAINER_DIALOG_EDIT);
+		CJayApplication.openContainerDetailDialog(this, 
+				mSelectedContainerSession.getContainerId(), 
+				mSelectedContainerSession.getOperatorName(), 
+				AddContainerDialog.CONTAINER_DIALOG_EDIT);
 	}
 
 	void hideMenuItems() {
@@ -295,7 +295,7 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 
 		if (cursorAdapter == null) {
 
-			cursorAdapter = new GateImportContainerCursorAdapter(getActivity(), mItemLayout, cursor, 0);
+			cursorAdapter = new GateImportContainerCursorAdapter(getActivity(), mItemLayout, cursor, 0, true);
 
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
 				@Override
@@ -313,7 +313,7 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 	}
 
 	public void OnOperatorSelected(String containerId, String operatorName, int mode) {
-		showContainerDetailDialog(containerId, operatorName, mode);
+		CJayApplication.openContainerDetailDialog(this, containerId, operatorName, mode);
 	}
 
 	@Override
@@ -399,18 +399,6 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 	void setTotalItems(int val) {
 		totalItems = val;
 		EventBus.getDefault().post(new ListItemChangedEvent(0, totalItems));
-	}
-
-	public void showContainerDetailDialog(String containerId, String operatorName, int mode) {
-
-		FragmentManager fm = getActivity().getSupportFragmentManager();
-		AddContainerDialog addContainerDialog = new AddContainerDialog();
-		addContainerDialog.setContainerId(containerId);
-		addContainerDialog.setOperatorName(operatorName);
-		addContainerDialog.setMode(mode);
-		addContainerDialog.setParent(this);
-		addContainerDialog.show(fm, "add_container_dialog");
-
 	}
 
 	@OptionsItem(R.id.menu_trash)

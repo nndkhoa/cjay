@@ -16,14 +16,14 @@ import android.widget.ImageView;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.view.CheckablePhotoItemLayout;
+import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class PhotoGridViewCursorAdapter extends CursorAdapter implements Filterable {
 
 	private static class ViewHolder {
 		public ImageView imageView;
-		public CheckablePhotoItemLayout photoLayout;
+		public CheckablePhotoGridItemLayout photoLayout;
 	}
 
 	private int mLayout;
@@ -71,7 +71,7 @@ public class PhotoGridViewCursorAdapter extends CursorAdapter implements Filtera
 			Logger.Log("Holder inside bindView is NULL");
 
 			holder = new ViewHolder();
-			holder.photoLayout = (CheckablePhotoItemLayout) view.findViewById(R.id.photo_layout);
+			holder.photoLayout = (CheckablePhotoGridItemLayout) view.findViewById(R.id.photo_layout);
 			holder.imageView = (ImageView) holder.photoLayout.findViewById(R.id.picture);
 			
 			view.setTag(holder);
@@ -85,7 +85,7 @@ public class PhotoGridViewCursorAdapter extends CursorAdapter implements Filtera
 			holder.imageView.setImageResource(R.drawable.ic_app);
 		}
 
-		CheckablePhotoItemLayout layout = (CheckablePhotoItemLayout) holder.photoLayout;
+		CheckablePhotoGridItemLayout layout = (CheckablePhotoGridItemLayout) holder.photoLayout;
 		layout.setShowCheckbox(mCheckable);
 		if (mCheckable) {
 			layout.setParentAdapter(this);
@@ -99,7 +99,7 @@ public class PhotoGridViewCursorAdapter extends CursorAdapter implements Filtera
 		View v = mInflater.inflate(mLayout, parent, false);
 
 		ViewHolder holder = new ViewHolder();
-		holder.photoLayout = (CheckablePhotoItemLayout) v.findViewById(R.id.photo_layout);
+		holder.photoLayout = (CheckablePhotoGridItemLayout) v.findViewById(R.id.photo_layout);
 		holder.imageView = (ImageView) holder.photoLayout.findViewById(R.id.picture);
 
 		v.setTag(holder);

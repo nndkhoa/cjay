@@ -11,7 +11,7 @@
         android:scaleType="centerCrop"
         custom:fixedAlong="width" /> -->
     
-	<com.cloudjay.cjay.view.CheckablePhotoItemLayout 
+	<com.cloudjay.cjay.view.CheckablePhotoGridItemLayout 
 	    android:id="@+id/photo_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
