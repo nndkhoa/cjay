@@ -200,7 +200,6 @@ public class CJayApplication extends Application {
 				containerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(ctx)
 													.getContainerSessionDaoImpl();
 				containerSessionDaoImpl.update(containerSession);
-
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

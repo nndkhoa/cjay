@@ -201,6 +201,7 @@ public class ContainerUploadIntentService extends IntentService implements Count
 
 					} else {
 
+						// restore state
 						containerSession.setUploadConfirmation(false);
 						containerSession.setUploadState(UploadState.NONE);
 
@@ -293,10 +294,10 @@ public class ContainerUploadIntentService extends IntentService implements Count
 		try {
 
 			if (!TextUtils.isEmpty(containerSession.getUuid())) {
-
 				containerSessionDaoImpl.updateRaw("UPDATE container_session SET state = "
 						+ containerSession.getUploadState() + " WHERE _id LIKE "
 						+ Utils.sqlString(containerSession.getUuid()));
+
 				containerSessionDaoImpl.refresh(containerSession);
 			}
 
