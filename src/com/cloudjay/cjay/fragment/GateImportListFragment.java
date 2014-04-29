@@ -434,8 +434,6 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 
 		// Marked it's not temporary anymore
 		mSelectedContainerSession.setUploadType(UploadType.IN);
-		mSelectedContainerSession.setOnLocal(false);
-
 		EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #IN container with ID "
 											+ mSelectedContainerSession.getContainerId() + "to upload queue"));
 

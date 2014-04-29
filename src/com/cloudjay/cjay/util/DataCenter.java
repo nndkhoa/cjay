@@ -11,6 +11,7 @@ import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EBean.Scope;
 import org.androidannotations.annotations.Trace;
 
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
@@ -704,6 +705,13 @@ public class DataCenter {
 
 	}
 
+	public void updateContainerSessionById(Context ctx, int id, String uuid) throws NoConnectionException,
+																			NullSessionException {
+		TmpContainerSession tmp = CJayClient.getInstance().getContainerSessionById(ctx, id);
+		Mapper.getInstance().update(ctx, tmp, uuid);
+
+	}
+
 	/**
 	 * Get new Container Sessions from last time
 	 * 
@@ -767,39 +775,37 @@ public class DataCenter {
 					List<TmpContainerSession> tmpContainerSessions = result.getResults();
 					Logger.Log("Total items: " + tmpContainerSessions.size());
 
-					if (null != tmpContainerSessions) {
+					for (TmpContainerSession tmpSession : tmpContainerSessions) {
 
-						for (TmpContainerSession tmpSession : tmpContainerSessions) {
+						ContainerSession containerSession = null;
+						Cursor cursor = db.rawQuery("select * from container_session where id = ?",
+													new String[] { Integer.toString(tmpSession.getId()) });
 
-							ContainerSession containerSession = null;
-							Cursor cursor = db.rawQuery("select * from container_session where id = ?",
-														new String[] { Integer.toString(tmpSession.getId()) });
+						// if tmpSession was existed somewhere in database --> update
+						// note: it will use rawQuery to update
+						if (cursor.moveToFirst()) {
 
-							// if tmpSession was existed somewhere in database --> update
-							// note: it will use rawQuery to update
-							if (cursor.moveToFirst()) {
+							Logger.Log("Container Session is existed. Prepare to update.");
+							String uuid = cursor.getString(cursor.getColumnIndex("_id"));
 
-								Logger.Log("Container Session is existed. Prepare to update.");
-								String uuid = cursor.getString(cursor.getColumnIndex("_id"));
-
-								if (TextUtils.isEmpty(uuid)) {
-									Logger.e("WTF? ContainerSession existed but cannot find _id");
-								} else {
-									Mapper.getInstance().update(ctx, tmpSession, uuid);
-								}
-								break;
-
-							} else { // --> create
-								containerSession = Mapper.getInstance().toContainerSession(tmpSession, ctx);
-							}
-
-							if (null != containerSession) {
-								containerSessions.add(containerSession);
+							if (TextUtils.isEmpty(uuid)) {
+								Logger.e("WTF? ContainerSession existed but cannot find _id");
 							} else {
-								Logger.e("WTF " + tmpSession.getContainerId());
+								Mapper.getInstance().update(ctx, tmpSession, uuid);
 							}
+							break;
 
+						} else { // --> create
+							Logger.Log("Create new container session:" + tmpSession.getContainerId());
+							containerSession = Mapper.getInstance().toContainerSession(tmpSession, ctx);
 						}
+
+						if (null != containerSession) {
+							containerSessions.add(containerSession);
+						} else {
+							Logger.e("WTF " + tmpSession.getContainerId());
+						}
+
 					}
 
 					// note: it will use ormlite to create, so do not need to recheck any condition

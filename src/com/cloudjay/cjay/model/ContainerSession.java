@@ -306,7 +306,7 @@ public class ContainerSession {
 	public boolean isOnLocal() {
 		return onLocal;
 	}
-	
+
 	public void setAvailable(boolean available) {
 		mAvailable = available;
 	}
@@ -347,7 +347,6 @@ public class ContainerSession {
 				// check if all issues have REPAIRED images
 				boolean issueHasNoImage;
 				for (Issue issue : issues) {
-
 					issueHasNoImage = true;
 
 					for (CJayImage cJayImage : issue.getCJayImages()) {

@@ -170,11 +170,9 @@ public class ContainerUploadIntentService extends IntentService implements Count
 		}
 
 		try {
-			// convert back then save containerSessio
+			// convert back then save containerSession
 			Mapper.getInstance().update(getApplicationContext(), response, containerSession);
-
 		} catch (SQLException e) {
-
 			e.printStackTrace();
 		} catch (Exception e) {
 			EventBus.getDefault()
@@ -201,6 +199,7 @@ public class ContainerUploadIntentService extends IntentService implements Count
 
 					} else {
 
+						// restore state
 						containerSession.setUploadConfirmation(false);
 						containerSession.setUploadState(UploadState.NONE);
 
@@ -218,6 +217,14 @@ public class ContainerUploadIntentService extends IntentService implements Count
 					}
 					break;
 
+				case IN:
+					containerSession.setOnLocal(false);
+					try {
+						containerSessionDaoImpl.update(containerSession);
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+					break;
 				default:
 					break;
 			}
@@ -285,10 +292,10 @@ public class ContainerUploadIntentService extends IntentService implements Count
 		try {
 
 			if (!TextUtils.isEmpty(containerSession.getUuid())) {
-
 				containerSessionDaoImpl.updateRaw("UPDATE container_session SET state = "
 						+ containerSession.getUploadState() + " WHERE _id LIKE "
 						+ Utils.sqlString(containerSession.getUuid()));
+
 				containerSessionDaoImpl.refresh(containerSession);
 			}
 

@@ -279,7 +279,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 			LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) gridView.getLayoutParams();
 			int gridViewWidth = gridView.getMeasuredWidth() > 0 ? gridView.getMeasuredWidth()
 					: gridView.getEmptyView().getMeasuredWidth();
-			p.height = gridViewWidth / mNumCols * (int)(1.0 * (cursor.getCount() + 1) / mNumCols + 0.5);
+			p.height = gridViewWidth / mNumCols * (int) (1.0 * (cursor.getCount() + 1) / mNumCols + 0.5);
 			gridView.setLayoutParams(p);
 		}
 	}
@@ -336,8 +336,8 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 			if (mViewMode == MODE_UPLOAD) {
 				if (sourceTag.equals(GateImportListFragment.LOG_TAG)) {
 					mContainerSession.setUploadType(UploadType.IN);
-					mContainerSession.setOnLocal(false);
-
+					
+					// mContainerSession.setOnLocal(false);
 					EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #IN container with ID "
 														+ mContainerSession.getContainerId() + "to upload queue"));
 
