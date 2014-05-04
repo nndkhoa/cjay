@@ -680,7 +680,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		try {
 
-			Logger.Log("Path: " + filename.getAbsolutePath());
+			// Logger.Log("Path: " + filename.getAbsolutePath());
 
 			FileOutputStream out = new FileOutputStream(filename);
 			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
