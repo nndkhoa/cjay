@@ -139,7 +139,10 @@ public class Mapper {
 			csValues.put("image_id_path", tmpSession.getImageIdPath());
 			csValues.put("id", tmpSession.getId());
 			csValues.put("server_state", tmpSession.getStatus());
-			csValues.put("is_available", tmpSession.getIsAvailable());
+
+			// TODO: Server do not return is_available
+			// csValues.put("is_available", tmpSession.getIsAvailable());
+
 			db.insertWithOnConflict("container_session", null, csValues, SQLiteDatabase.CONFLICT_REPLACE);
 
 			// process AuditReportItems --> create issues
@@ -217,7 +220,7 @@ public class Mapper {
 		tmpContainerSession.setDepotCode(containerSession.getContainer().getDepot().getDepotCode());
 		tmpContainerSession.setContainerId(containerId);
 		tmpContainerSession.setCheckInTime(containerSession.getRawCheckInTime());
-		tmpContainerSession.setIsAvailable(containerSession.getIsAvailable());
+		tmpContainerSession.setIsAvailable(containerSession.isAvailable());
 
 		if (TextUtils.isEmpty(checkoutTime)) {
 			Logger.e(containerId + " | Checkout Time is NULL");

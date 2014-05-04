@@ -90,7 +90,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			// csview --> join table operator + container + container_session
 			Logger.Log("create view csview");
 			String sql = "CREATE VIEW csview AS"
-					+ " SELECT cs._id, cs.check_out_time, cs.check_in_time, cs.image_id_path, cs.on_local, cs.fixed, cs.export, cs.upload_confirmation, cs.state, cs.cleared, cs.is_available, c.container_id, o.operator_name"
+					+ " SELECT cs._id, cs.check_out_time, cs.check_in_time, cs.image_id_path, cs.on_local, cs.fixed, cs.export, cs.upload_confirmation, cs.state, cs.cleared, c.container_id, o.operator_name"
 					+ " FROM container_session AS cs, container AS c"
 					+ " LEFT JOIN operator AS o ON c.operator_id = o._id" + " WHERE cs.container_id = c._id";
 			db.execSQL(sql);
@@ -104,6 +104,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 					+ " GROUP BY cs._id";
 			db.execSQL(sql);
 
+			// TODO: Deprecated
 			// view for validate container sessions before upload in Gate Export
 			Logger.Log("create view cs_export_validation_view");
 			sql = "CREATE VIEW cs_export_validation_view as"
@@ -217,17 +218,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 				Logger.w("Column `server_state` is already existed.");
 			}
 
-			try {
-				Logger.Log("add column `is_temp` in table `container_session`");
-				db.execSQL("ALTER TABLE container_session ADD COLUMN is_temp INTEGER DEFAULT 0");
-			} catch (Exception e) {
-				Logger.w("Column `is_temp` is already existed.");
-			}
-
 			// Add cs_full_info_view
 			Logger.Log("create view cs_full_info_view");
 			String sql = "CREATE VIEW cs_full_info_view AS"
-					+ " SELECT cs._id, cs.check_out_time, cs.check_in_time, cs.image_id_path, cs.server_state, cs.on_local, cs.fixed, cs.export, cs.upload_confirmation, cs.upload_type, cs.state, cs.cleared, cs.is_available, c.container_id, o.operator_name, o.operator_code, d.depot_code"
+					+ " SELECT cs._id, cs.check_out_time, cs.check_in_time, cs.image_id_path, cs.server_state, cs.on_local, cs.fixed, cs.export, cs.upload_confirmation, cs.upload_type, cs.state, cs.cleared, c.container_id, o.operator_name, o.operator_code, d.depot_code"
 					+ " FROM container_session AS cs, depot AS d, container AS c LEFT JOIN operator AS o ON c.operator_id = o._id"
 					+ " WHERE cs.container_id = c._id AND d.id = c.depot_id";
 			db.execSQL(sql);
@@ -243,26 +237,41 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		@Override
 		public void revert(SQLiteDatabase db, ConnectionSource connectionSource) {
 		}
+	}, new Patch() {
+
+			// version = 5
+		@Override
+		public void apply(SQLiteDatabase db, ConnectionSource connectionSource) {
+
+			// try {
+			// Logger.Log("add column `is_temp` in table `container_session`");
+			// db.execSQL("ALTER TABLE container_session ADD COLUMN is_temp INTEGER DEFAULT 0");
+			// } catch (Exception e) {
+			// Logger.w("Column `is_temp` is already existed.");
+			// }
+
+			Logger.Log("add is_available to csview");
+			String sql = "CREATE OR REPLACE VIEW csview AS"
+					+ " SELECT cs._id, cs.check_out_time, cs.check_in_time, cs.image_id_path, cs.on_local, cs.fixed, cs.export, cs.upload_confirmation, cs.state, cs.cleared, cs.is_available, c.container_id, o.operator_name"
+					+ " FROM container_session AS cs, container AS c"
+					+ " LEFT JOIN operator AS o ON c.operator_id = o._id" + " WHERE cs.container_id = c._id";
+			db.execSQL(sql);
+
+			Logger.Log("add is_available to cs_full_info_view");
+			sql = "CREATE OR REPLACE VIEW cs_full_info_view AS"
+					+ " SELECT cs._id, cs.check_out_time, cs.check_in_time, cs.image_id_path, cs.server_state, cs.on_local, cs.fixed, cs.export, cs.upload_confirmation, cs.upload_type, cs.state, cs.cleared, cs.is_available, c.container_id, o.operator_name, o.operator_code, d.depot_code"
+					+ " FROM container_session AS cs, depot AS d, container AS c LEFT JOIN operator AS o ON c.operator_id = o._id"
+					+ " WHERE cs.container_id = c._id AND d.id = c.depot_id";
+			db.execSQL(sql);
+
+		}
+
+		@Override
+		public void revert(SQLiteDatabase db, ConnectionSource connectionSource) {
+		}
 	} };
 
-	// , new Patch() {
-	// @Override
-	// public void apply(SQLiteDatabase db, ConnectionSource connectionSource) {
-	//
-	// try {
-	// Logger.Log("add column `is_temp` in table `container_session`");
-	// db.execSQL("ALTER TABLE container_session ADD COLUMN is_temp INTEGER DEFAULT 0");
-	// } catch (Exception e) {
-	// Logger.w("Column `is_temp` is already existed.");
-	// }
-	// }
-	//
-	// @Override
-	// public void revert(SQLiteDatabase db, ConnectionSource connectionSource) {
-	// }
-	// }
-
-	public static final int DATABASE_VERSION = 4;
+	public static final int DATABASE_VERSION = 5;
 
 	public DatabaseHelper(Context context) {
 

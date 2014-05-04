@@ -17,6 +17,7 @@ public class Issue {
 	public static final String ID = "id";
 	public static final String FIELD_UUID = "_id";
 	public static final String FIELD_FIXED = "fixed";
+	public static final String FIELD_IS_FIX_ALLOWED = "is_fix_allowed";
 
 	@DatabaseField(columnName = ID, defaultValue = "0")
 	int id;
@@ -47,6 +48,9 @@ public class Issue {
 
 	@DatabaseField(columnName = FIELD_FIXED, canBeNull = true, defaultValue = "false")
 	boolean fixed;
+
+	@DatabaseField(columnName = FIELD_IS_FIX_ALLOWED, canBeNull = true, defaultValue = "false")
+	boolean is_fix_allowed;
 
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
 	ContainerSession containerSession;
@@ -92,17 +96,20 @@ public class Issue {
 
 		if (o.getClass() == AuditReportItem.class) {
 			AuditReportItem tmp = (AuditReportItem) o;
-			
+
 			boolean isEqual = (damageCode != null ? damageCode.getId() : 0) == tmp.getDamageId()
 					&& (repairCode != null ? repairCode.getId() : 0) == tmp.getRepairId()
 					&& (componentCode != null ? componentCode.getId() : 0) == tmp.getComponentId()
 					&& locationCode == tmp.getLocationCode();
-			isEqual = isEqual && Integer.parseInt(Utils.replaceNull(quantity, "0")) 
-					== Integer.parseInt(Utils.replaceNull(tmp.getQuantity(), "0"));
-			isEqual = isEqual && Math.abs((Float.parseFloat(Utils.replaceNull(length, "0")))
-					- (Float.parseFloat(Utils.replaceNull(tmp.getLength(), "0")))) < 0.0001;
-			isEqual = isEqual && Math.abs((Float.parseFloat(Utils.replaceNull(height, "0"))) 
-					- (Float.parseFloat(Utils.replaceNull(tmp.getHeight(), "0")))) < 0.0001;
+			isEqual = isEqual
+					&& Integer.parseInt(Utils.replaceNull(quantity, "0")) == Integer.parseInt(Utils.replaceNull(tmp.getQuantity(),
+																												"0"));
+			isEqual = isEqual
+					&& Math.abs((Float.parseFloat(Utils.replaceNull(length, "0")))
+							- (Float.parseFloat(Utils.replaceNull(tmp.getLength(), "0")))) < 0.0001;
+			isEqual = isEqual
+					&& Math.abs((Float.parseFloat(Utils.replaceNull(height, "0")))
+							- (Float.parseFloat(Utils.replaceNull(tmp.getHeight(), "0")))) < 0.0001;
 			return isEqual;
 		}
 
@@ -233,5 +240,13 @@ public class Issue {
 
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
+	}
+
+	public boolean isFixAllowed() {
+		return is_fix_allowed;
+	}
+
+	public void setFixAllowed(boolean is_fix_allowed) {
+		this.is_fix_allowed = is_fix_allowed;
 	}
 }

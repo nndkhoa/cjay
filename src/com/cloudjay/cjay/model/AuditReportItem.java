@@ -146,4 +146,12 @@ public class AuditReportItem {
 		this.time_posted = time_posted;
 	}
 
+	public boolean isFixAllowed() {
+		return is_fix_allowed;
+	}
+
+	public void setFixAllowed(boolean is_fix_allowed) {
+		this.is_fix_allowed = is_fix_allowed;
+	}
+
 }
