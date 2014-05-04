@@ -326,13 +326,13 @@ public class ContainerSession {
 		if (issues.isEmpty()) return false;
 
 		switch (imageType) {
-			case CJayImage.TYPE_REPORT:
+			case CJayImage.TYPE_AUDIT:
 				// check if all REPORT image assigned to issues
 				int imageWithoutIssueCount = 0;
 
 				// count images without issues
 				for (CJayImage cJayImage : cJayImages) {
-					if (cJayImage.getType() == CJayImage.TYPE_REPORT && cJayImage.getIssue() == null) {
+					if (cJayImage.getType() == CJayImage.TYPE_AUDIT && cJayImage.getIssue() == null) {
 						imageWithoutIssueCount++;
 						if (imageWithoutIssueCount > 1) return false;
 					}

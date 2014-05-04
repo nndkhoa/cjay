@@ -137,6 +137,16 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 				} else {
 					isValidForUpload = true;
 				}
+
+				ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
+				if (state == ContainerState.REPAIRING) {
+					holder.warningImageView.setVisibility(View.GONE);
+					view.setEnabled(false);
+				} else {
+					holder.warningImageView.setVisibility(View.VISIBLE);
+					view.setEnabled(true);
+				}
+
 			}
 
 			if (!isValidForUpload) {
@@ -175,14 +185,6 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 			}
 		}
 
-		ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
-		if (state == ContainerState.REPAIRING) {
-			holder.warningImageView.setVisibility(View.GONE);
-			view.setEnabled(false);
-		} else {
-			holder.warningImageView.setVisibility(View.VISIBLE);
-			view.setEnabled(true);
-		}
 	}
 
 	@Override

@@ -73,7 +73,7 @@ public class RepairIssueImageListFragment extends SherlockFragment implements Lo
 	@AfterViews
 	void afterViews() {
 		// show or hide camera button
-		if (mType == CJayImage.TYPE_REPORT) {
+		if (mType == CJayImage.TYPE_AUDIT) {
 			mCameraButton.setVisibility(View.GONE);
 		} else {
 			mCameraButton.setVisibility(View.VISIBLE);

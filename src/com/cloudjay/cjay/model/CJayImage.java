@@ -29,7 +29,7 @@ public class CJayImage {
 
 	public static final int TYPE_IMPORT = 0;
 	public static final int TYPE_EXPORT = 1;
-	public static final int TYPE_REPORT = 2;
+	public static final int TYPE_AUDIT = 2;
 	public static final int TYPE_REPAIRED = 3;
 
 	public static final String ID = "id";

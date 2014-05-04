@@ -207,7 +207,7 @@ public class Utils {
 			case CJayImage.TYPE_EXPORT:
 				return ctx.getResources().getString(R.string.image_type_description_export);
 
-			case CJayImage.TYPE_REPORT:
+			case CJayImage.TYPE_AUDIT:
 				return ctx.getResources().getString(R.string.image_type_description_report);
 
 			case CJayImage.TYPE_REPAIRED:

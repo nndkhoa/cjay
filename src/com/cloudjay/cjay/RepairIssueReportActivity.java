@@ -61,7 +61,7 @@ public class RepairIssueReportActivity extends CJayActivity implements OnPageCha
 			switch (position) {
 				case 0:
 					bundle.putString(RepairIssueImageListFragment_.CJAY_ISSUE_UUID, mIssueUUID);
-					bundle.putInt(RepairIssueImageListFragment_.CJAY_IMAGE_TYPE, CJayImage.TYPE_REPORT);
+					bundle.putInt(RepairIssueImageListFragment_.CJAY_IMAGE_TYPE, CJayImage.TYPE_AUDIT);
 					fragment = new RepairIssueImageListFragment_();
 					fragment.setArguments(bundle);
 					return fragment;

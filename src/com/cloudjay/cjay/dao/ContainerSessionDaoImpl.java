@@ -374,7 +374,7 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 		for (ContainerSession containerSession : containerSessions) {
 			boolean hasReportTypeImages = false;
 			for (CJayImage cJayImage : containerSession.getCJayImages()) {
-				if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
+				if (cJayImage.getType() == CJayImage.TYPE_AUDIT) {
 					hasReportTypeImages = true;
 					break;
 				}
@@ -453,7 +453,7 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 		for (ContainerSession containerSession : containerSessions) {
 			boolean hasReportTypeImages = false;
 			for (CJayImage cJayImage : containerSession.getCJayImages()) {
-				if (cJayImage.getType() == CJayImage.TYPE_REPORT) {
+				if (cJayImage.getType() == CJayImage.TYPE_AUDIT) {
 					hasReportTypeImages = true;
 					break;
 				}

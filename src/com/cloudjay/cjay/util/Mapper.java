@@ -162,6 +162,7 @@ public class Mapper {
 					values.put("quantity", auditReportItem.getQuantity());
 					values.put("length", auditReportItem.getLength());
 					values.put("height", auditReportItem.getHeight());
+					values.put("is_fix_allowed", auditReportItem.isFixAllowed());
 					db.insertWithOnConflict("issue", null, values, SQLiteDatabase.CONFLICT_REPLACE);
 
 					List<AuditReportImage> auditReportImages = auditReportItem.getAuditReportImages();
@@ -276,7 +277,7 @@ public class Mapper {
 			// Set container Id Image
 			// TODO: only handle for app Auditor
 			for (CJayImage cJayImage : cJayImages) {
-				if (cJayImage.getType() == CJayImage.TYPE_REPORT && cJayImage.getIssue() == null) {
+				if (cJayImage.getType() == CJayImage.TYPE_AUDIT && cJayImage.getIssue() == null) {
 					Logger.Log("Container Id Image: " + cJayImage.getImageName());
 					tmpContainerSession.setContainerIdImage(cJayImage.getImageName());
 					break;
@@ -371,7 +372,8 @@ public class Mapper {
 
 							// update issue_id
 							String uuid = cursor.getString(cursor.getColumnIndexOrThrow(Issue.FIELD_UUID));
-							sql = "UPDATE issue SET id = " + auditReportItem.getId() + " WHERE _id = '" + uuid + "'";
+							sql = "UPDATE issue SET id = " + auditReportItem.getId() + ", is_fix_allowed = "
+									+ String.valueOf(auditReportItem.isFixAllowed()) + " WHERE _id = '" + uuid + "'";
 							db.execSQL(sql);
 							Logger.Log("Update Issue with id: " + auditReportItem.getId());
 

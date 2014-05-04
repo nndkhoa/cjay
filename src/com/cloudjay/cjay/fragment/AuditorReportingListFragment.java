@@ -485,7 +485,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 		if (mSelectedContainerSession != null) {
 
 			Logger.Log("Menu upload item clicked");
-			if (mSelectedContainerSession.isValidForUpload(getActivity(), CJayImage.TYPE_REPORT)) {
+			if (mSelectedContainerSession.isValidForUpload(getActivity(), CJayImage.TYPE_AUDIT)) {
 
 				mSelectedContainerSession.setUploadType(UploadType.AUDIT);
 				CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);

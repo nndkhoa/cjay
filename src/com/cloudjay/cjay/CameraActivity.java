@@ -381,7 +381,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		// -Repair: can NOT see captureModeToggleButton, mode always is single,
 		// user is forced to report issue after capturing an image
 		try {
-			if (mType == CJayImage.TYPE_REPORT) {
+			if (mType == CJayImage.TYPE_AUDIT) {
 				boolean isContinuous;
 				if (CJaySession.restore(this).getUserRole() == UserRole.AUDITOR.getValue()) {
 					isContinuous = PreferencesUtil.getPrefsValue(	getApplicationContext(),
@@ -713,7 +713,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 					imageType = "gate-out";
 					break;
 
-				case CJayImage.TYPE_REPORT:
+				case CJayImage.TYPE_AUDIT:
 					imageType = "auditor";
 					break;
 

@@ -42,7 +42,7 @@ public class AuditReportItem {
 			if (null != cJayImages) {
 				for (CJayImage cJayImage : cJayImages) {
 
-					if (cJayImage.getType() == CJayImage.TYPE_REPORT || cJayImage.getType() == CJayImage.TYPE_REPAIRED) {
+					if (cJayImage.getType() == CJayImage.TYPE_AUDIT || cJayImage.getType() == CJayImage.TYPE_REPAIRED) {
 						AuditReportImage image = new AuditReportImage(cJayImage.getId(), cJayImage.getType(),
 																		cJayImage.getTimePosted(),
 																		cJayImage.getImageName(), cJayImage.getUri());

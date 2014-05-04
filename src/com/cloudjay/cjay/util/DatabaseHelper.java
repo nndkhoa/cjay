@@ -264,6 +264,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 					+ " WHERE cs.container_id = c._id AND d.id = c.depot_id";
 			db.execSQL(sql);
 
+			try {
+				Logger.Log("add column `is_fix_allowed` in table `issue`");
+				db.execSQL("ALTER TABLE issue ADD COLUMN is_fix_allowed INTEGER DEFAULT 0");
+			} catch (Exception e) {
+				Logger.w("Column `is_fix_allowed` is already existed.");
+			}
 		}
 
 		@Override

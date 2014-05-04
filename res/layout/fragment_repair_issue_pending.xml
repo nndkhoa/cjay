@@ -16,7 +16,7 @@
         android:contentDescription="@string/camera_button_tooltip"
         android:scaleType="fitXY"
         android:src="@drawable/btn_camera"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
     <include layout="@layout/layout_empty_issues" />
 

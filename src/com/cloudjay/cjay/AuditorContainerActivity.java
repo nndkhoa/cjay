@@ -139,7 +139,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		// go to camera
 		mNewImageCount = 0;
 		mNewImageUUID = "";
-		CJayApplication.openCamera(this, mContainerSession, CJayImage.TYPE_REPORT, LOG_TAG);
+		CJayApplication.openCamera(this, mContainerSession, CJayImage.TYPE_AUDIT, LOG_TAG);
 	}
 
 	@Background
@@ -207,7 +207,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 			public Cursor loadInBackground() {
 				Cursor cursor = DataCenter.getInstance().getIssueItemCursorByContainer(getContext(),
 																						mContainerSessionUUID,
-																						CJayImage.TYPE_REPORT);
+																						CJayImage.TYPE_AUDIT);
 
 				if (cursor != null) {
 					// Ensure the cursor window is filled
@@ -243,7 +243,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		boolean isDisplayed = !(mLongClickedCJayImage == null);
 
 		menu.findItem(R.id.menu_trash).setVisible(isDisplayed);
-		menu.findItem(R.id.menu_upload).setVisible(mContainerSession.isValidForUpload(this, CJayImage.TYPE_REPORT));
+		menu.findItem(R.id.menu_upload).setVisible(mContainerSession.isValidForUpload(this, CJayImage.TYPE_AUDIT));
 		
 		avMenuItem = menu.findItem(R.id.menu_av);
 		avMenuItem.setIcon(mContainerSession.isAvailable() ? R.drawable.ic_action_good : R.drawable.ic_action_bad);
@@ -304,7 +304,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 
 		hideMenuItems();
 		CJayApplication.openPhotoGridViewForImport(	this, mContainerSessionUUID, mContainerSession.getContainerId(),
-													CJayImage.TYPE_IMPORT, CJayImage.TYPE_REPORT, LOG_TAG);
+													CJayImage.TYPE_IMPORT, CJayImage.TYPE_AUDIT, LOG_TAG);
 	}
 
 	@OptionsItem(R.id.menu_trash)
@@ -342,7 +342,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 	void uploadMenuItemClicked() {
 		Logger.Log("Menu upload item clicked");
 
-		if (mContainerSession.isValidForUpload(this, CJayImage.TYPE_REPORT)) {
+		if (mContainerSession.isValidForUpload(this, CJayImage.TYPE_AUDIT)) {
 
 			mContainerSession.setUploadType(UploadType.AUDIT);
 			CJayApplication.uploadContainerSesison(getApplicationContext(), mContainerSession);

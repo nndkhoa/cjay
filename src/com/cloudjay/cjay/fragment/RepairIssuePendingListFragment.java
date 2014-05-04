@@ -84,13 +84,12 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 
 	@Click(R.id.btn_add_new)
 	void cameraClicked() {
+
 		Logger.Log("cameraClicked()");
 		mSelectedIssue = null;
 		mFeedListView.setItemChecked(-1, true);
-
 		mTakenImages = new ArrayList<CJayImage>();
-
-		CJayApplication.openCamera(getActivity(), mContainerSession, CJayImage.TYPE_REPORT, LOG_TAG);
+		CJayApplication.openCamera(getActivity(), mContainerSession, CJayImage.TYPE_AUDIT, LOG_TAG);
 	}
 
 	/**
@@ -227,14 +226,15 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 
 			// Update list cjay images of selected Issue
 			try {
-				SQLiteDatabase db = DataCenter.getDatabaseHelper(getActivity().getApplicationContext()).getWritableDatabase();	
+				SQLiteDatabase db = DataCenter.getDatabaseHelper(getActivity().getApplicationContext())
+												.getWritableDatabase();
 				ContentValues values;
-				
+
 				issueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity()).getIssueDaoImpl();
 				cJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity())
 												.getCJayImageDaoImpl();
-				
-				for (CJayImage cJayImage : mTakenImages) {									
+
+				for (CJayImage cJayImage : mTakenImages) {
 					values = new ContentValues();
 					values.put("issue_id", mSelectedIssue.getUuid());
 					values.put("containerSession_id", mContainerSession.getUuid());
