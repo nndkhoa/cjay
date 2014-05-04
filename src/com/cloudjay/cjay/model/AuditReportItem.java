@@ -17,6 +17,7 @@ public class AuditReportItem {
 	private String height;
 	private String quantity;
 	private String time_posted;
+	private boolean is_fix_allowed;
 
 	private List<AuditReportImage> audit_report_images;
 
