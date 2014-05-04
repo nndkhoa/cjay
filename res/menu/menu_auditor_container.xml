@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/menu_av"
+        android:icon="@drawable/ic_action_bad"
+        android:showAsAction="always"
+        android:title="@string/menu_av_title"/>
+    <item
         android:id="@+id/menu_trash"
         android:icon="@drawable/icon_menu_trash"
         android:showAsAction="always"

@@ -10,7 +10,6 @@ import java.util.concurrent.ExecutionException;
 import org.apache.http.HttpStatus;
 import org.json.JSONException;
 
-import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
