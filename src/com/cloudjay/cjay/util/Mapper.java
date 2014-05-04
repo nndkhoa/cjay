@@ -139,7 +139,10 @@ public class Mapper {
 			csValues.put("image_id_path", tmpSession.getImageIdPath());
 			csValues.put("id", tmpSession.getId());
 			csValues.put("server_state", tmpSession.getStatus());
-			csValues.put("is_available", tmpSession.getIsAvailable());
+
+			// TODO: Server do not return is_available
+			// csValues.put("is_available", tmpSession.getIsAvailable());
+
 			db.insertWithOnConflict("container_session", null, csValues, SQLiteDatabase.CONFLICT_REPLACE);
 
 			// process AuditReportItems --> create issues

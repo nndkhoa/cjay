@@ -52,6 +52,8 @@ public class ContainerSession {
 	public static final String FIELD_LOCAL = "on_local"; // 1
 	public static final String FIELD_FIXED = "fixed";
 	public static final String FIELD_EXPORT = "export";
+
+	// Only use is_available when post tmpContainer
 	public static final String FIELD_AVAILABLE = "is_available";
 
 	// public static final String FIELD_IS_TEMP = "is_temp";

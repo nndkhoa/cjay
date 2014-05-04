@@ -54,7 +54,7 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 	public IssueContainerCursorAdapter(Context context, int layout, Cursor c, int flags) {
 		this(context, layout, c, flags, false);
 	}
-	
+
 	public IssueContainerCursorAdapter(Context context, int layout, Cursor c, int flags, boolean avCheckable) {
 		super(context, c, flags);
 		this.mLayout = layout;
@@ -151,14 +151,19 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 				holder.checkableImageView.setVisibility(View.VISIBLE);
 				holder.checkableImageView.setChecked(available == true);
 				holder.checkableImageView.setOnClickListener(new OnClickListener() {
+
 					@Override
 					public void onClick(View v) {
+
 						CheckableImageView checkButton = (CheckableImageView) v;
 						checkButton.toggle();
-						QueryHelper.update(ctx, "container_session", ContainerSession.FIELD_AVAILABLE, 
-								String.valueOf(checkButton.isChecked()), ContainerSession.FIELD_UUID + " = " + Utils.sqlString(uuid));
+						QueryHelper.update(	ctx, "container_session", ContainerSession.FIELD_AVAILABLE,
+											String.valueOf(checkButton.isChecked()), ContainerSession.FIELD_UUID
+													+ " = " + Utils.sqlString(uuid));
 						EventBus.getDefault().post(new ContainerSessionChangedEvent());
+
 					}
+
 				});
 			} else {
 				holder.checkableImageView.setVisibility(View.GONE);
@@ -178,7 +183,7 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 		holder.itemPictureView = (ImageView) v.findViewById(R.id.feed_item_picture);
 		holder.validationImageView = (ImageView) v.findViewById(R.id.feed_item_validator);
 		holder.checkableImageView = (CheckableImageView) v.findViewById(R.id.check_button);
-		
+
 		v.setTag(holder);
 
 		return v;

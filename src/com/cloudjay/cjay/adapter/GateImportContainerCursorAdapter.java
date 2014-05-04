@@ -64,7 +64,7 @@ public class GateImportContainerCursorAdapter extends CursorAdapter implements F
 		mImageLoader = ImageLoader.getInstance();
 		mAvCheckable = avCheckable;
 	}
-	
+
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 
@@ -126,14 +126,17 @@ public class GateImportContainerCursorAdapter extends CursorAdapter implements F
 				holder.checkableImageView.setVisibility(View.VISIBLE);
 				holder.checkableImageView.setChecked(available == true);
 				holder.checkableImageView.setOnClickListener(new OnClickListener() {
+
 					@Override
 					public void onClick(View v) {
 						CheckableImageView checkButton = (CheckableImageView) v;
 						checkButton.toggle();
-						QueryHelper.update(ctx, "container_session", ContainerSession.FIELD_AVAILABLE, 
-								String.valueOf(checkButton.isChecked()), ContainerSession.FIELD_UUID + " = " + Utils.sqlString(uuid));
+						QueryHelper.update(	ctx, "container_session", ContainerSession.FIELD_AVAILABLE,
+											String.valueOf(checkButton.isChecked()), ContainerSession.FIELD_UUID
+													+ " = " + Utils.sqlString(uuid));
 						EventBus.getDefault().post(new ContainerSessionChangedEvent());
 					}
+
 				});
 			} else {
 				holder.checkableImageView.setVisibility(View.GONE);
