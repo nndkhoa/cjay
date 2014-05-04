@@ -18,6 +18,7 @@ import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.ContainerState;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.QueryHelper;
 import com.cloudjay.cjay.util.StringHelper;
@@ -37,6 +38,7 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 		public ImageView itemPictureView;
 		public ImageView validationImageView;
 		public CheckableImageView checkableImageView;
+		public ImageView warningImageView;
 	}
 
 	private int mLayout;
@@ -83,6 +85,7 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 			holder.itemPictureView = (ImageView) view.findViewById(R.id.feed_item_picture);
 			holder.validationImageView = (ImageView) view.findViewById(R.id.feed_item_validator);
 			holder.checkableImageView = (CheckableImageView) view.findViewById(R.id.check_button);
+			holder.warningImageView = (ImageView) view.findViewById(R.id.feed_item_warning);
 			view.setTag(holder);
 		}
 
@@ -144,9 +147,11 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 		}
 
 		if (holder.checkableImageView != null) {
+
 			if (mAvCheckable && cursor.getColumnIndex(ContainerSession.FIELD_AVAILABLE) > 0) {
 				final Context ctx = context;
 				final String uuid = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+
 				boolean available = Boolean.valueOf(cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_AVAILABLE)));
 				holder.checkableImageView.setVisibility(View.VISIBLE);
 				holder.checkableImageView.setChecked(available == true);
@@ -169,6 +174,15 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 				holder.checkableImageView.setVisibility(View.GONE);
 			}
 		}
+
+		ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
+		if (state == ContainerState.REPAIRING) {
+			holder.warningImageView.setVisibility(View.GONE);
+			view.setEnabled(false);
+		} else {
+			holder.warningImageView.setVisibility(View.VISIBLE);
+			view.setEnabled(true);
+		}
 	}
 
 	@Override
@@ -183,7 +197,7 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 		holder.itemPictureView = (ImageView) v.findViewById(R.id.feed_item_picture);
 		holder.validationImageView = (ImageView) v.findViewById(R.id.feed_item_validator);
 		holder.checkableImageView = (CheckableImageView) v.findViewById(R.id.check_button);
-
+		holder.warningImageView = (ImageView) v.findViewById(R.id.feed_item_warning);
 		v.setTag(holder);
 
 		return v;

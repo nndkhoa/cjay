@@ -38,6 +38,14 @@
             android:scaleType="centerCrop"
             android:src="@drawable/ic_btn_selection_checked"
             android:visibility="invisible" />
+        
+        <ImageView
+            android:id="@+id/feed_item_warning"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="12dp"
+            android:src="@drawable/ic_warning"
+            android:visibility="gone" />
     </RelativeLayout>
 
     <LinearLayout
