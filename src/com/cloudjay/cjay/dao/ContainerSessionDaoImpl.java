@@ -216,13 +216,15 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 	public void updateServerState(int id, int state) throws SQLException {
 
 		if (id == -1) {
+
 			Logger.e("Container Session ID = -1");
 			return;
+
 		} else {
 
 			ContainerSession result = queryForFirst(queryBuilder().where().eq(ContainerSession.FIELD_ID, id).prepare());
-			if (null != result) {
 
+			if (null != result) {
 				Logger.Log("Update ServerState of container " + result.getContainerId() + " to: " + state);
 				result.setServerState(state);
 				this.update(result);

@@ -196,16 +196,26 @@ public class GcmIntentService extends IntentService {
 
 			} else if (type.equalsIgnoreCase("NEW_TEMP_CONTAINER")) {
 
+				// Received: CỔNG tạo mới container tạm
+				// Received roles: AUDIT
 				Logger.Log("Received notification: NEW_TEMP_CONTAINER");
 				DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_MODIFIED,
 																		InvokeType.NOTIFICATION);
 
-			} else if (type.equalsIgnoreCase("EXPORT_CONTAINER")) {
+			} else if (type.equalsIgnoreCase("EXPORTED_CONTAINER")) {
+
 				// Received: Container xuất khỏi Depot ở CỔNG
 				// Received Roles: all roles with attached `id`
 				// --> Remove Container Session having this id
 
 				DataCenter.getInstance().removeContainerSession(this, id);
+
+			} else if (type.equalsIgnoreCase("UPDATE_CONTAINER_INFO")) {
+
+				// Received: GATE | AUDIT | REPAIR
+				// --> Update list container
+				DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_MODIFIED,
+																		InvokeType.NOTIFICATION);
 
 			} else if (type.equalsIgnoreCase("UPDATE_CONTAINER_STATUS")) {
 
@@ -213,14 +223,17 @@ public class GcmIntentService extends IntentService {
 				status = Integer.parseInt(extras.getString("status"));
 
 				if (id == -1 || status == -1) {
-					Logger.e("Cannot not update container status");
-				} else {
 
+					Logger.e("Cannot not update container status");
+
+				} else {
 					Logger.Log("Id: " + id + " | Status: " + status);
 					DataCenter.getInstance().updateContainerStatus(this, id, status);
 				}
 
 			} else if (type.equalsIgnoreCase("NEW_ERROR_LIST")) {
+
+				// TODO: Deprecated
 				// Received: AUDIT post new Issue List
 				// Received Roles: REPAIR, (new) GATE
 				// Đối với ROLE == AUDIT, kèm `id` để remove
@@ -232,7 +245,6 @@ public class GcmIntentService extends IntentService {
 					DataCenter.getInstance().removeContainerSession(this, id);
 
 				} else {
-
 					Logger.Log("NEW_ERROR_LIST | Other roles");
 					// Get more data from Server
 					//
@@ -244,17 +256,40 @@ public class GcmIntentService extends IntentService {
 
 				// Received: Có thông tin thay đổi từ `văn phòng` || tổ sửa chữa
 				// thêm lỗi mới
-				// Received Roles: REPAIR
+				// Received Roles: GATE | AUDIT | REPAIR
 				// --> Get more data from Server
 				// use MODIFIED_AFTER
 
-				if (userRole == UserRole.REPAIR_STAFF && userRole == UserRole.GATE_KEEPER) {
-					DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_MODIFIED,
-																			InvokeType.NOTIFICATION);
+				DataCenter.getInstance().updateListContainerSessions(this, CJayClient.REQUEST_TYPE_MODIFIED,
+																		InvokeType.NOTIFICATION);
+
+			} else if (type.equalsIgnoreCase("AUDITED_CONTAINER")) {
+
+				// Received: audited container
+				// Received role: AUDIT
+				// --> remove container in other audit devices
+
+				if (id == -1) {
+					Logger.e("Cannot find container to remove.");
+				} else {
+					DataCenter.getInstance().removeContainerSession(this, id);
+				}
+
+			} else if (type.equalsIgnoreCase("REPAIRED_CONTAINER")) {
+
+				// Received: repaired container
+				// Received roles: REPAIR
+				// --> remove container in other repair devices
+
+				if (id == -1) {
+					Logger.e("Cannot find container to remove.");
+				} else {
+					DataCenter.getInstance().removeContainerSession(this, id);
 				}
 
 			} else if (type.equalsIgnoreCase("CONTAINER_REPAIRED")) {
 
+				// TODO: Deprecated
 				// Received: Sau khi post báo cáo `Sau sửa chữa` từ REPAIR
 				// Received Roles: REPAIR with attached `id`
 				// --> Remove Container Session having this `id`
@@ -279,8 +314,10 @@ public class GcmIntentService extends IntentService {
 				DataCenter.getInstance().updateListOperators(this);
 
 			} else if (type.equalsIgnoreCase("USER_INFO_UPDATED")) {
+
 				User user = com.cloudjay.cjay.util.CJaySession.restore(this).getCurrentUser();
 				DataCenter.getInstance().saveCredential(this, user.getAccessToken());
+
 			}
 		} catch (NullSessionException e) {
 
