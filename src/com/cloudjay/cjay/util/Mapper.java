@@ -11,7 +11,6 @@ import java.util.UUID;
 
 import org.androidannotations.annotations.EBean;
 
-import android.R.integer;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -19,28 +18,19 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
-import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
-import com.cloudjay.cjay.dao.ContainerDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
-import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
-import com.cloudjay.cjay.dao.DepotDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
-import com.cloudjay.cjay.dao.OperatorDaoImpl;
-import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.model.AuditReportImage;
 import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
-import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Depot;
 import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.model.Operator;
-import com.cloudjay.cjay.model.RepairCode;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.google.gson.Gson;

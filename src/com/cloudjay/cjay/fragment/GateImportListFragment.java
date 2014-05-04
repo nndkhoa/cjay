@@ -36,7 +36,6 @@ import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.adapter.GateExportContainerCursorAdapter;
 import com.cloudjay.cjay.adapter.GateImportContainerCursorAdapter;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;

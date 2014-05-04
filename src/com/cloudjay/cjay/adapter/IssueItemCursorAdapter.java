@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.util.Logger;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -27,6 +28,7 @@ public class IssueItemCursorAdapter extends CursorAdapter implements Filterable 
 		public TextView lengthTextView;
 		public TextView heightTextView;
 		public ImageView itemPictureView;
+		// public ImageView warningImageView;
 
 	}
 
@@ -97,13 +99,38 @@ public class IssueItemCursorAdapter extends CursorAdapter implements Filterable 
 		holder.lengthTextView.setText(length);
 		holder.heightTextView.setText(height);
 
-		if (!TextUtils.isEmpty(url)) {
+		if (!TextUtils.isEmpty(url)
+				&& !url.matches("^https://storage\\.googleapis\\.com/storage-cjay\\.cloudjay\\.com/\\s+$")) {
 			imageLoader.displayImage(url, holder.itemPictureView);
 		} else {
 			holder.itemPictureView.setImageResource(R.drawable.ic_app);
 		}
 
+		// boolean isFixAllowed = cursor.getInt(cursor.getColumnIndexOrThrow(Issue.FIELD_IS_FIX_ALLOWED)) > 0 ? true
+		// : false;
+		// if (isFixAllowed) {
+		// holder.warningImageView.setVisibility(View.GONE);
+		// view.setEnabled(false);
+		// } else {
+		// holder.warningImageView.setVisibility(View.VISIBLE);
+		// view.setEnabled(true);
+		// }
 	}
+
+	// @Override
+	// public boolean isEnabled(int position) {
+	//
+	// Cursor cursor = (Cursor) getItem(position);
+	// boolean isFixAllowed = cursor.getInt(cursor.getColumnIndexOrThrow(Issue.FIELD_IS_FIX_ALLOWED)) > 0 ? true
+	// : false;
+	// if (isFixAllowed) {
+	//
+	// } else {
+	// return false;
+	// }
+	//
+	// return super.isEnabled(position);
+	// }
 
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
@@ -118,6 +145,7 @@ public class IssueItemCursorAdapter extends CursorAdapter implements Filterable 
 		holder.lengthTextView = (TextView) v.findViewById(R.id.issue_length);
 		holder.heightTextView = (TextView) v.findViewById(R.id.issue_height);
 		holder.itemPictureView = (ImageView) v.findViewById(R.id.issue_picture);
+		// holder.warningImageView = (ImageView) v.findViewById(R.id.feed_item_warning);
 
 		v.setTag(holder);
 

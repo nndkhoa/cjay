@@ -6,15 +6,32 @@
     android:background="@drawable/selector_container_list"
     android:orientation="horizontal" >
 
-    <ImageView
-        android:id="@+id/issue_picture"
+    <RelativeLayout
         android:layout_width="0dp"
-        android:layout_height="@dimen/listview_issue_item_dimension"
-        android:layout_margin="3dp"
+        android:layout_height="@dimen/listview_item_dimension"
+        android:layout_marginBottom="3dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="3dp"
+        android:layout_marginTop="3dp"
         android:layout_weight="1"
-        android:contentDescription="@string/container_id"
-        android:padding="3dp"
-        android:scaleType="centerCrop" />
+        android:padding="1dp" >
+
+        <ImageView
+            android:id="@+id/issue_picture"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/container_id"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_app" />
+
+        <!-- <ImageView
+            android:id="@+id/feed_item_warning"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="12dp"
+            android:src="@drawable/ic_warning"
+            android:visibility="gone" /> -->
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/feed_item_descriptions"

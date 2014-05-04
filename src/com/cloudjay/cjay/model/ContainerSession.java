@@ -313,7 +313,7 @@ public class ContainerSession {
 	public void setAvailable(boolean available) {
 		mAvailable = available;
 	}
-	
+
 	public boolean isAvailable() {
 		return mAvailable;
 	}
@@ -348,18 +348,21 @@ public class ContainerSession {
 			case CJayImage.TYPE_REPAIRED:
 
 				// check if all issues have REPAIRED images
+				// update: check if all issues that is_fix_allowed have REPAIRED images
 				boolean issueHasNoImage;
 				for (Issue issue : issues) {
-					issueHasNoImage = true;
+					if (issue.isFixAllowed()) {
+						issueHasNoImage = true;
 
-					for (CJayImage cJayImage : issue.getCJayImages()) {
-						if (cJayImage.getType() == CJayImage.TYPE_REPAIRED) {
-							issueHasNoImage = false;
-							break;
+						for (CJayImage cJayImage : issue.getCJayImages()) {
+							if (cJayImage.getType() == CJayImage.TYPE_REPAIRED) {
+								issueHasNoImage = false;
+								break;
+							}
 						}
-					}
 
-					if (issueHasNoImage) return false;
+						if (issueHasNoImage) return false;
+					}
 				}
 
 				return true;
@@ -478,6 +481,7 @@ public class ContainerSession {
 	}
 
 	public void updateField(Context ctx, String field, String value) {
-		QueryHelper.update(ctx, "container_session", field, value, ContainerSession.FIELD_UUID + " = " + Utils.sqlString(uuid));
+		QueryHelper.update(	ctx, "container_session", field, value,
+							ContainerSession.FIELD_UUID + " = " + Utils.sqlString(uuid));
 	}
 }
