@@ -15,6 +15,7 @@ import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.QueryHelper;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadState;
 import com.cloudjay.cjay.util.UploadType;
@@ -311,7 +312,7 @@ public class ContainerSession {
 		mAvailable = available;
 	}
 	
-	public boolean getIsAvailable() {
+	public boolean isAvailable() {
 		return mAvailable;
 	}
 
@@ -474,4 +475,7 @@ public class ContainerSession {
 		this.serverState = serverState;
 	}
 
+	public void updateField(Context ctx, String field, String value) {
+		QueryHelper.update(ctx, "container_session", field, value, ContainerSession.FIELD_UUID + " = " + Utils.sqlString(uuid));
+	}
 }

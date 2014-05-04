@@ -217,7 +217,7 @@ public class Mapper {
 		tmpContainerSession.setDepotCode(containerSession.getContainer().getDepot().getDepotCode());
 		tmpContainerSession.setContainerId(containerId);
 		tmpContainerSession.setCheckInTime(containerSession.getRawCheckInTime());
-		tmpContainerSession.setIsAvailable(containerSession.getIsAvailable());
+		tmpContainerSession.setIsAvailable(containerSession.isAvailable());
 
 		if (TextUtils.isEmpty(checkoutTime)) {
 			Logger.e(containerId + " | Checkout Time is NULL");

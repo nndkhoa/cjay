@@ -335,26 +335,6 @@ public class RepairContainerPendingListFragment extends SherlockFragment impleme
 	}
 
 	@Override
-	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
-		Context context = getActivity();
-
-		return new CJayCursorLoader(context) {
-			@Override
-			public Cursor loadInBackground() {
-				Cursor cursor = DataCenter.getInstance().getPendingContainerSessionCursor(getContext());
-
-				if (cursor != null) {
-					// Ensure the cursor window is filled
-					setTotalItems(cursor.getCount());
-					cursor.registerContentObserver(mObserver);
-				}
-
-				return cursor;
-			}
-		};
-	}
-
-	@Override
 	public void onDestroy() {
 		EventBus.getDefault().unregister(this);
 		super.onDestroy();
@@ -382,6 +362,26 @@ public class RepairContainerPendingListFragment extends SherlockFragment impleme
 
 	public void onEventMainThread(ContainerSessionEnqueueEvent event) {
 		refresh();
+	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		Context context = getActivity();
+
+		return new CJayCursorLoader(context) {
+			@Override
+			public Cursor loadInBackground() {
+				Cursor cursor = DataCenter.getInstance().getPendingContainerSessionCursor(getContext());
+
+				if (cursor != null) {
+					// Ensure the cursor window is filled
+					setTotalItems(cursor.getCount());
+					cursor.registerContentObserver(mObserver);
+				}
+
+				return cursor;
+			}
+		};
 	}
 
 	@Override
