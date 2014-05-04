@@ -4,6 +4,8 @@ import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.security.auth.PrivateCredentialPermission;
+
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
@@ -171,12 +173,13 @@ public class CJayApplication extends Application {
 	public static void openIssueReport(Context ctx, String imageUuid) {
 		IssueReportHelper.showIssueReport(ctx, imageUuid);
 	}
-	
+
 	public static void openContainerDetailDialog(Fragment parent, String containerId, String operatorName, int mode) {
 		openContainerDetailDialog(parent, containerId, operatorName, true, mode);
 	}
-	
-	public static void openContainerDetailDialog(Fragment parent, String containerId, String operatorName, boolean operatorRequired, int mode) {
+
+	public static void openContainerDetailDialog(Fragment parent, String containerId, String operatorName,
+													boolean operatorRequired, int mode) {
 		FragmentManager fm = parent.getActivity().getSupportFragmentManager();
 		AddContainerDialog addContainerDialog = new AddContainerDialog();
 		addContainerDialog.setContainerId(containerId);
@@ -234,9 +237,7 @@ public class CJayApplication extends Application {
 	}
 
 	IDatabaseManager databaseManager = null;
-
 	IHttpRequestWrapper httpRequestWrapper = null;
-
 	static Context mContext = null;
 
 	public static Context getContext() {
@@ -252,6 +253,12 @@ public class CJayApplication extends Application {
 												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox), true);
 
 		Logger.getInstance().setDebuggable(debuggable);
+
+		// Setup API ROOT
+		boolean isBeta = true;
+		if (isBeta) {
+			CJayConstant.API_ROOT = CJayConstant.BETA_CLOUDJAY_API + "/api/";
+		}
 
 		// Ion.getDefault(getBaseContext()).configure()
 		// .setLogging("Network Module", Log.INFO);
