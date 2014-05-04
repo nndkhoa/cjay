@@ -77,14 +77,12 @@ public class GateExportContainerCursorAdapter extends CursorAdapter implements F
 		}
 
 		ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
-		if (state == ContainerState.IMPORTED || state == ContainerState.REPAIRED) {
+		if (state == ContainerState.AVAILABLE) {
 			holder.warningImageView.setVisibility(View.GONE);
 			view.setEnabled(false);
-
 		} else {
 			holder.warningImageView.setVisibility(View.VISIBLE);
 			view.setEnabled(true);
-
 		}
 
 		String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
@@ -130,7 +128,7 @@ public class GateExportContainerCursorAdapter extends CursorAdapter implements F
 		// TODO: enable this block to disable wrong state container session
 		Cursor cursor = (Cursor) getItem(position);
 		ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
-		if (state == ContainerState.IMPORTED || state == ContainerState.REPAIRED) {
+		if (state == ContainerState.NEW || state == ContainerState.AVAILABLE) {
 
 		} else {
 			return false;

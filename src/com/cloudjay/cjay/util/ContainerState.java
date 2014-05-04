@@ -2,7 +2,7 @@ package com.cloudjay.cjay.util;
 
 public enum ContainerState {
 
-	IMPORTED(0), CHECKED(1), CLASSIFIED(2), NOTIFIED(3), APPROVED(4), REPAIRED(5), EXPORTED(6);
+	NEW(0), AUDITED(1), PRICING(2), WAITING(3), REPAIRING(4), AVAILABLE(5), EXPORTED(6);
 	private int value;
 
 	private ContainerState(int value) {
