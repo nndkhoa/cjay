@@ -212,7 +212,7 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 
 				// Mark it's still temporary
 				containerSession.setOnLocal(true);
-				containerSession.setUploadType(UploadType.NONE);
+				// containerSession.setUploadType(UploadType.NONE);
 
 				try {
 					containerSessionDaoImpl.addContainerSession(containerSession);
@@ -224,8 +224,7 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 				CJayApplication.openCamera(activity, containerSession, CJayImage.TYPE_IMPORT, LOG_TAG);
 
 				// temporary upload with upload_type = NONE;
-				CJayApplication.uploadContainerSesison(getActivity(), containerSession);
-
+				// CJayApplication.uploadContainerSesison(getActivity(), containerSession);
 				break;
 
 			case AddContainerDialog.CONTAINER_DIALOG_EDIT:
