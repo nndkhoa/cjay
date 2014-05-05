@@ -187,6 +187,9 @@ public class ContainerSession {
 				}
 
 				containerDaoImpl.addContainer(container);
+			} else {
+				Logger.Log("Container " + containerId + " is already existed.");
+
 			}
 
 			// Create `container session` object

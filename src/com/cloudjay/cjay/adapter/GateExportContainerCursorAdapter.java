@@ -4,12 +4,18 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnCreateContextMenuListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Container;
@@ -79,10 +85,8 @@ public class GateExportContainerCursorAdapter extends CursorAdapter implements F
 		ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
 		if (state == ContainerState.AVAILABLE) {
 			holder.warningImageView.setVisibility(View.GONE);
-			view.setEnabled(false);
 		} else {
 			holder.warningImageView.setVisibility(View.VISIBLE);
-			view.setEnabled(true);
 		}
 
 		String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
@@ -122,19 +126,20 @@ public class GateExportContainerCursorAdapter extends CursorAdapter implements F
 
 	}
 
-	@Override
-	public boolean isEnabled(int position) {
-
-		Cursor cursor = (Cursor) getItem(position);
-		ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
-		if (state == ContainerState.AVAILABLE) {
-
-		} else {
-			return false;
-		}
-
-		return super.isEnabled(position);
-	}
+	// @Override
+	// public boolean isEnabled(int position) {
+	//
+	// Cursor cursor = (Cursor) getItem(position);
+	// ContainerState state =
+	// ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
+	// if (state == ContainerState.AVAILABLE) {
+	//
+	// } else {
+	// return false;
+	// }
+	//
+	// return super.isEnabled(position);
+	// }
 
 	// get --> new --> bind
 	@Override
