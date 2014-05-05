@@ -14,6 +14,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings.Secure;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ComponentCode;
@@ -252,7 +253,7 @@ public class CJayClient implements ICJayClient {
 			Response<String> response = null;
 			if (type == REQUEST_TYPE_CREATED) {
 
-				response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS)
+				response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS).setLogging("ION", Log.INFO)
 								.setHeader("Authorization", "Token " + accessToken)
 								.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
 								.addQuery("page", Integer.toString(page)).addQuery("created_after", date).asString()
@@ -567,7 +568,7 @@ public class CJayClient implements ICJayClient {
 			}
 			Logger.Log(resultString);
 
-			Response<String> response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS)
+			Response<String> response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS).setLogging("ION", Log.INFO)
 											.setHeader("Authorization", "Token " + accessToken)
 											.setHeader("CJAY_VERSION", appVersion)
 											.setJsonObjectBody(item, new TypeToken<TmpContainerSession>() {

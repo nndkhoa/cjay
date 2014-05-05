@@ -4,19 +4,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnCreateContextMenuListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -87,10 +81,7 @@ public class GateExportContainerCursorAdapter extends CursorAdapter implements F
 			holder.warningImageView.setVisibility(View.GONE);
 		} else {
 			holder.warningImageView.setVisibility(View.VISIBLE);
-
-			// view.setOnClickListener(null);
 			view.setOnLongClickListener(new OnLongClickListener() {
-
 				@Override
 				public boolean onLongClick(View v) {
 					return false;

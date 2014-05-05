@@ -144,10 +144,9 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 		Logger.Log("Menu edit item clicked");
 
 		// Open dialog for editing details
-		CJayApplication.openContainerDetailDialog(this, 
-				mSelectedContainerSession.getContainerId(), 
-				mSelectedContainerSession.getOperatorName(), 
-				AddContainerDialog.CONTAINER_DIALOG_EDIT);
+		CJayApplication.openContainerDetailDialog(	this, mSelectedContainerSession.getContainerId(),
+													mSelectedContainerSession.getOperatorName(),
+													AddContainerDialog.CONTAINER_DIALOG_EDIT);
 	}
 
 	void hideMenuItems() {
