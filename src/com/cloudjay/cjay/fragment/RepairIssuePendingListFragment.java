@@ -16,6 +16,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -171,6 +172,17 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 				} else {
 					view.setImageResource(R.drawable.ic_app);
 				}
+			}
+		});
+		feedsDict.addDynamicImageField(R.id.issue_warning, new StringExtractor<Issue>() {
+			@Override
+			public String getStringValue(Issue item, int position) {
+				return String.valueOf(item.isFixAllowed());
+			}
+		}, new DynamicImageLoader() {
+			@Override
+			public void loadImage(String isFixedAllow, ImageView view) {
+				view.setVisibility(Boolean.parseBoolean(isFixedAllow) ? View.VISIBLE : View.GONE);
 			}
 		});
 		mFeedsAdapter = new FunDapter<Issue>(getActivity(), containers, R.layout.list_item_issue, feedsDict);
