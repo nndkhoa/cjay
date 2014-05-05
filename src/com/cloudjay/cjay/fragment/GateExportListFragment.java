@@ -46,6 +46,7 @@ import android.widget.EditText;
 import android.widget.FilterQueryProvider;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -206,25 +207,58 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 		});
 
 		mFeedListView.setEmptyView(mEmptyElement);
+		mFeedListView.setLongClickable(true);
+		// registerForContextMenu(mFeedListView);
 	}
 
-	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-		super.onCreateContextMenu(menu, v, menuInfo);
-		MenuInflater inflater = this.getActivity().getMenuInflater();
-		inflater.inflate(R.menu.context_menu_export, menu);
-	}
+	// // inflate context menu
+	// @Override
+	// public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+	//
+	// MenuInflater inflater = this.getActivity().getMenuInflater();
+	// inflater.inflate(R.menu.context_menu_export, menu);
+	// super.onCreateContextMenu(menu, v, menuInfo);
+	// }
+	//
+	// // handle context menu selected item
+	// @Override
+	// public boolean onContextItemSelected(MenuItem item) {
+	// AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+	// switch (item.getItemId()) {
+	// case R.id.menu_force_export:
+	// Logger.Log("Force export");
+	// Cursor cursor = (Cursor) cursorAdapter.getItem(mCurrentPosition);
+	// handleContainerClicked(cursor);
+	// return true;
+	//
+	// default:
+	// return super.onContextItemSelected(item);
+	// }
+	// }
 
-	@Override
-	public boolean onContextItemSelected(MenuItem item) {
-		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-		switch (item.getItemId()) {
-			case R.id.menu_force_export:
-				Logger.Log("Force export");
-				return true;
+	void handleContainerClicked(Cursor cursor) {
+		String containerSessionUuid = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+		String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
 
-			default:
-				return super.onContextItemSelected(item);
+		// find the last role that took picture of this issue
+		SQLiteDatabase db = DataCenter.getDatabaseHelper(getActivity().getApplicationContext()).getWritableDatabase();
+		String sql = "SELECT type FROM cjay_image WHERE containerSession_id LIKE ? AND type <> ? ORDER BY time_posted DESC LIMIT 1";
+		Cursor imageCursor = db.rawQuery(	sql,
+											new String[] { containerSessionUuid, String.valueOf(CJayImage.TYPE_EXPORT) });
+		int lastRole = -1;
+		if (imageCursor.moveToFirst()) {
+			lastRole = imageCursor.getInt(imageCursor.getColumnIndexOrThrow("type"));
+		}
+
+		// show images
+		if (lastRole >= 0 && lastRole != CJayImage.TYPE_EXPORT) {
+			CJayApplication.openPhotoGridView(	getActivity(), containerSessionUuid, containerId,
+												CJayImage.TYPE_EXPORT,
+												lastRole, GateExportListFragment_.LOG_TAG);
+		} else {
+			CJayApplication.openPhotoGridView(	getActivity(), containerSessionUuid, containerId,
+												CJayImage.TYPE_EXPORT,
+												GateExportListFragment_.LOG_TAG);
 		}
 	}
 
@@ -239,39 +273,16 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	@ItemClick(R.id.container_list)
 	void listItemClicked(int position) {
 
+		hideMenuItems();
 		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
-
 		ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
 		if (state != ContainerState.AVAILABLE) {
-			Logger.Log("Disable click on item " + position);
+
 		} else {
-			hideMenuItems();
-
 			mCurrentPosition = position;
-			String containerSessionUuid = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
-			String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
-
-			// find the last role that took picture of this issue
-			SQLiteDatabase db = DataCenter.getDatabaseHelper(getActivity().getApplicationContext())
-											.getWritableDatabase();
-			String sql = "SELECT type FROM cjay_image WHERE containerSession_id LIKE ? AND type <> ? ORDER BY time_posted DESC LIMIT 1";
-			Cursor imageCursor = db.rawQuery(	sql,
-												new String[] { containerSessionUuid,
-														String.valueOf(CJayImage.TYPE_EXPORT) });
-			int lastRole = -1;
-			if (imageCursor.moveToFirst()) {
-				lastRole = imageCursor.getInt(imageCursor.getColumnIndexOrThrow("type"));
-			}
-
-			// show images
-			if (lastRole >= 0 && lastRole != CJayImage.TYPE_EXPORT) {
-				CJayApplication.openPhotoGridView(	getActivity(), containerSessionUuid, containerId,
-													CJayImage.TYPE_EXPORT, lastRole, GateExportListFragment_.LOG_TAG);
-			} else {
-				CJayApplication.openPhotoGridView(	getActivity(), containerSessionUuid, containerId,
-													CJayImage.TYPE_EXPORT, GateExportListFragment_.LOG_TAG);
-			}
+			handleContainerClicked(cursor);
 		}
+
 	}
 
 	@ItemLongClick(R.id.container_list)
@@ -286,11 +297,27 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 		ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
 		if (state != ContainerState.AVAILABLE) {
 
-			Logger.Log("Display context menu");
-			registerForContextMenu(mFeedListView);
+			mCurrentPosition = position;
+			// mFeedListView.showContextMenu();
 
-			// mFeedListView.setCacheColorHint(android.R.color.transparent);
-			// mFeedListView.setSelector(new StateListDrawable());
+			PopupMenu popup = new PopupMenu(getActivity(), mFeedListView.getChildAt(position));
+			popup.getMenuInflater().inflate(R.menu.popup_menu_export, popup.getMenu());
+			popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+
+				public boolean onMenuItemClick(MenuItem item) {
+					AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+					switch (item.getItemId()) {
+						case R.id.menu_force_export:
+							Logger.Log("Force export");
+							Cursor cursor = (Cursor) cursorAdapter.getItem(mCurrentPosition);
+							handleContainerClicked(cursor);
+							return true;
+					}
+					return false;
+				}
+			});
+
+			popup.show();
 
 		} else {
 

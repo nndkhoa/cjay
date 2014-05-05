@@ -53,9 +53,9 @@
         android:id="@+id/feed_item_descriptions"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_marginTop="3dp"
         android:layout_marginLeft="1dp"
         android:layout_marginRight="1dp"
+        android:layout_marginTop="3dp"
         android:layout_weight="3"
         android:orientation="vertical"
         android:padding="1dp" >
@@ -81,8 +81,8 @@
                 android:ellipsize="end"
                 android:gravity="right"
                 android:maxLines="1"
-                android:textColor="@color/blue_light"
                 android:text="LDQV1111112"
+                android:textColor="@color/blue_light"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -161,8 +161,8 @@
                 android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
-    
-   	<com.cloudjay.cjay.view.CheckableImageView
+
+    <com.cloudjay.cjay.view.CheckableImageView
         android:id="@+id/check_button"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -170,7 +170,7 @@
         android:layout_marginTop="3dp"
         android:padding="@dimen/spacing"
         android:scaleType="center"
-        android:visibility="gone"
-        android:src="@drawable/btn_selection_lrg" />
+        android:src="@drawable/btn_selection_lrg"
+        android:visibility="gone" />
 
 </LinearLayout>

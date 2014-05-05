@@ -72,5 +72,6 @@
     <string name="image_type_description_repaired">Hình Sửa Chữa</string>
 
     <!--  -->
+    <string name="force_export">Xuất theo chỉ định</string>
 
 </resources>
