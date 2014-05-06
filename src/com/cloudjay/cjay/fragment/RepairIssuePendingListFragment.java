@@ -175,15 +175,19 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 			}
 		});
 		feedsDict.addDynamicImageField(R.id.issue_warning, new StringExtractor<Issue>() {
+
 			@Override
 			public String getStringValue(Issue item, int position) {
 				return String.valueOf(item.isFixAllowed());
 			}
+
 		}, new DynamicImageLoader() {
+
 			@Override
 			public void loadImage(String isFixedAllow, ImageView view) {
 				view.setVisibility(Boolean.parseBoolean(isFixedAllow) ? View.VISIBLE : View.GONE);
 			}
+
 		});
 		mFeedsAdapter = new FunDapter<Issue>(getActivity(), containers, R.layout.list_item_issue, feedsDict);
 		mFeedListView.setAdapter(mFeedsAdapter);

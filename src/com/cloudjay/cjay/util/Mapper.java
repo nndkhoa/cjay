@@ -363,7 +363,7 @@ public class Mapper {
 							// update issue_id
 							String uuid = cursor.getString(cursor.getColumnIndexOrThrow(Issue.FIELD_UUID));
 							sql = "UPDATE issue SET id = " + auditReportItem.getId() + ", is_fix_allowed = "
-									+ String.valueOf(auditReportItem.isFixAllowed()) + " WHERE _id = '" + uuid + "'";
+									+ Utils.toInt(auditReportItem.isFixAllowed()) + " WHERE _id = '" + uuid + "'";
 							db.execSQL(sql);
 							Logger.Log("Update Issue with id: " + auditReportItem.getId());
 
@@ -428,7 +428,9 @@ public class Mapper {
 								sql = "INSERT INTO issue VALUES (" + componentId + ", '" + main.getUuid() + "', "
 										+ damageId + ", '" + issueUuid + "', " + height + ", '" + repairId + "', "
 										+ length + ", '" + auditReportItem.getLocationCode() + "', "
-										+ auditReportItem.getQuantity() + ", " + auditReportItem.getId() + ", 0)";
+										+ auditReportItem.getQuantity() + ", "
+										+ Utils.toInt(auditReportItem.isFixAllowed()) + ", " + auditReportItem.getId()
+										+ ", 0)";
 
 								db.execSQL(sql);
 

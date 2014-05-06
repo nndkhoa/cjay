@@ -39,6 +39,7 @@ import com.cloudjay.cjay.util.CJayCustomCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.UploadType;
+import com.cloudjay.cjay.util.Utils;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
@@ -68,7 +69,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 	int mItemLayout = R.layout.list_item_issue;
 	IssueItemCursorAdapter mCursorAdapter;
 	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_ISSUE_ITEM;
-	
+
 	MenuItem avMenuItem;
 
 	@ViewById(R.id.btn_add_new)
@@ -244,7 +245,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 
 		menu.findItem(R.id.menu_trash).setVisible(isDisplayed);
 		menu.findItem(R.id.menu_upload).setVisible(mContainerSession.isValidForUpload(this, CJayImage.TYPE_AUDIT));
-		
+
 		avMenuItem = menu.findItem(R.id.menu_av);
 		avMenuItem.setIcon(mContainerSession.isAvailable() ? R.drawable.ic_action_good : R.drawable.ic_action_bad);
 
@@ -287,14 +288,18 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		getLoaderManager().restartLoader(LOADER_ID, null, this);
 		supportInvalidateOptionsMenu();
 	}
-	
+
 	@OptionsItem(R.id.menu_av)
 	void avMenuItemClicked() {
+
 		if (avMenuItem != null) {
 			mContainerSession.setAvailable(!mContainerSession.isAvailable());
-			mContainerSession.updateField(this, ContainerSession.FIELD_AVAILABLE, String.valueOf(mContainerSession.isAvailable()));
+			mContainerSession.updateField(	this, ContainerSession.FIELD_AVAILABLE,
+											Integer.toString(Utils.toInt(mContainerSession.isAvailable())));
+
 			avMenuItem.setIcon(mContainerSession.isAvailable() ? R.drawable.ic_action_good : R.drawable.ic_action_bad);
 		}
+
 	}
 
 	@OptionsItem(R.id.menu_import)

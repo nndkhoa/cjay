@@ -162,8 +162,8 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 			if (mAvCheckable && cursor.getColumnIndex(ContainerSession.FIELD_AVAILABLE) > 0) {
 				final Context ctx = context;
 				final String uuid = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
-
-				boolean available = Boolean.valueOf(cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_AVAILABLE)));
+				boolean available = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_AVAILABLE)) == 1 ? true
+						: false;
 				holder.checkableImageView.setVisibility(View.VISIBLE);
 				holder.checkableImageView.setChecked(available == true);
 				holder.checkableImageView.setOnClickListener(new OnClickListener() {
@@ -174,10 +174,8 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 						CheckableImageView checkButton = (CheckableImageView) v;
 						checkButton.toggle();
 						QueryHelper.update(	ctx, "container_session", ContainerSession.FIELD_AVAILABLE,
-											String.valueOf(checkButton.isChecked()), ContainerSession.FIELD_UUID
-													+ " = " + Utils.sqlString(uuid));
-						EventBus.getDefault().post(new ContainerSessionChangedEvent());
-
+											Integer.toString(Utils.toInt(checkButton.isChecked())),
+											ContainerSession.FIELD_UUID + " = " + Utils.sqlString(uuid));
 					}
 
 				});

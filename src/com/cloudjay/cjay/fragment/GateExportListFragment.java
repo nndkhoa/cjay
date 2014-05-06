@@ -43,6 +43,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.CJayActivity;
@@ -269,9 +271,12 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 		hideMenuItems();
 		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
 		ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
-		if (state != ContainerState.AVAILABLE) {
+		String containerId = cursor.getString(cursor.getColumnIndexOrThrow("container_id"));
 
+		if (state != ContainerState.AVAILABLE) {
+			Logger.Log("User cannot open this container");
 		} else {
+			Logger.Log("Click on container " + containerId + " | " + state.name());
 			mCurrentPosition = position;
 			handleContainerClicked(cursor);
 		}
@@ -290,11 +295,13 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 		ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
 		if (state != ContainerState.AVAILABLE) {
 
+			Logger.Log("Position: " + position);
 			mCurrentPosition = position;
 			// mFeedListView.showContextMenu();
 
-			PopupMenu popup = new PopupMenu(getActivity(), mFeedListView.getChildAt(position));
+			PopupMenu popup = new PopupMenu(getActivity(), mFeedListView.getSelectedView());
 			popup.getMenuInflater().inflate(R.menu.popup_menu_export, popup.getMenu());
+
 			popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 
 				public boolean onMenuItemClick(MenuItem item) {
@@ -309,7 +316,6 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 					return false;
 				}
 			});
-
 			popup.show();
 
 		} else {

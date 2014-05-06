@@ -78,8 +78,11 @@ public class GateExportContainerCursorAdapter extends CursorAdapter implements F
 
 		ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
 		if (state == ContainerState.AVAILABLE) {
+
 			holder.warningImageView.setVisibility(View.GONE);
+
 		} else {
+
 			holder.warningImageView.setVisibility(View.VISIBLE);
 			view.setOnLongClickListener(new OnLongClickListener() {
 				@Override
@@ -97,14 +100,10 @@ public class GateExportContainerCursorAdapter extends CursorAdapter implements F
 		importDate = StringHelper.getRelativeDate(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE, importDate);
 		holder.importDateView.setText(importDate);
 
-		// Logger.Log(containerId + " state: " + state.name());
-
 		String operator = cursor.getString(cursor.getColumnIndexOrThrow(Operator.FIELD_NAME));
 		holder.containerOwnerView.setText(operator);
 
 		String url = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_IMAGE_ID_PATH));
-		// if (!TextUtils.isEmpty(url) && !url.equals("https://storage.googleapis.com/storage-cjay.cloudjay.com/")) {
-
 		if (!TextUtils.isEmpty(url)
 				&& !url.matches("^https://storage\\.googleapis\\.com/storage-cjay\\.cloudjay\\.com/\\s+$")) {
 			imageLoader.displayImage(url, holder.itemPictureView);
@@ -123,23 +122,7 @@ public class GateExportContainerCursorAdapter extends CursorAdapter implements F
 		} else {
 			holder.validationImageView.setVisibility(View.INVISIBLE);
 		}
-
 	}
-
-	// @Override
-	// public boolean isEnabled(int position) {
-	//
-	// Cursor cursor = (Cursor) getItem(position);
-	// ContainerState state =
-	// ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
-	// if (state == ContainerState.AVAILABLE) {
-	//
-	// } else {
-	// return false;
-	// }
-	//
-	// return super.isEnabled(position);
-	// }
 
 	// get --> new --> bind
 	@Override

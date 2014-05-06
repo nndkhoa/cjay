@@ -543,6 +543,7 @@ public class DataCenter {
 	public void updateContainerStatus(Context ctx, int id, int status) {
 		try {
 			getDatabaseHelper(ctx).getContainerSessionDaoImpl().updateServerState(id, status);
+			EventBus.getDefault().post(new ContainerSessionChangedEvent());
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -676,11 +677,11 @@ public class DataCenter {
 
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_RESOURCE_COMPONENT_LAST_UPDATE, nowString);
 
-			if (componentCodes == null) {
-				Logger.w("----> NO new component codes");
-			} else {
-				Logger.w("----> Has " + Integer.toString(componentCodes.size()) + " new component codes");
-			}
+			// if (componentCodes == null) {
+			// Logger.w("----> NO new component codes");
+			// } else {
+			// Logger.w("----> Has " + Integer.toString(componentCodes.size()) + " new component codes");
+			// }
 
 			if (null != componentCodes) {
 				componentCodeDaoImpl.bulkInsert(DataCenter.getDatabaseHelper(ctx).getWritableDatabase(), componentCodes);
@@ -697,7 +698,7 @@ public class DataCenter {
 			e.printStackTrace();
 		}
 		long difference = System.currentTimeMillis() - startTime;
-		Logger.w("---> Total time: " + Long.toString(difference));
+		// Logger.w("---> Total time: " + Long.toString(difference));
 	}
 
 	public void removeListExportedContainerSessions(Context ctx, int type) {
@@ -882,11 +883,11 @@ public class DataCenter {
 
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_RESOURCE_DAMAGE_LAST_UPDATE, nowString);
 
-			if (damageCodes == null) {
-				Logger.w("----> NO new damage codes");
-			} else {
-				Logger.w("----> Has " + Integer.toString(damageCodes.size()) + " new damage codes");
-			}
+			// if (damageCodes == null) {
+			// Logger.w("----> NO new damage codes");
+			// } else {
+			// Logger.w("----> Has " + Integer.toString(damageCodes.size()) + " new damage codes");
+			// }
 
 			if (null != damageCodes) {
 				damageCodeDaoImpl.bulkInsert(DataCenter.getDatabaseHelper(ctx).getWritableDatabase(), damageCodes);
@@ -899,8 +900,9 @@ public class DataCenter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		long difference = System.currentTimeMillis() - startTime;
-		Logger.w("---> Total time: " + Long.toString(difference));
+		// Logger.w("---> Total time: " + Long.toString(difference));
 	}
 
 	/**
@@ -934,7 +936,7 @@ public class DataCenter {
 			e.printStackTrace();
 		}
 		long difference = System.currentTimeMillis() - startTime;
-		Logger.w("---> Total time: " + Long.toString(difference));
+		// Logger.w("---> Total time: " + Long.toString(difference));
 	}
 
 	/**
@@ -971,11 +973,11 @@ public class DataCenter {
 
 			operators = CJayClient.getInstance().getOperators(ctx, lastUpdate);
 
-			if (operators == null) {
-				Logger.w("----> NO new operators");
-			} else {
-				Logger.w("----> Has " + Integer.toString(operators.size()) + " new operators");
-			}
+			// if (operators == null) {
+			// Logger.w("----> NO new operators");
+			// } else {
+			// Logger.w("----> Has " + Integer.toString(operators.size()) + " new operators");
+			// }
 
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_RESOURCE_OPERATOR_LAST_UPDATE, nowString);
 
@@ -995,7 +997,7 @@ public class DataCenter {
 		}
 
 		long difference = System.currentTimeMillis() - startTime;
-		Logger.w("---> Total time: " + Long.toString(difference));
+		// Logger.w("---> Total time: " + Long.toString(difference));
 	}
 
 	/**
@@ -1031,11 +1033,11 @@ public class DataCenter {
 
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_RESOURCE_REPAIR_LAST_UPDATE, nowString);
 
-			if (repairCodes == null) {
-				Logger.w("----> NO new repair codes");
-			} else {
-				Logger.w("----> Has " + Integer.toString(repairCodes.size()) + " new repair codes");
-			}
+			// if (repairCodes == null) {
+			// Logger.w("----> NO new repair codes");
+			// } else {
+			// Logger.w("----> Has " + Integer.toString(repairCodes.size()) + " new repair codes");
+			// }
 
 			if (null != repairCodes) {
 				repairCodeDaoImpl.bulkInsert(DataCenter.getDatabaseHelper(ctx).getWritableDatabase(), repairCodes);
@@ -1049,6 +1051,6 @@ public class DataCenter {
 			e.printStackTrace();
 		}
 		long difference = System.currentTimeMillis() - startTime;
-		Logger.w("---> Total time: " + Long.toString(difference));
+		// Logger.w("---> Total time: " + Long.toString(difference));
 	}
 }
