@@ -332,6 +332,7 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
+		hideMenuItems();
 		synchronized (this) {
 			if (null != mSelectedContainerSession) {
 
@@ -342,10 +343,9 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 													+ mSelectedContainerSession.getContainerId() + "to upload queue"));
 
 				CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
-
-				hideMenuItems();
 			}
 		}
+		hideMenuItems();
 	}
 	
 	@OptionsItem(R.id.menu_av_export)
@@ -353,6 +353,7 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 		if (mSelectedCursor != null) {
 			handleContainerClicked(mSelectedCursor);
 		}
+		hideMenuItems();
 	}
 
 	public void OnContainerInputCompleted(String containerId, String operatorName, int mode) {
