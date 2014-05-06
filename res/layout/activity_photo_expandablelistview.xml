@@ -22,6 +22,14 @@
         android:verticalSpacing="3dp" />
     -->
 
+    <TextView
+        android:id="@+id/non_av_textview"
+        style="@style/NotFoundTextViewStyle"
+        android:background="@color/red_light"
+        android:textColor="@color/abs__primary_text_holo_light"
+        android:text="@string/container_non_av"
+        android:visibility="gone" />
+    
     <ImageButton
         android:id="@+id/btn_add_new"
         android:layout_width="match_parent"
@@ -31,7 +39,8 @@
         android:background="#0000"
         android:contentDescription="@string/camera_button_tooltip"
         android:scaleType="fitXY"
-        android:src="@drawable/btn_camera" />
+        android:src="@drawable/btn_camera"
+        android:layout_below="@id/non_av_textview" />
 
     <ExpandableListView
         android:id="@+id/expandable_listview"

@@ -14,6 +14,7 @@
     <string name="progress">Loading…</string>
     <string name="list_items">Danh sách container</string>
     <string name="list_issues">Danh sách lỗi</string>
+    <string name="container_non_av">CONTAINER ĐANG CHỜ XỬ LÝ.</string>
 
     <!-- ACRA -->
     <string name="crash_toast_text">Ooooops! I crashed, but a report has been sent to my developer to help fix the issue!</string>
@@ -28,6 +29,7 @@
     <string name="menu_camera_title">Chụp hình</string>
     <string name="menu_edit_container_title">Sửa thông tin container</string>
     <string name="menu_upload_title">Tải lên</string>
+    <string name="menu_av_export_title">Xuất công chưa AV</string>
     <string name="menu_trash_title">Xoá</string>
     <string name="menu_logout_title">Đăng xuất</string>
     <string name="menu_select_all">Chọn tất cả</string>

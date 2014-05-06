@@ -62,15 +62,15 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 	private String mSelectedCJayImageUuid;
 	private String mLongClickedCJayImageUuid;
 
-	ContainerSessionDaoImpl containerSessionDaoImpl = null;
-	CJayImageDaoImpl cJayImageDaoImpl = null;
-	IssueDaoImpl issueDaoImpl = null;
+	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
+	private CJayImageDaoImpl cJayImageDaoImpl = null;
+	private IssueDaoImpl issueDaoImpl = null;
 
-	int mItemLayout = R.layout.list_item_issue;
-	IssueItemCursorAdapter mCursorAdapter;
+	private int mItemLayout = R.layout.list_item_issue;
+	private IssueItemCursorAdapter mCursorAdapter;
 	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_ISSUE_ITEM;
 
-	MenuItem avMenuItem;
+	private MenuItem avMenuItem;
 
 	@ViewById(R.id.btn_add_new)
 	ImageButton mAddButton;
@@ -294,7 +294,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 
 		if (avMenuItem != null) {
 			mContainerSession.setAvailable(!mContainerSession.isAvailable());
-			mContainerSession.updateField(	this, ContainerSession.FIELD_AVAILABLE,
+			mContainerSession.updateField(	this, ContainerSession.FIELD_AV,
 											Integer.toString(Utils.toInt(mContainerSession.isAvailable())));
 
 			avMenuItem.setIcon(mContainerSession.isAvailable() ? R.drawable.ic_action_good : R.drawable.ic_action_bad);

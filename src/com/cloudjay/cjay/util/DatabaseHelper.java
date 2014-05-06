@@ -256,7 +256,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			} catch (Exception e) {
 
 			}
-
 			String sql = "CREATE VIEW csview AS"
 					+ " SELECT cs._id, cs.check_out_time, cs.check_in_time, cs.image_id_path, cs.server_state, cs.on_local, cs.fixed, cs.export, cs.upload_confirmation, cs.state, cs.cleared, cs.is_available, c.container_id, o.operator_name"
 					+ " FROM container_session AS cs, container AS c"

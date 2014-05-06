@@ -245,6 +245,21 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 		super.onCreate(savedInstanceState);
 	}
 
+	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
+
+	public void onEventMainThread(ContainerSessionChangedEvent event) {
+		Logger.Log("ContainerSessionChangedEvent");
+		refresh();
+	}
+
+	public void onEventMainThread(ContainerSessionEnqueueEvent event) {
+		refresh();
+	}
+
 	// 4.
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
@@ -266,22 +281,7 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 			}
 		};
 	}
-
-	@Override
-	public void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
-	}
-
-	public void onEventMainThread(ContainerSessionChangedEvent event) {
-		Logger.Log("ContainerSessionChangedEvent");
-		refresh();
-	}
-
-	public void onEventMainThread(ContainerSessionEnqueueEvent event) {
-		refresh();
-	}
-
+	
 	@Override
 	public void onLoaderReset(Loader<Cursor> arg0) {
 		cursorAdapter.swapCursor(null);

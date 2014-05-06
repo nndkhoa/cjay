@@ -25,6 +25,7 @@
     <color name="translucent_dk_grey">#88000000</color>
     <color name="translucent_grey">#50000000</color>
     <color name="translucent_lght_grey">#30000000</color>
+    <color name="red_light">#FFF35C5C</color>
 
     <!-- Logical Colours -->
     <color name="item_bg_dark">@color/blue_dark</color>

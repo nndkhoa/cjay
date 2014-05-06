@@ -1,5 +1,7 @@
 package com.cloudjay.cjay.adapter;
 
+import java.util.HashMap;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
@@ -13,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
@@ -25,8 +26,6 @@ import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.CheckableImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
-
-import de.greenrobot.event.EventBus;
 
 public class IssueContainerCursorAdapter extends CursorAdapter implements Filterable {
 
@@ -45,6 +44,7 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 	private LayoutInflater mInflater;
 	private ImageLoader mImageLoader;
 	private boolean mAvCheckable;
+	private HashMap<String, Boolean> mCheckedMap;
 
 	public boolean isScrolling;
 
@@ -64,6 +64,7 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 		mCursor = c;
 		mImageLoader = ImageLoader.getInstance();
 		mAvCheckable = avCheckable;
+		mCheckedMap = new HashMap<String, Boolean>();
 	}
 
 	@Override
@@ -159,11 +160,15 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 
 		if (holder.checkableImageView != null) {
 
-			if (mAvCheckable && cursor.getColumnIndex(ContainerSession.FIELD_AVAILABLE) > 0) {
+			if (mAvCheckable && cursor.getColumnIndex(ContainerSession.FIELD_AV) > 0) {
 				final Context ctx = context;
 				final String uuid = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
-				boolean available = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_AVAILABLE)) == 1 ? true
-						: false;
+				boolean available;
+				if (mCheckedMap.containsKey(uuid)) {
+					available = mCheckedMap.get(uuid).booleanValue();
+				} else {
+					available = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_AV)) == 1 ? true : false;
+				}
 				holder.checkableImageView.setVisibility(View.VISIBLE);
 				holder.checkableImageView.setChecked(available == true);
 				holder.checkableImageView.setOnClickListener(new OnClickListener() {
@@ -173,9 +178,10 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 
 						CheckableImageView checkButton = (CheckableImageView) v;
 						checkButton.toggle();
-						QueryHelper.update(	ctx, "container_session", ContainerSession.FIELD_AVAILABLE,
+						QueryHelper.update(	ctx, "container_session", ContainerSession.FIELD_AV,
 											Integer.toString(Utils.toInt(checkButton.isChecked())),
 											ContainerSession.FIELD_UUID + " = " + Utils.sqlString(uuid));
+						mCheckedMap.put(uuid, Boolean.valueOf(checkButton.isChecked()));
 					}
 
 				});
@@ -202,6 +208,12 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 		v.setTag(holder);
 
 		return v;
+	}
+	
+	@Override
+	public Cursor swapCursor(Cursor newCursor) {
+		mCheckedMap = new HashMap<String, Boolean>();
+		return super.swapCursor(newCursor);
 	}
 
 }

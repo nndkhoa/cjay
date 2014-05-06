@@ -14,6 +14,7 @@ import com.cloudjay.cjay.dao.OperatorDaoImpl;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.ContainerState;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.QueryHelper;
 import com.cloudjay.cjay.util.StringHelper;
@@ -54,7 +55,7 @@ public class ContainerSession {
 	public static final String FIELD_EXPORT = "export";
 
 	// Only use is_available when post tmpContainer
-	public static final String FIELD_AVAILABLE = "is_available";
+	public static final String FIELD_AV = "is_available";
 
 	// public static final String FIELD_IS_TEMP = "is_temp";
 	// @DatabaseField(columnName = FIELD_IS_TEMP, defaultValue = "0")
@@ -101,7 +102,7 @@ public class ContainerSession {
 	int mState;
 
 	// remark = true -> container available
-	@DatabaseField(columnName = FIELD_AVAILABLE, defaultValue = "false", index = true)
+	@DatabaseField(columnName = FIELD_AV, defaultValue = "false", index = true)
 	boolean mAvailable;
 
 	// Use to mark from pending --> fix
@@ -481,6 +482,10 @@ public class ContainerSession {
 
 	public void setServerState(int serverState) {
 		this.serverState = serverState;
+	}
+	
+	public ContainerState getServerContainerState() {
+		return ContainerState.values()[serverState];
 	}
 
 	public void updateField(Context ctx, String field, String value) {

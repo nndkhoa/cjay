@@ -2,8 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/menu_upload"
+        android:id="@+id/menu_av"
+        android:icon="@drawable/ic_action_bad"
+        android:showAsAction="always"
+        android:title="@string/menu_av_title"/>
+    <item
+        android:id="@+id/menu_import"
         android:icon="@drawable/ic_action_accept"
+        android:showAsAction="always"
+        android:title="@string/menu_import_title"/>
+    <item
+        android:id="@+id/menu_upload"
+        android:icon="@drawable/ic_action_upload"
         android:showAsAction="always"
         android:title="@string/menu_upload_title"/>
      <item

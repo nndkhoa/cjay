@@ -6,11 +6,11 @@ import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -78,18 +78,15 @@ public class GateExportContainerCursorAdapter extends CursorAdapter implements F
 
 		ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
 		if (state == ContainerState.AVAILABLE) {
-
 			holder.warningImageView.setVisibility(View.GONE);
-
 		} else {
-
 			holder.warningImageView.setVisibility(View.VISIBLE);
-			view.setOnLongClickListener(new OnLongClickListener() {
-				@Override
-				public boolean onLongClick(View v) {
-					return false;
-				}
-			});
+//			view.setOnLongClickListener(new OnLongClickListener() {
+//				@Override
+//				public boolean onLongClick(View v) {
+//					return false;
+//				}
+//			});
 		}
 
 		String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
