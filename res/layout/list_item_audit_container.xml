@@ -44,9 +44,9 @@
         android:id="@+id/feed_item_descriptions"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_marginTop="3dp"
         android:layout_marginLeft="1dp"
         android:layout_marginRight="1dp"
+        android:layout_marginTop="3dp"
         android:layout_weight="3"
         android:orientation="vertical"
         android:padding="3dp" >
@@ -151,16 +151,16 @@
                 android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
-    
+
     <com.cloudjay.cjay.view.CheckableImageView
         android:id="@+id/check_button"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="top|right"
-        android:layout_marginTop="3dp"
-        android:padding="@dimen/spacing"
+        android:layout_gravity="center"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
         android:scaleType="center"
-        android:visibility="gone"
-        android:src="@drawable/btn_selection_lrg" />
+        android:src="@drawable/btn_selection_lrg"
+        android:visibility="gone" />
 
 </LinearLayout>

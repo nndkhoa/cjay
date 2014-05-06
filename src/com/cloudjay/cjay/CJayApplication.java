@@ -253,10 +253,7 @@ public class CJayApplication extends Application {
 		Logger.getInstance().setDebuggable(debuggable);
 
 		// Setup API ROOT
-		boolean isBeta = true;
-		if (isBeta) {
-			CJayConstant.API_ROOT = CJayConstant.BETA_CLOUDJAY_API + "/api/";
-		}
+		CJayConstant.initApi(true);
 
 		// Ion.getDefault(getBaseContext()).configure()
 		// .setLogging("Network Module", Log.INFO);

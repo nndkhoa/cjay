@@ -138,6 +138,7 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 					isValidForUpload = true;
 				}
 
+				// TODO: bug here
 				ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
 				if (state == ContainerState.REPAIRING) {
 					holder.warningImageView.setVisibility(View.GONE);

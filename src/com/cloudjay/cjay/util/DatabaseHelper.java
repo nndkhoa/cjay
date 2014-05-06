@@ -258,7 +258,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			}
 
 			String sql = "CREATE VIEW csview AS"
-					+ " SELECT cs._id, cs.check_out_time, cs.check_in_time, cs.image_id_path, cs.on_local, cs.fixed, cs.export, cs.upload_confirmation, cs.state, cs.cleared, cs.is_available, c.container_id, o.operator_name"
+					+ " SELECT cs._id, cs.check_out_time, cs.check_in_time, cs.image_id_path, cs.server_state, cs.on_local, cs.fixed, cs.export, cs.upload_confirmation, cs.state, cs.cleared, cs.is_available, c.container_id, o.operator_name"
 					+ " FROM container_session AS cs, container AS c"
 					+ " LEFT JOIN operator AS o ON c.operator_id = o._id" + " WHERE cs.container_id = c._id";
 			db.execSQL(sql);

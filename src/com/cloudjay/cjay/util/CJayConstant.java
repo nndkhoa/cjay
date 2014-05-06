@@ -4,34 +4,46 @@ import java.io.File;
 
 import android.os.Environment;
 
-public final class CJayConstant {
+public class CJayConstant {
 
 	// API
 	public static final String CLOUDJAY_API = "https://cloudjay-web.appspot.com";
-	public static final String BETA_CLOUDJAY_API = "https://beta-dot-cloudjay-web.appspot.com";
-
-	public static String API_ROOT = CLOUDJAY_API + "/api/";
-	public static final String TOKEN = CLOUDJAY_API + "/api-token-auth/";
 	public static final String ACRA = "https://cloudjay-web.appspot.com/acra/";
+	public static final String BETA_CLOUDJAY_API = "https://beta-dot-cloudjay-web.appspot.com";
+	public static final String TOKEN = CLOUDJAY_API + "/api-token-auth/";
 
-	public static final String API_ADD_GCM_DEVICE = API_ROOT + "mobile/gcm-devices.json";
-
-	public static final String CURRENT_USER = API_ROOT + "cjay/current-user.json";
-
-	public static final String LIST_OPERATORS = API_ROOT + "cjay/container-operators.json";
-
-	public static final String LIST_DAMAGE_CODES = API_ROOT + "cjay/damage-codes.json";
-
-	public static final String LIST_REPAIR_CODES = API_ROOT + "cjay/repair-codes.json";
-
-	public static final String LIST_COMPONENT_CODES = API_ROOT + "cjay/component-codes.json";
-
-	public static final String CONTAINER_SESSIONS = API_ROOT + "cjay/container-sessions.json";
-
-	public static final String CONTAINER_SESSION_ITEM = API_ROOT + "cjay/container-sessions/%s.json";
+	public static String API_ROOT = "";
+	public static String API_ADD_GCM_DEVICE = "";
+	public static String CURRENT_USER = "";
+	public static String LIST_OPERATORS = "";
+	public static String LIST_DAMAGE_CODES = "";
+	public static String LIST_REPAIR_CODES = "";
+	public static String LIST_COMPONENT_CODES = "";
+	public static String CONTAINER_SESSIONS = "";
+	public static String CONTAINER_SESSION_ITEM = "";
 
 	public static final String CJAY_TMP_STORAGE = "https://www.googleapis.com/upload/storage/v1beta2/b/cjaytmp/o?uploadType=media&name=%s";
+
 	// public static final String CJAY_TMP_STORAGE = "https://www.googleapis.com/upload/storage/v1beta2/b/cjaytmp/o";
+
+	public static void initApi(boolean isBeta) {
+
+		if (isBeta) {
+			API_ROOT = BETA_CLOUDJAY_API + "/api/";
+		} else {
+			API_ROOT = CLOUDJAY_API + "/api/";
+		}
+
+		API_ADD_GCM_DEVICE = API_ROOT + "mobile/gcm-devices.json";
+		CURRENT_USER = API_ROOT + "cjay/current-user.json";
+		LIST_OPERATORS = API_ROOT + "cjay/container-operators.json";
+		LIST_DAMAGE_CODES = API_ROOT + "cjay/damage-codes.json";
+		LIST_REPAIR_CODES = API_ROOT + "cjay/repair-codes.json";
+		LIST_COMPONENT_CODES = API_ROOT + "cjay/component-codes.json";
+		CONTAINER_SESSIONS = API_ROOT + "cjay/container-sessions.json";
+		CONTAINER_SESSION_ITEM = API_ROOT + "cjay/container-sessions/%s.json";
+
+	}
 
 	// File path
 	public static final String APP_DIRECTORY = "CJay";
