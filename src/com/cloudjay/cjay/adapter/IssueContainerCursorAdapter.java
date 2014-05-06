@@ -130,10 +130,10 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 				}
 			}
 
-			if (cursor.getColumnIndex("fixed_issue_count") >= 0 && cursor.getColumnIndex("issue_count") >= 0) {
+			if (cursor.getColumnIndex("fixed_issue_count") >= 0 && cursor.getColumnIndex("fix_allowed_issue_count") >= 0) {
 				int fixedIssueCount = cursor.getInt(cursor.getColumnIndexOrThrow("fixed_issue_count"));
-				int validIssueCount = cursor.getInt(cursor.getColumnIndexOrThrow("issue_count"));
-				if (fixedIssueCount < validIssueCount || validIssueCount == 0) {
+				int validIssueCount = cursor.getInt(cursor.getColumnIndexOrThrow("fix_allowed_issue_count"));
+				if (fixedIssueCount < validIssueCount) {
 					isValidForUpload = false;
 				} else {
 					isValidForUpload = true;
@@ -148,7 +148,6 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 					holder.warningImageView.setVisibility(View.VISIBLE);
 					view.setEnabled(true);
 				}
-
 			}
 
 			if (!isValidForUpload) {

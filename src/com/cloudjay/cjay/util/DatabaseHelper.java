@@ -148,7 +148,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 					+ " select csiview.*, count(issue._id) as fixed_issue_count" + " from csiview"
 					+ " left join issue on csiview._id = issue.containerSession_id and coalesce(issue.fixed, 0) = 1"
 					+ " group by csiview._id";
-
 			db.execSQL(sql);
 		}
 
@@ -281,6 +280,19 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			} catch (Exception e) {
 				Logger.w("Column `is_fix_allowed` is already existed.");
 			}
+			
+			// view for validate container sessions before upload in Repair Mode
+			try {
+				db.execSQL("DROP VIEW csi_repair_validation_view");
+			} catch (Exception e) {
+				
+			}
+			sql = "create view csi_repair_validation_view as"
+					+ " select csiview.*, count(i1._id) as fixed_issue_count, count(i2._id) as fix_allowed_issue_count from csiview"
+					+ " left join issue i1 on csiview._id = i1.containerSession_id and coalesce(i1.fixed, 0) = 1 and coalesce(i1.is_fix_allowed, 0) = 1"
+					+ " left join issue i2 on csiview._id = i2.containerSession_id and coalesce(i2.is_fix_allowed, 0) = 1"
+					+ " group by csiview._id";
+			db.execSQL(sql);
 		}
 
 		@Override
