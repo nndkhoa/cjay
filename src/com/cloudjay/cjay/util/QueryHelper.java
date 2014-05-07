@@ -19,4 +19,5 @@ public class QueryHelper {
 		}
 		db.update(table, cv, whereClause, null);
 	}
+
 }
