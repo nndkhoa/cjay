@@ -247,7 +247,8 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		menu.findItem(R.id.menu_upload).setVisible(mContainerSession.isValidForUpload(this, CJayImage.TYPE_AUDIT));
 
 		avMenuItem = menu.findItem(R.id.menu_av);
-		avMenuItem.setIcon(mContainerSession.isAvailable() ? R.drawable.ic_action_good : R.drawable.ic_action_bad);
+		// avMenuItem.setIcon(mContainerSession.isAvailable() ? R.drawable.ic_action_good : R.drawable.ic_action_bad);
+		avMenuItem.setIcon(mContainerSession.isAvailable() ? R.drawable.ic_menu_av : R.drawable.ic_menu_no_av);
 
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -297,7 +298,9 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 			mContainerSession.updateField(	this, ContainerSession.FIELD_AV,
 											Integer.toString(Utils.toInt(mContainerSession.isAvailable())));
 
-			avMenuItem.setIcon(mContainerSession.isAvailable() ? R.drawable.ic_action_good : R.drawable.ic_action_bad);
+			// avMenuItem.setIcon(mContainerSession.isAvailable() ? R.drawable.ic_action_good :
+			// R.drawable.ic_action_bad);
+			avMenuItem.setIcon(mContainerSession.isAvailable() ? R.drawable.ic_menu_av : R.drawable.ic_menu_no_av);
 		}
 
 	}

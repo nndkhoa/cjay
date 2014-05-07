@@ -101,6 +101,9 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 	@ItemClick(R.id.feeds)
 	@Trace(level = Log.WARN)
 	void imageItemClicked(int position) {
+
+		// TODO: disable click if warning icon is being displayed
+
 		mSelectedIssue = mFeedsAdapter.getItem(position);
 		mFeedListView.setItemChecked(-1, true);
 		mTakenImages = new ArrayList<CJayImage>();
