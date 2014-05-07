@@ -176,7 +176,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 	@Override
 	protected void onResume() {
 
-		Logger.Log("*** onResume - DataCenter.reload ***");
+		// Logger.Log("*** onResume - DataCenter.reload ***");
 		long startTime = System.currentTimeMillis();
 
 		if (null != session) {
@@ -219,7 +219,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 							} else {
 
-								Logger.Log("update List CS FOLLOWING TIME");
+								// Logger.Log("update List CS FOLLOWING TIME");
 								DataCenter.getInstance()
 											.updateListContainerSessions(getApplicationContext(),
 																			CJayClient.REQUEST_TYPE_MODIFIED,
@@ -271,7 +271,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 		super.onResume();
 
 		long difference = System.currentTimeMillis() - startTime;
-		Logger.w("---> Total time: " + Long.toString(difference));
+		// Logger.w("---> Total time: " + Long.toString(difference));
 	}
 
 	/**

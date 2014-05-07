@@ -103,9 +103,7 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 	void imageItemClicked(int position) {
 		mSelectedIssue = mFeedsAdapter.getItem(position);
 		mFeedListView.setItemChecked(-1, true);
-
 		mTakenImages = new ArrayList<CJayImage>();
-
 		CJayApplication.openCamera(getActivity(), mContainerSession, CJayImage.TYPE_REPAIRED, LOG_TAG);
 	}
 
@@ -185,7 +183,7 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 
 			@Override
 			public void loadImage(String isFixedAllow, ImageView view) {
-				view.setVisibility(Boolean.parseBoolean(isFixedAllow) ? View.VISIBLE : View.GONE);
+				view.setVisibility(Boolean.parseBoolean(isFixedAllow) ? View.GONE : View.VISIBLE);
 			}
 
 		});
