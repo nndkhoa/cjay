@@ -101,10 +101,10 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 	@ItemClick(R.id.feeds)
 	@Trace(level = Log.WARN)
 	void imageItemClicked(int position) {
-
-		// TODO: disable click if warning icon is being displayed
-
 		mSelectedIssue = mFeedsAdapter.getItem(position);
+		
+		if (mSelectedIssue == null || !mSelectedIssue.isFixAllowed()) {	return; }
+		
 		mFeedListView.setItemChecked(-1, true);
 		mTakenImages = new ArrayList<CJayImage>();
 		CJayApplication.openCamera(getActivity(), mContainerSession, CJayImage.TYPE_REPAIRED, LOG_TAG);
@@ -176,19 +176,15 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 			}
 		});
 		feedsDict.addDynamicImageField(R.id.issue_warning, new StringExtractor<Issue>() {
-
 			@Override
 			public String getStringValue(Issue item, int position) {
 				return String.valueOf(item.isFixAllowed());
 			}
-
 		}, new DynamicImageLoader() {
-
 			@Override
 			public void loadImage(String isFixedAllow, ImageView view) {
 				view.setVisibility(Boolean.parseBoolean(isFixedAllow) ? View.GONE : View.VISIBLE);
 			}
-
 		});
 		mFeedsAdapter = new FunDapter<Issue>(getActivity(), containers, R.layout.list_item_issue, feedsDict);
 		mFeedListView.setAdapter(mFeedsAdapter);
