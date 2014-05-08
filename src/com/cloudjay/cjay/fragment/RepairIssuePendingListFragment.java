@@ -17,9 +17,11 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.ami.fundapter.BindDictionary;
@@ -43,6 +45,8 @@ import com.cloudjay.cjay.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 @EFragment(R.layout.fragment_repair_issue_pending)
 public class RepairIssuePendingListFragment extends SherlockFragment {
@@ -101,16 +105,21 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 	@ItemClick(R.id.feeds)
 	@Trace(level = Log.WARN)
 	void imageItemClicked(int position) {
-
-		// TODO: disable click if warning icon is being displayed
-
 		mSelectedIssue = mFeedsAdapter.getItem(position);
 		mFeedListView.setItemChecked(-1, true);
-		mTakenImages = new ArrayList<CJayImage>();
-		CJayApplication.openCamera(getActivity(), mContainerSession, CJayImage.TYPE_REPAIRED, LOG_TAG);
+
+		if (mSelectedIssue.isFixAllowed()) {
+			mTakenImages = new ArrayList<CJayImage>();
+			CJayApplication.openCamera(getActivity(), mContainerSession, CJayImage.TYPE_REPAIRED, LOG_TAG);
+
+		} else {
+			Crouton.cancelAllCroutons();
+			Crouton.makeText(getActivity(), R.string.alert_cannot_fix_issue, Style.ALERT).show();
+		}
 	}
 
 	private void initIssueFeedAdapter(ArrayList<Issue> containers) {
+
 		BindDictionary<Issue> feedsDict = new BindDictionary<Issue>();
 		feedsDict.addStringField(R.id.issue_location_code, new StringExtractor<Issue>() {
 			@Override
@@ -190,8 +199,10 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 			}
 
 		});
+
 		mFeedsAdapter = new FunDapter<Issue>(getActivity(), containers, R.layout.list_item_issue, feedsDict);
 		mFeedListView.setAdapter(mFeedsAdapter);
+
 	}
 
 	@Override

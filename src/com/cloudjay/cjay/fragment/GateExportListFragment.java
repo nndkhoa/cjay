@@ -75,6 +75,8 @@ import com.cloudjay.cjay.util.UploadType;
 import com.cloudjay.cjay.view.AddContainerDialog;
 
 import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 @EFragment(R.layout.fragment_gate_export)
 @OptionsMenu(R.menu.menu_gate_export)
@@ -238,7 +240,9 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+
 		getActivity().supportInvalidateOptionsMenu();
+		Logger.Log("mSelectedContainerSession: " + mSelectedContainerSession.getContainerId());
 	}
 
 	void handleContainerClicked(String uuid, String containerId) {
@@ -264,20 +268,32 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
+
 		hideMenuItems();
 		synchronized (this) {
 			if (null != mSelectedContainerSession) {
 
-				mSelectedContainerSession.setUploadType(UploadType.OUT);
-				mSelectedContainerSession.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+				if (mSelectedContainerSession.isValidForUpload(getActivity(), CJayImage.TYPE_EXPORT)) {
 
-				EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #OUT container with ID "
-													+ mSelectedContainerSession.getContainerId() + "to upload queue"));
+					mSelectedContainerSession.setUploadType(UploadType.OUT);
+					mSelectedContainerSession.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 
-				CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
+					EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #OUT container with ID "
+														+ mSelectedContainerSession.getContainerId()
+														+ "to upload queue"));
+
+					CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
+					hideMenuItems();
+					Logger.Log("OK");
+				} else {
+					Logger.e("XXX");
+					Crouton.cancelAllCroutons();
+					Crouton.makeText(getActivity(), R.string.alert_no_issue_container, Style.ALERT).show();
+				}
+			} else {
+				Logger.e("ZZZZ");
 			}
 		}
-		hideMenuItems();
 	}
 
 	@OptionsItem(R.id.menu_av_export)

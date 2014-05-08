@@ -52,6 +52,8 @@ import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
 
 import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 @EActivity(R.layout.activity_photo_expandablelistview)
 @OptionsMenu(R.menu.menu_photo_expandable_list_view)
@@ -406,14 +408,19 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 													+ mContainerSession.getContainerId() + "to upload queue"));
 
 			} else {
-				String checkOutTime = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 
-				mContainerSession.setUploadType(UploadType.OUT);
-				mContainerSession.setCheckOutTime(checkOutTime);
+				if (mContainerSession.isValidForUpload(context, CJayImage.TYPE_EXPORT)) {
+					mContainerSession.setUploadType(UploadType.OUT);
+					mContainerSession.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 
-				Logger.Log("Prepare to upload EXPORT container " + mContainerSession.getContainerId());
-				EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #OUT container with ID "
-													+ mContainerSession.getContainerId() + "to upload queue"));
+					Logger.Log("Prepare to upload EXPORT container " + mContainerSession.getContainerId());
+					EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #OUT container with ID "
+														+ mContainerSession.getContainerId() + "to upload queue"));
+				} else {
+					Crouton.cancelAllCroutons();
+					Crouton.makeText(this, R.string.alert_no_issue_container, Style.ALERT).show();
+					return;
+				}
 			}
 
 			CJayApplication.uploadContainerSesison(context, mContainerSession);

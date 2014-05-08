@@ -330,6 +330,13 @@ public class ContainerSession {
 		if (issues.isEmpty()) return false;
 
 		switch (imageType) {
+
+			case CJayImage.TYPE_EXPORT:
+				for (CJayImage cJayImage : cJayImages) {
+					if (cJayImage.getType() == CJayImage.TYPE_EXPORT) { return true; }
+				}
+
+				return false;
 			case CJayImage.TYPE_AUDIT:
 				// check if all REPORT image assigned to issues
 				int imageWithoutIssueCount = 0;
@@ -483,7 +490,7 @@ public class ContainerSession {
 	public void setServerState(int serverState) {
 		this.serverState = serverState;
 	}
-	
+
 	public ContainerState getServerContainerState() {
 		return ContainerState.values()[serverState];
 	}
