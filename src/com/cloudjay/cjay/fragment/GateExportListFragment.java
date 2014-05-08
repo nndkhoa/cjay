@@ -218,6 +218,10 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 		if (state != ContainerState.AVAILABLE) {
 			Logger.Log("User cannot open this container");
+
+			Crouton.cancelAllCroutons();
+			Crouton.makeText(getActivity(), R.string.alert_cannot_export_container, Style.ALERT).show();
+
 		} else {
 
 			Logger.Log("Click on container " + containerId + " | " + state.name());
@@ -285,7 +289,9 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 					CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
 					hideMenuItems();
 					Logger.Log("OK");
+
 				} else {
+
 					Logger.e("XXX");
 					Crouton.cancelAllCroutons();
 					Crouton.makeText(getActivity(), R.string.alert_no_issue_container, Style.ALERT).show();

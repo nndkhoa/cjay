@@ -229,7 +229,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			sql = "CREATE VIEW cs_full_info_export_validation_view as"
 					+ " SELECT cs.*, count(cjay_image._id) as export_image_count " + " FROM cs_full_info_view cs"
 					+ " LEFT JOIN cjay_image ON cjay_image.containerSession_id = cs._id AND cjay_image.type = 1"
-					+ " WHERE cs.check_out_time = '' AND (cs.export = 1) OR (cs.on_local = 0)" + " GROUP BY cs._id";
+					+ " WHERE cs.check_out_time = '' AND ((cs.export = 1) OR (cs.on_local = 0))" + " GROUP BY cs._id";
 			db.execSQL(sql);
 		}
 
@@ -280,12 +280,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			} catch (Exception e) {
 				Logger.w("Column `is_fix_allowed` is already existed.");
 			}
-			
+
 			// view for validate container sessions before upload in Repair Mode
 			try {
 				db.execSQL("DROP VIEW csi_repair_validation_view");
 			} catch (Exception e) {
-				
+
 			}
 			sql = "create view csi_repair_validation_view as"
 					+ " select csiview.*, count(i1._id) as fixed_issue_count, count(i2._id) as fix_allowed_issue_count from csiview"

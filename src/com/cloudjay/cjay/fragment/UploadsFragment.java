@@ -49,9 +49,9 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 	@Override
 	public boolean canDismiss(AbsListView listView, int position) {
 		try {
+
 			Cursor cursor = (Cursor) listView.getItemAtPosition(position);
 			UploadState uploadState = UploadState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_STATE))];
-			// int uploadState = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_STATE));
 			return uploadState == UploadState.COMPLETED;
 
 		} catch (Exception e) {

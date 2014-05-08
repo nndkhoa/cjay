@@ -411,7 +411,15 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 			} else {
 
+				try {
+					containerSessionDaoImpl.refresh(mContainerSession);
+				} catch (SQLException e) {
+					e.printStackTrace();
+					showCrouton(R.string.alert_try_again);
+				}
+
 				if (mContainerSession.isValidForUpload(context, CJayImage.TYPE_EXPORT)) {
+
 					mContainerSession.setUploadType(UploadType.OUT);
 					mContainerSession.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 
@@ -419,8 +427,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 					EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #OUT container with ID "
 														+ mContainerSession.getContainerId() + "to upload queue"));
 				} else {
-					Crouton.cancelAllCroutons();
-					Crouton.makeText(this, R.string.alert_no_issue_container, Style.ALERT).show();
+					showCrouton(R.string.alert_no_issue_container);
 					return;
 				}
 			}
