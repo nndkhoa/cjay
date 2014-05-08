@@ -15,6 +15,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.ContactsContract.Contacts.Data;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -121,7 +122,6 @@ public class Mapper {
 
 			// Create `container session` object
 			String uuid = UUID.randomUUID().toString();
-
 			ContentValues csValues = new ContentValues();
 			csValues.put("check_in_time", tmpSession.getCheckInTime());
 			csValues.put("check_out_time", tmpSession.getCheckOutTime());
@@ -130,10 +130,6 @@ public class Mapper {
 			csValues.put("image_id_path", tmpSession.getImageIdPath());
 			csValues.put("id", tmpSession.getId());
 			csValues.put("server_state", tmpSession.getStatus());
-
-			// TODO: Server do not return is_available
-			// csValues.put("is_available", tmpSession.getIsAvailable());
-
 			db.insertWithOnConflict("container_session", null, csValues, SQLiteDatabase.CONFLICT_REPLACE);
 
 			// process AuditReportItems --> create issues
@@ -142,47 +138,20 @@ public class Mapper {
 				for (AuditReportItem auditReportItem : auditReportItems) {
 
 					String issueUuid = UUID.randomUUID().toString();
-					ContentValues values = new ContentValues();
-					values.put("id", auditReportItem.getId());
-					values.put("_id", issueUuid);
-					values.put("componentCode_id", auditReportItem.getComponentId());
-					values.put("damageCode_id", auditReportItem.getDamageId());
-					values.put("repairCode_id", auditReportItem.getRepairId());
-					values.put("locationCode", auditReportItem.getLocationCode());
-					values.put("containerSession_id", uuid);
-					values.put("quantity", auditReportItem.getQuantity());
-					values.put("length", auditReportItem.getLength());
-					values.put("height", auditReportItem.getHeight());
-					values.put("is_fix_allowed", auditReportItem.isFixAllowed());
-					db.insertWithOnConflict("issue", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+					DataCenter.getInstance().addIssue(ctx, auditReportItem, auditReportItem.getId(), issueUuid, uuid);
 
 					List<AuditReportImage> auditReportImages = auditReportItem.getAuditReportImages();
 					for (AuditReportImage image : auditReportImages) {
-						ContentValues imageValues = new ContentValues();
-						imageValues.put("id", image.getId());
-						imageValues.put("_id", image.getImageUrl());
-						imageValues.put("uuid", UUID.randomUUID().toString());
-						imageValues.put("issue_id", issueUuid);
-						imageValues.put("type", image.getType());
-						imageValues.put("containerSession_id", uuid);
-						imageValues.put("image_name", image.getImageName());
-						imageValues.put("time_posted", image.getCreatedAt());
-						db.insertWithOnConflict("cjay_image", null, imageValues, SQLiteDatabase.CONFLICT_REPLACE);
+						DataCenter.getInstance().addImage(ctx, image, image.getId(), UUID.randomUUID().toString(),
+															issueUuid, uuid);
 					}
 				}
 			}
 
 			List<GateReportImage> gateReportImages = tmpSession.getGateReportImages();
 			for (GateReportImage image : gateReportImages) {
-				ContentValues values = new ContentValues();
-				values.put("id", image.getId());
-				values.put("_id", image.getImageUrl());
-				values.put("uuid", UUID.randomUUID().toString());
-				values.put("type", image.getType());
-				values.put("containerSession_id", uuid);
-				values.put("image_name", image.getImageName());
-				values.put("time_posted", image.getCreatedAt());
-				db.insertWithOnConflict("cjay_image", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+				DataCenter.getInstance().addImage(ctx, image, image.getId(), UUID.randomUUID().toString(), uuid);
 			}
 
 			ContainerSession containerSession = containerSessionDaoImpl.queryForId(uuid);
@@ -205,7 +174,6 @@ public class Mapper {
 		String imageIdPath = containerSession.getImageIdPath();
 
 		TmpContainerSession tmpContainerSession = new TmpContainerSession();
-
 		tmpContainerSession.setId(containerSession.getId());
 		tmpContainerSession.setOperatorCode(containerSession.getOperatorCode());
 		tmpContainerSession.setOperatorId(containerSession.getOperatorId());
@@ -321,21 +289,13 @@ public class Mapper {
 
 							String uuid = cursor.getString(cursor.getColumnIndexOrThrow(CJayImage.FIELD_UUID));
 							String imageName = cursor.getString(cursor.getColumnIndexOrThrow(CJayImage.FIELD_IMAGE_NAME));
-							sql = "UPDATE cjay_image SET id = " + gateReportImage.getId() + " WHERE uuid = '" + uuid
-									+ "'";
-
-							db.execSQL(sql);
+							QueryHelper.update(	ctx, "cjay_image", "id", Integer.toString(gateReportImage.getId()),
+												"uuid = " + Utils.sqlString(uuid));
 							Logger.Log("Update CJayImage UUID: " + uuid + " | Image name: " + imageName);
 
 						} else { // create
-
-							String uuid = UUID.randomUUID().toString();
-							sql = "INSERT INTO cjay_image VALUES ('" + main.getUuid() + "', '" + uuid + "', '"
-									+ gateReportImage.getImageName() + "', NULL, '" + gateReportImage.getCreatedAt()
-									+ "', '" + gateReportImage.getImageUrl() + "', 4," + gateReportImage.getType()
-									+ ", " + gateReportImage.getId() + ")";
-
-							db.execSQL(sql);
+							DataCenter.getInstance().addImage(ctx, gateReportImage, gateReportImage.getId(),
+																UUID.randomUUID().toString(), main.getUuid());
 							Logger.Log("Create new CJayImage: " + gateReportImage.getImageName());
 
 						}
@@ -357,26 +317,11 @@ public class Mapper {
 						String sql = "select * from issue where id = ?";
 						Cursor cursor = db.rawQuery(sql, new String[] { Integer.toString(itemId) });
 
-						// issue existed inside db with id # 0 --> REPAIR received
+						// issue existed inside db with id # 0; --> REPAIR received
 						if (cursor.moveToFirst()) {
-							// issue id
-							// container session id
 							issueId = cursor.getString(cursor.getColumnIndexOrThrow(Issue.FIELD_UUID));
-
-							ContentValues values = new ContentValues();
-							values.put("_id", issueId);
-							values.put("containerSession_id", main.getUuid());
-							values.put("id", auditReportItem.getId());
-							values.put("componentCode_id", auditReportItem.getComponentId());
-							values.put("damageCode_id", auditReportItem.getDamageId());
-							values.put("repairCode_id", auditReportItem.getRepairId());
-							values.put("locationCode", auditReportItem.getLocationCode());
-							values.put("quantity", auditReportItem.getQuantity());
-							values.put("length", auditReportItem.getLength());
-							values.put("height", auditReportItem.getHeight());
-							values.put("is_fix_allowed", auditReportItem.isFixAllowed());
-							db.insertWithOnConflict("issue", null, values, SQLiteDatabase.CONFLICT_REPLACE);
-
+							DataCenter.getInstance().addIssue(ctx, auditReportItem, auditReportItem.getId(), issueId,
+																main.getUuid());
 							Logger.Log("Update Issue with id: " + auditReportItem.getId());
 						} else {
 
@@ -414,23 +359,9 @@ public class Mapper {
 
 									// REPAIR received --> create new issue
 									// issue didnt exist in db
-
 									issueId = UUID.randomUUID().toString();
-									ContentValues values = new ContentValues();
-									values.put("_id", issueId);
-									values.put("containerSession_id", main.getUuid());
-									values.put("id", auditReportItem.getId());
-									values.put("componentCode_id", auditReportItem.getComponentId());
-									values.put("damageCode_id", auditReportItem.getDamageId());
-									values.put("repairCode_id", auditReportItem.getRepairId());
-									values.put("locationCode", auditReportItem.getLocationCode());
-									values.put("quantity", auditReportItem.getQuantity());
-									values.put("length", auditReportItem.getLength());
-									values.put("height", auditReportItem.getHeight());
-									values.put("is_fix_allowed", auditReportItem.isFixAllowed());
-									db.insertWithOnConflict("issue", null, values, SQLiteDatabase.CONFLICT_REPLACE);
-									break;
-
+									DataCenter.getInstance().addIssue(ctx, auditReportItem, auditReportItem.getId(),
+																		issueId, main.getUuid());
 								default:
 									break;
 							}
@@ -452,32 +383,17 @@ public class Mapper {
 
 									String auditImageUuid = auditCursor.getString(auditCursor.getColumnIndexOrThrow(CJayImage.FIELD_UUID));
 									String imageName = auditCursor.getString(auditCursor.getColumnIndexOrThrow(CJayImage.FIELD_IMAGE_NAME));
+									QueryHelper.update(	ctx, "cjay_image", "id",
+														Integer.toString(auditReportImage.getId()),
+														"uuid = " + Utils.sqlString(auditImageUuid));
 
-									sql = "UPDATE cjay_image SET id = " + auditReportImage.getId() + " WHERE uuid = '"
-											+ auditImageUuid + "'";
-									db.execSQL(sql);
 									Logger.Log("Update CJayImage UUID: " + auditImageUuid + " | Image name: "
 											+ imageName);
 
 								} else { // create
-
-									SimpleDateFormat dateFormat = new SimpleDateFormat(
-																						CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-									String nowString = dateFormat.format(new Date());
-
-									ContentValues imageValues = new ContentValues();
-									imageValues.put("containerSession_id", main.getUuid());
-									imageValues.put("uuid", UUID.randomUUID().toString());
-									imageValues.put("image_name", auditReportImage.getImageName());
-									imageValues.put("issue_id", issueId);
-									imageValues.put("time_posted", nowString);
-									imageValues.put("_id", auditReportImage.getImageUrl());
-									imageValues.put("state", 4);
-									imageValues.put("type", auditReportImage.getType());
-									imageValues.put("id", auditReportImage.getId());
-									db.insertWithOnConflict("cjay_image", null, imageValues,
-															SQLiteDatabase.CONFLICT_REPLACE);
-
+									DataCenter.getInstance().addImage(ctx, auditReportImage, auditReportImage.getId(),
+																		UUID.randomUUID().toString(), issueId,
+																		main.getUuid());
 								}
 							}
 						} // end audit report images
@@ -487,6 +403,7 @@ public class Mapper {
 					Logger.e("AuditReportItems is NULL");
 				}
 
+				// Update other fields
 				String sqlString = "";
 				if (updateImageIdPath) {
 					if (!TextUtils.isEmpty(tmp.getImageIdPath())
