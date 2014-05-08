@@ -162,7 +162,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 			e.printStackTrace();
 		}
 
-		if (mContainerSession.getServerContainerState() == ContainerState.AVAILABLE) {
+		if (mContainerSession.getServerContainerState() == ContainerState.AVAILABLE || mCJayImageTypeB < 0) {
 			mNonAvTextView.setVisibility(View.GONE);
 		} else {
 			mNonAvTextView.setVisibility(View.VISIBLE);
@@ -380,6 +380,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 				if (selectedCJayImageUuidsList != null) {
 					for (String cJayImageUuid : selectedCJayImageUuidsList) {
+
 						String newUuid = UUID.randomUUID().toString();
 						String sql = "insert into cjay_image (containerSession_id, image_name, time_posted, state, _id, uuid, type) "
 								+ " select containerSession_id, image_name, time_posted, state, _id, "
@@ -388,6 +389,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 								+ mCJayImageTypeCopyTo
 								+ " from cjay_image where uuid = " + Utils.sqlString(cJayImageUuid);
 						db.execSQL(sql);
+
 					}
 				}
 			}

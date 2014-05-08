@@ -349,7 +349,7 @@ public class Mapper {
 										QueryHelper.update(	ctx, "issue", "id",
 															Integer.toString(auditReportItem.getId()),
 															"_id = " + Utils.sqlString(issueId));
-										Logger.Log("Update Issue with id: " + auditReportItem.getId());
+										Logger.Log("Update Issue with id: " + auditReportItem.getId() + " | " + issueId);
 									} else {
 										Toast.makeText(ctx, "Unexpected Exception", Toast.LENGTH_LONG).show();
 									}
@@ -362,6 +362,8 @@ public class Mapper {
 									issueId = UUID.randomUUID().toString();
 									DataCenter.getInstance().addIssue(ctx, auditReportItem, auditReportItem.getId(),
 																		issueId, main.getUuid());
+
+									Logger.Log("Add issue: " + auditReportItem.getId() + " | " + issueId);
 								default:
 									break;
 							}
@@ -394,6 +396,8 @@ public class Mapper {
 									DataCenter.getInstance().addImage(ctx, auditReportImage, auditReportImage.getId(),
 																		UUID.randomUUID().toString(), issueId,
 																		main.getUuid());
+
+									Logger.Log("create new image");
 								}
 							}
 						} // end audit report images
