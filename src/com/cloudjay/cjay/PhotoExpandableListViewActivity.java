@@ -160,7 +160,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 			e.printStackTrace();
 		}
 
-		if (mContainerSession.getServerContainerState() == ContainerState.AVAILABLE) {
+		if (mViewMode == MODE_UPLOAD && mContainerSession.getServerContainerState() == ContainerState.AVAILABLE) {
 			mNonAvTextView.setVisibility(View.GONE);
 		} else {
 			mNonAvTextView.setVisibility(View.VISIBLE);
@@ -289,7 +289,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 			LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) gridView.getLayoutParams();
 			int gridViewWidth = gridView.getMeasuredWidth() > 0 ? gridView.getMeasuredWidth()
 					: gridView.getEmptyView().getMeasuredWidth();
-			p.height = gridViewWidth / mNumCols * (int) (1.0 * (cursor.getCount() + 1) / mNumCols + 0.5);
+			p.height = gridViewWidth / mNumCols * (int) (1.0 * (cursor.getCount()) / mNumCols + 0.5);
 			gridView.setLayoutParams(p);
 		}
 	}
