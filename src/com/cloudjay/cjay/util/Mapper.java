@@ -23,6 +23,7 @@ import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
+import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.model.AuditReportImage;
 import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
@@ -319,10 +320,12 @@ public class Mapper {
 
 						// issue existed inside db with id # 0; --> REPAIR received
 						if (cursor.moveToFirst()) {
+
 							issueId = cursor.getString(cursor.getColumnIndexOrThrow(Issue.FIELD_UUID));
 							DataCenter.getInstance().addIssue(ctx, auditReportItem, auditReportItem.getId(), issueId,
 																main.getUuid());
 							Logger.Log("Update Issue with id: " + auditReportItem.getId());
+
 						} else {
 
 							CJaySession session = CJaySession.restore(ctx);
@@ -356,18 +359,28 @@ public class Mapper {
 									break;
 
 								case REPAIR_STAFF:
+								case GATE_KEEPER:
 
 									// REPAIR received --> create new issue
 									// issue didnt exist in db
 									issueId = UUID.randomUUID().toString();
 									DataCenter.getInstance().addIssue(ctx, auditReportItem, auditReportItem.getId(),
 																		issueId, main.getUuid());
-
 									Logger.Log("Add issue: " + auditReportItem.getId() + " | " + issueId);
+									break;
+
 								default:
+									Logger.e("Other role!!");
 									break;
 							}
 
+						}
+
+						if (TextUtils.isEmpty(issueId)) {
+							Logger.e("Error #parse audit_report_item with id: " + auditReportItem.getId());
+							DataCenter.getDatabaseHelper(ctx).addUsageLog(	"Error #parse audit_report_item with id: "
+																					+ auditReportItem.getId());
+							break;
 						}
 
 						// ----
@@ -377,8 +390,9 @@ public class Mapper {
 							for (AuditReportImage auditReportImage : auditReportImages) {
 
 								String auditReportImageName = auditReportImage.getImageName();
-								sql = "SELECT * FROM cjay_image WHERE image_name LIKE ? ";
-								Cursor auditCursor = db.rawQuery(sql, new String[] { "%" + auditReportImageName });
+								sql = "SELECT * FROM cjay_image WHERE image_name LIKE ? and type = ?";
+								Cursor auditCursor = db.rawQuery(sql, new String[] { "%" + auditReportImageName,
+										Integer.toString(auditReportImage.getType()) });
 
 								// existed
 								if (auditCursor.moveToFirst()) { // update
