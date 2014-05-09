@@ -339,6 +339,9 @@ public class ContainerUploadIntentService extends IntentService implements Count
 		if (NetworkHelper.isConnected(this)) {
 
 			try {
+
+				// rollback stuck containers
+				DataCenter.getInstance().rollbackStuckContainers(this);
 				ContainerSession containerSession = containerSessionDaoImpl.getNextWaiting(	this,
 																							DataCenter.getDatabaseHelper(	this)
 																										.getWritableDatabase());
@@ -450,8 +453,9 @@ public class ContainerUploadIntentService extends IntentService implements Count
 
 		Logger.w("Rolling back type: " + uploadType.name());
 		switch (uploadType) {
+
 			case IN:
-				containerSession.setOnLocal(false);
+				containerSession.setOnLocal(true);
 				break;
 
 			case OUT:

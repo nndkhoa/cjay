@@ -52,6 +52,8 @@ import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
 
 import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 @EActivity(R.layout.activity_photo_expandablelistview)
 @OptionsMenu(R.menu.menu_photo_expandable_list_view)
@@ -376,6 +378,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 				if (selectedCJayImageUuidsList != null) {
 					for (String cJayImageUuid : selectedCJayImageUuidsList) {
+
 						String newUuid = UUID.randomUUID().toString();
 						String sql = "insert into cjay_image (containerSession_id, image_name, time_posted, state, _id, uuid, type) "
 								+ " select containerSession_id, image_name, time_posted, state, _id, "
@@ -384,6 +387,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 								+ mCJayImageTypeCopyTo
 								+ " from cjay_image where uuid = " + Utils.sqlString(cJayImageUuid);
 						db.execSQL(sql);
+
 					}
 				}
 			}
@@ -406,14 +410,26 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 													+ mContainerSession.getContainerId() + "to upload queue"));
 
 			} else {
-				String checkOutTime = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 
-				mContainerSession.setUploadType(UploadType.OUT);
-				mContainerSession.setCheckOutTime(checkOutTime);
+				try {
+					containerSessionDaoImpl.refresh(mContainerSession);
+				} catch (SQLException e) {
+					e.printStackTrace();
+					showCrouton(R.string.alert_try_again);
+				}
 
-				Logger.Log("Prepare to upload EXPORT container " + mContainerSession.getContainerId());
-				EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #OUT container with ID "
-													+ mContainerSession.getContainerId() + "to upload queue"));
+				if (mContainerSession.isValidForUpload(context, CJayImage.TYPE_EXPORT)) {
+
+					mContainerSession.setUploadType(UploadType.OUT);
+					mContainerSession.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+
+					Logger.Log("Prepare to upload EXPORT container " + mContainerSession.getContainerId());
+					EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #OUT container with ID "
+														+ mContainerSession.getContainerId() + "to upload queue"));
+				} else {
+					showCrouton(R.string.alert_no_issue_container);
+					return;
+				}
 			}
 
 			CJayApplication.uploadContainerSesison(context, mContainerSession);

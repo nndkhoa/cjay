@@ -5,8 +5,6 @@
     android:layout_height="match_parent" >
 
     <!-- <include layout="@layout/layout_empty_items" /> -->
-
-
     <!--
          <GridView
         android:id="@+id/gridview"
@@ -26,21 +24,25 @@
         android:id="@+id/non_av_textview"
         style="@style/NotFoundTextViewStyle"
         android:background="@color/red_light"
-        android:textColor="@color/abs__primary_text_holo_light"
+        android:paddingBottom="6dp"
+        android:paddingTop="6dp"
+        android:textStyle="bold"
+        android:textSize="15sp"
         android:text="@string/container_non_av"
+        android:textColor="@color/abs__primary_text_holo_dark"
         android:visibility="gone" />
-    
+
     <ImageButton
         android:id="@+id/btn_add_new"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/non_av_textview"
         android:layout_gravity="center"
         android:adjustViewBounds="true"
         android:background="#0000"
         android:contentDescription="@string/camera_button_tooltip"
         android:scaleType="fitXY"
-        android:src="@drawable/btn_camera"
-        android:layout_below="@id/non_av_textview" />
+        android:src="@drawable/btn_camera" />
 
     <ExpandableListView
         android:id="@+id/expandable_listview"

@@ -56,6 +56,8 @@
     <string name="alert_ssl_timeout">Có vấn đề với SSL</string>
     <string name="alert_server_error">Máy chủ có vấn đề. Hãy thử lại lần sau</string>
     <string name="alert_no_issue_container">Container chưa được báo cáo đủ. Hãy kiểm tra lại.</string>
+    <string name="alert_cannot_fix_issue">Lỗi này không được phép sửa chữa</string>
+    <string name="alert_cannot_export_container">Container chưa được phép xuất</string>
     <string name="alert_invalid_container">Container không hợp lệ. Hãy kiểm tra lại.</string>
     <string name="alert_camera_preview">Ứng dụng không xử lý kịp. Hãy chụp chậm lại.</string>
 
@@ -64,7 +66,7 @@
     <string name="empty_items">No items available</string>
     <string name="empty_issues">Đã sửa chữa hết các lỗi</string>
     <string name="logout">Logout %1$s</string>
-    <string name="logout_prompt_title">Dữ liệu sẽ mất sau khi đăng xuất. Bạn có chắc chưa?</string>
+    <string name="logout_prompt_title">Dữ liệu sẽ mất sau khi đăng xuất.Bạn có chắc chưa?</string>
     <string name="title_activity_user_log">Usage Log</string>
 
     <!--  -->

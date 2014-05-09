@@ -81,12 +81,6 @@ public class GateExportContainerCursorAdapter extends CursorAdapter implements F
 			holder.warningImageView.setVisibility(View.GONE);
 		} else {
 			holder.warningImageView.setVisibility(View.VISIBLE);
-//			view.setOnLongClickListener(new OnLongClickListener() {
-//				@Override
-//				public boolean onLongClick(View v) {
-//					return false;
-//				}
-//			});
 		}
 
 		String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));

@@ -48,6 +48,7 @@ import com.cloudjay.cjay.adapter.IssueContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
+import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.events.PostLoadDataEvent;
 import com.cloudjay.cjay.events.PreLoadDataEvent;
@@ -316,6 +317,10 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 	public void onDestroy() {
 		EventBus.getDefault().unregister(this);
 		super.onDestroy();
+	}
+
+	public void onEvent(ContainerSessionUpdatedEvent event) {
+		refresh();
 	}
 
 	public void onEvent(ContainerSessionEnqueueEvent event) {

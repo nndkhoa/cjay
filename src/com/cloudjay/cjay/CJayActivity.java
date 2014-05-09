@@ -206,10 +206,10 @@ public class CJayActivity extends SherlockFragmentActivity {
 					@Override
 					protected Void doInBackground(Void... params) {
 
-						boolean initialize = PreferencesUtil.getPrefsValue(	context, PreferencesUtil.PREF_INITIALIZED,
-																			false);
-
 						try {
+							boolean initialize = PreferencesUtil.getPrefsValue(	context,
+																				PreferencesUtil.PREF_INITIALIZED, false);
+
 							if (!initialize) {
 								Logger.Log("update List CS FIRST TIME");
 								DataCenter.getInstance()

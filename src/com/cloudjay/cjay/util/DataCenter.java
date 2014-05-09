@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EBean;
@@ -12,6 +13,7 @@ import org.androidannotations.annotations.EBean.Scope;
 import org.androidannotations.annotations.Trace;
 
 import android.annotation.SuppressLint;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -30,6 +32,8 @@ import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.cloudjay.cjay.dao.UserDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.LogUserActivityEvent;
+import com.cloudjay.cjay.model.AuditReportImage;
+import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ComponentCode;
 import com.cloudjay.cjay.model.Container;
@@ -37,6 +41,7 @@ import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.ContainerSessionResult;
 import com.cloudjay.cjay.model.DamageCode;
 import com.cloudjay.cjay.model.Depot;
+import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.RepairCode;
@@ -103,9 +108,16 @@ public class DataCenter {
 
 	}
 
-	// TODO: find image that its upload state == IN_PROGRESS
-	public void rollbackStuckImages() {
+	public void rollbackStuckImages(Context ctx) {
+		SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
+		String sql = "UPDATE cjay_image SET state = 1 WHERE state = 2";
+		db.execSQL(sql);
+	}
 
+	public void rollbackStuckContainers(Context ctx) {
+		SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
+		String sql = "UPDATE container_session SET state = 1 WHERE state = 2";
+		db.execSQL(sql);
 	}
 
 	@Background
@@ -435,8 +447,20 @@ public class DataCenter {
 	}
 
 	public void clearListUpload(SQLiteDatabase db) {
-		String sql = "UPDATE container_session SET cleared = 1 WHERE cleared = 0 AND upload_confirmation = 1 ";
-		db.execSQL(sql);
+
+		String queryString = "SELECT * FROM csview WHERE upload_confirmation = 1 AND cleared = 0";
+		Cursor cursor = db.rawQuery(queryString, new String[] {});
+		while (cursor.moveToNext()) {
+
+			String uuid = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+			String sql = "UPDATE container_session SET cleared = 1 WHERE state = 4 AND upload_confirmation = 1 AND _id = "
+					+ Utils.sqlString(uuid);
+			db.execSQL(sql);
+		}
+
+		// String sql = "UPDATE container_session SET cleared = 1 WHERE cleared = 0 AND upload_confirmation = 1 ";
+		// db.execSQL(sql);
+
 	}
 
 	public void removeContainerFromListUpload(SQLiteDatabase db, String uuid) {
@@ -542,8 +566,10 @@ public class DataCenter {
 
 	public void updateContainerStatus(Context ctx, int id, int status) {
 		try {
+
 			getDatabaseHelper(ctx).getContainerSessionDaoImpl().updateServerState(id, status);
 			EventBus.getDefault().post(new ContainerSessionChangedEvent());
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -1053,5 +1079,61 @@ public class DataCenter {
 		}
 		long difference = System.currentTimeMillis() - startTime;
 		// Logger.w("---> Total time: " + Long.toString(difference));
+	}
+
+	public void addIssue(Context ctx, AuditReportItem auditReportItem, int issueNewId, String issueUuid,
+							String containerSessionUuid) {
+
+		SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put("_id", issueUuid);
+		values.put("containerSession_id", containerSessionUuid);
+		values.put("id", issueNewId);
+		values.put("componentCode_id", auditReportItem.getComponentId());
+		values.put("damageCode_id", auditReportItem.getDamageId());
+		values.put("repairCode_id", auditReportItem.getRepairId());
+		values.put("locationCode", auditReportItem.getLocationCode());
+		values.put("quantity", auditReportItem.getQuantity());
+		values.put("length", auditReportItem.getLength());
+		values.put("height", auditReportItem.getHeight());
+		values.put("is_fix_allowed", auditReportItem.isFixAllowed());
+		db.insertWithOnConflict("issue", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+	}
+
+	public void addImage(Context ctx, GateReportImage gateReportImage, int imageId, String imageUuid,
+							String containerSessionUuid) {
+
+		SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put("uuid", imageUuid);
+		values.put("containerSession_id", containerSessionUuid);
+		values.put("id", imageId);
+
+		values.put("_id", gateReportImage.getImageUrl());
+		values.put("type", gateReportImage.getType());
+		values.put("image_name", gateReportImage.getImageName());
+		values.put("time_posted", gateReportImage.getCreatedAt());
+		values.put("state", 4);
+		db.insertWithOnConflict("cjay_image", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+	}
+
+	public void addImage(Context ctx, AuditReportImage auditReportImage, int imageId, String imageUuid,
+							String issueUuid, String containerSessionUuid) {
+
+		SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
+		ContentValues imageValues = new ContentValues();
+		imageValues.put("containerSession_id", containerSessionUuid);
+		imageValues.put("uuid", imageUuid);
+		imageValues.put("id", imageId);
+		imageValues.put("issue_id", issueUuid);
+
+		imageValues.put("image_name", auditReportImage.getImageName());
+		imageValues.put("time_posted", auditReportImage.getCreatedAt());
+		imageValues.put("_id", auditReportImage.getImageUrl());
+		imageValues.put("type", auditReportImage.getType());
+		imageValues.put("state", 4);
+		db.insertWithOnConflict("cjay_image", null, imageValues, SQLiteDatabase.CONFLICT_REPLACE);
+
 	}
 }

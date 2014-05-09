@@ -130,7 +130,8 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 				}
 			}
 
-			if (cursor.getColumnIndex("fixed_issue_count") >= 0 && cursor.getColumnIndex("fix_allowed_issue_count") >= 0) {
+			if (cursor.getColumnIndex("fixed_issue_count") >= 0
+					&& cursor.getColumnIndex("fix_allowed_issue_count") >= 0) {
 				int fixedIssueCount = cursor.getInt(cursor.getColumnIndexOrThrow("fixed_issue_count"));
 				int validIssueCount = cursor.getInt(cursor.getColumnIndexOrThrow("fix_allowed_issue_count"));
 				if (fixedIssueCount < validIssueCount) {
@@ -166,7 +167,8 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 				if (mCheckedMap.containsKey(uuid)) {
 					available = mCheckedMap.get(uuid).booleanValue();
 				} else {
-					available = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_AV)) == 1 ? true : false;
+					available = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_AV)) == 1 ? true
+							: false;
 				}
 				holder.checkableImageView.setVisibility(View.VISIBLE);
 				holder.checkableImageView.setChecked(available == true);
@@ -208,7 +210,24 @@ public class IssueContainerCursorAdapter extends CursorAdapter implements Filter
 
 		return v;
 	}
-	
+
+	@Override
+	public boolean isEnabled(int position) {
+
+		Cursor cursor = (Cursor) getItem(position);
+		if (cursor.getColumnIndex("fixed_issue_count") >= 0 && cursor.getColumnIndex("fix_allowed_issue_count") >= 0) {
+
+			ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
+			if (state == ContainerState.REPAIRING) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		return super.isEnabled(position);
+	}
+
 	@Override
 	public Cursor swapCursor(Cursor newCursor) {
 		mCheckedMap = new HashMap<String, Boolean>();

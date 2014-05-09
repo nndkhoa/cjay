@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.UUID;
 
+import android.R.integer;
 import android.content.Context;
 import android.text.TextUtils;
 
@@ -327,10 +328,26 @@ public class ContainerSession {
 	// image without issue <= 1 && all issue is valid --> OK
 	public boolean isValidForUpload(Context ctx, int imageType) {
 
-		if (issues.isEmpty()) return false;
-
 		switch (imageType) {
+
+			case CJayImage.TYPE_EXPORT:
+
+				int exportImageCount = 0;
+				for (CJayImage cJayImage : cJayImages) {
+
+					Logger.Log(cJayImage.getImageName() + " -> " + cJayImage.getType());
+					if (cJayImage.getType() == CJayImage.TYPE_EXPORT) {
+						exportImageCount++;
+
+						if (exportImageCount > 0) return true;
+					}
+				}
+
+				return false;
 			case CJayImage.TYPE_AUDIT:
+
+				if (issues.isEmpty()) return false;
+
 				// check if all REPORT image assigned to issues
 				int imageWithoutIssueCount = 0;
 
@@ -350,6 +367,8 @@ public class ContainerSession {
 				return true;
 
 			case CJayImage.TYPE_REPAIRED:
+
+				if (issues.isEmpty()) return false;
 
 				// check if all issues have REPAIRED images
 				// update: check if all issues that is_fix_allowed have REPAIRED images
@@ -483,7 +502,7 @@ public class ContainerSession {
 	public void setServerState(int serverState) {
 		this.serverState = serverState;
 	}
-	
+
 	public ContainerState getServerContainerState() {
 		return ContainerState.values()[serverState];
 	}

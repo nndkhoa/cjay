@@ -64,6 +64,83 @@ import de.greenrobot.event.EventBus;
 @EApplication
 public class CJayApplication extends Application {
 
+	@Override
+	public void onCreate() {
+		Logger.Log("Start Application");
+
+		// Configure Logger
+		boolean debuggable = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox), true);
+
+		Logger.getInstance().setDebuggable(debuggable);
+
+		// Setup API ROOT
+		CJayConstant.initApi(true);
+
+		// Ion.getDefault(getBaseContext()).configure()
+		// .setLogging("Network Module", Log.INFO);
+
+		super.onCreate();
+		databaseManager = new DatabaseManager();
+		httpRequestWrapper = new HttpRequestWrapper();
+
+		DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder().cacheInMemory(true)
+																				.cacheOnDisc(true)
+																				.bitmapConfig(Bitmap.Config.RGB_565)
+																				.imageScaleType(ImageScaleType.IN_SAMPLE_INT)
+																				.showImageForEmptyUri(R.drawable.ic_app)
+																				.build();
+
+		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext()).defaultDisplayImageOptions(	defaultOptions)
+																										.discCacheSize(	100 * 1024 * 1024)
+																										.memoryCache(	new WeakMemoryCache())
+																										.threadPoolSize(3)
+																										.threadPriority(Thread.MAX_PRIORITY)
+																										.build();
+
+		ACRA.init(CJayApplication.this);
+		ACRA.getErrorReporter().checkReportsOnApplicationStart();
+
+		ImageLoader.getInstance().init(config);
+		CJayClient.getInstance().init(httpRequestWrapper, databaseManager);
+		DataCenter.getInstance().initialize(databaseManager);
+		databaseManager.getHelper(getApplicationContext());
+
+		if (!CJayConstant.APP_DIRECTORY_FILE.exists()) {
+			CJayConstant.APP_DIRECTORY_FILE.mkdir();
+		}
+
+		if (!CJayConstant.HIDDEN_APP_DIRECTORY_FILE.exists()) {
+			CJayConstant.HIDDEN_APP_DIRECTORY_FILE.mkdir();
+		}
+
+		if (!CJayConstant.BACK_UP_DIRECTORY_FILE.exists()) {
+			CJayConstant.BACK_UP_DIRECTORY_FILE.mkdir();
+		}
+
+		// Configure Alarm Manager
+		// TODO: refactor if needed
+		mContext = getApplicationContext();
+		if (!Utils.isAlarmUp(mContext)) {
+
+			Logger.w("Alarm Manager is not running.");
+			Utils.startAlarm(mContext);
+
+		} else {
+			Logger.Log("Alarm is already running "
+					+ StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+		}
+
+		// Utils.cancelThenStartAlarm(mContext);
+
+		if (NetworkHelper.isConnected(this)) {
+			PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_NO_CONNECTION, false);
+		} else {
+			PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_NO_CONNECTION, true);
+		}
+
+	}
+
 	public static CJayApplication getApplication(Context context) {
 		return (CJayApplication) context.getApplicationContext();
 	}
@@ -240,83 +317,6 @@ public class CJayApplication extends Application {
 
 	public static Context getContext() {
 		return mContext;
-	}
-
-	@Override
-	public void onCreate() {
-		Logger.Log("Start Application");
-
-		// Configure Logger
-		boolean debuggable = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox), true);
-
-		Logger.getInstance().setDebuggable(debuggable);
-
-		// Setup API ROOT
-		CJayConstant.initApi(true);
-
-		// Ion.getDefault(getBaseContext()).configure()
-		// .setLogging("Network Module", Log.INFO);
-
-		super.onCreate();
-		databaseManager = new DatabaseManager();
-		httpRequestWrapper = new HttpRequestWrapper();
-
-		DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder().cacheInMemory(true)
-																				.cacheOnDisc(true)
-																				.bitmapConfig(Bitmap.Config.RGB_565)
-																				.imageScaleType(ImageScaleType.IN_SAMPLE_INT)
-																				.showImageForEmptyUri(R.drawable.ic_app)
-																				.build();
-
-		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext()).defaultDisplayImageOptions(	defaultOptions)
-																										.discCacheSize(	100 * 1024 * 1024)
-																										.memoryCache(	new WeakMemoryCache())
-																										.threadPoolSize(3)
-																										.threadPriority(Thread.MAX_PRIORITY)
-																										.build();
-
-		ACRA.init(CJayApplication.this);
-		ACRA.getErrorReporter().checkReportsOnApplicationStart();
-
-		ImageLoader.getInstance().init(config);
-		CJayClient.getInstance().init(httpRequestWrapper, databaseManager);
-		DataCenter.getInstance().initialize(databaseManager);
-		databaseManager.getHelper(getApplicationContext());
-
-		if (!CJayConstant.APP_DIRECTORY_FILE.exists()) {
-			CJayConstant.APP_DIRECTORY_FILE.mkdir();
-		}
-
-		if (!CJayConstant.HIDDEN_APP_DIRECTORY_FILE.exists()) {
-			CJayConstant.HIDDEN_APP_DIRECTORY_FILE.mkdir();
-		}
-
-		if (!CJayConstant.BACK_UP_DIRECTORY_FILE.exists()) {
-			CJayConstant.BACK_UP_DIRECTORY_FILE.mkdir();
-		}
-
-		// Configure Alarm Manager
-		// TODO: refactor if needed
-		mContext = getApplicationContext();
-		if (!Utils.isAlarmUp(mContext)) {
-
-			Logger.w("Alarm Manager is not running.");
-			Utils.startAlarm(mContext);
-
-		} else {
-			Logger.Log("Alarm is already running "
-					+ StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
-		}
-
-		// Utils.cancelThenStartAlarm(mContext);
-
-		if (NetworkHelper.isConnected(this)) {
-			PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_NO_CONNECTION, false);
-		} else {
-			PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_NO_CONNECTION, true);
-		}
-
 	}
 
 	public void checkInstantUploadReceiverState() {
