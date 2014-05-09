@@ -282,8 +282,10 @@ public class Mapper {
 					for (GateReportImage gateReportImage : gateReportImages) {
 
 						String gateImageName = gateReportImage.getImageName();
-						String sql = "SELECT * FROM cjay_image WHERE image_name LIKE ?";
-						Cursor cursor = db.rawQuery(sql, new String[] { "%" + gateImageName });
+						String sql = "SELECT * FROM cjay_image WHERE image_name LIKE ? and type = ?";
+						Cursor cursor = db.rawQuery(sql,
+													new String[] { "%" + gateImageName,
+															Integer.toString(gateReportImage.getId()) });
 
 						// existed
 						if (cursor.moveToFirst()) { // update
@@ -295,6 +297,7 @@ public class Mapper {
 							Logger.Log("Update CJayImage UUID: " + uuid + " | Image name: " + imageName);
 
 						} else { // create
+
 							DataCenter.getInstance().addImage(ctx, gateReportImage, gateReportImage.getId(),
 																UUID.randomUUID().toString(), main.getUuid());
 							Logger.Log("Create new CJayImage: " + gateReportImage.getImageName());
