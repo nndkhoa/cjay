@@ -440,8 +440,20 @@ public class DataCenter {
 	}
 
 	public void clearListUpload(SQLiteDatabase db) {
-		String sql = "UPDATE container_session SET cleared = 1 WHERE cleared = 0 AND upload_confirmation = 1 ";
-		db.execSQL(sql);
+
+		String queryString = "SELECT * FROM csview WHERE upload_confirmation = 1 AND cleared = 0";
+		Cursor cursor = db.rawQuery(queryString, new String[] {});
+		while (cursor.moveToNext()) {
+
+			String uuid = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+			String sql = "UPDATE container_session SET cleared = 1 WHERE state = 4 AND upload_confirmation = 1 AND _id = "
+					+ Utils.sqlString(uuid);
+			db.execSQL(sql);
+		}
+
+		// String sql = "UPDATE container_session SET cleared = 1 WHERE cleared = 0 AND upload_confirmation = 1 ";
+		// db.execSQL(sql);
+
 	}
 
 	public void removeContainerFromListUpload(SQLiteDatabase db, String uuid) {

@@ -63,9 +63,11 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 
 	@OptionsItem(R.id.menu_clear_uploaded)
 	void clearUploadsMenuItemSelected() {
+
 		DataCenter.getInstance().clearListUpload(DataCenter.getDatabaseHelper(getActivity()).getWritableDatabase());
 		EventBus.getDefault().post(new LogUserActivityEvent("Clear list #upload"));
 		refresh();
+
 	}
 
 	@Override
