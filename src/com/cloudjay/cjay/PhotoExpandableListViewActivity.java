@@ -52,8 +52,6 @@ import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
 
 import de.greenrobot.event.EventBus;
-import de.keyboardsurfer.android.widget.crouton.Crouton;
-import de.keyboardsurfer.android.widget.crouton.Style;
 
 @EActivity(R.layout.activity_photo_expandablelistview)
 @OptionsMenu(R.menu.menu_photo_expandable_list_view)
