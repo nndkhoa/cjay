@@ -108,9 +108,16 @@ public class DataCenter {
 
 	}
 
-	// TODO: find image that its upload state == IN_PROGRESS
-	public void rollbackStuckImages() {
+	public void rollbackStuckImages(Context ctx) {
+		SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
+		String sql = "UPDATE cjay_image SET state = 1 WHERE state = 2";
+		db.execSQL(sql);
+	}
 
+	public void rollbackStuckContainers(Context ctx) {
+		SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
+		String sql = "UPDATE container_session SET state = 1 WHERE state = 2";
+		db.execSQL(sql);
 	}
 
 	@Background
@@ -559,8 +566,10 @@ public class DataCenter {
 
 	public void updateContainerStatus(Context ctx, int id, int status) {
 		try {
+
 			getDatabaseHelper(ctx).getContainerSessionDaoImpl().updateServerState(id, status);
 			EventBus.getDefault().post(new ContainerSessionChangedEvent());
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

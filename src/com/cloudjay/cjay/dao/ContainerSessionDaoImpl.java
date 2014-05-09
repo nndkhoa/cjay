@@ -18,6 +18,7 @@ import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.service.PhotoUploadService_;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.ContainerState;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringHelper;
@@ -223,10 +224,23 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 		} else {
 
 			ContainerSession result = queryForFirst(queryBuilder().where().eq(ContainerSession.FIELD_ID, id).prepare());
-
 			if (null != result) {
 				Logger.Log("Update ServerState of container " + result.getContainerId() + " to: " + state);
 				result.setServerState(state);
+
+				if (state == ContainerState.EXPORTED.getValue()) {
+
+					// update
+					Logger.w("Force export container " + result.getContainerId());
+					EventBus.getDefault().post(	new LogUserActivityEvent("#exported #duplication container "
+														+ result.getContainerId()));
+					result.setExport(true);
+					result.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+
+					// or force delete
+					// this.delete(result);
+				}
+
 				this.update(result);
 			}
 

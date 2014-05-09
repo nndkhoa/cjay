@@ -53,6 +53,7 @@ import com.cloudjay.cjay.adapter.GateExportContainerCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
+import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.events.PostLoadDataEvent;
@@ -384,6 +385,10 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	public void onDestroy() {
 		EventBus.getDefault().unregister(this);
 		super.onDestroy();
+	}
+
+	public void onEvent(ContainerSessionUpdatedEvent event) {
+		refresh();
 	}
 
 	public void onEvent(ContainerSessionEnqueueEvent event) {

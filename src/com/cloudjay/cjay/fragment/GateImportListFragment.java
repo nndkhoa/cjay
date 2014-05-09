@@ -41,6 +41,7 @@ import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
+import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.events.UploadStateRestoredEvent;
@@ -57,6 +58,7 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.UploadState;
 import com.cloudjay.cjay.util.UploadType;
 import com.cloudjay.cjay.view.AddContainerDialog;
 
@@ -235,6 +237,10 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 
 	}
 
+	public void onEvent(ContainerSessionUpdatedEvent event) {
+		refresh();
+	}
+
 	public void onEvent(UploadStateRestoredEvent event) {
 		refresh();
 	}
@@ -281,7 +287,7 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 			}
 		};
 	}
-	
+
 	@Override
 	public void onLoaderReset(Loader<Cursor> arg0) {
 		cursorAdapter.swapCursor(null);
