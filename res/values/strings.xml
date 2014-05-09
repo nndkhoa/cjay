@@ -56,7 +56,7 @@
     <string name="alert_ssl_timeout">Có vấn đề với SSL</string>
     <string name="alert_server_error">Máy chủ có vấn đề. Hãy thử lại lần sau</string>
     <string name="alert_no_issue_container">Container chưa được báo cáo đủ. Hãy kiểm tra lại.</string>
-    <string name="alert_cannot_fix_issue">Lỗi này chưa được phép sửa chữa</string>
+    <string name="alert_cannot_fix_issue">Lỗi này không được phép sửa chữa</string>
     <string name="alert_cannot_export_container">Container chưa được phép xuất</string>
     <string name="alert_invalid_container">Container không hợp lệ. Hãy kiểm tra lại.</string>
     <string name="alert_camera_preview">Ứng dụng không xử lý kịp. Hãy chụp chậm lại.</string>
