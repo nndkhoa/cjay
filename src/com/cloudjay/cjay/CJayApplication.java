@@ -75,7 +75,7 @@ public class CJayApplication extends Application {
 		Logger.getInstance().setDebuggable(debuggable);
 
 		// Setup API ROOT
-		CJayConstant.initApi(true);
+		CJayConstant.initApi(false);
 
 		// Ion.getDefault(getBaseContext()).configure()
 		// .setLogging("Network Module", Log.INFO);

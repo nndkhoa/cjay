@@ -274,7 +274,6 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 
-		hideMenuItems();
 		synchronized (this) {
 			if (null != mSelectedContainerSession) {
 

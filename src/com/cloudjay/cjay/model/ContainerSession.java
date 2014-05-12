@@ -330,12 +330,19 @@ public class ContainerSession {
 
 		switch (imageType) {
 
+			case CJayImage.TYPE_IMPORT:
+				for (CJayImage cJayImage : cJayImages) {
+					if (cJayImage.getType() == CJayImage.TYPE_IMPORT) return true;
+				}
+
+				return false;
+
 			case CJayImage.TYPE_EXPORT:
 
 				int exportImageCount = 0;
 				for (CJayImage cJayImage : cJayImages) {
 
-					Logger.Log(cJayImage.getImageName() + " -> " + cJayImage.getType());
+					// Logger.Log(cJayImage.getImageName() + " -> " + cJayImage.getType());
 					if (cJayImage.getType() == CJayImage.TYPE_EXPORT) {
 						exportImageCount++;
 

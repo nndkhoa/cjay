@@ -63,6 +63,8 @@ import com.cloudjay.cjay.util.UploadType;
 import com.cloudjay.cjay.view.AddContainerDialog;
 
 import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 @EFragment(R.layout.fragment_gate_import)
 @OptionsMenu(R.menu.menu_gate_import)
@@ -435,12 +437,21 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 
-		// Marked it's not temporary anymore
-		mSelectedContainerSession.setUploadType(UploadType.IN);
-		EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #IN container with ID "
-											+ mSelectedContainerSession.getContainerId() + "to upload queue"));
+		if (mSelectedContainerSession.isValidForUpload(getActivity(), CJayImage.TYPE_IMPORT)) {
 
-		CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
-		hideMenuItems();
+			// Marked it's not temporary anymore
+			mSelectedContainerSession.setUploadType(UploadType.IN);
+			EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #IN container with ID "
+												+ mSelectedContainerSession.getContainerId() + "to upload queue"));
+
+			CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
+			hideMenuItems();
+
+		} else {
+
+			Crouton.cancelAllCroutons();
+			Crouton.makeText(getActivity(), R.string.alert_no_issue_container, Style.ALERT).show();
+		}
+
 	}
 }

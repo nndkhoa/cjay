@@ -405,11 +405,19 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		if (null != mContainerSession) {
 
 			if (sourceTag.equals(GateImportListFragment.LOG_TAG)) {
-				mContainerSession.setUploadType(UploadType.IN);
 
-				// mContainerSession.setOnLocal(false);
-				EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #IN container with ID "
-													+ mContainerSession.getContainerId() + "to upload queue"));
+				if (mContainerSession.isValidForUpload(context, CJayImage.TYPE_IMPORT)) {
+
+					mContainerSession.setUploadType(UploadType.IN);
+
+					// mContainerSession.setOnLocal(false);
+					EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #IN container with ID "
+														+ mContainerSession.getContainerId() + "to upload queue"));
+
+				} else {
+					showCrouton(R.string.alert_no_issue_container);
+					return;
+				}
 
 			} else {
 

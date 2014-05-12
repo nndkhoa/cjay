@@ -204,6 +204,12 @@ public class ContainerUploadIntentService extends IntentService implements Count
 		// Restore container upload state to NORMAL if upload_type = NONE (temporary upload at GateImport)
 		synchronized (containerSession) {
 
+			try {
+				containerSessionDaoImpl.refresh(containerSession);
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+
 			switch (uploadType) {
 				case NONE:
 					if (isInterruptedByOfficialUpload) {
