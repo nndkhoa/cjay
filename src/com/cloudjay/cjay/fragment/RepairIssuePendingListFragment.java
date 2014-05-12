@@ -106,6 +106,9 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 	@Trace(level = Log.WARN)
 	void imageItemClicked(int position) {
 		mSelectedIssue = mFeedsAdapter.getItem(position);
+		
+		if (mSelectedIssue == null || !mSelectedIssue.isFixAllowed()) {	return; }
+		
 		mFeedListView.setItemChecked(-1, true);
 
 		if (mSelectedIssue.isFixAllowed()) {
@@ -185,19 +188,15 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 			}
 		});
 		feedsDict.addDynamicImageField(R.id.issue_warning, new StringExtractor<Issue>() {
-
 			@Override
 			public String getStringValue(Issue item, int position) {
 				return String.valueOf(item.isFixAllowed());
 			}
-
 		}, new DynamicImageLoader() {
-
 			@Override
 			public void loadImage(String isFixedAllow, ImageView view) {
 				view.setVisibility(Boolean.parseBoolean(isFixedAllow) ? View.GONE : View.VISIBLE);
 			}
-
 		});
 
 		mFeedsAdapter = new FunDapter<Issue>(getActivity(), containers, R.layout.list_item_issue, feedsDict);

@@ -52,8 +52,6 @@ import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
 
 import de.greenrobot.event.EventBus;
-import de.keyboardsurfer.android.widget.crouton.Crouton;
-import de.keyboardsurfer.android.widget.crouton.Style;
 
 @EActivity(R.layout.activity_photo_expandablelistview)
 @OptionsMenu(R.menu.menu_photo_expandable_list_view)
@@ -162,7 +160,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 			e.printStackTrace();
 		}
 
-		if (mContainerSession.getServerContainerState() == ContainerState.AVAILABLE || mCJayImageTypeB < 0) {
+		if (mViewMode == MODE_UPLOAD && mContainerSession.getServerContainerState() == ContainerState.AVAILABLE) {
 			mNonAvTextView.setVisibility(View.GONE);
 		} else {
 			mNonAvTextView.setVisibility(View.VISIBLE);
@@ -291,9 +289,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 			LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) gridView.getLayoutParams();
 			int gridViewWidth = gridView.getMeasuredWidth() > 0 ? gridView.getMeasuredWidth()
 					: gridView.getEmptyView().getMeasuredWidth();
-			// p.height = gridViewWidth / mNumCols * (int) (1.0 * (cursor.getCount() + 1) / mNumCols + 0.5);
 			p.height = gridViewWidth / mNumCols * (int) (1.0 * (cursor.getCount()) / mNumCols + 0.5);
-
 			gridView.setLayoutParams(p);
 		}
 	}
