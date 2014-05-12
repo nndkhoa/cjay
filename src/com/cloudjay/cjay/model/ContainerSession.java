@@ -276,7 +276,7 @@ public class ContainerSession {
 	}
 
 	public String getRawCheckOutTime() {
-		return check_out_time;
+		return Utils.stripNull(check_out_time);
 	}
 
 	public int getUploadProgress() {

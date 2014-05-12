@@ -28,20 +28,23 @@ public class AuditReportItem {
 	public AuditReportItem(Issue issue) {
 
 		if (null != issue) {
+
 			setId(issue.getId());
 			setDamageId(issue.getDamageCode().getId());
 			setRepairId(issue.getRepairCode().getId());
 			setComponentId(issue.getComponentCode().getId());
+
+			setLocationCode(issue.getLocationCode());
 			setLength(issue.getLength());
 			setHeight(issue.getHeight());
 			setQuantity(issue.getQuantity());
-			setLocationCode(issue.getLocationCode());
 
 			ArrayList<AuditReportImage> auditReportImages = new ArrayList<AuditReportImage>();
 			Collection<CJayImage> cJayImages = issue.getCJayImages();
-			if (null != cJayImages) {
-				for (CJayImage cJayImage : cJayImages) {
 
+			if (null != cJayImages) {
+
+				for (CJayImage cJayImage : cJayImages) {
 					if (cJayImage.getType() == CJayImage.TYPE_AUDIT || cJayImage.getType() == CJayImage.TYPE_REPAIRED) {
 						AuditReportImage image = new AuditReportImage(cJayImage.getId(), cJayImage.getType(),
 																		cJayImage.getTimePosted(),

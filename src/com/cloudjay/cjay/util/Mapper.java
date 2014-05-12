@@ -168,7 +168,7 @@ public class Mapper {
 	}
 
 	public TmpContainerSession toTmpContainerSession(Context ctx, ContainerSession containerSession,
-														boolean officialUpload) {
+														boolean officialUpload) throws NullSessionException {
 
 		String containerId = containerSession.getContainerId();
 		String checkoutTime = containerSession.getRawCheckOutTime();
@@ -224,15 +224,24 @@ public class Mapper {
 				tmpContainerSession.setImageIdPath(gateReportImages.get(0).getImageName());
 			}
 
-			// Create `audit_report_items`
-			List<AuditReportItem> auditReportItems = new ArrayList<AuditReportItem>();
-			Collection<Issue> issues = containerSession.getIssues();
-			if (null != issues) {
-				for (Issue issue : issues) {
-					auditReportItems.add(new AuditReportItem(issue));
+			CJaySession session = CJaySession.restore(ctx);
+			if (session == null) throw new NullSessionException();
+
+			// only convert if user role != gate
+			// NOTE: xảy ra lỗi khi deploy vào đợt đầu tháng 5/2014, không new được audit_report_items
+			// < do thiếu hình giám định >
+			if (session.getUserRole() != UserRole.GATE_KEEPER.getValue()) {
+
+				// Create `audit_report_items`
+				List<AuditReportItem> auditReportItems = new ArrayList<AuditReportItem>();
+				Collection<Issue> issues = containerSession.getIssues();
+				if (null != issues) {
+					for (Issue issue : issues) {
+						auditReportItems.add(new AuditReportItem(issue));
+					}
 				}
+				tmpContainerSession.setAuditReportItems(auditReportItems);
 			}
-			tmpContainerSession.setAuditReportItems(auditReportItems);
 
 			// Set container Id Image
 			// TODO: only handle for app Auditor
@@ -250,7 +259,8 @@ public class Mapper {
 
 	}
 
-	public TmpContainerSession toTmpContainerSession(Context ctx, ContainerSession containerSession) {
+	public TmpContainerSession
+			toTmpContainerSession(Context ctx, ContainerSession containerSession) throws NullSessionException {
 		return toTmpContainerSession(ctx, containerSession, true);
 	}
 

@@ -71,7 +71,7 @@ public class ContainerUploadIntentService extends IntentService implements Count
 		UploadType uploadType = UploadType.values()[containerSession.getUploadType()];
 		String response = "";
 
-		containerSession.setUploadState(UploadState.IN_PROGRESS);
+		// containerSession.setUploadState(UploadState.IN_PROGRESS);
 
 		// Convert ContainerSession to TmpContainerSession for uploading
 		TmpContainerSession uploadItem = null;
@@ -98,11 +98,18 @@ public class ContainerUploadIntentService extends IntentService implements Count
 
 		try {
 
+			containerSession.setUploadState(UploadState.IN_PROGRESS);
+
 			response = CJayClient.getInstance().postContainerSession(getApplicationContext(), uploadItem);
 			Logger.Log("Response from server: " + response);
 
-		} catch (NoConnectionException e) {
+			containerSession.setUploadState(UploadState.COMPLETED);
+			Logger.Log("Upload successfully container " + containerSession.getContainerId() + " | " + uploadType.name());
+			DataCenter.getDatabaseHelper(getApplicationContext())
+						.addUsageLog(	"#upload #successfully container " + containerSession.getContainerId() + " | "
+												+ uploadType.name());
 
+		} catch (NoConnectionException e) {
 			Logger.Log("No Internet Connection");
 			DataCenter.getDatabaseHelper(getApplicationContext())
 						.addUsageLog("No connection | #rollback | Container: " + containerSession.getContainerId());
@@ -170,22 +177,29 @@ public class ContainerUploadIntentService extends IntentService implements Count
 		}
 
 		try {
+
 			// convert back then save containerSession
 			Mapper.getInstance().update(getApplicationContext(), response, containerSession);
+
 		} catch (SQLException e) {
+
+			EventBus.getDefault()
+					.post(	new LogUserActivityEvent((containerSession.getContainerId()
+									+ " | #SQLerror when update #response data | Stack trace: " + e.getMessage())));
 			e.printStackTrace();
+
 		} catch (Exception e) {
 			EventBus.getDefault()
 					.post(	new LogUserActivityEvent((containerSession.getContainerId()
-									+ " | #error when update response data | Stack trace: " + e.getMessage())));
+									+ " | #error when update #response data | Stack trace: " + e.getMessage())));
 			e.printStackTrace();
 		}
 
-		containerSession.setUploadState(UploadState.COMPLETED);
-		Logger.Log("Upload successfully container " + containerSession.getContainerId() + " | " + uploadType.name());
-		DataCenter.getDatabaseHelper(getApplicationContext()).addUsageLog(	"#upload #successfully container "
-																					+ containerSession.getContainerId()
-																					+ " | " + uploadType.name());
+		// containerSession.setUploadState(UploadState.COMPLETED);
+		// Logger.Log("Upload successfully container " + containerSession.getContainerId() + " | " + uploadType.name());
+		// DataCenter.getDatabaseHelper(getApplicationContext()).addUsageLog( "#upload #successfully container "
+		// + containerSession.getContainerId()
+		// + " | " + uploadType.name());
 
 		// Restore container upload state to NORMAL if upload_type = NONE (temporary upload at GateImport)
 		synchronized (containerSession) {
