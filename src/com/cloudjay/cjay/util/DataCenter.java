@@ -5,11 +5,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EBean.Scope;
 import org.androidannotations.annotations.Trace;
 
+import android.R.id;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
@@ -800,6 +802,16 @@ public class DataCenter {
 					Logger.Log("Total items: " + tmpContainerSessions.size());
 
 					for (TmpContainerSession tmpSession : tmpContainerSessions) {
+
+						if (tmpSession.getStatus() == ContainerState.EXPORTED.getValue()) {
+
+							// find and delete this item
+							if (tmpSession.getId() != 0) {
+								DataCenter.getInstance().removeContainerSession(ctx, tmpSession.getId());
+								// db.delete("container_session", "id = " + tmpSession.getId(), null);
+							}
+							break;
+						}
 
 						ContainerSession containerSession = null;
 						Cursor cursor = db.rawQuery("select * from container_session where id = ?",
