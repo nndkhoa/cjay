@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.UUID;
 
-import android.R.integer;
 import android.content.Context;
 import android.text.TextUtils;
 

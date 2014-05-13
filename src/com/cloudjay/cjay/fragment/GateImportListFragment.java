@@ -58,7 +58,6 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.StringHelper;
-import com.cloudjay.cjay.util.UploadState;
 import com.cloudjay.cjay.util.UploadType;
 import com.cloudjay.cjay.view.AddContainerDialog;
 

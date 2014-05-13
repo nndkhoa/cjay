@@ -160,7 +160,11 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 			e.printStackTrace();
 		}
 
-		if (mViewMode == MODE_UPLOAD && mContainerSession.getServerContainerState() == ContainerState.AVAILABLE) {
+		// TODO: để điều kiện này thì bên trong GateImport cũng sẽ thấy?
+		// if (mViewMode == MODE_UPLOAD && mContainerSession.getServerContainerState() == ContainerState.AVAILABLE)
+		// {
+
+		if (mContainerSession.getServerContainerState() == ContainerState.AVAILABLE || mCJayImageTypeB < 0) {
 			mNonAvTextView.setVisibility(View.GONE);
 		} else {
 			mNonAvTextView.setVisibility(View.VISIBLE);
@@ -398,6 +402,14 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
+
+		try {
+			containerSessionDaoImpl.refresh(mContainerSession);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			showCrouton(R.string.alert_try_again);
+		}
+
 		if (null != mContainerSession) {
 
 			if (sourceTag.equals(GateImportListFragment.LOG_TAG)) {
@@ -416,13 +428,6 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 				}
 
 			} else {
-
-				try {
-					containerSessionDaoImpl.refresh(mContainerSession);
-				} catch (SQLException e) {
-					e.printStackTrace();
-					showCrouton(R.string.alert_try_again);
-				}
 
 				if (mContainerSession.isValidForUpload(context, CJayImage.TYPE_EXPORT)) {
 

@@ -1,6 +1,8 @@
 package com.cloudjay.cjay.view;
 
 import android.annotation.SuppressLint;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -25,6 +27,7 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Utils;
 
 @SuppressLint("DefaultLocale")
@@ -136,6 +139,15 @@ public class AddContainerDialog extends SherlockDialogFragment {
 
 				mContainerId = mContainerEditText.getText().toString().toUpperCase();
 				mOperatorName = mOperatorEditText.getText().toString();
+
+				SQLiteDatabase db = DataCenter.getDatabaseHelper(getActivity()).getWritableDatabase();
+				String sql = "select * from csview where container_id like ?";
+				Cursor cursor = db.rawQuery(sql, new String[] { mContainerId });
+
+				if (cursor.moveToFirst()) {
+					mContainerEditText.setError(getString(R.string.dialog_container_existed));
+					return;
+				}
 
 				if (!Utils.isContainerIdValid(mContainerId)) {
 					mContainerEditText.setError(getString(R.string.dialog_container_id_invalid));

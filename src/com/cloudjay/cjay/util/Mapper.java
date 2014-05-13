@@ -2,10 +2,8 @@ package com.cloudjay.cjay.util;
 
 import java.lang.reflect.Type;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,7 +13,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.provider.ContactsContract.Contacts.Data;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -23,7 +20,6 @@ import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
-import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.model.AuditReportImage;
 import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
@@ -434,22 +430,34 @@ public class Mapper {
 				}
 
 				// Update other fields
-				ContentValues csValues = new ContentValues();
-				csValues.put("check_in_time", tmp.getCheckInTime());
-				csValues.put("check_out_time", tmp.getCheckOutTime());
-				csValues.put("_id", main.getUuid());
-				csValues.put("id", tmp.getId());
-				csValues.put("server_state", tmp.getStatus());
+				String sqlString = "";
+
+				// ContentValues csValues = new ContentValues();
+				// csValues.put("check_in_time", tmp.getCheckInTime());
+				// csValues.put("check_out_time", tmp.getCheckOutTime());
+				// csValues.put("_id", main.getUuid());
+				// csValues.put("id", tmp.getId());
+				// csValues.put("server_state", tmp.getStatus());
 
 				if (updateImageIdPath) {
 					if (!TextUtils.isEmpty(tmp.getImageIdPath())
 							&& !tmp.getImageIdPath()
 									.matches("^https://storage\\.googleapis\\.com/storage-cjay\\.cloudjay\\.com/\\s+$")) {
-						csValues.put("image_id_path", tmp.getImageIdPath());
+
+						sqlString = "UPDATE container_session SET id = " + tmp.getId() + ", check_in_time = '"
+								+ tmp.getCheckInTime() + "', image_id_path = '" + tmp.getImageIdPath()
+								+ "', server_state = " + tmp.getStatus() + " WHERE _id = '" + main.getUuid() + "'";
+
+						// csValues.put("image_id_path", tmp.getImageIdPath());
 					}
+				} else {
+					sqlString = "UPDATE container_session SET id = " + tmp.getId() + ", check_in_time = '"
+							+ tmp.getCheckInTime() + "', server_state = " + tmp.getStatus() + " WHERE _id = '"
+							+ main.getUuid() + "'";
 				}
 
-				db.insertWithOnConflict("container_session", null, csValues, SQLiteDatabase.CONFLICT_REPLACE);
+				db.execSQL(sqlString);
+				// db.insertWithOnConflict("container_session", null, csValues, SQLiteDatabase.CONFLICT_REPLACE);
 
 				// Post ContainerSessionUpdatedEvent
 				EventBus.getDefault().post(new ContainerSessionChangedEvent());

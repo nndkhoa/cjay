@@ -9,7 +9,6 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.Issue;
-import com.cloudjay.cjay.model.Operator;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 

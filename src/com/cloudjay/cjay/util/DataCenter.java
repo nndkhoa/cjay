@@ -5,8 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
-
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EBean.Scope;

@@ -17,12 +17,9 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Toast;
-
 import com.actionbarsherlock.app.SherlockFragment;
 import com.ami.fundapter.BindDictionary;
 import com.ami.fundapter.FunDapter;
@@ -106,9 +103,9 @@ public class RepairIssuePendingListFragment extends SherlockFragment {
 	@Trace(level = Log.WARN)
 	void imageItemClicked(int position) {
 		mSelectedIssue = mFeedsAdapter.getItem(position);
-		
-		if (mSelectedIssue == null || !mSelectedIssue.isFixAllowed()) {	return; }
-		
+
+		// if (mSelectedIssue == null || !mSelectedIssue.isFixAllowed()) { return; }
+
 		mFeedListView.setItemChecked(-1, true);
 
 		if (mSelectedIssue.isFixAllowed()) {
