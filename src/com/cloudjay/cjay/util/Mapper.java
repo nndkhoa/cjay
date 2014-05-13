@@ -432,6 +432,16 @@ public class Mapper {
 				// Update other fields
 				String sqlString = "";
 
+				// update container_id
+				if (tmp.getContainerId() != main.getContainerId()) {
+
+					sqlString = "UPDATE container SET container_id = " + tmp.getContainerId()
+							+ " WHERE container_id LIKE " + main.getContainerId();
+					db.execSQL(sqlString);
+
+					Logger.Log("Update container_id from " + main.getContainerId() + " to " + tmp.getContainerId());
+				}
+
 				// ContentValues csValues = new ContentValues();
 				// csValues.put("check_in_time", tmp.getCheckInTime());
 				// csValues.put("check_out_time", tmp.getCheckOutTime());
