@@ -164,6 +164,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 			}
 		});
 
+		// TODO: can optimize, by keep it already alive inside memory
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance().getListOperators(getActivity());
 
 		if (mState == STATE_REPORTING) {

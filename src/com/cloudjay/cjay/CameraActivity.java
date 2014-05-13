@@ -55,7 +55,6 @@ import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
-import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.events.UploadStateRestoredEvent;
 import com.cloudjay.cjay.fragment.GateExportListFragment;
 import com.cloudjay.cjay.fragment.GateImportListFragment;
@@ -66,6 +65,7 @@ import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJaySession;
+import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringHelper;
@@ -753,6 +753,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			// Upload image
 			uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
 
+			DataCenter.getDatabaseHelper(this).addUsageLog(	mContainerSession.getContainerId() + " | Captured "
+																	+ fileName);
+
 			if (capturedBitmap != null) {
 				capturedBitmap.recycle();
 				capturedBitmap = null;
@@ -988,8 +991,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-			EventBus.getDefault().post(	new LogUserActivityEvent("#error when update captured image | "
-												+ mContainerSession.getContainerId()));
+
+			DataCenter.getDatabaseHelper(this).addUsageLog(	"#error when update captured image | "
+																	+ mContainerSession.getContainerId());
 			Logger.e("#error when update captured image | " + mContainerSession.getContainerId());
 		}
 
@@ -1009,10 +1013,12 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@UiThread
 	public void showIssueReportDialog(String cjayImageUuid) {
+
 		if (mSourceTag.equals("AuditorContainerActivity")) {
 			CJayApplication.openReportDialog(this, cjayImageUuid, mContainerSessionUUID);
 		} else if (mSourceTag.equals("RepairIssuePendingListFragment")) {
 			CJayApplication.openReportDialog(this, cjayImageUuid, mContainerSessionUUID);
 		}
+
 	}
 }

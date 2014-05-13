@@ -43,7 +43,6 @@ import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
-import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.events.UploadStateRestoredEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Container;
@@ -223,6 +222,8 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 					e.printStackTrace();
 				}
 
+				DataCenter.getDatabaseHelper(getActivity()).addUsageLog("Create new container: "
+																				+ containerSession.getContainerId());
 				EventBus.getDefault().post(new ContainerSessionChangedEvent(containerSession));
 				CJayApplication.openCamera(activity, containerSession, CJayImage.TYPE_IMPORT, LOG_TAG);
 
@@ -440,8 +441,9 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 
 			// Marked it's not temporary anymore
 			mSelectedContainerSession.setUploadType(UploadType.IN);
-			EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #IN container with ID "
-												+ mSelectedContainerSession.getContainerId() + "to upload queue"));
+			DataCenter.getDatabaseHelper(getActivity())
+						.addUsageLog(	"Prepare to add #IN container with ID "
+												+ mSelectedContainerSession.getContainerId() + "to upload queue");
 
 			CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
 			hideMenuItems();
