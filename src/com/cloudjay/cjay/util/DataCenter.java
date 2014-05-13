@@ -807,6 +807,7 @@ public class DataCenter {
 
 							// find and delete this item
 							if (tmpSession.getId() != 0) {
+								Logger.Log("Delete container session: " + tmpSession.getContainerId() + " | Id: ");
 								DataCenter.getInstance().removeContainerSession(ctx, tmpSession.getId());
 								// db.delete("container_session", "id = " + tmpSession.getId(), null);
 							}

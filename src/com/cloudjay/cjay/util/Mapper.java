@@ -290,7 +290,7 @@ public class Mapper {
 						String sql = "SELECT * FROM cjay_image WHERE image_name LIKE ? and type = ?";
 						Cursor cursor = db.rawQuery(sql,
 													new String[] { "%" + gateImageName,
-															Integer.toString(gateReportImage.getId()) });
+															Integer.toString(gateReportImage.getType()) });
 
 						// existed
 						if (cursor.moveToFirst()) { // update
@@ -433,10 +433,10 @@ public class Mapper {
 				String sqlString = "";
 
 				// update container_id
-				if (tmp.getContainerId() != main.getContainerId()) {
+				if (!tmp.getContainerId().equals(main.getContainerId())) {
 
-					sqlString = "UPDATE container SET container_id = " + tmp.getContainerId()
-							+ " WHERE container_id LIKE " + main.getContainerId();
+					sqlString = "UPDATE container SET container_id = " + Utils.sqlString(tmp.getContainerId())
+							+ " WHERE container_id = " + Utils.sqlString(main.getContainerId());
 					db.execSQL(sqlString);
 
 					Logger.Log("Update container_id from " + main.getContainerId() + " to " + tmp.getContainerId());
