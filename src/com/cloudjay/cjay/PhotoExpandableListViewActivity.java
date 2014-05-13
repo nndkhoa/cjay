@@ -419,8 +419,9 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 					mContainerSession.setUploadType(UploadType.IN);
 
 					// mContainerSession.setOnLocal(false);
-					EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #IN container with ID "
-														+ mContainerSession.getContainerId() + "to upload queue"));
+					DataCenter.getDatabaseHelper(this).addUsageLog(	"Prepare to add #IN container with ID "
+																			+ mContainerSession.getContainerId()
+																			+ "to upload queue");
 
 				} else {
 					showCrouton(R.string.alert_no_issue_container);
@@ -435,8 +436,10 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 					mContainerSession.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 
 					Logger.Log("Prepare to upload EXPORT container " + mContainerSession.getContainerId());
-					EventBus.getDefault().post(	new LogUserActivityEvent("Prepare to add #OUT container with ID "
-														+ mContainerSession.getContainerId() + "to upload queue"));
+					DataCenter.getDatabaseHelper(this).addUsageLog(	"Prepare to add #OUT container with ID "
+																			+ mContainerSession.getContainerId()
+																			+ "to upload queue");
+
 				} else {
 					showCrouton(R.string.alert_no_issue_container);
 					return;

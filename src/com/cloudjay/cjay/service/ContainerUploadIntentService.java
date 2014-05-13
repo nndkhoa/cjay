@@ -183,15 +183,19 @@ public class ContainerUploadIntentService extends IntentService implements Count
 
 		} catch (SQLException e) {
 
-			EventBus.getDefault()
-					.post(	new LogUserActivityEvent((containerSession.getContainerId()
-									+ " | #SQLerror when update #response data | Stack trace: " + e.getMessage())));
+			DataCenter.getDatabaseHelper(getApplicationContext())
+						.addUsageLog(	containerSession.getContainerId()
+												+ " | #SQLerror when update #response data | Stack trace: "
+												+ e.getMessage());
 			e.printStackTrace();
 
 		} catch (Exception e) {
-			EventBus.getDefault()
-					.post(	new LogUserActivityEvent((containerSession.getContainerId()
-									+ " | #error when update #response data | Stack trace: " + e.getMessage())));
+
+			DataCenter.getDatabaseHelper(getApplicationContext())
+						.addUsageLog(	containerSession.getContainerId()
+												+ " | #error when update #response data | Stack trace: "
+												+ e.getMessage());
+
 			e.printStackTrace();
 		}
 

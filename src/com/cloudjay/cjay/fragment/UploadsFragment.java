@@ -65,7 +65,7 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 	void clearUploadsMenuItemSelected() {
 
 		DataCenter.getInstance().clearListUpload(DataCenter.getDatabaseHelper(getActivity()).getWritableDatabase());
-		EventBus.getDefault().post(new LogUserActivityEvent("Clear list #upload"));
+		DataCenter.getDatabaseHelper(getActivity()).addUsageLog("Clear list #upload");
 		refresh();
 
 	}
@@ -165,7 +165,7 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 			case R.id.iv_upload_result:
 				Logger.Log("User click on retry button");
 
-				EventBus.getDefault().post(new LogUserActivityEvent(containerId + " | User #retry manually"));
+				DataCenter.getDatabaseHelper(getActivity()).addUsageLog(containerId + " | User #retry manually");
 				if (uploadState == UploadState.ERROR) {
 					DataCenter.getInstance().rollback(	DataCenter.getDatabaseHelper(getActivity())
 																	.getWritableDatabase(), containerUuid);
