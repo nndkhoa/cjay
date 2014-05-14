@@ -432,9 +432,19 @@ public class Mapper {
 				// Update other fields
 				String sqlString = "";
 
+				// update operator
+				if (!tmp.getOperatorCode().equals(main.getOperatorCode())) {
+
+					sqlString = "UPDATE container SET operator_id = " + tmp.getOperatorId() + " WHERE container_id = "
+							+ Utils.sqlString(main.getContainerId());
+
+					db.execSQL(sqlString);
+					Logger.Log("Update operator from " + main.getOperatorCode() + " to " + tmp.getOperatorCode());
+
+				}
+
 				// update container_id
 				if (!tmp.getContainerId().equals(main.getContainerId())) {
-
 					sqlString = "UPDATE container SET container_id = " + Utils.sqlString(tmp.getContainerId())
 							+ " WHERE container_id = " + Utils.sqlString(main.getContainerId());
 					db.execSQL(sqlString);

@@ -827,6 +827,9 @@ public class DataCenter {
 
 							if (TextUtils.isEmpty(uuid)) {
 								Logger.e("WTF? ContainerSession existed but cannot find _id");
+								DataCenter.getDatabaseHelper(ctx)
+											.addUsageLog(	tmpSession.getContainerId()
+																	+ " | Container existed but cannot find it in database.");
 							} else {
 								Mapper.getInstance().update(ctx, tmpSession, uuid);
 							}
