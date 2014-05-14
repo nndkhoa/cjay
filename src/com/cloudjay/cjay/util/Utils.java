@@ -403,6 +403,7 @@ public class Utils {
 			default:
 				break;
 		}
+		DataCenter.getDatabaseHelper(context).addUsageLog("Error | Cannot start Home Activity");
 		return null;
 	}
 

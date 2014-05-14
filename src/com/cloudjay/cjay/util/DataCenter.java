@@ -12,6 +12,7 @@ import org.androidannotations.annotations.EBean.Scope;
 import org.androidannotations.annotations.Trace;
 
 import android.R.id;
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
@@ -215,8 +216,6 @@ public class DataCenter {
 						updateListContainerSessions(ctx, CJayClient.REQUEST_TYPE_MODIFIED, InvokeType.FOLLOWING);
 					}
 				}
-
-				// TODO: Remove container session that exported
 
 				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, false);
 
@@ -762,6 +761,7 @@ public class DataCenter {
 		PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, true);
 
 		try {
+
 			// 2013-11-10T21:05:24 (do not have timezone info)
 			// SimpleDateFormat dateFormat = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 			// String nowString = dateFormat.format(new Date());
@@ -771,6 +771,8 @@ public class DataCenter {
 																				.getContainerSessionDaoImpl();
 
 			// 3. Update list ContainerSessions
+
+			int totalItems = 0;
 			int page = 1;
 			String nextUrl = "";
 			String lastUpdate = "";
@@ -799,19 +801,27 @@ public class DataCenter {
 					requestedTime = result.getRequestedTime();
 
 					List<TmpContainerSession> tmpContainerSessions = result.getResults();
+					totalItems += tmpContainerSessions.size();
+
 					Logger.Log("Total items: " + tmpContainerSessions.size());
+					int count = 0;
 
 					for (TmpContainerSession tmpSession : tmpContainerSessions) {
 
+						count++;
+						Logger.Log(count + ". Process container " + tmpSession.getContainerId());
+
 						if (tmpSession.getStatus() == ContainerState.EXPORTED.getValue()) {
+							Logger.w(tmpSession.getContainerId() + " has status = EXPORTED");
 
 							// find and delete this item
 							if (tmpSession.getId() != 0) {
+
 								Logger.Log("Delete container session: " + tmpSession.getContainerId() + " | Id: ");
 								DataCenter.getInstance().removeContainerSession(ctx, tmpSession.getId());
-								// db.delete("container_session", "id = " + tmpSession.getId(), null);
+								continue;
 							}
-							break;
+
 						}
 
 						ContainerSession containerSession = null;
@@ -834,7 +844,7 @@ public class DataCenter {
 								Mapper.getInstance().update(ctx, tmpSession, uuid);
 							}
 
-							break;
+							continue;
 
 						} else { // --> create
 							Logger.Log("Create new container session:" + tmpSession.getContainerId());
@@ -861,13 +871,17 @@ public class DataCenter {
 				}
 
 				Logger.Log("Requested Time: " + requestedTime);
-				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE, requestedTime);
+				if (totalItems > 0) {
+					PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
+													requestedTime);
+				}
 
 				long delta = System.currentTimeMillis() - beginParseTime;
 				Logger.w("--> One round duration: " + Long.toString(delta));
 
 			} while (!TextUtils.isEmpty(nextUrl));
 
+			getDatabaseHelper(ctx).addUsageLog("Update List CS at " + requestedTime + " | Total Items: " + totalItems);
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 
 			// chưa được gán INITIALIZED
@@ -876,18 +890,25 @@ public class DataCenter {
 			}
 
 		} catch (NoConnectionException e) {
+
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			throw e;
+
 		} catch (SQLException e) {
+
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			throw e;
+
 		} catch (NullSessionException e) {
 
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			throw e;
+
 		} catch (Exception e) {
+
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			e.printStackTrace();
+
 		}
 		long difference = System.currentTimeMillis() - startTime;
 		Logger.w("---> Total time: " + Long.toString(difference));

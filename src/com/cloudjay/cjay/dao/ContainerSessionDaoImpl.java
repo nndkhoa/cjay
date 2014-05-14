@@ -584,7 +584,7 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 
 		for (ContainerSession containerSession : containerSessions) {
 
-			// imma return if it's temporary container
+			// imma return if it's TEMP container
 			// and it should only activate in Gate app
 			if (containerSession.isOnLocal() && containerSession.getUploadType() == UploadType.NONE.getValue()) {
 
@@ -604,6 +604,8 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 
 						String key = cJayImage.getUuid();
 						Logger.Log(cJayImage.getImageName() + " | " + UploadState.values()[uploadState]);
+
+						// Check if this image is uploaded or not
 						if (uploadState == CJayImage.STATE_NONE && cJayImage.getUri().startsWith("http")) {
 
 							Logger.w("This cjay image is already stay in server.");
@@ -611,7 +613,10 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 									+ " WHERE " + CJayImage.FIELD_UUID + " = '" + key + "'";
 
 							db.execSQL(sql);
-							break;
+
+							// move to next item
+							continue;
+							// break;
 						}
 
 						// Increase retry count
@@ -623,7 +628,8 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 
 							Logger.Log(containerSession.getContainerId() + " | Retry count: " + Integer.toString(count));
 
-							// Retry to upload cjayimage
+							// Retry to upload cjay image if retry count is greater than THRESHOLD and
+							// PhotoQueue is not running
 							if (count >= CJayConstant.RETRY_THRESHOLD
 									&& !Utils.isRunning(ctx, PhotoUploadService_.class.getName())) {
 
@@ -658,9 +664,9 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 						break;
 					}
 				}
-
 			}
 
+			// if all cjay images of this container session are uploaded --> return this container
 			if (flag == true) {
 				result = containerSession;
 				Logger.Log("Result: " + containerSession.getContainerId());
