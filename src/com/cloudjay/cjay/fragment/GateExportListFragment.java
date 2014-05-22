@@ -280,9 +280,14 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 				if (mSelectedContainerSession.isValidForUpload(getActivity(), CJayImage.TYPE_EXPORT)) {
 
-					mSelectedContainerSession.setUploadType(UploadType.OUT);
-					mSelectedContainerSession.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+					// mSelectedContainerSession.setUploadType(UploadType.OUT);
+					// mSelectedContainerSession.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 
+					String currentTime = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+					mSelectedContainerSession.updateField(	getActivity(), ContainerSession.FIELD_UPLOAD_TYPE,
+															Integer.toString(UploadType.OUT.getValue()));
+					mSelectedContainerSession.updateField(	getActivity(), ContainerSession.FIELD_CHECK_OUT_TIME,
+															currentTime);
 					DataCenter.getDatabaseHelper(getActivity())
 								.addUsageLog(	mSelectedContainerSession.getContainerId()
 														+ " | Prepare to add #OUT container with ID to upload queue");

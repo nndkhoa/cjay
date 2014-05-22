@@ -276,7 +276,9 @@ public class RepairContainerFixedListFragment extends SherlockFragment implement
 		synchronized (this) {
 			if (mSelectedContainerSession != null) {
 
-				mSelectedContainerSession.setUploadType(UploadType.REPAIR);
+				// mSelectedContainerSession.setUploadType(UploadType.REPAIR);
+				mSelectedContainerSession.updateField(	getActivity(), ContainerSession.FIELD_UPLOAD_TYPE,
+														Integer.toString(UploadType.REPAIR.getValue()));
 				CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
 				hideMenuItems();
 			}

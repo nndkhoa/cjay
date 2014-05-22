@@ -279,18 +279,24 @@ public class CJayApplication extends Application {
 
 		Logger.w("Checkout Time: " + containerSession.getRawCheckOutTime());
 		ContainerSessionDaoImpl containerSessionDaoImpl = null;
-
-		// User confirm upload
-		containerSession.setUploadConfirmation(true);
-		containerSession.setUploadState(UploadState.WAITING);
-
 		if (null == containerSessionDaoImpl) {
 			try {
 				containerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(ctx)
 													.getContainerSessionDaoImpl();
+				containerSessionDaoImpl.refresh(containerSession);
+
+				// User confirm upload
+				containerSession.setUploadConfirmation(true);
+				containerSession.setUploadState(UploadState.WAITING);
+
 				containerSessionDaoImpl.update(containerSession);
 			} catch (SQLException e) {
+
+				DataCenter.getDatabaseHelper(ctx).addUsageLog(	containerSession.getContainerId()
+																		+ " | Error set state and user_confirmation");
 				e.printStackTrace();
+
+				return;
 			}
 		}
 

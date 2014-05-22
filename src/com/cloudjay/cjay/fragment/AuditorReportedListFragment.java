@@ -179,7 +179,9 @@ public class AuditorReportedListFragment extends SherlockFragment {
 	void uploadMenuItemSelected() {
 		if (mSelectedContainerSession != null) {
 
-			mSelectedContainerSession.setUploadType(UploadType.AUDIT);
+			// mSelectedContainerSession.setUploadType(UploadType.AUDIT);
+			mSelectedContainerSession.updateField(	getActivity(), ContainerSession.FIELD_UPLOAD_TYPE,
+													Integer.toString(UploadType.AUDIT.getValue()));
 			CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
 
 			hideMenuItems();

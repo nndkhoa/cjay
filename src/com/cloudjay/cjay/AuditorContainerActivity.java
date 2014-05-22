@@ -352,7 +352,9 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 
 		if (mContainerSession.isValidForUpload(this, CJayImage.TYPE_AUDIT)) {
 
-			mContainerSession.setUploadType(UploadType.AUDIT);
+			// mContainerSession.setUploadType(UploadType.AUDIT);
+			mContainerSession.updateField(	this, ContainerSession.FIELD_UPLOAD_TYPE,
+											Integer.toString(UploadType.AUDIT.getValue()));
 			CJayApplication.uploadContainerSesison(getApplicationContext(), mContainerSession);
 
 		} else {

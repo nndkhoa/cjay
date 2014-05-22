@@ -439,10 +439,12 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 		if (mSelectedContainerSession.isValidForUpload(getActivity(), CJayImage.TYPE_IMPORT)) {
 
 			// Marked it's not temporary anymore
-			mSelectedContainerSession.setUploadType(UploadType.IN);
+			// mSelectedContainerSession.setUploadType(UploadType.IN);
+			mSelectedContainerSession.updateField(	getActivity(), ContainerSession.FIELD_UPLOAD_TYPE,
+													Integer.toString(UploadType.IN.getValue()));
 			DataCenter.getDatabaseHelper(getActivity())
 						.addUsageLog(	"Prepare to add #IN container with ID "
-												+ mSelectedContainerSession.getContainerId() + "to upload queue");
+												+ mSelectedContainerSession.getContainerId() + " to upload queue");
 
 			CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
 			hideMenuItems();

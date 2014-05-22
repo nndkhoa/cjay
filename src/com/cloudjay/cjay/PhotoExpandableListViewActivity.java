@@ -430,12 +430,13 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 				if (mContainerSession.isValidForUpload(context, CJayImage.TYPE_IMPORT)) {
 
-					mContainerSession.setUploadType(UploadType.IN);
-
+					// mContainerSession.setUploadType(UploadType.IN);
+					mContainerSession.updateField(	context, ContainerSession.FIELD_UPLOAD_TYPE,
+													Integer.toString(UploadType.IN.getValue()));
 					// mContainerSession.setOnLocal(false);
 					DataCenter.getDatabaseHelper(this).addUsageLog(	"Prepare to add #IN container with ID "
 																			+ mContainerSession.getContainerId()
-																			+ "to upload queue");
+																			+ " to upload queue");
 
 				} else {
 					showCrouton(R.string.alert_no_issue_container);
@@ -446,13 +447,18 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 				if (mContainerSession.isValidForUpload(context, CJayImage.TYPE_EXPORT)) {
 
-					mContainerSession.setUploadType(UploadType.OUT);
-					mContainerSession.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+					// mContainerSession.setUploadType(UploadType.OUT);
+					// mContainerSession.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+
+					String currentTime = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+					mContainerSession.updateField(	context, ContainerSession.FIELD_UPLOAD_TYPE,
+													Integer.toString(UploadType.OUT.getValue()));
+					mContainerSession.updateField(context, ContainerSession.FIELD_CHECK_OUT_TIME, currentTime);
 
 					Logger.Log("Prepare to upload EXPORT container " + mContainerSession.getContainerId());
 					DataCenter.getDatabaseHelper(this).addUsageLog(	"Prepare to add #OUT container with ID "
 																			+ mContainerSession.getContainerId()
-																			+ "to upload queue");
+																			+ " to upload queue");
 
 				} else {
 					showCrouton(R.string.alert_no_issue_container);

@@ -226,8 +226,9 @@ public class Utils {
 	 * 
 	 * @return registration ID, or empty string if there is no existing
 	 *         registration ID.
+	 * @throws NullSessionException
 	 */
-	public static String getRegistrationId(Context context) {
+	public static String getRegistrationId(Context context) throws NullSessionException {
 
 		final SharedPreferences prefs = getGCMPreferences(context);
 		String registrationId = prefs.getString(PROPERTY_REG_ID, "");
@@ -245,11 +246,15 @@ public class Utils {
 		int currentVersion = getAppVersionCode(context);
 		int currentUserId = -1;
 
-		SQLiteDatabase db = DataCenter.getDatabaseHelper(context).getReadableDatabase();
-		Cursor cursor = db.rawQuery("select * from user", new String[] {});
-		if (cursor.moveToFirst()) {
-			currentUserId = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
-			// Logger.Log("Current user id: " + currentUserId);
+		try {
+			SQLiteDatabase db = DataCenter.getDatabaseHelper(context).getReadableDatabase();
+			Cursor cursor = db.rawQuery("select * from user", new String[] {});
+			if (cursor.moveToFirst()) {
+				currentUserId = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+				// Logger.Log("Current user id: " + currentUserId);
+			}
+		} catch (Exception e) {
+			throw new NullSessionException();
 		}
 
 		try {

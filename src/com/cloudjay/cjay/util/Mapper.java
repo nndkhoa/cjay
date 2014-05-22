@@ -234,6 +234,8 @@ public class Mapper {
 			// < do thiếu hình giám định >
 			if (session.getUserRole() != UserRole.GATE_KEEPER.getValue()) {
 
+				Logger.Log("Parse audit_report_items");
+
 				// Create `audit_report_items`
 				List<AuditReportItem> auditReportItems = new ArrayList<AuditReportItem>();
 				Collection<Issue> issues = containerSession.getIssues();

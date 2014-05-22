@@ -63,12 +63,12 @@ public class ContainerUploadIntentService extends IntentService implements Count
 	@Trace(level = Log.INFO)
 	synchronized void doUploadContainer(ContainerSession containerSession) {
 
-		Logger.w("Uploading container: " + containerSession.getContainerId());
-		DataCenter.getDatabaseHelper(getApplicationContext())
-					.addUsageLog("Begin to #upload container: " + containerSession.getContainerId());
-
 		UploadType uploadType = UploadType.values()[containerSession.getUploadType()];
 		String response = "";
+
+		Logger.w("Uploading container: " + containerSession.getContainerId() + " | " + uploadType.name());
+		DataCenter.getDatabaseHelper(getApplicationContext())
+					.addUsageLog("Begin to #upload container: " + containerSession.getContainerId());
 
 		// containerSession.setUploadState(UploadState.IN_PROGRESS);
 
@@ -78,6 +78,8 @@ public class ContainerUploadIntentService extends IntentService implements Count
 
 			// Temporary upload, use different type of mapping
 			if (uploadType == UploadType.NONE) {
+
+				Logger.w("Upload temp container " + containerSession.getContainerId());
 				uploadItem = Mapper.getInstance().toTmpContainerSession(getApplicationContext(), containerSession,
 																		false);
 			} else {

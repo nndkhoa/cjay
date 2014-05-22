@@ -106,10 +106,15 @@ public class DataCenter {
 
 	}
 
-	public void rollbackStuckImages(Context ctx) {
-		SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
-		String sql = "UPDATE cjay_image SET state = 1 WHERE state = 2";
-		db.execSQL(sql);
+	public void rollbackStuckImages(Context ctx) throws NullSessionException {
+		try {
+			SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
+			String sql = "UPDATE cjay_image SET state = 1 WHERE state = 2";
+			db.execSQL(sql);
+		} catch (Exception e) {
+			throw new NullSessionException();
+		}
+
 	}
 
 	public void rollbackStuckContainers(Context ctx) {

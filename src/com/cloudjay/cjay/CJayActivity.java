@@ -266,7 +266,11 @@ public class CJayActivity extends SherlockFragmentActivity {
 			if (checkPlayServices()) {
 
 				gcm = GoogleCloudMessaging.getInstance(this);
-				regid = Utils.getRegistrationId(context);
+				try {
+					regid = Utils.getRegistrationId(context);
+				} catch (NullSessionException e) {
+					return;
+				}
 
 				if (TextUtils.isEmpty(regid)) {
 					registerInBackground();

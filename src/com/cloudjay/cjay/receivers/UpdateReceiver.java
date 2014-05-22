@@ -40,7 +40,11 @@ public class UpdateReceiver extends BroadcastReceiver {
 		if (null != session && Utils.checkPlayServices(context)) {
 
 			gcm = GoogleCloudMessaging.getInstance(context);
-			regid = Utils.getRegistrationId(context);
+			try {
+				regid = Utils.getRegistrationId(context);
+			} catch (NullSessionException e) {
+				return;
+			}
 
 			if (regid.isEmpty()) {
 				registerInBackground();

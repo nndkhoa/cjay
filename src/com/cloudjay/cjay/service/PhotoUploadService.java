@@ -47,6 +47,7 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CountingInputStreamEntity;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.Utils;
 
 import de.greenrobot.event.EventBus;
@@ -416,7 +417,14 @@ public class PhotoUploadService extends Service {
 		if (canUpload()) {
 
 			// rollback stuck images
-			DataCenter.getInstance().rollbackStuckImages(this);
+			try {
+				DataCenter.getInstance().rollbackStuckImages(this);
+			} catch (NullSessionException e1) {
+				e1.printStackTrace();
+				setCurrentlyUploading(false);
+				stopSelf();
+				return false;
+			}
 
 			CJayImage uploadItem = null;
 			try {
