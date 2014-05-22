@@ -8,7 +8,6 @@ import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 import org.androidannotations.annotations.EApplication;
-
 import uk.co.senab.bitmapcache.BitmapLruCache;
 import android.app.Application;
 import android.content.ComponentName;
@@ -54,12 +53,7 @@ import de.greenrobot.event.EventBus;
 @ReportsCrashes(formKey = "",
 				formUri = CJayConstant.ACRA,
 				mode = ReportingInteractionMode.TOAST,
-				resToastText = R.string.crash_toast_text,
-				resDialogText = R.string.crash_dialog_text,
-				resDialogIcon = android.R.drawable.ic_dialog_info,
-				resDialogTitle = R.string.crash_dialog_title,
-				resDialogCommentPrompt = R.string.crash_dialog_comment_prompt,
-				resDialogOkToast = R.string.crash_dialog_ok_toast)
+				resToastText = R.string.crash_toast_text)
 @EApplication
 public class CJayApplication extends Application {
 

@@ -18,12 +18,6 @@
 
     <!-- ACRA -->
     <string name="crash_toast_text">Ooooops! I crashed, but a report has been sent to my developer to help fix the issue!</string>
-    <string name="crash_dialog_title">JayPix has crashed</string>
-    <string name="crash_dialog_text">An unexpected error occurred forcing the
-    application to stop. Please help us fix this by sending us error data,
-    all you have to do is click OK.</string>
-    <string name="crash_dialog_comment_prompt">You might add your comments about the problem below:</string>
-    <string name="crash_dialog_ok_toast">Thank you</string>
 
     <!-- menu titles -->
     <string name="menu_camera_title">Chụp hình</string>
@@ -46,7 +40,6 @@
     <!--  -->
     <string name="notification_uploading_photo">Uploading Photo %1$s/%2$d</string>
     <string name="notification_uploading_photo_progress">Uploading %1$d/%3$d | %2$d%%</string>
-    
     <string name="notification_uploading_container">Uploading %1$s</string>
     <string name="notification_uploading_container_progress">Uploading %1$s</string>
 

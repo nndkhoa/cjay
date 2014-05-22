@@ -2,6 +2,7 @@ package com.cloudjay.cjay;
 
 import java.sql.SQLException;
 
+import org.acra.ACRA;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
@@ -72,6 +73,7 @@ public class LoginActivity extends CJayActivity {
 
 					// Save username
 					PreferencesUtil.storePrefsValue(getApplicationContext(), PreferencesUtil.PREF_USERNAME, mEmail);
+					ACRA.getErrorReporter().putCustomData("user_email", mEmail);
 
 					return true;
 				}
