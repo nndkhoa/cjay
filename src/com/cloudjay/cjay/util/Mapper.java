@@ -305,13 +305,13 @@ public class Mapper {
 							String imageName = cursor.getString(cursor.getColumnIndexOrThrow(CJayImage.FIELD_IMAGE_NAME));
 							QueryHelper.update(	ctx, "cjay_image", "id", Integer.toString(gateReportImage.getId()),
 												"uuid = " + Utils.sqlString(uuid));
-							Logger.Log("Update CJayImage UUID: " + uuid + " | Image name: " + imageName);
+							// Logger.Log("Update CJayImage UUID: " + uuid + " | Image name: " + imageName);
 
 						} else { // create
 
 							DataCenter.getInstance().addImage(ctx, gateReportImage, gateReportImage.getId(),
 																UUID.randomUUID().toString(), main.getUuid());
-							Logger.Log("Create new CJayImage: " + gateReportImage.getImageName());
+							// Logger.Log("Create new CJayImage: " + gateReportImage.getImageName());
 
 						}
 					}
@@ -338,7 +338,7 @@ public class Mapper {
 							issueId = cursor.getString(cursor.getColumnIndexOrThrow(Issue.FIELD_UUID));
 							DataCenter.getInstance().addIssue(ctx, auditReportItem, auditReportItem.getId(), issueId,
 																main.getUuid());
-							Logger.Log("Update Issue with id: " + auditReportItem.getId());
+							// Logger.Log("Update Issue with id: " + auditReportItem.getId());
 
 						} else {
 
@@ -366,7 +366,8 @@ public class Mapper {
 										QueryHelper.update(	ctx, "issue", "id",
 															Integer.toString(auditReportItem.getId()),
 															"_id = " + Utils.sqlString(issueId));
-										Logger.Log("Update Issue with id: " + auditReportItem.getId() + " | " + issueId);
+										// Logger.Log("Update Issue with id: " + auditReportItem.getId() + " | " +
+										// issueId);
 									} else {
 										Toast.makeText(ctx, "Unexpected Exception", Toast.LENGTH_LONG).show();
 									}
@@ -380,7 +381,7 @@ public class Mapper {
 									issueId = UUID.randomUUID().toString();
 									DataCenter.getInstance().addIssue(ctx, auditReportItem, auditReportItem.getId(),
 																		issueId, main.getUuid());
-									Logger.Log("Add issue: " + auditReportItem.getId() + " | " + issueId);
+									// Logger.Log("Add issue: " + auditReportItem.getId() + " | " + issueId);
 									break;
 
 								default:
@@ -419,15 +420,15 @@ public class Mapper {
 														Integer.toString(auditReportImage.getId()),
 														"uuid = " + Utils.sqlString(auditImageUuid));
 
-									Logger.Log("Update CJayImage UUID: " + auditImageUuid + " | Image name: "
-											+ imageName);
+									// Logger.Log("Update CJayImage UUID: " + auditImageUuid + " | Image name: "
+									// + imageName);
 
 								} else { // create
 									DataCenter.getInstance().addImage(ctx, auditReportImage, auditReportImage.getId(),
 																		UUID.randomUUID().toString(), issueId,
 																		main.getUuid());
 
-									Logger.Log("create new image");
+									// Logger.Log("create new image");
 								}
 							}
 						} // end audit report images

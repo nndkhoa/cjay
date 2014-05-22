@@ -194,18 +194,20 @@ public class DataCenter {
 
 			try {
 				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, true);
-				updateListISOCode(ctx);
 
 				if (forced) {
 
+					updateListISOCode(ctx);
 					Logger.Log("Force to fetch new data from: "
 							+ StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 					updateListContainerSessions(ctx, CJayClient.REQUEST_TYPE_MODIFIED, InvokeType.FORCE_REFRESH);
 
 				} else {
+
 					boolean initialized = PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, false);
 					if (!initialized) {
 						// Logger.Log("fetch data for first time");
+						updateListISOCode(ctx);
 						updateListContainerSessions(ctx, CJayClient.REQUEST_TYPE_MODIFIED, InvokeType.FIRST_TIME);
 
 					} else {
@@ -830,7 +832,7 @@ public class DataCenter {
 						// note: it will use rawQuery to update
 						if (cursor.moveToFirst()) {
 
-							Logger.Log("Container Session is existed. Prepare to update.");
+							Logger.Log(tmpSession.getContainerId() + " is existed, prepare to update");
 							String uuid = cursor.getString(cursor.getColumnIndex("_id"));
 
 							if (TextUtils.isEmpty(uuid)) {

@@ -206,6 +206,9 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 	@ItemClick(R.id.container_list)
 	void listItemClicked(int position) {
+
+		long startTime = System.currentTimeMillis();
+
 		hideMenuItems();
 		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
 		ContainerState state = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
@@ -225,6 +228,9 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 			handleContainerClicked(uuid, containerId);
 
 		}
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.w("---> Total time: " + Long.toString(difference));
+		// 88 --> 90ms
 	}
 
 	@ItemLongClick(R.id.container_list)

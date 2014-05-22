@@ -260,7 +260,6 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 	}
 
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
-		Logger.Log("ContainerSessionChangedEvent");
 		refresh();
 	}
 

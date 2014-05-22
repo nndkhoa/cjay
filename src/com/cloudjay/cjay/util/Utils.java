@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.R.integer;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
@@ -21,6 +22,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
@@ -238,14 +241,19 @@ public class Utils {
 		// since the existing regID is not guaranteed to work with the new
 		// app version.
 		int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
-
 		int registeredCurrentUserId = prefs.getInt(PROPERTY_CURRENT_USER_ID, Integer.MIN_VALUE);
-
 		int currentVersion = getAppVersionCode(context);
+		int currentUserId = -1;
+
+		SQLiteDatabase db = DataCenter.getDatabaseHelper(context).getReadableDatabase();
+		Cursor cursor = db.rawQuery("select * from user", new String[] {});
+		if (cursor.moveToFirst()) {
+			currentUserId = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+			Logger.Log("Current user id: " + currentUserId);
+		}
 
 		try {
-			if (registeredVersion != currentVersion
-					|| registeredCurrentUserId != CJaySession.restore(context).getCurrentUser().getID()) {
+			if (registeredVersion != currentVersion || registeredCurrentUserId != currentUserId) {
 				Logger.i("App version changed.");
 				return "";
 			}
