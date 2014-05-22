@@ -283,7 +283,7 @@ public class CJayApplication extends Application {
 
 	public static void uploadContainerSesison(Context ctx, ContainerSession containerSession) {
 
-		Logger.w("Checkout Time: " + containerSession.getCheckOutTime());
+		Logger.w("Checkout Time: " + containerSession.getRawCheckOutTime());
 		ContainerSessionDaoImpl containerSessionDaoImpl = null;
 
 		// User confirm upload
@@ -306,9 +306,8 @@ public class CJayApplication extends Application {
 
 		// It will trigger `UploadsFragment` Adapter
 		EventBus.getDefault().post(new ContainerSessionEnqueueEvent(containerSession));
-
-		DataCenter.getDatabaseHelper(ctx).addUsageLog(	"Add container " + containerSession.getContainerId()
-																+ " to upload queue");
+		DataCenter.getDatabaseHelper(ctx).addUsageLog(	containerSession.getContainerId()
+																+ " | Added container to upload queue");
 	}
 
 	IDatabaseManager databaseManager = null;

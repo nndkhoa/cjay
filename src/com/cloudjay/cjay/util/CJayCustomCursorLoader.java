@@ -7,10 +7,11 @@ import android.database.Cursor;
 public abstract class CJayCustomCursorLoader extends CursorLoader {
 
 	private Cursor mCursor;
-	protected final ForceLoadContentObserver mObserver = new ForceLoadContentObserver();
+	protected ForceLoadContentObserver mObserver = null;
 
 	public CJayCustomCursorLoader(Context context) {
 		super(context);
+		mObserver = new ForceLoadContentObserver();
 	}
 
 	/* Runs on the UI thread */

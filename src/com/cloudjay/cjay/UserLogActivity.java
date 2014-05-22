@@ -63,7 +63,7 @@ public class UserLogActivity extends CJayActivity implements android.app.LoaderM
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
 
-		return new CJayCustomCursorLoader(this) {
+		return new CJayCustomCursorLoader(getApplicationContext()) {
 
 			@Override
 			public Cursor loadInBackground() {

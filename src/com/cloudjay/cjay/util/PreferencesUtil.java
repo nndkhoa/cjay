@@ -36,15 +36,19 @@ public class PreferencesUtil {
 	}
 
 	public static String getPrefsValue(Context context, String key) {
+
 		SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
 		String value = prefs.getString(key, "");
 		return value;
+
 	}
 
 	public static boolean getPrefsValue(Context context, String key, boolean defVal) {
+
 		SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
 		boolean value = prefs.getBoolean(key, defVal);
 		return value;
+
 	}
 
 	public static void storePrefsValue(final Context context, String key, final boolean value) {

@@ -278,22 +278,15 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 					mSelectedContainerSession.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 
 					DataCenter.getDatabaseHelper(getActivity())
-								.addUsageLog(	"Prepare to add #OUT container with ID "
-														+ mSelectedContainerSession.getContainerId()
-														+ "to upload queue");
+								.addUsageLog(	mSelectedContainerSession.getContainerId()
+														+ " | Prepare to add #OUT container with ID to upload queue");
 
 					CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
 					hideMenuItems();
-					Logger.Log("OK");
-
 				} else {
-
-					Logger.e("XXX");
 					Crouton.cancelAllCroutons();
 					Crouton.makeText(getActivity(), R.string.alert_no_issue_container, Style.ALERT).show();
 				}
-			} else {
-				Logger.e("ZZZZ");
 			}
 		}
 		hideMenuItems();
