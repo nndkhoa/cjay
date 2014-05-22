@@ -35,23 +35,23 @@ public class UpdateReceiver extends BroadcastReceiver {
 		Logger.Log("onReceive()");
 		mContext = context;
 
-		// CJaySession session = CJaySession.restore(context);
-		//
-		// if (null != session && Utils.checkPlayServices(context)) {
-		//
-		// gcm = GoogleCloudMessaging.getInstance(context);
-		// regid = Utils.getRegistrationId(context);
-		//
-		// if (regid.isEmpty()) {
-		// registerInBackground();
-		// }
-		// }
-		//
-		// String appVersion = Utils.getAppVersionName(context);
-		// int appVersionCode = Utils.getAppVersionCode(context);
-		//
-		// DataCenter.getDatabaseHelper(context).addUsageLog( "#update app to version " + appVersion + " | "
-		// + Integer.toString(appVersionCode));
+		CJaySession session = CJaySession.restore(context);
+
+		if (null != session && Utils.checkPlayServices(context)) {
+
+			gcm = GoogleCloudMessaging.getInstance(context);
+			regid = Utils.getRegistrationId(context);
+
+			if (regid.isEmpty()) {
+				registerInBackground();
+			}
+		}
+
+		String appVersion = Utils.getAppVersionName(context);
+		int appVersionCode = Utils.getAppVersionCode(context);
+
+		DataCenter.getDatabaseHelper(context).addUsageLog(	"#update app to version " + appVersion + " | "
+																	+ Integer.toString(appVersionCode));
 	}
 
 	/**

@@ -116,6 +116,8 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 	@AfterViews
 	void afterViews() {
 
+		long startTime = System.currentTimeMillis();
+
 		// Set Activity Title
 		setTitle(mContainerId);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -166,6 +168,10 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		} else {
 			mNonAvTextView.setVisibility(View.VISIBLE);
 		}
+
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.w("---> Total time: " + Long.toString(difference));
+
 	}
 
 	@Click(R.id.btn_add_new)
@@ -177,6 +183,8 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+
+		long startTime = System.currentTimeMillis();
 		int imageType = -1;
 
 		switch (id) {
@@ -191,7 +199,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 		final int cursorLoaderImageType = imageType;
 
-		return new CJayCursorLoader(this) {
+		CJayCursorLoader cJayCursorLoader = new CJayCursorLoader(this) {
 			@Override
 			public Cursor loadInBackground() {
 
@@ -219,6 +227,10 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 				return cursor;
 			}
 		};
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.w("---> Total time: " + Long.toString(difference));
+
+		return cJayCursorLoader;
 	}
 
 	public void onEvent(CJayImageAddedEvent event) {
@@ -297,6 +309,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 	@Override
 	public void onResume() {
+		long startTime = System.currentTimeMillis();
 		super.onResume();
 		if (mCursorAdapters != null && mNewImageCount > 0) {
 			Logger.e("Refresh cursor loader");
@@ -304,6 +317,10 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 				getSupportLoaderManager().restartLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_1, null, this);
 			}
 		}
+
+		// 5ms
+		long difference = System.currentTimeMillis() - startTime;
+		Logger.w("---> Total time: " + Long.toString(difference));
 	}
 
 	@Override

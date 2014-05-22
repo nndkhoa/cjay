@@ -63,7 +63,7 @@ public class CJayConstant {
 	public static final File BACK_UP_DIRECTORY_FILE = new File(Environment.getExternalStorageDirectory(),
 																BACK_UP_DIRECTORY);
 
-	public static final int SPLASH_TIME_OUT = 2000;
+	public static final int SPLASH_TIME_OUT = 1500;
 	public static final String CJAY_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
 	public static final String CJAY_DATETIME_FORMAT_NO_TIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
 

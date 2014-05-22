@@ -215,7 +215,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 								initialize = PreferencesUtil.getPrefsValue(	context, PreferencesUtil.PREF_INITIALIZED,
 																			false);
 							} catch (Exception e) {
-								e.printStackTrace();
+								Logger.e(e.getMessage());
 							}
 
 							if (!initialize) {
@@ -227,7 +227,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 							} else {
 
-								Logger.Log("update List CS FOLLOWING TIME");
+								// Logger.Log("update List CS FOLLOWING TIME");
 								DataCenter.getInstance()
 											.updateListContainerSessions(getApplicationContext(),
 																			CJayClient.REQUEST_TYPE_MODIFIED,

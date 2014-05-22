@@ -249,7 +249,7 @@ public class Utils {
 		Cursor cursor = db.rawQuery("select * from user", new String[] {});
 		if (cursor.moveToFirst()) {
 			currentUserId = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
-			Logger.Log("Current user id: " + currentUserId);
+			// Logger.Log("Current user id: " + currentUserId);
 		}
 
 		try {
