@@ -226,7 +226,7 @@ public class CJayApplication extends Application {
 		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_CONTAINER_ID_EXTRA, containerId);
 		intent.putExtra(PhotoExpandableListViewActivity_.SOURCE_TAG_EXTRA, sourceTag);
 		intent.putExtra(PhotoExpandableListViewActivity_.VIEW_MODE_EXTRA, PhotoExpandableListViewActivity_.MODE_IMPORT);
-		intent.putExtra(PhotoExpandableListViewActivity_.NUM_COLS_EXTRA, 3);
+		intent.putExtra(PhotoExpandableListViewActivity_.NUM_COLS_EXTRA, 2);
 		ctx.startActivity(intent);
 	}
 
