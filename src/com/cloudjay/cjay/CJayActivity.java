@@ -190,7 +190,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 						try {
 							DataCenter.getInstance().fetchData(getApplicationContext());
 						} catch (NoConnectionException e) {
-							showCrouton(R.string.alert_no_network);
+
 						} catch (NullSessionException e) {
 							CJayApplication.logOutInstantly(context);
 							finish();
@@ -362,6 +362,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 	@UiThread
 	public void showCrouton(int textResId) {
+
 		Crouton.cancelAllCroutons();
 		final Crouton crouton = Crouton.makeText(this, textResId, Style.ALERT)
 										.setConfiguration(	new Configuration.Builder().setDuration(Configuration.DURATION_INFINITE)

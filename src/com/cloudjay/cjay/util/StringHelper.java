@@ -13,6 +13,7 @@ public class StringHelper {
 
 	@SuppressLint("SimpleDateFormat")
 	public static String getCurrentTimestamp(String format) {
+
 		String timeStamp = "";
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat(format);

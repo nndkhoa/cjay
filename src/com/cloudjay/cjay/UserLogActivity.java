@@ -70,7 +70,8 @@ public class UserLogActivity extends CJayActivity implements android.app.LoaderM
 
 				Cursor cursor = DataCenter.getInstance().getUserLogCursor(getContext());
 
-				if (cursor != null) {
+				// Note: added on 2014-05-17
+				if (cursor != null && !cursor.isClosed()) {
 
 					// Ensure the cursor window is filled
 					cursor.getCount();

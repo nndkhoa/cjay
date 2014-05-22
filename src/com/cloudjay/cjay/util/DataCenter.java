@@ -11,8 +11,6 @@ import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EBean.Scope;
 import org.androidannotations.annotations.Trace;
 
-import android.R.id;
-import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
@@ -410,16 +408,17 @@ public class DataCenter {
 																					String.valueOf(imageType) });
 	}
 
-	public void rollback(SQLiteDatabase db, String uuid) {
-		Cursor cursor = db.rawQuery("select * from container_session where _id = ?", new String[] { uuid });
+	public void rollback(Context ctx, SQLiteDatabase db, String uuid) {
+
+		Cursor cursor = db.rawQuery("select * from csview where _id = ?", new String[] { uuid });
 		if (cursor.moveToFirst()) {
 
-			// int uploadType = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UPLOAD_TYPE));
 			UploadType uploadType = UploadType.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UPLOAD_TYPE))];
+			String containerId = cursor.getString(cursor.getColumnIndexOrThrow("container_id"));
 
-			Logger.Log("Manually rolling back container session upload state.");
-			EventBus.getDefault().post(new LogUserActivityEvent("#Manually #rollback upload state container"));
-
+			Logger.Log(containerId + " | Manually rolling back container session upload state.");
+			DataCenter.getDatabaseHelper(ctx)
+						.addUsageLog(containerId + " | #Manually #rollback upload state container");
 			String sql = "";
 
 			switch (uploadType) {
@@ -809,7 +808,7 @@ public class DataCenter {
 					for (TmpContainerSession tmpSession : tmpContainerSessions) {
 
 						count++;
-						Logger.Log(count + ". Process container " + tmpSession.getContainerId());
+						// Logger.Log(count + ". Process container " + tmpSession.getContainerId());
 
 						if (tmpSession.getStatus() == ContainerState.EXPORTED.getValue()) {
 							Logger.w(tmpSession.getContainerId() + " has status = EXPORTED");

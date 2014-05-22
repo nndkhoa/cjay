@@ -36,7 +36,6 @@ import com.cloudjay.cjay.adapter.PhotoExpandableListAdapter;
 import com.cloudjay.cjay.adapter.PhotoGridViewCursorAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
-import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.fragment.GateImportListFragment;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -50,8 +49,6 @@ import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadType;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
-
-import de.greenrobot.event.EventBus;
 
 @EActivity(R.layout.activity_photo_expandablelistview)
 @OptionsMenu(R.menu.menu_photo_expandable_list_view)

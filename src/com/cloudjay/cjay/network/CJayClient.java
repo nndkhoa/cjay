@@ -101,12 +101,12 @@ public class CJayClient implements ICJayClient {
 		requestPacket.addProperty("name", android.os.Build.MODEL);
 
 		try {
+
 			Response<JsonObject> response = Ion.with(ctx, CJayConstant.API_ADD_GCM_DEVICE)
 												.setHeader("Authorization ", "Token " + accessToken)
 												.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
 												.setHeader("CJAY_USERNAME", user.getUserName())
 												.setJsonObjectBody(requestPacket).asJsonObject().withResponse()
-
 												.setCallback(new FutureCallback<Response<JsonObject>>() {
 													@Override
 													public void onCompleted(Exception arg0, Response<JsonObject> arg1) {

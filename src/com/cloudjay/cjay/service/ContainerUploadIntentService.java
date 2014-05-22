@@ -22,7 +22,6 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
-import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.events.UploadStateChangedEvent;
 import com.cloudjay.cjay.events.UploadStateRestoredEvent;
 import com.cloudjay.cjay.model.CJayImage;
@@ -483,6 +482,9 @@ public class ContainerUploadIntentService extends IntentService implements Count
 				break;
 
 			case OUT:
+				DataCenter.getDatabaseHelper(getApplicationContext())
+							.addUsageLog(	"#rollback " + containerSession.getContainerId()
+													+ " | Set check_out_time to empty");
 				containerSession.setCheckOutTime("");
 				break;
 

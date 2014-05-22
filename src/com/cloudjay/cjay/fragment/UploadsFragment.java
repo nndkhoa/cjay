@@ -24,7 +24,6 @@ import com.cloudjay.cjay.adapter.UploadCursorAdapter;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
-import com.cloudjay.cjay.events.LogUserActivityEvent;
 import com.cloudjay.cjay.events.UploadStateRestoredEvent;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
@@ -167,7 +166,8 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 
 				DataCenter.getDatabaseHelper(getActivity()).addUsageLog(containerId + " | User #retry manually");
 				if (uploadState == UploadState.ERROR) {
-					DataCenter.getInstance().rollback(	DataCenter.getDatabaseHelper(getActivity())
+					DataCenter.getInstance().rollback(	getActivity(),
+														DataCenter.getDatabaseHelper(getActivity())
 																	.getWritableDatabase(), containerUuid);
 
 					// TODO: post new Event to refresh other fragment

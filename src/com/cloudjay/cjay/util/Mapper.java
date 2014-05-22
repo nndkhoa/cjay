@@ -16,9 +16,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
-import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.model.AuditReportImage;
 import com.cloudjay.cjay.model.AuditReportItem;
@@ -179,15 +177,23 @@ public class Mapper {
 		tmpContainerSession.setCheckInTime(containerSession.getRawCheckInTime());
 		tmpContainerSession.setIsAvailable(containerSession.isAvailable());
 
-		if (TextUtils.isEmpty(checkoutTime)) {
+		UploadType uploadType = UploadType.values()[containerSession.getUploadType()];
+
+		if (TextUtils.isEmpty(checkoutTime) && uploadType == UploadType.OUT) {
+
+			DataCenter.getDatabaseHelper(ctx).addUsageLog(containerId + " | Checkout Time is NULL");
 			Logger.e(containerId + " | Checkout Time is NULL");
+
+			checkoutTime = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 		}
+
 		tmpContainerSession.setCheckOutTime(checkoutTime);
 
 		if (officialUpload) {
 
 			if (TextUtils.isEmpty(imageIdPath)) {
 				Logger.e(containerId + " | Image Id Path is NULL");
+				DataCenter.getDatabaseHelper(ctx).addUsageLog(containerId + " | Image Id Path is NULL");
 			}
 
 			tmpContainerSession.setImageIdPath(imageIdPath);
