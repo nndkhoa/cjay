@@ -52,7 +52,7 @@ public class CJaySession {
 
 	}
 
-	private User currentUser;
+	private static User currentUser;
 
 	public CJaySession() {
 

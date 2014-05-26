@@ -26,7 +26,7 @@ public class CJayConstant {
 
 	// public static final String CJAY_TMP_STORAGE = "https://www.googleapis.com/upload/storage/v1beta2/b/cjaytmp/o";
 
-	public static void initApi(boolean isBeta) {
+	public static void initBetaApi(boolean isBeta) {
 
 		if (isBeta) {
 			API_ROOT = BETA_CLOUDJAY_API + "/api/";
@@ -92,7 +92,7 @@ public class CJayConstant {
 	public static final int ALARM_INTERVAL = 10;
 	public static final String CUSTOM_INTENT = "com.cloudjay.cjay.CUSTOM_INTENT";
 
-	public static final int HIDDEN_LOG_THRESHOLD = 4;
+	public static final int HIDDEN_LOG_THRESHOLD = 3;
 
 	public static final int RETRY_THRESHOLD = 4;
 

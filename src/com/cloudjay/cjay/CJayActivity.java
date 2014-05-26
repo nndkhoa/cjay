@@ -190,7 +190,8 @@ public class CJayActivity extends SherlockFragmentActivity {
 					protected Void doInBackground(Void... params) {
 
 						try {
-							DataCenter.getInstance().fetchData(getApplicationContext());
+							// DataCenter.getInstance().fetchData(getApplicationContext());
+							DataCenter.getInstance().fetchData(context, true);
 						} catch (NoConnectionException e) {
 
 						} catch (NullSessionException e) {

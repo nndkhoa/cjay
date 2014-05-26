@@ -8,6 +8,7 @@ import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 import org.androidannotations.annotations.EApplication;
+
 import uk.co.senab.bitmapcache.BitmapLruCache;
 import android.app.Application;
 import android.content.ComponentName;
@@ -19,6 +20,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
@@ -42,6 +44,7 @@ import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadState;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
+import com.koushikdutta.ion.Ion;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -63,15 +66,14 @@ public class CJayApplication extends Application {
 
 		// Configure Logger
 		boolean debuggable = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox), true);
+												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox), false);
 
 		Logger.getInstance().setDebuggable(debuggable);
 
 		// Setup API ROOT
-		CJayConstant.initApi(false);
+		CJayConstant.initBetaApi(false);
 
-		// Ion.getDefault(getBaseContext()).configure()
-		// .setLogging("Network Module", Log.INFO);
+		Ion.getDefault(getBaseContext()).configure().setLogging("Ion", Log.INFO);
 
 		super.onCreate();
 		databaseManager = new DatabaseManager();

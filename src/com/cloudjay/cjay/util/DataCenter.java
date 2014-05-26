@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.acra.ACRA;
+import org.acra.ACRAConstants;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EBean.Scope;
@@ -791,6 +793,14 @@ public class DataCenter {
 						+ invokeType.name() + " | RequestType: " + type);
 			}
 
+			UserRole role = null;
+			Cursor userCursor = db.rawQuery("Select * from user", new String[] {});
+			if (userCursor.moveToFirst()) {
+				role = UserRole.values()[userCursor.getInt(userCursor.getColumnIndexOrThrow("role"))];
+			}
+
+			if (role == null) { throw new NullSessionException(); }
+
 			do {
 
 				long beginParseTime = System.currentTimeMillis();
@@ -807,17 +817,13 @@ public class DataCenter {
 
 					List<TmpContainerSession> tmpContainerSessions = result.getResults();
 					totalItems += tmpContainerSessions.size();
-
 					Logger.Log("Total items: " + tmpContainerSessions.size());
-					int count = 0;
 
 					for (TmpContainerSession tmpSession : tmpContainerSessions) {
 
-						count++;
-						// Logger.Log(count + ". Process container " + tmpSession.getContainerId());
-
-						if (tmpSession.getStatus() == ContainerState.EXPORTED.getValue()) {
-							Logger.w(tmpSession.getContainerId() + " has status = EXPORTED");
+						if ((role == UserRole.AUDITOR && tmpSession.getStatus() != ContainerState.NEW.getValue())
+								|| (role == UserRole.REPAIR_STAFF && tmpSession.getStatus() == ContainerState.AVAILABLE.getValue())
+								|| (tmpSession.getStatus() == ContainerState.EXPORTED.getValue())) {
 
 							// find and delete this item
 							if (tmpSession.getId() != 0) {
@@ -826,7 +832,6 @@ public class DataCenter {
 								DataCenter.getInstance().removeContainerSession(ctx, tmpSession.getId());
 								continue;
 							}
-
 						}
 
 						ContainerSession containerSession = null;
@@ -841,7 +846,7 @@ public class DataCenter {
 							String uuid = cursor.getString(cursor.getColumnIndex("_id"));
 
 							if (TextUtils.isEmpty(uuid)) {
-								Logger.e("WTF? ContainerSession existed but cannot find _id");
+								Logger.e("ContainerSession existed but cannot find _id");
 								DataCenter.getDatabaseHelper(ctx)
 											.addUsageLog(	tmpSession.getContainerId()
 																	+ " | Container existed but cannot find it in database.");
@@ -859,7 +864,7 @@ public class DataCenter {
 						if (null != containerSession) {
 							containerSessions.add(containerSession);
 						} else {
-							Logger.e("WTF " + tmpSession.getContainerId());
+							Logger.e("WTF with " + tmpSession.getContainerId());
 						}
 
 					}
