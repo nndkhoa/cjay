@@ -184,6 +184,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 		if (null != session) {
 
 			if (this instanceof SplashScreenActivity) {
+
 				new AsyncTask<Void, Integer, Void>() {
 
 					@Override
@@ -202,6 +203,8 @@ public class CJayActivity extends SherlockFragmentActivity {
 					}
 				}.execute();
 
+			} else if (this instanceof LoginActivity) {
+
 			} else {
 
 				DataCenter.LoadDataTask = new AsyncTask<Void, Integer, Void>() {
@@ -213,8 +216,8 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 							boolean initialize = true;
 							try {
-								initialize = PreferencesUtil.getPrefsValue(	context, PreferencesUtil.PREF_INITIALIZED,
-																			false);
+								initialize = PreferencesUtil.getPrefsValue(	getApplicationContext(),
+																			PreferencesUtil.PREF_INITIALIZED, false);
 							} catch (Exception e) {
 								Logger.e(e.getMessage());
 							}
@@ -237,8 +240,10 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 						} catch (NoConnectionException e) {
 							showCrouton(R.string.alert_no_network);
+
 						} catch (SQLException e) {
 							e.printStackTrace();
+
 						} catch (NullSessionException e) {
 							CJayApplication.logOutInstantly(context);
 							finish();

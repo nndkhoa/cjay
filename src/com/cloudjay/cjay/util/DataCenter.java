@@ -13,6 +13,7 @@ import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EBean.Scope;
 import org.androidannotations.annotations.Trace;
 
+import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
@@ -758,32 +759,17 @@ public class DataCenter {
 																							SQLException,
 																							NullSessionException {
 
-		if (invokeType == InvokeType.FOLLOWING) {
-			// Logger.Log("Call for following time, better return.");
-			return;
-		}
+		if (invokeType == InvokeType.FOLLOWING) return;
 
-		// Logger.Log("*** UPDATE LIST CONTAINER SESSIONS ***");
 		long startTime = System.currentTimeMillis();
 		PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, true);
 
 		try {
-
-			// 2013-11-10T21:05:24 (do not have timezone info)
-			// SimpleDateFormat dateFormat = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-			// String nowString = dateFormat.format(new Date());
-
-			SQLiteDatabase db = DataCenter.getDatabaseHelper(ctx.getApplicationContext()).getWritableDatabase();
 			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager.getHelper(ctx)
 																				.getContainerSessionDaoImpl();
 
-			// 3. Update list ContainerSessions
-
-			int totalItems = 0;
-			int page = 1;
-			String nextUrl = "";
 			String lastUpdate = "";
-			String requestedTime = "";
+			String firstBatchUpdateTime = "";
 
 			if (containerSessionDaoImpl.isEmpty()) {
 
@@ -793,105 +779,9 @@ public class DataCenter {
 						+ invokeType.name() + " | RequestType: " + type);
 			}
 
-			UserRole role = null;
-			Cursor userCursor = db.rawQuery("Select * from user", new String[] {});
-			if (userCursor.moveToFirst()) {
-				role = UserRole.values()[userCursor.getInt(userCursor.getColumnIndexOrThrow("role"))];
-			}
+			firstBatchUpdateTime = updateContainerSessionsFromLastTime(ctx, type, lastUpdate);
+			updateContainerSessionsFromLastTime(ctx, type, firstBatchUpdateTime);
 
-			if (role == null) { throw new NullSessionException(); }
-
-			do {
-
-				long beginParseTime = System.currentTimeMillis();
-				List<ContainerSession> containerSessions = new ArrayList<ContainerSession>();
-				ContainerSessionResult result = null;
-
-				result = CJayClient.getInstance().getContainerSessionsByPage(ctx, lastUpdate, page, type);
-
-				if (null != result) {
-
-					page = page + 1;
-					nextUrl = result.getNext();
-					requestedTime = result.getRequestedTime();
-
-					List<TmpContainerSession> tmpContainerSessions = result.getResults();
-					totalItems += tmpContainerSessions.size();
-					Logger.Log("Total items: " + tmpContainerSessions.size());
-
-					for (TmpContainerSession tmpSession : tmpContainerSessions) {
-
-						if ((role == UserRole.AUDITOR && tmpSession.getStatus() != ContainerState.NEW.getValue())
-								|| (role == UserRole.REPAIR_STAFF && tmpSession.getStatus() == ContainerState.AVAILABLE.getValue())
-								|| (tmpSession.getStatus() == ContainerState.EXPORTED.getValue())) {
-
-							// find and delete this item
-							if (tmpSession.getId() != 0) {
-
-								Logger.Log("Delete container session: " + tmpSession.getContainerId() + " | Id: ");
-								DataCenter.getInstance().removeContainerSession(ctx, tmpSession.getId());
-								continue;
-							}
-						}
-
-						ContainerSession containerSession = null;
-						Cursor cursor = db.rawQuery("select * from container_session where id = ?",
-													new String[] { Integer.toString(tmpSession.getId()) });
-
-						// if tmpSession was existed somewhere in database --> update
-						// note: it will use rawQuery to update
-						if (cursor.moveToFirst()) {
-
-							Logger.Log(tmpSession.getContainerId() + " is existed, prepare to update");
-							String uuid = cursor.getString(cursor.getColumnIndex("_id"));
-
-							if (TextUtils.isEmpty(uuid)) {
-								Logger.e("ContainerSession existed but cannot find _id");
-								DataCenter.getDatabaseHelper(ctx)
-											.addUsageLog(	tmpSession.getContainerId()
-																	+ " | Container existed but cannot find it in database.");
-							} else {
-								Mapper.getInstance().update(ctx, tmpSession, uuid);
-							}
-
-							continue;
-
-						} else { // --> create
-							Logger.Log("Create new container session:" + tmpSession.getContainerId());
-							containerSession = Mapper.getInstance().toContainerSession(tmpSession, ctx);
-						}
-
-						if (null != containerSession) {
-							containerSessions.add(containerSession);
-						} else {
-							Logger.e("WTF with " + tmpSession.getContainerId());
-						}
-
-					}
-
-					// note: it will use ormlite to create, so do not need to recheck any condition
-					containerSessionDaoImpl.bulkInsertDataBySavePoint(containerSessions);
-
-					// containerSessionDaoImpl
-					// .bulkInsertDataByCallBatchTasks(containerSessions);
-
-					if (null != containerSessions && !containerSessions.isEmpty()) {
-						EventBus.getDefault().post(new ContainerSessionChangedEvent(containerSessions));
-					}
-				}
-
-				Logger.Log("Requested Time: " + requestedTime);
-				if (totalItems > 0) {
-					PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE,
-													requestedTime);
-				}
-
-				long delta = System.currentTimeMillis() - beginParseTime;
-				Logger.w("--> One round duration: " + Long.toString(delta));
-
-			} while (!TextUtils.isEmpty(nextUrl));
-
-			getDatabaseHelper(ctx).addUsageLog("Update List CS at " + requestedTime + " | Total Items: " + totalItems);
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 
 			// chưa được gán INITIALIZED
@@ -900,28 +790,150 @@ public class DataCenter {
 			}
 
 		} catch (NoConnectionException e) {
-
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			throw e;
-
 		} catch (SQLException e) {
 
+			Logger.e(e.getMessage());
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			throw e;
 
 		} catch (NullSessionException e) {
-
+			Logger.e("NullSessionException");
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			throw e;
-
 		} catch (Exception e) {
-
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			e.printStackTrace();
-
 		}
+
 		long difference = System.currentTimeMillis() - startTime;
-		Logger.w("---> Total time: " + Long.toString(difference));
+		Logger.w("---> Total time: " + Long.toString(difference / 1000) + " sec");
+	}
+
+	public String
+			updateContainerSessionsFromLastTime(Context ctx, int type, String lastUpdate) throws NullSessionException,
+																							NoConnectionException {
+
+		// we will return this value
+		String firstBatchRequestTime = "";
+
+		SQLiteDatabase db = getDatabaseManager().getReadableDatabase(ctx);
+		ContainerSessionDaoImpl containerSessionDaoImpl = null;
+		try {
+			containerSessionDaoImpl = databaseManager.getHelper(ctx).getContainerSessionDaoImpl();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		UserRole role = null;
+		Cursor userCursor = db.rawQuery("select * from user", new String[] {});
+		if (userCursor.moveToFirst()) {
+			role = UserRole.values()[userCursor.getInt(userCursor.getColumnIndexOrThrow("role"))];
+		}
+
+		if (role == null) { throw new NullSessionException(); }
+
+		int page = 1;
+		int totalItems = 0;
+		String nextUrl = "";
+		String requestedTime = "";
+
+		do {
+			long beginParseTime = System.currentTimeMillis();
+			List<ContainerSession> containerSessions = new ArrayList<ContainerSession>();
+			ContainerSessionResult result = null;
+
+			result = CJayClient.getInstance().getContainerSessionsByPage(ctx, lastUpdate, page, type,
+																			firstBatchRequestTime);
+
+			if (null != result) {
+
+				nextUrl = result.getNext();
+				requestedTime = result.getRequestedTime();
+
+				// Handle container that was removed during fetching time
+				if (page == 1) {
+					firstBatchRequestTime = requestedTime;
+				}
+
+				page = page + 1;
+
+				List<TmpContainerSession> tmpContainerSessions = result.getResults();
+				totalItems += tmpContainerSessions.size();
+				Logger.Log("Total items: " + tmpContainerSessions.size());
+
+				for (TmpContainerSession tmpSession : tmpContainerSessions) {
+
+					if ((role == UserRole.AUDITOR && tmpSession.getStatus() != ContainerState.NEW.getValue())
+							|| (role == UserRole.REPAIR_STAFF && tmpSession.getStatus() == ContainerState.AVAILABLE.getValue())
+							|| (tmpSession.getStatus() == ContainerState.EXPORTED.getValue())) {
+
+						// find and delete this item
+						if (tmpSession.getId() != 0) {
+
+							Logger.Log("Delete container session: " + tmpSession.getContainerId() + " | Id: ");
+							DataCenter.getInstance().removeContainerSession(ctx, tmpSession.getId());
+							continue;
+						}
+					}
+
+					ContainerSession containerSession = null;
+					Cursor cursor = db.rawQuery("select * from container_session where id = ?",
+												new String[] { Integer.toString(tmpSession.getId()) });
+
+					// if tmpSession was existed somewhere in database --> update
+					// note: it will use rawQuery to update
+					if (cursor.moveToFirst()) {
+
+						Logger.Log(tmpSession.getContainerId() + " is existed, prepare to update");
+						String uuid = cursor.getString(cursor.getColumnIndex("_id"));
+
+						if (TextUtils.isEmpty(uuid)) {
+							Logger.e("ContainerSession existed but cannot find _id");
+							DataCenter.getDatabaseHelper(ctx)
+										.addUsageLog(	tmpSession.getContainerId()
+																+ " | Container existed but cannot find it in database.");
+						} else {
+							Mapper.getInstance().update(ctx, tmpSession, uuid);
+						}
+
+						continue;
+
+					} else { // --> create
+						Logger.Log("Create new container session:" + tmpSession.getContainerId());
+						containerSession = Mapper.getInstance().toContainerSession(tmpSession, ctx);
+					}
+
+					if (null != containerSession) {
+						containerSessions.add(containerSession);
+					} else {
+						Logger.e("Cannot insert container " + tmpSession.getContainerId() + " to database.");
+					}
+
+				}
+
+				// note: it will use ormlite to create, so do not need to recheck any condition
+				containerSessionDaoImpl.bulkInsertDataBySavePoint(containerSessions);
+				if (null != containerSessions && !containerSessions.isEmpty()) {
+					EventBus.getDefault().post(new ContainerSessionChangedEvent(containerSessions));
+				}
+			}
+
+			Logger.Log("Requested Time: " + requestedTime);
+
+			long delta = System.currentTimeMillis() - beginParseTime;
+			Logger.w("--> One round duration: " + Long.toString(delta));
+
+		} while (!TextUtils.isEmpty(nextUrl));
+
+		if (totalItems > 0) {
+			Logger.Log("Store last update: " + requestedTime);
+			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE, requestedTime);
+		}
+
+		getDatabaseHelper(ctx).addUsageLog("Update List CS at " + requestedTime + " | Total Items: " + totalItems);
+		return firstBatchRequestTime;
 	}
 
 	/**

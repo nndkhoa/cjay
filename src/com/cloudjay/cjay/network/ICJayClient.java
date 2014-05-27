@@ -25,9 +25,9 @@ public interface ICJayClient {
 
 	List<ComponentCode> getComponentCodes(Context ctx, String date) throws NoConnectionException, NullSessionException;
 
-	ContainerSessionResult
-			getContainerSessionsByPage(Context ctx, String date, int page, int type) throws NoConnectionException,
-																					NullSessionException;
+	// ContainerSessionResult
+	// getContainerSessionsByPage(Context ctx, String date, int page, int type) throws NoConnectionException,
+	// NullSessionException;
 
 	User getCurrentUser(String token, Context ctx) throws NoConnectionException;
 
@@ -43,4 +43,9 @@ public interface ICJayClient {
 	String postContainerSession(Context ctx, TmpContainerSession item) throws NoConnectionException,
 																		NullSessionException, MismatchDataException,
 																		ServerInternalErrorException;
+
+			ContainerSessionResult
+			getContainerSessionsByPage(Context ctx, String date, int page, int type, String andAfter)
+																										throws NoConnectionException,
+																										NullSessionException;
 }

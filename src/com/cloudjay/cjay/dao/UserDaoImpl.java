@@ -23,7 +23,6 @@ public class UserDaoImpl extends BaseDaoImpl<User, Integer> implements IUserDao 
 
 	@Override
 	public void addUser(User user) throws SQLException {
-		Logger.Log("add User");
 		createOrUpdate(user);
 	}
 

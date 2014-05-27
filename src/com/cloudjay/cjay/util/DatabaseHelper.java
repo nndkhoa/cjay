@@ -56,6 +56,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 	public static final Class<?>[] DROP_CLASSES = { User.class, Depot.class, Container.class, ContainerSession.class,
 			Issue.class, CJayImage.class };
+
 	public static final String DATABASE_NAME = "cjay.db";
 
 	UserDaoImpl userDaoImpl = null;

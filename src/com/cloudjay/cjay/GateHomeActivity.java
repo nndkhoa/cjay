@@ -46,9 +46,11 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 
 	@AfterViews
 	void afterViews() {
+
 		locations = getResources().getStringArray(R.array.gate_home_tabs);
 		configureViewPager();
 		configureActionBar();
+
 	}
 
 	public void configureActionBar() {
@@ -69,6 +71,7 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 	}
 
 	private void configureViewPager() {
+
 		mPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), locations) {
 
 			@Override
@@ -87,6 +90,7 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 				}
 			}
 		};
+
 		pager.setAdapter(mPagerAdapter);
 		pager.setOnPageChangeListener(this);
 	}

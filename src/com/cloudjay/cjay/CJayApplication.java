@@ -66,14 +66,14 @@ public class CJayApplication extends Application {
 
 		// Configure Logger
 		boolean debuggable = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox), false);
+												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox), true);
 
 		Logger.getInstance().setDebuggable(debuggable);
 
 		// Setup API ROOT
 		CJayConstant.initBetaApi(false);
 
-		Ion.getDefault(getBaseContext()).configure().setLogging("Ion", Log.INFO);
+		// Ion.getDefault(getBaseContext()).configure().setLogging("Ion", Log.INFO);
 
 		super.onCreate();
 		databaseManager = new DatabaseManager();
@@ -87,7 +87,7 @@ public class CJayApplication extends Application {
 																				.build();
 
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext()).defaultDisplayImageOptions(	defaultOptions)
-																										.discCacheSize(	100 * 1024 * 1024)
+																										.discCacheSize(	500 * 1024 * 1024)
 																										.memoryCache(	new WeakMemoryCache())
 																										.threadPoolSize(3)
 																										.threadPriority(Thread.MAX_PRIORITY)

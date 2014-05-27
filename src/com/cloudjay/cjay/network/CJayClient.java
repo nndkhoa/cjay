@@ -235,9 +235,9 @@ public class CJayClient implements ICJayClient {
 	}
 
 	@Override
-	public ContainerSessionResult
-			getContainerSessionsByPage(Context ctx, String date, int page, int type) throws NoConnectionException,
-																					NullSessionException {
+	public ContainerSessionResult getContainerSessionsByPage(Context ctx, String date, int page, int type,
+																String andAfter) throws NoConnectionException,
+																				NullSessionException {
 
 		if (Utils.hasNoConnection(ctx)) throw new NoConnectionException();
 
@@ -264,8 +264,8 @@ public class CJayClient implements ICJayClient {
 				response = Ion.with(ctx, CJayConstant.CONTAINER_SESSIONS)
 								.setHeader("Authorization", "Token " + accessToken)
 								.setHeader("CJAY_VERSION", Utils.getAppVersionName(ctx))
-								.addQuery("page", Integer.toString(page)).addQuery("modified_after", date).asString()
-								.withResponse().get();
+								.addQuery("page", Integer.toString(page)).addQuery("modified_after", date)
+								.addQuery("and_after", andAfter).asString().withResponse().get();
 
 			}
 
