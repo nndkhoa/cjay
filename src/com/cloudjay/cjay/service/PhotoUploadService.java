@@ -283,7 +283,12 @@ public class PhotoUploadService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		uploadAll();
+		try {
+			uploadAll();
+		} catch (Exception e) {
+
+		}
+
 		return super.onStartCommand(intent, flags, startId);
 	}
 
@@ -420,7 +425,6 @@ public class PhotoUploadService extends Service {
 			try {
 				DataCenter.getInstance().rollbackStuckImages(this);
 			} catch (NullSessionException e1) {
-				e1.printStackTrace();
 				setCurrentlyUploading(false);
 				stopSelf();
 				return false;

@@ -826,21 +826,26 @@ public class DataCenter {
 			e.printStackTrace();
 		}
 
-		UserRole role = null;
-		Cursor userCursor = db.rawQuery("select * from user", new String[] {});
-		if (userCursor.moveToFirst()) {
-			role = UserRole.values()[userCursor.getInt(userCursor.getColumnIndexOrThrow("role"))];
-		}
-
-		if (role == null) { throw new NullSessionException(); }
-
 		int page = 1;
 		int totalItems = 0;
 		String nextUrl = "";
 		String requestedTime = "";
 
 		do {
+
 			long beginParseTime = System.currentTimeMillis();
+			boolean isAllowToUpdate = PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
+			if (isAllowToUpdate == false) { throw new NullSessionException(
+																			"User decided to log out. Process will be stopped here."); }
+
+			UserRole role = null;
+			Cursor userCursor = db.rawQuery("select * from user", new String[] {});
+			if (userCursor.moveToFirst()) {
+				role = UserRole.values()[userCursor.getInt(userCursor.getColumnIndexOrThrow("role"))];
+			}
+
+			if (role == null) { throw new NullSessionException(); }
+
 			List<ContainerSession> containerSessions = new ArrayList<ContainerSession>();
 			ContainerSessionResult result = null;
 
@@ -857,11 +862,11 @@ public class DataCenter {
 					firstBatchRequestTime = requestedTime;
 				}
 
-				page = page + 1;
-
 				List<TmpContainerSession> tmpContainerSessions = result.getResults();
 				totalItems += tmpContainerSessions.size();
-				Logger.Log("Total items: " + tmpContainerSessions.size());
+				Logger.Log("Total items of page " + page + ": " + tmpContainerSessions.size());
+
+				page = page + 1;
 
 				for (TmpContainerSession tmpSession : tmpContainerSessions) {
 
@@ -886,7 +891,7 @@ public class DataCenter {
 					// note: it will use rawQuery to update
 					if (cursor.moveToFirst()) {
 
-						Logger.Log(tmpSession.getContainerId() + " is existed, prepare to update");
+						// Logger.Log(tmpSession.getContainerId() + " is existed, prepare to update");
 						String uuid = cursor.getString(cursor.getColumnIndex("_id"));
 
 						if (TextUtils.isEmpty(uuid)) {
@@ -901,13 +906,16 @@ public class DataCenter {
 						continue;
 
 					} else { // --> create
-						Logger.Log("Create new container session:" + tmpSession.getContainerId());
+						// Logger.Log("Create new container session:" + tmpSession.getContainerId());
 						containerSession = Mapper.getInstance().toContainerSession(tmpSession, ctx);
 					}
 
 					if (null != containerSession) {
 						containerSessions.add(containerSession);
 					} else {
+						DataCenter.getDatabaseHelper(ctx)
+									.addUsageLog(	tmpSession.getContainerId()
+															+ " | Cannot insert container to database.");
 						Logger.e("Cannot insert container " + tmpSession.getContainerId() + " to database.");
 					}
 

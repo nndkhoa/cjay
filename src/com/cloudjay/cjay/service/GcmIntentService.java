@@ -157,21 +157,25 @@ public class GcmIntentService extends IntentService {
 			UserRole userRole = UserRole.NONE;
 
 			try {
+				CJaySession currentSession = CJaySession.restore(this);
+				if (currentSession == null) { return; }
 
-				Logger.Log("User role: " + CJaySession.restore(this).getUserRole());
-				userRole = UserRole.values()[CJaySession.restore(this).getUserRole()];
+				Logger.Log("User role: " + currentSession.getUserRole());
+				userRole = UserRole.values()[currentSession.getUserRole()];
 
 			} catch (Exception e) {
 
 				e.printStackTrace();
 
-				DataCenter.getDatabaseHelper(getApplicationContext()).addUsageLog("NullSessionException");
+				DataCenter.getDatabaseHelper(getApplicationContext())
+							.addUsageLog("GCMIntentService | NullSessionException");
 
-				Toast.makeText(getApplicationContext(), "Tài khoản có vấn đề. Xin hãy đăng nhập lại.",
+				Toast.makeText(getApplicationContext(), "Tài khoản có vấn đề.\nXin hãy đăng nhập lại.",
 								Toast.LENGTH_LONG).show();
 
 				CJayApplication.logOutInstantly(getApplicationContext());
 				onDestroy();
+
 				return;
 			}
 

@@ -131,12 +131,14 @@ public class CJayActivity extends SherlockFragmentActivity {
 		Logger.Log("onEvent UserLoggedOutEvent");
 
 		if (DataCenter.LoadDataTask.getStatus() == AsyncTask.Status.RUNNING) {
+
 			Logger.Log("BGTask is running");
 			DataCenter.LoadDataTask.cancel(true);
+
 		}
 
 		if (DataCenter.LoadDataTask.getStatus() == AsyncTask.Status.RUNNING) {
-			Logger.Log("BGTask is still running ????");
+			Logger.e("Why BGTask is still running ????");
 		}
 
 	}
@@ -248,6 +250,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 							CJayApplication.logOutInstantly(context);
 							finish();
 						}
+
 						return null;
 					};
 
@@ -420,6 +423,8 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
+
+				EventBus.getDefault().post(new UserLoggedOutEvent());
 				getSession().deleteSession(getApplicationContext());
 				startActivity(new Intent(getApplicationContext(), LoginActivity_.class));
 				finish();
