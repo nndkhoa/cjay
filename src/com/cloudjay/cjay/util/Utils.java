@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.R.integer;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
@@ -283,16 +282,6 @@ public class Utils {
 
 	}
 
-	public static boolean isContainerIdValid(String containerId) {
-
-		Pattern pattern = Pattern.compile("^([A-Z]+){4,4}+(\\d{7,7}+)$");
-		Matcher matcher = pattern.matcher(containerId);
-
-		if (!matcher.matches()) return false;
-
-		return true;
-	}
-
 	/**
 	 * 
 	 * @param ctx
@@ -432,5 +421,43 @@ public class Utils {
 				&& PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_EMPTY_PHOTO_QUEUE, false)) { return true; }
 
 		return false;
+	}
+
+	public static boolean isContainerIdValid(String containerId) {
+
+		Pattern pattern = Pattern.compile("^([A-Z]+){4,4}+(\\d{7,7}+)$");
+		Matcher matcher = pattern.matcher(containerId);
+
+		if (!matcher.matches()) return false;
+
+		if (!Logger.isDebuggable()) {
+
+			int crc = ContCheckDigit.getCRC(containerId);
+			if (crc == 10) {
+				crc = 0;
+			}
+
+			char lastChar = containerId.charAt(containerId.length() - 1);
+			if (Character.getNumericValue(lastChar) == crc) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public static void checkId(String containerId) {
+		int crc = ContCheckDigit.getCRC(containerId);
+		if (crc == 10) {
+			crc = 0;
+		}
+
+		char lastChar = containerId.charAt(containerId.length() - 1);
+		if (Character.getNumericValue(lastChar) != crc) {
+			Logger.Log("ContainerId: " + containerId + " | crc: " + crc + " | last: "
+					+ Character.getNumericValue(lastChar));
+		}
 	}
 }

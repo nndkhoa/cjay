@@ -6,14 +6,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.acra.ACRA;
-import org.acra.ACRAConstants;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EBean.Scope;
 import org.androidannotations.annotations.Trace;
 
-import android.R.integer;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
@@ -869,6 +866,8 @@ public class DataCenter {
 				page = page + 1;
 
 				for (TmpContainerSession tmpSession : tmpContainerSessions) {
+
+					Utils.checkId(tmpSession.getContainerId());
 
 					if ((role == UserRole.AUDITOR && tmpSession.getStatus() != ContainerState.NEW.getValue())
 							|| (role == UserRole.REPAIR_STAFF && tmpSession.getStatus() == ContainerState.AVAILABLE.getValue())

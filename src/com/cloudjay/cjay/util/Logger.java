@@ -152,4 +152,5 @@ public final class Logger {
 	public void setDebuggable(boolean enable) {
 		isDebuggable = enable;
 	}
+
 }
