@@ -232,7 +232,7 @@ public class CJayImage {
 
 	public void setBigPictureNotificationBmp(Context context, Bitmap bigPictureNotificationBmp) {
 		if (null == bigPictureNotificationBmp) {
-			mBigPictureNotificationBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_logo);
+			mBigPictureNotificationBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_app);
 		} else {
 			mBigPictureNotificationBmp = bigPictureNotificationBmp;
 		}
