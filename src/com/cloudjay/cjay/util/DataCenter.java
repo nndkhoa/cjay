@@ -244,7 +244,7 @@ public class DataCenter {
 				+ " WHERE container_id LIKE ? ORDER BY container_id LIMIT 100";
 
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
-																			new String[] { constraint + "%" });
+																			new String[] { "%" + constraint + "%" });
 	}
 
 	public Cursor filterComponentCodeCursor(Context context, CharSequence constraint) {
@@ -270,7 +270,7 @@ public class DataCenter {
 				+ " WHERE cs.upload_confirmation = 0 AND cs.fixed = 1 AND cs.state <> 4 AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
 
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
-																			new String[] { constraint + "%" });
+																			new String[] { "%" + constraint + "%" });
 	}
 
 	public Cursor filterLocalCursor(Context context, CharSequence constraint) {
@@ -279,7 +279,7 @@ public class DataCenter {
 				+ " WHERE container_id LIKE ? ORDER BY container_id LIMIT 100";
 
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
-																			new String[] { constraint + "%" });
+																			new String[] { "%" + constraint + "%" });
 	}
 
 	public Cursor filterNotReportedCursor(Context context, CharSequence constraint) {
@@ -290,7 +290,7 @@ public class DataCenter {
 				+ " WHERE cjay_image.type = 2) AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
 
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
-																			new String[] { constraint + "%" });
+																			new String[] { "%" + constraint + "%" });
 	}
 
 	public Cursor filterPendingCursor(Context context, CharSequence constraint) {
@@ -298,7 +298,7 @@ public class DataCenter {
 		String queryString = "SELECT * FROM csi_repair_validation_view cs"
 				+ " WHERE cs.upload_confirmation = 0 AND cs.fixed = 0 AND cs.state <> 4 AND cs.container_id LIKE ? ORDER BY cs.container_id LIMIT 100";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
-																			new String[] { constraint + "%" });
+																			new String[] { "%" + constraint + "%" });
 	}
 
 	public Cursor filterRepairCodeCursor(Context context, CharSequence constraint) {
@@ -319,7 +319,7 @@ public class DataCenter {
 				+ " ORDER BY cs.container_id, check_in_time DESC LIMIT 100";
 
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
-																			new String[] { constraint + "%" });
+																			new String[] { "%" + constraint + "%" });
 	}
 
 	public Cursor filterUserLogCursor(Context context, CharSequence constraint) {
