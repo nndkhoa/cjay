@@ -997,8 +997,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		// Set Uploading Status
 		uploadItem.setType(mType);
 		uploadItem.setTimePosted(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
-//		uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
-		uploadItem.setUploadState(CJayImage.STATE_NONE);
+		uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
 		uploadItem.setUuid(uuid);
 		uploadItem.setUri(uri);
 		uploadItem.setImageName(image_name);
