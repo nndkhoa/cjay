@@ -348,39 +348,45 @@ public class DataCenter {
 	}
 
 	public Cursor getCJayImagesCursorByContainer(Context context, String containerSessionUUID, int imageType) {
-		String queryString = "SELECT * FROM cjay_image WHERE containerSession_id LIKE ? AND type = ?";
+		String queryString = "SELECT * FROM cjay_image WHERE containerSession_id = ? AND type = ?";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
-																			new String[] { containerSessionUUID + "%",
+																			new String[] { containerSessionUUID,
 																					String.valueOf(imageType) });
 	}
 
 	public Cursor getCJayImagesCursorByContainer(Context context, String containerSessionUUID, String issueUUID,
 													int imageType) {
-		String queryString = "SELECT * FROM cjay_image WHERE containerSession_id LIKE ? AND issue_id LIKE ? AND type = ?";
+		String queryString = "SELECT * FROM cjay_image WHERE containerSession_id = ? AND issue_id = ? AND type = ?";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
-																			new String[] { containerSessionUUID + "%",
-																					issueUUID + "%",
+																			new String[] { containerSessionUUID,
+																					issueUUID,
 																					String.valueOf(imageType) });
+	}
+	
+	public Cursor getCJayImagesCursorByIssue(Context context, String issueUUID) {
+		String queryString = "SELECT * FROM cjay_image WHERE issue_id = ?";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
+																			new String[] { issueUUID });
 	}
 
 	public Cursor getCJayImagesCursorByIssue(Context context, String issueUUID, int imageType) {
-		String queryString = "SELECT * FROM cjay_image WHERE issue_id LIKE ? AND type = ?";
+		String queryString = "SELECT * FROM cjay_image WHERE issue_id = ? AND type = ?";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
-																			new String[] { issueUUID + "%",
+																			new String[] { issueUUID,
 																					String.valueOf(imageType) });
 	}
 
 	public Cursor getCJayImagesCursorByContainerForCopy(Context context, String containerSessionUUID, int fromType,
 														int toType) {
 
-		String queryString = "SELECT * FROM cjay_image c1 WHERE containerSession_id LIKE ? AND type = ? "
+		String queryString = "SELECT * FROM cjay_image c1 WHERE containerSession_id = ? AND type = ? "
 				+ "AND not exists "
-				+ "(select uuid from cjay_image c2 where c2.image_name = c1.image_name and containerSession_id LIKE ? and type = ?)";
+				+ "(select uuid from cjay_image c2 where c2.image_name = c1.image_name and containerSession_id = ? and type = ?)";
 
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
-																			new String[] { containerSessionUUID + "%",
+																			new String[] { containerSessionUUID,
 																					String.valueOf(fromType),
-																					containerSessionUUID + "%",
+																					containerSessionUUID,
 																					String.valueOf(toType) });
 	}
 
@@ -408,12 +414,26 @@ public class DataCenter {
 
 	public Cursor getIssueItemCursorByContainer(Context context, String containerSessionUUID, int imageType) {
 
-		String queryString = "SELECT * FROM issue_item_view WHERE containerSession_id LIKE ? AND type = ?";
+		String queryString = "SELECT * FROM issue_item_view WHERE containerSession_id = ? AND type = ?";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
-																			new String[] { containerSessionUUID + "%",
+																			new String[] { containerSessionUUID,
 																					String.valueOf(imageType) });
 	}
-
+	
+	public Cursor getFixedIssueItemCursorByContainer(Context context, String containerSessionUUID) {
+		String queryString = "SELECT * FROM issue_info_view_with_img"
+				+ " WHERE containerSession_id = ? AND fixed = 1";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
+																			new String[] { containerSessionUUID });
+	}
+	
+	public Cursor getPendingIssueItemCursorByContainer(Context context, String containerSessionUUID) {
+		String queryString = "SELECT * FROM issue_info_view_with_img"
+				+ " WHERE containerSession_id = ? AND fixed = 0";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
+																			new String[] { containerSessionUUID });
+	}
+	
 	public void rollback(Context ctx, SQLiteDatabase db, String uuid) {
 
 		Cursor cursor = db.rawQuery("select * from csview where _id = ?", new String[] { uuid });

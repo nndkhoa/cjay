@@ -66,7 +66,7 @@ public class CJayApplication extends Application {
 
 		// Configure Logger
 		boolean debuggable = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox), false);
+												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox), true);
 
 		Logger.getInstance().setDebuggable(debuggable);
 
@@ -183,13 +183,27 @@ public class CJayApplication extends Application {
 		// sendBroadcast(broadcastIntent);
 	}
 
-	public static void openCamera(Context ctx, ContainerSession containerSession, int imageType, String activityTag) {
+	public static void openCamera(Context ctx, String containerSessionUUID, int imageType, String activityTag) {
 
 		Intent intent = new Intent(ctx, CameraActivity_.class);
-		intent.putExtra(CameraActivity.CJAY_CONTAINER_SESSION_EXTRA, containerSession.getUuid());
+		intent.putExtra(CameraActivity.CJAY_CONTAINER_SESSION_EXTRA, containerSessionUUID);
 		intent.putExtra(CameraActivity.CJAY_IMAGE_TYPE_EXTRA, imageType);
 
-		if (activityTag != null && !TextUtils.isEmpty(activityTag)) {
+		if (!TextUtils.isEmpty(activityTag)) {
+			intent.putExtra(CameraActivity.SOURCE_TAG_EXTRA, activityTag);
+		}
+
+		ctx.startActivity(intent);
+	}
+	
+	public static void openCamera(Context ctx, String containerSessionUUID, String issueUUID, int imageType, String activityTag) {
+
+		Intent intent = new Intent(ctx, CameraActivity_.class);
+		intent.putExtra(CameraActivity.CJAY_CONTAINER_SESSION_EXTRA, containerSessionUUID);
+		intent.putExtra(CameraActivity.CJAY_ISSUE_EXTRA, issueUUID);
+		intent.putExtra(CameraActivity.CJAY_IMAGE_TYPE_EXTRA, imageType);
+
+		if (!TextUtils.isEmpty(activityTag)) {
 			intent.putExtra(CameraActivity.SOURCE_TAG_EXTRA, activityTag);
 		}
 
@@ -228,10 +242,24 @@ public class CJayApplication extends Application {
 		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_CONTAINER_ID_EXTRA, containerId);
 		intent.putExtra(PhotoExpandableListViewActivity_.SOURCE_TAG_EXTRA, sourceTag);
 		intent.putExtra(PhotoExpandableListViewActivity_.VIEW_MODE_EXTRA, PhotoExpandableListViewActivity_.MODE_IMPORT);
-		intent.putExtra(PhotoExpandableListViewActivity_.NUM_COLS_EXTRA, 2);
 		ctx.startActivity(intent);
 	}
+	
+	public static void openPhotoGridViewForIssue(Context ctx, String containerSessionUUID, String issueUUID,
+			String containerId, String issueId, int imageType1, int imageType2, String sourceTag) {
 
+		Intent intent = new Intent(ctx, PhotoExpandableListViewActivity_.class);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA, containerSessionUUID);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_CONTAINER_ID_EXTRA, containerId);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_ISSUE_UUID_EXTRA, issueUUID);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_ISSUE_ID_EXTRA, issueId);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_1_EXTRA, imageType1);
+		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_IMAGE_TYPE_2_EXTRA, imageType2);
+		intent.putExtra(PhotoExpandableListViewActivity_.SOURCE_TAG_EXTRA, sourceTag);
+		intent.putExtra(PhotoExpandableListViewActivity_.VIEW_MODE_EXTRA, PhotoExpandableListViewActivity_.MODE_ISSUE);
+		ctx.startActivity(intent);
+	}
+	
 	public static void openReportDialog(Context ctx, String cJayImageUuid, String containerSessionUUID) {
 		IssueReportHelper.showReportDialog(ctx, cJayImageUuid, containerSessionUUID);
 	}

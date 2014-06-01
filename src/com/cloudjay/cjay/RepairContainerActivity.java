@@ -3,10 +3,12 @@ package com.cloudjay.cjay;
 import java.sql.SQLException;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import android.support.v4.app.Fragment;
@@ -18,15 +20,18 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
+import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
-import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.fragment.RepairIssueFixedListFragment_;
+import com.cloudjay.cjay.fragment.RepairIssuePendingListFragment_;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.UploadType;
 
+import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
@@ -38,13 +43,15 @@ import de.keyboardsurfer.android.widget.crouton.Style;
  * 
  */
 @EActivity(R.layout.activity_repair_container)
-@OptionsMenu(R.menu.menu_repair_issue)
+@OptionsMenu(R.menu.menu_repair_container)
 public class RepairContainerActivity extends CJayActivity implements OnPageChangeListener, TabListener {
 
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
 
+	ContainerSessionDaoImpl mContainerSessionDaoImpl;
 	private ContainerSession mContainerSession;
 	private ViewPagerAdapter viewPagerAdapter;
+	Crouton mLoadingCrouton;
 	private String[] locations;
 
 	@ViewById
@@ -56,30 +63,45 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
 	String mContainerSessionUUID = "";
 
-	ContainerSessionDaoImpl containerSessionDaoImpl;
-
 	@AfterViews
 	void afterViews() {
-		try {
-			containerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this)
-												.getContainerSessionDaoImpl();
-
-			mContainerSession = containerSessionDaoImpl.queryForId(mContainerSessionUUID);
-
-			if (null != mContainerSession) {
-				setTitle(mContainerSession.getContainerId());
-				containerIdTextView.setText(mContainerSession.getContainerId());
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		mLoadingCrouton = makeCrouton("Loading...", Style.INFO, Configuration.DURATION_INFINITE, false);
+		mLoadingCrouton.show();
+		
+		// init container session
+		loadData();
 
 		locations = getResources().getStringArray(R.array.repair_container_tabs);
 		configureViewPager();
 		configureActionBar();
+	}
+	
+	@Background
+	void loadData() {		
+		try {
+			mContainerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this)
+												.getContainerSessionDaoImpl();
 
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+			mContainerSession = mContainerSessionDaoImpl.queryForId(mContainerSessionUUID);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		afterLoad();
+	}
+	
+	@UiThread
+	void afterLoad() {
+		Crouton.hide(mLoadingCrouton);
+		
+		if (null != mContainerSession) {
+			setTitle(mContainerSession.getContainerId());
+			containerIdTextView.setText(mContainerSession.getContainerId());
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+			
+			// refresh menu
+			supportInvalidateOptionsMenu();
+		}
 	}
 
 	private void configureActionBar() {
@@ -144,6 +166,12 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 	@Override
 	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 	}
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		menu.findItem(R.id.menu_upload).setVisible(mContainerSession != null);
+		return super.onPrepareOptionsMenu(menu);
+	}
 
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
@@ -152,7 +180,7 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 
 		if (null != mContainerSession) {
 			try {
-				containerSessionDaoImpl.refresh(mContainerSession);
+				mContainerSessionDaoImpl.refresh(mContainerSession);
 
 				if (mContainerSession.isValidForUpload(this, CJayImage.TYPE_REPAIRED)) {
 

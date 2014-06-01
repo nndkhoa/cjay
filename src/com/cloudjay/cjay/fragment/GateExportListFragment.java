@@ -207,7 +207,7 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	@ItemClick(R.id.container_list)
 	void listItemClicked(int position) {
 
-		long startTime = System.currentTimeMillis();
+//		long startTime = System.currentTimeMillis();
 
 		hideMenuItems();
 		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
@@ -228,8 +228,8 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 			handleContainerClicked(uuid, containerId);
 
 		}
-		long difference = System.currentTimeMillis() - startTime;
-		Logger.w("---> Total time: " + Long.toString(difference));
+//		long difference = System.currentTimeMillis() - startTime;
+//		Logger.w("---> Total time: " + Long.toString(difference));
 		// 88 --> 90ms
 	}
 
@@ -349,7 +349,7 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 				EventBus.getDefault().post(new ContainerSessionChangedEvent(containerSession));
 
-				CJayApplication.openCamera(activity, containerSession, CJayImage.TYPE_EXPORT, LOG_TAG);
+				CJayApplication.openCamera(activity, containerSession.getUuid(), CJayImage.TYPE_EXPORT, LOG_TAG);
 
 				break;
 		}

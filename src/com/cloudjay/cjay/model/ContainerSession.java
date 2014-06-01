@@ -76,17 +76,17 @@ public class ContainerSession {
 	@DatabaseField(columnName = FIELD_ID, index = true)
 	int id;
 
-	@DatabaseField(columnName = FIELD_UPLOAD_TYPE, defaultValue = "0")
+	@DatabaseField(columnName = FIELD_UPLOAD_TYPE, defaultValue = "0", index = true)
 	int upload_type;
 
 	@DatabaseField(columnName = FIELD_UUID, id = true)
 	String uuid;
 
 	// Use to mark: cleared from upload fragment
-	@DatabaseField(columnName = FIELD_CLEARED, defaultValue = "false")
+	@DatabaseField(columnName = FIELD_CLEARED, defaultValue = "false", index = true)
 	boolean cleared;
 
-	@DatabaseField(columnName = FIELD_LOCAL, defaultValue = "false")
+	@DatabaseField(columnName = FIELD_LOCAL, defaultValue = "false", index = true)
 	boolean onLocal;
 
 	@DatabaseField(columnName = FIELD_IMAGE_ID_PATH, defaultValue = "")
@@ -106,11 +106,11 @@ public class ContainerSession {
 	boolean mAvailable;
 
 	// Use to mark from pending --> fix
-	@DatabaseField(columnName = FIELD_FIXED, defaultValue = "false")
+	@DatabaseField(columnName = FIELD_FIXED, defaultValue = "false", index = true)
 	boolean fixed;
 
 	// Use to mark exported
-	@DatabaseField(columnName = FIELD_EXPORT, defaultValue = "false")
+	@DatabaseField(columnName = FIELD_EXPORT, defaultValue = "false", index = true)
 	boolean export;
 
 	@DatabaseField(columnName = FIELD_UPLOAD_CONFIRMATION, defaultValue = "false", index = true)

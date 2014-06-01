@@ -52,6 +52,7 @@ import android.widget.ToggleButton;
 import com.aerilys.helpers.android.UIHelper;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
+import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
@@ -62,6 +63,7 @@ import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.GateReportImage;
+import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJaySession;
@@ -73,6 +75,7 @@ import com.cloudjay.cjay.util.UserRole;
 import com.cloudjay.cjay.util.Utils;
 
 import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 /**
  * Input:
@@ -98,6 +101,7 @@ import de.greenrobot.event.EventBus;
 public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
+	public static final String CJAY_ISSUE_EXTRA = "cjay_issue_session";
 	public static final String CJAY_IMAGE_TYPE_EXTRA = "type";
 	public static final String SOURCE_TAG_EXTRA = "tag";
 
@@ -153,6 +157,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	List<GateReportImage> mGateReportImages = new ArrayList<GateReportImage>();
 	List<AuditReportItem> mAuditReportItems = new ArrayList<AuditReportItem>();
 
+	Crouton mLoadingCrouton;
+
 	// List<CJayImage> mCJayImages = new ArrayList<CJayImage>();
 	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
 
@@ -186,12 +192,17 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	AudioManager mAudioManager;
 	ContainerSession mContainerSession = null;
 	ContainerSessionDaoImpl mContainerSessionDaoImpl = null;
+	Issue mIssue = null;
+	IssueDaoImpl mIssueDaoImpl = null;
 
 	CJayImageDaoImpl mCJayImageDaoImpl = null;
 
 	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
 	String mContainerSessionUUID = "";
 
+	@Extra(CJAY_ISSUE_EXTRA)
+	String mIssueUUID = "";
+	
 	@Extra(CJAY_IMAGE_TYPE_EXTRA)
 	int mType = 0;
 
@@ -360,7 +371,10 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	}
 
 	@AfterViews
-	void initCamera() {
+	void afterViews() {
+		
+		// init container sessions
+		loadData();
 
 		Logger.Log("----> initCamera(), addSurfaceCallback");
 
@@ -409,30 +423,53 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			e.printStackTrace();
 		}
 	}
+	
+	@Background
+	void loadData() {	
 
-	@AfterViews
-	void initContainerSession() {
-
+		// hide controls while loading data
+		mBackButton.setVisibility(View.GONE);
+		mCaptureButton.setVisibility(View.GONE);
+		mDoneButton.setVisibility(View.GONE);
+		
 		try {
-
-			if (null == mContainerSessionDaoImpl) {
+			if (mContainerSessionDaoImpl == null) {
 				mContainerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this)
 														.getContainerSessionDaoImpl();
-
 			}
 
-			if (null == mCJayImageDaoImpl) {
+			if (mCJayImageDaoImpl == null) {
 				mCJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
 			}
 
 			if (mContainerSession == null) {
 				mContainerSession = mContainerSessionDaoImpl.queryForId(mContainerSessionUUID);
 			}
-
+			
+			if (!TextUtils.isEmpty(mIssueUUID)) {
+				if (mIssueDaoImpl == null) {
+					mIssueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getIssueDaoImpl();
+				}
+				
+				if (mIssue == null) {
+					mIssue = mIssueDaoImpl.findByUuid(mIssueUUID);
+				}
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
+		
+		afterLoad();
+	}
+	
+	@UiThread
+	void afterLoad() {
+		// finished loading, show controls
+		if (mContainerSession != null) {
+			mBackButton.setVisibility(View.VISIBLE);
+			mCaptureButton.setVisibility(View.VISIBLE);
+			mDoneButton.setVisibility(View.VISIBLE);
+		}
 	}
 
 	void initPreview(int width, int height) {
@@ -503,23 +540,24 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		Logger.Log("onBackPressed");
 
 		try {
-
-			mContainerSessionDaoImpl.update(mContainerSession);
-			EventBus.getDefault().post(new ContainerSessionChangedEvent(mContainerSession));
-
-			// Open GridView
-			if (mSourceTag.equals(GateImportListFragment.LOG_TAG)) {
-
-				CJayApplication.openPhotoGridView(	this, mContainerSession.getUuid(),
-													mContainerSession.getContainerId(), CJayImage.TYPE_IMPORT,
-													GateImportListFragment.LOG_TAG);
-
-			} else if (mSourceTag.equals(GateExportListFragment.LOG_TAG)) {
-
-				CJayApplication.openPhotoGridView(	this, mContainerSession.getUuid(),
-													mContainerSession.getContainerId(), CJayImage.TYPE_EXPORT,
-													CJayImage.TYPE_REPAIRED, GateExportListFragment.LOG_TAG);
-
+			if (mContainerSession != null) {
+				mContainerSessionDaoImpl.update(mContainerSession);
+				EventBus.getDefault().post(new ContainerSessionChangedEvent(mContainerSession));
+	
+				// Open GridView
+				if (mSourceTag.equals(GateImportListFragment.LOG_TAG)) {
+	
+					CJayApplication.openPhotoGridView(	this, mContainerSession.getUuid(),
+														mContainerSession.getContainerId(), CJayImage.TYPE_IMPORT,
+														GateImportListFragment.LOG_TAG);
+	
+				} else if (mSourceTag.equals(GateExportListFragment.LOG_TAG)) {
+	
+					CJayApplication.openPhotoGridView(	this, mContainerSession.getUuid(),
+														mContainerSession.getContainerId(), CJayImage.TYPE_EXPORT,
+														CJayImage.TYPE_REPAIRED, GateExportListFragment.LOG_TAG);
+	
+				}
 			}
 
 		} catch (SQLException e) {
@@ -959,11 +997,15 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		// Set Uploading Status
 		uploadItem.setType(mType);
 		uploadItem.setTimePosted(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
-		uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
+//		uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
+		uploadItem.setUploadState(CJayImage.STATE_NONE);
 		uploadItem.setUuid(uuid);
 		uploadItem.setUri(uri);
 		uploadItem.setImageName(image_name);
 		uploadItem.setContainerSession(mContainerSession);
+		if (mIssue != null) {
+			uploadItem.setIssue(mIssue);
+		}
 
 		try {
 

@@ -299,9 +299,52 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		@Override
 		public void revert(SQLiteDatabase db, ConnectionSource connectionSource) {
 		}
+	}, new Patch() {
+			// version = 6
+		@Override
+		public void apply(SQLiteDatabase db, ConnectionSource connectionSource) {
+	
+			// Add issue_info_view
+			try {
+				db.execSQL("DROP VIEW issue_info_view");
+			} catch (Exception e) {
+
+			}
+			String sql = "CREATE VIEW issue_info_view AS"
+					+ " select i.containerSession_id, i._id as issue_id, dc.code as damage_code, rc.code as repair_code, cc.code as component_code, i.height, i.length, i.quantity, i.locationCode as location_code, i.fixed, i.is_fix_allowed"
+					+ " from issue as i, component_code as cc, repair_code as rc, damage_code as dc"
+					+ " where i.componentCode_id = cc.id and i.repairCode_id = rc.id and i.damageCode_id = dc.id";
+			db.execSQL(sql);
+			
+			// Add issue_info_view_with_img
+			try {
+				db.execSQL("DROP VIEW issue_info_view_with_img");
+			} catch (Exception e) {
+
+			}
+			sql = "CREATE VIEW issue_info_view_with_img AS"
+					+ " SELECT i.*, cj._id AS _id FROM issue_info_view i"
+					+ " LEFT JOIN cjay_image cj ON i.issue_id = cj.issue_id"
+					+ " GROUP BY i.issue_id";
+			db.execSQL(sql);
+	
+			// Add issue item view
+			try {
+				db.execSQL("DROP VIEW issue_item_view");
+			} catch (Exception e) {
+
+			}
+			sql = "CREATE VIEW issue_item_view AS" + " SELECT cj.containerSession_id, cj.uuid, cj._id, cj.type, i.*"
+					+ " from cjay_image as cj LEFT JOIN issue_info_view as i on cj.issue_id = i.issue_id";
+			db.execSQL(sql);	
+		}
+	
+		@Override
+		public void revert(SQLiteDatabase db, ConnectionSource connectionSource) {
+		}
 	} };
 
-	public static final int DATABASE_VERSION = 5;
+	public static final int DATABASE_VERSION = 6;
 
 	public DatabaseHelper(Context context) {
 

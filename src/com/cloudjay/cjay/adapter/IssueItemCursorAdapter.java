@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.util.Logger;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -27,7 +28,7 @@ public class IssueItemCursorAdapter extends CursorAdapter implements Filterable 
 		public TextView lengthTextView;
 		public TextView heightTextView;
 		public ImageView itemPictureView;
-		// public ImageView warningImageView;
+		public ImageView warningImageView;
 
 	}
 
@@ -73,6 +74,7 @@ public class IssueItemCursorAdapter extends CursorAdapter implements Filterable 
 			holder.heightTextView = (TextView) view.findViewById(R.id.issue_height);
 
 			holder.itemPictureView = (ImageView) view.findViewById(R.id.issue_picture);
+			holder.warningImageView = (ImageView) view.findViewById(R.id.issue_warning);
 
 			view.setTag(holder);
 		}
@@ -105,15 +107,19 @@ public class IssueItemCursorAdapter extends CursorAdapter implements Filterable 
 			holder.itemPictureView.setImageResource(R.drawable.ic_app);
 		}
 
-		// boolean isFixAllowed = cursor.getInt(cursor.getColumnIndexOrThrow(Issue.FIELD_IS_FIX_ALLOWED)) > 0 ? true
-		// : false;
-		// if (isFixAllowed) {
-		// holder.warningImageView.setVisibility(View.GONE);
-		// view.setEnabled(false);
-		// } else {
-		// holder.warningImageView.setVisibility(View.VISIBLE);
-		// view.setEnabled(true);
-		// }
+		if (holder.warningImageView != null) {
+			boolean isFixAllowed = true;
+			if (cursor.getColumnIndex(Issue.FIELD_IS_FIX_ALLOWED) >= 0) {
+				isFixAllowed = cursor.getInt(cursor.getColumnIndexOrThrow(Issue.FIELD_IS_FIX_ALLOWED)) > 0;
+			}
+			if (isFixAllowed) {
+				holder.warningImageView.setVisibility(View.GONE);
+//				view.setEnabled(false);
+			} else {
+				holder.warningImageView.setVisibility(View.VISIBLE);
+//				view.setEnabled(true);
+			}
+		}
 	}
 
 	// @Override
@@ -144,7 +150,7 @@ public class IssueItemCursorAdapter extends CursorAdapter implements Filterable 
 		holder.lengthTextView = (TextView) v.findViewById(R.id.issue_length);
 		holder.heightTextView = (TextView) v.findViewById(R.id.issue_height);
 		holder.itemPictureView = (ImageView) v.findViewById(R.id.issue_picture);
-		// holder.warningImageView = (ImageView) v.findViewById(R.id.feed_item_warning);
+		holder.warningImageView = (ImageView) v.findViewById(R.id.feed_item_warning);
 
 		v.setTag(holder);
 

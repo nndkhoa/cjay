@@ -138,7 +138,7 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 	@OptionsItem(R.id.menu_camera)
 	void cameraMenuItemSelected() {
 		Logger.Log("Menu camera item clicked");
-		CJayApplication.openCamera(getActivity(), mSelectedContainerSession, CJayImage.TYPE_IMPORT, LOG_TAG);
+		CJayApplication.openCamera(getActivity(), mSelectedContainerSession.getUuid(), CJayImage.TYPE_IMPORT, LOG_TAG);
 	}
 
 	@OptionsItem(R.id.menu_edit_container)
@@ -225,7 +225,7 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 				DataCenter.getDatabaseHelper(getActivity()).addUsageLog("Create new container: "
 																				+ containerSession.getContainerId());
 				EventBus.getDefault().post(new ContainerSessionChangedEvent(containerSession));
-				CJayApplication.openCamera(activity, containerSession, CJayImage.TYPE_IMPORT, LOG_TAG);
+				CJayApplication.openCamera(activity, containerSession.getUuid(), CJayImage.TYPE_IMPORT, LOG_TAG);
 
 				// temporary upload with upload_type = NONE;
 				// CJayApplication.uploadContainerSesison(getActivity(), containerSession);
