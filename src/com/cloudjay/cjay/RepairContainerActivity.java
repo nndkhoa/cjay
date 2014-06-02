@@ -64,8 +64,9 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 
 	@AfterViews
 	void afterViews() {
-		mLoadingCrouton = makeCrouton("Loading...", Style.INFO, Configuration.DURATION_INFINITE, false);
-		mLoadingCrouton.show();
+
+		// mLoadingCrouton = makeCrouton("Loading...", Style.INFO, Configuration.DURATION_INFINITE, false);
+		// mLoadingCrouton.show();
 
 		// init container session
 		loadData();
@@ -91,7 +92,7 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 
 	@UiThread
 	void afterLoad() {
-		Crouton.hide(mLoadingCrouton);
+		// Crouton.hide(mLoadingCrouton);
 
 		if (null != mContainerSession) {
 			setTitle(mContainerSession.getContainerId());
