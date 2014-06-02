@@ -9,4 +9,6 @@
     <string name="container_search">Tìm container</string>
     <string name="container_add">Thêm</string>
     
+    <string name="container_gate_details">ID:\nHãng tàu:\nNhập:\nXuất:</string>
+    <string name="container_audit_details">ID:\nHãng tàu:\nSố lỗi:\nNhập:</string>
 </resources>

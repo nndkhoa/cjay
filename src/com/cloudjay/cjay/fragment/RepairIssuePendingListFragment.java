@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
@@ -17,12 +18,15 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.IssueItemCursorAdapter;
+import com.cloudjay.cjay.events.CJayImageAddedEvent;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
+import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Utils;
 
 import de.greenrobot.event.EventBus;
 
@@ -33,8 +37,9 @@ public class RepairIssuePendingListFragment extends SherlockFragment implements 
 	private static final int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_REPAIR_ISSUE_PENDING;
 	
 	private String mContainerSessionUUID;
-
 	private IssueItemCursorAdapter mCursorAdapter;
+	private int mNewImageCount;
+	private String mSelectedIssueUUID;
 	
 	private int mItemLayout = R.layout.list_item_issue;
 
@@ -57,17 +62,11 @@ public class RepairIssuePendingListFragment extends SherlockFragment implements 
 
 		// get selected issue uuid
 		Cursor cursor = (Cursor) mCursorAdapter.getItem(position);
-		String issueUUID = cursor.getString(cursor.getColumnIndexOrThrow("issue_id"));
-		String issueID = cursor.getString(cursor.getColumnIndexOrThrow("location_code"))
-				+ " " + cursor.getString(cursor.getColumnIndexOrThrow("damage_code"))
-				+ " " + cursor.getString(cursor.getColumnIndexOrThrow("repair_code"));
+		mSelectedIssueUUID = cursor.getString(cursor.getColumnIndexOrThrow("issue_id"));
 		
-		// show issue report activity
-		CJayApplication.openPhotoGridViewForIssue(getActivity(), mContainerSessionUUID, issueUUID, 
-				"", issueID, 
-				CJayImage.TYPE_REPAIRED, 
-				CJayImage.TYPE_AUDIT, 
-				LOG_TAG);
+		// show camera
+		mNewImageCount = 0;
+		CJayApplication.openCamera(getActivity(), mContainerSessionUUID, mSelectedIssueUUID, CJayImage.TYPE_REPAIRED, LOG_TAG);
 	}
 	
 	@Override
@@ -87,9 +86,20 @@ public class RepairIssuePendingListFragment extends SherlockFragment implements 
 		refresh();
 	}
 
+	public void onEvent(CJayImageAddedEvent event) {
+		if (event.getTag().equals(LOG_TAG)) {
+			mNewImageCount++;
+		}
+	}
+
 	@Override
 	public void onResume() {
-		if (mCursorAdapter != null) {
+		if (mCursorAdapter != null && mNewImageCount > 0) {
+			// update issue to fixed if needed
+			if (!TextUtils.isEmpty(mSelectedIssueUUID)) {
+				Issue.updateFieldByUuid(getActivity(), Issue.FIELD_FIXED, Integer.toString(Utils.toInt(true)), mSelectedIssueUUID);
+			}
+			
 			refresh();
 		}
 		super.onResume();

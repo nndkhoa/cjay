@@ -256,4 +256,9 @@ public class Issue {
 		QueryHelper.update(	ctx, "issue", field, value,
 							Issue.FIELD_UUID + " = " + Utils.sqlString(uuid));
 	}
+	
+	public static void updateFieldByUuid(Context ctx, String field, String value, String uuid) {
+		QueryHelper.update(	ctx, "issue", field, value,
+				Issue.FIELD_UUID + " = " + Utils.sqlString(uuid));
+	}
 }
