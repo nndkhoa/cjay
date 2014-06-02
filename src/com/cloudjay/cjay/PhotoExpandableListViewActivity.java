@@ -139,16 +139,16 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 	@AfterViews
 	void afterViews() {
+		mLoadingCrouton = makeCrouton("Loading...", Style.INFO, Configuration.DURATION_INFINITE, false);
+		mLoadingCrouton.show();
+		
 		// Set Activity Title
 		setTitle(mViewMode == MODE_ISSUE ? mIssueId : mContainerId);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		// Load async
-		mLoadingCrouton = makeCrouton("Loading...", Style.INFO, Configuration.DURATION_INFINITE, false);
-		mLoadingCrouton.show();
-		
-		loadAdapters();
 		loadData();
+		loadAdapters();
 	}
 	
 	@Background
