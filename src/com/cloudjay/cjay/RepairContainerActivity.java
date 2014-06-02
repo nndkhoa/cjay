@@ -30,7 +30,6 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.UploadType;
 
-import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
@@ -64,16 +63,24 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 
 	@AfterViews
 	void afterViews() {
+<<<<<<< HEAD
 
 		// mLoadingCrouton = makeCrouton("Loading...", Style.INFO, Configuration.DURATION_INFINITE, false);
 		// mLoadingCrouton.show();
 
+=======
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		
+>>>>>>> a41d833c9fa3185efd9d5f475ec30a937c7d9aee
 		// init container session
 		loadData();
 
 		locations = getResources().getStringArray(R.array.repair_container_tabs);
 		configureViewPager();
 		configureActionBar();
+		
+//		mLoadingCrouton = makeCrouton("Loading...", Style.INFO, Configuration.DURATION_INFINITE, false);
+//		mLoadingCrouton.show();
 	}
 
 	@Background
@@ -92,6 +99,7 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 
 	@UiThread
 	void afterLoad() {
+<<<<<<< HEAD
 		// Crouton.hide(mLoadingCrouton);
 
 		if (null != mContainerSession) {
@@ -99,6 +107,14 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 			containerIdTextView.setText(mContainerSession.getContainerId());
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+=======
+//		Crouton.hide(mLoadingCrouton);
+		
+		if (null != mContainerSession) {
+			setTitle(mContainerSession.getContainerId());
+			containerIdTextView.setText(mContainerSession.getContainerId());
+			
+>>>>>>> a41d833c9fa3185efd9d5f475ec30a937c7d9aee
 			// refresh menu
 			supportInvalidateOptionsMenu();
 		}

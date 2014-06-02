@@ -90,7 +90,6 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 	ContainerSessionDaoImpl mContainerSessionDaoImpl;
 	IssueDaoImpl mIssueDaoImpl;
 	ContainerSession mContainerSession;
-	Issue mIssue;
 	
 	PhotoExpandableListAdapter mListAdapter;
 	Hashtable<Integer, PhotoGridViewCursorAdapter> mCursorAdapters;
@@ -139,9 +138,6 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 	@AfterViews
 	void afterViews() {
-		mLoadingCrouton = makeCrouton("Loading...", Style.INFO, Configuration.DURATION_INFINITE, false);
-		mLoadingCrouton.show();
-		
 		// Set Activity Title
 		setTitle(mViewMode == MODE_ISSUE ? mIssueId : mContainerId);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -149,6 +145,9 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		// Load async
 		loadData();
 		loadAdapters();
+		
+		mLoadingCrouton = makeCrouton("Loading...", Style.INFO, Configuration.DURATION_INFINITE, false);
+		mLoadingCrouton.show();
 	}
 	
 	@Background
@@ -179,12 +178,6 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 			mContainerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this)
 												.getContainerSessionDaoImpl();
 			mContainerSession = mContainerSessionDaoImpl.queryForId(mContainerSessionUUID);
-			
-			if (mViewMode == MODE_ISSUE && !TextUtils.isEmpty(mIssueUUID)) {
-				mIssueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this)
-										.getIssueDaoImpl();
-				mIssue = mIssueDaoImpl.findByUuid(mIssueUUID);
-			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -396,10 +389,8 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 			
 			// update issue to fixed if needed
 			if (mViewMode == MODE_ISSUE) {
-				if (mIssue != null) {
-					// save db records
-					mIssue.setFixed(true);
-					mIssue.updateField(getApplicationContext(), Issue.FIELD_FIXED, Integer.toString(Utils.toInt(mIssue.isFixed())));
+				if (!TextUtils.isEmpty(mIssueUUID)) {
+					Issue.updateFieldByUuid(this, Issue.FIELD_FIXED, Integer.toString(Utils.toInt(true)), mIssueUUID);
 				}
 			}
 			
