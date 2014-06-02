@@ -195,8 +195,9 @@ public class CJayApplication extends Application {
 
 		ctx.startActivity(intent);
 	}
-	
-	public static void openCamera(Context ctx, String containerSessionUUID, String issueUUID, int imageType, String activityTag) {
+
+	public static void openCamera(Context ctx, String containerSessionUUID, String issueUUID, int imageType,
+									String activityTag) {
 
 		Intent intent = new Intent(ctx, CameraActivity_.class);
 		intent.putExtra(CameraActivity.CJAY_CONTAINER_SESSION_EXTRA, containerSessionUUID);
@@ -244,9 +245,10 @@ public class CJayApplication extends Application {
 		intent.putExtra(PhotoExpandableListViewActivity_.VIEW_MODE_EXTRA, PhotoExpandableListViewActivity_.MODE_IMPORT);
 		ctx.startActivity(intent);
 	}
-	
+
 	public static void openPhotoGridViewForIssue(Context ctx, String containerSessionUUID, String issueUUID,
-			String containerId, String issueId, int imageType1, int imageType2, String sourceTag) {
+													String containerId, String issueId, int imageType1, int imageType2,
+													String sourceTag) {
 
 		Intent intent = new Intent(ctx, PhotoExpandableListViewActivity_.class);
 		intent.putExtra(PhotoExpandableListViewActivity_.CJAY_CONTAINER_SESSION_UUID_EXTRA, containerSessionUUID);
@@ -259,7 +261,7 @@ public class CJayApplication extends Application {
 		intent.putExtra(PhotoExpandableListViewActivity_.VIEW_MODE_EXTRA, PhotoExpandableListViewActivity_.MODE_ISSUE);
 		ctx.startActivity(intent);
 	}
-	
+
 	public static void openReportDialog(Context ctx, String cJayImageUuid, String containerSessionUUID) {
 		IssueReportHelper.showReportDialog(ctx, cJayImageUuid, containerSessionUUID);
 	}

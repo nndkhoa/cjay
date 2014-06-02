@@ -23,8 +23,7 @@ import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
-import com.cloudjay.cjay.fragment.RepairIssueFixedListFragment_;
-import com.cloudjay.cjay.fragment.RepairIssuePendingListFragment_;
+import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
@@ -67,7 +66,7 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 	void afterViews() {
 		mLoadingCrouton = makeCrouton("Loading...", Style.INFO, Configuration.DURATION_INFINITE, false);
 		mLoadingCrouton.show();
-		
+
 		// init container session
 		loadData();
 
@@ -75,30 +74,30 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 		configureViewPager();
 		configureActionBar();
 	}
-	
+
 	@Background
-	void loadData() {		
+	void loadData() {
 		try {
 			mContainerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this)
-												.getContainerSessionDaoImpl();
+													.getContainerSessionDaoImpl();
 
 			mContainerSession = mContainerSessionDaoImpl.queryForId(mContainerSessionUUID);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		afterLoad();
 	}
-	
+
 	@UiThread
 	void afterLoad() {
 		Crouton.hide(mLoadingCrouton);
-		
+
 		if (null != mContainerSession) {
 			setTitle(mContainerSession.getContainerId());
 			containerIdTextView.setText(mContainerSession.getContainerId());
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-			
+
 			// refresh menu
 			supportInvalidateOptionsMenu();
 		}
@@ -166,7 +165,7 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 	@Override
 	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 	}
-	
+
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		menu.findItem(R.id.menu_upload).setVisible(mContainerSession != null);
