@@ -31,6 +31,7 @@ import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.UploadType;
 
+import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
@@ -50,7 +51,6 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 	ContainerSessionDaoImpl mContainerSessionDaoImpl;
 	private ContainerSession mContainerSession;
 	private ViewPagerAdapter viewPagerAdapter;
-	Crouton mLoadingCrouton;
 	private String[] locations;
 
 	@ViewById
@@ -65,20 +65,18 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 	@AfterViews
 	void afterViews() {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		
-		// init container session
-		loadData();
 
+		// init container session
+		makeCrouton("Loading...", Style.INFO, Configuration.DURATION_INFINITE, false).show();
+		loadObjects();
+		
 		locations = getResources().getStringArray(R.array.repair_container_tabs);
 		configureViewPager();
 		configureActionBar();
-		
-//		mLoadingCrouton = makeCrouton("Loading...", Style.INFO, Configuration.DURATION_INFINITE, false);
-//		mLoadingCrouton.show();
 	}
 	
 	@Background
-	void loadData() {		
+	void loadObjects() {		
 		try {
 			mContainerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this)
 												.getContainerSessionDaoImpl();
@@ -93,11 +91,11 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 	
 	@UiThread
 	void afterLoad() {
-//		Crouton.hide(mLoadingCrouton);
-		
 		if (null != mContainerSession) {
 			setTitle(mContainerSession.getContainerId());
 			containerIdTextView.setText(mContainerSession.getContainerId());
+
+			Crouton.clearCroutonsForActivity(this);
 			
 			// refresh menu
 			supportInvalidateOptionsMenu();

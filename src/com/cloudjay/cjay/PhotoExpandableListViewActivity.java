@@ -82,7 +82,6 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 	int mItemLayout;
 	MenuItem avMenuItem;
-	Crouton mLoadingCrouton;
 
 	int mNewImageCount = 0;
 	int[] mImageTypes;
@@ -143,11 +142,9 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		// Load async
+		makeCrouton("Loading...", Style.INFO, Configuration.DURATION_INFINITE, false).show();
 		loadData();
 		loadAdapters();
-		
-		mLoadingCrouton = makeCrouton("Loading...", Style.INFO, Configuration.DURATION_INFINITE, false);
-		mLoadingCrouton.show();
 	}
 	
 	@Background
@@ -196,7 +193,6 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 //			mNonAvTextView.setVisibility(View.VISIBLE);
 //		}
 		
-		
 		// show/hide screen controls
 		boolean containerAV = mContainerSession.getServerContainerState() == ContainerState.AVAILABLE;
 		switch (mViewMode) {
@@ -216,7 +212,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 			break;
 		}
 		
-		Crouton.hide(mLoadingCrouton);
+		Crouton.clearCroutonsForActivity(this);
 		
 		// refresh menu
 		supportInvalidateOptionsMenu();
