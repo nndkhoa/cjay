@@ -3,9 +3,11 @@ package com.cloudjay.cjay.model;
 import java.util.Collection;
 import java.util.UUID;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.dao.IssueDaoImpl;
+import com.cloudjay.cjay.util.QueryHelper;
 import com.cloudjay.cjay.util.Utils;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
@@ -248,5 +250,10 @@ public class Issue {
 
 	public void setFixAllowed(boolean is_fix_allowed) {
 		this.is_fix_allowed = is_fix_allowed;
+	}
+
+	public void updateField(Context ctx, String field, String value) {
+		QueryHelper.update(	ctx, "issue", field, value,
+							Issue.FIELD_UUID + " = " + Utils.sqlString(uuid));
 	}
 }

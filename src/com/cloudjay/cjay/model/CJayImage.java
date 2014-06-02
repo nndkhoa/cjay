@@ -55,7 +55,7 @@ public class CJayImage {
 	/**
 	 * TYPE include: in | out | issue | repaired
 	 */
-	@DatabaseField(columnName = FIELD_TYPE)
+	@DatabaseField(columnName = FIELD_TYPE, index = true)
 	int type;
 
 	@DatabaseField(columnName = FIELD_STATE, index = true, defaultValue = "4")
@@ -232,7 +232,7 @@ public class CJayImage {
 
 	public void setBigPictureNotificationBmp(Context context, Bitmap bigPictureNotificationBmp) {
 		if (null == bigPictureNotificationBmp) {
-			mBigPictureNotificationBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_logo);
+			mBigPictureNotificationBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_app);
 		} else {
 			mBigPictureNotificationBmp = bigPictureNotificationBmp;
 		}

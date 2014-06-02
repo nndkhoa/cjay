@@ -181,7 +181,6 @@ public class CJayActivity extends SherlockFragmentActivity {
 		super.onResume();
 
 		// Logger.Log("*** onResume - DataCenter.reload ***");
-		long startTime = System.currentTimeMillis();
 
 		if (null != session) {
 
@@ -285,9 +284,6 @@ public class CJayActivity extends SherlockFragmentActivity {
 					registerInBackground();
 				}
 			}
-
-			long difference = System.currentTimeMillis() - startTime;
-			// Logger.w("---> Total time: " + Long.toString(difference));
 		}
 
 		isActivityRunning = true;
@@ -412,6 +408,24 @@ public class CJayActivity extends SherlockFragmentActivity {
 		});
 
 		crouton.show();
+	}
+	
+	protected Crouton makeCrouton(String message, Style style, int duration, boolean hideOnTouch) {
+		Crouton.cancelAllCroutons();
+		final Crouton crouton = Crouton.makeText(this, message, style)
+										.setConfiguration(	new Configuration.Builder().setDuration(duration)
+																						.build());
+
+		if (hideOnTouch) {
+			crouton.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Crouton.hide(crouton);
+				}
+			});
+		}
+		
+		return crouton;
 	}
 
 	protected void showLogoutPrompt() {

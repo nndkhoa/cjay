@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/menu_check"
-        android:icon="@drawable/icon_menu_check"
+        android:id="@+id/menu_upload"
+        android:icon="@drawable/ic_action_upload"
         android:showAsAction="always"
-        android:title="@string/menu_issue_report_check_title"/>
-    
+        android:title="@string/menu_upload_title"/>
+
 </menu>

@@ -140,19 +140,18 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		// go to camera
 		mNewImageCount = 0;
 		mNewImageUUID = "";
-		CJayApplication.openCamera(this, mContainerSession, CJayImage.TYPE_AUDIT, LOG_TAG);
+		CJayApplication.openCamera(this, mContainerSessionUUID, CJayImage.TYPE_AUDIT, LOG_TAG);
 	}
 
 	@Background
 	void getOtherDao() {
-		try {
-			damageCodeDaoImpl = DataCenter.getDatabaseHelper(context).getDamageCodeDaoImpl();
-			repairCodeDaoImpl = DataCenter.getDatabaseHelper(context).getRepairCodeDaoImpl();
-			componentCodeDaoImpl = DataCenter.getDatabaseHelper(context).getComponentCodeDaoImpl();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
+//		try {
+//			damageCodeDaoImpl = DataCenter.getDatabaseHelper(context).getDamageCodeDaoImpl();
+//			repairCodeDaoImpl = DataCenter.getDatabaseHelper(context).getRepairCodeDaoImpl();
+//			componentCodeDaoImpl = DataCenter.getDatabaseHelper(context).getComponentCodeDaoImpl();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	@ItemClick(R.id.feeds)
@@ -317,8 +316,6 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 
 	@OptionsItem(R.id.menu_trash)
 	void trashMenuItemClicked() {
-		long startTime = System.currentTimeMillis();
-
 		if (mLongClickedCJayImage != null) {
 			Issue issue = mLongClickedCJayImage.getIssue();
 
@@ -341,9 +338,6 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 			// hide menu items
 			hideMenuItems();
 		}
-
-		long difference = System.currentTimeMillis() - startTime;
-		Logger.w("---> Total time: " + Long.toString(difference));
 	}
 
 	@OptionsItem(R.id.menu_upload)

@@ -115,7 +115,7 @@ public class RepairIssueImageListFragment extends SherlockFragment implements Lo
 			mTakenImages = new ArrayList<CJayImage>();
 		}
 
-		CJayApplication.openCamera(getActivity(), mIssue.getContainerSession(), mType, LOG_TAG);
+		CJayApplication.openCamera(getActivity(), mIssue.getContainerSession().getUuid(), mIssueUUID, mType, LOG_TAG);
 	}
 
 	@Override

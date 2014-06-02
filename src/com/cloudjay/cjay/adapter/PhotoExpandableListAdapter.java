@@ -5,21 +5,16 @@ import java.util.Hashtable;
 import java.util.List;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Typeface;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.PhotoExpandableListViewActivity;
-import com.cloudjay.cjay.PhotoViewPagerActivity;
-import com.cloudjay.cjay.PhotoViewPagerActivity_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Utils;
@@ -35,7 +30,7 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
 
 	private final Context mContext;
 	private final List<String> mSectionHeaders;
-	private final String mContainerSessionUUID;
+//	private final String mContainerSessionUUID;
 	private final int[] mImageTypes;
 	private final Hashtable<Integer, GridView> mGridViews;
 
@@ -46,7 +41,7 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
 		mSectionHeaders = new ArrayList<String>();
 
 		mImageTypes = imageTypes;
-		mContainerSessionUUID = containerSessionUUID;
+//		mContainerSessionUUID = containerSessionUUID;
 
 		for (int i = 0; i < mImageTypes.length; i++) {
 			mSectionHeaders.add(Utils.getImageTypeDescription(mContext, mImageTypes[i]));
@@ -82,28 +77,27 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
 			convertView = infalInflater.inflate(R.layout.expandable_list_photogrid_item, null);
 		}
 
-		final int imageType = mImageTypes[groupPosition];
-		final String title = mSectionHeaders.get(groupPosition);
+//		final int imageType = mImageTypes[groupPosition];
+//		final String title = mSectionHeaders.get(groupPosition);
 
 		TextView emptyTextView = (TextView) convertView.findViewById(android.R.id.empty);
 		GridView gridView = (GridView) convertView.findViewById(R.id.gridview);
-		// gridView.setEmptyView(((FragmentActivity) mContext).findViewById(android.R.id.empty));
 		gridView.setEmptyView(emptyTextView);
 
-		gridView.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-
-				Intent intent = new Intent(mContext, PhotoViewPagerActivity_.class);
-				intent.putExtra(PhotoViewPagerActivity.START_POSITION, position);
-				intent.putExtra(PhotoViewPagerActivity.CJAY_CONTAINER_SESSION_EXTRA, mContainerSessionUUID);
-				intent.putExtra(PhotoViewPagerActivity.CJAY_IMAGE_TYPE_EXTRA, imageType);
-				intent.putExtra("title", title);
-
-				mContext.startActivity(intent);
-			}
-		});
+//		gridView.setOnItemClickListener(new OnItemClickListener() {
+//
+//			@Override
+//			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+//
+//				Intent intent = new Intent(mContext, PhotoViewPagerActivity_.class);
+//				intent.putExtra(PhotoViewPagerActivity.START_POSITION, position);
+//				intent.putExtra(PhotoViewPagerActivity.CJAY_CONTAINER_SESSION_EXTRA, mContainerSessionUUID);
+//				intent.putExtra(PhotoViewPagerActivity.CJAY_IMAGE_TYPE_EXTRA, imageType);
+//				intent.putExtra("title", title);
+//
+//				mContext.startActivity(intent);
+//			}
+//		});
 
 		if (groupPosition == 0) {
 			((FragmentActivity) mContext).getSupportLoaderManager()
