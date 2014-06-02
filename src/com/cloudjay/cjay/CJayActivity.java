@@ -161,8 +161,8 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 	@Override
 	protected void onPause() {
+		Crouton.cancelAllCroutons();
 		isActivityRunning = false;
-
 		super.onPause();
 	}
 
@@ -379,10 +379,8 @@ public class CJayActivity extends SherlockFragmentActivity {
 	public void showCrouton(int textResId) {
 
 		Crouton.cancelAllCroutons();
-		final Crouton crouton = Crouton.makeText(this, textResId, Style.ALERT)
-										.setConfiguration(	new Configuration.Builder().setDuration(Configuration.DURATION_INFINITE)
-																						.build());
-
+		final Crouton crouton = Crouton.makeText(this, textResId, Style.ALERT);
+		crouton.setConfiguration(new Configuration.Builder().setDuration(Configuration.DURATION_INFINITE).build());
 		crouton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -396,10 +394,8 @@ public class CJayActivity extends SherlockFragmentActivity {
 	@UiThread
 	protected void showCrouton(String message) {
 		Crouton.cancelAllCroutons();
-		final Crouton crouton = Crouton.makeText(this, message, Style.ALERT)
-										.setConfiguration(	new Configuration.Builder().setDuration(Configuration.DURATION_INFINITE)
-																						.build());
-
+		final Crouton crouton = Crouton.makeText(this, message, Style.ALERT);
+		crouton.setConfiguration(new Configuration.Builder().setDuration(Configuration.DURATION_INFINITE).build());
 		crouton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -412,10 +408,8 @@ public class CJayActivity extends SherlockFragmentActivity {
 	
 	protected Crouton makeCrouton(String message, Style style, int duration, boolean hideOnTouch) {
 		Crouton.cancelAllCroutons();
-		final Crouton crouton = Crouton.makeText(this, message, style)
-										.setConfiguration(	new Configuration.Builder().setDuration(duration)
-																						.build());
-
+		final Crouton crouton = Crouton.makeText(this, message, style);;
+		crouton.setConfiguration(new Configuration.Builder().setDuration(duration).build());
 		if (hideOnTouch) {
 			crouton.setOnClickListener(new View.OnClickListener() {
 				@Override
