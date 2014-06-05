@@ -3,7 +3,6 @@ package com.cloudjay.cjay;
 import java.sql.SQLException;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
@@ -16,6 +15,7 @@ import org.androidannotations.annotations.ViewById;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.ImageButton;
@@ -26,18 +26,17 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.cloudjay.cjay.adapter.IssueItemCursorAdapter;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
-import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
-import com.cloudjay.cjay.dao.DamageCodeDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
-import com.cloudjay.cjay.dao.RepairCodeDaoImpl;
 import com.cloudjay.cjay.model.CJayImage;
+import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJayCustomCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.QueryHelper;
 import com.cloudjay.cjay.util.UploadType;
 import com.cloudjay.cjay.util.Utils;
 
@@ -54,15 +53,15 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
 	public static final String START_CAMERA_EXTRA = "start_camera";
 
-	private ContainerSession mContainerSession;
+	// private ContainerSession mContainerSession;
 	private CJayImage mLongClickedCJayImage;
+
 	private int mNewImageCount;
 	private String mNewImageUUID;
 
 	private String mSelectedCJayImageUuid;
 	private String mLongClickedCJayImageUuid;
 
-	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
 	private CJayImageDaoImpl cJayImageDaoImpl = null;
 	private IssueDaoImpl issueDaoImpl = null;
 
@@ -82,50 +81,38 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 	TextView containerIdTextView;
 
 	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
-	String mContainerSessionUUID = "";
+	String mContainerSessionUuid = "";
 
 	@Extra(START_CAMERA_EXTRA)
 	boolean mStartCamera = false;
 
-	DamageCodeDaoImpl damageCodeDaoImpl = null;
+	String containerId;
+	boolean isAvailable;
 
-	RepairCodeDaoImpl repairCodeDaoImpl = null;
-	ComponentCodeDaoImpl componentCodeDaoImpl = null;
+	private void refreshContainer() {
+		SQLiteDatabase db = DataCenter.getDatabaseHelper(getApplicationContext()).getReadableDatabase();
+		Cursor cursor = db.rawQuery("select * from csiview where _id = ?", new String[] { mContainerSessionUuid });
+
+		if (cursor.moveToFirst()) {
+			containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
+			isAvailable = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_AV)) != 0;
+		}
+	}
 
 	@AfterViews
 	void afterViews() {
 
-		try {
-
-			if (null == containerSessionDaoImpl) {
-				containerSessionDaoImpl = DataCenter.getDatabaseHelper(context).getContainerSessionDaoImpl();
-			}
-
-			mContainerSession = containerSessionDaoImpl.queryForId(mContainerSessionUUID);
-
-			if (null == cJayImageDaoImpl) {
-				cJayImageDaoImpl = DataCenter.getDatabaseHelper(context).getCJayImageDaoImpl();
-			}
-
-			if (null == issueDaoImpl) {
-				issueDaoImpl = DataCenter.getDatabaseHelper(context).getIssueDaoImpl();
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		// get containerId, isAvailable
+		refreshContainer();
 
 		// Set Activity Title
-		containerIdTextView.setText(mContainerSession.getContainerId());
-		setTitle(mContainerSession.getContainerId());
+		containerIdTextView.setText(containerId);
+		setTitle(containerId);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
 		getLoaderManager().initLoader(LOADER_ID, null, this);
 
 		mLongClickedCJayImage = null;
 		mNewImageCount = 0;
-
-		getOtherDao();
 
 		if (mStartCamera) {
 			cameraClicked();
@@ -140,18 +127,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		// go to camera
 		mNewImageCount = 0;
 		mNewImageUUID = "";
-		CJayApplication.openCamera(this, mContainerSessionUUID, CJayImage.TYPE_AUDIT, LOG_TAG);
-	}
-
-	@Background
-	void getOtherDao() {
-//		try {
-//			damageCodeDaoImpl = DataCenter.getDatabaseHelper(context).getDamageCodeDaoImpl();
-//			repairCodeDaoImpl = DataCenter.getDatabaseHelper(context).getRepairCodeDaoImpl();
-//			componentCodeDaoImpl = DataCenter.getDatabaseHelper(context).getComponentCodeDaoImpl();
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
+		CJayApplication.openCamera(this, mContainerSessionUuid, CJayImage.TYPE_AUDIT, LOG_TAG);
 	}
 
 	@ItemClick(R.id.feeds)
@@ -168,7 +144,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		if (!TextUtils.isEmpty(issueId)) {
 			CJayApplication.openIssueReport(this, mSelectedCJayImageUuid);
 		} else {
-			CJayApplication.openReportDialog(this, mSelectedCJayImageUuid, mContainerSessionUUID);
+			CJayApplication.openReportDialog(this, mSelectedCJayImageUuid, mContainerSessionUuid);
 		}
 
 	}
@@ -186,6 +162,8 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		try {
 			mLongClickedCJayImage = cJayImageDaoImpl.findByUuid(mLongClickedCJayImageUuid);
 			Issue issue = mLongClickedCJayImage.getIssue();
+
+			// TODO: Du`ng lam gi rua'?
 			if (issue != null) {
 				issue.equals(issue);
 			}
@@ -206,7 +184,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 			@Override
 			public Cursor loadInBackground() {
 				Cursor cursor = DataCenter.getInstance().getIssueItemCursorByContainer(getContext(),
-																						mContainerSessionUUID,
+																						mContainerSessionUuid,
 																						CJayImage.TYPE_AUDIT);
 
 				if (cursor != null) {
@@ -243,11 +221,10 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		boolean isDisplayed = !(mLongClickedCJayImage == null);
 
 		menu.findItem(R.id.menu_trash).setVisible(isDisplayed);
-		menu.findItem(R.id.menu_upload).setVisible(mContainerSession.isValidForUpload(this, CJayImage.TYPE_AUDIT));
-
+		menu.findItem(R.id.menu_upload)
+			.setVisible(Utils.isValidForUpload(getApplicationContext(), mContainerSessionUuid, CJayImage.TYPE_AUDIT));
 		avMenuItem = menu.findItem(R.id.menu_av);
-		// avMenuItem.setIcon(mContainerSession.isAvailable() ? R.drawable.ic_action_good : R.drawable.ic_action_bad);
-		avMenuItem.setIcon(mContainerSession.isAvailable() ? R.drawable.ic_menu_av : R.drawable.ic_menu_no_av);
+		avMenuItem.setIcon(isAvailable ? R.drawable.ic_menu_av : R.drawable.ic_menu_no_av);
 
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -279,12 +256,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 
 	@UiThread
 	public void refresh() {
-		try {
-			containerSessionDaoImpl.refresh(mContainerSession);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
+		refreshContainer();
 		getLoaderManager().restartLoader(LOADER_ID, null, this);
 		supportInvalidateOptionsMenu();
 	}
@@ -293,13 +265,12 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 	void avMenuItemClicked() {
 
 		if (avMenuItem != null) {
-			mContainerSession.setAvailable(!mContainerSession.isAvailable());
-			mContainerSession.updateField(	this, ContainerSession.FIELD_AV,
-											Integer.toString(Utils.toInt(mContainerSession.isAvailable())));
+			isAvailable = !isAvailable;
+			QueryHelper.update(	this, "container_session", ContainerSession.FIELD_AV,
+								Integer.toString(Utils.toInt(isAvailable)),
+								ContainerSession.FIELD_UUID + " = " + Utils.sqlString(mContainerSessionUuid));
 
-			// avMenuItem.setIcon(mContainerSession.isAvailable() ? R.drawable.ic_action_good :
-			// R.drawable.ic_action_bad);
-			avMenuItem.setIcon(mContainerSession.isAvailable() ? R.drawable.ic_menu_av : R.drawable.ic_menu_no_av);
+			avMenuItem.setIcon(isAvailable ? R.drawable.ic_menu_av : R.drawable.ic_menu_no_av);
 		}
 
 	}
@@ -307,11 +278,10 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 	@OptionsItem(R.id.menu_import)
 	void importMenuItemClicked() {
 
-		Logger.Log("container session id: " + mContainerSessionUUID);
-
+		Logger.Log("container session id: " + mContainerSessionUuid);
 		hideMenuItems();
-		CJayApplication.openPhotoGridViewForImport(	this, mContainerSessionUUID, mContainerSession.getContainerId(),
-													CJayImage.TYPE_IMPORT, CJayImage.TYPE_AUDIT, LOG_TAG);
+		CJayApplication.openPhotoGridViewForImport(	this, mContainerSessionUuid, containerId, CJayImage.TYPE_IMPORT,
+													CJayImage.TYPE_AUDIT, LOG_TAG);
 	}
 
 	@OptionsItem(R.id.menu_trash)
@@ -344,12 +314,12 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 	void uploadMenuItemClicked() {
 		Logger.Log("Menu upload item clicked");
 
-		if (mContainerSession.isValidForUpload(this, CJayImage.TYPE_AUDIT)) {
+		if (Utils.isValidForUpload(getApplicationContext(), mContainerSessionUuid, CJayImage.TYPE_AUDIT)) {
 
-			// mContainerSession.setUploadType(UploadType.AUDIT);
-			mContainerSession.updateField(	this, ContainerSession.FIELD_UPLOAD_TYPE,
-											Integer.toString(UploadType.AUDIT.getValue()));
-			CJayApplication.uploadContainerSesison(getApplicationContext(), mContainerSession);
+			QueryHelper.update(	this, "container_session", ContainerSession.FIELD_UPLOAD_TYPE,
+								Integer.toString(UploadType.AUDIT.getValue()), ContainerSession.FIELD_UUID + " = "
+										+ Utils.sqlString(mContainerSessionUuid));
+			CJayApplication.uploadContainer(context, mContainerSessionUuid, containerId);
 
 		} else {
 

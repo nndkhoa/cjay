@@ -85,17 +85,17 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 	int mNewImageCount = 0;
 	int[] mImageTypes;
-	
+
 	ContainerSessionDaoImpl mContainerSessionDaoImpl;
 	IssueDaoImpl mIssueDaoImpl;
 	ContainerSession mContainerSession;
-	
+
 	PhotoExpandableListAdapter mListAdapter;
 	Hashtable<Integer, PhotoGridViewCursorAdapter> mCursorAdapters;
 
 	@Extra(CJAY_CONTAINER_SESSION_UUID_EXTRA)
 	String mContainerSessionUUID = "";
-	
+
 	@Extra(CJAY_ISSUE_UUID_EXTRA)
 	String mIssueUUID = "";
 
@@ -110,7 +110,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 	@Extra(CJAY_CONTAINER_ID_EXTRA)
 	String mContainerId = "";
-	
+
 	@Extra(CJAY_ISSUE_ID_EXTRA)
 	String mIssueId = "";
 
@@ -146,7 +146,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		loadData();
 		loadAdapters();
 	}
-	
+
 	@Background
 	public void loadAdapters() {
 		// init expandable list adapter
@@ -168,70 +168,70 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 			mListView.expandGroup(i);
 		}
 	}
-	
+
 	@Background
-	public void loadData() {		
+	public void loadData() {
 		try {
 			mContainerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this)
-												.getContainerSessionDaoImpl();
+													.getContainerSessionDaoImpl();
 			mContainerSession = mContainerSessionDaoImpl.queryForId(mContainerSessionUUID);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		afterLoad();
 	}
-	
+
 	@UiThread
 	public void afterLoad() {
 		// TODO: để điều kiện này thì bên trong GateImport cũng sẽ thấy?
 		// if (mViewMode == MODE_UPLOAD && mContainerSession.getServerContainerState() == ContainerState.AVAILABLE)
 		// {
-//		if (mContainerSession.getServerContainerState() == ContainerState.AVAILABLE || mCJayImageTypeB < 0) {
-//			mNonAvTextView.setVisibility(View.GONE);
-//		} else {
-//			mNonAvTextView.setVisibility(View.VISIBLE);
-//		}
-		
+		// if (mContainerSession.getServerContainerState() == ContainerState.AVAILABLE || mCJayImageTypeB < 0) {
+		// mNonAvTextView.setVisibility(View.GONE);
+		// } else {
+		// mNonAvTextView.setVisibility(View.VISIBLE);
+		// }
+
 		// show/hide screen controls
 		boolean containerAV = mContainerSession.getServerContainerState() == ContainerState.AVAILABLE;
 		switch (mViewMode) {
-		case MODE_UPLOAD:
-			mAddButton.setVisibility(View.VISIBLE);
-			mNonAvTextView.setVisibility(containerAV ? View.GONE : View.VISIBLE);
-			break;
-			
-		case MODE_ISSUE:
-			mAddButton.setVisibility(View.VISIBLE);	
-			mNonAvTextView.setVisibility(View.GONE);		
-			break;
-		
-		case MODE_IMPORT:
-			mAddButton.setVisibility(View.GONE);
-			mNonAvTextView.setVisibility(View.GONE);
-			break;
+			case MODE_UPLOAD:
+				mAddButton.setVisibility(View.VISIBLE);
+				mNonAvTextView.setVisibility(containerAV ? View.GONE : View.VISIBLE);
+				break;
+
+			case MODE_ISSUE:
+				mAddButton.setVisibility(View.VISIBLE);
+				mNonAvTextView.setVisibility(View.GONE);
+				break;
+
+			case MODE_IMPORT:
+				mAddButton.setVisibility(View.GONE);
+				mNonAvTextView.setVisibility(View.GONE);
+				break;
 		}
-		
+
 		Crouton.clearCroutonsForActivity(this);
-		
+
 		// refresh menu
 		supportInvalidateOptionsMenu();
 	}
-	
+
 	@Click(R.id.btn_add_new)
 	void cameraClicked() {
 		// go to camera
 		if (mContainerSession != null) {
 			mNewImageCount = 0;
 			switch (mViewMode) {
-			case MODE_UPLOAD:
-			case MODE_IMPORT:
-				CJayApplication.openCamera(this, mContainerSessionUUID, mCJayImageTypeA, LOG_TAG);				
-				break;
+				case MODE_UPLOAD:
+				case MODE_IMPORT:
+					CJayApplication.openCamera(this, mContainerSessionUUID, mCJayImageTypeA, LOG_TAG);
+					break;
 
-			case MODE_ISSUE:
-				CJayApplication.openCamera(this, mContainerSessionUUID, mIssueUUID, mCJayImageTypeA, LOG_TAG);	
-				break;
+				case MODE_ISSUE:
+					CJayApplication.openCamera(this, mContainerSessionUUID, mIssueUUID, mCJayImageTypeA, LOG_TAG);
+					break;
 			}
 		}
 	}
@@ -259,23 +259,24 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 				Cursor cursor;
 				switch (mViewMode) {
-				case MODE_IMPORT:
-					cursor = DataCenter.getInstance().getCJayImagesCursorByContainerForCopy(getContext(),
-																							mContainerSessionUUID,
-																							cursorLoaderImageType,
-																							mCJayImageTypeCopyTo);
-					break;
+					case MODE_IMPORT:
+						cursor = DataCenter.getInstance().getCJayImagesCursorByContainerForCopy(getContext(),
+																								mContainerSessionUUID,
+																								cursorLoaderImageType,
+																								mCJayImageTypeCopyTo);
+						break;
 
-				case MODE_ISSUE:
-					cursor = DataCenter.getInstance().getCJayImagesCursorByIssue(getContext(), mIssueUUID,
-																					cursorLoaderImageType);
-					break;
-					
-				case MODE_UPLOAD:
-				default:
-					cursor = DataCenter.getInstance().getCJayImagesCursorByContainer(getContext(), mContainerSessionUUID,
+					case MODE_ISSUE:
+						cursor = DataCenter.getInstance().getCJayImagesCursorByIssue(getContext(), mIssueUUID,
 																						cursorLoaderImageType);
-					break;
+						break;
+
+					case MODE_UPLOAD:
+					default:
+						cursor = DataCenter.getInstance().getCJayImagesCursorByContainer(getContext(),
+																							mContainerSessionUUID,
+																							cursorLoaderImageType);
+						break;
 				}
 
 				if (cursor != null) {
@@ -342,29 +343,29 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 				Intent intent;
 				switch (mViewMode) {
-				case MODE_IMPORT:
-					CheckablePhotoGridItemLayout layout = (CheckablePhotoGridItemLayout) v.findViewById(R.id.photo_layout);
-					layout.toggle();
-					break;
+					case MODE_IMPORT:
+						CheckablePhotoGridItemLayout layout = (CheckablePhotoGridItemLayout) v.findViewById(R.id.photo_layout);
+						layout.toggle();
+						break;
 
-				case MODE_ISSUE:
-					intent = new Intent(ctx, PhotoViewPagerActivity_.class);
-					intent.putExtra(PhotoViewPagerActivity.START_POSITION, position);
-					intent.putExtra(PhotoViewPagerActivity.CJAY_CONTAINER_SESSION_EXTRA, mContainerSessionUUID);
-					intent.putExtra(PhotoViewPagerActivity.CJAY_ISSUE_TYPE_EXTRA, mIssueUUID);
-					intent.putExtra(PhotoViewPagerActivity.CJAY_IMAGE_TYPE_EXTRA, imageType);
-					intent.putExtra("title", title);
-					ctx.startActivity(intent);
-					break;
-					
-				case MODE_UPLOAD:
-					intent = new Intent(ctx, PhotoViewPagerActivity_.class);
-					intent.putExtra(PhotoViewPagerActivity.START_POSITION, position);
-					intent.putExtra(PhotoViewPagerActivity.CJAY_CONTAINER_SESSION_EXTRA, mContainerSessionUUID);
-					intent.putExtra(PhotoViewPagerActivity.CJAY_IMAGE_TYPE_EXTRA, imageType);
-					intent.putExtra("title", title);
-					ctx.startActivity(intent);
-					break;
+					case MODE_ISSUE:
+						intent = new Intent(ctx, PhotoViewPagerActivity_.class);
+						intent.putExtra(PhotoViewPagerActivity.START_POSITION, position);
+						intent.putExtra(PhotoViewPagerActivity.CJAY_CONTAINER_SESSION_EXTRA, mContainerSessionUUID);
+						intent.putExtra(PhotoViewPagerActivity.CJAY_ISSUE_TYPE_EXTRA, mIssueUUID);
+						intent.putExtra(PhotoViewPagerActivity.CJAY_IMAGE_TYPE_EXTRA, imageType);
+						intent.putExtra("title", title);
+						ctx.startActivity(intent);
+						break;
+
+					case MODE_UPLOAD:
+						intent = new Intent(ctx, PhotoViewPagerActivity_.class);
+						intent.putExtra(PhotoViewPagerActivity.START_POSITION, position);
+						intent.putExtra(PhotoViewPagerActivity.CJAY_CONTAINER_SESSION_EXTRA, mContainerSessionUUID);
+						intent.putExtra(PhotoViewPagerActivity.CJAY_IMAGE_TYPE_EXTRA, imageType);
+						intent.putExtra("title", title);
+						ctx.startActivity(intent);
+						break;
 				}
 			}
 		});
@@ -382,14 +383,14 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 	public void onResume() {
 		super.onResume();
 		if (mCursorAdapters != null && mNewImageCount > 0) {
-			
+
 			// update issue to fixed if needed
 			if (mViewMode == MODE_ISSUE) {
 				if (!TextUtils.isEmpty(mIssueUUID)) {
 					Issue.updateFieldByUuid(this, Issue.FIELD_FIXED, Integer.toString(Utils.toInt(true)), mIssueUUID);
 				}
 			}
-			
+
 			Logger.e("Refresh cursor loader");
 			if (mCursorAdapters.get(Integer.valueOf(0)) != null) {
 				getSupportLoaderManager().restartLoader(CJayConstant.CURSOR_LOADER_ID_PHOTO_GD_1, null, this);
@@ -399,24 +400,24 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		
+
 		menu.findItem(R.id.menu_select_all).setVisible(false);
 		menu.findItem(R.id.menu_import).setVisible(false);
 		menu.findItem(R.id.menu_upload).setVisible(false);
 		menu.findItem(R.id.menu_av).setVisible(false);
-		
+
 		if (mContainerSession != null) {
 			switch (mViewMode) {
-			case MODE_UPLOAD:
-				menu.findItem(R.id.menu_upload).setVisible(true);				
-				break;
+				case MODE_UPLOAD:
+					menu.findItem(R.id.menu_upload).setVisible(true);
+					break;
 
-			case MODE_IMPORT:
-				menu.findItem(R.id.menu_select_all).setVisible(true);
-				menu.findItem(R.id.menu_import).setVisible(true);
-				break;
+				case MODE_IMPORT:
+					menu.findItem(R.id.menu_select_all).setVisible(true);
+					menu.findItem(R.id.menu_import).setVisible(true);
+					break;
 			}
-			
+
 			// config AV menu item
 			avMenuItem = menu.findItem(R.id.menu_av);
 			if (sourceTag.equals(GateImportListFragment.LOG_TAG)) {

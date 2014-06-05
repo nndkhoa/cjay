@@ -481,7 +481,7 @@ public class Mapper {
 
 				db.execSQL(sqlString);
 
-				// Post ContainerSessionUpdatedEvent
+				// Post ContainerSessionChangedEvent
 				EventBus.getDefault().post(new ContainerSessionChangedEvent());
 			}
 		} catch (Exception e) {

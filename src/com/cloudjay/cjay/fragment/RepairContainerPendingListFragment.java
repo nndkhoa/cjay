@@ -288,13 +288,12 @@ public class RepairContainerPendingListFragment extends SherlockFragment impleme
 
 	@ItemClick(R.id.container_list)
 	void listItemClicked(int position) {
-		Intent intent = new Intent(getActivity(), RepairContainerActivity_.class);
 
 		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
 		String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
 
+		Intent intent = new Intent(getActivity(), RepairContainerActivity_.class);
 		intent.putExtra(RepairContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA, uuidString);
-
 		startActivity(intent);
 	}
 

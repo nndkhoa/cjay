@@ -362,11 +362,10 @@ public class DataCenter {
 																					issueUUID,
 																					String.valueOf(imageType) });
 	}
-	
+
 	public Cursor getCJayImagesCursorByIssue(Context context, String issueUUID) {
 		String queryString = "SELECT * FROM cjay_image WHERE issue_id = ?";
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
-																			new String[] { issueUUID });
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] { issueUUID });
 	}
 
 	public Cursor getCJayImagesCursorByIssue(Context context, String issueUUID, int imageType) {
@@ -419,21 +418,19 @@ public class DataCenter {
 																			new String[] { containerSessionUUID,
 																					String.valueOf(imageType) });
 	}
-	
+
 	public Cursor getFixedIssueItemCursorByContainer(Context context, String containerSessionUUID) {
-		String queryString = "SELECT * FROM issue_info_view_with_img"
-				+ " WHERE containerSession_id = ? AND fixed = 1";
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
+		String queryString = "SELECT * FROM issue_info_view_with_img" + " WHERE containerSession_id = ? AND fixed = 1";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
 																			new String[] { containerSessionUUID });
 	}
-	
+
 	public Cursor getPendingIssueItemCursorByContainer(Context context, String containerSessionUUID) {
-		String queryString = "SELECT * FROM issue_info_view_with_img"
-				+ " WHERE containerSession_id = ? AND fixed = 0";
-		return getDatabaseManager().getReadableDatabase(context).rawQuery(	queryString,
+		String queryString = "SELECT * FROM issue_info_view_with_img" + " WHERE containerSession_id = ? AND fixed = 0";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
 																			new String[] { containerSessionUUID });
 	}
-	
+
 	public void rollback(Context ctx, SQLiteDatabase db, String uuid) {
 
 		Cursor cursor = db.rawQuery("select * from csview where _id = ?", new String[] { uuid });

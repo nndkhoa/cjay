@@ -11,6 +11,9 @@ import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
@@ -25,10 +28,16 @@ import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.model.CJayImage;
+import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.NoConnectionException;
+import com.cloudjay.cjay.util.NullSessionException;
+import com.cloudjay.cjay.util.QueryHelper;
 import com.cloudjay.cjay.util.UploadType;
+import com.cloudjay.cjay.util.Utils;
 
 import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
@@ -47,8 +56,6 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
 
-	ContainerSessionDaoImpl mContainerSessionDaoImpl;
-	private ContainerSession mContainerSession;
 	private ViewPagerAdapter viewPagerAdapter;
 	private String[] locations;
 
@@ -59,47 +66,36 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 	TextView containerIdTextView;
 
 	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
-	String mContainerSessionUUID = "";
+	String mContainerSessionUuid = "";
+
+	String containerId;
 
 	@AfterViews
 	void afterViews() {
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-		// init container session
-		makeCrouton("Loading...", Style.INFO, Configuration.DURATION_INFINITE, false).show();
-		loadObjects();
+		SQLiteDatabase db = DataCenter.getDatabaseHelper(getApplicationContext()).getReadableDatabase();
+		Cursor cursor = db.rawQuery("select * from csiview where _id = ?", new String[] { mContainerSessionUuid });
+
+		if (cursor.moveToFirst()) {
+			containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
+		}
+
+		new AsyncTask<Void, Integer, Void>() {
+			@Override
+			protected Void doInBackground(Void... params) {
+
+				setTitle(containerId);
+				containerIdTextView.setText(containerId);
+				return null;
+			}
+		}.execute();
 
 		locations = getResources().getStringArray(R.array.repair_container_tabs);
 		configureViewPager();
 		configureActionBar();
 
-	}
-
-	@Background
-	void loadObjects() {
-
-		try {
-			mContainerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this)
-													.getContainerSessionDaoImpl();
-			mContainerSession = mContainerSessionDaoImpl.queryForId(mContainerSessionUUID);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		afterLoad();
-	}
-
-	@UiThread
-	void afterLoad() {
-
-		if (null != mContainerSession) {
-			setTitle(mContainerSession.getContainerId());
-			containerIdTextView.setText(mContainerSession.getContainerId());
-
-			// refresh menu
-			supportInvalidateOptionsMenu();
-		}
 	}
 
 	private void configureActionBar() {
@@ -121,12 +117,12 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 				switch (position) {
 					case 0:
 						RepairIssuePendingListFragment_ pendingFragment_ = new RepairIssuePendingListFragment_();
-						pendingFragment_.setContainerSessionUUID(mContainerSessionUUID);
+						pendingFragment_.setContainerSessionUUID(mContainerSessionUuid);
 						return pendingFragment_;
 					case 1:
 					default:
 						RepairIssueFixedListFragment_ fixedFragment_ = new RepairIssueFixedListFragment_();
-						fixedFragment_.setContainerSessionUUID(mContainerSessionUUID);
+						fixedFragment_.setContainerSessionUUID(mContainerSessionUuid);
 						return fixedFragment_;
 				}
 
@@ -167,36 +163,28 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		menu.findItem(R.id.menu_upload).setVisible(mContainerSession != null);
+		// menu.findItem(R.id.menu_upload).setVisible(mContainerSession != null);
+		menu.findItem(R.id.menu_upload).setVisible(	Utils.isValidForUpload(	getApplicationContext(),
+																			mContainerSessionUuid,
+																			CJayImage.TYPE_REPAIRED));
 		return super.onPrepareOptionsMenu(menu);
 	}
 
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 
-		Logger.Log("Validating container :" + mContainerSession.getContainerId());
+		Logger.Log("Validating container: " + containerId);
+		if (Utils.isValidForUpload(getApplicationContext(), mContainerSessionUuid, CJayImage.TYPE_REPAIRED)) {
 
-		if (null != mContainerSession) {
-			try {
-				mContainerSessionDaoImpl.refresh(mContainerSession);
+			QueryHelper.update(	this, "container_session", ContainerSession.FIELD_UPLOAD_TYPE,
+								Integer.toString(UploadType.REPAIR.getValue()), ContainerSession.FIELD_UUID + " = "
+										+ Utils.sqlString(mContainerSessionUuid));
+			CJayApplication.uploadContainer(context, mContainerSessionUuid, containerId);
+			finish();
 
-				if (mContainerSession.isValidForUpload(this, CJayImage.TYPE_REPAIRED)) {
-
-					// mContainerSession.setUploadType(UploadType.REPAIR);
-					mContainerSession.updateField(	this, ContainerSession.FIELD_UPLOAD_TYPE,
-													Integer.toString(UploadType.REPAIR.getValue()));
-					CJayApplication.uploadContainerSesison(context, mContainerSession);
-
-					finish();
-
-				} else {
-					Crouton.cancelAllCroutons();
-					Crouton.makeText(this, R.string.alert_no_issue_container, Style.ALERT).show();
-				}
-
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+		} else {
+			Crouton.cancelAllCroutons();
+			Crouton.makeText(this, R.string.alert_invalid_container, Style.ALERT).show();
 		}
 	}
 }

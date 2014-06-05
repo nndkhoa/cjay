@@ -15,13 +15,12 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
-import android.util.Log;
-
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
@@ -40,11 +39,11 @@ import com.cloudjay.cjay.util.IssueReportHelper;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.cloudjay.cjay.util.QueryHelper;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadState;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
-import com.koushikdutta.ion.Ion;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -73,7 +72,7 @@ public class CJayApplication extends Application {
 		// Setup API ROOT
 		CJayConstant.initBetaApi(false);
 
-		Ion.getDefault(getBaseContext()).configure().setLogging("Ion", Log.INFO);
+		// Ion.getDefault(getBaseContext()).configure().setLogging("Ion", Log.INFO);
 
 		super.onCreate();
 		databaseManager = new DatabaseManager();
@@ -340,6 +339,24 @@ public class CJayApplication extends Application {
 		EventBus.getDefault().post(new ContainerSessionEnqueueEvent(containerSession));
 		DataCenter.getDatabaseHelper(ctx).addUsageLog(	containerSession.getContainerId()
 																+ " | Added container to upload queue");
+	}
+
+	public static void uploadContainer(Context context, String uuid, String containerId) {
+
+		// Set upload_confirmation = true
+		// Set upload_state = WAITING
+		String[] fields = new String[] { ContainerSession.FIELD_UPLOAD_CONFIRMATION, ContainerSession.FIELD_STATE };
+		String[] values = new String[] { Integer.toString(1), Integer.toString(UploadState.WAITING.getValue()) };
+		QueryHelper.update(	context, "container_session", fields, values,
+							ContainerSession.FIELD_UUID + " = " + Utils.sqlString(uuid));
+
+		if (!Utils.isAlarmUp(context)) {
+			Utils.startAlarm(context);
+		}
+
+		// It will trigger `UploadsFragment` Adapter
+		EventBus.getDefault().post(new ContainerSessionEnqueueEvent(uuid));
+		DataCenter.getDatabaseHelper(context).addUsageLog(containerId + " | Added container to upload queue");
 	}
 
 	IDatabaseManager databaseManager = null;

@@ -19,9 +19,12 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources.NotFoundException;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
@@ -61,15 +64,19 @@ import com.cloudjay.cjay.fragment.GateExportListFragment;
 import com.cloudjay.cjay.fragment.GateImportListFragment;
 import com.cloudjay.cjay.model.AuditReportItem;
 import com.cloudjay.cjay.model.CJayImage;
+import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
+import com.cloudjay.cjay.model.Depot;
 import com.cloudjay.cjay.model.GateReportImage;
 import com.cloudjay.cjay.model.Issue;
+import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJaySession;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.cloudjay.cjay.util.QueryHelper;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UserRole;
 import com.cloudjay.cjay.util.Utils;
@@ -149,19 +156,14 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	MediaPlayer mShootMediaPlayer = null;
 	private SurfaceHolder mPreviewHolder = null;
 	private boolean mInPreview = false;
-
 	private boolean mCameraConfigured = false;
-	String mFlashMode;
+	String mFlashMode = Camera.Parameters.FLASH_MODE_OFF;
+	int mCameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
 
-	int mCameraMode;
 	List<GateReportImage> mGateReportImages = new ArrayList<GateReportImage>();
 	List<AuditReportItem> mAuditReportItems = new ArrayList<AuditReportItem>();
 
-	Crouton mLoadingCrouton;
-
-	// List<CJayImage> mCJayImages = new ArrayList<CJayImage>();
 	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
-
 	private static final int PREVIEW_SIZE_MAX_WIDTH = 1280;
 
 	@ViewById(R.id.camera_preview)
@@ -190,19 +192,13 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@SystemService
 	AudioManager mAudioManager;
-	ContainerSession mContainerSession = null;
-	ContainerSessionDaoImpl mContainerSessionDaoImpl = null;
-	Issue mIssue = null;
-	IssueDaoImpl mIssueDaoImpl = null;
-
-	CJayImageDaoImpl mCJayImageDaoImpl = null;
 
 	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
 	String mContainerSessionUUID = "";
 
 	@Extra(CJAY_ISSUE_EXTRA)
 	String mIssueUUID = "";
-	
+
 	@Extra(CJAY_IMAGE_TYPE_EXTRA)
 	int mType = 0;
 
@@ -210,6 +206,11 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Extra(SOURCE_TAG_EXTRA)
 	String mSourceTag = "";
+
+	String containerId;
+	String operatorCode;
+	String depotCode;
+	String imageIdPath;
 
 	SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
 
@@ -372,9 +373,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@AfterViews
 	void afterViews() {
-		
+
 		// init container sessions
-		loadData();
+		// loadData();
 
 		Logger.Log("----> initCamera(), addSurfaceCallback");
 
@@ -385,14 +386,14 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		mPreviewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
 		// Restore camera state from database or somewhere else
-		mFlashMode = Camera.Parameters.FLASH_MODE_AUTO;
-		mCameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
+		// mFlashMode = Camera.Parameters.FLASH_MODE_OFF;
+		// mCameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
 		// TYPE_REPORT images can be captured in single mode (non-continuous)
 		// Only two users use this:
-		// -Auditor: can see captureModeToggleButton, can set mode to single/continuous
-		// -Repair: can NOT see captureModeToggleButton, mode always is single,
+		// - Auditor: can see captureModeToggleButton, can set mode to single/continuous
+		// - Repair: can NOT see captureModeToggleButton, mode always is single,
 		// user is forced to report issue after capturing an image
 		try {
 			if (mType == CJayImage.TYPE_AUDIT) {
@@ -422,53 +423,16 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-	
-	@Background
-	void loadData() {	
 
-		// hide controls while loading data
-		mBackButton.setVisibility(View.GONE);
-		mCaptureButton.setVisibility(View.GONE);
-		mDoneButton.setVisibility(View.GONE);
-		
-		try {
-			if (mContainerSessionDaoImpl == null) {
-				mContainerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this)
-														.getContainerSessionDaoImpl();
-			}
+		SQLiteDatabase db = DataCenter.getDatabaseHelper(getApplicationContext()).getReadableDatabase();
+		Cursor cursor = db.rawQuery("select * from cs_full_info_view where _id = ?",
+									new String[] { mContainerSessionUUID });
 
-			if (mCJayImageDaoImpl == null) {
-				mCJayImageDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getCJayImageDaoImpl();
-			}
-
-			if (mContainerSession == null) {
-				mContainerSession = mContainerSessionDaoImpl.queryForId(mContainerSessionUUID);
-			}
-			
-			if (!TextUtils.isEmpty(mIssueUUID)) {
-				if (mIssueDaoImpl == null) {
-					mIssueDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(this).getIssueDaoImpl();
-				}
-				
-				if (mIssue == null) {
-					mIssue = mIssueDaoImpl.findByUuid(mIssueUUID);
-				}
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		afterLoad();
-	}
-	
-	@UiThread
-	void afterLoad() {
-		// finished loading, show controls
-		if (mContainerSession != null) {
-			mBackButton.setVisibility(View.VISIBLE);
-			mCaptureButton.setVisibility(View.VISIBLE);
-			mDoneButton.setVisibility(View.VISIBLE);
+		if (cursor.moveToFirst()) {
+			containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
+			operatorCode = cursor.getString(cursor.getColumnIndexOrThrow(Operator.FIELD_CODE));
+			depotCode = cursor.getString(cursor.getColumnIndexOrThrow(Depot.DEPOT_CODE));
+			imageIdPath = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_IMAGE_ID_PATH));
 		}
 	}
 
@@ -495,13 +459,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 				Camera.Size size = determineBestPreviewSize(parameters);
 				Camera.Size pictureSize = determineBestPictureSize(parameters);
 
-				// Logger.Log(
-				// "PreviewSize: " + Integer.toString(size.width) + "/"
-				// + Integer.toString(size.height));
-				//
-				// Logger.Log(
-				// "PictureSize: " + Integer.toString(pictureSize.width)
-				// + "/" + Integer.toString(pictureSize.height));
+				// Logger.Log("PreviewSize: " + Integer.toString(size.width) + "/" + Integer.toString(size.height));
+				// Logger.Log("PictureSize: " + Integer.toString(pictureSize.width) + "/"
+				// + Integer.toString(pictureSize.height));
 
 				try {
 					if (size != null && pictureSize != null) {
@@ -537,31 +497,13 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	@Override
 	public void onBackPressed() {
 
-		Logger.Log("onBackPressed");
-
-		try {
-			if (mContainerSession != null) {
-				mContainerSessionDaoImpl.update(mContainerSession);
-				EventBus.getDefault().post(new ContainerSessionChangedEvent(mContainerSession));
-	
-				// Open GridView
-				if (mSourceTag.equals(GateImportListFragment.LOG_TAG)) {
-	
-					CJayApplication.openPhotoGridView(	this, mContainerSession.getUuid(),
-														mContainerSession.getContainerId(), CJayImage.TYPE_IMPORT,
-														GateImportListFragment.LOG_TAG);
-	
-				} else if (mSourceTag.equals(GateExportListFragment.LOG_TAG)) {
-	
-					CJayApplication.openPhotoGridView(	this, mContainerSession.getUuid(),
-														mContainerSession.getContainerId(), CJayImage.TYPE_EXPORT,
-														CJayImage.TYPE_REPAIRED, GateExportListFragment.LOG_TAG);
-	
-				}
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
+		// Open GridView
+		if (mSourceTag.equals(GateImportListFragment.LOG_TAG)) {
+			CJayApplication.openPhotoGridView(	this, mContainerSessionUUID, containerId, CJayImage.TYPE_IMPORT,
+												GateImportListFragment.LOG_TAG);
+		} else if (mSourceTag.equals(GateExportListFragment.LOG_TAG)) {
+			CJayApplication.openPhotoGridView(	this, mContainerSessionUUID, containerId, CJayImage.TYPE_EXPORT,
+												CJayImage.TYPE_REPAIRED, GateExportListFragment.LOG_TAG);
 		}
 
 		super.onBackPressed();
@@ -578,54 +520,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		setContentView(R.layout.activity_camera);
 		openCamera();
-
-	}
-
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		EventBus.getDefault().register(this);
-		super.onCreate(savedInstanceState);
-	}
-
-	@Override
-	protected void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
-	}
-
-	public void onEvent(UploadStateRestoredEvent event) {
-
-		Logger.w("on Event CS Restored Event");
-
-		String eventContainerId = event.getContainerSession().getContainerId();
-		String currentContainerId = mContainerSession.getContainerId();
-
-		if (eventContainerId.equals(currentContainerId)) {
-
-			try {
-				Logger.Log("onEvent UploadStateRestoredEvent");
-				mContainerSessionDaoImpl.refresh(mContainerSession);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void onEvent(ContainerSessionUpdatedEvent event) {
-
-		Logger.w("onEvent CS Updated Event");
-		String eventContainerId = event.getTarget().getContainerId();
-		String currentContainerId = mContainerSession.getContainerId();
-
-		if (eventContainerId.equals(currentContainerId)) {
-
-			try {
-				Logger.Log("refresh Container Session");
-				mContainerSessionDaoImpl.refresh(mContainerSession);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	@Override
@@ -761,17 +655,12 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 					break;
 			}
 
-			String depotCode = mContainerSession.getContainer().getDepot().getDepotCode();
-			String containerId = mContainerSession.getContainerId();
-			String operator = mContainerSession.getOperatorCode() == null ? "" : mContainerSession.getOperatorCode()
-					+ "-";
-
 			// file name example:
 			// [depot-code]-2013-12-19-[gate-in|gate-out|report]-[containerId]-[UUID].jpg
 			String currentTimestamp = StringHelper.getCurrentTimestamp("yyyy-MM-dd");
 
-			String fileName = depotCode + "-" + currentTimestamp + "-" + imageType + "-" + containerId + "-" + operator
-					+ uuid + ".jpg";
+			String fileName = depotCode + "-" + currentTimestamp + "-" + imageType + "-" + containerId + "-"
+					+ operatorCode + "-" + uuid + ".jpg";
 
 			File newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/" + currentTimestamp + "/"
 					+ imageType + "/" + containerId);
@@ -780,19 +669,13 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 				newDirectory.mkdirs();
 			}
 
-			File photo = new File(newDirectory, fileName);
-
-			// File photo = new File(CJayConstant.APP_DIRECTORY_FILE, fileName);
-			// Logger.Log("Photo Path: " + photo.getAbsolutePath());
-
 			// Save Bitmap to JPEG
+			File photo = new File(newDirectory, fileName);
 			saveBitmapToFile(capturedBitmap, photo);
 
-			// Upload image
+			// Upload image --> add image to queue
 			uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
-
-			DataCenter.getDatabaseHelper(this).addUsageLog(	mContainerSession.getContainerId() + " | Captured "
-																	+ fileName);
+			DataCenter.getDatabaseHelper(this).addUsageLog(containerId + " | Captured " + fileName);
 
 			if (capturedBitmap != null) {
 				capturedBitmap.recycle();
@@ -991,63 +874,48 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	private synchronized void uploadImage(String uuid, String uri, String image_name) {
 
-		// Create Database Entity Object
-		CJayImage uploadItem = new CJayImage();
-
-		// Set Uploading Status
-		uploadItem.setType(mType);
-		uploadItem.setTimePosted(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
-		uploadItem.setUploadState(CJayImage.STATE_UPLOAD_WAITING);
-		uploadItem.setUuid(uuid);
-		uploadItem.setUri(uri);
-		uploadItem.setImageName(image_name);
-		uploadItem.setContainerSession(mContainerSession);
-		if (mIssue != null) {
-			uploadItem.setIssue(mIssue);
+		// Set container session image_id_path
+		if (TextUtils.isEmpty(imageIdPath)
+				|| imageIdPath.equals("https://storage.googleapis.com/storage-cjay.cloudjay.com/")) {
+			Logger.Log("Set container image_id_path: " + uri);
+			imageIdPath = uri;
+			QueryHelper.update(	getApplicationContext(), "container_session", ContainerSession.FIELD_IMAGE_ID_PATH,
+								imageIdPath,
+								ContainerSession.FIELD_UUID + " = " + Utils.sqlString(mContainerSessionUUID));
 		}
 
-		try {
+		// Create new image and add to queue
+		SQLiteDatabase db = DataCenter.getDatabaseHelper(getApplicationContext()).getWritableDatabase();
+		ContentValues imageValues = new ContentValues();
+		imageValues.put("containerSession_id", mContainerSessionUUID);
+		imageValues.put("uuid", uuid);
+		imageValues.put("image_name", image_name);
+		imageValues.put("time_posted", StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+		imageValues.put("_id", uri);
+		imageValues.put("type", mType);
+		imageValues.put("state", CJayImage.STATE_UPLOAD_WAITING);
 
-			// Logger.w("Image Id Path: " + mContainerSession.getImageIdPath());
-			if (TextUtils.isEmpty(mContainerSession.getImageIdPath())
-					|| mContainerSession.getImageIdPath()
-										.equals("https://storage.googleapis.com/storage-cjay.cloudjay.com/")) {
-
-				Logger.Log("Set container image_id_path: " + uri);
-				mContainerSession.setImageIdPath(uri);
-				mContainerSessionDaoImpl.update(mContainerSession);
-			}
-
-			// mCJayImages.add(uploadItem);
-			mCJayImageDaoImpl.addCJayImage(uploadItem);
-
-			// 1. start broadcast receiver
-			Intent i = new Intent();
-			i.setAction(CJayConstant.INTENT_PHOTO_TAKEN);
-			sendBroadcast(i);
-
-			if (!Utils.isAlarmUp(this)) {
-				Utils.startAlarm(this);
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-
-			DataCenter.getDatabaseHelper(this).addUsageLog(	"#error when update captured image | "
-																	+ mContainerSession.getContainerId());
-			Logger.e("#error when update captured image | " + mContainerSession.getContainerId());
+		// imageValues.put("id", 0);
+		if (TextUtils.isEmpty(mIssueUUID)) {
+			imageValues.put("issue_id", mIssueUUID);
 		}
+		db.insertWithOnConflict("cjay_image", null, imageValues, SQLiteDatabase.CONFLICT_REPLACE);
 
-		// Logger.Log("Source tag: " + mSourceTag);
+		// 1. start broadcast receiver
+		Intent i = new Intent();
+		i.setAction(CJayConstant.INTENT_PHOTO_TAKEN);
+		sendBroadcast(i);
+
+		if (!Utils.isAlarmUp(this)) {
+			Utils.startAlarm(this);
+		}
 
 		// tell people that an image has been created
 		if (!TextUtils.isEmpty(mSourceTag)) {
-			// SystemClock.sleep(300);
-			// Logger.Log("issue_report - " + uploadItem.getUuid() + " - Trigger cjayimage added");
-			EventBus.getDefault().post(new CJayImageAddedEvent(uploadItem, mSourceTag));
+			EventBus.getDefault().post(new CJayImageAddedEvent(uuid, mSourceTag));
 			if (!PreferencesUtil.getPrefsValue(	getApplicationContext(), PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS,
 												true)) {
-				showIssueReportDialog(uploadItem.getUuid());
+				showIssueReportDialog(uuid);
 			}
 		}
 	}

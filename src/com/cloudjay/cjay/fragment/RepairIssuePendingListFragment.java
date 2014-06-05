@@ -26,21 +26,21 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.QueryHelper;
 import com.cloudjay.cjay.util.Utils;
 
 import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_repair_issue_pending)
 public class RepairIssuePendingListFragment extends SherlockFragment implements LoaderCallbacks<Cursor> {
-	
+
 	public final static String LOG_TAG = "RepairIssuePendingListFragment";
 	private static final int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_REPAIR_ISSUE_PENDING;
-	
-	private String mContainerSessionUUID;
+
+	private String mContainerSessionUuid;
 	private IssueItemCursorAdapter mCursorAdapter;
-	private int mNewImageCount;
+	private int mNewImageCount = 0;
 	private String mSelectedIssueUUID;
-	
 	private int mItemLayout = R.layout.list_item_issue;
 
 	@ViewById(R.id.feeds)
@@ -48,11 +48,10 @@ public class RepairIssuePendingListFragment extends SherlockFragment implements 
 
 	@ViewById(android.R.id.empty)
 	FrameLayout emptyElement;
-	
+
 	@AfterViews
 	void afterViews() {
 		mFeedListView.setEmptyView(emptyElement);
-		
 		getLoaderManager().initLoader(LOADER_ID, null, this);
 	}
 
@@ -63,12 +62,13 @@ public class RepairIssuePendingListFragment extends SherlockFragment implements 
 		// get selected issue uuid
 		Cursor cursor = (Cursor) mCursorAdapter.getItem(position);
 		mSelectedIssueUUID = cursor.getString(cursor.getColumnIndexOrThrow("issue_id"));
-		
+
 		// show camera
 		mNewImageCount = 0;
-		CJayApplication.openCamera(getActivity(), mContainerSessionUUID, mSelectedIssueUUID, CJayImage.TYPE_REPAIRED, LOG_TAG);
+		CJayApplication.openCamera(	getActivity(), mContainerSessionUuid, mSelectedIssueUUID, CJayImage.TYPE_REPAIRED,
+									LOG_TAG);
 	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		EventBus.getDefault().register(this);
@@ -94,12 +94,15 @@ public class RepairIssuePendingListFragment extends SherlockFragment implements 
 
 	@Override
 	public void onResume() {
+
 		if (mCursorAdapter != null && mNewImageCount > 0) {
+
 			// update issue to fixed if needed
 			if (!TextUtils.isEmpty(mSelectedIssueUUID)) {
-				Issue.updateFieldByUuid(getActivity(), Issue.FIELD_FIXED, Integer.toString(Utils.toInt(true)), mSelectedIssueUUID);
+				QueryHelper.update(	getActivity(), "issue", Issue.FIELD_FIXED, "1",
+									Issue.FIELD_UUID + " = " + Utils.sqlString(mSelectedIssueUUID));
 			}
-			
+
 			refresh();
 		}
 		super.onResume();
@@ -110,18 +113,18 @@ public class RepairIssuePendingListFragment extends SherlockFragment implements 
 	}
 
 	public void setContainerSessionUUID(String containerSessionUUID) {
-		mContainerSessionUUID = containerSessionUUID;
+		mContainerSessionUuid = containerSessionUUID;
 	}
-	
+
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
 		Context context = getActivity();
-		
+
 		return new CJayCursorLoader(context) {
 			@Override
 			public Cursor loadInBackground() {
 				Cursor cursor = DataCenter.getInstance().getPendingIssueItemCursorByContainer(getContext(),
-																						mContainerSessionUUID);
+																								mContainerSessionUuid);
 
 				if (cursor != null) {
 					// Ensure the cursor window is filled

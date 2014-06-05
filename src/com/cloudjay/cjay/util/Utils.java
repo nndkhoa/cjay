@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.droidparts.contract.DB;
+
+import android.R.integer;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
@@ -459,5 +462,87 @@ public class Utils {
 			Logger.Log("ContainerId: " + containerId + " | crc: " + crc + " | last: "
 					+ Character.getNumericValue(lastChar));
 		}
+	}
+
+	public static boolean isValidForUpload(Context context, String uuid, int imageType) {
+		SQLiteDatabase db = DataCenter.getDatabaseHelper(context).getReadableDatabase();
+		boolean isValidForUpload = false;
+		Cursor cursor = null;
+
+		switch (imageType) {
+
+			case CJayImage.TYPE_IMPORT:
+
+				cursor = db.rawQuery(	"SELECT * FROM cs_import_validation_view WHERE _id = ? ORDER BY check_in_time DESC",
+										new String[] { uuid });
+				if (cursor.moveToFirst()) {
+					if (cursor.getColumnIndex("import_image_count") >= 0) {
+						isValidForUpload = cursor.getInt(cursor.getColumnIndexOrThrow("import_image_count")) > 0;
+					}
+				}
+				break;
+
+			case CJayImage.TYPE_EXPORT:
+				cursor = db.rawQuery(	"SELECT * FROM cs_full_info_export_validation_view WHERE _id = ? ORDER BY check_in_time DESC",
+										new String[] { uuid });
+
+				if (cursor.moveToFirst()) {
+					if (cursor.getColumnIndex("export_image_count") >= 0) {
+						isValidForUpload = cursor.getInt(cursor.getColumnIndexOrThrow("export_image_count")) > 0;
+					}
+				}
+				break;
+
+			case CJayImage.TYPE_AUDIT:
+				cursor = db.rawQuery(	"SELECT cs.* FROM csi_auditor_validation_view AS cs"
+												+ " WHERE cs.upload_confirmation = 0 AND _id = ? AND cs._id IN ("
+												+ " SELECT container_session._id"
+												+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
+												+ " WHERE cjay_image.type = 2) ORDER BY check_in_time DESC",
+										new String[] { uuid });
+
+				if (cursor.moveToFirst()) {
+
+					if (cursor.getColumnIndex("auditor_image_no_issue_count") >= 0
+							&& cursor.getColumnIndex("invalid_issue_count") >= 0
+							&& cursor.getColumnIndex("issue_count") >= 0) {
+
+						int imageWithoutIssueCount = cursor.getInt(cursor.getColumnIndexOrThrow("auditor_image_no_issue_count"));
+						int invalidIssueCount = cursor.getInt(cursor.getColumnIndexOrThrow("invalid_issue_count"));
+						int validIssueCount = cursor.getInt(cursor.getColumnIndexOrThrow("issue_count"));
+						if (imageWithoutIssueCount > 1 || validIssueCount == 0 || invalidIssueCount > 0) {
+							isValidForUpload = false;
+						} else {
+							isValidForUpload = true;
+						}
+					}
+
+				}
+
+				break;
+
+			case CJayImage.TYPE_REPAIRED:
+
+				cursor = db.rawQuery("SELECT * FROM csi_repair_validation_view cs"
+						+ " WHERE cs.upload_confirmation = 0 AND _id = ? AND cs.state <> 4"
+						+ " ORDER BY check_in_time DESC", new String[] { uuid });
+
+				if (cursor.moveToFirst()) {
+					if (cursor.getColumnIndex("fixed_issue_count") >= 0
+							&& cursor.getColumnIndex("fix_allowed_issue_count") >= 0) {
+						int fixedIssueCount = cursor.getInt(cursor.getColumnIndexOrThrow("fixed_issue_count"));
+						int validIssueCount = cursor.getInt(cursor.getColumnIndexOrThrow("fix_allowed_issue_count"));
+						if (fixedIssueCount < validIssueCount) {
+							isValidForUpload = false;
+						} else {
+							isValidForUpload = true;
+						}
+					}
+				}
+
+			default:
+				return true;
+		}
+		return isValidForUpload;
 	}
 }

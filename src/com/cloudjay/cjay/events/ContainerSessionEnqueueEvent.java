@@ -22,6 +22,10 @@ public class ContainerSessionEnqueueEvent {
 		listContainerSessions.add(upload);
 	}
 
+	public ContainerSessionEnqueueEvent(String uuid) {
+		listContainerSessions = new ArrayList<ContainerSession>();
+	}
+
 	public ContainerSessionEnqueueEvent(List<ContainerSession> uploads) {
 		listContainerSessions = uploads;
 	}
