@@ -2,6 +2,7 @@ package com.cloudjay.cjay.fragment;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.androidannotations.annotations.AfterViews;
@@ -16,6 +17,7 @@ import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefresh
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -58,6 +60,7 @@ import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.events.PostLoadDataEvent;
 import com.cloudjay.cjay.events.PreLoadDataEvent;
 import com.cloudjay.cjay.model.CJayImage;
+import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -66,8 +69,10 @@ import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
+import com.cloudjay.cjay.util.QueryHelper;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadType;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
 
 import de.greenrobot.event.EventBus;
@@ -80,9 +85,7 @@ public class RepairContainerPendingListFragment extends SherlockFragment impleme
 																		LoaderCallbacks<Cursor> {
 
 	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_REPAIR_PENDING;
-
-	private ArrayList<ContainerSession> mSelectedContainerSessions;
-	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
+	HashMap<String, String> mSelectedItems;
 	private int mItemLayout = R.layout.list_item_repair_container;
 
 	PullToRefreshLayout mPullToRefreshLayout;
@@ -126,14 +129,6 @@ public class RepairContainerPendingListFragment extends SherlockFragment impleme
 
 	@AfterViews
 	void afterViews() {
-		final Context ctx = getActivity();
-
-		try {
-			containerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity())
-												.getContainerSessionDaoImpl();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 
 		mSearchEditText.addTextChangedListener(new TextWatcher() {
 			@Override
@@ -167,6 +162,7 @@ public class RepairContainerPendingListFragment extends SherlockFragment impleme
 
 			@Override
 			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
 				// Respond to clicks on the actions in the CAB
 				switch (item.getItemId()) {
 				// case R.id.menu_check:
@@ -177,43 +173,33 @@ public class RepairContainerPendingListFragment extends SherlockFragment impleme
 					case R.id.menu_upload:
 
 						SparseBooleanArray selected = mFeedListView.getCheckedItemPositions();
-						mSelectedContainerSessions = new ArrayList<ContainerSession>();
+						mSelectedItems = new HashMap<String, String>();
+						HashMap<String, String> invalidItems = new HashMap<String, String>();
 
 						for (int i = 0; i < selected.size(); i++) {
 							if (selected.valueAt(i) == true) {
-
 								Cursor cursor = (Cursor) cursorAdapter.getItem(selected.keyAt(i));
 								String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
-								ContainerSession containerSession;
-								try {
-									containerSession = containerSessionDaoImpl.findByUuid(uuidString);
-									mSelectedContainerSessions.add(containerSession);
-								} catch (SQLException e) {
-									e.printStackTrace();
-								}
+								String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
+								mSelectedItems.put(uuidString, containerId);
 							}
 						}
 
-						List<ContainerSession> invalidContainerSessions = new ArrayList<ContainerSession>();
-						for (ContainerSession containerSession : mSelectedContainerSessions) {
-
-							if (containerSession.isValidForUpload(ctx, CJayImage.TYPE_REPAIRED)) {
-
-								// containerSession.setUploadType(UploadType.REPAIR);
-								containerSession.updateField(	getActivity(), ContainerSession.FIELD_UPLOAD_TYPE,
-																Integer.toString(UploadType.REPAIR.getValue()));
-								CJayApplication.uploadContainerSesison(getActivity(), containerSession);
-
+						for (String key : mSelectedItems.keySet()) {
+							if (Utils.isValidForUpload(getActivity(), key, CJayImage.TYPE_REPAIRED)) {
+								QueryHelper.update(	getActivity(), "container_session",
+													ContainerSession.FIELD_UPLOAD_TYPE,
+													Integer.toString(UploadType.REPAIR.getValue()),
+													ContainerSession.FIELD_UUID + " = " + Utils.sqlString(key));
+								CJayApplication.uploadContainer(getActivity(), key, mSelectedItems.get(key));
 							} else {
-								Logger.w("Container " + containerSession.getContainerId() + " is invalid for upload");
-								invalidContainerSessions.add(containerSession);
+								Logger.w("Container " + mSelectedItems.get(key) + " is invalid for upload");
+								invalidItems.put(key, mSelectedItems.get(key));
 							}
 						}
 
-						if (invalidContainerSessions.size() > 0) {
-
+						if (invalidItems.size() > 0) {
 							Crouton.makeText(getActivity(), R.string.alert_no_issue_container, Style.ALERT).show();
-
 						}
 
 						mode.finish();
@@ -312,7 +298,8 @@ public class RepairContainerPendingListFragment extends SherlockFragment impleme
 				containerSession.setOnLocal(true);
 
 				try {
-					containerSessionDaoImpl.addContainerSession(containerSession);
+					DataCenter.getDatabaseHelper(getActivity()).getContainerSessionDaoImpl()
+								.addContainerSession(containerSession);
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -487,46 +474,29 @@ public class RepairContainerPendingListFragment extends SherlockFragment impleme
 		getLoaderManager().restartLoader(LOADER_ID, null, this);
 	}
 
-	void setContainerFixed(ContainerSession containerSession) {
-		// set fixed to true
-		containerSession.setFixed(true);
-
-		// save db records
-		try {
-			containerSessionDaoImpl.createOrUpdate(containerSession);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
 	void setSelectedContainersFixed() {
+
 		// loop through all the selected container sessions
 		// and set each of them as fixed
 		SparseBooleanArray selected = mFeedListView.getCheckedItemPositions();
-		mSelectedContainerSessions = new ArrayList<ContainerSession>();
+		mSelectedItems = new HashMap<String, String>();
 
 		for (int i = 0; i < selected.size(); i++) {
 			if (selected.valueAt(i) == true) {
-
 				Cursor cursor = (Cursor) cursorAdapter.getItem(selected.keyAt(i));
 				String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
-				ContainerSession containerSession;
-				try {
-					containerSession = containerSessionDaoImpl.findByUuid(uuidString);
-					mSelectedContainerSessions.add(containerSession);
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
+				String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
+				mSelectedItems.put(uuidString, containerId);
 			}
 		}
 
-		for (ContainerSession containerSession : mSelectedContainerSessions) {
-			setContainerFixed(containerSession);
+		for (String key : mSelectedItems.keySet()) {
+			QueryHelper.update(	getActivity(), "container_session", ContainerSession.FIELD_FIXED, "1",
+								ContainerSession.FIELD_UUID + " = " + Utils.sqlString(key));
 		}
 
-		// TODO: does it need to force refresh
-		EventBus.getDefault().post(new ContainerRepairedEvent(mSelectedContainerSessions)); // Force
-																							// refresh
+		// TODO: does it need to force refresh?
+		EventBus.getDefault().post(new ContainerRepairedEvent()); // Force refresh
 	}
 
 	void setTotalItems(int val) {

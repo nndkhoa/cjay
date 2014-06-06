@@ -17,6 +17,10 @@ public class ContainerRepairedEvent {
 
 	private final List<ContainerSession> listContainerSessions;
 
+	public ContainerRepairedEvent() {
+		listContainerSessions = new ArrayList<ContainerSession>();
+	}
+
 	public ContainerRepairedEvent(ContainerSession containerSession) {
 		listContainerSessions = new ArrayList<ContainerSession>();
 		listContainerSessions.add(containerSession);
