@@ -26,7 +26,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.cloudjay.cjay.adapter.IssueItemCursorAdapter;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
-import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Container;

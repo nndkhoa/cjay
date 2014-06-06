@@ -3,7 +3,6 @@ package com.cloudjay.cjay;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -39,7 +38,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.Surface;
@@ -53,13 +51,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.aerilys.helpers.android.UIHelper;
-import com.cloudjay.cjay.dao.CJayImageDaoImpl;
-import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
-import com.cloudjay.cjay.dao.IssueDaoImpl;
 import com.cloudjay.cjay.events.CJayImageAddedEvent;
-import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
-import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
-import com.cloudjay.cjay.events.UploadStateRestoredEvent;
 import com.cloudjay.cjay.fragment.GateExportListFragment;
 import com.cloudjay.cjay.fragment.GateImportListFragment;
 import com.cloudjay.cjay.model.AuditReportItem;
@@ -68,9 +60,7 @@ import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Depot;
 import com.cloudjay.cjay.model.GateReportImage;
-import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.model.Operator;
-import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJaySession;
 import com.cloudjay.cjay.util.DataCenter;
@@ -82,7 +72,6 @@ import com.cloudjay.cjay.util.UserRole;
 import com.cloudjay.cjay.util.Utils;
 
 import de.greenrobot.event.EventBus;
-import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 /**
  * Input:

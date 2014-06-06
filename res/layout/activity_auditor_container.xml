@@ -4,34 +4,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <!--
-   	<TextView
+    <TextView
         android:id="@+id/container_id_textview"
         style="@style/ContainerIDTitle"
         android:visibility="gone" />
-    -->
 
-
-    <!--
-        	<ImageButton
+    <ImageButton
         android:id="@+id/btn_add_new"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/container_id_textview"
         android:layout_gravity="center"
-        android:scaleType="fitXY"
-        android:background="#0000"
         android:adjustViewBounds="true"
-    	android:layout_below="@id/container_id_textview"
-    	android:contentDescription="@string/camera_button_tooltip"
+        android:background="#0000"
+        android:contentDescription="@string/camera_button_tooltip"
+        android:scaleType="fitXY"
         android:src="@drawable/btn_camera" />
-    -->
 
     <ListView
         android:id="@+id/feeds"
         style="@style/CJayListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/btn_add_new"
         android:minHeight="260dp" />
-    <!-- android:layout_below="@id/btn_add_new" -->
 
 </RelativeLayout>

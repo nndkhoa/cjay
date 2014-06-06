@@ -1,45 +1,34 @@
 package com.cloudjay.cjay;
 
-import java.sql.SQLException;
-
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
-import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.widget.TextView;
-
+import android.text.TextUtils;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
-import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
-import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.NoConnectionException;
-import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.QueryHelper;
 import com.cloudjay.cjay.util.UploadType;
 import com.cloudjay.cjay.util.Utils;
 
-import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
@@ -149,10 +138,13 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		// menu.findItem(R.id.menu_upload).setVisible(mContainerSession != null);
-		menu.findItem(R.id.menu_upload).setVisible(	Utils.isValidForUpload(	getApplicationContext(),
-																			mContainerSessionUuid,
-																			CJayImage.TYPE_REPAIRED));
+		menu.findItem(R.id.menu_upload).setVisible(!TextUtils.isEmpty(mContainerSessionUuid));
+
+		// NOTE: it cost activityManager 200 - 400 ms to display Activity
+		// menu.findItem(R.id.menu_upload).setVisible( Utils.isValidForUpload( getApplicationContext(),
+		// mContainerSessionUuid,
+		// CJayImage.TYPE_REPAIRED));
+
 		return super.onPrepareOptionsMenu(menu);
 	}
 

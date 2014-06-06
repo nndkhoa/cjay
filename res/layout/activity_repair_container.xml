@@ -3,10 +3,13 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent" >
         
-   	<TextView
+    <!--
+        <TextView
         android:id="@+id/container_id_textview"
         android:visibility="gone"
         style="@style/ContainerIDTitle" />
+    -->
+
 
 	<android.support.v4.view.ViewPager
 		android:id="@+id/pager"
