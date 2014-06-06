@@ -217,27 +217,7 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 				break;
 
 			case AddContainerDialog.CONTAINER_DIALOG_EDIT:
-
-				SQLiteDatabase db = DataCenter.getDatabaseHelper(getActivity()).getWritableDatabase();
-				Cursor cursor = db.rawQuery("select * from operator where operator_code = ?",
-											new String[] { operatorCode });
-
-				int operatorId = 0;
-				if (cursor.moveToFirst()) {
-					operatorId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
-				} else {
-					// Alert error
-				}
-
-				int container_id = 0;
-				cursor = db.rawQuery("select * from container_session where _id = ?", new String[] { mSelectedUuid });
-				if (cursor.moveToFirst()) {
-					container_id = cursor.getInt(cursor.getColumnIndexOrThrow("container_id"));
-				}
-
-				String fields[] = { "container_id", "operator_id" };
-				String values[] = { containerId, Integer.toString(operatorId) };
-				QueryHelper.update(getActivity(), "container", fields, values, "_id = " + container_id);
+				DataCenter.getInstance().editContainer(getActivity(), mSelectedUuid, containerId, operatorCode);
 				break;
 		}
 

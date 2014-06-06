@@ -123,6 +123,29 @@ public class DataCenter {
 		db.execSQL(sql);
 	}
 
+	public void editContainer(Context context, String uuid, String containerId, String operatorCode) {
+
+		SQLiteDatabase db = DataCenter.getDatabaseHelper(context).getWritableDatabase();
+		Cursor cursor = db.rawQuery("select * from operator where operator_code = ?", new String[] { operatorCode });
+
+		int operatorId = 0;
+		if (cursor.moveToFirst()) {
+			operatorId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+		} else {
+			// Alert error
+		}
+
+		int container_id = 0;
+		cursor = db.rawQuery("select * from container_session where _id = ?", new String[] { uuid });
+		if (cursor.moveToFirst()) {
+			container_id = cursor.getInt(cursor.getColumnIndexOrThrow("container_id"));
+		}
+
+		String fields[] = { "container_id", "operator_id" };
+		String values[] = { containerId, Integer.toString(operatorId) };
+		QueryHelper.update(context, "container", fields, values, "_id = " + container_id);
+	}
+
 	@Background
 	public void editContainerSession(Context ctx, ContainerSession containerSession, String containerId,
 										String operatorCode) {

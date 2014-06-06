@@ -16,10 +16,12 @@ import org.androidannotations.annotations.ViewById;
 import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+import android.R.integer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -53,6 +55,7 @@ import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.events.PostLoadDataEvent;
 import com.cloudjay.cjay.events.PreLoadDataEvent;
 import com.cloudjay.cjay.model.CJayImage;
+import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.network.CJayClient;
@@ -62,8 +65,10 @@ import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
+import com.cloudjay.cjay.util.QueryHelper;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadType;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
 
 import de.greenrobot.event.EventBus;
@@ -82,9 +87,11 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 
 	private ArrayList<Operator> mOperators;
 	private int mState;
-	private ContainerSession mSelectedContainerSession = null;
+
+	String mSelectedUuid = "";
+	String mSelectedContainerId = "";
+
 	private int mItemLayout = R.layout.list_item_audit_container;
-	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
 
 	@SystemService
 	InputMethodManager inputMethodManager;
@@ -128,13 +135,6 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 
 	@AfterViews
 	void afterViews() {
-
-		try {
-			containerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity())
-												.getContainerSessionDaoImpl();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 
 		mSearchEditText.addTextChangedListener(new TextWatcher() {
 			@Override
@@ -200,7 +200,8 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 	}
 
 	void hideMenuItems() {
-		mSelectedContainerSession = null;
+		mSelectedUuid = "";
+		mSelectedContainerId = "";
 		mFeedListView.setItemChecked(-1, true);
 		getActivity().supportInvalidateOptionsMenu();
 	}
@@ -222,13 +223,11 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 
 		// refresh highlighting and menu
 		mFeedListView.setItemChecked(position, true);
+
 		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
-		String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
-		try {
-			mSelectedContainerSession = containerSessionDaoImpl.findByUuid(uuidString);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		mSelectedUuid = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+		mSelectedContainerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
+
 		getActivity().supportInvalidateOptionsMenu();
 	}
 
@@ -258,7 +257,8 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 				containerSession.setOnLocal(true);
 
 				try {
-					containerSessionDaoImpl.addContainerSession(containerSession);
+					DataCenter.getDatabaseHelper(getActivity()).getContainerSessionDaoImpl()
+								.addContainerSession(containerSession);
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -276,8 +276,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 				break;
 
 			case AddContainerDialog.CONTAINER_DIALOG_EDIT:
-				DataCenter.getInstance().editContainerSession(getActivity(), mSelectedContainerSession, containerId,
-																operatorCode);
+				DataCenter.getInstance().editContainer(getActivity(), mSelectedUuid, containerId, operatorCode);
 				break;
 		}
 	}
@@ -386,12 +385,12 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 		super.onPrepareOptionsMenu(menu);
 
 		if (mState == STATE_REPORTING) {
-			boolean isDisplayed = mSelectedContainerSession != null;
+			boolean isDisplayed = !TextUtils.isEmpty(mSelectedUuid);
 			menu.findItem(R.id.menu_upload).setVisible(isDisplayed);
 			menu.findItem(R.id.menu_refresh_item).setVisible(false);
 		} else {
 
-			boolean isDisplayed = mSelectedContainerSession != null;
+			boolean isDisplayed = !TextUtils.isEmpty(mSelectedUuid);
 			menu.findItem(R.id.menu_upload).setVisible(false);
 			menu.findItem(R.id.menu_refresh_item).setVisible(isDisplayed);
 		}
@@ -484,15 +483,16 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
-		if (mSelectedContainerSession != null) {
+		if (!TextUtils.isEmpty(mSelectedUuid)) {
 
 			Logger.Log("Menu upload item clicked");
-			if (mSelectedContainerSession.isValidForUpload(getActivity(), CJayImage.TYPE_AUDIT)) {
+			if (Utils.isValidForUpload(getActivity(), mSelectedUuid, CJayImage.TYPE_AUDIT)) {
 
-				// mSelectedContainerSession.setUploadType(UploadType.AUDIT);
-				mSelectedContainerSession.updateField(	getActivity(), ContainerSession.FIELD_UPLOAD_TYPE,
-														Integer.toString(UploadType.AUDIT.getValue()));
-				CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
+				QueryHelper.update(	getActivity(), "container_session", ContainerSession.FIELD_UPLOAD_TYPE,
+									Integer.toString(UploadType.AUDIT.getValue()), ContainerSession.FIELD_UUID + " = "
+											+ Utils.sqlString(mSelectedUuid));
+
+				CJayApplication.uploadContainer(getActivity(), mSelectedUuid, mSelectedContainerId);
 
 				// hide menu items
 				hideMenuItems();
@@ -505,20 +505,24 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 
 	@OptionsItem(R.id.menu_refresh_item)
 	void refreshMenuItemSelected() {
-		if (mSelectedContainerSession != null) {
+		if (!TextUtils.isEmpty(mSelectedUuid)) {
+
+			SQLiteDatabase db = DataCenter.getDatabaseHelper(getActivity()).getWritableDatabase();
+			Cursor cursor = db.rawQuery("select * from container_session where _id = ?",
+										new String[] { mSelectedContainerId });
+			int tmp = -1;
+			if (cursor.moveToFirst()) {
+				tmp = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_ID));
+			}
+			final int id = tmp;
 
 			Logger.Log("Menu upload item clicked");
-
-			// getContainerSessionById
-			final int id = mSelectedContainerSession.getId();
-			final String uuid = mSelectedContainerSession.getUuid();
-
 			new AsyncTask<Void, Integer, Void>() {
 				@Override
 				protected Void doInBackground(Void... params) {
 
 					try {
-						DataCenter.getInstance().updateContainerSessionById(getActivity(), id, uuid);
+						DataCenter.getInstance().updateContainerSessionById(getActivity(), id, mSelectedUuid);
 					} catch (NoConnectionException e) {
 						Crouton.cancelAllCroutons();
 						Crouton.makeText(getActivity(), R.string.alert_no_network, Style.ALERT).show();

@@ -364,7 +364,6 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 				}
 
 				EventBus.getDefault().post(new ContainerSessionChangedEvent(containerSession));
-
 				CJayApplication.openCamera(activity, containerSession.getUuid(), CJayImage.TYPE_EXPORT, LOG_TAG);
 
 				break;
