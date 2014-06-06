@@ -180,17 +180,10 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 	@UiThread
 	public void afterLoad() {
-		// TODO: để điều kiện này thì bên trong GateImport cũng sẽ thấy?
-		// if (mViewMode == MODE_UPLOAD && mContainerSession.getServerContainerState() == ContainerState.AVAILABLE)
-		// {
-		// if (mContainerSession.getServerContainerState() == ContainerState.AVAILABLE || mCJayImageTypeB < 0) {
-		// mNonAvTextView.setVisibility(View.GONE);
-		// } else {
-		// mNonAvTextView.setVisibility(View.VISIBLE);
-		// }
 
 		// show/hide screen controls
 		switch (mViewMode) {
+
 			case MODE_UPLOAD:
 				mAddButton.setVisibility(View.VISIBLE);
 				mNonAvTextView.setVisibility(containerAv ? View.GONE : View.VISIBLE);

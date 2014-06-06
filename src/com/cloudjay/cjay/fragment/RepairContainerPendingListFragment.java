@@ -186,12 +186,15 @@ public class RepairContainerPendingListFragment extends SherlockFragment impleme
 						}
 
 						for (String key : mSelectedItems.keySet()) {
+
 							if (Utils.isValidForUpload(getActivity(), key, CJayImage.TYPE_REPAIRED)) {
+
 								QueryHelper.update(	getActivity(), "container_session",
 													ContainerSession.FIELD_UPLOAD_TYPE,
 													Integer.toString(UploadType.REPAIR.getValue()),
 													ContainerSession.FIELD_UUID + " = " + Utils.sqlString(key));
 								CJayApplication.uploadContainer(getActivity(), key, mSelectedItems.get(key));
+
 							} else {
 								Logger.w("Container " + mSelectedItems.get(key) + " is invalid for upload");
 								invalidItems.put(key, mSelectedItems.get(key));

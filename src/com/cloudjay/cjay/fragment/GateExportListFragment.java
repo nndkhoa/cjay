@@ -83,8 +83,6 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_GATE_EXPORT;
 
 	private ArrayList<Operator> mOperators;
-	// private ContainerSession mSelectedContainerSession = null;
-	// private ContainerSessionDaoImpl containerSessionDaoImpl = null;
 
 	String mSelectedUuid = "";
 	String mSelectedContainerId = "";
@@ -138,13 +136,6 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 	@AfterViews
 	void afterViews() {
-
-		// try {
-		// containerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity())
-		// .getContainerSessionDaoImpl();
-		// } catch (SQLException e) {
-		// e.printStackTrace();
-		// }
 
 		mSearchEditText.addTextChangedListener(new TextWatcher() {
 			@Override
@@ -291,9 +282,6 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 			if (!TextUtils.isEmpty(mSelectedUuid)) {
 
 				if (Utils.isValidForUpload(getActivity(), mSelectedUuid, CJayImage.TYPE_EXPORT)) {
-
-					// mSelectedContainerSession.setUploadType(UploadType.OUT);
-					// mSelectedContainerSession.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 
 					String currentTime = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 					String[] fields = { ContainerSession.FIELD_UPLOAD_TYPE, ContainerSession.FIELD_CHECK_OUT_TIME };

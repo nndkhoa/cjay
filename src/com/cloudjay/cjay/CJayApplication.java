@@ -305,6 +305,9 @@ public class CJayApplication extends Application {
 		if (intent != null) context.startActivity(intent);
 	}
 
+	/*
+	 * Only use in deprecated fragment: `AuditorReportedListFragment`; `RepairContainerFixedListFragment`
+	 */
 	public static void uploadContainerSesison(Context ctx, ContainerSession containerSession) {
 
 		Logger.w("Checkout Time: " + containerSession.getRawCheckOutTime());

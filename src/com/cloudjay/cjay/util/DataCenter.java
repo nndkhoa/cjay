@@ -146,6 +146,9 @@ public class DataCenter {
 		QueryHelper.update(context, "container", fields, values, "_id = " + container_id);
 	}
 
+	/*
+	 * DEPRECATED
+	 */
 	@Background
 	public void editContainerSession(Context ctx, ContainerSession containerSession, String containerId,
 										String operatorCode) {

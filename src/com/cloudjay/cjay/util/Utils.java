@@ -462,6 +462,8 @@ public class Utils {
 	}
 
 	public static boolean isValidForUpload(Context context, String uuid, int imageType) {
+
+		Logger.w("Image type: " + imageType);
 		SQLiteDatabase db = DataCenter.getDatabaseHelper(context).getReadableDatabase();
 		boolean isValidForUpload = false;
 		Cursor cursor = null;
@@ -488,6 +490,7 @@ public class Utils {
 						isValidForUpload = cursor.getInt(cursor.getColumnIndexOrThrow("export_image_count")) > 0;
 					}
 				}
+
 				break;
 
 			case CJayImage.TYPE_AUDIT:
@@ -525,16 +528,20 @@ public class Utils {
 						+ " ORDER BY check_in_time DESC", new String[] { uuid });
 
 				if (cursor.moveToFirst()) {
+
 					if (cursor.getColumnIndex("fixed_issue_count") >= 0
 							&& cursor.getColumnIndex("fix_allowed_issue_count") >= 0) {
+
 						int fixedIssueCount = cursor.getInt(cursor.getColumnIndexOrThrow("fixed_issue_count"));
 						int validIssueCount = cursor.getInt(cursor.getColumnIndexOrThrow("fix_allowed_issue_count"));
+
 						if (fixedIssueCount < validIssueCount) {
 							isValidForUpload = false;
 						} else {
 							isValidForUpload = true;
 						}
 					}
+
 				}
 
 			default:
