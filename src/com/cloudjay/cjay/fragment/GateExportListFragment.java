@@ -56,6 +56,7 @@ import com.cloudjay.cjay.events.PostLoadDataEvent;
 import com.cloudjay.cjay.events.PreLoadDataEvent;
 import com.cloudjay.cjay.events.UploadStateRestoredEvent;
 import com.cloudjay.cjay.model.CJayImage;
+import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.network.CJayClient;
@@ -66,8 +67,10 @@ import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
+import com.cloudjay.cjay.util.QueryHelper;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadType;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
 
 import de.greenrobot.event.EventBus;
@@ -82,10 +85,12 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_GATE_EXPORT;
 
 	private ArrayList<Operator> mOperators;
-	private ContainerSession mSelectedContainerSession = null;
-	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
+	// private ContainerSession mSelectedContainerSession = null;
+	// private ContainerSessionDaoImpl containerSessionDaoImpl = null;
 
 	String mSelectedUuid = "";
+	String mSelectedContainerId = "";
+	ContainerState mSelectedState = null;
 
 	private final int mItemLayout = R.layout.list_item_container;
 	private int mCurrentPosition = -1;
@@ -136,12 +141,12 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	@AfterViews
 	void afterViews() {
 
-		try {
-			containerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity())
-												.getContainerSessionDaoImpl();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		// try {
+		// containerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity())
+		// .getContainerSessionDaoImpl();
+		// } catch (SQLException e) {
+		// e.printStackTrace();
+		// }
 
 		mSearchEditText.addTextChangedListener(new TextWatcher() {
 			@Override
@@ -201,7 +206,11 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	}
 
 	void hideMenuItems() {
-		mSelectedContainerSession = null;
+
+		mSelectedUuid = "";
+		mSelectedContainerId = "";
+		mSelectedState = null;
+
 		mFeedListView.setItemChecked(-1, true);
 		getActivity().supportInvalidateOptionsMenu();
 	}
@@ -241,17 +250,14 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 		// refresh highlighting and menu
 		mFeedListView.setItemChecked(position, true);
-		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
-		String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
 
-		try {
-			mSelectedContainerSession = containerSessionDaoImpl.findByUuid(uuidString);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
+		mSelectedUuid = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+		mSelectedContainerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
+		mSelectedState = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
 
 		getActivity().supportInvalidateOptionsMenu();
-		Logger.Log("mSelectedContainerSession: " + mSelectedContainerSession.getContainerId());
+		Logger.Log("mSelectedContainerSession: " + mSelectedContainerId);
 	}
 
 	void handleContainerClicked(String uuid, String containerId) {
@@ -284,23 +290,23 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	void uploadMenuItemSelected() {
 
 		synchronized (this) {
-			if (null != mSelectedContainerSession) {
+			if (!TextUtils.isEmpty(mSelectedUuid)) {
 
-				if (mSelectedContainerSession.isValidForUpload(getActivity(), CJayImage.TYPE_EXPORT)) {
+				if (Utils.isValidForUpload(getActivity(), mSelectedUuid, CJayImage.TYPE_EXPORT)) {
 
 					// mSelectedContainerSession.setUploadType(UploadType.OUT);
 					// mSelectedContainerSession.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 
 					String currentTime = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-					mSelectedContainerSession.updateField(	getActivity(), ContainerSession.FIELD_UPLOAD_TYPE,
-															Integer.toString(UploadType.OUT.getValue()));
-					mSelectedContainerSession.updateField(	getActivity(), ContainerSession.FIELD_CHECK_OUT_TIME,
-															currentTime);
-					DataCenter.getDatabaseHelper(getActivity())
-								.addUsageLog(	mSelectedContainerSession.getContainerId()
-														+ " | Prepare to add #OUT container with ID to upload queue");
+					String[] fields = { ContainerSession.FIELD_UPLOAD_TYPE, ContainerSession.FIELD_CHECK_OUT_TIME };
+					String[] values = { Integer.toString(UploadType.OUT.getValue()), currentTime };
+					QueryHelper.update(getActivity(), "container_session", fields, values, ContainerSession.FIELD_UUID
+							+ " = " + Utils.sqlString(mSelectedUuid));
 
-					CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
+					CJayApplication.uploadContainer(getActivity(), mSelectedUuid, mSelectedContainerId);
+					DataCenter.getDatabaseHelper(getActivity())
+								.addUsageLog(mSelectedContainerId + " | Prepare to add #OUT container to upload queue");
+
 					hideMenuItems();
 				} else {
 					Crouton.cancelAllCroutons();
@@ -314,8 +320,9 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	@OptionsItem(R.id.menu_av_export)
 	void exportNonAvailable() {
 
-		if (mSelectedContainerSession != null)
-			handleContainerClicked(mSelectedContainerSession.getUuid(), mSelectedContainerSession.getContainerId());
+		if (!TextUtils.isEmpty(mSelectedUuid)) {
+			handleContainerClicked(mSelectedUuid, mSelectedContainerId);
+		}
 
 		hideMenuItems();
 	}
@@ -350,7 +357,8 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 				containerSession.setExport(true);
 
 				try {
-					containerSessionDaoImpl.addContainerSession(containerSession);
+					DataCenter.getDatabaseHelper(getActivity()).getContainerSessionDaoImpl()
+								.addContainerSession(containerSession);
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -452,10 +460,10 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	public void onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
 
-		if (mSelectedContainerSession == null) {
+		if (TextUtils.isEmpty(mSelectedUuid)) {
 			menu.findItem(R.id.menu_upload).setVisible(false);
 			menu.findItem(R.id.menu_av_export).setVisible(false);
-		} else if (mSelectedContainerSession.getServerContainerState() != ContainerState.AVAILABLE) {
+		} else if (mSelectedState != ContainerState.AVAILABLE) {
 			menu.findItem(R.id.menu_upload).setVisible(false);
 			menu.findItem(R.id.menu_av_export).setVisible(true);
 		} else {
@@ -503,11 +511,9 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	@Override
 	public void onResume() {
 
-		if (mSelectedContainerSession != null) {
-
+		if (!TextUtils.isEmpty(mSelectedUuid)) {
 			mFeedListView.setItemChecked(mCurrentPosition, true);
-			Logger.d(mSelectedContainerSession.getContainerId());
-
+			Logger.d(mSelectedContainerId);
 		}
 
 		if (cursorAdapter != null) {
