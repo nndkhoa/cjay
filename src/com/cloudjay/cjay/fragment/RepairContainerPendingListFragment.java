@@ -153,18 +153,14 @@ public class RepairContainerPendingListFragment extends SherlockFragment impleme
 		});
 
 		mSearchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-
 			@Override
 			public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
 				if (id == EditorInfo.IME_ACTION_SEARCH) {
-
 					inputMethodManager.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
-
 					return true;
 				}
 				return false;
 			}
-
 		});
 
 		mFeedListView.setMultiChoiceModeListener(new MultiChoiceModeListener() {

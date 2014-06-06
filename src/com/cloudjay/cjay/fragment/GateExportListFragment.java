@@ -85,6 +85,8 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	private ContainerSession mSelectedContainerSession = null;
 	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
 
+	String mSelectedUuid = "";
+
 	private final int mItemLayout = R.layout.list_item_container;
 	private int mCurrentPosition = -1;
 
@@ -228,7 +230,7 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 			handleContainerClicked(uuid, containerId);
 
 		}
-		
+
 		long difference = System.currentTimeMillis() - startTime;
 		Logger.w("---> Total time: " + Long.toString(difference));
 		// 88 --> 90ms
@@ -255,7 +257,7 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	void handleContainerClicked(String uuid, String containerId) {
 
 		long startTime = System.currentTimeMillis();
-		
+
 		// find the last role that took picture of this issue
 		SQLiteDatabase db = DataCenter.getDatabaseHelper(getActivity().getApplicationContext()).getWritableDatabase();
 		String sql = "SELECT type FROM cjay_image WHERE containerSession_id LIKE ? AND type <> ? ORDER BY time_posted DESC LIMIT 1";
@@ -267,7 +269,7 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 		long difference = System.currentTimeMillis() - startTime;
 		Logger.w("---> Total time: " + Long.toString(difference));
-		
+
 		// show images
 		if (lastRole >= 0 && lastRole != CJayImage.TYPE_EXPORT) {
 			CJayApplication.openPhotoGridView(	getActivity(), uuid, containerId, CJayImage.TYPE_EXPORT, lastRole,

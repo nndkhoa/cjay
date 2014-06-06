@@ -145,8 +145,8 @@ public class ContainerSession {
 	public ContainerSession(Context ctx, String containerId, String operatorCode, String checkInTime, String depotCode) {
 
 		IDatabaseManager databaseManager = CJayClient.getInstance().getDatabaseManager();
-
 		DepotDaoImpl depotDaoImpl;
+
 		try {
 			depotDaoImpl = databaseManager.getHelper(ctx).getDepotDaoImpl();
 			OperatorDaoImpl operatorDaoImpl = databaseManager.getHelper(ctx).getOperatorDaoImpl();

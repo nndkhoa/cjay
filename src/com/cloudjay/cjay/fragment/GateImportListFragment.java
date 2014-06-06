@@ -18,6 +18,7 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -37,8 +38,6 @@ import com.cloudjay.cjay.CJayActivity;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateImportContainerCursorAdapter;
-import com.cloudjay.cjay.dao.CJayImageDaoImpl;
-import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
 import com.cloudjay.cjay.events.ContainerSessionUpdatedEvent;
@@ -48,16 +47,16 @@ import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.model.Container;
 import com.cloudjay.cjay.model.ContainerSession;
 import com.cloudjay.cjay.model.Operator;
-import com.cloudjay.cjay.network.CJayClient;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.CJayCursorLoader;
 import com.cloudjay.cjay.util.DataCenter;
-import com.cloudjay.cjay.util.DatabaseHelper;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
+import com.cloudjay.cjay.util.QueryHelper;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadType;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
 
 import de.greenrobot.event.EventBus;
@@ -66,7 +65,6 @@ import de.keyboardsurfer.android.widget.crouton.Style;
 
 @EFragment(R.layout.fragment_gate_import)
 @OptionsMenu(R.menu.menu_gate_import)
-// 2.
 public class GateImportListFragment extends SherlockFragment implements OnRefreshListener, LoaderCallbacks<Cursor> {
 
 	public final static String LOG_TAG = "GateImportListFragment";
@@ -80,13 +78,13 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 
 	private ArrayList<Operator> mOperators;
 
-	private ContainerSession mSelectedContainerSession = null;
-	private ContainerSessionDaoImpl containerSessionDaoImpl = null;
-	private int mItemLayout = R.layout.list_item_container;
+	String mSelectedOperator = "";
+	String mSelectedUuid = "";
+	String mSelectedContainerId = "";
+	Boolean isOnLocal = null;
+	int mItemLayout = R.layout.list_item_container;
 
 	PullToRefreshLayout mPullToRefreshLayout;
-
-	// 1.
 	GateImportContainerCursorAdapter cursorAdapter;
 
 	int totalItems = 0;
@@ -103,17 +101,7 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 	@AfterViews
 	void afterViews() {
 
-		try {
-			containerSessionDaoImpl = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity())
-												.getContainerSessionDaoImpl();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
 		mOperators = (ArrayList<Operator>) DataCenter.getInstance().getListOperators(getActivity());
-
-		// initContainerFeedAdapter(null);
-		// 3.
 		getLoaderManager().initLoader(LOADER_ID, null, this);
 
 		mFeedListView.setScrollingCacheEnabled(false);
@@ -137,22 +125,20 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 
 	@OptionsItem(R.id.menu_camera)
 	void cameraMenuItemSelected() {
-		Logger.Log("Menu camera item clicked");
-		CJayApplication.openCamera(getActivity(), mSelectedContainerSession.getUuid(), CJayImage.TYPE_IMPORT, LOG_TAG);
+		CJayApplication.openCamera(getActivity(), mSelectedUuid, CJayImage.TYPE_IMPORT, LOG_TAG);
 	}
 
 	@OptionsItem(R.id.menu_edit_container)
 	void editMenuItemSelected() {
-		Logger.Log("Menu edit item clicked");
-
-		// Open dialog for editing details
-		CJayApplication.openContainerDetailDialog(	this, mSelectedContainerSession.getContainerId(),
-													mSelectedContainerSession.getOperatorName(),
+		CJayApplication.openContainerDetailDialog(	this, mSelectedContainerId, mSelectedOperator,
 													AddContainerDialog.CONTAINER_DIALOG_EDIT);
 	}
 
 	void hideMenuItems() {
-		mSelectedContainerSession = null;
+		isOnLocal = null;
+		mSelectedOperator = "";
+		mSelectedUuid = "";
+		mSelectedContainerId = "";
 		mFeedListView.setItemChecked(-1, true);
 		getActivity().supportInvalidateOptionsMenu();
 	}
@@ -170,18 +156,16 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 											GateImportListFragment.LOG_TAG);
 	}
 
+	// refresh highlighting and menu
 	@ItemLongClick(R.id.feeds)
 	void listItemLongClicked(int position) {
-		// refresh highlighting and menu
 		mFeedListView.setItemChecked(position, true);
 
 		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
-		String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
-		try {
-			mSelectedContainerSession = containerSessionDaoImpl.findByUuid(uuidString);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		mSelectedUuid = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+		mSelectedContainerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
+		mSelectedOperator = cursor.getString(cursor.getColumnIndexOrThrow(Operator.FIELD_NAME));
+		isOnLocal = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_LOCAL)) != 0;
 
 		getActivity().supportInvalidateOptionsMenu();
 	}
@@ -217,7 +201,8 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 				// containerSession.setUploadType(UploadType.NONE);
 
 				try {
-					containerSessionDaoImpl.addContainerSession(containerSession);
+					DataCenter.getDatabaseHelper(getActivity()).getContainerSessionDaoImpl()
+								.addContainerSession(containerSession);
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -232,8 +217,27 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 				break;
 
 			case AddContainerDialog.CONTAINER_DIALOG_EDIT:
-				DataCenter.getInstance().editContainerSession(getActivity(), mSelectedContainerSession, containerId,
-																operatorCode);
+
+				SQLiteDatabase db = DataCenter.getDatabaseHelper(getActivity()).getWritableDatabase();
+				Cursor cursor = db.rawQuery("select * from operator where operator_code = ?",
+											new String[] { operatorCode });
+
+				int operatorId = 0;
+				if (cursor.moveToFirst()) {
+					operatorId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+				} else {
+					// Alert error
+				}
+
+				int container_id = 0;
+				cursor = db.rawQuery("select * from container_session where _id = ?", new String[] { mSelectedUuid });
+				if (cursor.moveToFirst()) {
+					container_id = cursor.getInt(cursor.getColumnIndexOrThrow("container_id"));
+				}
+
+				String fields[] = { "container_id", "operator_id" };
+				String values[] = { containerId, Integer.toString(operatorId) };
+				QueryHelper.update(getActivity(), "container", fields, values, "_id = " + container_id);
 				break;
 		}
 
@@ -324,7 +328,7 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 	public void onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
 
-		boolean isDisplayed = !(mSelectedContainerSession == null);
+		boolean isDisplayed = !(TextUtils.isEmpty(mSelectedUuid));
 		menu.findItem(R.id.menu_camera).setVisible(isDisplayed);
 		menu.findItem(R.id.menu_edit_container).setVisible(isDisplayed);
 		menu.findItem(R.id.menu_trash).setVisible(isDisplayed);
@@ -407,46 +411,31 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 
 	@OptionsItem(R.id.menu_trash)
 	void trashMenuItemSelected() {
-		if (mSelectedContainerSession != null && mSelectedContainerSession.isOnLocal()) {
-			try {
-				// delete selected container session from database
-				DatabaseHelper databaseHelper = CJayClient.getInstance().getDatabaseManager().getHelper(getActivity());
-				ContainerSessionDaoImpl containerSessionDaoImpl = databaseHelper.getContainerSessionDaoImpl();
-				CJayImageDaoImpl cJayImageDaoImpl = databaseHelper.getCJayImageDaoImpl();
+		if (!TextUtils.isEmpty(mSelectedUuid) && isOnLocal == true) {
+			SQLiteDatabase db = DataCenter.getDatabaseHelper(getActivity()).getWritableDatabase();
+			db.delete("cjay_image", "containerSession_id = ?", new String[] { mSelectedUuid });
+			db.delete("container_session", "_id = ?", new String[] { mSelectedUuid });
 
-				// delete images from database
-				for (CJayImage cJayImage : mSelectedContainerSession.getCJayImages()) {
-					mSelectedContainerSession.getCJayImages().remove(cJayImage);
-					cJayImageDaoImpl.delete(cJayImage);
-				}
-
-				// delete container session from database
-				containerSessionDaoImpl.delete(mSelectedContainerSession);
-
-				EventBus.getDefault().post(new ContainerSessionChangedEvent(mSelectedContainerSession));
-
-				hideMenuItems();
-
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			EventBus.getDefault().post(new ContainerSessionChangedEvent());
+			hideMenuItems();
 		}
 	}
 
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 
-		if (mSelectedContainerSession.isValidForUpload(getActivity(), CJayImage.TYPE_IMPORT)) {
+		if (Utils.isValidForUpload(getActivity(), mSelectedUuid, CJayImage.TYPE_IMPORT)) {
 
 			// Marked it's not temporary anymore
 			// mSelectedContainerSession.setUploadType(UploadType.IN);
-			mSelectedContainerSession.updateField(	getActivity(), ContainerSession.FIELD_UPLOAD_TYPE,
-													Integer.toString(UploadType.IN.getValue()));
-			DataCenter.getDatabaseHelper(getActivity())
-						.addUsageLog(	"Prepare to add #IN container with ID "
-												+ mSelectedContainerSession.getContainerId() + " to upload queue");
+			QueryHelper.update(	getActivity(), "container_session", ContainerSession.FIELD_UPLOAD_TYPE,
+								Integer.toString(UploadType.IN.getValue()),
+								ContainerSession.FIELD_UUID + " = " + Utils.sqlString(mSelectedUuid));
+			CJayApplication.uploadContainer(getActivity(), mSelectedUuid, mSelectedContainerId);
 
-			CJayApplication.uploadContainerSesison(getActivity(), mSelectedContainerSession);
+			DataCenter.getDatabaseHelper(getActivity())
+						.addUsageLog(mSelectedContainerId + " | Prepare to add #IN container to upload queue");
+
 			hideMenuItems();
 
 		} else {
