@@ -62,9 +62,6 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 	@ViewById
 	ViewPager pager;
 
-	@ViewById(R.id.container_id_textview)
-	TextView containerIdTextView;
-
 	@Extra(CJAY_CONTAINER_SESSION_EXTRA)
 	String mContainerSessionUuid = "";
 
@@ -77,25 +74,14 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 
 		SQLiteDatabase db = DataCenter.getDatabaseHelper(getApplicationContext()).getReadableDatabase();
 		Cursor cursor = db.rawQuery("select * from csiview where _id = ?", new String[] { mContainerSessionUuid });
-
 		if (cursor.moveToFirst()) {
 			containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
+			setTitle(containerId);
 		}
-
-		new AsyncTask<Void, Integer, Void>() {
-			@Override
-			protected Void doInBackground(Void... params) {
-
-				setTitle(containerId);
-				containerIdTextView.setText(containerId);
-				return null;
-			}
-		}.execute();
 
 		locations = getResources().getStringArray(R.array.repair_container_tabs);
 		configureViewPager();
 		configureActionBar();
-
 	}
 
 	private void configureActionBar() {

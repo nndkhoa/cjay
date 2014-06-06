@@ -157,6 +157,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	private SurfaceHolder mPreviewHolder = null;
 	private boolean mInPreview = false;
 	private boolean mCameraConfigured = false;
+
 	String mFlashMode = Camera.Parameters.FLASH_MODE_OFF;
 	int mCameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
 

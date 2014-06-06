@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent" >
-        
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <!--
    	<TextView
         android:id="@+id/container_id_textview"
         style="@style/ContainerIDTitle"
         android:visibility="gone" />
-   
-   	<ImageButton
+    -->
+
+
+    <!--
+        	<ImageButton
         android:id="@+id/btn_add_new"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,13 +24,14 @@
     	android:layout_below="@id/container_id_textview"
     	android:contentDescription="@string/camera_button_tooltip"
         android:src="@drawable/btn_camera" />
+    -->
 
     <ListView
         android:id="@+id/feeds"
-    	android:layout_width="match_parent"
-    	android:layout_height="match_parent"
-    	android:layout_below="@id/btn_add_new"
-   	 	android:minHeight="260dp" 
-		style="@style/CJayListView" />
-    
+        style="@style/CJayListView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:minHeight="260dp" />
+    <!-- android:layout_below="@id/btn_add_new" -->
+
 </RelativeLayout>

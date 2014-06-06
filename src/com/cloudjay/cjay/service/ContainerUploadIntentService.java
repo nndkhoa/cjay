@@ -352,6 +352,7 @@ public class ContainerUploadIntentService extends IntentService implements Count
 				break;
 		}
 
+		// use to update container session data in CameraActivity
 		EventBus.getDefault().post(new ContainerSessionUpdatedEvent(containerSession));
 	}
 

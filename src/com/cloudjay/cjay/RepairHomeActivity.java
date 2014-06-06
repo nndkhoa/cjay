@@ -22,6 +22,7 @@ import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
 import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
@@ -42,15 +43,19 @@ public class RepairHomeActivity extends CJayActivity implements OnPageChangeList
 	private String[] locations;
 	private ViewPagerAdapter viewPagerAdapter;
 
-	@ViewById
+	@ViewById(R.id.pager)
 	ViewPager pager;
 
 	@AfterViews
 	void afterViews() {
+
+		if (pager == null) {
+			Logger.e("ViewPager is null");
+		}
+
 		locations = getResources().getStringArray(R.array.repair_home_tabs);
 		configureViewPager();
 		configureActionBar();
-
 	}
 
 	private void configureActionBar() {
@@ -81,8 +86,7 @@ public class RepairHomeActivity extends CJayActivity implements OnPageChangeList
 						return pendingFragment;
 
 						// case 1:
-						// Fragment fixedFragment = new
-						// RepairContainerFixedListFragment_();
+						// Fragment fixedFragment = new RepairContainerFixedListFragment_();
 						// return fixedFragment;
 
 					case 1:
