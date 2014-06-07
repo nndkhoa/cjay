@@ -367,6 +367,8 @@ public class PhotoUploadService extends Service {
 					text = getString(	R.string.notification_uploading_photo_progress, mNumberUploaded + 1,
 										upload.getUploadProgress(), CJayImageDaoImpl.totalNumber + mNumberUploaded);
 					mNotificationBuilder.setContentTitle(text);
+					mNotificationBuilder.setSubText(upload.getImageName());
+					mNotificationBuilder.setContentText(upload.getImageName());
 					mNotificationBuilder.setProgress(100, upload.getUploadProgress(), false);
 				}
 				break;
@@ -384,7 +386,7 @@ public class PhotoUploadService extends Service {
 	private void startForeground() {
 		if (null == mNotificationBuilder) {
 			mNotificationBuilder = new NotificationCompat.Builder(this);
-			mNotificationBuilder.setSmallIcon(R.drawable.ic_stat_upload);
+			mNotificationBuilder.setSmallIcon(R.drawable.ic_app_small);
 			mNotificationBuilder.setContentTitle(getString(R.string.app_name));
 			mNotificationBuilder.setOngoing(true);
 			mNotificationBuilder.setWhen(System.currentTimeMillis());

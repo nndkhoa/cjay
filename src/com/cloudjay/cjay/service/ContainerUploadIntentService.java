@@ -70,8 +70,6 @@ public class ContainerUploadIntentService extends IntentService implements Count
 		DataCenter.getDatabaseHelper(getApplicationContext())
 					.addUsageLog("Begin to #upload container: " + containerSession.getContainerId());
 
-		// containerSession.setUploadState(UploadState.IN_PROGRESS);
-
 		// Convert ContainerSession to TmpContainerSession for uploading
 		TmpContainerSession uploadItem = null;
 		try {
@@ -398,7 +396,7 @@ public class ContainerUploadIntentService extends IntentService implements Count
 
 		if (null == mNotificationBuilder) {
 			mNotificationBuilder = new NotificationCompat.Builder(this);
-			mNotificationBuilder.setSmallIcon(R.drawable.ic_stat_upload);
+			mNotificationBuilder.setSmallIcon(R.drawable.ic_app_small);
 			mNotificationBuilder.setContentTitle(getString(R.string.app_name));
 			mNotificationBuilder.setOngoing(true);
 			mNotificationBuilder.setWhen(System.currentTimeMillis());
