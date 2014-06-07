@@ -28,6 +28,7 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 
 @SuppressLint("DefaultLocale")
@@ -53,6 +54,7 @@ public class AddContainerDialog extends SherlockDialogFragment {
 	EditText mOperatorEditText;
 	Button mCancelButton;
 	Button mOkButton;
+	Button mForceOkButton;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -60,6 +62,7 @@ public class AddContainerDialog extends SherlockDialogFragment {
 
 		mContainerEditText = (EditText) view.findViewById(R.id.dialog_new_container_id);
 		mOperatorEditText = (EditText) view.findViewById(R.id.dialog_new_container_owner);
+		mForceOkButton = (Button) view.findViewById(R.id.dialog_new_container_force_ok);
 		mCancelButton = (Button) view.findViewById(R.id.dialog_new_container_cancel);
 		mOkButton = (Button) view.findViewById(R.id.dialog_new_container_ok);
 		mOperatorLabel = (TextView) view.findViewById(R.id.dialog_new_container_owner_label);
@@ -132,6 +135,43 @@ public class AddContainerDialog extends SherlockDialogFragment {
 			}
 		});
 
+		mForceOkButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				mContainerId = mContainerEditText.getText().toString().toUpperCase();
+				mOperatorName = mOperatorEditText.getText().toString();
+
+				mContainerEditText.setError(null);
+				mOperatorEditText.setError(null);
+
+				if (TextUtils.isEmpty(mContainerId)) {
+
+					mContainerEditText.setError(getString(R.string.dialog_container_id_required));
+
+				} else if (isOperatorRequired && TextUtils.isEmpty(mOperatorName)) {
+
+					mOperatorEditText.setError(getString(R.string.dialog_container_owner_required));
+
+				} else {
+
+					mCallback = (AddContainerDialogListener) getActivity();
+					mCallback.OnContainerInputCompleted(mParent, mContainerId, mOperatorName, mMode);
+					dismiss();
+				}
+
+				mForceOkButton.setVisibility(View.GONE);
+
+			}
+		});
+
+		mCancelButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				dismiss();
+			}
+		});
+
 		mOkButton.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -144,6 +184,7 @@ public class AddContainerDialog extends SherlockDialogFragment {
 				String sql = "select * from csview where container_id like ?";
 				Cursor cursor = db.rawQuery(sql, new String[] { mContainerId });
 
+				// TODO: add new container session based on existed container
 				if (cursor.moveToFirst()) {
 					mContainerEditText.setError(getString(R.string.dialog_container_existed));
 					return;
@@ -151,6 +192,7 @@ public class AddContainerDialog extends SherlockDialogFragment {
 
 				if (!Utils.isContainerIdValid(mContainerId)) {
 					mContainerEditText.setError(getString(R.string.dialog_container_id_invalid));
+					mForceOkButton.setVisibility(View.VISIBLE);
 					return;
 				}
 
@@ -171,13 +213,6 @@ public class AddContainerDialog extends SherlockDialogFragment {
 				}
 			}
 
-		});
-
-		mCancelButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				dismiss();
-			}
 		});
 
 		getDialog().setTitle(getResources().getString(R.string.dialog_new_container_title));

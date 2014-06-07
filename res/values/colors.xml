@@ -53,4 +53,10 @@
     <color name="list_item_bg_container_fixed">#556fccf7</color>
     <color name="pressed_photup">#CC6fccf7</color>
 
+    <!-- Flat -->
+    <color name="danger">#e74c3c</color>
+    <color name="danger_pressed">#bbe74c3c</color>
+    <color name="success">#2ecc71</color>
+    <color name="success_pressed">#bb2ecc71</color>
+    
 </resources>

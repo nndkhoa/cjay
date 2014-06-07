@@ -7,6 +7,7 @@
     <string name="dialog_container_owner">Hãng tàu</string>
     <string name="dialog_container_cancel">Cancel</string>
     <string name="dialog_container_ok">OK</string>
+    <string name="dialog_container_force_ok">OK!!</string>
     <string name="dialog_container_id_required">Xin nhập Container ID</string>
     <string name="dialog_container_id_invalid">Container ID không hợp lệ</string>
     <string name="dialog_container_existed">Container này chưa được xuất</string>

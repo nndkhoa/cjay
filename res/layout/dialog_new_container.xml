@@ -15,7 +15,7 @@
             android:id="@+id/dialog_new_container_id_label"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="3"
             android:gravity="center_vertical"
             android:paddingBottom="12dp"
             android:paddingLeft="18dp"
@@ -27,7 +27,7 @@
             android:id="@+id/dialog_new_container_id"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="4"
             android:ellipsize="end"
             android:hint="@string/dialog_container_id"
             android:imeOptions="actionNext"
@@ -48,7 +48,7 @@
             android:id="@+id/dialog_new_container_owner_label"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="3"
             android:gravity="center_vertical"
             android:paddingBottom="12dp"
             android:paddingLeft="18dp"
@@ -60,7 +60,7 @@
             android:id="@+id/dialog_new_container_owner"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="4"
             android:ellipsize="end"
             android:hint="@string/dialog_container_owner"
             android:inputType="text|textNoSuggestions"
@@ -83,11 +83,28 @@
             android:text="@string/dialog_container_cancel" />
 
         <Button
-            android:id="@+id/dialog_new_container_ok"
-            style="@android:attr/buttonBarButtonStyle"
+            android:id="@+id/dialog_new_container_force_ok"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
             android:layout_weight="1"
+            android:background="@drawable/btn_danger"
+            android:minHeight="40dp"
+            android:padding="3dp"
+            android:text="@string/dialog_container_force_ok"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/dialog_new_container_ok"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_success"
+            android:minHeight="40dp"
+            android:padding="3dp"
             android:text="@string/dialog_container_ok" />
     </LinearLayout>
 
