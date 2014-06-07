@@ -493,13 +493,6 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 	@OptionsItem(R.id.menu_upload)
 	void uploadMenuItemSelected() {
 
-		// try {
-		// mContainerSessionDaoImpl.refresh(mContainerSession);
-		// } catch (SQLException e) {
-		// e.printStackTrace();
-		// showCrouton(R.string.alert_try_again);
-		// }
-
 		if (!TextUtils.isEmpty(mContainerSessionUUID)) {
 
 			if (sourceTag.equals(GateImportListFragment.LOG_TAG)) {
@@ -523,11 +516,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 				if (Utils.isValidForUpload(context, mContainerSessionUUID, CJayImage.TYPE_EXPORT)) {
 
-					// mContainerSession.setUploadType(UploadType.OUT);
-					// mContainerSession.setCheckOutTime(StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
-
 					String currentTime = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-
 					String[] fields = { ContainerSession.FIELD_UPLOAD_TYPE, ContainerSession.FIELD_CHECK_OUT_TIME };
 					String[] values = { Integer.toString(UploadType.OUT.getValue()), currentTime };
 					QueryHelper.update(context, "container_session", fields, values, ContainerSession.FIELD_UUID

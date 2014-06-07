@@ -541,9 +541,8 @@ public class Utils {
 							isValidForUpload = true;
 						}
 					}
-
 				}
-
+				break;
 			default:
 				return true;
 		}
