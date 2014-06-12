@@ -24,8 +24,12 @@ public class CJaySession {
 
 	private static IDatabaseManager databaseManager;
 	private static IUserDao userDao;
+	private static User currentUser;
+	private static CJaySession instance;
 
 	public static CJaySession restore(Context context) {
+
+		if (instance != null) return instance;
 
 		// Logger.Log("restoring session ... ");
 		databaseManager = CJayClient.getInstance().getDatabaseManager();
@@ -34,11 +38,10 @@ public class CJaySession {
 			userDao = helper.getUserDaoImpl();
 
 			User user = userDao.getMainUser();
-
 			if (null != user) {
-				CJaySession session = new CJaySession();
-				session.setCurrentUser(user);
-				return session;
+				instance = new CJaySession();
+				instance.setCurrentUser(user);
+				return instance;
 			}
 
 		} catch (SQLException e) {
@@ -51,8 +54,6 @@ public class CJaySession {
 	public static void save(Context context) {
 
 	}
-
-	private static User currentUser;
 
 	public CJaySession() {
 

@@ -49,12 +49,11 @@ import de.keyboardsurfer.android.widget.crouton.Style;
 public class AuditorContainerActivity extends CJayActivity implements android.app.LoaderManager.LoaderCallbacks<Cursor> {
 
 	private static final String LOG_TAG = "AuditorContainerActivity";
+	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_ISSUE_ITEM;
 	public static final String CJAY_CONTAINER_SESSION_EXTRA = "cjay_container_session";
 	public static final String START_CAMERA_EXTRA = "start_camera";
 
-	// private ContainerSession mContainerSession;
 	private CJayImage mLongClickedCJayImage;
-
 	private int mNewImageCount;
 	private String mNewImageUUID;
 
@@ -66,8 +65,6 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 
 	private int mItemLayout = R.layout.list_item_issue;
 	private IssueItemCursorAdapter mCursorAdapter;
-	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_ISSUE_ITEM;
-
 	private MenuItem avMenuItem;
 
 	@ViewById(R.id.btn_add_new)

@@ -142,6 +142,16 @@ public class AddContainerDialog extends SherlockDialogFragment {
 				mContainerId = mContainerEditText.getText().toString().toUpperCase();
 				mOperatorName = mOperatorEditText.getText().toString();
 
+				SQLiteDatabase db = DataCenter.getDatabaseHelper(getActivity()).getWritableDatabase();
+				String sql = "select * from csview where container_id like ?";
+				Cursor cursor = db.rawQuery(sql, new String[] { mContainerId });
+
+				// TODO: add new container session based on existed container
+				if (cursor.moveToFirst()) {
+					mContainerEditText.setError(getString(R.string.dialog_container_existed));
+					return;
+				}
+
 				mContainerEditText.setError(null);
 				mOperatorEditText.setError(null);
 

@@ -463,7 +463,6 @@ public class Utils {
 
 	public static boolean isValidForUpload(Context context, String uuid, int imageType) {
 
-		Logger.w("Image type: " + imageType);
 		SQLiteDatabase db = DataCenter.getDatabaseHelper(context).getReadableDatabase();
 		boolean isValidForUpload = false;
 		Cursor cursor = null;

@@ -216,6 +216,10 @@ public class DataCenter {
 
 		// Logger.Log("*** FETCHING DATA ... ***");
 
+		if (forced) {
+			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, false);
+		}
+
 		if (isFetchingData(ctx)) {
 
 			Logger.Log("fetchData() is already running");
@@ -657,17 +661,27 @@ public class DataCenter {
 	 * @since 1.0
 	 */
 	public boolean removeContainerSession(Context context, int id) {
-		Logger.Log("remove Container Session with Id = " + Integer.toString(id));
-		try {
 
-			getDatabaseManager().getHelper(context).getContainerSessionDaoImpl().delete(id);
+		Logger.Log("remove Container Session with Id = " + Integer.toString(id));
+		if (id == -1) return false;
+
+		SQLiteDatabase db = getDatabaseManager().getHelper(context).getWritableDatabase();
+		Cursor cursor = db.rawQuery("select * from container_session where id = ?",
+									new String[] { Integer.toString(id) });
+		if (cursor.moveToFirst()) {
+
+			String uuid = cursor.getString(cursor.getColumnIndexOrThrow("_id"));
+			db.delete("container_session", "_id = ?", new String[] { uuid });
+			db.delete("cjay_image", "containerSession_id = ?", new String[] { uuid });
+			db.delete("issue", "containerSession_id = ?", new String[] { uuid });
+
 			EventBus.getDefault().post(new ContainerSessionChangedEvent());
 			return true;
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
 		}
+
+		// getDatabaseManager().getHelper(context).getContainerSessionDaoImpl().delete(id);
+
+		return false;
 	}
 
 	/**
@@ -910,7 +924,7 @@ public class DataCenter {
 
 				for (TmpContainerSession tmpSession : tmpContainerSessions) {
 
-					Utils.checkId(tmpSession.getContainerId());
+					// Utils.checkId(tmpSession.getContainerId());
 
 					if ((role == UserRole.AUDITOR && tmpSession.getStatus() != ContainerState.NEW.getValue())
 							|| (role == UserRole.REPAIR_STAFF && tmpSession.getStatus() == ContainerState.AVAILABLE.getValue())

@@ -329,6 +329,7 @@ public class GcmIntentService extends IntentService {
 			onDestroy();
 
 		} catch (Exception e) {
+
 			e.printStackTrace();
 		}
 	}
