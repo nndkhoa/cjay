@@ -151,7 +151,6 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
 		String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
 		String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
-
 		CJayApplication.openPhotoGridView(	getActivity(), uuidString, containerId, CJayImage.TYPE_IMPORT,
 											GateImportListFragment.LOG_TAG);
 	}

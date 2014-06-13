@@ -246,12 +246,15 @@ public class Utils {
 		int currentUserId = -1;
 
 		try {
+
 			SQLiteDatabase db = DataCenter.getDatabaseHelper(context).getReadableDatabase();
 			Cursor cursor = db.rawQuery("select * from user", new String[] {});
 			if (cursor.moveToFirst()) {
 				currentUserId = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
 				// Logger.Log("Current user id: " + currentUserId);
 			}
+			cursor.close();
+
 		} catch (Exception e) {
 			throw new NullSessionException();
 		}
@@ -545,6 +548,7 @@ public class Utils {
 			default:
 				return true;
 		}
+		cursor.close();
 		return isValidForUpload;
 	}
 }

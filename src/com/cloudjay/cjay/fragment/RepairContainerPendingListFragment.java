@@ -181,6 +181,7 @@ public class RepairContainerPendingListFragment extends SherlockFragment impleme
 								Cursor cursor = (Cursor) cursorAdapter.getItem(selected.keyAt(i));
 								String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
 								String containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
+
 								mSelectedItems.put(uuidString, containerId);
 							}
 						}

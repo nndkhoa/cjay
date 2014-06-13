@@ -67,6 +67,7 @@ public class RepairContainerActivity extends CJayActivity implements OnPageChang
 			containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
 			setTitle(containerId);
 		}
+		cursor.close();
 
 		locations = getResources().getStringArray(R.array.repair_container_tabs);
 		configureViewPager();

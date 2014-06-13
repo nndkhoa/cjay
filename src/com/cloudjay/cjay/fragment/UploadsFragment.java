@@ -51,6 +51,7 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 
 			Cursor cursor = (Cursor) listView.getItemAtPosition(position);
 			UploadState uploadState = UploadState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_STATE))];
+
 			return uploadState == UploadState.COMPLETED;
 
 		} catch (Exception e) {
@@ -117,6 +118,7 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 
 				Cursor cursor = (Cursor) listView.getItemAtPosition(reverseSortedPositions[i]);
 				String containerId = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
+
 				DataCenter.getInstance()
 							.removeContainerFromListUpload(	DataCenter.getDatabaseHelper(getActivity())
 																		.getWritableDatabase(), containerId);

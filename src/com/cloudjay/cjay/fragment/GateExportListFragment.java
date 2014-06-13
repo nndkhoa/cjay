@@ -244,7 +244,6 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 		mSelectedUuid = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
 		mSelectedContainerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
 		mSelectedState = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
-
 		getActivity().supportInvalidateOptionsMenu();
 		Logger.Log("mSelectedContainerSession: " + mSelectedContainerId);
 	}

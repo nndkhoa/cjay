@@ -3,6 +3,7 @@ package com.cloudjay.cjay;
 import java.sql.SQLException;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
@@ -85,14 +86,14 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 	String containerId;
 	boolean isAvailable;
 
-	private void refreshContainer() {
+	void refreshContainer() {
 		SQLiteDatabase db = DataCenter.getDatabaseHelper(getApplicationContext()).getReadableDatabase();
 		Cursor cursor = db.rawQuery("select * from csiview where _id = ?", new String[] { mContainerSessionUuid });
-
 		if (cursor.moveToFirst()) {
 			containerId = cursor.getString(cursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
 			isAvailable = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_AV)) != 0;
 		}
+		cursor.close();
 	}
 
 	@AfterViews
@@ -102,7 +103,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		refreshContainer();
 
 		// Set Activity Title
-		containerIdTextView.setText(containerId);
+		// containerIdTextView.setText(containerId);
 		setTitle(containerId);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getLoaderManager().initLoader(LOADER_ID, null, this);
@@ -142,6 +143,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		} else {
 			CJayApplication.openReportDialog(this, mSelectedCJayImageUuid, mContainerSessionUuid);
 		}
+		cursor.close();
 
 	}
 
@@ -167,6 +169,8 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 
 			e.printStackTrace();
 		}
+
+		cursor.close();
 
 		supportInvalidateOptionsMenu();
 	}

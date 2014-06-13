@@ -151,6 +151,7 @@ public class AddContainerDialog extends SherlockDialogFragment {
 					mContainerEditText.setError(getString(R.string.dialog_container_existed));
 					return;
 				}
+				cursor.close();
 
 				mContainerEditText.setError(null);
 				mOperatorEditText.setError(null);
@@ -199,6 +200,8 @@ public class AddContainerDialog extends SherlockDialogFragment {
 					mContainerEditText.setError(getString(R.string.dialog_container_existed));
 					return;
 				}
+
+				cursor.close();
 
 				if (!Utils.isContainerIdValid(mContainerId)) {
 					mContainerEditText.setError(getString(R.string.dialog_container_id_invalid));

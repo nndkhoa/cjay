@@ -16,10 +16,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
+
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionEnqueueEvent;
@@ -67,6 +69,13 @@ public class CJayApplication extends Application {
 												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox), true);
 
 		Logger.getInstance().setDebuggable(debuggable);
+
+		if (Logger.isDebuggable()) {
+			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
+			StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
+																	.detectLeakedClosableObjects().penaltyLog()
+																	.penaltyDeath().build());
+		}
 
 		// Setup API ROOT
 		CJayConstant.initBetaApi(false);

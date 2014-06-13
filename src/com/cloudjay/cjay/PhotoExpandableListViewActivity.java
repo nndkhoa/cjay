@@ -172,6 +172,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		if (cursor.moveToFirst()) {
 			containerAv = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_AV)) != 0;
 		}
+		cursor.close();
 
 		afterLoad();
 	}

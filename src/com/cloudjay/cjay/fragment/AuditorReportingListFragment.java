@@ -208,6 +208,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 		// clear current selection
 		hideMenuItems();
 		Intent intent = new Intent(getActivity(), AuditorContainerActivity_.class);
+
 		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
 		String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
 		intent.putExtra(AuditorContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA, uuidString);
@@ -510,6 +511,8 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 			if (cursor.moveToFirst()) {
 				tmp = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_ID));
 			}
+
+			cursor.close();
 			final int id = tmp;
 
 			Logger.Log("Menu upload item clicked");

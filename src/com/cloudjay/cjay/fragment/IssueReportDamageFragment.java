@@ -131,7 +131,6 @@ public class IssueReportDamageFragment extends IssueReportFragment implements Lo
 
 		mDamageCode = cursor.getString(cursor.getColumnIndexOrThrow(DamageCode.CODE));
 		mDamageName = cursor.getString(cursor.getColumnIndexOrThrow(DamageCode.DISPLAY_NAME));
-
 		ignoreSearch = true;
 		mDamageEditText.setText(mDamageName);
 		ignoreSearch = false;

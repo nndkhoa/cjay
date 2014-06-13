@@ -424,6 +424,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			depotCode = cursor.getString(cursor.getColumnIndexOrThrow(Depot.DEPOT_CODE));
 			imageIdPath = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_IMAGE_ID_PATH));
 		}
+
+		cursor.close();
 	}
 
 	void initPreview(int width, int height) {

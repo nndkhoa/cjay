@@ -135,11 +135,15 @@ public class DataCenter {
 			// Alert error
 		}
 
+		cursor.close();
+
 		int container_id = 0;
 		cursor = db.rawQuery("select * from container_session where _id = ?", new String[] { uuid });
 		if (cursor.moveToFirst()) {
 			container_id = cursor.getInt(cursor.getColumnIndexOrThrow("container_id"));
 		}
+
+		cursor.close();
 
 		String fields[] = { "container_id", "operator_id" };
 		String values[] = { containerId, Integer.toString(operatorId) };
@@ -495,6 +499,7 @@ public class DataCenter {
 
 			db.execSQL(sql);
 		}
+		cursor.close();
 	}
 
 	public void clearListUpload(SQLiteDatabase db) {
@@ -509,6 +514,7 @@ public class DataCenter {
 			db.execSQL(sql);
 		}
 
+		cursor.close();
 		// String sql = "UPDATE container_session SET cleared = 1 WHERE cleared = 0 AND upload_confirmation = 1 ";
 		// db.execSQL(sql);
 
@@ -680,7 +686,7 @@ public class DataCenter {
 		}
 
 		// getDatabaseManager().getHelper(context).getContainerSessionDaoImpl().delete(id);
-
+		cursor.close();
 		return false;
 	}
 
@@ -897,6 +903,7 @@ public class DataCenter {
 			if (userCursor.moveToFirst()) {
 				role = UserRole.values()[userCursor.getInt(userCursor.getColumnIndexOrThrow("role"))];
 			}
+			userCursor.close();
 
 			if (role == null) { throw new NullSessionException(); }
 
@@ -959,12 +966,14 @@ public class DataCenter {
 							Mapper.getInstance().update(ctx, tmpSession, uuid);
 						}
 
+						cursor.close();
 						continue;
 
 					} else { // --> create
 						// Logger.Log("Create new container session:" + tmpSession.getContainerId());
 						containerSession = Mapper.getInstance().toContainerSession(tmpSession, ctx);
 					}
+					cursor.close();
 
 					if (null != containerSession) {
 						containerSessions.add(containerSession);

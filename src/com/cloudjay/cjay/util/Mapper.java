@@ -87,6 +87,8 @@ public class Mapper {
 				// Logger.Log("Create new Operator: " + operatorCode);
 			}
 
+			cursor.close();
+
 			long depotId = -1;
 			cursor = db.rawQuery(	"select id as _id, depot_code, depot_name from depot where depot_code = ?",
 									new String[] { depotCode });
@@ -99,6 +101,8 @@ public class Mapper {
 				depotId = db.insertWithOnConflict("depot", null, values, SQLiteDatabase.CONFLICT_REPLACE);
 				// Logger.Log("Create new depot: " + depotCode);
 			}
+
+			cursor.close();
 
 			long containerId = -1;
 			cursor = db.rawQuery(	"select * from container where container_id = ?",
@@ -114,6 +118,7 @@ public class Mapper {
 				containerId = db.insertWithOnConflict("container", null, values, SQLiteDatabase.CONFLICT_REPLACE);
 				// Logger.Log("Create new container: " + tmpSession.getContainerId());
 			}
+			cursor.close();
 
 			// Create `container session` object
 			String uuid = UUID.randomUUID().toString();
@@ -316,6 +321,8 @@ public class Mapper {
 							// Logger.Log("Create new CJayImage: " + gateReportImage.getImageName());
 
 						}
+
+						cursor.close();
 					}
 				}
 
@@ -373,6 +380,8 @@ public class Mapper {
 									} else {
 										Toast.makeText(ctx, "Unexpected Exception", Toast.LENGTH_LONG).show();
 									}
+
+									issueCursor.close();
 									break;
 
 								case REPAIR_STAFF:
@@ -392,6 +401,8 @@ public class Mapper {
 							}
 
 						}
+
+						cursor.close();
 
 						if (TextUtils.isEmpty(issueId)) {
 
@@ -432,6 +443,8 @@ public class Mapper {
 
 									// Logger.Log("create new image");
 								}
+
+								auditCursor.close();
 							}
 						} // end audit report images
 

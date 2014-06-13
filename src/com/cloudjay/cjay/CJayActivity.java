@@ -17,6 +17,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -405,10 +406,11 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 		crouton.show();
 	}
-	
+
 	protected Crouton makeCrouton(String message, Style style, int duration, boolean hideOnTouch) {
 		Crouton.cancelAllCroutons();
-		final Crouton crouton = Crouton.makeText(this, message, style);;
+		final Crouton crouton = Crouton.makeText(this, message, style);
+		;
 		crouton.setConfiguration(new Configuration.Builder().setDuration(duration).build());
 		if (hideOnTouch) {
 			crouton.setOnClickListener(new View.OnClickListener() {
@@ -418,7 +420,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 				}
 			});
 		}
-		
+
 		return crouton;
 	}
 

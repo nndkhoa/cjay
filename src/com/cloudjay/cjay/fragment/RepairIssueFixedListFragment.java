@@ -27,14 +27,14 @@ import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_repair_issue_fixed)
 public class RepairIssueFixedListFragment extends SherlockFragment implements LoaderCallbacks<Cursor> {
-	
+
 	public final static String LOG_TAG = "RepairIssueFixedListFragment";
 	private static final int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_REPAIR_ISSUE_FIXED;
-	
+
 	private String mContainerSessionUUID;
 
 	private IssueItemCursorAdapter mCursorAdapter;
-	
+
 	private int mItemLayout = R.layout.list_item_issue;
 
 	@ViewById(R.id.feeds)
@@ -52,18 +52,15 @@ public class RepairIssueFixedListFragment extends SherlockFragment implements Lo
 		// get selected issue uuid
 		Cursor cursor = (Cursor) mCursorAdapter.getItem(position);
 		String issueUUID = cursor.getString(cursor.getColumnIndexOrThrow("issue_id"));
-		String issueID = cursor.getString(cursor.getColumnIndexOrThrow("location_code"))
-				+ " " + cursor.getString(cursor.getColumnIndexOrThrow("damage_code"))
-				+ " " + cursor.getString(cursor.getColumnIndexOrThrow("repair_code"));
-		
-		// show issue report activity		
-		CJayApplication.openPhotoGridViewForIssue(getActivity(), mContainerSessionUUID, issueUUID, 
-				"", issueID, 
-				CJayImage.TYPE_REPAIRED, 
-				CJayImage.TYPE_AUDIT, 
-				LOG_TAG);
+		String issueID = cursor.getString(cursor.getColumnIndexOrThrow("location_code")) + " "
+				+ cursor.getString(cursor.getColumnIndexOrThrow("damage_code")) + " "
+				+ cursor.getString(cursor.getColumnIndexOrThrow("repair_code"));
+
+		// show issue report activity
+		CJayApplication.openPhotoGridViewForIssue(	getActivity(), mContainerSessionUUID, issueUUID, "", issueID,
+													CJayImage.TYPE_REPAIRED, CJayImage.TYPE_AUDIT, LOG_TAG);
 	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		EventBus.getDefault().register(this);
@@ -96,16 +93,16 @@ public class RepairIssueFixedListFragment extends SherlockFragment implements Lo
 	public void setContainerSessionUUID(String containerSessionUUID) {
 		mContainerSessionUUID = containerSessionUUID;
 	}
-	
+
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
 		Context context = getActivity();
-		
+
 		return new CJayCursorLoader(context) {
 			@Override
 			public Cursor loadInBackground() {
 				Cursor cursor = DataCenter.getInstance().getFixedIssueItemCursorByContainer(getContext(),
-																						mContainerSessionUUID);
+																							mContainerSessionUUID);
 
 				if (cursor != null) {
 					// Ensure the cursor window is filled
