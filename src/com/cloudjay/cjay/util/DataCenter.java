@@ -2,6 +2,7 @@ package com.cloudjay.cjay.util;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -885,24 +886,6 @@ public class DataCenter {
 		String firstBatchRequestTime = "";
 		SQLiteDatabase db = getDatabaseManager().getReadableDatabase(ctx);
 
-		// try {
-		// db.beginTransaction();
-		//
-		// // for each record in the list
-		// // {
-		// // do_some_processing();
-		// // if (line represent a valid entry)
-		// // {
-		// // db.insert(SOME_TABLE, null, SOME_VALUE);
-		// // }
-		// // some_other_processing();
-		// // }
-		//
-		// db.setTransactionSuccessful();
-		// } finally {
-		// db.endTransaction();
-		// }
-
 		int page = 1;
 		int totalItems = 0;
 		String nextUrl = "";
@@ -942,6 +925,8 @@ public class DataCenter {
 				Logger.Log("Total items of page " + page + ": " + tmpContainerSessions.size());
 
 				page = page + 1;
+
+				ArrayList<String> sqlsStrings = new ArrayList<String>();
 
 				for (TmpContainerSession tmpSession : tmpContainerSessions) {
 
@@ -983,10 +968,21 @@ public class DataCenter {
 					} else { // --> create
 
 						// Logger.Log("Create new container session:" + tmpSession.getContainerId());
-						Mapper.getInstance().toContainerSession(tmpSession, ctx);
+						sqlsStrings.addAll(Mapper.getInstance().getSqlStrings(ctx, tmpSession));
 					}
 
 					cursor.close();
+				}
+
+				try {
+					db.beginTransaction();
+
+					for (String sql : sqlsStrings) {
+						db.execSQL(sql);
+					}
+					db.setTransactionSuccessful();
+				} finally {
+					db.endTransaction();
 				}
 
 				EventBus.getDefault().post(new ContainerSessionChangedEvent());
@@ -1004,7 +1000,9 @@ public class DataCenter {
 		}
 
 		getDatabaseHelper(ctx).addUsageLog("Update List CS at " + requestedTime + " | Total Items: " + totalItems);
+
 		return firstBatchRequestTime;
+
 	}
 
 	/**

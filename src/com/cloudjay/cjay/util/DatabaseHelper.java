@@ -50,12 +50,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 	}
 
-	private static final Class<?>[] DATA_CLASSES = { DamageCode.class, ComponentCode.class, RepairCode.class,
+	public static final Class<?>[] DATA_CLASSES = { DamageCode.class, ComponentCode.class, RepairCode.class,
 			Operator.class, User.class, Depot.class, Container.class, ContainerSession.class, Issue.class,
 			CJayImage.class };
 
 	public static final Class<?>[] DROP_CLASSES = { User.class, Depot.class, Container.class, ContainerSession.class,
-			Issue.class, CJayImage.class };
+			Issue.class, CJayImage.class, DamageCode.class, ComponentCode.class, RepairCode.class, Operator.class };
 
 	public static final String DATABASE_NAME = "cjay.db";
 
@@ -410,9 +410,17 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	}
 
 	public ContainerSessionDaoImpl getContainerSessionDaoImpl() throws SQLException {
-		if (null == containerSessionDaoImpl) {
-			containerSessionDaoImpl = DaoManager.createDao(getConnectionSource(), ContainerSession.class);
+
+		try {
+
+			if (null == containerSessionDaoImpl) {
+				containerSessionDaoImpl = DaoManager.createDao(getConnectionSource(), ContainerSession.class);
+			}
+
+		} catch (IllegalStateException e) {
+			return null;
 		}
+
 		return containerSessionDaoImpl;
 	}
 

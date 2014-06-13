@@ -10,13 +10,16 @@ import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EBean.Scope;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
+import com.cloudjay.cjay.LoginActivity;
 import com.cloudjay.cjay.dao.IUserDao;
 import com.cloudjay.cjay.model.Depot;
 import com.cloudjay.cjay.model.IDatabaseManager;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
+import com.j256.ormlite.android.AndroidConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
 @EBean(scope = Scope.Singleton)
@@ -28,6 +31,11 @@ public class CJaySession {
 	private static CJaySession instance;
 
 	public static CJaySession restore(Context context) {
+
+		// make sure it will return fresh CJaySession to LoginActivity
+		if (context instanceof LoginActivity) {
+			instance = null;
+		}
 
 		if (instance != null) return instance;
 
@@ -45,7 +53,8 @@ public class CJaySession {
 			}
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Logger.e(e.getMessage());
+			instance = null;
 		}
 
 		return null;
@@ -61,6 +70,8 @@ public class CJaySession {
 
 	public void deleteSession(final Context context) {
 
+		instance = null;
+
 		new AsyncTask<Void, Boolean, Void>() {
 
 			@Override
@@ -68,42 +79,45 @@ public class CJaySession {
 
 				// PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_INITIALIZED, false);
 				DataCenter.getDatabaseHelper(context).addUsageLog("#backup database");
-
 				Utils.backupDatabase(getCurrentUser().getUserName());
-				PreferencesUtil.clearPrefs(context);
-				context.deleteDatabase(DatabaseHelper.DATABASE_NAME);
 
-				// Logger.Log("deleting session ...");
-				// databaseManager = CJayClient.getInstance().getDatabaseManager();
-				// try {
-				//
-				// DatabaseHelper helper = databaseManager.getHelper(context);
-				//
-				// // userDao = helper.getUserDaoImpl();
-				// // User user = userDao.getMainUser();
-				// //
-				// // if (null != user) {
-				// // user.setMainAccount(false);
-				// // user.setAccessToken("");
-				// // userDao.update(user);
-				// // currentUser = null;
-				// // }
-				//
-				// for (Class<?> dataClass : DatabaseHelper.DROP_CLASSES) {
-				// TableUtils.dropTable(helper.getConnectionSource(), dataClass, true);
-				// }
-				//
-				// for (Class<?> dataClass : DatabaseHelper.DROP_CLASSES) {
-				// TableUtils.createTable(helper.getConnectionSource(), dataClass);
-				// }
-				//
-				// DataCenter.getDatabaseHelper(context).addUsageLog("User #logout");
-				// } catch (SQLException e) {
-				//
-				// e.printStackTrace();
-				// context.deleteDatabase(DatabaseHelper.DATABASE_NAME);
-				//
-				// }
+				if (Utils.isAlarmUp(context)) {
+					Utils.cancelAlarm(context);
+				}
+
+				PreferencesUtil.clearPrefs(context);
+
+				Logger.Log("deleting session ...");
+				databaseManager = CJayClient.getInstance().getDatabaseManager();
+				try {
+
+					DatabaseHelper helper = databaseManager.getHelper(context);
+
+					for (Class<?> dataClass : DatabaseHelper.DROP_CLASSES) {
+						TableUtils.dropTable(helper.getConnectionSource(), dataClass, true);
+					}
+
+					for (Class<?> dataClass : DatabaseHelper.DROP_CLASSES) {
+						TableUtils.createTable(helper.getConnectionSource(), dataClass);
+					}
+
+					DataCenter.getDatabaseHelper(context)
+								.addUsageLog(	"User #logout at: "
+														+ StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+				} catch (SQLException e) {
+
+					e.printStackTrace();
+					try {
+						databaseManager.getHelper(context).getConnectionSource().close();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+
+					context.deleteDatabase(DatabaseHelper.DATABASE_NAME);
+					SQLiteDatabase db = context.openOrCreateDatabase(DatabaseHelper.DATABASE_NAME, 0, null);
+					databaseManager.getHelper(context).onCreate(db, new AndroidConnectionSource(db));
+
+				}
 
 				return null;
 			}

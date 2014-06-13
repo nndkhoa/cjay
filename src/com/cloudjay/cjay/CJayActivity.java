@@ -182,6 +182,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 		// Logger.Log("*** onResume - DataCenter.reload ***");
 
+		// session = CJaySession.restore(getApplicationContext());
 		if (null != session) {
 
 			if (this instanceof SplashScreenActivity) {
@@ -284,6 +285,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 					registerInBackground();
 				}
 			}
+
 		}
 
 		isActivityRunning = true;

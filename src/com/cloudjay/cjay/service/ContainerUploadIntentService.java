@@ -272,8 +272,12 @@ public class ContainerUploadIntentService extends IntentService implements Count
 												.getCJayImageDaoImpl();
 			}
 
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+			stopSelf();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return;
 		}
 
 		mNotificationMgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

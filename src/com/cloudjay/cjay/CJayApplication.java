@@ -305,7 +305,9 @@ public class CJayApplication extends Application {
 		Logger.Log("start CJayHome Activity");
 		Intent intent = null;
 		try {
+
 			intent = new Intent(context, Utils.getHomeActivity(context));
+
 		} catch (NullSessionException e) {
 			e.printStackTrace();
 		}

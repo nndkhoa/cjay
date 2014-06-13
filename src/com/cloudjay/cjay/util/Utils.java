@@ -377,6 +377,8 @@ public class Utils {
 	}
 
 	public static String sqlString(String input) {
+		if (TextUtils.isEmpty(input)) return input;
+
 		return "'" + input.replace("'", "''") + "'";
 	}
 
@@ -394,6 +396,8 @@ public class Utils {
 		}
 
 		UserRole role = UserRole.values()[userRole];
+
+		Logger.Log("Current user role: " + role.name());
 
 		switch (role) {
 			case GATE_KEEPER:

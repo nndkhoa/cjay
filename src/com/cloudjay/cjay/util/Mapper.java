@@ -29,6 +29,7 @@ import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
+import com.google.android.gms.internal.ck;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -55,6 +56,111 @@ public class Mapper {
 		}
 	}
 
+	public ArrayList<String> getSqlStrings(Context ctx, TmpContainerSession tmpSession) {
+
+		ArrayList<String> sqlStrings = new ArrayList<String>();
+		SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
+
+		String operatorCode = tmpSession.getOperatorCode();
+		String depotCode = tmpSession.getDepotCode();
+
+		long operatorId = -1;
+		Cursor cursor = db.rawQuery("select * from operator where operator_code = ?", new String[] { operatorCode });
+		if (cursor.moveToFirst()) {
+			operatorId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+		} else {
+			ContentValues values = new ContentValues();
+			values.put(Operator.FIELD_CODE, operatorCode);
+			values.put(Operator.FIELD_NAME, operatorCode);
+			operatorId = db.insertWithOnConflict("operator", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+			// Logger.Log("Create new Operator: " + operatorCode);
+		}
+
+		cursor.close();
+
+		long depotId = -1;
+		cursor = db.rawQuery(	"select id as _id, depot_code, depot_name from depot where depot_code = ?",
+								new String[] { depotCode });
+		if (cursor.moveToFirst()) {
+			depotId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+		} else {
+			ContentValues values = new ContentValues();
+			values.put(Depot.DEPOT_CODE, depotCode);
+			values.put(Depot.DEPOT_NAME, depotCode);
+			depotId = db.insertWithOnConflict("depot", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+			// Logger.Log("Create new depot: " + depotCode);
+		}
+
+		cursor.close();
+		long containerId = -1;
+		cursor = db.rawQuery(	"select * from container where container_id = ?",
+								new String[] { tmpSession.getContainerId() });
+		if (cursor.moveToFirst()) {
+			containerId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+		} else {
+
+			ContentValues values = new ContentValues();
+			values.put(Container.CONTAINER_ID, tmpSession.getContainerId());
+			values.put("operator_id", operatorId);
+			values.put("depot_id", depotId);
+			containerId = db.insertWithOnConflict("container", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+			// Logger.Log("Create new container: " + tmpSession.getContainerId());
+
+		}
+		cursor.close();
+
+		// Create `container session` object
+		String uuid = UUID.randomUUID().toString();
+		sqlStrings.add(String.format(	"insert or replace into container_session values (%s, %s, %s, %s, %s, %s, 0, 0, 0, 0, 0, %s, 0, 0, 0)",
+										Utils.sqlString(tmpSession.getCheckInTime()),
+										Utils.sqlString(tmpSession.getCheckOutTime()), Utils.sqlString(uuid),
+										containerId, Utils.sqlString(tmpSession.getImageIdPath()), tmpSession.getId(),
+										tmpSession.getStatus()));
+
+		// process AuditReportItems --> create issues
+		List<AuditReportItem> auditReportItems = tmpSession.getAuditReportItems();
+		if (null != auditReportItems) {
+			for (AuditReportItem auditReportItem : auditReportItems) {
+
+				String issueUuid = UUID.randomUUID().toString();
+
+				sqlStrings.add(String.format(	"insert or replace into issue values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0)",
+												auditReportItem.getComponentId(), Utils.sqlString(uuid),
+												auditReportItem.getDamageId(), Utils.sqlString(issueUuid),
+												auditReportItem.getHeight(), auditReportItem.getRepairId(),
+												auditReportItem.getQuantity(), auditReportItem.getLength(),
+												Utils.sqlString(auditReportItem.getLocationCode()),
+												Utils.toInt(auditReportItem.isFixAllowed()), auditReportItem.getId()));
+
+				List<AuditReportImage> auditReportImages = auditReportItem.getAuditReportImages();
+				for (AuditReportImage image : auditReportImages) {
+					sqlStrings.add(String.format(	"insert or replace into cjay_image values(%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+													Utils.sqlString(uuid),
+													Utils.sqlString(UUID.randomUUID().toString()),
+													Utils.sqlString(image.getImageName()), Utils.sqlString(issueUuid),
+													Utils.sqlString(image.getCreatedAt()),
+													Utils.sqlString(image.getImageUrl()), Integer.toString(4),
+													image.getType(), image.getId()));
+
+				}
+			}
+		}
+
+		List<GateReportImage> gateReportImages = tmpSession.getGateReportImages();
+		for (GateReportImage image : gateReportImages) {
+
+			sqlStrings.add(String.format(	"insert or replace into cjay_image values(%s, %s, NULL, %s, %s, %s, %s, %s, %s)",
+											Utils.sqlString(uuid), Utils.sqlString(UUID.randomUUID().toString()),
+											Utils.sqlString(image.getImageName()),
+											Utils.sqlString(image.getCreatedAt()),
+											Utils.sqlString(image.getImageUrl()), Integer.toString(4), image.getType(),
+											image.getId()));
+
+		}
+
+		return sqlStrings;
+	}
+
 	/**
 	 * 
 	 * Sử dụng để convert data lấy từ server thành local data
@@ -63,7 +169,7 @@ public class Mapper {
 	 * @param ctx
 	 * @return
 	 */
-	public synchronized ContainerSession toContainerSession(TmpContainerSession tmpSession, Context ctx) {
+	public synchronized void toContainerSession(TmpContainerSession tmpSession, Context ctx) {
 
 		SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
 
@@ -98,7 +204,6 @@ public class Mapper {
 		}
 
 		cursor.close();
-
 		long containerId = -1;
 		cursor = db.rawQuery(	"select * from container where container_id = ?",
 								new String[] { tmpSession.getContainerId() });
@@ -112,11 +217,13 @@ public class Mapper {
 			values.put("depot_id", depotId);
 			containerId = db.insertWithOnConflict("container", null, values, SQLiteDatabase.CONFLICT_REPLACE);
 			// Logger.Log("Create new container: " + tmpSession.getContainerId());
+
 		}
 		cursor.close();
 
 		// Create `container session` object
 		String uuid = UUID.randomUUID().toString();
+
 		ContentValues csValues = new ContentValues();
 		csValues.put("check_in_time", tmpSession.getCheckInTime());
 		csValues.put("check_out_time", tmpSession.getCheckOutTime());
@@ -133,7 +240,6 @@ public class Mapper {
 			for (AuditReportItem auditReportItem : auditReportItems) {
 
 				String issueUuid = UUID.randomUUID().toString();
-
 				DataCenter.getInstance().addIssue(ctx, auditReportItem, auditReportItem.getId(), issueUuid, uuid);
 
 				List<AuditReportImage> auditReportImages = auditReportItem.getAuditReportImages();
@@ -148,8 +254,6 @@ public class Mapper {
 		for (GateReportImage image : gateReportImages) {
 			DataCenter.getInstance().addImage(ctx, image, image.getId(), UUID.randomUUID().toString(), uuid);
 		}
-
-		return null;
 	}
 
 	public TmpContainerSession toTmpContainerSession(Context ctx, ContainerSession containerSession,

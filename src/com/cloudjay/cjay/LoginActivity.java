@@ -27,11 +27,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.network.CJayClient;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.NoConnectionException;
 import com.cloudjay.cjay.util.NullSessionException;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
 import com.rampo.updatechecker.UpdateChecker;
 
@@ -118,7 +120,9 @@ public class LoginActivity extends CJayActivity {
 
 				// Navigate user to Main Activity based on user role
 				Logger.Log("Login successfully");
-				DataCenter.getDatabaseHelper(LoginActivity.this).addUsageLog("user #login");
+				DataCenter.getDatabaseHelper(LoginActivity.this)
+							.addUsageLog(	"user #login at: "
+													+ StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 				CJayApplication.startCJayHomeActivity(LoginActivity.this);
 				finish();
 
