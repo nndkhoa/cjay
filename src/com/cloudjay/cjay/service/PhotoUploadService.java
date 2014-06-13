@@ -161,6 +161,7 @@ public class PhotoUploadService extends Service {
 				ParcelFileDescriptor fileDescriptor = ctx.getContentResolver()
 															.openFileDescriptor(Uri.parse(uploadItem.getUri()), "r");
 				InputStream in = ctx.getContentResolver().openInputStream(Uri.parse(uploadItem.getUri()));
+
 				CountingInputStreamEntity entity = new CountingInputStreamEntity(in, fileDescriptor.getStatSize());
 				entity.setUploadListener(new CountingInputStreamEntity.UploadListener() {
 
@@ -170,6 +171,7 @@ public class PhotoUploadService extends Service {
 					}
 
 				});
+
 				entity.setContentType("image/jpeg");
 				post.setEntity(entity);
 
@@ -201,6 +203,9 @@ public class PhotoUploadService extends Service {
 					Logger.e("ClientProtocolException: " + e.getMessage());
 					uploadItem.setUploadState(CJayImage.STATE_UPLOAD_ERROR);
 				}
+
+				in.close();
+
 			} catch (IOException e) { // Rớt mạng
 
 				Logger.e("IOException: " + e.getMessage());

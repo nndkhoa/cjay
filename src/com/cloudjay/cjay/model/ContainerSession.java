@@ -253,8 +253,10 @@ public class ContainerSession {
 	}
 
 	public String getOperatorCode() {
+
 		if (getContainer() != null && getContainer().getOperator() != null)
 			return getContainer().getOperator().getCode();
+
 		return null;
 	}
 

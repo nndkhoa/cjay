@@ -31,12 +31,16 @@ public class IssueReportHelper {
 			damageId = damageCursor.getInt(damageCursor.getColumnIndexOrThrow("_id"));
 		}
 
+		damageCursor.close();
+
 		Cursor repairCursor = db.rawQuery("select id as _id from repair_code where code = ?", new String[] { "WW" });
 
 		int repairId = 0;
 		if (repairCursor.moveToFirst()) {
 			repairId = repairCursor.getInt(repairCursor.getColumnIndexOrThrow("_id"));
 		}
+
+		repairCursor.close();
 
 		Cursor componentCursor = db.rawQuery(	"select id as _id from component_code where code = ?",
 												new String[] { "FWA" });
@@ -45,6 +49,8 @@ public class IssueReportHelper {
 		if (componentCursor.moveToFirst()) {
 			componentId = componentCursor.getInt(componentCursor.getColumnIndexOrThrow("_id"));
 		}
+
+		componentCursor.close();
 
 		String issueId;
 		String sql = "select _id from issue where componentCode_id = " + componentId + " and damageCode_id = "
@@ -65,6 +71,8 @@ public class IssueReportHelper {
 					+ Utils.sqlString(issueId) + ", NULL, " + repairId + ", NULL, 'BXXX', 1, 0, 0)";
 			db.execSQL(sql);
 		}
+
+		issueCursor.close();
 
 		// link issue to cjayimage
 		ContentValues values = new ContentValues();
@@ -98,40 +106,51 @@ public class IssueReportHelper {
 	public static void
 			showReportDialog(final Context ctx, final String cJayImageUuid, final String containerSessionUUID) {
 
-		AlertDialog.Builder builder = 
-				new AlertDialog.Builder(ctx)
-					.setCancelable(false)
-					.setMessage(R.string.dialog_report_message)
-					.setTitle(R.string.dialog_report_title)
-					.setPositiveButton(	R.string.dialog_report_no,
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int id) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(ctx).setCancelable(false)
+																	.setMessage(R.string.dialog_report_message)
+																	.setTitle(R.string.dialog_report_title)
+																	.setPositiveButton(	R.string.dialog_report_no,
+																						new DialogInterface.OnClickListener() {
+																							@Override
+																							public
+																									void
+																									onClick(DialogInterface dialog,
+																											int id) {
 
-								// Issue not reported,
-								// report issue
-								showIssueReport(ctx, cJayImageUuid);
-							}
-						})
-					.setNegativeButton(	R.string.dialog_report_yes,
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int id) {
-	
-								// The issue already
-								// reported, assign this
-								// image to that issue
-								showIssueAssigment(	ctx, cJayImageUuid);
-							}
-						})
-					.setNeutralButton(R.string.dialog_report_neutral,
-						new OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
+																								// Issue not reported,
+																								// report issue
+																								showIssueReport(ctx,
+																												cJayImageUuid);
+																							}
+																						})
+																	.setNegativeButton(	R.string.dialog_report_yes,
+																						new DialogInterface.OnClickListener() {
+																							@Override
+																							public
+																									void
+																									onClick(DialogInterface dialog,
+																											int id) {
 
-								setWWContainer(	ctx, cJayImageUuid, containerSessionUUID);
-							}
-						});
+																								// The issue already
+																								// reported, assign this
+																								// image to that issue
+																								showIssueAssigment(	ctx,
+																													cJayImageUuid);
+																							}
+																						})
+																	.setNeutralButton(R.string.dialog_report_neutral,
+																						new OnClickListener() {
+																							@Override
+																							public
+																									void
+																									onClick(DialogInterface dialog,
+																											int which) {
+
+																								setWWContainer(	ctx,
+																												cJayImageUuid,
+																												containerSessionUUID);
+																							}
+																						});
 		builder.show();
 	}
 }

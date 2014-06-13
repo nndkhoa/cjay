@@ -2,7 +2,6 @@ package com.cloudjay.cjay.util;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -671,6 +670,7 @@ public class DataCenter {
 		Logger.Log("remove Container Session with Id = " + Integer.toString(id));
 		if (id == -1) return false;
 
+		boolean result = false;
 		SQLiteDatabase db = getDatabaseManager().getHelper(context).getWritableDatabase();
 		Cursor cursor = db.rawQuery("select * from container_session where id = ?",
 									new String[] { Integer.toString(id) });
@@ -682,12 +682,11 @@ public class DataCenter {
 			db.delete("issue", "containerSession_id = ?", new String[] { uuid });
 
 			EventBus.getDefault().post(new ContainerSessionChangedEvent());
-			return true;
+			result = true;
 		}
 
-		// getDatabaseManager().getHelper(context).getContainerSessionDaoImpl().delete(id);
 		cursor.close();
-		return false;
+		return result;
 	}
 
 	/**
@@ -821,6 +820,13 @@ public class DataCenter {
 
 		if (invokeType == InvokeType.FOLLOWING) return;
 
+		if (isUpdating(ctx)) {
+
+			Logger.Log("updateListContainerSessions is already running");
+			return;
+
+		}
+
 		long startTime = System.currentTimeMillis();
 		PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, true);
 
@@ -877,14 +883,25 @@ public class DataCenter {
 
 		// we will return this value
 		String firstBatchRequestTime = "";
-
 		SQLiteDatabase db = getDatabaseManager().getReadableDatabase(ctx);
-		ContainerSessionDaoImpl containerSessionDaoImpl = null;
-		try {
-			containerSessionDaoImpl = databaseManager.getHelper(ctx).getContainerSessionDaoImpl();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+
+		// try {
+		// db.beginTransaction();
+		//
+		// // for each record in the list
+		// // {
+		// // do_some_processing();
+		// // if (line represent a valid entry)
+		// // {
+		// // db.insert(SOME_TABLE, null, SOME_VALUE);
+		// // }
+		// // some_other_processing();
+		// // }
+		//
+		// db.setTransactionSuccessful();
+		// } finally {
+		// db.endTransaction();
+		// }
 
 		int page = 1;
 		int totalItems = 0;
@@ -907,12 +924,9 @@ public class DataCenter {
 
 			if (role == null) { throw new NullSessionException(); }
 
-			List<ContainerSession> containerSessions = new ArrayList<ContainerSession>();
 			ContainerSessionResult result = null;
-
 			result = CJayClient.getInstance().getContainerSessionsByPage(ctx, lastUpdate, page, type,
 																			firstBatchRequestTime);
-
 			if (null != result) {
 
 				nextUrl = result.getNext();
@@ -931,22 +945,19 @@ public class DataCenter {
 
 				for (TmpContainerSession tmpSession : tmpContainerSessions) {
 
-					// Utils.checkId(tmpSession.getContainerId());
-
+					// Remove container that exported
 					if ((role == UserRole.AUDITOR && tmpSession.getStatus() != ContainerState.NEW.getValue())
 							|| (role == UserRole.REPAIR_STAFF && tmpSession.getStatus() == ContainerState.AVAILABLE.getValue())
 							|| (tmpSession.getStatus() == ContainerState.EXPORTED.getValue())) {
 
-						// find and delete this item
 						if (tmpSession.getId() != 0) {
-
 							Logger.Log("Delete container session: " + tmpSession.getContainerId() + " | Id: ");
 							DataCenter.getInstance().removeContainerSession(ctx, tmpSession.getId());
 							continue;
 						}
 					}
 
-					ContainerSession containerSession = null;
+					// Add or update container
 					Cursor cursor = db.rawQuery("select * from container_session where id = ?",
 												new String[] { Integer.toString(tmpSession.getId()) });
 
@@ -970,31 +981,18 @@ public class DataCenter {
 						continue;
 
 					} else { // --> create
+
 						// Logger.Log("Create new container session:" + tmpSession.getContainerId());
-						containerSession = Mapper.getInstance().toContainerSession(tmpSession, ctx);
+						Mapper.getInstance().toContainerSession(tmpSession, ctx);
 					}
+
 					cursor.close();
-
-					if (null != containerSession) {
-						containerSessions.add(containerSession);
-					} else {
-						DataCenter.getDatabaseHelper(ctx)
-									.addUsageLog(	tmpSession.getContainerId()
-															+ " | Cannot insert container to database.");
-						Logger.e("Cannot insert container " + tmpSession.getContainerId() + " to database.");
-					}
-
 				}
 
-				// note: it will use ormlite to create, so do not need to recheck any condition
-				containerSessionDaoImpl.bulkInsertDataBySavePoint(containerSessions);
-				if (null != containerSessions && !containerSessions.isEmpty()) {
-					EventBus.getDefault().post(new ContainerSessionChangedEvent(containerSessions));
-				}
+				EventBus.getDefault().post(new ContainerSessionChangedEvent());
 			}
 
 			Logger.Log("Requested Time: " + requestedTime);
-
 			long delta = System.currentTimeMillis() - beginParseTime;
 			Logger.w("--> One round duration: " + Long.toString(delta));
 

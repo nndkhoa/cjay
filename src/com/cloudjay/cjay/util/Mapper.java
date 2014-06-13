@@ -1,7 +1,6 @@
 package com.cloudjay.cjay.util;
 
 import java.lang.reflect.Type;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -66,103 +65,90 @@ public class Mapper {
 	 */
 	public synchronized ContainerSession toContainerSession(TmpContainerSession tmpSession, Context ctx) {
 
-		try {
+		SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
 
-			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager.getHelper(ctx)
-																				.getContainerSessionDaoImpl();
-			SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
+		String operatorCode = tmpSession.getOperatorCode();
+		String depotCode = tmpSession.getDepotCode();
 
-			String operatorCode = tmpSession.getOperatorCode();
-			String depotCode = tmpSession.getDepotCode();
+		long operatorId = -1;
+		Cursor cursor = db.rawQuery("select * from operator where operator_code = ?", new String[] { operatorCode });
+		if (cursor.moveToFirst()) {
+			operatorId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+		} else {
+			ContentValues values = new ContentValues();
+			values.put(Operator.FIELD_CODE, operatorCode);
+			values.put(Operator.FIELD_NAME, operatorCode);
+			operatorId = db.insertWithOnConflict("operator", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+			// Logger.Log("Create new Operator: " + operatorCode);
+		}
 
-			long operatorId = -1;
-			Cursor cursor = db.rawQuery("select * from operator where operator_code = ?", new String[] { operatorCode });
-			if (cursor.moveToFirst()) {
-				operatorId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
-			} else {
-				ContentValues values = new ContentValues();
-				values.put(Operator.FIELD_CODE, operatorCode);
-				values.put(Operator.FIELD_NAME, operatorCode);
-				operatorId = db.insertWithOnConflict("operator", null, values, SQLiteDatabase.CONFLICT_REPLACE);
-				// Logger.Log("Create new Operator: " + operatorCode);
-			}
+		cursor.close();
 
-			cursor.close();
+		long depotId = -1;
+		cursor = db.rawQuery(	"select id as _id, depot_code, depot_name from depot where depot_code = ?",
+								new String[] { depotCode });
+		if (cursor.moveToFirst()) {
+			depotId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+		} else {
+			ContentValues values = new ContentValues();
+			values.put(Depot.DEPOT_CODE, depotCode);
+			values.put(Depot.DEPOT_NAME, depotCode);
+			depotId = db.insertWithOnConflict("depot", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+			// Logger.Log("Create new depot: " + depotCode);
+		}
 
-			long depotId = -1;
-			cursor = db.rawQuery(	"select id as _id, depot_code, depot_name from depot where depot_code = ?",
-									new String[] { depotCode });
-			if (cursor.moveToFirst()) {
-				depotId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
-			} else {
-				ContentValues values = new ContentValues();
-				values.put(Depot.DEPOT_CODE, depotCode);
-				values.put(Depot.DEPOT_NAME, depotCode);
-				depotId = db.insertWithOnConflict("depot", null, values, SQLiteDatabase.CONFLICT_REPLACE);
-				// Logger.Log("Create new depot: " + depotCode);
-			}
+		cursor.close();
 
-			cursor.close();
+		long containerId = -1;
+		cursor = db.rawQuery(	"select * from container where container_id = ?",
+								new String[] { tmpSession.getContainerId() });
+		if (cursor.moveToFirst()) {
+			containerId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+		} else {
 
-			long containerId = -1;
-			cursor = db.rawQuery(	"select * from container where container_id = ?",
-									new String[] { tmpSession.getContainerId() });
-			if (cursor.moveToFirst()) {
-				containerId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
-			} else {
+			ContentValues values = new ContentValues();
+			values.put(Container.CONTAINER_ID, tmpSession.getContainerId());
+			values.put("operator_id", operatorId);
+			values.put("depot_id", depotId);
+			containerId = db.insertWithOnConflict("container", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+			// Logger.Log("Create new container: " + tmpSession.getContainerId());
+		}
+		cursor.close();
 
-				ContentValues values = new ContentValues();
-				values.put(Container.CONTAINER_ID, tmpSession.getContainerId());
-				values.put("operator_id", operatorId);
-				values.put("depot_id", depotId);
-				containerId = db.insertWithOnConflict("container", null, values, SQLiteDatabase.CONFLICT_REPLACE);
-				// Logger.Log("Create new container: " + tmpSession.getContainerId());
-			}
-			cursor.close();
+		// Create `container session` object
+		String uuid = UUID.randomUUID().toString();
+		ContentValues csValues = new ContentValues();
+		csValues.put("check_in_time", tmpSession.getCheckInTime());
+		csValues.put("check_out_time", tmpSession.getCheckOutTime());
+		csValues.put("_id", uuid);
+		csValues.put("container_id", containerId);
+		csValues.put("image_id_path", tmpSession.getImageIdPath());
+		csValues.put("id", tmpSession.getId());
+		csValues.put("server_state", tmpSession.getStatus());
+		db.insertWithOnConflict("container_session", null, csValues, SQLiteDatabase.CONFLICT_REPLACE);
 
-			// Create `container session` object
-			String uuid = UUID.randomUUID().toString();
-			ContentValues csValues = new ContentValues();
-			csValues.put("check_in_time", tmpSession.getCheckInTime());
-			csValues.put("check_out_time", tmpSession.getCheckOutTime());
-			csValues.put("_id", uuid);
-			csValues.put("container_id", containerId);
-			csValues.put("image_id_path", tmpSession.getImageIdPath());
-			csValues.put("id", tmpSession.getId());
-			csValues.put("server_state", tmpSession.getStatus());
-			db.insertWithOnConflict("container_session", null, csValues, SQLiteDatabase.CONFLICT_REPLACE);
+		// process AuditReportItems --> create issues
+		List<AuditReportItem> auditReportItems = tmpSession.getAuditReportItems();
+		if (null != auditReportItems) {
+			for (AuditReportItem auditReportItem : auditReportItems) {
 
-			// process AuditReportItems --> create issues
-			List<AuditReportItem> auditReportItems = tmpSession.getAuditReportItems();
-			if (null != auditReportItems) {
-				for (AuditReportItem auditReportItem : auditReportItems) {
+				String issueUuid = UUID.randomUUID().toString();
 
-					String issueUuid = UUID.randomUUID().toString();
+				DataCenter.getInstance().addIssue(ctx, auditReportItem, auditReportItem.getId(), issueUuid, uuid);
 
-					DataCenter.getInstance().addIssue(ctx, auditReportItem, auditReportItem.getId(), issueUuid, uuid);
-
-					List<AuditReportImage> auditReportImages = auditReportItem.getAuditReportImages();
-					for (AuditReportImage image : auditReportImages) {
-						DataCenter.getInstance().addImage(ctx, image, image.getId(), UUID.randomUUID().toString(),
-															issueUuid, uuid);
-					}
+				List<AuditReportImage> auditReportImages = auditReportItem.getAuditReportImages();
+				for (AuditReportImage image : auditReportImages) {
+					DataCenter.getInstance().addImage(ctx, image, image.getId(), UUID.randomUUID().toString(),
+														issueUuid, uuid);
 				}
 			}
-
-			List<GateReportImage> gateReportImages = tmpSession.getGateReportImages();
-			for (GateReportImage image : gateReportImages) {
-				DataCenter.getInstance().addImage(ctx, image, image.getId(), UUID.randomUUID().toString(), uuid);
-			}
-
-			ContainerSession containerSession = containerSessionDaoImpl.queryForId(uuid);
-			if (containerSession == null) {
-				Logger.e("Cannot find container " + tmpSession.getContainerId() + " after conversion");
-			}
-
-			return containerSession;
-		} catch (SQLException e) {
-			e.printStackTrace();
 		}
+
+		List<GateReportImage> gateReportImages = tmpSession.getGateReportImages();
+		for (GateReportImage image : gateReportImages) {
+			DataCenter.getInstance().addImage(ctx, image, image.getId(), UUID.randomUUID().toString(), uuid);
+		}
+
 		return null;
 	}
 
@@ -276,17 +262,262 @@ public class Mapper {
 	public synchronized void update(Context ctx, TmpContainerSession tmp, String uuid) {
 
 		try {
-			ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager.getHelper(ctx)
-																				.getContainerSessionDaoImpl();
-
-			ContainerSession main = containerSessionDaoImpl.queryForId(uuid);
-			update(ctx, tmp, main, true);
-
+			update(ctx, tmp, uuid, true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		// try {
+		// ContainerSessionDaoImpl containerSessionDaoImpl = databaseManager.getHelper(ctx)
+		// .getContainerSessionDaoImpl();
+		//
+		// ContainerSession main = containerSessionDaoImpl.queryForId(uuid);
+		// update(ctx, tmp, main, true);
+		//
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
 	}
 
+	public synchronized
+			void
+			update(Context ctx, TmpContainerSession tmp, String sessionUuid, boolean updateImageIdPath)
+																										throws Exception {
+
+		String containerId = "";
+		String operatorCode = "";
+
+		try {
+			if (null != tmp) {
+				SQLiteDatabase db = databaseManager.getHelper(ctx).getWritableDatabase();
+
+				Cursor sessionCursor = db.rawQuery(	"select * from cs_full_info_view where _id = ?",
+													new String[] { sessionUuid });
+
+				if (sessionCursor.moveToFirst()) {
+					containerId = sessionCursor.getString(sessionCursor.getColumnIndexOrThrow(Container.CONTAINER_ID));
+					operatorCode = sessionCursor.getString(sessionCursor.getColumnIndexOrThrow(Operator.FIELD_CODE));
+				} else {
+					sessionCursor.close();
+					Logger.e("Cannot find container session with _id = " + sessionUuid);
+					return;
+				}
+
+				sessionCursor.close();
+
+				// Update GateReportImages
+				List<GateReportImage> gateReportImages = tmp.getGateReportImages();
+				if (gateReportImages != null) {
+					for (GateReportImage gateReportImage : gateReportImages) {
+
+						String gateImageName = gateReportImage.getImageName();
+						String sql = "SELECT * FROM cjay_image WHERE image_name LIKE ? and type = ?";
+						Cursor cursor = db.rawQuery(sql,
+													new String[] { "%" + gateImageName,
+															Integer.toString(gateReportImage.getType()) });
+
+						// existed
+						if (cursor.moveToFirst()) { // update
+
+							String uuid = cursor.getString(cursor.getColumnIndexOrThrow(CJayImage.FIELD_UUID));
+							String imageName = cursor.getString(cursor.getColumnIndexOrThrow(CJayImage.FIELD_IMAGE_NAME));
+							QueryHelper.update(	ctx, "cjay_image", "id", Integer.toString(gateReportImage.getId()),
+												"uuid = " + Utils.sqlString(uuid));
+							// Logger.Log("Update CJayImage UUID: " + uuid + " | Image name: " + imageName);
+
+						} else { // create
+
+							DataCenter.getInstance().addImage(ctx, gateReportImage, gateReportImage.getId(),
+																UUID.randomUUID().toString(), sessionUuid);
+							// Logger.Log("Create new CJayImage: " + gateReportImage.getImageName());
+
+						}
+
+						cursor.close();
+					}
+				}
+
+				// Update AuditReportItems
+				List<AuditReportItem> auditReportItems = tmp.getAuditReportItems();
+				if (auditReportItems != null) {
+					for (AuditReportItem auditReportItem : auditReportItems) {
+
+						//
+						int itemId = auditReportItem.getId();
+						int componentId = auditReportItem.getComponentId();
+						int damageId = auditReportItem.getDamageId();
+						int repairId = auditReportItem.getRepairId();
+						String issueId = "";
+
+						String sql = "select * from issue where id = ?";
+						Cursor cursor = db.rawQuery(sql, new String[] { Integer.toString(itemId) });
+
+						// issue existed inside db with id # 0; --> REPAIR received
+						if (cursor.moveToFirst()) {
+
+							issueId = cursor.getString(cursor.getColumnIndexOrThrow(Issue.FIELD_UUID));
+							DataCenter.getInstance().addIssue(ctx, auditReportItem, auditReportItem.getId(), issueId,
+																sessionUuid);
+							// Logger.Log("Update Issue with id: " + auditReportItem.getId());
+
+						} else {
+
+							CJaySession session = CJaySession.restore(ctx);
+							if (session == null) throw new NullSessionException();
+							UserRole userRole = UserRole.values()[session.getUserRole()];
+
+							switch (userRole) {
+								case AUDITOR:
+
+									// AUDIT received
+									// issue existed with id = 0 --> update id
+									// find that issue based on codes then update issue info
+
+									String issueSql = "select * from issue where componentCode_id = " + componentId
+											+ " and damageCode_id = " + damageId + " and repairCode_id = " + repairId
+											+ " and locationCode LIKE ? and containerSession_id = ?";
+
+									Cursor issueCursor = db.rawQuery(	issueSql,
+																		new String[] {
+																				auditReportItem.getLocationCode(),
+																				sessionUuid });
+									if (issueCursor.moveToFirst()) {
+										issueId = issueCursor.getString(issueCursor.getColumnIndexOrThrow(Issue.FIELD_UUID));
+										QueryHelper.update(	ctx, "issue", "id",
+															Integer.toString(auditReportItem.getId()),
+															"_id = " + Utils.sqlString(issueId));
+
+										// Logger.Log("Update Issue with id: " + auditReportItem.getId() + " | " +
+										// issueId);
+									} else {
+										Toast.makeText(ctx, "Unexpected Exception", Toast.LENGTH_LONG).show();
+									}
+
+									issueCursor.close();
+									break;
+
+								case REPAIR_STAFF:
+								case GATE_KEEPER:
+
+									// REPAIR received --> create new issue
+									// issue didnt exist in db
+									issueId = UUID.randomUUID().toString();
+									DataCenter.getInstance().addIssue(ctx, auditReportItem, auditReportItem.getId(),
+																		issueId, sessionUuid);
+									// Logger.Log("Add issue: " + auditReportItem.getId() + " | " + issueId);
+									break;
+
+								default:
+									Logger.e("Other role!!");
+									break;
+							}
+
+						}
+
+						cursor.close();
+
+						if (TextUtils.isEmpty(issueId)) {
+
+							Logger.e("Error #parse audit_report_item with id: " + auditReportItem.getId());
+							DataCenter.getDatabaseHelper(ctx).addUsageLog(	"Error #parse audit_report_item with id: "
+																					+ auditReportItem.getId());
+							// move to next issue
+							continue;
+						}
+
+						// ----
+						// update AuditReportImages
+						List<AuditReportImage> auditReportImages = auditReportItem.getAuditReportImages();
+						if (auditReportImages != null) {
+							for (AuditReportImage auditReportImage : auditReportImages) {
+
+								String auditReportImageName = auditReportImage.getImageName();
+								sql = "SELECT * FROM cjay_image WHERE image_name LIKE ? and type = ?";
+								Cursor auditCursor = db.rawQuery(sql, new String[] { "%" + auditReportImageName,
+										Integer.toString(auditReportImage.getType()) });
+
+								// existed
+								if (auditCursor.moveToFirst()) { // update
+
+									String auditImageUuid = auditCursor.getString(auditCursor.getColumnIndexOrThrow(CJayImage.FIELD_UUID));
+									String imageName = auditCursor.getString(auditCursor.getColumnIndexOrThrow(CJayImage.FIELD_IMAGE_NAME));
+									QueryHelper.update(	ctx, "cjay_image", "id",
+														Integer.toString(auditReportImage.getId()),
+														"uuid = " + Utils.sqlString(auditImageUuid));
+
+									// Logger.Log("Update CJayImage UUID: " + auditImageUuid + " | Image name: "
+									// + imageName);
+
+								} else { // create
+									DataCenter.getInstance().addImage(ctx, auditReportImage, auditReportImage.getId(),
+																		UUID.randomUUID().toString(), issueId,
+																		sessionUuid);
+
+									// Logger.Log("create new image");
+								}
+
+								auditCursor.close();
+							}
+						} // end audit report images
+
+					}
+				} else {
+					Logger.e("AuditReportItems is NULL");
+				}
+
+				// Update other fields
+				String sqlString = "";
+
+				// update operator
+				if (!tmp.getOperatorCode().equals(operatorCode)) {
+
+					sqlString = "UPDATE container SET operator_id = " + tmp.getOperatorId() + " WHERE container_id = "
+							+ Utils.sqlString(containerId);
+
+					db.execSQL(sqlString);
+					Logger.Log("Update operator from " + operatorCode + " to " + tmp.getOperatorCode());
+
+				}
+
+				// update container_id
+				if (!tmp.getContainerId().equals(containerId)) {
+					sqlString = "UPDATE container SET container_id = " + Utils.sqlString(tmp.getContainerId())
+							+ " WHERE container_id = " + Utils.sqlString(containerId);
+					db.execSQL(sqlString);
+
+					Logger.Log("Update container_id from " + containerId + " to " + tmp.getContainerId());
+				}
+
+				if (updateImageIdPath) {
+
+					if (!TextUtils.isEmpty(tmp.getImageIdPath())
+							&& !tmp.getImageIdPath()
+									.matches("^https://storage\\.googleapis\\.com/storage-cjay\\.cloudjay\\.com/\\s+$")) {
+
+						sqlString = "UPDATE container_session SET id = " + tmp.getId() + ", check_in_time = '"
+								+ tmp.getCheckInTime() + "', image_id_path = '" + tmp.getImageIdPath()
+								+ "', server_state = " + tmp.getStatus() + " WHERE _id = '" + sessionUuid + "'";
+					}
+				} else {
+					sqlString = "UPDATE container_session SET id = " + tmp.getId() + ", check_in_time = '"
+							+ tmp.getCheckInTime() + "', server_state = " + tmp.getStatus() + " WHERE _id = '"
+							+ sessionUuid + "'";
+				}
+
+				db.execSQL(sqlString);
+
+				// Post ContainerSessionChangedEvent
+				EventBus.getDefault().post(new ContainerSessionChangedEvent());
+			}
+		} catch (Exception e) {
+			throw e;
+		}
+
+	}
+
+	/*
+	 * DEPRECATED
+	 */
 	public synchronized void update(Context ctx, TmpContainerSession tmp, ContainerSession main,
 									boolean updateImageIdPath) throws Exception {
 
@@ -503,7 +734,9 @@ public class Mapper {
 
 	}
 
+	// TODO: should be replaced by update(Context ctx, String jsonString, String uuid) in next version
 	public synchronized void update(Context ctx, String jsonString, ContainerSession main) throws Exception {
+
 		TmpContainerSession tmp = null;
 		Gson gson = new GsonBuilder().setDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE).create();
 		Type listType = new TypeToken<TmpContainerSession>() {

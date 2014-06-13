@@ -261,6 +261,8 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 			lastRole = imageCursor.getInt(imageCursor.getColumnIndexOrThrow("type"));
 		}
 
+		imageCursor.close();
+
 		long difference = System.currentTimeMillis() - startTime;
 		Logger.w("---> Total time: " + Long.toString(difference));
 
@@ -363,19 +365,21 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+
 		Context context = getActivity();
 
 		return new CJayCursorLoader(context) {
 			@Override
 			public Cursor loadInBackground() {
+
 				Cursor cursor = DataCenter.getInstance().getCheckOutContainerSessionCursor(getContext());
 
 				if (cursor != null) {
+
 					// Ensure the cursor window is filled
 					setTotalItems(cursor.getCount());
 					cursor.registerContentObserver(mObserver);
 				}
-
 				return cursor;
 			}
 		};
@@ -419,10 +423,11 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+
 		if (cursorAdapter == null) {
 			cursorAdapter = new GateExportContainerCursorAdapter(getActivity(), mItemLayout, cursor, 0);
-
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+
 				@Override
 				public Cursor runQuery(CharSequence constraint) {
 					return DataCenter.getInstance().filterCheckoutCursor(getActivity(), constraint);

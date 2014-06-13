@@ -98,8 +98,9 @@ public class UserLogActivity extends CJayActivity implements android.app.LoaderM
 
 				@Override
 				public Cursor runQuery(CharSequence constraint) {
-
-					return DataCenter.getInstance().filterUserLogCursor(UserLogActivity.this, constraint);
+					Cursor cursor = null;
+					cursor = DataCenter.getInstance().filterUserLogCursor(UserLogActivity.this, constraint);
+					return cursor;
 				}
 
 			});

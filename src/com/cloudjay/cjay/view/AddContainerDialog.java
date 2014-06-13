@@ -28,7 +28,6 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.util.DataCenter;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 
 @SuppressLint("DefaultLocale")

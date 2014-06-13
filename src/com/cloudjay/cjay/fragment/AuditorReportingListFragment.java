@@ -321,22 +321,22 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 	}
 
 	public void onEvent(ContainerSessionEnqueueEvent event) {
-		Logger.Log("onEvent ContainerSessionEnqueueEvent");
+		// Logger.Log("onEvent ContainerSessionEnqueueEvent");
 		refresh();
 	}
 
 	public void onEvent(PostLoadDataEvent event) {
-		Logger.Log("onEvent PostLoadDataEvent");
+		// Logger.Log("onEvent PostLoadDataEvent");
 		mLoadMoreDataLayout.setVisibility(View.GONE);
 	}
 
 	public void onEvent(PreLoadDataEvent event) {
-		Logger.Log("onEvent PreLoadDataEvent");
+		// Logger.Log("onEvent PreLoadDataEvent");
 		mLoadMoreDataLayout.setVisibility(View.VISIBLE);
 	}
 
 	public void onEventMainThread(ContainerSessionChangedEvent event) {
-		Logger.Log("onEvent ContainerSessionChangedEvent");
+		// Logger.Log("onEvent ContainerSessionChangedEvent");
 		refresh();
 	}
 
@@ -435,7 +435,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 		}
 
 		if (DataCenter.getInstance().isUpdating(getActivity()) == false) {
-			Logger.Log("is not updating");
+			// Logger.Log("is not updating");
 			mLoadMoreDataLayout.setVisibility(View.GONE);
 		}
 
@@ -455,8 +455,7 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 	}
 
 	public void refresh() {
-		Logger.Log("onRefresh with LOADER_ID: " + Integer.toString(LOADER_ID));
-
+		// Logger.Log("onRefresh with LOADER_ID: " + Integer.toString(LOADER_ID));
 		getLoaderManager().restartLoader(LOADER_ID, null, this);
 
 	}
@@ -502,26 +501,30 @@ public class AuditorReportingListFragment extends SherlockFragment implements On
 
 	@OptionsItem(R.id.menu_refresh_item)
 	void refreshMenuItemSelected() {
+
 		if (!TextUtils.isEmpty(mSelectedUuid)) {
 
 			SQLiteDatabase db = DataCenter.getDatabaseHelper(getActivity()).getWritableDatabase();
-			Cursor cursor = db.rawQuery("select * from container_session where _id = ?",
-										new String[] { mSelectedContainerId });
+			Cursor cursor = db.rawQuery("select * from container_session where _id = ?", new String[] { mSelectedUuid });
+
 			int tmp = -1;
 			if (cursor.moveToFirst()) {
 				tmp = cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_ID));
 			}
 
 			cursor.close();
-			final int id = tmp;
 
-			Logger.Log("Menu upload item clicked");
+			final int id = tmp;
+			final String csUuid = mSelectedUuid;
+
 			new AsyncTask<Void, Integer, Void>() {
 				@Override
 				protected Void doInBackground(Void... params) {
 
 					try {
-						DataCenter.getInstance().updateContainerSessionById(getActivity(), id, mSelectedUuid);
+
+						DataCenter.getInstance().updateContainerSessionById(getActivity(), id, csUuid);
+
 					} catch (NoConnectionException e) {
 						Crouton.cancelAllCroutons();
 						Crouton.makeText(getActivity(), R.string.alert_no_network, Style.ALERT).show();

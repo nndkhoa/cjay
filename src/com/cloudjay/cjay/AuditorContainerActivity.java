@@ -3,7 +3,6 @@ package com.cloudjay.cjay;
 import java.sql.SQLException;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
@@ -87,6 +86,7 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 	boolean isAvailable;
 
 	void refreshContainer() {
+
 		SQLiteDatabase db = DataCenter.getDatabaseHelper(getApplicationContext()).getReadableDatabase();
 		Cursor cursor = db.rawQuery("select * from csiview where _id = ?", new String[] { mContainerSessionUuid });
 		if (cursor.moveToFirst()) {
@@ -143,7 +143,6 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 		} else {
 			CJayApplication.openReportDialog(this, mSelectedCJayImageUuid, mContainerSessionUuid);
 		}
-		cursor.close();
 
 	}
 
@@ -169,8 +168,6 @@ public class AuditorContainerActivity extends CJayActivity implements android.ap
 
 			e.printStackTrace();
 		}
-
-		cursor.close();
 
 		supportInvalidateOptionsMenu();
 	}

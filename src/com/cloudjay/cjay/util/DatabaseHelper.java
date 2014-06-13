@@ -228,9 +228,11 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 			Logger.Log("create view cs_full_info_export_validation_view");
 			sql = "CREATE VIEW cs_full_info_export_validation_view as"
-					+ " SELECT cs.*, count(cjay_image._id) as export_image_count " + " FROM cs_full_info_view cs"
+					+ " SELECT cs.*, count(cjay_image._id) as export_image_count "
+					+ " FROM cs_full_info_view cs"
 					+ " LEFT JOIN cjay_image ON cjay_image.containerSession_id = cs._id AND cjay_image.type = 1"
-					+ " WHERE cs.check_out_time = '' AND ((cs.export = 1) OR (cs.on_local = 0))" + " GROUP BY cs._id";
+					+ " WHERE (cs.check_out_time = '' OR cs.check_out_time ISNULL) AND ((cs.export = 1) OR (cs.on_local = 0))"
+					+ " GROUP BY cs._id";
 			db.execSQL(sql);
 		}
 
@@ -303,7 +305,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			// version = 6
 		@Override
 		public void apply(SQLiteDatabase db, ConnectionSource connectionSource) {
-	
+
 			// Add issue_info_view
 			try {
 				db.execSQL("DROP VIEW issue_info_view");
@@ -315,19 +317,17 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 					+ " from issue as i, component_code as cc, repair_code as rc, damage_code as dc"
 					+ " where i.componentCode_id = cc.id and i.repairCode_id = rc.id and i.damageCode_id = dc.id";
 			db.execSQL(sql);
-			
+
 			// Add issue_info_view_with_img
 			try {
 				db.execSQL("DROP VIEW issue_info_view_with_img");
 			} catch (Exception e) {
 
 			}
-			sql = "CREATE VIEW issue_info_view_with_img AS"
-					+ " SELECT i.*, cj._id AS _id FROM issue_info_view i"
-					+ " LEFT JOIN cjay_image cj ON i.issue_id = cj.issue_id"
-					+ " GROUP BY i.issue_id";
+			sql = "CREATE VIEW issue_info_view_with_img AS" + " SELECT i.*, cj._id AS _id FROM issue_info_view i"
+					+ " LEFT JOIN cjay_image cj ON i.issue_id = cj.issue_id" + " GROUP BY i.issue_id";
 			db.execSQL(sql);
-	
+
 			// Add issue item view
 			try {
 				db.execSQL("DROP VIEW issue_item_view");
@@ -336,9 +336,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			}
 			sql = "CREATE VIEW issue_item_view AS" + " SELECT cj.containerSession_id, cj.uuid, cj._id, cj.type, i.*"
 					+ " from cjay_image as cj LEFT JOIN issue_info_view as i on cj.issue_id = i.issue_id";
-			db.execSQL(sql);	
+			db.execSQL(sql);
 		}
-	
+
 		@Override
 		public void revert(SQLiteDatabase db, ConnectionSource connectionSource) {
 		}

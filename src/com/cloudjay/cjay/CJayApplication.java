@@ -16,7 +16,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -71,10 +70,10 @@ public class CJayApplication extends Application {
 		Logger.getInstance().setDebuggable(debuggable);
 
 		if (Logger.isDebuggable()) {
-			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
-			StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
-																	.detectLeakedClosableObjects().penaltyLog()
-																	.penaltyDeath().build());
+			// StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
+			// StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
+			// .detectLeakedClosableObjects().penaltyLog()
+			// .penaltyDeath().build());
 		}
 
 		// Setup API ROOT

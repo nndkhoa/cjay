@@ -67,39 +67,43 @@ public class CJaySession {
 			protected Void doInBackground(Void... params) {
 
 				// PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_INITIALIZED, false);
-				Utils.backupDatabase(getCurrentUser().getUserName());
 				DataCenter.getDatabaseHelper(context).addUsageLog("#backup database");
 
-				Logger.Log("deleting session ...");
-				databaseManager = CJayClient.getInstance().getDatabaseManager();
-				try {
+				Utils.backupDatabase(getCurrentUser().getUserName());
+				PreferencesUtil.clearPrefs(context);
+				context.deleteDatabase(DatabaseHelper.DATABASE_NAME);
 
-					DatabaseHelper helper = databaseManager.getHelper(context);
-
-					// userDao = helper.getUserDaoImpl();
-					// User user = userDao.getMainUser();
-					//
-					// if (null != user) {
-					// user.setMainAccount(false);
-					// user.setAccessToken("");
-					// userDao.update(user);
-					// currentUser = null;
-					// }
-
-					for (Class<?> dataClass : DatabaseHelper.DROP_CLASSES) {
-						TableUtils.dropTable(helper.getConnectionSource(), dataClass, true);
-					}
-
-					for (Class<?> dataClass : DatabaseHelper.DROP_CLASSES) {
-						TableUtils.createTable(helper.getConnectionSource(), dataClass);
-					}
-
-					DataCenter.getDatabaseHelper(context).addUsageLog("User #logout");
-				} catch (SQLException e) {
-
-					e.printStackTrace();
-					context.deleteDatabase(DatabaseHelper.DATABASE_NAME);
-				}
+				// Logger.Log("deleting session ...");
+				// databaseManager = CJayClient.getInstance().getDatabaseManager();
+				// try {
+				//
+				// DatabaseHelper helper = databaseManager.getHelper(context);
+				//
+				// // userDao = helper.getUserDaoImpl();
+				// // User user = userDao.getMainUser();
+				// //
+				// // if (null != user) {
+				// // user.setMainAccount(false);
+				// // user.setAccessToken("");
+				// // userDao.update(user);
+				// // currentUser = null;
+				// // }
+				//
+				// for (Class<?> dataClass : DatabaseHelper.DROP_CLASSES) {
+				// TableUtils.dropTable(helper.getConnectionSource(), dataClass, true);
+				// }
+				//
+				// for (Class<?> dataClass : DatabaseHelper.DROP_CLASSES) {
+				// TableUtils.createTable(helper.getConnectionSource(), dataClass);
+				// }
+				//
+				// DataCenter.getDatabaseHelper(context).addUsageLog("User #logout");
+				// } catch (SQLException e) {
+				//
+				// e.printStackTrace();
+				// context.deleteDatabase(DatabaseHelper.DATABASE_NAME);
+				//
+				// }
 
 				return null;
 			}
