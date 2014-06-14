@@ -875,7 +875,7 @@ public class DataCenter {
 		}
 
 		long difference = System.currentTimeMillis() - startTime;
-		Logger.w("---> Total time: " + Long.toString(difference / 1000) + " sec");
+		Logger.e("---> Total time: " + Long.toString(difference / 1000) + " sec");
 	}
 
 	public String

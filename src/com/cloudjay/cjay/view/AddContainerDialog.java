@@ -145,12 +145,16 @@ public class AddContainerDialog extends SherlockDialogFragment {
 				String sql = "select * from csview where container_id like ?";
 				Cursor cursor = db.rawQuery(sql, new String[] { mContainerId });
 
-				// TODO: add new container session based on existed container
 				if (cursor.moveToFirst()) {
 					mContainerEditText.setError(getString(R.string.dialog_container_existed));
 					return;
 				}
 				cursor.close();
+
+				if (!Utils.simpleValid(mContainerId)) {
+					mContainerEditText.setError(getString(R.string.dialog_container_id_invalid));
+					return;
+				}
 
 				mContainerEditText.setError(null);
 				mOperatorEditText.setError(null);
@@ -202,8 +206,13 @@ public class AddContainerDialog extends SherlockDialogFragment {
 
 				cursor.close();
 
-				if (!Utils.isContainerIdValid(mContainerId)) {
+				if (!Utils.simpleValid(mContainerId)) {
 					mContainerEditText.setError(getString(R.string.dialog_container_id_invalid));
+					return;
+				}
+
+				if (!Utils.isContainerIdValid(mContainerId)) {
+					mContainerEditText.setError(getString(R.string.dialog_container_id_invalid_iso));
 					mForceOkButton.setVisibility(View.VISIBLE);
 					return;
 				}

@@ -430,12 +430,17 @@ public class Utils {
 		return false;
 	}
 
-	public static boolean isContainerIdValid(String containerId) {
+	public static boolean simpleValid(String containerId) {
 
 		Pattern pattern = Pattern.compile("^([A-Z]+){4,4}+(\\d{7,7}+)$");
 		Matcher matcher = pattern.matcher(containerId);
 
 		if (!matcher.matches()) return false;
+
+		return true;
+	}
+
+	public static boolean isContainerIdValid(String containerId) {
 
 		if (!Logger.isDebuggable()) {
 
