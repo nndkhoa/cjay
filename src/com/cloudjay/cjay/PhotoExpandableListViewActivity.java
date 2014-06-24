@@ -302,6 +302,14 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+
+		// try {
+
+		// add by tieubao
+		if (mCursorAdapters == null) {
+			mCursorAdapters = new Hashtable<Integer, PhotoGridViewCursorAdapter>();
+		}
+
 		int adapterId = 0;
 
 		switch (loader.getId()) {
@@ -326,7 +334,10 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 		final String title = Utils.getImageTypeDescription(this, mImageTypes[adapterId]);
 
 		GridView gridView = mListAdapter.getPhotoGridView(adapterId);
+
+		// TODO: ACRA said that mCursorAdapters is null sometimes
 		gridView.setAdapter(mCursorAdapters.get(Integer.valueOf(adapterId)));
+
 		gridView.setNumColumns(mNumCols);
 		gridView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -367,6 +378,11 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 			p.height = gridViewWidth / mNumCols * (int) (1.0 * (cursor.getCount()) / mNumCols + 0.5);
 			gridView.setLayoutParams(p);
 		}
+		// } catch (Exception e) {
+		// showCrouton(R.string.alert_try_again);
+		// e.printStackTrace();
+		// }
+
 	}
 
 	@Override

@@ -242,8 +242,10 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
 			try {
+
 				savePhoto(data);
 				camera.startPreview();
+
 				mInPreview = true;
 			} catch (Exception e) {
 
@@ -534,6 +536,10 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	// region Override Activity
 	@Override
 	protected void onResume() {
+
+		Logger.w("Session: " + mContainerSessionUUID);
+		Logger.w("Issue: " + mIssueUUID);
+		Logger.w("Image Type: " + mType);
 
 		Logger.Log("----> onResume()");
 		super.onResume();
@@ -878,19 +884,24 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		// Create new image and add to queue
 		SQLiteDatabase db = DataCenter.getDatabaseHelper(getApplicationContext()).getWritableDatabase();
+
+		Logger.e("Image name: " + image_name);
+
 		ContentValues imageValues = new ContentValues();
 		imageValues.put("containerSession_id", mContainerSessionUUID);
 		imageValues.put("uuid", uuid);
 		imageValues.put("image_name", image_name);
 		imageValues.put("time_posted", StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 		imageValues.put("_id", uri);
-		imageValues.put("type", mType);
 		imageValues.put("state", CJayImage.STATE_UPLOAD_WAITING);
+		imageValues.put("type", mType);
 
 		// imageValues.put("id", 0);
-		if (TextUtils.isEmpty(mIssueUUID)) {
+		if (!TextUtils.isEmpty(mIssueUUID)) {
+			Logger.w("Set issue for cjay_image " + image_name);
 			imageValues.put("issue_id", mIssueUUID);
 		}
+
 		db.insertWithOnConflict("cjay_image", null, imageValues, SQLiteDatabase.CONFLICT_REPLACE);
 
 		// 1. start broadcast receiver

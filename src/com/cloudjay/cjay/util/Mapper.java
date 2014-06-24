@@ -134,6 +134,7 @@ public class Mapper {
 
 				List<AuditReportImage> auditReportImages = auditReportItem.getAuditReportImages();
 				for (AuditReportImage image : auditReportImages) {
+
 					sqlStrings.add(String.format(	"insert or replace into cjay_image values(%s, %s, %s, %s, %s, %s, %s, %s, %s)",
 													Utils.sqlString(uuid),
 													Utils.sqlString(UUID.randomUUID().toString()),
@@ -149,7 +150,7 @@ public class Mapper {
 		List<GateReportImage> gateReportImages = tmpSession.getGateReportImages();
 		for (GateReportImage image : gateReportImages) {
 
-			sqlStrings.add(String.format(	"insert or replace into cjay_image values(%s, %s, NULL, %s, %s, %s, %s, %s, %s)",
+			sqlStrings.add(String.format(	"insert or replace into cjay_image values(%s, %s, %s, NULL, %s, %s, %s, %s, %s)",
 											Utils.sqlString(uuid), Utils.sqlString(UUID.randomUUID().toString()),
 											Utils.sqlString(image.getImageName()),
 											Utils.sqlString(image.getCreatedAt()),

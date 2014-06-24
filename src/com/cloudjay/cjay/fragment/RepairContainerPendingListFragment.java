@@ -271,7 +271,6 @@ public class RepairContainerPendingListFragment extends SherlockFragment impleme
 
 		Cursor cursor = (Cursor) cursorAdapter.getItem(position);
 		String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_UUID));
-
 		Intent intent = new Intent(getActivity(), RepairContainerActivity_.class);
 		intent.putExtra(RepairContainerActivity_.CJAY_CONTAINER_SESSION_EXTRA, uuidString);
 		startActivity(intent);
@@ -330,12 +329,12 @@ public class RepairContainerPendingListFragment extends SherlockFragment impleme
 	}
 
 	public void onEvent(PostLoadDataEvent event) {
-		Logger.Log("onEvent PostLoadDataEvent");
+		// Logger.Log("onEvent PostLoadDataEvent");
 		mLoadMoreDataLayout.setVisibility(View.GONE);
 	}
 
 	public void onEvent(PreLoadDataEvent event) {
-		Logger.Log("onEvent PreLoadDataEvent");
+		// Logger.Log("onEvent PreLoadDataEvent");
 		mLoadMoreDataLayout.setVisibility(View.VISIBLE);
 	}
 
