@@ -14,6 +14,7 @@ import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
@@ -63,12 +64,15 @@ public class CJayApplication extends Application {
 	public void onCreate() {
 		Logger.Log("Start Application");
 
+		boolean defaultDebugVal = false;
+		boolean defaultUpdateVal = true;
+		boolean defaultBetaApiVal = false;
+
 		// Configure Logger
 		boolean debuggable = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox), true);
-
+												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox),
+															defaultDebugVal);
 		Logger.getInstance().setDebuggable(debuggable);
-
 		if (Logger.isDebuggable()) {
 			// StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
 			// StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
@@ -76,10 +80,18 @@ public class CJayApplication extends Application {
 			// .penaltyDeath().build());
 		}
 
-		// Setup API ROOT
-		CJayConstant.initBetaApi(false);
+		// Configure Auto Update
+		boolean autoUpdate = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox),
+															defaultUpdateVal);
 
 		// Ion.getDefault(getBaseContext()).configure().setLogging("Ion", Log.INFO);
+		Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+		editor.putBoolean(getString(R.string.pref_key_auto_check_update_checkbox), autoUpdate);
+		editor.commit();
+
+		// Setup API ROOT
+		CJayConstant.initBetaApi(defaultBetaApiVal);
 
 		super.onCreate();
 		databaseManager = new DatabaseManager();

@@ -48,8 +48,10 @@ public class Utils {
 	private static final String PROPERTY_APP_VERSION = "appVersion";
 
 	public static boolean enableAutoCheckForUpdate(Context context) {
+
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 		return pref.getBoolean(context.getString(R.string.pref_key_auto_check_update_checkbox), false);
+
 	}
 
 	public static void backupDatabase(String username) {

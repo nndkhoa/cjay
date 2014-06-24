@@ -537,11 +537,10 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	@Override
 	protected void onResume() {
 
-		Logger.w("Session: " + mContainerSessionUUID);
-		Logger.w("Issue: " + mIssueUUID);
-		Logger.w("Image Type: " + mType);
-
-		Logger.Log("----> onResume()");
+		// Logger.w("Session: " + mContainerSessionUUID);
+		// Logger.w("Issue: " + mIssueUUID);
+		// Logger.w("Image Type: " + mType);
+		// Logger.Log("----> onResume()");
 		super.onResume();
 
 		openCamera();
@@ -898,7 +897,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		// imageValues.put("id", 0);
 		if (!TextUtils.isEmpty(mIssueUUID)) {
-			Logger.w("Set issue for cjay_image " + image_name);
+			// Logger.w("Set issue for cjay_image " + image_name);
 			imageValues.put("issue_id", mIssueUUID);
 		}
 
