@@ -2,9 +2,9 @@ package com.cloudjay.cjay.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 
-public abstract class ViewPagerAdapter extends FragmentStatePagerAdapter {
+public abstract class ViewPagerAdapter extends FragmentPagerAdapter {
 
 	private String[] locations;
 
