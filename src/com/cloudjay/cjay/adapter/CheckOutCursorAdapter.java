@@ -50,7 +50,7 @@ public class CheckOutCursorAdapter extends OrmliteCursorAdapter<ContainerSession
 			holder.containerIdView = (TextView) itemView.findViewById(R.id.feed_item_container_id);
 			holder.containerOwnerView = (TextView) itemView.findViewById(R.id.feed_item_container_owner);
 			holder.importDateView = (TextView) itemView.findViewById(R.id.feed_item_container_import_date);
-			holder.exportDateView = (TextView) itemView.findViewById(R.id.feed_item_container_export_date);
+			// holder.exportDateView = (TextView) itemView.findViewById(R.id.feed_item_container_export_date);
 			holder.itemPictureView = (ImageView) itemView.findViewById(R.id.feed_item_picture);
 			itemView.setTag(holder);
 		}
@@ -83,7 +83,7 @@ public class CheckOutCursorAdapter extends OrmliteCursorAdapter<ContainerSession
 		holder.containerIdView = (TextView) v.findViewById(R.id.feed_item_container_id);
 		holder.containerOwnerView = (TextView) v.findViewById(R.id.feed_item_container_owner);
 		holder.importDateView = (TextView) v.findViewById(R.id.feed_item_container_import_date);
-		holder.exportDateView = (TextView) v.findViewById(R.id.feed_item_container_export_date);
+		// holder.exportDateView = (TextView) v.findViewById(R.id.feed_item_container_export_date);
 		holder.itemPictureView = (ImageView) v.findViewById(R.id.feed_item_picture);
 
 		v.setTag(holder);

@@ -570,8 +570,10 @@ public class DataCenter {
 	}
 
 	public Cursor getValidCheckOutContainerCursor(Context context) {
+
 		String queryString = "SELECT * FROM cs_full_info_export_validation_view WHERE export_image_count > 0 ORDER BY check_in_time DESC";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
+
 	}
 
 	public Cursor getCheckOutContainerSessionCursor(Context context) {

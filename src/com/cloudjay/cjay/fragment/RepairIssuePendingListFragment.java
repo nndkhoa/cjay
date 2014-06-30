@@ -128,6 +128,7 @@ public class RepairIssuePendingListFragment extends SherlockFragment implements 
 
 				if (cursor != null) {
 					// Ensure the cursor window is filled
+					cursor.getCount();
 					cursor.registerContentObserver(mObserver);
 				}
 

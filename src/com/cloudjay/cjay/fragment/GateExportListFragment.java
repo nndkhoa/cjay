@@ -136,7 +136,31 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 		CJayApplication.openContainerDetailDialog(this, containerId, "", AddContainerDialog.CONTAINER_DIALOG_ADD);
 	}
 
-	Cursor filterCursor = null;
+	@Override
+	public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+
+		Context context = getActivity();
+
+		return new CJayCursorLoader(context) {
+
+			@Override
+			public Cursor loadInBackground() {
+
+				Cursor totalCursor = DataCenter.getInstance().getCheckOutContainerSessionCursor(getContext());
+				setTotalItems(totalCursor.getCount());
+				totalCursor.close();
+
+				Cursor cursor = DataCenter.getInstance().getValidCheckOutContainerCursor(getContext());
+				if (cursor != null) {
+
+					// Ensure the cursor window is filled
+					cursor.getCount();
+					cursor.registerContentObserver(mObserver);
+				}
+				return cursor;
+			}
+		};
+	}
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
@@ -149,16 +173,19 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 				@Override
 				public Cursor runQuery(CharSequence constraint) {
 
-					filterCursor = DataCenter.getInstance().filterCheckoutCursor(getActivity(), constraint);
-					return filterCursor;
+					if (TextUtils.isEmpty(constraint)) { return DataCenter.getInstance()
+																			.getValidCheckOutContainerCursor(	getActivity()); }
 
+					return DataCenter.getInstance().filterCheckoutCursor(getActivity(), constraint);
 				}
 			});
 
 			mFeedListView.setAdapter(cursorAdapter);
 
 		} else {
+
 			cursorAdapter.swapCursor(cursor);
+
 		}
 	}
 
@@ -169,18 +196,9 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 			@Override
 			public void afterTextChanged(Editable arg0) {
 
-				FilterListener listener = new FilterListener() {
-
-					@Override
-					public void onFilterComplete(int count) {
-
-					}
-
-				};
-
 				if (cursorAdapter != null) {
 
-					cursorAdapter.getFilter().filter(arg0.toString(), listener);
+					cursorAdapter.getFilter().filter(arg0.toString());
 				}
 
 			}
@@ -197,10 +215,12 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 		mSearchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+
 				if (id == EditorInfo.IME_ACTION_SEARCH) {
 					inputMethodManager.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
 					return true;
 				}
+
 				return false;
 			}
 		});
@@ -286,6 +306,7 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 		mSelectedState = ContainerState.values()[cursor.getInt(cursor.getColumnIndexOrThrow(ContainerSession.FIELD_SERVER_STATE))];
 		getActivity().supportInvalidateOptionsMenu();
 		Logger.Log("mSelectedContainerSession: " + mSelectedContainerId);
+
 	}
 
 	void handleContainerClicked(String uuid, String containerId) {
@@ -401,31 +422,6 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	public void onCreate(Bundle savedInstanceState) {
 		EventBus.getDefault().register(this);
 		super.onCreate(savedInstanceState);
-	}
-
-	@Override
-	public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-
-		Context context = getActivity();
-
-		return new CJayCursorLoader(context) {
-			@Override
-			public Cursor loadInBackground() {
-
-				Cursor totalCursor = DataCenter.getInstance().getCheckOutContainerSessionCursor(getContext());
-				setTotalItems(totalCursor.getCount());
-				totalCursor.close();
-
-				Cursor cursor = DataCenter.getInstance().getValidCheckOutContainerCursor(getContext());
-				if (cursor != null) {
-
-					// Ensure the cursor window is filled
-
-					cursor.registerContentObserver(mObserver);
-				}
-				return cursor;
-			}
-		};
 	}
 
 	@Override

@@ -46,6 +46,14 @@ public class GateExportContainerCursorAdapter extends CursorAdapter implements F
 		super(context, c);
 	}
 
+	@Override
+	public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
+
+		if (constraint.length() < 4 && constraint.length() > 0) { return null; }
+		if (getFilterQueryProvider() != null) { return getFilterQueryProvider().runQuery(constraint); }
+		return super.runQueryOnBackgroundThread(constraint);
+	}
+
 	public GateExportContainerCursorAdapter(Context context, int layout, Cursor c, int flags) {
 		super(context, c, flags);
 		this.layout = layout;
