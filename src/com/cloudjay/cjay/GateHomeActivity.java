@@ -83,8 +83,6 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 			@Override
 			public Fragment getItem(int position) {
 
-				super.getItemId(position);
-
 				switch (position) {
 					case 0:
 						Fragment importFeedFragment = new GateImportListFragment_();
