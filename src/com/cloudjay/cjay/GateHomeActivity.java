@@ -36,16 +36,16 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 	public static final int TAB_IMPORT = 0;
 	public static final int TAB_EXPORT = 1;
 	public static final int TAB_UPLOAD = 2;
-	
-//	private static final String FRAG_IMPORT = "fragment_import";
-//	private static final String FRAG_EXPORT = "fragment_export";
+
+	// private static final String FRAG_IMPORT = "fragment_import";
+	// private static final String FRAG_EXPORT = "fragment_export";
 
 	private String[] locations;
 	private ViewPagerAdapter mPagerAdapter;
 	PullToRefreshAttacher mPullToRefreshAttacher;
-	
-//	private Fragment mExportFragment;
-//	private Fragment mImportFragment;
+
+	// private Fragment mExportFragment;
+	// private Fragment mImportFragment;
 
 	@ViewById
 	ViewPager pager;
@@ -82,6 +82,9 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 
 			@Override
 			public Fragment getItem(int position) {
+
+				super.getItemId(position);
+
 				switch (position) {
 					case 0:
 						Fragment importFeedFragment = new GateImportListFragment_();
@@ -94,6 +97,7 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 						Fragment uploadFragment = new UploadsFragment_();
 						return uploadFragment;
 				}
+
 			}
 		};
 
@@ -117,19 +121,19 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 
 		}
 	}
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
-//	    if (savedInstanceState != null) {
-//	        //Restore the fragment's instance
-//	    	if (savedInstanceState.containsKey(FRAG_IMPORT)) {
-//				mImportFragment = getSupportFragmentManager().getFragment(savedInstanceState, FRAG_IMPORT);
-//			} else {
-//				mExportFragment = getSupportFragmentManager().getFragment(savedInstanceState, FRAG_EXPORT);
-//			}
-//	    }
-	    
+		// if (savedInstanceState != null) {
+		// //Restore the fragment's instance
+		// if (savedInstanceState.containsKey(FRAG_IMPORT)) {
+		// mImportFragment = getSupportFragmentManager().getFragment(savedInstanceState, FRAG_IMPORT);
+		// } else {
+		// mExportFragment = getSupportFragmentManager().getFragment(savedInstanceState, FRAG_EXPORT);
+		// }
+		// }
+
 		// Below code to show `More Action` item on menu
 		try {
 			ViewConfiguration config = ViewConfiguration.get(this);
@@ -149,13 +153,13 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 		super.onCreate(savedInstanceState);
 
 	}
-	
-//	@Override
-//	protected void onSaveInstanceState(Bundle outState) {
-//	    super.onSaveInstanceState(outState);
-//
-//		//Save the fragment's instance
-//	}
+
+	// @Override
+	// protected void onSaveInstanceState(Bundle outState) {
+	// super.onSaveInstanceState(outState);
+	//
+	// //Save the fragment's instance
+	// }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

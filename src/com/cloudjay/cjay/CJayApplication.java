@@ -17,6 +17,7 @@ import android.content.Intent;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -64,8 +65,8 @@ public class CJayApplication extends Application {
 	public void onCreate() {
 		Logger.Log("Start Application");
 
-		boolean defaultDebugVal = false;
-		boolean defaultUpdateVal = true;
+		boolean defaultDebugVal = true;
+		boolean defaultUpdateVal = false;
 		boolean defaultBetaApiVal = false;
 
 		// Configure Logger

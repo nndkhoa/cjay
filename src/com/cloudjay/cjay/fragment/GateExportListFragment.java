@@ -34,6 +34,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.Filter.FilterListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
@@ -140,9 +141,28 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 		mSearchEditText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable arg0) {
+
+				// final Cursor oldCursor = cursorAdapter.getCursor();
+				// FilterListener listener = new FilterListener() {
+				//
+				// @Override
+				// public void onFilterComplete(int count) {
+				//
+				// getActivity().stopManagingCursor(oldCursor);
+				// final Cursor newCursor = cursorAdapter.getCursor();
+				// getActivity().startManagingCursor(newCursor);
+				// if (oldCursor != null && !oldCursor.isClosed()) {
+				// oldCursor.close();
+				// }
+				// }
+				// };
+
 				if (cursorAdapter != null) {
+
+					// cursorAdapter.getFilter().filter(arg0.toString(), listener);
 					cursorAdapter.getFilter().filter(arg0.toString());
 				}
+
 			}
 
 			@Override
@@ -372,12 +392,15 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 			@Override
 			public Cursor loadInBackground() {
 
-				Cursor cursor = DataCenter.getInstance().getCheckOutContainerSessionCursor(getContext());
+				Cursor totalCursor = DataCenter.getInstance().getCheckOutContainerSessionCursor(getContext());
+				setTotalItems(totalCursor.getCount());
+				totalCursor.close();
 
+				Cursor cursor = DataCenter.getInstance().getValidCheckOutContainerCursor(getContext());
 				if (cursor != null) {
 
 					// Ensure the cursor window is filled
-					setTotalItems(cursor.getCount());
+
 					cursor.registerContentObserver(mObserver);
 				}
 				return cursor;
@@ -425,12 +448,15 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 
 		if (cursorAdapter == null) {
+
 			cursorAdapter = new GateExportContainerCursorAdapter(getActivity(), mItemLayout, cursor, 0);
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
 
 				@Override
 				public Cursor runQuery(CharSequence constraint) {
+
 					return DataCenter.getInstance().filterCheckoutCursor(getActivity(), constraint);
+
 				}
 			});
 
