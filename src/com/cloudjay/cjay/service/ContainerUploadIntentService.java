@@ -12,6 +12,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
@@ -112,7 +113,7 @@ public class ContainerUploadIntentService extends IntentService implements Count
 			Logger.Log("No Internet Connection");
 			DataCenter.getDatabaseHelper(getApplicationContext())
 						.addUsageLog("No connection | #rollback | Container: " + containerSession.getContainerId());
-			rollbackContainerState(containerSession);
+			retry(containerSession);
 			return;
 
 		} catch (NullSessionException e) {
@@ -470,6 +471,18 @@ public class ContainerUploadIntentService extends IntentService implements Count
 		}
 
 		mNotificationMgr.notify(NOTIFICATION_ID, mNotificationBuilder.build());
+	}
+
+	public void retry(ContainerSession containerSession) {
+
+		SQLiteDatabase db = DataCenter.getDatabaseHelper(getApplicationContext()).getWritableDatabase();
+		String sql = "UPDATE container_session SET state = 1 WHERE _id LIKE "
+				+ Utils.sqlString(containerSession.getUuid());
+		db.execSQL(sql);
+
+		DataCenter.getDatabaseHelper(getApplicationContext())
+					.addUsageLog("rollback to #reupload " + containerSession.getContainerId());
+
 	}
 
 	public void rollbackContainerState(ContainerSession containerSession) {

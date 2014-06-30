@@ -608,8 +608,10 @@ public class DataCenter {
 	}
 
 	public Cursor getPendingContainerSessionCursor(Context context) {
+
 		String queryString = "SELECT * FROM csi_repair_validation_view cs WHERE cs.upload_confirmation = 0 AND cs.state <> 4 ORDER BY check_in_time DESC";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
+
 	}
 
 	public Cursor getRepairCodesCursor(Context context) {
