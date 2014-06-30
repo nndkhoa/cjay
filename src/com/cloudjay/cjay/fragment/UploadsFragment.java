@@ -8,6 +8,7 @@ import org.androidannotations.annotations.ViewById;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
@@ -64,9 +65,20 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 	@OptionsItem(R.id.menu_clear_uploaded)
 	void clearUploadsMenuItemSelected() {
 
-		DataCenter.getInstance().clearListUpload(DataCenter.getDatabaseHelper(getActivity()).getWritableDatabase());
-		DataCenter.getDatabaseHelper(getActivity()).addUsageLog("Clear list #upload");
-		refresh();
+		new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... params) {
+
+				DataCenter.getInstance().clearListUpload(	DataCenter.getDatabaseHelper(getActivity())
+																		.getWritableDatabase());
+				DataCenter.getDatabaseHelper(getActivity()).addUsageLog("Clear list #upload");
+				refresh();
+
+				return null;
+			}
+
+		}.execute();
 
 	}
 

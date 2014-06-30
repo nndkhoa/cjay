@@ -74,6 +74,7 @@ public class CJayApplication extends Application {
 												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox),
 															defaultDebugVal);
 		Logger.getInstance().setDebuggable(debuggable);
+
 		if (Logger.isDebuggable()) {
 			// StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
 			// StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()

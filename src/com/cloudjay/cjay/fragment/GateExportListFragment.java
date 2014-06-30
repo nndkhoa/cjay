@@ -71,6 +71,7 @@ import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadType;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
+import com.google.android.gms.appstate.a;
 
 import de.greenrobot.event.EventBus;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
@@ -135,6 +136,32 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 		CJayApplication.openContainerDetailDialog(this, containerId, "", AddContainerDialog.CONTAINER_DIALOG_ADD);
 	}
 
+	Cursor filterCursor = null;
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+
+		if (cursorAdapter == null) {
+
+			cursorAdapter = new GateExportContainerCursorAdapter(getActivity(), mItemLayout, cursor, 0);
+			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+
+				@Override
+				public Cursor runQuery(CharSequence constraint) {
+
+					filterCursor = DataCenter.getInstance().filterCheckoutCursor(getActivity(), constraint);
+					return filterCursor;
+
+				}
+			});
+
+			mFeedListView.setAdapter(cursorAdapter);
+
+		} else {
+			cursorAdapter.swapCursor(cursor);
+		}
+	}
+
 	@AfterViews
 	void afterViews() {
 
@@ -142,25 +169,18 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 			@Override
 			public void afterTextChanged(Editable arg0) {
 
-				// final Cursor oldCursor = cursorAdapter.getCursor();
-				// FilterListener listener = new FilterListener() {
-				//
-				// @Override
-				// public void onFilterComplete(int count) {
-				//
-				// getActivity().stopManagingCursor(oldCursor);
-				// final Cursor newCursor = cursorAdapter.getCursor();
-				// getActivity().startManagingCursor(newCursor);
-				// if (oldCursor != null && !oldCursor.isClosed()) {
-				// oldCursor.close();
-				// }
-				// }
-				// };
+				FilterListener listener = new FilterListener() {
+
+					@Override
+					public void onFilterComplete(int count) {
+
+					}
+
+				};
 
 				if (cursorAdapter != null) {
 
-					// cursorAdapter.getFilter().filter(arg0.toString(), listener);
-					cursorAdapter.getFilter().filter(arg0.toString());
+					cursorAdapter.getFilter().filter(arg0.toString(), listener);
 				}
 
 			}
@@ -442,29 +462,6 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	@Override
 	public void onLoaderReset(Loader<Cursor> arg0) {
 		cursorAdapter.swapCursor(null);
-	}
-
-	@Override
-	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
-
-		if (cursorAdapter == null) {
-
-			cursorAdapter = new GateExportContainerCursorAdapter(getActivity(), mItemLayout, cursor, 0);
-			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
-
-				@Override
-				public Cursor runQuery(CharSequence constraint) {
-
-					return DataCenter.getInstance().filterCheckoutCursor(getActivity(), constraint);
-
-				}
-			});
-
-			mFeedListView.setAdapter(cursorAdapter);
-
-		} else {
-			cursorAdapter.swapCursor(cursor);
-		}
 	}
 
 	public void OnOperatorSelected(String containerId, String operatorName, int mode) {
