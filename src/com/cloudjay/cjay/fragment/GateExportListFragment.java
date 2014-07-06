@@ -34,7 +34,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.Filter.FilterListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
@@ -71,7 +70,6 @@ import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadType;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
-import com.google.android.gms.appstate.a;
 
 import de.greenrobot.event.EventBus;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
@@ -146,17 +144,20 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 			@Override
 			public Cursor loadInBackground() {
 
-				Cursor totalCursor = DataCenter.getInstance().getCheckOutContainerSessionCursor(getContext());
-				setTotalItems(totalCursor.getCount());
-				totalCursor.close();
-
+				new AsyncTask<Void, Void, Void>() {
+					@Override
+					protected Void doInBackground(Void... params) {
+						refreshTotalCount(); // refresh the total number containers. Run async
+						return null;
+					}
+				}.execute();
+				
 				Cursor cursor = DataCenter.getInstance().getValidCheckOutContainerCursor(getContext());
-				if (cursor != null) {
 
-					// Ensure the cursor window is filled
-					cursor.getCount();
-					cursor.registerContentObserver(mObserver);
+				if (cursor != null) {
+					cursor.getCount(); // Ensure the cursor window is filled
 				}
+				
 				return cursor;
 			}
 		};
@@ -164,7 +165,7 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
-
+		
 		if (cursorAdapter == null) {
 
 			cursorAdapter = new GateExportContainerCursorAdapter(getActivity(), mItemLayout, cursor, 0);
@@ -173,19 +174,17 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 				@Override
 				public Cursor runQuery(CharSequence constraint) {
 
-					if (TextUtils.isEmpty(constraint)) { return DataCenter.getInstance()
-																			.getValidCheckOutContainerCursor(	getActivity()); }
+					if (TextUtils.isEmpty(constraint)) { 
+						return DataCenter.getInstance().getValidCheckOutContainerCursor(getActivity()); 
+					}
 
 					return DataCenter.getInstance().filterCheckoutCursor(getActivity(), constraint);
 				}
 			});
 
 			mFeedListView.setAdapter(cursorAdapter);
-
 		} else {
-
 			cursorAdapter.swapCursor(cursor);
-
 		}
 	}
 
@@ -195,12 +194,9 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 		mSearchEditText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable arg0) {
-
 				if (cursorAdapter != null) {
-
 					cursorAdapter.getFilter().filter(arg0.toString());
 				}
-
 			}
 
 			@Override
@@ -550,6 +546,14 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 		getLoaderManager().restartLoader(LOADER_ID, null, this);
 	}
 
+	void refreshTotalCount() {
+		// Reresh the total number of export containers.
+		// The query takes a while to run, hence run in background
+		Cursor totalCursor = DataCenter.getInstance().getCheckOutContainerSessionCursor(getActivity());
+		setTotalItems(totalCursor.getCount());
+		totalCursor.close();
+	}
+	
 	void setTotalItems(int val) {
 		totalItems = val;
 		EventBus.getDefault().post(new ListItemChangedEvent(1, totalItems));

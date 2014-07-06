@@ -4,6 +4,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import android.content.Context;
@@ -205,6 +206,7 @@ public class UploadsFragment extends SherlockFragment implements OnDismissCallba
 	UploadCursorAdapter cursorAdapter;
 	private final int mItemLayout = R.layout.item_list_upload;
 
+	@UiThread
 	public void refresh() {
 		getLoaderManager().restartLoader(LOADER_ID, null, this);
 	}
