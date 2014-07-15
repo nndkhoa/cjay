@@ -43,6 +43,7 @@ import com.cloudjay.cjay.util.Utils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.internal.al;
 
 import de.greenrobot.event.EventBus;
 import de.keyboardsurfer.android.widget.crouton.Configuration;
@@ -257,6 +258,28 @@ public class CJayActivity extends SherlockFragmentActivity {
 					@Override
 					protected void onPostExecute(Void result) {
 						EventBus.getDefault().post(new PostLoadDataEvent());
+
+						String alert = "";
+						if (DataCenter.addedItems > 0) {
+							alert += "Đã thêm\t\t" + DataCenter.addedItems + " containers";
+						}
+
+						if (DataCenter.updatedItems > 0) {
+							alert += "\nĐã cập nhật\t" + DataCenter.updatedItems + " containers";
+						}
+
+						if (DataCenter.deletedItems > 0) {
+							alert += "\nĐã xóa\t\t" + DataCenter.deletedItems + " containers";
+						}
+
+						if (!TextUtils.isEmpty(alert)) {
+							Toast.makeText(context, alert, Toast.LENGTH_LONG).show();
+							DataCenter.addedItems = 0;
+							DataCenter.updatedItems = 0;
+							DataCenter.deletedItems = 0;
+						} else {
+							Toast.makeText(context, "Đã cập nhật đầy đủ", Toast.LENGTH_LONG).show();
+						}
 					};
 
 					@Override
@@ -487,6 +510,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 	@OptionsItem(R.id.menu_refresh)
 	void refreshItemSelected() {
+
 		new AsyncTask<Void, Integer, Void>() {
 
 			@Override
@@ -494,6 +518,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 				try {
 					DataCenter.getInstance().fetchData(getApplicationContext(), true);
+
 				} catch (NoConnectionException e) {
 					showCrouton(R.string.alert_no_network);
 

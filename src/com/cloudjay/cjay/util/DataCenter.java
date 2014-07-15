@@ -11,7 +11,10 @@ import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EBean.Scope;
 import org.androidannotations.annotations.Trace;
 
+import android.R.anim;
+import android.R.integer;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -19,6 +22,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
@@ -48,6 +52,8 @@ import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.CJayClient;
 
 import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 /**
  * 
@@ -81,6 +87,9 @@ public class DataCenter {
 	public static AsyncTask<Void, Void, String> RegisterGCMTask;
 
 	private static DataCenter instance = null;
+	public static int addedItems = 0;
+	public static int deletedItems = 0;
+	public static int updatedItems = 0;
 
 	public static DatabaseHelper getDatabaseHelper(Context context) {
 		return getInstance().getDatabaseManager().getHelper(context);
@@ -220,9 +229,9 @@ public class DataCenter {
 
 		// Logger.Log("*** FETCHING DATA ... ***");
 
-		if (forced) {
-			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, false);
-		}
+		// if (isFetchingData(ctx) && forced) {
+		// PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, false);
+		// }
 
 		if (isFetchingData(ctx)) {
 
@@ -255,18 +264,16 @@ public class DataCenter {
 					}
 				}
 
-				// PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, false);
-
 			} catch (NoConnectionException e) {
-				// PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, false);
+
 				throw e;
+
 			} catch (SQLException e) {
-				// PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, false);
 				e.printStackTrace();
 			} catch (NullSessionException e) {
+
 				throw e;
 			} catch (Exception e) {
-				// PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, false);
 				e.printStackTrace();
 			} finally {
 				PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_FETCHING_DATA, false);
@@ -859,7 +866,7 @@ public class DataCenter {
 			firstBatchUpdateTime = updateContainerSessionsFromLastTime(ctx, type, lastUpdate);
 			updateContainerSessionsFromLastTime(ctx, type, firstBatchUpdateTime);
 
-			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
+			// PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 
 			// chưa được gán INITIALIZED
 			if (PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_INITIALIZED, false) == false) {
@@ -867,21 +874,21 @@ public class DataCenter {
 			}
 
 		} catch (NoConnectionException e) {
-			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			throw e;
+
 		} catch (SQLException e) {
 
 			Logger.e(e.getMessage());
-			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			throw e;
 
 		} catch (NullSessionException e) {
-			Logger.e("NullSessionException");
-			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			throw e;
+
 		} catch (Exception e) {
-			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			e.printStackTrace();
+
+		} finally {
+			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 		}
 
 		long difference = System.currentTimeMillis() - startTime;
@@ -904,6 +911,8 @@ public class DataCenter {
 		do {
 
 			long beginParseTime = System.currentTimeMillis();
+
+			// Check if user is logged out or not
 			boolean isAllowToUpdate = PreferencesUtil.getPrefsValue(ctx, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 			if (isAllowToUpdate == false) { throw new NullSessionException(
 																			"User decided to log out. Process will be stopped here."); }
@@ -948,6 +957,7 @@ public class DataCenter {
 						if (tmpSession.getId() != 0) {
 							Logger.Log("Delete container session: " + tmpSession.getContainerId() + " | Id: ");
 							DataCenter.getInstance().removeContainerSession(ctx, tmpSession.getId());
+							deletedItems++;
 							continue;
 						}
 					}
@@ -971,15 +981,18 @@ public class DataCenter {
 																+ " | Container existed but cannot find it in database.");
 						} else {
 							Mapper.getInstance().update(ctx, tmpSession, uuid);
+
 						}
 
 						cursor.close();
+						updatedItems++;
 						continue;
 
 					} else { // --> create
 
 						// Logger.Log("Create new container session:" + tmpSession.getContainerId());
 						sqlsStrings.addAll(Mapper.getInstance().getSqlStrings(ctx, tmpSession));
+						addedItems++;
 					}
 
 					cursor.close();
@@ -1006,8 +1019,10 @@ public class DataCenter {
 		} while (!TextUtils.isEmpty(nextUrl));
 
 		if (totalItems > 0) {
+
 			Logger.Log("Store last update: " + requestedTime);
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE, requestedTime);
+
 		}
 
 		getDatabaseHelper(ctx).addUsageLog(ctx, "Update List CS at " + requestedTime + " | Total Items: " + totalItems);

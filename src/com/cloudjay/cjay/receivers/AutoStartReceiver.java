@@ -9,6 +9,7 @@ import android.content.Intent;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
 
@@ -20,6 +21,9 @@ public class AutoStartReceiver extends BroadcastReceiver {
 
 		Logger.Log("**********started************");
 		DataCenter.getDatabaseHelper(context).addUsageLog(context, "#autostart Application");
+
+		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_IS_FETCHING_DATA, false);
+		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_IS_UPDATING_DATA, false);
 
 		// TODO: refactor if needed
 		// Making Alarm for Queue Worker
