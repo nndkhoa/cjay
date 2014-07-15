@@ -4,6 +4,8 @@ package com.cloudjay.cjay.util;
  * Created by Tieu Bao on 9/30/13.
  */
 
+import com.cloudjay.cjay.R;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -22,7 +24,6 @@ public class PreferencesUtil {
 	public static final String PREF_IS_UPDATING_DATA = "pref_is_updating_data";
 	public static final String PREF_USERNAME = "pref_username";
 	public static final String PREF_APP_VERSION = "pref_app_version";
-	public static final String PREF_AUTO_CHECK_UPDATE = "pref_auto_check_update";
 	public static final String PREF_INITIALIZED = "pref_initialized";
 
 	public static final String PREF_EMPTY_CONTAINER_QUEUE = "pref_empty_container_queue";

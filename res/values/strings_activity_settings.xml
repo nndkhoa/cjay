@@ -6,6 +6,7 @@
 
     <string name="pref_key_enable_logger_checkbox">enable_logger_checkbox</string>
     <string name="pref_key_auto_check_update_checkbox">auto_check_update_checkbox</string>
+    <string name="pref_key_enable_user_log_checkbox">enable_user_log_checkbox</string>
 
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>
@@ -13,6 +14,8 @@
     <string name="pref_description_auto_check_update">Tự động kiểm tra phiên bản mới</string>
     <string name="pref_title_enable_logger">Enable Logger</string>
     <string name="pref_description_enable_logger">Cho phép hệ thống Log hoạt động</string>
+    <string name="pref_title_enable_user_log">Enable User Activities Log</string>
+    <string name="pref_description_enable_user_log">Lưu trữ hoạt động của người sử dụng</string>
     <string name="pref_title_secret_log">Open secret log</string>
     <string name="pref_description_secret_log">Mở trang log ẩn</string>
 

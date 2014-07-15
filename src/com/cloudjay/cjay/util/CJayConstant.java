@@ -104,5 +104,4 @@ public class CJayConstant {
 	public static final String INTENT_LOGOUT = "cjay.intent.action.LOGOUT";
 	public static final String INTENT_OPEN_TAB_UPLOAD = "cjay.intent.action.OPEN_TAB_UPLOAD";
 	public static final float IMAGE_CACHE_HEAP_PERCENTAGE = 1f / 6f;
-
 }

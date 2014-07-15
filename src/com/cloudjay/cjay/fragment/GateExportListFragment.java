@@ -146,9 +146,9 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 			@Override
 			public Cursor loadInBackground() {
 
-				Cursor totalCursor = DataCenter.getInstance().getCheckOutContainerSessionCursor(getContext());
-				setTotalItems(totalCursor.getCount());
-				totalCursor.close();
+				// Cursor totalCursor = DataCenter.getInstance().getCheckOutContainerSessionCursor(getContext());
+				// setTotalItems(totalCursor.getCount());
+				// totalCursor.close();
 
 				Cursor cursor = DataCenter.getInstance().getValidCheckOutContainerCursor(getContext());
 				if (cursor != null) {
@@ -180,6 +180,7 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 				}
 			});
 
+			// ####
 			mFeedListView.setAdapter(cursorAdapter);
 
 		} else {

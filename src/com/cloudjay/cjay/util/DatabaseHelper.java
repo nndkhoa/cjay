@@ -354,10 +354,14 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 	public void addUsageLog(String message) {
 
-		UserLog userLog = new UserLog(message);
-
 		try {
-			getUserLogDaoImpl().addLog(userLog);
+			if (Logger.isUserActivitiesLoggable()) {
+
+				UserLog userLog = new UserLog(message);
+				getUserLogDaoImpl().addLog(userLog);
+
+			}
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

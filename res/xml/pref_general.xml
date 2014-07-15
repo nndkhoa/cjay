@@ -11,6 +11,12 @@
         android:key="@string/pref_key_enable_logger_checkbox"
         android:summary="@string/pref_description_enable_logger"
         android:title="@string/pref_title_enable_logger" />
+    
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="@string/pref_key_enable_user_log_checkbox"
+        android:summary="@string/pref_description_enable_user_log"
+        android:title="@string/pref_title_enable_user_log" />
 
     <Preference
         android:key="secret_log"

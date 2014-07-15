@@ -68,6 +68,7 @@ public class CJayApplication extends Application {
 		boolean defaultDebugVal = false;
 		boolean defaultUpdateVal = true;
 		boolean defaultBetaApiVal = false;
+		boolean defaultEnableUserLog = false;
 
 		// Configure Logger
 		boolean debuggable = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
@@ -76,10 +77,12 @@ public class CJayApplication extends Application {
 		Logger.getInstance().setDebuggable(debuggable);
 
 		if (Logger.isDebuggable()) {
+
 			// StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
 			// StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
 			// .detectLeakedClosableObjects().penaltyLog()
 			// .penaltyDeath().build());
+
 		}
 
 		// Configure Auto Update
@@ -90,6 +93,14 @@ public class CJayApplication extends Application {
 		// Ion.getDefault(getBaseContext()).configure().setLogging("Ion", Log.INFO);
 		Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
 		editor.putBoolean(getString(R.string.pref_key_auto_check_update_checkbox), autoUpdate);
+		editor.commit();
+
+		// Configure User Activities Log
+		boolean enableUserLog = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+													.getBoolean(getString(R.string.pref_key_enable_user_log_checkbox),
+																defaultEnableUserLog);
+
+		editor.putBoolean(getString(R.string.pref_key_enable_user_log_checkbox), enableUserLog);
 		editor.commit();
 
 		// Setup API ROOT
