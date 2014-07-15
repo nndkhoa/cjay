@@ -412,7 +412,7 @@ public class Utils {
 			default:
 				break;
 		}
-		DataCenter.getDatabaseHelper(context).addUsageLog("Error | Cannot start Home Activity");
+		DataCenter.getDatabaseHelper(context).addUsageLog(context, "Error | Cannot start Home Activity");
 		return null;
 	}
 
@@ -559,5 +559,54 @@ public class Utils {
 		}
 		cursor.close();
 		return isValidForUpload;
+	}
+
+	public static File getFileFromPath(String path) {
+
+		boolean ret;
+		boolean isExist;
+		boolean isWritable;
+		File file = null;
+
+		if (TextUtils.isEmpty(path)) {
+			Log.e("Error", "The path of Log file is Null.");
+			return file;
+		}
+
+		file = new File(path);
+
+		isExist = file.exists();
+		isWritable = file.canWrite();
+
+		if (isExist) {
+			if (isWritable) {
+				// Log.i("Success", "The Log file exist,and can be written! -" + file.getAbsolutePath());
+			} else {
+				Log.e("Error", "The Log file can not be written.");
+			}
+
+		} else {
+
+			// create the log file
+			try {
+				ret = file.createNewFile();
+
+				if (ret) {
+					Log.i("Success", "The Log file was successfully created! -" + file.getAbsolutePath());
+				} else {
+					Log.i("Success", "The Log file exist! -" + file.getAbsolutePath());
+				}
+
+				isWritable = file.canWrite();
+				if (!isWritable) {
+					Log.e("Error", "The Log file can not be written.");
+				}
+			} catch (IOException e) {
+				Log.e("Error", "Failed to create The Log file.");
+				e.printStackTrace();
+			}
+		}
+
+		return file;
 	}
 }

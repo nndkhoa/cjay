@@ -54,7 +54,8 @@ public class UpdateReceiver extends BroadcastReceiver {
 		String appVersion = Utils.getAppVersionName(context);
 		int appVersionCode = Utils.getAppVersionCode(context);
 
-		DataCenter.getDatabaseHelper(context).addUsageLog(	"#update app to version " + appVersion + " | "
+		DataCenter.getDatabaseHelper(context).addUsageLog(	context,
+															"#update app to version " + appVersion + " | "
 																	+ Integer.toString(appVersionCode));
 	}
 

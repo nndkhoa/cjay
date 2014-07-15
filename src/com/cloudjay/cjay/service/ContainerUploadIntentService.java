@@ -69,7 +69,7 @@ public class ContainerUploadIntentService extends IntentService implements Count
 
 		Logger.w("Uploading container: " + containerSession.getContainerId() + " | " + uploadType.name());
 		DataCenter.getDatabaseHelper(getApplicationContext())
-					.addUsageLog("Begin to #upload container: " + containerSession.getContainerId());
+					.addUsageLog(this, "Begin to #upload container: " + containerSession.getContainerId());
 
 		// Convert ContainerSession to TmpContainerSession for uploading
 		TmpContainerSession uploadItem = null;
@@ -89,7 +89,8 @@ public class ContainerUploadIntentService extends IntentService implements Count
 
 			containerSession.setUploadState(UploadState.ERROR);
 			DataCenter.getDatabaseHelper(getApplicationContext())
-						.addUsageLog(	"#upload #failed container " + containerSession.getContainerId() + " | "
+						.addUsageLog(	this,
+										containerSession.getContainerId() + " | #upload #failed " + " | "
 												+ Integer.toString(containerSession.getUploadType())
 												+ " | #error on #conversion to Upload Format");
 			e.printStackTrace();
@@ -105,21 +106,23 @@ public class ContainerUploadIntentService extends IntentService implements Count
 
 			containerSession.setUploadState(UploadState.COMPLETED);
 			Logger.Log("Upload successfully container " + containerSession.getContainerId() + " | " + uploadType.name());
-			DataCenter.getDatabaseHelper(getApplicationContext())
-						.addUsageLog(	"#upload #successfully container " + containerSession.getContainerId() + " | "
-												+ uploadType.name());
+			DataCenter.getDatabaseHelper(getApplicationContext()).addUsageLog(	this,
+																				containerSession.getContainerId()
+																						+ " | #upload #successfully "
+																						+ " | Upload type: "
+																						+ uploadType.name());
 
 		} catch (NoConnectionException e) {
 			Logger.Log("No Internet Connection");
 			DataCenter.getDatabaseHelper(getApplicationContext())
-						.addUsageLog("No connection | #rollback | Container: " + containerSession.getContainerId());
+						.addUsageLog(this, containerSession.getContainerId() + " | #rollback because of no connection");
 			retry(containerSession);
 			return;
 
 		} catch (NullSessionException e) {
 
 			DataCenter.getDatabaseHelper(getApplicationContext())
-						.addUsageLog("Null Session | #rollback | Container: " + containerSession.getContainerId());
+						.addUsageLog(this, containerSession.getContainerId() + " | #rollback because of Null Session");
 			rollbackContainerState(containerSession);
 
 			// Log user out
@@ -132,7 +135,8 @@ public class ContainerUploadIntentService extends IntentService implements Count
 			// Set state to Error
 			containerSession.setUploadState(UploadState.ERROR);
 			DataCenter.getDatabaseHelper(getApplicationContext())
-						.addUsageLog(	"#upload #failed container " + containerSession.getContainerId() + " | "
+						.addUsageLog(	this,
+										containerSession.getContainerId() + " | #upload #failed, upload type: "
 												+ Integer.toString(containerSession.getUploadType()));
 			return;
 
@@ -140,14 +144,17 @@ public class ContainerUploadIntentService extends IntentService implements Count
 
 			Logger.e("Server Internal Error cmnr");
 			DataCenter.getDatabaseHelper(getApplicationContext())
-						.addUsageLog(	"Server Internal Error | #rollback | Container: "
-												+ containerSession.getContainerId());
+						.addUsageLog(	this,
+										containerSession.getContainerId()
+												+ " | #rollback because of Server Internal Error");
 			rollbackContainerState(containerSession);
 			return;
 
 		} catch (Exception e) {
 			DataCenter.getDatabaseHelper(getApplicationContext())
-						.addUsageLog("Unknown Exception | #rollback | Container: " + containerSession.getContainerId());
+						.addUsageLog(	this,
+										"Unknown Exception | #rollback | Container: "
+												+ containerSession.getContainerId());
 			rollbackContainerState(containerSession);
 			return;
 		}
@@ -184,7 +191,8 @@ public class ContainerUploadIntentService extends IntentService implements Count
 		} catch (SQLException e) {
 
 			DataCenter.getDatabaseHelper(getApplicationContext())
-						.addUsageLog(	containerSession.getContainerId()
+						.addUsageLog(	this,
+										containerSession.getContainerId()
 												+ " | #SQLerror when update #response data | Stack trace: "
 												+ e.getMessage());
 			e.printStackTrace();
@@ -192,7 +200,8 @@ public class ContainerUploadIntentService extends IntentService implements Count
 		} catch (Exception e) {
 
 			DataCenter.getDatabaseHelper(getApplicationContext())
-						.addUsageLog(	containerSession.getContainerId()
+						.addUsageLog(	this,
+										containerSession.getContainerId()
 												+ " | #error when update #response data | Stack trace: "
 												+ e.getMessage());
 
@@ -480,15 +489,17 @@ public class ContainerUploadIntentService extends IntentService implements Count
 				+ Utils.sqlString(containerSession.getUuid());
 		db.execSQL(sql);
 
-		DataCenter.getDatabaseHelper(getApplicationContext())
-					.addUsageLog("rollback to #reupload " + containerSession.getContainerId());
+		DataCenter.getDatabaseHelper(getApplicationContext()).addUsageLog(	this,
+																			containerSession.getContainerId()
+																					+ " | rollback to #reupload ");
 
 	}
 
 	public void rollbackContainerState(ContainerSession containerSession) {
 
 		UploadType uploadType = UploadType.values()[containerSession.getUploadType()];
-		DataCenter.getDatabaseHelper(getApplicationContext()).addUsageLog(	"#rollback "
+		DataCenter.getDatabaseHelper(getApplicationContext()).addUsageLog(	this,
+																			"#rollback "
 																					+ containerSession.getContainerId()
 																					+ " | " + uploadType.name());
 
@@ -501,7 +512,8 @@ public class ContainerUploadIntentService extends IntentService implements Count
 
 			case OUT:
 				DataCenter.getDatabaseHelper(getApplicationContext())
-							.addUsageLog(	"#rollback " + containerSession.getContainerId()
+							.addUsageLog(	this,
+											"#rollback " + containerSession.getContainerId()
 													+ " | Set check_out_time to empty");
 				containerSession.setCheckOutTime("");
 				break;

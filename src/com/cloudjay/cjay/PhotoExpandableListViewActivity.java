@@ -522,7 +522,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 					// mContainerSession.setOnLocal(false);
 					DataCenter.getDatabaseHelper(this)
-								.addUsageLog(mContainerId + " | Prepare to add #IN container to upload queue");
+								.addUsageLog(this, mContainerId + " | Prepare to add #IN container to upload queue");
 
 				} else {
 					showCrouton(R.string.alert_no_issue_container);
@@ -541,7 +541,7 @@ public class PhotoExpandableListViewActivity extends CJayActivity implements Loa
 
 					Logger.Log("Prepare to upload EXPORT container " + mContainerId);
 					DataCenter.getDatabaseHelper(this)
-								.addUsageLog(mContainerId + " | Prepare to add #OUT container to upload queue");
+								.addUsageLog(this, mContainerId + " | Prepare to add #OUT container to upload queue");
 
 				} else {
 					showCrouton(R.string.alert_no_issue_container);

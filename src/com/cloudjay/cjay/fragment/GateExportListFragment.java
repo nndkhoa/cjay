@@ -353,7 +353,9 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 					CJayApplication.uploadContainer(getActivity(), mSelectedUuid, mSelectedContainerId);
 					DataCenter.getDatabaseHelper(getActivity())
-								.addUsageLog(mSelectedContainerId + " | Prepare to add #OUT container to upload queue");
+								.addUsageLog(	getActivity(),
+												mSelectedContainerId
+														+ " | Prepare to add #OUT container to upload queue");
 
 					hideMenuItems();
 				} else {
@@ -491,7 +493,8 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 				try {
 					DataCenter.getInstance().fetchData(getActivity(), true);
-					DataCenter.getDatabaseHelper(getActivity()).addUsageLog("#refresh in fragment #GateExport");
+					DataCenter.getDatabaseHelper(getActivity()).addUsageLog(getActivity(),
+																			"#refresh in fragment #GateExport");
 
 				} catch (NoConnectionException e) {
 

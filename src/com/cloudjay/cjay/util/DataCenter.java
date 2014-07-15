@@ -476,8 +476,9 @@ public class DataCenter {
 			String containerId = cursor.getString(cursor.getColumnIndexOrThrow("container_id"));
 
 			Logger.Log(containerId + " | Manually rolling back container session upload state.");
-			DataCenter.getDatabaseHelper(ctx)
-						.addUsageLog(containerId + " | #Manually #rollback upload state container");
+			DataCenter.getDatabaseHelper(ctx).addUsageLog(	ctx,
+															containerId
+																	+ " | #Manually #rollback upload state container");
 			String sql = "";
 
 			switch (uploadType) {
@@ -965,7 +966,8 @@ public class DataCenter {
 						if (TextUtils.isEmpty(uuid)) {
 							Logger.e("ContainerSession existed but cannot find _id");
 							DataCenter.getDatabaseHelper(ctx)
-										.addUsageLog(	tmpSession.getContainerId()
+										.addUsageLog(	ctx,
+														tmpSession.getContainerId()
 																+ " | Container existed but cannot find it in database.");
 						} else {
 							Mapper.getInstance().update(ctx, tmpSession, uuid);
@@ -1008,7 +1010,7 @@ public class DataCenter {
 			PreferencesUtil.storePrefsValue(ctx, PreferencesUtil.PREF_CONTAINER_SESSION_LAST_UPDATE, requestedTime);
 		}
 
-		getDatabaseHelper(ctx).addUsageLog("Update List CS at " + requestedTime + " | Total Items: " + totalItems);
+		getDatabaseHelper(ctx).addUsageLog(ctx, "Update List CS at " + requestedTime + " | Total Items: " + totalItems);
 
 		return firstBatchRequestTime;
 

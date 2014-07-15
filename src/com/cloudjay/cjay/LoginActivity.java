@@ -121,7 +121,8 @@ public class LoginActivity extends CJayActivity {
 				// Navigate user to Main Activity based on user role
 				Logger.Log("Login successfully");
 				DataCenter.getDatabaseHelper(LoginActivity.this)
-							.addUsageLog(	"user #login at: "
+							.addUsageLog(	getApplicationContext(),
+											"user #login at: "
 													+ StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 				CJayApplication.startCJayHomeActivity(LoginActivity.this);
 				finish();

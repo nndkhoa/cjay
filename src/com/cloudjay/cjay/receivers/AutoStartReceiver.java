@@ -19,7 +19,7 @@ public class AutoStartReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 
 		Logger.Log("**********started************");
-		DataCenter.getDatabaseHelper(context).addUsageLog("#autostart Application");
+		DataCenter.getDatabaseHelper(context).addUsageLog(context, "#autostart Application");
 
 		// TODO: refactor if needed
 		// Making Alarm for Queue Worker

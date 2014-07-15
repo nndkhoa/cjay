@@ -1,5 +1,6 @@
 package com.cloudjay.cjay;
 
+import java.io.File;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -142,6 +143,10 @@ public class CJayApplication extends Application {
 
 		if (!CJayConstant.BACK_UP_DIRECTORY_FILE.exists()) {
 			CJayConstant.BACK_UP_DIRECTORY_FILE.mkdir();
+		}
+
+		if (!CJayConstant.LOG_DIRECTORY_FILE.exists()) {
+			CJayConstant.LOG_DIRECTORY_FILE.mkdirs();
 		}
 
 		// Configure Alarm Manager
@@ -360,7 +365,8 @@ public class CJayApplication extends Application {
 				containerSessionDaoImpl.update(containerSession);
 			} catch (SQLException e) {
 
-				DataCenter.getDatabaseHelper(ctx).addUsageLog(	containerSession.getContainerId()
+				DataCenter.getDatabaseHelper(ctx).addUsageLog(	ctx,
+																containerSession.getContainerId()
 																		+ " | Error set state and user_confirmation");
 				e.printStackTrace();
 
@@ -374,7 +380,8 @@ public class CJayApplication extends Application {
 
 		// It will trigger `UploadsFragment` Adapter
 		EventBus.getDefault().post(new ContainerSessionEnqueueEvent(containerSession));
-		DataCenter.getDatabaseHelper(ctx).addUsageLog(	containerSession.getContainerId()
+		DataCenter.getDatabaseHelper(ctx).addUsageLog(	ctx,
+														containerSession.getContainerId()
 																+ " | Added container to upload queue");
 	}
 
@@ -393,7 +400,7 @@ public class CJayApplication extends Application {
 
 		// It will trigger `UploadsFragment` Adapter
 		EventBus.getDefault().post(new ContainerSessionEnqueueEvent(uuid));
-		DataCenter.getDatabaseHelper(context).addUsageLog(containerId + " | Added container to upload queue");
+		DataCenter.getDatabaseHelper(context).addUsageLog(context, containerId + " | Added container to upload queue");
 	}
 
 	IDatabaseManager databaseManager = null;

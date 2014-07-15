@@ -277,7 +277,7 @@ public class Mapper {
 
 		if (TextUtils.isEmpty(checkoutTime) && uploadType == UploadType.OUT) {
 
-			DataCenter.getDatabaseHelper(ctx).addUsageLog(containerId + " | Checkout Time is NULL");
+			DataCenter.getDatabaseHelper(ctx).addUsageLog(ctx, containerId + " | Checkout Time is NULL");
 			Logger.e(containerId + " | Checkout Time is NULL");
 
 			checkoutTime = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
@@ -289,7 +289,7 @@ public class Mapper {
 
 			if (TextUtils.isEmpty(imageIdPath)) {
 				Logger.e(containerId + " | Image Id Path is NULL");
-				DataCenter.getDatabaseHelper(ctx).addUsageLog(containerId + " | Image Id Path is NULL");
+				DataCenter.getDatabaseHelper(ctx).addUsageLog(ctx, containerId + " | Image Id Path is NULL");
 			}
 
 			tmpContainerSession.setImageIdPath(imageIdPath);
@@ -524,7 +524,8 @@ public class Mapper {
 						if (TextUtils.isEmpty(issueId)) {
 
 							Logger.e("Error #parse audit_report_item with id: " + auditReportItem.getId());
-							DataCenter.getDatabaseHelper(ctx).addUsageLog(	"Error #parse audit_report_item with id: "
+							DataCenter.getDatabaseHelper(ctx).addUsageLog(	ctx,
+																			"Error #parse audit_report_item with id: "
 																					+ auditReportItem.getId());
 							// move to next issue
 							continue;
@@ -743,7 +744,8 @@ public class Mapper {
 						if (TextUtils.isEmpty(issueId)) {
 
 							Logger.e("Error #parse audit_report_item with id: " + auditReportItem.getId());
-							DataCenter.getDatabaseHelper(ctx).addUsageLog(	"Error #parse audit_report_item with id: "
+							DataCenter.getDatabaseHelper(ctx).addUsageLog(	ctx,
+																			"Error #parse audit_report_item with id: "
 																					+ auditReportItem.getId());
 							// move to next issue
 							continue;

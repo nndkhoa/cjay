@@ -123,7 +123,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 	}
 
 	public void onEvent(LogUserActivityEvent event) {
-		DataCenter.getDatabaseHelper(context).addUsageLog(event.getTarget());
+		DataCenter.getDatabaseHelper(context).addUsageLog(this, event.getTarget());
 	}
 
 	public void onEvent(UserLoggedOutEvent event) {
@@ -359,7 +359,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 				// When Submit Server Successfully, save it here!.
 				Utils.storeRegistrationId(context, regid);
-				DataCenter.getDatabaseHelper(context).addUsageLog("Register #GCM device");
+				DataCenter.getDatabaseHelper(context).addUsageLog(this, "Register #GCM device");
 
 			}
 		} catch (JSONException e) {

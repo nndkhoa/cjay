@@ -654,13 +654,12 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			// file name example:
 			// [depot-code]-2013-12-19-[gate-in|gate-out|report]-[containerId]-[UUID].jpg
-			String currentTimestamp = StringHelper.getCurrentTimestamp("yyyy-MM-dd");
+			String today = StringHelper.getCurrentTimestamp("yyyy-MM-dd");
+			String fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-" + operatorCode + "-"
+					+ uuid + ".jpg";
 
-			String fileName = depotCode + "-" + currentTimestamp + "-" + imageType + "-" + containerId + "-"
-					+ operatorCode + "-" + uuid + ".jpg";
-
-			File newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/" + currentTimestamp + "/"
-					+ imageType + "/" + containerId);
+			File newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/" + today + "/" + imageType
+					+ "/" + containerId);
 
 			if (!newDirectory.exists()) {
 				newDirectory.mkdirs();
@@ -672,7 +671,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			// Upload image --> add image to queue
 			uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
-			DataCenter.getDatabaseHelper(this).addUsageLog(containerId + " | Captured " + fileName);
+			DataCenter.getDatabaseHelper(this).addUsageLog(this, containerId + " | Captured " + fileName);
 
 			if (capturedBitmap != null) {
 				capturedBitmap.recycle();

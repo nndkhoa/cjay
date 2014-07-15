@@ -583,8 +583,8 @@ public class CJayClient implements ICJayClient {
 			Logger.w("Response code: " + response.getHeaders().getResponseMessage() + " | "
 					+ Integer.toString(response.getHeaders().getResponseCode()));
 
-			getDatabaseManager().getHelper(ctx).addUsageLog("Container "
-																	+ item.getContainerId()
+			getDatabaseManager().getHelper(ctx).addUsageLog(ctx,
+															item.getContainerId()
 																	+ " | #Response code: "
 																	+ response.getHeaders().getResponseMessage()
 																	+ " | "
@@ -626,7 +626,6 @@ public class CJayClient implements ICJayClient {
 
 		return ret;
 	}
-
 	// public List<TmpContainerSession> getContainerSessions(Context ctx, String date) throws NoConnectionException,
 	// NullSessionException {
 	//

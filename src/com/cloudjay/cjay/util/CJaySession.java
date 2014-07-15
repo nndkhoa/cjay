@@ -78,7 +78,7 @@ public class CJaySession {
 			protected Void doInBackground(Void... params) {
 
 				// PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_INITIALIZED, false);
-				DataCenter.getDatabaseHelper(context).addUsageLog("#backup database");
+				DataCenter.getDatabaseHelper(context).addUsageLog(context, "#backup database");
 				Utils.backupDatabase(getCurrentUser().getUserName());
 
 				if (Utils.isAlarmUp(context)) {
@@ -102,7 +102,8 @@ public class CJaySession {
 					}
 
 					DataCenter.getDatabaseHelper(context)
-								.addUsageLog(	"User #logout at: "
+								.addUsageLog(	context,
+												"User #logout at: "
 														+ StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 				} catch (SQLException e) {
 

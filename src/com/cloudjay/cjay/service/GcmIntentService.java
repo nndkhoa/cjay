@@ -121,7 +121,7 @@ public class GcmIntentService extends IntentService {
 						// Alert cannot register GCM device
 						Logger.Log("Cannot register GCM device. Please log out and try again.");
 						DataCenter.getDatabaseHelper(getApplicationContext())
-									.addUsageLog("Cannot register #GCM device. Please log out and try again.");
+									.addUsageLog(this, "Cannot register #GCM device. Please log out and try again.");
 
 						Toast.makeText(this, "Server đang gặp sự cố.\nHãy đăng xuất và thử lại sau 5 phút nữa.",
 										Toast.LENGTH_LONG).show();
@@ -168,7 +168,7 @@ public class GcmIntentService extends IntentService {
 				e.printStackTrace();
 
 				DataCenter.getDatabaseHelper(getApplicationContext())
-							.addUsageLog("GCMIntentService | NullSessionException");
+							.addUsageLog(this, "GCMIntentService | NullSessionException");
 
 				Toast.makeText(getApplicationContext(), "Tài khoản có vấn đề.\nXin hãy đăng nhập lại.",
 								Toast.LENGTH_LONG).show();

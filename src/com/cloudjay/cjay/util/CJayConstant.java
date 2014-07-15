@@ -49,6 +49,7 @@ public class CJayConstant {
 	public static final String APP_DIRECTORY = "CJay";
 	public static final String HIDDEN_APP_DIRECTORY = ".CJay";
 	public static final String BACK_UP_DIRECTORY = ".backup";
+	public static final String LOG_DIRECTORY = "log";
 
 	// `/sdcard/DCMI/CJay/`
 	public static final File APP_DIRECTORY_FILE = new File(
@@ -63,9 +64,12 @@ public class CJayConstant {
 	public static final File BACK_UP_DIRECTORY_FILE = new File(Environment.getExternalStorageDirectory(),
 																BACK_UP_DIRECTORY);
 
+	public static final File LOG_DIRECTORY_FILE = new File(Environment.getExternalStorageDirectory(), LOG_DIRECTORY);
+
 	public static final int SPLASH_TIME_OUT = 1500;
 	public static final String CJAY_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
 	public static final String CJAY_DATETIME_FORMAT_NO_TIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
+	public static final String LOG_TO_FILE_FORMAT = "[%s]	-	%s\n";
 
 	// GCM configuration
 	public static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;

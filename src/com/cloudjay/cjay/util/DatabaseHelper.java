@@ -1,11 +1,18 @@
 package com.cloudjay.cjay.util;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.sql.SQLException;
+import java.util.Locale;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.util.Log;
 
+import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
 import com.cloudjay.cjay.dao.ComponentCodeDaoImpl;
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
@@ -352,14 +359,46 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 	}
 
-	public void addUsageLog(String message) {
+	public void addUsageLog(Context context, final String message) {
 
 		try {
-			if (Logger.isUserActivitiesLoggable()) {
 
+			new AsyncTask<Void, Void, Void>() {
+
+				@Override
+				protected Void doInBackground(Void... params) {
+
+					PrintStream printStream = null;
+					String today = StringHelper.getCurrentTimestamp("yyyy-MM-dd");
+					String fileName = CJayConstant.LOG_DIRECTORY_FILE.getAbsolutePath() + "/" + today + ".log";
+					File file = Utils.getFileFromPath(fileName);
+
+					try {
+
+						printStream = new PrintStream(new FileOutputStream(file), true);
+						String result = String.format(	Locale.US,
+														CJayConstant.LOG_TO_FILE_FORMAT,
+														StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE),
+														message);
+						printStream.append(result);
+
+					} catch (FileNotFoundException e) {
+
+						e.printStackTrace();
+
+					} finally {
+						if (null != printStream) {
+							printStream.close();
+						}
+					}
+
+					return null;
+				}
+			}.execute();
+
+			if (Logger.isUserActivitiesLoggable()) {
 				UserLog userLog = new UserLog(message);
 				getUserLogDaoImpl().addLog(userLog);
-
 			}
 
 		} catch (SQLException e) {

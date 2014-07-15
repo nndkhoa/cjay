@@ -206,7 +206,8 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 					e.printStackTrace();
 				}
 
-				DataCenter.getDatabaseHelper(getActivity()).addUsageLog("Create new container: "
+				DataCenter.getDatabaseHelper(getActivity()).addUsageLog(getActivity(),
+																		"Create new container: "
 																				+ containerSession.getContainerId());
 				EventBus.getDefault().post(new ContainerSessionChangedEvent(containerSession));
 				CJayApplication.openCamera(activity, containerSession.getUuid(), CJayImage.TYPE_IMPORT, LOG_TAG);
@@ -329,7 +330,8 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 				try {
 
 					DataCenter.getInstance().fetchData(getActivity(), true);
-					DataCenter.getDatabaseHelper(getSherlockActivity()).addUsageLog("#refresh in fragment #GateImport");
+					DataCenter.getDatabaseHelper(getSherlockActivity()).addUsageLog(getActivity(),
+																					"#refresh in fragment #GateImport");
 
 				} catch (NoConnectionException e) {
 
@@ -413,7 +415,8 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 			CJayApplication.uploadContainer(getActivity(), mSelectedUuid, mSelectedContainerId);
 
 			DataCenter.getDatabaseHelper(getActivity())
-						.addUsageLog(mSelectedContainerId + " | Prepare to add #IN container to upload queue");
+						.addUsageLog(getActivity(),
+										mSelectedContainerId + " | Prepare to add #IN container to upload queue");
 
 			hideMenuItems();
 

@@ -12,6 +12,7 @@ import com.cloudjay.cjay.BuildConfig;
 public final class Logger {
 
 	/**
+	 * 
 	 * Adjust this field for properly logs
 	 * 
 	 * PRODUCTION => PRODUCTION_MODE = true
