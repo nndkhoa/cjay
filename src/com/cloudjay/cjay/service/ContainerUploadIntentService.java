@@ -316,15 +316,16 @@ public class ContainerUploadIntentService extends IntentService implements Count
 		UploadState uploadState = UploadState.values()[containerSession.getUploadState()];
 		Logger.Log("onEvent UploadStateChangedEvent | " + uploadState.name());
 
-		if (uploadState == UploadState.NONE) {
-			try {
-				containerSessionDaoImpl.update(containerSession);
-			} catch (SQLException e) {
-				Logger.Log("Error when rolling back container " + containerSession.getContainerId());
-				e.printStackTrace();
-			}
-			return;
-		}
+		// Temporary upload, irrelevant at this time
+		// if (uploadState == UploadState.NONE) {
+		// try {
+		// containerSessionDaoImpl.update(containerSession);
+		// } catch (SQLException e) {
+		// Logger.Log("Error when rolling back container " + containerSession.getContainerId());
+		// e.printStackTrace();
+		// }
+		// return;
+		// }
 
 		try {
 
@@ -443,8 +444,8 @@ public class ContainerUploadIntentService extends IntentService implements Count
 			mNotificationBuilder.setProgress(0, 0, false);
 			mNotificationBuilder.setWhen(System.currentTimeMillis());
 			mNotificationBuilder.setContentTitle(text);
-			mNotificationBuilder.setTicker(text);
-			mNotificationBuilder.setContentText(StringHelper.concatStringsWSep(uploadedContainer, ","));
+			// mNotificationBuilder.setTicker(text);
+			mNotificationBuilder.setContentText(StringHelper.concatStringsWSep(uploadedContainer, ", "));
 
 			mNotificationMgr.notify(NOTIFICATION_ID, mNotificationBuilder.build());
 		}

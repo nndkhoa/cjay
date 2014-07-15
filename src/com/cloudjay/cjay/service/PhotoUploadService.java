@@ -72,9 +72,10 @@ public class PhotoUploadService extends Service {
 
 	}
 
-	public void onEvent(CJayImageUploadProgressChangedEvent event) {
-		updateNotification(event.getTarget());
-	}
+	// TODO: enable this block to display percentage of progress bar
+	// public void onEvent(CJayImageUploadProgressChangedEvent event) {
+	// updateNotification(event.getTarget());
+	// }
 
 	public synchronized void onEvent(CJayImageUploadStateChangedEvent event) {
 
@@ -361,8 +362,8 @@ public class PhotoUploadService extends Service {
 				text = getString(	R.string.notification_uploading_photo, mNumberUploaded + 1,
 									CJayImageDaoImpl.totalNumber + mNumberUploaded);
 				mNotificationBuilder.setContentTitle(text);
-				mNotificationBuilder.setTicker(text);
-				mNotificationBuilder.setProgress(0, 0, true);
+				// mNotificationBuilder.setTicker(text);
+				// mNotificationBuilder.setProgress(0, 0, true);
 				mNotificationBuilder.setWhen(System.currentTimeMillis());
 				break;
 
@@ -372,15 +373,14 @@ public class PhotoUploadService extends Service {
 					text = getString(	R.string.notification_uploading_photo_progress, mNumberUploaded + 1,
 										upload.getUploadProgress(), CJayImageDaoImpl.totalNumber + mNumberUploaded);
 					mNotificationBuilder.setContentTitle(text);
-					mNotificationBuilder.setSubText(upload.getImageName());
-					mNotificationBuilder.setContentText(upload.getImageName());
-					mNotificationBuilder.setProgress(100, upload.getUploadProgress(), false);
+					// mNotificationBuilder.setSubText(upload.getImageName());
+					// mNotificationBuilder.setContentText(upload.getImageName());
+					// mNotificationBuilder.setProgress(100, upload.getUploadProgress(), false);
 				}
 				break;
 		}
 
 		mBigPicStyle.setSummaryText(mNotificationSubtitle);
-
 		mNotificationMgr.notify(NOTIFICATION_ID, mBigPicStyle.build());
 	}
 
