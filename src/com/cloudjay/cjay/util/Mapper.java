@@ -15,7 +15,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.cloudjay.cjay.dao.ContainerSessionDaoImpl;
 import com.cloudjay.cjay.events.ContainerSessionChangedEvent;
 import com.cloudjay.cjay.model.AuditReportImage;
 import com.cloudjay.cjay.model.AuditReportItem;
@@ -29,7 +28,6 @@ import com.cloudjay.cjay.model.Issue;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.TmpContainerSession;
 import com.cloudjay.cjay.network.CJayClient;
-import com.google.android.gms.internal.ck;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;

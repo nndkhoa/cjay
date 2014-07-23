@@ -39,7 +39,6 @@ import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.CJayApplication;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.dao.CJayImageDaoImpl;
-import com.cloudjay.cjay.events.CJayImageUploadProgressChangedEvent;
 import com.cloudjay.cjay.events.CJayImageUploadStateChangedEvent;
 import com.cloudjay.cjay.model.CJayImage;
 import com.cloudjay.cjay.tasks.PhotupThreadRunnable;
@@ -348,20 +347,21 @@ public class PhotoUploadService extends Service {
 
 		String text;
 
-		if (VERSION.SDK_INT >= VERSION_CODES.BASE) {
-
-			final Bitmap uploadBigPic = upload.getBigPictureNotificationBmp();
-			if (null == uploadBigPic) {
-				mExecutor.submit(new UpdateBigPictureStyleRunnable(upload));
-			}
-			mBigPicStyle.bigPicture(uploadBigPic);
-		}
+		// if (VERSION.SDK_INT >= VERSION_CODES.BASE) {
+		//
+		// final Bitmap uploadBigPic = upload.getBigPictureNotificationBmp();
+		// if (null == uploadBigPic) {
+		// mExecutor.submit(new UpdateBigPictureStyleRunnable(upload));
+		// }
+		// mBigPicStyle.bigPicture(uploadBigPic);
+		// }
 
 		switch (upload.getUploadState()) {
 			case CJayImage.STATE_UPLOAD_WAITING:
 				text = getString(	R.string.notification_uploading_photo, mNumberUploaded + 1,
 									CJayImageDaoImpl.totalNumber + mNumberUploaded);
 				mNotificationBuilder.setContentTitle(text);
+
 				// mNotificationBuilder.setTicker(text);
 				// mNotificationBuilder.setProgress(0, 0, true);
 				mNotificationBuilder.setWhen(System.currentTimeMillis());
@@ -373,6 +373,7 @@ public class PhotoUploadService extends Service {
 					text = getString(	R.string.notification_uploading_photo_progress, mNumberUploaded + 1,
 										upload.getUploadProgress(), CJayImageDaoImpl.totalNumber + mNumberUploaded);
 					mNotificationBuilder.setContentTitle(text);
+
 					// mNotificationBuilder.setSubText(upload.getImageName());
 					// mNotificationBuilder.setContentText(upload.getImageName());
 					// mNotificationBuilder.setProgress(100, upload.getUploadProgress(), false);
@@ -380,8 +381,10 @@ public class PhotoUploadService extends Service {
 				break;
 		}
 
-		mBigPicStyle.setSummaryText(mNotificationSubtitle);
-		mNotificationMgr.notify(NOTIFICATION_ID, mBigPicStyle.build());
+		// mBigPicStyle.setSummaryText(mNotificationSubtitle);
+		// mNotificationMgr.notify(NOTIFICATION_ID, mBigPicStyle.build());
+
+		mNotificationMgr.notify(NOTIFICATION_ID, mNotificationBuilder.build());
 	}
 
 	private boolean canUpload() {
@@ -447,6 +450,8 @@ public class PhotoUploadService extends Service {
 			if (uploadItem != null) {
 
 				Logger.Log("Begin to upload cjay images.");
+				Logger.Log(uploadItem.getId() + " | " + uploadItem.getImageName());
+				Logger.Log(uploadItem.getUuid() + " | " + uploadItem.getUri());
 				startForeground();
 				startUpload(uploadItem);
 				return true;

@@ -3,8 +3,6 @@ package com.cloudjay.cjay;
 import java.util.List;
 
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.PreferencesUtil;
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;

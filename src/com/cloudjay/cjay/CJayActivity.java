@@ -43,8 +43,6 @@ import com.cloudjay.cjay.util.Utils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.internal.al;
-
 import de.greenrobot.event.EventBus;
 import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
@@ -208,7 +206,8 @@ public class CJayActivity extends SherlockFragmentActivity {
 
 			} else if (this instanceof LoginActivity) {
 
-			} else {
+			} else if (this instanceof GateHomeActivity || this instanceof AuditorHomeActivity
+					|| this instanceof RepairHomeActivity) {
 
 				DataCenter.LoadDataTask = new AsyncTask<Void, Integer, Void>() {
 
@@ -258,28 +257,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 					@Override
 					protected void onPostExecute(Void result) {
 						EventBus.getDefault().post(new PostLoadDataEvent());
-
-						String alert = "";
-						if (DataCenter.addedItems > 0) {
-							alert += "Đã thêm\t\t" + DataCenter.addedItems + " containers";
-						}
-
-						if (DataCenter.updatedItems > 0) {
-							alert += "\nĐã cập nhật\t" + DataCenter.updatedItems + " containers";
-						}
-
-						if (DataCenter.deletedItems > 0) {
-							alert += "\nĐã xóa\t\t" + DataCenter.deletedItems + " containers";
-						}
-
-						if (!TextUtils.isEmpty(alert)) {
-							Toast.makeText(context, alert, Toast.LENGTH_LONG).show();
-							DataCenter.addedItems = 0;
-							DataCenter.updatedItems = 0;
-							DataCenter.deletedItems = 0;
-						} else {
-							Toast.makeText(context, "Đã cập nhật đầy đủ", Toast.LENGTH_LONG).show();
-						}
+						displayRefreshResult();
 					};
 
 					@Override
@@ -312,6 +290,30 @@ public class CJayActivity extends SherlockFragmentActivity {
 		}
 
 		isActivityRunning = true;
+	}
+
+	private void displayRefreshResult() {
+		String alert = "";
+		if (DataCenter.addedItems > 0) {
+			alert += "Đã thêm\t\t" + DataCenter.addedItems + " containers";
+		}
+
+		if (DataCenter.updatedItems > 0) {
+			alert += "\nĐã cập nhật\t" + DataCenter.updatedItems + " containers";
+		}
+
+		if (DataCenter.deletedItems > 0) {
+			alert += "\nĐã xóa\t\t" + DataCenter.deletedItems + " containers";
+		}
+
+		if (!TextUtils.isEmpty(alert)) {
+			Toast.makeText(context, alert, Toast.LENGTH_LONG).show();
+			DataCenter.addedItems = 0;
+			DataCenter.updatedItems = 0;
+			DataCenter.deletedItems = 0;
+		} else {
+			Toast.makeText(context, "Đã cập nhật đầy đủ", Toast.LENGTH_LONG).show();
+		}
 	}
 
 	/**
@@ -536,6 +538,7 @@ public class CJayActivity extends SherlockFragmentActivity {
 			@Override
 			protected void onPostExecute(Void result) {
 				EventBus.getDefault().post(new PostLoadDataEvent());
+				displayRefreshResult();
 			};
 
 			@Override

@@ -1,6 +1,8 @@
 package com.cloudjay.cjay;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
@@ -37,15 +39,10 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 	public static final int TAB_EXPORT = 1;
 	public static final int TAB_UPLOAD = 2;
 
-	// private static final String FRAG_IMPORT = "fragment_import";
-	// private static final String FRAG_EXPORT = "fragment_export";
-
 	private String[] locations;
 	private ViewPagerAdapter mPagerAdapter;
 	PullToRefreshAttacher mPullToRefreshAttacher;
-
-	// private Fragment mExportFragment;
-	// private Fragment mImportFragment;
+	private int currentPosition = 0;
 
 	@ViewById
 	ViewPager pager;
@@ -76,25 +73,43 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 		}
 	}
 
+	List<Fragment> fragments;
+
 	private void configureViewPager() {
 
-		mPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), locations) {
+		fragments = new ArrayList<Fragment>() {
+			private static final long serialVersionUID = 5756183191569788212L;
+
+			{
+				add(new GateImportListFragment_());
+				add(new GateExportListFragment_());
+				add(new UploadsFragment_());
+			}
+		};
+
+		mPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), locations, fragments) {
 
 			@Override
 			public Fragment getItem(int position) {
 
-				switch (position) {
-					case 0:
-						Fragment importFeedFragment = new GateImportListFragment_();
-						return importFeedFragment;
-					case 1:
-						Fragment exportFeedFragment = new GateExportListFragment_();
-						return exportFeedFragment;
-					case 2:
-					default:
-						Fragment uploadFragment = new UploadsFragment_();
-						return uploadFragment;
-				}
+				// switch (position) {
+				// case 0:
+				//
+				// // Fragment importFeedFragment = new GateImportListFragment_();
+				// // return importFeedFragment;
+				// case 1:
+				//
+				// // Fragment exportFeedFragment = new GateExportListFragment_();
+				// // return exportFeedFragment;
+				//
+				// case 2:
+				// default:
+				//
+				// // Fragment uploadFragment = new UploadsFragment_();
+				// // return uploadFragment;
+				// }
+
+				return getFragments().get(position);
 
 			}
 		};
@@ -123,15 +138,6 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
-		// if (savedInstanceState != null) {
-		// //Restore the fragment's instance
-		// if (savedInstanceState.containsKey(FRAG_IMPORT)) {
-		// mImportFragment = getSupportFragmentManager().getFragment(savedInstanceState, FRAG_IMPORT);
-		// } else {
-		// mExportFragment = getSupportFragmentManager().getFragment(savedInstanceState, FRAG_EXPORT);
-		// }
-		// }
-
 		// Below code to show `More Action` item on menu
 		try {
 			ViewConfiguration config = ViewConfiguration.get(this);
@@ -151,13 +157,6 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 		super.onCreate(savedInstanceState);
 
 	}
-
-	// @Override
-	// protected void onSaveInstanceState(Bundle outState) {
-	// super.onSaveInstanceState(outState);
-	//
-	// //Save the fragment's instance
-	// }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -193,8 +192,10 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 
 	@Override
 	public void onPageSelected(int position) {
+
 		Tab tab = getSupportActionBar().getTabAt(position);
 		getSupportActionBar().selectTab(tab);
+
 	}
 
 	@Override
@@ -204,8 +205,26 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 
 	@Override
 	public void onTabSelected(Tab tab, FragmentTransaction ft) {
+
 		int position = tab.getPosition();
 		pager.setCurrentItem(position);
+		currentPosition = position;
+	}
+
+	@Override
+	public void onBackPressed() {
+
+		if (currentPosition == 1) {
+
+			GateExportListFragment_ fragment = (GateExportListFragment_) mPagerAdapter.getItem(currentPosition);
+			if (fragment.isSearching()) {
+				fragment.clearSearchEditText();
+				return;
+			}
+
+		}
+
+		super.onBackPressed();
 	}
 
 	@Override

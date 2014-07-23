@@ -70,7 +70,6 @@ import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadType;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
-
 import de.greenrobot.event.EventBus;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
@@ -252,6 +251,18 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 		mFeedListView.setEmptyView(mEmptyElement);
 		mFeedListView.setLongClickable(true);
+	}
+
+	public boolean isSearching() {
+		if (mSearchEditText != null) {
+			Logger.Log("Halo");
+			return mSearchEditText.getText().length() > 0;
+		}
+		return false;
+	}
+
+	public void clearSearchEditText() {
+		mSearchEditText.setText("");
 	}
 
 	void hideMenuItems() {

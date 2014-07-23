@@ -603,7 +603,9 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 					if (uploadState != CJayImage.STATE_UPLOAD_COMPLETED) {
 
 						String key = cJayImage.getUuid();
-						Logger.Log(cJayImage.getImageName() + " | " + UploadState.values()[uploadState]);
+
+						// TODO
+						// Logger.Log(cJayImage.getImageName() + " | " + UploadState.values()[uploadState]);
 
 						// Check if this image is uploaded or not
 						if (uploadState == CJayImage.STATE_NONE && cJayImage.getUri().startsWith("http")) {
@@ -626,7 +628,9 @@ public class ContainerSessionDaoImpl extends BaseDaoImpl<ContainerSession, Strin
 							count++;
 							retryCountHashMap.put(key, count);
 
-							Logger.Log(containerSession.getContainerId() + " | Retry count: " + Integer.toString(count));
+							// TODO
+							// Logger.Log(containerSession.getContainerId() + " | Retry count: " +
+							// Integer.toString(count));
 
 							// Retry to upload cjay image if retry count is greater than THRESHOLD and
 							// PhotoQueue is not running

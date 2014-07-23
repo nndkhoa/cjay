@@ -1,5 +1,8 @@
 package com.cloudjay.cjay.view;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -7,7 +10,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.InputType;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -77,6 +82,7 @@ public class AddContainerDialog extends SherlockDialogFragment {
 
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
 				if (s.length() < 4) {
 					if (mContainerEditText.getInputType() != InputType.TYPE_CLASS_TEXT) {
 						mContainerEditText.setInputType(InputType.TYPE_CLASS_TEXT
@@ -93,16 +99,29 @@ public class AddContainerDialog extends SherlockDialogFragment {
 
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-				// TODO Auto-generated method stub
-
+				// Pattern pattern = Pattern.compile("^[a-zA-Z\\d]+$");
+				// Matcher matcher = pattern.matcher(s);
+				// if (!matcher.matches()) return false;
+				// return true;
 			}
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				// TODO Auto-generated method stub
 
 			}
 		});
+
+		InputFilter filter = new InputFilter() {
+			@Override
+			public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+				for (int i = start; i < end; i++) {
+					if (!Character.isLetterOrDigit(source.charAt(i))) { return ""; }
+				}
+				return null;
+			}
+		};
+
+		mContainerEditText.setFilters(new InputFilter[] { filter });
 
 		mOperatorEditText.setOnFocusChangeListener(new OnFocusChangeListener() {
 			@Override

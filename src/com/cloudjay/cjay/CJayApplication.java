@@ -1,6 +1,5 @@
 package com.cloudjay.cjay;
 
-import java.io.File;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,7 +17,6 @@ import android.content.Intent;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -66,7 +64,7 @@ public class CJayApplication extends Application {
 	public void onCreate() {
 		Logger.Log("Start Application");
 
-		boolean defaultDebugVal = true;
+		boolean defaultDebugVal = false;
 		boolean defaultUpdateVal = true;
 		boolean defaultBetaApiVal = false;
 		boolean defaultEnableUserLog = false;
@@ -75,6 +73,7 @@ public class CJayApplication extends Application {
 		boolean debuggable = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
 												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox),
 															defaultDebugVal);
+
 		Logger.getInstance().setDebuggable(debuggable);
 
 		if (Logger.isDebuggable()) {

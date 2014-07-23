@@ -4,8 +4,6 @@ package com.cloudjay.cjay.util;
  * Created by Tieu Bao on 9/30/13.
  */
 
-import com.cloudjay.cjay.R;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
