@@ -24,9 +24,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +34,7 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Filter.FilterListener;
 import android.widget.FilterQueryProvider;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -70,7 +69,9 @@ import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.UploadType;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
+
 import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
@@ -155,11 +156,14 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 					}
 				}.execute();
 
-				Cursor cursor = DataCenter.getInstance().getValidCheckOutContainerCursor(getContext());
-
-				if (cursor != null) {
-					cursor.getCount(); // Ensure the cursor window is filled
-				}
+				// Set cursor to NULL for now, to prevent the list from being populated
+				// The list should only populate when user starts searching
+				Cursor cursor = null; 
+				
+//				Cursor cursor = DataCenter.getInstance().getValidCheckOutContainerCursor(getContext());
+//				if (cursor != null) {
+//					cursor.getCount(); // Ensure the cursor window is filled
+//				}
 
 				return cursor;
 			}
@@ -168,19 +172,22 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
-
 		if (cursorAdapter == null) {
-
 			cursorAdapter = new GateExportContainerCursorAdapter(getActivity(), mItemLayout, cursor, 0);
 			cursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
 
 				@Override
-				public Cursor runQuery(CharSequence constraint) {
-
-					if (TextUtils.isEmpty(constraint)) { return DataCenter.getInstance()
-																			.getValidCheckOutContainerCursor(	getActivity()); }
-
-					return DataCenter.getInstance().filterCheckoutCursor(getActivity(), constraint);
+				public Cursor runQuery(CharSequence constraint) { 
+					Cursor cursor;
+					if (TextUtils.isEmpty(constraint)) { 
+						cursor = DataCenter.getInstance().getValidCheckOutContainerCursor(getActivity()); 
+					} else {
+						cursor = DataCenter.getInstance().filterCheckoutCursor(getActivity(), constraint);
+					}
+					if (cursor != null) {
+						cursor.getCount();  // Ensure the cursor window is filled
+					}
+					return cursor;
 				}
 			});
 
@@ -194,28 +201,13 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	@AfterViews
 	void afterViews() {
 
-		mSearchEditText.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void afterTextChanged(Editable arg0) {
-				if (cursorAdapter != null) {
-					cursorAdapter.getFilter().filter(arg0.toString());
-				}
-			}
-
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-			}
-		});
-
 		mSearchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
 
 				if (id == EditorInfo.IME_ACTION_SEARCH) {
+					filter(textView.getText());
+					// Hide keyboard
 					inputMethodManager.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
 					return true;
 				}
@@ -540,6 +532,7 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 		if (cursorAdapter != null) {
 			refresh();
+			filter(mSearchEditText.getText());
 		}
 
 		if (!DataCenter.getInstance().isUpdating(getActivity())) {
@@ -565,10 +558,8 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	}
 
 	void refreshTotalCount() {
-
 		// Reresh the total number of export containers.
 		// The query takes a while to run, hence run in background
-
 		Cursor totalCursor = DataCenter.getInstance().getCheckOutContainerSessionCursor(getActivity());
 		setTotalItems(totalCursor.getCount());
 		totalCursor.close();
@@ -578,5 +569,26 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 	void setTotalItems(int val) {
 		totalItems = val;
 		EventBus.getDefault().post(new ListItemChangedEvent(1, totalItems));
+	}
+	
+	void filter(CharSequence text) {
+		// Show search notification
+		final Crouton searchCrouton = Crouton
+				.makeText(getActivity(), R.string.search_executing, Style.INFO)
+			    .setConfiguration(new Configuration.Builder().setDuration(Configuration.DURATION_INFINITE).build());
+		if (searchCrouton != null) { searchCrouton.show(); }
+		// Execute search
+		if (cursorAdapter != null) {
+			cursorAdapter.getFilter().filter(text, new FilterListener() {
+				@Override
+				public void onFilterComplete(int count) {
+					// Hide search notification
+					Crouton.cancelAllCroutons();
+					Crouton resultCrouton = Crouton
+							.makeText(getActivity(), getResources().getString(R.string.search_result) + " " + count, Style.INFO);
+					if (resultCrouton != null) { resultCrouton.show(); }
+				}
+			});
+		}
 	}
 }

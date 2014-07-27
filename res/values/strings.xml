@@ -71,5 +71,9 @@
 
     <!--  -->
     <string name="force_export">Xuất theo chỉ định</string>
+    
+    <!--  -->
+    <string name="search_executing">Đang tìm kiếm…</string>
+    <string name="search_result">Container tìm thấy: </string>
 
 </resources>

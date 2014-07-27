@@ -493,12 +493,29 @@ public class Utils {
 				break;
 
 			case CJayImage.TYPE_EXPORT:
-				cursor = db.rawQuery(	"SELECT * FROM cs_full_info_export_validation_view WHERE _id = ? ORDER BY check_in_time DESC",
+				// The two queries below are from 'cs_full_info_export_validation_view'
+				// We execute two separate query to speed up performance
+				
+				// Count containers valid for export
+				cursor = db.rawQuery(	"SELECT COUNT(_id) AS container_count FROM cs_full_info_view WHERE _id = ? "
+												+ " AND check_out_time = ''"
+												+ " AND ((export = 1) OR (on_local = 0))", 
 										new String[] { uuid });
-
 				if (cursor.moveToFirst()) {
-					if (cursor.getColumnIndex("export_image_count") >= 0) {
-						isValidForUpload = cursor.getInt(cursor.getColumnIndexOrThrow("export_image_count")) > 0;
+					if (cursor.getColumnIndex("container_count") >= 0) {
+						if (cursor.getInt(cursor.getColumnIndexOrThrow("container_count")) == 0) {
+							isValidForUpload = false;
+							break;
+						}
+					}
+				}
+				
+				// Has valid container. Count the number of export image of this container
+				cursor = db.rawQuery(	"SELECT COUNT(_id) AS image_count FROM cjay_image WHERE containerSession_id = ? AND type = 1 ",
+										new String[] { uuid });
+				if (cursor.moveToFirst()) {
+					if (cursor.getColumnIndex("image_count") >= 0) {
+						isValidForUpload = cursor.getInt(cursor.getColumnIndexOrThrow("image_count")) > 0;
 					}
 				}
 
