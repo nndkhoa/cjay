@@ -157,8 +157,10 @@ public class CJayApplication extends Application {
 			Utils.startAlarm(mContext);
 
 		} else {
+
 			Logger.Log("Alarm is already running "
 					+ StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+
 		}
 
 		// Utils.cancelThenStartAlarm(mContext);
@@ -418,6 +420,7 @@ public class CJayApplication extends Application {
 		final PackageManager pkgMgr = getPackageManager();
 
 		switch (pkgMgr.getComponentEnabledSetting(component)) {
+
 			case PackageManager.COMPONENT_ENABLED_STATE_DISABLED:
 				pkgMgr.setComponentEnabledSetting(	component, PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
 													PackageManager.DONT_KILL_APP);

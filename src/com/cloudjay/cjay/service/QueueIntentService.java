@@ -17,23 +17,10 @@ public class QueueIntentService extends IntentService {
 	}
 
 	@Override
-	public void onCreate() {
-		super.onCreate();
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-	}
-
-	@Override
 	protected void onHandleIntent(Intent intent) {
 
 		if (!Utils.isRunning(this, ContainerUploadIntentService_.class.getName())
 				&& NetworkHelper.isConnected(getApplicationContext())) {
-
-			// Logger.Log("Start ContainerUploadIntentService at "
-			// + StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 
 			Intent uploadIntent = new Intent(this, ContainerUploadIntentService_.class);
 			startService(uploadIntent);
@@ -43,18 +30,15 @@ public class QueueIntentService extends IntentService {
 		}
 
 		if (!Utils.isRunning(this, PhotoUploadService_.class.getName())) {
-
-			// Logger.Log("Start PhotoUploadService at "
-			// + StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
-
-			startService(Utils.getUploadAllIntent(this));
-
+			startService(Utils.getUploadPhotoIntent(this));
 		} else {
 
 			if (PhotoUploadService_.isCurrentlyUploading() == false) {
+
 				Logger.w("Force stop PhotoUploadService");
-				stopService(Utils.getUploadAllIntent(this));
-				startService(Utils.getUploadAllIntent(this));
+				stopService(Utils.getUploadPhotoIntent(this));
+				startService(Utils.getUploadPhotoIntent(this));
+
 			}
 		}
 	}

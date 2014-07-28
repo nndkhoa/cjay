@@ -278,12 +278,13 @@ public class DataCenter {
 	}
 
 	public Cursor filterCheckoutCursor(Context context, CharSequence constraint) {
-//		String queryString = "SELECT * FROM cs_full_info_export_validation_view"
-//				+ " WHERE container_id LIKE ? ORDER BY container_id LIMIT 20";
+		// String queryString = "SELECT * FROM cs_full_info_export_validation_view"
+		// + " WHERE container_id LIKE ? ORDER BY container_id LIMIT 20";
+
 		String queryString = "SELECT * FROM  cs_full_info_view cs"
 				+ " WHERE (cs.check_out_time = '' OR cs.check_out_time ISNULL) AND ((cs.export = 1) OR (cs.on_local = 0))"
-				+ " AND container_id LIKE ? "
-				+ " ORDER BY container_id LIMIT 20";		
+				+ " AND container_id LIKE ? " + " ORDER BY container_id LIMIT 50";
+
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
 																			new String[] { "%" + constraint + "%" });
 	}
@@ -310,8 +311,10 @@ public class DataCenter {
 	}
 
 	public Cursor filterLocalCursor(Context context, CharSequence constraint) {
+
 		String queryString = "SELECT * FROM cs_import_validation_view"
 				+ " WHERE container_id LIKE ? ORDER BY container_id LIMIT 20";
+
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
 																			new String[] { "%" + constraint + "%" });
 	}
@@ -335,6 +338,7 @@ public class DataCenter {
 	public Cursor filterRepairCodeCursor(Context context, CharSequence constraint) {
 		String queryString = "SELECT id as _id, code, display_name FROM repair_code"
 				+ " WHERE code LIKE ? ORDER BY _id LIMIT 20";
+
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
 																			new String[] { "%" + constraint + "%" });
 	}
@@ -345,6 +349,7 @@ public class DataCenter {
 				+ " FROM cjay_image JOIN container_session ON cjay_image.containerSession_id = container_session._id"
 				+ " WHERE cjay_image.type = 2) AND cs.container_id LIKE ?"
 				+ " ORDER BY cs.container_id, check_in_time DESC LIMIT 20";
+
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString,
 																			new String[] { "%" + constraint + "%" });
 	}
@@ -561,7 +566,8 @@ public class DataCenter {
 	}
 
 	public Cursor getValidCheckOutContainerCursor(Context context) {
-//		String queryString = "SELECT * FROM cs_full_info_export_validation_view WHERE export_image_count > 0 ORDER BY check_in_time DESC";
+		// String queryString =
+		// "SELECT * FROM cs_full_info_export_validation_view WHERE export_image_count > 0 ORDER BY check_in_time DESC";
 		String queryString = "SELECT * FROM  cs_full_info_view cs"
 				+ " WHERE (cs.check_out_time = '' OR cs.check_out_time ISNULL) AND ((cs.export = 1) OR (cs.on_local = 0))"
 				+ " ORDER BY check_in_time DESC";
@@ -570,7 +576,7 @@ public class DataCenter {
 
 	public Cursor getCheckOutContainerSessionCursor(Context context) {
 		// String queryString = "SELECT * FROM cs_export_validation_view ORDER BY check_in_time DESC";
-//		String queryString = "SELECT * FROM cs_full_info_export_validation_view ORDER BY check_in_time DESC";	
+		// String queryString = "SELECT * FROM cs_full_info_export_validation_view ORDER BY check_in_time DESC";
 		String queryString = "SELECT * FROM  cs_full_info_view cs"
 				+ " WHERE (cs.check_out_time = '' OR cs.check_out_time ISNULL) AND ((cs.export = 1) OR (cs.on_local = 0))";
 		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String[] {});
