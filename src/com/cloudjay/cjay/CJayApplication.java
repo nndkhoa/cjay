@@ -64,9 +64,9 @@ public class CJayApplication extends Application {
 	public void onCreate() {
 		Logger.Log("Start Application");
 
-		boolean defaultDebugVal = false;
+		boolean defaultDebugVal = true;
 		boolean defaultUpdateVal = true;
-		boolean defaultBetaApiVal = false;
+		boolean defaultBetaApiVal = true;
 		boolean defaultEnableUserLog = false;
 
 		// Configure Logger

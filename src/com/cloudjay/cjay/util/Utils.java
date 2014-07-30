@@ -498,7 +498,9 @@ public class Utils {
 
 				// Count containers valid for export
 				cursor = db.rawQuery("SELECT COUNT(_id) AS container_count FROM cs_full_info_view WHERE _id = ? "
-						+ " AND check_out_time = ''" + " AND ((export = 1) OR (on_local = 0))", new String[] { uuid });
+						+ " AND (check_out_time = '' OR check_out_time ISNULL)"
+						+ " AND ((export = 1) OR (on_local = 0))", new String[] { uuid });
+
 				if (cursor.moveToFirst()) {
 					if (cursor.getColumnIndex("container_count") >= 0) {
 						if (cursor.getInt(cursor.getColumnIndexOrThrow("container_count")) == 0) {
