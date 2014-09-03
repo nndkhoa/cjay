@@ -2,6 +2,8 @@ package com.cloudjay.cjay.fragment;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
@@ -24,7 +26,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,7 +86,6 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 	public final static String LOG_TAG = "GateExportListFragment";
 	private final static int LOADER_ID = CJayConstant.CURSOR_LOADER_ID_GATE_EXPORT;
-
 	private ArrayList<Operator> mOperators;
 
 	String mSelectedUuid = "";
@@ -90,6 +94,8 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 
 	private final int mItemLayout = R.layout.list_item_container;
 	private int mCurrentPosition = -1;
+
+	Pattern pattern = Pattern.compile("^[a-zA-Z]{4}");
 
 	@SystemService
 	InputMethodManager inputMethodManager;
@@ -223,6 +229,42 @@ public class GateExportListFragment extends SherlockFragment implements OnRefres
 				}
 
 				return false;
+			}
+		});
+
+		mSearchEditText.addTextChangedListener(new TextWatcher() {
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+				Matcher matcher = pattern.matcher(s);
+				if (s.length() < 4) {
+
+					if (mSearchEditText.getInputType() != InputType.TYPE_CLASS_TEXT) {
+						mSearchEditText.setInputType(InputType.TYPE_CLASS_TEXT
+								| InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+					}
+
+				} else if (matcher.matches()) {
+
+					if (mSearchEditText.getInputType() != InputType.TYPE_CLASS_NUMBER) {
+						mSearchEditText.setInputType(InputType.TYPE_CLASS_NUMBER
+								| InputType.TYPE_NUMBER_VARIATION_NORMAL);
+					}
+				}
+
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				// TODO Auto-generated method stub
+
 			}
 		});
 

@@ -66,6 +66,7 @@ public class PhotoViewPagerActivity extends CJayActivity implements LoaderCallba
 	
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+		
 		return new CJayCustomCursorLoader(this) {
 			@Override
 			public Cursor loadInBackground() {

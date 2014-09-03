@@ -1,5 +1,8 @@
 package com.cloudjay.cjay.view;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -43,6 +46,8 @@ public class AddContainerDialog extends SherlockDialogFragment {
 
 	public final static int CONTAINER_DIALOG_ADD = 0;
 	public final static int CONTAINER_DIALOG_EDIT = 1;
+	
+	Pattern pattern = Pattern.compile("^[a-zA-Z]{4}");
 
 	private String mContainerId;
 	private String mOperatorName;
@@ -80,13 +85,15 @@ public class AddContainerDialog extends SherlockDialogFragment {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 
+				Matcher matcher = pattern.matcher(s);
 				if (s.length() < 4) {
 					if (mContainerEditText.getInputType() != InputType.TYPE_CLASS_TEXT) {
 						mContainerEditText.setInputType(InputType.TYPE_CLASS_TEXT
 								| InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
 					}
 
-				} else {
+				} else if (matcher.matches()) {
+
 					if (mContainerEditText.getInputType() != InputType.TYPE_CLASS_NUMBER) {
 						mContainerEditText.setInputType(InputType.TYPE_CLASS_NUMBER
 								| InputType.TYPE_NUMBER_VARIATION_NORMAL);
@@ -96,10 +103,7 @@ public class AddContainerDialog extends SherlockDialogFragment {
 
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-				// Pattern pattern = Pattern.compile("^[a-zA-Z\\d]+$");
-				// Matcher matcher = pattern.matcher(s);
-				// if (!matcher.matches()) return false;
-				// return true;
+				
 			}
 
 			@Override
