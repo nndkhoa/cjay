@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_edit_container"
+        android:icon="@drawable/icon_menu_edit"
+        android:showAsAction="always"
+        android:title="@string/menu_edit_container_title"/>
+    
+    <item
+        android:id="@+id/menu_import"
+        android:icon="@drawable/ic_action_accept"
+        android:showAsAction="always"
+        android:title="@string/menu_import_title"/>
+    
+    <item
+        android:id="@+id/menu_trash"
+        android:icon="@drawable/ic_action_upload"
+        android:showAsAction="never"
+        android:title="@string/menu_trash_title"/>
+
+</menu>

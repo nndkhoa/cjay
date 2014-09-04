@@ -251,13 +251,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		@Override
 		public void apply(SQLiteDatabase db, ConnectionSource connectionSource) {
 
-			// try {
-			// Logger.Log("add column `is_temp` in table `container_session`");
-			// db.execSQL("ALTER TABLE container_session ADD COLUMN is_temp INTEGER DEFAULT 0");
-			// } catch (Exception e) {
-			// Logger.w("Column `is_temp` is already existed.");
-			// }
-
 			Logger.Log("add is_available to csview");
 			try {
 				db.execSQL("DROP VIEW csview");
@@ -343,6 +336,21 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			sql = "CREATE VIEW issue_item_view AS" + " SELECT cj.containerSession_id, cj.uuid, cj._id, cj.type, i.*"
 					+ " from cjay_image as cj LEFT JOIN issue_info_view as i on cj.issue_id = i.issue_id";
 			db.execSQL(sql);
+		}
+
+		@Override
+		public void revert(SQLiteDatabase db, ConnectionSource connectionSource) {
+		}
+	}, new Patch() {
+			// version = 7
+		@Override
+		public void apply(SQLiteDatabase db, ConnectionSource connectionSource) {
+			try {
+				Logger.Log("add column `is_temp` in table `container_session`");
+				db.execSQL("ALTER TABLE container_session ADD COLUMN is_temp INTEGER DEFAULT 0");
+			} catch (Exception e) {
+				Logger.w("Column `is_temp` is already existed.");
+			}
 		}
 
 		@Override

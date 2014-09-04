@@ -17,6 +17,18 @@
         android:key="@string/pref_key_enable_user_log_checkbox"
         android:summary="@string/pref_description_enable_user_log"
         android:title="@string/pref_title_enable_user_log" />
+    
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="@string/pref_key_enable_temporary_fragment_checkbox"
+        android:summary="@string/pref_description_rainy_mode"
+        android:title="@string/pref_title_rainy_mode" />
+    
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/pref_key_enable_multiple_roles_checkbox"
+        android:summary="@string/pref_description_multiple_roles"
+        android:title="@string/pref_title_multiple_roles" />
 
     <Preference
         android:key="secret_log"

@@ -107,9 +107,10 @@ public class Mapper {
 		}
 		cursor.close();
 
+		// TODO: 
 		// Create `container session` object
 		String uuid = UUID.randomUUID().toString();
-		sqlStrings.add(String.format(	"insert or replace into container_session values (%s, %s, %s, %s, %s, %s, 0, 0, 0, 0, 0, %s, 0, 0, 0)",
+		sqlStrings.add(String.format(	"insert or replace into container_session values (%s, %s, %s, %s, %s, %s, 0, 0, 0, 0, 0, 0, %s, 0, 0, 0)",
 										Utils.sqlString(tmpSession.getCheckInTime()),
 										Utils.sqlString(tmpSession.getCheckOutTime()), Utils.sqlString(uuid),
 										containerId, Utils.sqlString(tmpSession.getImageIdPath()), tmpSession.getId(),

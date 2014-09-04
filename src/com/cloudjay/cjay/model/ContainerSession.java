@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 import android.content.Context;
+import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.dao.ContainerDaoImpl;
@@ -27,17 +28,6 @@ import com.j256.ormlite.table.DatabaseTable;
 
 import de.greenrobot.event.EventBus;
 
-/**
- * { "container_id": "abcdef12313", "image_id_path": "abcdef12313.jpg",
- * "operator_code": "BS", "check_in_time": "2013-12-20T20:14:47",
- * "check_out_time": null, "gate_report_images": [ { "type": 0, "image_name":
- * "asd" }, { "type": 0, "image_name": "asd21" }, { "type": 1, "image_name":
- * "1233313" } ] }
- * 
- * @author tieubao
- * 
- */
-
 @DatabaseTable(tableName = "container_session", daoClass = ContainerSessionDaoImpl.class)
 public class ContainerSession {
 
@@ -56,18 +46,18 @@ public class ContainerSession {
 
 	// Only use is_available when post tmpContainer
 	public static final String FIELD_AV = "is_available";
+	public static final String FIELD_IS_TEMP = "is_temp";
 
-	// public static final String FIELD_IS_TEMP = "is_temp";
-	// @DatabaseField(columnName = FIELD_IS_TEMP, defaultValue = "0")
-	// private boolean is_temp;
-	//
-	// public boolean isTemporary() {
-	// return is_temp;
-	// }
-	//
-	// public void setTemporary(boolean is_temp) {
-	// this.is_temp = is_temp;
-	// }
+	@DatabaseField(columnName = FIELD_IS_TEMP, defaultValue = "0")
+	private boolean is_temp;
+
+	public boolean isTemporary() {
+		return is_temp;
+	}
+
+	public void setTemporary(boolean is_temp) {
+		this.is_temp = is_temp;
+	}
 
 	public static final String FIELD_CHECK_OUT_TIME = "check_out_time";
 	public static final String FIELD_CHECK_IN_TIME = "check_in_time";
@@ -190,7 +180,6 @@ public class ContainerSession {
 				containerDaoImpl.addContainer(container);
 			} else {
 				Logger.Log("Container " + containerId + " is already existed.");
-
 			}
 
 			// Create `container session` object
@@ -206,6 +195,15 @@ public class ContainerSession {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public ContainerSession(Context ctx, String checkInTime) {
+		
+		// Create `container session` object
+		// UUID is primary key
+		String uuid = UUID.randomUUID().toString();
+		setCheckInTime(checkInTime);
+		setUuid(uuid);
 	}
 
 	public String getCheckInTime() {

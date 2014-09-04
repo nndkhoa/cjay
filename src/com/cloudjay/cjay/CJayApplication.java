@@ -57,6 +57,7 @@ import de.greenrobot.event.EventBus;
 				formUri = CJayConstant.ACRA,
 				mode = ReportingInteractionMode.TOAST,
 				resToastText = R.string.crash_toast_text)
+
 @EApplication
 public class CJayApplication extends Application {
 
@@ -65,7 +66,7 @@ public class CJayApplication extends Application {
 		Logger.Log("Start Application");
 
 		boolean defaultDebugVal = true;
-		boolean defaultUpdateVal = true;
+		boolean defaultUpdateVal = true; 
 		boolean defaultBetaApiVal = false;
 		boolean defaultEnableUserLog = false;
 
@@ -73,11 +74,11 @@ public class CJayApplication extends Application {
 		boolean debuggable = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
 												.getBoolean(getString(R.string.pref_key_enable_logger_checkbox),
 															defaultDebugVal);
-
+		
 		Logger.getInstance().setDebuggable(debuggable);
 
 		if (Logger.isDebuggable()) {
-
+			
 			// StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
 			// StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
 			// .detectLeakedClosableObjects().penaltyLog()

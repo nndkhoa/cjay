@@ -46,7 +46,7 @@ public class AddContainerDialog extends SherlockDialogFragment {
 
 	public final static int CONTAINER_DIALOG_ADD = 0;
 	public final static int CONTAINER_DIALOG_EDIT = 1;
-	
+
 	Pattern pattern = Pattern.compile("^[a-zA-Z]{4}");
 
 	private String mContainerId;
@@ -103,7 +103,7 @@ public class AddContainerDialog extends SherlockDialogFragment {
 
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-				
+
 			}
 
 			@Override

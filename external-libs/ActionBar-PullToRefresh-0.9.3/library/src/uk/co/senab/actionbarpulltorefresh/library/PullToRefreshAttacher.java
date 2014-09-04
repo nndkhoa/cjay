@@ -590,6 +590,7 @@ public class PullToRefreshAttacher {
     }
 
     protected void addHeaderViewToActivity(View headerView) {
+    	
         // Get the Display Rect of the Decor View
         mActivity.getWindow().getDecorView().getWindowVisibleDisplayFrame(mRect);
 
@@ -597,6 +598,7 @@ public class PullToRefreshAttacher {
         int width = WindowManager.LayoutParams.MATCH_PARENT;
         int height = WindowManager.LayoutParams.WRAP_CONTENT;
         ViewGroup.LayoutParams requestedLp = headerView.getLayoutParams();
+        
         if (requestedLp != null) {
             width = requestedLp.width;
             height = requestedLp.height;
@@ -607,6 +609,7 @@ public class PullToRefreshAttacher {
                 WindowManager.LayoutParams.TYPE_APPLICATION_PANEL,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 PixelFormat.TRANSLUCENT);
+        
         wlp.x = 0;
         wlp.y = mRect.top;
         wlp.gravity = Gravity.TOP;

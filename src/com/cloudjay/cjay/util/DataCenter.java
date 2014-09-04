@@ -361,6 +361,11 @@ public class DataCenter {
 																			new String[] { "%" + constraint + "%",
 																					"%" + constraint + "%" });
 	}
+	
+	public Cursor getTemporaryContainerCursor(Context context) {
+		String queryString = "SELECT * FROM csview WHERE is_temp = 1";
+		return getDatabaseManager().getReadableDatabase(context).rawQuery(queryString, new String [] {});
+	}
 
 	public Cursor getAllContainersCursor(Context context) {
 		try {

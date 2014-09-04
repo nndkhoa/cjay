@@ -26,12 +26,17 @@ public class SettingsActivity extends PreferenceActivity {
 		PREF_KEY_AUTO_CHECK_UPDATE = getString(R.string.pref_key_auto_check_update_checkbox);
 		PREF_KEY_ENABLE_LOGGER = getString(R.string.pref_key_enable_logger_checkbox);
 		PREF_KEY_ENABLE_USER_LOG = getString(R.string.pref_key_enable_user_log_checkbox);
+		PREF_KEY_RAINY_MODE = getString(R.string.pref_key_enable_temporary_fragment_checkbox);
+		PREF_KEY_MULTIPLE_ROLES = getString(R.string.pref_key_enable_multiple_roles_checkbox);
+		
 	}
 	private static final boolean ALWAYS_SIMPLE_PREFS = false;
 
 	static String PREF_KEY_AUTO_CHECK_UPDATE;
 	static String PREF_KEY_ENABLE_LOGGER;
 	static String PREF_KEY_ENABLE_USER_LOG;
+	static String PREF_KEY_RAINY_MODE;
+	static String PREF_KEY_MULTIPLE_ROLES;
 
 	private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
 
@@ -44,7 +49,6 @@ public class SettingsActivity extends PreferenceActivity {
 
 			} else if (key.equals(PREF_KEY_ENABLE_USER_LOG)) {
 				Logger.getInstance().setUserActivitiesLoggable((Boolean) value);
-
 			}
 			
 			return true;
@@ -123,7 +127,10 @@ public class SettingsActivity extends PreferenceActivity {
 		bindPreferenceSummaryToValue(findPreference(PREF_KEY_AUTO_CHECK_UPDATE));
 		bindPreferenceSummaryToValue(findPreference(PREF_KEY_ENABLE_LOGGER));
 		bindPreferenceSummaryToValue(findPreference(PREF_KEY_ENABLE_USER_LOG));
+		bindPreferenceSummaryToValue(findPreference(PREF_KEY_RAINY_MODE));
+		bindPreferenceSummaryToValue(findPreference(PREF_KEY_MULTIPLE_ROLES));
 		Preference findPreference = findPreference("secret_log");
+		
 
 		findPreference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 

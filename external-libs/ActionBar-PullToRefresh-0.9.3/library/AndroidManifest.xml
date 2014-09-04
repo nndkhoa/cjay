@@ -3,7 +3,7 @@
     package="uk.co.senab.actionbarpulltorefresh.library" >
 
     <uses-sdk
-        android:minSdkVersion="11"
+        android:minSdkVersion="14"
         android:targetSdkVersion="15" />
 
     <application />

@@ -10,11 +10,13 @@ import org.androidannotations.annotations.ViewById;
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.ViewConfiguration;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -23,8 +25,12 @@ import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.view.Menu;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.events.ListItemChangedEvent;
-import com.cloudjay.cjay.fragment.*;
+import com.cloudjay.cjay.fragment.GateExportListFragment_;
+import com.cloudjay.cjay.fragment.GateImportListFragment_;
+import com.cloudjay.cjay.fragment.TemporaryContainerFragment_;
+import com.cloudjay.cjay.fragment.UploadsFragment_;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.AddContainerDialog;
 import com.cloudjay.cjay.view.SearchOperatorDialog;
@@ -38,27 +44,40 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 	public static final int TAB_IMPORT = 0;
 	public static final int TAB_EXPORT = 1;
 	public static final int TAB_UPLOAD = 2;
+	public static final int TAB_TEMP = 3;
 
-	private String[] locations;
+	List<String> locations;
 	private ViewPagerAdapter mPagerAdapter;
 	PullToRefreshAttacher mPullToRefreshAttacher;
 	private int currentPosition = 0;
+	boolean rainyMode = false;
 
 	@ViewById
 	ViewPager pager;
 
 	@AfterViews
 	void afterViews() {
+		locations = new ArrayList<String>();
 
-		locations = getResources().getStringArray(R.array.gate_home_tabs);
-		configureViewPager();
+		String[] tmp = getResources().getStringArray(R.array.gate_home_tabs);
+		for (String string : tmp) {
+			locations.add(string);
+		}
+
 		configureActionBar();
+		configureViewPager();
 
 	}
 
 	public void configureActionBar() {
 
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+		Logger.e("Rainy Mode " + rainyMode);
+		if (rainyMode) {
+			locations.add("Tạm");
+		}
+
 		for (String location : locations) {
 			Tab tab = getSupportActionBar().newTab();
 			tab.setText(location);
@@ -78,14 +97,20 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 	private void configureViewPager() {
 
 		fragments = new ArrayList<Fragment>() {
-			private static final long serialVersionUID = 5756183191569788212L;
-
-			{
-				add(new GateImportListFragment_());
-				add(new GateExportListFragment_());
-				add(new UploadsFragment_());
-			}
+			private static final long serialVersionUID = 1L;
 		};
+
+		fragments.add(new GateImportListFragment_());
+		fragments.add(new GateExportListFragment_());
+		fragments.add(new UploadsFragment_());
+
+		Logger.e("Rainy Mode " + rainyMode);
+		if (rainyMode) {
+
+			Logger.e("Add temporary tabs");
+			fragments.add(new TemporaryContainerFragment_());
+
+		}
 
 		mPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), locations, fragments) {
 
@@ -118,6 +143,54 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 		pager.setOnPageChangeListener(this);
 	}
 
+	@Override
+	protected void onResume() {
+
+		rainyMode = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+										.getBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox),
+													true);
+
+		// Remove last tab
+		if (!rainyMode && fragments.size() > TAB_TEMP) {
+
+			// Select first tab
+			// onPageSelected(0);
+
+			Logger.e("Remove last tab");
+
+			locations.remove(TAB_TEMP);
+			fragments.remove(TAB_TEMP);
+			getSupportActionBar().removeTabAt(TAB_TEMP);
+			configureViewPager();
+
+			// mPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), locations, fragments) {
+			// @Override
+			// public Fragment getItem(int position) {
+			// return getFragments().get(position);
+			// }
+			// };
+			//
+			// pager.setAdapter(mPagerAdapter);
+			// pager.setOnPageChangeListener(this);
+
+		} else if (rainyMode && fragments.size() <= TAB_TEMP) {
+
+			Logger.e("Add temporary tab");
+			locations.add("Tạm");
+
+			Tab tab = getSupportActionBar().newTab();
+			tab.setText("Tạm");
+			tab.setTabListener(this);
+			getSupportActionBar().addTab(tab);
+
+			configureViewPager();
+		} else {
+			Logger.e("Something goes wrong");
+		}
+
+		super.onResume();
+	}
+
 	public PullToRefreshAttacher getPullToRefreshAttacher() {
 		return mPullToRefreshAttacher;
 	}
@@ -138,6 +211,11 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
+		rainyMode = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+										.getBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox),
+													true);
+
+		Logger.Log("Rainy Mode " + rainyMode);
 		// Below code to show `More Action` item on menu
 		try {
 			ViewConfiguration config = ViewConfiguration.get(this);
@@ -155,7 +233,6 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 		}
 
 		super.onCreate(savedInstanceState);
-
 	}
 
 	@Override
@@ -167,7 +244,7 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 	public void onEventMainThread(ListItemChangedEvent event) {
 
 		int currentTab = event.getPosition();
-		getSupportActionBar().getTabAt(currentTab).setText(	locations[currentTab] + " ("
+		getSupportActionBar().getTabAt(currentTab).setText(	locations.get(currentTab) + " ("
 																	+ Integer.toString(event.getCount()) + ")");
 	}
 
@@ -215,13 +292,11 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 	public void onBackPressed() {
 
 		if (currentPosition == 1) {
-
 			GateExportListFragment_ fragment = (GateExportListFragment_) mPagerAdapter.getItem(currentPosition);
 			if (fragment.isSearching()) {
 				fragment.clearSearchEditText();
 				return;
 			}
-
 		}
 
 		super.onBackPressed();
@@ -232,4 +307,17 @@ public class GateHomeActivity extends CJayActivity implements OnPageChangeListen
 
 	}
 
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+		if (rainyMode && currentPosition == 3) {
+			
+			TemporaryContainerFragment_ fragment = (TemporaryContainerFragment_) mPagerAdapter.getItem(currentPosition);
+			fragment.onKeyDown(keyCode);
+			return true;
+
+		} else {
+			return super.onKeyDown(keyCode, event);
+		}
+	}
 }

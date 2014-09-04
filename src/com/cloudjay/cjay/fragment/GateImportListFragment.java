@@ -209,6 +209,7 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 				DataCenter.getDatabaseHelper(getActivity()).addUsageLog(getActivity(),
 																		"Create new container: "
 																				+ containerSession.getContainerId());
+				
 				EventBus.getDefault().post(new ContainerSessionChangedEvent(containerSession));
 				CJayApplication.openCamera(activity, containerSession.getUuid(), CJayImage.TYPE_IMPORT, LOG_TAG);
 
@@ -419,12 +420,9 @@ public class GateImportListFragment extends SherlockFragment implements OnRefres
 										mSelectedContainerId + " | Prepare to add #IN container to upload queue");
 
 			hideMenuItems();
-
 		} else {
-
 			Crouton.cancelAllCroutons();
 			Crouton.makeText(getActivity(), R.string.alert_no_issue_container, Style.ALERT).show();
 		}
-
 	}
 }
