@@ -1,0 +1,29 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion '19.1.0'
+
+    defaultConfig {
+        applicationId "com.cloudjay.cjay.data"
+        minSdkVersion 16
+        targetSdkVersion 16
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+    }
+
+    lintOptions {
+        abortOnError false;
+        disable 'InvalidPackage' // Some libraries have issues with this
+        disable 'OldTargetApi' // Due to Robolectric that modifies the manifest when running tests
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}
