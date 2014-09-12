@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.StrictMode;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.network.NetworkClient;
 
 
 public class MainActivity extends Activity {

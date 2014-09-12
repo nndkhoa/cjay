@@ -39,9 +39,7 @@ public class LoginActivity extends Activity {
 				.penaltyDeath()
 				.build());
 
-		String result = NetworkClient.getInstance().getToken("giamdinhcong@test.com", "123456");
-
-
+		NetworkClient.getInstance().getToken("giamdinhcong@test.com", "123456");
 	}
 
 	public void onEvent(LoginSuccessEvent loginSuccessEvent) {
