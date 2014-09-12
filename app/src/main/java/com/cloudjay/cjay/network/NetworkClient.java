@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.network;
 
 import com.cloudjay.cjay.event.LoginSuccessEvent;
+import com.cloudjay.cjay.model.CJayProvider;
 import com.cloudjay.cjay.util.ApiEndpoint;
 import com.cloudjay.cjay.util.Logger;
 import com.google.gson.JsonObject;
@@ -37,7 +38,7 @@ public class NetworkClient {
 		cJayService.getToken(username, password, new Callback<JsonObject>() {
 			@Override
 			public void success(JsonObject jsonObject, Response response) {
-				EventBus.getDefault().post(new LoginSuccessEvent());
+				//EventBus.getDefault().post(new LoginSuccessEvent());
 			}
 
 			@Override
