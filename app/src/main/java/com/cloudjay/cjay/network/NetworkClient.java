@@ -3,7 +3,7 @@ package com.cloudjay.cjay.network;
 import android.util.Log;
 
 import com.cloudjay.cjay.event.LoginSuccessEvent;
-import com.cloudjay.cjay.util.ApiConfiguration;
+import com.cloudjay.cjay.util.ApiEndpoint;
 import com.google.gson.JsonObject;
 import com.squareup.okhttp.OkHttpClient;
 
@@ -34,7 +34,7 @@ public class NetworkClient {
 	interface CJayService {
 
 		@FormUrlEncoded
-		@POST(ApiConfiguration.TOKEN)
+		@POST(ApiEndpoint.TOKEN_API)
 		public void getToken(@Field("username") String username, @Field("password") String password, Callback<JsonObject> callback);
 
 
@@ -43,7 +43,7 @@ public class NetworkClient {
 	public String getToken(String username, String password) {
 		Log.i("Running;","aasdasdsadsadsadsadsadsa");
 		OkHttpClient okHttpClient = new OkHttpClient();
-		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiConfiguration.ROOT).setClient(new
+		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.ROOT_API).setClient(new
 				OkClient(okHttpClient)).build();
 		CJayService cJayService = restAdapter.create(CJayService.class);
 
