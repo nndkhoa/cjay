@@ -32,9 +32,9 @@ public class NetworkClient {
 	}
 
 	public void getToken(String username, String password) {
-
 		NetworkService cJayService = restAdapter.create(NetworkService.class);
 		cJayService.getToken(username, password, new Callback<JsonObject>() {
+
 			@Override
 			public void success(JsonObject jsonObject, Response response) {
 				EventBus.getDefault().post(new LoginSuccessEvent());
