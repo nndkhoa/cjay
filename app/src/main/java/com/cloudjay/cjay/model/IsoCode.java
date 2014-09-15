@@ -4,10 +4,10 @@ import android.net.Uri;
 
 public class IsoCode {
 
-    int id;
-    int type;
-    String code;
-    String display_name;
+    public int id;
+    public int type;
+    public String code;
+    public String display_name;
 
     public static final String TABLE = "iso_code";
 	public static final String ID = "id";

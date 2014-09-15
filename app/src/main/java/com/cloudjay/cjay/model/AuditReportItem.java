@@ -7,21 +7,21 @@ import android.net.Uri;
  */
 public class AuditReportItem {
 
-    int id;
-    String time_posted;
-    int repair_id;
-    int repair_code;
-    int damage_id;
-    int damage_code;
-    int component_id;
-    int component_code;
-    String component_name;
-    String location_code;
-    int length;
-    int height;
-    int quantity;
-    int is_fix_allowed;
-    int session_id;
+    public int id;
+    public String time_posted;
+    public int repair_id;
+    public int repair_code;
+    public int damage_id;
+    public int damage_code;
+    public int component_id;
+    public int component_code;
+    public String component_name;
+    public String location_code;
+    public int length;
+    public int height;
+    public int quantity;
+    public int is_fix_allowed;
+    public int session_id;
 
     public static final String TABLE = "audit_report_item";
     public static final String ID = "id";
