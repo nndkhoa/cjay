@@ -6,16 +6,16 @@ public class User {
 
     int id;
     String email;
-    String accessToken;
+    String access_token;
     int role;
-    String roleName;
-    String firstName;
-    String lastName;
-    String fullName;
+    String role_name;
+    String first_name;
+    String last_name;
+    String full_name;
     String phone;
-    String avatarUrl;
-    int dialingCode;
-    int depotCode;
+    String avatar_url;
+    int dialing_code;
+    int depot_code;
 
     public static final String TABLE = "user";
     public static final String EMAIL = "email";

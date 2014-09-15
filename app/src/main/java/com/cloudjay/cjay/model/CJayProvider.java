@@ -15,7 +15,6 @@ public class CJayProvider extends VContentProvider {
     @Override
     protected String addDatabaseVersionsViewsAndGetName(ArrayList<VDatabaseVersion> vDatabaseVersions, HashMap<String, VViewCreation> stringVViewCreationHashMap) {
 
-
         VTableCreation userTable = new VTableCreation(User.TABLE, "id")
                 .addIntegerColumn(User.ID, null)
                 .addTextColumn(User.FIRST_NAME, "", false)
@@ -33,15 +32,19 @@ public class CJayProvider extends VContentProvider {
         VTableCreation auditReportItemTable = new VTableCreation(AuditReportItem.TABLE, "id")
                 .addIntegerColumn(AuditReportItem.ID, null)
                 .addTextColumn(AuditReportItem.TIME_POSTED, "", false)
-                .addIntegerColumn(AuditReportItem.DAMAGE_CODE_ID, null)
-                .addIntegerColumn(AuditReportItem.REPAIR_CODE_ID, null)
-                .addIntegerColumn(AuditReportItem.PAY_CODE_ID, null)
-                .addIntegerColumn(AuditReportItem.COMPONENT_CODE_ID, null)
+                .addIntegerColumn(AuditReportItem.DAMAGE_ID, null)
+                .addIntegerColumn(AuditReportItem.DAMAGE_CODE, null)
+                .addIntegerColumn(AuditReportItem.REPAIR_ID, null)
+                .addIntegerColumn(AuditReportItem.REPAIR_CODE, null)
+                .addIntegerColumn(AuditReportItem.COMPONENT_ID, null)
+                .addIntegerColumn(AuditReportItem.COMPONENT_CODE, null)
+                .addTextColumn(AuditReportItem.COMPONENT_NAME, "", false)
                 .addTextColumn(AuditReportItem.LOCATION_CODE, "", false)
                 .addIntegerColumn(AuditReportItem.LENGTH, null)
                 .addIntegerColumn(AuditReportItem.HEIGHT, null)
                 .addIntegerColumn(AuditReportItem.QUANTITY, null)
-                .addIntegerColumn(AuditReportItem.IS_FIX_ALLOWED, null);
+                .addIntegerColumn(AuditReportItem.IS_FIX_ALLOWED, null)
+                .addIntegerColumn(AuditReportItem.SESSION_ID, null);
 
         VTableCreation auditReportImageTable = new VTableCreation(AuditReportImage.TABLE, "id")
                 .addIntegerColumn(AuditReportImage.ID, null)
@@ -102,6 +105,6 @@ public class CJayProvider extends VContentProvider {
 
 
 
-        return "database";
+        return "cjay_db";
     }
 }
