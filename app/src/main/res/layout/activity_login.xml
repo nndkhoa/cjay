@@ -3,7 +3,7 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
-              tools:context="com.cloudjay.cjay.activity.LoginActivity">
+             >
 
     <EditText
         android:layout_width="match_parent"
@@ -22,5 +22,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/btn_login"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_getUser"
+        android:text="Lấy Token"/>
 
 </LinearLayout>
