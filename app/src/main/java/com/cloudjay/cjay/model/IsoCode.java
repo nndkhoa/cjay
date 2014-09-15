@@ -1,5 +1,7 @@
 package com.cloudjay.cjay.model;
 
+import android.net.Uri;
+
 public class IsoCode {
 
     int id;
@@ -12,4 +14,6 @@ public class IsoCode {
     public static final String TYPE = "type";
     public static final String CODE = "code";
     public static final String DISPLAY_NAME = "display_name";
+
+    public static final Uri URI = Uri.parse("content://" + User.AUTHORITY + "/" + TABLE);
 }

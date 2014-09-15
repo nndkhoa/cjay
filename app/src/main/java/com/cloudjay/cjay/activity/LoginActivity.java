@@ -45,8 +45,6 @@ public class LoginActivity extends Activity {
 		values.put(User.ACCESS_TOKEN, "dasdefefdsfdsfdsfs");
 		values.put(User.EMAIL, "giamdinhcong@test.com");
 		values.put(User.ROLE, "full_permission");
-		values.put(User.MOTHER_NAME, "fuck you");
-		values.put(User.FATHER_NAME, "motherfucker");
 		getContentResolver().insert(User.URI, values);
 	}
 
