@@ -44,6 +44,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
     private AccountManager mAccountManager;
     private AlertDialog mAlertDialog;
     private boolean mInvalidate;
+    public String mtoken;
 
     @InjectView(R.id.btn_login)
     Button mLoginButton;
@@ -53,6 +54,8 @@ public class LoginActivity extends AccountAuthenticatorActivity {
     EditText etpassword;
     @InjectView(R.id.btn_getUser)
     Button btn_getUser;
+    @InjectView(R.id.btnOpenMainAcitivty)
+    Button btnOpenMain;
 
     AccountManager accountManager;
 
@@ -155,18 +158,27 @@ public class LoginActivity extends AccountAuthenticatorActivity {
         String email = etemail.getText().toString();
         String password = etpassword.getText().toString();
         String token = NetworkClient.getInstance().getToken(this, email, password);
+        mtoken = "Token " + token;
         Log.e("Results: ", token);
-        Session user = NetworkClient.getInstance().getContainerSessionById(getApplicationContext(), "Token " + token,7325);
+        //Session user = NetworkClient.getInstance().getContainerSessionById(getApplicationContext(), "Token " + token,7325);
 
-        Logger.e(user.toString());
-//		if (null != token) {
-//			addNewAccount(email, password, token, AccountGeneral.AUTHTOKEN_TYPE);
-//		}
+       // Logger.e(user.toString());
+		if (null != token) {
+			addNewAccount(email, password, token, AccountGeneral.AUTHTOKEN_TYPE);
+		}
 //		String currentUser = NetworkClient.getInstance().getCurrentUser(this,"Token "+token);
 //		Log.e("Current User: ", currentUser);
         String autho = "Token " + token;
         Logger.e(autho);
 
+    }
+
+    @OnClick(R.id.btnOpenMainAcitivty)
+    void open() {
+        Logger.i("mToken: " + mtoken);
+        Intent i = new Intent(this, MainActivity.class);
+        i.putExtra("token", mtoken);
+        startActivity(i);
     }
 
     private void addNewAccount(String email, String password, String token, String authTokenType) {

@@ -30,6 +30,8 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.0.0'
     compile 'com.koushikdutta.ion:ion:1.+'
     compile 'de.greenrobot:eventbus:2.2.1'
+    compile 'com.android.support:support-v4:19.0.+'
+    compile 'com.android.support:appcompat-v7:19.0.+'
     compile files('libs/vcontentprovider.jar')
 }
 
