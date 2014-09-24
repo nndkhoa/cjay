@@ -33,5 +33,6 @@ dependencies {
     compile 'com.android.support:support-v4:19.0.+'
     compile 'com.android.support:appcompat-v7:19.0.+'
     compile files('libs/vcontentprovider.jar')
+    compile files('libs/Pubnub-Android-3.5.6.jar')
 }
 
