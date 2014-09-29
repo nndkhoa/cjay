@@ -40,7 +40,7 @@ public interface NetworkService {
 	public List<Operator> getOperators(@Header("Authorization") String token, @Header("CJAY_VERSION") String cJayVersion, @Query("modified_after") String lastModifiedDate);
 
 	@GET(ApiEndpoint.CONTAINER_SESSIONS_API)
-	public List<Session> getContainerSessionsByPage(@Header("Authorization") String token, @Header("CJAY_VERSION") String cJayVersion, @Query("page") int page, @Query("modified_after") String lastModifiedDate);
+	public JsonObject getContainerSessionsByPage(@Header("Authorization") String token, @Header("CJAY_VERSION") String cJayVersion, @Query("page") int page, @Query("modified_after") String lastModifiedDate);
 
 	//TODO edit getContainerSessionById, postContainer and postImageFile
 

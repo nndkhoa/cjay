@@ -12,7 +12,7 @@ public class AuditReportItem {
     public int repair_id;
     public int repair_code;
     public int damage_id;
-    public int damage_code;
+    public String damage_code;
     public int component_id;
     public int component_code;
     public String component_name;
