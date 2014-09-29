@@ -30,5 +30,6 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.0.0'
     compile 'com.koushikdutta.ion:ion:1.+'
     compile 'de.greenrobot:eventbus:2.2.1'
+    compile files('libs/vcontentprovider.jar')
 }
 

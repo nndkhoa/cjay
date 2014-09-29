@@ -1,21 +1,18 @@
 package com.cloudjay.cjay.network;
 
-import com.cloudjay.cjay.event.LoginSuccessEvent;
+import android.content.Context;
+
 import com.cloudjay.cjay.util.ApiEndpoint;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Utils;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.squareup.okhttp.OkHttpClient;
 
-import de.greenrobot.event.EventBus;
-import retrofit.Callback;
 import retrofit.RestAdapter;
-import retrofit.RetrofitError;
 import retrofit.client.OkClient;
-import retrofit.client.Response;
 
 public class NetworkClient {
-
-	private RestAdapter restAdapter;
 	private static NetworkClient INSTANCE;
 
 	public static NetworkClient getInstance() {
@@ -26,26 +23,81 @@ public class NetworkClient {
 
 	public NetworkClient() {
 		super();
+
+	}
+
+	private void createClient() {
+
+	}
+
+
+	public String getToken(Context context, String username, String password) {
 		OkHttpClient okHttpClient = new OkHttpClient();
-		restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.ROOT_API).setClient(new
+		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.ROOT_API).setClient(new
 				OkClient(okHttpClient)).build();
-	}
-
-	public void getToken(String username, String password) {
 		NetworkService cJayService = restAdapter.create(NetworkService.class);
-		cJayService.getToken(username, password, new Callback<JsonObject>() {
-
-			@Override
-			public void success(JsonObject jsonObject, Response response) {
-				EventBus.getDefault().post(new LoginSuccessEvent());
-			}
-
-			@Override
-			public void failure(RetrofitError error) {
-				Logger.e(error.getMessage());
-			}
-		});
+		JsonObject tokenJson = cJayService.getToken(username, password);
+		String token = tokenJson.get("token").getAsString();
+		return token;
 	}
 
+	public String getCurrentUser(Context context, String token) {
+		OkHttpClient okHttpClient = new OkHttpClient();
+		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.ROOT_API).setClient(new
+				OkClient(okHttpClient)).build();
+		NetworkService cJayService = restAdapter.create(NetworkService.class);
+		String cJayVersion = Utils.getAppVersionName(context);
+		JsonObject userJson = cJayService.getCurrentUser(token, cJayVersion);
+		return userJson.toString();
+	}
 
+	public String getRepairCodes(Context context, String token, String lastModifiedDate) {
+		OkHttpClient okHttpClient = new OkHttpClient();
+		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.ROOT_API).setClient(new
+				OkClient(okHttpClient)).build();
+		NetworkService cJayService = restAdapter.create(NetworkService.class);
+		String cJayVersion = Utils.getAppVersionName(context);
+		JsonArray repairCodes = cJayService.getRepairCodes(token, cJayVersion, lastModifiedDate);
+		return repairCodes.toString();
+	}
+
+	public String getDamageCodes(Context context, String token, String lastModifiedDate) {
+		OkHttpClient okHttpClient = new OkHttpClient();
+		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.ROOT_API).setClient(new
+				OkClient(okHttpClient)).build();
+		NetworkService cJayService = restAdapter.create(NetworkService.class);
+		String cJayVersion = Utils.getAppVersionName(context);
+		JsonArray repairCodes = cJayService.getDamageCodes(token, cJayVersion, lastModifiedDate);
+		return repairCodes.toString();
+	}
+
+	public String getComponentCodes(Context context, String token, String lastModifiedDate) {
+		OkHttpClient okHttpClient = new OkHttpClient();
+		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.ROOT_API).setClient(new
+				OkClient(okHttpClient)).build();
+		NetworkService cJayService = restAdapter.create(NetworkService.class);
+		String cJayVersion = Utils.getAppVersionName(context);
+		JsonArray repairCodes = cJayService.getComponentCodes(token, cJayVersion, lastModifiedDate);
+		return repairCodes.toString();
+	}
+
+	public String getOperators(Context context, String token, String lastModifiedDate) {
+		OkHttpClient okHttpClient = new OkHttpClient();
+		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.ROOT_API).setClient(new
+				OkClient(okHttpClient)).build();
+		NetworkService cJayService = restAdapter.create(NetworkService.class);
+		String cJayVersion = Utils.getAppVersionName(context);
+		JsonArray repairCodes = cJayService.getOperators(token, cJayVersion, lastModifiedDate);
+		return repairCodes.toString();
+	}
+
+	public String getContainerSessionsByPage(Context context, String token,int page, String lastModifiedDate) {
+		OkHttpClient okHttpClient = new OkHttpClient();
+		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.ROOT_API).setClient(new
+				OkClient(okHttpClient)).build();
+		NetworkService cJayService = restAdapter.create(NetworkService.class);
+		String cJayVersion = Utils.getAppVersionName(context);
+		JsonArray repairCodes = cJayService.getContainerSessionsByPage(token, cJayVersion,page, lastModifiedDate);
+		return repairCodes.toString();
+	}
 }
