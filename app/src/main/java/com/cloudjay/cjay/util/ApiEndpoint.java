@@ -11,7 +11,7 @@ public class ApiEndpoint {
 	public static final String LIST_REPAIR_CODES_API = "/api/cjay/repair-codes.json";
 	public static final String LIST_COMPONENT_CODES_API = "/api/cjay/component-codes.json";
 	public static final String CONTAINER_SESSIONS_API = "/api/cjay/container-sessions.json";
-	public static final String CONTAINER_SESSION_ITEM_API = "/api/cjay/container-sessions/%s.json";
+	public static final String CONTAINER_SESSION_ITEM_API = "/api/cjay/container-sessions/{id}.json";
 
 //	public static final String CJAY_TMP_STORAGE = "https://www.googleapis.com/upload/storage/v1beta2/b/cjaytmp/o?uploadType=media&name=%s";
 	public static final String CJAY_TMP_STORAGE = "https://www.googleapis.com/upload/storage/v1beta2/b/cjaytmp/o";

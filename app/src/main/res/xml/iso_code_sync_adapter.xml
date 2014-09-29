@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
+    android:contentAuthority="com.cloudjay.cjay"
+    android:accountType="com.cloudjay.cjay"
+    android:userVisible="true"
+    android:allowParallelSyncs="false"
+    android:isAlwaysSyncable="false"
+    android:supportsUploading="true"/>

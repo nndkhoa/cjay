@@ -7,12 +7,12 @@ import android.net.Uri;
  */
 public class AuditReportImage {
 
-    int id;
-    int type;
-    String image_name;
-    String image_url;
-    String created_at;
-    int audit_report_item_id;
+    public int id;
+    public int type;
+    public String image_name;
+    public String image_url;
+    public String created_at;
+    public int audit_report_item_id;
 
     public static final String TABLE = "audit_report_image";
     public static final String ID = "id";

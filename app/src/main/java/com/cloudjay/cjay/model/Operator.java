@@ -3,9 +3,9 @@ package com.cloudjay.cjay.model;
 import android.net.Uri;
 
 public class Operator {
-	int id;
-	String operatorCode;
-	String operator_code;
+    public int id;
+    public String Name;
+    public String operator_code;
 
     public static final String TABLE = "operator";
     public static final String ID = "id";
