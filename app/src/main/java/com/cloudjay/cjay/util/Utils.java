@@ -4,9 +4,6 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
-/**
- * Created by Thai on 9/13/2014.
- */
 public class Utils {
 	public static String getAppVersionName(Context ctx) {
 

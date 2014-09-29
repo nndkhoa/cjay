@@ -5,6 +5,9 @@ import android.util.Log;
 
 import com.cloudjay.cjay.BuildConfig;
 
+/**
+ *
+ */
 public final class Logger {
 
 	/**
@@ -16,9 +19,9 @@ public final class Logger {
 	 * DEVELOPMENT => PRODUCTION_MODE = false
 	 *
 	 */
+	private static boolean isDebuggable = BuildConfig.DEBUG;
 
 	private volatile static Logger instance;
-	private static boolean isDebuggable = BuildConfig.DEBUG;
 	private static boolean isUserActivitiesLoggable = BuildConfig.DEBUG;
 	static String className;
 	static String methodName;

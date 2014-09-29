@@ -9,7 +9,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.hardware.input.InputManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -27,16 +26,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.accountmanager.AccountGeneral;
 import com.cloudjay.cjay.event.LoginSuccessEvent;
 import com.cloudjay.cjay.network.NetworkClient;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.account.AccountGeneral;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import de.greenrobot.event.EventBus;
 
+/**
+ *
+ */
 public class LoginActivity extends AccountAuthenticatorActivity {
 	public static final String PARAM_AUTHTOKEN_TYPE = "auth.token";
 	private AccountManager mAccountManager;
@@ -67,10 +69,11 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	InputMethodManager inputManager;
 
 	void getUserToken() {
-		showAccountPicker(AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, false);
+		showAccountPicker(AccountGeneral.AUTH_TOKEN_TYPE_FULL_ACCESS, false);
 	}
 
 	private void showAccountPicker(final String authtokenTypeFullAccess, boolean b) {
+
 		mInvalidate = b;
 		final Account availableAccounts[] = accountManager
 				.getAccountsByType(AccountGeneral.ACCOUNT_TYPE);
@@ -99,6 +102,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 										getExistingAccountAuthToken(availableAccounts[which], authtokenTypeFullAccess);
 								}
 							}).create();
+
 			mAlertDialog.show();
 		}
 	}
@@ -111,9 +115,9 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 			public void run() {
 				try {
 					Bundle bnd = future.getResult();
-
 					final String authtoken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
 					mAccountManager.invalidateAuthToken(availableAccount.type, authtoken);
+
 					showMessage(availableAccount.name + " invalidated");
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -138,6 +142,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 					showMessage((authtoken != null) ? "SUCCESS!\ntoken: "
 							+ authtoken : "FAIL");
 					Logger.e("CJay GetToken Bundle is " + bnd);
+
 				} catch (Exception e) {
 					e.printStackTrace();
 					showMessage(e.getMessage());
@@ -161,7 +166,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 	@OnClick(R.id.btn_login)
 	void doLogin() {
-		email = etemail.getText().toString();
+				email = etemail.getText().toString();
 		password = etpassword.getText().toString();
 		View focusView = null;
 		boolean cancel = false;
@@ -209,9 +214,9 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 					Log.e("Results: ", token);
 
 					if (null != token) {
-						mtoken = "Token "+token;
+						mtoken = "Token " + token;
 						// add account to account manager
-						addNewAccount(email, password, token, AccountGeneral.AUTHTOKEN_TYPE);
+						addNewAccount(email, password, token, AccountGeneral.AUTH_TOKEN_TYPE);
 					}
 					return null;
 				}
@@ -236,6 +241,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 						protected void onPostExecute(Void aVoid) {
 							Intent intent = new Intent(getApplicationContext(), MainActivity.class);
 							startActivity(intent);
+							finish();
 							super.onPostExecute(aVoid);
 						}
 					}.execute();
@@ -261,7 +267,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		final Account account = new Account(email, accountType);
 
 		manager.addAccountExplicitly(account, password, null);
-		manager.setAuthToken(account, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, token);
+		manager.setAuthToken(account, AccountGeneral.AUTH_TOKEN_TYPE_FULL_ACCESS, token);
 		final Intent intent = new Intent();
 		intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, email);
 		intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, accountType);
@@ -279,7 +285,6 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		actionBar.hide();
 
 		inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-
 
 		ButterKnife.inject(this);
 		EventBus.getDefault().register(this);
@@ -301,7 +306,6 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 	public void onEvent(LoginSuccessEvent loginSuccessEvent) {
 		Log.e("EventBus: ", "OK");
-
 	}
 
 	@Override
@@ -309,4 +313,5 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		super.onDestroy();
 		//	EventBus.getDefault().unregister(this);
 	}
+
 }

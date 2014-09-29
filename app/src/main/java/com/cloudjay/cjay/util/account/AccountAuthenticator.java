@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.accountmanager;
+package com.cloudjay.cjay.util.account;
 
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
@@ -13,18 +13,18 @@ import android.text.TextUtils;
 import com.cloudjay.cjay.activity.MainActivity;
 
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
-import static com.cloudjay.cjay.accountmanager.AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS;
-import static com.cloudjay.cjay.accountmanager.AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS_LABEL;
-import static com.cloudjay.cjay.accountmanager.AccountGeneral.AUTHTOKEN_TYPE_READ_ONLY;
-import static com.cloudjay.cjay.accountmanager.AccountGeneral.AUTHTOKEN_TYPE_READ_ONLY_LABEL;
+import static com.cloudjay.cjay.util.account.AccountGeneral.AUTH_TOKEN_TYPE_FULL_ACCESS;
+import static com.cloudjay.cjay.util.account.AccountGeneral.AUTH_TOKEN_TYPE_FULL_ACCESS_LABEL;
+import static com.cloudjay.cjay.util.account.AccountGeneral.AUTH_TOKEN_TYPE_READ_ONLY;
+import static com.cloudjay.cjay.util.account.AccountGeneral.AUTH_TOKEN_TYPE_READ_ONLY_LABEL;
 
 /**
- * Created by Thai on 9/14/2014.
+ * TODO: write description
  */
-public class AccountAuthenticatior extends AbstractAccountAuthenticator {
+public class AccountAuthenticator extends AbstractAccountAuthenticator {
 	Context mContext;
 
-	public AccountAuthenticatior(Context context) {
+	public AccountAuthenticator(Context context) {
 		super(context);
 		mContext = context;
 	}
@@ -61,7 +61,7 @@ public class AccountAuthenticatior extends AbstractAccountAuthenticator {
 
 		// If the caller requested an authToken type we don't support, then
 		// return an error
-		if (!authTokenType.equals(AccountGeneral.AUTHTOKEN_TYPE_READ_ONLY) && !authTokenType.equals(AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS)) {
+		if (!authTokenType.equals(AccountGeneral.AUTH_TOKEN_TYPE_READ_ONLY) && !authTokenType.equals(AccountGeneral.AUTH_TOKEN_TYPE_FULL_ACCESS)) {
 			final Bundle result = new Bundle();
 			result.putString(AccountManager.KEY_ERROR_MESSAGE, "invalid authTokenType");
 			return result;
@@ -99,10 +99,10 @@ public class AccountAuthenticatior extends AbstractAccountAuthenticator {
 
 	@Override
 	public String getAuthTokenLabel(String authTokenType) {
-		if (AUTHTOKEN_TYPE_FULL_ACCESS.equals(authTokenType))
-			return AUTHTOKEN_TYPE_FULL_ACCESS_LABEL;
-		else if (AUTHTOKEN_TYPE_READ_ONLY.equals(authTokenType))
-			return AUTHTOKEN_TYPE_READ_ONLY_LABEL;
+		if (AUTH_TOKEN_TYPE_FULL_ACCESS.equals(authTokenType))
+			return AUTH_TOKEN_TYPE_FULL_ACCESS_LABEL;
+		else if (AUTH_TOKEN_TYPE_READ_ONLY.equals(authTokenType))
+			return AUTH_TOKEN_TYPE_READ_ONLY_LABEL;
 		else
 			return authTokenType + " (Label)";
 	}

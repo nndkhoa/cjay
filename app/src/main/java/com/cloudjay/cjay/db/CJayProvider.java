@@ -1,4 +1,12 @@
-package com.cloudjay.cjay.model;
+package com.cloudjay.cjay.db;
+
+import com.cloudjay.cjay.model.AuditReportImage;
+import com.cloudjay.cjay.model.AuditReportItem;
+import com.cloudjay.cjay.model.GateReportImage;
+import com.cloudjay.cjay.model.IsoCode;
+import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.model.User;
 
 import org.coocood.vcontentprovider.VContentProvider;
 import org.coocood.vcontentprovider.VDatabaseVersion;

@@ -50,7 +50,6 @@ public class NetworkClient {
 		return token;
 	}
 
-
 	public User getCurrentUser(Context context, String token) {
 		OkHttpClient okHttpClient = new OkHttpClient();
 		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.ROOT_API).setClient(new
@@ -58,9 +57,7 @@ public class NetworkClient {
 		NetworkService cJayService = restAdapter.create(NetworkService.class);
 		String cJayVersion = Utils.getAppVersionName(context);
 		User user = cJayService.getCurrentUser(token, cJayVersion);
-
 		return user;
-
 	}
 
 	public List<IsoCode> getRepairCodes(Context context, String token, String lastModifiedDate) {
