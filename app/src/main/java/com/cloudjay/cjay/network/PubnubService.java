@@ -17,103 +17,117 @@ import com.pubnub.api.PubnubError;
 import com.pubnub.api.PubnubException;
 
 /**
- * Created by nambv on 24/09/2014.
+ * PubNub notification service
  */
-public class PubnubService extends Service {
+public class PubNubService extends Service {
 
-    private NotificationManager notificationManager;
+	/**
+	 * Notification manager is used for display message in Notification Center
+	 */
+	private NotificationManager notificationManager;
 
-    private static final String PUBLISH_KEY = "publish_key";
-    private static final String SUBCRIBE_KEY = "subcribe_key";
+	// Define PubNub Key
+	private static final String PUBLISH_KEY = "publish_key";
+	private static final String SUBSCRIBE_KEY = "subscribe_key";
 
-    private static final String SESSION_CHANNEL = "session_channel";
-    private static final String ISO_CODE_CHANNEL = "iso_code_channel";
-    private static final String OPERATOR_CHANNEL = "operator_channel";
+	// Define PubNub Channel
+	private static final String SESSION_CHANNEL = "session_channel";
+	private static final String ISO_CODE_CHANNEL = "iso_code_channel";
+	private static final String OPERATOR_CHANNEL = "operator_channel";
+	private String[] channels = new String[]{
+			SESSION_CHANNEL,
+			ISO_CODE_CHANNEL,
+			OPERATOR_CHANNEL
+	};
 
-    private String[] channels = new String[] {
-        SESSION_CHANNEL,
-        ISO_CODE_CHANNEL,
-        OPERATOR_CHANNEL
-    };
+	private static final int DELAY_TIME = 200;
 
-    Pubnub pubnub = new Pubnub(PUBLISH_KEY, SUBCRIBE_KEY);
+	// Initial PubNub
+	Pubnub pubnub = new Pubnub(PUBLISH_KEY, SUBSCRIBE_KEY);
 
-    private final Handler handler = new Handler() {
-        public void handleMessage(Message msg) {
-            //get data from bundle
-            Bundle b = msg.getData();
-            final String channel = b.getString("channel");
-            final String message = b.getString("message");
+	/**
+	 * Display notification in Notification Center
+	 *
+	 * @param channel
+	 * @param message
+	 */
+	private void pushNotification(String channel, String message) {
 
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
+		//Todo: Push notification
+		Notification notification = new Notification.Builder(this).setContentTitle(channel)
+				.setContentText(message)
+				.setSmallIcon(R.drawable.ic_launcher)
+				.setAutoCancel(true)
+				.setDefaults(Notification.DEFAULT_SOUND).build();
 
-                @Override
-                public void run() {
-                    pushNotification(channel, message);
-                }
-            }, 200);
-        }
-    };
+		notificationManager.notify(1, notification);
+	}
 
-    private void pushNotification(String channel, String message) {
+	@Override
+	public IBinder onBind(Intent intent) {
+		return null;
+	}
 
-        Notification notification = null;
+	/**
+	 * Handler is used for post new notification
+	 */
+	private final Handler handler = new Handler() {
+		public void handleMessage(Message msg) {
+			Bundle b = msg.getData();
+			final String channel = b.getString("channel");
+			final String message = b.getString("message");
 
-        //Todo: Push notification
-        notification = new Notification.Builder(this).setContentTitle(channel)
-            .setContentText(message)
-            .setSmallIcon(R.drawable.ic_launcher)
-            .setAutoCancel(true)
-            .setDefaults(Notification.DEFAULT_SOUND).build();
+			Handler handler = new Handler();
+			handler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					pushNotification(channel, message);
+				}
+			}, DELAY_TIME);
+		}
+	};
 
-        notificationManager.notify(1, notification);
-    }
+	private void notifyUser(String channel, Object message) {
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
+		Message msg = handler.obtainMessage();
+		try {
+			Logger.Log("Received msg : " + message.toString());
+			String obj = (String) message;
+			Bundle b = new Bundle();
+			b.putString("channel", channel);
+			b.putString("message", obj);
+			msg.setData(b);
+			handler.sendMessage(msg);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-    private void notifyUser(String channel, Object message) {
-        Message msg = handler.obtainMessage();
+	}
 
-        try {
-            final String obj = (String) message;
-            Bundle b = new Bundle();
-            b.putString("channel", channel);
-            b.putString("message", obj);
-            msg.setData(b);
-            handler.sendMessage(msg);
+	@Override
+	public void onCreate() {
 
-            Logger.e("Received msg : " + obj.toString());
+		super.onCreate();
+		// TODO: Add PowerManager
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+		notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		try {
+			pubnub.subscribe(channels, new Callback() {
+				@Override
+				public void successCallback(String channel, Object message) {
+					Logger.Log("Success: " + message.toString());
+					notifyUser(channel, message);
+				}
 
-        try {
-            pubnub.subscribe(channels, new Callback() {
-                @Override
-                public void successCallback(String channel, Object message) {
-                    Logger.e("success: " + message.toString());
-                    notifyUser(channel, message);
-                }
-
-                @Override
-                public void errorCallback(String channel, PubnubError pubnubError) {
-                    Logger.e("error: " + pubnubError.toString());
-                    notifyUser(channel, pubnubError.toString());
-                }
-            });
-        } catch (PubnubException e) {
-            e.printStackTrace();
-        }
-    }
+				@Override
+				public void errorCallback(String channel, PubnubError pubnubError) {
+					Logger.e("Error: " + pubnubError.toString());
+					notifyUser(channel, pubnubError.toString());
+				}
+			});
+		} catch (PubnubException e) {
+			e.printStackTrace();
+		}
+	}
 }

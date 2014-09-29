@@ -1,7 +1,6 @@
 package com.cloudjay.cjay.activity;
 
 import android.accounts.Account;
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,15 +16,9 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.accountmanager.AccountGeneral;
+import com.cloudjay.cjay.util.account.AccountGeneral;
 import com.cloudjay.cjay.model.IsoCode;
-import com.cloudjay.cjay.network.NetworkClient;
 import com.cloudjay.cjay.util.Logger;
-
-import java.util.List;
-
-import butterknife.InjectView;
-import butterknife.OnClick;
 
 
 public class MainActivity extends FragmentActivity implements LoaderManager.LoaderCallbacks<Cursor> {

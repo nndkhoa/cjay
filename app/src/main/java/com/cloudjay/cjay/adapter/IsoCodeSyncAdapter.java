@@ -13,7 +13,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.RemoteException;
 
-import com.cloudjay.cjay.accountmanager.AccountGeneral;
+import com.cloudjay.cjay.util.account.AccountGeneral;
 import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.network.NetworkClient;
 import com.cloudjay.cjay.util.Logger;
@@ -38,7 +38,7 @@ public class IsoCodeSyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle bundle, String s, ContentProviderClient contentProviderClient, SyncResult syncResult) {
         Logger.i("onPerformSync for account[" + account.name + "]");
         try {
-            String authToken = "Token " + mAccountManager.blockingGetAuthToken(account, AccountGeneral.AUTHTOKEN_TYPE_FULL_ACCESS, true);
+            String authToken = "Token " + mAccountManager.blockingGetAuthToken(account, AccountGeneral.AUTH_TOKEN_TYPE_FULL_ACCESS, true);
 
             //Get iso codes from server
             List<IsoCode> listRepairsCode = NetworkClient.getInstance().getRepairCodes(getContext(), authToken, null);
