@@ -69,6 +69,14 @@
             android:name=".activity.ExportActivity"
             android:label="@string/title_activity_export" >
         </activity>
+        <activity
+            android:name=".activity.LinkIssueActivity"
+            android:label="@string/title_activity_link_issue" >
+        </activity>
+        <activity
+            android:name=".activity.ReportIssueActivity"
+            android:label="@string/title_activity_report_issue" >
+        </activity>
     </application>
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />

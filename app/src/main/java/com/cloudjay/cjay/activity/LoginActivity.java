@@ -81,8 +81,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 									android.R.layout.simple_list_item_1, name),
 							new DialogInterface.OnClickListener() {
 								@Override
-								public void onClick(DialogInterface dialog,
-								                    int which) {
+								public void onClick(DialogInterface dialog, int which) {
 									if (mInvalidate)
 										invalidateAuthToken(availableAccounts[which], authTokenTypeFullAccess);
 									else

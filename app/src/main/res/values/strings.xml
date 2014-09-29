@@ -12,5 +12,7 @@
     <string name="title_activity_reuse">ReuseActivity</string>
     <string name="title_activity_repair">RepairActivity</string>
     <string name="title_activity_export">ExportActivity</string>
+    <string name="title_activity_link_issue">LinkIssueActivity</string>
+    <string name="title_activity_report_issue">ReportIssueActivity</string>
 
 </resources>
