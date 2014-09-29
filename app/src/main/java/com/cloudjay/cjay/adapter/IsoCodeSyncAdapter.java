@@ -22,9 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by nambv on 16/09/2014.
- */
 public class IsoCodeSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private final AccountManager mAccountManager;

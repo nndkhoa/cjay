@@ -27,6 +27,9 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import de.greenrobot.event.EventBus;
 
+/**
+ *
+ */
 public class LoginActivity extends AccountAuthenticatorActivity {
 
 	public static final String PARAM_AUTH_TOKEN_TYPE = "auth.token";
@@ -100,8 +103,8 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 				try {
 					Bundle bnd = future.getResult();
 
-					final String authtoken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
-					mAccountManager.invalidateAuthToken(availableAccount.type, authtoken);
+					final String authToken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
+					mAccountManager.invalidateAuthToken(availableAccount.type, authToken);
 					showMessage(availableAccount.name + " invalidated");
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -119,13 +122,10 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 			@Override
 			public void run() {
 				try {
-					Bundle bnd = future.getResult();
-
-					final String authToken = bnd
-							.getString(AccountManager.KEY_AUTHTOKEN);
-					showMessage((authToken != null) ? "SUCCESS!\ntoken: "
-							+ authToken : "FAIL");
-					Logger.e("CJay GetToken Bundle is " + bnd);
+					Bundle bundle = future.getResult();
+					final String authToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
+					showMessage((authToken != null) ? "SUCCESS!\ntoken: " + authToken : "FAIL");
+					Logger.e("CJay GetToken Bundle is " + bundle);
 				} catch (Exception e) {
 					e.printStackTrace();
 					showMessage(e.getMessage());

@@ -20,7 +20,6 @@ import com.cloudjay.cjay.util.account.AccountGeneral;
 import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.util.Logger;
 
-
 public class MainActivity extends FragmentActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private Account mConnectedAccount;

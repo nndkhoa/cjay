@@ -7,5 +7,10 @@
     <string name="title_activity_login">LoginActivity</string>
     <string name="btn_login">Đăng nhập</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_audit">AuditActivity</string>
+    <string name="title_activity_import">ImportActivity</string>
+    <string name="title_activity_reuse">ReuseActivity</string>
+    <string name="title_activity_repair">RepairActivity</string>
+    <string name="title_activity_export">ExportActivity</string>
 
 </resources>

@@ -2,9 +2,6 @@ package com.cloudjay.cjay.model;
 
 import android.net.Uri;
 
-/**
- * Created by nambv on 14/09/2014.
- */
 public class GateReportImage {
 
     public int id;
