@@ -35,6 +35,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import de.greenrobot.event.EventBus;
+import retrofit.RetrofitError;
 
 /**
  *
@@ -166,11 +167,11 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 	@OnClick(R.id.btn_login)
 	void doLogin() {
-				email = etemail.getText().toString();
+		email = etemail.getText().toString();
 		password = etpassword.getText().toString();
 		View focusView = null;
 		boolean cancel = false;
-		inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+
 		// Check for a valid password.
 		if (TextUtils.isEmpty(password)) {
 			etpassword.setError(getString(R.string.error_password_field_required));
@@ -199,6 +200,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 		} else {
 			// Define login asynctask login
+			inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 			AsyncTask<Void, Void, Void> login = new AsyncTask<Void, Void, Void>() {
 				@Override
 				protected void onPreExecute() {
@@ -210,43 +212,58 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 				@Override
 				protected Void doInBackground(Void... params) {
-					String token = NetworkClient.getInstance().getToken(getApplicationContext(), email, password);
-					Log.e("Results: ", token);
+					String token = null;
+					try {
+						token = NetworkClient.getInstance().getToken(getApplicationContext(), email, password);
+						Log.e("Results: ", token);
+						mtoken = token;
+						if (null != token) {
+							// add account to account manager
+							addNewAccount(email, password, token, AccountGeneral.AUTH_TOKEN_TYPE);
+						}
+						return null;
+					} catch (RetrofitError error) {
 
-					if (null != token) {
-						mtoken = "Token " + token;
-						// add account to account manager
-						addNewAccount(email, password, token, AccountGeneral.AUTH_TOKEN_TYPE);
+						return null;
 					}
-					return null;
+
 				}
 
 				@Override
 				protected void onPostExecute(Void aVoid) {
-					// Define get data after login success asyntask
-					AsyncTask<Void, Void, Void> getDataAfterLogin = new AsyncTask<Void, Void, Void>() {
-						@Override
-						protected void onPreExecute() {
-							tvLoginStatusMessage.setText(R.string.login_progress_loading_data);
-							super.onPreExecute();
-						}
+					//Check login success
+					if (null != mtoken) {
+						mtoken = "Token "+mtoken;
+						// Define get data after login success asyntask
+						AsyncTask<Void, Void, Void> getDataAfterLogin = new AsyncTask<Void, Void, Void>() {
+							@Override
+							protected void onPreExecute() {
+								tvLoginStatusMessage.setText(R.string.login_progress_loading_data);
+								super.onPreExecute();
+							}
 
-						@Override
-						protected Void doInBackground(Void... params) {
-							NetworkClient.getInstance().getContainerSessionsByPage(getApplicationContext(), mtoken, 1, "");
-							return null;
-						}
+							@Override
+							protected Void doInBackground(Void... params) {
+								NetworkClient.getInstance().getContainerSessionsByPage(getApplicationContext(), mtoken, 1, "");
+								return null;
+							}
 
-						@Override
-						protected void onPostExecute(Void aVoid) {
-							Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-							startActivity(intent);
-							finish();
-							super.onPostExecute(aVoid);
-						}
-					}.execute();
-					super.onPostExecute(aVoid);
+							@Override
+							protected void onPostExecute(Void aVoid) {
+								Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+								startActivity(intent);
+								finish();
+								super.onPostExecute(aVoid);
+							}
+						}.execute();
+						super.onPostExecute(aVoid);
+					} else {
+						login_status.setVisibility(View.GONE);
+						login_form.setVisibility(View.VISIBLE);
+						etemail.setError(getString(R.string.error_incorrect_password));
+					}
 				}
+
 			}.execute();
 
 

@@ -19,6 +19,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import retrofit.RestAdapter;
+import retrofit.RetrofitError;
 import retrofit.client.OkClient;
 
 public class NetworkClient {
@@ -40,12 +41,19 @@ public class NetworkClient {
 	}
 
 
-	public String getToken(Context context, String username, String password) {
+	public String getToken(Context context, String username, String password) throws RetrofitError {
 		OkHttpClient okHttpClient = new OkHttpClient();
 		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.ROOT_API).setClient(new
 				OkClient(okHttpClient)).build();
 		NetworkService cJayService = restAdapter.create(NetworkService.class);
-		JsonObject tokenJson = cJayService.getToken(username, password);
+
+		JsonObject tokenJson = null;
+		try {
+			tokenJson = cJayService.getToken(username, password);
+		} catch (RetrofitError e) {
+			throw e;
+		}
+
 		String token = tokenJson.get("token").getAsString();
 		return token;
 	}
