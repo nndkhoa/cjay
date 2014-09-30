@@ -23,6 +23,7 @@
     <string name="error_email_field_required">Bạn chưa điền email</string>
     <string name="error_password_field_required">Bạn chưa điền mật khẩu</string>
     <string name="error_try_again">Có lỗi phát sinh. Hãy thử đăng nhập lại</string>
+    <string name="error_connection">Không thể kết nối mạng, vui lòng thử lại</string>
 
     <string name="title_activity_audit">AuditActivity</string>
     <string name="title_activity_import">ImportActivity</string>
