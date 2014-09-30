@@ -19,7 +19,7 @@ import com.pubnub.api.PubnubException;
 /**
  * PubNub notification service
  */
-public class PubNubService extends Service {
+public class PubnubService extends Service {
 
 	/**
 	 * Notification manager is used for display message in Notification Center

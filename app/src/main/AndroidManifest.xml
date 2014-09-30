@@ -35,13 +35,9 @@
         </activity>
         <activity
             android:name=".activity.LoginActivity"
-            android:label="@string/title_activity_login">
+            android:label="@string/title_activity_login" >
             android:windowSoftInputMode="stateVisible|adjustPan"
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <provider
@@ -55,7 +51,7 @@
             android:label="@string/title_activity_audit" >
         </activity>
         <activity
-            android:name=".activity.ImportActivity"
+            android:name=".activity.MainProcess"
             android:label="@string/title_activity_import" >
         </activity>
         <activity
@@ -77,6 +73,17 @@
         <activity
             android:name=".activity.ReportIssueActivity"
             android:label="@string/title_activity_report_issue" >
+        </activity>
+        <activity
+            android:name=".activity.MainProcessActivity"
+            android:label="@string/title_activity_main_process" >
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
         </activity>
     </application>
 

@@ -1,0 +1,68 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.cloudjay.cjay.fragment.GateImportFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_container_code"
+            android:textSize="24dp"
+            android:textStyle="bold"
+            android:paddingBottom="3dp"
+            android:text="ABCD1234567 - B" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_camera"
+            android:paddingBottom="6dp"
+            android:text="Camera"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_use_gate_in_image"
+            android:paddingBottom="6dp"
+            android:text="Sử dụng hỉnh Gate-in"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_clean"
+            android:paddingBottom="6dp"
+            android:text="Container Vệ sinh quét"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:weightSum="2">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_complete"
+            android:layout_weight="1"
+            android:text="Hoàn tất"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_continue"
+            android:layout_weight="1"
+            android:text="Tiếp bước sau"/>
+
+    </LinearLayout>
+
+</RelativeLayout>
