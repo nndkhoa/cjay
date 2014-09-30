@@ -322,18 +322,6 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		ButterKnife.inject(this);
 		EventBus.getDefault().register(this);
 
-		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-				.detectDiskReads()
-				.detectDiskWrites()
-				.detectNetwork()   // or .detectAll() for all detectable problems
-				.penaltyLog()
-				.build());
-		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-				.detectLeakedSqlLiteObjects()
-				.detectLeakedClosableObjects()
-				.penaltyLog()
-				.penaltyDeath()
-				.build());
 
 	}
 
