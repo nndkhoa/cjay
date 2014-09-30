@@ -20,7 +20,7 @@ import butterknife.InjectView;
 /**
  * Created by Thai on 9/30/2014.
  */
-public class HomeActivity extends FragmentActivity {
+public class HomeActivity extends BaseActivity {
 
 	@InjectView(R.id.tabhost)
 	FragmentTabHost mTabhost;

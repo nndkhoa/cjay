@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.v4.app.FragmentActivity;
 import android.view.View;
 
 import de.keyboardsurfer.android.widget.crouton.Configuration;
@@ -13,7 +14,7 @@ import de.keyboardsurfer.android.widget.crouton.Style;
 /**
  * Created by Thai on 9/30/2014.
  */
-public class BaseActivity extends Activity {
+public class BaseActivity extends FragmentActivity {
 	/**
 	 * Checks if the device has Internet connection.
 	 *
