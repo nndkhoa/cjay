@@ -259,7 +259,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 								@Override
 								protected void onPostExecute(Void aVoid) {
-									Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+									Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
 									startActivity(intent);
 									finish();
 									super.onPostExecute(aVoid);
