@@ -9,6 +9,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -35,6 +37,9 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Configuration;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 import retrofit.RetrofitError;
 
 /**
@@ -171,107 +176,118 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		password = etpassword.getText().toString();
 		View focusView = null;
 		boolean cancel = false;
-
+		//Check connect to internet
+		if (!hasConnection()) {
+			showCrouton(R.string.error_connection);
+		}
 		// Check for a valid password.
-		if (TextUtils.isEmpty(password)) {
-			etpassword.setError(getString(R.string.error_password_field_required));
-			focusView = etpassword;
-			cancel = true;
-		} else if (password.length() < 6) {
-			etpassword.setError(getString(R.string.error_invalid_password));
-			focusView = etpassword;
-			cancel = true;
-		}
-		// Check for a valid email address.
+		else {
+			if (TextUtils.isEmpty(password)) {
+				etpassword.setError(getString(R.string.error_password_field_required));
+				focusView = etpassword;
+				cancel = true;
+			} else if (password.length() < 6) {
+				etpassword.setError(getString(R.string.error_invalid_password));
+				focusView = etpassword;
+				cancel = true;
+			}
+			// Check for a valid email address.
 
-		if (TextUtils.isEmpty(email)) {
-			etemail.setError(getString(R.string.error_email_field_required));
-			focusView = etemail;
-			cancel = true;
-		} else if (!email.contains("@")) {
-			etemail.setError(getString(R.string.error_invalid_email));
-			focusView = etemail;
-			cancel = true;
-		}
-		if (cancel) {
-			// There was an error; don't attempt login and focus the first
-			// form field with an error.
-			focusView.requestFocus();
+			if (TextUtils.isEmpty(email)) {
+				etemail.setError(getString(R.string.error_email_field_required));
+				focusView = etemail;
+				cancel = true;
+			} else if (!email.contains("@")) {
+				etemail.setError(getString(R.string.error_invalid_email));
+				focusView = etemail;
+				cancel = true;
+			}
+			if (cancel) {
+				// There was an error; don't attempt login and focus the first
+				// form field with an error.
+				focusView.requestFocus();
 
-		} else {
-			// Define login asynctask login
-			inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-			AsyncTask<Void, Void, Void> login = new AsyncTask<Void, Void, Void>() {
-				@Override
-				protected void onPreExecute() {
-					login_form.setVisibility(View.GONE);
-					login_status.setVisibility(View.VISIBLE);
+			} else {
+				// Define login asynctask login
+				inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+				AsyncTask<Void, Void, Void> login = new AsyncTask<Void, Void, Void>() {
+					@Override
+					protected void onPreExecute() {
+						login_form.setVisibility(View.GONE);
+						login_status.setVisibility(View.VISIBLE);
 
-					super.onPreExecute();
-				}
+						super.onPreExecute();
+					}
 
-				@Override
-				protected Void doInBackground(Void... params) {
-					String token = null;
-					try {
-						token = NetworkClient.getInstance().getToken(getApplicationContext(), email, password);
-						Log.e("Results: ", token);
-						mtoken = token;
-						if (null != token) {
-							// add account to account manager
-							addNewAccount(email, password, token, AccountGeneral.AUTH_TOKEN_TYPE);
+					@Override
+					protected Void doInBackground(Void... params) {
+						String token = null;
+						try {
+							token = NetworkClient.getInstance().getToken(getApplicationContext(), email, password);
+							Log.e("Results: ", token);
+							mtoken = token;
+							if (null != token) {
+								// add account to account manager
+								addNewAccount(email, password, token, AccountGeneral.AUTH_TOKEN_TYPE);
+							}
+							return null;
+						} catch (RetrofitError error) {
+
+							return null;
 						}
-						return null;
-					} catch (RetrofitError error) {
 
-						return null;
 					}
 
-				}
+					@Override
+					protected void onPostExecute(Void aVoid) {
+						//Check login success
+						if (null != mtoken) {
+							mtoken = "Token " + mtoken;
+							// Define get data after login success asyntask
+							AsyncTask<Void, Void, Void> getDataAfterLogin = new AsyncTask<Void, Void, Void>() {
+								@Override
+								protected void onPreExecute() {
+									tvLoginStatusMessage.setText(R.string.login_progress_loading_data);
+									super.onPreExecute();
+								}
 
-				@Override
-				protected void onPostExecute(Void aVoid) {
-					//Check login success
-					if (null != mtoken) {
-						mtoken = "Token "+mtoken;
-						// Define get data after login success asyntask
-						AsyncTask<Void, Void, Void> getDataAfterLogin = new AsyncTask<Void, Void, Void>() {
-							@Override
-							protected void onPreExecute() {
-								tvLoginStatusMessage.setText(R.string.login_progress_loading_data);
-								super.onPreExecute();
-							}
+								@Override
+								protected Void doInBackground(Void... params) {
+									NetworkClient.getInstance().getContainerSessionsByPage(getApplicationContext(), mtoken, 1, "");
+									return null;
+								}
 
-							@Override
-							protected Void doInBackground(Void... params) {
-								NetworkClient.getInstance().getContainerSessionsByPage(getApplicationContext(), mtoken, 1, "");
-								return null;
-							}
-
-							@Override
-							protected void onPostExecute(Void aVoid) {
-								Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-								startActivity(intent);
-								finish();
-								super.onPostExecute(aVoid);
-							}
-						}.execute();
-						super.onPostExecute(aVoid);
-					} else {
-						login_status.setVisibility(View.GONE);
-						login_form.setVisibility(View.VISIBLE);
-						etemail.setError(getString(R.string.error_incorrect_password));
+								@Override
+								protected void onPostExecute(Void aVoid) {
+									Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+									startActivity(intent);
+									finish();
+									super.onPostExecute(aVoid);
+								}
+							}.execute();
+							super.onPostExecute(aVoid);
+						} else {
+							login_status.setVisibility(View.GONE);
+							login_form.setVisibility(View.VISIBLE);
+							etemail.setError(getString(R.string.error_incorrect_password));
+						}
 					}
-				}
 
-			}.execute();
+				}.execute();
 
+
+			}
 
 		}
-
-
 	}
 
+	/**
+	 * Add account to account manager
+	 * @param email
+	 * @param password
+	 * @param token
+	 * @param authTokenType
+	 */
 
 	private void addNewAccount(String email, String password, String token, String authTokenType) {
 		AccountManager manager = AccountManager.get(this);
@@ -306,18 +322,6 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		ButterKnife.inject(this);
 		EventBus.getDefault().register(this);
 
-		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-				.detectDiskReads()
-				.detectDiskWrites()
-				.detectNetwork()   // or .detectAll() for all detectable problems
-				.penaltyLog()
-				.build());
-		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-				.detectLeakedSqlLiteObjects()
-				.detectLeakedClosableObjects()
-				.penaltyLog()
-				.penaltyDeath()
-				.build());
 
 	}
 
@@ -331,4 +335,46 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		//	EventBus.getDefault().unregister(this);
 	}
 
+	/**
+	 * Checks if the device has Internet connection.
+	 *
+	 * @return <code>true</code> if the phone is connected to the Internet.
+	 */
+	public boolean hasConnection() {
+		ConnectivityManager cm = (ConnectivityManager) getSystemService(
+				Context.CONNECTIVITY_SERVICE);
+
+		NetworkInfo wifiNetwork = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		if (wifiNetwork != null && wifiNetwork.isConnected()) {
+			return true;
+		}
+
+		NetworkInfo mobileNetwork = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+		if (mobileNetwork != null && mobileNetwork.isConnected()) {
+			return true;
+		}
+
+		NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+		if (activeNetwork != null && activeNetwork.isConnected()) {
+			return true;
+		}
+
+		return false;
+	}
+
+	//Show error
+	public void showCrouton(int textResId) {
+
+		Crouton.cancelAllCroutons();
+		final Crouton crouton = Crouton.makeText(this, textResId, Style.ALERT);
+		crouton.setConfiguration(new Configuration.Builder().setDuration(Configuration.DURATION_INFINITE).build());
+		crouton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Crouton.hide(crouton);
+			}
+		});
+
+		crouton.show();
+	}
 }

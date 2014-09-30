@@ -10,7 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.cloudjay.cjay.activity.MainActivity;
+import com.cloudjay.cjay.activity.HomeActivity;
 
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
 import static com.cloudjay.cjay.util.account.AccountGeneral.AUTH_TOKEN_TYPE_FULL_ACCESS;
@@ -39,7 +39,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
 		final Bundle result;
 		final Intent intent;
 
-		intent = new Intent(this.mContext, MainActivity.class);
+		intent = new Intent(this.mContext, HomeActivity.class);
 		intent.putExtra(AccountGeneral.ARG_ACCOUNT_TYPE, accountType);
 		intent.putExtra(AccountGeneral.ARG_AUTH_TYPE, authTokenType);
 		intent.putExtra(AccountGeneral.ARG_IS_ADDING_NEW_ACCOUNT, true);

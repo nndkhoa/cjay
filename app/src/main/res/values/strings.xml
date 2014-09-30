@@ -5,7 +5,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
- //Màn hình login:    <string name="title_activity_login">Đăng nhập</string>
+    <string name="title_activity_login">Đăng nhập</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Mật khẩu</string>
     <string name="btn_login">Đăng nhập</string>
@@ -21,6 +21,7 @@
     <string name="error_email_field_required">Bạn chưa điền email</string>
     <string name="error_password_field_required">Bạn chưa điền mật khẩu</string>
     <string name="error_try_again">Có lỗi phát sinh. Hãy thử đăng nhập lại</string>
+    <string name="error_connection">Không thể kết nối mạng, vui lòng thử lại</string>
     <string name="title_activity_audit">AuditActivity</string>
     <string name="title_activity_import">ImportActivity</string>
     <string name="title_activity_reuse">ReuseActivity</string>
