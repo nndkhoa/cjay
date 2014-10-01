@@ -18,7 +18,7 @@ public class Operator {
     public ContentValues getContentValues() {
         ContentValues values = new ContentValues();
         values.put(ID, id);
-        values.put(OPERATOR_NAME, Name);
+        values.put(OPERATOR_NAME, operator_name);
         values.put(OPERATOR_CODE, operator_code);
 
         return values;

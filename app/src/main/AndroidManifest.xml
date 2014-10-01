@@ -43,7 +43,10 @@
             android:name=".activity.LoginActivity"
             android:label="@string/title_activity_login"
             android:windowSoftInputMode="stateVisible|adjustPan">
-
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
 
 		<activity
@@ -61,10 +64,7 @@
 		<activity
 			android:name=".activity.WizardActivity"
 			android:label="@string/title_activity_main_process">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+
         </activity>
 		<activity
 			android:name=".activity.CameraActivity"
