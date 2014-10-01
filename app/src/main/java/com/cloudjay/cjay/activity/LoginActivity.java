@@ -13,7 +13,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -42,11 +41,9 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 import retrofit.RetrofitError;
 
-/**
- *
- */
 public class LoginActivity extends AccountAuthenticatorActivity {
-	public static final String PARAM_AUTHTOKEN_TYPE = "auth.token";
+
+	public static final String PARAM_AUTH_TOKEN_TYPE = "auth.token";
 	private AccountManager mAccountManager;
 	private AlertDialog mAlertDialog;
 	private boolean mInvalidate;
@@ -292,7 +289,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	private void addNewAccount(String email, String password, String token, String authTokenType) {
 		AccountManager manager = AccountManager.get(this);
 		String accountType = this.getIntent().getStringExtra(
-				PARAM_AUTHTOKEN_TYPE);
+				PARAM_AUTH_TOKEN_TYPE);
 		if (accountType == null) {
 			accountType = AccountGeneral.ACCOUNT_TYPE;
 		}

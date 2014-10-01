@@ -14,10 +14,10 @@ import com.cloudjay.cjay.R;
  * A simple {@link Fragment} subclass.
  *
  */
-public class ListContainersFixedFragment extends Fragment {
+public class IssueRepairedFragment extends Fragment {
 
 
-    public ListContainersFixedFragment() {
+    public IssueRepairedFragment() {
         // Required empty public constructor
     }
 

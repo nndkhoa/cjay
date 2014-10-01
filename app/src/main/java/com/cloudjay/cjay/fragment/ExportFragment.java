@@ -11,9 +11,7 @@ import android.view.ViewGroup;
 import com.cloudjay.cjay.R;
 
 /**
- * A simple {@link Fragment} subclass.
- * Fragment in MainProcessActivity
- *
+ * Màn hình xuất
  */
 public class ExportFragment extends Fragment {
 
