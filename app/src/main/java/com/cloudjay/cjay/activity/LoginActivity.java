@@ -68,15 +68,23 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	ImageView imageView;
 
 	@InjectView(R.id.rootLayout)
+<<<<<<< HEAD
+	LinearLayout ll_root;
+=======
 	LinearLayout linearLayout;
 
+>>>>>>> 147412b415e6a5b1073ec493fd02b162a0bc1f03
 	@InjectView(R.id.login_form)
 	ScrollView login_form;
 
 	// TODO: need to refactor all layout name
 	@InjectView(R.id.login_status)
+<<<<<<< HEAD
+	LinearLayout ll_login_status;
+=======
 	LinearLayout login_status;
 
+>>>>>>> 147412b415e6a5b1073ec493fd02b162a0bc1f03
 	@InjectView(R.id.login_status_message)
 	TextView tvLoginStatusMessage;
 
@@ -223,7 +231,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 					@Override
 					protected void onPreExecute() {
 						login_form.setVisibility(View.GONE);
-						login_status.setVisibility(View.VISIBLE);
+						ll_login_status.setVisibility(View.VISIBLE);
 
 						super.onPreExecute();
 					}
@@ -262,6 +270,9 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 								@Override
 								protected Void doInBackground(Void... params) {
+<<<<<<< HEAD
+									NetworkClient.getInstance().getContainerSessionsByPage(getApplicationContext(), mtoken,email, 1, "");
+=======
 									NetworkClient.getInstance().getContainerSessionsByPage(getApplicationContext(), mtoken, 1, "");
                                     //get operators from server
                                     List<Operator> operators = NetworkClient.getInstance().getOperators(getApplicationContext(), mtoken, null);
@@ -272,6 +283,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
                                         addValues[i++] = operator.getContentValues();
                                     }
                                     getContentResolver().bulkInsert(Operator.URI, addValues);
+>>>>>>> 147412b415e6a5b1073ec493fd02b162a0bc1f03
 									return null;
 								}
 
@@ -285,7 +297,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 							}.execute();
 							super.onPostExecute(aVoid);
 						} else {
-							login_status.setVisibility(View.GONE);
+							ll_login_status.setVisibility(View.GONE);
 							login_form.setVisibility(View.VISIBLE);
 							etEmail.setError(getString(R.string.error_incorrect_password));
 						}

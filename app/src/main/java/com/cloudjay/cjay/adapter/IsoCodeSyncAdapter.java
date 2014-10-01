@@ -38,7 +38,7 @@ public class IsoCodeSyncAdapter extends AbstractThreadedSyncAdapter {
             String authToken = "Token " + mAccountManager.blockingGetAuthToken(account, AccountGeneral.AUTH_TOKEN_TYPE_FULL_ACCESS, true);
 
             //Get iso codes from server
-            List<IsoCode> listRepairsCode = NetworkClient.getInstance().getRepairCodes(getContext(), authToken, null);
+            List<IsoCode> listRepairsCode = NetworkClient.getInstance().getRepairCodes(getContext(), authToken,account.name, null);
             Logger.i("data server counts: " + listRepairsCode.size());
 
             //Get iso codes from client
