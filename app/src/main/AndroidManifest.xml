@@ -29,21 +29,26 @@
 				android:resource="@xml/iso_code_sync_adapter"/>
 		</service>
 
-		<provider
-			android:name=".db.CJayProvider"
-			android:authorities="com.cloudjay.cjay"
-			android:exported="false">
-		</provider>
+        <provider
+            android:name=".db.CJayProvider"
+            android:authorities="com.cloudjay.cjay"
+            android:exported="false">
+        </provider>
 
-		<activity
-			android:name=".activity.HomeActivity"
-			android:label="@string/app_name">
-		</activity>
-		<activity
-			android:name=".activity.LoginActivity"
-			android:label="@string/title_activity_login"
-			android:windowSoftInputMode="stateVisible|adjustPan">
-		</activity>
+        <activity
+            android:name=".activity.HomeActivity"
+            android:label="@string/app_name">
+        </activity>
+        <activity
+            android:name=".activity.LoginActivity"
+            android:label="@string/title_activity_login"
+            android:windowSoftInputMode="stateVisible|adjustPan">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
 		<activity
 			android:name=".activity.ReuseActivity"
 			android:label="@string/title_activity_reuse">
@@ -59,17 +64,11 @@
 		<activity
 			android:name=".activity.WizardActivity"
 			android:label="@string/title_activity_main_process">
-
 		</activity>
 		<activity
 			android:name=".activity.CameraActivity"
 			android:label="@string/title_activity_camera">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN"/>
-
-				<category android:name="android.intent.category.LAUNCHER"/>
-			</intent-filter>
-		</activity>
+        </activity>
 		<activity
 			android:name=".activity.DisplayActivity"
 			android:label="@string/title_activity_display">

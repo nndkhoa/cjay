@@ -3,7 +3,7 @@ package com.cloudjay.cjay.util;
 public class ApiEndpoint {
 
 	public static final String ROOT_API = "https://beta-dot-cloudjay-web.appspot.com";
-	public static final String TOKEN_API = "/api-token-auth/";
+	public static final String TOKEN_API = "/api/auth";
 	public static final String API_ADD_GCM_DEVICE_API = "/mobile/gcm-devices.json";
 	public static final String CURRENT_USER_API = "/api/cjay/me";
 	public static final String LIST_OPERATORS_API = "/api/cjay/operators";
