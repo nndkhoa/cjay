@@ -68,9 +68,18 @@
             </intent-filter>
 
         </activity>
+        
 		<activity
 			android:name=".activity.CameraActivity"
 			android:label="@string/title_activity_camera">
+        </activity>
+		<activity
+			android:name=".activity.DisplayActivity"
+			android:label="@string/title_activity_display">
+		</activity>
+		<activity
+			android:name=".activity.FullScreenActivity"
+			android:label="@string/title_activity_full_screen">
 		</activity>
 	</application>
 
@@ -84,7 +93,6 @@
 	<uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
 	<uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-
 	<uses-permission android:name="android.permission.CAMERA"/>
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
