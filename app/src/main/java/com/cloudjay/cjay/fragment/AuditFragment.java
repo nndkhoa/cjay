@@ -27,7 +27,7 @@ public class AuditFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	                         Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
-		View v = inflater.inflate(R.layout.fragment_gate_import, container, false);
+		View v = inflater.inflate(R.layout.fragment_audit, container, false);
 		btnContinue = (Button) v.findViewById(R.id.btn_continue);
 		btnContinue.setOnClickListener(new View.OnClickListener() {
 			@Override

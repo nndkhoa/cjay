@@ -30,5 +30,6 @@
     <string name="title_activity_link_issue">LinkIssueActivity</string>
     <string name="title_activity_report_issue">ReportIssueActivity</string>
     <string name="title_activity_main_process">MainProcessActivity</string>
+    <string name="title_activity_camera">CameraActivity</string>
 
 </resources>

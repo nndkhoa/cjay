@@ -12,7 +12,7 @@ public class WizardActivity extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main_process);
+		setContentView(R.layout.activity_wizard);
 
         /* Add ImportFragment to MainProcessActivity */
 		ImportFragment importFragment = new ImportFragment();
