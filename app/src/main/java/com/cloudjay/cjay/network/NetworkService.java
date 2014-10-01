@@ -37,7 +37,7 @@ public interface NetworkService {
 	public List<IsoCode> getComponentCodes(@Header("Authorization") String token, @Header("CJAY_VERSION") String cJayVersion, @Query("modified_after") String lastModifiedDate);
 
 	@GET(ApiEndpoint.LIST_OPERATORS_API)
-	public List<Operator> getOperators(@Header("Authorization") String token, @Header("CJAY_VERSION") String cJayVersion, @Query("modified_after") String lastModifiedDate);
+	public List<Operator> getOperators(@Header("Authorization") String token, @Header("CJAY_VERSION") String cJayVersion, @Query("modified_since") String lastModifiedDate);
 
 	@GET(ApiEndpoint.CONTAINER_SESSIONS_API)
 	public JsonObject getContainerSessionsByPage(@Header("Authorization") String token, @Header("CJAY_VERSION") String cJayVersion, @Query("page") int page, @Query("modified_after") String lastModifiedDate);

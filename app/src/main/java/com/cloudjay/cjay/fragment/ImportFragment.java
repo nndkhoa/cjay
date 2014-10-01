@@ -24,6 +24,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
 import com.cloudjay.cjay.R;
+<<<<<<< HEAD
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.network.NetworkClient;
 import com.cloudjay.cjay.util.Logger;
@@ -35,6 +36,11 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  * Fragment in MainProcessActivity
+=======
+
+/**
+ * Màn hình nhập
+>>>>>>> dcb8b6f96957d05ece6bd1cba07d2947c343c687
  */
 public class ImportFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -51,6 +57,7 @@ public class ImportFragment extends Fragment implements LoaderManager.LoaderCall
     public static final int LOADER_OPERATOR = 1;  //Loader identifier for operators;
     public static final int LOADER_STATUS = 2;    //Loader identifier for statuses;
 
+<<<<<<< HEAD
     protected final AccountManager mAccountManager;
     protected Account mConnectedAccount;
 
@@ -60,12 +67,15 @@ public class ImportFragment extends Fragment implements LoaderManager.LoaderCall
     public ImportFragment(Context context) {
         // Required empty public constructor
         mAccountManager = AccountManager.get(context);
+=======
+    public ImportFragment() {
+>>>>>>> dcb8b6f96957d05ece6bd1cba07d2947c343c687
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         v = inflater.inflate(R.layout.fragment_import, container, false);
 
@@ -83,8 +93,9 @@ public class ImportFragment extends Fragment implements LoaderManager.LoaderCall
         btnContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 /* Go to next fragment */
-                GateImportFragment fragment = new GateImportFragment();
+                AuditFragment fragment = new AuditFragment();
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
                 transaction.replace(R.id.ll_main_process, fragment);
                 transaction.commit();

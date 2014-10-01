@@ -65,6 +65,7 @@ public class NetworkClient {
 		NetworkService cJayService = restAdapter.create(NetworkService.class);
 		String cJayVersion = Utils.getAppVersionName(context);
 		User user = cJayService.getCurrentUser(token, cJayVersion);
+		Logger.e(user.getEmail());
 		return user;
 	}
 
@@ -75,7 +76,7 @@ public class NetworkClient {
 		NetworkService cJayService = restAdapter.create(NetworkService.class);
 		String cJayVersion = Utils.getAppVersionName(context);
 		List<IsoCode> repairCodes = cJayService.getRepairCodes(token, cJayVersion, lastModifiedDate);
-		Logger.e(repairCodes.get(0).display_name);
+		Logger.e(repairCodes.get(0).full_name);
 		return repairCodes;
 	}
 
@@ -86,7 +87,7 @@ public class NetworkClient {
 		NetworkService cJayService = restAdapter.create(NetworkService.class);
 		String cJayVersion = Utils.getAppVersionName(context);
 		List<IsoCode> damageCodes = cJayService.getDamageCodes(token, cJayVersion, lastModifiedDate);
-		Logger.e(damageCodes.get(0).display_name);
+		Logger.e(damageCodes.toString());
 		return damageCodes;
 	}
 
@@ -97,7 +98,7 @@ public class NetworkClient {
 		NetworkService cJayService = restAdapter.create(NetworkService.class);
 		String cJayVersion = Utils.getAppVersionName(context);
 		List<IsoCode> componentCodes = cJayService.getComponentCodes(token, cJayVersion, lastModifiedDate);
-		Logger.e(componentCodes.get(0).display_name);
+		Logger.e(componentCodes.get(0).full_name);
 		return componentCodes;
 	}
 
@@ -110,7 +111,7 @@ public class NetworkClient {
         Logger.e("Token: " + token);
 //        Logger.e(cJayService.getOperators(token, cJayVersion, lastModifiedDate).toString());
 		List<Operator> operators = cJayService.getOperators(token, cJayVersion, lastModifiedDate);
-		Logger.e(operators.get(0).Name);
+		Logger.e(operators.get(0).operator_name );
 		return operators;
 	}
 

@@ -13,7 +13,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -42,11 +41,9 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 import retrofit.RetrofitError;
 
-/**
- *
- */
 public class LoginActivity extends AccountAuthenticatorActivity {
-	public static final String PARAM_AUTHTOKEN_TYPE = "auth.token";
+
+	public static final String PARAM_AUTH_TOKEN_TYPE = "auth.token";
 	private AccountManager mAccountManager;
 	private AlertDialog mAlertDialog;
 	private boolean mInvalidate;
@@ -56,18 +53,26 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 	@InjectView(R.id.btn_login)
 	Button mLoginButton;
+
 	@InjectView(R.id.email)
-	EditText etemail;
+	EditText etEmail;
+
 	@InjectView(R.id.password)
-	EditText etpassword;
+	EditText etPassword;
+
 	@InjectView(R.id.iv_app)
 	ImageView imageView;
+
 	@InjectView(R.id.rootLayout)
 	LinearLayout linearLayout;
+
 	@InjectView(R.id.login_form)
 	ScrollView login_form;
+
+	// TODO: need to refactor all layout name
 	@InjectView(R.id.login_status)
 	LinearLayout login_status;
+
 	@InjectView(R.id.login_status_message)
 	TextView tvLoginStatusMessage;
 
@@ -172,8 +177,8 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 	@OnClick(R.id.btn_login)
 	void doLogin() {
-		email = etemail.getText().toString();
-		password = etpassword.getText().toString();
+		email = etEmail.getText().toString();
+		password = etPassword.getText().toString();
 		View focusView = null;
 		boolean cancel = false;
 		//Check connect to internet
@@ -183,23 +188,23 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		// Check for a valid password.
 		else {
 			if (TextUtils.isEmpty(password)) {
-				etpassword.setError(getString(R.string.error_password_field_required));
-				focusView = etpassword;
+				etPassword.setError(getString(R.string.error_password_field_required));
+				focusView = etPassword;
 				cancel = true;
 			} else if (password.length() < 6) {
-				etpassword.setError(getString(R.string.error_invalid_password));
-				focusView = etpassword;
+				etPassword.setError(getString(R.string.error_invalid_password));
+				focusView = etPassword;
 				cancel = true;
 			}
 			// Check for a valid email address.
 
 			if (TextUtils.isEmpty(email)) {
-				etemail.setError(getString(R.string.error_email_field_required));
-				focusView = etemail;
+				etEmail.setError(getString(R.string.error_email_field_required));
+				focusView = etEmail;
 				cancel = true;
 			} else if (!email.contains("@")) {
-				etemail.setError(getString(R.string.error_invalid_email));
-				focusView = etemail;
+				etEmail.setError(getString(R.string.error_invalid_email));
+				focusView = etEmail;
 				cancel = true;
 			}
 			if (cancel) {
@@ -269,7 +274,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 						} else {
 							login_status.setVisibility(View.GONE);
 							login_form.setVisibility(View.VISIBLE);
-							etemail.setError(getString(R.string.error_incorrect_password));
+							etEmail.setError(getString(R.string.error_incorrect_password));
 						}
 					}
 
@@ -292,7 +297,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	private void addNewAccount(String email, String password, String token, String authTokenType) {
 		AccountManager manager = AccountManager.get(this);
 		String accountType = this.getIntent().getStringExtra(
-				PARAM_AUTHTOKEN_TYPE);
+				PARAM_AUTH_TOKEN_TYPE);
 		if (accountType == null) {
 			accountType = AccountGeneral.ACCOUNT_TYPE;
 		}

@@ -6,9 +6,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.List;
 
-/**
- * Created by Thai on 9/30/2014.
- */
 public class TabHostPagerAdapter extends FragmentPagerAdapter {
 	List<Fragment> fragments;
 

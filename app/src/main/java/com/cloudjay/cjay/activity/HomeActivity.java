@@ -1,7 +1,6 @@
 package com.cloudjay.cjay.activity;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -11,15 +10,13 @@ import com.cloudjay.cjay.adapter.TabHostPagerAdapter;
 import com.cloudjay.cjay.fragment.SearchFragment;
 import com.cloudjay.cjay.fragment.UploadFragment;
 import com.cloudjay.cjay.fragment.WorkingFragment;
+import com.cloudjay.cjay.network.NetworkClient;
 
 import java.util.List;
 import java.util.Vector;
 
 import butterknife.InjectView;
 
-/**
- * Created by Thai on 9/30/2014.
- */
 public class HomeActivity extends BaseActivity {
 
 	@InjectView(R.id.tabhost)
@@ -34,6 +31,15 @@ public class HomeActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.activity_home);
 		super.onCreate(savedInstanceState);
+
+		Thread thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				NetworkClient.getInstance().getContainerSessionById(getApplicationContext(), "Token 9ea2f97a9cdafb2f06e6f9c339a492942f86529d", 7322);
+			}
+		});
+		thread.start();
+
 		initTabHost();
 		initViewPager();
 
@@ -41,10 +47,13 @@ public class HomeActivity extends BaseActivity {
 
 	private void initViewPager() {
 		mViewPager = (ViewPager) findViewById(R.id.viewpager);
+
 		List<android.support.v4.app.Fragment> fragments = new Vector<android.support.v4.app.Fragment>();
+
 		fragments.add(android.support.v4.app.Fragment.instantiate(this, SearchFragment.class.getName()));
 		fragments.add(android.support.v4.app.Fragment.instantiate(this, WorkingFragment.class.getName()));
 		fragments.add(android.support.v4.app.Fragment.instantiate(this, UploadFragment.class.getName()));
+
 		mPagerAdapter = new TabHostPagerAdapter(getSupportFragmentManager(), fragments);
 		mViewPager.setAdapter(mPagerAdapter);
 		mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -63,8 +72,6 @@ public class HomeActivity extends BaseActivity {
 
 			}
 		});
-
-
 	}
 
 	private void initTabHost() {

@@ -15,20 +15,17 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.util.Logger;
 
 /**
- * A simple {@link Fragment} subclass.
- * Fragment in MainProcessActivity
- *
+ * Màn hình sửa chữa
  */
 public class RepairFragment extends Fragment {
 
     ActionBar.Tab Tab1, Tab2;
-    Fragment fragmentTab1 = new ListErrorsFragment();
-    Fragment fragmentTab2 = new ListContainersFixedFragment();
+    Fragment fragmentTab1 = new IssuePendingFragment();
+    Fragment fragmentTab2 = new IssueRepairedFragment();
 
     Button btnContinue;
 
     public RepairFragment() {
-        // Required empty public constructor
     }
 
     @Override
