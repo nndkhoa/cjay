@@ -3,7 +3,7 @@ package com.cloudjay.cjay.fragment;
 
 
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,9 +11,7 @@ import android.view.ViewGroup;
 import com.cloudjay.cjay.R;
 
 /**
- * A simple {@link Fragment} subclass.
- * Fragment in MainProcessActivity
- *
+ * Màn hình xuất
  */
 public class ExportFragment extends Fragment {
 

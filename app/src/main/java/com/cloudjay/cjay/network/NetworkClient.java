@@ -108,7 +108,13 @@ public class NetworkClient {
 				OkClient(okHttpClient)).build();
 		NetworkService cJayService = restAdapter.create(NetworkService.class);
 		String cJayVersion = Utils.getAppVersionName(context);
+<<<<<<< HEAD
 		List<Operator> operators = cJayService.getOperators(token,userName, cJayVersion, lastModifiedDate);
+=======
+        Logger.e("Token: " + token);
+//        Logger.e(cJayService.getOperators(token, cJayVersion, lastModifiedDate).toString());
+		List<Operator> operators = cJayService.getOperators(token, cJayVersion, lastModifiedDate);
+>>>>>>> 147412b415e6a5b1073ec493fd02b162a0bc1f03
 		Logger.e(operators.get(0).operator_name );
 		return operators;
 	}

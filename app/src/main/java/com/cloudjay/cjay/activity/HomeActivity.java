@@ -17,9 +17,6 @@ import java.util.Vector;
 
 import butterknife.InjectView;
 
-/**
- * Created by Thai on 9/30/2014.
- */
 public class HomeActivity extends BaseActivity {
 
 	@InjectView(R.id.tabhost)
@@ -35,6 +32,7 @@ public class HomeActivity extends BaseActivity {
 		setContentView(R.layout.activity_home);
 		super.onCreate(savedInstanceState);
 
+<<<<<<< HEAD
 //		Thread thread = new Thread(new Runnable() {
 //			@Override
 //			public void run() {
@@ -42,6 +40,15 @@ public class HomeActivity extends BaseActivity {
 //			}
 //		});
 //		thread.start();
+=======
+		Thread thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				NetworkClient.getInstance().getContainerSessionById(getApplicationContext(), "Token 9ea2f97a9cdafb2f06e6f9c339a492942f86529d", 7322);
+			}
+		});
+		thread.start();
+>>>>>>> 147412b415e6a5b1073ec493fd02b162a0bc1f03
 
 		initTabHost();
 		initViewPager();
@@ -50,10 +57,13 @@ public class HomeActivity extends BaseActivity {
 
 	private void initViewPager() {
 		mViewPager = (ViewPager) findViewById(R.id.viewpager);
+
 		List<android.support.v4.app.Fragment> fragments = new Vector<android.support.v4.app.Fragment>();
+
 		fragments.add(android.support.v4.app.Fragment.instantiate(this, SearchFragment.class.getName()));
 		fragments.add(android.support.v4.app.Fragment.instantiate(this, WorkingFragment.class.getName()));
 		fragments.add(android.support.v4.app.Fragment.instantiate(this, UploadFragment.class.getName()));
+
 		mPagerAdapter = new TabHostPagerAdapter(getSupportFragmentManager(), fragments);
 		mViewPager.setAdapter(mPagerAdapter);
 		mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -72,8 +82,6 @@ public class HomeActivity extends BaseActivity {
 
 			}
 		});
-
-
 	}
 
 	private void initTabHost() {
