@@ -145,11 +145,11 @@ class ViewPagerAdapter extends FragmentPagerAdapter {
         Locale l = Locale.getDefault();
         switch (position) {
             case 0:
-                return mContext.getResources().getString(R.string.fragment_search).toUpperCase(l);
+                return mContext.getResources().getString(R.string.fragment_search_title).toUpperCase(l);
             case 1:
-                return mContext.getResources().getString(R.string.fragment_working).toUpperCase(l);
+                return mContext.getResources().getString(R.string.fragment_working_title).toUpperCase(l);
             case 2:
-                return mContext.getResources().getString(R.string.fragment_upload).toUpperCase(l);
+                return mContext.getResources().getString(R.string.fragment_upload_title).toUpperCase(l);
         }
         return null;
     }
