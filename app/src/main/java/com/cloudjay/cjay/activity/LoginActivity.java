@@ -63,11 +63,11 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	@InjectView(R.id.iv_app)
 	ImageView imageView;
 	@InjectView(R.id.rootLayout)
-	LinearLayout linearLayout;
+	LinearLayout ll_root;
 	@InjectView(R.id.login_form)
 	ScrollView login_form;
 	@InjectView(R.id.login_status)
-	LinearLayout login_status;
+	LinearLayout ll_login_status;
 	@InjectView(R.id.login_status_message)
 	TextView tvLoginStatusMessage;
 
@@ -214,7 +214,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 					@Override
 					protected void onPreExecute() {
 						login_form.setVisibility(View.GONE);
-						login_status.setVisibility(View.VISIBLE);
+						ll_login_status.setVisibility(View.VISIBLE);
 
 						super.onPreExecute();
 					}
@@ -253,7 +253,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 								@Override
 								protected Void doInBackground(Void... params) {
-									NetworkClient.getInstance().getContainerSessionsByPage(getApplicationContext(), mtoken, 1, "");
+									NetworkClient.getInstance().getContainerSessionsByPage(getApplicationContext(), mtoken,email, 1, "");
 									return null;
 								}
 
@@ -267,7 +267,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 							}.execute();
 							super.onPostExecute(aVoid);
 						} else {
-							login_status.setVisibility(View.GONE);
+							ll_login_status.setVisibility(View.GONE);
 							login_form.setVisibility(View.VISIBLE);
 							etemail.setError(getString(R.string.error_incorrect_password));
 						}
