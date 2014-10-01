@@ -1,5 +1,6 @@
 package com.cloudjay.cjay.model;
 
+import android.content.ContentValues;
 import android.net.Uri;
 
 public class Operator {
@@ -13,4 +14,13 @@ public class Operator {
     public static final String OPERATOR_NAME = "operator_name";
 
     public static final Uri URI = Uri.parse("content://" + User.AUTHORITY + "/" + TABLE);
+
+    public ContentValues getContentValues() {
+        ContentValues values = new ContentValues();
+        values.put(ID, id);
+        values.put(OPERATOR_NAME, Name);
+        values.put(OPERATOR_CODE, operator_code);
+
+        return values;
+    }
 }

@@ -19,7 +19,7 @@ public class MainProcessActivity extends FragmentActivity {
         setContentView(R.layout.activity_main_process);
 
         /* Add ImportFragment to MainProcessActivity */
-        ImportFragment importFragment = new ImportFragment();
+        ImportFragment importFragment = new ImportFragment(this);
         //FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.add(R.id.ll_main_process, importFragment);
