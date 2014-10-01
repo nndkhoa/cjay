@@ -1,20 +1,4 @@
-<<<<<<< HEAD
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.cloudjay.cjay.fragment.SearchFragment">
-
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Hello search fragment" />
-
-</FrameLayout>
-=======
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
@@ -38,4 +22,3 @@
         android:id="@+id/lv_searchContainer"></ListView>
 
 </LinearLayout>
->>>>>>> 7a876b57b725e1a3c507603f935a13322ec460d9
