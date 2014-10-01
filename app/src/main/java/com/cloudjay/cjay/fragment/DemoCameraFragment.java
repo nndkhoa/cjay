@@ -1,110 +1,376 @@
 package com.cloudjay.cjay.fragment;
 
-import android.app.Activity;
-import android.net.Uri;
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.Intent;
+import android.hardware.Camera;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.os.SystemClock;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
+import android.widget.Toast;
 
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.activity.DisplayActivity;
+import com.cloudjay.cjay.util.Logger;
+import com.commonsware.cwac.camera.CameraFragment;
+import com.commonsware.cwac.camera.CameraHost;
+import com.commonsware.cwac.camera.CameraUtils;
+import com.commonsware.cwac.camera.PictureTransaction;
+import com.commonsware.cwac.camera.SimpleCameraHost;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link DemoCameraFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link DemoCameraFragment#newInstance} factory method to
- * create an instance of this fragment.
- *
- */
-public class DemoCameraFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class DemoCameraFragment extends CameraFragment implements
+		SeekBar.OnSeekBarChangeListener {
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+	private static final String KEY_USE_FFC = "com.commonsware.cwac.camera.demo.USE_FFC";
+	private MenuItem singleShotItem = null;
+	private MenuItem autoFocusItem = null;
+	private MenuItem takePictureItem = null;
+	private MenuItem flashItem = null;
+	private MenuItem recordItem = null;
+	private MenuItem stopRecordItem = null;
+	private MenuItem mirrorFFC = null;
 
-    private OnFragmentInteractionListener mListener;
+	private boolean singleShotProcessing = false;
+	private SeekBar zoom = null;
+	private long lastFaceToast = 0L;
+	String flashMode = null;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment DemoCameraFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static DemoCameraFragment newInstance(String param1, String param2) {
-        DemoCameraFragment fragment = new DemoCameraFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-    public DemoCameraFragment() {
-        // Required empty public constructor
-    }
+	public static DemoCameraFragment newInstance(boolean useFFC) {
+		Logger.Log("new DemoCameraFragment");
+		DemoCameraFragment f = new DemoCameraFragment();
+		Bundle args = new Bundle();
+		args.putBoolean(KEY_USE_FFC, useFFC);
+		f.setArguments(args);
+		return (f);
+	}
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+	@Override
+	public void onCreate(Bundle state) {
+		super.onCreate(state);
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_demo_camera, container, false);
-    }
+		// CameraHost is the interface use to configure behavior of camera
+		SimpleCameraHost.Builder builder = new SimpleCameraHost.Builder(new DemoCameraHost(getActivity()));
+		setHost(builder.useFullBleedPreview(true).build());
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
+		setHasOptionsMenu(true);
+	}
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View cameraView =
+				super.onCreateView(inflater, container, savedInstanceState);
+		View results = inflater.inflate(R.layout.fragment_demo_camera, container, false);
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
+		((ViewGroup) results.findViewById(R.id.camera)).addView(cameraView);
+		zoom = (SeekBar) results.findViewById(R.id.zoom);
+		zoom.setKeepScreenOn(true);
+		setRecordingItemVisibility();
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
-    }
+		return (results);
+	}
 
+	@Override
+	public void onPause() {
+		super.onPause();
+
+		getActivity().invalidateOptionsMenu();
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.camera, menu);
+
+		takePictureItem = menu.findItem(R.id.camera);
+		singleShotItem = menu.findItem(R.id.single_shot);
+		singleShotItem.setChecked(getContract().isSingleShotMode());
+		autoFocusItem = menu.findItem(R.id.autofocus);
+		flashItem = menu.findItem(R.id.flash);
+		recordItem = menu.findItem(R.id.record);
+		stopRecordItem = menu.findItem(R.id.stop);
+		mirrorFFC = menu.findItem(R.id.mirror_ffc);
+
+		if (isRecording()) {
+			recordItem.setVisible(false);
+			stopRecordItem.setVisible(true);
+			takePictureItem.setVisible(false);
+		}
+
+		setRecordingItemVisibility();
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.camera:
+				takeSimplePicture();
+
+				return (true);
+
+			case R.id.record:
+				try {
+					record();
+					getActivity().invalidateOptionsMenu();
+				} catch (Exception e) {
+					Log.e(getClass().getSimpleName(),
+							"Exception trying to record", e);
+					Toast.makeText(getActivity(), e.getMessage(),
+							Toast.LENGTH_LONG).show();
+				}
+
+				return (true);
+
+			case R.id.stop:
+				try {
+					stopRecording();
+					getActivity().invalidateOptionsMenu();
+				} catch (Exception e) {
+					Log.e(getClass().getSimpleName(),
+							"Exception trying to stop recording", e);
+					Toast.makeText(getActivity(), e.getMessage(),
+							Toast.LENGTH_LONG).show();
+				}
+
+				return (true);
+
+			case R.id.autofocus:
+				takePictureItem.setEnabled(false);
+				autoFocus();
+
+				return (true);
+
+			case R.id.single_shot:
+				item.setChecked(!item.isChecked());
+				getContract().setSingleShotMode(item.isChecked());
+
+				return (true);
+
+			case R.id.show_zoom:
+				item.setChecked(!item.isChecked());
+				zoom.setVisibility(item.isChecked() ? View.VISIBLE : View.GONE);
+
+				return (true);
+
+			case R.id.flash:
+			case R.id.mirror_ffc:
+				item.setChecked(!item.isChecked());
+
+				return (true);
+		}
+
+		return (super.onOptionsItemSelected(item));
+	}
+
+	public boolean isSingleShotProcessing() {
+		return (singleShotProcessing);
+	}
+
+	@Override
+	public void onProgressChanged(SeekBar seekBar, int progress,
+	                              boolean fromUser) {
+		if (fromUser) {
+			zoom.setEnabled(false);
+			zoomTo(zoom.getProgress()).onComplete(new Runnable() {
+				@Override
+				public void run() {
+					zoom.setEnabled(true);
+				}
+			}).go();
+		}
+	}
+
+	@Override
+	public void onStartTrackingTouch(SeekBar seekBar) {
+		// ignore
+	}
+
+	@Override
+	public void onStopTrackingTouch(SeekBar seekBar) {
+		// ignore
+	}
+
+	void setRecordingItemVisibility() {
+		if (zoom != null && recordItem != null) {
+			if (getDisplayOrientation() != 0
+					&& getDisplayOrientation() != 180) {
+				recordItem.setVisible(false);
+			}
+		}
+	}
+
+	Contract getContract() {
+		return ((Contract) getActivity());
+	}
+
+	/**
+	 * Take a picture, need to call auto focus before taking picture
+	 */
+	public void takeSimplePicture() {
+		Logger.Log("Prepare to take picture");
+
+		if (singleShotItem != null && singleShotItem.isChecked()) {
+			singleShotProcessing = true;
+			takePictureItem.setEnabled(false);
+		}
+
+		PictureTransaction xact = new PictureTransaction(getHost());
+
+		// Tag another object along if you need to
+		// xact.tag();
+
+		if (flashItem != null && flashItem.isChecked()) {
+			xact.flashMode(flashMode);
+		}
+
+		// Call it with PictureTransaction to take picture with configuration in CameraHost
+		// Process image in Subclass of `CameraHost#saveImage`
+		takePicture(xact);
+	}
+
+	public interface Contract {
+		boolean isSingleShotMode();
+
+		void setSingleShotMode(boolean mode);
+	}
+
+	class DemoCameraHost extends SimpleCameraHost implements
+			Camera.FaceDetectionListener {
+		boolean supportsFaces = false;
+
+		public DemoCameraHost(Context _ctxt) {
+			super(_ctxt);
+		}
+
+		@Override
+		public boolean useFrontFacingCamera() {
+			if (getArguments() == null) {
+				return (false);
+			}
+
+			return (getArguments().getBoolean(KEY_USE_FFC));
+		}
+
+		@Override
+		public boolean useSingleShotMode() {
+			if (singleShotItem == null) {
+				return (false);
+			}
+
+			return (singleShotItem.isChecked());
+		}
+
+		/**
+		 * Process taken picture
+		 *
+		 * @param xact
+		 * @param image
+		 */
+		@Override
+		public void saveImage(PictureTransaction xact, byte[] image) {
+
+			// TODO: Checkout cjay v1 flow
+			if (useSingleShotMode()) {
+				singleShotProcessing = false;
+
+				getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						takePictureItem.setEnabled(true);
+					}
+				});
+
+				DisplayActivity.imageToShow = image;
+				startActivity(new Intent(getActivity(), DisplayActivity.class));
+			} else {
+				super.saveImage(xact, image);
+			}
+		}
+
+		@Override
+		public void autoFocusAvailable() {
+			if (autoFocusItem != null) {
+				autoFocusItem.setEnabled(true);
+
+				if (supportsFaces)
+					startFaceDetection();
+			}
+		}
+
+		@Override
+		public void autoFocusUnavailable() {
+			if (autoFocusItem != null) {
+				stopFaceDetection();
+
+				if (supportsFaces)
+					autoFocusItem.setEnabled(false);
+			}
+		}
+
+		@Override
+		public void onCameraFail(CameraHost.FailureReason reason) {
+			super.onCameraFail(reason);
+
+			Toast.makeText(getActivity(),
+					"Sorry, but you cannot use the camera now!",
+					Toast.LENGTH_LONG).show();
+		}
+
+		@Override
+		public Camera.Parameters adjustPreviewParameters(Camera.Parameters parameters) {
+			flashMode =
+					CameraUtils.findBestFlashModeMatch(parameters,
+							Camera.Parameters.FLASH_MODE_RED_EYE,
+							Camera.Parameters.FLASH_MODE_AUTO,
+							Camera.Parameters.FLASH_MODE_ON);
+
+			if (doesZoomReallyWork() && parameters.getMaxZoom() > 0) {
+				zoom.setMax(parameters.getMaxZoom());
+				zoom.setOnSeekBarChangeListener(DemoCameraFragment.this);
+			} else {
+				zoom.setEnabled(false);
+			}
+
+			if (parameters.getMaxNumDetectedFaces() > 0) {
+				supportsFaces = true;
+			} else {
+				Toast.makeText(getActivity(),
+						"Face detection not available for this camera",
+						Toast.LENGTH_LONG).show();
+			}
+
+			return (super.adjustPreviewParameters(parameters));
+		}
+
+		@Override
+		public void onFaceDetection(Camera.Face[] faces, Camera camera) {
+			if (faces.length > 0) {
+				long now = SystemClock.elapsedRealtime();
+
+				if (now > lastFaceToast + 10000) {
+					Toast.makeText(getActivity(), "I see your face!",
+							Toast.LENGTH_LONG).show();
+					lastFaceToast = now;
+				}
+			}
+		}
+
+		@Override
+		@TargetApi(16)
+		public void onAutoFocus(boolean success, Camera camera) {
+			super.onAutoFocus(success, camera);
+
+			takePictureItem.setEnabled(true);
+		}
+
+		@Override
+		public boolean mirrorFFC() {
+			return (mirrorFFC.isChecked());
+		}
+	}
 }
