@@ -4,7 +4,7 @@ import android.net.Uri;
 
 public class Operator {
     public int id;
-    public String Name;
+    public String operator_name ;
     public String operator_code;
 
     public static final String TABLE = "operator";

@@ -11,13 +11,18 @@ public class IsoCode implements Serializable {
     public int id;
     public int type;
     public String code;
-    public String display_name;
+    public String full_name;
 
-    public IsoCode(int id, int type, String code, String display_name) {
+	@Override
+	public String toString() {
+		return code +": " +full_name;
+	}
+
+	public IsoCode(int id, int type, String code, String full_name) {
         id = this.id;
         type = this.type;
         code = this.code;
-        display_name = this.display_name;
+		full_name = this.full_name;
     }
 
     public static final String TABLE = "iso_code";
@@ -33,7 +38,7 @@ public class IsoCode implements Serializable {
         values.put(ID, id);
         values.put(TYPE, type);
         values.put(CODE, code);
-        values.put(DISPLAY_NAME, display_name);
+        values.put(DISPLAY_NAME, full_name);
 
         return values;
     }
@@ -57,7 +62,7 @@ public class IsoCode implements Serializable {
 
         if (id != isoCode.id) return false;
         if (type != isoCode.type) return false;
-        if (!display_name.equals(isoCode.display_name)) return false;
+        if (!full_name.equals(isoCode.full_name)) return false;
         if (!code.equals(isoCode.code)) return false;
 
         return true;
