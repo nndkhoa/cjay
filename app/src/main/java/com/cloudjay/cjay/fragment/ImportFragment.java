@@ -3,10 +3,7 @@ package com.cloudjay.cjay.fragment;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -24,13 +21,11 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
 import com.cloudjay.cjay.R;
-<<<<<<< HEAD
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.network.NetworkClient;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.account.AccountGeneral;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -40,7 +35,6 @@ import java.util.List;
 
 /**
  * Màn hình nhập
->>>>>>> dcb8b6f96957d05ece6bd1cba07d2947c343c687
  */
 public class ImportFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -57,19 +51,14 @@ public class ImportFragment extends Fragment implements LoaderManager.LoaderCall
     public static final int LOADER_OPERATOR = 1;  //Loader identifier for operators;
     public static final int LOADER_STATUS = 2;    //Loader identifier for statuses;
 
-<<<<<<< HEAD
-    protected final AccountManager mAccountManager;
+    public AccountManager mAccountManager;
     protected Account mConnectedAccount;
 
     /* Declare Adapters */
     SimpleCursorAdapter mOperatorAdapter, mStatusAdapter;
 
-    public ImportFragment(Context context) {
-        // Required empty public constructor
-        mAccountManager = AccountManager.get(context);
-=======
     public ImportFragment() {
->>>>>>> dcb8b6f96957d05ece6bd1cba07d2947c343c687
+        mAccountManager = AccountManager.get(getActivity());
     }
 
     @Override
