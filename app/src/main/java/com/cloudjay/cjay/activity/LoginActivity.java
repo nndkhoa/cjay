@@ -6,6 +6,7 @@ import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
 import android.app.ActionBar;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,9 +29,12 @@ import android.widget.Toast;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.LoginSuccessEvent;
+import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.network.NetworkClient;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.account.AccountGeneral;
+
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -259,6 +263,15 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 								@Override
 								protected Void doInBackground(Void... params) {
 									NetworkClient.getInstance().getContainerSessionsByPage(getApplicationContext(), mtoken, 1, "");
+                                    //get operators from server
+                                    List<Operator> operators = NetworkClient.getInstance().getOperators(getApplicationContext(), mtoken, null);
+                                    //save operators to client
+                                    ContentValues addValues[] = new ContentValues[operators.size()];
+                                    int i = 0;
+                                    for (Operator operator : operators) {
+                                        addValues[i++] = operator.getContentValues();
+                                    }
+                                    getContentResolver().bulkInsert(Operator.URI, addValues);
 									return null;
 								}
 
