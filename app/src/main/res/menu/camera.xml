@@ -7,19 +7,6 @@
 		android:title="@string/take_picture">
 	</item>
 	<item
-		android:id="@+id/record"
-		android:icon="@drawable/abc_ic_menu_share_holo_dark"
-		android:showAsAction="ifRoom"
-		android:title="@string/record">
-	</item>
-	<item
-		android:id="@+id/stop"
-		android:icon="@drawable/abc_ic_menu_share_holo_light"
-		android:showAsAction="ifRoom"
-		android:title="@string/stop"
-		android:visible="false">
-	</item>
-	<item
 		android:id="@+id/autofocus"
 		android:enabled="false"
 		android:showAsAction="never"
@@ -43,12 +30,6 @@
 		android:checkable="true"
 		android:checked="true"
 		android:title="@string/flash">
-	</item>
-	<item
-		android:id="@+id/mirror_ffc"
-		android:checkable="true"
-		android:checked="false"
-		android:title="@string/mirror_ffc">
 	</item>
 
 </menu>

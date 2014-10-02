@@ -1,0 +1,315 @@
+package com.cloudjay.cjay.data.model;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Generated;
+
+@Generated("org.jsonschema2pojo")
+public class AuditItem {
+
+	@Expose
+	private long id;
+	@SerializedName("damage_code")
+	@Expose
+	private String damageCode;
+	@SerializedName("damage_code_id")
+	@Expose
+	private long damageCodeId;
+	@SerializedName("repair_code")
+	@Expose
+	private String repairCode;
+	@SerializedName("repair_code_id")
+	@Expose
+	private long repairCodeId;
+	@SerializedName("pay_code")
+	@Expose
+	private Object payCode;
+	@SerializedName("pay_code_type")
+	@Expose
+	private Object payCodeType;
+	@SerializedName("pay_code_id")
+	@Expose
+	private Object payCodeId;
+	@SerializedName("component_code")
+	@Expose
+	private String componentCode;
+	@SerializedName("component_name")
+	@Expose
+	private String componentName;
+	@SerializedName("component_code_id")
+	@Expose
+	private long componentCodeId;
+	@SerializedName("location_code")
+	@Expose
+	private String locationCode;
+	@Expose
+	private Object length;
+	@Expose
+	private Object height;
+	@Expose
+	private long quantity;
+	@SerializedName("is_allowed")
+	@Expose
+	private boolean isAllowed;
+	@SerializedName("audit_images")
+	@Expose
+	private List<AuditImage> auditImages = new ArrayList<AuditImage>();
+	@SerializedName("created_at")
+	@Expose
+	private String createdAt;
+	@SerializedName("modified_at")
+	@Expose
+	private String modifiedAt;
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public AuditItem withId(long id) {
+		this.id = id;
+		return this;
+	}
+
+	public String getDamageCode() {
+		return damageCode;
+	}
+
+	public void setDamageCode(String damageCode) {
+		this.damageCode = damageCode;
+	}
+
+	public AuditItem withDamageCode(String damageCode) {
+		this.damageCode = damageCode;
+		return this;
+	}
+
+	public long getDamageCodeId() {
+		return damageCodeId;
+	}
+
+	public void setDamageCodeId(long damageCodeId) {
+		this.damageCodeId = damageCodeId;
+	}
+
+	public AuditItem withDamageCodeId(long damageCodeId) {
+		this.damageCodeId = damageCodeId;
+		return this;
+	}
+
+	public String getRepairCode() {
+		return repairCode;
+	}
+
+	public void setRepairCode(String repairCode) {
+		this.repairCode = repairCode;
+	}
+
+	public AuditItem withRepairCode(String repairCode) {
+		this.repairCode = repairCode;
+		return this;
+	}
+
+	public long getRepairCodeId() {
+		return repairCodeId;
+	}
+
+	public void setRepairCodeId(long repairCodeId) {
+		this.repairCodeId = repairCodeId;
+	}
+
+	public AuditItem withRepairCodeId(long repairCodeId) {
+		this.repairCodeId = repairCodeId;
+		return this;
+	}
+
+	public Object getPayCode() {
+		return payCode;
+	}
+
+	public void setPayCode(Object payCode) {
+		this.payCode = payCode;
+	}
+
+	public AuditItem withPayCode(Object payCode) {
+		this.payCode = payCode;
+		return this;
+	}
+
+	public Object getPayCodeType() {
+		return payCodeType;
+	}
+
+	public void setPayCodeType(Object payCodeType) {
+		this.payCodeType = payCodeType;
+	}
+
+	public AuditItem withPayCodeType(Object payCodeType) {
+		this.payCodeType = payCodeType;
+		return this;
+	}
+
+	public Object getPayCodeId() {
+		return payCodeId;
+	}
+
+	public void setPayCodeId(Object payCodeId) {
+		this.payCodeId = payCodeId;
+	}
+
+	public AuditItem withPayCodeId(Object payCodeId) {
+		this.payCodeId = payCodeId;
+		return this;
+	}
+
+	public String getComponentCode() {
+		return componentCode;
+	}
+
+	public void setComponentCode(String componentCode) {
+		this.componentCode = componentCode;
+	}
+
+	public AuditItem withComponentCode(String componentCode) {
+		this.componentCode = componentCode;
+		return this;
+	}
+
+	public String getComponentName() {
+		return componentName;
+	}
+
+	public void setComponentName(String componentName) {
+		this.componentName = componentName;
+	}
+
+	public AuditItem withComponentName(String componentName) {
+		this.componentName = componentName;
+		return this;
+	}
+
+	public long getComponentCodeId() {
+		return componentCodeId;
+	}
+
+	public void setComponentCodeId(long componentCodeId) {
+		this.componentCodeId = componentCodeId;
+	}
+
+	public AuditItem withComponentCodeId(long componentCodeId) {
+		this.componentCodeId = componentCodeId;
+		return this;
+	}
+
+	public String getLocationCode() {
+		return locationCode;
+	}
+
+	public void setLocationCode(String locationCode) {
+		this.locationCode = locationCode;
+	}
+
+	public AuditItem withLocationCode(String locationCode) {
+		this.locationCode = locationCode;
+		return this;
+	}
+
+	public Object getLength() {
+		return length;
+	}
+
+	public void setLength(Object length) {
+		this.length = length;
+	}
+
+	public AuditItem withLength(Object length) {
+		this.length = length;
+		return this;
+	}
+
+	public Object getHeight() {
+		return height;
+	}
+
+	public void setHeight(Object height) {
+		this.height = height;
+	}
+
+	public AuditItem withHeight(Object height) {
+		this.height = height;
+		return this;
+	}
+
+	public long getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(long quantity) {
+		this.quantity = quantity;
+	}
+
+	public AuditItem withQuantity(long quantity) {
+		this.quantity = quantity;
+		return this;
+	}
+
+	public boolean isIsAllowed() {
+		return isAllowed;
+	}
+
+	public void setIsAllowed(boolean isAllowed) {
+		this.isAllowed = isAllowed;
+	}
+
+	public AuditItem withIsAllowed(boolean isAllowed) {
+		this.isAllowed = isAllowed;
+		return this;
+	}
+
+	public List<AuditImage> getAuditImages() {
+		return auditImages;
+	}
+
+	public void setAuditImages(List<AuditImage> auditImages) {
+		this.auditImages = auditImages;
+	}
+
+	public AuditItem withAuditImages(List<AuditImage> auditImages) {
+		this.auditImages = auditImages;
+		return this;
+	}
+
+	public String getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(String createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public AuditItem withCreatedAt(String createdAt) {
+		this.createdAt = createdAt;
+		return this;
+	}
+
+	public String getModifiedAt() {
+		return modifiedAt;
+	}
+
+	public void setModifiedAt(String modifiedAt) {
+		this.modifiedAt = modifiedAt;
+	}
+
+	public AuditItem withModifiedAt(String modifiedAt) {
+		this.modifiedAt = modifiedAt;
+		return this;
+	}
+
+}
