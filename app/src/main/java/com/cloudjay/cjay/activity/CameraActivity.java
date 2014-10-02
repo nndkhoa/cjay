@@ -33,12 +33,22 @@ public class CameraActivity extends Activity implements ActionBar.OnNavigationLi
 
 	private boolean hasTwoCameras = (Camera.getNumberOfCameras() > 1);
 	private boolean singleShot = false;
-	private boolean isLockedToLandscape = false;
+	private boolean isLockedToLandscape = true;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_camera);
+
+        Logger.Log("isLockedToLandscape = " + isLockedToLandscape);
+
+        /*final ActionBar actionBar = getActionBar();
+        actionBar.hide();
+
+        Logger.Log("New DemoCameraFragment");
+        current = DemoCameraFragment.newInstance(false);
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, current).commit();*/
 
 		if (hasTwoCameras) {
 
@@ -60,6 +70,7 @@ public class CameraActivity extends Activity implements ActionBar.OnNavigationLi
 
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
+        Logger.Log("isLockedToLandscape = " + isLockedToLandscape);
 
 		if (hasTwoCameras) {
 			if (savedInstanceState.containsKey(STATE_SELECTED_NAVIGATION_ITEM)) {
@@ -117,26 +128,27 @@ public class CameraActivity extends Activity implements ActionBar.OnNavigationLi
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		new MenuInflater(this).inflate(R.menu.main, menu);
-		menu.findItem(R.id.landscape).setChecked(isLockedToLandscape);
+		/*new MenuInflater(this).inflate(R.menu.main_camera, menu);
+		menu.findItem(R.id.landscape).setChecked(isLockedToLandscape);*/
 		return (super.onCreateOptionsMenu(menu));
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.content) {
+		/*if (item.getItemId() == R.id.content) {
 			Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 			File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
 			File output = new File(dir, "CameraContentDemo.jpeg");
 			i.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(output));
 			startActivityForResult(i, CONTENT_REQUEST);
-		} else if (item.getItemId() == R.id.landscape) {
+		}
+        else if (item.getItemId() == R.id.landscape) {
 			item.setChecked(!item.isChecked());
 			current.lockToLandscape(item.isChecked());
 			isLockedToLandscape = item.isChecked();
 		} else if (item.getItemId() == R.id.fullscreen) {
 			startActivity(new Intent(this, FullScreenActivity.class));
-		}
+		}*/
 
 		return (super.onOptionsItemSelected(item));
 	}
