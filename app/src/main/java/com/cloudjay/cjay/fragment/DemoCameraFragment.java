@@ -55,7 +55,8 @@ public class DemoCameraFragment extends CameraFragment implements
 	public void onCreate(Bundle state) {
 		super.onCreate(state);
 
-		// CameraHost is the interface use to configure behavior of camera
+		// 1. CameraHost is the interface use to configure behavior of camera
+		// ~ setting
 		SimpleCameraHost.Builder builder = new SimpleCameraHost.Builder(new DemoCameraHost(getActivity()));
 		setHost(builder.useFullBleedPreview(true).build());
 
@@ -219,6 +220,7 @@ public class DemoCameraFragment extends CameraFragment implements
 			takePictureItem.setEnabled(false);
 		}
 
+		// 2.
 		PictureTransaction xact = new PictureTransaction(getHost());
 
 		// Tag another object along if you need to
@@ -363,9 +365,10 @@ public class DemoCameraFragment extends CameraFragment implements
 		@Override
 		@TargetApi(16)
 		public void onAutoFocus(boolean success, Camera camera) {
-			super.onAutoFocus(success, camera);
 
+			super.onAutoFocus(success, camera);
 			takePictureItem.setEnabled(true);
+
 		}
 
 		@Override

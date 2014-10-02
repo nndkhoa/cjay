@@ -90,6 +90,7 @@ public class CameraActivity extends Activity implements ActionBar.OnNavigationLi
 	@Override
 	public boolean onNavigationItemSelected(int position, long id) {
 
+		// Trigger to open Camera Fragment
 		if (position == 0) {
 			Logger.Log("Position 0");
 			if (std == null) {
