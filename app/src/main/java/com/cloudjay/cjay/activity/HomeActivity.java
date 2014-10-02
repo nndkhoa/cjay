@@ -9,6 +9,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 
 import com.cloudjay.cjay.R;
@@ -40,17 +42,10 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
         configureActionBar();
         configureViewPager();
 
-//		Thread thread = new Thread(new Runnable() {
-//			@Override
-//			public void run() {
-//				NetworkClient.getInstance().getContainerSessionById(getApplicationContext(), "Token 9ea2f97a9cdafb2f06e6f9c339a492942f86529d",7322);
-//			}
-//		});
-//		thread.start();
-
 	}
 
-    private void configureActionBar() {
+
+	private void configureActionBar() {
         actionBar = getActionBar();
         final Method method;
         try {
