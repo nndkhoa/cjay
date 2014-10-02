@@ -1,11 +1,13 @@
 package com.cloudjay.cjay.fragment;
 
-
-
-import android.app.ActionBar;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
+import android.content.Context;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
+import android.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,16 +16,21 @@ import android.widget.Button;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.util.Logger;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Locale;
+
 /**
  * Màn hình sửa chữa
  */
-public class RepairFragment extends Fragment {
+public class RepairFragment extends Fragment implements ActionBar.TabListener {
 
-    ActionBar.Tab Tab1, Tab2;
-    Fragment fragmentTab1 = new IssuePendingFragment();
-    Fragment fragmentTab2 = new IssueRepairedFragment();
-
+    private ViewPagerAdapter mPagerAdapter;
+    View v;
+    ViewPager pager;
     Button btnContinue;
+    ActionBar actionBar;
+    public int currentPosition = 0;
 
     public RepairFragment() {
     }
@@ -32,27 +39,13 @@ public class RepairFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_repair, container, false);
+        v = inflater.inflate(R.layout.fragment_repair, container, false);
 
         Logger.i("Open Repair Fragment");
-        final ActionBar actionBar = getActivity().getActionBar();
+        configureActionBar();
+        getControl();
+        configureViewPager();
 
-        // Create Actionbar Tabs
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-        // Set Tab Icon and Titles
-        Tab1 = actionBar.newTab().setText("Danh sách lỗi");
-        Tab2 = actionBar.newTab().setText("Đã sữa chữa");
-
-        // Set Tab Listeners
-        Tab1.setTabListener(new TabListener(fragmentTab1));
-        Tab2.setTabListener(new TabListener(fragmentTab2));
-
-        // Add tabs to actionbar
-        actionBar.addTab(Tab1);
-        actionBar.addTab(Tab2);
-
-        btnContinue = (Button) v.findViewById(R.id.btn_continue);
         btnContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -61,7 +54,7 @@ public class RepairFragment extends Fragment {
                 actionBar.removeAllTabs();
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 
-                /* Go to next fragment */
+                // Go to next fragment
                 Fragment fragment = new ExportFragment();
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
                 transaction.replace(R.id.ll_main_process, fragment);
@@ -72,28 +65,112 @@ public class RepairFragment extends Fragment {
         return v;
     }
 
-    public class TabListener implements ActionBar.TabListener {
+    private void getControl() {
+        btnContinue = (Button) v.findViewById(R.id.btn_continue);
+        pager = (ViewPager) v.findViewById(R.id.pager);
+    }
 
-        Fragment fragment;
-
-        public TabListener(Fragment fragment) {
-            // TODO Auto-generated constructor stub
-            this.fragment = fragment;
+    private void configureActionBar() {
+        actionBar = getActivity().getActionBar();
+        final Method method;
+        try {
+            method = actionBar.getClass()
+                    .getDeclaredMethod("setHasEmbeddedTabs", new Class[] { Boolean.TYPE });
+            method.setAccessible(true);
+            method.invoke(actionBar, false);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
 
-        @Override
-        public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-            fragmentTransaction.replace(R.id.fragment_container, fragment);
+        // Create Actionbar Tabs
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+    }
+
+    private void configureViewPager() {
+        mPagerAdapter = new ViewPagerAdapter(getActivity(), getActivity().getSupportFragmentManager());
+        pager.setAdapter(mPagerAdapter);
+        pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+
+            @Override
+            public void onPageSelected(int position) {
+                ActionBar.Tab tab = actionBar.getTabAt(position);
+                actionBar.selectTab(tab);
+            }
+
+        });
+
+        // For each of the sections in the app, add a tab to the action bar.
+        for (int i = 0; i < mPagerAdapter.getCount(); i++) {
+            actionBar.addTab(
+                    actionBar.newTab()
+                            .setText(mPagerAdapter.getPageTitle(i))
+                            .setTabListener(this));
+        }
+    }
+
+    @Override
+    public void onTabSelected(ActionBar.Tab tab, android.app.FragmentTransaction fragmentTransaction) {
+        int position = tab.getPosition();
+        pager.setCurrentItem(position);
+        currentPosition = position;
+    }
+
+    @Override
+    public void onTabUnselected(ActionBar.Tab tab, android.app.FragmentTransaction fragmentTransaction) {
+
+    }
+
+    @Override
+    public void onTabReselected(ActionBar.Tab tab, android.app.FragmentTransaction fragmentTransaction) {
+
+    }
+}
+
+/**
+ * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
+ * one of the sections/tabs/pages.
+ */
+class ViewPagerAdapter extends FragmentPagerAdapter {
+
+    Context mContext;
+    public ViewPagerAdapter(Context context, FragmentManager fm) {
+        super(fm);
+        mContext = context;
+    }
+
+    @Override
+    public Fragment getItem(int position) {
+//		return fragments.get(position);
+
+        switch (position) {
+            case 0:
+                return IssuePendingFragment.newInstance(0);
+            case 1:
+                return IssueRepairedFragment.newInstance(1);
+            default:
+                return null;
         }
 
-        @Override
-        public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-            fragmentTransaction.remove(fragment);
-        }
+    }
 
-        @Override
-        public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+    @Override
+    public int getCount() {
+        return 2;
+    }
 
+    @Override
+    public CharSequence getPageTitle(int position) {
+        Locale l = Locale.getDefault();
+        switch (position) {
+            case 0:
+                return "Danh sách lỗi";
+            case 1:
+                return "Đã sữa chữa";
         }
+        return null;
     }
 }

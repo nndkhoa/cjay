@@ -51,4 +51,13 @@
     <string name="mirror_ffc">Mirror FFC</string>
     <string name="title_activity_full_screen">FullScreenActivity</string>
 
+    <!--- Fragments name-->
+    <!-- 3 fragments in HomeActivity Tabs -->
+    <string name="fragment_search_title">Tìm kiếm</string>
+    <string name="fragment_working_title">Đang làm</string>
+    <string name="fragment_upload_title">Tải lên</string>
+    <!-- 2 fragments in RepairFragmentTab -->
+    <string name="fragment_issue_pending">Danh sách lỗi</string>
+    <string name="fragment_issue_repaired">Đã sửa chữa</string>
+
 </resources>

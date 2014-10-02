@@ -28,27 +28,27 @@ public interface NetworkService {
 	public User getCurrentUser(@Header("Authorization") String token, @Header("CJAY_VERSION") String cJayVersion);
 
 	@GET(ApiEndpoint.LIST_REPAIR_CODES_API)
-	public List<IsoCode> getRepairCodes(@Header("Authorization") String token, @Header("CJAY_VERSION") String cJayVersion, @Query("modified_after") String lastModifiedDate);
+	public List<IsoCode> getRepairCodes(@Header("Authorization") String token, @Header("Username") String userName,@Header("CJAY_VERSION") String cJayVersion, @Query("modified_after") String lastModifiedDate);
 
 	@GET(ApiEndpoint.LIST_DAMAGE_CODES_API)
-	public List<IsoCode> getDamageCodes(@Header("Authorization") String token, @Header("CJAY_VERSION") String cJayVersion, @Query("modified_after") String lastModifiedDate);
+	public List<IsoCode> getDamageCodes(@Header("Authorization") String token, @Header("Username") String userName, @Header("CJAY_VERSION") String cJayVersion, @Query("modified_after") String lastModifiedDate);
 
 	@GET(ApiEndpoint.LIST_COMPONENT_CODES_API)
-	public List<IsoCode> getComponentCodes(@Header("Authorization") String token, @Header("CJAY_VERSION") String cJayVersion, @Query("modified_after") String lastModifiedDate);
+	public List<IsoCode> getComponentCodes(@Header("Authorization") String token,@Header("Username") String userName, @Header("CJAY_VERSION") String cJayVersion, @Query("modified_after") String lastModifiedDate);
 
 	@GET(ApiEndpoint.LIST_OPERATORS_API)
-	public List<Operator> getOperators(@Header("Authorization") String token, @Header("CJAY_VERSION") String cJayVersion, @Query("modified_since") String lastModifiedDate);
+	public List<Operator> getOperators(@Header("Authorization") String token,@Header("Username") String userName, @Header("CJAY_VERSION") String cJayVersion, @Query("modified_since") String lastModifiedDate);
 
 	@GET(ApiEndpoint.CONTAINER_SESSIONS_API)
-	public JsonObject getContainerSessionsByPage(@Header("Authorization") String token, @Header("CJAY_VERSION") String cJayVersion, @Query("page") int page, @Query("modified_after") String lastModifiedDate);
+	public JsonObject getContainerSessionsByPage(@Header("Authorization") String token,@Header("Username") String userName, @Header("CJAY_VERSION") String cJayVersion, @Query("page") int page, @Query("modified_after") String lastModifiedDate);
 
 	//TODO edit getContainerSessionById, postContainer and postImageFile
 
 	@GET(ApiEndpoint.CONTAINER_SESSION_ITEM_API)
-	public Session getContainerSessionById(@Header("Authorization") String token, @Header("CJAY_VERSION") String cJayVersion, @Path("id") int containerId);
+	public Session getContainerSessionById(@Header("Authorization") String token,@Header("Username") String userName, @Header("CJAY_VERSION") String cJayVersion, @Path("id") int containerId);
 
 	@POST(ApiEndpoint.CONTAINER_SESSIONS_API)
-	public void postContainer(@Header("Authorization") String token, @Header("CJAY_VERSION") String cJayVersion, @Field("username") String username, @Field("password") String password);
+	public void postContainer(@Header("Authorization") String token,@Header("Username") String userName, @Header("CJAY_VERSION") String cJayVersion, @Field("username") String username, @Field("password") String password);
 
 	// Check source v1, uploadType=media
 	@POST(ApiEndpoint.CJAY_TMP_STORAGE)

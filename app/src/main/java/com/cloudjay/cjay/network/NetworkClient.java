@@ -69,53 +69,51 @@ public class NetworkClient {
 		return user;
 	}
 
-	public List<IsoCode> getRepairCodes(Context context, String token, String lastModifiedDate) {
+	public List<IsoCode> getRepairCodes(Context context, String token,String userName, String lastModifiedDate) {
 		OkHttpClient okHttpClient = new OkHttpClient();
 		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.ROOT_API).setClient(new
 				OkClient(okHttpClient)).build();
 		NetworkService cJayService = restAdapter.create(NetworkService.class);
 		String cJayVersion = Utils.getAppVersionName(context);
-		List<IsoCode> repairCodes = cJayService.getRepairCodes(token, cJayVersion, lastModifiedDate);
+		List<IsoCode> repairCodes = cJayService.getRepairCodes(token,userName, cJayVersion, lastModifiedDate);
 		Logger.e(repairCodes.get(0).full_name);
 		return repairCodes;
 	}
 
-	public List<IsoCode> getDamageCodes(Context context, String token, String lastModifiedDate) {
+	public List<IsoCode> getDamageCodes(Context context, String token,String userName, String lastModifiedDate) {
 		OkHttpClient okHttpClient = new OkHttpClient();
 		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.ROOT_API).setClient(new
 				OkClient(okHttpClient)).build();
 		NetworkService cJayService = restAdapter.create(NetworkService.class);
 		String cJayVersion = Utils.getAppVersionName(context);
-		List<IsoCode> damageCodes = cJayService.getDamageCodes(token, cJayVersion, lastModifiedDate);
+		List<IsoCode> damageCodes = cJayService.getDamageCodes(token,userName, cJayVersion, lastModifiedDate);
 		Logger.e(damageCodes.toString());
 		return damageCodes;
 	}
 
-	public List<IsoCode> getComponentCodes(Context context, String token, String lastModifiedDate) {
+	public List<IsoCode> getComponentCodes(Context context, String token,String userName, String lastModifiedDate) {
 		OkHttpClient okHttpClient = new OkHttpClient();
 		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.ROOT_API).setClient(new
 				OkClient(okHttpClient)).build();
 		NetworkService cJayService = restAdapter.create(NetworkService.class);
 		String cJayVersion = Utils.getAppVersionName(context);
-		List<IsoCode> componentCodes = cJayService.getComponentCodes(token, cJayVersion, lastModifiedDate);
+		List<IsoCode> componentCodes = cJayService.getComponentCodes(token, userName,cJayVersion, lastModifiedDate);
 		Logger.e(componentCodes.get(0).full_name);
 		return componentCodes;
 	}
 
-	public List<Operator> getOperators(Context context, String token, String lastModifiedDate) {
+	public List<Operator> getOperators(Context context, String token,String userName, String lastModifiedDate) {
 		OkHttpClient okHttpClient = new OkHttpClient();
 		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.ROOT_API).setClient(new
 				OkClient(okHttpClient)).build();
 		NetworkService cJayService = restAdapter.create(NetworkService.class);
 		String cJayVersion = Utils.getAppVersionName(context);
-        Logger.e("Token: " + token);
-//        Logger.e(cJayService.getOperators(token, cJayVersion, lastModifiedDate).toString());
-		List<Operator> operators = cJayService.getOperators(token, cJayVersion, lastModifiedDate);
-		Logger.e(operators.get(0).operator_name );
+		List<Operator> operators = cJayService.getOperators(token,userName, cJayVersion, lastModifiedDate);
+        Logger.e(operators.get(0).operator_name );
 		return operators;
 	}
 
-	public List<Session> getContainerSessionsByPage(Context context, String token, int page, String lastModifiedDate) {
+	public List<Session> getContainerSessionsByPage(Context context, String token,String userName, int page, String lastModifiedDate) {
 		OkHttpClient okHttpClient = new OkHttpClient();
 		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.ROOT_API).setClient(new
 				OkClient(okHttpClient)).setLogLevel(RestAdapter.LogLevel.FULL).setLog(new RestAdapter.Log() {
@@ -127,7 +125,7 @@ public class NetworkClient {
 		NetworkService cJayService = restAdapter.create(NetworkService.class);
 		String cJayVersion = Utils.getAppVersionName(context);
 
-		JsonObject jsonObject = cJayService.getContainerSessionsByPage(token, cJayVersion, page, lastModifiedDate);
+		JsonObject jsonObject = cJayService.getContainerSessionsByPage(token,userName, cJayVersion, page, lastModifiedDate);
 		JsonArray jsonArray = jsonObject.getAsJsonArray("results");
 		Gson gson = new Gson();
 		Type listType = new TypeToken<List<Session>>() {
@@ -137,7 +135,7 @@ public class NetworkClient {
 		return containerSessionsByPage;
 	}
 
-	public Session getContainerSessionById(Context context, String token, int id) {
+	public Session getContainerSessionById(Context context, String token,String userName, int id) {
 		OkHttpClient okHttpClient = new OkHttpClient();
 		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.ROOT_API).setClient(new
 				OkClient(okHttpClient)).setLogLevel(RestAdapter.LogLevel.FULL).setLog(new RestAdapter.Log() {
@@ -148,7 +146,7 @@ public class NetworkClient {
 		}).build();
 		NetworkService cJayService = restAdapter.create(NetworkService.class);
 		String cJayVersion = Utils.getAppVersionName(context);
-		Session containerSessionById = cJayService.getContainerSessionById(token, cJayVersion, id);
+		Session containerSessionById = cJayService.getContainerSessionById(token,userName, cJayVersion, id);
 		Logger.e(containerSessionById.getContainerId());
 		return containerSessionById;
 	}

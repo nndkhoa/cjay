@@ -37,14 +37,40 @@
         <ListView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/lv_image">
+            android:id="@+id/lv_image"
+            android:paddingBottom="6dp">
         </ListView>
 
-        <Spinner
+        <RadioGroup
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/sp_status">
-        </Spinner>
+            android:id="@+id/rdn_group_status"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/rdn_status_a"
+                android:text="A"
+                android:checked="true"/>
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/rdn_status_b"
+                android:text="B"/>
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/rdn_status_c"
+                android:text="C"/>
+
+        </RadioGroup>
 
     </LinearLayout>
 

@@ -1,8 +1,8 @@
 package com.cloudjay.cjay.activity;
 
-import android.app.FragmentTransaction;
-import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
+import android.os.Bundle;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.fragment.ImportFragment;
@@ -16,7 +16,7 @@ public class WizardActivity extends FragmentActivity {
 
         /* Add ImportFragment to MainProcessActivity */
 		ImportFragment importFragment = new ImportFragment();
-		FragmentTransaction transaction = getFragmentManager().beginTransaction();
+		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 		transaction.add(R.id.ll_main_process, importFragment);
 		transaction.commit();
 	}
