@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.util.Utils;
 
 import butterknife.InjectView;
 
@@ -20,9 +21,10 @@ import butterknife.InjectView;
 public class AddContainerDialog extends android.support.v4.app.DialogFragment {
 
 	Context context;
+	String containerID;
 
 	@InjectView(R.id.tv_containterIDSearch)
-	TextView tvContainerSearch;
+	TextView tvContainerIDSearch;
 	@InjectView(R.id.tv_searchresult)
 	TextView tvSearchResult;
 	@InjectView(R.id.btn_addContainer)
@@ -30,15 +32,22 @@ public class AddContainerDialog extends android.support.v4.app.DialogFragment {
 	@InjectView(R.id.btn_cancelAddContainer)
 	Button btnCancelAddContainer;
 
-	public AddContainerDialog(Context context) {
+	public AddContainerDialog(Context context, String containerID) {
 		this.context = context;
+		this.containerID = containerID;
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_addcontainer, container, false);
 		getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-		btnAddContainer = (Button) rootView.findViewById(R.id.btn_addContainer);
+		initController(rootView);
+		tvContainerIDSearch.setText(containerID);
+
+		if (Utils.isContainerIdValid(containerID)) {
+			btnAddContainer.setText(R.string.dialog_create_container_id_invalid_iso);
+		}
+
 		btnAddContainer.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -54,6 +63,11 @@ public class AddContainerDialog extends android.support.v4.app.DialogFragment {
 		});
 
 		return rootView;
+	}
+
+	private void initController(View rootView) {
+		tvContainerIDSearch = (TextView) rootView.findViewById(R.id.tv_containterIDSearch);
+		btnAddContainer = (Button) rootView.findViewById(R.id.btn_addContainer);
 	}
 
 }

@@ -18,8 +18,6 @@ import com.cloudjay.cjay.util.Logger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -27,16 +25,12 @@ import java.util.Locale;
  */
 public class RepairFragment extends Fragment implements ActionBar.TabListener {
 
-    ActionBar.Tab Tab1, Tab2;
-    Fragment fragmentTab1 = new IssuePendingFragment();
-    Fragment fragmentTab2 = new IssueRepairedFragment();
     private ViewPagerAdapter mPagerAdapter;
     View v;
     ViewPager pager;
-    List<String> locations = new ArrayList<String>();
     Button btnContinue;
     ActionBar actionBar;
-    private int currentPosition = 0;
+    public int currentPosition = 0;
 
     public RepairFragment() {
     }

@@ -33,6 +33,7 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
     compile 'com.squareup.okhttp:okhttp:2.0.0'
     compile 'de.greenrobot:eventbus:2.2.1'
+    compile 'com.path:android-priority-jobqueue:1.1.2'
 
 	compile 'com.commonsware.cwac:camera:0.6.+'
 

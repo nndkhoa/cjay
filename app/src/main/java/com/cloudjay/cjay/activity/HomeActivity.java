@@ -1,85 +1,152 @@
 package com.cloudjay.cjay.activity;
 
+import android.app.ActionBar;
+import android.app.FragmentTransaction;
+import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTabHost;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.View;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.adapter.TabHostPagerAdapter;
 import com.cloudjay.cjay.fragment.SearchFragment;
 import com.cloudjay.cjay.fragment.UploadFragment;
 import com.cloudjay.cjay.fragment.WorkingFragment;
 import com.cloudjay.cjay.network.NetworkClient;
 
-import java.util.List;
-import java.util.Vector;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Locale;
 
 import butterknife.InjectView;
 
-public class HomeActivity extends BaseActivity {
+public class HomeActivity extends BaseActivity implements ActionBar.TabListener {
 
-	@InjectView(R.id.tabhost)
-	FragmentTabHost mTabhost;
-
-	@InjectView(R.id.viewpager)
 	ViewPager mViewPager;
-
 	PagerAdapter mPagerAdapter;
+    ActionBar actionBar;
+    public int currentPosition = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.activity_home);
 		super.onCreate(savedInstanceState);
 
-//		Thread thread = new Thread(new Runnable() {
-//			@Override
-//			public void run() {
-//				NetworkClient.getInstance().getContainerSessionById(getApplicationContext(), "Token 9ea2f97a9cdafb2f06e6f9c339a492942f86529d",7322);
-//			}
-//		});
-//		thread.start();
+        mViewPager = (ViewPager) findViewById(R.id.pager);
 
-
-		initTabHost();
-		initViewPager();
+        configureActionBar();
+        configureViewPager();
 
 	}
 
-	private void initViewPager() {
-		mViewPager = (ViewPager) findViewById(R.id.viewpager);
 
-		List<android.support.v4.app.Fragment> fragments = new Vector<android.support.v4.app.Fragment>();
+	private void configureActionBar() {
+        actionBar = getActionBar();
+        final Method method;
+        try {
+            method = actionBar.getClass()
+                    .getDeclaredMethod("setHasEmbeddedTabs", new Class[] { Boolean.TYPE });
+            method.setAccessible(true);
+            method.invoke(actionBar, false);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
 
-		fragments.add(android.support.v4.app.Fragment.instantiate(this, SearchFragment.class.getName()));
-		fragments.add(android.support.v4.app.Fragment.instantiate(this, WorkingFragment.class.getName()));
-		fragments.add(android.support.v4.app.Fragment.instantiate(this, UploadFragment.class.getName()));
+        // Create Actionbar Tabs
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+    }
 
-		mPagerAdapter = new TabHostPagerAdapter(getSupportFragmentManager(), fragments);
-		mViewPager.setAdapter(mPagerAdapter);
-		mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-			@Override
-			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    private void configureViewPager() {
+        mPagerAdapter = new ViewPagerAdapter(getApplicationContext(), getSupportFragmentManager());
+        mViewPager.setAdapter(mPagerAdapter);
+        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
-			}
+            @Override
+            public void onPageSelected(int position) {
+                ActionBar.Tab tab = actionBar.getTabAt(position);
+                actionBar.selectTab(tab);
+            }
 
-			@Override
-			public void onPageSelected(int position) {
-				mTabhost.setCurrentTab(position);
-			}
+        });
 
-			@Override
-			public void onPageScrollStateChanged(int state) {
+        // For each of the sections in the app, add a tab to the action bar.
+        for (int i = 0; i < mPagerAdapter.getCount(); i++) {
+            actionBar.addTab(
+                    actionBar.newTab()
+                            .setText(mPagerAdapter.getPageTitle(i))
+                            .setTabListener(this));
+        }
+    }
 
-			}
-		});
-	}
+    @Override
+    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+        int position = tab.getPosition();
+        mViewPager.setCurrentItem(position);
+        currentPosition = position;
+    }
 
-	private void initTabHost() {
-		mTabhost = (FragmentTabHost) findViewById(R.id.tabhost);
-		mTabhost.setup(this, getSupportFragmentManager(), R.id.realtabcontent);
-		mTabhost.addTab(mTabhost.newTabSpec("tab1").setIndicator("Tìm kiếm"), SearchFragment.class, null);
-		mTabhost.addTab(mTabhost.newTabSpec("tab1").setIndicator("Đang làm"), WorkingFragment.class, null);
-		mTabhost.addTab(mTabhost.newTabSpec("tab1").setIndicator("Tải lên"), UploadFragment.class, null);
-	}
+    @Override
+    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
+    }
+
+    @Override
+    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
+    }
 }
+
+class ViewPagerAdapter extends FragmentPagerAdapter {
+
+    Context mContext;
+    public ViewPagerAdapter(Context context, FragmentManager fm) {
+        super(fm);
+        mContext = context;
+    }
+
+    @Override
+    public Fragment getItem(int position) {
+//		return fragments.get(position);
+
+        switch (position) {
+            case 0:
+                return SearchFragment.newInstance(0);
+            case 1:
+                return WorkingFragment.newInstance(1);
+            case 2:
+                return UploadFragment.newInstance(2);
+            default:
+                return null;
+        }
+
+    }
+
+    @Override
+    public int getCount() {
+        return 3;
+    }
+
+    @Override
+    public CharSequence getPageTitle(int position) {
+        Locale l = Locale.getDefault();
+        switch (position) {
+            case 0:
+                return mContext.getResources().getString(R.string.fragment_search_title).toUpperCase(l);
+            case 1:
+                return mContext.getResources().getString(R.string.fragment_working_title).toUpperCase(l);
+            case 2:
+                return mContext.getResources().getString(R.string.fragment_upload_title).toUpperCase(l);
+        }
+        return null;
+    }
+}
+

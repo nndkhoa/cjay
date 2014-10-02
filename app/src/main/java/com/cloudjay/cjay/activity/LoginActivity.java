@@ -6,7 +6,6 @@ import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
 import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -29,12 +28,10 @@ import android.widget.Toast;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.LoginSuccessEvent;
-import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.network.NetworkClient;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.account.AccountGeneral;
-
-import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -68,23 +65,15 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	ImageView imageView;
 
 	@InjectView(R.id.rootLayout)
-<<<<<<< HEAD
 	LinearLayout ll_root;
-=======
-	LinearLayout linearLayout;
 
->>>>>>> 147412b415e6a5b1073ec493fd02b162a0bc1f03
 	@InjectView(R.id.login_form)
 	ScrollView login_form;
 
 	// TODO: need to refactor all layout name
 	@InjectView(R.id.login_status)
-<<<<<<< HEAD
 	LinearLayout ll_login_status;
-=======
-	LinearLayout login_status;
 
->>>>>>> 147412b415e6a5b1073ec493fd02b162a0bc1f03
 	@InjectView(R.id.login_status_message)
 	TextView tvLoginStatusMessage;
 
@@ -270,11 +259,13 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 								@Override
 								protected Void doInBackground(Void... params) {
-<<<<<<< HEAD
-									NetworkClient.getInstance().getContainerSessionsByPage(getApplicationContext(), mtoken,email, 1, "");
-=======
-									NetworkClient.getInstance().getContainerSessionsByPage(getApplicationContext(), mtoken, 1, "");
-                                    //get operators from server
+									//TODO add all data below to database
+									User user = NetworkClient.getInstance().getCurrentUser(getApplicationContext(), mtoken);
+									NetworkClient.getInstance().getDamageCodes(getApplicationContext(), mtoken, user.getFullName(), null);
+									NetworkClient.getInstance().getComponentCodes(getApplicationContext(), mtoken, user.getFullName(), null);
+									NetworkClient.getInstance().getRepairCodes(getApplicationContext(), mtoken, user.getFullName(), null);
+									NetworkClient.getInstance().getOperators(getApplicationContext(), mtoken, user.getFullName(), null);
+	                                /*//get operators from server
                                     List<Operator> operators = NetworkClient.getInstance().getOperators(getApplicationContext(), mtoken, null);
                                     //save operators to client
                                     ContentValues addValues[] = new ContentValues[operators.size()];
@@ -282,8 +273,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
                                     for (Operator operator : operators) {
                                         addValues[i++] = operator.getContentValues();
                                     }
-                                    getContentResolver().bulkInsert(Operator.URI, addValues);
->>>>>>> 147412b415e6a5b1073ec493fd02b162a0bc1f03
+                                    getContentResolver().bulkInsert(Operator.URI, addValues);*/
 									return null;
 								}
 
@@ -313,6 +303,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 	/**
 	 * Add account to account manager
+	 *
 	 * @param email
 	 * @param password
 	 * @param token

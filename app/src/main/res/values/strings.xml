@@ -33,6 +33,9 @@
     <string name="title_activity_camera">CameraActivity</string>
     <string name="title_activity_display">DisplayActivity</string>
 
+    <string name="dialog_create_container_id_invalid_iso">Tạo container sai ISO</string>
+    <string name="btn_search">Tìm kiếm</string>
+
     <!--  -->
 
     <string name="standard">Standard</string>
@@ -50,5 +53,19 @@
     <string name="launch_full_screen">Launch Full-Screen</string>
     <string name="mirror_ffc">Mirror FFC</string>
     <string name="title_activity_full_screen">FullScreenActivity</string>
+
+    <!--- Fragments name-->
+    <!-- 3 fragments in HomeActivity Tabs -->
+    <string name="fragment_search_title">Tìm kiếm</string>
+    <string name="fragment_working_title">Đang làm</string>
+    <string name="fragment_upload_title">Tải lên</string>
+    <!-- 2 fragments in RepairFragmentTab -->
+    <string name="fragment_issue_pending">Danh sách lỗi</string>
+    <string name="fragment_issue_repaired">Đã sửa chữa</string>
+    <string name="fragment_search_pb_searching">Đang tìm kiếm</string>
+    <string name="fragment_search_hint_et_search">Nhập container ID cần tìm</string>
+    <string name="fragment_search_btn_search">Tìm kiếm</string>
+    <string name="dialog_container_id_required">Chưa nhập container ID</string>
+    <string name="dialog_container_id_invalid">Container ID không đúng quy định</string>
 
 </resources>
