@@ -32,7 +32,6 @@ public class HomeActivity extends BaseActivity {
 		setContentView(R.layout.activity_home);
 		super.onCreate(savedInstanceState);
 
-<<<<<<< HEAD
 //		Thread thread = new Thread(new Runnable() {
 //			@Override
 //			public void run() {
@@ -40,15 +39,7 @@ public class HomeActivity extends BaseActivity {
 //			}
 //		});
 //		thread.start();
-=======
-		Thread thread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				NetworkClient.getInstance().getContainerSessionById(getApplicationContext(), "Token 9ea2f97a9cdafb2f06e6f9c339a492942f86529d", 7322);
-			}
-		});
-		thread.start();
->>>>>>> 147412b415e6a5b1073ec493fd02b162a0bc1f03
+
 
 		initTabHost();
 		initViewPager();
