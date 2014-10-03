@@ -4,8 +4,10 @@ import com.google.gson.annotations.Expose;
 
 import javax.annotation.Generated;
 
+import io.realm.RealmObject;
+
 @Generated("org.jsonschema2pojo")
-public class AuditImage {
+public class AuditImage extends RealmObject {
 
 	@Expose
 	private long id;

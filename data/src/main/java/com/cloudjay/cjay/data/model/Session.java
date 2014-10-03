@@ -4,13 +4,13 @@ package com.cloudjay.cjay.data.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.annotation.Generated;
 
+import io.realm.RealmList;
+import io.realm.RealmObject;
+
 @Generated("org.jsonschema2pojo")
-public class Session {
+public class Session extends RealmObject {
 
 	@Expose
 	private long id;
@@ -24,66 +24,42 @@ public class Session {
 
 	@Expose
 	private long status;
+
 	@SerializedName("container_id")
 	@Expose
 	private String containerId;
+
 	@SerializedName("operator_code")
 	@Expose
 	private String operatorCode;
+
 	@SerializedName("operator_id")
 	@Expose
 	private long operatorId;
+
 	@SerializedName("depot_code")
 	@Expose
 	private String depotCode;
+
 	@SerializedName("depot_id")
 	@Expose
 	private long depotId;
+
 	@SerializedName("check_in_time")
 	@Expose
 	private String checkInTime;
-	@SerializedName("supervise_time")
-	@Expose
-	private String superviseTime;
-	@SerializedName("approve_time")
-	@Expose
-	private String approveTime;
-	@SerializedName("input_time")
-	@Expose
-	private String inputTime;
-	@SerializedName("repair_time")
-	@Expose
-	private Object repairTime;
-	@SerializedName("available_time")
-	@Expose
-	private Object availableTime;
+
 	@SerializedName("check_out_time")
 	@Expose
-	private Object checkOutTime;
-	@SerializedName("estimate_time")
-	@Expose
-	private String estimateTime;
-	@SerializedName("user_check_in_name")
-	@Expose
-	private String userCheckInName;
-	@SerializedName("user_supervise_name")
-	@Expose
-	private String userSuperviseName;
-	@SerializedName("user_repair_name")
-	@Expose
-	private Object userRepairName;
-	@SerializedName("user_available_name")
-	@Expose
-	private Object userAvailableName;
-	@SerializedName("user_check_out_name")
-	@Expose
-	private Object userCheckOutName;
+	private String checkOutTime;
+
 	@SerializedName("gate_images")
 	@Expose
-	private List<GateImage> gateImages = new ArrayList<GateImage>();
+	private RealmList<GateImage> gateImages;
+
 	@SerializedName("audit_items")
 	@Expose
-	private List<AuditItem> auditItems = new ArrayList<AuditItem>();
+	private RealmList<AuditItem> auditItems;
 
 	public long getId() {
 		return id;
@@ -215,184 +191,41 @@ public class Session {
 		return this;
 	}
 
-	public String getSuperviseTime() {
-		return superviseTime;
-	}
-
-	public void setSuperviseTime(String superviseTime) {
-		this.superviseTime = superviseTime;
-	}
-
-	public Session withSuperviseTime(String superviseTime) {
-		this.superviseTime = superviseTime;
-		return this;
-	}
-
-	public String getApproveTime() {
-		return approveTime;
-	}
-
-	public void setApproveTime(String approveTime) {
-		this.approveTime = approveTime;
-	}
-
-	public Session withApproveTime(String approveTime) {
-		this.approveTime = approveTime;
-		return this;
-	}
-
-	public String getInputTime() {
-		return inputTime;
-	}
-
-	public void setInputTime(String inputTime) {
-		this.inputTime = inputTime;
-	}
-
-	public Session withInputTime(String inputTime) {
-		this.inputTime = inputTime;
-		return this;
-	}
-
-	public Object getRepairTime() {
-		return repairTime;
-	}
-
-	public void setRepairTime(Object repairTime) {
-		this.repairTime = repairTime;
-	}
-
-	public Session withRepairTime(Object repairTime) {
-		this.repairTime = repairTime;
-		return this;
-	}
-
-	public Object getAvailableTime() {
-		return availableTime;
-	}
-
-	public void setAvailableTime(Object availableTime) {
-		this.availableTime = availableTime;
-	}
-
-	public Session withAvailableTime(Object availableTime) {
-		this.availableTime = availableTime;
-		return this;
-	}
-
 	public Object getCheckOutTime() {
 		return checkOutTime;
 	}
 
-	public void setCheckOutTime(Object checkOutTime) {
+	public void setCheckOutTime(String checkOutTime) {
 		this.checkOutTime = checkOutTime;
 	}
 
-	public Session withCheckOutTime(Object checkOutTime) {
+	public Session withCheckOutTime(String checkOutTime) {
 		this.checkOutTime = checkOutTime;
 		return this;
 	}
 
-	public String getEstimateTime() {
-		return estimateTime;
-	}
-
-	public void setEstimateTime(String estimateTime) {
-		this.estimateTime = estimateTime;
-	}
-
-	public Session withEstimateTime(String estimateTime) {
-		this.estimateTime = estimateTime;
-		return this;
-	}
-
-	public String getUserCheckInName() {
-		return userCheckInName;
-	}
-
-	public void setUserCheckInName(String userCheckInName) {
-		this.userCheckInName = userCheckInName;
-	}
-
-	public Session withUserCheckInName(String userCheckInName) {
-		this.userCheckInName = userCheckInName;
-		return this;
-	}
-
-	public String getUserSuperviseName() {
-		return userSuperviseName;
-	}
-
-	public void setUserSuperviseName(String userSuperviseName) {
-		this.userSuperviseName = userSuperviseName;
-	}
-
-	public Session withUserSuperviseName(String userSuperviseName) {
-		this.userSuperviseName = userSuperviseName;
-		return this;
-	}
-
-	public Object getUserRepairName() {
-		return userRepairName;
-	}
-
-	public void setUserRepairName(Object userRepairName) {
-		this.userRepairName = userRepairName;
-	}
-
-	public Session withUserRepairName(Object userRepairName) {
-		this.userRepairName = userRepairName;
-		return this;
-	}
-
-	public Object getUserAvailableName() {
-		return userAvailableName;
-	}
-
-	public void setUserAvailableName(Object userAvailableName) {
-		this.userAvailableName = userAvailableName;
-	}
-
-	public Session withUserAvailableName(Object userAvailableName) {
-		this.userAvailableName = userAvailableName;
-		return this;
-	}
-
-	public Object getUserCheckOutName() {
-		return userCheckOutName;
-	}
-
-	public void setUserCheckOutName(Object userCheckOutName) {
-		this.userCheckOutName = userCheckOutName;
-	}
-
-	public Session withUserCheckOutName(Object userCheckOutName) {
-		this.userCheckOutName = userCheckOutName;
-		return this;
-	}
-
-	public List<GateImage> getGateImages() {
+	public RealmList<GateImage> getGateImages() {
 		return gateImages;
 	}
 
-	public void setGateImages(List<GateImage> gateImages) {
+	public void setGateImages(RealmList<GateImage> gateImages) {
 		this.gateImages = gateImages;
 	}
 
-	public Session withGateImages(List<GateImage> gateImages) {
+	public Session withGateImages(RealmList<GateImage> gateImages) {
 		this.gateImages = gateImages;
 		return this;
 	}
 
-	public List<AuditItem> getAuditItems() {
+	public RealmList<AuditItem> getAuditItems() {
 		return auditItems;
 	}
 
-	public void setAuditItems(List<AuditItem> auditItems) {
+	public void setAuditItems(RealmList<AuditItem> auditItems) {
 		this.auditItems = auditItems;
 	}
 
-	public Session withAuditItems(List<AuditItem> auditItems) {
+	public Session withAuditItems(RealmList<AuditItem> auditItems) {
 		this.auditItems = auditItems;
 		return this;
 	}

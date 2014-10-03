@@ -3,13 +3,13 @@ package com.cloudjay.cjay.data.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.annotation.Generated;
 
+import io.realm.RealmList;
+import io.realm.RealmObject;
+
 @Generated("org.jsonschema2pojo")
-public class AuditItem {
+public class AuditItem extends RealmObject {
 
 	@Expose
 	private long id;
@@ -25,15 +25,6 @@ public class AuditItem {
 	@SerializedName("repair_code_id")
 	@Expose
 	private long repairCodeId;
-	@SerializedName("pay_code")
-	@Expose
-	private Object payCode;
-	@SerializedName("pay_code_type")
-	@Expose
-	private Object payCodeType;
-	@SerializedName("pay_code_id")
-	@Expose
-	private Object payCodeId;
 	@SerializedName("component_code")
 	@Expose
 	private String componentCode;
@@ -47,9 +38,9 @@ public class AuditItem {
 	@Expose
 	private String locationCode;
 	@Expose
-	private Object length;
+	private double length;
 	@Expose
-	private Object height;
+	private double height;
 	@Expose
 	private long quantity;
 	@SerializedName("is_allowed")
@@ -57,7 +48,7 @@ public class AuditItem {
 	private boolean isAllowed;
 	@SerializedName("audit_images")
 	@Expose
-	private List<AuditImage> auditImages = new ArrayList<AuditImage>();
+	private RealmList<AuditImage> auditImages;
 	@SerializedName("created_at")
 	@Expose
 	private String createdAt;
@@ -130,45 +121,6 @@ public class AuditItem {
 		return this;
 	}
 
-	public Object getPayCode() {
-		return payCode;
-	}
-
-	public void setPayCode(Object payCode) {
-		this.payCode = payCode;
-	}
-
-	public AuditItem withPayCode(Object payCode) {
-		this.payCode = payCode;
-		return this;
-	}
-
-	public Object getPayCodeType() {
-		return payCodeType;
-	}
-
-	public void setPayCodeType(Object payCodeType) {
-		this.payCodeType = payCodeType;
-	}
-
-	public AuditItem withPayCodeType(Object payCodeType) {
-		this.payCodeType = payCodeType;
-		return this;
-	}
-
-	public Object getPayCodeId() {
-		return payCodeId;
-	}
-
-	public void setPayCodeId(Object payCodeId) {
-		this.payCodeId = payCodeId;
-	}
-
-	public AuditItem withPayCodeId(Object payCodeId) {
-		this.payCodeId = payCodeId;
-		return this;
-	}
-
 	public String getComponentCode() {
 		return componentCode;
 	}
@@ -221,28 +173,28 @@ public class AuditItem {
 		return this;
 	}
 
-	public Object getLength() {
+	public double getLength() {
 		return length;
 	}
 
-	public void setLength(Object length) {
+	public void setLength(double length) {
 		this.length = length;
 	}
 
-	public AuditItem withLength(Object length) {
+	public AuditItem withLength(double length) {
 		this.length = length;
 		return this;
 	}
 
-	public Object getHeight() {
+	public double getHeight() {
 		return height;
 	}
 
-	public void setHeight(Object height) {
+	public void setHeight(double height) {
 		this.height = height;
 	}
 
-	public AuditItem withHeight(Object height) {
+	public AuditItem withHeight(double height) {
 		this.height = height;
 		return this;
 	}
@@ -273,15 +225,15 @@ public class AuditItem {
 		return this;
 	}
 
-	public List<AuditImage> getAuditImages() {
+	public RealmList<AuditImage> getAuditImages() {
 		return auditImages;
 	}
 
-	public void setAuditImages(List<AuditImage> auditImages) {
+	public void setAuditImages(RealmList<AuditImage> auditImages) {
 		this.auditImages = auditImages;
 	}
 
-	public AuditItem withAuditImages(List<AuditImage> auditImages) {
+	public AuditItem withAuditImages(RealmList<AuditImage> auditImages) {
 		this.auditImages = auditImages;
 		return this;
 	}

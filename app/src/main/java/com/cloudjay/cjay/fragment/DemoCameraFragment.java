@@ -13,8 +13,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.DisplayActivity;
@@ -36,8 +38,10 @@ public class DemoCameraFragment extends CameraFragment implements
 
 	private boolean singleShotProcessing = false;
 	//private SeekBar zoom = null;
-    private Button btnTakePicture;
-    private Button btnFlashMode;
+    private ImageButton btnTakePicture;
+    private ImageButton btnFlashMode;
+    private ToggleButton btnCameraMode;
+    private Button btnDone;
 	private long lastFaceToast = 0L;
 	String flashMode = null;
 
@@ -71,15 +75,16 @@ public class DemoCameraFragment extends CameraFragment implements
 		((ViewGroup) results.findViewById(R.id.camera)).addView(cameraView);
 		/*zoom = (SeekBar) results.findViewById(R.id.zoom);
 		zoom.setKeepScreenOn(true);*/
-        btnTakePicture = (Button) results.findViewById(R.id.btn_capture);
+        btnTakePicture = (ImageButton) results.findViewById(R.id.btn_capture);
         btnTakePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                takePictureItem.setEnabled(false);
                 autoFocus();
             }
         });
 
-        btnFlashMode = (Button) results.findViewById(R.id.btn_toggle_flash);
+        btnFlashMode = (ImageButton) results.findViewById(R.id.btn_toggle_flash);
         btnFlashMode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -94,7 +99,31 @@ public class DemoCameraFragment extends CameraFragment implements
             }
         });
 
-		return (results);
+        btnCameraMode = (ToggleButton) results.findViewById(R.id.btn_capture_mode);
+        btnCameraMode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (btnCameraMode.isChecked() == true) {
+                    getContract().setSingleShotMode(false);
+                    Logger.Log("Single shot mode: " + getContract().isSingleShotMode());
+                    Toast.makeText(getActivity(), "Kích hoạt chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
+                } else {
+                    getContract().setSingleShotMode(true);
+                    Logger.Log("Single shot mode: " + getContract().isSingleShotMode());
+                    Toast.makeText(getActivity(), "Đã dừng chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        btnDone = (Button) results.findViewById(R.id.btn_camera_done);
+        btnDone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        return (results);
 	}
 
 	@Override
@@ -135,8 +164,9 @@ public class DemoCameraFragment extends CameraFragment implements
 				return (true);
 
 			case R.id.single_shot:
-				item.setChecked(!item.isChecked());
+				/*item.setChecked(!item.isChecked());
 				getContract().setSingleShotMode(item.isChecked());
+                Logger.Log("Single shot mode: " + getContract().isSingleShotMode());*/
 
 				return (true);
 
@@ -191,7 +221,8 @@ public class DemoCameraFragment extends CameraFragment implements
 
 		Logger.Log("Prepare to take picture");
 
-		if (singleShotItem != null && singleShotItem.isChecked()) {
+		if (getContract().isSingleShotMode()==true) {
+            Logger.Log("Processing Single shot mode");
 			singleShotProcessing = true;
 			takePictureItem.setEnabled(false);
 		}
@@ -236,11 +267,7 @@ public class DemoCameraFragment extends CameraFragment implements
 
         @Override
         public boolean useSingleShotMode() {
-            if (singleShotItem == null) {
-                return (false);
-            }
-
-            return (singleShotItem.isChecked());
+            return (!btnCameraMode.isChecked());
         }
 
         /**
@@ -253,6 +280,7 @@ public class DemoCameraFragment extends CameraFragment implements
         public void saveImage(PictureTransaction xact, byte[] image) {
 
             // TODO: Checkout cjay v1 flow
+            Logger.i("useSingleShotMode: "+ useSingleShotMode());
             if (useSingleShotMode()) {
                 singleShotProcessing = false;
 

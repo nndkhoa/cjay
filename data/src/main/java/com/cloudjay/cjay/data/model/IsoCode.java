@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import javax.annotation.Generated;
 
 @Generated("org.jsonschema2pojo")
-public class ISOCode {
+public class IsoCode {
 
 	@Expose
 	private long id;
@@ -15,12 +15,6 @@ public class ISOCode {
 	@SerializedName("full_name")
 	@Expose
 	private String fullName;
-	@SerializedName("created_at")
-	@Expose
-	private String createdAt;
-	@SerializedName("modified_at")
-	@Expose
-	private String modifiedAt;
 
 	public long getId() {
 		return id;
@@ -30,7 +24,7 @@ public class ISOCode {
 		this.id = id;
 	}
 
-	public ISOCode withId(long id) {
+	public IsoCode withId(long id) {
 		this.id = id;
 		return this;
 	}
@@ -43,7 +37,7 @@ public class ISOCode {
 		this.code = code;
 	}
 
-	public ISOCode withCode(String code) {
+	public IsoCode withCode(String code) {
 		this.code = code;
 		return this;
 	}
@@ -56,35 +50,8 @@ public class ISOCode {
 		this.fullName = fullName;
 	}
 
-	public ISOCode withFullName(String fullName) {
+	public IsoCode withFullName(String fullName) {
 		this.fullName = fullName;
 		return this;
 	}
-
-	public String getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(String createdAt) {
-		this.createdAt = createdAt;
-	}
-
-	public ISOCode withCreatedAt(String createdAt) {
-		this.createdAt = createdAt;
-		return this;
-	}
-
-	public String getModifiedAt() {
-		return modifiedAt;
-	}
-
-	public void setModifiedAt(String modifiedAt) {
-		this.modifiedAt = modifiedAt;
-	}
-
-	public ISOCode withModifiedAt(String modifiedAt) {
-		this.modifiedAt = modifiedAt;
-		return this;
-	}
-
 }
