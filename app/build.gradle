@@ -64,22 +64,17 @@ android {
 
 dependencies {
 	apt fileTree(dir: 'libs', include: ['*.jar'])
-	compile 'com.jakewharton:butterknife:5.1.2'
-	compile 'com.squareup.retrofit:retrofit:1.6.1'
-	compile 'com.google.code.gson:gson:2.3'
-	compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.3'
-	compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
-	compile 'com.squareup.okhttp:okhttp:2.0.0'
-	compile 'de.greenrobot:eventbus:2.2.1'
-	compile 'com.commonsware.cwac:camera:0.6.+'
 	compile 'com.android.support:support-v4:19.0.+'
 	compile 'com.android.support:appcompat-v7:19.0.+'
 	compile 'com.crashlytics.android:crashlytics:1.+'
 
-	compile 'com.squareup.dagger:dagger:1.2.2'
-	provided 'com.squareup.dagger:dagger-compiler:1.2.2'
 	compile 'com.netflix.rxjava:rxjava-core:0.16.1'
 	compile 'com.netflix.rxjava:rxjava-android:0.16.1'
+
+	compile 'com.jakewharton:butterknife:5.1.2'
+	compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.3'
+	compile 'de.greenrobot:eventbus:2.2.1'
+	compile 'com.commonsware.cwac:camera:0.6.+'
 
 	compile project(':data')
 	compile files('libs/crouton-1.8.1.jar')

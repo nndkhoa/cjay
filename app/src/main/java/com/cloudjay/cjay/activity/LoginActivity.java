@@ -33,6 +33,8 @@ import com.cloudjay.cjay.network.NetworkClient;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.account.AccountGeneral;
 
+import org.androidannotations.annotations.EActivity;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
@@ -42,6 +44,7 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 import retrofit.RetrofitError;
 
+@EActivity
 public class LoginActivity extends AccountAuthenticatorActivity {
 
 	public static final String PARAM_AUTH_TOKEN_TYPE = "auth.token";
