@@ -42,14 +42,6 @@ public class CameraActivity extends Activity implements ActionBar.OnNavigationLi
 
         Logger.Log("isLockedToLandscape = " + isLockedToLandscape);
 
-        /*final ActionBar actionBar = getActionBar();
-        actionBar.hide();
-
-        Logger.Log("New DemoCameraFragment");
-        current = DemoCameraFragment.newInstance(false);
-        getFragmentManager().beginTransaction()
-                .replace(R.id.container, current).commit();*/
-
 		if (hasTwoCameras) {
 
 			Logger.Log("Has 2 camera");
@@ -125,33 +117,6 @@ public class CameraActivity extends Activity implements ActionBar.OnNavigationLi
 		});
 
 		return (true);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		/*new MenuInflater(this).inflate(R.menu.main_camera, menu);
-		menu.findItem(R.id.landscape).setChecked(isLockedToLandscape);*/
-		return (super.onCreateOptionsMenu(menu));
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		/*if (item.getItemId() == R.id.content) {
-			Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-			File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-			File output = new File(dir, "CameraContentDemo.jpeg");
-			i.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(output));
-			startActivityForResult(i, CONTENT_REQUEST);
-		}
-        else if (item.getItemId() == R.id.landscape) {
-			item.setChecked(!item.isChecked());
-			current.lockToLandscape(item.isChecked());
-			isLockedToLandscape = item.isChecked();
-		} else if (item.getItemId() == R.id.fullscreen) {
-			startActivity(new Intent(this, FullScreenActivity.class));
-		}*/
-
-		return (super.onOptionsItemSelected(item));
 	}
 
 	@Override
