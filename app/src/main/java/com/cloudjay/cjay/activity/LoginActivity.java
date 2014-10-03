@@ -283,7 +283,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 								protected Void doInBackground(Void... params) {
 
 									// TODO: call get() from DataCenter
-									User user = NetworkClient.getInstance().getCurrentUser(mToken);
+									User user = NetworkClient.getInstance().getCurrentUser();
 									NetworkClient.getInstance().getDamageCodes(null);
 									NetworkClient.getInstance().getComponentCodes(null);
 									NetworkClient.getInstance().getRepairCodes(null);

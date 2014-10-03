@@ -62,10 +62,13 @@
     <!-- 2 fragments in RepairFragmentTab -->
     <string name="fragment_issue_pending">Danh sách lỗi</string>
     <string name="fragment_issue_repaired">Đã sửa chữa</string>
+
     <string name="fragment_search_pb_searching">Đang tìm kiếm</string>
     <string name="fragment_search_hint_et_search">Nhập container ID cần tìm</string>
     <string name="fragment_search_btn_search">Tìm kiếm</string>
     <string name="dialog_container_id_required">Chưa nhập container ID</string>
     <string name="dialog_container_id_invalid">Container ID không đúng quy định</string>
 
+    <!-- Camera Button -->
+    <string name="camera_done">Done</string>
 </resources>

@@ -1,6 +1,8 @@
 package com.cloudjay.cjay.api;
 
 
+import android.content.Context;
+
 import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
@@ -47,7 +49,7 @@ public class NetworkClient {
 		return token;
 	}
 
-	public User getCurrentUser(String token) {
+	public User getCurrentUser() {
 		User user = cJayService.getCurrentUser();
 		return user;
 	}
@@ -85,5 +87,8 @@ public class NetworkClient {
 	public Session getContainerSessionById(int id) {
 		Session containerSessionById = cJayService.getContainerSessionById(id);
 		return containerSessionById;
+	}
+
+	public void getAllSession(Context context, String mToken, String fullName, Object o) {
 	}
 }

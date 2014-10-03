@@ -13,8 +13,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.DisplayActivity;
@@ -29,17 +31,16 @@ public class DemoCameraFragment extends CameraFragment implements
 		SeekBar.OnSeekBarChangeListener {
 
 	private static final String KEY_USE_FFC = "com.commonsware.cwac.camera.demo.USE_FFC";
-	private MenuItem singleShotItem = null;
-	private MenuItem autoFocusItem = null;
-	private MenuItem takePictureItem = null;
-	private MenuItem flashItem = null;
+	//private MenuItem autoFocusItem = null;
 
 	private boolean singleShotProcessing = false;
 	//private SeekBar zoom = null;
-    private Button btnTakePicture;
-    private Button btnFlashMode;
+    private ImageButton btnTakePicture;
+    private ImageButton btnFlashMode;
+    private ToggleButton btnCameraMode;
+    private Button btnDone;
 	private long lastFaceToast = 0L;
-	String flashMode = null;
+	String flashMode = null; //flash mode parameter when take camera
 
 	public static DemoCameraFragment newInstance(boolean useFFC) {
 		Logger.Log("new DemoCameraFragment");
@@ -60,6 +61,8 @@ public class DemoCameraFragment extends CameraFragment implements
 		setHost(builder.useFullBleedPreview(true).build());
 
 		setHasOptionsMenu(true);
+        //Set default flash mode parameter when take camera is OFF
+        flashMode = "off";
 	}
 
 	@Override
@@ -71,30 +74,60 @@ public class DemoCameraFragment extends CameraFragment implements
 		((ViewGroup) results.findViewById(R.id.camera)).addView(cameraView);
 		/*zoom = (SeekBar) results.findViewById(R.id.zoom);
 		zoom.setKeepScreenOn(true);*/
-        btnTakePicture = (Button) results.findViewById(R.id.btn_capture);
+        btnTakePicture = (ImageButton) results.findViewById(R.id.btn_capture);
         btnTakePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                btnTakePicture.setEnabled(false);
                 autoFocus();
             }
         });
 
-        btnFlashMode = (Button) results.findViewById(R.id.btn_toggle_flash);
+        btnFlashMode = (ImageButton) results.findViewById(R.id.btn_toggle_flash);
         btnFlashMode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Logger.i("Flash mode: " + getFlashMode());
-                if (getFlashMode().equals("off")) {
-                    Logger.Log("Flash on");
-                    setFlashMode(Camera.Parameters.FLASH_MODE_ON);
-                } else {
-                    Logger.Log("Flash off");
-                    setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                if (flashMode.equals("off")) {
+                    Logger.Log("Set auto");
+                    flashMode = "auto";
+                    btnFlashMode.setImageResource(R.drawable.ic_flash_auto);
+                } else if (flashMode.equals("auto")) {
+                    Logger.Log("Set on");
+                    flashMode = "on";
+                    btnFlashMode.setImageResource(R.drawable.ic_flash_on);
+                } else if (flashMode.equals("on")) {
+                    Logger.Log("Set off");
+                    flashMode = "off";
+                    btnFlashMode.setImageResource(R.drawable.ic_flash_off);
                 }
             }
         });
 
-		return (results);
+        btnCameraMode = (ToggleButton) results.findViewById(R.id.btn_capture_mode);
+        btnCameraMode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (btnCameraMode.isChecked() == true) {
+                    getContract().setSingleShotMode(false);
+                    Logger.Log("Single shot mode: " + getContract().isSingleShotMode());
+                    Toast.makeText(getActivity(), "Kích hoạt chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
+                } else {
+                    getContract().setSingleShotMode(true);
+                    Logger.Log("Single shot mode: " + getContract().isSingleShotMode());
+                    Toast.makeText(getActivity(), "Đã dừng chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        btnDone = (Button) results.findViewById(R.id.btn_camera_done);
+        btnDone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        return (results);
 	}
 
 	@Override
@@ -102,54 +135,6 @@ public class DemoCameraFragment extends CameraFragment implements
 		super.onPause();
 
 		getActivity().invalidateOptionsMenu();
-	}
-
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.camera, menu);
-
-		takePictureItem = menu.findItem(R.id.camera);
-		singleShotItem = menu.findItem(R.id.single_shot);
-		singleShotItem.setChecked(getContract().isSingleShotMode());
-		autoFocusItem = menu.findItem(R.id.autofocus);
-		flashItem = menu.findItem(R.id.flash);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.camera:
-				takeSimplePicture();
-
-				return (true);
-
-			case R.id.autofocus:
-				takePictureItem.setEnabled(false);
-				/*autoFocus(new Camera.AutoFocusCallback() {
-                    @Override
-                    public void onAutoFocus(boolean b, Camera camera) {
-
-                    }
-                });*/
-
-				return (true);
-
-			case R.id.single_shot:
-				item.setChecked(!item.isChecked());
-				getContract().setSingleShotMode(item.isChecked());
-
-				return (true);
-
-			case R.id.show_zoom:
-				item.setChecked(!item.isChecked());
-				//zoom.setVisibility(item.isChecked() ? View.VISIBLE : View.GONE);
-
-				return (true);
-
-			case R.id.flash:
-		}
-
-		return (super.onOptionsItemSelected(item));
 	}
 
 	public boolean isSingleShotProcessing() {
@@ -191,9 +176,10 @@ public class DemoCameraFragment extends CameraFragment implements
 
 		Logger.Log("Prepare to take picture");
 
-		if (singleShotItem != null && singleShotItem.isChecked()) {
+		if (getContract().isSingleShotMode()==true) {
+            Logger.Log("Processing Single shot mode");
 			singleShotProcessing = true;
-			takePictureItem.setEnabled(false);
+			btnTakePicture.setEnabled(false);
 		}
 
 		// 2.
@@ -201,10 +187,10 @@ public class DemoCameraFragment extends CameraFragment implements
 
 		// Tag another object along if you need to
 		// xact.tag();
-
-		if (flashItem != null && flashItem.isChecked()) {
+        xact.flashMode(flashMode);
+		/*if (flashItem != null && flashItem.isChecked()) {
 			xact.flashMode(flashMode);
-		}
+		}*/
 
 		// Call it with PictureTransaction to take picture with configuration in CameraHost
 		// Process image in Subclass of `CameraHost#saveImage`
@@ -236,11 +222,7 @@ public class DemoCameraFragment extends CameraFragment implements
 
         @Override
         public boolean useSingleShotMode() {
-            if (singleShotItem == null) {
-                return (false);
-            }
-
-            return (singleShotItem.isChecked());
+            return (!btnCameraMode.isChecked());
         }
 
         /**
@@ -253,13 +235,14 @@ public class DemoCameraFragment extends CameraFragment implements
         public void saveImage(PictureTransaction xact, byte[] image) {
 
             // TODO: Checkout cjay v1 flow
+            Logger.i("useSingleShotMode: "+ useSingleShotMode());
             if (useSingleShotMode()) {
                 singleShotProcessing = false;
 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        takePictureItem.setEnabled(true);
+                        btnTakePicture.setEnabled(true);
                     }
                 });
 
@@ -272,22 +255,24 @@ public class DemoCameraFragment extends CameraFragment implements
 
         @Override
         public void autoFocusAvailable() {
-            if (autoFocusItem != null) {
+           /* if (autoFocusItem != null) {
                 autoFocusItem.setEnabled(true);
 
                 if (supportsFaces)
                     startFaceDetection();
-            }
+            }*/
+            if (supportsFaces)
+                startFaceDetection();
         }
 
         @Override
         public void autoFocusUnavailable() {
-            if (autoFocusItem != null) {
+            /*if (autoFocusItem != null) {
                 stopFaceDetection();
 
                 if (supportsFaces)
                     autoFocusItem.setEnabled(false);
-            }
+            }*/
         }
 
         @Override
@@ -343,7 +328,7 @@ public class DemoCameraFragment extends CameraFragment implements
         public void onAutoFocus(boolean success, Camera camera) {
             super.onAutoFocus(success, camera);
 
-            takePictureItem.setEnabled(true);
+            btnTakePicture.setEnabled(true);
             takeSimplePicture();
         }
     }

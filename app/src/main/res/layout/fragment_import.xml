@@ -17,10 +17,10 @@
             android:textStyle="bold"
             android:textSize="16dp"/>
 
-        <EditText
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/et_container_id"/>
+            android:id="@+id/tv_container_id"/>
 
         <Spinner
             android:layout_width="match_parent"
