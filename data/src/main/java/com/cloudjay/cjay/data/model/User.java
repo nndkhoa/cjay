@@ -5,8 +5,10 @@ import com.google.gson.annotations.SerializedName;
 
 import javax.annotation.Generated;
 
+import io.realm.RealmObject;
+
 @Generated("org.jsonschema2pojo")
-public class User {
+public class User extends RealmObject {
 
 	@Expose
 	private long id;

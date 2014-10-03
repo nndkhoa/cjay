@@ -15,12 +15,6 @@ public class ISOCode {
 	@SerializedName("full_name")
 	@Expose
 	private String fullName;
-	@SerializedName("created_at")
-	@Expose
-	private String createdAt;
-	@SerializedName("modified_at")
-	@Expose
-	private String modifiedAt;
 
 	public long getId() {
 		return id;
@@ -60,31 +54,4 @@ public class ISOCode {
 		this.fullName = fullName;
 		return this;
 	}
-
-	public String getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(String createdAt) {
-		this.createdAt = createdAt;
-	}
-
-	public ISOCode withCreatedAt(String createdAt) {
-		this.createdAt = createdAt;
-		return this;
-	}
-
-	public String getModifiedAt() {
-		return modifiedAt;
-	}
-
-	public void setModifiedAt(String modifiedAt) {
-		this.modifiedAt = modifiedAt;
-	}
-
-	public ISOCode withModifiedAt(String modifiedAt) {
-		this.modifiedAt = modifiedAt;
-		return this;
-	}
-
 }
