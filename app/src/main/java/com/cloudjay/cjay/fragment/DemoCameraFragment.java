@@ -31,10 +31,7 @@ public class DemoCameraFragment extends CameraFragment implements
 		SeekBar.OnSeekBarChangeListener {
 
 	private static final String KEY_USE_FFC = "com.commonsware.cwac.camera.demo.USE_FFC";
-	private MenuItem singleShotItem = null;
-	private MenuItem autoFocusItem = null;
-	private MenuItem takePictureItem = null;
-	private MenuItem flashItem = null;
+	//private MenuItem autoFocusItem = null;
 
 	private boolean singleShotProcessing = false;
 	//private SeekBar zoom = null;
@@ -43,7 +40,7 @@ public class DemoCameraFragment extends CameraFragment implements
     private ToggleButton btnCameraMode;
     private Button btnDone;
 	private long lastFaceToast = 0L;
-	String flashMode = null;
+	String flashMode = null; //flash mode parameter when take camera
 
 	public static DemoCameraFragment newInstance(boolean useFFC) {
 		Logger.Log("new DemoCameraFragment");
@@ -64,6 +61,8 @@ public class DemoCameraFragment extends CameraFragment implements
 		setHost(builder.useFullBleedPreview(true).build());
 
 		setHasOptionsMenu(true);
+        //Set default flash mode parameter when take camera is OFF
+        flashMode = "off";
 	}
 
 	@Override
@@ -79,7 +78,7 @@ public class DemoCameraFragment extends CameraFragment implements
         btnTakePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                takePictureItem.setEnabled(false);
+                btnTakePicture.setEnabled(false);
                 autoFocus();
             }
         });
@@ -88,13 +87,18 @@ public class DemoCameraFragment extends CameraFragment implements
         btnFlashMode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Logger.i("Flash mode: " + getFlashMode());
-                if (getFlashMode().equals("off")) {
-                    Logger.Log("Flash on");
-                    setFlashMode(Camera.Parameters.FLASH_MODE_ON);
-                } else {
-                    Logger.Log("Flash off");
-                    setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                if (flashMode.equals("off")) {
+                    Logger.Log("Set auto");
+                    flashMode = "auto";
+                    btnFlashMode.setImageResource(R.drawable.ic_flash_auto);
+                } else if (flashMode.equals("auto")) {
+                    Logger.Log("Set on");
+                    flashMode = "on";
+                    btnFlashMode.setImageResource(R.drawable.ic_flash_on);
+                } else if (flashMode.equals("on")) {
+                    Logger.Log("Set off");
+                    flashMode = "off";
+                    btnFlashMode.setImageResource(R.drawable.ic_flash_off);
                 }
             }
         });
@@ -131,55 +135,6 @@ public class DemoCameraFragment extends CameraFragment implements
 		super.onPause();
 
 		getActivity().invalidateOptionsMenu();
-	}
-
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.camera, menu);
-
-		takePictureItem = menu.findItem(R.id.camera);
-		singleShotItem = menu.findItem(R.id.single_shot);
-		singleShotItem.setChecked(getContract().isSingleShotMode());
-		autoFocusItem = menu.findItem(R.id.autofocus);
-		flashItem = menu.findItem(R.id.flash);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.camera:
-				takeSimplePicture();
-
-				return (true);
-
-			case R.id.autofocus:
-				takePictureItem.setEnabled(false);
-				/*autoFocus(new Camera.AutoFocusCallback() {
-                    @Override
-                    public void onAutoFocus(boolean b, Camera camera) {
-
-                    }
-                });*/
-
-				return (true);
-
-			case R.id.single_shot:
-				/*item.setChecked(!item.isChecked());
-				getContract().setSingleShotMode(item.isChecked());
-                Logger.Log("Single shot mode: " + getContract().isSingleShotMode());*/
-
-				return (true);
-
-			case R.id.show_zoom:
-				item.setChecked(!item.isChecked());
-				//zoom.setVisibility(item.isChecked() ? View.VISIBLE : View.GONE);
-
-				return (true);
-
-			case R.id.flash:
-		}
-
-		return (super.onOptionsItemSelected(item));
 	}
 
 	public boolean isSingleShotProcessing() {
@@ -224,7 +179,7 @@ public class DemoCameraFragment extends CameraFragment implements
 		if (getContract().isSingleShotMode()==true) {
             Logger.Log("Processing Single shot mode");
 			singleShotProcessing = true;
-			takePictureItem.setEnabled(false);
+			btnTakePicture.setEnabled(false);
 		}
 
 		// 2.
@@ -232,10 +187,10 @@ public class DemoCameraFragment extends CameraFragment implements
 
 		// Tag another object along if you need to
 		// xact.tag();
-
-		if (flashItem != null && flashItem.isChecked()) {
+        xact.flashMode(flashMode);
+		/*if (flashItem != null && flashItem.isChecked()) {
 			xact.flashMode(flashMode);
-		}
+		}*/
 
 		// Call it with PictureTransaction to take picture with configuration in CameraHost
 		// Process image in Subclass of `CameraHost#saveImage`
@@ -287,7 +242,7 @@ public class DemoCameraFragment extends CameraFragment implements
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        takePictureItem.setEnabled(true);
+                        btnTakePicture.setEnabled(true);
                     }
                 });
 
@@ -300,22 +255,24 @@ public class DemoCameraFragment extends CameraFragment implements
 
         @Override
         public void autoFocusAvailable() {
-            if (autoFocusItem != null) {
+           /* if (autoFocusItem != null) {
                 autoFocusItem.setEnabled(true);
 
                 if (supportsFaces)
                     startFaceDetection();
-            }
+            }*/
+            if (supportsFaces)
+                startFaceDetection();
         }
 
         @Override
         public void autoFocusUnavailable() {
-            if (autoFocusItem != null) {
+            /*if (autoFocusItem != null) {
                 stopFaceDetection();
 
                 if (supportsFaces)
                     autoFocusItem.setEnabled(false);
-            }
+            }*/
         }
 
         @Override
@@ -371,7 +328,7 @@ public class DemoCameraFragment extends CameraFragment implements
         public void onAutoFocus(boolean success, Camera camera) {
             super.onAutoFocus(success, camera);
 
-            takePictureItem.setEnabled(true);
+            btnTakePicture.setEnabled(true);
             takeSimplePicture();
         }
     }
