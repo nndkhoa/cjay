@@ -9,6 +9,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 
+// Define this will be a dagger module
 @Module(
 		includes = {
 				DataModule.class
@@ -18,6 +19,7 @@ import dagger.Provides;
 		}
 )
 public class CJayModule {
+
 	private final CJayApplication app;
 
 	public CJayModule(CJayApplication app) {
@@ -26,7 +28,7 @@ public class CJayModule {
 
 	@Provides
 	@Singleton
-	Application provideApplication() {
+	public Application provideApplication() {
 		return app;
 	}
 

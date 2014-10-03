@@ -52,7 +52,7 @@ public final class ApiModule {
 
 	@Provides
 	@Singleton
-	NetworkService provideGalleryService(RestAdapter restAdapter) {
+	NetworkService provideNetworkService(RestAdapter restAdapter) {
 		return restAdapter.create(NetworkService.class);
 	}
 }
