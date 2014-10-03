@@ -1,16 +1,12 @@
 package com.cloudjay.cjay.fragment;
 
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.content.ContentValues;
+import android.app.LoaderManager;
+import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.app.LoaderManager;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,12 +19,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.model.Operator;
-import com.cloudjay.cjay.network.NetworkClient;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.account.AccountGeneral;
-
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -70,8 +61,9 @@ public class ImportFragment extends Fragment implements LoaderManager.LoaderCall
         getControl();
 
         /* Init simple cursor adapter */
-        mOperatorAdapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_spinner_item, null,
-                new String[]{Operator.OPERATOR_NAME}, new int[]{android.R.id.text1}, 0);
+//        mOperatorAdapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_spinner_item, null,
+//                new String[]{Operator.OPERATOR_NAME}, new int[]{android.R.id.text1}, 0);
+
         /* Set apdater for spinner */
         spOperator.setAdapter(mOperatorAdapter);
 
@@ -105,8 +97,9 @@ public class ImportFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Logger.i ("onCreateLoader - Operator");
-        return new CursorLoader(getActivity(), Operator.URI,
-                null, null, null, null);
+//        return new CursorLoader(getActivity(), Operator.URI,
+//                null, null, null, null);
+	    return null;
     }
 
     @Override

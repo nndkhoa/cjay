@@ -16,6 +16,7 @@ def buildTime = new Date().format("yyyy-MM-dd'T'HH:mm'Z'", TimeZone.getTimeZone(
 def isTravis = "true".equals(System.getenv("TRAVIS"))
 def preDexEnabled = "true".equals(System.getProperty("pre-dex", "true"))
 
+def AAVersion = '3.1'
 
 android {
     compileSdkVersion 19
@@ -56,10 +57,6 @@ android {
 		abortOnError false
 	}
 
-	compileOptions {
-		sourceCompatibility JavaVersion.VERSION_1_7
-		targetCompatibility JavaVersion.VERSION_1_7
-	}
 }
 
 dependencies {
@@ -76,9 +73,31 @@ dependencies {
 	compile 'de.greenrobot:eventbus:2.2.1'
 	compile 'com.commonsware.cwac:camera:0.6.+'
 
-	compile project(':data')
+	apt "org.androidannotations:androidannotations:$AAVersion"
+	compile "org.androidannotations:androidannotations-api:$AAVersion"
+
+	compile 'com.google.code.gson:gson:2.3'
+	compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
+	compile 'com.squareup.okhttp:okhttp:2.0.0'
+	compile 'com.squareup.retrofit:retrofit:1.6.1'
+
+	compile project(':realm')
+	compile files('libs/javax.annotation-3.2-b06.jar')
 	compile files('libs/crouton-1.8.1.jar')
 	compile files('libs/Pubnub-Android-3.5.6.jar')
-	compile files('libs/vcontentprovider.jar')
+	compile files('libs/helpertoolsforandroid.jar')
+}
 
+apt {
+	arguments {
+		androidManifestFile variant.processResources.manifestFile
+		resourcePackageName 'com.cloudjay.cjay'
+
+		// If you're using Android NBS flavors you should use the following line instead of hard-coded packageName
+		// resourcePackageName android.defaultConfig.packageName
+
+		// You can set optional annotation processing options here, like these commented options:
+		// logLevel 'INFO'
+		// logFile '/var/log/aa.log'
+	}
 }

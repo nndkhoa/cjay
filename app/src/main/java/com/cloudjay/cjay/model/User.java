@@ -1,132 +1,224 @@
 package com.cloudjay.cjay.model;
 
-import android.net.Uri;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-public class User {
+import javax.annotation.Generated;
 
-    private int id;
-    private String email;
-    private String access_token;
-    private int role;
-    private String role_name;
-    private String first_name;
-    private String last_name;
-    private String full_name;
-    private String phone;
-    private String avatar_url;
-    private int dialing_code;
-    private String depot_code;
+import io.realm.RealmObject;
 
-    public static final String TABLE = "user";
-    public static final String EMAIL = "email";
-    public static final String ACCESS_TOKEN = "access_token";
-    public static final String ROLE = "role";
-    public static final String ROLE_NAME = "role_name";
-    public static final String ID = "id";
-    public static final String FIRST_NAME = "first_name";
-    public static final String LAST_NAME = "last_name";
-    public static final String FULL_NAME = "full_name";
-    public static final String PHONE = "phone";
-    public static final String AVATAR_URL = "avatar_url";
-    public static final String DIALING_CODE = "dialing_code";
-    public static final String DEPOT_CODE = "depot_code";
-    public static final String AUTHORITY = "com.cloudjay.cjay";
-    public static final Uri URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE);
+@Generated("org.jsonschema2pojo")
+public class User extends RealmObject {
 
-    public int getId() {
-        return id;
-    }
+	@Expose
+	private long id;
 
-    public void setId(int id) {
-        this.id = id;
-    }
+	@Expose
+	private String token;
 
-    public String getEmail() {
-        return email;
-    }
+	@SerializedName("first_name")
+	@Expose
+	private String firstName;
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+	@SerializedName("last_name")
+	@Expose
+	private String lastName;
 
-    public String getAccessToken() {
-        return access_token;
-    }
+	@Expose
+	private String phone;
 
-    public void setAccessToken(String access_token) {
-        this.access_token = access_token;
-    }
+	@SerializedName("dialing_code")
+	@Expose
+	private long dialingCode;
 
-    public int getRole() {
-        return role;
-    }
+	@Expose
+	private String username;
 
-    public void setRole(int role) {
-        this.role = role;
-    }
+	@Expose
+	private String email;
 
-    public String getRoleName() {
-        return role_name;
-    }
+	@SerializedName("full_name")
+	@Expose
+	private String fullName;
+	@SerializedName("avatar_url")
+	@Expose
+	private String avatarUrl;
+	@Expose
+	private long role;
+	@SerializedName("role_name")
+	@Expose
+	private String roleName;
+	@SerializedName("depot_code")
+	@Expose
+	private String depotCode;
 
-    public void setRoleName(String role_name) {
-        this.role_name = role_name;
-    }
+	public long getId() {
+		return id;
+	}
 
-    public String getFirstName() {
-        return first_name;
-    }
+	public void setId(long id) {
+		this.id = id;
+	}
 
-    public void setFirstName(String first_name) {
-        this.first_name = first_name;
-    }
+	public User withId(long id) {
+		this.id = id;
+		return this;
+	}
 
-    public String getLastName() {
-        return last_name;
-    }
+	public String getToken() {
+		return token;
+	}
 
-    public void setLastName(String last_name) {
-        this.last_name = last_name;
-    }
+	public void setToken(String token) {
+		this.token = token;
+	}
 
-    public String getFullName() {
-        return full_name;
-    }
+	public User withToken(String token) {
+		this.token = token;
+		return this;
+	}
 
-    public void setFullName(String full_name) {
-        this.full_name = full_name;
-    }
+	public String getFirstName() {
+		return firstName;
+	}
 
-    public String getPhone() {
-        return phone;
-    }
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+	public User withFirstName(String firstName) {
+		this.firstName = firstName;
+		return this;
+	}
 
-    public String getAvatarUrl() {
-        return avatar_url;
-    }
+	public String getLastName() {
+		return lastName;
+	}
 
-    public void setAvatarUrl(String avatar_url) {
-        this.avatar_url = avatar_url;
-    }
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
 
-    public int getDialingCode() {
-        return dialing_code;
-    }
+	public User withLastName(String lastName) {
+		this.lastName = lastName;
+		return this;
+	}
 
-    public void setDialingCode(int dialing_code) {
-        this.dialing_code = dialing_code;
-    }
+	public String getPhone() {
+		return phone;
+	}
 
-    public String getDepotCode() {
-        return depot_code;
-    }
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
 
-    public void setDepotCode(String depot_code) {
-        this.depot_code = depot_code;
-    }
+	public User withPhone(String phone) {
+		this.phone = phone;
+		return this;
+	}
+
+	public long getDialingCode() {
+		return dialingCode;
+	}
+
+	public void setDialingCode(long dialingCode) {
+		this.dialingCode = dialingCode;
+	}
+
+	public User withDialingCode(long dialingCode) {
+		this.dialingCode = dialingCode;
+		return this;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public User withUsername(String username) {
+		this.username = username;
+		return this;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public User withEmail(String email) {
+		this.email = email;
+		return this;
+	}
+
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+
+	public User withFullName(String fullName) {
+		this.fullName = fullName;
+		return this;
+	}
+
+	public String getAvatarUrl() {
+		return avatarUrl;
+	}
+
+	public void setAvatarUrl(String avatarUrl) {
+		this.avatarUrl = avatarUrl;
+	}
+
+	public User withAvatarUrl(String avatarUrl) {
+		this.avatarUrl = avatarUrl;
+		return this;
+	}
+
+	public long getRole() {
+		return role;
+	}
+
+	public void setRole(long role) {
+		this.role = role;
+	}
+
+	public User withRole(long role) {
+		this.role = role;
+		return this;
+	}
+
+	public String getRoleName() {
+		return roleName;
+	}
+
+	public void setRoleName(String roleName) {
+		this.roleName = roleName;
+	}
+
+	public User withRoleName(String roleName) {
+		this.roleName = roleName;
+		return this;
+	}
+
+	public String getDepotCode() {
+		return depotCode;
+	}
+
+	public void setDepotCode(String depotCode) {
+		this.depotCode = depotCode;
+	}
+
+	public User withDepotCode(String depotCode) {
+		this.depotCode = depotCode;
+		return this;
+	}
+
 }
-

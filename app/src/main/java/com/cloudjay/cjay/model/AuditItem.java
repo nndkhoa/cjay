@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.data.model;
+package com.cloudjay.cjay.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

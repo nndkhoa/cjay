@@ -1,9 +1,9 @@
-package com.cloudjay.cjay.data.api;
+package com.cloudjay.cjay.api;
 
-import com.cloudjay.cjay.data.model.IsoCode;
-import com.cloudjay.cjay.data.model.Operator;
-import com.cloudjay.cjay.data.model.Session;
-import com.cloudjay.cjay.data.model.User;
+import com.cloudjay.cjay.model.IsoCode;
+import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.model.User;
 import com.google.gson.JsonObject;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public interface NetworkService {
 
 	@FormUrlEncoded
 	@POST(ApiEndpoint.TOKEN_API)
-	public JsonObject getToken(@Field("password") String password);
+	public JsonObject getToken(@Field("username") String username, @Field("password") String password);
 
 	@GET(ApiEndpoint.CURRENT_USER_API)
 	public User getCurrentUser();

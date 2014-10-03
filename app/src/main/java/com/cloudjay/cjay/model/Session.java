@@ -1,165 +1,233 @@
 package com.cloudjay.cjay.model;
 
-import android.net.Uri;
 
-import java.util.List;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-public class Session {
+import javax.annotation.Generated;
 
-	// Server fields
-    private int id;
-	private String depot_code;
-	private String container_id;
-	private String image_id_path;
-	private String check_in_time;
-	private String check_out_time;
-	private String time_modified;
-	private String type;            // A    |   B   |   C
-	private String status;          // NEW  |   XX  |   YY
-	private String operator_code;
-	private String operator_name;
-	private int operator_id; //references operatorTable
+import io.realm.RealmList;
+import io.realm.RealmObject;
 
-	private List<AuditReportItem> audit_report_items;
-	private List<GateReportImage> gate_report_images;
+@Generated("org.jsonschema2pojo")
+public class Session extends RealmObject {
 
-	// Local fields
-    private int upload_type;        // NONE |   WAITING |   IN_PROGRESS
+	@Expose
+	private long id;
 
-    public static final String TABLE = "session";
-    public static final String ID = "id";
-    public static final String DEPOT_CODE = "depot_code";
-    public static final String CONTAINER_ID = "container_id";
-    public static final String IMAGE_ID_PATH = "image_id_path";
-    public static final String CHECK_IN_TIME = "check_in_time";
-    public static final String CHECK_OUT_TIME = "check_out_time";
-    public static final String TIME_MODIFIED = "time_modified";
-    public static final String TYPE = "type";
-    public static final String STATUS = "status";
-    public static final String OPERATOR_ID = "operator_id";
-    public static final String OPERATOR_CODE = "operator_code";
-    public static final String OPERATOR_NAME = "operator_name";
-    public static final String UPLOAD_TYPE = "upload_type";
+	@Expose
+	private long step;
 
-    public static final Uri URI = Uri.parse("content://" + User.AUTHORITY + "/" + TABLE);
+	@SerializedName("pre_status")
+	@Expose
+	private long preStatus;
 
-    public int getId() {
-        return id;
-    }
+	@Expose
+	private long status;
 
-    public void setId(int id) {
-        this.id = id;
-    }
+	@SerializedName("container_id")
+	@Expose
+	private String containerId;
 
-    public String getDepot_code() {
-        return depot_code;
-    }
+	@SerializedName("operator_code")
+	@Expose
+	private String operatorCode;
 
-    public void setDepotCode(String depot_code) {
-        this.depot_code = depot_code;
-    }
+	@SerializedName("operator_id")
+	@Expose
+	private long operatorId;
 
-    public String getContainerId() {
-        return container_id;
-    }
+	@SerializedName("depot_code")
+	@Expose
+	private String depotCode;
 
-    public void setContainerId(String container_id) {
-        this.container_id = container_id;
-    }
+	@SerializedName("depot_id")
+	@Expose
+	private long depotId;
 
-    public String getImageIdPath() {
-        return image_id_path;
-    }
+	@SerializedName("check_in_time")
+	@Expose
+	private String checkInTime;
 
-    public void setImageIdPath(String image_id_path) {
-        this.image_id_path = image_id_path;
-    }
+	@SerializedName("check_out_time")
+	@Expose
+	private String checkOutTime;
 
-    public String getCheckInTime() {
-        return check_in_time;
-    }
+	@SerializedName("gate_images")
+	@Expose
+	private RealmList<GateImage> gateImages;
 
-    public void setCheckInTime(String check_in_time) {
-        this.check_in_time = check_in_time;
-    }
+	@SerializedName("audit_items")
+	@Expose
+	private RealmList<AuditItem> auditItems;
 
-    public String getCheckOutTime() {
-        return check_out_time;
-    }
+	public long getId() {
+		return id;
+	}
 
-    public void setCheckOutTime(String check_out_time) {
-        this.check_out_time = check_out_time;
-    }
+	public void setId(long id) {
+		this.id = id;
+	}
 
-    public String getTimeModified() {
-        return time_modified;
-    }
+	public Session withId(long id) {
+		this.id = id;
+		return this;
+	}
 
-    public void setTimeModified(String time_modified) {
-        this.time_modified = time_modified;
-    }
+	public long getStep() {
+		return step;
+	}
 
-    public String getType() {
-        return type;
-    }
+	public void setStep(long step) {
+		this.step = step;
+	}
 
-    public void setType(String type) {
-        this.type = type;
-    }
+	public Session withStep(long step) {
+		this.step = step;
+		return this;
+	}
 
-    public String getStatus() {
-        return status;
-    }
+	public long getPreStatus() {
+		return preStatus;
+	}
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+	public void setPreStatus(long preStatus) {
+		this.preStatus = preStatus;
+	}
 
-    public String getOperatorCode() {
-        return operator_code;
-    }
+	public Session withPreStatus(long preStatus) {
+		this.preStatus = preStatus;
+		return this;
+	}
 
-    public void setOperatorCode(String operator_code) {
-        this.operator_code = operator_code;
-    }
+	public long getStatus() {
+		return status;
+	}
 
-    public String getOperatorName() {
-        return operator_name;
-    }
+	public void setStatus(long status) {
+		this.status = status;
+	}
 
-    public void setOperatorName(String operator_name) {
-        this.operator_name = operator_name;
-    }
+	public Session withStatus(long status) {
+		this.status = status;
+		return this;
+	}
 
-    public int getOperatorId() {
-        return operator_id;
-    }
+	public String getContainerId() {
+		return containerId;
+	}
 
-    public void setOperatorId(int operator_id) {
-        this.operator_id = operator_id;
-    }
+	public void setContainerId(String containerId) {
+		this.containerId = containerId;
+	}
 
-    public List<AuditReportItem> getAudit_report_items() {
-        return audit_report_items;
-    }
+	public Session withContainerId(String containerId) {
+		this.containerId = containerId;
+		return this;
+	}
 
-    public void setAuditReportItems(List<AuditReportItem> audit_report_items) {
-        this.audit_report_items = audit_report_items;
-    }
+	public String getOperatorCode() {
+		return operatorCode;
+	}
 
-    public List<GateReportImage> getGateReportImages() {
-        return gate_report_images;
-    }
+	public void setOperatorCode(String operatorCode) {
+		this.operatorCode = operatorCode;
+	}
 
-    public void setGateReportImages(List<GateReportImage> gate_report_images) {
-        this.gate_report_images = gate_report_images;
-    }
+	public Session withOperatorCode(String operatorCode) {
+		this.operatorCode = operatorCode;
+		return this;
+	}
 
-    public int getUploadType() {
-        return upload_type;
-    }
+	public long getOperatorId() {
+		return operatorId;
+	}
 
-    public void setUploadType(int upload_type) {
-        this.upload_type = upload_type;
-    }
+	public void setOperatorId(long operatorId) {
+		this.operatorId = operatorId;
+	}
+
+	public Session withOperatorId(long operatorId) {
+		this.operatorId = operatorId;
+		return this;
+	}
+
+	public String getDepotCode() {
+		return depotCode;
+	}
+
+	public void setDepotCode(String depotCode) {
+		this.depotCode = depotCode;
+	}
+
+	public Session withDepotCode(String depotCode) {
+		this.depotCode = depotCode;
+		return this;
+	}
+
+	public long getDepotId() {
+		return depotId;
+	}
+
+	public void setDepotId(long depotId) {
+		this.depotId = depotId;
+	}
+
+	public Session withDepotId(long depotId) {
+		this.depotId = depotId;
+		return this;
+	}
+
+	public String getCheckInTime() {
+		return checkInTime;
+	}
+
+	public void setCheckInTime(String checkInTime) {
+		this.checkInTime = checkInTime;
+	}
+
+	public Session withCheckInTime(String checkInTime) {
+		this.checkInTime = checkInTime;
+		return this;
+	}
+
+	public Object getCheckOutTime() {
+		return checkOutTime;
+	}
+
+	public void setCheckOutTime(String checkOutTime) {
+		this.checkOutTime = checkOutTime;
+	}
+
+	public Session withCheckOutTime(String checkOutTime) {
+		this.checkOutTime = checkOutTime;
+		return this;
+	}
+
+	public RealmList<GateImage> getGateImages() {
+		return gateImages;
+	}
+
+	public void setGateImages(RealmList<GateImage> gateImages) {
+		this.gateImages = gateImages;
+	}
+
+	public Session withGateImages(RealmList<GateImage> gateImages) {
+		this.gateImages = gateImages;
+		return this;
+	}
+
+	public RealmList<AuditItem> getAuditItems() {
+		return auditItems;
+	}
+
+	public void setAuditItems(RealmList<AuditItem> auditItems) {
+		this.auditItems = auditItems;
+	}
+
+	public Session withAuditItems(RealmList<AuditItem> auditItems) {
+		this.auditItems = auditItems;
+		return this;
+	}
+
 }

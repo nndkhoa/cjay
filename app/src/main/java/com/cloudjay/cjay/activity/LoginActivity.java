@@ -9,8 +9,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -26,14 +24,13 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.LoginSuccessEvent;
 import com.cloudjay.cjay.model.User;
-import com.cloudjay.cjay.network.NetworkClient;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.account.AccountGeneral;
-
-import org.androidannotations.annotations.EActivity;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -44,14 +41,14 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 import retrofit.RetrofitError;
 
-@EActivity
 public class LoginActivity extends AccountAuthenticatorActivity {
 
 	public static final String PARAM_AUTH_TOKEN_TYPE = "auth.token";
 	private AccountManager mAccountManager;
+
 	private AlertDialog mAlertDialog;
 	private boolean mInvalidate;
-	public String mtoken;
+	public String mToken;
 	String email;
 	String password;
 
@@ -116,7 +113,8 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 									else
 										getExistingAccountAuthToken(availableAccounts[which], authtokenTypeFullAccess);
 								}
-							}).create();
+							}
+					).create();
 
 			mAlertDialog.show();
 		}
@@ -181,16 +179,29 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 	@OnClick(R.id.btn_login)
 	void doLogin() {
+
 		email = etEmail.getText().toString();
 		password = etPassword.getText().toString();
+
 		View focusView = null;
 		boolean cancel = false;
+
 		//Check connect to internet
-		if (!hasConnection()) {
-			showCrouton(R.string.error_connection);
-		}
-		// Check for a valid password.
-		else {
+		if (!NetworkHelper.isConnected(this)) {
+			Crouton.cancelAllCroutons();
+			final Crouton crouton = Crouton.makeText(this, R.string.error_connection, Style.ALERT);
+			crouton.setConfiguration(new Configuration.Builder().setDuration(Configuration.DURATION_INFINITE).build());
+			crouton.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Crouton.hide(crouton);
+				}
+			});
+			crouton.show();
+
+		} else {    // Check for a valid password.
+
+
 			if (TextUtils.isEmpty(password)) {
 				etPassword.setError(getString(R.string.error_password_field_required));
 				focusView = etPassword;
@@ -200,8 +211,8 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 				focusView = etPassword;
 				cancel = true;
 			}
-			// Check for a valid email address.
 
+			// Check for a valid email address.
 			if (TextUtils.isEmpty(email)) {
 				etEmail.setError(getString(R.string.error_email_field_required));
 				focusView = etEmail;
@@ -211,37 +222,43 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 				focusView = etEmail;
 				cancel = true;
 			}
+
 			if (cancel) {
 				// There was an error; don't attempt login and focus the first
 				// form field with an error.
 				focusView.requestFocus();
-
 			} else {
-				// Define login asynctask login
 				inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-				AsyncTask<Void, Void, Void> login = new AsyncTask<Void, Void, Void>() {
+
+				// Define login asynctask login
+				new AsyncTask<Void, Void, Void>() {
 					@Override
 					protected void onPreExecute() {
 						login_form.setVisibility(View.GONE);
 						ll_login_status.setVisibility(View.VISIBLE);
-
 						super.onPreExecute();
 					}
 
 					@Override
 					protected Void doInBackground(Void... params) {
-						String token = null;
+
+						String token;
 						try {
-							token = NetworkClient.getInstance().getToken(getApplicationContext(), email, password);
-							Log.e("Results: ", token);
-							mtoken = token;
+							// TODO: call getToken() from DataCenter
+							token = NetworkClient.getInstance().getToken(email, password);
+							Logger.Log("Login successfully");
+
+							mToken = token;
 							if (null != token) {
+
 								// add account to account manager
 								addNewAccount(email, password, token, AccountGeneral.AUTH_TOKEN_TYPE);
 							}
+
 							return null;
 						} catch (RetrofitError error) {
 
+							// TODO: showCrouton
 							return null;
 						}
 
@@ -249,11 +266,13 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 					@Override
 					protected void onPostExecute(Void aVoid) {
+
 						//Check login success
-						if (null != mtoken) {
-							mtoken = "Token " + mtoken;
+						if (null != mToken) {
+
 							// Define get data after login success asyntask
-							AsyncTask<Void, Void, Void> getDataAfterLogin = new AsyncTask<Void, Void, Void>() {
+							mToken = "Token " + mToken;
+							new AsyncTask<Void, Void, Void>() {
 								@Override
 								protected void onPreExecute() {
 									tvLoginStatusMessage.setText(R.string.login_progress_loading_data);
@@ -262,32 +281,29 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 								@Override
 								protected Void doInBackground(Void... params) {
-									//TODO add all data below to database
-									User user = NetworkClient.getInstance().getCurrentUser(getApplicationContext(), mtoken);
-									NetworkClient.getInstance().getDamageCodes(getApplicationContext(), mtoken, user.getFullName(), null);
-									NetworkClient.getInstance().getComponentCodes(getApplicationContext(), mtoken, user.getFullName(), null);
-									NetworkClient.getInstance().getRepairCodes(getApplicationContext(), mtoken, user.getFullName(), null);
-									NetworkClient.getInstance().getOperators(getApplicationContext(), mtoken, user.getFullName(), null);
-	                                /*//get operators from server
-                                    List<Operator> operators = NetworkClient.getInstance().getOperators(getApplicationContext(), mtoken, null);
-                                    //save operators to client
-                                    ContentValues addValues[] = new ContentValues[operators.size()];
-                                    int i = 0;
-                                    for (Operator operator : operators) {
-                                        addValues[i++] = operator.getContentValues();
-                                    }
-                                    getContentResolver().bulkInsert(Operator.URI, addValues);*/
+
+									// TODO: call get() from DataCenter
+									User user = NetworkClient.getInstance().getCurrentUser(mToken);
+									NetworkClient.getInstance().getDamageCodes(null);
+									NetworkClient.getInstance().getComponentCodes(null);
+									NetworkClient.getInstance().getRepairCodes(null);
+									NetworkClient.getInstance().getOperators(null);
+
+									// TODO: Save to database
+
 									return null;
 								}
 
 								@Override
 								protected void onPostExecute(Void aVoid) {
+									super.onPostExecute(aVoid);
 									Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
 									startActivity(intent);
 									finish();
-									super.onPostExecute(aVoid);
 								}
+
 							}.execute();
+
 							super.onPostExecute(aVoid);
 						} else {
 							ll_login_status.setVisibility(View.GONE);
@@ -295,12 +311,8 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 							etEmail.setError(getString(R.string.error_incorrect_password));
 						}
 					}
-
 				}.execute();
-
-
 			}
-
 		}
 	}
 
@@ -312,8 +324,8 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	 * @param token
 	 * @param authTokenType
 	 */
-
 	private void addNewAccount(String email, String password, String token, String authTokenType) {
+
 		AccountManager manager = AccountManager.get(this);
 		String accountType = this.getIntent().getStringExtra(
 				PARAM_AUTH_TOKEN_TYPE);
@@ -335,18 +347,15 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
 		accountManager = AccountManager.get(this);
 		ActionBar actionBar = getActionBar();
 		actionBar.hide();
-
 		inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-
 		ButterKnife.inject(this);
 		EventBus.getDefault().register(this);
-
-
 	}
 
 	public void onEvent(LoginSuccessEvent loginSuccessEvent) {
@@ -356,49 +365,6 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		//	EventBus.getDefault().unregister(this);
-	}
-
-	/**
-	 * Checks if the device has Internet connection.
-	 *
-	 * @return <code>true</code> if the phone is connected to the Internet.
-	 */
-	public boolean hasConnection() {
-		ConnectivityManager cm = (ConnectivityManager) getSystemService(
-				Context.CONNECTIVITY_SERVICE);
-
-		NetworkInfo wifiNetwork = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-		if (wifiNetwork != null && wifiNetwork.isConnected()) {
-			return true;
-		}
-
-		NetworkInfo mobileNetwork = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-		if (mobileNetwork != null && mobileNetwork.isConnected()) {
-			return true;
-		}
-
-		NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-		if (activeNetwork != null && activeNetwork.isConnected()) {
-			return true;
-		}
-
-		return false;
-	}
-
-	//Show error
-	public void showCrouton(int textResId) {
-
-		Crouton.cancelAllCroutons();
-		final Crouton crouton = Crouton.makeText(this, textResId, Style.ALERT);
-		crouton.setConfiguration(new Configuration.Builder().setDuration(Configuration.DURATION_INFINITE).build());
-		crouton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Crouton.hide(crouton);
-			}
-		});
-
-		crouton.show();
+		EventBus.getDefault().unregister(this);
 	}
 }

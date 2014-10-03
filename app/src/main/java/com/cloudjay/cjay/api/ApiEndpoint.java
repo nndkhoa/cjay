@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.data.api;
+package com.cloudjay.cjay.api;
 
 
 public class ApiEndpoint {

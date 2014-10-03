@@ -9,21 +9,17 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.View;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.fragment.SearchFragment;
 import com.cloudjay.cjay.fragment.UploadFragment;
 import com.cloudjay.cjay.fragment.WorkingFragment;
-import com.cloudjay.cjay.network.NetworkClient;
+import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.util.PreferencesUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Locale;
-
-import butterknife.InjectView;
 
 public class HomeActivity extends BaseActivity implements ActionBar.TabListener {
 
@@ -34,14 +30,19 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+
+		// Check if user was logged in
+		User user = PreferencesUtil.getObject(this, PreferencesUtil.PREF_CURRENT_USER, User.class);
+		if (null == user) {
+			// Navigate to LoginActivity
+		}
+
 		setContentView(R.layout.activity_home);
 		super.onCreate(savedInstanceState);
 
         mViewPager = (ViewPager) findViewById(R.id.pager);
-
         configureActionBar();
         configureViewPager();
-
 	}
 
 
@@ -115,7 +116,6 @@ class ViewPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-//		return fragments.get(position);
 
         switch (position) {
             case 0:
