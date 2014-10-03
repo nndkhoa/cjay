@@ -51,7 +51,7 @@ public class Session extends RealmObject {
 
 	@SerializedName("check_out_time")
 	@Expose
-	private Object checkOutTime;
+	private String checkOutTime;
 
 	@SerializedName("gate_images")
 	@Expose
@@ -195,11 +195,11 @@ public class Session extends RealmObject {
 		return checkOutTime;
 	}
 
-	public void setCheckOutTime(Object checkOutTime) {
+	public void setCheckOutTime(String checkOutTime) {
 		this.checkOutTime = checkOutTime;
 	}
 
-	public Session withCheckOutTime(Object checkOutTime) {
+	public Session withCheckOutTime(String checkOutTime) {
 		this.checkOutTime = checkOutTime;
 		return this;
 	}

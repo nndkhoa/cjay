@@ -9,9 +9,6 @@ import com.cloudjay.cjay.util.Logger;
 
 import java.util.Objects;
 
-/**
- * Created by nambv on 16/09/2014.
- */
 public class IsoCodeSyncService extends Service {
 
     private static final Object isoCodeSyncAdapterLock = new Object();
