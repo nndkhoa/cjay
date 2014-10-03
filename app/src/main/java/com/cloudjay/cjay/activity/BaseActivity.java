@@ -1,45 +1,26 @@
 package com.cloudjay.cjay.activity;
 
-import android.app.Activity;
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
+
+import com.cloudjay.cjay.CJayApplication;
 
 import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
-/**
- * Created by Thai on 9/30/2014.
- */
+
 public class BaseActivity extends FragmentActivity {
-	/**
-	 * Checks if the device has Internet connection.
-	 *
-	 * @return <code>true</code> if the phone is connected to the Internet.
-	 */
-	public boolean hasConnection() {
-		ConnectivityManager cm = (ConnectivityManager) getSystemService(
-				Context.CONNECTIVITY_SERVICE);
 
-		NetworkInfo wifiNetwork = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-		if (wifiNetwork != null && wifiNetwork.isConnected()) {
-			return true;
-		}
 
-		NetworkInfo mobileNetwork = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-		if (mobileNetwork != null && mobileNetwork.isConnected()) {
-			return true;
-		}
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-		NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-		if (activeNetwork != null && activeNetwork.isConnected()) {
-			return true;
-		}
-
-		return false;
+		//
+		CJayApplication app = CJayApplication.get(this);
+		app.inject(this);
 	}
 
 	/**
@@ -47,7 +28,6 @@ public class BaseActivity extends FragmentActivity {
 	 * @param textResId
 	 */
 	public void showCrouton(int textResId) {
-
 		Crouton.cancelAllCroutons();
 		final Crouton crouton = Crouton.makeText(this, textResId, Style.ALERT);
 		crouton.setConfiguration(new Configuration.Builder().setDuration(Configuration.DURATION_INFINITE).build());
@@ -57,7 +37,6 @@ public class BaseActivity extends FragmentActivity {
 				Crouton.hide(crouton);
 			}
 		});
-
 		crouton.show();
 	}
 }

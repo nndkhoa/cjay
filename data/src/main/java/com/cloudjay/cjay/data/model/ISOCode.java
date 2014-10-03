@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import javax.annotation.Generated;
 
 @Generated("org.jsonschema2pojo")
-public class ISOCode {
+public class IsoCode {
 
 	@Expose
 	private long id;
@@ -24,7 +24,7 @@ public class ISOCode {
 		this.id = id;
 	}
 
-	public ISOCode withId(long id) {
+	public IsoCode withId(long id) {
 		this.id = id;
 		return this;
 	}
@@ -37,7 +37,7 @@ public class ISOCode {
 		this.code = code;
 	}
 
-	public ISOCode withCode(String code) {
+	public IsoCode withCode(String code) {
 		this.code = code;
 		return this;
 	}
@@ -50,7 +50,7 @@ public class ISOCode {
 		this.fullName = fullName;
 	}
 
-	public ISOCode withFullName(String fullName) {
+	public IsoCode withFullName(String fullName) {
 		this.fullName = fullName;
 		return this;
 	}
