@@ -103,7 +103,15 @@ public class DemoCameraFragment extends CameraFragment implements
         btnCameraMode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if (btnCameraMode.isChecked() == true) {
+                    getContract().setSingleShotMode(false);
+                    Logger.Log("Single shot mode: " + getContract().isSingleShotMode());
+                    Toast.makeText(getActivity(), "Kích hoạt chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
+                } else {
+                    getContract().setSingleShotMode(true);
+                    Logger.Log("Single shot mode: " + getContract().isSingleShotMode());
+                    Toast.makeText(getActivity(), "Đã dừng chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -156,8 +164,9 @@ public class DemoCameraFragment extends CameraFragment implements
 				return (true);
 
 			case R.id.single_shot:
-				item.setChecked(!item.isChecked());
+				/*item.setChecked(!item.isChecked());
 				getContract().setSingleShotMode(item.isChecked());
+                Logger.Log("Single shot mode: " + getContract().isSingleShotMode());*/
 
 				return (true);
 
@@ -212,7 +221,8 @@ public class DemoCameraFragment extends CameraFragment implements
 
 		Logger.Log("Prepare to take picture");
 
-		if (singleShotItem != null && singleShotItem.isChecked()) {
+		if (getContract().isSingleShotMode()==true) {
+            Logger.Log("Processing Single shot mode");
 			singleShotProcessing = true;
 			takePictureItem.setEnabled(false);
 		}
@@ -257,11 +267,7 @@ public class DemoCameraFragment extends CameraFragment implements
 
         @Override
         public boolean useSingleShotMode() {
-            if (singleShotItem == null) {
-                return (false);
-            }
-
-            return (singleShotItem.isChecked());
+            return (!btnCameraMode.isChecked());
         }
 
         /**
@@ -274,6 +280,7 @@ public class DemoCameraFragment extends CameraFragment implements
         public void saveImage(PictureTransaction xact, byte[] image) {
 
             // TODO: Checkout cjay v1 flow
+            Logger.i("useSingleShotMode: "+ useSingleShotMode());
             if (useSingleShotMode()) {
                 singleShotProcessing = false;
 
