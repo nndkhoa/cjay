@@ -43,7 +43,8 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 
 		configureActionBar();
 		configureViewPager();
-		//Set Job Queue to get all sessions
+		//Set Job Queue to get all sessions after login
+		//TODO add fetch data from job queue to database
 		jobManager = new JobManager(getApplicationContext());
 		jobManager.addJobInBackground(new GetAllSessionsJob(this));
 	}

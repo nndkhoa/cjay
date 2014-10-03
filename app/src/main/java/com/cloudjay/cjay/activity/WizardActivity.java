@@ -9,10 +9,12 @@ import com.cloudjay.cjay.fragment.ImportFragment;
 
 public class WizardActivity extends FragmentActivity {
 
+	String containerID;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_wizard);
+		containerID = getIntent().getExtras().getString("containerID");
 
         /* Add ImportFragment to MainProcessActivity */
 		ImportFragment importFragment = new ImportFragment();
