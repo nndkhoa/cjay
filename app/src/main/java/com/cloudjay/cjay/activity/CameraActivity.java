@@ -20,18 +20,13 @@ import com.cloudjay.cjay.util.Logger;
 
 import java.io.File;
 
-public class CameraActivity extends Activity implements ActionBar.OnNavigationListener, DemoCameraFragment.Contract {
+public class CameraActivity extends Activity implements DemoCameraFragment.Contract {
 
-	private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
 	private static final String STATE_SINGLE_SHOT = "single_shot";
 	private static final String STATE_LOCK_TO_LANDSCAPE = "lock_to_landscape";
 	private static final int CONTENT_REQUEST = 1337;
 
-	private DemoCameraFragment std = null;
-	private DemoCameraFragment ffc = null;
 	private DemoCameraFragment current = null;
-
-	private boolean hasTwoCameras = (Camera.getNumberOfCameras() > 1);
 	private boolean singleShot = false;
 	private boolean isLockedToLandscape = true;
 
@@ -39,37 +34,25 @@ public class CameraActivity extends Activity implements ActionBar.OnNavigationLi
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_camera);
-
         Logger.Log("isLockedToLandscape = " + isLockedToLandscape);
 
-		if (hasTwoCameras) {
+        final ActionBar actionBar = getActionBar();
+        actionBar.hide();
 
-			Logger.Log("Has 2 camera");
-			final ActionBar actionBar = getActionBar();
-			actionBar.setDisplayShowTitleEnabled(false);
-			actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-			ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(actionBar.getThemedContext(),
-					R.array.nav,
-					android.R.layout.simple_list_item_1);
-			actionBar.setListNavigationCallbacks(adapter, this);
-		} else {
-			Logger.Log("New DemoCameraFragment");
-			current = DemoCameraFragment.newInstance(false);
-			getFragmentManager().beginTransaction()
-					.replace(R.id.container, current).commit();
-		}
+        Logger.Log("New DemoCameraFragment");
+        current = DemoCameraFragment.newInstance(false);
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, current).commit();
+        findViewById(android.R.id.content).post(new Runnable() {
+            @Override
+            public void run() {
+                current.lockToLandscape(isLockedToLandscape);
+            }
+        });
 	}
 
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
-        Logger.Log("isLockedToLandscape = " + isLockedToLandscape);
-
-		if (hasTwoCameras) {
-			if (savedInstanceState.containsKey(STATE_SELECTED_NAVIGATION_ITEM)) {
-				Logger.Log("setSelectedNavigationItem");
-				getActionBar().setSelectedNavigationItem(savedInstanceState.getInt(STATE_SELECTED_NAVIGATION_ITEM));
-			}
-		}
 
 		setSingleShotMode(savedInstanceState.getBoolean(STATE_SINGLE_SHOT));
 		isLockedToLandscape = savedInstanceState.getBoolean(STATE_LOCK_TO_LANDSCAPE);
@@ -80,43 +63,8 @@ public class CameraActivity extends Activity implements ActionBar.OnNavigationLi
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		if (hasTwoCameras) {
-			Logger.Log("XXX");
-			outState.putInt(STATE_SELECTED_NAVIGATION_ITEM,
-					getActionBar().getSelectedNavigationIndex());
-		}
 		outState.putBoolean(STATE_SINGLE_SHOT, isSingleShotMode());
 		outState.putBoolean(STATE_LOCK_TO_LANDSCAPE, isLockedToLandscape);
-	}
-
-	// Will be call when set adapter
-	@Override
-	public boolean onNavigationItemSelected(int position, long id) {
-
-		// Trigger to open Camera Fragment
-		if (position == 0) {
-			Logger.Log("Position 0");
-			if (std == null) {
-				std = DemoCameraFragment.newInstance(false);
-			}
-			current = std;
-		} else {
-			Logger.Log("Position 1");
-			if (ffc == null) {
-				ffc = DemoCameraFragment.newInstance(true);
-			}
-			current = ffc;
-		}
-
-		getFragmentManager().beginTransaction().replace(R.id.container, current).commit();
-		findViewById(android.R.id.content).post(new Runnable() {
-			@Override
-			public void run() {
-				current.lockToLandscape(isLockedToLandscape);
-			}
-		});
-
-		return (true);
 	}
 
 	@Override
