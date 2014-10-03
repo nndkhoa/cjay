@@ -16,7 +16,7 @@ import de.greenrobot.event.EventBus;
  */
 public class GetAllSessionsJob extends Job {
 	public static final int PRIORITY = 1;
-	public static  int PAGE =58;
+	public static  int PAGE =1;
 	Context context;
 
 	public GetAllSessionsJob(Context context) {
