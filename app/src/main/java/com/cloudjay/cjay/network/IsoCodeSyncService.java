@@ -5,9 +5,6 @@ import android.content.Intent;
 import android.os.IBinder;
 
 import com.cloudjay.cjay.adapter.IsoCodeSyncAdapter;
-import com.cloudjay.cjay.util.Logger;
-
-import java.util.Objects;
 
 public class IsoCodeSyncService extends Service {
 
@@ -17,13 +14,13 @@ public class IsoCodeSyncService extends Service {
     @Override
     public void onCreate() {
 
-        Logger.i("Sync server start!");
-
-        synchronized (isoCodeSyncAdapterLock) {
-            if (isoCodeSyncAdapter == null) {
-                isoCodeSyncAdapter = new IsoCodeSyncAdapter(getApplicationContext(), true);
-            }
-        }
+//        Logger.i("Sync server start!");
+//
+//        synchronized (isoCodeSyncAdapterLock) {
+//            if (isoCodeSyncAdapter == null) {
+//                isoCodeSyncAdapter = new IsoCodeSyncAdapter(getApplicationContext(), true);
+//            }
+//        }
     }
 
     @Override

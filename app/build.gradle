@@ -19,39 +19,39 @@ def preDexEnabled = "true".equals(System.getProperty("pre-dex", "true"))
 def AAVersion = '3.1'
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion "19.1.0"
+	compileSdkVersion 19
+	buildToolsVersion "19.1.0"
 
 	dexOptions {
 		// Skip pre-dexing when running on Travis CI or when disabled via -Dpre-dex=false.
 		preDexLibraries = preDexEnabled && !isTravis
 	}
 
-    defaultConfig {
-        applicationId "com.cloudjay.cjay"
-        minSdkVersion 16
-        targetSdkVersion 16
+	defaultConfig {
+		applicationId "com.cloudjay.cjay"
+		minSdkVersion 16
+		targetSdkVersion 16
 
 //		versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
 //		versionName "${versionMajor}.${versionMinor}.${versionPatch}"
 
-        versionCode 40
-        versionName "2.0-alpha"
+		versionCode 40
+		versionName "2.0-alpha"
 
 //		buildConfigField "String", "GIT_SHA", "\"${gitSha}\""
 //		buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
-    }
-    buildTypes {
-        release {
-            runProguard false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+	}
+	buildTypes {
+		release {
+			runProguard false
+			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+		}
 
 		debug {
 			applicationIdSuffix '.dev'
 			versionNameSuffix '-dev'
 		}
-    }
+	}
 
 	lintOptions {
 		abortOnError false
@@ -65,13 +65,11 @@ dependencies {
 	compile 'com.android.support:appcompat-v7:19.0.+'
 	compile 'com.crashlytics.android:crashlytics:1.+'
 
-
-    compile 'com.path:android-priority-jobqueue:1.1.2'
+	compile 'com.path:android-priority-jobqueue:1.1.2'
 
 	compile 'com.netflix.rxjava:rxjava-core:0.16.1'
 	compile 'com.netflix.rxjava:rxjava-android:0.16.1'
 
-	compile 'com.jakewharton:butterknife:5.1.2'
 	compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.3'
 	compile 'de.greenrobot:eventbus:2.2.1'
 	compile 'com.commonsware.cwac:camera:0.6.+'

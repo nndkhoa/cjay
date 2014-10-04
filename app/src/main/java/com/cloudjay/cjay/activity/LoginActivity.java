@@ -4,15 +4,11 @@ import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
-import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
@@ -26,25 +22,42 @@ import android.widget.Toast;
 
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.api.NetworkClient;
-import com.cloudjay.cjay.event.LoginSuccessEvent;
 import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.util.DataCenter;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.PreferencesUtil;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.account.AccountGeneral;
 
-import butterknife.ButterKnife;
-import butterknife.InjectView;
-import butterknife.OnClick;
-import de.greenrobot.event.EventBus;
-import de.keyboardsurfer.android.widget.crouton.Configuration;
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.Click;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.SystemService;
+import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.ViewById;
+
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 import retrofit.RetrofitError;
 
+@EActivity(R.layout.activity_login)
 public class LoginActivity extends AccountAuthenticatorActivity {
 
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		accountManager = AccountManager.get(this);
+	}
+
+	@Bean
+	DataCenter dataCenter;
+
 	public static final String PARAM_AUTH_TOKEN_TYPE = "auth.token";
+
+	// TODO: need to figure out
 	private AccountManager mAccountManager;
+	AccountManager accountManager;
 
 	private AlertDialog mAlertDialog;
 	private boolean mInvalidate;
@@ -52,34 +65,36 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	String email;
 	String password;
 
-	@InjectView(R.id.btn_login)
-	Button mLoginButton;
+	//region VIEW
+	@ViewById(R.id.btn_login)
+	Button btnLogin;
 
-	@InjectView(R.id.email)
+	@ViewById(R.id.email)
 	EditText etEmail;
 
-	@InjectView(R.id.password)
+	@ViewById(R.id.password)
 	EditText etPassword;
 
-	@InjectView(R.id.iv_app)
-	ImageView imageView;
+	@ViewById(R.id.iv_app)
+	ImageView iv;
 
-	@InjectView(R.id.rootLayout)
-	LinearLayout ll_root;
+	@ViewById(R.id.ll_root)
+	LinearLayout llRoot;
 
-	@InjectView(R.id.login_form)
-	ScrollView login_form;
+	@ViewById(R.id.login_form)
+	ScrollView svLoginForm;
 
-	// TODO: need to refactor all layout name
-	@InjectView(R.id.login_status)
-	LinearLayout ll_login_status;
+	@ViewById(R.id.ll_login_status)
+	LinearLayout llLoginStatus;
 
-	@InjectView(R.id.login_status_message)
+	@ViewById(R.id.login_status_message)
 	TextView tvLoginStatusMessage;
 
-	AccountManager accountManager;
+	@SystemService
 	InputMethodManager inputManager;
+	//endregion
 
+	//region ACCOUNT MANAGER
 	void getUserToken() {
 		showAccountPicker(AccountGeneral.AUTH_TOKEN_TYPE_FULL_ACCESS, false);
 	}
@@ -121,8 +136,8 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	}
 
 	private void invalidateAuthToken(final Account availableAccount, String authtokenTypeFullAccess) {
-		final AccountManagerFuture<Bundle> future = mAccountManager.getAuthToken(availableAccount, authtokenTypeFullAccess, null, this, null, null);
 
+		final AccountManagerFuture<Bundle> future = mAccountManager.getAuthToken(availableAccount, authtokenTypeFullAccess, null, this, null, null);
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -130,7 +145,6 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 					Bundle bnd = future.getResult();
 					final String authtoken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
 					mAccountManager.invalidateAuthToken(availableAccount.type, authtoken);
-
 					showMessage(availableAccount.name + " invalidated");
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -164,158 +178,6 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		}).start();
 	}
 
-	private void showMessage(final String s) {
-		if (TextUtils.isEmpty(s))
-			return;
-
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				Toast.makeText(getBaseContext(), s, Toast.LENGTH_SHORT)
-						.show();
-			}
-		});
-	}
-
-	@OnClick(R.id.btn_login)
-	void doLogin() {
-
-		email = etEmail.getText().toString();
-		password = etPassword.getText().toString();
-
-		View focusView = null;
-		boolean cancel = false;
-
-		//Check connect to internet
-		if (!NetworkHelper.isConnected(this)) {
-			Crouton.cancelAllCroutons();
-			final Crouton crouton = Crouton.makeText(this, R.string.error_connection, Style.ALERT);
-			crouton.setConfiguration(new Configuration.Builder().setDuration(Configuration.DURATION_INFINITE).build());
-			crouton.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					Crouton.hide(crouton);
-				}
-			});
-			crouton.show();
-
-		} else {    // Check for a valid password.
-
-
-			if (TextUtils.isEmpty(password)) {
-				etPassword.setError(getString(R.string.error_password_field_required));
-				focusView = etPassword;
-				cancel = true;
-			} else if (password.length() < 6) {
-				etPassword.setError(getString(R.string.error_invalid_password));
-				focusView = etPassword;
-				cancel = true;
-			}
-
-			// Check for a valid email address.
-			if (TextUtils.isEmpty(email)) {
-				etEmail.setError(getString(R.string.error_email_field_required));
-				focusView = etEmail;
-				cancel = true;
-			} else if (!email.contains("@")) {
-				etEmail.setError(getString(R.string.error_invalid_email));
-				focusView = etEmail;
-				cancel = true;
-			}
-
-			if (cancel) {
-				// There was an error; don't attempt login and focus the first
-				// form field with an error.
-				focusView.requestFocus();
-			} else {
-				inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-
-				// Define login asynctask login
-				new AsyncTask<Void, Void, Void>() {
-					@Override
-					protected void onPreExecute() {
-						login_form.setVisibility(View.GONE);
-						ll_login_status.setVisibility(View.VISIBLE);
-						super.onPreExecute();
-					}
-
-					@Override
-					protected Void doInBackground(Void... params) {
-
-						String token;
-						try {
-							// TODO: call getToken() from DataCenter
-							token = NetworkClient.getInstance().getToken(email, password);
-							Logger.Log("Login successfully");
-
-							mToken = token;
-							if (null != token) {
-
-								// add account to account manager
-								addNewAccount(email, password, token, AccountGeneral.AUTH_TOKEN_TYPE);
-							}
-
-							return null;
-						} catch (RetrofitError error) {
-
-							// TODO: showCrouton
-							return null;
-						}
-
-					}
-
-					@Override
-					protected void onPostExecute(Void aVoid) {
-
-						//Check login success
-						if (null != mToken) {
-
-							// Define get data after login success asyntask
-							mToken = "Token " + mToken;
-							new AsyncTask<Void, Void, Void>() {
-								@Override
-								protected void onPreExecute() {
-									tvLoginStatusMessage.setText(R.string.login_progress_loading_data);
-									super.onPreExecute();
-								}
-
-								@Override
-								protected Void doInBackground(Void... params) {
-
-									// TODO: call get() from DataCenter
-									User user = NetworkClient.getInstance().getCurrentUser();
-									NetworkClient.getInstance().getDamageCodes(null);
-									NetworkClient.getInstance().getComponentCodes(null);
-									NetworkClient.getInstance().getRepairCodes(null);
-									NetworkClient.getInstance().getOperators(null);
-
-									// TODO: Save to database
-
-									return null;
-								}
-
-								@Override
-								protected void onPostExecute(Void aVoid) {
-									super.onPostExecute(aVoid);
-									Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-									startActivity(intent);
-									finish();
-								}
-
-							}.execute();
-
-							super.onPostExecute(aVoid);
-						} else {
-							ll_login_status.setVisibility(View.GONE);
-							login_form.setVisibility(View.VISIBLE);
-							etEmail.setError(getString(R.string.error_incorrect_password));
-						}
-					}
-				}.execute();
-			}
-		}
-	}
-
 	/**
 	 * Add account to account manager
 	 *
@@ -334,37 +196,132 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		}
 
 		final Account account = new Account(email, accountType);
-
 		manager.addAccountExplicitly(account, password, null);
 		manager.setAuthToken(account, AccountGeneral.AUTH_TOKEN_TYPE_FULL_ACCESS, token);
+
 		final Intent intent = new Intent();
 		intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, email);
 		intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, accountType);
 		intent.putExtra(AccountManager.KEY_AUTHTOKEN, accountType);
+
 		this.setAccountAuthenticatorResult(intent.getExtras());
 		this.setResult(RESULT_OK, intent);
 	}
+	//endregion
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_login);
-		accountManager = AccountManager.get(this);
-		ActionBar actionBar = getActionBar();
-		actionBar.hide();
-		inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		ButterKnife.inject(this);
-		EventBus.getDefault().register(this);
+	@UiThread
+	void showMessage(String s) {
+		Toast.makeText(getBaseContext(), s, Toast.LENGTH_SHORT).show();
 	}
 
-	public void onEvent(LoginSuccessEvent loginSuccessEvent) {
-		Log.e("EventBus: ", "OK");
+	@Background
+	void doLogin () {
+
+		// Query Token from server and add account to account manager
+		try {
+			mToken = dataCenter.getToken(email, password);
+			if (null != mToken) {
+
+				Logger.Log("Login successfully");
+				addNewAccount(email, password, mToken, AccountGeneral.AUTH_TOKEN_TYPE);
+				PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_TOKEN, mToken);
+
+				// Continue to fetch List Operators and Iso Codes
+				dataCenter.fetchOperators(this);
+				dataCenter.fetchIsoCodes(this);
+				User user = dataCenter.getCurrentUser(this);
+
+				if (null != user) {
+					// Navigate to Home Activity
+					Logger.Log("Navigate to Home Activity");
+					Intent intent = new Intent(getApplicationContext(), HomeActivity_.class);
+					startActivity(intent);
+					finish();
+				} else {
+
+					Logger.w("Cannot fetch user information");
+					showProgress(false);
+					showCrouton(getResources().getString(R.string.error_try_again));
+				}
+			} else {
+				Logger.w("Login failed");
+				showProgress(false);
+				showError(etEmail, R.string.error_incorrect_password);
+			}
+		} catch (RetrofitError error) {
+			error.printStackTrace();
+			showCrouton(error.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			showCrouton(e.getMessage());
+		}
 	}
 
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		EventBus.getDefault().unregister(this);
+	@UiThread
+	void showCrouton(String message) {
+		Crouton.cancelAllCroutons();
+		final Crouton crouton = Crouton.makeText(this, message, Style.ALERT);
+		crouton.setConfiguration(new de.keyboardsurfer.android.widget.crouton.Configuration.Builder().setDuration(de.keyboardsurfer.android.widget.crouton.Configuration.DURATION_INFINITE).build());
+		crouton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Crouton.hide(crouton);
+			}
+		});
+		crouton.show();
+	}
+
+	@UiThread
+	void showProgress(final boolean show) {
+		llLoginStatus.setVisibility(show ? View.VISIBLE : View.GONE);
+		svLoginForm.setVisibility(show ? View.GONE : View.VISIBLE);
+	}
+
+	@UiThread
+	void showError(EditText view, int textResId) {
+		view.setError(getString(textResId));
+	}
+
+	@Click(R.id.btn_login)
+	void btnLoginClicked() {
+
+		email = etEmail.getText().toString();
+		password = etPassword.getText().toString();
+
+		View focusView = null;
+		boolean cancel = false;
+
+		// Check for a valid password.
+		if (TextUtils.isEmpty(password)) {
+			etPassword.setError(getString(R.string.error_password_field_required));
+			focusView = etPassword;
+			cancel = true;
+		} else if (password.length() < 6) {
+			etPassword.setError(getString(R.string.error_invalid_password));
+			focusView = etPassword;
+			cancel = true;
+		}
+
+		// Check for a valid email address.
+		if (TextUtils.isEmpty(email)) {
+			etEmail.setError(getString(R.string.error_email_field_required));
+			focusView = etEmail;
+			cancel = true;
+		} else if (!email.contains("@")) {
+			etEmail.setError(getString(R.string.error_invalid_email));
+			focusView = etEmail;
+			cancel = true;
+		}
+
+		// Done validation process. Try to log user in
+		if (cancel) {
+			focusView.requestFocus();
+		} else if (NetworkHelper.isConnected(this)) {
+			inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+			showProgress(true);
+			doLogin();
+		} else {
+			Utils.showCrouton(this, R.string.error_connection);
+		}
 	}
 }

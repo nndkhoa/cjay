@@ -31,12 +31,9 @@ public class SearchFragment extends Fragment {
 	View rootView;
 	Button btnSearch;
 	EditText etSearch;
-
 	Pattern pattern = Pattern.compile("^[a-zA-Z]{4}");
 
-
 	public SearchFragment() {
-		// Required empty public constructor
 	}
 
 	public static SearchFragment newInstance(int sectionNumber) {
@@ -122,7 +119,8 @@ public class SearchFragment extends Fragment {
 
 	private void showAddContainerDialog(String containerID) {
 		FragmentManager fragmentManager = getChildFragmentManager();
-		AddContainerDialog addContainerDialog = new AddContainerDialog(getActivity(), containerID);
+		AddContainerDialog addContainerDialog = AddContainerDialog_.builder().containerID(containerID).build();
+
 		addContainerDialog.show(fragmentManager, "fragment_addcontainer");
 	}
 }

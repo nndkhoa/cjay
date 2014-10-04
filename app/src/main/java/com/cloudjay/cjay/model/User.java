@@ -25,13 +25,6 @@ public class User extends RealmObject {
 	private String lastName;
 
 	@Expose
-	private String phone;
-
-	@SerializedName("dialing_code")
-	@Expose
-	private long dialingCode;
-
-	@Expose
 	private String username;
 
 	@Expose
@@ -101,32 +94,6 @@ public class User extends RealmObject {
 
 	public User withLastName(String lastName) {
 		this.lastName = lastName;
-		return this;
-	}
-
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
-
-	public User withPhone(String phone) {
-		this.phone = phone;
-		return this;
-	}
-
-	public long getDialingCode() {
-		return dialingCode;
-	}
-
-	public void setDialingCode(long dialingCode) {
-		this.dialingCode = dialingCode;
-	}
-
-	public User withDialingCode(long dialingCode) {
-		this.dialingCode = dialingCode;
 		return this;
 	}
 
@@ -221,4 +188,8 @@ public class User extends RealmObject {
 		return this;
 	}
 
+	@Override
+	public String toString() {
+		return fullName;
+	}
 }
