@@ -3,6 +3,10 @@ package com.cloudjay.cjay.fragment;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -20,12 +24,18 @@ import android.widget.ToggleButton;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.DisplayActivity;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.StringHelper;
 import com.commonsware.cwac.camera.CameraFragment;
 import com.commonsware.cwac.camera.CameraHost;
 import com.commonsware.cwac.camera.CameraUtils;
 import com.commonsware.cwac.camera.PictureTransaction;
 import com.commonsware.cwac.camera.SimpleCameraHost;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.UUID;
 
 public class DemoCameraFragment extends CameraFragment implements
 		SeekBar.OnSeekBarChangeListener {
@@ -41,6 +51,12 @@ public class DemoCameraFragment extends CameraFragment implements
     private Button btnDone;
 	private long lastFaceToast = 0L;
 	String flashMode = null; //flash mode parameter when take camera
+
+    int mType = 0;
+
+    String containerId;
+    String depotCode;
+    String operatorCode;
 
 	public static DemoCameraFragment newInstance(boolean useFFC) {
 		Logger.Log("new DemoCameraFragment");
@@ -235,7 +251,53 @@ public class DemoCameraFragment extends CameraFragment implements
         public void saveImage(PictureTransaction xact, byte[] image) {
 
             // TODO: Checkout cjay v1 flow
-            Logger.i("useSingleShotMode: "+ useSingleShotMode());
+
+            // Convert rotated byte[] to Bitmap
+            Bitmap capturedBitmap = saveToBitmap(image);
+
+            // Save Bitmap to Files
+            String uuid = UUID.randomUUID().toString();
+
+            String imageType;
+            switch (mType) {
+                case CJayConstant.TYPE_IMPORT:
+                    imageType = "gate-in";
+                    break;
+
+                case CJayConstant.TYPE_EXPORT:
+                    imageType = "gate-out";
+                    break;
+
+                case CJayConstant.TYPE_AUDIT:
+                    imageType = "auditor";
+                    break;
+
+                case CJayConstant.TYPE_REPAIRED:
+                default:
+                    imageType = "repair";
+                    break;
+            }
+
+            // file name example:
+            // [depot-code]-2013-12-19-[gate-in|gate-out|report]-[containerId]-[UUID].jpg
+
+            //create today String
+            String today = StringHelper.getCurrentTimestamp("yyyy-MM-dd");
+
+            //create image file name
+            String fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-" + operatorCode + "-"
+                    + uuid + ".jpg";
+
+            //create directory to save images
+            File newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/" + today + "/" + imageType
+                    + "/" + containerId);
+
+            if (!newDirectory.exists()) {
+                newDirectory.mkdirs();
+            }
+
+
+
             if (useSingleShotMode()) {
                 singleShotProcessing = false;
 
@@ -249,8 +311,28 @@ public class DemoCameraFragment extends CameraFragment implements
                 DisplayActivity.imageToShow = image;
                 startActivity(new Intent(getActivity(), DisplayActivity.class));
             } else {
-                super.saveImage(xact, image);
+                // Save Bitmap to JPEG
+                File photo = new File(newDirectory, fileName);
+                saveBitmapToFile(capturedBitmap, photo);
+                //super.saveImage(xact, image);
             }
+        }
+
+        void saveBitmapToFile(Bitmap bitmap, File filename) {
+
+            Logger.Log("File name: " + filename);
+
+            try {
+
+                FileOutputStream out = new FileOutputStream(filename);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                out.flush();
+                out.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
 
         @Override
@@ -331,6 +413,38 @@ public class DemoCameraFragment extends CameraFragment implements
             btnTakePicture.setEnabled(true);
             takeSimplePicture();
         }
+    }
+
+    /**
+     * save byte array to Bitmap
+     *
+     * @param data
+     * @return
+     */
+    Bitmap saveToBitmap(byte[] data) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+
+        if (data != null) {
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+
+                Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data != null ? data.length : 0);
+
+                Matrix mtx = new Matrix();
+
+                Bitmap rotatedBitmap = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), mtx, true);
+
+                if (bm != null) {
+                    bm.recycle();
+                    bm = null;
+                    System.gc();
+                }
+
+                return rotatedBitmap;
+
+            }
+        }
+        return null;
     }
 
 }
