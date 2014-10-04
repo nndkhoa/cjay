@@ -38,8 +38,7 @@ import java.io.FileOutputStream;
 import java.util.List;
 import java.util.UUID;
 
-public class DemoCameraFragment extends CameraFragment implements
-		SeekBar.OnSeekBarChangeListener {
+public class DemoCameraFragment extends CameraFragment {
 
     private static final int PICTURE_SIZE_MAX_WIDTH = 640;
     private static final int PREVIEW_SIZE_MAX_WIDTH = 1280;
@@ -92,8 +91,6 @@ public class DemoCameraFragment extends CameraFragment implements
 		View results = inflater.inflate(R.layout.fragment_demo_camera, container, false);
 
 		((ViewGroup) results.findViewById(R.id.camera)).addView(cameraView);
-		/*zoom = (SeekBar) results.findViewById(R.id.zoom);
-		zoom.setKeepScreenOn(true);*/
         btnTakePicture = (ImageButton) results.findViewById(R.id.btn_capture);
         btnTakePicture.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -161,30 +158,6 @@ public class DemoCameraFragment extends CameraFragment implements
 		return (singleShotProcessing);
 	}
 
-	@Override
-	public void onProgressChanged(SeekBar seekBar, int progress,
-	                              boolean fromUser) {
-		/*if (fromUser) {
-			zoom.setEnabled(false);
-			zoomTo(zoom.getProgress()).onComplete(new Runnable() {
-				@Override
-				public void run() {
-					zoom.setEnabled(true);
-				}
-			}).go();
-		}*/
-	}
-
-	@Override
-	public void onStartTrackingTouch(SeekBar seekBar) {
-		// ignore
-	}
-
-	@Override
-	public void onStopTrackingTouch(SeekBar seekBar) {
-		// ignore
-	}
-
 	Contract getContract() {
 		return ((Contract) getActivity());
 	}
@@ -209,9 +182,6 @@ public class DemoCameraFragment extends CameraFragment implements
 		// Tag another object along if you need to
 		// xact.tag();
         xact.flashMode(flashMode);
-		/*if (flashItem != null && flashItem.isChecked()) {
-			xact.flashMode(flashMode);
-		}*/
 
 		// Call it with PictureTransaction to take picture with configuration in CameraHost
 		// Process image in Subclass of `CameraHost#saveImage`
@@ -250,7 +220,7 @@ public class DemoCameraFragment extends CameraFragment implements
          * Process taken picture
          *
          * @param xact
-         * @param image
+         * @param capturedBitmap
          */
         @Override
         public void saveImage(PictureTransaction xact, Bitmap capturedBitmap) {
@@ -320,8 +290,8 @@ public class DemoCameraFragment extends CameraFragment implements
                 });
 
                 //Todo: Open Dialg and Process here
-                /*DisplayActivity.imageToShow = ca //image;
-                startActivity(new Intent(getActivity(), DisplayActivity.class));*/
+                // DisplayActivity.imageToShow = ca //image;
+                // startActivity(new Intent(getActivity(), DisplayActivity.class));*/
             }
 
             // Save Bitmap to JPEG

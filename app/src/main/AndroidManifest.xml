@@ -65,7 +65,8 @@
 
 		<activity
 			android:name=".activity.CameraActivity"
-			android:label="@string/title_activity_camera">
+			android:label="@string/title_activity_camera"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen"  >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
