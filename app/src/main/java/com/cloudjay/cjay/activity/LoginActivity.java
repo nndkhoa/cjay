@@ -54,11 +54,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	DataCenter dataCenter;
 
 	public static final String PARAM_AUTH_TOKEN_TYPE = "auth.token";
-
-	// TODO: need to figure out
-	private AccountManager mAccountManager;
 	AccountManager accountManager;
-
 	private AlertDialog mAlertDialog;
 	private boolean mInvalidate;
 	public String mToken;
@@ -137,14 +133,15 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 	private void invalidateAuthToken(final Account availableAccount, String authtokenTypeFullAccess) {
 
-		final AccountManagerFuture<Bundle> future = mAccountManager.getAuthToken(availableAccount, authtokenTypeFullAccess, null, this, null, null);
+		final AccountManagerFuture<Bundle> future = accountManager.getAuthToken(availableAccount, authtokenTypeFullAccess, null, this, null, null);
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
 					Bundle bnd = future.getResult();
 					final String authtoken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
-					mAccountManager.invalidateAuthToken(availableAccount.type, authtoken);
+					accountManager.invalidateAuthToken(availableAccount.type, authtoken);
+
 					showMessage(availableAccount.name + " invalidated");
 				} catch (Exception e) {
 					e.printStackTrace();
