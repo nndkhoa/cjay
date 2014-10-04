@@ -9,7 +9,7 @@ public class CJayApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 
-		// Crashlytics.start(this);
+//		Crashlytics.start(this);
 	}
 
 	public static CJayApplication get(Context context) {

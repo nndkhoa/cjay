@@ -17,8 +17,10 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Utils;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,12 +33,9 @@ public class SearchFragment extends Fragment {
 	View rootView;
 	Button btnSearch;
 	EditText etSearch;
-
 	Pattern pattern = Pattern.compile("^[a-zA-Z]{4}");
 
-
 	public SearchFragment() {
-		// Required empty public constructor
 	}
 
 	public static SearchFragment newInstance(int sectionNumber) {
@@ -56,7 +55,7 @@ public class SearchFragment extends Fragment {
 		//Show soft key when show this fragment
 		etSearch.requestFocus();
 		InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-		inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED,InputMethodManager.HIDE_IMPLICIT_ONLY);
+		inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
 		//Set action for btnSearch
 		btnSearch.setOnClickListener(new View.OnClickListener() {
@@ -70,7 +69,12 @@ public class SearchFragment extends Fragment {
 					etSearch.setError(getString(R.string.dialog_container_id_invalid));
 					return;
 				} else {
-					showAddContainerDialog(containeriD);
+					List<Session> result = searchSession(containeriD);
+					if (result.size() != 0) {
+						refreshListView();
+					} else {
+						showAddContainerDialog(containeriD);
+					}
 					etSearch.setText("");
 				}
 
@@ -80,7 +84,7 @@ public class SearchFragment extends Fragment {
 		etSearch.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-				if (s.length() == 0){
+				if (s.length() == 0) {
 					etSearch.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
 				}
 
@@ -114,6 +118,15 @@ public class SearchFragment extends Fragment {
 		return rootView;
 	}
 
+	//TODO refresh list view after search
+	private void refreshListView() {
+	}
+
+	//TODO add logic search
+	private List<Session> searchSession(String containeriD) {
+		return null;
+	}
+
 	private void initController() {
 		etSearch = (EditText) rootView.findViewById(R.id.et_search);
 		btnSearch = (Button) rootView.findViewById(R.id.btn_search);
@@ -122,7 +135,8 @@ public class SearchFragment extends Fragment {
 
 	private void showAddContainerDialog(String containerID) {
 		FragmentManager fragmentManager = getChildFragmentManager();
-		AddContainerDialog addContainerDialog = new AddContainerDialog(getActivity(), containerID);
+		AddContainerDialog addContainerDialog = AddContainerDialog_.builder().containerID(containerID).build();
+
 		addContainerDialog.show(fragmentManager, "fragment_addcontainer");
 	}
 }

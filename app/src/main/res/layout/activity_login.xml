@@ -5,7 +5,7 @@
               android:orientation="vertical"
               tools:context=".LoginActivity"
               android:weightSum="8"
-              android:id="@+id/rootLayout"
+              android:id="@+id/ll_root"
               android:background="#FFFFFF">
 
     <LinearLayout
@@ -45,7 +45,7 @@
             <!-- Login progress -->
 
             <LinearLayout
-                android:id="@+id/login_status"
+                android:id="@+id/ll_login_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"

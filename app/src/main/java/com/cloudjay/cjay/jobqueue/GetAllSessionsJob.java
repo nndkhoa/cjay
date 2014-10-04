@@ -2,14 +2,9 @@ package com.cloudjay.cjay.jobqueue;
 
 import android.content.Context;
 
-import com.cloudjay.cjay.event.GotAllSessionEvent;
-import com.cloudjay.cjay.model.User;
-import com.cloudjay.cjay.network.NetworkClient;
 import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
-
-import de.greenrobot.event.EventBus;
 
 /**
  * Created by Thai on 10/2/2014.
@@ -22,7 +17,6 @@ public class GetAllSessionsJob extends Job {
 	public GetAllSessionsJob(Context context) {
 		super(new Params(500).requireNetwork().groupBy("get_session"));
 		this.context = context;
-
 	}
 
 	@Override
@@ -34,13 +28,13 @@ public class GetAllSessionsJob extends Job {
 
 	@Override
 	public void onRun() throws Throwable {
-		Logger.e("Job is running");
-		Logger.e(String.valueOf(getCurrentRunCount()));
-		String token = NetworkClient.getInstance().getToken(context, "giamdinhcong1.icd1@pip.com.vn", "123456");
-		String mToken = "Token " + token;
-		User user = NetworkClient.getInstance().getCurrentUser(context, mToken);
-		NetworkClient.getInstance().getAllSession(context, mToken, user.getFullName(),null);
-		Logger.e("Job is done");
+//		Logger.e("Job is running");
+//		Logger.e(String.valueOf(getCurrentRunCount()));
+//		String token = NetworkClient.getInstance().getToken("giamdinhcong1.icd1@pip.com.vn", "123456");
+//		String mToken = "Token " + token;
+//		User user = NetworkClient.getInstance().getCurrentUser();
+//		NetworkClient.getInstance().getAllSession(context, mToken, user.getFullName(),null);
+//		Logger.e("Job is done");
 
 	}
 

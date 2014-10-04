@@ -3,12 +3,14 @@ package com.cloudjay.cjay.activity;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.cloudjay.cjay.R;
@@ -16,8 +18,12 @@ import com.cloudjay.cjay.event.GotAllSessionEvent;
 import com.cloudjay.cjay.fragment.SearchFragment;
 import com.cloudjay.cjay.fragment.UploadFragment;
 import com.cloudjay.cjay.fragment.WorkingFragment;
-import com.cloudjay.cjay.jobqueue.GetAllSessionsJob;
+import com.cloudjay.cjay.util.PreferencesUtil;
 import com.path.android.jobqueue.JobManager;
+
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,40 +31,50 @@ import java.util.Locale;
 
 import de.greenrobot.event.EventBus;
 
+@EActivity(R.layout.activity_home)
 public class HomeActivity extends BaseActivity implements ActionBar.TabListener {
 
+	public int currentPosition = 0;
+
+	@ViewById(R.id.pager)
 	ViewPager mViewPager;
+
 	PagerAdapter mPagerAdapter;
 	ActionBar actionBar;
-	public int currentPosition = 0;
 	JobManager jobManager;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		setContentView(R.layout.activity_home);
-		super.onCreate(savedInstanceState);
-		EventBus.getDefault().register(this);
+	@AfterViews
+	void setup() {
 
-		mViewPager = (ViewPager) findViewById(R.id.pager);
+		// Check if user was logged in
+		String token = PreferencesUtil.getPrefsValue(this, PreferencesUtil.PREF_TOKEN);
+		if (TextUtils.isEmpty(token)) {
 
-		configureActionBar();
-		configureViewPager();
-		//Set Job Queue to get all sessions
-		jobManager = new JobManager(getApplicationContext());
-		jobManager.addJobInBackground(new GetAllSessionsJob(this));
+			// Navigate to LoginActivity
+			Intent intent = new Intent(getApplicationContext(), LoginActivity_.class);
+			startActivity(intent);
+			finish();
+
+		} else {
+			configureActionBar();
+			configureViewPager();
+
+			// Set Job Queue to get all sessions after login
+			// TODO: add fetch data from job queue to database
+//			jobManager = new JobManager(getApplicationContext());
+//			jobManager.addJobInBackground(new GetAllSessionsJob(this));
+		}
 	}
 
 	public void onEventMainThread(GotAllSessionEvent gotAllSessionEvent) {
 		Toast.makeText(this, "Got all Session", Toast.LENGTH_SHORT);
 	}
 
-
 	private void configureActionBar() {
 		actionBar = getActionBar();
 		final Method method;
 		try {
-			method = actionBar.getClass()
-					.getDeclaredMethod("setHasEmbeddedTabs", new Class[]{Boolean.TYPE});
+			method = actionBar.getClass().getDeclaredMethod("setHasEmbeddedTabs", new Class[]{Boolean.TYPE});
 			method.setAccessible(true);
 			method.invoke(actionBar, false);
 		} catch (NoSuchMethodException e) {
@@ -91,7 +107,8 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 			actionBar.addTab(
 					actionBar.newTab()
 							.setText(mPagerAdapter.getPageTitle(i))
-							.setTabListener(this));
+							.setTabListener(this)
+			);
 		}
 	}
 
@@ -104,12 +121,22 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 
 	@Override
 	public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-
 	}
 
 	@Override
 	public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+	}
 
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		EventBus.getDefault().register(this);
+	}
+
+	@Override
+	protected void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
 	}
 }
 
@@ -124,8 +151,6 @@ class ViewPagerAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public Fragment getItem(int position) {
-//		return fragments.get(position);
-
 		switch (position) {
 			case 0:
 				return SearchFragment.newInstance(0);
@@ -136,7 +161,6 @@ class ViewPagerAdapter extends FragmentPagerAdapter {
 			default:
 				return null;
 		}
-
 	}
 
 	@Override

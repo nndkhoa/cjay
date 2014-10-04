@@ -1,26 +1,61 @@
 package com.cloudjay.cjay.model;
 
-import android.content.ContentValues;
-import android.net.Uri;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-public class Operator {
-    public int id;
-    public String operator_name ;
-    public String operator_code;
+import javax.annotation.Generated;
 
-    public static final String TABLE = "operator";
-    public static final String ID = "id";
-    public static final String OPERATOR_CODE = "operator_code";
-    public static final String OPERATOR_NAME = "operator_name";
+import io.realm.RealmObject;
 
-    public static final Uri URI = Uri.parse("content://" + User.AUTHORITY + "/" + TABLE);
+@Generated("org.jsonschema2pojo")
+public class Operator extends RealmObject{
 
-    public ContentValues getContentValues() {
-        ContentValues values = new ContentValues();
-        values.put(ID, id);
-        values.put(OPERATOR_NAME, operator_name);
-        values.put(OPERATOR_CODE, operator_code);
+	@Expose
+	private long id;
 
-        return values;
-    }
+	@SerializedName("operator_code")
+	@Expose
+	private String operatorCode;
+	@SerializedName("operator_name")
+	@Expose
+	private String operatorName;
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public Operator withId(long id) {
+		this.id = id;
+		return this;
+	}
+
+	public String getOperatorCode() {
+		return operatorCode;
+	}
+
+	public void setOperatorCode(String operatorCode) {
+		this.operatorCode = operatorCode;
+	}
+
+	public Operator withOperatorCode(String operatorCode) {
+		this.operatorCode = operatorCode;
+		return this;
+	}
+
+	public String getOperatorName() {
+		return operatorName;
+	}
+
+	public void setOperatorName(String operatorName) {
+		this.operatorName = operatorName;
+	}
+
+	public Operator withOperatorName(String operatorName) {
+		this.operatorName = operatorName;
+		return this;
+	}
 }
