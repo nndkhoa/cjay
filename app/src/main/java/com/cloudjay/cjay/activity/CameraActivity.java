@@ -36,9 +36,6 @@ public class CameraActivity extends Activity implements DemoCameraFragment.Contr
 		setContentView(R.layout.activity_camera);
         Logger.Log("isLockedToLandscape = " + isLockedToLandscape);
 
-        final ActionBar actionBar = getActionBar();
-        actionBar.hide();
-
         Logger.Log("New DemoCameraFragment");
         current = DemoCameraFragment.newInstance(false);
         getFragmentManager().beginTransaction()

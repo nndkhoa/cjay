@@ -35,10 +35,14 @@ import com.commonsware.cwac.camera.SimpleCameraHost;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.List;
 import java.util.UUID;
 
 public class DemoCameraFragment extends CameraFragment implements
 		SeekBar.OnSeekBarChangeListener {
+
+    private static final int PICTURE_SIZE_MAX_WIDTH = 640;
+    private static final int PREVIEW_SIZE_MAX_WIDTH = 1280;
 
 	private static final String KEY_USE_FFC = "com.commonsware.cwac.camera.demo.USE_FFC";
 	//private MenuItem autoFocusItem = null;
@@ -200,6 +204,7 @@ public class DemoCameraFragment extends CameraFragment implements
 
 		// 2.
 		PictureTransaction xact = new PictureTransaction(getHost());
+        xact.needBitmap(true);
 
 		// Tag another object along if you need to
 		// xact.tag();
@@ -248,12 +253,16 @@ public class DemoCameraFragment extends CameraFragment implements
          * @param image
          */
         @Override
-        public void saveImage(PictureTransaction xact, byte[] image) {
+        public void saveImage(PictureTransaction xact, Bitmap capturedBitmap) {
 
             // TODO: Checkout cjay v1 flow
 
             // Convert rotated byte[] to Bitmap
-            Bitmap capturedBitmap = saveToBitmap(image);
+            //Bitmap capturedBitmap = saveToBitmap(image);
+
+            if (null == capturedBitmap) {
+                Logger.Log("capturedBitmap is null");
+            }
 
             // Save Bitmap to Files
             String uuid = UUID.randomUUID().toString();
@@ -285,12 +294,14 @@ public class DemoCameraFragment extends CameraFragment implements
             String today = StringHelper.getCurrentTimestamp("yyyy-MM-dd");
 
             //create image file name
-            String fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-" + operatorCode + "-"
+            /*String fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-" + operatorCode + "-"
+                    + uuid + ".jpg";*/
+            String fileName = "DemoDepotCode" + "-" + today + "-" + "DemoimageType" + "-" + "ContainerId" + "-" + "DemoOperatorCode" + "-"
                     + uuid + ".jpg";
 
             //create directory to save images
-            File newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/" + today + "/" + imageType
-                    + "/" + containerId);
+            File newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, "DemoDepotCode" + "/" + today + "/" + imageType
+                    + "/" + "ContainerId");
 
             if (!newDirectory.exists()) {
                 newDirectory.mkdirs();
@@ -308,14 +319,14 @@ public class DemoCameraFragment extends CameraFragment implements
                     }
                 });
 
-                DisplayActivity.imageToShow = image;
-                startActivity(new Intent(getActivity(), DisplayActivity.class));
-            } else {
-                // Save Bitmap to JPEG
-                File photo = new File(newDirectory, fileName);
-                saveBitmapToFile(capturedBitmap, photo);
-                //super.saveImage(xact, image);
+                //Todo: Open Dialg and Process here
+                /*DisplayActivity.imageToShow = ca //image;
+                startActivity(new Intent(getActivity(), DisplayActivity.class));*/
             }
+
+            // Save Bitmap to JPEG
+            File photo = new File(newDirectory, fileName);
+            saveBitmapToFile(capturedBitmap, photo);
         }
 
         void saveBitmapToFile(Bitmap bitmap, File filename) {
@@ -337,24 +348,12 @@ public class DemoCameraFragment extends CameraFragment implements
 
         @Override
         public void autoFocusAvailable() {
-           /* if (autoFocusItem != null) {
-                autoFocusItem.setEnabled(true);
-
-                if (supportsFaces)
-                    startFaceDetection();
-            }*/
             if (supportsFaces)
                 startFaceDetection();
         }
 
         @Override
         public void autoFocusUnavailable() {
-            /*if (autoFocusItem != null) {
-                stopFaceDetection();
-
-                if (supportsFaces)
-                    autoFocusItem.setEnabled(false);
-            }*/
         }
 
         @Override
@@ -373,13 +372,6 @@ public class DemoCameraFragment extends CameraFragment implements
                             Camera.Parameters.FLASH_MODE_RED_EYE,
                             Camera.Parameters.FLASH_MODE_AUTO,
                             Camera.Parameters.FLASH_MODE_ON);
-
-			/*if (doesZoomReallyWork() && parameters.getMaxZoom() > 0) {
-				zoom.setMax(parameters.getMaxZoom());
-				zoom.setOnSeekBarChangeListener(DemoCameraFragment.this);
-			} else {
-				zoom.setEnabled(false);
-			}*/
 
             if (parameters.getMaxNumDetectedFaces() > 0) {
                 supportsFaces = true;
@@ -413,38 +405,33 @@ public class DemoCameraFragment extends CameraFragment implements
             btnTakePicture.setEnabled(true);
             takeSimplePicture();
         }
-    }
 
-    /**
-     * save byte array to Bitmap
-     *
-     * @param data
-     * @return
-     */
-    Bitmap saveToBitmap(byte[] data) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
+        protected Camera.Size determineBestSize(List<Camera.Size> sizes, int widthThreshold) {
+            Camera.Size bestSize = null;
 
-        if (data != null) {
-            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            for (Camera.Size currentSize : sizes) {
+                boolean isDesiredRatio = currentSize.width / 4 == currentSize.height / 3;
+                boolean isBetterSize = bestSize == null || currentSize.width > bestSize.width;
+                boolean isInBounds = currentSize.width <= PICTURE_SIZE_MAX_WIDTH;
 
-                Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data != null ? data.length : 0);
-
-                Matrix mtx = new Matrix();
-
-                Bitmap rotatedBitmap = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), mtx, true);
-
-                if (bm != null) {
-                    bm.recycle();
-                    bm = null;
-                    System.gc();
+                if (isDesiredRatio && isInBounds && isBetterSize) {
+                    bestSize = currentSize;
                 }
-
-                return rotatedBitmap;
-
             }
-        }
-        return null;
-    }
 
+            return bestSize;
+        }
+
+        @Override
+        public Camera.Size getPreviewSize(int displayOrientation, int width, int height, Camera.Parameters parameters) {
+            List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
+            return determineBestSize(sizes, PREVIEW_SIZE_MAX_WIDTH);
+        }
+
+        @Override
+        public Camera.Size getPictureSize(PictureTransaction xact, Camera.Parameters parameters) {
+            List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
+            return determineBestSize(sizes, PICTURE_SIZE_MAX_WIDTH);
+        }
+    }
 }
