@@ -29,9 +29,15 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_use_gate_in_image"
+            android:id="@+id/btn_reuse_gate_in_image"
             android:paddingBottom="6dp"
             android:text="Sử dụng hỉnh Gate-in"/>
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/lv_audit_images">
+        </ListView>
 
         <Button
             android:layout_width="match_parent"
