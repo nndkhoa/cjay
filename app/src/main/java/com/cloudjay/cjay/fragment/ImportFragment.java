@@ -1,23 +1,15 @@
 package com.cloudjay.cjay.fragment;
 
 
-import android.app.LoaderManager;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -25,12 +17,11 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.model.Operator;
-import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 
 import de.greenrobot.event.EventBus;
@@ -46,7 +37,6 @@ import io.realm.RealmResults;
  */
 @EFragment(R.layout.fragment_import)
 public class ImportFragment extends Fragment {
-
 
     //region Declare Controls and Views
     @ViewById(R.id.btn_camera)
@@ -71,8 +61,9 @@ public class ImportFragment extends Fragment {
 	ListView lvImages;
     //endregion
 
-    @Extra("containerID")
-    String containerID;
+	@FragmentArg("containerID")
+	String containerID;
+
     //Declare adapter operator
     ArrayAdapter<Operator> operatorAdapter;
 

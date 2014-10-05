@@ -237,28 +237,29 @@ public class NetworkClient {
 		JsonObject result = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionById(id);
 
 		// check if result has values
-		int id = result.get("id").getAsLong();
-		if ()
-		// WTF is this shit :| Fuck Realm
-		Realm realm = Realm.getInstance(context);
-		realm.beginTransaction();
-		Session session = realm.createObject(Session.class);
+		if (id != result.get("id").getAsLong()) {
+			return null;
+		} else {
+			// WTF is this shit :| Fuck Realm
+			Realm realm = Realm.getInstance(context);
+			realm.beginTransaction();
+			Session session = realm.createObject(Session.class);
 
-		User user = realm.createObject(User.class);
-		user.setId();
-		user.setFirstName(result.get("first_name").getAsString());
-		user.setLastName(result.get("last_name").getAsString());
-		user.setUsername(result.get("username").getAsString());
-		user.setEmail(result.get("email").getAsString());
-		user.setFullName(result.get("full_name").getAsString());
-		user.setRole(result.get("role").getAsLong());
-		user.setRoleName(result.get("role_name").getAsString());
-		user.setDepotCode(result.get("depot_code").getAsString());
-		user.setAvatarUrl(result.get("avatar_url").getAsString());
+			User user = realm.createObject(User.class);
+			user.setId(result.get("id").getAsLong());
+			user.setFirstName(result.get("first_name").getAsString());
+			user.setLastName(result.get("last_name").getAsString());
+			user.setUsername(result.get("username").getAsString());
+			user.setEmail(result.get("email").getAsString());
+			user.setFullName(result.get("full_name").getAsString());
+			user.setRole(result.get("role").getAsLong());
+			user.setRoleName(result.get("role_name").getAsString());
+			user.setDepotCode(result.get("depot_code").getAsString());
+			user.setAvatarUrl(result.get("avatar_url").getAsString());
 
-		realm.commitTransaction();
-
-		return session;
+			realm.commitTransaction();
+			return session;
+		}
 	}
 
 	public void getAllSession(Context context, String mToken, String fullName, Object o) {

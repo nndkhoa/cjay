@@ -5,7 +5,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.util.Utils;
 

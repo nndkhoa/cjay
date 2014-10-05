@@ -137,7 +137,6 @@ public class SearchFragment extends Fragment {
 	private void showAddContainerDialog(String containerID) {
 		FragmentManager fragmentManager = getChildFragmentManager();
 		AddContainerDialog addContainerDialog = AddContainerDialog_.builder().containerID(containerID).build();
-
 		addContainerDialog.show(fragmentManager, "fragment_addcontainer");
 	}
 }
