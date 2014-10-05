@@ -35,6 +35,9 @@ public interface NetworkService {
 	@GET(ApiEndpoint.CONTAINER_SESSIONS_API)
 	public JsonObject getContainerSessionsByPage(@Query("page") int page, @Query("modified_after") String lastModifiedDate);
 
+	@GET(ApiEndpoint.CONTAINER_SESSIONS_API)
+	public JsonObject searchContainer(@Query("keyword") String keyword);
+
 	@GET(ApiEndpoint.CONTAINER_SESSION_ITEM_API)
 	public Session getContainerSessionById(@Path("id") int containerId);
 
