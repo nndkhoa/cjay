@@ -24,7 +24,9 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.EReceiver;
 import org.androidannotations.annotations.FragmentArg;
+import org.androidannotations.annotations.SupposeBackground;
 import org.androidannotations.annotations.ViewById;
 
 import de.greenrobot.event.EventBus;
