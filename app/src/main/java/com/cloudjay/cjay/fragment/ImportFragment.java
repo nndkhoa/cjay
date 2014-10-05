@@ -18,7 +18,6 @@ import com.cloudjay.cjay.activity.CameraActivity;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.util.DataCenter;
-import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -44,22 +43,31 @@ public class ImportFragment extends Fragment {
     //region Declare Controls and Views
     @ViewById(R.id.btn_camera)
 	Button btnCamera;
+
     @ViewById(R.id.btn_continue)
     Button btnContinue;
+
     @ViewById(R.id.btn_complete)
     Button btnComplete;
+
     @ViewById(R.id.sp_operator)
     Spinner spOperator;
+
     @ViewById(R.id.rdn_group_status)
 	RadioGroup rdnGroupStatus;
+
     @ViewById(R.id.rdn_status_a)
 	RadioButton rdnStatusA;
+
     @ViewById(R.id.rdn_status_b)
     RadioButton rdnStatusB;
+
     @ViewById(R.id.rdn_status_c)
     RadioButton rdnStatusC;
+
     @ViewById(R.id.tv_container_id)
 	TextView tvContainerCode;
+
     @ViewById(R.id.lv_image)
 	ListView lvImages;
     //endregion
@@ -79,8 +87,8 @@ public class ImportFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         EventBus.getDefault().register(this);
+
     }
 
     @Override
@@ -92,8 +100,10 @@ public class ImportFragment extends Fragment {
     public void onEvent(OperatorsGotEvent event) {
         // retrieve list operators
         RealmResults<Operator> operators = event.getOperators();
-        Logger.Log("count data: " + operators.size());
+
         // Init and set adapter
+	    // TODO: show list operators in spinner
+	    operatorAdapter = new ArrayAdapter<Operator>(getActivity(), android.R.layout.simple_dropdown_item_1line);
         operatorAdapter.addAll(operators);
         spOperator.setAdapter(operatorAdapter);
     }
@@ -102,6 +112,7 @@ public class ImportFragment extends Fragment {
 	void doAfterViews() {
 		// Set container ID for text View containerID
 		tvContainerCode.setText(containerID);
+
         // Get operators from data center
         dataCenter.getOperators();
 	}
