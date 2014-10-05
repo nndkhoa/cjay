@@ -24,7 +24,7 @@
     <string name="error_connection">Không thể kết nối mạng, vui lòng thử lại</string>
     <string name="title_activity_audit">AuditActivity</string>
     <string name="title_activity_import">ImportActivity</string>
-    <string name="title_activity_reuse">ReuseActivity</string>
+    <string name="title_activity_reuse">Chọn hình Gate-in</string>
     <string name="title_activity_repair">RepairActivity</string>
     <string name="title_activity_export">ExportActivity</string>
     <string name="title_activity_link_issue">LinkIssueActivity</string>
