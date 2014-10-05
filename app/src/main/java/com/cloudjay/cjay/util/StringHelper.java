@@ -9,9 +9,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by nambv on 03/10/2014.
- */
 public class StringHelper {
     @SuppressLint("SimpleDateFormat")
     public static String getCurrentTimestamp(String format) {

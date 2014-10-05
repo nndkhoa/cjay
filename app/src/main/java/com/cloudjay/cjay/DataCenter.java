@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.util;
+package com.cloudjay.cjay;
 
 import android.content.Context;
 
@@ -8,6 +8,7 @@ import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.util.PreferencesUtil;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
@@ -49,7 +50,7 @@ public class DataCenter {
 	}
 
 	public void fetchOperators(Context context) {
-		networkClient.getOperators(context, null);
+		List<Operator> operators = networkClient.getOperators(context, null);
 	}
 
 	public void fetchIsoCodes(Context context) {

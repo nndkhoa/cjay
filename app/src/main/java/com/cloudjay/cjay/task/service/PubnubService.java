@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.network;
+package com.cloudjay.cjay.task.service;
 
 import android.app.Notification;
 import android.app.NotificationManager;
