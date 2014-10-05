@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.WizardActivity;
+import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.util.Utils;
 
 import org.androidannotations.annotations.AfterViews;
@@ -52,7 +53,7 @@ public class AddContainerDialog extends android.support.v4.app.DialogFragment {
 
 	@Click(R.id.btn_addContainer)
 	void btnAddClicked() {
-		Intent wizardActivityIntent = new Intent(getActivity(), WizardActivity.class);
+		Intent wizardActivityIntent = new Intent(getActivity(), WizardActivity_.class);
 		wizardActivityIntent.putExtra("containerID", containerID);
 		startActivity(wizardActivityIntent);
 		getDialog().dismiss();

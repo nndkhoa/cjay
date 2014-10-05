@@ -4,6 +4,8 @@ import android.content.Context;
 
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
+import com.cloudjay.cjay.event.OperatorsGotEvent;
+import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
 
@@ -85,4 +87,14 @@ public class DataCenter {
 		List<Session> sessions = networkClient.searchSessions(context, keyword);
 		EventBus.getDefault().post(new ContainerSearchedEvent((RealmResults<Session>) sessions));
 	}
+
+    @Background(serial = CACHE)
+    public void getOperators() {
+        // Search on local db
+        Realm realm = Realm.getInstance(context);
+        RealmResults<Operator> operators = realm.where(Operator.class).findAll();
+
+        EventBus.getDefault().post(new OperatorsGotEvent(operators));
+
+    }
 }
