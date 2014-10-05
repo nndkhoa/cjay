@@ -17,8 +17,11 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
@@ -64,6 +67,9 @@ public class ImportFragment extends Fragment {
 	@FragmentArg("containerID")
 	String containerID;
 
+    @Bean
+    DataCenter dataCenter;
+
     //Declare adapter operator
     ArrayAdapter<Operator> operatorAdapter;
 
@@ -86,6 +92,7 @@ public class ImportFragment extends Fragment {
     public void onEvent(OperatorsGotEvent event) {
         // retrieve list operators
         RealmResults<Operator> operators = event.getOperators();
+        Logger.Log("count data: " + operators.size());
         // Init and set adapter
         operatorAdapter.addAll(operators);
         spOperator.setAdapter(operatorAdapter);
@@ -93,11 +100,10 @@ public class ImportFragment extends Fragment {
 
     @AfterViews
 	void doAfterViews() {
-		//Set container ID for text View containerID
+		// Set container ID for text View containerID
 		tvContainerCode.setText(containerID);
-        //Query operators from database
-
-        //TODO: Set adapter
+        // Get operators from data center
+        dataCenter.getOperators();
 	}
 
     @Click(R.id.btn_camera)
