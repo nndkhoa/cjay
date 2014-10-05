@@ -70,7 +70,7 @@ public class SearchFragment extends Fragment {
 					return;
 				} else {
 					List<Session> result = searchSession(containeriD);
-					if (result.size() != 0) {
+					if (result != null) {
 						refreshListView();
 					} else {
 						showAddContainerDialog(containeriD);

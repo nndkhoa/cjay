@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@android:color/white" >
+
+    <FrameLayout
+        android:id="@+id/camera"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:background="@color/camera_background_transparent"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center" >
+
+            <ImageButton
+                android:id="@+id/btn_toggle_flash"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/camera_option_background_selector"
+                android:paddingBottom="12dp"
+                android:paddingLeft="18dp"
+                android:paddingRight="18dp"
+                android:paddingTop="12dp"
+                android:src="@drawable/ic_flash_off" />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/camera_activity_bottom_bar_layout"
+        android:layout_width="100dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:background="@color/camera_background_transparent"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <ToggleButton
+                android:id="@+id/btn_capture_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:background="@drawable/btn_toggle_blue"
+                android:shadowColor="@android:color/black"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="2" />
+
+        </RelativeLayout>
+
+        <ImageButton
+            android:id="@+id/btn_capture"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/camera_option_background_selector"
+            android:src="@drawable/ic_capture" />
+
+        <RelativeLayout
+            android:id="@+id/rl_camera_done"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" >
+
+            <Button
+                android:id="@+id/btn_camera_done"
+                style="@style/StyledButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:background="@drawable/btn_blue"
+                android:minHeight="40dp"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:shadowDx="1"
+                android:text="@string/camera_done" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</RelativeLayout>

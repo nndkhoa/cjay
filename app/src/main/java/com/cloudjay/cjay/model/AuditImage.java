@@ -10,13 +10,13 @@ import io.realm.RealmObject;
 public class AuditImage extends RealmObject {
 
 	@Expose
-	long id;
+	private long id;
 
 	@Expose
-	long type;
+	private long type;
 
 	@Expose
-	String url;
+	private String url;
 
 	public long getId() {
 		return id;

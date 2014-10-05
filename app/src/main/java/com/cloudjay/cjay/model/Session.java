@@ -8,10 +8,12 @@ import javax.annotation.Generated;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
+import io.realm.annotations.Ignore;
 
 @Generated("org.jsonschema2pojo")
 public class Session extends RealmObject {
 
+	@Ignore
 	public static final String FIELD_CONTAINER_ID = "container_id";
 
 	@Expose

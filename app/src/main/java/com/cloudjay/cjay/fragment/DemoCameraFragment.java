@@ -3,6 +3,10 @@ package com.cloudjay.cjay.fragment;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -20,15 +24,24 @@ import android.widget.ToggleButton;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.DisplayActivity;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.StringHelper;
 import com.commonsware.cwac.camera.CameraFragment;
 import com.commonsware.cwac.camera.CameraHost;
 import com.commonsware.cwac.camera.CameraUtils;
 import com.commonsware.cwac.camera.PictureTransaction;
 import com.commonsware.cwac.camera.SimpleCameraHost;
 
-public class DemoCameraFragment extends CameraFragment implements
-		SeekBar.OnSeekBarChangeListener {
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.List;
+import java.util.UUID;
+
+public class DemoCameraFragment extends CameraFragment {
+
+    private static final int PICTURE_SIZE_MAX_WIDTH = 640;
+    private static final int PREVIEW_SIZE_MAX_WIDTH = 1280;
 
 	private static final String KEY_USE_FFC = "com.commonsware.cwac.camera.demo.USE_FFC";
 	//private MenuItem autoFocusItem = null;
@@ -41,6 +54,12 @@ public class DemoCameraFragment extends CameraFragment implements
     private Button btnDone;
 	private long lastFaceToast = 0L;
 	String flashMode = null; //flash mode parameter when take camera
+
+    int mType = 0;
+
+    String containerId;
+    String depotCode;
+    String operatorCode;
 
 	public static DemoCameraFragment newInstance(boolean useFFC) {
 		Logger.Log("new DemoCameraFragment");
@@ -72,8 +91,6 @@ public class DemoCameraFragment extends CameraFragment implements
 		View results = inflater.inflate(R.layout.fragment_demo_camera, container, false);
 
 		((ViewGroup) results.findViewById(R.id.camera)).addView(cameraView);
-		/*zoom = (SeekBar) results.findViewById(R.id.zoom);
-		zoom.setKeepScreenOn(true);*/
         btnTakePicture = (ImageButton) results.findViewById(R.id.btn_capture);
         btnTakePicture.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,30 +158,6 @@ public class DemoCameraFragment extends CameraFragment implements
 		return (singleShotProcessing);
 	}
 
-	@Override
-	public void onProgressChanged(SeekBar seekBar, int progress,
-	                              boolean fromUser) {
-		/*if (fromUser) {
-			zoom.setEnabled(false);
-			zoomTo(zoom.getProgress()).onComplete(new Runnable() {
-				@Override
-				public void run() {
-					zoom.setEnabled(true);
-				}
-			}).go();
-		}*/
-	}
-
-	@Override
-	public void onStartTrackingTouch(SeekBar seekBar) {
-		// ignore
-	}
-
-	@Override
-	public void onStopTrackingTouch(SeekBar seekBar) {
-		// ignore
-	}
-
 	Contract getContract() {
 		return ((Contract) getActivity());
 	}
@@ -184,13 +177,11 @@ public class DemoCameraFragment extends CameraFragment implements
 
 		// 2.
 		PictureTransaction xact = new PictureTransaction(getHost());
+        xact.needBitmap(true);
 
 		// Tag another object along if you need to
 		// xact.tag();
         xact.flashMode(flashMode);
-		/*if (flashItem != null && flashItem.isChecked()) {
-			xact.flashMode(flashMode);
-		}*/
 
 		// Call it with PictureTransaction to take picture with configuration in CameraHost
 		// Process image in Subclass of `CameraHost#saveImage`
@@ -229,13 +220,65 @@ public class DemoCameraFragment extends CameraFragment implements
          * Process taken picture
          *
          * @param xact
-         * @param image
+         * @param capturedBitmap
          */
         @Override
-        public void saveImage(PictureTransaction xact, byte[] image) {
+        public void saveImage(PictureTransaction xact, Bitmap capturedBitmap) {
 
             // TODO: Checkout cjay v1 flow
-            Logger.i("useSingleShotMode: "+ useSingleShotMode());
+
+            // Convert rotated byte[] to Bitmap
+            //Bitmap capturedBitmap = saveToBitmap(image);
+
+            if (null == capturedBitmap) {
+                Logger.Log("capturedBitmap is null");
+            }
+
+            // Save Bitmap to Files
+            String uuid = UUID.randomUUID().toString();
+
+            String imageType;
+            switch (mType) {
+                case CJayConstant.TYPE_IMPORT:
+                    imageType = "gate-in";
+                    break;
+
+                case CJayConstant.TYPE_EXPORT:
+                    imageType = "gate-out";
+                    break;
+
+                case CJayConstant.TYPE_AUDIT:
+                    imageType = "auditor";
+                    break;
+
+                case CJayConstant.TYPE_REPAIRED:
+                default:
+                    imageType = "repair";
+                    break;
+            }
+
+            // file name example:
+            // [depot-code]-2013-12-19-[gate-in|gate-out|report]-[containerId]-[UUID].jpg
+
+            //create today String
+            String today = StringHelper.getCurrentTimestamp("yyyy-MM-dd");
+
+            //create image file name
+            /*String fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-" + operatorCode + "-"
+                    + uuid + ".jpg";*/
+            String fileName = "DemoDepotCode" + "-" + today + "-" + "DemoimageType" + "-" + "ContainerId" + "-" + "DemoOperatorCode" + "-"
+                    + uuid + ".jpg";
+
+            //create directory to save images
+            File newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, "DemoDepotCode" + "/" + today + "/" + imageType
+                    + "/" + "ContainerId");
+
+            if (!newDirectory.exists()) {
+                newDirectory.mkdirs();
+            }
+
+
+
             if (useSingleShotMode()) {
                 singleShotProcessing = false;
 
@@ -246,33 +289,41 @@ public class DemoCameraFragment extends CameraFragment implements
                     }
                 });
 
-                DisplayActivity.imageToShow = image;
-                startActivity(new Intent(getActivity(), DisplayActivity.class));
-            } else {
-                super.saveImage(xact, image);
+                //Todo: Open Dialg and Process here
+                // DisplayActivity.imageToShow = ca //image;
+                // startActivity(new Intent(getActivity(), DisplayActivity.class));*/
             }
+
+            // Save Bitmap to JPEG
+            File photo = new File(newDirectory, fileName);
+            saveBitmapToFile(capturedBitmap, photo);
+        }
+
+        void saveBitmapToFile(Bitmap bitmap, File filename) {
+
+            Logger.Log("File name: " + filename);
+
+            try {
+
+                FileOutputStream out = new FileOutputStream(filename);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                out.flush();
+                out.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
 
         @Override
         public void autoFocusAvailable() {
-           /* if (autoFocusItem != null) {
-                autoFocusItem.setEnabled(true);
-
-                if (supportsFaces)
-                    startFaceDetection();
-            }*/
             if (supportsFaces)
                 startFaceDetection();
         }
 
         @Override
         public void autoFocusUnavailable() {
-            /*if (autoFocusItem != null) {
-                stopFaceDetection();
-
-                if (supportsFaces)
-                    autoFocusItem.setEnabled(false);
-            }*/
         }
 
         @Override
@@ -291,13 +342,6 @@ public class DemoCameraFragment extends CameraFragment implements
                             Camera.Parameters.FLASH_MODE_RED_EYE,
                             Camera.Parameters.FLASH_MODE_AUTO,
                             Camera.Parameters.FLASH_MODE_ON);
-
-			/*if (doesZoomReallyWork() && parameters.getMaxZoom() > 0) {
-				zoom.setMax(parameters.getMaxZoom());
-				zoom.setOnSeekBarChangeListener(DemoCameraFragment.this);
-			} else {
-				zoom.setEnabled(false);
-			}*/
 
             if (parameters.getMaxNumDetectedFaces() > 0) {
                 supportsFaces = true;
@@ -331,6 +375,33 @@ public class DemoCameraFragment extends CameraFragment implements
             btnTakePicture.setEnabled(true);
             takeSimplePicture();
         }
-    }
 
+        protected Camera.Size determineBestSize(List<Camera.Size> sizes, int widthThreshold) {
+            Camera.Size bestSize = null;
+
+            for (Camera.Size currentSize : sizes) {
+                boolean isDesiredRatio = currentSize.width / 4 == currentSize.height / 3;
+                boolean isBetterSize = bestSize == null || currentSize.width > bestSize.width;
+                boolean isInBounds = currentSize.width <= PICTURE_SIZE_MAX_WIDTH;
+
+                if (isDesiredRatio && isInBounds && isBetterSize) {
+                    bestSize = currentSize;
+                }
+            }
+
+            return bestSize;
+        }
+
+        @Override
+        public Camera.Size getPreviewSize(int displayOrientation, int width, int height, Camera.Parameters parameters) {
+            List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
+            return determineBestSize(sizes, PREVIEW_SIZE_MAX_WIDTH);
+        }
+
+        @Override
+        public Camera.Size getPictureSize(PictureTransaction xact, Camera.Parameters parameters) {
+            List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
+            return determineBestSize(sizes, PICTURE_SIZE_MAX_WIDTH);
+        }
+    }
 }
