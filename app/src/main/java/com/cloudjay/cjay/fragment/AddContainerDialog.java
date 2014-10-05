@@ -6,7 +6,7 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.WizardActivity_;
-import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.Util;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
@@ -40,7 +40,7 @@ public class AddContainerDialog extends android.support.v4.app.DialogFragment {
 	@AfterViews
 	void init () {
 		tvContainerIDSearch.setText(containerID);
-		if (Utils.isContainerIdValid(containerID)) {
+		if (Util.isContainerIdValid(containerID)) {
 			btnAddContainer.setText(R.string.dialog_create_container_id_invalid_iso);
 		}
 	}

@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
-public class Utils {
+public class Util {
 	public static String getAppVersionName(Context ctx) {
 
 		PackageInfo pInfo = null;

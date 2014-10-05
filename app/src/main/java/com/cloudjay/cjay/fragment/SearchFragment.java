@@ -18,7 +18,7 @@ import android.widget.EditText;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.Util;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -65,7 +65,7 @@ public class SearchFragment extends Fragment {
 				if (TextUtils.isEmpty(containeriD)) {
 					etSearch.setError(getString(R.string.dialog_container_id_required));
 
-				} else if (!Utils.simpleValid(containeriD)) {
+				} else if (!Util.simpleValid(containeriD)) {
 					etSearch.setError(getString(R.string.dialog_container_id_invalid));
 					return;
 				} else {

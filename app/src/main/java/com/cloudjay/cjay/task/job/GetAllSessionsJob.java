@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.jobqueue;
+package com.cloudjay.cjay.task.job;
 
 import android.content.Context;
 

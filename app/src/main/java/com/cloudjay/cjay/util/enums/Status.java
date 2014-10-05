@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.api;
+package com.cloudjay.cjay.util.enums;
 
 public enum Status {
 

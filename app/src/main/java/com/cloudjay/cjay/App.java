@@ -3,7 +3,7 @@ package com.cloudjay.cjay;
 import android.app.Application;
 import android.content.Context;
 
-public class CJayApplication extends Application {
+public class App extends Application {
 
 	@Override
 	public void onCreate() {
@@ -12,7 +12,7 @@ public class CJayApplication extends Application {
 //		Crashlytics.start(this);
 	}
 
-	public static CJayApplication get(Context context) {
-		return (CJayApplication) context.getApplicationContext();
+	public static App get(Context context) {
+		return (App) context.getApplicationContext();
 	}
 }
