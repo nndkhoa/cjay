@@ -50,8 +50,9 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		accountManager = AccountManager.get(this);
 	}
 
+	// Inject DataCenter to this Activity
 	@Bean
-	public DataCenter dataCenter;
+	DataCenter dataCenter;
 
 	public static final String PARAM_AUTH_TOKEN_TYPE = "auth.token";
 	AccountManager accountManager;

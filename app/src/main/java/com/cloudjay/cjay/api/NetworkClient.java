@@ -48,6 +48,12 @@ public class NetworkClient {
 		return token;
 	}
 
+	/**
+	 * Get current logged in user information
+	 *
+	 * @param context
+	 * @return
+	 */
 	public User getCurrentUser(Context context) {
 		JsonObject result = provider.getRestAdapter(context).create(NetworkService.class).getCurrentUser();
 
@@ -70,6 +76,13 @@ public class NetworkClient {
 		return user;
 	}
 
+	/**
+	 * Get repair iso codes based on lastModifiedDate
+	 *
+	 * @param context
+	 * @param lastModifiedDate
+	 * @return
+	 */
 	public List<IsoCode> getRepairCodes(Context context, String lastModifiedDate) {
 
 		JsonArray results = provider.getRestAdapter(context).create(NetworkService.class).getRepairCodes
@@ -99,6 +112,13 @@ public class NetworkClient {
 		return items;
 	}
 
+	/**
+	 * Get damage iso codes based on lastModifiedDate
+	 *
+	 * @param context
+	 * @param lastModifiedDate
+	 * @return
+	 */
 	public List<IsoCode> getDamageCodes(Context context, String lastModifiedDate) {
 		JsonArray results = provider.getRestAdapter(context).create(NetworkService.class).getDamageCodes
 				(lastModifiedDate);
@@ -127,6 +147,13 @@ public class NetworkClient {
 		return items;
 	}
 
+	/**
+	 * Get component iso codes based on lastModifiedDate
+	 *
+	 * @param context
+	 * @param lastModifiedDate
+	 * @return
+	 */
 	public List<IsoCode> getComponentCodes(Context context, String lastModifiedDate) {
 		JsonArray results = provider.getRestAdapter(context).create(NetworkService.class).getComponentCodes(lastModifiedDate);
 
@@ -154,6 +181,13 @@ public class NetworkClient {
 		return items;
 	}
 
+	/**
+	 * Get operator based on lastModifiedDate.
+	 *
+	 * @param context
+	 * @param lastModifiedDate
+	 * @return
+	 */
 	public List<Operator> getOperators(Context context, String lastModifiedDate) {
 
 		JsonArray results = provider.getRestAdapter(context).create(NetworkService.class).getOperators(lastModifiedDate);
@@ -181,7 +215,14 @@ public class NetworkClient {
 		return items;
 	}
 
+	/**
+	 *
+	 * @param page
+	 * @param lastModifiedDate
+	 * @return
+	 */
 	public List<Session> getContainerSessionsByPage(int page, String lastModifiedDate) {
+
 		JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionsByPage(page, lastModifiedDate);
 		JsonArray jsonArray = jsonObject.getAsJsonArray("results");
 		Gson gson = new Gson();
@@ -192,8 +233,32 @@ public class NetworkClient {
 	}
 
 	public Session getContainerSessionById(int id) {
-		Session containerSessionById = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionById(id);
-		return containerSessionById;
+
+		JsonObject result = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionById(id);
+
+		// check if result has values
+		int id = result.get("id").getAsLong();
+		if ()
+		// WTF is this shit :| Fuck Realm
+		Realm realm = Realm.getInstance(context);
+		realm.beginTransaction();
+		Session session = realm.createObject(Session.class);
+
+		User user = realm.createObject(User.class);
+		user.setId();
+		user.setFirstName(result.get("first_name").getAsString());
+		user.setLastName(result.get("last_name").getAsString());
+		user.setUsername(result.get("username").getAsString());
+		user.setEmail(result.get("email").getAsString());
+		user.setFullName(result.get("full_name").getAsString());
+		user.setRole(result.get("role").getAsLong());
+		user.setRoleName(result.get("role_name").getAsString());
+		user.setDepotCode(result.get("depot_code").getAsString());
+		user.setAvatarUrl(result.get("avatar_url").getAsString());
+
+		realm.commitTransaction();
+
+		return session;
 	}
 
 	public void getAllSession(Context context, String mToken, String fullName, Object o) {
