@@ -15,9 +15,11 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity;
+import com.cloudjay.cjay.adapter.OperatorAdapter;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -81,7 +83,7 @@ public class ImportFragment extends Fragment {
     DataCenter dataCenter;
 
     //Declare adapter operator
-    ArrayAdapter<Operator> operatorAdapter;
+    OperatorAdapter operatorAdapter;
 
 	public ImportFragment() {
 	}
@@ -90,6 +92,7 @@ public class ImportFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
+
     }
 
     @Override
@@ -101,11 +104,11 @@ public class ImportFragment extends Fragment {
     public void onEvent(OperatorsGotEvent event) {
         // retrieve list operators
         RealmResults<Operator> operators = event.getOperators();
-
+        Logger.Log("count: " + operators.size());
         // Init and set adapter
 	    // TODO: show list operators in spinner
-	    operatorAdapter = new ArrayAdapter<Operator>(getActivity(), android.R.layout.simple_dropdown_item_1line);
-        operatorAdapter.addAll(operators);
+	    operatorAdapter = new OperatorAdapter(getActivity(),
+                android.R.layout.simple_spinner_dropdown_item, operators);
         spOperator.setAdapter(operatorAdapter);
     }
 
@@ -113,7 +116,6 @@ public class ImportFragment extends Fragment {
 	void doAfterViews() {
 		// Set container ID for text View containerID
 		tvContainerCode.setText(containerID);
-
         // Get operators from data center
         dataCenter.getOperators();
 	}
