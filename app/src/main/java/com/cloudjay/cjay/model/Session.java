@@ -12,6 +12,8 @@ import io.realm.RealmObject;
 @Generated("org.jsonschema2pojo")
 public class Session extends RealmObject {
 
+	public static final String FIELD_CONTAINER_ID = "container_id";
+
 	@Expose
 	private long id;
 
@@ -25,7 +27,7 @@ public class Session extends RealmObject {
 	@Expose
 	private long status;
 
-	@SerializedName("container_id")
+	@SerializedName(FIELD_CONTAINER_ID)
 	@Expose
 	private String containerId;
 

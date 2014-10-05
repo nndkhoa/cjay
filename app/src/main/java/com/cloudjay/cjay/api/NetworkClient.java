@@ -198,4 +198,8 @@ public class NetworkClient {
 
 	public void getAllSession(Context context, String mToken, String fullName, Object o) {
 	}
+
+	public List<Session> searchSessions(Context context, String keyword) {
+		return null;
+	}
 }

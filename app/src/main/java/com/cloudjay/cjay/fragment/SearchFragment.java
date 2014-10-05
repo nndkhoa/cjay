@@ -80,6 +80,7 @@ public class SearchFragment extends Fragment {
 
 			}
 		});
+
 		//Set action change soft key when text in etSearch
 		etSearch.addTextChangedListener(new TextWatcher() {
 			@Override

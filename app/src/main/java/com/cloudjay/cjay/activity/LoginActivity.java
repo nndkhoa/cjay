@@ -51,12 +51,12 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	}
 
 	@Bean
-	DataCenter dataCenter;
+	public DataCenter dataCenter;
 
 	public static final String PARAM_AUTH_TOKEN_TYPE = "auth.token";
 	AccountManager accountManager;
-	private AlertDialog mAlertDialog;
-	private boolean mInvalidate;
+	AlertDialog mAlertDialog;
+	boolean mInvalidate;
 	public String mToken;
 	String email;
 	String password;
@@ -95,7 +95,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		showAccountPicker(AccountGeneral.AUTH_TOKEN_TYPE_FULL_ACCESS, false);
 	}
 
-	private void showAccountPicker(final String authtokenTypeFullAccess, boolean b) {
+	void showAccountPicker(final String authtokenTypeFullAccess, boolean b) {
 
 		mInvalidate = b;
 		final Account availableAccounts[] = accountManager
@@ -131,7 +131,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		}
 	}
 
-	private void invalidateAuthToken(final Account availableAccount, String authtokenTypeFullAccess) {
+	void invalidateAuthToken(final Account availableAccount, String authtokenTypeFullAccess) {
 
 		final AccountManagerFuture<Bundle> future = accountManager.getAuthToken(availableAccount, authtokenTypeFullAccess, null, this, null, null);
 		new Thread(new Runnable() {
@@ -151,7 +151,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		}).start();
 	}
 
-	private void getExistingAccountAuthToken(Account availableAccount, String authtokenTypeFullAccess) {
+	void getExistingAccountAuthToken(Account availableAccount, String authtokenTypeFullAccess) {
 		final AccountManagerFuture<Bundle> future = accountManager
 				.getAuthToken(availableAccount, authtokenTypeFullAccess, null, this, null, null);
 
@@ -183,7 +183,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	 * @param token
 	 * @param authTokenType
 	 */
-	private void addNewAccount(String email, String password, String token, String authTokenType) {
+	void addNewAccount(String email, String password, String token, String authTokenType) {
 
 		AccountManager manager = AccountManager.get(this);
 		String accountType = this.getIntent().getStringExtra(
