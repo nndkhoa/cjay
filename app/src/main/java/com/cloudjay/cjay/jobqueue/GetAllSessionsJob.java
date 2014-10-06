@@ -6,9 +6,12 @@ import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 
+import org.androidannotations.annotations.EBean;
+
 /**
  * Created by Thai on 10/2/2014.
  */
+
 public class GetAllSessionsJob extends Job {
 	public static final int PRIORITY = 1;
 	public static  int PAGE =1;
