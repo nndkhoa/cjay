@@ -54,7 +54,7 @@
         </activity>
 
         <activity
-            android:name=".activity.ReuseActivity"
+            android:name=".activity.ReuseActivity_"
             android:label="@string/title_activity_reuse">
         </activity>
         <activity
