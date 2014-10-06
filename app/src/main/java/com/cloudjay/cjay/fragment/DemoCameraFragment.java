@@ -16,6 +16,7 @@ import android.widget.ToggleButton;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
@@ -74,6 +75,15 @@ public class DemoCameraFragment extends CameraFragment {
 		setHasOptionsMenu(true);
         //Set default flash mode parameter when take camera is OFF
         flashMode = "off";
+
+        // get data from agruments
+        Bundle args = getArguments();
+        if (args != null) {
+            containerId = args.getString("containerId");
+            mType = args.getInt("imageType");
+        } else {
+            Logger.Log("Agruments is null!");
+        }
 	}
 
 	@Override
@@ -255,15 +265,17 @@ public class DemoCameraFragment extends CameraFragment {
 
             //create today String
             String today = StringHelper.getCurrentTimestamp("yyyy-MM-dd");
+            //get DepotCode from SharePreferences
+            depotCode = PreferencesUtil.getPrefsValue(getActivity(), PreferencesUtil.PREF_USER_DEPOT);
 
             //create image file name
 	        // TODO: @nam add real values
-            String fileName = "DemoDepotCode" + "-" + today + "-" + "DemoimageType" + "-" + "ContainerId" + "-" + "DemoOperatorCode" + "-"
+            String fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-" + "DemoOperatorCode" + "-"
                     + uuid + ".jpg";
 
             //create directory to save images
-            File newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, "DemoDepotCode" + "/" + today + "/" + imageType
-                    + "/" + "ContainerId");
+            File newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/" + today + "/" + imageType
+                    + "/" + containerId);
             if (!newDirectory.exists()) {
                 newDirectory.mkdirs();
             }

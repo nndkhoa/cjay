@@ -30,14 +30,26 @@ public class CameraActivity extends Activity implements DemoCameraFragment.Contr
 	private boolean singleShot = false;
 	private boolean isLockedToLandscape = true;
 
+    // Bundles data
+    private int mType;
+    private String containerId;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_camera);
-        Logger.Log("isLockedToLandscape = " + isLockedToLandscape);
 
-        Logger.Log("New DemoCameraFragment");
+        // Get bundles data
+        containerId = getIntent().getStringExtra("containerID");
+        mType = getIntent().getIntExtra("imageType", 0);
+
+        //Add data get from bundle to argument
+        Bundle args = new Bundle();
+        args.putString("containerId", containerId);
+        args.putInt("imageType", mType);
+
         current = DemoCameraFragment.newInstance(false);
+        current.setArguments(args);
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, current).commit();
         findViewById(android.R.id.content).post(new Runnable() {

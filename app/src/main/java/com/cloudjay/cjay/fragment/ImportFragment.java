@@ -18,6 +18,7 @@ import com.cloudjay.cjay.activity.CameraActivity;
 import com.cloudjay.cjay.adapter.OperatorAdapter;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.util.CJayConstant;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -116,6 +117,7 @@ public class ImportFragment extends Fragment {
     void buttonCameraClicked() {
         Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
         cameraActivityIntent.putExtra("containerID", containerID);
+        cameraActivityIntent.putExtra("imageType", CJayConstant.TYPE_IMPORT);
         startActivity(cameraActivityIntent);
     }
 
