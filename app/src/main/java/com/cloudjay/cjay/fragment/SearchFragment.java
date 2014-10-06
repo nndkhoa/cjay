@@ -11,13 +11,11 @@ import android.widget.EditText;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.util.Util;
+import com.cloudjay.cjay.util.Utils;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.BeforeTextChange;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.TextChange;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.List;
@@ -44,7 +42,7 @@ public class SearchFragment extends Fragment {
 		if (TextUtils.isEmpty(containerID)) {
 			etSearch.setError(getString(R.string.dialog_container_id_required));
 
-		} else if (!Util.simpleValid(containerID)) {
+		} else if (!Utils.simpleValid(containerID)) {
 			etSearch.setError(getString(R.string.dialog_container_id_invalid));
 			return;
 		} else {

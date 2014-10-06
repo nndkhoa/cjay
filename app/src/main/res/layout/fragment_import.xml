@@ -22,12 +22,18 @@
             android:layout_height="wrap_content"
             android:id="@+id/tv_container_id"/>
 
-        <Spinner
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/et_operator"
+            android:hint="Hãng tàu"/>
+
+        <!--<Spinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/sp_operator"
             android:spinnerMode="dialog">
-        </Spinner>
+        </Spinner>-->
 
         <Button
             android:layout_width="match_parent"

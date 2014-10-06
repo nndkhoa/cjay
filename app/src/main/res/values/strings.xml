@@ -71,4 +71,7 @@
 
     <!-- Camera Button -->
     <string name="camera_done">Done</string>
+
+    <!-- Dialog Search Operator -->
+    <string name="dialog_container_owner">Danh sách hãng tàu</string>
 </resources>

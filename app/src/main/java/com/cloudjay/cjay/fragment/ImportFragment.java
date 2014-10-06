@@ -4,8 +4,11 @@ package com.cloudjay.cjay.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -28,6 +31,7 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ItemSelect;
+import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -37,6 +41,7 @@ import io.realm.RealmResults;
 /**
  * Màn hình nhập
  */
+
 @EFragment(R.layout.fragment_import)
 public class ImportFragment extends Fragment {
 
@@ -50,8 +55,11 @@ public class ImportFragment extends Fragment {
 	@ViewById(R.id.btn_complete)
 	Button btnComplete;
 
-	@ViewById(R.id.sp_operator)
-	Spinner spOperator;
+	/*@ViewById(R.id.sp_operator)
+	Spinner spOperator;*/
+
+    @ViewById(R.id.et_operator)
+    EditText etOperator;
 
 	@ViewById(R.id.rdn_group_status)
 	RadioGroup rdnGroupStatus;
@@ -106,7 +114,7 @@ public class ImportFragment extends Fragment {
 		// Init and set adapter
 		operatorAdapter = new OperatorAdapter(getActivity(),
 				android.R.layout.simple_spinner_dropdown_item, operators);
-		spOperator.setAdapter(operatorAdapter);
+		//spOperator.setAdapter(operatorAdapter);
 	}
 
 	@AfterViews
@@ -137,8 +145,25 @@ public class ImportFragment extends Fragment {
         transaction.commit();
     }
 
-    @ItemSelect(R.id.sp_operator)
+    @Touch(R.id.et_operator)
+    void editTextOperatorTouched() {
+
+    }
+
+    private void showDialogSearchOperator(int mode) {
+        FragmentManager fm = getActivity().getFragmentManager();
+        SearchOperatorDialog searchOperatorDialog = new SearchOperatorDialog();
+        searchOperatorDialog.show(fm, null);
+    }
+
+    /*@ItemSelect(R.id.sp_operator)
     void spinnerOperatorsItemClicked(boolean selected, Operator selectedOperator) {
         operatorCode = selectedOperator.getOperatorCode();
-    }
+        long operatorId = selectedOperator.getId();
+
+        if (!TextUtils.isEmpty(tvContainerCode.getText()) && !TextUtils.isEmpty(operatorCode)) {
+            dataCenter.addSession(containerID, operatorCode, operatorId);
+        }
+
+    }*/
 }
