@@ -16,42 +16,41 @@ import java.util.List;
  */
 public class OperatorAdapter extends ArrayAdapter<Operator> {
 
-    private Context context;
-    private List<Operator> values;
+	private Context context;
+	private List<Operator> values;
 
-    public OperatorAdapter(Context context, int resource, List<Operator> values) {
-        super(context, resource, values);
-        this.context = context;
-        this.values = values;
-    }
+	public OperatorAdapter(Context context, int resource, List<Operator> values) {
+		super(context, resource, values);
+		this.context = context;
+		this.values = values;
+	}
 
-    public int getCount() {
-        return values.size();
-    }
+	public int getCount() {
+		return values.size();
+	}
 
-    public Operator getItem(int position) {
-        return values.get(position);
-    }
+	public Operator getItem(int position) {
+		return values.get(position);
+	}
 
-    public long getItemId(int position) {
-        return position;
-    }
+	public long getItemId(int position) {
+		return position;
+	}
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        TextView label = new TextView(context);
-        label.setTextColor(Color.BLACK);
-        label.setText(values.get(position).getOperatorName());
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
 
-        return label;
-    }
+		TextView label = new TextView(context);
+		label.setTextColor(Color.BLACK);
+		label.setText(values.get(position).getOperatorName());
+		return label;
+	}
 
-    @Override
-    public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        TextView label = new TextView(context);
-        label.setTextColor(Color.BLACK);
-        label.setText(values.get(position).getOperatorName());
-
-        return label;
-    }
+	@Override
+	public View getDropDownView(int position, View convertView, ViewGroup parent) {
+		TextView label = new TextView(context);
+		label.setTextColor(Color.BLACK);
+		label.setText(values.get(position).getOperatorName());
+		return label;
+	}
 }
