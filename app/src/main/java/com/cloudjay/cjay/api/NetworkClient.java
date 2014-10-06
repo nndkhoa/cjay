@@ -327,6 +327,7 @@ public class NetworkClient {
     public List<Session> getAllSessionsByPage(Context context, int page) {
         List<Session> sessions = new ArrayList<Session>();
         JsonElement next;
+        //TODO: set nullable to some fill
         do {
             Logger.e("Running do while");
             JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionsByPage(page, null);

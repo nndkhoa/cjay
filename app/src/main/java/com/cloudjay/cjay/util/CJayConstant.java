@@ -12,6 +12,11 @@ public class CJayConstant {
     public static final String LOG_DIRECTORY = "log";
     public static final String DAY_FORMAT = "yyyy-MM-dd";
 
+    public static final int TYPE_IMPORT = 0;
+    public static final int TYPE_EXPORT = 1;
+    public static final int TYPE_AUDIT = 2;
+    public static final int TYPE_REPAIRED = 3;
+
     // `/sdcard/DCMI/CJay/`
     public static final File APP_DIRECTORY_FILE = new File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),

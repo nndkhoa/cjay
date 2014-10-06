@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.PreferencesUtil;
-import com.cloudjay.cjay.util.Util;
+import com.cloudjay.cjay.util.Utils;
 
 import org.androidannotations.annotations.EBean;
 
@@ -29,7 +29,7 @@ public class RestAdapterProvider {
 		}
 
 		// Init header, pass 3 params: token, app version, username
-		String appVersion = Util.getAppVersionName(context);
+		String appVersion = Utils.getAppVersionName(context);
 		ApiHeaders headers = new ApiHeaders(token, appVersion, username);
 		return new RestAdapter.Builder().setEndpoint(ApiEndpoint.ROOT_API).setRequestInterceptor(headers).build();
 	}

@@ -99,4 +99,21 @@ public class DataCenter {
         EventBus.getDefault().post(new OperatorsGotEvent(operators));
 
     }
+
+    @Background(serial = CACHE)
+    public void addSession(String containerId, String operatorCode, long operatorId) {
+        Realm realm = Realm.getInstance(context);
+
+        // Open a transaction to store session into the realm
+        realm.beginTransaction();
+
+        Session session = realm.createObject(Session.class);
+        session.setContainerId(containerId);
+        session.setOperatorId(operatorId);
+        session.setOperatorCode(operatorCode);
+
+        realm.commitTransaction();
+
+        Logger.Log("insert session successfully");
+    }
 }

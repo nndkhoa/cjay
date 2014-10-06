@@ -21,8 +21,10 @@ public class OperatorAdapter extends ArrayAdapter<Operator> {
 
 	public OperatorAdapter(Context context, int resource, List<Operator> values) {
 		super(context, resource, values);
+
 		this.context = context;
 		this.values = values;
+
 	}
 
 	public int getCount() {

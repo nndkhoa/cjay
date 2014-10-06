@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
-public class Util {
+public class Utils {
 	public static String getAppVersionName(Context ctx) {
 
 		PackageInfo pInfo = null;
@@ -79,4 +79,8 @@ public class Util {
 
 		return true;
 	}
+
+    public static String replaceNullBySpace(String in) {
+        return in == null || in.equals("") ? " " : in;
+    }
 }

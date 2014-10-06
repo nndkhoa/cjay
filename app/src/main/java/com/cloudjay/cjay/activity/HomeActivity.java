@@ -16,11 +16,14 @@ import android.widget.Toast;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.SessionsFetchedEvent;
 import com.cloudjay.cjay.fragment.SearchFragment;
+import com.cloudjay.cjay.fragment.SearchFragment_;
 import com.cloudjay.cjay.fragment.UploadFragment;
+import com.cloudjay.cjay.fragment.UploadFragment_;
 import com.cloudjay.cjay.fragment.WorkingFragment;
 import com.cloudjay.cjay.jobqueue.GetAllSessionsJob;
 import com.cloudjay.cjay.jobqueue.UpLoadImageJob;
 import com.cloudjay.cjay.jobqueue.UploadSessionJob;
+import com.cloudjay.cjay.fragment.WorkingFragment_;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.path.android.jobqueue.JobManager;
 
@@ -158,11 +161,11 @@ class ViewPagerAdapter extends FragmentPagerAdapter {
 	public Fragment getItem(int position) {
 		switch (position) {
 			case 0:
-				return SearchFragment.newInstance(0);
+				return new SearchFragment_();
 			case 1:
-				return WorkingFragment.newInstance(1);
+				return new WorkingFragment_();
 			case 2:
-				return UploadFragment.newInstance(2);
+				return new UploadFragment_();
 			default:
 				return null;
 		}
