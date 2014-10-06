@@ -20,6 +20,9 @@ import com.cloudjay.cjay.fragment.SearchFragment_;
 import com.cloudjay.cjay.fragment.UploadFragment;
 import com.cloudjay.cjay.fragment.UploadFragment_;
 import com.cloudjay.cjay.fragment.WorkingFragment;
+import com.cloudjay.cjay.jobqueue.GetAllSessionsJob;
+import com.cloudjay.cjay.jobqueue.UpLoadImageJob;
+import com.cloudjay.cjay.jobqueue.UploadSessionJob;
 import com.cloudjay.cjay.fragment.WorkingFragment_;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.path.android.jobqueue.JobManager;
@@ -62,7 +65,12 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 			configureActionBar();
 			configureViewPager();
 
-//			jobManager.addJobInBackground(new GetAllSessionsJob(this));
+			// Set Job Queue to get all sessions after login
+			// TODO: add fetch data from job queue to database
+			jobManager = new JobManager(getApplicationContext());
+			jobManager.addJobInBackground(new GetAllSessionsJob(this));
+
+
 		}
 	}
 

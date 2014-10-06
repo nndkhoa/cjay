@@ -265,9 +265,9 @@ public class DemoCameraFragment extends CameraFragment {
             // [depot-code]-2013-12-19-[gate-in|gate-out|report]-[containerId]-[UUID].jpg
 
             //create today String
-            String today = StringHelper.getCurrentTimestamp("yyyy-MM-dd");
-            //get DepotCode from SharePreferences
+            String today = StringHelper.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
             depotCode = PreferencesUtil.getPrefsValue(getActivity(), PreferencesUtil.PREF_USER_DEPOT);
+
 
             //create image file name
 	        // TODO: @nam add real values

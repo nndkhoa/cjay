@@ -10,6 +10,7 @@ public class CJayConstant {
     public static final String APP_DIRECTORY = "CJay";
     public static final String BACK_UP_DIRECTORY = ".backup";
     public static final String LOG_DIRECTORY = "log";
+    public static final String DAY_FORMAT = "yyyy-MM-dd";
 
     public static final int TYPE_IMPORT = 0;
     public static final int TYPE_EXPORT = 1;
