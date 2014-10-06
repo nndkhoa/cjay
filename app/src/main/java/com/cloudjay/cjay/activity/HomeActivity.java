@@ -14,7 +14,7 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.event.GotAllSessionEvent;
+import com.cloudjay.cjay.event.SessionsFetchedEvent;
 import com.cloudjay.cjay.fragment.SearchFragment;
 import com.cloudjay.cjay.fragment.UploadFragment;
 import com.cloudjay.cjay.fragment.WorkingFragment;
@@ -58,15 +58,10 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 		} else {
 			configureActionBar();
 			configureViewPager();
-
-			// Set Job Queue to get all sessions after login
-			// TODO: add fetch data from job queue to database
-//			jobManager = new JobManager(getApplicationContext());
-//			jobManager.addJobInBackground(new GetAllSessionsJob(this));
 		}
 	}
 
-	public void onEventMainThread(GotAllSessionEvent gotAllSessionEvent) {
+	public void onEventMainThread(SessionsFetchedEvent gotAllSessionEvent) {
 		Toast.makeText(this, "Got all Session", Toast.LENGTH_SHORT);
 	}
 
