@@ -16,6 +16,7 @@ public class Operator extends RealmObject{
 	@SerializedName("operator_code")
 	@Expose
 	private String operatorCode;
+
 	@SerializedName("operator_name")
 	@Expose
 	private String operatorName;

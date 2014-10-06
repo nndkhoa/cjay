@@ -1,6 +1,5 @@
 package com.cloudjay.cjay.api;
 
-import com.cloudjay.cjay.model.Session;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -43,8 +42,14 @@ public interface NetworkService {
     @GET(ApiEndpoint.CONTAINER_SESSIONS_API)
     public JsonObject getContainerSessionsByPage(@Query("page") int page, @Query("modified_after") String lastModifiedDate);
 
-    @GET(ApiEndpoint.CONTAINER_SESSION_ITEM_API)
-    public Session getContainerSessionById(@Path("id") int containerId);
+    @GET(ApiEndpoint.CONTAINER_SESSIONS_API)
+    public JsonObject getContainerSessionsByModifiedDay(@Query("modified_after") String lastModifiedDate);
+
+	@GET(ApiEndpoint.CONTAINER_SESSION_ITEM_API)
+	public JsonObject getContainerSessionById(@Path("id") int containerId);
+
+	@GET(ApiEndpoint.CONTAINER_SESSIONS_API)
+	public JsonObject searchContainer(@Query("keyword") String keyword);
 
     @POST(ApiEndpoint.CONTAINER_SESSIONS_API)
     public void postContainer(@Field("username") String username, @Field("password") String password);

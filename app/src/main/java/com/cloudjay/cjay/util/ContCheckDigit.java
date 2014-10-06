@@ -1,9 +1,7 @@
 package com.cloudjay.cjay.util;
 
-/**
- * Created by Thai on 10/2/2014.
- */
 public class ContCheckDigit {
+
 	public ContCheckDigit() {
 	}
 
@@ -40,8 +38,6 @@ public class ContCheckDigit {
 	}
 
 	private static int getNumber(char c) {
-
 		return map[Character.getNumericValue(c) - 10]; // 10 is the offset from the returning value of A to 0
-
 	}
 }

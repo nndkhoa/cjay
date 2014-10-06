@@ -2,29 +2,21 @@ package com.cloudjay.cjay.fragment;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.SeekBar;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.activity.DisplayActivity;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
 import com.commonsware.cwac.camera.CameraFragment;
@@ -238,20 +230,21 @@ public class DemoCameraFragment extends CameraFragment {
             String uuid = UUID.randomUUID().toString();
 
             String imageType;
-            switch (mType) {
-                case CJayConstant.TYPE_IMPORT:
+	        ImageType type = ImageType.values()[mType];
+            switch (type) {
+                case IMPORT:
                     imageType = "gate-in";
                     break;
 
-                case CJayConstant.TYPE_EXPORT:
+                case EXPORT:
                     imageType = "gate-out";
                     break;
 
-                case CJayConstant.TYPE_AUDIT:
+                case AUDIT:
                     imageType = "auditor";
                     break;
 
-                case CJayConstant.TYPE_REPAIRED:
+                case REPAIRED:
                 default:
                     imageType = "repair";
                     break;
@@ -261,23 +254,19 @@ public class DemoCameraFragment extends CameraFragment {
             // [depot-code]-2013-12-19-[gate-in|gate-out|report]-[containerId]-[UUID].jpg
 
             //create today String
-            String today = StringHelper.getCurrentTimestamp("yyyy-MM-dd");
+            String today = StringHelper.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
 
             //create image file name
-            /*String fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-" + operatorCode + "-"
-                    + uuid + ".jpg";*/
+	        // TODO: @nam add real values
             String fileName = "DemoDepotCode" + "-" + today + "-" + "DemoimageType" + "-" + "ContainerId" + "-" + "DemoOperatorCode" + "-"
                     + uuid + ".jpg";
 
             //create directory to save images
             File newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, "DemoDepotCode" + "/" + today + "/" + imageType
                     + "/" + "ContainerId");
-
             if (!newDirectory.exists()) {
                 newDirectory.mkdirs();
             }
-
-
 
             if (useSingleShotMode()) {
                 singleShotProcessing = false;
@@ -300,9 +289,7 @@ public class DemoCameraFragment extends CameraFragment {
         }
 
         void saveBitmapToFile(Bitmap bitmap, File filename) {
-
             Logger.Log("File name: " + filename);
-
             try {
 
                 FileOutputStream out = new FileOutputStream(filename);
@@ -313,7 +300,6 @@ public class DemoCameraFragment extends CameraFragment {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
 
         @Override

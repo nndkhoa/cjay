@@ -23,10 +23,10 @@ import android.widget.Toast;
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.User;
-import com.cloudjay.cjay.util.DataCenter;
+import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
-import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.Util;
 import com.cloudjay.cjay.util.account.AccountGeneral;
 
 import org.androidannotations.annotations.Background;
@@ -50,13 +50,14 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		accountManager = AccountManager.get(this);
 	}
 
+	// Inject DataCenter to this Activity
 	@Bean
 	DataCenter dataCenter;
 
 	public static final String PARAM_AUTH_TOKEN_TYPE = "auth.token";
 	AccountManager accountManager;
-	private AlertDialog mAlertDialog;
-	private boolean mInvalidate;
+	AlertDialog mAlertDialog;
+	boolean mInvalidate;
 	public String mToken;
 	String email;
 	String password;
@@ -88,92 +89,9 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 	@SystemService
 	InputMethodManager inputManager;
-	//endregion
 
 	//region ACCOUNT MANAGER
-	void getUserToken() {
-		showAccountPicker(AccountGeneral.AUTH_TOKEN_TYPE_FULL_ACCESS, false);
-	}
 
-	private void showAccountPicker(final String authtokenTypeFullAccess, boolean b) {
-
-		mInvalidate = b;
-		final Account availableAccounts[] = accountManager
-				.getAccountsByType(AccountGeneral.ACCOUNT_TYPE);
-
-		if (availableAccounts.length == 0) {
-			Toast.makeText(this, "No accounts", Toast.LENGTH_SHORT).show();
-		} else {
-			String name[] = new String[availableAccounts.length];
-			for (int i = 0; i < availableAccounts.length; i++) {
-				name[i] = availableAccounts[i].name;
-			}
-
-			// Account picker
-			mAlertDialog = new AlertDialog.Builder(this)
-					.setTitle("Pick Account")
-					.setAdapter(
-							new ArrayAdapter<String>(getBaseContext(),
-									android.R.layout.simple_list_item_1, name),
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-								                    int which) {
-									if (mInvalidate)
-										invalidateAuthToken(availableAccounts[which], authtokenTypeFullAccess);
-									else
-										getExistingAccountAuthToken(availableAccounts[which], authtokenTypeFullAccess);
-								}
-							}
-					).create();
-
-			mAlertDialog.show();
-		}
-	}
-
-	private void invalidateAuthToken(final Account availableAccount, String authtokenTypeFullAccess) {
-
-		final AccountManagerFuture<Bundle> future = accountManager.getAuthToken(availableAccount, authtokenTypeFullAccess, null, this, null, null);
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					Bundle bnd = future.getResult();
-					final String authtoken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
-					accountManager.invalidateAuthToken(availableAccount.type, authtoken);
-
-					showMessage(availableAccount.name + " invalidated");
-				} catch (Exception e) {
-					e.printStackTrace();
-					showMessage(e.getMessage());
-				}
-			}
-		}).start();
-	}
-
-	private void getExistingAccountAuthToken(Account availableAccount, String authtokenTypeFullAccess) {
-		final AccountManagerFuture<Bundle> future = accountManager
-				.getAuthToken(availableAccount, authtokenTypeFullAccess, null, this, null, null);
-
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					Bundle bnd = future.getResult();
-
-					final String authtoken = bnd
-							.getString(AccountManager.KEY_AUTHTOKEN);
-					showMessage((authtoken != null) ? "SUCCESS!\ntoken: "
-							+ authtoken : "FAIL");
-					Logger.e("CJay GetToken Bundle is " + bnd);
-
-				} catch (Exception e) {
-					e.printStackTrace();
-					showMessage(e.getMessage());
-				}
-			}
-		}).start();
-	}
 
 	/**
 	 * Add account to account manager
@@ -183,7 +101,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	 * @param token
 	 * @param authTokenType
 	 */
-	private void addNewAccount(String email, String password, String token, String authTokenType) {
+	void addNewAccount(String email, String password, String token, String authTokenType) {
 
 		AccountManager manager = AccountManager.get(this);
 		String accountType = this.getIntent().getStringExtra(
@@ -314,11 +232,15 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		if (cancel) {
 			focusView.requestFocus();
 		} else if (NetworkHelper.isConnected(this)) {
-			inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+
+			if (inputManager != null) {
+				inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+			}
+
 			showProgress(true);
 			doLogin();
 		} else {
-			Utils.showCrouton(this, R.string.error_connection);
+			Util.showCrouton(this, R.string.error_connection);
 		}
 	}
 }

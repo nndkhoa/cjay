@@ -11,8 +11,10 @@ public class AuditImage extends RealmObject {
 
 	@Expose
 	private long id;
+
 	@Expose
 	private long type;
+
 	@Expose
 	private String url;
 

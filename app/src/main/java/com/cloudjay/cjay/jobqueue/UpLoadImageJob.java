@@ -16,11 +16,13 @@ import org.androidannotations.annotations.EBean;
 
 public class UpLoadImageJob extends Job {
     Context context;
+    String containerId;
 
 
-    public UpLoadImageJob(Context context) {
-        super(new Params(1).requireNetwork());
+    public UpLoadImageJob(Context context, String containerID) {
+        super(new Params(2).requireNetwork().groupBy(containerID));
         this.context = context;
+        this.containerId =containerID;
     }
 
     @Override
@@ -31,9 +33,10 @@ public class UpLoadImageJob extends Job {
 
     @Override
     public void onRun() throws Throwable {
-        Logger.e("Running Upload Image");
+
         NetworkClient networkClient = new NetworkClient(context);
         networkClient.uploadImage(context);
+        Logger.e("Upload Image " + containerId);
 
     }
 
