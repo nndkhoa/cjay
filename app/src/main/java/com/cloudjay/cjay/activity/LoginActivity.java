@@ -89,6 +89,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 	@SystemService
 	InputMethodManager inputManager;
+
 	//endregion
 
 	//region ACCOUNT MANAGER
@@ -315,7 +316,11 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		if (cancel) {
 			focusView.requestFocus();
 		} else if (NetworkHelper.isConnected(this)) {
-			inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+
+			if (inputManager != null) {
+				inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+			}
+
 			showProgress(true);
 			doLogin();
 		} else {

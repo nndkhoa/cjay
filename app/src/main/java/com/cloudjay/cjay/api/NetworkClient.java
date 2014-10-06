@@ -90,9 +90,6 @@ public class NetworkClient {
 
 		List<IsoCode> items = new ArrayList<IsoCode>();
 
-		// Clear the realm from last time
-		Realm.deleteRealmFile(context);
-
 		// Store the retrieved items to the Realm
 		Realm realm = Realm.getInstance(context);
 
@@ -125,9 +122,6 @@ public class NetworkClient {
 
 		List<IsoCode> items = new ArrayList<IsoCode>();
 
-		// Clear the realm from last time
-		Realm.deleteRealmFile(context);
-
 		// Store the retrieved items to the Realm
 		Realm realm = Realm.getInstance(context);
 
@@ -158,9 +152,6 @@ public class NetworkClient {
 		JsonArray results = provider.getRestAdapter(context).create(NetworkService.class).getComponentCodes(lastModifiedDate);
 
 		List<IsoCode> items = new ArrayList<IsoCode>();
-
-		// Clear the realm from last time
-		Realm.deleteRealmFile(context);
 
 		// Store the retrieved items to the Realm
 		Realm realm = Realm.getInstance(context);
@@ -193,8 +184,8 @@ public class NetworkClient {
 		JsonArray results = provider.getRestAdapter(context).create(NetworkService.class).getOperators(lastModifiedDate);
 		List<Operator> items = new ArrayList<Operator>();
 
-		// Clear the realm from last time
-		Realm.deleteRealmFile(context);
+//		// Clear the realm from last time
+//		Realm.deleteRealmFile(context);
 
 		// Store the retrieved items to the Realm
 		Realm realm = Realm.getInstance(context);
@@ -216,7 +207,6 @@ public class NetworkClient {
 	}
 
 	/**
-	 *
 	 * @param page
 	 * @param lastModifiedDate
 	 * @return
@@ -262,7 +252,7 @@ public class NetworkClient {
 		}
 	}
 
-	public void getAllSession(Context context, String mToken, String fullName, Object o) {
+	public void getAllSessions(Context context) {
 	}
 
 	public List<Session> searchSessions(Context context, String keyword) {

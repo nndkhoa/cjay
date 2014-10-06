@@ -14,7 +14,7 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.event.GotAllSessionEvent;
+import com.cloudjay.cjay.event.SessionsFetchedEvent;
 import com.cloudjay.cjay.fragment.SearchFragment;
 import com.cloudjay.cjay.fragment.UploadFragment;
 import com.cloudjay.cjay.fragment.WorkingFragment;
@@ -59,14 +59,11 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 			configureActionBar();
 			configureViewPager();
 
-			// Set Job Queue to get all sessions after login
-			// TODO: add fetch data from job queue to database
-//			jobManager = new JobManager(getApplicationContext());
 //			jobManager.addJobInBackground(new GetAllSessionsJob(this));
 		}
 	}
 
-	public void onEventMainThread(GotAllSessionEvent gotAllSessionEvent) {
+	public void onEventMainThread(SessionsFetchedEvent gotAllSessionEvent) {
 		Toast.makeText(this, "Got all Session", Toast.LENGTH_SHORT);
 	}
 
@@ -153,11 +150,11 @@ class ViewPagerAdapter extends FragmentPagerAdapter {
 	public Fragment getItem(int position) {
 		switch (position) {
 			case 0:
-				return SearchFragment.newInstance(0);
+				return new SearchFragment();
 			case 1:
-				return WorkingFragment.newInstance(1);
+				return new WorkingFragment();
 			case 2:
-				return UploadFragment.newInstance(2);
+				return new UploadFragment();
 			default:
 				return null;
 		}
