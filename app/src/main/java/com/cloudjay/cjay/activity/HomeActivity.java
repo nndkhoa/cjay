@@ -18,6 +18,7 @@ import com.cloudjay.cjay.event.SessionsFetchedEvent;
 import com.cloudjay.cjay.fragment.SearchFragment;
 import com.cloudjay.cjay.fragment.UploadFragment;
 import com.cloudjay.cjay.fragment.WorkingFragment;
+import com.cloudjay.cjay.task.job.GetAllSessionsJob;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.path.android.jobqueue.JobManager;
 
@@ -58,6 +59,8 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 		} else {
 			configureActionBar();
 			configureViewPager();
+
+			jobManager.addJobInBackground(new GetAllSessionsJob(this));
 		}
 	}
 

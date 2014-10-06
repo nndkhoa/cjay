@@ -216,7 +216,6 @@ public class NetworkClient {
 	}
 
 	/**
-	 *
 	 * @param page
 	 * @param lastModifiedDate
 	 * @return
@@ -262,7 +261,7 @@ public class NetworkClient {
 		}
 	}
 
-	public void getAllSession(Context context, String mToken, String fullName, Object o) {
+	public void getAllSessions(Context context) {
 	}
 
 	public List<Session> searchSessions(Context context, String keyword) {

@@ -63,7 +63,7 @@ public class DataCenter {
 	public void fetchSession(Context context) {
 		// TODO: get all container sessions
 
-
+		networkClient.getAllSessions(context);
 	}
 
 	@Background(serial = CACHE)

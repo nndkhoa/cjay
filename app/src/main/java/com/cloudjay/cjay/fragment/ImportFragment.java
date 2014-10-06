@@ -91,6 +91,7 @@ public class ImportFragment extends Fragment {
 		super.onDestroy();
 	}
 
+
 	public void onEvent(OperatorsGotEvent event) {
 
 		// retrieve list operators
