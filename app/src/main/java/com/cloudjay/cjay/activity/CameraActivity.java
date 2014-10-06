@@ -33,6 +33,7 @@ public class CameraActivity extends Activity implements DemoCameraFragment.Contr
     // Bundles data
     private int mType;
     private String containerId;
+    private String operatorCode;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +43,13 @@ public class CameraActivity extends Activity implements DemoCameraFragment.Contr
         // Get bundles data
         containerId = getIntent().getStringExtra("containerID");
         mType = getIntent().getIntExtra("imageType", 0);
+        operatorCode = getIntent().getStringExtra("operatorCode");
 
         //Add data get from bundle to argument
         Bundle args = new Bundle();
         args.putString("containerId", containerId);
         args.putInt("imageType", mType);
+        args.putString("operatorCode", operatorCode);
 
         current = DemoCameraFragment.newInstance(false);
         current.setArguments(args);

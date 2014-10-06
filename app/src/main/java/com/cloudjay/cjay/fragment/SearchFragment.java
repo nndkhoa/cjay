@@ -2,8 +2,10 @@ package com.cloudjay.cjay.fragment;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -11,6 +13,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Util;
 
+import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.BeforeTextChange;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
@@ -55,30 +58,42 @@ public class SearchFragment extends Fragment {
 		}
 	}
 
-	@BeforeTextChange(R.id.et_search)
-	void beforeTextChangedOnHelloTextView(EditText editText, CharSequence s) {
-		if (s.length() == 0) {
-			etSearch.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-		}
-	}
+	@AfterViews
+    void doAfterViews() {
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                if (s.length() == 0) {
+                    etSearch.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+                }
 
-	@TextChange(R.id.et_search)
-	void onTextChangedOnButtonSearch(EditText editText, CharSequence s) {
-		Matcher matcher = pattern.matcher(s);
-		if (s.length() < 4) {
-			if (etSearch.getInputType() != InputType.TYPE_CLASS_TEXT) {
-				etSearch.setInputType(InputType.TYPE_CLASS_TEXT
-						| InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-			}
+            }
 
-		} else if (matcher.matches()) {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Matcher matcher = pattern.matcher(s);
+                if (s.length() < 4) {
+                    if (etSearch.getInputType() != InputType.TYPE_CLASS_TEXT) {
+                        etSearch.setInputType(InputType.TYPE_CLASS_TEXT
+                                | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                    }
 
-			if (etSearch.getInputType() != InputType.TYPE_CLASS_NUMBER) {
-				etSearch.setInputType(InputType.TYPE_CLASS_NUMBER
-						| InputType.TYPE_NUMBER_VARIATION_NORMAL);
-			}
-		}
-	}
+                } else if (matcher.matches()) {
+
+                    if (etSearch.getInputType() != InputType.TYPE_CLASS_NUMBER) {
+                        etSearch.setInputType(InputType.TYPE_CLASS_NUMBER
+                                | InputType.TYPE_NUMBER_VARIATION_NORMAL);
+                    }
+                }
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+    }
 
 	//TODO refresh list view after search
 	private void refreshListView() {

@@ -19,12 +19,16 @@ import com.cloudjay.cjay.adapter.OperatorAdapter;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
+import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.ItemSelect;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import de.greenrobot.event.EventBus;
@@ -70,6 +74,7 @@ public class ImportFragment extends Fragment {
 
 	@FragmentArg("containerID")
 	String containerID;
+    String operatorCode;
 
 	@Bean
 	DataCenter dataCenter;
@@ -92,7 +97,7 @@ public class ImportFragment extends Fragment {
 		super.onDestroy();
 	}
 
-
+    @UiThread
 	public void onEvent(OperatorsGotEvent event) {
 
 		// retrieve list operators
@@ -119,6 +124,7 @@ public class ImportFragment extends Fragment {
         Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
         cameraActivityIntent.putExtra("containerID", containerID);
         cameraActivityIntent.putExtra("imageType", CJayConstant.TYPE_IMPORT);
+        cameraActivityIntent.putExtra("operatorCode", operatorCode);
         startActivity(cameraActivityIntent);
     }
 
@@ -129,5 +135,10 @@ public class ImportFragment extends Fragment {
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.ll_main_process, fragment);
         transaction.commit();
+    }
+
+    @ItemSelect(R.id.sp_operator)
+    void spinnerOperatorsItemClicked(boolean selected, Operator selectedOperator) {
+        operatorCode = selectedOperator.getOperatorCode();
     }
 }

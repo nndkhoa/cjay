@@ -81,6 +81,7 @@ public class DemoCameraFragment extends CameraFragment {
         if (args != null) {
             containerId = args.getString("containerId");
             mType = args.getInt("imageType");
+            operatorCode = args.getString("operatorCode");
         } else {
             Logger.Log("Agruments is null!");
         }
@@ -270,7 +271,7 @@ public class DemoCameraFragment extends CameraFragment {
 
             //create image file name
 	        // TODO: @nam add real values
-            String fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-" + "DemoOperatorCode" + "-"
+            String fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-" + operatorCode + "-"
                     + uuid + ".jpg";
 
             //create directory to save images
