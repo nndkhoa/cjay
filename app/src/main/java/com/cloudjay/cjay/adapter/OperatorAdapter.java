@@ -2,11 +2,14 @@ package com.cloudjay.cjay.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Operator;
 
 import java.util.List;
@@ -14,15 +17,18 @@ import java.util.List;
 /**
  * Created by nambv on 06/10/2014.
  */
-public class OperatorAdapter extends ArrayAdapter<Operator> {
+public class OperatorAdapter extends BaseAdapter {
 
-	private Context context;
+    private LayoutInflater inflater;
 	private List<Operator> values;
 
-	public OperatorAdapter(Context context, int resource, List<Operator> values) {
-		super(context, resource, values);
+    private class ViewHolder {
+        TextView tvOperatorName;
+        TextView tvOperatorCode;
+    }
 
-		this.context = context;
+	public OperatorAdapter(Context context, List<Operator> values) {
+        this.inflater = LayoutInflater.from(context);
 		this.values = values;
 
 	}
@@ -41,18 +47,18 @@ public class OperatorAdapter extends ArrayAdapter<Operator> {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-
-		TextView label = new TextView(context);
-		label.setTextColor(Color.BLACK);
-		label.setText(values.get(position).getOperatorName());
-		return label;
-	}
-
-	@Override
-	public View getDropDownView(int position, View convertView, ViewGroup parent) {
-		TextView label = new TextView(context);
-		label.setTextColor(Color.BLACK);
-		label.setText(values.get(position).getOperatorName());
-		return label;
+        ViewHolder holder = null;
+        if(convertView == null) {
+            holder = new ViewHolder();
+            convertView = inflater.inflate(R.layout.list_item_operator, null);
+            holder.tvOperatorName = (TextView) convertView.findViewById(R.id.tv_operator_name);
+            holder.tvOperatorCode = (TextView) convertView.findViewById(R.id.tv_operator_code);
+            convertView.setTag(holder);
+        } else {
+            holder = (ViewHolder) convertView.getTag();
+        }
+        holder.tvOperatorName.setText(values.get(position).getOperatorName());
+        holder.tvOperatorCode.setText(values.get(position).getOperatorCode());
+        return convertView;
 	}
 }

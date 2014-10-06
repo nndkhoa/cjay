@@ -1,12 +1,13 @@
 package com.cloudjay.cjay.fragment;
 
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.app.FragmentManager;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -28,6 +29,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.FocusChange;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ItemSelect;
@@ -84,9 +86,6 @@ public class ImportFragment extends Fragment {
 	String containerID;
     String operatorCode;
 
-	@Bean
-	DataCenter dataCenter;
-
 	OperatorAdapter operatorAdapter;
 
 	public ImportFragment() {
@@ -95,26 +94,12 @@ public class ImportFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		EventBus.getDefault().register(this);
 
 	}
 
 	@Override
 	public void onDestroy() {
-		EventBus.getDefault().unregister(this);
 		super.onDestroy();
-	}
-
-    @UiThread
-	public void onEvent(OperatorsGotEvent event) {
-
-		// retrieve list operators
-		RealmResults<Operator> operators = event.getOperators();
-
-		// Init and set adapter
-		operatorAdapter = new OperatorAdapter(getActivity(),
-				android.R.layout.simple_spinner_dropdown_item, operators);
-		//spOperator.setAdapter(operatorAdapter);
 	}
 
 	@AfterViews
@@ -122,9 +107,6 @@ public class ImportFragment extends Fragment {
 
 		// Set container ID for text View containerID
 		tvContainerCode.setText(containerID);
-
-		// Begin to get operators from cache
-		dataCenter.getOperators();
 	}
 
     @Click(R.id.btn_camera)
@@ -146,14 +128,17 @@ public class ImportFragment extends Fragment {
     }
 
     @Touch(R.id.et_operator)
-    void editTextOperatorTouched() {
-
+    void editTextOperatorTouched(View v, MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            startSearchOperator();
+        }
     }
 
-    private void showDialogSearchOperator(int mode) {
-        FragmentManager fm = getActivity().getFragmentManager();
-        SearchOperatorDialog searchOperatorDialog = new SearchOperatorDialog();
-        searchOperatorDialog.show(fm, null);
+    private void showDialogSearchOperator() {
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        SearchOperatorDialog searchOperatorDialog = new SearchOperatorDialog_();
+        searchOperatorDialog.setParent(this);
+        searchOperatorDialog.show(fm, "search_operator_dialog");
     }
 
     /*@ItemSelect(R.id.sp_operator)
@@ -166,4 +151,9 @@ public class ImportFragment extends Fragment {
         }
 
     }*/
+
+    private void startSearchOperator() {
+        // mContainerId = mContainerEditText.getText().toString();
+        showDialogSearchOperator();
+    }
 }
