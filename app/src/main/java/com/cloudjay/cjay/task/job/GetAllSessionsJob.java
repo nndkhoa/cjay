@@ -2,15 +2,11 @@ package com.cloudjay.cjay.task.job;
 
 import android.content.Context;
 
-import com.cloudjay.cjay.event.SessionsFetchedEvent;
-import com.cloudjay.cjay.util.DataCenter_;
 import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 
 import org.androidannotations.annotations.Trace;
-
-import de.greenrobot.event.EventBus;
 
 /**
  * Created by Thai on 10/2/2014.
@@ -35,11 +31,11 @@ public class GetAllSessionsJob extends Job {
 	@Trace
 	public void onRun() throws Throwable {
 
-		// Call DataCenter#fetchSessions
-		DataCenter_.getInstance_(context).fetchSession(context);
-
-		// post Event
-		EventBus.getDefault().post(new SessionsFetchedEvent());
+//		// Call DataCenter#fetchSessions
+//		DataCenter_.getInstance_(context).fetchSession(context);
+//
+//		// post Event
+//		EventBus.getDefault().post(new SessionsFetchedEvent());
 	}
 
 	@Override
