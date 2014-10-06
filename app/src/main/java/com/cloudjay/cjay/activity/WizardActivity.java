@@ -26,5 +26,4 @@ public class WizardActivity extends FragmentActivity {
         transaction.add(R.id.ll_main_process, importFragment);
         transaction.commit();
     }
-
 }

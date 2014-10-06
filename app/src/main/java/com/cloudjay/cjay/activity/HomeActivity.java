@@ -150,11 +150,11 @@ class ViewPagerAdapter extends FragmentPagerAdapter {
 	public Fragment getItem(int position) {
 		switch (position) {
 			case 0:
-				return SearchFragment.newInstance(0);
+				return new SearchFragment();
 			case 1:
-				return WorkingFragment.newInstance(1);
+				return new WorkingFragment();
 			case 2:
-				return UploadFragment.newInstance(2);
+				return new UploadFragment();
 			default:
 				return null;
 		}
