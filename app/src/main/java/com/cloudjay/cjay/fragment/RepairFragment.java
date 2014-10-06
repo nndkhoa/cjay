@@ -16,6 +16,11 @@ import android.widget.Button;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.util.Logger;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Click;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ViewById;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Locale;
@@ -23,51 +28,39 @@ import java.util.Locale;
 /**
  * Màn hình sửa chữa
  */
+@EFragment(R.layout.fragment_repair)
 public class RepairFragment extends Fragment implements ActionBar.TabListener {
 
-    private ViewPagerAdapter mPagerAdapter;
-    View v;
+    @ViewById(R.id.pager)
     ViewPager pager;
+
+    @ViewById(R.id.btn_continue)
     Button btnContinue;
+
     ActionBar actionBar;
+    private ViewPagerAdapter mPagerAdapter;
     public int currentPosition = 0;
 
     public RepairFragment() {
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        v = inflater.inflate(R.layout.fragment_repair, container, false);
+    @Click(R.id.btn_continue)
+    void buttonContinueClick() {
+         /* Remove all tabs */
+        actionBar.removeAllTabs();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 
-        Logger.i("Open Repair Fragment");
-        configureActionBar();
-        getControl();
-        configureViewPager();
-
-        btnContinue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                /* Remove all tabs */
-                actionBar.removeAllTabs();
-                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-
-                // Go to next fragment
-                Fragment fragment = new ExportFragment();
-                FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                transaction.replace(R.id.ll_main_process, fragment);
-                transaction.commit();
-            }
-        });
-
-        return v;
+        // Go to next fragment
+        Fragment fragment = new ExportFragment();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.ll_main_process, fragment);
+        transaction.commit();
     }
 
-    private void getControl() {
-        btnContinue = (Button) v.findViewById(R.id.btn_continue);
-        pager = (ViewPager) v.findViewById(R.id.pager);
+    @AfterViews
+    void doAfterViews() {
+        configureActionBar();
+        configureViewPager();
     }
 
     private void configureActionBar() {

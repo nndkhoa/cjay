@@ -113,20 +113,19 @@ public class ImportFragment extends Fragment {
 		dataCenter.getOperators();
 	}
 
-	@Click(R.id.btn_camera)
-	void buttonCameraClicked() {
-		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
-		cameraActivityIntent.putExtra("containerID", containerID);
-		startActivity(cameraActivityIntent);
-	}
+    @Click(R.id.btn_camera)
+    void buttonCameraClicked() {
+        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
+        cameraActivityIntent.putExtra("containerID", containerID);
+        startActivity(cameraActivityIntent);
+    }
 
-	@Click(R.id.btn_continue)
-	void buttonContinueClicked() {
-
-		//Go to next fragment
-		AuditFragment fragment = new AuditFragment();
-		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-		transaction.replace(R.id.ll_main_process, fragment);
-		transaction.commit();
-	}
+    @Click(R.id.btn_continue)
+    void buttonContinueClicked() {
+        //Go to next fragment
+        AuditFragment fragment = new AuditFragment_().builder().build();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.ll_main_process, fragment);
+        transaction.commit();
+    }
 }

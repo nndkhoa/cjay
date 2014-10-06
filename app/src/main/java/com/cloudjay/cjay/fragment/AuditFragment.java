@@ -23,51 +23,35 @@ import org.androidannotations.annotations.ViewById;
 /**
  * Màn hình giám định
  */
+@EFragment(R.layout.fragment_audit)
 public class AuditFragment extends Fragment {
 
+    //region Control_View_Declare
+    @ViewById(R.id.btn_continue)
 	Button btnContinue;
+
+    @ViewById(R.id.btn_reuse_gate_in_image)
     Button btnReuseGateInImage;
+
+    @ViewById(R.id.lv_audit_images)
     ListView lvAuditImages;
+    //endregion
 
 	public AuditFragment() {
 		// Required empty public constructor
 	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-	                         Bundle savedInstanceState) {
-		// Inflate the layout for this fragment
-		View v = inflater.inflate(R.layout.fragment_audit, container, false);
-
-        btnContinue = (Button) v.findViewById(R.id.btn_continue);
-        btnReuseGateInImage = (Button) v.findViewById(R.id.btn_reuse_gate_in_image);
-        lvAuditImages = (ListView) v.findViewById(R.id.lv_audit_images);
-
-        btnContinue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                doContinueClick();
-            }
-        });
-        btnReuseGateInImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                doReuseGateInImageClick();
-            }
-        });
-
-        return v;
-	}
-
-    void doContinueClick() {
+    @Click(R.id.btn_continue)
+    void buttonContinueClicked() {
         //Go to next fragment
-        RepairFragment fragment = new RepairFragment();
+        RepairFragment fragment = new RepairFragment_().builder().build();
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.ll_main_process, fragment);
         transaction.commit();
     }
 
-    void doReuseGateInImageClick() {
+    @Click(R.id.btn_reuse_gate_in_image)
+    void buttonReuseGateInImageClicked() {
         // Open ReuseActivity
         Intent intent = new Intent(getActivity(), ReuseActivity.class);
         getActivity().startActivity(intent);
