@@ -73,6 +73,7 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 		// TODO: Set data to view
 		viewHolder.tvContainerId.setText(session.getContainerId());
 		viewHolder.tvOperator.setText(session.getOperatorCode());
+        viewHolder.tvCurrentStatus.setText(String.valueOf(session.getStatus()));
 
 		return convertView;
 	}

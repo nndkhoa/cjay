@@ -170,9 +170,11 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		} catch (RetrofitError error) {
 			error.printStackTrace();
 			showCrouton(error.getMessage());
+            showProgress(false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			showCrouton(e.getMessage());
+            showProgress(false);
 		}
 	}
 
