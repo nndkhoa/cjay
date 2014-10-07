@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity;
+import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.adapter.OperatorAdapter;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
@@ -87,9 +88,8 @@ public class ImportFragment extends Fragment {
 
 	@FragmentArg("containerID")
 	String containerID;
-
-	OperatorAdapter operatorAdapter;
-	Operator selectedOperator;
+    GateImageAdapter gateImageAdapter;
+    Operator selectedOperator;
 
 	public ImportFragment() {
 	}
@@ -126,9 +126,16 @@ public class ImportFragment extends Fragment {
 
     @UiThread
     void onEvent(GateImagesGotEvent event) {
-        Logger.Log("GateImagesGotEvent");
+
+        // Get gate image objects from event post back
         RealmResults<GateImage> gateImages = event.getGateImages();
         Logger.Log("count gate images: " + gateImages.size());
+
+        //Init
+        gateImageAdapter = new GateImageAdapter(getActivity(), gateImages);
+        Logger.Log("adapter count: " + gateImageAdapter.getCount());
+        lvImages.setAdapter(gateImageAdapter);
+
     }
 
 	@AfterViews
@@ -136,8 +143,6 @@ public class ImportFragment extends Fragment {
 
 		// Set container ID for text View containerID
 		tvContainerCode.setText(containerID);
-
-        dataCenter.getGateImages(0, "");
 	}
 
 	@Click(R.id.btn_camera)

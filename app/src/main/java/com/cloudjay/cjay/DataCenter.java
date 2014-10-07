@@ -109,6 +109,7 @@ public class DataCenter {
         realm.beginTransaction();
 
         Session session = realm.createObject(Session.class);
+        session.setId(0);
         session.setContainerId(containerId);
         session.setOperatorId(operatorId);
         session.setOperatorCode(operatorCode);
@@ -119,7 +120,6 @@ public class DataCenter {
         Logger.Log("insert session successfully");
     }
 
-    @Background(serial = CALLBACK)
     public void addGateImage(long type, String url) {
         Logger.Log("url when insert in data center: " + url);
         Realm realm = Realm.getInstance(context);
@@ -128,6 +128,7 @@ public class DataCenter {
         realm.beginTransaction();
 
         GateImage gateImage = realm.createObject(GateImage.class);
+        gateImage.setId(0);
         gateImage.setType(type);
         gateImage.setUrl(url);
 
@@ -137,11 +138,11 @@ public class DataCenter {
         Logger.Log("insert gate image successfully");
     }
 
-    @Background(serial = GET_CALLBACK)
     public void getGateImages(long type, String containerId) {
         Logger.Log("type = " + type + ", containerId = " + containerId);
         Realm realm = Realm.getInstance(context);
-        RealmResults<GateImage> gateImages = realm.where(GateImage.class).findAll();
+        RealmResults<GateImage> gateImages = realm.where(GateImage.class).contains("url", containerId).findAll();
+        // RealmResults<GateImage> gateImages = realm.where(GateImage.class).findAll();
         for (GateImage g : gateImages) {
             Logger.Log("url: " + g.getUrl());
         }
