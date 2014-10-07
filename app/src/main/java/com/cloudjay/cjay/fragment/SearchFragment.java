@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.fragment.dialog.AddContainerDialog;
+import com.cloudjay.cjay.fragment.dialog.AddContainerDialog_;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Utils;
 
@@ -22,6 +24,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ *
+ */
 @EFragment(R.layout.fragment_search)
 public class SearchFragment extends Fragment {
 
@@ -36,6 +41,9 @@ public class SearchFragment extends Fragment {
 	public SearchFragment() {
 	}
 
+	/**
+	 * Xử lý các dialog
+	 */
 	@Click(R.id.btn_search)
 	void buttonSearchClicked() {
 
@@ -59,13 +67,13 @@ public class SearchFragment extends Fragment {
 	@AfterViews
 	void doAfterViews() {
 
+		// Add text change listener to process keyboard
 		etSearch.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 				if (s.length() == 0) {
 					etSearch.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
 				}
-
 			}
 
 			@Override
@@ -76,15 +84,12 @@ public class SearchFragment extends Fragment {
 						etSearch.setInputType(InputType.TYPE_CLASS_TEXT
 								| InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
 					}
-
 				} else if (matcher.matches()) {
-
 					if (etSearch.getInputType() != InputType.TYPE_CLASS_NUMBER) {
 						etSearch.setInputType(InputType.TYPE_CLASS_NUMBER
 								| InputType.TYPE_NUMBER_VARIATION_NORMAL);
 					}
 				}
-
 			}
 
 			@Override
@@ -94,13 +99,13 @@ public class SearchFragment extends Fragment {
 		});
 	}
 
-	//TODO refresh list view after search
+	// TODO: refresh list view after search
 	private void refreshListView() {
 
 	}
 
-	//TODO add logic search
-	private List<Session> searchSession(String containeriD) {
+	// TODO: add logic search
+	private List<Session> searchSession(String containerID) {
 		return null;
 	}
 

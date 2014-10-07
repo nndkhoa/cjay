@@ -110,10 +110,14 @@ public abstract class AbstractDataLoader<E extends RealmResults<?>> extends
 	}
 
 	protected void emptyDataList(E dataList) {
-		if (dataList != null && dataList.size() > 0) {
-			for (int i = 0; i < dataList.size(); i++) {
-				dataList.remove(i);
+		try {
+			if (dataList != null && dataList.size() > 0) {
+				for (int i = 0; i < dataList.size(); i++) {
+					dataList.remove(i);
+				}
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }

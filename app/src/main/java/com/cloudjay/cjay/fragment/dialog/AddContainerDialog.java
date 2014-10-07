@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.fragment;
+package com.cloudjay.cjay.fragment.dialog;
 
 import android.content.Intent;
 import android.widget.Button;

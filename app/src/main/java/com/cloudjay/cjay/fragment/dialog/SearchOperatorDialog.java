@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.fragment;
+package com.cloudjay.cjay.fragment.dialog;
 
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
