@@ -34,11 +34,11 @@ public class AddContainerDialog extends android.support.v4.app.DialogFragment {
 	@ViewById(R.id.btn_cancelAddContainer)
 	Button btnCancelAddContainer;
 
-	public AddContainerDialog() {}
-
+	public AddContainerDialog() {
+	}
 
 	@AfterViews
-	void init () {
+	void init() {
 		tvContainerIDSearch.setText(containerID);
 		if (Utils.isContainerIdValid(containerID)) {
 			btnAddContainer.setText(R.string.dialog_create_container_id_invalid_iso);

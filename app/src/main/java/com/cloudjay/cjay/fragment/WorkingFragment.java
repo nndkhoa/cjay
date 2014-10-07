@@ -54,7 +54,7 @@ public class WorkingFragment extends Fragment implements LoaderManager.LoaderCal
 	@Override
 	public void onLoadFinished(Loader<RealmResults<Session>> loader, RealmResults<Session> data) {
 		mAdapter.clear();
-		for(Session session : data){
+		for (Session session : data) {
 			mAdapter.add(session);
 		}
 	}

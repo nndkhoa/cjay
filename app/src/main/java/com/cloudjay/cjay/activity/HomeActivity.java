@@ -43,6 +43,14 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 	ActionBar actionBar;
 	JobManager jobManager;
 
+	/**
+	 * > MAIN FUNCTION
+	 *
+	 * 1. Config action bar NAVIGATION MODE
+	 * 2. Config view pager
+	 * 3. Start JobQueue to get all session
+	 *
+	 */
 	@AfterViews
 	void setup() {
 
@@ -69,6 +77,9 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 		Toast.makeText(this, "Got all Session", Toast.LENGTH_SHORT);
 	}
 
+	/**
+	 * Config action bar
+	 */
 	private void configureActionBar() {
 		actionBar = getActionBar();
 		final Method method;
@@ -88,6 +99,9 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 	}
 
+	/**
+	 * Config and add view pager
+	 */
 	private void configureViewPager() {
 		mPagerAdapter = new ViewPagerAdapter(getApplicationContext(), getSupportFragmentManager());
 		mViewPager.setAdapter(mPagerAdapter);
