@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <EditText
         android:layout_width="match_parent"
@@ -13,7 +13,7 @@
         android:maxLength="11"
         android:inputType="textCapCharacters|textNoSuggestions"
         android:selectAllOnFocus="true"
-        android:hint="@string/fragment_search_hint_et_search"/>
+        android:hint="@string/fragment_search_hint_et_search" />
 
     <Button
         android:layout_width="match_parent"
@@ -21,7 +21,7 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:text="@string/fragment_search_btn_search"
-        android:id="@+id/btn_search"/>
+        android:id="@+id/btn_search" />
 
     <LinearLayout
         android:id="@+id/ll_login_status"
@@ -30,14 +30,14 @@
         android:layout_gravity="center_vertical"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <ProgressBar
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:layout_gravity="center_horizontal"/>
+            android:layout_gravity="center_horizontal" />
 
         <TextView
             android:id="@+id/login_status_message"
@@ -46,13 +46,12 @@
             android:layout_marginBottom="16dp"
             android:text="@string/fragment_search_pb_searching"
             android:layout_gravity="center_horizontal"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
+            android:textAppearance="?android:attr/textAppearanceMedium" />
     </LinearLayout>
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/lv_searchContainer"
-        android:visibility="gone"></ListView>
+        android:id="@+id/lv_search_container"></ListView>
 
 </LinearLayout>

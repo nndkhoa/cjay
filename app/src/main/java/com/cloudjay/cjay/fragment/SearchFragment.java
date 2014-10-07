@@ -6,11 +6,20 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 
+import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.adapter.SessionAdapter;
+import com.cloudjay.cjay.fragment.dialog.AddContainerDialog;
+import com.cloudjay.cjay.fragment.dialog.AddContainerDialog_;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 
 import org.androidannotations.annotations.AfterViews;
@@ -22,91 +31,143 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
+
+/**
+ *
+ */
 @EFragment(R.layout.fragment_search)
 public class SearchFragment extends Fragment {
 
-	@ViewById(R.id.btn_search)
-	Button btnSearch;
+    @ViewById(R.id.btn_search)
+    Button btnSearch;
 
-	@ViewById(R.id.et_search)
-	EditText etSearch;
+    @ViewById(R.id.et_search)
+    EditText etSearch;
 
-	Pattern pattern = Pattern.compile("^[a-zA-Z]{4}");
+    @ViewById(R.id.lv_search_container)
+    ListView lvSearch;
 
-	public SearchFragment() {
-	}
+    @ViewById(R.id.ll_login_status)
+    LinearLayout llLoginStatus;
 
-	@Click(R.id.btn_search)
-	void buttonSearchClicked() {
+    Pattern pattern = Pattern.compile("^[a-zA-Z]{4}");
+    private SessionAdapter mAdapter;
 
-		String containerID = etSearch.getText().toString();
-		if (TextUtils.isEmpty(containerID)) {
-			etSearch.setError(getString(R.string.dialog_container_id_required));
-		} else if (!Utils.simpleValid(containerID)) {
-			etSearch.setError(getString(R.string.dialog_container_id_invalid));
-			return;
-		} else {
-			List<Session> result = searchSession(containerID);
-			if (result != null) {
-				refreshListView();
-			} else {
-				showAddContainerDialog(containerID);
-			}
-			etSearch.setText("");
-		}
-	}
+    public SearchFragment() {
+    }
 
-	@AfterViews
-	void doAfterViews() {
+    @Click(R.id.btn_search)
+    void buttonSearchClicked() {
+        lvSearch.setVisibility(View.GONE);
+        llLoginStatus.setVisibility(View.VISIBLE);
+        String containerID = etSearch.getText().toString();
+        if (isGateRole()) {
+            //If this is gate role, check enough 11 charater (4 string, 7 int)
+            if (TextUtils.isEmpty(containerID)) {
+                etSearch.setError(getString(R.string.dialog_container_id_required));
+            } else if (!Utils.simpleValid(containerID)) {
+                etSearch.setError(getString(R.string.dialog_container_id_invalid));
+                return;
+            } else {
+                List<Session> result = searchSession(containerID);
+                if (result != null) {
+                    mAdapter.clear();
+                    mAdapter.addAll(result);
+                    refreshListView();
+                } else {
+                    showAddContainerDialog(containerID);
+                }
+                etSearch.setText("");
+            }
+        } else {
+            //Check not null
+            if (TextUtils.isEmpty(containerID)) {
+                etSearch.setError(getString(R.string.dialog_container_id_required));
+            } else {
+                List<Session> result = searchSession(containerID);
+                if (result != null) {
+                    refreshListView();
+                } else {
+                    showAddContainerDialog(containerID);
+                }
+                etSearch.setText("");
+            }
+        }
+    }
 
-		etSearch.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-				if (s.length() == 0) {
-					etSearch.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-				}
+    @AfterViews
+    void doAfterViews() {
+        mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
+        lvSearch.setAdapter(mAdapter);
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                if (s.length() == 0) {
+                    etSearch.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+                }
 
-			}
+            }
 
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				Matcher matcher = pattern.matcher(s);
-				if (s.length() < 4) {
-					if (etSearch.getInputType() != InputType.TYPE_CLASS_TEXT) {
-						etSearch.setInputType(InputType.TYPE_CLASS_TEXT
-								| InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-					}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (isGateRole()) {
+                    Matcher matcher = pattern.matcher(s);
+                    if (s.length() < 4) {
+                        if (etSearch.getInputType() != InputType.TYPE_CLASS_TEXT) {
+                            etSearch.setInputType(InputType.TYPE_CLASS_TEXT
+                                    | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                        }
 
-				} else if (matcher.matches()) {
+                    } else if (matcher.matches()) {
 
-					if (etSearch.getInputType() != InputType.TYPE_CLASS_NUMBER) {
-						etSearch.setInputType(InputType.TYPE_CLASS_NUMBER
-								| InputType.TYPE_NUMBER_VARIATION_NORMAL);
-					}
-				}
+                        if (etSearch.getInputType() != InputType.TYPE_CLASS_NUMBER) {
+                            etSearch.setInputType(InputType.TYPE_CLASS_NUMBER
+                                    | InputType.TYPE_NUMBER_VARIATION_NORMAL);
+                        }
+                    }
+                } else {
+                    etSearch.setInputType(InputType.TYPE_CLASS_NUMBER
+                            | InputType.TYPE_NUMBER_VARIATION_NORMAL);
+                }
 
-			}
+            }
 
-			@Override
-			public void afterTextChanged(Editable s) {
+            @Override
+            public void afterTextChanged(Editable s) {
 
-			}
-		});
-	}
+            }
+        });
+    }
 
-	//TODO refresh list view after search
-	private void refreshListView() {
+    //TODO refresh list view after search
+    private void refreshListView() {
+        mAdapter.notifyDataSetChanged();
+    }
 
-	}
+    //TODO add logic search
+    private List<Session> searchSession(String containeriD) {
+        Realm realm = Realm.getInstance(getActivity());
+        RealmQuery<Session> query = realm.where(Session.class);
+        query.equalTo("container_id", containeriD);
+        RealmResults<Session> results = query.findAll();
+        return results;
+    }
 
-	//TODO add logic search
-	private List<Session> searchSession(String containeriD) {
-		return null;
-	}
+    private void showAddContainerDialog(String containerID) {
+        FragmentManager fragmentManager = getChildFragmentManager();
+        AddContainerDialog addContainerDialog = AddContainerDialog_.builder().containerID(containerID).build();
+        addContainerDialog.show(fragmentManager, "fragment_addcontainer");
+    }
 
-	private void showAddContainerDialog(String containerID) {
-		FragmentManager fragmentManager = getChildFragmentManager();
-		AddContainerDialog addContainerDialog = AddContainerDialog_.builder().containerID(containerID).build();
-		addContainerDialog.show(fragmentManager, "fragment_addcontainer");
-	}
+    private boolean isGateRole() {
+        if (PreferencesUtil.getPrefsValue(getActivity(), PreferencesUtil.PREF_USER_ROLE) == "6") {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }

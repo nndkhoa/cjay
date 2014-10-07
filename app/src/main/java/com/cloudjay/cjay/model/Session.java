@@ -53,9 +53,43 @@ public class Session extends RealmObject {
 	@Expose
 	private String checkInTime;
 
+	public static String getFieldContainerId() {
+		return FIELD_CONTAINER_ID;
+	}
+
 	@SerializedName("check_out_time")
 	@Expose
 	private String checkOutTime;
+
+	public boolean isUploaded() {
+		return uploaded;
+	}
+
+	public void setUploaded(boolean isUploaded) {
+		this.uploaded = isUploaded;
+	}
+
+	public Session withUploaded(boolean isUploaded) {
+		this.uploaded = isUploaded;
+		return this;
+	}
+
+	private boolean uploaded;
+
+	public boolean isProcessing() {
+		return processing;
+	}
+
+	public void setProcessing(boolean isProcessing) {
+		this.processing = isProcessing;
+	}
+
+	public Session withProcessing(boolean isProcessing) {
+		this.processing = isProcessing;
+		return this;
+	}
+
+	private boolean processing;
 
 	@SerializedName("gate_images")
 	@Expose
@@ -64,6 +98,10 @@ public class Session extends RealmObject {
 	@SerializedName("audit_items")
 	@Expose
 	private RealmList<AuditItem> auditItems;
+
+	public Session() {
+
+	}
 
 	public long getId() {
 		return id;
@@ -195,7 +233,7 @@ public class Session extends RealmObject {
 		return this;
 	}
 
-	public Object getCheckOutTime() {
+	public String getCheckOutTime() {
 		return checkOutTime;
 	}
 

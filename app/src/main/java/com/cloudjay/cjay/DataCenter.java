@@ -52,7 +52,7 @@ public class DataCenter {
     }
 
     public void fetchOperators(Context context) {
-        List<Operator> operators = networkClient.getOperators(context, null);
+        networkClient.getOperators(context, null);
     }
 
     public void fetchIsoCodes(Context context) {
