@@ -65,6 +65,10 @@ public class Session extends RealmObject {
 	@Expose
 	private RealmList<AuditItem> auditItems;
 
+    public Session (){
+
+    }
+
 	public long getId() {
 		return id;
 	}
