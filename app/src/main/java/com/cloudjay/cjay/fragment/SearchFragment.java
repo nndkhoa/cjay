@@ -57,42 +57,42 @@ public class SearchFragment extends Fragment {
 	}
 
 	@AfterViews
-    void doAfterViews() {
+	void doAfterViews() {
 
-        etSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                if (s.length() == 0) {
-                    etSearch.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-                }
+		etSearch.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+				if (s.length() == 0) {
+					etSearch.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+				}
 
-            }
+			}
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Matcher matcher = pattern.matcher(s);
-                if (s.length() < 4) {
-                    if (etSearch.getInputType() != InputType.TYPE_CLASS_TEXT) {
-                        etSearch.setInputType(InputType.TYPE_CLASS_TEXT
-                                | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-                    }
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				Matcher matcher = pattern.matcher(s);
+				if (s.length() < 4) {
+					if (etSearch.getInputType() != InputType.TYPE_CLASS_TEXT) {
+						etSearch.setInputType(InputType.TYPE_CLASS_TEXT
+								| InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+					}
 
-                } else if (matcher.matches()) {
+				} else if (matcher.matches()) {
 
-                    if (etSearch.getInputType() != InputType.TYPE_CLASS_NUMBER) {
-                        etSearch.setInputType(InputType.TYPE_CLASS_NUMBER
-                                | InputType.TYPE_NUMBER_VARIATION_NORMAL);
-                    }
-                }
+					if (etSearch.getInputType() != InputType.TYPE_CLASS_NUMBER) {
+						etSearch.setInputType(InputType.TYPE_CLASS_NUMBER
+								| InputType.TYPE_NUMBER_VARIATION_NORMAL);
+					}
+				}
 
-            }
+			}
 
-            @Override
-            public void afterTextChanged(Editable s) {
+			@Override
+			public void afterTextChanged(Editable s) {
 
-            }
-        });
-    }
+			}
+		});
+	}
 
 	//TODO refresh list view after search
 	private void refreshListView() {

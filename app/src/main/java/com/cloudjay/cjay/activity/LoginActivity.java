@@ -3,15 +3,12 @@ package com.cloudjay.cjay.activity;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
-import android.accounts.AccountManagerFuture;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -21,9 +18,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aerilys.helpers.android.NetworkHelper;
+import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.User;
-import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
@@ -62,7 +59,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	String email;
 	String password;
 
-	//region VIEW
+	//region VIEWS
 	@ViewById(R.id.btn_login)
 	Button btnLogin;
 
@@ -89,9 +86,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 	@SystemService
 	InputMethodManager inputManager;
-
-	//region ACCOUNT MANAGER
-
+	//endregion
 
 	/**
 	 * Add account to account manager
@@ -122,15 +117,24 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		this.setAccountAuthenticatorResult(intent.getExtras());
 		this.setResult(RESULT_OK, intent);
 	}
-	//endregion
 
 	@UiThread
 	void showMessage(String s) {
 		Toast.makeText(getBaseContext(), s, Toast.LENGTH_SHORT).show();
 	}
 
+	/**
+	 * > MAIN FUNCTION
+	 *
+	 * 1. Get data từ 2 text views username và password
+	 * 2. Validate ở client các trường hợp lỗi và thông báo
+	 * 3. Gửi username và password lên cho server
+	 * 4. Nhận token trả về và tiến hành gửi request get iso codes và operators
+	 * 5. Login thành công thì chuyển trang Home
+	 *
+	 */
 	@Background
-	void doLogin () {
+	void doLogin() {
 
 		// Query Token from server and add account to account manager
 		try {

@@ -13,15 +13,16 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity;
 import com.cloudjay.cjay.adapter.OperatorAdapter;
+import com.cloudjay.cjay.event.GateImagesGotEvent;
+import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.OperatorCallbackEvent;
-import com.cloudjay.cjay.event.OperatorsGotEvent;
+import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -31,10 +32,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.FocusChange;
 import org.androidannotations.annotations.FragmentArg;
-import org.androidannotations.annotations.ItemClick;
-import org.androidannotations.annotations.ItemSelect;
 import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
@@ -62,8 +60,8 @@ public class ImportFragment extends Fragment {
 	/*@ViewById(R.id.sp_operator)
 	Spinner spOperator;*/
 
-    @ViewById(R.id.et_operator)
-    EditText etOperator;
+	@ViewById(R.id.et_operator)
+	EditText etOperator;
 
 	@ViewById(R.id.rdn_group_status)
 	RadioGroup rdnGroupStatus;
@@ -84,14 +82,14 @@ public class ImportFragment extends Fragment {
 	ListView lvImages;
 	//endregion
 
-    @Bean
-    DataCenter dataCenter;
+	@Bean
+	DataCenter dataCenter;
 
 	@FragmentArg("containerID")
 	String containerID;
 
 	OperatorAdapter operatorAdapter;
-    Operator selectedOperator;
+	Operator selectedOperator;
 
 	public ImportFragment() {
 	}
@@ -99,25 +97,38 @@ public class ImportFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        EventBus.getDefault().register(this);
+		EventBus.getDefault().register(this);
 	}
 
 	@Override
 	public void onDestroy() {
-        EventBus.getDefault().unregister(this);
+		EventBus.getDefault().unregister(this);
 		super.onDestroy();
 	}
 
+	@UiThread
+	void onEvent(OperatorCallbackEvent event) {
+		// Get selected operator from search operator dialog
+		selectedOperator = event.getOperator();
+
+		// Set operator to edit text
+		etOperator.setText(selectedOperator.getOperatorName());
+
+		//Save session with containerId, operatorId and operatorCode into realm
+		dataCenter.addSession(containerID, selectedOperator.getOperatorCode(), selectedOperator.getId());
+	}
+
     @UiThread
-    void onEvent(OperatorCallbackEvent event) {
-        // Get selected operator from search operator dialog
-        selectedOperator = event.getOperator();
+    void onEvent(ImageCapturedEvent event) {
+        // Get gate images from realm
+        dataCenter.getGateImages(CJayConstant.TYPE_IMPORT, containerID);
+    }
 
-        // Set operator to edit text
-        etOperator.setText(selectedOperator.getOperatorName());
-
-        //Save session with containerId, operatorId and operatorCode into realm
-        dataCenter.addSession(containerID, selectedOperator.getOperatorCode(), selectedOperator.getId());
+    @UiThread
+    void onEvent(GateImagesGotEvent event) {
+        Logger.Log("GateImagesGotEvent");
+        RealmResults<GateImage> gateImages = event.getGateImages();
+        Logger.Log("count gate images: " + gateImages.size());
     }
 
 	@AfterViews
@@ -125,60 +136,51 @@ public class ImportFragment extends Fragment {
 
 		// Set container ID for text View containerID
 		tvContainerCode.setText(containerID);
+
+        dataCenter.getGateImages(0, "");
 	}
 
-    @Click(R.id.btn_camera)
-    void buttonCameraClicked() {
+	@Click(R.id.btn_camera)
+	void buttonCameraClicked() {
 
-        if (!TextUtils.isEmpty(tvContainerCode.getText()) && !TextUtils.isEmpty(etOperator.getText())) {
-            // Open camera activity
-            Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
-            cameraActivityIntent.putExtra("containerID", containerID);
-            cameraActivityIntent.putExtra("imageType", CJayConstant.TYPE_IMPORT);
-            cameraActivityIntent.putExtra("operatorCode", selectedOperator.getOperatorCode());
-            startActivity(cameraActivityIntent);
-        } else {
-            // Alert: require select operator first
-            Utils.showCrouton(getActivity(), R.string.require_select_operator_first);
-        }
-    }
+		if (!TextUtils.isEmpty(tvContainerCode.getText()) && !TextUtils.isEmpty(etOperator.getText())) {
+			// Open camera activity
+			Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
+			cameraActivityIntent.putExtra("containerID", containerID);
+			cameraActivityIntent.putExtra("imageType", CJayConstant.TYPE_IMPORT);
+			cameraActivityIntent.putExtra("operatorCode", selectedOperator.getOperatorCode());
+			startActivity(cameraActivityIntent);
+		} else {
+			// Alert: require select operator first
+			Utils.showCrouton(getActivity(), R.string.require_select_operator_first);
+		}
+	}
 
-    @Click(R.id.btn_continue)
-    void buttonContinueClicked() {
-        //Go to next fragment
-        AuditFragment fragment = new AuditFragment_().builder().build();
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.replace(R.id.ll_main_process, fragment);
-        transaction.commit();
-    }
+	@Click(R.id.btn_continue)
+	void buttonContinueClicked() {
+		//Go to next fragment
+		AuditFragment fragment = new AuditFragment_().builder().build();
+		FragmentTransaction transaction = getFragmentManager().beginTransaction();
+		transaction.replace(R.id.ll_main_process, fragment);
+		transaction.commit();
+	}
 
-    @Touch(R.id.et_operator)
-    void editTextOperatorTouched(View v, MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_UP) {
-            startSearchOperator();
-        }
-    }
+	@Touch(R.id.et_operator)
+	void editTextOperatorTouched(View v, MotionEvent event) {
+		if (event.getAction() == MotionEvent.ACTION_UP) {
+			startSearchOperator();
+		}
+	}
 
-    private void showDialogSearchOperator() {
-        FragmentManager fm = getActivity().getSupportFragmentManager();
-        SearchOperatorDialog searchOperatorDialog = new SearchOperatorDialog_();
-        searchOperatorDialog.setParent(this);
-        searchOperatorDialog.show(fm, "search_operator_dialog");
-    }
+	private void showDialogSearchOperator() {
+		FragmentManager fm = getActivity().getSupportFragmentManager();
+		SearchOperatorDialog searchOperatorDialog = new SearchOperatorDialog_();
+		searchOperatorDialog.setParent(this);
+		searchOperatorDialog.show(fm, "search_operator_dialog");
+	}
 
-    /*@ItemSelect(R.id.sp_operator)
-    void spinnerOperatorsItemClicked(boolean selected, Operator selectedOperator) {
-        operatorCode = selectedOperator.getOperatorCode();
-        long operatorId = selectedOperator.getId();
-
-        if (!TextUtils.isEmpty(tvContainerCode.getText()) && !TextUtils.isEmpty(operatorCode)) {
-            dataCenter.addSession(containerID, operatorCode, operatorId);
-        }
-
-    }*/
-
-    private void startSearchOperator() {
-        // mContainerId = mContainerEditText.getText().toString();
-        showDialogSearchOperator();
-    }
+	private void startSearchOperator() {
+		// mContainerId = mContainerEditText.getText().toString();
+		showDialogSearchOperator();
+	}
 }

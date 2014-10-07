@@ -18,13 +18,16 @@ import org.androidannotations.annotations.ViewById;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
+/**
+ * Danh sách các container đang thao tác
+ */
 @EFragment(R.layout.fragment_working)
 public class WorkingFragment extends Fragment implements LoaderManager.LoaderCallbacks<RealmResults<Session>> {
 
 	private static final int LOADER_ID = 1;
 
 	@ViewById(R.id.lv_search_container)
-	ListView mFeedListView;
+	ListView listView;
 
 	private SessionAdapter mAdapter;
 
@@ -32,16 +35,18 @@ public class WorkingFragment extends Fragment implements LoaderManager.LoaderCal
 		// Required empty public constructor
 	}
 
+	/**
+	 * Initial loader and set adapter for list view
+	 */
 	@AfterViews
 	void initLoader() {
 		getLoaderManager().initLoader(LOADER_ID, null, this);
 		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
-		mFeedListView.setAdapter(mAdapter);
+		listView.setAdapter(mAdapter);
 	}
 
 	@Override
 	public Loader<RealmResults<Session>> onCreateLoader(int id, Bundle args) {
-
 		return new AbstractDataLoader<RealmResults<Session>>(getActivity()) {
 			@Override
 			protected RealmResults<Session> buildList() {
@@ -54,7 +59,7 @@ public class WorkingFragment extends Fragment implements LoaderManager.LoaderCal
 	@Override
 	public void onLoadFinished(Loader<RealmResults<Session>> loader, RealmResults<Session> data) {
 		mAdapter.clear();
-		for(Session session : data){
+		for (Session session : data) {
 			mAdapter.add(session);
 		}
 	}

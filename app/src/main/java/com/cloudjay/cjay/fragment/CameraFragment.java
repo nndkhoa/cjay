@@ -14,7 +14,11 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.event.ImageCapturedEvent;
+import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -30,28 +34,31 @@ import java.io.FileOutputStream;
 import java.util.List;
 import java.util.UUID;
 
+import de.greenrobot.event.EventBus;
+import io.realm.RealmResults;
+
 public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
-    private static final int PICTURE_SIZE_MAX_WIDTH = 640;
-    private static final int PREVIEW_SIZE_MAX_WIDTH = 1280;
+	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
+	private static final int PREVIEW_SIZE_MAX_WIDTH = 1280;
 
 	private static final String KEY_USE_FFC = "com.commonsware.cwac.camera.demo.USE_FFC";
 	//private MenuItem autoFocusItem = null;
 
 	private boolean singleShotProcessing = false;
 	//private SeekBar zoom = null;
-    private ImageButton btnTakePicture;
-    private ImageButton btnFlashMode;
-    private ToggleButton btnCameraMode;
-    private Button btnDone;
+	private ImageButton btnTakePicture;
+	private ImageButton btnFlashMode;
+	private ToggleButton btnCameraMode;
+	private Button btnDone;
 	private long lastFaceToast = 0L;
 	String flashMode = null; //flash mode parameter when take camera
 
-    int mType = 0;
+	int mType = 0;
 
-    String containerId;
-    String depotCode;
-    String operatorCode;
+	String containerId;
+	String depotCode;
+	String operatorCode;
 
 	public static CameraFragment newInstance(boolean useFFC) {
 		CameraFragment f = new CameraFragment();
@@ -71,18 +78,18 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		setHost(builder.useFullBleedPreview(true).build());
 
 		setHasOptionsMenu(true);
-        //Set default flash mode parameter when take camera is OFF
-        flashMode = "off";
+		//Set default flash mode parameter when take camera is OFF
+		flashMode = "off";
 
-        // get data from agruments
-        Bundle args = getArguments();
-        if (args != null) {
-            containerId = args.getString("containerId");
-            mType = args.getInt("imageType");
-            operatorCode = args.getString("operatorCode");
-        } else {
-            Logger.Log("Agruments is null!");
-        }
+		// get data from agruments
+		Bundle args = getArguments();
+		if (args != null) {
+			containerId = args.getString("containerId");
+			mType = args.getInt("imageType");
+			operatorCode = args.getString("operatorCode");
+		} else {
+			Logger.Log("Agruments is null!");
+		}
 	}
 
 	@Override
@@ -142,6 +149,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
             @Override
             public void onClick(View view) {
                 // Close Camera
+                // DataCenter_.getInstance_(getActivity()).getGateImages(mType, containerId);
                 getActivity().finish();
             }
         });
@@ -177,19 +185,19 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 		Logger.Log("Prepare to take picture");
 
-		if (getContract().isSingleShotMode()==true) {
-            Logger.Log("Processing Single shot mode");
+		if (getContract().isSingleShotMode() == true) {
+			Logger.Log("Processing Single shot mode");
 			singleShotProcessing = true;
 			btnTakePicture.setEnabled(false);
 		}
 
 		// 2.
 		PictureTransaction xact = new PictureTransaction(getHost());
-        xact.needBitmap(true);
+		xact.needBitmap(true);
 
 		// Tag another object along if you need to
 		// xact.tag();
-        xact.flashMode(flashMode);
+		xact.flashMode(flashMode);
 
 		// Call it with PictureTransaction to take picture with configuration in CameraHost
 		// Process image in Subclass of `CameraHost#saveImage`
@@ -204,6 +212,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 	class DemoCameraHost extends SimpleCameraHost implements
 			Camera.FaceDetectionListener {
+
         boolean supportsFaces = false;
 
         public DemoCameraHost(Context _ctxt) {
@@ -294,8 +303,18 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
             File photo = new File(newDirectory, fileName);
             saveBitmapToFile(capturedBitmap, photo);
 
-            // TODO: upload image to server
-            // image location: @photo
+            uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
+        }
+
+        void uploadImage(String uuid, String uri, String imageName) {
+            // 1. Save image to local db
+            Logger.Log("uri in uploadImage: " + uri);
+            DataCenter_.getInstance_(getActivity()).addGateImage(mType, uri);
+            EventBus.getDefault().post(new ImageCapturedEvent(uri));
+            Logger.Log("save image to realm successfully");
+
+            // 2. TODO: upload image
+
         }
 
         void saveBitmapToFile(Bitmap bitmap, File filename) {
