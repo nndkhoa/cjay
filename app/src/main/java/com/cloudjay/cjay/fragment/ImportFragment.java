@@ -20,10 +20,12 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity;
 import com.cloudjay.cjay.adapter.OperatorAdapter;
+import com.cloudjay.cjay.event.OperatorCallbackEvent;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Utils;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -82,11 +84,14 @@ public class ImportFragment extends Fragment {
 	ListView lvImages;
 	//endregion
 
+    @Bean
+    DataCenter dataCenter;
+
 	@FragmentArg("containerID")
 	String containerID;
-    String operatorCode;
 
 	OperatorAdapter operatorAdapter;
+    Operator selectedOperator;
 
 	public ImportFragment() {
 	}
@@ -94,13 +99,26 @@ public class ImportFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+        EventBus.getDefault().register(this);
 	}
 
 	@Override
 	public void onDestroy() {
+        EventBus.getDefault().unregister(this);
 		super.onDestroy();
 	}
+
+    @UiThread
+    void onEvent(OperatorCallbackEvent event) {
+        // Get selected operator from search operator dialog
+        selectedOperator = event.getOperator();
+
+        // Set operator to edit text
+        etOperator.setText(selectedOperator.getOperatorName());
+
+        //Save session with containerId, operatorId and operatorCode into realm
+        dataCenter.addSession(containerID, selectedOperator.getOperatorCode(), selectedOperator.getId());
+    }
 
 	@AfterViews
 	void doAfterViews() {
@@ -111,11 +129,18 @@ public class ImportFragment extends Fragment {
 
     @Click(R.id.btn_camera)
     void buttonCameraClicked() {
-        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
-        cameraActivityIntent.putExtra("containerID", containerID);
-        cameraActivityIntent.putExtra("imageType", CJayConstant.TYPE_IMPORT);
-        cameraActivityIntent.putExtra("operatorCode", operatorCode);
-        startActivity(cameraActivityIntent);
+
+        if (!TextUtils.isEmpty(tvContainerCode.getText()) && !TextUtils.isEmpty(etOperator.getText())) {
+            // Open camera activity
+            Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
+            cameraActivityIntent.putExtra("containerID", containerID);
+            cameraActivityIntent.putExtra("imageType", CJayConstant.TYPE_IMPORT);
+            cameraActivityIntent.putExtra("operatorCode", selectedOperator.getOperatorCode());
+            startActivity(cameraActivityIntent);
+        } else {
+            // Alert: require select operator first
+            Utils.showCrouton(getActivity(), R.string.require_select_operator_first);
+        }
     }
 
     @Click(R.id.btn_continue)
