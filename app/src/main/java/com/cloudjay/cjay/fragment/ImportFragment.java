@@ -88,8 +88,9 @@ public class ImportFragment extends Fragment {
 
 	@FragmentArg("containerID")
 	String containerID;
-    GateImageAdapter gateImageAdapter;
+    GateImageAdapter gateImageAdapter = null;
     Operator selectedOperator;
+    RealmResults<GateImage> gateImages = null;
 
 	public ImportFragment() {
 	}
@@ -128,13 +129,17 @@ public class ImportFragment extends Fragment {
     void onEvent(GateImagesGotEvent event) {
 
         // Get gate image objects from event post back
-        RealmResults<GateImage> gateImages = event.getGateImages();
+        gateImages = event.getGateImages();
         Logger.Log("count gate images: " + gateImages.size());
 
-        //Init
-        gateImageAdapter = new GateImageAdapter(getActivity(), gateImages);
-        Logger.Log("adapter count: " + gateImageAdapter.getCount());
-        lvImages.setAdapter(gateImageAdapter);
+        //Init adapter if null and set adapter for listview
+        if (gateImageAdapter == null) {
+            Logger.Log("gateImageAdapter is null");
+            gateImageAdapter = new GateImageAdapter(getActivity(), gateImages);
+            lvImages.setAdapter(gateImageAdapter);
+        }
+
+        gateImageAdapter.notifyDataSetChanged();
 
     }
 
