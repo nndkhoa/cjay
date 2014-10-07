@@ -39,26 +39,26 @@ import io.realm.RealmResults;
 
 public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
-    private static final int PICTURE_SIZE_MAX_WIDTH = 640;
-    private static final int PREVIEW_SIZE_MAX_WIDTH = 1280;
+	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
+	private static final int PREVIEW_SIZE_MAX_WIDTH = 1280;
 
 	private static final String KEY_USE_FFC = "com.commonsware.cwac.camera.demo.USE_FFC";
 	//private MenuItem autoFocusItem = null;
 
 	private boolean singleShotProcessing = false;
 	//private SeekBar zoom = null;
-    private ImageButton btnTakePicture;
-    private ImageButton btnFlashMode;
-    private ToggleButton btnCameraMode;
-    private Button btnDone;
+	private ImageButton btnTakePicture;
+	private ImageButton btnFlashMode;
+	private ToggleButton btnCameraMode;
+	private Button btnDone;
 	private long lastFaceToast = 0L;
 	String flashMode = null; //flash mode parameter when take camera
 
-    int mType = 0;
+	int mType = 0;
 
-    String containerId;
-    String depotCode;
-    String operatorCode;
+	String containerId;
+	String depotCode;
+	String operatorCode;
 
 	public static CameraFragment newInstance(boolean useFFC) {
 		CameraFragment f = new CameraFragment();
@@ -78,18 +78,18 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		setHost(builder.useFullBleedPreview(true).build());
 
 		setHasOptionsMenu(true);
-        //Set default flash mode parameter when take camera is OFF
-        flashMode = "off";
+		//Set default flash mode parameter when take camera is OFF
+		flashMode = "off";
 
-        // get data from agruments
-        Bundle args = getArguments();
-        if (args != null) {
-            containerId = args.getString("containerId");
-            mType = args.getInt("imageType");
-            operatorCode = args.getString("operatorCode");
-        } else {
-            Logger.Log("Agruments is null!");
-        }
+		// get data from agruments
+		Bundle args = getArguments();
+		if (args != null) {
+			containerId = args.getString("containerId");
+			mType = args.getInt("imageType");
+			operatorCode = args.getString("operatorCode");
+		} else {
+			Logger.Log("Agruments is null!");
+		}
 	}
 
 	@Override
@@ -185,19 +185,19 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 		Logger.Log("Prepare to take picture");
 
-		if (getContract().isSingleShotMode()==true) {
-            Logger.Log("Processing Single shot mode");
+		if (getContract().isSingleShotMode() == true) {
+			Logger.Log("Processing Single shot mode");
 			singleShotProcessing = true;
 			btnTakePicture.setEnabled(false);
 		}
 
 		// 2.
 		PictureTransaction xact = new PictureTransaction(getHost());
-        xact.needBitmap(true);
+		xact.needBitmap(true);
 
 		// Tag another object along if you need to
 		// xact.tag();
-        xact.flashMode(flashMode);
+		xact.flashMode(flashMode);
 
 		// Call it with PictureTransaction to take picture with configuration in CameraHost
 		// Process image in Subclass of `CameraHost#saveImage`
@@ -212,6 +212,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 	class DemoCameraHost extends SimpleCameraHost implements
 			Camera.FaceDetectionListener {
+
         boolean supportsFaces = false;
 
         public DemoCameraHost(Context _ctxt) {

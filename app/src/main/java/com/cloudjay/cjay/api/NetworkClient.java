@@ -328,9 +328,7 @@ public class NetworkClient {
     public List<Session> getAllSessionsByPage(Context context, int page) {
         List<Session> sessions = new ArrayList<Session>();
         JsonElement next;
-        //TODO: set nullable to some fill
         do {
-            Logger.e("Running do while");
             JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionsByPage(page, null);
             JsonArray jsonArray = jsonObject.getAsJsonArray("results");
             next = jsonObject.get("next");
@@ -339,8 +337,6 @@ public class NetworkClient {
                 Realm realm = Realm.getInstance(context);
                 realm.beginTransaction();
                 Session session = realm.createObject(Session.class);
-                Logger.e("Adding session " + e.getAsJsonObject().get("id").toString() + " " + e.getAsJsonObject().get("container_id").toString());
-
                 session.setId(Long.parseLong(e.getAsJsonObject().get("id").toString()));
                 session.setContainerId(e.getAsJsonObject().get("container_id").toString());
                 session.setCheckInTime(e.getAsJsonObject().get("check_in_time").toString());
@@ -353,7 +349,6 @@ public class NetworkClient {
                 session.setStatus(Long.parseLong(e.getAsJsonObject().get("status").toString()));
                 session.setStep(Long.parseLong(e.getAsJsonObject().get("step").toString()));
 
-                Logger.e("Added Session");
                 JsonArray auditItems = e.getAsJsonObject().getAsJsonArray("audit_items");
                 for (JsonElement audit : auditItems) {
                     AuditItem item = realm.createObject(AuditItem.class);
@@ -389,7 +384,6 @@ public class NetworkClient {
                     item.setRepairCode(audit.getAsJsonObject().get("repair_code").toString());
                     item.setRepairCodeId(Long.parseLong(audit.getAsJsonObject().get("repair_code_id").toString()));
 
-                    Logger.e("Adding auditItems");
 
                     JsonArray auditImage = audit.getAsJsonObject().getAsJsonArray("audit_images");
                     for (JsonElement imageAudit : auditImage) {
@@ -398,8 +392,6 @@ public class NetworkClient {
                         imageAuditItem.setId(Long.parseLong(imageAudit.getAsJsonObject().get("id").toString()));
                         imageAuditItem.setType(Long.parseLong(imageAudit.getAsJsonObject().get("type").toString()));
                         imageAuditItem.setUrl(imageAudit.getAsJsonObject().get("url").toString());
-
-                        Logger.e("Adding auditImage");
                     }
                 }
                 JsonArray gateImage = e.getAsJsonObject().getAsJsonArray("gate_images");
@@ -410,14 +402,12 @@ public class NetworkClient {
                     imageItem.setType(Long.parseLong(image.getAsJsonObject().get("type").toString()));
                     imageItem.setUrl(image.getAsJsonObject().get("url").toString());
 
-                    Logger.e("Adding gateImage");
                 }
                 sessions.add(session);
                 realm.commitTransaction();
             }
 
             page = page + 1;
-            Logger.e("Loading page: " + String.valueOf(page));
 
         } while (!next.isJsonNull());
         PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, StringHelper.getCurrentTimestamp(CJayConstant.DAY_TIME_FORMAT));
