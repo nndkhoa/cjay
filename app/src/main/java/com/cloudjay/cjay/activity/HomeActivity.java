@@ -68,7 +68,7 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 			// Set Job Queue to get all sessions after login
 			// TODO: add fetch data from job queue to database
 			jobManager = new JobManager(getApplicationContext());
-			jobManager.addJobInBackground(new GetAllSessionsJob(this));
+			jobManager.addJobInBackground(new GetAllSessionsJob(this,true));
 
 
 		}

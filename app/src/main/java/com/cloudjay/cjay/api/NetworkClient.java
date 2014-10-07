@@ -289,30 +289,31 @@ public class NetworkClient {
     }
 
     public List<Session> getAllSessions(Context context, boolean isGetByModifiedDay) {
-        Logger.e("Fetching Data");
         List<Session> sessions = new ArrayList<Session>();
         JsonElement next;
         //If get by day, get fist page query by day=>get page form key "next"=>get all page after that page
         if (isGetByModifiedDay) {
+            Logger.e("Fetch by time");
             //Get session fist page when query by day
             String lastModifiedDate = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
-            JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionsByModifiedDay(lastModifiedDate);
-            JsonArray jsonArray = jsonObject.getAsJsonArray("results");
-            next = jsonObject.get("next");
-            Gson gson = new Gson();
-            Type listType = new TypeToken<List<Session>>() {
-            }.getType();
-            List<Session> containerSessionsByPage = gson.fromJson(jsonArray.toString(), listType);
-            sessions.addAll(containerSessionsByPage);
-            String nextString = next.toString();
-            //get page number of fist page
-            int page = Integer.parseInt(nextString.substring(nextString.lastIndexOf("=") + 1));
-            Logger.e(String.valueOf(page));
-            //get all session have page number greater then fist page
-            List<Session> sessionsByPage = this.getAllSessionsByPage(context, page);
-            sessions.addAll(sessionsByPage);
-            //Update Modified day in preferences
-            PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, StringHelper.getCurrentTimestamp(CJayConstant.DAY_FORMAT));
+            Logger.e(lastModifiedDate);
+            //If don't have lastmodifiedDay fetch all by day
+            if (lastModifiedDate.isEmpty()) {
+                sessions = getAllSessionsByPage(context, 1);
+            } else {
+                //Get by lastModifiedDay
+                JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionsByModifiedDay(lastModifiedDate);
+                next = jsonObject.get("next");
+                String nextString = next.toString();
+                //get page number of fist page
+                int page = Integer.parseInt(nextString.substring(nextString.lastIndexOf("=") + 1));
+                Logger.e(String.valueOf(page));
+                //get all session have page number greater then fist page
+                List<Session> sessionsByPage = this.getAllSessionsByPage(context, page);
+                sessions.addAll(sessionsByPage);
+                //Update Modified day in preferences
+                PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, StringHelper.getCurrentTimestamp(CJayConstant.DAY_TIME_FORMAT));
+            }
 
         }
         //If not, get all sessions start form page 1
@@ -338,49 +339,65 @@ public class NetworkClient {
                 Realm realm = Realm.getInstance(context);
                 realm.beginTransaction();
                 Session session = realm.createObject(Session.class);
+                Logger.e("Adding session " + e.getAsJsonObject().get("id").toString() + " " + e.getAsJsonObject().get("container_id").toString());
 
-                session.setId(e.getAsJsonObject().get("id").getAsLong());
-                session.setContainerId(e.getAsJsonObject().get("container_id").getAsString());
-                session.setCheckInTime(e.getAsJsonObject().get("check_in_time").getAsString());
-                session.setCheckOutTime(e.getAsJsonObject().get("input_time").getAsString());
-                session.setDepotCode(e.getAsJsonObject().get("depot_code").getAsString());
-                session.setDepotId(e.getAsJsonObject().get("depot_id").getAsLong());
-                session.setOperatorCode(e.getAsJsonObject().get("container_id").getAsString());
-                session.setOperatorId(e.getAsJsonObject().get("operator_id").getAsLong());
-                session.setPreStatus(e.getAsJsonObject().get("pre_status").getAsLong());
-                session.setStatus(e.getAsJsonObject().get("status").getAsLong());
-                session.setStep(e.getAsJsonObject().get("step").getAsLong());
-                Logger.e("Adding session");
+                session.setId(Long.parseLong(e.getAsJsonObject().get("id").toString()));
+                session.setContainerId(e.getAsJsonObject().get("container_id").toString());
+                session.setCheckInTime(e.getAsJsonObject().get("check_in_time").toString());
+                session.setCheckOutTime(e.getAsJsonObject().get("check_out_time").toString());
+                session.setDepotCode(e.getAsJsonObject().get("depot_code").toString());
+                session.setDepotId(Long.parseLong(e.getAsJsonObject().get("depot_id").toString()));
+                session.setOperatorCode(e.getAsJsonObject().get("container_id").toString());
+                session.setOperatorId(Long.parseLong(e.getAsJsonObject().get("operator_id").toString()));
+                session.setPreStatus(Long.parseLong(e.getAsJsonObject().get("pre_status").toString()));
+                session.setStatus(Long.parseLong(e.getAsJsonObject().get("status").toString()));
+                session.setStep(Long.parseLong(e.getAsJsonObject().get("step").toString()));
 
+                Logger.e("Added Session");
                 JsonArray auditItems = e.getAsJsonObject().getAsJsonArray("audit_items");
                 for (JsonElement audit : auditItems) {
                     AuditItem item = realm.createObject(AuditItem.class);
 
-                    item.setComponentCode(audit.getAsJsonObject().get("component_code").getAsString());
-                    item.setComponentCodeId(audit.getAsJsonObject().get("component_code_id").getAsLong());
-                    item.setComponentName(audit.getAsJsonObject().get("component_name").getAsString());
-                    item.setCreatedAt(audit.getAsJsonObject().get("created_at").getAsString());
-                    item.setDamageCode(audit.getAsJsonObject().get("damage_code").getAsString());
-                    item.setDamageCodeId(audit.getAsJsonObject().get("damage_code_id").getAsLong());
-                    item.setHeight(audit.getAsJsonObject().get("height").getAsLong());
-                    item.setId(audit.getAsJsonObject().get("id").getAsLong());
-                    item.setIsAllowed(audit.getAsJsonObject().get("is_allowed").getAsBoolean());
-                    item.setLength(audit.getAsJsonObject().get("length").getAsLong());
-                    item.setLocationCode(audit.getAsJsonObject().get("location_code").getAsString());
-                    item.setModifiedAt(audit.getAsJsonObject().get("modified_at").getAsString());
-                    item.setQuantity(audit.getAsJsonObject().get("quantity").getAsLong());
-                    item.setRepairCode(audit.getAsJsonObject().get("repair_code").getAsString());
-                    item.setRepairCodeId(audit.getAsJsonObject().get("repair_code_id").getAsLong());
+                    item.setComponentCode(audit.getAsJsonObject().get("component_code").toString());
+                    item.setComponentCodeId(Long.parseLong(audit.getAsJsonObject().get("component_code_id").toString()));
+                    item.setComponentName(audit.getAsJsonObject().get("component_name").toString());
+                    item.setCreatedAt(audit.getAsJsonObject().get("created_at").toString());
+                    item.setDamageCode(audit.getAsJsonObject().get("damage_code").toString());
+                    item.setDamageCodeId(Long.parseLong(audit.getAsJsonObject().get("damage_code_id").toString()));
+                    if (audit.getAsJsonObject().get("height").isJsonNull()) {
+                        item.setHeight(0);
+                    } else {
+                        item.setHeight(Double.valueOf(audit.getAsJsonObject().get("height").toString()));
+                    }
+
+                    if (audit.getAsJsonObject().get("length").isJsonNull()) {
+                        item.setHeight(0);
+                    } else {
+                        item.setHeight(Double.valueOf(audit.getAsJsonObject().get("length").toString()));
+                    }
+
+                    item.setId(Long.parseLong(audit.getAsJsonObject().get("id").toString()));
+                    item.setIsAllowed(Boolean.parseBoolean(audit.getAsJsonObject().get("is_allowed").toString()));
+                    item.setLocationCode(audit.getAsJsonObject().get("location_code").toString());
+                    item.setModifiedAt(audit.getAsJsonObject().get("modified_at").toString());
+                    if (audit.getAsJsonObject().get("quantity").isJsonNull()) {
+                        item.setQuantity(0);
+                    } else {
+                        item.setQuantity(Long.valueOf(audit.getAsJsonObject().get("quantity").toString()));
+                    }
+
+                    item.setRepairCode(audit.getAsJsonObject().get("repair_code").toString());
+                    item.setRepairCodeId(Long.parseLong(audit.getAsJsonObject().get("repair_code_id").toString()));
 
                     Logger.e("Adding auditItems");
 
                     JsonArray auditImage = audit.getAsJsonObject().getAsJsonArray("audit_images");
-                    for (JsonElement image : auditImage) {
-                        AuditImage imageItem = realm.createObject(AuditImage.class);
+                    for (JsonElement imageAudit : auditImage) {
+                        AuditImage imageAuditItem = realm.createObject(AuditImage.class);
 
-                        imageItem.setId(image.getAsJsonObject().get("id").getAsLong());
-                        imageItem.setType(image.getAsJsonObject().get("type").getAsLong());
-                        imageItem.setUrl(image.getAsJsonObject().get("url").getAsString());
+                        imageAuditItem.setId(Long.parseLong(imageAudit.getAsJsonObject().get("id").toString()));
+                        imageAuditItem.setType(Long.parseLong(imageAudit.getAsJsonObject().get("type").toString()));
+                        imageAuditItem.setUrl(imageAudit.getAsJsonObject().get("url").toString());
 
                         Logger.e("Adding auditImage");
                     }
@@ -389,9 +406,9 @@ public class NetworkClient {
                 for (JsonElement image : gateImage) {
                     GateImage imageItem = realm.createObject(GateImage.class);
 
-                    imageItem.setId(image.getAsJsonObject().get("id").getAsLong());
-                    imageItem.setType(image.getAsJsonObject().get("type").getAsLong());
-                    imageItem.setUrl(image.getAsJsonObject().get("url").getAsString());
+                    imageItem.setId(Long.parseLong(image.getAsJsonObject().get("id").toString()));
+                    imageItem.setType(Long.parseLong(image.getAsJsonObject().get("type").toString()));
+                    imageItem.setUrl(image.getAsJsonObject().get("url").toString());
 
                     Logger.e("Adding gateImage");
                 }
@@ -403,11 +420,12 @@ public class NetworkClient {
             Logger.e("Loading page: " + String.valueOf(page));
 
         } while (!next.isJsonNull());
-        PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, StringHelper.getCurrentTimestamp(CJayConstant.DAY_FORMAT));
+        PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, StringHelper.getCurrentTimestamp(CJayConstant.DAY_TIME_FORMAT));
         return sessions;
     }
 
     public List<Session> searchSessions(Context context, String keyword) {
         return null;
     }
+
 }
