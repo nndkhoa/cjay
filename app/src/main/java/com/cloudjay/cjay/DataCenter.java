@@ -28,13 +28,10 @@ public class DataCenter {
     @Bean
     NetworkClient networkClient;
 
-    // Inject the Cache
-
     public static final String NETWORK = "NETWORK";
     public static final String CACHE = "CACHE";
 
     Context context;
-
     public DataCenter(Context context) {
         this.context = context;
     }
