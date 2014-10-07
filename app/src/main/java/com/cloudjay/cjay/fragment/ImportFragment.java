@@ -20,8 +20,11 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity;
 import com.cloudjay.cjay.adapter.OperatorAdapter;
+import com.cloudjay.cjay.event.GateImagesGotEvent;
+import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.OperatorCallbackEvent;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
+import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -120,11 +123,26 @@ public class ImportFragment extends Fragment {
         dataCenter.addSession(containerID, selectedOperator.getOperatorCode(), selectedOperator.getId());
     }
 
+    @UiThread
+    void onEvent(ImageCapturedEvent event) {
+        // Get gate images from realm
+        dataCenter.getGateImages(CJayConstant.TYPE_IMPORT, containerID);
+    }
+
+    @UiThread
+    void onEvent(GateImagesGotEvent event) {
+        Logger.Log("GateImagesGotEvent");
+        RealmResults<GateImage> gateImages = event.getGateImages();
+        Logger.Log("count gate images: " + gateImages.size());
+    }
+
 	@AfterViews
 	void doAfterViews() {
 
 		// Set container ID for text View containerID
 		tvContainerCode.setText(containerID);
+
+        dataCenter.getGateImages(0, "");
 	}
 
     @Click(R.id.btn_camera)

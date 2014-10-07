@@ -4,7 +4,9 @@ import android.content.Context;
 
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
+import com.cloudjay.cjay.event.GateImagesGotEvent;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
+import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
@@ -30,6 +32,8 @@ public class DataCenter {
 
     public static final String NETWORK = "NETWORK";
     public static final String CACHE = "CACHE";
+    public static final String CALLBACK = "CALLBACK";
+    public static final String GET_CALLBACK = "GET_CALLBACK";
 
     Context context;
     public DataCenter(Context context) {
@@ -109,8 +113,39 @@ public class DataCenter {
         session.setOperatorId(operatorId);
         session.setOperatorCode(operatorCode);
 
+        // Commit transaction
         realm.commitTransaction();
 
         Logger.Log("insert session successfully");
+    }
+
+    @Background(serial = CALLBACK)
+    public void addGateImage(long type, String url) {
+        Logger.Log("url when insert in data center: " + url);
+        Realm realm = Realm.getInstance(context);
+
+        // Open a transaction to store session into the realm
+        realm.beginTransaction();
+
+        GateImage gateImage = realm.createObject(GateImage.class);
+        gateImage.setType(type);
+        gateImage.setUrl(url);
+
+        // Commit transaction
+        realm.commitTransaction();
+
+        Logger.Log("insert gate image successfully");
+    }
+
+    @Background(serial = GET_CALLBACK)
+    public void getGateImages(long type, String containerId) {
+        Logger.Log("type = " + type + ", containerId = " + containerId);
+        Realm realm = Realm.getInstance(context);
+        RealmResults<GateImage> gateImages = realm.where(GateImage.class).findAll();
+        for (GateImage g : gateImages) {
+            Logger.Log("url: " + g.getUrl());
+        }
+        Logger.Log("gate images count in dataCenter: " + gateImages.size());
+        EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
     }
 }

@@ -14,7 +14,11 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.event.ImageCapturedEvent;
+import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -29,6 +33,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
 import java.util.UUID;
+
+import de.greenrobot.event.EventBus;
+import io.realm.RealmResults;
 
 public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
@@ -142,6 +149,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
             @Override
             public void onClick(View view) {
                 // Close Camera
+                // DataCenter_.getInstance_(getActivity()).getGateImages(mType, containerId);
                 getActivity().finish();
             }
         });
@@ -294,8 +302,18 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
             File photo = new File(newDirectory, fileName);
             saveBitmapToFile(capturedBitmap, photo);
 
-            // TODO: upload image to server
-            // image location: @photo
+            uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
+        }
+
+        void uploadImage(String uuid, String uri, String imageName) {
+            // 1. Save image to local db
+            Logger.Log("uri in uploadImage: " + uri);
+            DataCenter_.getInstance_(getActivity()).addGateImage(mType, uri);
+            EventBus.getDefault().post(new ImageCapturedEvent(uri));
+            Logger.Log("save image to realm successfully");
+
+            // 2. TODO: upload image
+
         }
 
         void saveBitmapToFile(Bitmap bitmap, File filename) {
