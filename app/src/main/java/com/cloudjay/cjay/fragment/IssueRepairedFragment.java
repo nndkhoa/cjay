@@ -10,10 +10,13 @@ import android.view.ViewGroup;
 
 import com.cloudjay.cjay.R;
 
+import org.androidannotations.annotations.EFragment;
+
 /**
  * A simple {@link Fragment} subclass.
  *
  */
+@EFragment(R.layout.fragment_issue_repaired)
 public class IssueRepairedFragment extends Fragment {
 
     private static final String ARG_SECTION_NUMBER = "section_number";
@@ -29,14 +32,5 @@ public class IssueRepairedFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_issue_repaired, container, false);
-    }
-
 
 }

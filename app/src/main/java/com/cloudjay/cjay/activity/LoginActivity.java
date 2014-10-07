@@ -26,7 +26,7 @@ import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
-import com.cloudjay.cjay.util.Util;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.account.AccountGeneral;
 
 import org.androidannotations.annotations.Background;
@@ -90,92 +90,8 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	@SystemService
 	InputMethodManager inputManager;
 
-	//endregion
-
 	//region ACCOUNT MANAGER
-	void getUserToken() {
-		showAccountPicker(AccountGeneral.AUTH_TOKEN_TYPE_FULL_ACCESS, false);
-	}
 
-	void showAccountPicker(final String authtokenTypeFullAccess, boolean b) {
-
-		mInvalidate = b;
-		final Account availableAccounts[] = accountManager
-				.getAccountsByType(AccountGeneral.ACCOUNT_TYPE);
-
-		if (availableAccounts.length == 0) {
-			Toast.makeText(this, "No accounts", Toast.LENGTH_SHORT).show();
-		} else {
-			String name[] = new String[availableAccounts.length];
-			for (int i = 0; i < availableAccounts.length; i++) {
-				name[i] = availableAccounts[i].name;
-			}
-
-			// Account picker
-			mAlertDialog = new AlertDialog.Builder(this)
-					.setTitle("Pick Account")
-					.setAdapter(
-							new ArrayAdapter<String>(getBaseContext(),
-									android.R.layout.simple_list_item_1, name),
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-								                    int which) {
-									if (mInvalidate)
-										invalidateAuthToken(availableAccounts[which], authtokenTypeFullAccess);
-									else
-										getExistingAccountAuthToken(availableAccounts[which], authtokenTypeFullAccess);
-								}
-							}
-					).create();
-
-			mAlertDialog.show();
-		}
-	}
-
-	void invalidateAuthToken(final Account availableAccount, String authtokenTypeFullAccess) {
-
-		final AccountManagerFuture<Bundle> future = accountManager.getAuthToken(availableAccount, authtokenTypeFullAccess, null, this, null, null);
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					Bundle bnd = future.getResult();
-					final String authtoken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
-					accountManager.invalidateAuthToken(availableAccount.type, authtoken);
-
-					showMessage(availableAccount.name + " invalidated");
-				} catch (Exception e) {
-					e.printStackTrace();
-					showMessage(e.getMessage());
-				}
-			}
-		}).start();
-	}
-
-	void getExistingAccountAuthToken(Account availableAccount, String authtokenTypeFullAccess) {
-		final AccountManagerFuture<Bundle> future = accountManager
-				.getAuthToken(availableAccount, authtokenTypeFullAccess, null, this, null, null);
-
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					Bundle bnd = future.getResult();
-
-					final String authtoken = bnd
-							.getString(AccountManager.KEY_AUTHTOKEN);
-					showMessage((authtoken != null) ? "SUCCESS!\ntoken: "
-							+ authtoken : "FAIL");
-					Logger.e("CJay GetToken Bundle is " + bnd);
-
-				} catch (Exception e) {
-					e.printStackTrace();
-					showMessage(e.getMessage());
-				}
-			}
-		}).start();
-	}
 
 	/**
 	 * Add account to account manager
@@ -324,7 +240,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 			showProgress(true);
 			doLogin();
 		} else {
-			Util.showCrouton(this, R.string.error_connection);
+			Utils.showCrouton(this, R.string.error_connection);
 		}
 	}
 }

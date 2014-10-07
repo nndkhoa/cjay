@@ -19,6 +19,7 @@ import com.cloudjay.cjay.util.Logger;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.InvocationTargetException;
@@ -51,7 +52,7 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 
         // Go to next fragment
-        Fragment fragment = new ExportFragment();
+        Fragment fragment = new ExportFragment_().builder().build();
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.ll_main_process, fragment);
         transaction.commit();
@@ -141,9 +142,9 @@ class ViewPagerAdapter extends FragmentPagerAdapter {
 
         switch (position) {
             case 0:
-                return IssuePendingFragment.newInstance(0);
+                return IssuePendingFragment_.newInstance(0);
             case 1:
-                return IssueRepairedFragment.newInstance(1);
+                return IssueRepairedFragment_.newInstance(1);
             default:
                 return null;
         }

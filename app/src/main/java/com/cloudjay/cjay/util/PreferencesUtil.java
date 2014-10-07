@@ -10,6 +10,7 @@ public class PreferencesUtil {
 	public static final String PREF_TOKEN = "com.cloudjay.cjay.pref_token";
 	public static final String PREF_USER_ROLE = "com.cloudjay.cjay.pref_role";
 	public static final String PREF_USER_DEPOT = "com.cloudjay.cjay.pref_depot";
+    public static final String PREF_MODIFIED_DATE = "com.cloudjay.cjay.pref_modified_date";
 
 	public static void clearPrefs(Context context) {
 		SharedPreferences settings = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);

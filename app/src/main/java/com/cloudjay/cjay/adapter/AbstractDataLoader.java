@@ -7,12 +7,16 @@ import io.realm.RealmResults;
 
 public abstract class AbstractDataLoader<E extends RealmResults<?>> extends
 		AsyncTaskLoader<E> {
+
 	protected E mLastDataList = null;
+	protected Context context;
+
 	protected abstract E buildList();
 	protected final ForceLoadContentObserver mObserver = new ForceLoadContentObserver();
 
 	public AbstractDataLoader(Context context) {
 		super(context);
+		this.context = context;
 	}
 	/**
 	 * Runs on a worker thread, loading in our data. Delegates the real work to

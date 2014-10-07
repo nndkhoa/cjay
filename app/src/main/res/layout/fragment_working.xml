@@ -5,5 +5,10 @@
     tools:context="com.cloudjay.cjay.fragment.WorkingFragment">
 
 
+	<ListView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:id="@+id/lv_search_container"
+		></ListView>
 
 </FrameLayout>

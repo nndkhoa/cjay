@@ -10,20 +10,16 @@ import android.view.ViewGroup;
 
 import com.cloudjay.cjay.R;
 
+import org.androidannotations.annotations.EFragment;
+
 /**
  * Màn hình xuất
  */
+@EFragment(R.layout.fragment_export)
 public class ExportFragment extends Fragment {
 
     public ExportFragment() {
         // Required empty public constructor
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_export, container, false);
     }
 
 }
