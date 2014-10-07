@@ -38,187 +38,187 @@ import retrofit.mime.TypedFile;
 @EBean(scope = EBean.Scope.Singleton)
 public class NetworkClient {
 
-    @Bean
-    RestAdapterProvider provider = new RestAdapterProvider();
+	@Bean
+	RestAdapterProvider provider = new RestAdapterProvider();
 
-    Context context;
+	Context context;
 
-    public NetworkClient(Context context) {
-        this.context = context;
-    }
+	public NetworkClient(Context context) {
+		this.context = context;
+	}
 
-    public String getToken(String username, String password) throws RetrofitError {
+	public String getToken(String username, String password) throws RetrofitError {
 
-        JsonObject tokenJson;
-        try {
-            tokenJson = provider.getRestAdapter(context).create(NetworkService.class).getToken(username, password);
-        } catch (RetrofitError e) {
-            throw e;
-        }
+		JsonObject tokenJson;
+		try {
+			tokenJson = provider.getRestAdapter(context).create(NetworkService.class).getToken(username, password);
+		} catch (RetrofitError e) {
+			throw e;
+		}
 
-        String token = tokenJson.get("token").getAsString();
-        return token;
-    }
+		String token = tokenJson.get("token").getAsString();
+		return token;
+	}
 
-    /**
-     * Get current logged in user information
-     *
-     * @param context
-     * @return
-     */
-    public User getCurrentUser(Context context) {
-        JsonObject result = provider.getRestAdapter(context).create(NetworkService.class).getCurrentUser();
+	/**
+	 * Get current logged in user information
+	 *
+	 * @param context
+	 * @return
+	 */
+	public User getCurrentUser(Context context) {
+		JsonObject result = provider.getRestAdapter(context).create(NetworkService.class).getCurrentUser();
 
-        // WTF is this shit :| Fuck Realm
-        Realm realm = Realm.getInstance(context);
-        realm.beginTransaction();
-        User user = realm.createObject(User.class);
-        user.setId(result.get("id").getAsLong());
-        user.setFirstName(result.get("first_name").getAsString());
-        user.setLastName(result.get("last_name").getAsString());
-        user.setUsername(result.get("username").getAsString());
-        user.setEmail(result.get("email").getAsString());
-        user.setFullName(result.get("full_name").getAsString());
-        user.setRole(result.get("role").getAsLong());
-        user.setRoleName(result.get("role_name").getAsString());
-        user.setDepotCode(result.get("depot_code").getAsString());
-        user.setAvatarUrl(result.get("avatar_url").getAsString());
-        realm.commitTransaction();
+		// WTF is this shit :| Fuck Realm
+		Realm realm = Realm.getInstance(context);
+		realm.beginTransaction();
+		User user = realm.createObject(User.class);
+		user.setId(result.get("id").getAsLong());
+		user.setFirstName(result.get("first_name").getAsString());
+		user.setLastName(result.get("last_name").getAsString());
+		user.setUsername(result.get("username").getAsString());
+		user.setEmail(result.get("email").getAsString());
+		user.setFullName(result.get("full_name").getAsString());
+		user.setRole(result.get("role").getAsLong());
+		user.setRoleName(result.get("role_name").getAsString());
+		user.setDepotCode(result.get("depot_code").getAsString());
+		user.setAvatarUrl(result.get("avatar_url").getAsString());
+		realm.commitTransaction();
 
-        return user;
-    }
+		return user;
+	}
 
-    public void uploadImage(Context context) {
-        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.CJAY_TMP_STORAGE).build();
-        File image = new File("storage/sdcard0/DCIM/CJay/DemoDepotCode/2014-10-06/gate-in/ContainerId/DemoDepotCode-2014-10-06-DemoimageType-ContainerId-DemoOperatorCode-ee58e92d-77c0-493c-9a33-2de38a626bd7.jpg");
-        TypedFile typedFile = new TypedFile("image/png", image);
-        restAdapter.create(NetworkService.class).postImageFile("image/jpeg", "media", "DemoDepotCode-2014-10-06-DemoimageType-ContainerId-DemoOperatorCode-ee58e92d-77c0-493c-9a33-2de38a626bd7.jpg", typedFile, new Callback<Response>() {
-            @Override
-            public void success(Response response, Response response2) {
+	public void uploadImage(Context context) {
+		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.CJAY_TMP_STORAGE).build();
+		File image = new File("storage/sdcard0/DCIM/CJay/DemoDepotCode/2014-10-06/gate-in/ContainerId/DemoDepotCode-2014-10-06-DemoimageType-ContainerId-DemoOperatorCode-ee58e92d-77c0-493c-9a33-2de38a626bd7.jpg");
+		TypedFile typedFile = new TypedFile("image/png", image);
+		restAdapter.create(NetworkService.class).postImageFile("image/jpeg", "media", "DemoDepotCode-2014-10-06-DemoimageType-ContainerId-DemoOperatorCode-ee58e92d-77c0-493c-9a33-2de38a626bd7.jpg", typedFile, new Callback<Response>() {
+			@Override
+			public void success(Response response, Response response2) {
 
-                Logger.e(response.getUrl());
-                Logger.e(response.getHeaders().toString());
-            }
+				Logger.e(response.getUrl());
+				Logger.e(response.getHeaders().toString());
+			}
 
-            @Override
-            public void failure(RetrofitError error) {
-                Logger.e(error.toString());
-            }
-        });
-    }
+			@Override
+			public void failure(RetrofitError error) {
+				Logger.e(error.toString());
+			}
+		});
+	}
 
-    public void uploadContainerSession(Context context, Session containerSession) {
-        provider.getRestAdapter(context).create(NetworkService.class).postContainer("", "");
-    }
+	public void uploadContainerSession(Context context, Session containerSession) {
+		provider.getRestAdapter(context).create(NetworkService.class).postContainer("", "");
+	}
 
-    /**
-     * Get repair iso codes based on lastModifiedDate
-     *
-     * @param context
-     * @param lastModifiedDate
-     * @return
-     */
-    public List<IsoCode> getRepairCodes(Context context, String lastModifiedDate) {
+	/**
+	 * Get repair iso codes based on lastModifiedDate
+	 *
+	 * @param context
+	 * @param lastModifiedDate
+	 * @return
+	 */
+	public List<IsoCode> getRepairCodes(Context context, String lastModifiedDate) {
 
-        JsonArray results = provider.getRestAdapter(context).create(NetworkService.class).getRepairCodes
-                (lastModifiedDate);
+		JsonArray results = provider.getRestAdapter(context).create(NetworkService.class).getRepairCodes
+				(lastModifiedDate);
 
 
-        List<IsoCode> items = new ArrayList<IsoCode>();
+		List<IsoCode> items = new ArrayList<IsoCode>();
 
-        // Store the retrieved items to the Realm
-        Realm realm = Realm.getInstance(context);
+		// Store the retrieved items to the Realm
+		Realm realm = Realm.getInstance(context);
 
-        // Open a transaction to store items into the realm
-        realm.beginTransaction();
-        for (JsonElement e : results) {
+		// Open a transaction to store items into the realm
+		realm.beginTransaction();
+		for (JsonElement e : results) {
 
-            // Create a realm capable object
-            IsoCode code = realm.createObject(IsoCode.class);
-            code.setId(e.getAsJsonObject().get("id").getAsLong());
-            code.setCode(e.getAsJsonObject().get("code").getAsString());
-            code.setFullName(e.getAsJsonObject().get("full_name").getAsString());
-            items.add(code);
-        }
-        realm.commitTransaction();
+			// Create a realm capable object
+			IsoCode code = realm.createObject(IsoCode.class);
+			code.setId(e.getAsJsonObject().get("id").getAsLong());
+			code.setCode(e.getAsJsonObject().get("code").getAsString());
+			code.setFullName(e.getAsJsonObject().get("full_name").getAsString());
+			items.add(code);
+		}
+		realm.commitTransaction();
 
-        return items;
-    }
+		return items;
+	}
 
-    /**
-     * Get damage iso codes based on lastModifiedDate
-     *
-     * @param context
-     * @param lastModifiedDate
-     * @return
-     */
-    public List<IsoCode> getDamageCodes(Context context, String lastModifiedDate) {
-        JsonArray results = provider.getRestAdapter(context).create(NetworkService.class).getDamageCodes
-                (lastModifiedDate);
+	/**
+	 * Get damage iso codes based on lastModifiedDate
+	 *
+	 * @param context
+	 * @param lastModifiedDate
+	 * @return
+	 */
+	public List<IsoCode> getDamageCodes(Context context, String lastModifiedDate) {
+		JsonArray results = provider.getRestAdapter(context).create(NetworkService.class).getDamageCodes
+				(lastModifiedDate);
 
-        List<IsoCode> items = new ArrayList<IsoCode>();
+		List<IsoCode> items = new ArrayList<IsoCode>();
 
-        // Store the retrieved items to the Realm
-        Realm realm = Realm.getInstance(context);
+		// Store the retrieved items to the Realm
+		Realm realm = Realm.getInstance(context);
 
-        // Open a transaction to store items into the realm
-        realm.beginTransaction();
-        for (JsonElement e : results) {
+		// Open a transaction to store items into the realm
+		realm.beginTransaction();
+		for (JsonElement e : results) {
 
-            // Create a realm capable object
-            IsoCode code = realm.createObject(IsoCode.class);
-            code.setId(e.getAsJsonObject().get("id").getAsLong());
-            code.setCode(e.getAsJsonObject().get("code").getAsString());
-            code.setFullName(e.getAsJsonObject().get("full_name").getAsString());
-            items.add(code);
-        }
-        realm.commitTransaction();
+			// Create a realm capable object
+			IsoCode code = realm.createObject(IsoCode.class);
+			code.setId(e.getAsJsonObject().get("id").getAsLong());
+			code.setCode(e.getAsJsonObject().get("code").getAsString());
+			code.setFullName(e.getAsJsonObject().get("full_name").getAsString());
+			items.add(code);
+		}
+		realm.commitTransaction();
 
-        return items;
-    }
+		return items;
+	}
 
-    /**
-     * Get component iso codes based on lastModifiedDate
-     *
-     * @param context
-     * @param lastModifiedDate
-     * @return
-     */
-    public List<IsoCode> getComponentCodes(Context context, String lastModifiedDate) {
-        JsonArray results = provider.getRestAdapter(context).create(NetworkService.class).getComponentCodes(lastModifiedDate);
+	/**
+	 * Get component iso codes based on lastModifiedDate
+	 *
+	 * @param context
+	 * @param lastModifiedDate
+	 * @return
+	 */
+	public List<IsoCode> getComponentCodes(Context context, String lastModifiedDate) {
+		JsonArray results = provider.getRestAdapter(context).create(NetworkService.class).getComponentCodes(lastModifiedDate);
 
-        List<IsoCode> items = new ArrayList<IsoCode>();
+		List<IsoCode> items = new ArrayList<IsoCode>();
 
-        // Store the retrieved items to the Realm
-        Realm realm = Realm.getInstance(context);
+		// Store the retrieved items to the Realm
+		Realm realm = Realm.getInstance(context);
 
-        // Open a transaction to store items into the realm
-        realm.beginTransaction();
-        for (JsonElement e : results) {
+		// Open a transaction to store items into the realm
+		realm.beginTransaction();
+		for (JsonElement e : results) {
 
-            // Create a realm capable object
-            IsoCode code = realm.createObject(IsoCode.class);
-            code.setId(e.getAsJsonObject().get("id").getAsLong());
-            code.setCode(e.getAsJsonObject().get("code").getAsString());
-            code.setFullName(e.getAsJsonObject().get("full_name").getAsString());
-            items.add(code);
-        }
-        realm.commitTransaction();
+			// Create a realm capable object
+			IsoCode code = realm.createObject(IsoCode.class);
+			code.setId(e.getAsJsonObject().get("id").getAsLong());
+			code.setCode(e.getAsJsonObject().get("code").getAsString());
+			code.setFullName(e.getAsJsonObject().get("full_name").getAsString());
+			items.add(code);
+		}
+		realm.commitTransaction();
 
-        return items;
-    }
+		return items;
+	}
 
-    /**
-     * Get operator based on lastModifiedDate.
-     *
-     * @param context
-     * @param lastModifiedDate
-     * @return
-     */
-    public List<Operator> getOperators(Context context, String lastModifiedDate) {
+	/**
+	 * Get operator based on lastModifiedDate.
+	 *
+	 * @param context
+	 * @param lastModifiedDate
+	 * @return
+	 */
+	public List<Operator> getOperators(Context context, String lastModifiedDate) {
 
-        JsonArray results = provider.getRestAdapter(context).create(NetworkService.class).getOperators(lastModifiedDate);
-        List<Operator> items = new ArrayList<Operator>();
+		JsonArray results = provider.getRestAdapter(context).create(NetworkService.class).getOperators(lastModifiedDate);
+		List<Operator> items = new ArrayList<Operator>();
 
 //		// Clear the realm from last time
 //		Realm.deleteRealmFile(context);
@@ -302,7 +302,7 @@ public class NetworkClient {
                 sessions = getAllSessionsByPage(context, 1);
             } else {
                 //Get by lastModifiedDay
-                JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionsByModifiedDay(lastModifiedDate);
+                JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionsByModifiedTime(lastModifiedDate);
                 next = jsonObject.get("next");
                 String nextString = next.toString();
                 //get page number of fist page
@@ -427,5 +427,6 @@ public class NetworkClient {
     public List<Session> searchSessions(Context context, String keyword) {
         return null;
     }
+
 
 }

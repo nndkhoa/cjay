@@ -20,7 +20,6 @@ import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
-import com.commonsware.cwac.camera.CameraFragment;
 import com.commonsware.cwac.camera.CameraHost;
 import com.commonsware.cwac.camera.CameraUtils;
 import com.commonsware.cwac.camera.PictureTransaction;
@@ -31,7 +30,7 @@ import java.io.FileOutputStream;
 import java.util.List;
 import java.util.UUID;
 
-public class DemoCameraFragment extends CameraFragment {
+public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
     private static final int PICTURE_SIZE_MAX_WIDTH = 640;
     private static final int PREVIEW_SIZE_MAX_WIDTH = 1280;
@@ -54,9 +53,8 @@ public class DemoCameraFragment extends CameraFragment {
     String depotCode;
     String operatorCode;
 
-	public static DemoCameraFragment newInstance(boolean useFFC) {
-		Logger.Log("new DemoCameraFragment");
-		DemoCameraFragment f = new DemoCameraFragment();
+	public static CameraFragment newInstance(boolean useFFC) {
+		CameraFragment f = new CameraFragment();
 		Bundle args = new Bundle();
 		args.putBoolean(KEY_USE_FFC, useFFC);
 		f.setArguments(args);
@@ -143,9 +141,16 @@ public class DemoCameraFragment extends CameraFragment {
         btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                // Close Camera
+                getActivity().finish();
             }
         });
+
+        // If we are in import step, use continuing shot only
+        if (mType == 0) {
+            getContract().setSingleShotMode(false);
+            btnCameraMode.setVisibility(View.INVISIBLE);
+        }
 
         return (results);
 	}
@@ -216,7 +221,8 @@ public class DemoCameraFragment extends CameraFragment {
 
         @Override
         public boolean useSingleShotMode() {
-            return (!btnCameraMode.isChecked());
+            //return (!btnCameraMode.isChecked());
+            return (getContract().isSingleShotMode());
         }
 
         /**
@@ -229,13 +235,6 @@ public class DemoCameraFragment extends CameraFragment {
         public void saveImage(PictureTransaction xact, Bitmap capturedBitmap) {
 
             // TODO: Checkout cjay v1 flow
-
-            // Convert rotated byte[] to Bitmap
-            //Bitmap capturedBitmap = saveToBitmap(image);
-
-            if (null == capturedBitmap) {
-                Logger.Log("capturedBitmap is null");
-            }
 
             // Save Bitmap to Files
             String uuid = UUID.randomUUID().toString();
@@ -261,13 +260,9 @@ public class DemoCameraFragment extends CameraFragment {
                     break;
             }
 
-            // file name example:
-            // [depot-code]-2013-12-19-[gate-in|gate-out|report]-[containerId]-[UUID].jpg
-
             //create today String
             String today = StringHelper.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
             depotCode = PreferencesUtil.getPrefsValue(getActivity(), PreferencesUtil.PREF_USER_DEPOT);
-
 
             //create image file name
 	        // TODO: @nam add real values
@@ -291,7 +286,6 @@ public class DemoCameraFragment extends CameraFragment {
                     }
                 });
 
-                //Todo: Open Dialg and Process here
                 // DisplayActivity.imageToShow = ca //image;
                 // startActivity(new Intent(getActivity(), DisplayActivity.class));*/
             }
@@ -299,6 +293,9 @@ public class DemoCameraFragment extends CameraFragment {
             // Save Bitmap to JPEG
             File photo = new File(newDirectory, fileName);
             saveBitmapToFile(capturedBitmap, photo);
+
+            // TODO: upload image to server
+            // image location: @photo
         }
 
         void saveBitmapToFile(Bitmap bitmap, File filename) {

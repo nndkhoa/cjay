@@ -1,8 +1,7 @@
-package com.cloudjay.cjay.jobqueue;
+package com.cloudjay.cjay.task.jobqueue;
 
 import android.content.Context;
 
-import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;

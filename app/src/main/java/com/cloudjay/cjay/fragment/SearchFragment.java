@@ -38,10 +38,10 @@ public class SearchFragment extends Fragment {
 
 	@Click(R.id.btn_search)
 	void buttonSearchClicked() {
+
 		String containerID = etSearch.getText().toString();
 		if (TextUtils.isEmpty(containerID)) {
 			etSearch.setError(getString(R.string.dialog_container_id_required));
-
 		} else if (!Utils.simpleValid(containerID)) {
 			etSearch.setError(getString(R.string.dialog_container_id_invalid));
 			return;
@@ -58,6 +58,7 @@ public class SearchFragment extends Fragment {
 
 	@AfterViews
     void doAfterViews() {
+
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

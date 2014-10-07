@@ -71,7 +71,9 @@
 
     <!-- Camera Button -->
     <string name="camera_done">Done</string>
+    <string name="require_select_operator_first">Vui lòng chọn hãng tàu trước khi chụp</string>
 
     <!-- Dialog Search Operator -->
-    <string name="dialog_container_owner">Danh sách hãng tàu</string>
+    <string name="dialog_container_owner">Hãng tàu</string>
+    <string name="dialog_operator_title">Danh sách hãng tàu</string>
 </resources>

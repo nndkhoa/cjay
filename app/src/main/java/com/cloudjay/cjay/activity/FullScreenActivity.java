@@ -2,22 +2,20 @@ package com.cloudjay.cjay.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.fragment.DemoCameraFragment;
+import com.cloudjay.cjay.fragment.CameraFragment;
 
-public class FullScreenActivity extends Activity implements DemoCameraFragment.Contract {
-	DemoCameraFragment frag = null;
+public class FullScreenActivity extends Activity implements CameraFragment.Contract {
+	CameraFragment frag = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_full_screen);
-		frag = (DemoCameraFragment) getFragmentManager().findFragmentById(R.id.camera_preview);
+		frag = (CameraFragment) getFragmentManager().findFragmentById(R.id.camera_preview);
 	}
 
 	@Override
