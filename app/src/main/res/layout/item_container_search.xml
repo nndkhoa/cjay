@@ -23,7 +23,7 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:id="@+id/tv_containerID"
+			android:id="@+id/tv_container_id"
 			android:text="AUDY12983750"
 			android:layout_alignParentRight="true"/>
 	</RelativeLayout>
@@ -61,7 +61,7 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:id="@+id/dayIn"
+			android:id="@+id/tv_date_in"
 			android:text="10-12-1991"
 			android:layout_alignParentRight="true"/>
 	</RelativeLayout>
@@ -80,7 +80,7 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:id="@+id/tv_dayOut"
+			android:id="@+id/tv_date_out"
 			android:text="10-12-1991"
 			android:layout_alignParentRight="true"/>
 	</RelativeLayout>
@@ -99,7 +99,7 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:id="@+id/tv_dayEstimate"
+			android:id="@+id/tv_date_estimate"
 			android:text="10-12-1991"
 			android:layout_alignParentRight="true"/>
 	</RelativeLayout>
@@ -118,7 +118,7 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:id="@+id/tv_dayRepair"
+			android:id="@+id/tv_date_repair"
 			android:text="AUDY12983750"
 			android:layout_alignParentRight="true"/>
 	</RelativeLayout>
@@ -175,7 +175,7 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:id="@+id/tv_status"
+			android:id="@+id/tv_current_status"
 			android:text="A"
 			android:layout_alignParentRight="true"/>
 	</RelativeLayout>

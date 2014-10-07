@@ -1,17 +1,12 @@
-package com.cloudjay.cjay.jobqueue;
+package com.cloudjay.cjay.task.jobqueue;
 
 import android.content.Context;
-import android.util.Log;
 
-import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
-
-import org.androidannotations.annotations.Bean;
-import org.androidannotations.annotations.EBean;
 
 import java.util.List;
 
@@ -23,23 +18,28 @@ import java.util.List;
 public class GetAllSessionsJob extends Job {
 
     Context context;
+    boolean isFetchByTime;
 
-
-    public GetAllSessionsJob(Context context) {
+    /**
+     * Fetch data from server
+     * @param context
+     * @param isFetchByTime
+     */
+    public GetAllSessionsJob(Context context, boolean isFetchByTime) {
         super(new Params(1).requireNetwork());
         this.context = context;
+        this.isFetchByTime = isFetchByTime;
     }
 
     @Override
     public void onAdded() {
-        Logger.Log("Add Fetch Job");
     }
 
     @Override
     public void onRun() throws Throwable {
-        Logger.Log("Feching data");
+        Logger.e("Running Fetch Job");
         NetworkClient networkClient = new NetworkClient(context);
-        List<Session> sessions = networkClient.getAllSessions(context, false);
+        List<Session> sessions = networkClient.getAllSessions(context, isFetchByTime);
 
     }
 
