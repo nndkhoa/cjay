@@ -4,11 +4,11 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.adapter.AbstractDataLoader;
+import com.cloudjay.cjay.util.loader.AbstractDataLoader;
+import com.cloudjay.cjay.adapter.SessionAdapter;
 import com.cloudjay.cjay.model.Session;
 
 import org.androidannotations.annotations.AfterViews;
@@ -26,7 +26,7 @@ public class WorkingFragment extends Fragment implements LoaderManager.LoaderCal
 	@ViewById(R.id.lv_search_container)
 	ListView mFeedListView;
 
-	private ArrayAdapter mAdapter;
+	private SessionAdapter mAdapter;
 
 	public WorkingFragment() {
 		// Required empty public constructor
@@ -35,7 +35,7 @@ public class WorkingFragment extends Fragment implements LoaderManager.LoaderCal
 	@AfterViews
 	void initLoader() {
 		getLoaderManager().initLoader(LOADER_ID, null, this);
-		mAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1);
+		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
 		mFeedListView.setAdapter(mAdapter);
 	}
 
@@ -54,16 +54,9 @@ public class WorkingFragment extends Fragment implements LoaderManager.LoaderCal
 	@Override
 	public void onLoadFinished(Loader<RealmResults<Session>> loader, RealmResults<Session> data) {
 		mAdapter.clear();
-
 		for(Session session : data){
 			mAdapter.add(session);
 		}
-
-//		if (isResumed()) {
-//			setListShown(true);
-//		} else {
-//			setListShownNoAnimation(true);
-//		}
 	}
 
 	@Override

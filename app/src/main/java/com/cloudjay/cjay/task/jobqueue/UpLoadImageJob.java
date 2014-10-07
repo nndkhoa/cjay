@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.jobqueue;
+package com.cloudjay.cjay.task.jobqueue;
 
 import android.content.Context;
 
@@ -6,9 +6,6 @@ import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
-
-import org.androidannotations.annotations.Bean;
-import org.androidannotations.annotations.EBean;
 
 /**
  * Created by thai on 04/10/2014.

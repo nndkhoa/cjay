@@ -1,17 +1,12 @@
-package com.cloudjay.cjay.jobqueue;
+package com.cloudjay.cjay.task.jobqueue;
 
 import android.content.Context;
-import android.util.Log;
 
-import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
-
-import org.androidannotations.annotations.Bean;
-import org.androidannotations.annotations.EBean;
 
 import java.util.List;
 

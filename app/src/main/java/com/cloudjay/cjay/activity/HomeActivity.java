@@ -18,7 +18,6 @@ import com.cloudjay.cjay.event.SessionsFetchedEvent;
 import com.cloudjay.cjay.fragment.SearchFragment_;
 import com.cloudjay.cjay.fragment.UploadFragment_;
 import com.cloudjay.cjay.fragment.WorkingFragment_;
-import com.cloudjay.cjay.jobqueue.GetAllSessionsJob;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.path.android.jobqueue.JobManager;
 
@@ -61,8 +60,8 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 			configureViewPager();
 
 			// Set Job Queue to get all sessions after login
-			jobManager = new JobManager(getApplicationContext());
-			jobManager.addJobInBackground(new GetAllSessionsJob(this));
+//			jobManager = new JobManager(getApplicationContext());
+//			jobManager.addJobInBackground(new GetAllSessionsJob(this));
 		}
 	}
 

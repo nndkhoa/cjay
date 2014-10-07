@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.adapter;
+package com.cloudjay.cjay.util.loader;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
