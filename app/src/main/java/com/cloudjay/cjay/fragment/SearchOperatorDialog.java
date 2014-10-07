@@ -10,6 +10,7 @@ import android.widget.Toast;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.OperatorAdapter;
+import com.cloudjay.cjay.event.OperatorCallbackEvent;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.model.Operator;
 
@@ -75,8 +76,8 @@ public class SearchOperatorDialog extends DialogFragment {
 
     @ItemClick(R.id.lv_operators_list)
     void listViewOperatorsItemClicked(Operator selectedOperator) {
-        Toast.makeText(getActivity(), "selected: " + selectedOperator.getOperatorName(),
-                Toast.LENGTH_SHORT).show();
+        EventBus.getDefault().post(new OperatorCallbackEvent(selectedOperator));
+        this.dismiss();
     }
 
     private void search(String searchText) {
