@@ -13,6 +13,9 @@ import com.cloudjay.cjay.model.Session;
 
 import java.util.List;
 
+/**
+ * Adapter for list container sessions
+ */
 public class SessionAdapter extends ArrayAdapter<Session> {
 
 	private LayoutInflater mInflater;
@@ -43,9 +46,9 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		Session session = getItem(position);
 
+		// Apply ViewHolder pattern for better performance
 		ViewHolder viewHolder;
 		if (convertView == null) {
-
 			convertView = mInflater.inflate(layoutResId, parent, false);
 			viewHolder = new ViewHolder();
 
@@ -59,8 +62,8 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 			viewHolder.tvCurrentStatus = (TextView) convertView.findViewById(R.id.tv_current_status);
 			viewHolder.tvStep = (TextView) convertView.findViewById(R.id.tv_step);
 
-//			viewHolder.btnSubmit = (Button) convertView.findViewById(R.id.btn_submit);
-//			viewHolder.btnContinue = (Button) convertView.findViewById(R.id.btn_continue);
+			viewHolder.btnSubmit = (Button) convertView.findViewById(R.id.btn_submit);
+			viewHolder.btnContinue = (Button) convertView.findViewById(R.id.btn_continue);
 
 			convertView.setTag(viewHolder);
 		} else {

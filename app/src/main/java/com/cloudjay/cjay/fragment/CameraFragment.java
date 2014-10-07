@@ -14,7 +14,11 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.event.ImageCapturedEvent;
+import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -29,6 +33,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
 import java.util.UUID;
+
+import de.greenrobot.event.EventBus;
+import io.realm.RealmResults;
 
 public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
@@ -92,67 +99,68 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		View results = inflater.inflate(R.layout.fragment_demo_camera, container, false);
 
 		((ViewGroup) results.findViewById(R.id.camera)).addView(cameraView);
-		btnTakePicture = (ImageButton) results.findViewById(R.id.btn_capture);
-		btnTakePicture.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				btnTakePicture.setEnabled(false);
-				autoFocus();
-			}
-		});
+        btnTakePicture = (ImageButton) results.findViewById(R.id.btn_capture);
+        btnTakePicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                btnTakePicture.setEnabled(false);
+                autoFocus();
+            }
+        });
 
-		btnFlashMode = (ImageButton) results.findViewById(R.id.btn_toggle_flash);
-		btnFlashMode.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				if (flashMode.equals("off")) {
-					Logger.Log("Set auto");
-					flashMode = "auto";
-					btnFlashMode.setImageResource(R.drawable.ic_flash_auto);
-				} else if (flashMode.equals("auto")) {
-					Logger.Log("Set on");
-					flashMode = "on";
-					btnFlashMode.setImageResource(R.drawable.ic_flash_on);
-				} else if (flashMode.equals("on")) {
-					Logger.Log("Set off");
-					flashMode = "off";
-					btnFlashMode.setImageResource(R.drawable.ic_flash_off);
-				}
-			}
-		});
+        btnFlashMode = (ImageButton) results.findViewById(R.id.btn_toggle_flash);
+        btnFlashMode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (flashMode.equals("off")) {
+                    Logger.Log("Set auto");
+                    flashMode = "auto";
+                    btnFlashMode.setImageResource(R.drawable.ic_flash_auto);
+                } else if (flashMode.equals("auto")) {
+                    Logger.Log("Set on");
+                    flashMode = "on";
+                    btnFlashMode.setImageResource(R.drawable.ic_flash_on);
+                } else if (flashMode.equals("on")) {
+                    Logger.Log("Set off");
+                    flashMode = "off";
+                    btnFlashMode.setImageResource(R.drawable.ic_flash_off);
+                }
+            }
+        });
 
-		btnCameraMode = (ToggleButton) results.findViewById(R.id.btn_capture_mode);
-		btnCameraMode.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				if (btnCameraMode.isChecked() == true) {
-					getContract().setSingleShotMode(false);
-					Logger.Log("Single shot mode: " + getContract().isSingleShotMode());
-					Toast.makeText(getActivity(), "Kích hoạt chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
-				} else {
-					getContract().setSingleShotMode(true);
-					Logger.Log("Single shot mode: " + getContract().isSingleShotMode());
-					Toast.makeText(getActivity(), "Đã dừng chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
-				}
-			}
-		});
+        btnCameraMode = (ToggleButton) results.findViewById(R.id.btn_capture_mode);
+        btnCameraMode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (btnCameraMode.isChecked() == true) {
+                    getContract().setSingleShotMode(false);
+                    Logger.Log("Single shot mode: " + getContract().isSingleShotMode());
+                    Toast.makeText(getActivity(), "Kích hoạt chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
+                } else {
+                    getContract().setSingleShotMode(true);
+                    Logger.Log("Single shot mode: " + getContract().isSingleShotMode());
+                    Toast.makeText(getActivity(), "Đã dừng chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
-		btnDone = (Button) results.findViewById(R.id.btn_camera_done);
-		btnDone.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				// Close Camera
-				getActivity().finish();
-			}
-		});
+        btnDone = (Button) results.findViewById(R.id.btn_camera_done);
+        btnDone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Close Camera
+                // DataCenter_.getInstance_(getActivity()).getGateImages(mType, containerId);
+                getActivity().finish();
+            }
+        });
 
-		// If we are in import step, use continuing shot only
-		if (mType == 0) {
-			getContract().setSingleShotMode(false);
-			btnCameraMode.setVisibility(View.INVISIBLE);
-		}
+        // If we are in import step, use continuing shot only
+        if (mType == 0) {
+            getContract().setSingleShotMode(false);
+            btnCameraMode.setVisibility(View.INVISIBLE);
+        }
 
-		return (results);
+        return (results);
 	}
 
 	@Override
@@ -204,200 +212,211 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 	class DemoCameraHost extends SimpleCameraHost implements
 			Camera.FaceDetectionListener {
-		boolean supportsFaces = false;
 
-		public DemoCameraHost(Context _ctxt) {
-			super(_ctxt);
-		}
+        boolean supportsFaces = false;
 
-		@Override
-		public boolean useFrontFacingCamera() {
-			if (getArguments() == null) {
-				return (false);
-			}
+        public DemoCameraHost(Context _ctxt) {
+            super(_ctxt);
+        }
 
-			return (getArguments().getBoolean(KEY_USE_FFC));
-		}
+        @Override
+        public boolean useFrontFacingCamera() {
+            if (getArguments() == null) {
+                return (false);
+            }
 
-		@Override
-		public boolean useSingleShotMode() {
-			//return (!btnCameraMode.isChecked());
-			return (getContract().isSingleShotMode());
-		}
+            return (getArguments().getBoolean(KEY_USE_FFC));
+        }
 
-		/**
-		 * Process taken picture
-		 *
-		 * @param xact
-		 * @param capturedBitmap
-		 */
-		@Override
-		public void saveImage(PictureTransaction xact, Bitmap capturedBitmap) {
+        @Override
+        public boolean useSingleShotMode() {
+            //return (!btnCameraMode.isChecked());
+            return (getContract().isSingleShotMode());
+        }
 
-			// TODO: Checkout cjay v1 flow
+        /**
+         * Process taken picture
+         *
+         * @param xact
+         * @param capturedBitmap
+         */
+        @Override
+        public void saveImage(PictureTransaction xact, Bitmap capturedBitmap) {
 
-			// Save Bitmap to Files
-			String uuid = UUID.randomUUID().toString();
+            // TODO: Checkout cjay v1 flow
 
-			String imageType;
-			ImageType type = ImageType.values()[mType];
-			switch (type) {
-				case IMPORT:
-					imageType = "gate-in";
-					break;
+            // Save Bitmap to Files
+            String uuid = UUID.randomUUID().toString();
 
-				case EXPORT:
-					imageType = "gate-out";
-					break;
+            String imageType;
+	        ImageType type = ImageType.values()[mType];
+            switch (type) {
+                case IMPORT:
+                    imageType = "gate-in";
+                    break;
 
-				case AUDIT:
-					imageType = "auditor";
-					break;
+                case EXPORT:
+                    imageType = "gate-out";
+                    break;
 
-				case REPAIRED:
-				default:
-					imageType = "repair";
-					break;
-			}
+                case AUDIT:
+                    imageType = "auditor";
+                    break;
 
-			//create today String
-			String today = StringHelper.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
-			depotCode = PreferencesUtil.getPrefsValue(getActivity(), PreferencesUtil.PREF_USER_DEPOT);
+                case REPAIRED:
+                default:
+                    imageType = "repair";
+                    break;
+            }
 
-			//create image file name
-			// TODO: @nam add real values
-			String fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-" + operatorCode + "-"
-					+ uuid + ".jpg";
+            //create today String
+            String today = StringHelper.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
+            depotCode = PreferencesUtil.getPrefsValue(getActivity(), PreferencesUtil.PREF_USER_DEPOT);
 
-			//create directory to save images
-			File newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/" + today + "/" + imageType
-					+ "/" + containerId);
-			if (!newDirectory.exists()) {
-				newDirectory.mkdirs();
-			}
+            //create image file name
+	        // TODO: @nam add real values
+            String fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-" + operatorCode + "-"
+                    + uuid + ".jpg";
 
-			if (useSingleShotMode()) {
-				singleShotProcessing = false;
+            //create directory to save images
+            File newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/" + today + "/" + imageType
+                    + "/" + containerId);
+            if (!newDirectory.exists()) {
+                newDirectory.mkdirs();
+            }
 
-				getActivity().runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						btnTakePicture.setEnabled(true);
-					}
-				});
+            if (useSingleShotMode()) {
+                singleShotProcessing = false;
 
-				// DisplayActivity.imageToShow = ca //image;
-				// startActivity(new Intent(getActivity(), DisplayActivity.class));*/
-			}
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        btnTakePicture.setEnabled(true);
+                    }
+                });
 
-			// Save Bitmap to JPEG
-			File photo = new File(newDirectory, fileName);
-			saveBitmapToFile(capturedBitmap, photo);
+                // DisplayActivity.imageToShow = ca //image;
+                // startActivity(new Intent(getActivity(), DisplayActivity.class));*/
+            }
 
-			// TODO: upload image to server
-			// image location: @photo
-		}
+            // Save Bitmap to JPEG
+            File photo = new File(newDirectory, fileName);
+            saveBitmapToFile(capturedBitmap, photo);
 
-		void saveBitmapToFile(Bitmap bitmap, File filename) {
-			Logger.Log("File name: " + filename);
-			try {
+            uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
+        }
 
-				FileOutputStream out = new FileOutputStream(filename);
-				bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-				out.flush();
-				out.close();
+        void uploadImage(String uuid, String uri, String imageName) {
+            // 1. Save image to local db
+            Logger.Log("uri in uploadImage: " + uri);
+            DataCenter_.getInstance_(getActivity()).addGateImage(mType, uri);
+            EventBus.getDefault().post(new ImageCapturedEvent(uri));
+            Logger.Log("save image to realm successfully");
 
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+            // 2. TODO: upload image
 
-		@Override
-		public void autoFocusAvailable() {
-			if (supportsFaces)
-				startFaceDetection();
-		}
+        }
 
-		@Override
-		public void autoFocusUnavailable() {
-		}
+        void saveBitmapToFile(Bitmap bitmap, File filename) {
+            Logger.Log("File name: " + filename);
+            try {
 
-		@Override
-		public void onCameraFail(CameraHost.FailureReason reason) {
-			super.onCameraFail(reason);
+                FileOutputStream out = new FileOutputStream(filename);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                out.flush();
+                out.close();
 
-			Toast.makeText(getActivity(),
-					"Sorry, but you cannot use the camera now!",
-					Toast.LENGTH_LONG).show();
-		}
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
-		@Override
-		public Camera.Parameters adjustPreviewParameters(Camera.Parameters parameters) {
-			flashMode =
-					CameraUtils.findBestFlashModeMatch(parameters,
-							Camera.Parameters.FLASH_MODE_RED_EYE,
-							Camera.Parameters.FLASH_MODE_AUTO,
-							Camera.Parameters.FLASH_MODE_ON);
+        @Override
+        public void autoFocusAvailable() {
+            if (supportsFaces)
+                startFaceDetection();
+        }
 
-			if (parameters.getMaxNumDetectedFaces() > 0) {
-				supportsFaces = true;
-			} else {
-				Toast.makeText(getActivity(),
-						"Face detection not available for this camera",
-						Toast.LENGTH_LONG).show();
-			}
+        @Override
+        public void autoFocusUnavailable() {
+        }
 
-			return (super.adjustPreviewParameters(parameters));
-		}
+        @Override
+        public void onCameraFail(CameraHost.FailureReason reason) {
+            super.onCameraFail(reason);
 
-		@Override
-		public void onFaceDetection(Camera.Face[] faces, Camera camera) {
-			if (faces.length > 0) {
-				long now = SystemClock.elapsedRealtime();
+            Toast.makeText(getActivity(),
+                    "Sorry, but you cannot use the camera now!",
+                    Toast.LENGTH_LONG).show();
+        }
 
-				if (now > lastFaceToast + 10000) {
-					Toast.makeText(getActivity(), "I see your face!",
-							Toast.LENGTH_LONG).show();
-					lastFaceToast = now;
-				}
-			}
-		}
+        @Override
+        public Camera.Parameters adjustPreviewParameters(Camera.Parameters parameters) {
+            flashMode =
+                    CameraUtils.findBestFlashModeMatch(parameters,
+                            Camera.Parameters.FLASH_MODE_RED_EYE,
+                            Camera.Parameters.FLASH_MODE_AUTO,
+                            Camera.Parameters.FLASH_MODE_ON);
 
-		@Override
-		@TargetApi(16)
-		public void onAutoFocus(boolean success, Camera camera) {
-			super.onAutoFocus(success, camera);
+            if (parameters.getMaxNumDetectedFaces() > 0) {
+                supportsFaces = true;
+            } else {
+                Toast.makeText(getActivity(),
+                        "Face detection not available for this camera",
+                        Toast.LENGTH_LONG).show();
+            }
 
-			btnTakePicture.setEnabled(true);
-			takeSimplePicture();
-		}
+            return (super.adjustPreviewParameters(parameters));
+        }
 
-		protected Camera.Size determineBestSize(List<Camera.Size> sizes, int widthThreshold) {
-			Camera.Size bestSize = null;
+        @Override
+        public void onFaceDetection(Camera.Face[] faces, Camera camera) {
+            if (faces.length > 0) {
+                long now = SystemClock.elapsedRealtime();
 
-			for (Camera.Size currentSize : sizes) {
-				boolean isDesiredRatio = currentSize.width / 4 == currentSize.height / 3;
-				boolean isBetterSize = bestSize == null || currentSize.width > bestSize.width;
-				boolean isInBounds = currentSize.width <= PICTURE_SIZE_MAX_WIDTH;
+                if (now > lastFaceToast + 10000) {
+                    Toast.makeText(getActivity(), "I see your face!",
+                            Toast.LENGTH_LONG).show();
+                    lastFaceToast = now;
+                }
+            }
+        }
 
-				if (isDesiredRatio && isInBounds && isBetterSize) {
-					bestSize = currentSize;
-				}
-			}
+        @Override
+        @TargetApi(16)
+        public void onAutoFocus(boolean success, Camera camera) {
+            super.onAutoFocus(success, camera);
 
-			return bestSize;
-		}
+            btnTakePicture.setEnabled(true);
+            takeSimplePicture();
+        }
 
-		@Override
-		public Camera.Size getPreviewSize(int displayOrientation, int width, int height, Camera.Parameters parameters) {
-			List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
-			return determineBestSize(sizes, PREVIEW_SIZE_MAX_WIDTH);
-		}
+        protected Camera.Size determineBestSize(List<Camera.Size> sizes, int widthThreshold) {
+            Camera.Size bestSize = null;
 
-		@Override
-		public Camera.Size getPictureSize(PictureTransaction xact, Camera.Parameters parameters) {
-			List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
-			return determineBestSize(sizes, PICTURE_SIZE_MAX_WIDTH);
-		}
-	}
+            for (Camera.Size currentSize : sizes) {
+                boolean isDesiredRatio = currentSize.width / 4 == currentSize.height / 3;
+                boolean isBetterSize = bestSize == null || currentSize.width > bestSize.width;
+                boolean isInBounds = currentSize.width <= PICTURE_SIZE_MAX_WIDTH;
+
+                if (isDesiredRatio && isInBounds && isBetterSize) {
+                    bestSize = currentSize;
+                }
+            }
+
+            return bestSize;
+        }
+
+        @Override
+        public Camera.Size getPreviewSize(int displayOrientation, int width, int height, Camera.Parameters parameters) {
+            List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
+            return determineBestSize(sizes, PREVIEW_SIZE_MAX_WIDTH);
+        }
+
+        @Override
+        public Camera.Size getPictureSize(PictureTransaction xact, Camera.Parameters parameters) {
+            List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
+            return determineBestSize(sizes, PICTURE_SIZE_MAX_WIDTH);
+        }
+    }
 }
