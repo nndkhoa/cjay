@@ -46,7 +46,8 @@ public class SessionAdapter extends ArrayAdapter<Session> {
     public View getView(int position, View convertView, ViewGroup parent) {
         Session session = getItem(position);
 
-        boolean isSessionWorking;
+        boolean isSessionProcessing;
+        isSessionProcessing = session.isProcessing();
 
         // Apply ViewHolder pattern for better performance
         ViewHolder viewHolder;
@@ -64,16 +65,14 @@ public class SessionAdapter extends ArrayAdapter<Session> {
             viewHolder.tvCurrentStatus = (TextView) convertView.findViewById(R.id.tv_current_status);
             viewHolder.tvStep = (TextView) convertView.findViewById(R.id.tv_step);
 
-            if (isSessionWorking) {
-                viewHolder.btnSubmit = (Button) convertView.findViewById(R.id.btn_submit);
-                viewHolder.btnContinue = (Button) convertView.findViewById(R.id.btn_continue);
-            }
+            viewHolder.btnSubmit = (Button) convertView.findViewById(R.id.btn_submit);
+            viewHolder.btnContinue = (Button) convertView.findViewById(R.id.btn_continue);
 
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-//Set data to view
+        //Set data to view
         viewHolder.tvContainerId.setText(session.getContainerId());
         viewHolder.tvOperator.setText(session.getOperatorCode());
         viewHolder.tvDateIn.setText(String.valueOf(session.getCheckInTime()));
@@ -81,6 +80,11 @@ public class SessionAdapter extends ArrayAdapter<Session> {
         viewHolder.tvStep.setText(String.valueOf(session.getStep()));
         viewHolder.tvPreStatus.setText(String.valueOf(session.getPreStatus()));
         viewHolder.tvCurrentStatus.setText(String.valueOf(session.getStatus()));
+
+        if (!isSessionProcessing) {
+            viewHolder.btnContinue.setVisibility(View.GONE);
+            viewHolder.btnSubmit.setVisibility(View.GONE);
+        }
 
         return convertView;
     }

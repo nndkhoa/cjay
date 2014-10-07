@@ -28,6 +28,7 @@ import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -179,7 +180,7 @@ public class ImportFragment extends Fragment {
 
 	private void showDialogSearchOperator() {
 		FragmentManager fm = getActivity().getSupportFragmentManager();
-		SearchOperatorDialog searchOperatorDialog = new SearchOperatorDialog_();
+		SearchOperatorDialog_ searchOperatorDialog = new SearchOperatorDialog_();
 		searchOperatorDialog.setParent(this);
 		searchOperatorDialog.show(fm, "search_operator_dialog");
 	}

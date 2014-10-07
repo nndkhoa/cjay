@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.fragment;
+package com.cloudjay.cjay.fragment.dialog;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -58,6 +58,7 @@ public class AddContainerDialog extends android.support.v4.app.DialogFragment {
         if (!Utils.simpleValid(containerID)) {
             tvContainerIDSearch.setVisibility(View.GONE);
             etContainerID.setVisibility(View.VISIBLE);
+            etContainerID.setText(containerID);
         }
     }
 

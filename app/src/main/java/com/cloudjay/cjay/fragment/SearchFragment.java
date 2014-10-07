@@ -14,6 +14,9 @@ import android.widget.ListView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.adapter.SessionAdapter;
+import com.cloudjay.cjay.fragment.dialog.AddContainerDialog;
+import com.cloudjay.cjay.fragment.dialog.AddContainerDialog_;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -28,6 +31,13 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
+
+/**
+ *
+ */
 @EFragment(R.layout.fragment_search)
 public class SearchFragment extends Fragment {
 
@@ -44,6 +54,7 @@ public class SearchFragment extends Fragment {
     LinearLayout llLoginStatus;
 
     Pattern pattern = Pattern.compile("^[a-zA-Z]{4}");
+    private SessionAdapter mAdapter;
 
     public SearchFragment() {
     }
@@ -63,6 +74,8 @@ public class SearchFragment extends Fragment {
             } else {
                 List<Session> result = searchSession(containerID);
                 if (result != null) {
+                    mAdapter.clear();
+                    mAdapter.addAll(result);
                     refreshListView();
                 } else {
                     showAddContainerDialog(containerID);
@@ -87,7 +100,8 @@ public class SearchFragment extends Fragment {
 
     @AfterViews
     void doAfterViews() {
-
+        mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
+        lvSearch.setAdapter(mAdapter);
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -130,12 +144,16 @@ public class SearchFragment extends Fragment {
 
     //TODO refresh list view after search
     private void refreshListView() {
-
+        mAdapter.notifyDataSetChanged();
     }
 
     //TODO add logic search
     private List<Session> searchSession(String containeriD) {
-        return null;
+        Realm realm = Realm.getInstance(getActivity());
+        RealmQuery<Session> query = realm.where(Session.class);
+        query.equalTo("container_id", containeriD);
+        RealmResults<Session> results = query.findAll();
+        return results;
     }
 
     private void showAddContainerDialog(String containerID) {
@@ -151,4 +169,5 @@ public class SearchFragment extends Fragment {
             return false;
         }
     }
+
 }

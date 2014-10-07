@@ -101,19 +101,27 @@ public abstract class AbstractDataLoader<E extends RealmResults<?>> extends
 	@Override
 	protected void onReset() {
 		super.onReset();
+
 		// Ensure the loader is stopped
 		onStopLoading();
 		if (mLastDataList != null && mLastDataList.size() > 0) {
 			emptyDataList(mLastDataList);
+//			mLastDataList.clear();
 		}
 		mLastDataList = null;
 	}
 
 	protected void emptyDataList(E dataList) {
-		if (dataList != null && dataList.size() > 0) {
-			for (int i = 0; i < dataList.size(); i++) {
-				dataList.remove(i);
-			}
-		}
+
+		dataList.clear();
+//		try {
+//			if (dataList != null && dataList.size() > 0) {
+//				for (int i = 0; i < dataList.size(); i++) {
+//					dataList.remove(i);
+//				}
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 	}
 }

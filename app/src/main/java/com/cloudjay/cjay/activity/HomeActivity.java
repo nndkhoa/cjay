@@ -42,6 +42,10 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 
 	PagerAdapter mPagerAdapter;
 	ActionBar actionBar;
+
+	/**
+	 * Manage Job Queue
+	 */
 	JobManager jobManager;
 
 	/**
@@ -73,9 +77,7 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
             if (lastModifiedDate.isEmpty()){
                 jobManager = new JobManager(getApplicationContext());
                 jobManager.addJobInBackground(new GetAllSessionsJob(this,false));
-
             }
-
 		}
 	}
 

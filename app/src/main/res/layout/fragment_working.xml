@@ -9,5 +9,11 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:id="@+id/lv_working_container"></ListView>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Không có Container nào đang làm"
+        android:id="@+id/tv_emptylist_working"/>
 
 </FrameLayout>
