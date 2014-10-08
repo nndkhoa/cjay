@@ -18,72 +18,83 @@ import java.util.List;
  */
 public class SessionAdapter extends ArrayAdapter<Session> {
 
-	private LayoutInflater mInflater;
-	private int layoutResId;
+    private LayoutInflater mInflater;
+    private int layoutResId;
 
-	public SessionAdapter(Context context, int resource) {
-		super(context, resource);
-		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		layoutResId = resource;
-	}
+    public SessionAdapter(Context context, int resource) {
+        super(context, resource);
+        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        layoutResId = resource;
+    }
 
-	private static class ViewHolder {
-		TextView tvContainerId;
-		TextView tvOperator;
-		TextView tvDateIn;
-		TextView tvDateOut;
-		TextView tvDateEstimate;
-		TextView tvDateRepair;
-		TextView tvPreStatus;
-		TextView tvCurrentStatus;
-		TextView tvStep;
+    private static class ViewHolder {
+        TextView tvContainerId;
+        TextView tvOperator;
+        TextView tvDateIn;
+        TextView tvDateOut;
+        TextView tvDateEstimate;
+        TextView tvDateRepair;
+        TextView tvPreStatus;
+        TextView tvCurrentStatus;
+        TextView tvStep;
 
-		Button btnSubmit;
-		Button btnContinue;
-	}
+        Button btnSubmit;
+        Button btnContinue;
+    }
 
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		Session session = getItem(position);
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        Session session = getItem(position);
 
-		// Apply ViewHolder pattern for better performance
-		ViewHolder viewHolder;
-		if (convertView == null) {
-			convertView = mInflater.inflate(layoutResId, parent, false);
-			viewHolder = new ViewHolder();
+        boolean isSessionProcessing;
+        isSessionProcessing = session.isProcessing();
 
-			viewHolder.tvContainerId = (TextView) convertView.findViewById(R.id.tv_container_id);
-			viewHolder.tvOperator = (TextView) convertView.findViewById(R.id.tv_operator);
-			viewHolder.tvDateIn = (TextView) convertView.findViewById(R.id.tv_date_in);
-			viewHolder.tvDateOut = (TextView) convertView.findViewById(R.id.tv_date_out);
-			viewHolder.tvDateEstimate = (TextView) convertView.findViewById(R.id.tv_date_estimate);
-			viewHolder.tvDateRepair = (TextView) convertView.findViewById(R.id.tv_date_repair);
-			viewHolder.tvPreStatus = (TextView) convertView.findViewById(R.id.tv_pre_status);
-			viewHolder.tvCurrentStatus = (TextView) convertView.findViewById(R.id.tv_current_status);
-			viewHolder.tvStep = (TextView) convertView.findViewById(R.id.tv_step);
+        // Apply ViewHolder pattern for better performance
+        ViewHolder viewHolder;
+        if (convertView == null) {
+            convertView = mInflater.inflate(layoutResId, parent, false);
+            viewHolder = new ViewHolder();
 
-			viewHolder.btnSubmit = (Button) convertView.findViewById(R.id.btn_submit);
-			viewHolder.btnContinue = (Button) convertView.findViewById(R.id.btn_continue);
+            viewHolder.tvContainerId = (TextView) convertView.findViewById(R.id.tv_container_id);
+            viewHolder.tvOperator = (TextView) convertView.findViewById(R.id.tv_operator);
+            viewHolder.tvDateIn = (TextView) convertView.findViewById(R.id.tv_date_in);
+            viewHolder.tvDateOut = (TextView) convertView.findViewById(R.id.tv_date_out);
+            viewHolder.tvDateEstimate = (TextView) convertView.findViewById(R.id.tv_date_estimate);
+            viewHolder.tvDateRepair = (TextView) convertView.findViewById(R.id.tv_date_repair);
+            viewHolder.tvPreStatus = (TextView) convertView.findViewById(R.id.tv_pre_status);
+            viewHolder.tvCurrentStatus = (TextView) convertView.findViewById(R.id.tv_current_status);
+            viewHolder.tvStep = (TextView) convertView.findViewById(R.id.tv_step);
 
-			convertView.setTag(viewHolder);
-		} else {
-			viewHolder = (ViewHolder) convertView.getTag();
-		}
+            viewHolder.btnSubmit = (Button) convertView.findViewById(R.id.btn_submit);
+            viewHolder.btnContinue = (Button) convertView.findViewById(R.id.btn_continue);
 
-		// TODO: Set data to view
-		viewHolder.tvContainerId.setText(session.getContainerId());
-		viewHolder.tvOperator.setText(session.getOperatorCode());
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
+        }
+        //Set data to view
+        viewHolder.tvContainerId.setText(session.getContainerId());
+        viewHolder.tvOperator.setText(session.getOperatorCode());
+        viewHolder.tvDateIn.setText(String.valueOf(session.getCheckInTime()));
+        viewHolder.tvDateOut.setText(String.valueOf(session.getCheckOutTime()));
+        viewHolder.tvStep.setText(String.valueOf(session.getStep()));
+        viewHolder.tvPreStatus.setText(String.valueOf(session.getPreStatus()));
         viewHolder.tvCurrentStatus.setText(String.valueOf(session.getStatus()));
 
-		return convertView;
-	}
+        if (!isSessionProcessing) {
+            viewHolder.btnContinue.setVisibility(View.GONE);
+            viewHolder.btnSubmit.setVisibility(View.GONE);
+        }
 
-	public void setData(List<Session> data) {
-		clear();
-		if (data != null) {
-			for (int i = 0; i < data.size(); i++) {
-				add(data.get(i));
-			}
-		}
-	}
+        return convertView;
+    }
+
+    public void setData(List<Session> data) {
+        clear();
+        if (data != null) {
+            for (int i = 0; i < data.size(); i++) {
+                add(data.get(i));
+            }
+        }
+    }
 }

@@ -356,7 +356,7 @@ public class NetworkClient {
 				session.setCheckOutTime(e.getAsJsonObject().get("check_out_time").toString());
 				session.setDepotCode(e.getAsJsonObject().get("depot_code").toString());
 				session.setDepotId(Long.parseLong(e.getAsJsonObject().get("depot_id").toString()));
-				session.setOperatorCode(e.getAsJsonObject().get("container_id").toString());
+				session.setOperatorCode(e.getAsJsonObject().get("operator_code").toString());
 				session.setOperatorId(Long.parseLong(e.getAsJsonObject().get("operator_id").toString()));
 				session.setPreStatus(Long.parseLong(e.getAsJsonObject().get("pre_status").toString()));
 				session.setStatus(Long.parseLong(e.getAsJsonObject().get("status").toString()));

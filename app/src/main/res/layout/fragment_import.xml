@@ -4,47 +4,47 @@
     android:layout_height="match_parent"
     tools:context="com.cloudjay.cjay.fragment.ImportFragment">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="12dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_above="@+id/ll_bottom">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Nhập container mới"
             android:textStyle="bold"
-            android:textSize="16dp"/>
+            android:textSize="16dp"
+            android:id="@+id/tv_input_container"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/tv_container_id"/>
+            android:id="@+id/tv_container_id"
+            android:layout_below="@+id/tv_input_container"/>
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/et_operator"
-            android:hint="Hãng tàu"/>
-
-        <!--<Spinner
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/sp_operator"
-            android:spinnerMode="dialog">
-        </Spinner>-->
+            android:hint="Hãng tàu"
+            android:layout_below="@+id/tv_container_id"/>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/btn_camera"
-            android:text="Camera button"/>
+            android:text="Camera button"
+            android:layout_below="@+id/et_operator"/>
 
         <ListView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/lv_image"
+            android:layout_above="@+id/rdn_group_status"
+            android:layout_below="@+id/btn_camera"
             android:paddingBottom="6dp">
         </ListView>
 
@@ -53,6 +53,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/rdn_group_status"
             android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
             android:weightSum="3">
 
             <RadioButton
@@ -100,14 +101,15 @@
 
         </RadioGroup>
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
-        android:weightSum="2">
+        android:weightSum="2"
+        android:id="@+id/ll_bottom">
 
         <Button
             android:layout_width="match_parent"

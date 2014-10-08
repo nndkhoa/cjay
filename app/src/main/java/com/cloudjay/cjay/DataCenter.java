@@ -149,4 +149,14 @@ public class DataCenter {
         Logger.Log("gate images count in dataCenter: " + gateImages.size());
         EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
     }
+
+    public void searchOperator(String keyword) {
+        Realm realm = Realm.getInstance(context);
+        RealmResults<Operator> operators = realm.where(Operator.class)
+                .contains("operatorName", keyword).or()
+                .contains("operatorCode", keyword)
+                .findAll();
+
+        EventBus.getDefault().post(new OperatorsGotEvent(operators));
+    }
 }

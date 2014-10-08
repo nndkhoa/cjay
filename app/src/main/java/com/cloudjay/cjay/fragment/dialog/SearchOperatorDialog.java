@@ -3,6 +3,7 @@ package com.cloudjay.cjay.fragment.dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -12,11 +13,14 @@ import com.cloudjay.cjay.adapter.OperatorAdapter;
 import com.cloudjay.cjay.event.OperatorCallbackEvent;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.util.Logger;
 
+import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.TextChange;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -32,8 +36,8 @@ public class SearchOperatorDialog extends DialogFragment {
 	private String mOperatorName;
 	private Fragment mParent;
 
-	private RealmResults<Operator> operators;
-	private OperatorAdapter operatorAdapter;
+	RealmResults<Operator> operators;
+	OperatorAdapter operatorAdapter;
 
 	@ViewById(R.id.et_operator_name)
 	EditText etOperatorName;
@@ -58,11 +62,16 @@ public class SearchOperatorDialog extends DialogFragment {
 
 	@UiThread
 	public void onEvent(OperatorsGotEvent event) {
-		// retrieve list operators
+		// Retrieve list operators
 		operators = event.getOperators();
 		// Init and set adapter
-		operatorAdapter = new OperatorAdapter(getActivity(), operators);
-		lvOperators.setAdapter(operatorAdapter);
+        if (null == operatorAdapter) {
+            operatorAdapter = new OperatorAdapter(getActivity(), operators);
+            lvOperators.setAdapter(operatorAdapter);
+        }
+
+        // Notify change
+        operatorAdapter.swapOperators(operators);
 	}
 
 	@AfterViews
@@ -79,20 +88,15 @@ public class SearchOperatorDialog extends DialogFragment {
 		this.dismiss();
 	}
 
-	private void search(String searchText) {
-		if (searchText.equals("")) {
-			//operatorAdapter.updateData(operators);
+    @AfterTextChange(R.id.et_operator_name)
+	void search(Editable text) {
+        String keyword = text.toString();
+		if (keyword.equals("")) {
+			// Get all operators
+            dataCenter.getOperators();
 		} else {
-			ArrayList<Operator> searchFeeds = new ArrayList<Operator>();
-			for (Operator operator : operators) {
-				if (operator.getOperatorName().toLowerCase(Locale.US).contains(searchText.toLowerCase(Locale.US))
-						|| operator.getOperatorCode().toLowerCase(Locale.US).contains(searchText.toLowerCase(Locale.US))) {
-
-					searchFeeds.add(operator);
-				}
-			}
-			// refresh list
-			//operatorAdapter.updateData(searchFeeds);
+			// Get operator(s) by keyword
+            dataCenter.searchOperator(keyword.toUpperCase());
 		}
 	}
 
