@@ -12,13 +12,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
-import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.SessionAdapter;
 import com.cloudjay.cjay.fragment.dialog.AddContainerDialog;
 import com.cloudjay.cjay.fragment.dialog.AddContainerDialog_;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 

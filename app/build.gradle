@@ -83,7 +83,9 @@ dependencies {
 	compile 'com.squareup.okhttp:okhttp:2.0.0'
 	compile 'com.squareup.retrofit:retrofit:1.6.1'
 
-	compile project(':realm')
+	compile 'io.realm:realm-android:0.71.0'
+
+//	compile project(':realm')
 	compile files('libs/javax.annotation-3.2-b06.jar')
 	compile files('libs/crouton-1.8.1.jar')
 	compile files('libs/Pubnub-Android-3.5.6.jar')
@@ -92,6 +94,7 @@ dependencies {
 
 apt {
 	arguments {
+
 		androidManifestFile variant.processResources.manifestFile
 		resourcePackageName 'com.cloudjay.cjay'
 

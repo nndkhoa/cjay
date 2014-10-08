@@ -2,10 +2,8 @@ package com.cloudjay.cjay.api;
 
 
 import android.content.Context;
+import android.text.TextUtils;
 
-import com.cloudjay.cjay.model.AuditImage;
-import com.cloudjay.cjay.model.AuditItem;
-import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
@@ -14,17 +12,16 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringHelper;
-import com.google.gson.Gson;
+import com.cloudjay.cjay.util.Utils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
+import org.androidannotations.annotations.Trace;
 
 import java.io.File;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +44,7 @@ public class NetworkClient {
 		this.context = context;
 	}
 
+	//region User
 	public String getToken(String username, String password) throws RetrofitError {
 
 		JsonObject tokenJson;
@@ -87,6 +85,7 @@ public class NetworkClient {
 
 		return user;
 	}
+	//endregion
 
 	public void uploadImage(Context context) {
 		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.CJAY_TMP_STORAGE).build();
@@ -105,10 +104,6 @@ public class NetworkClient {
 				Logger.e(error.toString());
 			}
 		});
-	}
-
-	public void uploadContainerSession(Context context, Session containerSession) {
-		provider.getRestAdapter(context).create(NetworkService.class).postContainer("", "");
 	}
 
 	/**
@@ -220,9 +215,6 @@ public class NetworkClient {
 		JsonArray results = provider.getRestAdapter(context).create(NetworkService.class).getOperators(lastModifiedDate);
 		List<Operator> items = new ArrayList<Operator>();
 
-//		// Clear the realm from last time
-//		Realm.deleteRealmFile(context);
-
 		// Store the retrieved items to the Realm
 		Realm realm = Realm.getInstance(context);
 
@@ -242,92 +234,52 @@ public class NetworkClient {
 		return items;
 	}
 
-	/**
-	 * @param page
-	 * @param lastModifiedDate
-	 * @return
-	 */
-	public List<Session> getContainerSessionsByPage(int page, String lastModifiedDate) {
-
-		JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionsByPage(page, lastModifiedDate);
-		JsonArray jsonArray = jsonObject.getAsJsonArray("results");
-		Gson gson = new Gson();
-		Type listType = new TypeToken<List<Session>>() {
-		}.getType();
-		List<Session> containerSessionsByPage = gson.fromJson(jsonArray.toString(), listType);
-		return containerSessionsByPage;
-	}
-
 	public Session getContainerSessionById(int id) {
-
 		JsonObject result = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionById(id);
-
-		// check if result has values
 		if (id != result.get("id").getAsLong()) {
 			return null;
 		} else {
-			// WTF is this shit :| Fuck Realm
-			Realm realm = Realm.getInstance(context);
-			realm.beginTransaction();
-			Session session = realm.createObject(Session.class);
-
-			User user = realm.createObject(User.class);
-			user.setId(result.get("id").getAsLong());
-			user.setFirstName(result.get("first_name").getAsString());
-			user.setLastName(result.get("last_name").getAsString());
-			user.setUsername(result.get("username").getAsString());
-			user.setEmail(result.get("email").getAsString());
-			user.setFullName(result.get("full_name").getAsString());
-			user.setRole(result.get("role").getAsLong());
-			user.setRoleName(result.get("role_name").getAsString());
-			user.setDepotCode(result.get("depot_code").getAsString());
-			user.setAvatarUrl(result.get("avatar_url").getAsString());
-
-			realm.commitTransaction();
-			return session;
+			return Utils.parseSession(context, result);
 		}
 	}
 
-	public List<Session> getAllSessions(Context context, boolean isGetByModifiedDate) {
+	@Trace(tag = "NetworkClient")
+	public List<Session> getAllSessions(Context context, String modifiedDate) {
+
 		List<Session> sessions = new ArrayList<Session>();
 		JsonElement next;
 
 		// If get by day, get fist page query by day
 		// => get page form key "next"
 		// => get all page after that page
-		if (isGetByModifiedDate) {
-			Logger.e("Fetch by time");
+		if (!TextUtils.isEmpty(modifiedDate)) {
+
+			// Get by lastModified Day
+			Logger.Log("Fetch data by time");
+
+			JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionsByModifiedTime(modifiedDate);
+			next = jsonObject.get("next");
+			String nextString = next.toString();
+
+			//get page number of fist page
+			int page = Integer.parseInt(nextString.substring(nextString.lastIndexOf("=") + 1));
+			Logger.e(String.valueOf(page));
+
+			//get all session have page number greater then fist page
+			List<Session> sessionsByPage = this.getAllSessionsByPage(context, page);
+			sessions.addAll(sessionsByPage);
+
+			// Update Modified day in preferences
+			PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, StringHelper.getCurrentTimestamp(CJayConstant.DAY_TIME_FORMAT));
 
 			//Get session fist page when query by day
 			String lastModifiedDate = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
-			Logger.e(lastModifiedDate);
-
-			//If don't have last modified Day -> fetch all by day
-			if (lastModifiedDate.isEmpty()) {
-				sessions = getAllSessionsByPage(context, 1);
-			} else {
-
-				// Get by lastModified Day
-				JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionsByModifiedTime(lastModifiedDate);
-				next = jsonObject.get("next");
-				String nextString = next.toString();
-
-				//get page number of fist page
-				int page = Integer.parseInt(nextString.substring(nextString.lastIndexOf("=") + 1));
-				Logger.e(String.valueOf(page));
-
-				//get all session have page number greater then fist page
-				List<Session> sessionsByPage = this.getAllSessionsByPage(context, page);
-				sessions.addAll(sessionsByPage);
-
-				//Update Modified day in preferences
-				PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, StringHelper.getCurrentTimestamp(CJayConstant.DAY_TIME_FORMAT));
-			}
-
+			Logger.Log("Last modified date: " + lastModifiedDate);
 		}
+
 		//If not, get all sessions start form page 1
 		else {
-			Logger.e("Fetching all page");
+			Logger.Log("Fetching all page");
 			sessions = getAllSessionsByPage(context, 1);
 		}
 
@@ -343,87 +295,9 @@ public class NetworkClient {
 			JsonArray jsonArray = jsonObject.getAsJsonArray("results");
 			next = jsonObject.get("next");
 
-//			Logger.e(next.toString());
 			for (JsonElement e : jsonArray) {
-
-				Realm realm = Realm.getInstance(context);
-				realm.beginTransaction();
-
-				Session session = realm.createObject(Session.class);
-				session.setId(Long.parseLong(e.getAsJsonObject().get("id").toString()));
-				session.setContainerId(e.getAsJsonObject().get("container_id").toString());
-				session.setCheckInTime(e.getAsJsonObject().get("check_in_time").toString());
-				session.setCheckOutTime(e.getAsJsonObject().get("check_out_time").toString());
-				session.setDepotCode(e.getAsJsonObject().get("depot_code").toString());
-				session.setDepotId(Long.parseLong(e.getAsJsonObject().get("depot_id").toString()));
-				session.setOperatorCode(e.getAsJsonObject().get("operator_code").toString());
-				session.setOperatorId(Long.parseLong(e.getAsJsonObject().get("operator_id").toString()));
-				session.setPreStatus(Long.parseLong(e.getAsJsonObject().get("pre_status").toString()));
-				session.setStatus(Long.parseLong(e.getAsJsonObject().get("status").toString()));
-				session.setStep(Long.parseLong(e.getAsJsonObject().get("step").toString()));
-
-				// Process list audit items
-				JsonArray auditItems = e.getAsJsonObject().getAsJsonArray("audit_items");
-				for (JsonElement audit : auditItems) {
-					AuditItem item = realm.createObject(AuditItem.class);
-
-					item.setComponentCode(audit.getAsJsonObject().get("component_code").toString());
-					item.setComponentCodeId(Long.parseLong(audit.getAsJsonObject().get("component_code_id").toString()));
-					item.setComponentName(audit.getAsJsonObject().get("component_name").toString());
-					item.setCreatedAt(audit.getAsJsonObject().get("created_at").toString());
-					item.setDamageCode(audit.getAsJsonObject().get("damage_code").toString());
-					item.setDamageCodeId(Long.parseLong(audit.getAsJsonObject().get("damage_code_id").toString()));
-
-					if (audit.getAsJsonObject().get("height").isJsonNull()) {
-						item.setHeight(0);
-					} else {
-						item.setHeight(Double.valueOf(audit.getAsJsonObject().get("height").toString()));
-					}
-
-					if (audit.getAsJsonObject().get("length").isJsonNull()) {
-						item.setHeight(0);
-					} else {
-						item.setHeight(Double.valueOf(audit.getAsJsonObject().get("length").toString()));
-					}
-
-					item.setId(Long.parseLong(audit.getAsJsonObject().get("id").toString()));
-					item.setIsAllowed(Boolean.parseBoolean(audit.getAsJsonObject().get("is_allowed").toString()));
-					item.setLocationCode(audit.getAsJsonObject().get("location_code").toString());
-					item.setModifiedAt(audit.getAsJsonObject().get("modified_at").toString());
-					if (audit.getAsJsonObject().get("quantity").isJsonNull()) {
-						item.setQuantity(0);
-					} else {
-						item.setQuantity(Long.valueOf(audit.getAsJsonObject().get("quantity").toString()));
-					}
-
-					item.setRepairCode(audit.getAsJsonObject().get("repair_code").toString());
-					item.setRepairCodeId(Long.parseLong(audit.getAsJsonObject().get("repair_code_id").toString()));
-
-					// // Process list audit images
-					JsonArray auditImage = audit.getAsJsonObject().getAsJsonArray("audit_images");
-					for (JsonElement imageAudit : auditImage) {
-						AuditImage imageAuditItem = realm.createObject(AuditImage.class);
-
-						imageAuditItem.setId(Long.parseLong(imageAudit.getAsJsonObject().get("id").toString()));
-						imageAuditItem.setType(Long.parseLong(imageAudit.getAsJsonObject().get("type").toString()));
-						imageAuditItem.setUrl(imageAudit.getAsJsonObject().get("url").toString());
-					}
-				}
-
-				// Process list gate images
-				JsonArray gateImage = e.getAsJsonObject().getAsJsonArray("gate_images");
-				for (JsonElement image : gateImage) {
-					GateImage imageItem = realm.createObject(GateImage.class);
-
-					imageItem.setId(Long.parseLong(image.getAsJsonObject().get("id").toString()));
-					imageItem.setType(Long.parseLong(image.getAsJsonObject().get("type").toString()));
-					imageItem.setUrl(image.getAsJsonObject().get("url").toString());
-				}
-
-				sessions.add(session);
-				realm.commitTransaction();
+				sessions.add(Utils.parseSession(context, e.getAsJsonObject()));
 			}
-
 			page = page + 1;
 
 		} while (!next.isJsonNull());
@@ -437,5 +311,8 @@ public class NetworkClient {
 		return null;
 	}
 
+	public void uploadContainerSession(Context context, Session containerSession) {
+		provider.getRestAdapter(context).create(NetworkService.class).postContainer("", "");
+	}
 
 }

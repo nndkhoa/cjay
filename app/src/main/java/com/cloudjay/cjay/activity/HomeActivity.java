@@ -50,11 +50,10 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 
 	/**
 	 * > MAIN FUNCTION
-	 *
+	 * <p/>
 	 * 1. Config action bar NAVIGATION MODE
 	 * 2. Config view pager
 	 * 3. Start JobQueue to get all session
-	 *
 	 */
 	@AfterViews
 	void setup() {
@@ -73,11 +72,11 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 			configureViewPager();
 
 			// Check if don't have modified set Job Queue to get all sessions after login
-            String lastModifiedDate = PreferencesUtil.getPrefsValue(this, PreferencesUtil.PREF_MODIFIED_DATE);
-            if (lastModifiedDate.isEmpty()){
-                jobManager = new JobManager(getApplicationContext());
-                jobManager.addJobInBackground(new GetAllSessionsJob(this,false));
-            }
+			String lastModifiedDate = PreferencesUtil.getPrefsValue(this, PreferencesUtil.PREF_MODIFIED_DATE);
+			if (lastModifiedDate.isEmpty()) {
+				jobManager = new JobManager(getApplicationContext());
+				jobManager.addJobInBackground(new GetAllSessionsJob(this, lastModifiedDate));
+			}
 		}
 	}
 
