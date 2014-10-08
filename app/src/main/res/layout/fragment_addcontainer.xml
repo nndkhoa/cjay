@@ -28,5 +28,4 @@
             android:id="@+id/et_container_id"/>
 
     </LinearLayout>
-
 </LinearLayout>

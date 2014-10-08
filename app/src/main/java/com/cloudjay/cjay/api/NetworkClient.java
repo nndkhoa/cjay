@@ -87,11 +87,11 @@ public class NetworkClient {
 	}
 	//endregion
 
-	public void uploadImage(Context context) {
+	public void uploadImage(Context context, String uri, String imageName) {
 		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.CJAY_TMP_STORAGE).build();
-		File image = new File("storage/sdcard0/DCIM/CJay/DemoDepotCode/2014-10-06/gate-in/ContainerId/DemoDepotCode-2014-10-06-DemoimageType-ContainerId-DemoOperatorCode-ee58e92d-77c0-493c-9a33-2de38a626bd7.jpg");
-		TypedFile typedFile = new TypedFile("image/png", image);
-		restAdapter.create(NetworkService.class).postImageFile("image/jpeg", "media", "DemoDepotCode-2014-10-06-DemoimageType-ContainerId-DemoOperatorCode-ee58e92d-77c0-493c-9a33-2de38a626bd7.jpg", typedFile, new Callback<Response>() {
+		File image = new File(uri);
+		TypedFile typedFile = new TypedFile("image/jpeg", image);
+		restAdapter.create(NetworkService.class).postImageFile("image/jpeg", "media",imageName, typedFile, new Callback<Response>() {
 			@Override
 			public void success(Response response, Response response2) {
 

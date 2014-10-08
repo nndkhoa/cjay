@@ -17,6 +17,7 @@ import android.widget.ToggleButton;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
+import com.cloudjay.cjay.task.jobqueue.UpLoadImageJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -25,6 +26,7 @@ import com.cloudjay.cjay.util.enums.ImageType;
 import com.commonsware.cwac.camera.CameraUtils;
 import com.commonsware.cwac.camera.PictureTransaction;
 import com.commonsware.cwac.camera.SimpleCameraHost;
+import com.path.android.jobqueue.JobManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -307,8 +309,10 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 			EventBus.getDefault().post(new ImageCapturedEvent(uri));
 			Logger.Log("save image to realm successfully");
 
-			// 2. TODO: upload image
-
+			// 2.upload image
+            //TODO: Get instance jobmanager
+            JobManager jobManager = new JobManager(getActivity());
+            jobManager.addJobInBackground(new UpLoadImageJob(getActivity(),uri,imageName, containerId));
 		}
 
 		void saveBitmapToFile(Bitmap bitmap, File filename) {

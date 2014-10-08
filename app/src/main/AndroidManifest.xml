@@ -9,6 +9,7 @@
         android:theme="@style/AppTheme"
 		android:name=".activity.CJayApplication">
 
+		<!--android:theme="@style/Theme.AppCompat.Light"-->
 		<meta-data android:name="com.crashlytics.ApiKey" android:value="d95dbe17ef52014812094c8003d8d48cd72d9197"/>
 
 		<service android:name=".util.account.CJayAuthenticationService">

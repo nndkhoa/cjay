@@ -3,6 +3,7 @@ package com.cloudjay.cjay.task.jobqueue;
 import android.content.Context;
 
 import com.cloudjay.cjay.api.NetworkClient;
+import com.cloudjay.cjay.api.NetworkClient_;
 import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
@@ -14,12 +15,16 @@ import com.path.android.jobqueue.Params;
 public class UpLoadImageJob extends Job {
     Context context;
     String containerId;
+    String uri;
+    String imageName;
 
 
-    public UpLoadImageJob(Context context, String containerID) {
-        super(new Params(2).requireNetwork().groupBy(containerID));
+    public UpLoadImageJob(Context context, String uri, String imageName, String containerId) {
+        super(new Params(2).requireNetwork().groupBy(containerId));
         this.context = context;
-        this.containerId =containerID;
+        this.containerId =containerId;
+        this.uri = uri;
+        this.imageName =imageName;
     }
 
     @Override
@@ -31,8 +36,8 @@ public class UpLoadImageJob extends Job {
     @Override
     public void onRun() throws Throwable {
 
-        NetworkClient networkClient = new NetworkClient(context);
-        networkClient.uploadImage(context);
+        NetworkClient networkClient = NetworkClient_.getInstance_(context);
+        networkClient.uploadImage(context, uri,imageName);
         Logger.e("Upload Image " + containerId);
 
     }
