@@ -146,8 +146,8 @@ public class SearchFragment extends Fragment {
 		Logger.Log("onEvent ContainerSearchedEvent");
 		showProgress(false);
 		List<Session> result = event.getSessions();
-		if (result != null) {
 
+		if (result != null) {
 			mAdapter.clear();
 			mAdapter.addAll(result);
 			mAdapter.notifyDataSetChanged();

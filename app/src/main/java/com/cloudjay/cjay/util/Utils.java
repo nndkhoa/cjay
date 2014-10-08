@@ -84,9 +84,7 @@ public class Utils {
 
 		Pattern pattern = Pattern.compile("^([A-Z]+){4,4}+(\\d{7,7}+)$");
 		Matcher matcher = pattern.matcher(containerID);
-
 		if (!matcher.matches()) return false;
-
 		return true;
 	}
 

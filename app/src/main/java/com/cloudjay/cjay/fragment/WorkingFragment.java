@@ -30,8 +30,8 @@ public class WorkingFragment extends Fragment implements LoaderManager.LoaderCal
 	@ViewById(R.id.lv_working_container)
 	ListView listView;
 
-    @ViewById(R.id.tv_emptylist_working)
-    TextView tvEmpty;
+	@ViewById(R.id.tv_emptylist_working)
+	TextView tvEmpty;
 
 	private SessionAdapter mAdapter;
 
@@ -47,11 +47,12 @@ public class WorkingFragment extends Fragment implements LoaderManager.LoaderCal
 		getLoaderManager().initLoader(LOADER_ID, null, this);
 		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
 		listView.setAdapter(mAdapter);
-        listView.setEmptyView(tvEmpty);
+		listView.setEmptyView(tvEmpty);
 	}
 
 	@Override
 	public Loader<RealmResults<Session>> onCreateLoader(int id, Bundle args) {
+
 		return new AbstractDataLoader<RealmResults<Session>>(getActivity()) {
 			@Override
 			protected RealmResults<Session> buildList() {
@@ -59,6 +60,7 @@ public class WorkingFragment extends Fragment implements LoaderManager.LoaderCal
 				return realm.where(Session.class).findAll();
 			}
 		};
+
 	}
 
 	@Override

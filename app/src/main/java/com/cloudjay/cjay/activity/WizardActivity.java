@@ -59,7 +59,7 @@ public class WizardActivity extends FragmentActivity {
 		}
 
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-		transaction.add(R.id.ll_main_process, fragment);
+		transaction.add(R.id.ll_main, fragment);
 		transaction.commit();
 	}
 }
