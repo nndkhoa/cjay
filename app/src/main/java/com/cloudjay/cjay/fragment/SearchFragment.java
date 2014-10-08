@@ -25,6 +25,7 @@ import com.cloudjay.cjay.util.Utils;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.List;
@@ -73,12 +74,15 @@ public class SearchFragment extends Fragment {
                 return;
             } else {
                 List<Session> result = searchSession(containerID);
-                if (result != null) {
+                llLoginStatus.setVisibility(View.GONE);
+                lvSearch.setVisibility(View.INVISIBLE);
+                if (result != null){
                     mAdapter.clear();
                     mAdapter.addAll(result);
                     refreshListView();
-                } else {
-                    showAddContainerDialog(containerID);
+                    if (result.size()==0){
+                        showAddContainerDialog(containerID);
+                    }
                 }
                 etSearch.setText("");
             }
@@ -88,10 +92,15 @@ public class SearchFragment extends Fragment {
                 etSearch.setError(getString(R.string.dialog_container_id_required));
             } else {
                 List<Session> result = searchSession(containerID);
+                llLoginStatus.setVisibility(View.GONE);
+                lvSearch.setVisibility(View.INVISIBLE);
                 if (result != null) {
+                    mAdapter.clear();
+                    mAdapter.addAll(result);
                     refreshListView();
-                } else {
-                    showAddContainerDialog(containerID);
+                    if (result.size()==0){
+                        showAddContainerDialog(containerID);
+                    }
                 }
                 etSearch.setText("");
             }
@@ -148,11 +157,14 @@ public class SearchFragment extends Fragment {
     }
 
     //TODO add logic search
+    @Trace
     private List<Session> searchSession(String containeriD) {
+
         Realm realm = Realm.getInstance(getActivity());
         RealmQuery<Session> query = realm.where(Session.class);
-        query.equalTo("container_id", containeriD);
+        query.contains("containerId", containeriD);
         RealmResults<Session> results = query.findAll();
+        Logger.e(results.toString());
         return results;
     }
 
@@ -163,7 +175,7 @@ public class SearchFragment extends Fragment {
     }
 
     private boolean isGateRole() {
-        if (PreferencesUtil.getPrefsValue(getActivity(), PreferencesUtil.PREF_USER_ROLE) == "6") {
+        if (PreferencesUtil.getPrefsValue(getActivity(), PreferencesUtil.PREF_USER_ROLE).equals("6")) {
             return true;
         } else {
             return false;
