@@ -69,6 +69,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Bỏ qua"
-            android:id="@+id/btn_cancelAddContainer" />
+            android:id="@+id/btn_cancel_add_container" />
     </LinearLayout>
 </LinearLayout>

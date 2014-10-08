@@ -79,7 +79,7 @@ public class DataCenter {
 				.contains("containerId", keyword)
 				.findAll();
 
-		if (sessions != null) {
+		if (sessions.size() != 0) {
 
 			Logger.Log("1");
 			EventBus.getDefault().post(new ContainerSearchedEvent(sessions));

@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.WizardActivity_;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 
 import org.androidannotations.annotations.AfterViews;
@@ -39,9 +40,7 @@ public class AddContainerDialog extends android.support.v4.app.DialogFragment {
     @ViewById(R.id.et_containerid_diaglog)
     EditText etContainerID;
 
-    // TODO: mismatch naming convention !! @thai please refactor those id
-    // R.id.btn_cancelAddContainer --> (should be) R.id.btn_cancel or R.id.btn_cancel_add_container
-    @ViewById(R.id.btn_cancelAddContainer)
+    @ViewById(R.id.btn_cancel_add_container)
     Button btnCancelAddContainer;
 
     public AddContainerDialog() {
@@ -52,6 +51,7 @@ public class AddContainerDialog extends android.support.v4.app.DialogFragment {
         //Remove title bar
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         tvSearchResult.setText(containerID);
+        Logger.e(containerID);
         if (Utils.isContainerIdValid(containerID)) {
             btnAddContainer.setText(R.string.dialog_create_container_id_invalid_iso);
         }
