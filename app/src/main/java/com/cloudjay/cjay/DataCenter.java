@@ -62,9 +62,7 @@ public class DataCenter {
     }
 
     public void fetchSession(Context context, String lastModifiedDate) {
-        // TODO: get all container sessions
-
-        networkClient.getAllSessions(context, false);
+        networkClient.getAllSessions(context, lastModifiedDate);
     }
 
     @Background(serial = CACHE)

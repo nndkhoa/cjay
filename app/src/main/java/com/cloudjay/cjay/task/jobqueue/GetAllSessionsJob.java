@@ -2,54 +2,39 @@ package com.cloudjay.cjay.task.jobqueue;
 
 import android.content.Context;
 
-import com.cloudjay.cjay.api.NetworkClient;
-import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 
-import java.util.List;
-
-
-/**
- * Created by thai on 06/10/2014.
- */
-
 public class GetAllSessionsJob extends Job {
 
-    Context context;
-    boolean isFetchByTime;
+	Context context;
+	String modifiedDate;
 
-    /**
-     * Fetch data from server
-     * @param context
-     * @param isFetchByTime
-     */
-    public GetAllSessionsJob(Context context, boolean isFetchByTime) {
-        super(new Params(1).requireNetwork());
-        this.context = context;
-        this.isFetchByTime = isFetchByTime;
-    }
+	public GetAllSessionsJob(Context context, String modifiedDate) {
+		super(new Params(1).requireNetwork());
+		this.context = context;
+		this.modifiedDate = modifiedDate;
+	}
 
-    @Override
-    public void onAdded() {
-    }
+	@Override
+	public void onAdded() {
+	}
 
-    @Override
-    public void onRun() throws Throwable {
-        Logger.e("Running Fetch Job");
-        NetworkClient networkClient = new NetworkClient(context);
-        List<Session> sessions = networkClient.getAllSessions(context, isFetchByTime);
+	@Override
+	public void onRun() throws Throwable {
+		Logger.Log("Running fetch all sessions job");
+		DataCenter_.getInstance_(context).fetchSession(context, modifiedDate);
+	}
 
-    }
+	@Override
+	protected void onCancel() {
 
-    @Override
-    protected void onCancel() {
+	}
 
-    }
-
-    @Override
-    protected boolean shouldReRunOnThrowable(Throwable throwable) {
-        return false;
-    }
+	@Override
+	protected boolean shouldReRunOnThrowable(Throwable throwable) {
+		return false;
+	}
 }

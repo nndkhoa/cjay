@@ -43,7 +43,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
-
         </activity>
         <activity
             android:name=".activity.LoginActivity_"
@@ -67,16 +66,19 @@
         <activity
             android:name=".activity.WizardActivity_"
             android:label="@string/title_activity_main_process">
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 514f2d9259882f68d8ab9cf59a42e449a9d93d7a
         </activity>
 
 		<activity
 			android:name=".activity.CameraActivity"
 			android:label="@string/title_activity_camera"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen"  >
-
         </activity>
+
 	</application>
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
