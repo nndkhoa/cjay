@@ -60,6 +60,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	String depotCode;
 	String operatorCode;
 
+    JobManager jobManager;
+
 	public static CameraFragment newInstance(boolean useFFC) {
 		CameraFragment f = new CameraFragment();
 		Bundle args = new Bundle();
@@ -72,6 +74,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	public void onCreate(Bundle state) {
 		super.onCreate(state);
 		setHasOptionsMenu(true);
+        //TODO: Get instance jobmanager
+        jobManager = new JobManager(getActivity());
 
 		// 1. CameraHost is the interface use to configure behavior of camera
 		// ~ setting
@@ -310,8 +314,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 			Logger.Log("save image to realm successfully");
 
 			// 2.upload image
-            //TODO: Get instance jobmanager
-            JobManager jobManager = new JobManager(getActivity());
+
             jobManager.addJobInBackground(new UpLoadImageJob(getActivity(),uri,imageName, containerId));
 		}
 
