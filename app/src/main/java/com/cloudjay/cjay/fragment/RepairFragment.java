@@ -14,6 +14,7 @@ import com.cloudjay.cjay.R;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.InvocationTargetException;
@@ -25,6 +26,11 @@ import java.util.Locale;
  */
 @EFragment(R.layout.fragment_repair)
 public class RepairFragment extends Fragment implements ActionBar.TabListener {
+
+	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+
+	@FragmentArg(CONTAINER_ID_EXTRA)
+	String containerID;
 
 	@ViewById(R.id.pager)
 	ViewPager pager;

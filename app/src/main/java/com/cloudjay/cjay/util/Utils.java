@@ -105,7 +105,7 @@ public class Utils {
 		Realm realm = Realm.getInstance(context);
 		realm.beginTransaction();
 
-		String containerId = e.get("container_id").toString();
+//		String containerId = e.get("container_id").toString();
 //		Logger.Log(" > Parsing container: " + containerId);
 
 		Session session = realm.createObject(Session.class);

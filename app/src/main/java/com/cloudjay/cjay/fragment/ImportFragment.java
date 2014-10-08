@@ -19,16 +19,15 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
-import com.cloudjay.cjay.adapter.OperatorAdapter;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.OperatorCallbackEvent;
+import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
-import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -49,6 +48,8 @@ import io.realm.RealmResults;
 @EFragment(R.layout.fragment_import)
 public class ImportFragment extends Fragment {
 
+	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+
 	//region Controls and Views
 	@ViewById(R.id.btn_camera)
 	Button btnCamera;
@@ -58,9 +59,6 @@ public class ImportFragment extends Fragment {
 
 	@ViewById(R.id.btn_complete)
 	Button btnComplete;
-
-	/*@ViewById(R.id.sp_operator)
-	Spinner spOperator;*/
 
 	@ViewById(R.id.et_operator)
 	EditText etOperator;
@@ -87,11 +85,12 @@ public class ImportFragment extends Fragment {
 	@Bean
 	DataCenter dataCenter;
 
-	@FragmentArg("containerID")
+	@FragmentArg(CONTAINER_ID_EXTRA)
 	String containerID;
-    GateImageAdapter gateImageAdapter = null;
-    Operator selectedOperator;
-    RealmResults<GateImage> gateImages = null;
+
+	GateImageAdapter gateImageAdapter = null;
+	Operator selectedOperator;
+	RealmResults<GateImage> gateImages = null;
 
 	public ImportFragment() {
 	}
@@ -120,29 +119,29 @@ public class ImportFragment extends Fragment {
 		dataCenter.addSession(containerID, selectedOperator.getOperatorCode(), selectedOperator.getId());
 	}
 
-    @UiThread
-    void onEvent(ImageCapturedEvent event) {
-        // Get gate images from realm
-        dataCenter.getGateImages(CJayConstant.TYPE_IMPORT, containerID);
-    }
+	@UiThread
+	void onEvent(ImageCapturedEvent event) {
+		// Get gate images from realm
+		dataCenter.getGateImages(CJayConstant.TYPE_IMPORT, containerID);
+	}
 
-    @UiThread
-    void onEvent(GateImagesGotEvent event) {
+	@UiThread
+	void onEvent(GateImagesGotEvent event) {
 
-        // Get gate image objects from event post back
-        gateImages = event.getGateImages();
-        Logger.Log("count gate images: " + gateImages.size());
+		// Get gate image objects from event post back
+		gateImages = event.getGateImages();
+		Logger.Log("count gate images: " + gateImages.size());
 
-        //Init adapter if null and set adapter for listview
-        if (gateImageAdapter == null) {
-            Logger.Log("gateImageAdapter is null");
-            gateImageAdapter = new GateImageAdapter(getActivity(), gateImages);
-            lvImages.setAdapter(gateImageAdapter);
-        }
+		//Init adapter if null and set adapter for listview
+		if (gateImageAdapter == null) {
+			Logger.Log("gateImageAdapter is null");
+			gateImageAdapter = new GateImageAdapter(getActivity(), gateImages);
+			lvImages.setAdapter(gateImageAdapter);
+		}
 
-        gateImageAdapter.notifyDataSetChanged();
+		gateImageAdapter.notifyDataSetChanged();
 
-    }
+	}
 
 	@AfterViews
 	void doAfterViews() {
@@ -169,6 +168,7 @@ public class ImportFragment extends Fragment {
 
 	@Click(R.id.btn_continue)
 	void buttonContinueClicked() {
+
 		//Go to next fragment
 		AuditFragment fragment = new AuditFragment_().builder().build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();

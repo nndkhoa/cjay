@@ -16,6 +16,7 @@ import android.widget.ListView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
@@ -160,10 +161,12 @@ public class SearchFragment extends Fragment {
 
 	@ItemClick(R.id.lv_search_container)
 	void searchListViewItemClicked(int position) {
+
 		// navigation to Wizard Activity
 		Session item = mAdapter.getItem(position);
 		Intent intent = new Intent(getActivity(), WizardActivity_.class);
-		intent.putExtra("", item.getContainerId());
+		intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, item.getContainerId());
+		intent.putExtra(WizardActivity.STEP_EXTRA, item.getStep());
 		startActivity(intent);
 	}
 

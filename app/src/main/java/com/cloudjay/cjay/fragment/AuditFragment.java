@@ -12,6 +12,7 @@ import com.cloudjay.cjay.activity.ReuseActivity;
 
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 
 /**
@@ -20,7 +21,12 @@ import org.androidannotations.annotations.ViewById;
 @EFragment(R.layout.fragment_audit)
 public class AuditFragment extends Fragment {
 
-	//region Control_View_Declare
+	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+
+	@FragmentArg(CONTAINER_ID_EXTRA)
+	String containerID;
+
+	//region VIEW
 	@ViewById(R.id.btn_continue)
 	Button btnContinue;
 
@@ -32,12 +38,10 @@ public class AuditFragment extends Fragment {
 	//endregion
 
 	public AuditFragment() {
-		// Required empty public constructor
 	}
 
 	@Click(R.id.btn_continue)
 	void buttonContinueClicked() {
-
 		//Go to next fragment
 		RepairFragment fragment = new RepairFragment_().builder().build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
