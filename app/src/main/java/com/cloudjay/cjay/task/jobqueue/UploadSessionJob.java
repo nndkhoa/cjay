@@ -29,7 +29,7 @@ public class UploadSessionJob extends Job {
     @Override
     public void onRun() throws Throwable {
         Logger.e("Uploading container: " + session.getContainerId());
-         = NetworkClient_.getInstance_().uploadContainerSession(context,session);
+        Session result = NetworkClient_.getInstance_(context).uploadContainerSession(context,session);
 
 
     }
