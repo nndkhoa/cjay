@@ -66,11 +66,6 @@
         <activity
             android:name=".activity.WizardActivity_"
             android:label="@string/title_activity_main_process">
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 514f2d9259882f68d8ab9cf59a42e449a9d93d7a
         </activity>
 
 		<activity
