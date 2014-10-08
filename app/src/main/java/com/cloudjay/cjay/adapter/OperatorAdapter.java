@@ -58,4 +58,9 @@ public class OperatorAdapter extends BaseAdapter {
 		holder.tvOperatorCode.setText(values.get(position).getOperatorCode());
 		return convertView;
 	}
+
+    public void swapOperators(List<Operator> values) {
+        this.values = values;
+        notifyDataSetChanged();
+    }
 }
