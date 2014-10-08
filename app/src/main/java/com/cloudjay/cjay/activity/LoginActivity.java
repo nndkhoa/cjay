@@ -78,7 +78,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	@ViewById(R.id.login_form)
 	ScrollView svLoginForm;
 
-	@ViewById(R.id.ll_login_status)
+	@ViewById(R.id.ll_search_progress)
 	LinearLayout llLoginStatus;
 
 	@ViewById(R.id.login_status_message)

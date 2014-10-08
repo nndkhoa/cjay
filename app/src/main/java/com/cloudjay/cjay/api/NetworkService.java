@@ -46,7 +46,7 @@ public interface NetworkService {
 	public JsonObject getContainerSessionById(@Path("id") int containerId);
 
 	@GET(ApiEndpoint.CONTAINER_SESSIONS_API)
-	public JsonObject searchContainer(@Query("keyword") String keyword);
+	public JsonObject searchContainer(@Query("search") String keyword);
 
 	@POST(ApiEndpoint.CONTAINER_SESSIONS_API)
 	public void postContainer(@Field("username") String username, @Field("password") String password);

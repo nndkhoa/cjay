@@ -16,6 +16,7 @@ import com.cloudjay.cjay.util.PreferencesUtil;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
+import org.androidannotations.annotations.Trace;
 
 import java.util.List;
 
@@ -65,6 +66,7 @@ public class DataCenter {
         networkClient.getAllSessions(context, lastModifiedDate);
     }
 
+	@Trace
     @Background(serial = CACHE)
     public void search(Context context, String keyword) {
 
@@ -76,9 +78,9 @@ public class DataCenter {
 
         if (sessions != null) {
             EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
+
         } else {
             // If there was not result in local, send search request to server
-            // TODO: ask server for search feature
             searchAsync(context, keyword);
         }
     }
@@ -91,12 +93,11 @@ public class DataCenter {
 
     @Background(serial = CACHE)
     public void getOperators() {
+
         // Search on local db
         Realm realm = Realm.getInstance(context);
         RealmResults<Operator> operators = realm.where(Operator.class).findAll();
-        Logger.Log("operators count in dataCenter: " + operators.size());
         EventBus.getDefault().post(new OperatorsGotEvent(operators));
-
     }
 
     @Background(serial = CACHE)
@@ -129,8 +130,6 @@ public class DataCenter {
         gateImage.setId(0);
         gateImage.setType(type);
         gateImage.setUrl(url);
-
-        // Commit transaction
         realm.commitTransaction();
 
         Logger.Log("insert gate image successfully");

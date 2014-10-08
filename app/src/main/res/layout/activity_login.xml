@@ -45,7 +45,7 @@
 			<!-- Login progress -->
 
 			<LinearLayout
-				android:id="@+id/ll_login_status"
+				android:id="@+id/ll_search_progress"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_gravity="center_vertical"
