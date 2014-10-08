@@ -2,29 +2,15 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/ll_addcontainter"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center"
     android:orientation="vertical"
-    android:paddingLeft="20dp"
-    android:paddingRight="20dp">
+    android:padding="12dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Không tìm thấy container" />
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="#c0c0c0" />
-
-    <TextView
-        android:id="@+id/tv_containterid_search"
-        android:text="ContainerID này chưa được nhập vào hệ thống CJay"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:text="ContainerID chứa từ khóa này chưa được nhập" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -32,43 +18,14 @@
         android:orientation="horizontal">
 
         <TextView
-            android:text="ContainerID: "
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="ContainerID" />
 
         <EditText
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/et_containerid_diaglog"
-            android:visibility="gone"/>
+            android:id="@+id/et_container_id"/>
 
-        <TextView
-            android:id="@+id/tv_search_result"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:weightSum="2"
-        android:orientation="horizontal">
-
-        <Button
-            android:textSize="12sp"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/btn_addContainer"
-            android:text="Tạo mới" />
-
-        <Button
-            android:textSize="12sp"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Bỏ qua"
-            android:id="@+id/btn_cancelAddContainer" />
     </LinearLayout>
 </LinearLayout>

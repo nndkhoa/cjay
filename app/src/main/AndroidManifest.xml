@@ -67,7 +67,6 @@
         <activity
             android:name=".activity.WizardActivity_"
             android:label="@string/title_activity_main_process">
-
         </activity>
 
 		<activity

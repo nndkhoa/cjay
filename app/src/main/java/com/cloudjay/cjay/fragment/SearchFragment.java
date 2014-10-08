@@ -22,6 +22,8 @@ import com.cloudjay.cjay.adapter.SessionAdapter;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.fragment.dialog.AddContainerDialog;
 import com.cloudjay.cjay.fragment.dialog.AddContainerDialog_;
+import com.cloudjay.cjay.fragment.dialog.SearchResultContainerDialog;
+import com.cloudjay.cjay.fragment.dialog.SearchResultContainerDialog_;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -36,10 +38,13 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.List;
+import java.util.SimpleTimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.greenrobot.event.EventBus;
+import eu.inmite.android.lib.dialogs.ISimpleDialogListener;
+import eu.inmite.android.lib.dialogs.SimpleDialogFragment;
 
 /**
  * Tab search container
@@ -97,6 +102,7 @@ public class SearchFragment extends Fragment {
 		else {
 
 			// Start search in background
+            containerID = keyword;
 			dataCenter.search(getActivity(), keyword);
 		}
 	}
@@ -153,8 +159,7 @@ public class SearchFragment extends Fragment {
 			mAdapter.notifyDataSetChanged();
 
 			if (result.size() == 0) {
-				// TODO: Show dialog alert that keyword was not found
-				showAddContainerDialog(containerID);
+                showSearchResultDialog(containerID);
 			}
 		}
 	}
@@ -170,11 +175,13 @@ public class SearchFragment extends Fragment {
 		startActivity(intent);
 	}
 
-	private void showAddContainerDialog(String containerID) {
-		FragmentManager fragmentManager = getChildFragmentManager();
-		AddContainerDialog addContainerDialog = AddContainerDialog_.builder().containerID(containerID).build();
-		addContainerDialog.show(fragmentManager, "fragment_addcontainer");
-	}
+    private void showSearchResultDialog(String containerId) {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        SearchResultContainerDialog searchResultDialog = SearchResultContainerDialog_
+                .builder().containerId(containerId).build();
+        searchResultDialog.show(fragmentManager, "search_container_result_dialog");
+
+    }
 
 	// TODO: @thai cần phải refactor lại chỗ này, add Enum và tạo hàm trong Utils.java
 	private boolean isGateRole() {

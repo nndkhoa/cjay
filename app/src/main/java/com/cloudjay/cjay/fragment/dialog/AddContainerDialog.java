@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.WizardActivity_;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 
 import org.androidannotations.annotations.AfterViews;
@@ -21,68 +22,50 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 
+import eu.inmite.android.lib.dialogs.SimpleDialogFragment;
+
 @EFragment(R.layout.fragment_addcontainer)
-public class AddContainerDialog extends android.support.v4.app.DialogFragment {
+public class AddContainerDialog extends SimpleDialogFragment {
 
-    @FragmentArg("containerID")
-    String containerID;
+    @FragmentArg("containerId")
+    String containerId;
 
-    @ViewById(R.id.tv_containterid_search)
-    TextView tvContainerIDSearch;
-
-    @ViewById(R.id.tv_search_result)
-    TextView tvSearchResult;
-
-    @ViewById(R.id.btn_addContainer)
-    Button btnAddContainer;
-
-    @ViewById(R.id.et_containerid_diaglog)
+    @ViewById(R.id.et_container_id)
     EditText etContainerID;
 
-    // TODO: mismatch naming convention !! @thai please refactor those id
-    // R.id.btn_cancelAddContainer --> (should be) R.id.btn_cancel or R.id.btn_cancel_add_container
-    @ViewById(R.id.btn_cancelAddContainer)
-    Button btnCancelAddContainer;
+    @Override
+    protected Builder build(Builder builder) {
+        builder.setTitle(R.string.dialog_search_container_title);
+        builder.setPositiveButton("Tạo mới", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO: validate container ISO and create container
+                // Validate Container Id
+                if(Utils.isContainerIdValid(containerId)) {
+                    // Go to wizzard activity
+                    Intent intent = new Intent(getActivity(), WizardActivity_.class);
+                    startActivity(intent);
+                    dismiss();
+                } else {
+                    //
+                }
+            }
+        });
+        builder.setView(LayoutInflater.from(getActivity()).inflate(R.layout.fragment_addcontainer, null));
+        builder.setNegativeButton("Bỏ qua", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
 
-    public AddContainerDialog() {
+        return builder;
     }
 
     @AfterViews
-    void init() {
-        //Remove title bar
-        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        tvSearchResult.setText(containerID);
-        if (Utils.isContainerIdValid(containerID)) {
-            btnAddContainer.setText(R.string.dialog_create_container_id_invalid_iso);
-        }
-        if (!Utils.simpleValid(containerID)) {
-            tvContainerIDSearch.setVisibility(View.GONE);
-            etContainerID.setVisibility(View.VISIBLE);
-            etContainerID.setText(containerID);
-        }
-    }
-
-    @Click(R.id.btn_cancelAddContainer)
-    void btnCancelClicked() {
-        getDialog().dismiss();
-    }
-
-    @Click(R.id.btn_addContainer)
-    void btnAddClicked() {
-        if (etContainerID.getVisibility() == View.VISIBLE) {
-            containerID = etContainerID.getText().toString();
-            startWizadActivity(containerID);
-        } else {
-            startWizadActivity(containerID);
-        }
-
-    }
-
-    private void startWizadActivity(String containerID) {
-        Intent wizardActivityIntent = new Intent(getActivity(), WizardActivity_.class);
-        wizardActivityIntent.putExtra("containerID", containerID);
-        startActivity(wizardActivityIntent);
-        getDialog().dismiss();
+    void doAfterViews() {
+        // Set search keywotrd into edit text
+        etContainerID.setText(containerId);
     }
 
 }
