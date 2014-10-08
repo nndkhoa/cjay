@@ -169,6 +169,9 @@ public class ImportFragment extends Fragment {
 
 	@Click(R.id.btn_continue)
 	void buttonContinueClicked() {
+        // Get selected radio type
+
+
 		//Go to next fragment
 		AuditFragment fragment = new AuditFragment_().builder().build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();

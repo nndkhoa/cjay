@@ -1,5 +1,6 @@
 package com.cloudjay.cjay.fragment;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
@@ -12,8 +13,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
+import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.fragment.dialog.AddContainerDialog;
 import com.cloudjay.cjay.fragment.dialog.AddContainerDialog_;
 import com.cloudjay.cjay.model.Session;
@@ -22,163 +26,152 @@ import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.Trace;
+import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.realm.Realm;
-import io.realm.RealmQuery;
-import io.realm.RealmResults;
-
 /**
- *
+ * Tab search container
  */
 @EFragment(R.layout.fragment_search)
 public class SearchFragment extends Fragment {
 
-    @ViewById(R.id.btn_search)
-    Button btnSearch;
+	//region VIEW
+	@ViewById(R.id.btn_search)
+	Button btnSearch;
 
-    @ViewById(R.id.et_search)
-    EditText etSearch;
+	@ViewById(R.id.et_search)
+	EditText etSearch;
 
-    @ViewById(R.id.lv_search_container)
-    ListView lvSearch;
+	@ViewById(R.id.lv_search_container)
+	ListView lvSearch;
 
-    @ViewById(R.id.ll_login_status)
-    LinearLayout llLoginStatus;
+	@ViewById(R.id.ll_search_progress)
+	LinearLayout llSearchProgress;
+	//endregion
 
-    Pattern pattern = Pattern.compile("^[a-zA-Z]{4}");
-    private SessionAdapter mAdapter;
+	Pattern pattern = Pattern.compile("^[a-zA-Z]{4}");
 
-    public SearchFragment() {
-    }
+	@Bean
+	DataCenter dataCenter;
+	String containerID;
 
-    @Click(R.id.btn_search)
-    void buttonSearchClicked() {
-        lvSearch.setVisibility(View.GONE);
-        llLoginStatus.setVisibility(View.VISIBLE);
-        String containerID = etSearch.getText().toString();
-        if (isGateRole()) {
-            //If this is gate role, check enough 11 charater (4 string, 7 int)
-            if (TextUtils.isEmpty(containerID)) {
-                etSearch.setError(getString(R.string.dialog_container_id_required));
-            } else if (!Utils.simpleValid(containerID)) {
-                etSearch.setError(getString(R.string.dialog_container_id_invalid));
-                return;
-            } else {
-                List<Session> result = searchSession(containerID);
-                llLoginStatus.setVisibility(View.GONE);
-                lvSearch.setVisibility(View.INVISIBLE);
-                if (result != null){
-                    mAdapter.clear();
-                    mAdapter.addAll(result);
-                    refreshListView();
-                    if (result.size()==0){
-                        showAddContainerDialog(containerID);
-                    }
-                }
-                etSearch.setText("");
-            }
-        } else {
-            //Check not null
-            if (TextUtils.isEmpty(containerID)) {
-                etSearch.setError(getString(R.string.dialog_container_id_required));
-            } else {
-                List<Session> result = searchSession(containerID);
-                llLoginStatus.setVisibility(View.GONE);
-                lvSearch.setVisibility(View.INVISIBLE);
-                if (result != null) {
-                    mAdapter.clear();
-                    mAdapter.addAll(result);
-                    refreshListView();
-                    if (result.size()==0){
-                        showAddContainerDialog(containerID);
-                    }
-                }
-                etSearch.setText("");
-            }
-        }
-    }
+	private SessionAdapter mAdapter;
 
-    @AfterViews
-    void doAfterViews() {
-        mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
-        lvSearch.setAdapter(mAdapter);
-        etSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                if (s.length() == 0) {
-                    etSearch.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-                }
+	public SearchFragment() {
+	}
 
-            }
+	@UiThread
+	void showProgress(final boolean show) {
+		llSearchProgress.setVisibility(show ? View.VISIBLE : View.GONE);
+		lvSearch.setVisibility(show ? View.GONE : View.VISIBLE);
+	}
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (isGateRole()) {
-                    Matcher matcher = pattern.matcher(s);
-                    if (s.length() < 4) {
-                        if (etSearch.getInputType() != InputType.TYPE_CLASS_TEXT) {
-                            etSearch.setInputType(InputType.TYPE_CLASS_TEXT
-                                    | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-                        }
+	@Click(R.id.btn_search)
+	void buttonSearchClicked() {
+		showProgress(true);
+		String keyword = etSearch.getText().toString();
 
-                    } else if (matcher.matches()) {
+		if (TextUtils.isEmpty(keyword)) {
+			etSearch.setError(getString(R.string.dialog_container_id_required));
 
-                        if (etSearch.getInputType() != InputType.TYPE_CLASS_NUMBER) {
-                            etSearch.setInputType(InputType.TYPE_CLASS_NUMBER
-                                    | InputType.TYPE_NUMBER_VARIATION_NORMAL);
-                        }
-                    }
-                } else {
-                    etSearch.setInputType(InputType.TYPE_CLASS_NUMBER
-                            | InputType.TYPE_NUMBER_VARIATION_NORMAL);
-                }
+		} else if (isGateRole() && !Utils.simpleValid(keyword)) {
 
-            }
+			// Note: if current user is Gate then we need to validate full container ID
+			etSearch.setError(getString(R.string.dialog_container_id_invalid));
 
-            @Override
-            public void afterTextChanged(Editable s) {
+		} else {
 
-            }
-        });
-    }
+			// Start search in background
+			dataCenter.search(getActivity(), keyword);
+		}
+	}
 
-    //TODO refresh list view after search
-    private void refreshListView() {
-        mAdapter.notifyDataSetChanged();
-    }
+	@AfterViews
+	void doAfterViews() {
+		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
+		lvSearch.setAdapter(mAdapter);
+		etSearch.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+				if (s.length() == 0) {
+					etSearch.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+				}
+			}
 
-    //TODO add logic search
-    @Trace
-    private List<Session> searchSession(String containeriD) {
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				if (isGateRole()) {
+					Matcher matcher = pattern.matcher(s);
+					if (s.length() < 4) {
+						if (etSearch.getInputType() != InputType.TYPE_CLASS_TEXT) {
+							etSearch.setInputType(InputType.TYPE_CLASS_TEXT
+									| InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+						}
+					} else if (matcher.matches()) {
+						if (etSearch.getInputType() != InputType.TYPE_CLASS_NUMBER) {
+							etSearch.setInputType(InputType.TYPE_CLASS_NUMBER);
+						}
+					}
+				} else {
+					etSearch.setInputType(InputType.TYPE_CLASS_NUMBER);
+				}
 
-        Realm realm = Realm.getInstance(getActivity());
-        RealmQuery<Session> query = realm.where(Session.class);
-        query.contains("containerId", containeriD);
-        RealmResults<Session> results = query.findAll();
-        Logger.e(results.toString());
-        return results;
-    }
+			}
 
-    private void showAddContainerDialog(String containerID) {
-        FragmentManager fragmentManager = getChildFragmentManager();
-        AddContainerDialog addContainerDialog = AddContainerDialog_.builder().containerID(containerID).build();
-        addContainerDialog.show(fragmentManager, "fragment_addcontainer");
-    }
+			@Override
+			public void afterTextChanged(Editable s) {
 
-    private boolean isGateRole() {
-        if (PreferencesUtil.getPrefsValue(getActivity(), PreferencesUtil.PREF_USER_ROLE).equals("6")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+			}
+		});
+	}
 
+	@UiThread
+	public void onEvent(ContainerSearchedEvent event) {
+
+		showProgress(false);
+		List<Session> result = event.getSessions();
+		if (result != null) {
+
+			mAdapter.clear();
+			mAdapter.addAll(result);
+			mAdapter.notifyDataSetChanged();
+
+			if (result.size() == 0) {
+				// TODO: Show dialog alert that keyword was not found
+				showAddContainerDialog(containerID);
+			}
+		}
+	}
+
+	@ItemClick(R.id.lv_search_container)
+	void searchListViewItemClicked(int position) {
+		// navigation to Wizard Activity
+		Session item = mAdapter.getItem(position);
+		Intent intent = new Intent(getActivity(), WizardActivity_.class);
+		intent.putExtra("", item.getContainerId());
+		startActivity(intent);
+	}
+
+	private void showAddContainerDialog(String containerID) {
+		FragmentManager fragmentManager = getChildFragmentManager();
+		AddContainerDialog addContainerDialog = AddContainerDialog_.builder().containerID(containerID).build();
+		addContainerDialog.show(fragmentManager, "fragment_addcontainer");
+	}
+
+	// TODO: @thai cần phải refactor lại chỗ này, add Enum và tạo hàm trong Utils.java
+	private boolean isGateRole() {
+		if (PreferencesUtil.getPrefsValue(getActivity(), PreferencesUtil.PREF_USER_ROLE).equals("6")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
