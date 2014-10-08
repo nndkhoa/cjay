@@ -59,6 +59,7 @@ public class SearchFragment extends Fragment {
 
     @Click(R.id.btn_search)
     void buttonSearchClicked() {
+
         lvSearch.setVisibility(View.GONE);
         llLoginStatus.setVisibility(View.VISIBLE);
         String containerID = etSearch.getText().toString();
@@ -106,7 +107,6 @@ public class SearchFragment extends Fragment {
                 if (s.length() == 0) {
                     etSearch.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
                 }
-
             }
 
             @Override
@@ -140,12 +140,12 @@ public class SearchFragment extends Fragment {
         });
     }
 
-    //TODO refresh list view after search
+    //TODO: refresh list view after search
     private void refreshListView() {
         mAdapter.notifyDataSetChanged();
     }
 
-    //TODO add logic search
+    //TODO: add logic search
     private List<Session> searchSession(String containeriD) {
         Realm realm = Realm.getInstance(getActivity());
         RealmQuery<Session> query = realm.where(Session.class);
@@ -160,6 +160,7 @@ public class SearchFragment extends Fragment {
         addContainerDialog.show(fragmentManager, "fragment_addcontainer");
     }
 
+	// TODO: @thai cần phải refactor lại chỗ này, add Enum và tạo hàm trong Utils.java
     private boolean isGateRole() {
         if (PreferencesUtil.getPrefsValue(getActivity(), PreferencesUtil.PREF_USER_ROLE) == "6") {
             return true;
@@ -167,5 +168,4 @@ public class SearchFragment extends Fragment {
             return false;
         }
     }
-
 }
