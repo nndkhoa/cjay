@@ -1,5 +1,6 @@
 package com.cloudjay.cjay.api;
 
+import com.cloudjay.cjay.model.Session;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -49,7 +50,7 @@ public interface NetworkService {
 	public JsonObject searchContainer(@Query("search") String keyword);
 
 	@POST(ApiEndpoint.CONTAINER_SESSIONS_API)
-	public void postContainer(@Field("username") String username, @Field("password") String password);
+	public JsonObject postContainer(@Body Session session);
 
 	// Check source v1, uploadType=media
 	@POST(ApiEndpoint.CJAY_TMP_STORAGE_IMAGE)
