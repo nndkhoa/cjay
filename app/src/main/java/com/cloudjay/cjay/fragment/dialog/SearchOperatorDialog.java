@@ -62,20 +62,16 @@ public class SearchOperatorDialog extends DialogFragment {
 
 	@UiThread
 	public void onEvent(OperatorsGotEvent event) {
-		// retrieve list operators
+		// Retrieve list operators
 		operators = event.getOperators();
-        Logger.Log("operators count in event: " + operators.size());
-
 		// Init and set adapter
         if (null == operatorAdapter) {
-            Logger.Log("operatorAdapter is null");
             operatorAdapter = new OperatorAdapter(getActivity(), operators);
             lvOperators.setAdapter(operatorAdapter);
         }
 
         // Notify change
         operatorAdapter.swapOperators(operators);
-        // operatorAdapter.notifyDataSetChanged();
 	}
 
 	@AfterViews

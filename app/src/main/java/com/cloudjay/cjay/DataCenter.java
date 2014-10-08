@@ -151,9 +151,7 @@ public class DataCenter {
     }
 
     public void searchOperator(String keyword) {
-        Logger.Log("keyword is " + keyword);
         Realm realm = Realm.getInstance(context);
-        //RealmResults<Operator> operators = realm.where(Operator.class).findAll();
         RealmResults<Operator> operators = realm.where(Operator.class)
                 .contains("operatorName", keyword).or()
                 .contains("operatorCode", keyword)
