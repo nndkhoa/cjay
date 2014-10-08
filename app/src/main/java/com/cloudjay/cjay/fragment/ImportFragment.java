@@ -32,6 +32,7 @@ import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.CheckedChange;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
@@ -185,6 +186,11 @@ public class ImportFragment extends Fragment {
 			startSearchOperator();
 		}
 	}
+
+    @CheckedChange({ R.id.rdn_status_a, R.id.rdn_status_b, R.id.rdn_status_c })
+    void radioTypesCheckedChanged() {
+
+    }
 
 	private void showDialogSearchOperator() {
 		FragmentManager fm = getActivity().getSupportFragmentManager();

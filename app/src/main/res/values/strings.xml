@@ -76,4 +76,7 @@
     <!-- Dialog Search Operator -->
     <string name="dialog_container_owner">Hãng tàu</string>
     <string name="dialog_operator_title">Danh sách hãng tàu</string>
+
+    <!-- Dialog Search Session Result -->
+    <string name="dialog_search_container_title">Không tìm thấy Container</string>
 </resources>
