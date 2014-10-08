@@ -80,9 +80,10 @@ public class Utils {
 		return true;
 	}
 
-	public static boolean simpleValid(String containeriD) {
+	public static boolean simpleValid(String containerID) {
+
 		Pattern pattern = Pattern.compile("^([A-Z]+){4,4}+(\\d{7,7}+)$");
-		Matcher matcher = pattern.matcher(containeriD);
+		Matcher matcher = pattern.matcher(containerID);
 
 		if (!matcher.matches()) return false;
 
@@ -105,7 +106,7 @@ public class Utils {
 		realm.beginTransaction();
 
 		String containerId = e.get("container_id").toString();
-		Logger.Log(" > Parsing container: " + containerId);
+//		Logger.Log(" > Parsing container: " + containerId);
 
 		Session session = realm.createObject(Session.class);
 		session.setId(Long.parseLong(e.get("id").toString()));

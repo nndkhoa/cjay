@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.fragment;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
@@ -21,6 +22,7 @@ import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.fragment.dialog.AddContainerDialog;
 import com.cloudjay.cjay.fragment.dialog.AddContainerDialog_;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 
@@ -35,6 +37,8 @@ import org.androidannotations.annotations.ViewById;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Tab search container
@@ -79,14 +83,17 @@ public class SearchFragment extends Fragment {
 		String keyword = etSearch.getText().toString();
 
 		if (TextUtils.isEmpty(keyword)) {
+
 			etSearch.setError(getString(R.string.dialog_container_id_required));
+			showProgress(false);
 
 		} else if (isGateRole() && !Utils.simpleValid(keyword)) {
 
 			// Note: if current user is Gate then we need to validate full container ID
 			etSearch.setError(getString(R.string.dialog_container_id_invalid));
-
-		} else {
+			showProgress(false);
+		}
+		else {
 
 			// Start search in background
 			dataCenter.search(getActivity(), keyword);
@@ -135,6 +142,7 @@ public class SearchFragment extends Fragment {
 	@UiThread
 	public void onEvent(ContainerSearchedEvent event) {
 
+		Logger.Log("onEvent ContainerSearchedEvent");
 		showProgress(false);
 		List<Session> result = event.getSessions();
 		if (result != null) {
@@ -172,5 +180,17 @@ public class SearchFragment extends Fragment {
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		EventBus.getDefault().register(this);
+	}
+
+	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
 	}
 }
