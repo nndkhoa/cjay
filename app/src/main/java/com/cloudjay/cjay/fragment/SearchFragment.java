@@ -163,19 +163,13 @@ public class SearchFragment extends Fragment {
         showProgress(false);
         List<Session> result = event.getSessions();
 
-        if (result != null) {
+        if (result.size() != 0) {
             mAdapter.clear();
             mAdapter.addAll(result);
             mAdapter.notifyDataSetChanged();
-
-            if (result.size() == 0) {
-                showSearchResultDialog(containerID);
-            }
         } else {
             Logger.Log("Result is null");
-            if (result.size() == 0) {
-                showSearchResultDialog(containerID);
-            }
+            showSearchResultDialog(containerID);
         }
     }
 

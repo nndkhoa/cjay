@@ -139,7 +139,11 @@ public class Utils {
         session.setId(Long.parseLong(e.get("id").toString()));
         session.setContainerId(e.get("container_id").toString());
         session.setCheckInTime(e.get("check_in_time").toString());
-        session.setCheckOutTime(e.get("check_out_time").toString());
+        if (e.get("check_out_time").isJsonNull()) {
+            session.setCheckOutTime("");
+        } else {
+            session.setCheckOutTime(e.get("check_out_time").toString());
+        }
         session.setDepotCode(e.get("depot_code").toString());
         session.setDepotId(Long.parseLong(e.get("depot_id").toString()));
         session.setOperatorCode(e.get("operator_code").toString());

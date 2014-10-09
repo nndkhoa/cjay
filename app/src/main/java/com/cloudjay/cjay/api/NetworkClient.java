@@ -314,12 +314,13 @@ public class NetworkClient {
         List<Session> sessions = new ArrayList<Session>();
 
         JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).searchContainer(keyword);
+        Logger.e(jsonObject.toString());
         JsonArray jsonArray = jsonObject.getAsJsonArray("results");
 
         for (JsonElement e : jsonArray) {
             sessions.add(Utils.parseSession(context, e.getAsJsonObject()));
         }
-
+        Logger.e(String.valueOf(sessions.size()));
         return sessions;
     }
 

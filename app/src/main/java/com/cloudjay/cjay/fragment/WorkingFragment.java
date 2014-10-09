@@ -8,15 +8,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.event.ParsedSessionEvent;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.loader.AbstractDataLoader;
 import com.cloudjay.cjay.adapter.SessionAdapter;
 import com.cloudjay.cjay.model.Session;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import io.realm.Realm;
@@ -32,7 +29,7 @@ public class WorkingFragment extends Fragment implements LoaderManager.LoaderCal
 	private static final int LOADER_ID = 1;
 
 	@ViewById(R.id.lv_working_container)
-	ListView listView;
+	ListView lvWorking;
 
 	@ViewById(R.id.tv_emptylist_working)
 	TextView tvEmpty;
@@ -50,8 +47,8 @@ public class WorkingFragment extends Fragment implements LoaderManager.LoaderCal
 	void initLoader() {
 		getLoaderManager().initLoader(LOADER_ID, null, this);
 		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
-		listView.setAdapter(mAdapter);
-		listView.setEmptyView(tvEmpty);
+		lvWorking.setAdapter(mAdapter);
+		lvWorking.setEmptyView(tvEmpty);
         Realm realm = Realm.getInstance(getActivity());
         realm.addChangeListener(new RealmChangeListener() {
 
