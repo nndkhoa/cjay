@@ -14,7 +14,7 @@
 		android:inputType="textCapCharacters|textNoSuggestions"
 		android:selectAllOnFocus="true"
 		android:hint="@string/fragment_search_hint_et_search"
-        android:background="@android:drawable/editbox_background_normal"
+        android:background="@android:drawable/editbox_dropdown_light_frame"
         android:singleLine="true"
         android:textSize="18sp"
         android:layout_marginBottom="6dp"/>
@@ -24,7 +24,7 @@
 		android:layout_height="wrap_content"
 		android:src="@android:drawable/ic_menu_search"
 		android:id="@+id/btn_search"
-        android:background="@drawable/btn_customize"
+        android:background="@drawable/btn_customize_selector"
         android:layout_marginBottom="12dp"/>
 
 	<LinearLayout

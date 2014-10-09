@@ -17,5 +17,7 @@
     <color name="pressed_photup">#CC6fccf7</color>
 
     <!-- Main Colors -->
+    <color name="tab_background_stacked">#128AB2</color>
+    <color name="actionbar_background">#373737</color>
     <color name="background_button_and_line">#0091CC</color>
 </resources>

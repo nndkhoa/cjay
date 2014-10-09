@@ -44,6 +44,7 @@ import java.util.regex.Pattern;
 import de.greenrobot.event.EventBus;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
+import io.realm.RealmResults;
 
 /**
  * Tab search container
@@ -93,8 +94,7 @@ public class SearchFragment extends Fragment {
         // Start search in background
         containerID = keyword;
         dataCenter.search(getActivity(), keyword);
-
-    }
+	}
 
     @AfterViews
     void doAfterViews() {

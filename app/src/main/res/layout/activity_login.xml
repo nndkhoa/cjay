@@ -88,7 +88,7 @@
 						android:layout_width="match_parent"
 						android:layout_height="48dp"
 						android:layout_marginBottom="6dp"
-						android:background="@android:drawable/editbox_background_normal"
+                        android:background="@android:drawable/editbox_dropdown_light_frame"
 						android:hint="@string/prompt_email"
 						android:inputType="textEmailAddress"
 						android:maxLines="1"
@@ -105,7 +105,7 @@
 						android:layout_width="match_parent"
 						android:layout_height="48dp"
 						android:layout_marginBottom="6dp"
-						android:background="@android:drawable/editbox_background_normal"
+                        android:background="@android:drawable/editbox_dropdown_light_frame"
 						android:ems="10"
 						android:hint="@string/prompt_password"
 						android:imeActionId="@+id/login"
@@ -131,7 +131,7 @@
 						android:shadowDx="1"
 						android:text="@string/action_sign_in_short"
                         android:textColor="@android:color/white"
-                        android:background="@drawable/btn_customize" />
+                        android:background="@drawable/btn_customize_selector" />
 				</LinearLayout>
 			</ScrollView>
 		</LinearLayout>
