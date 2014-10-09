@@ -6,10 +6,12 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.view.View;
 
+import com.cloudjay.cjay.event.ParsedSessionEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.enums.Role;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -17,6 +19,7 @@ import com.google.gson.JsonObject;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.greenrobot.event.EventBus;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 import io.realm.Realm;
@@ -58,6 +61,11 @@ public class Utils {
             }
         });
         crouton.show();
+    }
+
+    public static int getRole(Context context) {
+
+        return Integer.valueOf(PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_USER_ROLE));
     }
 
     //Check containerID is valid or not
@@ -102,9 +110,30 @@ public class Utils {
      * @return
      */
     public static Session parseSession(Context context, JsonObject e) {
-        
-        Realm realm = Realm.getInstance(context);
 
+        //Check available session
+        String containerId = e.get("container_id").toString();
+        Realm realm = Realm.getInstance(context);
+        RealmResults<Session> sessions = realm.where(Session.class).equalTo("containerId", containerId).findAll();
+        //If hasn't -> create
+        if (sessions.isEmpty()) {
+            Session session = parseNewSession(context, e);
+            return session;
+        }
+        //else -> update
+        else {
+            realm.beginTransaction();
+            sessions.clear();
+            Session session = parseNewSession(context, e);
+            realm.commitTransaction();
+            return session;
+        }
+
+
+    }
+
+    private static Session parseNewSession(Context context, JsonObject e) {
+        Realm realm = Realm.getInstance(context);
         realm.beginTransaction();
         Session session = realm.createObject(Session.class);
         session.setId(Long.parseLong(e.get("id").toString()));
@@ -187,7 +216,6 @@ public class Utils {
             session.getGateImages().add(imageItem);
         }
         realm.commitTransaction();
-
         return session;
     }
 }

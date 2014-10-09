@@ -8,15 +8,19 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.event.ParsedSessionEvent;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.loader.AbstractDataLoader;
 import com.cloudjay.cjay.adapter.SessionAdapter;
 import com.cloudjay.cjay.model.Session;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
 /**
@@ -48,22 +52,40 @@ public class WorkingFragment extends Fragment implements LoaderManager.LoaderCal
 		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
 		listView.setAdapter(mAdapter);
 		listView.setEmptyView(tvEmpty);
+        Realm realm = Realm.getInstance(getActivity());
+        realm.addChangeListener(new RealmChangeListener() {
+
+            @Override
+            public void onChange() {
+                refreshListView();
+            }
+        });
 	}
 
-	@Override
+    private void refreshListView() {
+        getLoaderManager().restartLoader(LOADER_ID,null,this);
+    }
+
+    @Override
 	public Loader<RealmResults<Session>> onCreateLoader(int id, Bundle args) {
 
 		return new AbstractDataLoader<RealmResults<Session>>(getActivity()) {
 			@Override
 			protected RealmResults<Session> buildList() {
 				Realm realm = Realm.getInstance(context);
-				return realm.where(Session.class).equalTo("processing",true).findAll();
+				return realm.where(Session.class).equalTo("processing",false).findAll();
 			}
 		};
 
 	}
 
-	@Override
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    @Override
 	public void onLoadFinished(Loader<RealmResults<Session>> loader, RealmResults<Session> data) {
 		mAdapter.clear();
 		for (Session session : data) {

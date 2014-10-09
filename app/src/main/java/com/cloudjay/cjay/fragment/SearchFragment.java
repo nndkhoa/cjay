@@ -27,6 +27,7 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.enums.Role;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -51,162 +52,162 @@ import io.realm.RealmResults;
 @EFragment(R.layout.fragment_search)
 public class SearchFragment extends Fragment {
 
-	//region VIEW
-	@ViewById(R.id.btn_search)
+    //region VIEW
+    @ViewById(R.id.btn_search)
     ImageButton btnSearch;
 
-	@ViewById(R.id.et_search)
-	EditText etSearch;
+    @ViewById(R.id.et_search)
+    EditText etSearch;
 
-	@ViewById(R.id.lv_search_container)
-	ListView lvSearch;
+    @ViewById(R.id.lv_search_container)
+    ListView lvSearch;
 
-	@ViewById(R.id.ll_search_progress)
-	LinearLayout llSearchProgress;
+    @ViewById(R.id.ll_search_progress)
+    LinearLayout llSearchProgress;
 
     @ViewById(R.id.ll_search_result)
     LinearLayout llSearchResult;
-	//endregion
+    //endregion
 
-	Pattern pattern = Pattern.compile("^[a-zA-Z]{4}");
+    Pattern pattern = Pattern.compile("^[a-zA-Z]{4}");
 
-	@Bean
-	DataCenter dataCenter;
-	String containerID;
+    @Bean
+    DataCenter dataCenter;
+    String containerID;
 
-	private SessionAdapter mAdapter;
+    private SessionAdapter mAdapter;
 
-	public SearchFragment() {
-	}
+    public SearchFragment() {
+    }
 
-	@UiThread
-	void showProgress(final boolean show) {
-		llSearchProgress.setVisibility(show ? View.VISIBLE : View.GONE);
+    @UiThread
+    void showProgress(final boolean show) {
+        llSearchProgress.setVisibility(show ? View.VISIBLE : View.GONE);
         llSearchResult.setVisibility(show ? View.GONE : View.VISIBLE);
-	}
+    }
 
-	@Click(R.id.btn_search)
-	void buttonSearchClicked() {
-		showProgress(true);
-		String keyword = etSearch.getText().toString();
+    @Click(R.id.btn_search)
+    void buttonSearchClicked() {
+        showProgress(true);
+        String keyword = etSearch.getText().toString();
 
         // Start search in background
         containerID = keyword;
         dataCenter.search(getActivity(), keyword);
-
 	}
 
-	@AfterViews
-	void doAfterViews() {
-		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
-		lvSearch.setAdapter(mAdapter);
-		etSearch.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-				if (s.length() == 0) {
-					etSearch.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-				}
-			}
+    @AfterViews
+    void doAfterViews() {
+        mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
+        lvSearch.setAdapter(mAdapter);
+        //Set input type for role
+        setKeybroadForRole();
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                if (s.length() == 0) {
 
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				if (isGateRole()) {
-					Matcher matcher = pattern.matcher(s);
-					if (s.length() < 4) {
-						if (etSearch.getInputType() != InputType.TYPE_CLASS_TEXT) {
-							etSearch.setInputType(InputType.TYPE_CLASS_TEXT
-									| InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-						}
-					} else if (matcher.matches()) {
-						if (etSearch.getInputType() != InputType.TYPE_CLASS_NUMBER) {
-							etSearch.setInputType(InputType.TYPE_CLASS_NUMBER);
-						}
-					}
-				} else {
-					etSearch.setInputType(InputType.TYPE_CLASS_NUMBER);
-				}
+                }
+            }
 
-			}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if ((Utils.getRole(getActivity())) == Role.GATE.getValue()) {
+                    Matcher matcher = pattern.matcher(s);
+                    if (s.length() < 4) {
+                        if (etSearch.getInputType() != InputType.TYPE_CLASS_TEXT) {
+                            etSearch.setInputType(InputType.TYPE_CLASS_TEXT
+                                    | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                        }
+                    } else if (matcher.matches()) {
+                        if (etSearch.getInputType() != InputType.TYPE_CLASS_NUMBER) {
+                            etSearch.setInputType(InputType.TYPE_CLASS_NUMBER);
+                        }
+                    }
+                } else {
+                    etSearch.setInputType(InputType.TYPE_CLASS_NUMBER);
+                }
 
-			@Override
-			public void afterTextChanged(Editable s) {
+            }
 
-			}
-		});
+            @Override
+            public void afterTextChanged(Editable s) {
 
-		// Use to notify UI when some threads adding data to Realm
-		Realm realm = Realm.getInstance(getActivity());
-		realm.addChangeListener(new RealmChangeListener() {
+            }
+        });
 
-			@Override
-			public void onChange() {
-				Logger.Log("Realm data changed");
-			}
-		});
-	}
+        // Use to notify UI when some threads adding data to Realm
+        Realm realm = Realm.getInstance(getActivity());
+        realm.addChangeListener(new RealmChangeListener() {
 
-	@UiThread
-	public void onEvent(ContainerSearchedEvent event) {
+            @Override
+            public void onChange() {
+                Logger.Log("Realm data changed");
+            }
+        });
+    }
 
-		Logger.Log("onEvent ContainerSearchedEvent");
+    private void setKeybroadForRole() {
+        if ((Utils.getRole(getActivity())) == Role.GATE.getValue()) {
+            etSearch.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+        } else {
+            etSearch.setInputType(InputType.TYPE_CLASS_NUMBER);
+        }
+    }
 
-		showProgress(false);
-		//List<Session> result = event.getSessions();
-        RealmResults<Session> result = event.getSessions();
+    @UiThread
+    public void onEvent(ContainerSearchedEvent event) {
 
-		if (result != null) {
-			mAdapter.clear();
-			mAdapter.addAll(result);
-			mAdapter.notifyDataSetChanged();
+        Logger.Log("onEvent ContainerSearchedEvent");
 
-			if (result.size() == 0) {
-				showSearchResultDialog(containerID);
-			}
-		} else {
-			Logger.Log("Result is null");
-			if (result.size() == 0) {
-				showSearchResultDialog(containerID);
-			}
-		}
-	}
+        showProgress(false);
+        List<Session> result = event.getSessions();
 
-	@ItemClick(R.id.lv_search_container)
-	void searchListViewItemClicked(int position) {
+        if (result != null) {
+            mAdapter.clear();
+            mAdapter.addAll(result);
+            mAdapter.notifyDataSetChanged();
 
-		// navigation to Wizard Activity
-		Session item = mAdapter.getItem(position);
-		Intent intent = new Intent(getActivity(), WizardActivity_.class);
-		intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, item.getContainerId());
-		intent.putExtra(WizardActivity.STEP_EXTRA, item.getStep());
-		startActivity(intent);
-	}
+            if (result.size() == 0) {
+                showSearchResultDialog(containerID);
+            }
+        } else {
+            Logger.Log("Result is null");
+            if (result.size() == 0) {
+                showSearchResultDialog(containerID);
+            }
+        }
+    }
 
-	private void showSearchResultDialog(String containerId) {
-		FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-		SearchResultContainerDialog searchResultDialog = SearchResultContainerDialog_
-				.builder().containerId(containerId).build();
-		searchResultDialog.show(fragmentManager, "search_container_result_dialog");
+    @ItemClick(R.id.lv_search_container)
+    void searchListViewItemClicked(int position) {
 
-	}
+        // navigation to Wizard Activity
+        Session item = mAdapter.getItem(position);
+        Intent intent = new Intent(getActivity(), WizardActivity_.class);
+        intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, item.getContainerId());
+        intent.putExtra(WizardActivity.STEP_EXTRA, item.getStep());
+        startActivity(intent);
+    }
 
-	// TODO: @thai cần phải refactor lại chỗ này, add Enum và tạo hàm trong Utils.java
-	private boolean isGateRole() {
-		if (PreferencesUtil.getPrefsValue(getActivity(), PreferencesUtil.PREF_USER_ROLE).equals("6")) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+    private void showSearchResultDialog(String containerId) {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        SearchResultContainerDialog searchResultDialog = SearchResultContainerDialog_
+                .builder().containerId(containerId).build();
+        searchResultDialog.show(fragmentManager, "search_container_result_dialog");
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		EventBus.getDefault().register(this);
-	}
+    }
 
-	@Override
-	public void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
-	}
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
 }
