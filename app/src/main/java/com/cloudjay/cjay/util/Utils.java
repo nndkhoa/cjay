@@ -11,6 +11,7 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.enums.Role;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -62,6 +63,11 @@ public class Utils {
         crouton.show();
     }
 
+    public static int getRole(Context context) {
+
+        return Integer.valueOf(PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_USER_ROLE));
+    }
+
     //Check containerID is valid or not
     public static boolean isContainerIdValid(String containerId) {
 
@@ -110,15 +116,15 @@ public class Utils {
         Realm realm = Realm.getInstance(context);
         RealmResults<Session> sessions = realm.where(Session.class).equalTo("containerId", containerId).findAll();
         //If hasn't -> create
-        if (sessions.isEmpty()){
+        if (sessions.isEmpty()) {
             Session session = parseNewSession(context, e);
-            return  session;
+            return session;
         }
         //else -> update
         else {
             realm.beginTransaction();
             sessions.clear();
-            Session session = parseNewSession(context,e);
+            Session session = parseNewSession(context, e);
             realm.commitTransaction();
             return session;
         }
@@ -210,7 +216,6 @@ public class Utils {
             session.getGateImages().add(imageItem);
         }
         realm.commitTransaction();
-        EventBus.getDefault().post(new ParsedSessionEvent(session));
         return session;
     }
 }
