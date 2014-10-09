@@ -24,7 +24,8 @@
 		android:layout_height="wrap_content"
 		android:src="@android:drawable/ic_menu_search"
 		android:id="@+id/btn_search"
-        android:background="@drawable/btn_blue"/>
+        android:background="@drawable/btn_customize"
+        android:layout_marginBottom="12dp"/>
 
 	<LinearLayout
 		android:id="@+id/ll_search_progress"
@@ -52,9 +53,35 @@
 			android:textAppearance="?android:attr/textAppearanceMedium"/>
 	</LinearLayout>
 
-	<ListView
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:id="@+id/lv_search_container"></ListView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ll_search_result"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:background="@color/background_button_and_line"
+            android:layout_marginBottom="6dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Kết quả tìm kiếm"
+            android:textSize="18sp"
+            android:textColor="@color/background_button_and_line"
+            android:layout_marginBottom="6dp"/>
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/lv_search_container"
+            android:dividerHeight="1dip"
+            android:divider="@color/background_button_and_line">
+        </ListView>
+
+    </LinearLayout>
 
 </LinearLayout>

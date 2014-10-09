@@ -62,6 +62,9 @@ public class SearchFragment extends Fragment {
 
 	@ViewById(R.id.ll_search_progress)
 	LinearLayout llSearchProgress;
+
+    @ViewById(R.id.ll_search_result)
+    LinearLayout llSearchResult;
 	//endregion
 
 	Pattern pattern = Pattern.compile("^[a-zA-Z]{4}");
@@ -78,7 +81,7 @@ public class SearchFragment extends Fragment {
 	@UiThread
 	void showProgress(final boolean show) {
 		llSearchProgress.setVisibility(show ? View.VISIBLE : View.GONE);
-		lvSearch.setVisibility(show ? View.GONE : View.VISIBLE);
+        llSearchResult.setVisibility(show ? View.GONE : View.VISIBLE);
 	}
 
 	@Click(R.id.btn_search)

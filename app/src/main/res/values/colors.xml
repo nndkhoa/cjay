@@ -15,4 +15,7 @@
     <color name="camera_splashscreen_background">#808080</color>
     <color name="list_item_bg_container_fixed">#556fccf7</color>
     <color name="pressed_photup">#CC6fccf7</color>
+
+    <!-- Main Colors -->
+    <color name="background_button_and_line">#0091CC</color>
 </resources>
