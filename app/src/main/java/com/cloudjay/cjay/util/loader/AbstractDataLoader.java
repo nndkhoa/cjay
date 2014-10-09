@@ -113,7 +113,7 @@ public abstract class AbstractDataLoader<E extends RealmResults<?>> extends
 
 	protected void emptyDataList(E dataList) {
 
-		//dataList.clear();
+//		dataList.clear();
 //		try {
 //			if (dataList != null && dataList.size() > 0) {
 //				for (int i = 0; i < dataList.size(); i++) {

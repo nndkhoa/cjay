@@ -37,7 +37,6 @@ public class WorkingFragment extends Fragment implements LoaderManager.LoaderCal
 	private SessionAdapter mAdapter;
 
 	public WorkingFragment() {
-		// Required empty public constructor
 	}
 
 	/**
@@ -49,40 +48,40 @@ public class WorkingFragment extends Fragment implements LoaderManager.LoaderCal
 		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
 		lvWorking.setAdapter(mAdapter);
 		lvWorking.setEmptyView(tvEmpty);
-        Realm realm = Realm.getInstance(getActivity());
-        realm.addChangeListener(new RealmChangeListener() {
+		Realm realm = Realm.getInstance(getActivity());
+		realm.addChangeListener(new RealmChangeListener() {
 
-            @Override
-            public void onChange() {
-                refreshListView();
-            }
-        });
+			@Override
+			public void onChange() {
+				refreshListView();
+			}
+		});
 	}
 
-    private void refreshListView() {
-        getLoaderManager().restartLoader(LOADER_ID,null,this);
-    }
+	private void refreshListView() {
+		getLoaderManager().restartLoader(LOADER_ID, null, this);
+	}
 
-    @Override
+	@Override
 	public Loader<RealmResults<Session>> onCreateLoader(int id, Bundle args) {
 
 		return new AbstractDataLoader<RealmResults<Session>>(getActivity()) {
 			@Override
 			protected RealmResults<Session> buildList() {
 				Realm realm = Realm.getInstance(context);
-				return realm.where(Session.class).equalTo("processing",false).findAll();
+				return realm.where(Session.class).equalTo("processing", true).findAll();
 			}
 		};
 
 	}
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-    }
+	}
 
-    @Override
+	@Override
 	public void onLoadFinished(Loader<RealmResults<Session>> loader, RealmResults<Session> data) {
 		mAdapter.clear();
 		for (Session session : data) {
@@ -92,7 +91,6 @@ public class WorkingFragment extends Fragment implements LoaderManager.LoaderCal
 
 	@Override
 	public void onLoaderReset(Loader<RealmResults<Session>> loader) {
-        //TODO: @Han set reset addapter
 		mAdapter.clear();
 	}
 

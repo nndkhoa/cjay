@@ -1,6 +1,7 @@
 package com.cloudjay.cjay;
 
 import android.app.Application;
+import android.content.Context;
 import android.graphics.Bitmap;
 
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
@@ -8,10 +9,15 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.path.android.jobqueue.JobManager;
+
+import org.androidannotations.api.view.OnViewChangedNotifier;
+
 
 public class App extends Application {
 
 	private static App instance;
+	private static JobManager jobManager;
 
 	public App() {
 		instance = this;
@@ -19,6 +25,15 @@ public class App extends Application {
 
 	public static App getInstance() {
 		return instance;
+	}
+
+	public static JobManager getJobManager(Context context) {
+		if (jobManager == null) {
+			OnViewChangedNotifier previousNotifier = OnViewChangedNotifier.replaceNotifier(null);
+			jobManager = new JobManager(context);
+			OnViewChangedNotifier.replaceNotifier(previousNotifier);
+		}
+		return jobManager;
 	}
 
 	@Override

@@ -14,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
@@ -26,7 +27,6 @@ import com.cloudjay.cjay.util.enums.ImageType;
 import com.commonsware.cwac.camera.CameraUtils;
 import com.commonsware.cwac.camera.PictureTransaction;
 import com.commonsware.cwac.camera.SimpleCameraHost;
-import com.path.android.jobqueue.JobManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -60,8 +60,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	String depotCode;
 	String operatorCode;
 
-    JobManager jobManager;
-
 	public static CameraFragment newInstance(boolean useFFC) {
 		CameraFragment f = new CameraFragment();
 		Bundle args = new Bundle();
@@ -74,8 +72,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	public void onCreate(Bundle state) {
 		super.onCreate(state);
 		setHasOptionsMenu(true);
-        //TODO: Get instance jobmanager
-        jobManager = new JobManager(getActivity());
 
 		// 1. CameraHost is the interface use to configure behavior of camera
 		// ~ setting
@@ -315,7 +311,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 			// 2.upload image
 
-            jobManager.addJobInBackground(new UpLoadImageJob(getActivity(),uri,imageName, containerId));
+			App.getJobManager(getActivity()).addJobInBackground(new UpLoadImageJob(getActivity(), uri, imageName, containerId));
 		}
 
 		void saveBitmapToFile(Bitmap bitmap, File filename) {
