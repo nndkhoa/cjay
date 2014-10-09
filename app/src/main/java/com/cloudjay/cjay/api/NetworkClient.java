@@ -92,7 +92,7 @@ public class NetworkClient {
 		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.CJAY_TMP_STORAGE).build();
 		File image = new File(uri);
 		TypedFile typedFile = new TypedFile("image/jpeg", image);
-		restAdapter.create(NetworkService.class).postImageFile("image/jpeg", "media",imageName, typedFile, new Callback<Response>() {
+		restAdapter.create(NetworkService.class).postImageFile("image/jpeg", "media", imageName, typedFile, new Callback<Response>() {
 			@Override
 			public void success(Response response, Response response2) {
 
@@ -322,8 +322,11 @@ public class NetworkClient {
 		return sessions;
 	}
 
-	public void uploadContainerSession(Context context, Session containerSession) {
-		provider.getRestAdapter(context).create(NetworkService.class).postContainer("", "");
-	}
+	public Session uploadContainerSession(Context context, Session containerSession) {
+		JsonObject result = provider.getRestAdapter(context).create(NetworkService.class).postContainer(containerSession);
 
+		// TODO: Need to update container
+		Session session = Utils.parseSession(context, result);
+		return session;
+	}
 }
