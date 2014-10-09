@@ -18,14 +18,18 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="Container ID:"
-			android:layout_alignParentLeft="true"/>
+			android:layout_alignParentLeft="true"
+            android:textStyle="bold"/>
 
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:id="@+id/tv_container_id"
 			android:text="AUDY12983750"
-			android:layout_alignParentRight="true"/>
+			android:layout_alignParentRight="true"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#0091CC"/>
 	</RelativeLayout>
 
 	<RelativeLayout
@@ -37,7 +41,8 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="Hãng tàu:"
-			android:layout_alignParentLeft="true"/>
+			android:layout_alignParentLeft="true"
+            android:textStyle="bold"/>
 
 		<TextView
 			android:layout_width="wrap_content"
@@ -56,7 +61,8 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="Ngày tạo:"
-			android:layout_alignParentLeft="true"/>
+			android:layout_alignParentLeft="true"
+            android:textStyle="bold"/>
 
 		<TextView
 			android:layout_width="wrap_content"
@@ -75,7 +81,8 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="Ngày xuất:"
-			android:layout_alignParentLeft="true"/>
+			android:layout_alignParentLeft="true"
+            android:textStyle="bold"/>
 
 		<TextView
 			android:layout_width="wrap_content"
@@ -94,7 +101,8 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="Ngày giám định:"
-			android:layout_alignParentLeft="true"/>
+			android:layout_alignParentLeft="true"
+            android:textStyle="bold"/>
 
 		<TextView
 			android:layout_width="wrap_content"
@@ -113,7 +121,8 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="Ngày sữa chữa:"
-			android:layout_alignParentLeft="true"/>
+			android:layout_alignParentLeft="true"
+            android:textStyle="bold"/>
 
 		<TextView
 			android:layout_width="wrap_content"
@@ -132,7 +141,8 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="Bước đang làm:"
-			android:layout_alignParentLeft="true"/>
+			android:layout_alignParentLeft="true"
+            android:textStyle="bold"/>
 
 		<TextView
 			android:layout_width="wrap_content"
@@ -151,7 +161,8 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="Trạng thái đầu vào:"
-			android:layout_alignParentLeft="true"/>
+			android:layout_alignParentLeft="true"
+            android:textStyle="bold"/>
 
 		<TextView
 			android:layout_width="wrap_content"
@@ -170,7 +181,8 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="Ngày giám định:"
-			android:layout_alignParentLeft="true"/>
+			android:layout_alignParentLeft="true"
+            android:textStyle="bold"/>
 
 		<TextView
 			android:layout_width="wrap_content"

@@ -131,7 +131,7 @@
 						android:shadowDx="1"
 						android:text="@string/action_sign_in_short"
                         android:textColor="@android:color/white"
-                        android:background="@drawable/btn_blue" />
+                        android:background="@drawable/btn_customize" />
 				</LinearLayout>
 			</ScrollView>
 		</LinearLayout>
