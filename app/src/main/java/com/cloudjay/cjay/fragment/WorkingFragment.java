@@ -57,7 +57,7 @@ public class WorkingFragment extends Fragment implements LoaderManager.LoaderCal
 			@Override
 			protected RealmResults<Session> buildList() {
 				Realm realm = Realm.getInstance(context);
-				return realm.where(Session.class).findAll();
+				return realm.where(Session.class).equalTo("processing",true).findAll();
 			}
 		};
 

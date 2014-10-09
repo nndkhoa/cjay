@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
@@ -325,8 +326,22 @@ public class NetworkClient {
 	public Session uploadContainerSession(Context context, Session containerSession) {
 		JsonObject result = provider.getRestAdapter(context).create(NetworkService.class).postContainer(containerSession);
 
-		// TODO: Need to update container
-		Session session = Utils.parseSession(context, result);
-		return session;
+        //Check available session
+        String containerId = result.get("container_id").toString();
+        Realm realm = Realm.getInstance(context);
+        RealmResults<Session> sessions = realm.where(Session.class).equalTo("containerId", containerId).findAll();
+        //If hasn't -> create
+        if (sessions.isEmpty()){
+            Session session = Utils.parseSession(context,result);
+            return  session;
+        }
+        //else -> update
+        else {
+            realm.beginTransaction();
+            sessions.clear();
+            Session session = Utils.parseSession(context,result);
+            realm.commitTransaction();
+            return session;
+        }
 	}
 }
