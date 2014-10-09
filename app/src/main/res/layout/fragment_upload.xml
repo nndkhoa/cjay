@@ -4,10 +4,20 @@
     android:layout_height="match_parent"
     tools:context="com.cloudjay.cjay.fragment.UploadFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ListView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Hello upload fragment" />
+        android:layout_height="wrap_content"
+        android:id="@+id/lv_uploading_container"
+        android:dividerHeight="1dip"
+        android:divider="@color/background_button_and_line"></ListView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Không có Container nào đang tải lên"
+        android:id="@+id/tv_emptylist_uploading"
+        android:textSize="18sp"
+        android:textColor="@color/background_button_and_line" />
 
 </FrameLayout>

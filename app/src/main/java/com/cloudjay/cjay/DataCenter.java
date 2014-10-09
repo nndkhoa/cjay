@@ -29,140 +29,150 @@ import io.realm.RealmResults;
 @EBean(scope = EBean.Scope.Singleton)
 public class DataCenter {
 
-	// Inject the rest client
-	@Bean
-	NetworkClient networkClient;
+    // Inject the rest client
+    @Bean
+    NetworkClient networkClient;
 
-	public static final String NETWORK = "NETWORK";
-	public static final String CACHE = "CACHE";
-	public static final String CALLBACK = "CALLBACK";
-	public static final String GET_CALLBACK = "GET_CALLBACK";
+    public static final String NETWORK = "NETWORK";
+    public static final String CACHE = "CACHE";
+    public static final String CALLBACK = "CALLBACK";
+    public static final String GET_CALLBACK = "GET_CALLBACK";
 
-	Context context;
+    Context context;
 
-	public DataCenter(Context context) {
-		this.context = context;
-	}
+    public DataCenter(Context context) {
+        this.context = context;
+    }
 
-	public String getToken(String email, String password) {
-		return networkClient.getToken(email, password);
-	}
+    public String getToken(String email, String password) {
+        return networkClient.getToken(email, password);
+    }
 
-	public User getCurrentUser(Context context) {
-		User user = networkClient.getCurrentUser(context);
-		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_USER_ROLE, user.getRole() + "");
-		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_USER_DEPOT, user.getDepotCode() + "");
-		return user;
-	}
+    public User getCurrentUser(Context context) {
+        User user = networkClient.getCurrentUser(context);
+        PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_USER_ROLE, user.getRole() + "");
+        PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_USER_DEPOT, user.getDepotCode() + "");
+        return user;
+    }
 
-	public void fetchOperators(Context context) {
-		networkClient.getOperators(context, null);
-	}
+    public void fetchOperators(Context context) {
+        networkClient.getOperators(context, null);
+    }
 
-	public void fetchIsoCodes(Context context) {
-		networkClient.getDamageCodes(context, null);
-		networkClient.getRepairCodes(context, null);
-		networkClient.getComponentCodes(context, null);
-	}
+    public void fetchIsoCodes(Context context) {
+        networkClient.getDamageCodes(context, null);
+        networkClient.getRepairCodes(context, null);
+        networkClient.getComponentCodes(context, null);
+    }
 
-	@Trace
-	public void fetchSession(Context context, String lastModifiedDate) {
-		networkClient.getAllSessions(context, lastModifiedDate);
-	}
+    @Trace
+    public void fetchSession(Context context, String lastModifiedDate) {
+        networkClient.getAllSessions(context, lastModifiedDate);
+    }
 
-	@Trace
-	@Background(serial = CACHE)
-	public void search(Context context, String keyword) {
+    @Trace
+    @Background(serial = CACHE)
+    public void search(Context context, String keyword) {
 
-		Logger.Log("Begin search: " + keyword);
-		// Search on local db
-		Realm realm = Realm.getInstance(context);
-		RealmResults<Session> sessions = realm.where(Session.class)
-				.contains("containerId", keyword)
-				.findAll();
+        Logger.Log("Begin search: " + keyword);
+        // Search on local db
+        Realm realm = Realm.getInstance(context);
+        RealmResults<Session> sessions = realm.where(Session.class)
+                .contains("containerId", keyword)
+                .findAll();
+        Logger.e(String.valueOf(sessions.size()));
+        if (sessions.size() != 0) {
+            EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
+        } else {
+            // If there was not result in local, send search request to server
+            searchAsync(context, keyword);
+        }
+    }
 
-		if (sessions.size() != 0) {
-			EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
-		} else {
-			// If there was not result in local, send search request to server
-			searchAsync(context, keyword);
-		}
-	}
+    @Background(serial = NETWORK)
+    public void searchAsync(Context context, String keyword) {
 
-	@Background(serial = NETWORK)
-	public void searchAsync(Context context, String keyword) {
+        Logger.Log("Begin to search container from server");
+        Realm realm = Realm.getInstance(context);
+        List<Session> sessions = networkClient.searchSessions(context, keyword);
+        if (sessions.size() != 0) {
+            RealmResults<Session> results = realm.where(Session.class)
+                    .contains("containerId", keyword)
+                    .findAll();
+            EventBus.getDefault().post(new ContainerSearchedEvent(results));
+        } else {
+            RealmResults<Session> results = realm.where(Session.class)
+                    .contains("containerId", keyword)
+                    .findAll();
+            EventBus.getDefault().post(new ContainerSearchedEvent(results));
+        }
 
-		Logger.Log("Begin to search container from server");
-		List<Session> sessions = networkClient.searchSessions(context, keyword);
+    }
 
-		Logger.Log("Size: " + sessions.size());
-		EventBus.getDefault().post(new ContainerSearchedEvent((RealmResults<Session>) sessions));
-	}
+    @Background(serial = CACHE)
+    public void getOperators() {
 
-	@Background(serial = CACHE)
-	public void getOperators() {
+        // Search on local db
+        Realm realm = Realm.getInstance(context);
+        RealmResults<Operator> operators = realm.where(Operator.class).findAll();
+        EventBus.getDefault().post(new OperatorsGotEvent(operators));
+    }
 
-		// Search on local db
-		Realm realm = Realm.getInstance(context);
-		RealmResults<Operator> operators = realm.where(Operator.class).findAll();
-		EventBus.getDefault().post(new OperatorsGotEvent(operators));
-	}
+    @Background(serial = CACHE)
+    public void addSession(String containerId, String operatorCode, long operatorId) {
+        Realm realm = Realm.getInstance(context);
 
-	@Background(serial = CACHE)
-	public void addSession(String containerId, String operatorCode, long operatorId) {
-		Realm realm = Realm.getInstance(context);
+        // Open a transaction to store session into the realm
+        realm.beginTransaction();
 
-		// Open a transaction to store session into the realm
-		realm.beginTransaction();
+        Session session = realm.createObject(Session.class);
+        session.setId(0);
+        session.setContainerId(containerId);
+        session.setOperatorId(operatorId);
+        session.setOperatorCode(operatorCode);
 
-		Session session = realm.createObject(Session.class);
-		session.setId(0);
-		session.setContainerId(containerId);
-		session.setOperatorId(operatorId);
-		session.setOperatorCode(operatorCode);
+        // Commit transaction
+        realm.commitTransaction();
 
-		// Commit transaction
-		realm.commitTransaction();
+        Logger.Log("insert session successfully");
+    }
 
-		Logger.Log("insert session successfully");
-	}
+    public void addGateImage(long type, String url) {
+        Logger.Log("url when insert in data center: " + url);
+        Realm realm = Realm.getInstance(context);
 
-	public void addGateImage(long type, String url) {
-		Logger.Log("url when insert in data center: " + url);
-		Realm realm = Realm.getInstance(context);
+        // Open a transaction to store session into the realm
+        realm.beginTransaction();
 
-		// Open a transaction to store session into the realm
-		realm.beginTransaction();
+        GateImage gateImage = realm.createObject(GateImage.class);
+        gateImage.setId(0);
+        gateImage.setType(type);
+        gateImage.setUrl(url);
+        realm.commitTransaction();
 
-		GateImage gateImage = realm.createObject(GateImage.class);
-		gateImage.setId(0);
-		gateImage.setType(type);
-		gateImage.setUrl(url);
-		realm.commitTransaction();
+        Logger.Log("insert gate image successfully");
+    }
 
-		Logger.Log("insert gate image successfully");
-	}
+    public void getGateImages(long type, String containerId) {
+        Logger.Log("type = " + type + ", containerId = " + containerId);
+        Realm realm = Realm.getInstance(context);
+        RealmResults<GateImage> gateImages = realm.where(GateImage.class).contains("url", containerId).findAll();
+        // RealmResults<GateImage> gateImages = realm.where(GateImage.class).findAll();
+        for (GateImage g : gateImages) {
+            Logger.Log("url: " + g.getUrl());
+        }
+        Logger.Log("gate images count in dataCenter: " + gateImages.size());
+        EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
+    }
 
-	public void getGateImages(long type, String containerId) {
-		Logger.Log("type = " + type + ", containerId = " + containerId);
-		Realm realm = Realm.getInstance(context);
-		RealmResults<GateImage> gateImages = realm.where(GateImage.class).contains("url", containerId).findAll();
-		// RealmResults<GateImage> gateImages = realm.where(GateImage.class).findAll();
-		for (GateImage g : gateImages) {
-			Logger.Log("url: " + g.getUrl());
-		}
-		Logger.Log("gate images count in dataCenter: " + gateImages.size());
-		EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
-	}
+    public void searchOperator(String keyword) {
+        Realm realm = Realm.getInstance(context);
+        RealmResults<Operator> operators = realm.where(Operator.class)
+                .contains("operatorName", keyword).or()
+                .contains("operatorCode", keyword)
+                .findAll();
 
-	public void searchOperator(String keyword) {
-		Realm realm = Realm.getInstance(context);
-		RealmResults<Operator> operators = realm.where(Operator.class)
-				.contains("operatorName", keyword).or()
-				.contains("operatorCode", keyword)
-				.findAll();
-
-		EventBus.getDefault().post(new OperatorsGotEvent(operators));
-	}
+        EventBus.getDefault().post(new OperatorsGotEvent(operators));
+    }
 
 }
