@@ -23,6 +23,7 @@ import de.greenrobot.event.EventBus;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 
 public class Utils {
@@ -132,6 +133,44 @@ public class Utils {
 
 
     }
+
+    /**
+     * Count total image off session
+     *
+     * @param session
+     * @return
+     */
+    public static int countTotalImage(Session session) {
+        int totalImage = 0;
+        RealmList<AuditItem> auditItems = session.getAuditItems();
+        for (AuditItem auditItem : auditItems) {
+            totalImage = totalImage + auditItem.getAuditImages().size();
+        }
+        totalImage = totalImage + session.getGateImages().size();
+        return totalImage;
+    }
+
+    public static int countUploadedImage(Session session) {
+        int uploadedImage = 0;
+        RealmList<AuditItem> auditItems = session.getAuditItems();
+        for (AuditItem auditItem : auditItems) {
+            RealmList<AuditImage> auditImages = auditItem.getAuditImages();
+            for (AuditImage auditImage : auditImages) {
+                if (auditImage.isUploaded()) {
+                    uploadedImage = uploadedImage + 1;
+                }
+            }
+
+        }
+        RealmList<GateImage> gateImages = session.getGateImages();
+        for (GateImage gateImage : gateImages) {
+            if (gateImage.isUploaded()) {
+                uploadedImage = uploadedImage + 1;
+            }
+        }
+        return uploadedImage;
+    }
+
 
     private static Session parseNewSession(Context context, JsonObject e) {
         Realm realm = Realm.getInstance(context);

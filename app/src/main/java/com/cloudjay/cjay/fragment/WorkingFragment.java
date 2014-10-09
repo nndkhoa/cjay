@@ -92,6 +92,7 @@ public class WorkingFragment extends Fragment implements LoaderManager.LoaderCal
 
 	@Override
 	public void onLoaderReset(Loader<RealmResults<Session>> loader) {
+        //TODO: @Han set reset addapter
 		mAdapter.clear();
 	}
 

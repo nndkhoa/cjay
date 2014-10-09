@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
+import com.path.android.jobqueue.JobManager;
 
 import java.util.List;
 
@@ -20,9 +22,11 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 
     private LayoutInflater mInflater;
     private int layoutResId;
+    Context context;
 
     public SessionAdapter(Context context, int resource) {
         super(context, resource);
+        this.context = context;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         layoutResId = resource;
     }
@@ -44,7 +48,7 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Session session = getItem(position);
+        final Session session = getItem(position);
 
         boolean isSessionProcessing;
         isSessionProcessing = session.isProcessing();
@@ -85,6 +89,14 @@ public class SessionAdapter extends ArrayAdapter<Session> {
             viewHolder.btnContinue.setVisibility(View.GONE);
             viewHolder.btnSubmit.setVisibility(View.GONE);
         }
+        viewHolder.btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //TODO: get instance jobmanager
+                JobManager jobManager = new JobManager(context);
+                jobManager.addJobInBackground(new UploadSessionJob(context, session));
+            }
+        });
 
         return convertView;
     }

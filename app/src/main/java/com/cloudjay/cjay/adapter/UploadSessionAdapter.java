@@ -6,12 +6,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.Utils;
 
 import java.util.List;
+
+import io.realm.RealmList;
 
 /**
  * Created by thai on 09/10/2014.
@@ -20,23 +28,23 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 
     private LayoutInflater mInflater;
     private int layoutResId;
+    Context context;
 
     public UploadSessionAdapter(Context context, int resource) {
         super(context, resource);
+        this.context = context;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         layoutResId = resource;
     }
 
     private static class ViewHolder {
         TextView tvContainerId;
-        TextView tvOperator;
-        TextView tvDateIn;
-        TextView tvDateOut;
-        TextView tvDateEstimate;
-        TextView tvDateRepair;
-        TextView tvPreStatus;
-        TextView tvCurrentStatus;
-        TextView tvStep;
+        TextView tvCurrentPhotoUpload;
+        TextView tvTotalPhotoUpload;
+        ImageView ivContainer;
+        ProgressBar pbUpLoading;
+        ImageView ivUploadStatus;
+        TextView tvUploadError;
     }
 
     @Override
@@ -49,27 +57,31 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
             convertView = mInflater.inflate(layoutResId, parent, false);
             viewHolder = new ViewHolder();
 
-            viewHolder.tvContainerId = (TextView) convertView.findViewById(R.id.tv_container_id);
-            viewHolder.tvOperator = (TextView) convertView.findViewById(R.id.tv_operator);
-            viewHolder.tvDateIn = (TextView) convertView.findViewById(R.id.tv_date_in);
-            viewHolder.tvDateOut = (TextView) convertView.findViewById(R.id.tv_date_out);
-            viewHolder.tvDateEstimate = (TextView) convertView.findViewById(R.id.tv_date_estimate);
-            viewHolder.tvDateRepair = (TextView) convertView.findViewById(R.id.tv_date_repair);
-            viewHolder.tvPreStatus = (TextView) convertView.findViewById(R.id.tv_pre_status);
-            viewHolder.tvCurrentStatus = (TextView) convertView.findViewById(R.id.tv_current_status);
-            viewHolder.tvStep = (TextView) convertView.findViewById(R.id.tv_step);
+            viewHolder.tvContainerId = (TextView) convertView.findViewById(R.id.tv_containerId_uploading);
+            viewHolder.tvCurrentPhotoUpload = (TextView) convertView.findViewById(R.id.tv_current_photo_upload);
+            viewHolder.tvTotalPhotoUpload = (TextView) convertView.findViewById(R.id.tv_total_photo_upload);
+            viewHolder.ivContainer = (ImageView) convertView.findViewById(R.id.iv_container_upload);
+            viewHolder.pbUpLoading = (ProgressBar) convertView.findViewById(R.id.pb_upload_progress);
+            viewHolder.ivUploadStatus = (ImageView) convertView.findViewById(R.id.iv_upload_result);
+            viewHolder.tvUploadError = (TextView) convertView.findViewById(R.id.tv_upload_error);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         //Set data to view
         viewHolder.tvContainerId.setText(session.getContainerId());
-        viewHolder.tvOperator.setText(session.getOperatorCode());
-        viewHolder.tvDateIn.setText(String.valueOf(session.getCheckInTime()));
-        viewHolder.tvDateOut.setText(String.valueOf(session.getCheckOutTime()));
-        viewHolder.tvStep.setText(String.valueOf(session.getStep()));
-        viewHolder.tvPreStatus.setText(String.valueOf(session.getPreStatus()));
-        viewHolder.tvCurrentStatus.setText(String.valueOf(session.getStatus()));
+        viewHolder.tvTotalPhotoUpload.setText(String.valueOf(Utils.countTotalImage(session)));
+        viewHolder.tvCurrentPhotoUpload.setText(String.valueOf(Utils.countUploadedImage(session)));
+        if (NetworkHelper.isConnected(context)) {
+            if (Utils.countTotalImage(session) == Utils.countUploadedImage(session)) {
+                viewHolder.ivUploadStatus.setVisibility(View.VISIBLE);
+            }
+        } else {
+            viewHolder.ivUploadStatus.setImageResource(R.drawable.ic_error);
+            viewHolder.pbUpLoading.setVisibility(View.GONE);
+            viewHolder.tvUploadError.setVisibility(View.VISIBLE);
+
+        }
 
         return convertView;
     }
