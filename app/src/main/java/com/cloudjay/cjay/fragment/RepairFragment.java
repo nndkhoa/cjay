@@ -54,7 +54,7 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 		// Go to next fragment
 		Fragment fragment = new ExportFragment_().builder().build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-		transaction.replace(R.id.ll_main_process, fragment);
+		transaction.replace(R.id.ll_main, fragment);
 		transaction.commit();
 	}
 

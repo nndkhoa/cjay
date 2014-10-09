@@ -21,8 +21,6 @@ import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
-import com.cloudjay.cjay.fragment.dialog.AddContainerDialog;
-import com.cloudjay.cjay.fragment.dialog.AddContainerDialog_;
 import com.cloudjay.cjay.fragment.dialog.SearchResultContainerDialog;
 import com.cloudjay.cjay.fragment.dialog.SearchResultContainerDialog_;
 import com.cloudjay.cjay.model.Session;
@@ -39,13 +37,12 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.List;
-import java.util.SimpleTimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.greenrobot.event.EventBus;
-import eu.inmite.android.lib.dialogs.ISimpleDialogListener;
-import eu.inmite.android.lib.dialogs.SimpleDialogFragment;
+import io.realm.Realm;
+import io.realm.RealmChangeListener;
 
 /**
  * Tab search container
@@ -92,6 +89,7 @@ public class SearchFragment extends Fragment {
         // Start search in background
         containerID = keyword;
         dataCenter.search(getActivity(), keyword);
+
 	}
 
 	@AfterViews
@@ -131,22 +129,38 @@ public class SearchFragment extends Fragment {
 
 			}
 		});
+
+		// Use to notify UI when some threads adding data to Realm
+		Realm realm = Realm.getInstance(getActivity());
+		realm.addChangeListener(new RealmChangeListener() {
+
+			@Override
+			public void onChange() {
+				Logger.Log("Realm data changed");
+			}
+		});
 	}
 
 	@UiThread
 	public void onEvent(ContainerSearchedEvent event) {
 
 		Logger.Log("onEvent ContainerSearchedEvent");
+
 		showProgress(false);
 		List<Session> result = event.getSessions();
-		if (result != null) {
 
+		if (result != null) {
 			mAdapter.clear();
 			mAdapter.addAll(result);
 			mAdapter.notifyDataSetChanged();
 
 			if (result.size() == 0) {
-                showSearchResultDialog(containerID);
+				showSearchResultDialog(containerID);
+			}
+		} else {
+			Logger.Log("Result is null");
+			if (result.size() == 0) {
+				showSearchResultDialog(containerID);
 			}
 		}
 	}
@@ -162,13 +176,13 @@ public class SearchFragment extends Fragment {
 		startActivity(intent);
 	}
 
-    private void showSearchResultDialog(String containerId) {
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        SearchResultContainerDialog searchResultDialog = SearchResultContainerDialog_
-                .builder().containerId(containerId).build();
-        searchResultDialog.show(fragmentManager, "search_container_result_dialog");
+	private void showSearchResultDialog(String containerId) {
+		FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+		SearchResultContainerDialog searchResultDialog = SearchResultContainerDialog_
+				.builder().containerId(containerId).build();
+		searchResultDialog.show(fragmentManager, "search_container_result_dialog");
 
-    }
+	}
 
 	// TODO: @thai cần phải refactor lại chỗ này, add Enum và tạo hàm trong Utils.java
 	private boolean isGateRole() {

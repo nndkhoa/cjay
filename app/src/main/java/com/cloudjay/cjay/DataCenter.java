@@ -79,13 +79,9 @@ public class DataCenter {
 				.contains("containerId", keyword)
 				.findAll();
 
-		if (sessions != null) {
-
-			Logger.Log("1");
+		if (sessions.size() != 0) {
 			EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
-
 		} else {
-			Logger.Log("2");
 			// If there was not result in local, send search request to server
 			searchAsync(context, keyword);
 		}
@@ -93,8 +89,11 @@ public class DataCenter {
 
 	@Background(serial = NETWORK)
 	public void searchAsync(Context context, String keyword) {
-		Logger.Log("searchAsync");
+
+		Logger.Log("Begin to search container from server");
 		List<Session> sessions = networkClient.searchSessions(context, keyword);
+
+		Logger.Log("Size: " + sessions.size());
 		EventBus.getDefault().post(new ContainerSearchedEvent((RealmResults<Session>) sessions));
 	}
 

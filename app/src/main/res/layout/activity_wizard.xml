@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/ll_main_process"
+    android:id="@+id/ll_main"
     tools:context="com.cloudjay.cjay.activity.WizardActivity">
 
 </FrameLayout>

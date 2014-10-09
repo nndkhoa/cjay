@@ -45,7 +45,7 @@ public class AuditFragment extends Fragment {
 		//Go to next fragment
 		RepairFragment fragment = new RepairFragment_().builder().build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-		transaction.replace(R.id.ll_main_process, fragment);
+		transaction.replace(R.id.ll_main, fragment);
 		transaction.commit();
 	}
 
