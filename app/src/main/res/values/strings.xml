@@ -79,4 +79,7 @@
 
     <!-- Dialog Search Session Result -->
     <string name="dialog_search_container_title">Không tìm thấy Container</string>
+
+    <string name="button_completed">Hoàn tất</string>
+    <string name="button_audit_now">Giám định ngay</string>
 </resources>
