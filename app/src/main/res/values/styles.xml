@@ -4,6 +4,7 @@
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="sdlDialogStyle">@style/DialogStyleLight.Custom</item>
+        <item name="android:actionBarStyle">@style/ActionBar</item>
     </style>
 
     <style name="StyledButton">
@@ -17,6 +18,7 @@
         <item name="android:shadowRadius">2</item>
     </style>
 
+    <!-- style simple dialog color -->
     <style name="DialogStyleLight.Custom">
         <!-- anything can be left out: -->
         <item name="titleTextColor">@android:color/black</item>
@@ -28,6 +30,13 @@
         <item name="buttonBackgroundColorPressed">@android:color/white</item>
         <item name="buttonBackgroundColorFocused">@android:color/white</item>
         <item name="dialogBackground">@android:color/white</item>
+    </style>
+
+    <!-- style actionbar -->
+    <style name="ActionBar" parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
+        <item name="android:backgroundStacked">@color/tab_background_stacked</item>
+        <item name="android:background">@color/actionbar_background</item>
+        <item name="android:backgroundSplit">@android:color/white</item>
     </style>
 
 </resources>

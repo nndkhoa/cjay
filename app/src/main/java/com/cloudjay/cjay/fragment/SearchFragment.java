@@ -43,6 +43,7 @@ import java.util.regex.Pattern;
 import de.greenrobot.event.EventBus;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
+import io.realm.RealmResults;
 
 /**
  * Tab search container
@@ -150,7 +151,8 @@ public class SearchFragment extends Fragment {
 		Logger.Log("onEvent ContainerSearchedEvent");
 
 		showProgress(false);
-		List<Session> result = event.getSessions();
+		//List<Session> result = event.getSessions();
+        RealmResults<Session> result = event.getSessions();
 
 		if (result != null) {
 			mAdapter.clear();
