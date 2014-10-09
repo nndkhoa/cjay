@@ -1,5 +1,7 @@
 package com.cloudjay.cjay.fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,6 +10,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,8 +24,7 @@ import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
-import com.cloudjay.cjay.fragment.dialog.SearchResultContainerDialog;
-import com.cloudjay.cjay.fragment.dialog.SearchResultContainerDialog_;
+import com.cloudjay.cjay.fragment.dialog.*;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -168,7 +170,6 @@ public class SearchFragment extends Fragment {
             mAdapter.addAll(result);
             mAdapter.notifyDataSetChanged();
         } else {
-            Logger.Log("Result is null");
             showSearchResultDialog(containerID);
         }
     }
@@ -184,12 +185,37 @@ public class SearchFragment extends Fragment {
         startActivity(intent);
     }
 
-    private void showSearchResultDialog(String containerId) {
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        SearchResultContainerDialog searchResultDialog = SearchResultContainerDialog_
-                .builder().containerId(containerId).build();
-        searchResultDialog.show(fragmentManager, "search_container_result_dialog");
+    private void showSearchResultDialog(final String containerId) {
+        Logger.Log("Result is null");
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.dialog_search_container_title);
+        builder.setMessage("Container ID với từ khóa " + containerId + " chưa được nhập vào hệ thống");
+        builder.setPositiveButton("Bỏ qua", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.setNegativeButton("Tạo mới", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                showAddContainerDialog(containerId);
+                dialogInterface.dismiss();
+            }
+        });
 
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                // Set background and text color for confirm button
+                ((AlertDialog)dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setTextColor(getResources().getColor(android.R.color.white));
+                ((AlertDialog)dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setBackgroundResource(R.drawable.btn_green_selector);
+            }
+        });
+        dialog.show();
     }
 
 
@@ -203,5 +229,12 @@ public class SearchFragment extends Fragment {
     public void onDestroy() {
         EventBus.getDefault().unregister(this);
         super.onDestroy();
+    }
+
+    private void showAddContainerDialog(String containerId) {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        AddContainerDialog addContainerDialog_ = com.cloudjay.cjay.fragment.dialog.AddContainerDialog_
+                .builder().containerId(containerId).build();
+        addContainerDialog_.show(fragmentManager, "fragment_addcontainer");
     }
 }

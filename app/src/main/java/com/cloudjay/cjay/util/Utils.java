@@ -71,7 +71,8 @@ public class Utils {
     //Check containerID is valid or not
     public static boolean isContainerIdValid(String containerId) {
 
-        if (!Logger.isDebuggable()) {
+        //if (!Logger.isDebuggable()) {
+            Logger.Log("isContainerIdValid");
 
             int crc = ContCheckDigit.getCRC(containerId);
             if (crc == 10) {
@@ -84,9 +85,9 @@ public class Utils {
             } else {
                 return false;
             }
-        }
+        //}
 
-        return true;
+        //return true;
     }
 
     public static boolean simpleValid(String containerID) {

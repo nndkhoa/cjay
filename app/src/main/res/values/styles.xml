@@ -21,11 +21,11 @@
     <!-- style simple dialog color -->
     <style name="DialogStyleLight.Custom">
         <!-- anything can be left out: -->
-        <item name="titleTextColor">@android:color/black</item>
-        <item name="titleSeparatorColor">@android:color/black</item>
+        <item name="titleTextColor">@color/background_button_and_line</item>
+        <item name="titleSeparatorColor">@color/background_button_and_line</item>
         <item name="messageTextColor">@android:color/black</item>
         <item name="buttonTextColor">@android:color/black</item>
-        <item name="buttonSeparatorColor">@android:color/black</item>
+        <item name="buttonSeparatorColor">@android:color/white</item>
         <item name="buttonBackgroundColorNormal">@android:color/white</item>
         <item name="buttonBackgroundColorPressed">@android:color/white</item>
         <item name="buttonBackgroundColorFocused">@android:color/white</item>
