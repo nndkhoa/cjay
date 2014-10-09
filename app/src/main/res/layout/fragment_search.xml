@@ -7,8 +7,9 @@
 	<EditText
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:paddingRight="16dp"
-		android:paddingLeft="16dp"
+		android:layout_marginTop="12dp"
+		android:layout_marginLeft="9dp"
+		android:layout_marginRight="9dp"
 		android:id="@+id/et_search"
 		android:maxLength="11"
 		android:inputType="textCapCharacters|textNoSuggestions"
@@ -18,8 +19,8 @@
 	<Button
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:paddingLeft="16dp"
-		android:paddingRight="16dp"
+		android:layout_marginLeft="9dp"
+		android:layout_marginRight="9dp"
 		android:text="@string/fragment_search_btn_search"
 		android:id="@+id/btn_search"/>
 

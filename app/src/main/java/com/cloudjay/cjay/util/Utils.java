@@ -93,19 +93,18 @@ public class Utils {
 	}
 
 	/**
-	 * Convert container session json to Session Object
+	 * Convert container session json to Session Object.
+	 * Need to check if container is existed or not. (should use insert or update concept)
 	 *
 	 * @param context
 	 * @param e
 	 * @return
 	 */
 	public static Session parseSession(Context context, JsonObject e) {
+
 		Realm realm = Realm.getInstance(context);
+
 		realm.beginTransaction();
-
-//		String containerId = e.get("container_id").toString();
-//		Logger.Log(" > Parsing container: " + containerId);
-
 		Session session = realm.createObject(Session.class);
 		session.setId(Long.parseLong(e.get("id").toString()));
 		session.setContainerId(e.get("container_id").toString());
@@ -118,7 +117,9 @@ public class Utils {
 		session.setPreStatus(Long.parseLong(e.get("pre_status").toString()));
 		session.setStatus(Long.parseLong(e.get("status").toString()));
 		session.setStep(Long.parseLong(e.get("step").toString()));
+		realm.commitTransaction();
 
+		realm.beginTransaction();
 		// Process list audit items
 		JsonArray auditItems = e.getAsJsonArray("audit_items");
 		for (JsonElement audit : auditItems) {
@@ -164,19 +165,26 @@ public class Utils {
 				imageAuditItem.setId(Long.parseLong(imageAudit.getAsJsonObject().get("id").toString()));
 				imageAuditItem.setType(Long.parseLong(imageAudit.getAsJsonObject().get("type").toString()));
 				imageAuditItem.setUrl(imageAudit.getAsJsonObject().get("url").toString());
+				item.getAuditImages().add(imageAuditItem);
 			}
+
+			session.getAuditItems().add(item);
 		}
+		realm.commitTransaction();
 
 		// Process list gate images
+		realm.beginTransaction();
 		JsonArray gateImage = e.getAsJsonArray("gate_images");
 		for (JsonElement image : gateImage) {
-			GateImage imageItem = realm.createObject(GateImage.class);
 
+			GateImage imageItem = realm.createObject(GateImage.class);
 			imageItem.setId(Long.parseLong(image.getAsJsonObject().get("id").toString()));
 			imageItem.setType(Long.parseLong(image.getAsJsonObject().get("type").toString()));
 			imageItem.setUrl(image.getAsJsonObject().get("url").toString());
-		}
 
+			// Add reference
+			session.getGateImages().add(imageItem);
+		}
 		realm.commitTransaction();
 
 		return session;

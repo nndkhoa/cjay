@@ -55,6 +55,7 @@ public class NetworkClient {
 		}
 
 		String token = tokenJson.get("token").getAsString();
+		Logger.Log("User Token: " + token);
 		return token;
 	}
 
@@ -308,7 +309,17 @@ public class NetworkClient {
 	}
 
 	public List<Session> searchSessions(Context context, String keyword) {
-		return null;
+
+		List<Session> sessions = new ArrayList<Session>();
+
+		JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).searchContainer(keyword);
+		JsonArray jsonArray = jsonObject.getAsJsonArray("results");
+
+		for (JsonElement e : jsonArray) {
+			sessions.add(Utils.parseSession(context, e.getAsJsonObject()));
+		}
+
+		return sessions;
 	}
 
 	public void uploadContainerSession(Context context, Session containerSession) {
