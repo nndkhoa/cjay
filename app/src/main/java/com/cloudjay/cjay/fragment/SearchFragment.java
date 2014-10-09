@@ -11,6 +11,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
@@ -51,7 +52,7 @@ public class SearchFragment extends Fragment {
 
 	//region VIEW
 	@ViewById(R.id.btn_search)
-	Button btnSearch;
+    ImageButton btnSearch;
 
 	@ViewById(R.id.et_search)
 	EditText etSearch;
@@ -85,22 +86,10 @@ public class SearchFragment extends Fragment {
 		showProgress(true);
 		String keyword = etSearch.getText().toString();
 
-		if (TextUtils.isEmpty(keyword)) {
+        // Start search in background
+        containerID = keyword;
+        dataCenter.search(getActivity(), keyword);
 
-			etSearch.setError(getString(R.string.dialog_container_id_required));
-			showProgress(false);
-
-		} else if (isGateRole() && !Utils.simpleValid(keyword)) {
-
-			// Note: if current user is Gate then we need to validate full container ID
-			etSearch.setError(getString(R.string.dialog_container_id_invalid));
-			showProgress(false);
-		} else {
-
-			// Start search in background
-			containerID = keyword;
-			dataCenter.search(getActivity(), keyword);
-		}
 	}
 
 	@AfterViews

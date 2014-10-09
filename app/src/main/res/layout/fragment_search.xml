@@ -1,28 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+  android:orientation="vertical"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:padding="16dp">
 
 	<EditText
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginTop="12dp"
-		android:layout_marginLeft="9dp"
-		android:layout_marginRight="9dp"
+        android:padding="12dp"
 		android:id="@+id/et_search"
 		android:maxLength="11"
 		android:inputType="textCapCharacters|textNoSuggestions"
 		android:selectAllOnFocus="true"
-		android:hint="@string/fragment_search_hint_et_search"/>
+		android:hint="@string/fragment_search_hint_et_search"
+        android:background="@android:drawable/editbox_background_normal"
+        android:singleLine="true"
+        android:textSize="18sp"
+        android:layout_marginBottom="6dp"/>
 
-	<Button
+	<ImageButton
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginLeft="9dp"
-		android:layout_marginRight="9dp"
-		android:text="@string/fragment_search_btn_search"
-		android:id="@+id/btn_search"/>
+		android:src="@android:drawable/ic_menu_search"
+		android:id="@+id/btn_search"
+        android:background="@drawable/btn_blue"/>
 
 	<LinearLayout
 		android:id="@+id/ll_search_progress"

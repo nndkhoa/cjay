@@ -129,7 +129,9 @@
 						android:layout_weight="1"
 						android:minHeight="40dp"
 						android:shadowDx="1"
-						android:text="@string/action_sign_in_short"/>
+						android:text="@string/action_sign_in_short"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/btn_blue" />
 				</LinearLayout>
 			</ScrollView>
 		</LinearLayout>
