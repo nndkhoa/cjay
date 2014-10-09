@@ -8,8 +8,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.adapter.SessionAdapter;
 import com.cloudjay.cjay.adapter.UploadSessionAdapter;
+import com.cloudjay.cjay.event.ResumeUpLoadEvent;
+import com.cloudjay.cjay.event.StopUpLoadEvent;
+import com.cloudjay.cjay.event.UploadedEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.loader.AbstractDataLoader;
 
@@ -35,9 +37,9 @@ public class UploadFragment extends Fragment implements LoaderManager.LoaderCall
     private UploadSessionAdapter mAdapter;
 
 
-	public UploadFragment() {
-		// Required empty public constructor
-	}
+    public UploadFragment() {
+        // Required empty public constructor
+    }
 
     /**
      * Initial loader and set adapter for list view
@@ -45,7 +47,7 @@ public class UploadFragment extends Fragment implements LoaderManager.LoaderCall
     @AfterViews
     void initLoader() {
         getLoaderManager().initLoader(LOADER_ID, null, this);
-        mAdapter = new UploadSessionAdapter(getActivity(), R.layout.item_container_working);
+        mAdapter = new UploadSessionAdapter(getActivity(), R.layout.item_upload);
         lvUploading.setAdapter(mAdapter);
         lvUploading.setEmptyView(tvEmpty);
         Realm realm = Realm.getInstance(getActivity());
@@ -59,7 +61,7 @@ public class UploadFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     private void refreshListView() {
-        getLoaderManager().restartLoader(LOADER_ID,null,this);
+        getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
     @Override
@@ -69,10 +71,22 @@ public class UploadFragment extends Fragment implements LoaderManager.LoaderCall
             @Override
             protected RealmResults<Session> buildList() {
                 Realm realm = Realm.getInstance(context);
-                return realm.where(Session.class).equalTo("processing",false).findAll();
+                return realm.where(Session.class).equalTo("processing", false).findAll();
             }
         };
 
+    }
+
+    public void onEvent(UploadedEvent event) {
+        getLoaderManager().restartLoader(LOADER_ID, null, this);
+    }
+
+    public void onEvent(StopUpLoadEvent event) {
+        getLoaderManager().restartLoader(LOADER_ID, null, this);
+    }
+
+    public void onEvent(ResumeUpLoadEvent event) {
+        getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
     @Override

@@ -2,12 +2,16 @@ package com.cloudjay.cjay.task.jobqueue;
 
 import android.content.Context;
 
-import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.api.NetworkClient_;
+import com.cloudjay.cjay.event.ResumeUpLoadEvent;
+import com.cloudjay.cjay.event.StopUpLoadEvent;
+import com.cloudjay.cjay.event.UploadedEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by thai on 06/10/2014.
@@ -28,8 +32,12 @@ public class UploadSessionJob extends Job {
 
     @Override
     public void onRun() throws Throwable {
+        EventBus.getDefault().post(new ResumeUpLoadEvent());
+
         Logger.e("Uploading container: " + session.getContainerId());
         Session result = NetworkClient_.getInstance_(context).uploadContainerSession(context,session);
+
+        EventBus.getDefault().post(new UploadedEvent());
 
 
     }
@@ -41,6 +49,7 @@ public class UploadSessionJob extends Job {
 
     @Override
     protected boolean shouldReRunOnThrowable(Throwable throwable) {
-        return false;
+        EventBus.getDefault().post(new StopUpLoadEvent());
+        return true;
     }
 }

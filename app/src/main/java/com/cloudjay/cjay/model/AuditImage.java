@@ -9,52 +9,62 @@ import io.realm.RealmObject;
 @Generated("org.jsonschema2pojo")
 public class AuditImage extends RealmObject {
 
-	@Expose
-	private long id;
+    @Expose
+    private long id;
 
-	@Expose
-	private long type;
+    @Expose
+    private long type;
 
-	@Expose
-	private String url;
+    @Expose
+    private String url;
 
-	public long getId() {
-		return id;
-	}
+    private boolean uploaded;
 
-	public void setId(long id) {
-		this.id = id;
-	}
+    public boolean isUploaded() {
+        return uploaded;
+    }
 
-	public AuditImage withId(long id) {
-		this.id = id;
-		return this;
-	}
+    public void setUploaded(boolean isUploaded) {
+        this.uploaded = isUploaded;
+    }
 
-	public long getType() {
-		return type;
-	}
+    public long getId() {
+        return id;
+    }
 
-	public void setType(long type) {
-		this.type = type;
-	}
+    public void setId(long id) {
+        this.id = id;
+    }
 
-	public AuditImage withType(long type) {
-		this.type = type;
-		return this;
-	}
+    public AuditImage withId(long id) {
+        this.id = id;
+        return this;
+    }
 
-	public String getUrl() {
-		return url;
-	}
+    public long getType() {
+        return type;
+    }
 
-	public void setUrl(String url) {
-		this.url = url;
-	}
+    public void setType(long type) {
+        this.type = type;
+    }
 
-	public AuditImage withUrl(String url) {
-		this.url = url;
-		return this;
-	}
+    public AuditImage withType(long type) {
+        this.type = type;
+        return this;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public AuditImage withUrl(String url) {
+        this.url = url;
+        return this;
+    }
 
 }

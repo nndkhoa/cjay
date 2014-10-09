@@ -16,6 +16,16 @@ public class GateImage extends RealmObject {
 	@Expose
 	private String url;
 
+    private boolean uploaded;
+
+    public boolean isUploaded() {
+        return uploaded;
+    }
+
+    public void setUploaded(boolean isUploaded) {
+        this.uploaded = isUploaded;
+    }
+
 	public long getId() {
 		return id;
 	}
