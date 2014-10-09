@@ -10,6 +10,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -53,7 +54,7 @@ public class ImportFragment extends Fragment {
 
 	//region Controls and Views
 	@ViewById(R.id.btn_camera)
-	Button btnCamera;
+    ImageButton btnCamera;
 
 	@ViewById(R.id.btn_continue)
 	Button btnContinue;

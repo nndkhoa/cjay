@@ -4,6 +4,7 @@ import android.view.View;
 
 import com.cloudjay.cjay.R;
 
+import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 
@@ -35,5 +36,10 @@ public class AddInvalidContainerIsoDialog extends SimpleDialogFragment {
         });
         builder.setMessage("ContainerID " + containerId + " này sai chuẩn ISO.");
         return builder;
+    }
+
+    @AfterViews
+    void doAfterViews() {
+
     }
 }

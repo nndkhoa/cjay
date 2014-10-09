@@ -1,27 +1,22 @@
 package com.cloudjay.cjay.fragment.dialog;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
-
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.WizardActivity_;
-import com.cloudjay.cjay.fragment.dialog.AddInvalidContainerIsoDialog_;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
@@ -41,17 +36,10 @@ public class AddContainerDialog extends SimpleDialogFragment {
     protected Builder build(final Builder builder) {
         builder.setTitle(R.string.dialog_search_container_title);
         builder.setView(LayoutInflater.from(getActivity()).inflate(R.layout.fragment_addcontainer, null));
-        builder.setNegativeButton("Bỏ qua", new View.OnClickListener() {
+        builder.setNegativeButton("Tạo mới", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dismiss();
-            }
-        });
-        builder.setPositiveButton("Tạo mới", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                // Get Container Id from EditText
+// Get Container Id from EditText
                 containerId = etContainerID.getText().toString();
 
                 // Check container id is valid or not
@@ -64,15 +52,32 @@ public class AddContainerDialog extends SimpleDialogFragment {
                 } else {
                     Logger.Log("valid");
                     // Check invalid container ISO
-                    if(!Utils.isContainerIdValid(containerId)) {
-                        showAddInvalidContainerISODialog(containerId);
+                    if(!Utils.isContainerIdValid(containerId)) {;
+                        getNeutralButton().setVisibility(View.VISIBLE);
+                        etContainerID.setError(getString(R.string.dialog_container_id_invalid_iso));
                     } else {
+                        // Hide button create container wrong ISO
+                        getNeutralButton().setVisibility(View.GONE);
+                        // Start workflow
                         Intent intent = new Intent(getActivity(), WizardActivity_.class);
                         startActivity(intent);
                         dismiss();
                     }
                 }
-
+            }
+        });
+        builder.setPositiveButton("Bỏ qua", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
+        builder.setNeutralButton("Taọ sai ISO", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), WizardActivity_.class);
+                startActivity(intent);
+                dismiss();
             }
         });
 
@@ -83,6 +88,16 @@ public class AddContainerDialog extends SimpleDialogFragment {
     void doAfterViews() {
         // Set search keywotrd into edit text
         etContainerID.setText(containerId);
+        // Set background and text color for Negative button
+        this.getNegativeButton().setBackgroundResource(R.drawable.btn_green_selector);
+        this.getNegativeButton().setTextColor(getActivity().
+                getResources().getColor(android.R.color.white));
+        // Set background and text color for Neutral button
+        this.getNeutralButton().setBackgroundResource(R.drawable.btn_red_selector);
+        this.getNeutralButton().setTextColor(getActivity().
+                getResources().getColor(android.R.color.white));
+        // Hide button create container wrong ISO
+        this.getNeutralButton().setVisibility(View.GONE);
     }
 
     private void showAddInvalidContainerISODialog(String containerId) {
@@ -90,6 +105,5 @@ public class AddContainerDialog extends SimpleDialogFragment {
         AddInvalidContainerIsoDialog addContainerDialog_ = AddInvalidContainerIsoDialog_
                 .builder().containerId(containerId).build();
         addContainerDialog_.show(fragmentManager, "fragment_addcontainer");
-
     }
 }
