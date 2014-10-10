@@ -217,13 +217,19 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
     @AfterViews
     void doAfterViews() {
-        etPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        etPassword.setOnKeyListener(new View.OnKeyListener() {
             @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                // TODO: imple
-                if (i == EditorInfo.IME_ACTION_DONE) {
-                    performLogin();
-                    return true;
+            public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
+
+                if (keyCode == EditorInfo.IME_ACTION_SEARCH ||
+                        keyCode == EditorInfo.IME_ACTION_DONE ||
+                        keyEvent.getAction() == KeyEvent.ACTION_DOWN &&
+                                keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+
+                    if (!keyEvent.isShiftPressed()) {
+                        performLogin();
+                        return true;
+                    }
                 }
 
                 return false;
