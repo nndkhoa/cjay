@@ -19,6 +19,7 @@
         android:text="Không có Container nào đang làm"
         android:id="@+id/tv_emptylist_working"
         android:textSize="18sp"
-        android:textColor="@color/background_button_and_line"/>
+        android:textColor="@color/background_button_and_line"
+        android:scrollbars="none"/>
 
 </FrameLayout>

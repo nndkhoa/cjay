@@ -10,6 +10,7 @@ import android.widget.ListView;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.ReuseActivity;
 
+import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
@@ -57,4 +58,10 @@ public class AuditFragment extends Fragment {
 		getActivity().startActivity(intent);
 	}
 
+    @AfterViews
+    void setUp() {
+
+        // Set ActionBar Title
+        getActivity().getActionBar().setTitle(R.string.fragment_audit_title);
+    }
 }

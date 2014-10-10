@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 
 import com.cloudjay.cjay.R;
 
+import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 
@@ -22,4 +23,10 @@ public class ExportFragment extends Fragment {
 	public ExportFragment() {
 	}
 
+    @AfterViews
+    void setUp() {
+
+        // Set ActionBar Title
+        getActivity().getActionBar().setTitle(R.string.fragment_export_title);
+    }
 }

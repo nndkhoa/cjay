@@ -100,46 +100,6 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="Ngày giám định:"
-			android:layout_alignParentLeft="true"
-            android:textStyle="bold"/>
-
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:id="@+id/tv_date_estimate"
-			android:text="10-12-1991"
-			android:layout_alignParentRight="true"/>
-	</RelativeLayout>
-
-	<RelativeLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal">
-
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="Ngày sữa chữa:"
-			android:layout_alignParentLeft="true"
-            android:textStyle="bold"/>
-
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:id="@+id/tv_date_repair"
-			android:text="AUDY12983750"
-			android:layout_alignParentRight="true"/>
-	</RelativeLayout>
-
-	<RelativeLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal">
-
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
 			android:text="Bước đang làm:"
 			android:layout_alignParentLeft="true"
             android:textStyle="bold"/>
