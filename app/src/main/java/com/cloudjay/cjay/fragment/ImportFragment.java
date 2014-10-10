@@ -156,12 +156,14 @@ public class ImportFragment extends Fragment {
 	void buttonCameraClicked() {
 
 		if (!TextUtils.isEmpty(tvContainerCode.getText()) && !TextUtils.isEmpty(etOperator.getText())) {
+
 			// Open camera activity
 			Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
 			cameraActivityIntent.putExtra("containerID", containerID);
 			cameraActivityIntent.putExtra("imageType", CJayConstant.TYPE_IMPORT);
 			cameraActivityIntent.putExtra("operatorCode", selectedOperator.getOperatorCode());
 			startActivity(cameraActivityIntent);
+
 		} else {
 			// Alert: require select operator first
 			Utils.showCrouton(getActivity(), R.string.require_select_operator_first);
@@ -175,6 +177,7 @@ public class ImportFragment extends Fragment {
 		//Go to next fragment
 		AuditFragment fragment = new AuditFragment_().builder().build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
+		transaction.setCustomAnimations(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
 		transaction.replace(R.id.ll_main, fragment);
 		transaction.commit();
 	}
