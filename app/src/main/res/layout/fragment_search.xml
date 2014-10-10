@@ -3,7 +3,7 @@
   android:orientation="vertical"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:padding="16dp">
+  android:padding="9dp">
 
 	<EditText
 		android:layout_width="match_parent"
@@ -17,7 +17,8 @@
         android:background="@android:drawable/editbox_dropdown_light_frame"
         android:singleLine="true"
         android:textSize="18sp"
-        android:layout_marginBottom="6dp"/>
+        android:layout_marginBottom="6dp"
+        android:imeOptions="actionSearch"/>
 
 	<ImageButton
 		android:layout_width="match_parent"
@@ -80,7 +81,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/lv_search_container"
             android:dividerHeight="1dip"
-            android:divider="@color/background_button_and_line">
+            android:divider="@color/background_button_and_line"
+            android:scrollbars="none">
         </ListView>
 
     </LinearLayout>

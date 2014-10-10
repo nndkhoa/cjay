@@ -81,6 +81,26 @@
     <!-- Dialog Search Session Result -->
     <string name="dialog_search_container_title">Không tìm thấy Container</string>
 
+    <!-- Button titles -->
     <string name="button_completed">Hoàn tất</string>
     <string name="button_audit_now">Giám định ngay</string>
+    <string name="button_repair_now">Sửa chữa ngay</string>
+
+    <!-- Label for container item -->
+    <string name="label_container_id">Container ID: </string>
+    <string name="label_operator_code">Hãng tàu: </string>
+    <string name="label_date_created">Ngày tạo: </string>
+    <string name="label_date_out">Ngày xuất</string>
+    <string name="label_on_step">Bước đang làm: </string>
+    <string name="label_pre_status">Trạng thái đầu vào: </string>
+    <string name="label_current_status">Trạng thái hiện tại</string>
+
+    <!-- Menu items -->
+    <string name="menu_logout">Đăng xuất</string>
+
+    <!-- Main flow fragment titles -->
+    <string name="fragment_import_title">Nhập</string>
+    <string name="fragment_audit_title">Giám định</string>
+    <string name="fragment_repair_title">Sửa chữa</string>
+    <string name="fragment_export_title">Xuất</string>
 </resources>

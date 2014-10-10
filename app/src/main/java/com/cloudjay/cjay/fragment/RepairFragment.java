@@ -65,7 +65,14 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 	}
 
 	private void configureActionBar() {
+
+        // Get actionbar
 		actionBar = getActivity().getActionBar();
+
+        // Set ActionBar Title
+        actionBar.setTitle(R.string.fragment_repair_title);
+
+        // Fix tab layout
 		final Method method;
 		try {
 			method = actionBar.getClass()

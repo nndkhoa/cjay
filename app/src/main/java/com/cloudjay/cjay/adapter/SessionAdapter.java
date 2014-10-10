@@ -36,8 +36,6 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 		TextView tvOperator;
 		TextView tvDateIn;
 		TextView tvDateOut;
-		TextView tvDateEstimate;
-		TextView tvDateRepair;
 		TextView tvPreStatus;
 		TextView tvCurrentStatus;
 		TextView tvStep;
@@ -63,8 +61,6 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 			viewHolder.tvOperator = (TextView) convertView.findViewById(R.id.tv_operator);
 			viewHolder.tvDateIn = (TextView) convertView.findViewById(R.id.tv_date_in);
 			viewHolder.tvDateOut = (TextView) convertView.findViewById(R.id.tv_date_out);
-			viewHolder.tvDateEstimate = (TextView) convertView.findViewById(R.id.tv_date_estimate);
-			viewHolder.tvDateRepair = (TextView) convertView.findViewById(R.id.tv_date_repair);
 			viewHolder.tvPreStatus = (TextView) convertView.findViewById(R.id.tv_pre_status);
 			viewHolder.tvCurrentStatus = (TextView) convertView.findViewById(R.id.tv_current_status);
 			viewHolder.tvStep = (TextView) convertView.findViewById(R.id.tv_step);

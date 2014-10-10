@@ -9,11 +9,14 @@ import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
@@ -83,12 +86,7 @@ public class SearchFragment extends Fragment {
 
 	@Click(R.id.btn_search)
 	void buttonSearchClicked() {
-		showProgress(true);
-		String keyword = etSearch.getText().toString();
-
-		// Start search in background
-		containerID = keyword;
-		dataCenter.search(getActivity(), keyword);
+		performSearch();
 	}
 
 	@AfterViews
@@ -130,6 +128,19 @@ public class SearchFragment extends Fragment {
 
 			}
 		});
+
+        etSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+
+                if (i == EditorInfo.IME_ACTION_SEARCH) {
+                    performSearch();
+                    return true;
+                }
+
+                return false;
+            }
+        });
 	}
 
 	private void setKeyboardBasedOnRole() {
@@ -220,4 +231,13 @@ public class SearchFragment extends Fragment {
 				.builder().containerId(containerId).build();
 		addContainerDialog_.show(fragmentManager, "fragment_addcontainer");
 	}
+
+    private void performSearch() {
+        showProgress(true);
+        String keyword = etSearch.getText().toString();
+
+        // Start search in background
+        containerID = keyword;
+        dataCenter.search(getActivity(), keyword);
+    }
 }

@@ -7,7 +7,9 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,10 +28,14 @@ import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.account.AccountGeneral;
 
+import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.EditorAction;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
@@ -206,48 +212,67 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 	@Click(R.id.btn_login)
 	void btnLoginClicked() {
-
-		email = etEmail.getText().toString();
-		password = etPassword.getText().toString();
-
-		View focusView = null;
-		boolean cancel = false;
-
-		// Check for a valid password.
-		if (TextUtils.isEmpty(password)) {
-			etPassword.setError(getString(R.string.error_password_field_required));
-			focusView = etPassword;
-			cancel = true;
-		} else if (password.length() < 6) {
-			etPassword.setError(getString(R.string.error_invalid_password));
-			focusView = etPassword;
-			cancel = true;
-		}
-
-		// Check for a valid email address.
-		if (TextUtils.isEmpty(email)) {
-			etEmail.setError(getString(R.string.error_email_field_required));
-			focusView = etEmail;
-			cancel = true;
-		} else if (!email.contains("@")) {
-			etEmail.setError(getString(R.string.error_invalid_email));
-			focusView = etEmail;
-			cancel = true;
-		}
-
-		// Done validation process. Try to log user in
-		if (cancel) {
-			focusView.requestFocus();
-		} else if (NetworkHelper.isConnected(this)) {
-
-			if (inputManager != null) {
-				inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-			}
-
-			showProgress(true);
-			doLogin();
-		} else {
-			Utils.showCrouton(this, R.string.error_connection);
-		}
+        performLogin();
 	}
+
+    @AfterViews
+    void doAfterViews() {
+        etPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                // TODO: imple
+                if (i == EditorInfo.IME_ACTION_DONE) {
+                    performLogin();
+                    return true;
+                }
+
+                return false;
+            }
+        });
+    }
+
+    void performLogin() {
+        email = etEmail.getText().toString();
+        password = etPassword.getText().toString();
+
+        View focusView = null;
+        boolean cancel = false;
+
+        // Check for a valid password.
+        if (TextUtils.isEmpty(password)) {
+            etPassword.setError(getString(R.string.error_password_field_required));
+            focusView = etPassword;
+            cancel = true;
+        } else if (password.length() < 6) {
+            etPassword.setError(getString(R.string.error_invalid_password));
+            focusView = etPassword;
+            cancel = true;
+        }
+
+        // Check for a valid email address.
+        if (TextUtils.isEmpty(email)) {
+            etEmail.setError(getString(R.string.error_email_field_required));
+            focusView = etEmail;
+            cancel = true;
+        } else if (!email.contains("@")) {
+            etEmail.setError(getString(R.string.error_invalid_email));
+            focusView = etEmail;
+            cancel = true;
+        }
+
+        // Done validation process. Try to log user in
+        if (cancel) {
+            focusView.requestFocus();
+        } else if (NetworkHelper.isConnected(this)) {
+
+            if (inputManager != null) {
+                inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+            }
+
+            showProgress(true);
+            doLogin();
+        } else {
+            Utils.showCrouton(this, R.string.error_connection);
+        }
+    }
 }

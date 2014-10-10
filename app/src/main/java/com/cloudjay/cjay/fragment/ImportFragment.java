@@ -148,6 +148,9 @@ public class ImportFragment extends Fragment {
 	@AfterViews
 	void doAfterViews() {
 
+        // Set ActionBar Title
+        getActivity().getActionBar().setTitle(R.string.fragment_import_title);
+
 		// Set container ID for text View containerID
 		tvContainerCode.setText(containerID);
 	}
