@@ -54,7 +54,7 @@ public class ImportFragment extends Fragment {
 
 	//region Controls and Views
 	@ViewById(R.id.btn_camera)
-    ImageButton btnCamera;
+	ImageButton btnCamera;
 
 	@ViewById(R.id.btn_continue)
 	Button btnContinue;
@@ -172,12 +172,12 @@ public class ImportFragment extends Fragment {
 
 	@Click(R.id.btn_continue)
 	void buttonContinueClicked() {
-        // Get selected radio type
+		// Get selected radio type
 
-		//Go to next fragment
+		// Go to next fragment
 		AuditFragment fragment = new AuditFragment_().builder().build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-		transaction.setCustomAnimations(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
+		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 		transaction.replace(R.id.ll_main, fragment);
 		transaction.commit();
 	}
@@ -189,10 +189,10 @@ public class ImportFragment extends Fragment {
 		}
 	}
 
-    @CheckedChange({ R.id.rdn_status_a, R.id.rdn_status_b, R.id.rdn_status_c })
-    void radioTypesCheckedChanged() {
+	@CheckedChange({R.id.rdn_status_a, R.id.rdn_status_b, R.id.rdn_status_c})
+	void radioTypesCheckedChanged() {
 
-    }
+	}
 
 	private void showDialogSearchOperator() {
 		FragmentManager fm = getActivity().getSupportFragmentManager();

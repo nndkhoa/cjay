@@ -54,7 +54,7 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 		// Go to next fragment
 		Fragment fragment = new ExportFragment_().builder().build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-		transaction.setCustomAnimations(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
+		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 		transaction.replace(R.id.ll_main, fragment);
 		transaction.commit();
 	}

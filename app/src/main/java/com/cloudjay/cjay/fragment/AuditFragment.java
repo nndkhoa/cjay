@@ -45,7 +45,7 @@ public class AuditFragment extends Fragment {
 		//Go to next fragment
 		RepairFragment fragment = new RepairFragment_().builder().build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-		transaction.setCustomAnimations(android.R.anim.slide_out_right, android.R.anim.slide_in_left);
+		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 		transaction.replace(R.id.ll_main, fragment);
 		transaction.commit();
 	}
