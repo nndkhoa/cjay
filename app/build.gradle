@@ -90,6 +90,8 @@ dependencies {
 	compile files('libs/helpertoolsforandroid.jar')
 
     compile 'eu.inmite.android.lib:android-styled-dialogs:1.2.0'
+	compile 'com.snappydb:snappydb-lib:0.4.0'
+	compile 'com.esotericsoftware.kryo:kryo:2.24.0'
 }
 
 apt {
