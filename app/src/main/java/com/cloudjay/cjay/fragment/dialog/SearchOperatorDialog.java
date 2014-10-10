@@ -14,6 +14,7 @@ import com.cloudjay.cjay.event.OperatorCallbackEvent;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.util.Logger;
+import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
@@ -25,18 +26,17 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import de.greenrobot.event.EventBus;
-import io.realm.RealmResults;
-
 @EFragment(R.layout.dialog_select_operator)
 public class SearchOperatorDialog extends DialogFragment {
 
 	private String mOperatorName;
 	private Fragment mParent;
 
-	RealmResults<Operator> operators;
+	List<Operator> operators;
 	OperatorAdapter operatorAdapter;
 
 	@ViewById(R.id.et_operator_name)
@@ -75,7 +75,7 @@ public class SearchOperatorDialog extends DialogFragment {
 	}
 
 	@AfterViews
-	void doAfterViews() {
+	void doAfterViews()  {
 		// Set title for search operator dialog
 		getDialog().setTitle(getResources().getString(R.string.dialog_operator_title));
 		// Begin to get operators from cache
@@ -96,8 +96,12 @@ public class SearchOperatorDialog extends DialogFragment {
             dataCenter.getOperators();
 		} else {
 			// Get operator(s) by keyword
-            dataCenter.searchOperator(keyword.toUpperCase());
-		}
+            try {
+                dataCenter.searchOperator(keyword.toUpperCase());
+            } catch (SnappydbException e) {
+                e.printStackTrace();
+            }
+        }
 	}
 
 	public void setParent(Fragment parent) {

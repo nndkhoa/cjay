@@ -29,6 +29,7 @@ import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
+import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -40,8 +41,9 @@ import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
+import java.util.List;
+
 import de.greenrobot.event.EventBus;
-import io.realm.RealmResults;
 
 /**
  * Màn hình nhập
@@ -92,7 +94,7 @@ public class ImportFragment extends Fragment {
 
 	GateImageAdapter gateImageAdapter = null;
 	Operator selectedOperator;
-	RealmResults<GateImage> gateImages = null;
+	List<GateImage> gateImages = null;
 
 	public ImportFragment() {
 	}
@@ -124,8 +126,12 @@ public class ImportFragment extends Fragment {
 	@UiThread
 	void onEvent(ImageCapturedEvent event) {
 		// Get gate images from realm
-		dataCenter.getGateImages(CJayConstant.TYPE_IMPORT, containerID);
-	}
+        try {
+            dataCenter.getGateImages(CJayConstant.TYPE_IMPORT, containerID);
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+    }
 
 	@UiThread
 	void onEvent(GateImagesGotEvent event) {

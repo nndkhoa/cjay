@@ -27,6 +27,7 @@ import com.cloudjay.cjay.util.enums.ImageType;
 import com.commonsware.cwac.camera.CameraUtils;
 import com.commonsware.cwac.camera.PictureTransaction;
 import com.commonsware.cwac.camera.SimpleCameraHost;
+import com.snappydb.SnappydbException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -298,14 +299,18 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 			File photo = new File(newDirectory, fileName);
 			saveBitmapToFile(capturedBitmap, photo);
 
-			uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
-		}
+            try {
+                uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
+            } catch (SnappydbException e) {
+                e.printStackTrace();
+            }
+        }
 
-		void uploadImage(String uuid, String uri, String imageName) {
+		void uploadImage(String uuid, String uri, String imageName) throws SnappydbException {
 
 			// 1. Save image to local db
 			Logger.Log("uri in uploadImage: " + uri);
-			DataCenter_.getInstance_(getActivity()).addGateImage(mType, uri);
+			DataCenter_.getInstance_(getActivity()).addGateImage(mType, uri, containerId);
 			EventBus.getDefault().post(new ImageCapturedEvent(uri));
 			Logger.Log("save image to realm successfully");
 

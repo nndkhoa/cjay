@@ -1,20 +1,21 @@
 package com.cloudjay.cjay.event;
 
 import com.cloudjay.cjay.model.Operator;
-import io.realm.RealmObject;
-import io.realm.RealmResults;
+
+import java.util.List;
+
 
 public class OperatorsGotEvent {
 
-	public RealmResults<Operator> getOperators() {
+	public List<Operator> getOperators() {
 		return operators;
 	}
 
-	public RealmResults<Operator> getTargets() {
+	public List<Operator> getTargets() {
 		return operators;
 	}
 
-	public RealmObject getTarget() {
+	public Operator getTarget() {
 		if (isSingleChange()) {
 			return operators.get(0);
 		} else {
@@ -22,9 +23,9 @@ public class OperatorsGotEvent {
 		}
 	}
 
-	private RealmResults<Operator> operators;
+	private List<Operator> operators;
 
-	public OperatorsGotEvent(RealmResults<Operator> operators) {
+	public OperatorsGotEvent(List<Operator> operators) {
 		this.operators = operators;
 	}
 

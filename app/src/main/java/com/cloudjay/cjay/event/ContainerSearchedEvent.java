@@ -1,21 +1,19 @@
 package com.cloudjay.cjay.event;
 
 import com.cloudjay.cjay.model.Session;
-
-import io.realm.RealmObject;
-import io.realm.RealmResults;
+;import java.util.List;
 
 public class ContainerSearchedEvent {
 
-	public RealmResults<Session> getSessions() {
+	public List<Session> getSessions() {
 		return sessions;
 	}
 
-	public RealmResults<Session> getTargets() {
+	public List<Session> getTargets() {
 		return sessions;
 	}
 
-	public RealmObject getTarget() {
+	public Session getTarget() {
 		if (isSingleChange()) {
 			return sessions.get(0);
 		} else {
@@ -23,9 +21,9 @@ public class ContainerSearchedEvent {
 		}
 	}
 
-	private RealmResults<Session> sessions;
+	private List<Session> sessions;
 
-	public ContainerSearchedEvent(RealmResults<Session> sessions) {
+	public ContainerSearchedEvent(List<Session> sessions) {
 		this.sessions = sessions;
 	}
 

@@ -4,16 +4,14 @@ package com.cloudjay.cjay.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 import javax.annotation.Generated;
 
-import io.realm.RealmList;
-import io.realm.RealmObject;
-import io.realm.annotations.Ignore;
 
 @Generated("org.jsonschema2pojo")
-public class Session extends RealmObject {
+public class Session {
 
-	@Ignore
 	public static final String FIELD_CONTAINER_ID = "container_id";
 
 	@Expose
@@ -93,11 +91,11 @@ public class Session extends RealmObject {
 
 	@SerializedName("gate_images")
 	@Expose
-	private RealmList<GateImage> gateImages;
+	private List<GateImage> gateImages;
 
 	@SerializedName("audit_items")
 	@Expose
-	private RealmList<AuditItem> auditItems;
+	private List<AuditItem> auditItems;
 
 	public Session() {
 
@@ -246,28 +244,28 @@ public class Session extends RealmObject {
 		return this;
 	}
 
-	public RealmList<GateImage> getGateImages() {
+	public List<GateImage> getGateImages() {
 		return gateImages;
 	}
 
-	public void setGateImages(RealmList<GateImage> gateImages) {
+	public void setGateImages(List<GateImage> gateImages) {
 		this.gateImages = gateImages;
 	}
 
-	public Session withGateImages(RealmList<GateImage> gateImages) {
+	public Session withGateImages(List<GateImage> gateImages) {
 		this.gateImages = gateImages;
 		return this;
 	}
 
-	public RealmList<AuditItem> getAuditItems() {
+	public List<AuditItem> getAuditItems() {
 		return auditItems;
 	}
 
-	public void setAuditItems(RealmList<AuditItem> auditItems) {
+	public void setAuditItems(List<AuditItem> auditItems) {
 		this.auditItems = auditItems;
 	}
 
-	public Session withAuditItems(RealmList<AuditItem> auditItems) {
+	public Session withAuditItems(List<AuditItem> auditItems) {
 		this.auditItems = auditItems;
 		return this;
 	}

@@ -12,9 +12,6 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
-import io.realm.Realm;
-import io.realm.RealmResults;
-
 /**
  * Danh sách các container đang thao tác
  */
@@ -43,12 +40,6 @@ public class WorkingFragment extends Fragment {
 		lvWorking.setAdapter(mAdapter);
 		lvWorking.setEmptyView(tvEmpty);
 
-		Realm realm = Realm.getInstance(getActivity());
-		RealmResults<Session> sessions = realm.where(Session.class).equalTo("processing", true).findAll();
 
-		if (sessions.size() != 0) {
-			mAdapter.addAll(sessions);
-			mAdapter.notifyDataSetChanged();
-		}
 	}
 }

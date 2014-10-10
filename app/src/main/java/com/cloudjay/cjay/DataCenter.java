@@ -12,169 +12,183 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.snappydb.DB;
+import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.Trace;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
-import io.realm.Realm;
-import io.realm.RealmResults;
 
 @EBean(scope = EBean.Scope.Singleton)
 public class DataCenter {
 
-	// Inject the rest client
-	@Bean
-	NetworkClient networkClient;
+    // Inject the rest client
+    @Bean
+    NetworkClient networkClient;
 
-	public static final String NETWORK = "NETWORK";
-	public static final String CACHE = "CACHE";
-	public static final String CALLBACK = "CALLBACK";
-	public static final String GET_CALLBACK = "GET_CALLBACK";
 
-	Context context;
+    public static final String NETWORK = "NETWORK";
+    public static final String CACHE = "CACHE";
+    public static final String CALLBACK = "CALLBACK";
+    public static final String GET_CALLBACK = "GET_CALLBACK";
 
-	public DataCenter(Context context) {
-		this.context = context;
-	}
+    Context context;
 
-	public String getToken(String email, String password) {
-		return networkClient.getToken(email, password);
-	}
+    public DataCenter(Context context) {
+        this.context = context;
+    }
 
-	public User getCurrentUser(Context context) {
-		User user = networkClient.getCurrentUser(context);
-		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_USER_ROLE, user.getRole() + "");
-		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_USER_DEPOT, user.getDepotCode() + "");
-		return user;
-	}
+    public String getToken(String email, String password) {
+        return networkClient.getToken(email, password);
+    }
 
-	public void fetchOperators(Context context) {
-		networkClient.getOperators(context, null);
-	}
+    public User getCurrentUser(Context context) {
+        User user = networkClient.getCurrentUser(context);
+        PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_USER_ROLE, user.getRole() + "");
+        PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_USER_DEPOT, user.getDepotCode() + "");
+        return user;
+    }
 
-	public void fetchIsoCodes(Context context) {
-		networkClient.getDamageCodes(context, null);
-		networkClient.getRepairCodes(context, null);
-		networkClient.getComponentCodes(context, null);
-	}
+    public void fetchOperators(Context context) {
+        networkClient.getOperators(context, null);
+    }
 
-	@Trace
-	public void fetchSession(Context context, String lastModifiedDate) {
-		networkClient.getAllSessions(context, lastModifiedDate);
-	}
+    public void fetchIsoCodes(Context context) {
+        networkClient.getDamageCodes(context, null);
+        networkClient.getRepairCodes(context, null);
+        networkClient.getComponentCodes(context, null);
+    }
 
-	@Trace
-	@Background(serial = CACHE)
-	public void search(Context context, String keyword) {
+    @Trace
+    public void fetchSession(Context context, String lastModifiedDate) throws SnappydbException {
+        List<Session> sessions = networkClient.getAllSessions(context, lastModifiedDate);
+        for (Session session : sessions) {
+            Logger.e("Added: " + session.getContainerId());
+            App.getSnappyDB(context).put(session.getContainerId(), session);
+        }
 
-		Logger.Log("Begin search: " + keyword);
+    }
 
-		// Search on local db
-		Realm realm = Realm.getInstance(context);
-		RealmResults<Session> sessions = realm.where(Session.class)
-				.contains("containerId", keyword)
-				.findAll();
+    @Trace
+    @Background(serial = CACHE)
+    public void search(Context context, String keyword) {
 
-		if (sessions.size() != 0) {
-			EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
-		} else {
-			// TODO: @thai need to alert to user about that no results was found in local
+        Logger.Log("Begin search: " + keyword);
 
-			// If there was not result in local, send search request to server
-			searchAsync(context, keyword);
-		}
-	}
+        // Search on local db
 
-	@Background(serial = NETWORK)
-	public void searchAsync(Context context, String keyword) {
+        String[] keysresult = new String[0];
+        try {
+            keysresult = App.getSnappyDB(context).findKeys(keyword);
+            List<Session> sessions = new ArrayList<Session>();
+            for (String result : keysresult) {
+                sessions.add(App.getSnappyDB(context).getObject(result, Session.class));
+            }
+            if (sessions.size() != 0) {
+                EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
+            } else {
+                // TODO: @thai need to alert to user about that no results was found in local
 
-		Logger.Log("Begin to search container from server");
-		Realm realm = Realm.getInstance(context);
-		List<Session> sessions = networkClient.searchSessions(context, keyword);
+                // If there was not result in local, send search request to server
+                searchAsync(context, keyword);
+            }
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
 
-		if (sessions.size() != 0) {
-			RealmResults<Session> results = realm.where(Session.class)
-					.contains("containerId", keyword)
-					.findAll();
-			EventBus.getDefault().post(new ContainerSearchedEvent(results));
-		} else {
-			RealmResults<Session> results = realm.where(Session.class)
-					.contains("containerId", keyword)
-					.findAll();
-			EventBus.getDefault().post(new ContainerSearchedEvent(results));
-		}
+    }
 
-	}
+    @Background(serial = NETWORK)
+    public void searchAsync(Context context, String keyword) {
 
-	@Background(serial = CACHE)
-	public void getOperators() {
+        Logger.Log("Begin to search container from server");
+        List<Session> sessions = networkClient.searchSessions(context, keyword);
 
-		// Search on local db
-		Realm realm = Realm.getInstance(context);
-		RealmResults<Operator> operators = realm.where(Operator.class).findAll();
-		EventBus.getDefault().post(new OperatorsGotEvent(operators));
-	}
+        if (sessions.size() != 0) {
+            for (Session session : sessions) {
+                try {
+                    App.getSnappyDB(context).put(session.getContainerId(), session);
+                } catch (SnappydbException e) {
+                    e.printStackTrace();
+                }
+            }
+            EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
+        } else {
+            EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
+        }
 
-	@Background(serial = CACHE)
-	public void addSession(String containerId, String operatorCode, long operatorId) {
-		Realm realm = Realm.getInstance(context);
+    }
 
-		// Open a transaction to store session into the realm
-		realm.beginTransaction();
+    @Background(serial = CACHE)
+    public void getOperators() {
 
-		Session session = realm.createObject(Session.class);
-		session.setId(0);
-		session.setContainerId(containerId);
-		session.setOperatorId(operatorId);
-		session.setOperatorCode(operatorCode);
+        // Search on local db
+        List<Operator> operators = new ArrayList<Operator>();
+        String[] keysresult = new String[0];
+        try {
+            keysresult = App.getSnappyDB(context).findKeys("OP");
+            for (String result : keysresult) {
+                operators.add(App.getSnappyDB(context).getObject(result, Operator.class));
+            }
+            EventBus.getDefault().post(new OperatorsGotEvent(operators));
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
 
-		// Commit transaction
-		realm.commitTransaction();
+    }
 
-		Logger.Log("insert session successfully");
-	}
+    @Background(serial = CACHE)
+    public void addSession(String containerId, String operatorCode, long operatorId) {
+        Session session = new Session();
+        session.setId(0);
+        session.setContainerId(containerId);
+        session.setOperatorId(operatorId);
+        session.setOperatorCode(operatorCode);
+        try {
+            App.getSnappyDB(context).put(containerId, Session.class);
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+        Logger.Log("insert session successfully");
+    }
 
-	public void addGateImage(long type, String url) {
-		Logger.Log("url when insert in data center: " + url);
-		Realm realm = Realm.getInstance(context);
+    public void addGateImage(long type, String url, String containerId) throws SnappydbException {
+        Logger.Log("url when insert in data center: " + url);
+        Session session = App.getSnappyDB(context).getObject(containerId, Session.class);
+        GateImage gateImage = new GateImage();
+        gateImage.setId(0);
+        gateImage.setType(type);
+        gateImage.setUrl(url);
+        session.getGateImages().add(gateImage);
+        App.getSnappyDB(context).put(containerId, session);
+        Logger.Log("insert gate image successfully");
+    }
 
-		// Open a transaction to store session into the realm
-		realm.beginTransaction();
+    public void getGateImages(long type, String containerId) throws SnappydbException {
+        Logger.Log("type = " + type + ", containerId = " + containerId);
+        Session session = App.getSnappyDB(context).getObject(containerId, Session.class);
+        List<GateImage> gateImages = session.getGateImages();
+        for (GateImage g : gateImages) {
+            Logger.Log("url: " + g.getUrl());
+        }
+        Logger.Log("gate images count in dataCenter: " + gateImages.size());
+        EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
+    }
 
-		GateImage gateImage = realm.createObject(GateImage.class);
-		gateImage.setId(0);
-		gateImage.setType(type);
-		gateImage.setUrl(url);
-		realm.commitTransaction();
+    public void searchOperator(String keyword) throws SnappydbException {
+        String[] keysresult = App.getSnappyDB(context).findKeys(keyword);
+        List<Operator> operators = new ArrayList<Operator>();
+        for (String result : keysresult) {
+            operators.add(App.getSnappyDB(context).getObject(result, Operator.class));
+        }
 
-		Logger.Log("insert gate image successfully");
-	}
-
-	public void getGateImages(long type, String containerId) {
-		Logger.Log("type = " + type + ", containerId = " + containerId);
-		Realm realm = Realm.getInstance(context);
-		RealmResults<GateImage> gateImages = realm.where(GateImage.class).contains("url", containerId).findAll();
-		// RealmResults<GateImage> gateImages = realm.where(GateImage.class).findAll();
-		for (GateImage g : gateImages) {
-			Logger.Log("url: " + g.getUrl());
-		}
-		Logger.Log("gate images count in dataCenter: " + gateImages.size());
-		EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
-	}
-
-	public void searchOperator(String keyword) {
-		Realm realm = Realm.getInstance(context);
-		RealmResults<Operator> operators = realm.where(Operator.class)
-				.contains("operatorName", keyword).or()
-				.contains("operatorCode", keyword)
-				.findAll();
-
-		EventBus.getDefault().post(new OperatorsGotEvent(operators));
-	}
+        EventBus.getDefault().post(new OperatorsGotEvent(operators));
+    }
 
 }

@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.view.View;
 
+import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
@@ -13,14 +14,16 @@ import com.cloudjay.cjay.model.Session;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.snappydb.DB;
+import com.snappydb.DBFactory;
+import com.snappydb.SnappydbException;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
-import io.realm.Realm;
-import io.realm.RealmList;
 
 public class Utils {
 
@@ -70,19 +73,19 @@ public class Utils {
     public static boolean isContainerIdValid(String containerId) {
 
         //if (!Logger.isDebuggable()) {
-            Logger.Log("isContainerIdValid");
+        Logger.Log("isContainerIdValid");
 
-            int crc = ContCheckDigit.getCRC(containerId);
-            if (crc == 10) {
-                crc = 0;
-            }
+        int crc = ContCheckDigit.getCRC(containerId);
+        if (crc == 10) {
+            crc = 0;
+        }
 
-            char lastChar = containerId.charAt(containerId.length() - 1);
-            if (Character.getNumericValue(lastChar) == crc) {
-                return true;
-            } else {
-                return false;
-            }
+        char lastChar = containerId.charAt(containerId.length() - 1);
+        if (Character.getNumericValue(lastChar) == crc) {
+            return true;
+        } else {
+            return false;
+        }
         //}
 
         //return true;
@@ -105,27 +108,25 @@ public class Utils {
      * Need to check if container is existed or not. (should use insert or update concept)
      *
      * @param context
-     * @param e
+     * @param session
      * @return
      */
-    public static Session parseSession(Context context, JsonObject e) {
+    public static Session parseSession(Context context, Session session) throws SnappydbException {
 
         //Check available session
-        String containerId = e.get("container_id").toString();
-        Realm realm = Realm.getInstance(context);
-        Session found = realm.where(Session.class).equalTo("containerId", containerId).findFirst();
+        DB snappyDb = App.getSnappyDB(context);
+        Session found = snappyDb.getObject(session.getContainerId(), Session.class);
 
         // If hasn't -> create
         if (found == null) {
-            Session session = parseNewSession(context, e);
+            snappyDb.put(session.getContainerId(), session);
             return session;
         }
 
         // else -> update
         else {
-            realm.beginTransaction();
-            Session session = parseNewSession(context, e);
-            realm.commitTransaction();
+            snappyDb.del(session.getContainerId());
+            snappyDb.put(session.getContainerId(), session);
             return session;
         }
 
@@ -140,7 +141,7 @@ public class Utils {
      */
     public static int countTotalImage(Session session) {
         int totalImage = 0;
-        RealmList<AuditItem> auditItems = session.getAuditItems();
+        List<AuditItem> auditItems = session.getAuditItems();
         for (AuditItem auditItem : auditItems) {
             totalImage = totalImage + auditItem.getAuditImages().size();
         }
@@ -150,9 +151,9 @@ public class Utils {
 
     public static int countUploadedImage(Session session) {
         int uploadedImage = 0;
-        RealmList<AuditItem> auditItems = session.getAuditItems();
+        List<AuditItem> auditItems = session.getAuditItems();
         for (AuditItem auditItem : auditItems) {
-            RealmList<AuditImage> auditImages = auditItem.getAuditImages();
+            List<AuditImage> auditImages = auditItem.getAuditImages();
             for (AuditImage auditImage : auditImages) {
                 if (auditImage.isUploaded()) {
                     uploadedImage = uploadedImage + 1;
@@ -160,7 +161,7 @@ public class Utils {
             }
 
         }
-        RealmList<GateImage> gateImages = session.getGateImages();
+        List<GateImage> gateImages = session.getGateImages();
         for (GateImage gateImage : gateImages) {
             if (gateImage.isUploaded()) {
                 uploadedImage = uploadedImage + 1;
@@ -169,99 +170,4 @@ public class Utils {
         return uploadedImage;
     }
 
-
-    private static Session parseNewSession(Context context, JsonObject e) {
-
-        Realm realm = Realm.getInstance(context);
-        realm.beginTransaction();
-        Session session = realm.createObject(Session.class);
-        session.setId(Long.parseLong(e.get("id").toString()));
-        session.setContainerId(e.get("container_id").toString());
-        session.setCheckInTime(e.get("check_in_time").toString());
-
-        if (e.get("check_out_time").isJsonNull()) {
-            session.setCheckOutTime("");
-        } else {
-            session.setCheckOutTime(e.get("check_out_time").toString());
-        }
-        session.setDepotCode(e.get("depot_code").toString());
-        session.setDepotId(Long.parseLong(e.get("depot_id").toString()));
-        session.setOperatorCode(e.get("operator_code").toString());
-        session.setOperatorId(Long.parseLong(e.get("operator_id").toString()));
-        session.setPreStatus(Long.parseLong(e.get("pre_status").toString()));
-        session.setStatus(Long.parseLong(e.get("status").toString()));
-        session.setStep(Long.parseLong(e.get("step").toString()));
-	    session.setProcessing(false);
-
-        realm.commitTransaction();
-
-        realm.beginTransaction();
-        // Process list audit items
-        JsonArray auditItems = e.getAsJsonArray("audit_items");
-        for (JsonElement audit : auditItems) {
-            AuditItem item = realm.createObject(AuditItem.class);
-
-            item.setComponentCode(audit.getAsJsonObject().get("component_code").toString());
-            item.setComponentCodeId(Long.parseLong(audit.getAsJsonObject().get("component_code_id").toString()));
-            item.setComponentName(audit.getAsJsonObject().get("component_name").toString());
-            item.setCreatedAt(audit.getAsJsonObject().get("created_at").toString());
-            item.setDamageCode(audit.getAsJsonObject().get("damage_code").toString());
-            item.setDamageCodeId(Long.parseLong(audit.getAsJsonObject().get("damage_code_id").toString()));
-
-            if (audit.getAsJsonObject().get("height").isJsonNull()) {
-                item.setHeight(0);
-            } else {
-                item.setHeight(Double.valueOf(audit.getAsJsonObject().get("height").toString()));
-            }
-
-            if (audit.getAsJsonObject().get("length").isJsonNull()) {
-                item.setHeight(0);
-            } else {
-                item.setHeight(Double.valueOf(audit.getAsJsonObject().get("length").toString()));
-            }
-
-            item.setId(Long.parseLong(audit.getAsJsonObject().get("id").toString()));
-            item.setIsAllowed(Boolean.parseBoolean(audit.getAsJsonObject().get("is_allowed").toString()));
-            item.setLocationCode(audit.getAsJsonObject().get("location_code").toString());
-            item.setModifiedAt(audit.getAsJsonObject().get("modified_at").toString());
-            if (audit.getAsJsonObject().get("quantity").isJsonNull()) {
-                item.setQuantity(0);
-            } else {
-                item.setQuantity(Long.valueOf(audit.getAsJsonObject().get("quantity").toString()));
-            }
-
-            item.setRepairCode(audit.getAsJsonObject().get("repair_code").toString());
-            item.setRepairCodeId(Long.parseLong(audit.getAsJsonObject().get("repair_code_id").toString()));
-
-            // // Process list audit images
-            JsonArray auditImage = audit.getAsJsonObject().getAsJsonArray("audit_images");
-            for (JsonElement imageAudit : auditImage) {
-                AuditImage imageAuditItem = realm.createObject(AuditImage.class);
-
-                imageAuditItem.setId(Long.parseLong(imageAudit.getAsJsonObject().get("id").toString()));
-                imageAuditItem.setType(Long.parseLong(imageAudit.getAsJsonObject().get("type").toString()));
-                imageAuditItem.setUrl(imageAudit.getAsJsonObject().get("url").toString());
-                item.getAuditImages().add(imageAuditItem);
-            }
-
-            session.getAuditItems().add(item);
-        }
-        realm.commitTransaction();
-
-        // Process list gate images
-        realm.beginTransaction();
-        JsonArray gateImage = e.getAsJsonArray("gate_images");
-        for (JsonElement image : gateImage) {
-
-            GateImage imageItem = realm.createObject(GateImage.class);
-            imageItem.setId(Long.parseLong(image.getAsJsonObject().get("id").toString()));
-            imageItem.setType(Long.parseLong(image.getAsJsonObject().get("type").toString()));
-            imageItem.setUrl(image.getAsJsonObject().get("url").toString());
-
-            // Add reference
-            session.getGateImages().add(imageItem);
-        }
-        realm.commitTransaction();
-        return session;
-    }
 }

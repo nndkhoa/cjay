@@ -2,19 +2,19 @@ package com.cloudjay.cjay.event;
 
 import com.cloudjay.cjay.model.GateImage;
 
-import io.realm.RealmResults;
+import java.util.List;
 
 /**
  * Created by nambv on 07/10/2014.
  */
 public class GateImagesGotEvent {
-    private RealmResults<GateImage> gateImages;
+    private List<GateImage> gateImages;
 
-    public GateImagesGotEvent(RealmResults<GateImage> gateImages) {
+    public GateImagesGotEvent(List<GateImage> gateImages) {
         this.gateImages = gateImages;
     }
 
-    public RealmResults<GateImage> getGateImages() {
+    public List<GateImage> getGateImages() {
         return this.gateImages;
     }
 }
