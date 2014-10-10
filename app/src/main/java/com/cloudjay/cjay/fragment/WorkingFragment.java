@@ -1,14 +1,10 @@
 package com.cloudjay.cjay.fragment;
 
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.util.loader.AbstractDataLoader;
 import com.cloudjay.cjay.adapter.SessionAdapter;
 import com.cloudjay.cjay.model.Session;
 
@@ -17,14 +13,13 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
 import io.realm.Realm;
-import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
 /**
  * Danh sách các container đang thao tác
  */
 @EFragment(R.layout.fragment_working)
-public class WorkingFragment extends Fragment implements LoaderManager.LoaderCallbacks<RealmResults<Session>> {
+public class WorkingFragment extends Fragment {
 
 	private static final int LOADER_ID = 1;
 
@@ -43,55 +38,17 @@ public class WorkingFragment extends Fragment implements LoaderManager.LoaderCal
 	 * Initial loader and set adapter for list view
 	 */
 	@AfterViews
-	void initLoader() {
-		getLoaderManager().initLoader(LOADER_ID, null, this);
+	void init() {
 		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
 		lvWorking.setAdapter(mAdapter);
 		lvWorking.setEmptyView(tvEmpty);
+
 		Realm realm = Realm.getInstance(getActivity());
-		realm.addChangeListener(new RealmChangeListener() {
+		RealmResults<Session> sessions = realm.where(Session.class).equalTo("processing", true).findAll();
 
-			@Override
-			public void onChange() {
-				refreshListView();
-			}
-		});
-	}
-
-	private void refreshListView() {
-		getLoaderManager().restartLoader(LOADER_ID, null, this);
-	}
-
-	@Override
-	public Loader<RealmResults<Session>> onCreateLoader(int id, Bundle args) {
-
-		return new AbstractDataLoader<RealmResults<Session>>(getActivity()) {
-			@Override
-			protected RealmResults<Session> buildList() {
-				Realm realm = Realm.getInstance(context);
-				return realm.where(Session.class).equalTo("processing", true).findAll();
-			}
-		};
-
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-	}
-
-	@Override
-	public void onLoadFinished(Loader<RealmResults<Session>> loader, RealmResults<Session> data) {
-		mAdapter.clear();
-		for (Session session : data) {
-			mAdapter.add(session);
+		if (sessions.size() != 0) {
+			mAdapter.addAll(sessions);
+			mAdapter.notifyDataSetChanged();
 		}
 	}
-
-	@Override
-	public void onLoaderReset(Loader<RealmResults<Session>> loader) {
-		mAdapter.clear();
-	}
-
 }

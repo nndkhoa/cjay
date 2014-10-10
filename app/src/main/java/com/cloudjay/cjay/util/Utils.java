@@ -177,6 +177,7 @@ public class Utils {
         session.setId(Long.parseLong(e.get("id").toString()));
         session.setContainerId(e.get("container_id").toString());
         session.setCheckInTime(e.get("check_in_time").toString());
+
         if (e.get("check_out_time").isJsonNull()) {
             session.setCheckOutTime("");
         } else {
@@ -190,6 +191,7 @@ public class Utils {
         session.setStatus(Long.parseLong(e.get("status").toString()));
         session.setStep(Long.parseLong(e.get("step").toString()));
 	    session.setProcessing(false);
+
         realm.commitTransaction();
 
         realm.beginTransaction();

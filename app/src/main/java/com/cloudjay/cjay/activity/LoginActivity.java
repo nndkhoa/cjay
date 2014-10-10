@@ -168,9 +168,10 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 				showError(etEmail, R.string.error_incorrect_password);
 			}
 		} catch (RetrofitError error) {
-			error.printStackTrace();
+
+			showProgress(false);
+			etPassword.setError(getString(R.string.error_invalid_password));
 			showCrouton(error.getMessage());
-            showProgress(false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			showCrouton(e.getMessage());

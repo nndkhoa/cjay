@@ -4,15 +4,15 @@ package com.cloudjay.cjay.util.enums;
  * Created by thai on 09/10/2014.
  */
 public enum Role {
-    GATE(6);
+	GATE(6);
 
-    public final int value;
+	public final int value;
 
-    Role(int value) {
-        this.value = value;
-    }
+	Role(int value) {
+		this.value = value;
+	}
 
-    public int getValue() {
-        return value;
-    }
+	public int getValue() {
+		return value;
+	}
 }

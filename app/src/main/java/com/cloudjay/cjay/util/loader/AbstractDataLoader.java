@@ -35,11 +35,13 @@ public abstract class AbstractDataLoader<E extends RealmResults<?>> extends
 	 */
 	@Override
 	public void deliverResult(E dataList) {
+
 		if (isReset()) {
 			// An async query came in while the loader is stopped
 			emptyDataList(dataList);
 			return;
 		}
+
 		E oldDataList = mLastDataList;
 		mLastDataList = dataList;
 		if (isStarted()) {
@@ -104,24 +106,25 @@ public abstract class AbstractDataLoader<E extends RealmResults<?>> extends
 
 		// Ensure the loader is stopped
 		onStopLoading();
+
 		if (mLastDataList != null && mLastDataList.size() > 0) {
 			emptyDataList(mLastDataList);
 //			mLastDataList.clear();
 		}
+
 		mLastDataList = null;
 	}
 
 	protected void emptyDataList(E dataList) {
-
 //		dataList.clear();
-//		try {
-//			if (dataList != null && dataList.size() > 0) {
-//				for (int i = 0; i < dataList.size(); i++) {
-//					dataList.remove(i);
-//				}
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+		try {
+			if (dataList != null && dataList.size() > 0) {
+				for (int i = 0; i < dataList.size(); i++) {
+					dataList.remove(i);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
