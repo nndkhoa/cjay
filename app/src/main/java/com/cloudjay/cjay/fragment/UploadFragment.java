@@ -15,8 +15,6 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
-import io.realm.Realm;
-import io.realm.RealmResults;
 
 @EFragment(R.layout.fragment_upload)
 public class UploadFragment extends Fragment {
@@ -44,13 +42,6 @@ public class UploadFragment extends Fragment {
 		mAdapter = new UploadSessionAdapter(getActivity(), R.layout.item_upload);
 		lvUploading.setAdapter(mAdapter);
 		lvUploading.setEmptyView(tvEmpty);
-
-		Realm realm = Realm.getInstance(getActivity());
-		RealmResults<Session> sessions = realm.where(Session.class).equalTo("processing", false).findAll();
-		if (sessions.size() != 0) {
-			mAdapter.addAll(sessions);
-			mAdapter.notifyDataSetChanged();
-		}
 	}
 
 

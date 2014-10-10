@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
@@ -60,6 +61,7 @@ public class AddContainerDialog extends SimpleDialogFragment {
                         getNeutralButton().setVisibility(View.GONE);
                         // Start workflow
                         Intent intent = new Intent(getActivity(), WizardActivity_.class);
+                        intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, containerId);
                         startActivity(intent);
                         dismiss();
                     }

@@ -3,13 +3,13 @@ package com.cloudjay.cjay.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 import javax.annotation.Generated;
 
-import io.realm.RealmList;
-import io.realm.RealmObject;
 
 @Generated("org.jsonschema2pojo")
-public class AuditItem extends RealmObject {
+public class AuditItem {
 
 	@Expose
 	private long id;
@@ -48,7 +48,7 @@ public class AuditItem extends RealmObject {
 	private boolean isAllowed;
 	@SerializedName("audit_images")
 	@Expose
-	private RealmList<AuditImage> auditImages;
+	private List<AuditImage> auditImages;
 	@SerializedName("created_at")
 	@Expose
 	private String createdAt;
@@ -225,15 +225,15 @@ public class AuditItem extends RealmObject {
 		return this;
 	}
 
-	public RealmList<AuditImage> getAuditImages() {
+	public List<AuditImage> getAuditImages() {
 		return auditImages;
 	}
 
-	public void setAuditImages(RealmList<AuditImage> auditImages) {
+	public void setAuditImages(List<AuditImage> auditImages) {
 		this.auditImages = auditImages;
 	}
 
-	public AuditItem withAuditImages(RealmList<AuditImage> auditImages) {
+	public AuditItem withAuditImages(List<AuditImage> auditImages) {
 		this.auditImages = auditImages;
 		return this;
 	}

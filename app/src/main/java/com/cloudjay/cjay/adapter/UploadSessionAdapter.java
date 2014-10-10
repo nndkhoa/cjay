@@ -19,7 +19,6 @@ import com.cloudjay.cjay.util.Utils;
 
 import java.util.List;
 
-import io.realm.RealmList;
 
 /**
  * Created by thai on 09/10/2014.

@@ -10,6 +10,9 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.path.android.jobqueue.JobManager;
+import com.snappydb.DB;
+import com.snappydb.DBFactory;
+import com.snappydb.SnappydbException;
 
 import org.androidannotations.api.view.OnViewChangedNotifier;
 
@@ -18,6 +21,7 @@ public class App extends Application {
 
 	private static App instance;
 	private static JobManager jobManager;
+    private static DB snappydb;
 
 	public App() {
 		instance = this;
@@ -35,6 +39,14 @@ public class App extends Application {
 		}
 		return jobManager;
 	}
+    public static DB getSnappyDB(Context context) throws SnappydbException {
+        if (snappydb == null) {
+            OnViewChangedNotifier previousNotifier = OnViewChangedNotifier.replaceNotifier(null);
+            snappydb = DBFactory.open(context,"Thai");
+            OnViewChangedNotifier.replaceNotifier(previousNotifier);
+        }
+        return snappydb;
+    }
 
 	@Override
 	public void onCreate() {

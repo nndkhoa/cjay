@@ -18,6 +18,8 @@ public class CJayConstant {
     public static final int TYPE_AUDIT = 2;
     public static final int TYPE_REPAIRED = 3;
 
+    public static final String WORKING_DB = "Working";
+
     // `/sdcard/DCMI/CJay/`
     public static final File APP_DIRECTORY_FILE = new File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
