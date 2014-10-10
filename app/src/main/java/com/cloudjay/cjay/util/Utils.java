@@ -21,7 +21,6 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 import io.realm.Realm;
 import io.realm.RealmList;
-import io.realm.RealmResults;
 
 public class Utils {
 
@@ -114,16 +113,17 @@ public class Utils {
         //Check available session
         String containerId = e.get("container_id").toString();
         Realm realm = Realm.getInstance(context);
-        RealmResults<Session> sessions = realm.where(Session.class).equalTo("containerId", containerId).findAll();
-        //If hasn't -> create
-        if (sessions.isEmpty()) {
+        Session found = realm.where(Session.class).equalTo("containerId", containerId).findFirst();
+
+        // If hasn't -> create
+        if (found == null) {
             Session session = parseNewSession(context, e);
             return session;
         }
-        //else -> update
+
+        // else -> update
         else {
             realm.beginTransaction();
-            sessions.clear();
             Session session = parseNewSession(context, e);
             realm.commitTransaction();
             return session;
@@ -171,6 +171,7 @@ public class Utils {
 
 
     private static Session parseNewSession(Context context, JsonObject e) {
+
         Realm realm = Realm.getInstance(context);
         realm.beginTransaction();
         Session session = realm.createObject(Session.class);
