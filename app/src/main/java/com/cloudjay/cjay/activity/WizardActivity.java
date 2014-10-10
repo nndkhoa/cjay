@@ -9,6 +9,7 @@ import com.cloudjay.cjay.fragment.AuditFragment_;
 import com.cloudjay.cjay.fragment.ExportFragment_;
 import com.cloudjay.cjay.fragment.ImportFragment_;
 import com.cloudjay.cjay.fragment.RepairFragment_;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.Step;
 
 import org.androidannotations.annotations.AfterViews;
@@ -25,7 +26,7 @@ public class WizardActivity extends FragmentActivity {
 	String containerID;
 
 	@Extra(STEP_EXTRA)
-	long step;
+	long step = 3;
 
 	/**
 	 * Dựa bước (step) hiện tại của container session, để tạo nên các màn hình tương ứng
@@ -35,6 +36,9 @@ public class WizardActivity extends FragmentActivity {
 
 		Fragment fragment;
 		Step currentStep = Step.values()[((int) step)];
+
+
+        Logger.Log(currentStep + "");
 
 		switch (currentStep) {
 			// Load fragment Audit

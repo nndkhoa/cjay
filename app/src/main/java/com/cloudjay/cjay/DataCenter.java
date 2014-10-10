@@ -6,13 +6,15 @@ import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
+import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.model.WorkingSession;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
-import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.Background;
@@ -152,10 +154,20 @@ public class DataCenter {
         session.setOperatorCode(operatorCode);
         try {
             App.getSnappyDB(context).put(containerId, Session.class);
+            addWorkingId(context,containerId);
         } catch (SnappydbException e) {
             e.printStackTrace();
         }
         Logger.Log("insert session successfully");
+    }
+    public void addWorkingId(Context context,String containerId) throws SnappydbException {
+        WorkingSession workingSession = App.getSnappyDB(context).getObject("WorkingID",WorkingSession.class);
+        List<Session> current = workingSession.getWorkingSession();
+        Session sessionWorking = App.getSnappyDB(context).getObject(containerId,Session.class);
+        current.add(sessionWorking);
+        workingSession.setWorkingSession(current);
+        App.getSnappyDB(context).put(CJayConstant.WORKING_DB, workingSession);
+        EventBus.getDefault().post(new WorkingSessionCreatedEvent(current));
     }
 
     public void addGateImage(long type, String url, String containerId) throws SnappydbException {
