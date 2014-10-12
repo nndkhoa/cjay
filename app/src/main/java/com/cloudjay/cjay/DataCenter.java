@@ -223,7 +223,7 @@ public class DataCenter {
     }
 
     public void searchOperator(String keyword) throws SnappydbException {
-        String[] keysresult = App.getSnappyDB(context).findKeys(keyword);
+        String[] keysresult = App.getSnappyDB(context).findKeys(CJayConstant.OPERATOR_KEY+keyword);
         List<Operator> operators = new ArrayList<Operator>();
         for (String result : keysresult) {
             operators.add(App.getSnappyDB(context).getObject(result, Operator.class));
