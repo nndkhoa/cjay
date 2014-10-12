@@ -195,7 +195,7 @@ public class NetworkClient {
         //If not, get all sessions start form page 1
         else {
             Logger.Log("Fetching all page");
-            sessions = getAllSessionsByPage(context, 1);
+            sessions = getAllSessionsByPage(context, 55);
         }
 
         return sessions;

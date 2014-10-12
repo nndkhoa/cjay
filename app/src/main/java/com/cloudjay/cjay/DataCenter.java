@@ -57,11 +57,15 @@ public class DataCenter {
         return user;
     }
 
-    public void fetchOperators(Context context) {
-        networkClient.getOperators(context, null);
+    public void fetchOperators(Context context) throws SnappydbException {
+        List<Operator> operators = networkClient.getOperators(context, null);
+        for (Operator operator : operators) {
+            App.getSnappyDB(context).put(CJayConstant.OPERATOR_KEY + operator.getOperatorCode(), operator);
+        }
     }
 
     public void fetchIsoCodes(Context context) {
+        //TODO: Add iso code to database @Thai
         networkClient.getDamageCodes(context, null);
         networkClient.getRepairCodes(context, null);
         networkClient.getComponentCodes(context, null);
@@ -85,7 +89,7 @@ public class DataCenter {
 
         // Search on local db
 
-        String[] keysresult = new String[0];
+        String[] keysresult;
         try {
             keysresult = App.getSnappyDB(context).findKeys(keyword);
             List<Session> sessions = new ArrayList<Session>();
@@ -132,9 +136,9 @@ public class DataCenter {
 
         // Search on local db
         List<Operator> operators = new ArrayList<Operator>();
-        String[] keysresult = new String[0];
+        String[] keysresult;
         try {
-            keysresult = App.getSnappyDB(context).findKeys("OP");
+            keysresult = App.getSnappyDB(context).findKeys(CJayConstant.OPERATOR_KEY);
             for (String result : keysresult) {
                 operators.add(App.getSnappyDB(context).getObject(result, Operator.class));
             }
@@ -154,20 +158,45 @@ public class DataCenter {
         session.setOperatorCode(operatorCode);
         try {
             App.getSnappyDB(context).put(containerId, Session.class);
-            addWorkingId(context,containerId);
+            addWorkingId(context, containerId);
         } catch (SnappydbException e) {
             e.printStackTrace();
         }
         Logger.Log("insert session successfully");
     }
-    public void addWorkingId(Context context,String containerId) throws SnappydbException {
-        WorkingSession workingSession = App.getSnappyDB(context).getObject("WorkingID",WorkingSession.class);
-        List<Session> current = workingSession.getWorkingSession();
-        Session sessionWorking = App.getSnappyDB(context).getObject(containerId,Session.class);
-        current.add(sessionWorking);
-        workingSession.setWorkingSession(current);
-        App.getSnappyDB(context).put(CJayConstant.WORKING_DB, workingSession);
-        EventBus.getDefault().post(new WorkingSessionCreatedEvent(current));
+
+    public void addWorkingId(Context context, String containerId) {
+
+        WorkingSession workingSession = null;
+
+        //Get working session list, if can't create one
+        try {
+            Session sessionWorking = App.getSnappyDB(context).getObject(containerId, Session.class);
+            try {
+                workingSession = App.getSnappyDB(context).getObject(CJayConstant.WORKING_DB, WorkingSession.class);
+                List<Session> current = workingSession.getWorkingSession();
+                current.add(sessionWorking);
+                workingSession.setWorkingSession(current);
+                try {
+                    App.getSnappyDB(context).put(CJayConstant.WORKING_DB, workingSession);
+                } catch (SnappydbException e) {
+                    e.printStackTrace();
+                }
+                EventBus.getDefault().post(new WorkingSessionCreatedEvent(current));
+            } catch (SnappydbException e) {
+                WorkingSession workingSessionCreate = new WorkingSession();
+
+                List<Session> current = new ArrayList<Session>();
+                current.add(sessionWorking);
+                workingSessionCreate.setWorkingSession(current);
+                App.getSnappyDB(context).put(CJayConstant.WORKING_DB, workingSessionCreate);
+                EventBus.getDefault().post(new WorkingSessionCreatedEvent(current));
+            }
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     public void addGateImage(long type, String url, String containerId) throws SnappydbException {
