@@ -12,6 +12,7 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
+import com.cloudjay.cjay.util.enums.Status;
 
 import java.util.List;
 
@@ -77,12 +78,16 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 		viewHolder.tvContainerId.setText(session.getContainerId());
 		viewHolder.tvOperator.setText(session.getOperatorCode());
 		viewHolder.tvDateIn.setText(String.valueOf(session.getCheckInTime()));
-		viewHolder.tvDateOut.setText(String.valueOf(session.getCheckOutTime()));
+        if (session.getCheckOutTime() != null) {
+            viewHolder.tvDateOut.setText(String.valueOf(session.getCheckOutTime()));
+        } else {
+            viewHolder.tvDateOut.setText("");
+        }
 		viewHolder.tvStep.setText(String.valueOf(session.getStep()));
 		viewHolder.tvPreStatus.setText(String.valueOf(session.getPreStatus()));
 		viewHolder.tvCurrentStatus.setText(String.valueOf(session.getStatus()));
 
-		if (!isSessionProcessing) {
+		if (!session.isProcessing()) {
 			viewHolder.btnContinue.setVisibility(View.GONE);
 			viewHolder.btnSubmit.setVisibility(View.GONE);
 		}

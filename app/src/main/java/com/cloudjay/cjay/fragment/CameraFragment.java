@@ -300,7 +300,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 			saveBitmapToFile(capturedBitmap, photo);
 
             try {
-                uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
+                // uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
+                uploadImage(uuid, photo.getAbsolutePath(), fileName);
             } catch (SnappydbException e) {
                 e.printStackTrace();
             }
@@ -309,10 +310,9 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		void uploadImage(String uuid, String uri, String imageName) throws SnappydbException {
 
 			// 1. Save image to local db
-			Logger.Log("uri in uploadImage: " + uri);
-			DataCenter_.getInstance_(getActivity()).addGateImage(mType, uri, containerId);
+			DataCenter_.getInstance_(getActivity()).addGateImage(mType, "file://" + uri, containerId);
 			EventBus.getDefault().post(new ImageCapturedEvent(uri));
-			Logger.Log("save image to realm successfully");
+			Logger.Log("save image to snappy successfully");
 
 			// 2.upload image
 

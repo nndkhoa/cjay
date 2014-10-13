@@ -75,6 +75,7 @@ public class NetworkClient {
     //endregion
 
     public void uploadImage(Context context, String uri, String imageName) {
+        Logger.e("uri in NetworkClient: " + uri);
         RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.CJAY_TMP_STORAGE).build();
         File image = new File(uri);
         TypedFile typedFile = new TypedFile("image/jpeg", image);

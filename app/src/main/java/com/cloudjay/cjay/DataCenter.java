@@ -37,8 +37,6 @@ public class DataCenter {
 
     public static final String NETWORK = "NETWORK";
     public static final String CACHE = "CACHE";
-    public static final String CALLBACK = "CALLBACK";
-    public static final String GET_CALLBACK = "GET_CALLBACK";
 
     Context context;
 
@@ -150,19 +148,21 @@ public class DataCenter {
     }
 
     @Background(serial = CACHE)
-    public void addSession(String containerId, String operatorCode, long operatorId) {
+    public void addSession(String containerId, String operatorCode, long operatorId, String checkInTime, long preStatus) {
         Session session = new Session();
         session.setId(0);
         session.setContainerId(containerId);
         session.setOperatorId(operatorId);
         session.setOperatorCode(operatorCode);
+        session.setCheckInTime(checkInTime);
+        session.setPreStatus(preStatus);
         try {
-            App.getSnappyDB(context).put(containerId, Session.class);
+            App.getSnappyDB(context).put(containerId, session);
             addWorkingId(context, containerId);
+            Logger.Log("insert session successfully");
         } catch (SnappydbException e) {
             e.printStackTrace();
         }
-        Logger.Log("insert session successfully");
     }
 
     public void addWorkingId(Context context, String containerId) {
@@ -172,6 +172,7 @@ public class DataCenter {
         //Get working session list, if can't create one
         try {
             Session sessionWorking = App.getSnappyDB(context).getObject(containerId, Session.class);
+            sessionWorking.setProcessing(true);
             try {
                 workingSession = App.getSnappyDB(context).getObject(CJayConstant.WORKING_DB, WorkingSession.class);
                 List<Session> current = workingSession.getWorkingSession();
@@ -201,13 +202,22 @@ public class DataCenter {
 
     public void addGateImage(long type, String url, String containerId) throws SnappydbException {
         Logger.Log("url when insert in data center: " + url);
+
         Session session = App.getSnappyDB(context).getObject(containerId, Session.class);
         GateImage gateImage = new GateImage();
         gateImage.setId(0);
         gateImage.setType(type);
         gateImage.setUrl(url);
-        session.getGateImages().add(gateImage);
+
+        List<GateImage> gateImages = session.getGateImages();
+        if (gateImages == null){
+           gateImages = new ArrayList<GateImage>();
+        }
+        gateImages.add(gateImage);
+        session.setGateImages(gateImages);
+
         App.getSnappyDB(context).put(containerId, session);
+
         Logger.Log("insert gate image successfully");
     }
 

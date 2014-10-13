@@ -7,20 +7,28 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
+
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.enums.Role;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
+import org.androidannotations.annotations.TextChange;
 import org.androidannotations.annotations.ViewById;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import eu.inmite.android.lib.dialogs.SimpleDialogFragment;
 
@@ -32,6 +40,8 @@ public class AddContainerDialog extends SimpleDialogFragment {
 
     @ViewById(R.id.et_container_id)
     EditText etContainerID;
+
+    Pattern pattern = Pattern.compile("^[a-zA-Z]{4}");
 
     @Override
     protected Builder build(final Builder builder) {
@@ -78,6 +88,7 @@ public class AddContainerDialog extends SimpleDialogFragment {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), WizardActivity_.class);
+                intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, containerId);
                 startActivity(intent);
                 dismiss();
             }
@@ -102,10 +113,22 @@ public class AddContainerDialog extends SimpleDialogFragment {
         this.getNeutralButton().setVisibility(View.GONE);
     }
 
-    private void showAddInvalidContainerISODialog(String containerId) {
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        AddInvalidContainerIsoDialog addContainerDialog_ = AddInvalidContainerIsoDialog_
-                .builder().containerId(containerId).build();
-        addContainerDialog_.show(fragmentManager, "fragment_addcontainer");
+    @TextChange(R.id.et_container_id)
+    void onContainerIdEditTextChanged(CharSequence s, int start, int before, int count) {
+        if ((Utils.getRole(getActivity())) == Role.GATE.getValue()) {
+            Matcher matcher = pattern.matcher(s);
+            if (s.length() < 4) {
+                if (etContainerID.getInputType() != InputType.TYPE_CLASS_TEXT) {
+                    etContainerID.setInputType(InputType.TYPE_CLASS_TEXT
+                            | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                }
+            } else if (matcher.matches()) {
+                if (etContainerID.getInputType() != InputType.TYPE_CLASS_NUMBER) {
+                    etContainerID.setInputType(InputType.TYPE_CLASS_NUMBER);
+                }
+            }
+        } else {
+            etContainerID.setInputType(InputType.TYPE_CLASS_NUMBER);
+        }
     }
 }

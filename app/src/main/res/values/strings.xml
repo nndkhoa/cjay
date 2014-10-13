@@ -103,4 +103,7 @@
     <string name="fragment_audit_title">Giám định</string>
     <string name="fragment_repair_title">Sửa chữa</string>
     <string name="fragment_export_title">Xuất</string>
+
+    <!-- Text Error -->
+    <string name="error_empty_search_string">Vui lòng nhập từ khóa tìm kiếm</string>
 </resources>

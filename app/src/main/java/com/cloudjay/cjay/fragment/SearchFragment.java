@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
@@ -86,7 +87,11 @@ public class SearchFragment extends Fragment {
 
 	@Click(R.id.btn_search)
 	void buttonSearchClicked() {
-		performSearch();
+        if (!TextUtils.isEmpty(etSearch.getText())) {
+            performSearch();
+        } else {
+            etSearch.setError(getResources().getString(R.string.error_empty_search_string));
+        }
 	}
 
 	@AfterViews
@@ -134,7 +139,11 @@ public class SearchFragment extends Fragment {
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
 
                 if (i == EditorInfo.IME_ACTION_SEARCH) {
-                    performSearch();
+                    if (!TextUtils.isEmpty(etSearch.getText())) {
+                        performSearch();
+                    } else {
+                        etSearch.setError(getResources().getString(R.string.error_empty_search_string));
+                    }
                     return true;
                 }
 

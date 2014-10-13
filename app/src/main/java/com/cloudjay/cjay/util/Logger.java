@@ -89,7 +89,7 @@ public final class Logger {
 		if (!isDebuggable()) return;
 
 		getMethodNames(new Throwable().getStackTrace());
-		Log.i(className, createLog(message));
+		Log.e(className, createLog(message));
 	}
 
 	public static void Log(String tag, String message) {
