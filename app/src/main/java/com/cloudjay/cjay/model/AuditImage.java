@@ -6,7 +6,7 @@ import javax.annotation.Generated;
 
 
 @Generated("org.jsonschema2pojo")
-public class AuditImage{
+public class AuditImage {
 
     @Expose
     private long id;
