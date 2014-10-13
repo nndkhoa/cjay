@@ -90,6 +90,7 @@
 						android:layout_marginBottom="6dp"
                         android:background="@android:drawable/editbox_dropdown_light_frame"
 						android:hint="@string/prompt_email"
+                        android:text="giamdinhcong1.icd1@pip.com.vn"
 						android:inputType="textEmailAddress"
 						android:maxLines="1"
 						android:paddingBottom="12dp"
@@ -102,6 +103,7 @@
 
 					<EditText
 						android:id="@+id/password"
+                        android:text="123456"
 						android:layout_width="match_parent"
 						android:layout_height="48dp"
 						android:layout_marginBottom="6dp"

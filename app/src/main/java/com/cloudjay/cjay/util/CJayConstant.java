@@ -17,8 +17,10 @@ public class CJayConstant {
     public static final int TYPE_EXPORT = 1;
     public static final int TYPE_AUDIT = 2;
     public static final int TYPE_REPAIRED = 3;
-
+//For save and query in db
+    public static final String OPERATOR_KEY = "OP";
     public static final String WORKING_DB = "Working";
+
 
     // `/sdcard/DCMI/CJay/`
     public static final File APP_DIRECTORY_FILE = new File(
