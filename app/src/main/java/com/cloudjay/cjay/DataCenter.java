@@ -190,7 +190,7 @@ public class DataCenter {
                 List<Session> current = new ArrayList<Session>();
                 current.add(sessionWorking);
                 workingSessionCreate.setWorkingSession(current);
-                App.getSnappyDB(context).put(CJayConstant.WORKING_DB, workingSessionCreate);
+                App.getSnappyDB().put(CJayConstant.WORKING_DB, workingSessionCreate);
                 EventBus.getDefault().post(new WorkingSessionCreatedEvent(current));
             }
         } catch (SnappydbException e) {

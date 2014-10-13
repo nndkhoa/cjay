@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.api.NetworkClient_;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
 import com.cloudjay.cjay.util.enums.Status;
@@ -96,7 +97,8 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 		viewHolder.btnSubmit.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				App.getJobManager(context).addJobInBackground(new UploadSessionJob(context, session));
+//				App.getJobManager(context).addJobInBackground(new UploadSessionJob(context, session));
+                NetworkClient_.getInstance_(context).uploadContainerSession(context,session);
 			}
 		});
 

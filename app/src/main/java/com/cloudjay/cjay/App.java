@@ -42,7 +42,7 @@ public class App extends Application {
     public static DB getSnappyDB(Context context) throws SnappydbException {
         if (snappydb == null) {
             OnViewChangedNotifier previousNotifier = OnViewChangedNotifier.replaceNotifier(null);
-            snappydb = DBFactory.open(context,"Thai");
+            snappydb = DBFactory.open(context, "Thai");
             OnViewChangedNotifier.replaceNotifier(previousNotifier);
         }
         return snappydb;
