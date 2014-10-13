@@ -156,7 +156,8 @@ public class ImportFragment extends Fragment {
 			lvImages.setAdapter(gateImageAdapter);
 		}
 
-		gateImageAdapter.notifyDataSetChanged();
+        // Notify change
+		gateImageAdapter.swapData(gateImages);
 
 	}
 
@@ -221,16 +222,22 @@ public class ImportFragment extends Fragment {
 
     @CheckedChange(R.id.rdn_status_a)
     void preStatusAChecked(boolean isChecked) {
-        preStatus = 0;
+        if (isChecked == true) {
+            preStatus = 0;
+        }
     }
 
     @CheckedChange(R.id.rdn_status_b)
     void preStatusBChecked(boolean isChecked) {
-        preStatus = 1;
+        if (isChecked == true) {
+            preStatus = 1;
+        }
     }
 
     @CheckedChange(R.id.rdn_status_c)
     void preStatusCChecked(boolean isChecked) {
-        preStatus = 2;
+        if (isChecked == true) {
+            preStatus = 2;
+        }
     }
 }
