@@ -80,11 +80,19 @@
 
     <!-- Dialog Search Session Result -->
     <string name="dialog_search_container_title">Không tìm thấy Container</string>
+    <string name="search_on_server">Bắt đầu tìm kiếm trên server</string>
 
     <!-- Button titles -->
     <string name="button_completed">Hoàn tất</string>
     <string name="button_audit_now">Giám định ngay</string>
     <string name="button_repair_now">Sửa chữa ngay</string>
+    <string name="button_export_now">Xuất ngay</string>
+    <string name="button_add_issues_image">Bổ sung lỗi</string>
+    <string name="button_approve">Duyệt</string>
+    <string name="button_approved">Đã duyệt</string>
+    <string name="button_upload">Tải lên</string>
+    <string name="button_edit">Sửa</string>
+    <string name="button_take_export_picture">Chụp hình xuất</string>
 
     <!-- Label for container item -->
     <string name="label_container_id">Container ID: </string>
@@ -106,4 +114,12 @@
 
     <!-- Text Error -->
     <string name="error_empty_search_string">Vui lòng nhập từ khóa tìm kiếm</string>
+    
+    <!-- Label for error item -->
+    <string name="label_code_component">CODE component</string>
+    <string name="label_code_location">CODE vị trí</string>
+    <string name="label_code_issue">CODE hư hỏng</string>
+    <string name="label_code_repair">CODE sửa chữa</string>
+    <string name="label_dimension">Kích thước</string>
+    <string name="label_count">Số lượng</string>
 </resources>

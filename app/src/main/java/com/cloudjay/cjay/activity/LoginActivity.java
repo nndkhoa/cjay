@@ -152,6 +152,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 				PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_TOKEN, mToken);
 
 				// Continue to fetch List Operators and Iso Codes
+                showGettingDataTextView();
 				dataCenter.fetchOperators(this);
 				dataCenter.fetchIsoCodes(this);
 				User user = dataCenter.getCurrentUser(this);
@@ -280,5 +281,10 @@ public class LoginActivity extends AccountAuthenticatorActivity {
         } else {
             Utils.showCrouton(this, R.string.error_connection);
         }
+    }
+
+    @UiThread
+    void showGettingDataTextView() {
+        tvLoginStatusMessage.setText(getResources().getString(R.string.login_progress_loading_data));
     }
 }

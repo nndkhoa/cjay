@@ -10,6 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.widget.Button;
 
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
@@ -152,9 +153,9 @@ class ViewPagerAdapter extends FragmentPagerAdapter {
 
 		switch (position) {
 			case 0:
-				return IssuePendingFragment_.newInstance(0);
+				return new IssuePendingFragment_();
 			case 1:
-				return IssueRepairedFragment_.newInstance(1);
+				return new IssueRepairedFragment_();
 			default:
 				return null;
 		}
