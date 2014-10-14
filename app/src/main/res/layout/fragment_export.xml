@@ -4,11 +4,15 @@
     android:layout_height="match_parent"
     tools:context="com.cloudjay.cjay.fragment.ExportFragment">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:layout_above="@+id/ll_bottom">
 
         <TextView
             android:layout_width="match_parent"
@@ -16,69 +20,106 @@
             android:id="@+id/tv_container_code"
             android:textSize="24dp"
             android:textStyle="bold"
-            android:paddingBottom="6dp"
-            android:text="ABCD1234567 - B" />
+            android:paddingBottom="3dp"
+            android:text="ABCD1234567 - B"
+            android:textColor="@color/background_button_and_line"/>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dip"
-            android:background="#000"
-            android:layout_marginBottom="6dp"/>
+            android:background="@color/background_button_and_line"
+            android:layout_marginBottom="6dp"
+            android:layout_below="@+id/tv_container_code"
+            android:id="@+id/v_line"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="6dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:id="@+id/ll_import_location"
+            android:layout_below="@+id/v_line">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16dp"
-                android:text="Lúc nhập bãi: "/>
+                android:text="Lúc nhập bãi: "
+                android:textColor="@color/background_button_and_line"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_status_name"
                 android:textSize="16dp"
-                android:text="C"/>
+                android:text="C"
+                android:textStyle="bold"
+                android:textColor="@color/import_location_text_color"/>
 
         </LinearLayout>
 
-        <Button
+        <LinearLayout
+            android:id="@+id/btn_camera"
+            style="@android:style/Widget.Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_camera"
-            android:paddingBottom="6dp"
-            android:text="Chụp hình xuất"/>
+            android:gravity="center"
+            android:layout_marginBottom="6dp"
+            android:layout_below="@+id/ll_import_location"
+            android:background="@drawable/btn_customize_selector">
+
+            <TextView
+                android:id="@+id/image_button_2_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/button_take_export_picture"
+                android:textSize="18sp"
+                android:textColor="@android:color/white"
+                android:layout_marginRight="12dp"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_menu_camera"/>
+
+        </LinearLayout>
 
         <GridView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/gv_images"
-            android:numColumns="2">
+            android:numColumns="2"
+            android:layout_below="@+id/btn_camera"
+            android:layout_above="@+id/btn_view_previous_step"
+            android:layout_marginBottom="6dp">
         </GridView>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/btn_view_previous_step"
-            android:text="Xem hình các bước trước"/>
+            android:layout_alignParentBottom="true"
+            android:text="Xem hình các bước trước"
+            android:textColor="@android:color/white"
+            android:background="@drawable/btn_view_previous_images_step"/>
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:id="@+id/ll_bottom">
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/btn_complete"
-            android:text="Hoàn tất"/>
+            android:layout_weight="1"
+            android:text="@string/button_completed"
+            android:textColor="@android:color/white"
+            android:background="@drawable/btn_green_selector"/>
 
     </LinearLayout>
 

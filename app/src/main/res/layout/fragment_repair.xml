@@ -23,14 +23,18 @@
             android:layout_height="wrap_content"
             android:id="@+id/btn_complete"
             android:layout_weight="1"
-            android:text="Hoàn tất"/>
+            android:text="@string/button_completed"
+            android:textColor="@android:color/white"
+            android:background="@drawable/btn_green_selector"/>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/btn_continue"
             android:layout_weight="1"
-            android:text="Tiếp bước sau"/>
+            android:text="@string/button_export_now"
+            android:textColor="@android:color/white"
+            android:background="@drawable/btn_customize_selector"/>
 
     </LinearLayout>
 

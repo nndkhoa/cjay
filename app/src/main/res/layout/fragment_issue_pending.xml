@@ -1,13 +1,47 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.cloudjay.cjay.fragment.IssuePendingFragment">
+    tools:context="com.cloudjay.cjay.fragment.IssuePendingFragment"
+    android:padding="12dp">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Issue pending fragment" />
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_container_code"
+        android:textSize="24dp"
+        android:textStyle="bold"
+        android:paddingBottom="3dp"
+        android:text="ABCD1234567 - B"
+        android:textColor="@color/background_button_and_line"/>
 
-</FrameLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dip"
+        android:background="@color/background_button_and_line"
+        android:layout_marginBottom="6dp"
+        android:layout_below="@+id/tv_container_code"
+        android:id="@+id/v_line"/>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/lv_issues_pending"
+        android:scrollbars="none"
+        android:layout_below="@+id/v_line"
+        android:layout_above="@+id/btn_add_issue_images"
+        tools:listitem="@layout/item_issue_pending"
+        android:layout_marginBottom="6dp">
+    </ListView>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_add_issue_images"
+        android:layout_weight="1"
+        android:text="@string/button_add_issues_image"
+        android:textColor="@android:color/white"
+        android:background="@drawable/btn_customize_selector"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

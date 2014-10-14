@@ -22,4 +22,9 @@
     <color name="background_button_and_line">#0091CC</color>
     <color name="background_btn_gate_in">#006185</color>
     <color name="background_btn_check_container_clean">#006425</color>
+
+    <!-- Text Colors -->
+    <color name="pre_status_text_color">#7E0052</color>
+    <color name="current_status_text_color">#397E00</color>
+    <color name="import_location_text_color">#FF0000</color>
 </resources>
