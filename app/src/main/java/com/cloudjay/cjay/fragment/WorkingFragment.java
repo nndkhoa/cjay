@@ -2,12 +2,10 @@ package com.cloudjay.cjay.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.widget.Adapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.App;
-import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.SessionAdapter;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
@@ -22,7 +20,6 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -47,47 +44,49 @@ public class WorkingFragment extends Fragment {
 	}
 
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EventBus.getDefault().register(this);
-    }
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		EventBus.getDefault().register(this);
+	}
 
-    @Override
-    public void onDestroy() {
-        EventBus.getDefault().unregister(this);
-        super.onDestroy();
-    }
-    /**
+	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
+
+	/**
 	 * Initial loader and set adapter for list view
 	 */
 	@AfterViews
 	void init() {
-        List<Session> workingSessionInit = null;
-        try {
-            workingSessionInit = App.getSnappyDB(getActivity()).getObject(CJayConstant.WORKING_DB, WorkingSession.class).getWorkingSession();
-            Logger.e(String.valueOf(workingSessionInit.size()));
 
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
-        mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
-        mAdapter.setData(workingSessionInit);
-        lvWorking.setAdapter(mAdapter);
-        lvWorking.setEmptyView(tvEmpty);
+		List<Session> workingSessionInit = null;
 
+		try {
+			workingSessionInit = App.getSnappyDB(getActivity()).getObject(CJayConstant.WORKING_DB, WorkingSession.class).getWorkingSession();
+			Logger.e(String.valueOf(workingSessionInit.size()));
+
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
+		mAdapter.setData(workingSessionInit);
+		lvWorking.setAdapter(mAdapter);
+		lvWorking.setEmptyView(tvEmpty);
 	}
 
-    @UiThread
-    public void onEvent(WorkingSessionCreatedEvent event){
-        try {
-            Logger.e("WorkingSessionCreatedEvent");
-            List<Session> workingSession = App.getSnappyDB(getActivity()).getObject(CJayConstant.WORKING_DB, WorkingSession.class).getWorkingSession();
-            mAdapter.clear();
-            mAdapter.setData(workingSession);
-            mAdapter.notifyDataSetChanged();
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
-    }
+	@UiThread
+	public void onEvent(WorkingSessionCreatedEvent event) {
+		try {
+			Logger.e("WorkingSessionCreatedEvent");
+			List<Session> workingSession = App.getSnappyDB(getActivity()).getObject(CJayConstant.WORKING_DB, WorkingSession.class).getWorkingSession();
+			mAdapter.clear();
+			mAdapter.setData(workingSession);
+			mAdapter.notifyDataSetChanged();
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
 }

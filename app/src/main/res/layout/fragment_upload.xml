@@ -1,24 +1,30 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.cloudjay.cjay.fragment.UploadFragment">
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context="com.cloudjay.cjay.fragment.UploadFragment">
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/lv_uploading_container"
-        android:dividerHeight="1dip"
-        android:divider="@color/background_button_and_line"
-        android:scrollbars="none"></ListView>
+	<ListView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:id="@+id/lv_uploading_container"
+		android:dividerHeight="1dip"
+		android:divider="@color/background_button_and_line"
+		android:scrollbars="none"
+		tools:listitem="@layout/item_upload"
+		>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Không có Container nào đang tải lên"
-        android:id="@+id/tv_emptylist_uploading"
-        android:textSize="18sp"
-        android:textColor="@color/background_button_and_line" />
+	</ListView>
+
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:text="Upload Completed"
+		android:id="@+id/tv_emptylist_uploading"
+		android:textSize="18sp"
+		android:textColor="@color/background_button_and_line"
+		android:visibility="gone"
+		/>
 
 </FrameLayout>

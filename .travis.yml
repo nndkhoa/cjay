@@ -1,0 +1,20 @@
+language: android
+jdk: openjdk7
+android:
+  components:
+    - android-19
+    - platform-tools
+    - build-tools-19.1.0
+    - extra-android-support
+    - extra-android-m2repository
+    - echo yes | android update sdk --filter platform-tools --no-ui --force > /dev/null
+    - echo yes | android update sdk --filter android-18 --no-ui --force > /dev/null
+    - echo yes | android update sdk --filter android-19 --no-ui --force > /dev/null
+    - echo yes | android update sdk --filter sysimg-19 --no-ui --force > /dev/null
+    - echo yes | android update sdk --filter extra-android-support --no-ui --force > /dev/null
+    - echo yes | android update sdk --filter extra-android-m2repository --no-ui --force > /dev/null
+
+  licenses:
+    - '.+'
+script:
+  - ./gradlew clean assemble check
