@@ -204,7 +204,8 @@ public class DataCenter {
     }
 
     public void addGateImage(long type, String url, String containerId) throws SnappydbException {
-        Logger.Log("url when insert in data center: " + url);
+        Logger.Log("url when insert in dataCenter: " + url);
+        Logger.Log("type when insert in dataCenter: " + type);
 
         Session session = App.getSnappyDB(context).getObject(containerId, Session.class);
         GateImage gateImage = new GateImage();
@@ -227,12 +228,15 @@ public class DataCenter {
     public void getGateImages(long type, String containerId) throws SnappydbException {
         Logger.Log("type = " + type + ", containerId = " + containerId);
         Session session = App.getSnappyDB(context).getObject(containerId, Session.class);
+        List<GateImage> gateImagesFiltered = new ArrayList<GateImage>();
         List<GateImage> gateImages = session.getGateImages();
         for (GateImage g : gateImages) {
-            Logger.Log("url: " + g.getUrl());
+            if (g.getType() == type) {
+                gateImagesFiltered.add(g);
+            }
         }
-        Logger.Log("gate images count in dataCenter: " + gateImages.size());
-        EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
+        Logger.Log("gate images count in dataCenter: " + gateImagesFiltered.size());
+        EventBus.getDefault().post(new GateImagesGotEvent(gateImagesFiltered));
     }
 
     public void searchOperator(String keyword) throws SnappydbException {
@@ -243,6 +247,24 @@ public class DataCenter {
         }
 
         EventBus.getDefault().post(new OperatorsGotEvent(operators));
+    }
+
+    @Background(serial = CACHE)
+    public void getSessionByContainerId(String containerId) {
+
+        String[] keysresult = new String[0];
+        try {
+            keysresult = App.getSnappyDB(context).findKeys(containerId);
+            List<Session> sessions = new ArrayList<Session>();
+            for (String result : keysresult) {
+                sessions.add(App.getSnappyDB(context).getObject(result, Session.class));
+            }
+
+            EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

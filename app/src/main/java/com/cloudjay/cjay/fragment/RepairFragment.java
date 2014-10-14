@@ -53,7 +53,7 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 
 		// Go to next fragment
-		Fragment fragment = new ExportFragment_().builder().build();
+		Fragment fragment = new ExportFragment_().builder().containerID(containerID).build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 		transaction.replace(R.id.ll_main, fragment);

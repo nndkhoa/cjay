@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.ReuseActivity;
@@ -36,6 +37,9 @@ public class AuditFragment extends Fragment {
 
 	@ViewById(R.id.lv_audit_images)
 	ListView lvAuditImages;
+
+    @ViewById(R.id.tv_container_code)
+    TextView tvContainerId;
 	//endregion
 
 	public AuditFragment() {
@@ -44,7 +48,7 @@ public class AuditFragment extends Fragment {
 	@Click(R.id.btn_continue)
 	void buttonContinueClicked() {
 		//Go to next fragment
-		RepairFragment fragment = new RepairFragment_().builder().build();
+		RepairFragment fragment = new RepairFragment_().builder().containerID(containerID).build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 		transaction.replace(R.id.ll_main, fragment);
@@ -63,5 +67,8 @@ public class AuditFragment extends Fragment {
 
         // Set ActionBar Title
         getActivity().getActionBar().setTitle(R.string.fragment_audit_title);
+
+        // Set ContainerId to TextView
+        tvContainerId.setText(containerID);
     }
 }
