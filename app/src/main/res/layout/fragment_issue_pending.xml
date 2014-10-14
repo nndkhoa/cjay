@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.cloudjay.cjay.fragment.IssuePendingFragment"
-    android:padding="12dp">
+    android:padding="9dp">
 
     <TextView
         android:layout_width="match_parent"
@@ -34,14 +34,30 @@
         android:layout_marginBottom="6dp">
     </ListView>
 
-    <Button
+    <LinearLayout
+        android:id="@+id/btn_add_issue_images"
+        style="@android:style/Widget.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/btn_add_issue_images"
+        android:gravity="center"
         android:layout_weight="1"
-        android:text="@string/button_add_issues_image"
-        android:textColor="@android:color/white"
-        android:background="@drawable/btn_customize_selector"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/btn_customize_selector">
+
+        <TextView
+            android:id="@+id/image_button_2_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_add_issues_image"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            android:layout_marginRight="12dp"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_menu_camera"/>
+
+    </LinearLayout>
 
 </RelativeLayout>
