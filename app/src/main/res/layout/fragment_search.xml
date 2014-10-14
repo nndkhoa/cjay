@@ -76,14 +76,31 @@
             android:textColor="@color/background_button_and_line"
             android:layout_marginBottom="6dp"/>
 
-        <ListView
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/lv_search_container"
-            android:dividerHeight="1dip"
-            android:divider="@color/background_button_and_line"
-            android:scrollbars="none">
-        </ListView>
+            android:layout_height="match_parent">
+
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/lv_search_container"
+                android:dividerHeight="1dip"
+                android:divider="@color/background_button_and_line"
+                android:scrollbars="none">
+            </ListView>
+
+            <!-- Here is the view to show if the list is emtpy -->
+            <TextView
+                android:id="@id/android:empty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/dialog_search_container_title"
+                android:textSize="16dp"
+                android:layout_centerInParent="true"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
 
     </LinearLayout>
 

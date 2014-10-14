@@ -3,6 +3,7 @@ package com.cloudjay.cjay;
 import android.content.Context;
 
 import com.cloudjay.cjay.api.NetworkClient;
+import com.cloudjay.cjay.event.BeginSearchOnServerEvent;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
@@ -100,6 +101,8 @@ public class DataCenter {
                 // TODO: @thai need to alert to user about that no results was found in local
 
                 // If there was not result in local, send search request to server
+                EventBus.getDefault().post(new BeginSearchOnServerEvent(
+                        context.getResources().getString(R.string.search_on_server)));
                 searchAsync(context, keyword);
             }
         } catch (SnappydbException e) {

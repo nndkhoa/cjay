@@ -18,12 +18,14 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
+import com.cloudjay.cjay.event.BeginSearchOnServerEvent;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.fragment.dialog.AddContainerDialog;
 import com.cloudjay.cjay.model.Session;
@@ -66,6 +68,9 @@ public class SearchFragment extends Fragment {
 
 	@ViewById(R.id.ll_search_result)
 	LinearLayout llSearchResult;
+
+    @ViewById(android.R.id.empty)
+    TextView tvEmptyView;
 	//endregion
 
 	Pattern pattern = Pattern.compile("^[a-zA-Z]{4}");
@@ -97,6 +102,7 @@ public class SearchFragment extends Fragment {
 	@AfterViews
 	void doAfterViews() {
 		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
+        lvSearch.setEmptyView(tvEmptyView);
 		lvSearch.setAdapter(mAdapter);
 		//Set input type for role
 		setKeyboardBasedOnRole();
@@ -167,9 +173,9 @@ public class SearchFragment extends Fragment {
 
 		showProgress(false);
 		List<Session> result = event.getSessions();
+        mAdapter.clear();
 
 		if (result.size() != 0) {
-			mAdapter.clear();
 			mAdapter.addAll(result);
 			mAdapter.notifyDataSetChanged();
 		} else {
@@ -248,5 +254,10 @@ public class SearchFragment extends Fragment {
         // Start search in background
         containerID = keyword;
         dataCenter.search(getActivity(), keyword);
+    }
+
+    @UiThread
+    public void onEvent(BeginSearchOnServerEvent event) {
+        Toast.makeText(getActivity(), event.getStringEvent(), Toast.LENGTH_SHORT).show();
     }
 }
