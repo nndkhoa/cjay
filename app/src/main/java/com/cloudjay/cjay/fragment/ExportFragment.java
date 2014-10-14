@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity;
-import com.cloudjay.cjay.activity.ViewImagesPreviousStepsActivity_;
+import com.cloudjay.cjay.activity.PhotoExpandableListViewActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
@@ -132,7 +132,7 @@ public class ExportFragment extends Fragment {
 
     @Click(R.id.btn_view_previous_step)
     void buttonViewPreClicked() {
-        Intent intent = new Intent(getActivity(), ViewImagesPreviousStepsActivity_.class);
+        Intent intent = new Intent(getActivity(), PhotoExpandableListViewActivity_.class);
         startActivity(intent);
     }
 

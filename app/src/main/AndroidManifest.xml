@@ -84,7 +84,7 @@
             android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" >
         </activity>
         <activity
-            android:name=".activity.ViewImagesPreviousStepsActivity_"
+            android:name=".activity.PhotoExpandableListViewActivity_"
             android:label="@string/title_activity_view_iimages_previous_steps" >
         </activity>
     </application>
