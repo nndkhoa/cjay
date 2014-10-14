@@ -4,6 +4,7 @@ package com.cloudjay.cjay.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity;
+import com.cloudjay.cjay.activity.ViewImagesPreviousStepsActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
@@ -18,7 +20,6 @@ import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.Logger;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
@@ -52,6 +53,9 @@ public class ExportFragment extends Fragment {
 
     @ViewById(R.id.gv_images)
     GridView gvExportImages;
+
+    @ViewById(R.id.btn_view_previous_step)
+    Button btnViewPreviousSteps;
 
     @Bean
     DataCenter dataCenter;
@@ -124,6 +128,12 @@ public class ExportFragment extends Fragment {
     void onEvent(ContainerSearchedEvent event) {
         List<Session> result = event.getSessions();
         operatorCode = result.get(0).getOperatorCode();
+    }
+
+    @Click(R.id.btn_view_previous_step)
+    void buttonViewPreClicked() {
+        Intent intent = new Intent(getActivity(), ViewImagesPreviousStepsActivity_.class);
+        startActivity(intent);
     }
 
     @Override

@@ -32,7 +32,7 @@
     <string name="title_activity_main_process">MainProcessActivity</string>
     <string name="title_activity_camera">CameraActivity</string>
     <string name="title_activity_display">DisplayActivity</string>
-
+    <string name="title_activity_view_iimages_previous_steps">Hình các bước trước</string>
     <string name="dialog_create_container_id_invalid_iso">Tạo container sai ISO</string>
     <string name="btn_search">Tìm kiếm</string>
 
@@ -54,7 +54,7 @@
     <string name="mirror_ffc">Mirror FFC</string>
     <string name="title_activity_full_screen">FullScreenActivity</string>
 
-    <!--- Fragments name-->
+    <!-- - Fragments name -->
     <!-- 3 fragments in HomeActivity Tabs -->
     <string name="fragment_search_title">Tìm kiếm</string>
     <string name="fragment_working_title">Đang làm</string>
@@ -62,7 +62,6 @@
     <!-- 2 fragments in RepairFragmentTab -->
     <string name="fragment_issue_pending">Danh sách lỗi</string>
     <string name="fragment_issue_repaired">Đã sửa chữa</string>
-
     <string name="fragment_search_pb_searching">Đang tìm kiếm</string>
     <string name="fragment_search_hint_et_search">Nhập container ID cần tìm</string>
     <string name="fragment_search_btn_search">Tìm kiếm</string>
@@ -114,7 +113,7 @@
 
     <!-- Text Error -->
     <string name="error_empty_search_string">Vui lòng nhập từ khóa tìm kiếm</string>
-    
+
     <!-- Label for error item -->
     <string name="label_code_component">CODE component</string>
     <string name="label_code_location">CODE vị trí</string>
@@ -122,4 +121,11 @@
     <string name="label_code_repair">CODE sửa chữa</string>
     <string name="label_dimension">Kích thước</string>
     <string name="label_count">Số lượng</string>
+
+    <!-- Image Type Descriptions -->
+    <string name="image_type_description_import">Hình Nhập</string>
+    <string name="image_type_description_export">Hình Xuất</string>
+    <string name="image_type_description_report">Hình Giám Định</string>
+    <string name="image_type_description_repaired">Hình Sửa Chữa</string>
+
 </resources>
