@@ -28,7 +28,9 @@ import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.enums.Status;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
@@ -96,6 +98,8 @@ public class ImportFragment extends Fragment {
 	Operator selectedOperator;
 	List<GateImage> gateImages = null;
 
+    long preStatus = 0;
+
 	public ImportFragment() {
 	}
 
@@ -119,8 +123,13 @@ public class ImportFragment extends Fragment {
 		// Set operator to edit text
 		etOperator.setText(selectedOperator.getOperatorName());
 
-		//Save session with containerId, operatorId and operatorCode into realm
-		dataCenter.addSession(containerID, selectedOperator.getOperatorCode(), selectedOperator.getId());
+        // Get today
+        // create today String
+        String today = StringHelper.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
+
+		//Save session with containerId, operatorId, operatorCode, dateCreated, preStatus into snappy
+		dataCenter.addSession(containerID, selectedOperator.getOperatorCode(),
+                selectedOperator.getId(), today, preStatus);
 	}
 
 	@UiThread
@@ -147,7 +156,8 @@ public class ImportFragment extends Fragment {
 			lvImages.setAdapter(gateImageAdapter);
 		}
 
-		gateImageAdapter.notifyDataSetChanged();
+        // Notify change
+		gateImageAdapter.swapData(gateImages);
 
 	}
 
@@ -198,11 +208,6 @@ public class ImportFragment extends Fragment {
 		}
 	}
 
-	@CheckedChange({R.id.rdn_status_a, R.id.rdn_status_b, R.id.rdn_status_c})
-	void radioTypesCheckedChanged() {
-
-	}
-
 	private void showDialogSearchOperator() {
 		FragmentManager fm = getActivity().getSupportFragmentManager();
 		SearchOperatorDialog_ searchOperatorDialog = new SearchOperatorDialog_();
@@ -214,4 +219,25 @@ public class ImportFragment extends Fragment {
 		// mContainerId = mContainerEditText.getText().toString();
 		showDialogSearchOperator();
 	}
+
+    @CheckedChange(R.id.rdn_status_a)
+    void preStatusAChecked(boolean isChecked) {
+        if (isChecked == true) {
+            preStatus = 0;
+        }
+    }
+
+    @CheckedChange(R.id.rdn_status_b)
+    void preStatusBChecked(boolean isChecked) {
+        if (isChecked == true) {
+            preStatus = 1;
+        }
+    }
+
+    @CheckedChange(R.id.rdn_status_c)
+    void preStatusCChecked(boolean isChecked) {
+        if (isChecked == true) {
+            preStatus = 2;
+        }
+    }
 }

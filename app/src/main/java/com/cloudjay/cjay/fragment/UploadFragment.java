@@ -9,7 +9,6 @@ import com.cloudjay.cjay.adapter.UploadSessionAdapter;
 import com.cloudjay.cjay.event.ResumeUpLoadEvent;
 import com.cloudjay.cjay.event.StopUpLoadEvent;
 import com.cloudjay.cjay.event.UploadedEvent;
-import com.cloudjay.cjay.model.Session;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;

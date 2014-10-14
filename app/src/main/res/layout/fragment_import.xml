@@ -21,20 +21,33 @@
             android:text="Nhập container mới"
             android:textStyle="bold"
             android:textSize="16dp"
-            android:id="@+id/tv_input_container"/>
+            android:id="@+id/tv_input_container"
+            android:layout_marginBottom="6dp"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/tv_container_id"
-            android:layout_below="@+id/tv_input_container"/>
+            android:text="ABCD1234567 - B"
+            android:layout_below="@+id/tv_input_container"
+            android:background="@android:drawable/editbox_dropdown_light_frame"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:paddingLeft="9dp"
+            android:layout_marginBottom="6dp"
+            android:textSize="18sp"/>
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/et_operator"
             android:hint="Hãng tàu"
-            android:layout_below="@+id/tv_container_id"/>
+            android:layout_below="@+id/tv_container_id"
+            android:layout_marginBottom="6dp"
+            android:background="@android:drawable/editbox_dropdown_light_frame"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:paddingLeft="9dp"/>
 
         <ImageButton
             android:layout_width="match_parent"
@@ -44,7 +57,8 @@
             android:layout_below="@+id/et_operator"
             android:background="@drawable/btn_customize_selector"
             android:src="@android:drawable/ic_menu_camera"
-            android:minHeight="20dp"/>
+            android:minHeight="20dp"
+            android:layout_marginBottom="6dp"/>
 
         <ListView
             android:layout_width="match_parent"

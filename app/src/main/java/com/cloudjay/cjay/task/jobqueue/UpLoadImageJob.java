@@ -26,6 +26,9 @@ public class UpLoadImageJob extends Job {
 
     public UpLoadImageJob(Context context, String uri, String imageName, String containerId) {
         super(new Params(2).requireNetwork().groupBy(containerId));
+
+        Logger.e("uri in UpLoadImageJob: " + uri);
+
         this.context = context;
         this.containerId =containerId;
         this.uri = uri;
