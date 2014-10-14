@@ -4,6 +4,7 @@ android:
   components:
     - build-tools-19.1.0
     - android-19
+    - extra
 
 script:
-  ./gradlew build
+  ./gradlew build connectedCheck
