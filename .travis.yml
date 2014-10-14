@@ -14,4 +14,4 @@ branches:
     - dev
     - master
 
-script: ./gradlew clean build
+script: ./gradlew build connectedCheck
