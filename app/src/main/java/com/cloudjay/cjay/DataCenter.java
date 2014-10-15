@@ -267,4 +267,16 @@ public class DataCenter {
 
     }
 
+    @Background(serial = CACHE)
+    public void getAllGateImagesByContainerId(String containerId) {
+        Session session = null;
+        try {
+            session = App.getSnappyDB(context).getObject(containerId, Session.class);
+            List<GateImage> gateImages = session.getGateImages();
+            Logger.Log("gate images count in dataCenter: " + gateImages.size());
+            EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+    }
 }

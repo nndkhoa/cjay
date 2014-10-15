@@ -30,7 +30,6 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
-import com.cloudjay.cjay.util.enums.Status;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;

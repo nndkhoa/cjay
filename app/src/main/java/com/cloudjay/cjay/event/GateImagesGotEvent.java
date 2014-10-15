@@ -5,7 +5,7 @@ import com.cloudjay.cjay.model.GateImage;
 import java.util.List;
 
 /**
- * Created by nambv on 07/10/2014.
+ * Created by nambv on 15/10/2014.
  */
 public class GateImagesGotEvent {
     private List<GateImage> gateImages;

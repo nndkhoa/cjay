@@ -85,7 +85,8 @@
         </activity>
         <activity
             android:name=".activity.PhotoExpandableListViewActivity_"
-            android:label="@string/title_activity_view_iimages_previous_steps" >
+            android:label="@string/title_activity_view_iimages_previous_steps"
+            android:screenOrientation="portrait">
         </activity>
     </application>
 

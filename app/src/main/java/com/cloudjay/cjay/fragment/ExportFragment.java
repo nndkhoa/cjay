@@ -20,6 +20,7 @@ import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
@@ -112,6 +113,7 @@ public class ExportFragment extends Fragment {
 
         // Get gate image objects from event post back
         gateImages = event.getGateImages();
+        Logger.Log("size: " + gateImages.size());
 
         //Init adapter if null and set adapter for listview
         if (gateImageAdapter == null) {
@@ -133,6 +135,7 @@ public class ExportFragment extends Fragment {
     @Click(R.id.btn_view_previous_step)
     void buttonViewPreClicked() {
         Intent intent = new Intent(getActivity(), PhotoExpandableListViewActivity_.class);
+        intent.putExtra(PhotoExpandableListViewActivity_.CONTAINER_ID_EXTRA, containerID);
         startActivity(intent);
     }
 

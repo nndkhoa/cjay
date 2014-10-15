@@ -1,14 +1,20 @@
 package com.cloudjay.cjay.adapter;
 
 import android.content.Context;
+import android.graphics.Typeface;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.GridView;
+import android.widget.TextView;
 
+import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.util.Utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -22,7 +28,14 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
     private final int[] mImageTypes;
     private final Hashtable<Integer, GridView> mGridViews;
 
-    public PhotoExpandableListAdapter(Context context, String containerSessionUUID, int[] imageTypes) {
+    List<GateImage> mImportImages;
+    List<GateImage> mAuditImages;
+    List<GateImage> mRepairedImages;
+
+    public PhotoExpandableListAdapter(Context context, int[] imageTypes,
+                                      List<GateImage> importImages,
+                                      List<GateImage> auditImages,
+                                      List<GateImage> repairedImages) {
 
         mContext = context;
         mGridViews = new Hashtable<Integer, GridView>();
@@ -33,36 +46,39 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
             mSectionHeaders.add(Utils.getImageTypeDescription(mContext, mImageTypes[i]));
         }
 
+        mImportImages = importImages;
+        mAuditImages = auditImages;
+        mRepairedImages = repairedImages;
     }
 
     @Override
     public int getGroupCount() {
-        return 0;
+        return mSectionHeaders.size();
     }
 
     @Override
-    public int getChildrenCount(int i) {
-        return 0;
+    public int getChildrenCount(int groupPosition) {
+        return 1;
     }
 
     @Override
-    public Object getGroup(int i) {
+    public Object getGroup(int groupPosition) {
+        return mSectionHeaders.get(groupPosition);
+    }
+
+    @Override
+    public Object getChild(int groupPosition, int childPosition) {
         return null;
     }
 
     @Override
-    public Object getChild(int i, int i2) {
-        return null;
+    public long getGroupId(int groupPosition) {
+        return groupPosition;
     }
 
     @Override
-    public long getGroupId(int i) {
-        return 0;
-    }
-
-    @Override
-    public long getChildId(int i, int i2) {
-        return 0;
+    public long getChildId(int groupPosition, int childPosition) {
+        return childPosition;
     }
 
     @Override
@@ -71,17 +87,58 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public View getGroupView(int i, boolean b, View view, ViewGroup viewGroup) {
-        return null;
+    public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+
+        if (convertView == null) {
+            LayoutInflater infalInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = infalInflater.inflate(R.layout.expandable_list_photogrid_section, null);
+        }
+
+        String headerTitle = (String) getGroup(groupPosition);
+        TextView sectionHeaderTextView = (TextView) convertView.findViewById(R.id.list_section_header);
+        sectionHeaderTextView.setTypeface(null, Typeface.BOLD);
+        sectionHeaderTextView.setText(headerTitle);
+
+        return convertView;
     }
 
     @Override
-    public View getChildView(int i, int i2, boolean b, View view, ViewGroup viewGroup) {
-        return null;
+    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+
+        // TODO: Inflate layout for child group view based on ```imageType```
+        // Import/Export --> GridView (R.layout.expandable_list_photogrid_item)
+        // Auditor --> ListView (R.layout.fragment_auditor_reporting)
+        // Consider to apply ViewHolder Pattern
+
+        if (convertView == null) {
+            LayoutInflater infalInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = infalInflater.inflate(R.layout.expandable_list_photogrid_item, null);
+        }
+
+        GridView gridView = (GridView) convertView.findViewById(R.id.gv_images_item);
+        if (groupPosition == 0) {
+            gridView.setAdapter(new GateImageAdapter(mContext, mImportImages));
+        }
+
+        if (groupPosition == 1) {
+            gridView.setAdapter(new GateImageAdapter(mContext, mAuditImages));
+        }
+
+        if (groupPosition == 2) {
+            gridView.setAdapter(new GateImageAdapter(mContext, mRepairedImages));
+        }
+
+        mGridViews.put(Integer.valueOf(groupPosition), gridView);
+
+        return convertView;
     }
 
     @Override
-    public boolean isChildSelectable(int i, int i2) {
+    public boolean isChildSelectable(int groupPosition, int childPosition) {
         return false;
+    }
+
+    public GridView getPhotoGridView(int groupPosition) {
+        return mGridViews.get(Integer.valueOf(groupPosition));
     }
 }
