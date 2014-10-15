@@ -12,6 +12,8 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.api.NetworkClient_;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.enums.Status;
+import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
 
 import java.util.List;
@@ -83,9 +85,9 @@ public class SessionAdapter extends ArrayAdapter<Session> {
         } else {
             viewHolder.tvDateOut.setText("");
         }
-		viewHolder.tvStep.setText(String.valueOf(session.getStep()));
-		viewHolder.tvPreStatus.setText(String.valueOf(session.getPreStatus()));
-		viewHolder.tvCurrentStatus.setText(String.valueOf(session.getStatus()));
+		viewHolder.tvStep.setText((Step.values()[(int)session.getStep()]).toString());
+		viewHolder.tvPreStatus.setText((Status.values()[(int)session.getPreStatus()]).toString());
+		viewHolder.tvCurrentStatus.setText((Status.values()[(int)session.getStatus()]).toString());
 
 		if (!session.isProcessing()) {
 			viewHolder.btnContinue.setVisibility(View.GONE);

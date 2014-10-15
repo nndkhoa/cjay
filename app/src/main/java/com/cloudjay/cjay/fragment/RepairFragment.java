@@ -31,7 +31,7 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
 
 	@FragmentArg(CONTAINER_ID_EXTRA)
-	String containerID;
+	public String containerID;
 
 	@ViewById(R.id.pager)
 	ViewPager pager;
@@ -94,7 +94,7 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 	}
 
 	private void configureViewPager() {
-		mPagerAdapter = new ViewPagerAdapter(getActivity(), getActivity().getSupportFragmentManager());
+		mPagerAdapter = new ViewPagerAdapter(getActivity(), getActivity().getSupportFragmentManager(), containerID);
 		pager.setAdapter(mPagerAdapter);
 		pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
@@ -141,10 +141,12 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 class ViewPagerAdapter extends FragmentPagerAdapter {
 
 	Context mContext;
+    String mContainerID;
 
-	public ViewPagerAdapter(Context context, FragmentManager fm) {
+	public ViewPagerAdapter(Context context, FragmentManager fm, String containerID) {
 		super(fm);
 		mContext = context;
+        mContainerID = containerID;
 	}
 
 	@Override
@@ -153,9 +155,9 @@ class ViewPagerAdapter extends FragmentPagerAdapter {
 
 		switch (position) {
 			case 0:
-				return new IssuePendingFragment_();
+				return new IssuePendingFragment_().builder().containerID(mContainerID).build();
 			case 1:
-				return new IssueRepairedFragment_();
+				return new IssueRepairedFragment_().builder().containerID(mContainerID).build();
 			default:
 				return null;
 		}

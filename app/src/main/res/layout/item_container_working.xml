@@ -29,7 +29,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:text="AUDY12983750" />
+                android:text="AUDY12983750"
+                android:textStyle="bold"
+                android:textColor="@color/background_button_and_line"/>
         </RelativeLayout>
 
         <RelativeLayout
