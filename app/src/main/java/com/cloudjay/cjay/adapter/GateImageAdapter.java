@@ -66,4 +66,9 @@ public class GateImageAdapter extends BaseAdapter {
         ImageLoader.getInstance().displayImage(gateImages.get(i).getUrl(), holder.ivGateImage);
         return convertView;
     }
+
+    public void swapData(List<GateImage> gateImages) {
+        this.gateImages = gateImages;
+        notifyDataSetChanged();
+    }
 }

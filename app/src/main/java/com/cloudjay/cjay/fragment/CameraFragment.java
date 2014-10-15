@@ -151,7 +151,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 			@Override
 			public void onClick(View view) {
 				// Close Camera
-				// DataCenter_.getInstance_(getActivity()).getGateImages(mType, containerId);
 				getActivity().finish();
 			}
 		});

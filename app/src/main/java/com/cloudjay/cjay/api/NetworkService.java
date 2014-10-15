@@ -18,6 +18,7 @@ import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
 import retrofit.http.Header;
 import retrofit.http.POST;
+import retrofit.http.PUT;
 import retrofit.http.Path;
 import retrofit.http.Query;
 import retrofit.mime.TypedFile;
@@ -57,6 +58,18 @@ public interface NetworkService {
 
     @POST(ApiEndpoint.CONTAINER_SESSIONS_API)
     public void postContainer(@Body Session session, Callback<Response> responseCallback);
+
+    @PUT(ApiEndpoint.CONTAINER_SESSION_CHECK_OUT_API)
+    public void checkOutContainerSession(@Path("id") String containerId, @Query("gate_images") String gate_image);
+
+    @PUT(ApiEndpoint.CONTAINER_SESSION_COMPLETE_AUDIT_API)
+    public void completeAudit(@Path("id") String containerId);
+
+    @PUT(ApiEndpoint.CONTAINER_SESSION_COMPLETE_REPAIR_API)
+    public void completeRepair(@Path("id") String containerId, @Query("audit_items") String audit_item);
+
+    @PUT(ApiEndpoint.CONTAINER_SESSION_POST_AUDIT_ITEM_API)
+    public void postAudiItem(@Path("id") String containerId, @Query("damage_code_id") String damage_code_id, @Query("repair_code_id") String repair_code_id, @Query("component_code_id") String component_code_id, @Query("location_code") String location_code, @Query("length") Long length, @Query("height") Long height, @Query("quantity") Long quantity, @Query("audit_images") String audit_images);
 
     // Check source v1, uploadType=media
     @POST(ApiEndpoint.CJAY_TMP_STORAGE_IMAGE)

@@ -11,7 +11,14 @@ public class ApiEndpoint {
 	public static final String LIST_REPAIR_CODES_API = "/api/cjay/repair-codes";
 	public static final String LIST_COMPONENT_CODES_API = "/api/cjay/component-codes";
 	public static final String CONTAINER_SESSIONS_API = "/api/cjay/containers";
-	public static final String CONTAINER_SESSION_ITEM_API = "/api/cjay/full-containers/{id}";
+	public static final String CONTAINER_SESSION_ITEM_API = "/api/cjay/containers/{id}";
+
+    public static final String CONTAINER_SESSION_CHECK_OUT_API = "/api/cjay/containers/{id}/check-out";
+    public static final String CONTAINER_SESSION_COMPLETE_REPAIR_API = "/api/cjay/containers/{id}/complete-repair";
+    public static final String CONTAINER_SESSION_POST_AUDIT_ITEM_API = "/api/cjay/containers/{id}/post-audit-item";
+    public static final String CONTAINER_SESSION_COMPLETE_AUDIT_API = "/api/cjay/containers/{id}/complete-audit";
+    public static final String CONTAINER_SESSION_ADD_AUDIT_IMAGE_API = "/api/cjay/containers/{audit-item-id}/add-audit-image";
+
 	public static final String CJAY_TMP_STORAGE = "https://www.googleapis.com";
     public static final String CJAY_TMP_STORAGE_IMAGE = "/upload/storage/v1beta2/b/cjaytmp/o";
 	//	public static final String CJAY_TMP_STORAGE = "https://www.googleapis.com/upload/storage/v1beta2/b/cjaytmp/o?uploadType=media&name=%s";

@@ -10,6 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.widget.Button;
 
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
@@ -52,7 +53,7 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 
 		// Go to next fragment
-		Fragment fragment = new ExportFragment_().builder().build();
+		Fragment fragment = new ExportFragment_().builder().containerID(containerID).build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 		transaction.replace(R.id.ll_main, fragment);
@@ -152,9 +153,9 @@ class ViewPagerAdapter extends FragmentPagerAdapter {
 
 		switch (position) {
 			case 0:
-				return IssuePendingFragment_.newInstance(0);
+				return new IssuePendingFragment_();
 			case 1:
-				return IssueRepairedFragment_.newInstance(1);
+				return new IssueRepairedFragment_();
 			default:
 				return null;
 		}

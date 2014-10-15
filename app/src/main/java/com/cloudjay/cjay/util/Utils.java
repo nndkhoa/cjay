@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.view.View;
 
 import com.cloudjay.cjay.App;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
@@ -170,4 +171,21 @@ public class Utils {
         return uploadedImage;
     }
 
+    public static String getImageTypeDescription(Context ctx, int imageType) {
+
+        switch (imageType) {
+            case CJayConstant.TYPE_IMPORT:
+                return ctx.getResources().getString(R.string.image_type_description_import);
+
+            case CJayConstant.TYPE_EXPORT:
+                return ctx.getResources().getString(R.string.image_type_description_export);
+
+            case CJayConstant.TYPE_AUDIT:
+                return ctx.getResources().getString(R.string.image_type_description_report);
+
+            case CJayConstant.TYPE_REPAIRED:
+            default:
+                return ctx.getResources().getString(R.string.image_type_description_repaired);
+        }
+    }
 }

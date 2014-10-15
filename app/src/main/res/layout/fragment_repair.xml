@@ -9,28 +9,34 @@
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center" />
+        android:gravity="center"
+        android:layout_above="@+id/ll_bottom"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
-        android:weightSum="2">
+        android:weightSum="2"
+        android:id="@+id/ll_bottom">
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/btn_complete"
             android:layout_weight="1"
-            android:text="Hoàn tất"/>
+            android:text="@string/button_completed"
+            android:textColor="@android:color/white"
+            android:background="@drawable/btn_green_selector"/>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/btn_continue"
             android:layout_weight="1"
-            android:text="Tiếp bước sau"/>
+            android:text="@string/button_export_now"
+            android:textColor="@android:color/white"
+            android:background="@drawable/btn_customize_selector"/>
 
     </LinearLayout>
 

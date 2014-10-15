@@ -3,6 +3,7 @@ package com.cloudjay.cjay;
 import android.content.Context;
 
 import com.cloudjay.cjay.api.NetworkClient;
+import com.cloudjay.cjay.event.BeginSearchOnServerEvent;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
@@ -109,6 +110,8 @@ public class DataCenter {
                 // TODO: @thai need to alert to user about that no results was found in local
 
                 // If there was not result in local, send search request to server
+                EventBus.getDefault().post(new BeginSearchOnServerEvent(
+                        context.getResources().getString(R.string.search_on_server)));
                 searchAsync(context, keyword);
             }
         } catch (SnappydbException e) {
@@ -201,9 +204,9 @@ public class DataCenter {
 
                 List<Session> current = new ArrayList<Session>();
                 current.add(sessionWorking);
-                workingSessionCreate.setWorkingSession(current);
-                snappyDb.put(CJayConstant.WORKING_DB, workingSessionCreate);
-                snappyDb.close();
+
+                App.getSnappyDB(context).put(CJayConstant.WORKING_DB, workingSessionCreate);
+
                 EventBus.getDefault().post(new WorkingSessionCreatedEvent(current));
             }
         } catch (SnappydbException e) {
@@ -214,7 +217,8 @@ public class DataCenter {
     }
 
     public void addGateImage(long type, String url, String containerId) throws SnappydbException {
-        Logger.Log("url when insert in data center: " + url);
+        Logger.Log("url when insert in dataCenter: " + url);
+        Logger.Log("type when insert in dataCenter: " + type);
 
         Session session = snappyDb.getObject(containerId, Session.class);
         GateImage gateImage = new GateImage();
@@ -236,13 +240,17 @@ public class DataCenter {
 
     public void getGateImages(long type, String containerId) throws SnappydbException {
         Logger.Log("type = " + type + ", containerId = " + containerId);
-        Session session = snappyDb.getObject(containerId, Session.class);
+        Session session = App.getSnappyDB(context).getObject(containerId, Session.class);
+        List<GateImage> gateImagesFiltered = new ArrayList<GateImage>();
+
         List<GateImage> gateImages = session.getGateImages();
         for (GateImage g : gateImages) {
-            Logger.Log("url: " + g.getUrl());
+            if (g.getType() == type) {
+                gateImagesFiltered.add(g);
+            }
         }
-        Logger.Log("gate images count in dataCenter: " + gateImages.size());
-        EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
+        Logger.Log("gate images count in dataCenter: " + gateImagesFiltered.size());
+        EventBus.getDefault().post(new GateImagesGotEvent(gateImagesFiltered));
     }
 
     public void searchOperator(String keyword) throws SnappydbException {
@@ -255,4 +263,34 @@ public class DataCenter {
         EventBus.getDefault().post(new OperatorsGotEvent(operators));
     }
 
+    @Background(serial = CACHE)
+    public void getSessionByContainerId(String containerId) {
+
+        String[] keysresult = new String[0];
+        try {
+            keysresult = App.getSnappyDB(context).findKeys(containerId);
+            List<Session> sessions = new ArrayList<Session>();
+            for (String result : keysresult) {
+                sessions.add(App.getSnappyDB(context).getObject(result, Session.class));
+            }
+
+            EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Background(serial = CACHE)
+    public void getAllGateImagesByContainerId(String containerId) {
+        Session session = null;
+        try {
+            session = App.getSnappyDB(context).getObject(containerId, Session.class);
+            List<GateImage> gateImages = session.getGateImages();
+            Logger.Log("gate images count in dataCenter: " + gateImages.size());
+            EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+    }
 }

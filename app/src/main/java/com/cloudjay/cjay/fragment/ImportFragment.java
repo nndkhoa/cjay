@@ -30,7 +30,6 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
-import com.cloudjay.cjay.util.enums.Status;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
@@ -156,7 +155,8 @@ public class ImportFragment extends Fragment {
 			lvImages.setAdapter(gateImageAdapter);
 		}
 
-		gateImageAdapter.notifyDataSetChanged();
+        // Notify change
+		gateImageAdapter.swapData(gateImages);
 
 	}
 
@@ -190,10 +190,8 @@ public class ImportFragment extends Fragment {
 
 	@Click(R.id.btn_continue)
 	void buttonContinueClicked() {
-		// Get selected radio type
-
 		// Go to next fragment
-		AuditFragment fragment = new AuditFragment_().builder().build();
+		AuditFragment fragment = new AuditFragment_().builder().containerID(containerID).build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 		transaction.replace(R.id.ll_main, fragment);
@@ -221,16 +219,22 @@ public class ImportFragment extends Fragment {
 
     @CheckedChange(R.id.rdn_status_a)
     void preStatusAChecked(boolean isChecked) {
-        preStatus = 0;
+        if (isChecked == true) {
+            preStatus = 0;
+        }
     }
 
     @CheckedChange(R.id.rdn_status_b)
     void preStatusBChecked(boolean isChecked) {
-        preStatus = 1;
+        if (isChecked == true) {
+            preStatus = 1;
+        }
     }
 
     @CheckedChange(R.id.rdn_status_c)
     void preStatusCChecked(boolean isChecked) {
-        preStatus = 2;
+        if (isChecked == true) {
+            preStatus = 2;
+        }
     }
 }

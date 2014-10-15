@@ -170,33 +170,6 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		EventBus.getDefault().register(this);
-
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                .detectAll()
-                .penaltyLog()
-                .penaltyDialog()
-                .build());
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll()
-                .penaltyLog()
-                .build());
-        StrictMode.ThreadPolicy old = StrictMode.getThreadPolicy();
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder(old)
-                .permitDiskWrites()
-                .build());
-        StrictMode.setThreadPolicy(old);
-
-        Session session = new Session();
-        session.setContainerId("TGHU4815950");
-        session.setPreStatus(1);
-        session.setOperatorId(1);
-        List<GateImage> gateImages = new ArrayList<GateImage>();
-        GateImage gateImage = new GateImage();
-        gateImage.setName("pip_icd1-2014-05-15-gate-in-TCLU5139487-APL-32508885-8b98-44f5-9a90-232f532959f5.jpg");
-        gateImages.add(gateImage);
-        session.setGateImages(gateImages);
-
-
-        NetworkClient_.getInstance_(this).uploadContainerSession(this, session);
 	}
 
 	@Override
