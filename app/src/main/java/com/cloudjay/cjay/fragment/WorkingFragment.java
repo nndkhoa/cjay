@@ -63,16 +63,16 @@ public class WorkingFragment extends Fragment {
 	 */
 	@AfterViews
 	void init() {
-        List<Session> workingSessionInit = null;
-        try {
-            workingSessionInit = App.getSnappyDB(getActivity()).getObject(CJayConstant.WORKING_DB, WorkingSession.class).getWorkingSession();
-            Logger.e(String.valueOf(workingSessionInit.size()));
-
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
+//        List<Session> workingSessionInit = null;
+//        try {
+//            workingSessionInit = App.getSnappyDB(getActivity()).getObject(CJayConstant.WORKING_DB, WorkingSession.class).getWorkingSession();
+//            Logger.e(String.valueOf(workingSessionInit.size()));
+//
+//        } catch (SnappydbException e) {
+//            e.printStackTrace();
+//        }
         mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
-        mAdapter.setData(workingSessionInit);
+//        mAdapter.setData(workingSessionInit);
         lvWorking.setAdapter(mAdapter);
         lvWorking.setEmptyView(tvEmpty);
 

@@ -10,7 +10,7 @@ public class ApiEndpoint {
 	public static final String LIST_DAMAGE_CODES_API = "/api/cjay/damage-codes";
 	public static final String LIST_REPAIR_CODES_API = "/api/cjay/repair-codes";
 	public static final String LIST_COMPONENT_CODES_API = "/api/cjay/component-codes";
-	public static final String CONTAINER_SESSIONS_API = "/api/cjay/full-containers";
+	public static final String CONTAINER_SESSIONS_API = "/api/cjay/containers";
 	public static final String CONTAINER_SESSION_ITEM_API = "/api/cjay/full-containers/{id}";
 	public static final String CJAY_TMP_STORAGE = "https://www.googleapis.com";
     public static final String CJAY_TMP_STORAGE_IMAGE = "/upload/storage/v1beta2/b/cjaytmp/o";

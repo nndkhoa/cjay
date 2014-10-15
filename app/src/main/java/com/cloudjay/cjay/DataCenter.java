@@ -15,6 +15,8 @@ import com.cloudjay.cjay.model.WorkingSession;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.snappydb.DB;
+import com.snappydb.DBFactory;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.Background;
@@ -33,6 +35,7 @@ public class DataCenter {
     // Inject the rest client
     @Bean
     NetworkClient networkClient;
+    DB snappyDb;
 
 
     public static final String NETWORK = "NETWORK";
@@ -42,6 +45,12 @@ public class DataCenter {
 
     public DataCenter(Context context) {
         this.context = context;
+        try {
+            snappyDb = DBFactory.open(context,"Thai");
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public String getToken(String email, String password) {
@@ -58,7 +67,7 @@ public class DataCenter {
     public void fetchOperators(Context context) throws SnappydbException {
         List<Operator> operators = networkClient.getOperators(context, null);
         for (Operator operator : operators) {
-            App.getSnappyDB(context).put(CJayConstant.OPERATOR_KEY + operator.getOperatorCode(), operator);
+            snappyDb.put(CJayConstant.OPERATOR_KEY + operator.getOperatorCode(), operator);
         }
     }
 
@@ -74,7 +83,7 @@ public class DataCenter {
         List<Session> sessions = networkClient.getAllSessions(context, lastModifiedDate);
         for (Session session : sessions) {
             Logger.e("Added: " + session.getContainerId());
-            App.getSnappyDB(context).put(session.getContainerId(), session);
+            snappyDb.put(session.getContainerId(), session);
         }
 
     }
@@ -89,10 +98,10 @@ public class DataCenter {
 
         String[] keysresult;
         try {
-            keysresult = App.getSnappyDB(context).findKeys(keyword);
+            keysresult = snappyDb.findKeys(keyword);
             List<Session> sessions = new ArrayList<Session>();
             for (String result : keysresult) {
-                sessions.add(App.getSnappyDB(context).getObject(result, Session.class));
+                sessions.add(snappyDb.getObject(result, Session.class));
             }
             if (sessions.size() != 0) {
                 EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
@@ -117,7 +126,7 @@ public class DataCenter {
         if (sessions.size() != 0) {
             for (Session session : sessions) {
                 try {
-                    App.getSnappyDB(context).put(session.getContainerId(), session);
+                    snappyDb.put(session.getContainerId(), session);
                 } catch (SnappydbException e) {
                     e.printStackTrace();
                 }
@@ -136,9 +145,9 @@ public class DataCenter {
         List<Operator> operators = new ArrayList<Operator>();
         String[] keysresult;
         try {
-            keysresult = App.getSnappyDB(context).findKeys(CJayConstant.OPERATOR_KEY);
+            keysresult = snappyDb.findKeys(CJayConstant.OPERATOR_KEY);
             for (String result : keysresult) {
-                operators.add(App.getSnappyDB(context).getObject(result, Operator.class));
+                operators.add(snappyDb.getObject(result, Operator.class));
             }
             EventBus.getDefault().post(new OperatorsGotEvent(operators));
         } catch (SnappydbException e) {
@@ -157,7 +166,7 @@ public class DataCenter {
         session.setCheckInTime(checkInTime);
         session.setPreStatus(preStatus);
         try {
-            App.getSnappyDB(context).put(containerId, session);
+            snappyDb.put(containerId, session);
             addWorkingId(context, containerId);
             Logger.Log("insert session successfully");
         } catch (SnappydbException e) {
@@ -171,26 +180,30 @@ public class DataCenter {
 
         //Get working session list, if can't create one
         try {
-            Session sessionWorking = App.getSnappyDB(context).getObject(containerId, Session.class);
+            Session sessionWorking = snappyDb.getObject(containerId, Session.class);
             sessionWorking.setProcessing(true);
             try {
-                workingSession = App.getSnappyDB(context).getObject(CJayConstant.WORKING_DB, WorkingSession.class);
+                workingSession = snappyDb.getObject(CJayConstant.WORKING_DB, WorkingSession.class);
                 List<Session> current = workingSession.getWorkingSession();
                 current.add(sessionWorking);
                 workingSession.setWorkingSession(current);
                 try {
-                    App.getSnappyDB(context).put(CJayConstant.WORKING_DB, workingSession);
+                    Logger.e("Insert Working");
+                    snappyDb.put(CJayConstant.WORKING_DB, workingSession);
                 } catch (SnappydbException e) {
                     e.printStackTrace();
                 }
+                snappyDb.close();
                 EventBus.getDefault().post(new WorkingSessionCreatedEvent(current));
             } catch (SnappydbException e) {
+                Logger.e("Create Working");
                 WorkingSession workingSessionCreate = new WorkingSession();
 
                 List<Session> current = new ArrayList<Session>();
                 current.add(sessionWorking);
                 workingSessionCreate.setWorkingSession(current);
-                App.getSnappyDB().put(CJayConstant.WORKING_DB, workingSessionCreate);
+                snappyDb.put(CJayConstant.WORKING_DB, workingSessionCreate);
+                snappyDb.close();
                 EventBus.getDefault().post(new WorkingSessionCreatedEvent(current));
             }
         } catch (SnappydbException e) {
@@ -203,7 +216,7 @@ public class DataCenter {
     public void addGateImage(long type, String url, String containerId) throws SnappydbException {
         Logger.Log("url when insert in data center: " + url);
 
-        Session session = App.getSnappyDB(context).getObject(containerId, Session.class);
+        Session session = snappyDb.getObject(containerId, Session.class);
         GateImage gateImage = new GateImage();
         gateImage.setId(0);
         gateImage.setType(type);
@@ -216,14 +229,14 @@ public class DataCenter {
         gateImages.add(gateImage);
         session.setGateImages(gateImages);
 
-        App.getSnappyDB(context).put(containerId, session);
+        snappyDb.put(containerId, session);
 
         Logger.Log("insert gate image successfully");
     }
 
     public void getGateImages(long type, String containerId) throws SnappydbException {
         Logger.Log("type = " + type + ", containerId = " + containerId);
-        Session session = App.getSnappyDB(context).getObject(containerId, Session.class);
+        Session session = snappyDb.getObject(containerId, Session.class);
         List<GateImage> gateImages = session.getGateImages();
         for (GateImage g : gateImages) {
             Logger.Log("url: " + g.getUrl());
@@ -233,10 +246,10 @@ public class DataCenter {
     }
 
     public void searchOperator(String keyword) throws SnappydbException {
-        String[] keysresult = App.getSnappyDB(context).findKeys(CJayConstant.OPERATOR_KEY+keyword);
+        String[] keysresult = snappyDb.findKeys(CJayConstant.OPERATOR_KEY+keyword);
         List<Operator> operators = new ArrayList<Operator>();
         for (String result : keysresult) {
-            operators.add(App.getSnappyDB(context).getObject(result, Operator.class));
+            operators.add(snappyDb.getObject(result, Operator.class));
         }
 
         EventBus.getDefault().post(new OperatorsGotEvent(operators));

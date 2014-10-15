@@ -5,6 +5,7 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -14,14 +15,19 @@ import android.text.TextUtils;
 import android.view.ViewConfiguration;
 import android.widget.Toast;
 
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.api.NetworkClient_;
 import com.cloudjay.cjay.event.SessionsFetchedEvent;
 import com.cloudjay.cjay.fragment.SearchFragment_;
 import com.cloudjay.cjay.fragment.UploadFragment_;
 import com.cloudjay.cjay.fragment.WorkingFragment_;
+import com.cloudjay.cjay.model.GateImage;
+import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.jobqueue.GetAllSessionsJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.google.gson.Gson;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
@@ -33,6 +39,8 @@ import org.androidannotations.annotations.ViewById;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import de.greenrobot.event.EventBus;
@@ -53,6 +61,10 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 	 * Manage Job Queue
 	 */
 	JobManager jobManager;
+
+
+
+
 
 	/**
 	 * > MAIN FUNCTION
@@ -158,6 +170,33 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		EventBus.getDefault().register(this);
+
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .detectAll()
+                .penaltyLog()
+                .penaltyDialog()
+                .build());
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll()
+                .penaltyLog()
+                .build());
+        StrictMode.ThreadPolicy old = StrictMode.getThreadPolicy();
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder(old)
+                .permitDiskWrites()
+                .build());
+        StrictMode.setThreadPolicy(old);
+
+        Session session = new Session();
+        session.setContainerId("TGHU4815950");
+        session.setPreStatus(1);
+        session.setOperatorId(1);
+        List<GateImage> gateImages = new ArrayList<GateImage>();
+        GateImage gateImage = new GateImage();
+        gateImage.setName("pip_icd1-2014-05-15-gate-in-TCLU5139487-APL-32508885-8b98-44f5-9a90-232f532959f5.jpg");
+        gateImages.add(gateImage);
+        session.setGateImages(gateImages);
+
+
+        NetworkClient_.getInstance_(this).uploadContainerSession(this, session);
 	}
 
 	@Override
