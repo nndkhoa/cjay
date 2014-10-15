@@ -95,10 +95,6 @@ dependencies {
     compile 'eu.inmite.android.lib:android-styled-dialogs:1.2.0'
 	compile 'com.snappydb:snappydb-lib:0.4.0'
 	compile 'com.esotericsoftware.kryo:kryo:2.24.0'
-
-	// Test
-//	compile "org.codehaus.groovy:groovy-all:1.8.6"
-//	compile 'org.robospock:robospock:0.4'
 }
 
 apt {
@@ -118,8 +114,8 @@ apt {
 	}
 }
 
-//project.ext {
-//	robospock = ":app" // project to test
-//}
-//
-//apply plugin: 'robospock'
+task zip2jar(type: Zip, dependsOn: "compileReleaseJava") {
+	from 'build/intermediates/classes/release'
+	destinationDir = file('build/libs')
+	extension = "jar"
+}
