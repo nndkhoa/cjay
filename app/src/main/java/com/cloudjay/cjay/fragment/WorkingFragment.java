@@ -65,6 +65,7 @@ public class WorkingFragment extends Fragment {
 
 		List<Session> workingSessionInit = null;
 
+/*
 		try {
 			workingSessionInit = App.getSnappyDB(getActivity()).getObject(CJayConstant.WORKING_DB, WorkingSession.class).getWorkingSession();
 			Logger.e(String.valueOf(workingSessionInit.size()));
@@ -72,6 +73,7 @@ public class WorkingFragment extends Fragment {
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
+*/
 		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
 		mAdapter.setData(workingSessionInit);
 		lvWorking.setAdapter(mAdapter);
