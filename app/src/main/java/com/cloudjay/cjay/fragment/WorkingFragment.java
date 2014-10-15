@@ -62,6 +62,7 @@ public class WorkingFragment extends Fragment {
 	@AfterViews
 	void init() {
 
+
 		List<Session> workingSessionInit = null;
 
 		try {

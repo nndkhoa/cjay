@@ -15,6 +15,17 @@ public class GateImage{
 	@Expose
 	private String url;
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Expose
+    private String name;
+
     private boolean uploaded;
 
     public boolean isUploaded() {
