@@ -233,7 +233,6 @@ public class NetworkClient {
 
 
         List<Session> sessions = new ArrayList<Session>();
-        JsonElement next;
         JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).searchContainer(keyword);
         JsonArray results = jsonObject.getAsJsonArray("results");
         Gson gson = new Gson();
@@ -245,9 +244,21 @@ public class NetworkClient {
         return sessions;
     }
 
-    public Session uploadContainerSession(Context context, Session containerSession) {
-        Session result = provider.getRestAdapter(context).create(NetworkService.class).postContainer(containerSession);
-        return result;
+    public void uploadContainerSession(Context context, Session containerSession) {
 
-    }
+        provider.getRestAdapter(context).create(NetworkService.class).postContainer(containerSession, new Callback<Response>() {
+            @Override
+            public void success(Response response, Response response2) {
+                Logger.e(response.toString());
+               Logger.e(response2.toString());
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Logger.e(error.getResponse().getHeaders().toString());
+                Logger.e(error.getResponse().getReason());
+
+            }
+        });
+     }
 }

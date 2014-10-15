@@ -30,7 +30,6 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
-import com.cloudjay.cjay.util.enums.Status;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
@@ -191,10 +190,8 @@ public class ImportFragment extends Fragment {
 
 	@Click(R.id.btn_continue)
 	void buttonContinueClicked() {
-		// Get selected radio type
-
 		// Go to next fragment
-		AuditFragment fragment = new AuditFragment_().builder().build();
+		AuditFragment fragment = new AuditFragment_().builder().containerID(containerID).build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 		transaction.replace(R.id.ll_main, fragment);
