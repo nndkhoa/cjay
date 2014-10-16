@@ -27,8 +27,6 @@ public class UpLoadImageJob extends Job {
     public UpLoadImageJob(Context context, String uri, String imageName, String containerId) {
         super(new Params(2).requireNetwork().groupBy(containerId));
 
-        Logger.e("uri in UpLoadImageJob: " + uri);
-
         this.context = context;
         this.containerId =containerId;
         this.uri = uri;
@@ -37,7 +35,6 @@ public class UpLoadImageJob extends Job {
 
     @Override
     public void onAdded() {
-        Logger.d("Added Upload Image Job");
 
     }
 
@@ -47,8 +44,7 @@ public class UpLoadImageJob extends Job {
 
         NetworkClient networkClient = NetworkClient_.getInstance_(context);
         networkClient.uploadImage(context, uri,imageName);
-        Logger.e("Upload Image " + containerId);
-        EventBus.getDefault().post(new UploadedEvent());
+
 
     }
 

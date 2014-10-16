@@ -2,6 +2,8 @@ package com.cloudjay.cjay.model;
 
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -81,15 +83,15 @@ public class AuditItem {
      * @return
      * @throws JSONException
      */
-    public JSONArray getAuditImageToUpLoad() throws JSONException {
-        JSONArray audit_image = new JSONArray();
+    public JsonArray getAuditImageToUpLoad() {
+        JsonArray audit_image = new JsonArray();
         Logger.e(String.valueOf(auditImages.size()));
         for (AuditImage auditImage : this.auditImages) {
             if (auditImage.getType() == ImageType.AUDIT.getValue()) {
                 String auditImageName = auditImage.getName();
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("name", auditImageName);
-                audit_image.put(jsonObject);
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("name", auditImageName);
+                audit_image.add(jsonObject);
             }
         }
         return audit_image;
@@ -101,15 +103,15 @@ public class AuditItem {
      * @return
      * @throws JSONException
      */
-    public JSONArray getRepairedImageToUpLoad() throws JSONException {
-        JSONArray repaired_image = new JSONArray();
+    public JsonArray getRepairedImageToUpLoad() {
+        JsonArray repaired_image = new JsonArray();
         Logger.e(String.valueOf(auditImages.size()));
         for (AuditImage repairedtImage : this.auditImages) {
             if (repairedtImage.getType() == ImageType.REPAIRED.getValue()) {
                 String repairedImageName = repairedtImage.getName();
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("name", repairedImageName);
-                repaired_image.put(jsonObject);
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("name", repairedImageName);
+                repaired_image.add(jsonObject);
             }
         }
         return repaired_image;

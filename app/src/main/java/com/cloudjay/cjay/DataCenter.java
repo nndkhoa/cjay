@@ -225,7 +225,6 @@ public class DataCenter {
         //Add update session with image to normal session in db
         App.getSnappyDB(context).put(containerId, session);
 
-        Logger.Log("insert gate image to working successfully");
         App.closeSnappyDB();
     }
 
@@ -246,8 +245,6 @@ public class DataCenter {
         session.setGateImages(gateImages);
         //Add update session with image to normal session in db
         App.getSnappyDB(context).put(containerId, session);
-
-        Logger.Log("insert gate image to normail successfully");
         App.closeSnappyDB();
     }
 
@@ -262,7 +259,6 @@ public class DataCenter {
                 gateImagesFiltered.add(g);
             }
         }
-        Logger.Log("gate images count in dataCenter: " + gateImagesFiltered.size());
         EventBus.getDefault().post(new GateImagesGotEvent(gateImagesFiltered));
         App.closeSnappyDB();
     }

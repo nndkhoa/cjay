@@ -4,6 +4,8 @@ package com.cloudjay.cjay.model;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -113,12 +115,12 @@ public class Session {
      *
      * @return
      */
-    public JSONObject getJsonSession() throws JSONException {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("pre_status", (Status.values()[(int) this.preStatus]).toString());
-        jsonObject.put("container_id", containerId);
-        jsonObject.put("operator_id", operatorId);
-        jsonObject.put("gate_images",this.getGateInImageToUpLoad());
+    public JsonObject getJsonSession() throws JSONException {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("pre_status", this.preStatus);
+        jsonObject.addProperty("container_id", containerId);
+        jsonObject.addProperty("operator_id", operatorId);
+        jsonObject.add("gate_images",this.getGateInImageToUpLoad());
         return jsonObject;
     }
 
@@ -128,15 +130,14 @@ public class Session {
      * @return
      * @throws JSONException
      */
-    public JSONArray getGateInImageToUpLoad() throws JSONException {
-        JSONArray gate_image = new JSONArray();
-        Logger.e(String.valueOf(gateImages.size()));
+    public JsonArray getGateInImageToUpLoad()  {
+        JsonArray gate_image = new JsonArray();
         for (GateImage gateImage : this.gateImages) {
             if (gateImage.getType() == ImageType.IMPORT.getValue()) {
                 String gateImageName = gateImage.getName();
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("name", gateImageName);
-                gate_image.put(jsonObject);
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("name", gateImageName);
+                gate_image.add(jsonObject);
             }
         }
         return gate_image;
@@ -148,15 +149,14 @@ public class Session {
      * @return
      * @throws JSONException
      */
-    public JSONArray getGateOutImageToUpLoad() throws JSONException {
-        JSONArray gate_image = new JSONArray();
-        Logger.e(String.valueOf(gateImages.size()));
+    public JsonArray getGateOutImageToUpLoad()  {
+        JsonArray gate_image = new JsonArray();
         for (GateImage gateImage : this.gateImages) {
             if (gateImage.getType() == ImageType.EXPORT.getValue()) {
                 String gateImageName = gateImage.getName();
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("name", gateImageName);
-                gate_image.put(jsonObject);
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("name", gateImageName);
+                gate_image.add(jsonObject);
             }
         }
         return gate_image;
@@ -169,16 +169,15 @@ public class Session {
      * @return
      * @throws JSONException
      */
-    public JSONArray getRepairedAuditItemToUpLoad() throws JSONException {
-        JSONArray auditItems = new JSONArray();
-        Logger.e(String.valueOf(gateImages.size()));
+    public JsonArray getRepairedAuditItemToUpLoad() {
+        JsonArray auditItems = new JsonArray();
         for (AuditItem auditItem : this.auditItems) {
-            JSONObject jsonObject = new JSONObject();
+            JsonObject jsonObject = new JsonObject();
             long auditId = auditItem.getId();
-            jsonObject.put("name", auditId);
-            auditItems.put(jsonObject);
-            JSONArray repairedImageName = auditItem.getRepairedImageToUpLoad();
-            jsonObject.put("audit_images", repairedImageName);
+            jsonObject.addProperty("name", auditId);
+            auditItems.add(jsonObject);
+            JsonArray repairedImageName = auditItem.getRepairedImageToUpLoad();
+            jsonObject.add("audit_images", repairedImageName);
         }
         return auditItems;
     }

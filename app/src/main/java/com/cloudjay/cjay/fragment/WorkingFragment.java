@@ -87,7 +87,6 @@ public class WorkingFragment extends Fragment {
 
     @UiThread
     public void onEvent(WorkingSessionCreatedEvent event) {
-        Logger.e("WorkingSessionCreatedEvent");
         Session session = null;
         try {
             session = App.getSnappyDB(getActivity()).getObject(CJayConstant.WORKING_DB+event.getWorkingSession().getContainerId(), Session.class);
@@ -101,7 +100,6 @@ public class WorkingFragment extends Fragment {
     }
     @UiThread
     public void onEvent(ImageCapturedEvent event) {
-        Logger.e("WorkingSessionCreatedEvent");
         Session session = null;
         try {
             session = App.getSnappyDB(getActivity()).getObject(CJayConstant.WORKING_DB+event.getContainerId(), Session.class);
