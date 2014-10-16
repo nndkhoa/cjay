@@ -369,8 +369,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 			}
 		});
 
-		btnFlashMode = (ImageButton) results.findViewById(R.id.btn_toggle_flash);
-
 		btnCameraMode = (ToggleButton) results.findViewById(R.id.btn_capture_mode);
 		btnCameraMode.setOnClickListener(new View.OnClickListener() {
 			@Override
