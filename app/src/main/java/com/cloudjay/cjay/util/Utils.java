@@ -139,24 +139,31 @@ public class Utils {
     public static int countTotalImage(Session session) {
         int totalImage = 0;
         List<AuditItem> auditItems = session.getAuditItems();
-        for (AuditItem auditItem : auditItems) {
-            totalImage = totalImage + auditItem.getAuditImages().size();
+        if (auditItems != null) {
+            for (AuditItem auditItem : auditItems) {
+                totalImage = totalImage + auditItem.getAuditImages().size();
+            }
+            totalImage = totalImage + session.getGateImages().size();
+            return totalImage;
+        } else {
+            totalImage = session.getGateImages().size();
+            return totalImage;
         }
-        totalImage = totalImage + session.getGateImages().size();
-        return totalImage;
     }
 
     public static int countUploadedImage(Session session) {
         int uploadedImage = 0;
         List<AuditItem> auditItems = session.getAuditItems();
-        for (AuditItem auditItem : auditItems) {
-            List<AuditImage> auditImages = auditItem.getAuditImages();
-            for (AuditImage auditImage : auditImages) {
-                if (auditImage.isUploaded()) {
-                    uploadedImage = uploadedImage + 1;
+        if (auditItems != null) {
+            for (AuditItem auditItem : auditItems) {
+                List<AuditImage> auditImages = auditItem.getAuditImages();
+                for (AuditImage auditImage : auditImages) {
+                    if (auditImage.isUploaded()) {
+                        uploadedImage = uploadedImage + 1;
+                    }
                 }
-            }
 
+            }
         }
         List<GateImage> gateImages = session.getGateImages();
         for (GateImage gateImage : gateImages) {

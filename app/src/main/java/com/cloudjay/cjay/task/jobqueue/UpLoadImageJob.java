@@ -2,14 +2,17 @@ package com.cloudjay.cjay.task.jobqueue;
 
 import android.content.Context;
 
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.api.NetworkClient_;
 import com.cloudjay.cjay.event.ResumeUpLoadEvent;
+import com.cloudjay.cjay.event.StartUpLoadEvent;
 import com.cloudjay.cjay.event.StopUpLoadEvent;
 import com.cloudjay.cjay.event.UploadedEvent;
 import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
+import com.snappydb.SnappydbException;
 
 import de.greenrobot.event.EventBus;
 
@@ -35,6 +38,12 @@ public class UpLoadImageJob extends Job {
 
     @Override
     public void onAdded() {
+        try {
+            DataCenter_.getInstance_(context).addUploadingSession(containerId);
+            EventBus.getDefault().post(new StartUpLoadEvent(containerId));
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
 
     }
 

@@ -305,4 +305,10 @@ public class DataCenter {
             e.printStackTrace();
         }
     }
+
+    public void addUploadingSession(String containerId) throws SnappydbException {
+        Session uploadingSession = App.getSnappyDB(context).getObject(containerId, Session.class);
+        App.getSnappyDB(context).put(CJayConstant.UPLOADING_DB+containerId, uploadingSession);
+        App.closeSnappyDB();
+    }
 }
