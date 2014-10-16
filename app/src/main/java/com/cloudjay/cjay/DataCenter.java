@@ -182,7 +182,7 @@ public class DataCenter {
         try {
             Session sessionWorking = App.getSnappyDB(context).getObject(containerId, Session.class);
             sessionWorking.setProcessing(true);
-            App.getSnappyDB(context).put(CJayConstant.WORKING_DB+containerId, sessionWorking);
+            App.getSnappyDB(context).put(CJayConstant.WORKING_DB + containerId, sessionWorking);
             EventBus.getDefault().post(new WorkingSessionCreatedEvent(sessionWorking));
             App.closeSnappyDB();
         } catch (SnappydbException e) {
@@ -192,15 +192,29 @@ public class DataCenter {
 
     }
 
-    public void addGateImage(long type, String url, String containerId) throws SnappydbException {
-        Logger.Log("url when insert in dataCenter: " + url);
-        Logger.Log("type when insert in dataCenter: " + type);
 
+    /**
+     * Add gate image for both normal session and working session
+     *
+     * @param type
+     * @param url
+     * @param containerId
+     * @throws SnappydbException
+     */
+    public void addGateImage(long type, String url, String containerId, String imageName) throws SnappydbException {
+        addGateImageToNormalSession(type, url, containerId, imageName);
+        addGateImageToWorkingSession(type, url, containerId, imageName);
+
+    }
+
+    private void addGateImageToWorkingSession(long type, String url, String containerId, String imageName) throws SnappydbException {
+        containerId = CJayConstant.WORKING_DB + containerId;
         Session session = App.getSnappyDB(context).getObject(containerId, Session.class);
         GateImage gateImage = new GateImage();
         gateImage.setId(0);
         gateImage.setType(type);
         gateImage.setUrl(url);
+        gateImage.setName(imageName);
 
         List<GateImage> gateImages = session.getGateImages();
         if (gateImages == null) {
@@ -208,10 +222,32 @@ public class DataCenter {
         }
         gateImages.add(gateImage);
         session.setGateImages(gateImages);
-
+        //Add update session with image to normal session in db
         App.getSnappyDB(context).put(containerId, session);
 
-        Logger.Log("insert gate image successfully");
+        Logger.Log("insert gate image to working successfully");
+        App.closeSnappyDB();
+    }
+
+    private void addGateImageToNormalSession(long type, String url, String containerId, String imageName) throws SnappydbException {
+
+        Session session = App.getSnappyDB(context).getObject(containerId, Session.class);
+        GateImage gateImage = new GateImage();
+        gateImage.setId(0);
+        gateImage.setType(type);
+        gateImage.setUrl(url);
+        gateImage.setName(imageName);
+
+        List<GateImage> gateImages = session.getGateImages();
+        if (gateImages == null) {
+            gateImages = new ArrayList<GateImage>();
+        }
+        gateImages.add(gateImage);
+        session.setGateImages(gateImages);
+        //Add update session with image to normal session in db
+        App.getSnappyDB(context).put(containerId, session);
+
+        Logger.Log("insert gate image to normail successfully");
         App.closeSnappyDB();
     }
 

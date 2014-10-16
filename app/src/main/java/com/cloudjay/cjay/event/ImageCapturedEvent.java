@@ -1,16 +1,16 @@
 package com.cloudjay.cjay.event;
 
 /**
- * Created by nambv on 07/10/2014.
+ * User for update list of image capture and session in working fragment
  */
 public class ImageCapturedEvent {
-    private String imageUrl;
+    private String containerId;
 
-    public ImageCapturedEvent(String imageUrl) {
-        this.imageUrl= imageUrl;
+    public ImageCapturedEvent(String containerId) {
+        this.containerId= containerId;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getContainerId() {
+        return containerId;
     }
 }

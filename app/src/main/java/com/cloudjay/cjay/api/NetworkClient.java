@@ -246,9 +246,10 @@ public class NetworkClient {
     }
 
     public Session uploadContainerSession(Context context, Session containerSession) throws JSONException {
+        Logger.e(containerSession.getJsonSession().toString());
 
-        Session uploadedSession =provider.getRestAdapter(context).create(NetworkService.class).postContainer((Status.values()[(int) containerSession.getPreStatus()]).toString(), containerSession.getContainerId(), containerSession.getOperatorId(), containerSession.getGateImageToUpLoad());
+        Session uploadedSession = provider.getRestAdapter(context).create(NetworkService.class).postContainer(containerSession.getJsonSession());
 
-        return uploadedSession;
+        return null;
     }
 }

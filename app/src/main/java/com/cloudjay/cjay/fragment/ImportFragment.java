@@ -135,7 +135,7 @@ public class ImportFragment extends Fragment {
 	void onEvent(ImageCapturedEvent event) {
 		// Get gate images from realm
         try {
-            dataCenter.getGateImages(CJayConstant.TYPE_IMPORT, containerID);
+            dataCenter.getGateImages(CJayConstant.TYPE_IMPORT, event.getContainerId());
         } catch (SnappydbException e) {
             e.printStackTrace();
         }
