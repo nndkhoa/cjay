@@ -8,17 +8,17 @@ import java.util.List;
  * Created by thai on 10/10/2014.
  */
 public class WorkingSessionCreatedEvent {
-    public List<Session> getListWorkingId() {
-        return listWorkingId;
+    public Session getWorkingSession() {
+        return workingSession;
     }
 
-    public void setListWorkingId(List<Session> listWorkingId) {
-        this.listWorkingId = listWorkingId;
+    public void setworkingSession(Session workingId) {
+        this.workingSession = workingId;
     }
 
-    List<Session> listWorkingId;
+    Session workingSession;
 
-    public WorkingSessionCreatedEvent(List<Session> current) {
-        this.listWorkingId = current;
+    public WorkingSessionCreatedEvent(Session current) {
+        this.workingSession = current;
     }
 }

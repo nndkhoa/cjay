@@ -57,7 +57,7 @@ public interface NetworkService {
     public JsonObject searchContainer(@Query("search") String keyword);
 
     @POST(ApiEndpoint.CONTAINER_SESSIONS_API)
-    public void postContainer(@Body Session session, Callback<Response> responseCallback);
+    public void postContainer(@Query("pre_status") String pre_status, @Query("container_id") String container_id, @Query("operator_id") Long operator_id, @Query("gate_images") JsonArray gate_images, Callback<Response> responseCallback);
 
     @PUT(ApiEndpoint.CONTAINER_SESSION_CHECK_OUT_API)
     public void checkOutContainerSession(@Path("id") String containerId, @Query("gate_images") String gate_image);

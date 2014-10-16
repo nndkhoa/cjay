@@ -35,7 +35,7 @@ public class UploadSessionJob extends Job {
         EventBus.getDefault().post(new ResumeUpLoadEvent());
 
         Logger.e("Uploading container: " + session.getContainerId());
-//        Session result = NetworkClient_.getInstance_(context).uploadContainerSession(context,session);
+        Session result = NetworkClient_.getInstance_(context).uploadContainerSession(context,session);
 
         EventBus.getDefault().post(new UploadedEvent());
 

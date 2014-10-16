@@ -10,7 +10,6 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.SessionAdapter;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.model.WorkingSession;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.snappydb.SnappydbException;
@@ -20,6 +19,7 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -30,64 +30,67 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.fragment_working)
 public class WorkingFragment extends Fragment {
 
-	private static final int LOADER_ID = 1;
+    private static final int LOADER_ID = 1;
 
-	@ViewById(R.id.lv_working_container)
-	ListView lvWorking;
+    @ViewById(R.id.lv_working_container)
+    ListView lvWorking;
 
-	@ViewById(R.id.tv_emptylist_working)
-	TextView tvEmpty;
+    @ViewById(R.id.tv_emptylist_working)
+    TextView tvEmpty;
 
-	private SessionAdapter mAdapter;
+    private SessionAdapter mAdapter;
 
-	public WorkingFragment() {
-	}
+    List<Session> workingSessionList;
 
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		EventBus.getDefault().register(this);
-	}
-
-	@Override
-	public void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
-	}
-
-	/**
-	 * Initial loader and set adapter for list view
-	 */
-	@AfterViews
-	void init() {
+    public WorkingFragment() {
+    }
 
 
-		List<Session> workingSessionInit = null;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
 
-		try {
-			workingSessionInit = App.getSnappyDB(getActivity()).getObject(CJayConstant.WORKING_DB, WorkingSession.class).getWorkingSession();
-			Logger.e(String.valueOf(workingSessionInit.size()));
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        try {
+            App.getSnappyDB(getActivity()).close();
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+        super.onDestroy();
+    }
 
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
-		mAdapter.setData(workingSessionInit);
-		lvWorking.setAdapter(mAdapter);
-		lvWorking.setEmptyView(tvEmpty);
-	}
+    /**
+     * Initial loader and set adapter for list view
+     */
+    @AfterViews
+    void init() {
+        workingSessionList = new ArrayList<Session>();
 
-	@UiThread
-	public void onEvent(WorkingSessionCreatedEvent event) {
-		try {
-			Logger.e("WorkingSessionCreatedEvent");
-			List<Session> workingSession = App.getSnappyDB(getActivity()).getObject(CJayConstant.WORKING_DB, WorkingSession.class).getWorkingSession();
-			mAdapter.clear();
-			mAdapter.setData(workingSession);
-			mAdapter.notifyDataSetChanged();
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-	}
+        try {
+            String[] listWorkingId = App.getSnappyDB(getActivity()).findKeys(CJayConstant.WORKING_DB);
+            for (String workingId : listWorkingId) {
+                Session session = App.getSnappyDB(getActivity()).getObject(workingId, Session.class);
+                workingSessionList.add(session);
+            }
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+        mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
+        mAdapter.setData(workingSessionList);
+        lvWorking.setAdapter(mAdapter);
+        lvWorking.setEmptyView(tvEmpty);
+    }
+
+    @UiThread
+    public void onEvent(WorkingSessionCreatedEvent event) {
+        Logger.e("WorkingSessionCreatedEvent");
+        Session session = event.getWorkingSession();
+        workingSessionList.add(session);
+        mAdapter.setData(workingSessionList);
+        mAdapter.notifyDataSetChanged();
+    }
 }
