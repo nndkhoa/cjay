@@ -103,7 +103,11 @@ public class WorkingFragment extends Fragment {
         Session session = null;
         try {
             session = App.getSnappyDB(getActivity()).getObject(CJayConstant.WORKING_DB+event.getContainerId(), Session.class);
-            workingSessionList.remove(session);
+            for (Session session1 : workingSessionList){
+                if (session1.getContainerId().equals(event.getContainerId())){
+                    workingSessionList.remove(session1);
+                }
+            }
             workingSessionList.add(session);
             mAdapter.setData(workingSessionList);
             mAdapter.notifyDataSetChanged();
