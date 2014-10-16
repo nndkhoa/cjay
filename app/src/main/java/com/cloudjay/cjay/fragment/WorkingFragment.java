@@ -30,7 +30,6 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.fragment_working)
 public class WorkingFragment extends Fragment {
 
-    private static final int LOADER_ID = 1;
 
     @ViewById(R.id.lv_working_container)
     ListView lvWorking;
@@ -88,9 +87,16 @@ public class WorkingFragment extends Fragment {
     @UiThread
     public void onEvent(WorkingSessionCreatedEvent event) {
         Logger.e("WorkingSessionCreatedEvent");
-        Session session = event.getWorkingSession();
-        workingSessionList.add(session);
-        mAdapter.setData(workingSessionList);
-        mAdapter.notifyDataSetChanged();
+        Session session = null;
+        try {
+            session = App.getSnappyDB(getActivity()).getObject(CJayConstant.WORKING_DB+event.getWorkingSession().getContainerId(), Session.class);
+            workingSessionList.add(session);
+            mAdapter.setData(workingSessionList);
+            mAdapter.notifyDataSetChanged();
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+
     }
+
 }

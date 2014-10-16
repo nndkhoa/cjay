@@ -14,7 +14,6 @@ import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.util.Utils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 

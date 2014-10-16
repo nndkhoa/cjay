@@ -4,13 +4,13 @@ import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
+import org.json.JSONArray;
 
 import java.util.List;
 
 import retrofit.Callback;
-import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.http.Body;
 import retrofit.http.Field;
@@ -57,7 +57,7 @@ public interface NetworkService {
     public JsonObject searchContainer(@Query("search") String keyword);
 
     @POST(ApiEndpoint.CONTAINER_SESSIONS_API)
-    public void postContainer(@Query("pre_status") String pre_status, @Query("container_id") String container_id, @Query("operator_id") Long operator_id, @Query("gate_images") JsonArray gate_images, Callback<Response> responseCallback);
+    public Session postContainer(@Query("pre_status") String pre_status, @Query("container_id") String container_id, @Query("operator_id") Long operator_id, @Query("gate_images") JSONArray gate_images);
 
     @PUT(ApiEndpoint.CONTAINER_SESSION_CHECK_OUT_API)
     public void checkOutContainerSession(@Path("id") String containerId, @Query("gate_images") String gate_image);

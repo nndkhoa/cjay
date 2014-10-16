@@ -65,8 +65,12 @@ android {
 
 dependencies {
 	apt fileTree(dir: 'libs', include: ['*.jar'])
+
+//	compile fileTree(dir: 'libs', include: ['*.jar'])
+
 	compile 'com.android.support:support-v4:19.1.0'
 	compile 'com.android.support:appcompat-v7:19.1.0'
+
 	compile 'com.crashlytics.android:crashlytics:1.+'
 
 	compile 'com.path:android-priority-jobqueue:1.1.2'
@@ -92,13 +96,9 @@ dependencies {
 	compile files('libs/Pubnub-Android-3.5.6.jar')
 	compile files('libs/helpertoolsforandroid.jar')
 
-    compile 'eu.inmite.android.lib:android-styled-dialogs:1.2.0'
 	compile 'com.snappydb:snappydb-lib:0.4.0'
 	compile 'com.esotericsoftware.kryo:kryo:2.24.0'
-
-	// Test
-//	compile "org.codehaus.groovy:groovy-all:1.8.6"
-//	compile 'org.robospock:robospock:0.4'
+	compile 'eu.inmite.android.lib:android-styled-dialogs:1.2.0'
 }
 
 apt {
@@ -118,8 +118,8 @@ apt {
 	}
 }
 
-//project.ext {
-//	robospock = ":app" // project to test
-//}
-//
-//apply plugin: 'robospock'
+task zip2jar(type: Zip, dependsOn: "compileReleaseJava") {
+	from 'build/intermediates/classes/release'
+	destinationDir = file('build/libs')
+	extension = "jar"
+}

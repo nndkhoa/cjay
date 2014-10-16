@@ -12,7 +12,7 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringHelper;
-import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.enums.Status;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -22,6 +22,7 @@ import com.google.gson.reflect.TypeToken;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.Trace;
+import org.json.JSONException;
 
 import java.io.File;
 import java.lang.reflect.Type;
@@ -244,21 +245,10 @@ public class NetworkClient {
         return sessions;
     }
 
-    public void uploadContainerSession(Context context, Session containerSession) {
+    public Session uploadContainerSession(Context context, Session containerSession) throws JSONException {
 
-        provider.getRestAdapter(context).create(NetworkService.class).postContainer(containerSession, new Callback<Response>() {
-            @Override
-            public void success(Response response, Response response2) {
-                Logger.e(response.toString());
-               Logger.e(response2.toString());
-            }
+        Session uploadedSession =provider.getRestAdapter(context).create(NetworkService.class).postContainer((Status.values()[(int) containerSession.getPreStatus()]).toString(), containerSession.getContainerId(), containerSession.getOperatorId(), containerSession.getGateImageToUpLoad());
 
-            @Override
-            public void failure(RetrofitError error) {
-                Logger.e(error.getResponse().getHeaders().toString());
-                Logger.e(error.getResponse().getReason());
-
-            }
-        });
-     }
+        return uploadedSession;
+    }
 }

@@ -21,6 +21,7 @@ import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.enums.Status;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
@@ -58,6 +59,12 @@ public class ExportFragment extends Fragment {
     @ViewById(R.id.btn_view_previous_step)
     Button btnViewPreviousSteps;
 
+    @ViewById(R.id.tv_status_name)
+    TextView tvPreStatus;
+
+    @ViewById(R.id.tv_current_status)
+    TextView tvCurrentStatus;
+
     @Bean
     DataCenter dataCenter;
 
@@ -65,6 +72,8 @@ public class ExportFragment extends Fragment {
     List<GateImage> gateImages = null;
 
     String operatorCode;
+    long preStatus;
+    long currentStatus;
 
 	public ExportFragment() {
 	}
@@ -130,6 +139,14 @@ public class ExportFragment extends Fragment {
     void onEvent(ContainerSearchedEvent event) {
         List<Session> result = event.getSessions();
         operatorCode = result.get(0).getOperatorCode();
+        preStatus = result.get(0).getPreStatus();
+        currentStatus = result.get(0).getStatus();
+
+        // Set preStatus to TextView
+        tvPreStatus.setText((Status.values()[(int)preStatus]).toString());
+
+        // Set currentStatus to TextView
+        tvCurrentStatus.setText((Status.values()[(int)currentStatus]).toString());
     }
 
     @Click(R.id.btn_view_previous_step)

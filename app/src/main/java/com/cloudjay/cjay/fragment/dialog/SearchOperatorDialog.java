@@ -13,7 +13,6 @@ import com.cloudjay.cjay.adapter.OperatorAdapter;
 import com.cloudjay.cjay.event.OperatorCallbackEvent;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.model.Operator;
-import com.cloudjay.cjay.util.Logger;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterTextChange;
@@ -21,13 +20,10 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
-import org.androidannotations.annotations.TextChange;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import de.greenrobot.event.EventBus;
 @EFragment(R.layout.dialog_select_operator)

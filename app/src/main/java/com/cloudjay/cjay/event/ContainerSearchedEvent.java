@@ -1,7 +1,10 @@
 package com.cloudjay.cjay.event;
 
 import com.cloudjay.cjay.model.Session;
-;import java.util.List;
+
+import java.util.List;
+
+;
 
 public class ContainerSearchedEvent {
 

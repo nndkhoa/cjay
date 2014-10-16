@@ -2,8 +2,6 @@ package com.cloudjay.cjay.event;
 
 import com.cloudjay.cjay.model.Session;
 
-import java.util.List;
-
 /**
  * Created by thai on 10/10/2014.
  */

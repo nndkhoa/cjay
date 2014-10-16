@@ -1,8 +1,13 @@
 package com.cloudjay.cjay.model;
 
 
+import com.cloudjay.cjay.util.Logger;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -101,6 +106,22 @@ public class Session {
 
 	}
 
+    /**
+     * Return JSONArray of gate image list look like [{name: '....'}, {name: '....'}, ...] for upload
+     * @return
+     * @throws JSONException
+     */
+    public JSONArray getGateImageToUpLoad() throws JSONException {
+        JSONArray gate_image = new JSONArray();
+        Logger.e(String.valueOf(gateImages.size()));
+        for (GateImage gateImage : this.gateImages){
+            String gateImageName = gateImage.getName();
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("name",gateImageName);
+            gate_image.put(jsonObject);
+        }
+        return gate_image;
+    }
 	public long getId() {
 		return id;
 	}

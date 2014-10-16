@@ -1,22 +1,13 @@
 package com.cloudjay.cjay.fragment.dialog;
 
-import android.app.Dialog;
-import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
-import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.util.Logger;
 
-import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
-import org.androidannotations.annotations.ViewById;
 
-import eu.inmite.android.lib.dialogs.BaseDialogFragment;
-import eu.inmite.android.lib.dialogs.ISimpleDialogListener;
 import eu.inmite.android.lib.dialogs.SimpleDialogFragment;
 
 /**

@@ -5,7 +5,6 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -15,19 +14,14 @@ import android.text.TextUtils;
 import android.view.ViewConfiguration;
 import android.widget.Toast;
 
-import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.api.NetworkClient_;
 import com.cloudjay.cjay.event.SessionsFetchedEvent;
 import com.cloudjay.cjay.fragment.SearchFragment_;
 import com.cloudjay.cjay.fragment.UploadFragment_;
 import com.cloudjay.cjay.fragment.WorkingFragment_;
-import com.cloudjay.cjay.model.GateImage;
-import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.jobqueue.GetAllSessionsJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
-import com.google.gson.Gson;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
@@ -39,8 +33,6 @@ import org.androidannotations.annotations.ViewById;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import de.greenrobot.event.EventBus;
