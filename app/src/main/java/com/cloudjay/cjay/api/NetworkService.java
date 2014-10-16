@@ -7,6 +7,7 @@ import com.cloudjay.cjay.model.User;
 import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -57,7 +58,7 @@ public interface NetworkService {
     public JsonObject searchContainer(@Query("search") String keyword);
 
     @POST(ApiEndpoint.CONTAINER_SESSIONS_API)
-    public Session postContainer(@Query("pre_status") String pre_status, @Query("container_id") String container_id, @Query("operator_id") Long operator_id, @Query("gate_images") JSONArray gate_images);
+    public Session postContainer( @Body JSONObject jsonSession);
 
     @PUT(ApiEndpoint.CONTAINER_SESSION_CHECK_OUT_API)
     public void checkOutContainerSession(@Path("id") String containerId, @Query("gate_images") String gate_image);
