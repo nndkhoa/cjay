@@ -201,13 +201,13 @@ public class DataCenter {
      * @param containerId
      * @throws SnappydbException
      */
-    public void addGateImage(long type, String url, String containerId) throws SnappydbException {
-        addGateImageToNormalSession(type, url, containerId);
-        addGateImageToWorkingSession(type, url, containerId);
+    public void addGateImage(long type, String url, String containerId, String imageName) throws SnappydbException {
+        addGateImageToNormalSession(type, url, containerId, imageName);
+        addGateImageToWorkingSession(type, url, containerId, imageName);
 
     }
 
-    private void addGateImageToWorkingSession(long type, String url, String containerId) throws SnappydbException {
+    private void addGateImageToWorkingSession(long type, String url, String containerId, String imageName) throws SnappydbException {
         containerId = CJayConstant.WORKING_DB + containerId;
         Session session = App.getSnappyDB(context).getObject(containerId, Session.class);
         GateImage gateImage = new GateImage();
@@ -229,13 +229,14 @@ public class DataCenter {
         App.closeSnappyDB();
     }
 
-    private void addGateImageToNormalSession(long type, String url, String containerId) throws SnappydbException {
+    private void addGateImageToNormalSession(long type, String url, String containerId, String imageName) throws SnappydbException {
 
         Session session = App.getSnappyDB(context).getObject(containerId, Session.class);
         GateImage gateImage = new GateImage();
         gateImage.setId(0);
         gateImage.setType(type);
         gateImage.setUrl(url);
+        gateImage.setName(imageName);
 
         List<GateImage> gateImages = session.getGateImages();
         if (gateImages == null) {
