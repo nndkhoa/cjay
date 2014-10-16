@@ -46,7 +46,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	private boolean singleShotProcessing = false;
 
 	private ImageButton btnTakePicture;
-	private ImageButton btnFlashMode;
 	private ToggleButton btnCameraMode;
 	private Button btnDone;
 	private long lastFaceToast = 0L;
@@ -54,7 +53,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	/**
 	 * flash mode parameter when take camera
 	 */
-	String flashMode = null;
+	int flashMode = 1;
 	int mType = 0;
 
 	String containerId;
@@ -79,8 +78,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		SimpleCameraHost.Builder builder = new SimpleCameraHost.Builder(new CameraHost(getActivity()));
 		setHost(builder.useFullBleedPreview(true).build());
 
-		//Set default flash mode parameter when take camera is OFF
-		flashMode = "off";
+		// Set default flash mode parameter when take camera is OFF
+		// flashMode = "off";
 
 		// get data from arguments
 		Bundle args = getArguments();
@@ -110,25 +109,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		});
 
 		btnFlashMode = (ImageButton) results.findViewById(R.id.btn_toggle_flash);
-		btnFlashMode.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View view) {
-				if (flashMode.equals("off")) {
-					Logger.Log("Set auto");
-					flashMode = "auto";
-					btnFlashMode.setImageResource(R.drawable.ic_flash_auto);
-				} else if (flashMode.equals("auto")) {
-					Logger.Log("Set on");
-					flashMode = "on";
-					btnFlashMode.setImageResource(R.drawable.ic_flash_on);
-				} else if (flashMode.equals("on")) {
-					Logger.Log("Set off");
-					flashMode = "off";
-					btnFlashMode.setImageResource(R.drawable.ic_flash_off);
-				}
-			}
-		});
 
 		btnCameraMode = (ToggleButton) results.findViewById(R.id.btn_capture_mode);
 		btnCameraMode.setOnClickListener(new View.OnClickListener() {
@@ -196,7 +176,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 		// Tag another object along if you need to
 		// xact.tag();
-		xact.flashMode(flashMode);
+        xact.flashMode(Camera.Parameters.FLASH_MODE_AUTO);
 
 		// Call it with PictureTransaction to take picture with configuration in CameraHost
 		// Process image in Subclass of `CameraHost#saveImage`
@@ -309,7 +289,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		void uploadImage(String uuid, String uri, String imageName) throws SnappydbException {
 
 			// 1. Save image to local db
-			DataCenter_.getInstance_(getActivity()).addGateImage(mType, "file://" + uri, containerId);
+			DataCenter_.getInstance_(getActivity()).addGateImage(mType, "file://" + uri, containerId, imageName);
 			EventBus.getDefault().post(new ImageCapturedEvent(uri));
 			Logger.Log("save image to snappy successfully");
 
@@ -351,11 +331,11 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 		@Override
 		public Camera.Parameters adjustPreviewParameters(Camera.Parameters parameters) {
-			flashMode =
+			/*flashMode =
 					CameraUtils.findBestFlashModeMatch(parameters,
 							Camera.Parameters.FLASH_MODE_RED_EYE,
 							Camera.Parameters.FLASH_MODE_AUTO,
-							Camera.Parameters.FLASH_MODE_ON);
+							Camera.Parameters.FLASH_MODE_ON);*/
 
 			if (parameters.getMaxNumDetectedFaces() > 0) {
 				supportsFaces = true;

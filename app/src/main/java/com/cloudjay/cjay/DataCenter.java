@@ -192,7 +192,7 @@ public class DataCenter {
 
     }
 
-    public void addGateImage(long type, String url, String containerId) throws SnappydbException {
+    public void addGateImage(long type, String url, String containerId, String imageName) throws SnappydbException {
         Logger.Log("url when insert in dataCenter: " + url);
         Logger.Log("type when insert in dataCenter: " + type);
 
@@ -201,6 +201,7 @@ public class DataCenter {
         gateImage.setId(0);
         gateImage.setType(type);
         gateImage.setUrl(url);
+        gateImage.setName(imageName);
 
         List<GateImage> gateImages = session.getGateImages();
         if (gateImages == null) {
