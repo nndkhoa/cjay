@@ -192,6 +192,7 @@ public class DataCenter {
 
     }
 
+
     /**
      * Add gate image for both normal session and working session
      *
@@ -213,6 +214,7 @@ public class DataCenter {
         gateImage.setId(0);
         gateImage.setType(type);
         gateImage.setUrl(url);
+        gateImage.setName(imageName);
 
         List<GateImage> gateImages = session.getGateImages();
         if (gateImages == null) {
