@@ -22,6 +22,7 @@ public class CJayConstant {
 	public static final String OPERATOR_KEY = "OP";
 	public static final String WORKING_DB = "Working";
     public static final String UPLOADING_DB = "Uploading";
+	public static final String USER_KEY = "USER";
 
 	// `/sdcard/DCMI/CJay/`
 	public static final File APP_DIRECTORY_FILE = new File(

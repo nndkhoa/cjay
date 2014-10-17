@@ -50,15 +50,17 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		accountManager = AccountManager.get(this);
 	}
 
+	public static final String PARAM_AUTH_TOKEN_TYPE = "auth.token";
+
 	// Inject DataCenter to this Activity
 	@Bean
 	DataCenter dataCenter;
 
-	public static final String PARAM_AUTH_TOKEN_TYPE = "auth.token";
 	AccountManager accountManager;
 	AlertDialog mAlertDialog;
 	boolean mInvalidate;
-	public String mToken;
+
+	String mToken;
 	String email;
 	String password;
 
@@ -92,7 +94,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	//endregion
 
 	/**
-	 * Add account to account manager
+	 * Add account to Account Manager
 	 *
 	 * @param email
 	 * @param password
@@ -133,7 +135,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	 * 2. Validate ở client các trường hợp lỗi và thông báo
 	 * 3. Gửi username và password lên cho server
 	 * 4. Nhận token trả về và tiến hành gửi request get iso codes và operators
-	 * 5. Login thành công thì chuyển trang Home
+	 * 5. Login thành công thì chuyển trang Home (HomeActivity)
 	 *
 	 */
 	@Background
@@ -152,9 +154,10 @@ public class LoginActivity extends AccountAuthenticatorActivity {
                 showGettingDataTextView();
 				dataCenter.fetchOperators(this);
 				dataCenter.fetchIsoCodes(this);
-				User user = dataCenter.getCurrentUser(this);
+				User user = dataCenter.getCurrentUserAsync(this);
 
 				if (null != user) {
+
 					// Navigate to Home Activity
 					Logger.Log("Navigate to Home Activity");
 					Intent intent = new Intent(getApplicationContext(), HomeActivity_.class);
@@ -167,6 +170,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 					showCrouton(getResources().getString(R.string.error_try_again));
 				}
 			} else {
+
 				Logger.w("Login failed");
 				showProgress(false);
 				showError(etEmail, R.string.error_incorrect_password);
