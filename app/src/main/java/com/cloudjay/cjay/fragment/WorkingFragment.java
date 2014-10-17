@@ -55,11 +55,6 @@ public class WorkingFragment extends Fragment {
     @Override
     public void onDestroy() {
         EventBus.getDefault().unregister(this);
-        try {
-            App.getSnappyDB(getActivity()).close();
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
         super.onDestroy();
     }
 
@@ -102,12 +97,14 @@ public class WorkingFragment extends Fragment {
     public void onEvent(ImageCapturedEvent event) {
         Session session = null;
         try {
+            Session oldSession = null;
             session = App.getSnappyDB(getActivity()).getObject(CJayConstant.WORKING_DB+event.getContainerId(), Session.class);
             for (Session session1 : workingSessionList){
                 if (session1.getContainerId().equals(event.getContainerId())){
-                    workingSessionList.remove(session1);
+                    oldSession =session1;
                 }
             }
+            workingSessionList.remove(oldSession);
             workingSessionList.add(session);
             mAdapter.setData(workingSessionList);
             mAdapter.notifyDataSetChanged();

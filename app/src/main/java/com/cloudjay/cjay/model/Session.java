@@ -115,7 +115,7 @@ public class Session {
      *
      * @return
      */
-    public JsonObject getJsonSession() throws JSONException {
+    public JsonObject getJsonSession()  {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("pre_status", this.preStatus);
         jsonObject.addProperty("container_id", containerId);

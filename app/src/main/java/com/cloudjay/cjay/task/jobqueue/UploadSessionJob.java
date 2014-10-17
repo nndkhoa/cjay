@@ -2,8 +2,9 @@ package com.cloudjay.cjay.task.jobqueue;
 
 import android.content.Context;
 
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.api.NetworkClient_;
-import com.cloudjay.cjay.event.ResumeUpLoadEvent;
+import com.cloudjay.cjay.event.UpLoadingEvent;
 import com.cloudjay.cjay.event.StopUpLoadEvent;
 import com.cloudjay.cjay.event.UploadedEvent;
 import com.cloudjay.cjay.model.Session;
@@ -33,12 +34,10 @@ public class UploadSessionJob extends Job {
 
     @Override
     public void onRun() throws Throwable {
-        EventBus.getDefault().post(new ResumeUpLoadEvent());
-        Logger.e("Uploading container"+ session.getContainerId());
-
-        Session result = NetworkClient_.getInstance_(context).uploadContainerSession(context,session);
+        EventBus.getDefault().post(new UpLoadingEvent());
+        DataCenter_.getInstance_(context).uploadContainerSession(context,session);
         Logger.e("Uploaded container: " + session.getContainerId());
-        EventBus.getDefault().post(new UploadedEvent());
+        EventBus.getDefault().post(new UploadedEvent(session.getContainerId()));
 
 
     }

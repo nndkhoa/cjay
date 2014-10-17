@@ -5,11 +5,9 @@ import android.content.Context;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.api.NetworkClient_;
-import com.cloudjay.cjay.event.ResumeUpLoadEvent;
+import com.cloudjay.cjay.event.UpLoadingEvent;
 import com.cloudjay.cjay.event.StartUpLoadEvent;
 import com.cloudjay.cjay.event.StopUpLoadEvent;
-import com.cloudjay.cjay.event.UploadedEvent;
-import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 import com.snappydb.SnappydbException;
@@ -49,10 +47,8 @@ public class UpLoadImageJob extends Job {
 
     @Override
     public void onRun() throws Throwable {
-        EventBus.getDefault().post(new ResumeUpLoadEvent());
-
-        NetworkClient networkClient = NetworkClient_.getInstance_(context);
-        networkClient.uploadImage(context, uri,imageName);
+        EventBus.getDefault().post(new UpLoadingEvent());
+        DataCenter_.getInstance_(context).uploadImage(context, uri,imageName, containerId);
 
 
     }

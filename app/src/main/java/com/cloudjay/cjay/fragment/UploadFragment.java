@@ -8,7 +8,7 @@ import android.widget.TextView;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadSessionAdapter;
-import com.cloudjay.cjay.event.ResumeUpLoadEvent;
+import com.cloudjay.cjay.event.UpLoadingEvent;
 import com.cloudjay.cjay.event.StartUpLoadEvent;
 import com.cloudjay.cjay.event.StopUpLoadEvent;
 import com.cloudjay.cjay.event.UploadedEvent;
@@ -18,6 +18,7 @@ import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
@@ -29,22 +30,22 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.fragment_upload)
 public class UploadFragment extends Fragment {
 
-	private static final int LOADER_ID = 1;
+    private static final int LOADER_ID = 1;
 
-	@ViewById(R.id.lv_uploading_container)
-	ListView lvUploading;
+    @ViewById(R.id.lv_uploading_container)
+    ListView lvUploading;
 
-	@ViewById(R.id.tv_emptylist_uploading)
-	TextView tvEmpty;
+    @ViewById(R.id.tv_emptylist_uploading)
+    TextView tvEmpty;
 
-	private UploadSessionAdapter mAdapter;
+    private UploadSessionAdapter mAdapter;
 
     List<Session> uploadingSessionList;
 
 
-	public UploadFragment() {
-		// Required empty public constructor
-	}
+    public UploadFragment() {
+        // Required empty public constructor
+    }
 
 
     @Override
@@ -56,19 +57,14 @@ public class UploadFragment extends Fragment {
     @Override
     public void onDestroy() {
         EventBus.getDefault().unregister(this);
-        try {
-            App.getSnappyDB(getActivity()).close();
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
         super.onDestroy();
     }
 
-	/**
-	 * Initial loader and set adapter for list view
-	 */
-	@AfterViews
-	void initLoader() {
+    /**
+     * Initial loader and set adapter for list view
+     */
+    @AfterViews
+    void initLoader() {
         uploadingSessionList = new ArrayList<Session>();
 
         try {
@@ -80,21 +76,23 @@ public class UploadFragment extends Fragment {
         } catch (SnappydbException e) {
             e.printStackTrace();
         }
-		mAdapter = new UploadSessionAdapter(getActivity(), R.layout.item_upload);
+        mAdapter = new UploadSessionAdapter(getActivity(), R.layout.item_upload);
         mAdapter.setData(uploadingSessionList);
-		lvUploading.setAdapter(mAdapter);
-		lvUploading.setEmptyView(tvEmpty);
-	}
+        lvUploading.setAdapter(mAdapter);
+        lvUploading.setEmptyView(tvEmpty);
+    }
 
     public void onEvent(StartUpLoadEvent event) {
         Session session = null;
         try {
-            session = App.getSnappyDB(getActivity()).getObject(CJayConstant.UPLOADING_DB+event.getContainerId(), Session.class);
-            for (Session session1 : uploadingSessionList){
-                if (session1.getContainerId().equals(event.getContainerId())){
-                    uploadingSessionList.remove(session1);
+            Session oldSession = null;
+            session = App.getSnappyDB(getActivity()).getObject(CJayConstant.UPLOADING_DB + event.getContainerId(), Session.class);
+            for (Session session1 : uploadingSessionList) {
+                if (session1.getContainerId().equals(event.getContainerId())) {
+                    oldSession = session1;
                 }
             }
+            uploadingSessionList.remove(oldSession);
             uploadingSessionList.add(session);
             mAdapter.setData(uploadingSessionList);
             mAdapter.notifyDataSetChanged();
@@ -104,15 +102,30 @@ public class UploadFragment extends Fragment {
 
     }
 
-
+    @UiThread
     public void onEvent(UploadedEvent event) {
+        Session session = null;
+        try {
+            Session oldSession = null;
+            session = App.getSnappyDB(getActivity()).getObject(CJayConstant.UPLOADING_DB + event.getContainerId(), Session.class);
+            for (Session session1 : uploadingSessionList) {
+                if (session1.getContainerId().equals(event.getContainerId())) {
+                    oldSession = session1;
+                }
+            }
+            uploadingSessionList.remove(oldSession);
+            uploadingSessionList.add(session);
+            mAdapter.setData(uploadingSessionList);
+            mAdapter.notifyDataSetChanged();
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+    }
 
-	}
+    public void onEvent(StopUpLoadEvent event) {
+    }
 
-	public void onEvent(StopUpLoadEvent event) {
-	}
+    public void onEvent(UpLoadingEvent event) {
 
-	public void onEvent(ResumeUpLoadEvent event) {
-
-	}
+    }
 }
