@@ -7,6 +7,7 @@ import com.cloudjay.cjay.event.BeginSearchOnServerEvent;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
+import com.cloudjay.cjay.event.UploadedEvent;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
@@ -21,6 +22,7 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.Trace;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +63,7 @@ public class DataCenter {
         List<Operator> operators = networkClient.getOperators(context, null);
         for (Operator operator : operators) {
             App.getSnappyDB(context).put(CJayConstant.OPERATOR_KEY + operator.getOperatorCode(), operator);
-            App.closeSnappyDB();
+            //App.closeSnappyDB();
         }
     }
 
@@ -78,7 +80,7 @@ public class DataCenter {
         for (Session session : sessions) {
             Logger.e("Added: " + session.getContainerId());
             App.getSnappyDB(context).put(session.getContainerId(), session);
-            App.closeSnappyDB();
+            //App.closeSnappyDB();
         }
 
     }
@@ -99,16 +101,17 @@ public class DataCenter {
                 sessions.add(App.getSnappyDB(context).getObject(result, Session.class));
             }
             if (sessions.size() != 0) {
+                //App.closeSnappyDB();
                 EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
-                App.closeSnappyDB();
             } else {
                 // TODO: @thai need to alert to user about that no results was found in local
 
                 // If there was not result in local, send search request to server
                 EventBus.getDefault().post(new BeginSearchOnServerEvent(
                         context.getResources().getString(R.string.search_on_server)));
+                //App.closeSnappyDB();
                 searchAsync(context, keyword);
-                App.closeSnappyDB();
+
             }
 
         } catch (SnappydbException e) {
@@ -127,7 +130,7 @@ public class DataCenter {
             for (Session session : sessions) {
                 try {
                     App.getSnappyDB(context).put(session.getContainerId(), session);
-                    App.closeSnappyDB();
+                    //App.closeSnappyDB();
                 } catch (SnappydbException e) {
                     e.printStackTrace();
                 }
@@ -150,8 +153,9 @@ public class DataCenter {
             for (String result : keysresult) {
                 operators.add(App.getSnappyDB(context).getObject(result, Operator.class));
             }
+            //App.closeSnappyDB();
             EventBus.getDefault().post(new OperatorsGotEvent(operators));
-            App.closeSnappyDB();
+
         } catch (SnappydbException e) {
             e.printStackTrace();
         }
@@ -183,8 +187,9 @@ public class DataCenter {
             Session sessionWorking = App.getSnappyDB(context).getObject(containerId, Session.class);
             sessionWorking.setProcessing(true);
             App.getSnappyDB(context).put(CJayConstant.WORKING_DB + containerId, sessionWorking);
+            //App.closeSnappyDB();
             EventBus.getDefault().post(new WorkingSessionCreatedEvent(sessionWorking));
-            App.closeSnappyDB();
+
         } catch (SnappydbException e) {
             e.printStackTrace();
         }
@@ -225,8 +230,7 @@ public class DataCenter {
         //Add update session with image to normal session in db
         App.getSnappyDB(context).put(containerId, session);
 
-        Logger.Log("insert gate image to working successfully");
-        App.closeSnappyDB();
+        //App.closeSnappyDB();
     }
 
     private void addGateImageToNormalSession(long type, String url, String containerId, String imageName) throws SnappydbException {
@@ -246,9 +250,7 @@ public class DataCenter {
         session.setGateImages(gateImages);
         //Add update session with image to normal session in db
         App.getSnappyDB(context).put(containerId, session);
-
-        Logger.Log("insert gate image to normail successfully");
-        App.closeSnappyDB();
+        //App.closeSnappyDB();
     }
 
     public void getGateImages(long type, String containerId) throws SnappydbException {
@@ -262,9 +264,9 @@ public class DataCenter {
                 gateImagesFiltered.add(g);
             }
         }
-        Logger.Log("gate images count in dataCenter: " + gateImagesFiltered.size());
+        //App.closeSnappyDB();
         EventBus.getDefault().post(new GateImagesGotEvent(gateImagesFiltered));
-        App.closeSnappyDB();
+
     }
 
     public void searchOperator(String keyword) throws SnappydbException {
@@ -273,9 +275,9 @@ public class DataCenter {
         for (String result : keysresult) {
             operators.add(App.getSnappyDB(context).getObject(result, Operator.class));
         }
-
+        //App.closeSnappyDB();
         EventBus.getDefault().post(new OperatorsGotEvent(operators));
-        App.closeSnappyDB();
+
     }
 
     @Background(serial = CACHE)
@@ -288,7 +290,7 @@ public class DataCenter {
             for (String result : keysresult) {
                 sessions.add(App.getSnappyDB(context).getObject(result, Session.class));
             }
-            App.closeSnappyDB();
+            //App.closeSnappyDB();
             EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
         } catch (SnappydbException e) {
             e.printStackTrace();
@@ -303,10 +305,47 @@ public class DataCenter {
             session = App.getSnappyDB(context).getObject(containerId, Session.class);
             List<GateImage> gateImages = session.getGateImages();
             Logger.Log("gate images count in dataCenter: " + gateImages.size());
+            //App.closeSnappyDB();
             EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
-            App.closeSnappyDB();
         } catch (SnappydbException e) {
             e.printStackTrace();
         }
+    }
+
+    public void addUploadingSession(String containerId) throws SnappydbException {
+        Session uploadingSession = App.getSnappyDB(context).getObject(containerId, Session.class);
+        App.getSnappyDB(context).put(CJayConstant.UPLOADING_DB + containerId, uploadingSession);
+        //App.closeSnappyDB();
+    }
+
+    //TODO: include upload Audit Image
+    public void uploadImage(Context context, String uri, String imageName, String containerId) throws SnappydbException {
+        //Call network client to upload image
+        networkClient.uploadImage(context, uri, imageName);
+        //Change status image in db
+        Session uploadingSession = App.getSnappyDB(context).getObject(CJayConstant.UPLOADING_DB + containerId, Session.class);
+        for (GateImage gateImage : uploadingSession.getGateImages()) {
+            if (gateImage.getName().equals(imageName)) {
+                gateImage.setUploaded(true);
+            }
+        }
+        App.getSnappyDB(context).put(CJayConstant.UPLOADING_DB + containerId, uploadingSession);
+        //App.closeSnappyDB();
+        EventBus.getDefault().post(new UploadedEvent(containerId));
+    }
+
+    /**
+     * Upload container session and change status uploaded of session to true
+     *
+     * @param context
+     * @param session
+     * @throws SnappydbException
+     */
+    public void uploadContainerSession(Context context, Session session) throws SnappydbException {
+        networkClient.uploadContainerSession(context, session);
+        Session sessionUploaded = App.getSnappyDB(context).getObject(CJayConstant.UPLOADING_DB + session.getContainerId(), Session.class);
+        sessionUploaded.setUploaded(true);
+        App.getSnappyDB(context).put(CJayConstant.UPLOADING_DB + session + session.getContainerId(), sessionUploaded);
+        //App.closeSnappyDB();
     }
 }

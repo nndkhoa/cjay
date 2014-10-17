@@ -3,6 +3,7 @@ package com.cloudjay.cjay;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.StrictMode;
 
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;

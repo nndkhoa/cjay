@@ -75,24 +75,14 @@ public class NetworkClient {
     }
     //endregion
 
-    public void uploadImage(Context context, String uri, String imageName) {
-        Logger.e("uri in NetworkClient: " + uri);
+    public Response uploadImage(Context context, String uri, String imageName) {
         RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.CJAY_TMP_STORAGE).build();
         File image = new File(uri);
         TypedFile typedFile = new TypedFile("image/jpeg", image);
-        restAdapter.create(NetworkService.class).postImageFile("image/jpeg", "media", imageName, typedFile, new Callback<Response>() {
-            @Override
-            public void success(Response response, Response response2) {
+        Response response = restAdapter.create(NetworkService.class).postImageFile("image/jpeg", "media", imageName, typedFile);
+        Logger.e("Uploaded Image");
+        return response;
 
-                Logger.e(response.getUrl());
-                Logger.e(response.getHeaders().toString());
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                Logger.e(error.toString());
-            }
-        });
     }
 
     /**
@@ -245,7 +235,7 @@ public class NetworkClient {
         return sessions;
     }
 
-    public Session uploadContainerSession(Context context, Session containerSession) throws JSONException {
+    public Session uploadContainerSession(Context context, Session containerSession) {
         Logger.e(containerSession.getJsonSession().toString());
 
         Session uploadedSession = provider.getRestAdapter(context).create(NetworkService.class).postContainer(containerSession.getJsonSession());

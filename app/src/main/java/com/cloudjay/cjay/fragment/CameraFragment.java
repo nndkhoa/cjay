@@ -162,9 +162,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	 */
 	public void takeSimplePicture() {
 
-		Logger.Log("Prepare to take picture");
 		if (getContract().isSingleShotMode() == true) {
-			Logger.Log("Processing Single shot mode");
 			singleShotProcessing = true;
 			btnTakePicture.setEnabled(false);
 		}
@@ -289,7 +287,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 			// 1. Save image to local db
 			DataCenter_.getInstance_(getActivity()).addGateImage(mType, "file://" + uri, containerId, imageName);
-			EventBus.getDefault().post(new ImageCapturedEvent(uri));
+			EventBus.getDefault().post(new ImageCapturedEvent(containerId));
 			Logger.Log("save image to snappy successfully");
 
 			// 2.upload image
@@ -298,7 +296,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		}
 
 		void saveBitmapToFile(Bitmap bitmap, File filename) {
-			Logger.Log("File name: " + filename);
 			try {
 				FileOutputStream out = new FileOutputStream(filename);
 				bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);

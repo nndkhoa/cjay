@@ -62,7 +62,6 @@ public class GateImageAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        Logger.Log("image: " + gateImages.get(i).getUrl());
         ImageLoader.getInstance().displayImage(gateImages.get(i).getUrl(), holder.ivGateImage);
         return convertView;
     }
