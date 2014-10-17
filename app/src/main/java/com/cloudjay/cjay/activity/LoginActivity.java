@@ -64,16 +64,16 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 	//region VIEWS
 	@ViewById(R.id.btn_login)
-	Button btnLogin;
+	public Button btnLogin;
 
 	@ViewById(R.id.email)
-	EditText etEmail;
+	public EditText etEmail;
 
 	@ViewById(R.id.password)
-	EditText etPassword;
+	public EditText etPassword;
 
 	@ViewById(R.id.iv_app)
-	ImageView iv;
+	public ImageView iv;
 
 	@ViewById(R.id.ll_root)
 	LinearLayout llRoot;
