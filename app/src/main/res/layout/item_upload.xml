@@ -7,8 +7,8 @@
 
 	<ImageView
 		android:id="@+id/iv_container_upload"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_width="60dp"
+		android:layout_height="60dp"
 		android:padding="6dp"
 		android:scaleType="centerCrop"
 		android:src="@drawable/ic_launcher"/>
@@ -63,7 +63,7 @@
 				style="?android:attr/progressBarStyleHorizontal"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:max="100"/>
+                android:indeterminate="true"/>
 
 			<TextView
 				android:id="@+id/tv_upload_error"
@@ -79,7 +79,7 @@
 		android:id="@+id/iv_upload_result"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:visibility="visible"
+		android:visibility="gone"
 		android:src="@drawable/ic_success"/>
 
 </LinearLayout>

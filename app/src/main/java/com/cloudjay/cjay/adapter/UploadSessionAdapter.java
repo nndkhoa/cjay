@@ -13,6 +13,7 @@ import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Utils;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.List;
 
@@ -65,12 +66,17 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         //Set data to view
+        ImageLoader.getInstance().displayImage(session.getGateImages().get(0).getUrl(), viewHolder.ivContainer);
         viewHolder.tvContainerId.setText(session.getContainerId());
         viewHolder.tvTotalPhotoUpload.setText(String.valueOf(Utils.countTotalImage(session)));
         viewHolder.tvCurrentPhotoUpload.setText(String.valueOf(Utils.countUploadedImage(session)));
         if (NetworkHelper.isConnected(context)) {
             if (Utils.countTotalImage(session) == Utils.countUploadedImage(session)) {
                 viewHolder.ivUploadStatus.setVisibility(View.VISIBLE);
+                viewHolder.pbUpLoading.setVisibility(View.GONE);
+                viewHolder.ivUploadStatus.setImageResource(R.drawable.ic_success);
+            } else {
+                viewHolder.pbUpLoading.setVisibility(View.VISIBLE);
             }
         } else {
             viewHolder.ivUploadStatus.setImageResource(R.drawable.ic_error);

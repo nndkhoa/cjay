@@ -206,7 +206,7 @@ public class DataCenter {
      * @param containerId
      * @throws SnappydbException
      */
-    public void addGateImage(long type, String url, String containerId, String imageName) throws SnappydbException {
+    public void addGateImage(Context context,long type, String url, String containerId, String imageName) throws SnappydbException {
         addGateImageToNormalSession(type, url, containerId, imageName);
         addGateImageToWorkingSession(type, url, containerId, imageName);
 
@@ -329,8 +329,10 @@ public class DataCenter {
                 gateImage.setUploaded(true);
             }
         }
+
         App.getSnappyDB(context).put(CJayConstant.UPLOADING_DB + containerId, uploadingSession);
         //App.closeSnappyDB();
+        Logger.e("Update Gate Image after upload");
         EventBus.getDefault().post(new UploadedEvent(containerId));
     }
 
