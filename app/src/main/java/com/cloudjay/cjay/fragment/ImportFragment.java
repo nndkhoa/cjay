@@ -133,7 +133,6 @@ public class ImportFragment extends Fragment {
 
 	@UiThread
 	void onEvent(ImageCapturedEvent event) {
-		// Get gate images from realm
         try {
             dataCenter.getGateImages(CJayConstant.TYPE_IMPORT, event.getContainerId());
         } catch (SnappydbException e) {
@@ -151,7 +150,7 @@ public class ImportFragment extends Fragment {
 		//Init adapter if null and set adapter for listview
 		if (gateImageAdapter == null) {
 			Logger.Log("gateImageAdapter is null");
-			gateImageAdapter = new GateImageAdapter(getActivity(), gateImages);
+			gateImageAdapter = new GateImageAdapter(getActivity(), gateImages, false);
 			lvImages.setAdapter(gateImageAdapter);
 		}
 

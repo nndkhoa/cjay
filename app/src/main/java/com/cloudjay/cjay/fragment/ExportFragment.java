@@ -126,7 +126,7 @@ public class ExportFragment extends Fragment {
 
         //Init adapter if null and set adapter for listview
         if (gateImageAdapter == null) {
-            gateImageAdapter = new GateImageAdapter(getActivity(), gateImages);
+            gateImageAdapter = new GateImageAdapter(getActivity(), gateImages, false);
             gvExportImages.setAdapter(gateImageAdapter);
         }
 

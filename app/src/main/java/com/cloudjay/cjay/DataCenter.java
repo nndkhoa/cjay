@@ -9,11 +9,13 @@ import com.cloudjay.cjay.event.GateImagesGotEvent;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.event.UploadedEvent;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
+import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.model.WorkingSession;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -48,6 +50,7 @@ public class DataCenter {
 
 	public DataCenter(Context context) {
 		this.context = context;
+
 		try {
 			db = DBFactory.open(context);
 		} catch (SnappydbException e) {
@@ -410,5 +413,26 @@ public class DataCenter {
 		Session sessionUploaded = App.getSnappyDB(context).getObject(key, Session.class);
 		sessionUploaded.setUploaded(true);
 		App.getSnappyDB(context).put(CJayConstant.UPLOADING_DB + session + session.getContainerId(), sessionUploaded);
+	}
+
+	public void addAuditImages(String containerId, long type, String url) throws SnappydbException {
+		Session session = App.getSnappyDB(context).getObject(containerId, Session.class);
+		AuditImage auditImage = new AuditImage();
+		auditImage.setId(0);
+		auditImage.setType(type);
+		auditImage.setUrl(url);
+		auditImage.setUploaded(false);
+
+		List<AuditImage> auditImages = session.getAuditImages();
+		if (auditImages == null) {
+			auditImages = new ArrayList<AuditImage>();
+		}
+		auditImages.add(auditImage);
+		session.setAuditImages(auditImages);
+
+		App.getSnappyDB(context).put(containerId, session);
+
+		Logger.Log("insert audit image successfully");
+		App.closeSnappyDB();
 	}
 }

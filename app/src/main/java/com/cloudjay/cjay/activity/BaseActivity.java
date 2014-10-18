@@ -29,7 +29,7 @@ public class BaseActivity extends FragmentActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.base, menu);
+		//getMenuInflater().inflate(R.menu.base, menu);
 //		menu.findItem(R.id.menu_username).setTitle();
 		return true;
 	}

@@ -106,8 +106,11 @@ public class Session {
     @Expose
     private List<AuditItem> auditItems;
 
-    public Session() {
+    @SerializedName("audit_images")
+    @Expose
+    private List<AuditImage> auditImages;
 
+	public Session() {
     }
 
     /**
@@ -349,6 +352,19 @@ public class Session {
 
     public Session withAuditItems(List<AuditItem> auditItems) {
         this.auditItems = auditItems;
+        return this;
+    }
+
+    public List<AuditImage> getAuditImages() {
+        return auditImages;
+    }
+
+    public void setAuditImages(List<AuditImage> auditImages) {
+        this.auditImages = auditImages;
+    }
+
+    public Session withAuditImages(List<AuditImage> auditImages) {
+        this.auditImages = auditImages;
         return this;
     }
 
