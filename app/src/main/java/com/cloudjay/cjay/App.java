@@ -3,8 +3,9 @@ package com.cloudjay.cjay;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.StrictMode;
+
 import android.util.Log;
+
 
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -86,6 +87,7 @@ public class App extends Application {
         Configuration configuration = new Configuration.Builder(this)
                 .customLogger(new CustomLogger() {
                     private static final String TAG = "JOBS";
+
                     @Override
                     public boolean isDebugEnabled() {
                         return true;
@@ -106,13 +108,13 @@ public class App extends Application {
                         Log.e(TAG, String.format(text, args));
                     }
                 })
-                .minConsumerCount(1)//always keep at least one consumer alive
-                .maxConsumerCount(3)//up to 3 consumers at a time
-                .loadFactor(3)//3 jobs per consumer
-                .consumerKeepAlive(120)//wait 2 minute
+                .minConsumerCount(1)
+                .maxConsumerCount(3)
+                .loadFactor(3)
                 .build();
         jobManager = new JobManager(this, configuration);
     }
+
     public static JobManager getJobManager() {
         return jobManager;
     }

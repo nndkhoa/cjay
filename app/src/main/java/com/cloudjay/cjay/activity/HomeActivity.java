@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -12,22 +11,18 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.ViewConfiguration;
-import android.widget.Toast;
 
+import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.event.SessionsFetchedEvent;
 import com.cloudjay.cjay.fragment.SearchFragment_;
 import com.cloudjay.cjay.fragment.UploadFragment_;
 import com.cloudjay.cjay.fragment.WorkingFragment_;
 import com.cloudjay.cjay.task.jobqueue.GetAllSessionsJob;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.OptionsItem;
-import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.Field;
@@ -35,10 +30,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Locale;
 
-import de.greenrobot.event.EventBus;
-
 @EActivity(R.layout.activity_home)
-@OptionsMenu(R.menu.home_menu)
 public class HomeActivity extends BaseActivity implements ActionBar.TabListener {
 
 	public int currentPosition = 0;
@@ -48,15 +40,6 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 
 	PagerAdapter mPagerAdapter;
 	ActionBar actionBar;
-
-	/**
-	 * Manage Job Queue
-	 */
-	JobManager jobManager;
-
-
-
-
 
 	/**
 	 * > MAIN FUNCTION
@@ -78,21 +61,18 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 			finish();
 
 		} else {
+
 			configureActionBar();
 			configureViewPager();
-            forceShowActionBarOverflowMenu();
+			forceShowActionBarOverflowMenu();
 
-			// Check if don't have modified set Job Queue to get all sessions after login
+			// Check if Pref don't have modified set Job Queue to get all sessions after login
 			String lastModifiedDate = PreferencesUtil.getPrefsValue(this, PreferencesUtil.PREF_MODIFIED_DATE);
 			if (lastModifiedDate.isEmpty()) {
-				jobManager = new JobManager(getApplicationContext());
+				JobManager jobManager = App.getJobManager();
 				jobManager.addJobInBackground(new GetAllSessionsJob(this, lastModifiedDate));
 			}
 		}
-	}
-
-	public void onEventMainThread(SessionsFetchedEvent gotAllSessionEvent) {
-		Toast.makeText(this, "Got all Session", Toast.LENGTH_SHORT);
 	}
 
 	/**
@@ -158,36 +138,18 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 	public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
 	}
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		EventBus.getDefault().register(this);
+	private void forceShowActionBarOverflowMenu() {
+		try {
+			ViewConfiguration config = ViewConfiguration.get(this);
+			Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+			if (menuKeyField != null) {
+				menuKeyField.setAccessible(true);
+				menuKeyField.setBoolean(config, false);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
-
-	@Override
-	protected void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
-	}
-
-    @OptionsItem(R.id.mnu_logout)
-    void logout() {
-        // TODO: logout
-        Logger.Log("menu item logout clicked");
-    }
-
-    private void forceShowActionBarOverflowMenu() {
-        try {
-            ViewConfiguration config = ViewConfiguration.get(this);
-            Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
-            if (menuKeyField != null) {
-                menuKeyField.setAccessible(true);
-                menuKeyField.setBoolean(config, false);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }
 
 class ViewPagerAdapter extends FragmentPagerAdapter {
