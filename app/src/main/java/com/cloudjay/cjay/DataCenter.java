@@ -15,7 +15,6 @@ import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
-import com.cloudjay.cjay.model.WorkingSession;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -37,7 +36,8 @@ import de.greenrobot.event.EventBus;
 @EBean(scope = EBean.Scope.Singleton)
 public class DataCenter {
 
-	//region DECLARE
+	// region DECLARE
+
 	// Inject the rest client
 	@Bean
 	NetworkClient networkClient;

@@ -101,7 +101,7 @@ public class SessionAdapter extends ArrayAdapter<Session> {
         viewHolder.btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                App.getJobManager(context).addJobInBackground(new UploadSessionJob(context, session));
+                App.getJobManager().addJobInBackground(new UploadSessionJob(context, session));
 
             }
         });

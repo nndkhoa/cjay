@@ -14,6 +14,7 @@ import com.cloudjay.cjay.event.StopUpLoadEvent;
 import com.cloudjay.cjay.event.UploadedEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
@@ -104,6 +105,7 @@ public class UploadFragment extends Fragment {
 
     @UiThread
     public void onEvent(UploadedEvent event) {
+        Logger.e("Uploaded event");
         Session session = null;
         try {
             Session oldSession = null;

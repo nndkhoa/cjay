@@ -69,7 +69,7 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 			// Check if Pref don't have modified set Job Queue to get all sessions after login
 			String lastModifiedDate = PreferencesUtil.getPrefsValue(this, PreferencesUtil.PREF_MODIFIED_DATE);
 			if (lastModifiedDate.isEmpty()) {
-				JobManager jobManager = App.getJobManager(getApplicationContext());
+				JobManager jobManager = App.getJobManager();
 				jobManager.addJobInBackground(new GetAllSessionsJob(this, lastModifiedDate));
 			}
 		}
