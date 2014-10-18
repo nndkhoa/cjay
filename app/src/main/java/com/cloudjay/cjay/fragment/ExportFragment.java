@@ -110,7 +110,11 @@ public class ExportFragment extends Fragment {
     @UiThread
     void onEvent(ImageCapturedEvent event) {
         // Get gate images from realm
-        dataCenter.getGateImages(CJayConstant.TYPE_EXPORT, containerID);
+        try {
+            dataCenter.getGateImages(CJayConstant.TYPE_EXPORT, containerID);
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
     }
 
     @UiThread

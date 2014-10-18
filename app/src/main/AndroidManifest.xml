@@ -86,8 +86,12 @@
         <activity
             android:name=".activity.PhotoExpandableListViewActivity_"
             android:label="@string/title_activity_view_iimages_previous_steps"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
         </activity>
+        <!--<activity
+            android:name=".activity.MyActivity"
+            android:label="@string/title_activity_my" >
+        </activity>-->
     </application>
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />

@@ -21,10 +21,13 @@ public class CJayConstant {
 	//For save and query in db
 	public static final String OPERATOR_KEY = "OP";
 	public static final String WORKING_DB = "Working";
+    public static final String UPLOADING_DB = "Uploading";
+	public static final String USER_KEY = "USER";
 
 	// `/sdcard/DCMI/CJay/`
 	public static final File APP_DIRECTORY_FILE = new File(
 			Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
 			CJayConstant.APP_DIRECTORY);
+
 
 }

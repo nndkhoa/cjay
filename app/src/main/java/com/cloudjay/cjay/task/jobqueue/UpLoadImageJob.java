@@ -2,14 +2,15 @@ package com.cloudjay.cjay.task.jobqueue;
 
 import android.content.Context;
 
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.api.NetworkClient_;
-import com.cloudjay.cjay.event.ResumeUpLoadEvent;
+import com.cloudjay.cjay.event.UpLoadingEvent;
+import com.cloudjay.cjay.event.StartUpLoadEvent;
 import com.cloudjay.cjay.event.StopUpLoadEvent;
-import com.cloudjay.cjay.event.UploadedEvent;
-import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
+import com.snappydb.SnappydbException;
 
 import de.greenrobot.event.EventBus;
 
@@ -27,8 +28,6 @@ public class UpLoadImageJob extends Job {
     public UpLoadImageJob(Context context, String uri, String imageName, String containerId) {
         super(new Params(2).requireNetwork().groupBy(containerId));
 
-        Logger.e("uri in UpLoadImageJob: " + uri);
-
         this.context = context;
         this.containerId =containerId;
         this.uri = uri;
@@ -37,18 +36,20 @@ public class UpLoadImageJob extends Job {
 
     @Override
     public void onAdded() {
-        Logger.d("Added Upload Image Job");
+        try {
+            DataCenter_.getInstance_(context).addUploadingSession(containerId);
+            EventBus.getDefault().post(new StartUpLoadEvent(containerId));
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
 
     }
 
     @Override
     public void onRun() throws Throwable {
-        EventBus.getDefault().post(new ResumeUpLoadEvent());
+        EventBus.getDefault().post(new UpLoadingEvent());
+        DataCenter_.getInstance_(context).uploadImage(context, uri,imageName, containerId);
 
-        NetworkClient networkClient = NetworkClient_.getInstance_(context);
-        networkClient.uploadImage(context, uri,imageName);
-        Logger.e("Upload Image " + containerId);
-        EventBus.getDefault().post(new UploadedEvent());
 
     }
 

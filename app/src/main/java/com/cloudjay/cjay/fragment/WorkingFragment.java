@@ -8,6 +8,7 @@ import android.widget.TextView;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.SessionAdapter;
+import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -54,11 +55,6 @@ public class WorkingFragment extends Fragment {
     @Override
     public void onDestroy() {
         EventBus.getDefault().unregister(this);
-        try {
-            App.getSnappyDB(getActivity()).close();
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
         super.onDestroy();
     }
 
@@ -86,10 +82,29 @@ public class WorkingFragment extends Fragment {
 
     @UiThread
     public void onEvent(WorkingSessionCreatedEvent event) {
-        Logger.e("WorkingSessionCreatedEvent");
         Session session = null;
         try {
             session = App.getSnappyDB(getActivity()).getObject(CJayConstant.WORKING_DB+event.getWorkingSession().getContainerId(), Session.class);
+            workingSessionList.add(session);
+            mAdapter.setData(workingSessionList);
+            mAdapter.notifyDataSetChanged();
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+
+    }
+    @UiThread
+    public void onEvent(ImageCapturedEvent event) {
+        Session session = null;
+        try {
+            Session oldSession = null;
+            session = App.getSnappyDB(getActivity()).getObject(CJayConstant.WORKING_DB+event.getContainerId(), Session.class);
+            for (Session session1 : workingSessionList){
+                if (session1.getContainerId().equals(event.getContainerId())){
+                    oldSession =session1;
+                }
+            }
+            workingSessionList.remove(oldSession);
             workingSessionList.add(session);
             mAdapter.setData(workingSessionList);
             mAdapter.notifyDataSetChanged();

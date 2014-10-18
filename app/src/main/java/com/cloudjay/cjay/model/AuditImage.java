@@ -17,6 +17,16 @@ public class AuditImage {
     @Expose
     private String url;
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    private String name;
+
     private boolean uploaded;
 
     public boolean isUploaded() {

@@ -1,12 +1,12 @@
 package com.cloudjay.cjay.event;
 
 /**
- * User for update list of image capture and session in working fragment
+ * Created by thai on 16/10/2014.
  */
-public class ImageCapturedEvent {
+public class StartUpLoadEvent {
     private String containerId;
 
-    public ImageCapturedEvent(String containerId) {
+    public StartUpLoadEvent(String containerId) {
         this.containerId= containerId;
     }
 
