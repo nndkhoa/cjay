@@ -2,56 +2,95 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     tools:context="com.cloudjay.cjay.activity.ReuseActivity">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/ll_bottom"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="9dp">
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:id="@+id/tv_container_code"
-            android:textSize="24dp"
-            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:paddingBottom="3dp"
-            android:text="ABCD1234567 - B" />
+            android:text="ABCD1234567"
+            android:textColor="@color/background_button_and_line"
+            android:textSize="24dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_divider_line"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/tv_container_code"
+            android:paddingBottom="3dp"
+            android:text=" - "
+            android:textColor="@color/background_button_and_line"
+            android:textSize="24dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_current_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/tv_divider_line"
+            android:paddingBottom="3dp"
+            android:text="B"
+            android:textColor="@color/background_button_and_line"
+            android:textSize="24dp"
+            android:textStyle="bold" />
 
         <View
+            android:id="@+id/v_line"
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:background="#000"
-            android:layout_marginBottom="6dp"/>
+            android:layout_below="@+id/tv_container_code"
+            android:layout_marginBottom="6dp"
+            android:background="@color/background_button_and_line" />
 
         <TextView
+            android:id="@+id/tv_import_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/v_line"
             android:paddingBottom="3dp"
-            android:text="Hình nhập" />
+            android:text="Hình nhập"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <GridView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:id="@+id/gv_reuse_images"
-            android:numColumns="2">
-        </GridView>
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:numColumns="auto_fit"
+            android:verticalSpacing="1dp"
+            android:horizontalSpacing="1dp"
+            android:columnWidth="100dp"
+            android:stretchMode="columnWidth"
+            android:gravity="center"
+            tools:listitem="@layout/item_gridview_photo_multi_select"
+            android:layout_below="@+id/tv_import_label"/>
 
-
-    </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
+        android:id="@+id/ll_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
 
         <Button
+            android:id="@+id/btn_done"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_continue"
-            android:text="Chọn các hình trên"/>
+            android:background="@color/background_button_and_line"
+            android:text="Chọn các hình trên"
+            android:textColor="@android:color/white" />
 
     </LinearLayout>
 

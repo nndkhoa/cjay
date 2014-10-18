@@ -8,10 +8,12 @@ import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
+import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.model.WorkingSession;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -167,6 +169,7 @@ public class DataCenter {
         session.setOperatorCode(operatorCode);
         session.setCheckInTime(checkInTime);
         session.setPreStatus(preStatus);
+        session.setStatus(0);
         try {
             App.getSnappyDB(context).put(containerId, session);
             addWorkingId(context, containerId);
@@ -216,20 +219,26 @@ public class DataCenter {
         App.closeSnappyDB();
     }
 
-    public void getGateImages(long type, String containerId) throws SnappydbException {
+    @Background(serial = CACHE)
+    public void getGateImages(long type, String containerId) {
         Logger.Log("type = " + type + ", containerId = " + containerId);
-        Session session = App.getSnappyDB(context).getObject(containerId, Session.class);
-        List<GateImage> gateImagesFiltered = new ArrayList<GateImage>();
+        Session session = null;
+        try {
+            session = App.getSnappyDB(context).getObject(containerId, Session.class);
+            List<GateImage> gateImagesFiltered = new ArrayList<GateImage>();
 
-        List<GateImage> gateImages = session.getGateImages();
-        for (GateImage g : gateImages) {
-            if (g.getType() == type) {
-                gateImagesFiltered.add(g);
+            List<GateImage> gateImages = session.getGateImages();
+            for (GateImage g : gateImages) {
+                if (g.getType() == type) {
+                    gateImagesFiltered.add(g);
+                }
             }
+            Logger.Log("gate images count in dataCenter: " + gateImagesFiltered.size());
+            EventBus.getDefault().post(new GateImagesGotEvent(gateImagesFiltered));
+            App.closeSnappyDB();
+        } catch (SnappydbException e) {
+            e.printStackTrace();
         }
-        Logger.Log("gate images count in dataCenter: " + gateImagesFiltered.size());
-        EventBus.getDefault().post(new GateImagesGotEvent(gateImagesFiltered));
-        App.closeSnappyDB();
     }
 
     public void searchOperator(String keyword) throws SnappydbException {
@@ -273,5 +282,26 @@ public class DataCenter {
         } catch (SnappydbException e) {
             e.printStackTrace();
         }
+    }
+
+    public void addAuditImages(String containerId, long type, String url) throws SnappydbException {
+        Session session = App.getSnappyDB(context).getObject(containerId, Session.class);
+        AuditImage auditImage = new AuditImage();
+        auditImage.setId(0);
+        auditImage.setType(type);
+        auditImage.setUrl(url);
+        auditImage.setUploaded(false);
+
+        List<AuditImage> auditImages = session.getAuditImages();
+        if (auditImages == null) {
+            auditImages = new ArrayList<AuditImage>();
+        }
+        auditImages.add(auditImage);
+        session.setAuditImages(auditImages);
+
+        App.getSnappyDB(context).put(containerId, session);
+
+        Logger.Log("insert audit image successfully");
+        App.closeSnappyDB();
     }
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/item_select_all"
+        android:title="Chọn hết"/>
+
+    <item
+        android:id="@+id/item_unselect_all"
+        android:title="Bỏ chọn hết" />
+</menu>
