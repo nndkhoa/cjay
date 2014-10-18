@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.StrictMode;
+import android.util.Log;
 
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -11,6 +12,8 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.path.android.jobqueue.JobManager;
+import com.path.android.jobqueue.config.Configuration;
+import com.path.android.jobqueue.log.CustomLogger;
 import com.snappydb.DB;
 import com.snappydb.DBFactory;
 import com.snappydb.SnappydbException;
@@ -32,14 +35,14 @@ public class App extends Application {
         return instance;
     }
 
-    public static JobManager getJobManager(Context context) {
-        if (jobManager == null) {
-            OnViewChangedNotifier previousNotifier = OnViewChangedNotifier.replaceNotifier(null);
-            jobManager = new JobManager(context);
-            OnViewChangedNotifier.replaceNotifier(previousNotifier);
-        }
-        return jobManager;
-    }
+//    public static JobManager getJobManager(Context context) {
+//        if (jobManager == null) {
+//            OnViewChangedNotifier previousNotifier = OnViewChangedNotifier.replaceNotifier(null);
+//            jobManager = new JobManager(context);
+//            OnViewChangedNotifier.replaceNotifier(previousNotifier);
+//        }
+//        return jobManager;
+//    }
 
     public static DB getSnappyDB(Context context) throws SnappydbException {
         snappydb = DBFactory.open(context, "Thai");
@@ -74,7 +77,43 @@ public class App extends Application {
 
         // init image loader with config defined
         ImageLoader.getInstance().init(config);
+        configureJobManager();
 
         //		Crashlytics.start(this);
+    }
+
+    private void configureJobManager() {
+        Configuration configuration = new Configuration.Builder(this)
+                .customLogger(new CustomLogger() {
+                    private static final String TAG = "JOBS";
+                    @Override
+                    public boolean isDebugEnabled() {
+                        return true;
+                    }
+
+                    @Override
+                    public void d(String text, Object... args) {
+                        Log.d(TAG, String.format(text, args));
+                    }
+
+                    @Override
+                    public void e(Throwable t, String text, Object... args) {
+                        Log.e(TAG, String.format(text, args), t);
+                    }
+
+                    @Override
+                    public void e(String text, Object... args) {
+                        Log.e(TAG, String.format(text, args));
+                    }
+                })
+                .minConsumerCount(1)//always keep at least one consumer alive
+                .maxConsumerCount(3)//up to 3 consumers at a time
+                .loadFactor(3)//3 jobs per consumer
+                .consumerKeepAlive(120)//wait 2 minute
+                .build();
+        jobManager = new JobManager(this, configuration);
+    }
+    public static JobManager getJobManager() {
+        return jobManager;
     }
 }

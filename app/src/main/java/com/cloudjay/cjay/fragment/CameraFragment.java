@@ -292,7 +292,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 			// 2.upload image
 
-			App.getJobManager(getActivity()).addJobInBackground(new UpLoadImageJob(getActivity(), uri, imageName, containerId));
+			App.getJobManager().addJob(new UpLoadImageJob(getActivity(), uri, imageName, containerId));
 		}
 
 		void saveBitmapToFile(Bitmap bitmap, File filename) {
