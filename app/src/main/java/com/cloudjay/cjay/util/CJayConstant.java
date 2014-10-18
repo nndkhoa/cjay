@@ -20,9 +20,12 @@ public class CJayConstant {
 
 	//For save and query in db
 	public static final String OPERATOR_KEY = "OP";
-	public static final String WORKING_DB = "Working";
-    public static final String UPLOADING_DB = "Uploading";
+	public static final String WORKING_DB = "WORKING";
+	public static final String UPLOADING_DB = "UPLOADING";
 	public static final String USER_KEY = "USER";
+	public static final String DAMAGE_CODE_KEY = "DAMAGE";
+	public static final String REPAIR_CODE_KEY = "REPAIR";
+	public static final String COMPONENT_CODE_KEY = "COMPONENT";
 
 	// `/sdcard/DCMI/CJay/`
 	public static final File APP_DIRECTORY_FILE = new File(

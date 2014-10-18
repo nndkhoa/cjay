@@ -10,6 +10,7 @@ import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.event.UploadedEvent;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.model.GateImage;
+import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
@@ -17,8 +18,8 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
+import com.snappydb.DB;
 import com.snappydb.DBFactory;
-import com.snappydb.SnappyDB;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.Background;
@@ -34,26 +35,28 @@ import de.greenrobot.event.EventBus;
 @EBean(scope = EBean.Scope.Singleton)
 public class DataCenter {
 
+	//region DECLARE
 	// Inject the rest client
 	@Bean
 	NetworkClient networkClient;
 
-	static SnappyDB db;
+	static DB db;
+	Context context;
 
 	public static final String NETWORK = "NETWORK";
 	public static final String CACHE = "CACHE";
 
-	Context context;
-
 	public DataCenter(Context context) {
 		this.context = context;
 		try {
-			db = (SnappyDB) DBFactory.open(context);
+			db = DBFactory.open(context);
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
 	}
+	//endregion
 
+	//region USER
 	public String getToken(String email, String password) {
 		return networkClient.getToken(email, password);
 	}
@@ -81,7 +84,16 @@ public class DataCenter {
 
 		return user;
 	}
+	//endregion
 
+	//region OPERATOR
+
+	/**
+	 * Fetch and save all operators to database
+	 *
+	 * @param context
+	 * @throws SnappydbException
+	 */
 	public void fetchOperators(Context context) throws SnappydbException {
 		List<Operator> operators = networkClient.getOperators(context, null);
 		for (Operator operator : operators) {
@@ -89,24 +101,76 @@ public class DataCenter {
 		}
 	}
 
-	public void fetchIsoCodes(Context context) {
-		//TODO: Add iso code to database @Thai
-		networkClient.getDamageCodes(context, null);
-		networkClient.getRepairCodes(context, null);
-		networkClient.getComponentCodes(context, null);
-	}
 
-	@Trace
+	/**
+	 * Get all operators from client database
+	 */
+	@Background(serial = CACHE)
+	public void getOperators() throws SnappydbException {
+
+		// Search on local db
+		List<Operator> operators = new ArrayList<Operator>();
+		String[] keysResult = App.getSnappyDB(context).findKeys(CJayConstant.OPERATOR_KEY);
+		for (String key : keysResult) {
+			Operator foundOperator = App.getSnappyDB(context).getObject(key, Operator.class);
+			operators.add(foundOperator);
+		}
+		EventBus.getDefault().post(new OperatorsGotEvent(operators));
+	}
+	//endregion
+
+	//region ISO CODE
+
+	/**
+	 * Fetch and save all iso codes to database
+	 *
+	 * @param context
+	 * @throws SnappydbException
+	 */
+	public void fetchIsoCodes(Context context) throws SnappydbException {
+		List<IsoCode> damageCodes = networkClient.getDamageCodes(context, null);
+		for (IsoCode code : damageCodes) {
+			String key = CJayConstant.DAMAGE_CODE_KEY + code.getCode();
+			db.put(key, code);
+		}
+
+		List<IsoCode> repairCodes = networkClient.getRepairCodes(context, null);
+		for (IsoCode code : repairCodes) {
+			String key = CJayConstant.REPAIR_CODE_KEY + code.getCode();
+			db.put(key, code);
+		}
+
+		List<IsoCode> componentCodes = networkClient.getComponentCodes(context, null);
+		for (IsoCode code : componentCodes) {
+			String key = CJayConstant.COMPONENT_CODE_KEY + code.getCode();
+			db.put(key, code);
+		}
+	}
+	//endregion
+
+	/**
+	 * Fetch all container session with last modified datetime
+	 *
+	 * @param context
+	 * @param lastModifiedDate
+	 * @throws SnappydbException
+	 */
 	public void fetchSession(Context context, String lastModifiedDate) throws SnappydbException {
 		List<Session> sessions = networkClient.getAllSessions(context, lastModifiedDate);
 		for (Session session : sessions) {
-			Logger.e("Added: " + session.getContainerId());
-			App.getSnappyDB(context).put(session.getContainerId(), session);
+			String key = session.getContainerId();
+			App.getSnappyDB(context).put(key, session);
 		}
 	}
 
 	/**
-	 * Search on local db / snappy
+	 * Search container session from device database.
+	 * <p/>
+	 * > FLOW
+	 * <p/>
+	 * 1. Tìm kiếm từ database với keyword được cung cấp(không hỗ trợ full text search)
+	 * 2. Post kết quả tìm được (nếu có) thông qua EventBus
+	 * 3. Nếu không tìm thấy ở trên client thì tiến hành search ở server.
 	 *
 	 * @param context
 	 * @param keyword
@@ -114,68 +178,63 @@ public class DataCenter {
 	@Trace
 	@Background(serial = CACHE)
 	public void search(Context context, String keyword) {
-
-		Logger.Log("Begin search: " + keyword);
 		String[] keysResult;
+
 		try {
+
+			// try to search from client database
 			keysResult = App.getSnappyDB(context).findKeys(keyword);
 			List<Session> sessions = new ArrayList<Session>();
 			for (String result : keysResult) {
-				sessions.add(App.getSnappyDB(context).getObject(result, Session.class));
+				Session session = App.getSnappyDB(context).getObject(result, Session.class);
+				sessions.add(session);
 			}
+
+			// Check if local search has results
 			if (sessions.size() != 0) {
 				EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
+
 			} else {
-				// TODO: @thai need to alert to user about that no results was found in local
+
 				// If there was not result in local, send search request to server
-				EventBus.getDefault().post(new BeginSearchOnServerEvent(
-						context.getResources().getString(R.string.search_on_server)));
+				//  --> alert to user about that no results was found in local
+				EventBus.getDefault().post(new BeginSearchOnServerEvent(context.getResources().getString(R.string.search_on_server)));
 				searchAsync(context, keyword);
-
 			}
-
 		} catch (SnappydbException e) {
-			e.printStackTrace();
+			Logger.e(e.getMessage());
 		}
-
 	}
 
+	/**
+	 * Search container session từ server
+	 * <p/>
+	 * > FLOW
+	 * <p/>
+	 * 1. Call NetworkClient#search để lấy list container sessions từ server
+	 * 2. Post kết quả trả về thông qua EventBus
+	 *
+	 * @param context
+	 * @param keyword
+	 */
 	@Background(serial = NETWORK)
 	public void searchAsync(Context context, String keyword) {
-		Logger.Log("Begin to search container from server");
-		List<Session> sessions = networkClient.searchSessions(context, keyword);
-		if (sessions.size() != 0) {
-			for (Session session : sessions) {
-				try {
-					App.getSnappyDB(context).put(session.getContainerId(), session);
-				} catch (SnappydbException e) {
-					e.printStackTrace();
+
+		try {
+			Logger.Log("Begin to search container from server");
+			List<Session> sessions = networkClient.searchSessions(context, keyword);
+
+			if (sessions.size() != 0) {
+				for (Session session : sessions) {
+					String key = session.getContainerId();
+					App.getSnappyDB(context).put(key, session);
 				}
 			}
+
 			EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
-		} else {
-			EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
-		}
-	}
-
-	@Background(serial = CACHE)
-	public void getOperators() {
-
-		// Search on local db
-		List<Operator> operators = new ArrayList<Operator>();
-		String[] keysresult;
-		try {
-			keysresult = App.getSnappyDB(context).findKeys(CJayConstant.OPERATOR_KEY);
-			for (String result : keysresult) {
-				operators.add(App.getSnappyDB(context).getObject(result, Operator.class));
-			}
-			//App.closeSnappyDB();
-			EventBus.getDefault().post(new OperatorsGotEvent(operators));
-
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	@Background(serial = CACHE)
@@ -221,7 +280,6 @@ public class DataCenter {
 	public void addGateImage(long type, String url, String containerId, String imageName) throws SnappydbException {
 		addGateImageToNormalSession(type, url, containerId, imageName);
 		addGateImageToWorkingSession(type, url, containerId, imageName);
-
 	}
 
 	private void addGateImageToWorkingSession(long type, String url, String containerId, String imageName) throws SnappydbException {
@@ -348,7 +406,8 @@ public class DataCenter {
 	 */
 	public void uploadContainerSession(Context context, Session session) throws SnappydbException {
 		networkClient.uploadContainerSession(context, session);
-		Session sessionUploaded = App.getSnappyDB(context).getObject(CJayConstant.UPLOADING_DB + session.getContainerId(), Session.class);
+		String key = CJayConstant.UPLOADING_DB + session.getContainerId();
+		Session sessionUploaded = App.getSnappyDB(context).getObject(key, Session.class);
 		sessionUploaded.setUploaded(true);
 		App.getSnappyDB(context).put(CJayConstant.UPLOADING_DB + session + session.getContainerId(), sessionUploaded);
 	}
