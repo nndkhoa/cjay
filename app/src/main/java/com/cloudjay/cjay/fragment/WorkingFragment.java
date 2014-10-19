@@ -73,6 +73,7 @@ public class WorkingFragment extends Fragment {
         } catch (SnappydbException e) {
             e.printStackTrace();
         }
+
         mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
         mAdapter.setData(workingSessionList);
         lvWorking.setAdapter(mAdapter);
@@ -81,7 +82,7 @@ public class WorkingFragment extends Fragment {
 
     @UiThread
     public void onEvent(WorkingSessionCreatedEvent event) {
-        Session session = null;
+        Session session;
         try {
             session = App.getDB(getActivity()).getObject(CJayConstant.WORKING_DB+event.getWorkingSession().getContainerId(), Session.class);
             workingSessionList.add(session);

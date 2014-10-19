@@ -8,6 +8,7 @@ import android.view.Window;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.PreferencesUtil;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
@@ -29,8 +30,14 @@ public class BaseActivity extends FragmentActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		//getMenuInflater().inflate(R.menu.base, menu);
-//		menu.findItem(R.id.menu_username).setTitle();
+		getMenuInflater().inflate(R.menu.base, menu);
+
+		String name = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_USER_NAME);
+		String roleName = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_USER_ROLE_NAME);
+
+		menu.findItem(R.id.menu_username).setTitle(name);
+		menu.findItem(R.id.menu_role).setTitle(roleName);
+		
 		return true;
 	}
 

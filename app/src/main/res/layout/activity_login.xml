@@ -80,41 +80,52 @@
 					android:padding="16dp"
 					android:orientation="vertical">
 
+					<!--<EditText-->
+						<!--android:layout_width="match_parent"-->
+						<!--android:layout_height="wrap_content"-->
+						<!--android:padding="12dp"-->
+						<!--android:id="@+id/email"-->
+						<!--android:maxLength="11"-->
+						<!--android:inputType="textCapCharacters|textNoSuggestions"-->
+						<!--android:selectAllOnFocus="true"-->
+						<!--android:hint="@string/fragment_search_hint_et_search"-->
+						<!--android:background="@android:drawable/editbox_dropdown_light_frame"-->
+						<!--android:singleLine="true"-->
+						<!--android:textSize="18sp"-->
+						<!--android:layout_marginBottom="6dp"-->
+						<!--android:imeOptions="actionSearch"/>-->
+
 					<EditText
 						android:id="@+id/email"
 						android:layout_width="match_parent"
-						android:layout_height="48dp"
+						android:layout_height="wrap_content"
 						android:layout_marginBottom="6dp"
-						android:background="@android:drawable/edit_text"
+						android:background="@android:drawable/editbox_dropdown_light_frame"
 						android:hint="@string/prompt_email"
 						android:inputType="textEmailAddress"
 						android:maxLines="1"
-						android:paddingBottom="12dp"
-						android:paddingLeft="12dp"
-						android:paddingRight="12dp"
+						android:padding="12dp"
 						android:singleLine="true"
 						android:textColor="@android:color/black"
 						android:textCursorDrawable="@null"
-						android:textSize="16sp"/>
+						android:textSize="18sp"/>
 
 					<EditText
 						android:id="@+id/password"
 						android:layout_width="match_parent"
-						android:layout_height="48dp"
+						android:layout_height="wrap_content"
 						android:layout_marginBottom="6dp"
-						android:background="@android:drawable/edit_text"
+						android:background="@android:drawable/editbox_dropdown_light_frame"
 						android:hint="@string/prompt_password"
 						android:imeActionLabel="@string/action_sign_in_short"
 						android:imeOptions="actionSend"
 						android:inputType="textPassword"
 						android:maxLines="1"
-						android:paddingBottom="12dp"
-						android:paddingLeft="12dp"
-						android:paddingRight="12dp"
+						android:padding="12dp"
 						android:singleLine="true"
 						android:textColor="@android:color/black"
 						android:textCursorDrawable="@null"
-						android:textSize="16sp"/>
+						android:textSize="18sp"/>
 
 					<Button
 						android:id="@+id/btn_login"
