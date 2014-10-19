@@ -111,7 +111,7 @@ public class Utils {
     public static Session parseSession(Context context, Session session) throws SnappydbException {
 
         //Check available session
-        DB snappyDb = App.getSnappyDB(context);
+        DB snappyDb = App.getDB(context);
         Session found = snappyDb.getObject(session.getContainerId(), Session.class);
 
         // If hasn't -> create

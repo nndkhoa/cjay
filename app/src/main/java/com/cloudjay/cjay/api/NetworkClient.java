@@ -44,7 +44,7 @@ public class NetworkClient {
 		this.context = context;
 	}
 
-	//region User
+	//region USER
 	public String getToken(String username, String password) throws RetrofitError {
 
 		JsonObject tokenJson;
@@ -72,15 +72,29 @@ public class NetworkClient {
 	}
 	//endregion
 
-	public Response uploadImage(Context context, String uri, String imageName) {
-		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.CJAY_TMP_STORAGE).build();
-		File image = new File(uri);
-		TypedFile typedFile = new TypedFile("image/jpeg", image);
-		Response response = restAdapter.create(NetworkService.class).postImageFile("image/jpeg", "media", imageName, typedFile);
-		Logger.e("Uploaded Image");
-		return response;
+	//region IMAGE
 
+	/**
+	 * Upload an image to Google Cloud Storage
+	 *
+	 * @param uri
+	 * @param imageName
+	 * @return
+	 */
+	public Response uploadImage(String uri, String imageName) {
+
+		// Init explicit rest adapter for upload to Google Cloud Storage
+		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.CJAY_TMP_STORAGE).build();
+		File imageFile = new File(uri);
+		TypedFile typedFile = new TypedFile("image/jpeg", imageFile);
+
+		// Begin to post image
+		Response response = restAdapter.create(NetworkService.class).postImageFile("image/jpeg", "media", imageName, typedFile);
+		return response;
 	}
+	//endregion
+
+	//region ISO CODE
 
 	/**
 	 * Get repair iso codes based on lastModifiedDate
@@ -90,10 +104,8 @@ public class NetworkClient {
 	 * @return
 	 */
 	public List<IsoCode> getRepairCodes(Context context, String lastModifiedDate) {
-
 		List<IsoCode> results = provider.getRestAdapter(context).create(NetworkService.class).getRepairCodes
 				(lastModifiedDate);
-
 		return results;
 	}
 
@@ -137,8 +149,15 @@ public class NetworkClient {
 
 		return result;
 	}
+	//endregion
 
-	public Session getContainerSessionById(int id) {
+	/**
+	 * Get session by id
+	 *
+	 * @param id
+	 * @return
+	 */
+	public Session getSessionById(int id) {
 		Session result = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionById(id);
 		if (id != result.getId()) {
 			return null;
@@ -154,7 +173,7 @@ public class NetworkClient {
 		JsonElement next;
 
 		// If get by day, get fist page query by day
-		// => get page form key "next"
+		// => get page from key "next"
 		// => get all page after that page
 		if (!TextUtils.isEmpty(modifiedDate)) {
 
@@ -167,7 +186,6 @@ public class NetworkClient {
 
 			//get page number of fist page
 			int page = Integer.parseInt(nextString.substring(nextString.lastIndexOf("=") + 1));
-			Logger.e(String.valueOf(page));
 
 			//get all session have page number greater then fist page
 			List<Session> sessionsByPage = this.getAllSessionsByPage(context, page);
@@ -184,41 +202,49 @@ public class NetworkClient {
 		//If not, get all sessions start form page 1
 		else {
 			Logger.Log("Fetching all page");
-			sessions = getAllSessionsByPage(context, 55);
+			sessions = getAllSessionsByPage(context, 1);
 		}
 
 		return sessions;
 	}
 
+	/**
+	 * Get all container sessions from server with input page.
+	 * <p/>
+	 * Trong khi còn có thể lấy được kết quả (next != null), thực hiện tăng trang và tiếp tục quá trình.
+	 *
+	 * @param context
+	 * @param page
+	 * @return
+	 */
 	public List<Session> getAllSessionsByPage(Context context, int page) {
 
 		List<Session> sessions = new ArrayList<Session>();
 		JsonElement next;
 		do {
 			JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionsByPage(page, null);
+
+			// Parse list sessions nằm bên trong key `results` của kết quả trả về
 			JsonArray results = jsonObject.getAsJsonArray("results");
 			next = jsonObject.get("next");
-
-			//get page number of fist page
-//            String nextString = next.toString();
-//            int currentPage = Integer.parseInt(nextString.substring(nextString.lastIndexOf("=") + 1));
-			Logger.e(String.valueOf(next.toString()));
 
 			Gson gson = new Gson();
 			Type listType = new TypeToken<List<Session>>() {
 			}.getType();
+
 			List<Session> sessionsPage = gson.fromJson(results, listType);
 			sessions.addAll(sessionsPage);
 			page = page + 1;
+
 		} while (!next.isJsonNull());
 
-		Logger.e(String.valueOf(sessions.size()));
-		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, StringHelper.getCurrentTimestamp(CJayConstant.DAY_TIME_FORMAT));
+		// Store the datetime that complete parsing process
+		String currentTime = StringHelper.getCurrentTimestamp(CJayConstant.DAY_TIME_FORMAT);
+		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, currentTime);
 		return sessions;
 	}
 
 	public List<Session> searchSessions(Context context, String keyword) {
-
 
 		List<Session> sessions = new ArrayList<Session>();
 		JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).searchContainer(keyword);
@@ -237,6 +263,6 @@ public class NetworkClient {
 
 		Session uploadedSession = provider.getRestAdapter(context).create(NetworkService.class).postContainer(containerSession.getJsonSession());
 
-		return null;
+		return uploadedSession;
 	}
 }

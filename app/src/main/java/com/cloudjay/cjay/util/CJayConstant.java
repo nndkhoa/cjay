@@ -6,6 +6,9 @@ import java.io.File;
 
 public class CJayConstant {
 
+	// Database
+	public static final String DB_NAME = "cjay";
+
 	// File path
 	public static final String APP_DIRECTORY = "CJay";
 	public static final String BACK_UP_DIRECTORY = ".backup";

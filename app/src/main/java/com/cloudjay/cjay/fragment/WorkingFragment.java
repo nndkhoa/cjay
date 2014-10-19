@@ -12,7 +12,6 @@ import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.Logger;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
@@ -35,7 +34,7 @@ public class WorkingFragment extends Fragment {
     @ViewById(R.id.lv_working_container)
     ListView lvWorking;
 
-    @ViewById(R.id.tv_emptylist_working)
+    @ViewById(R.id.tv_empty_list_working)
     TextView tvEmpty;
 
     private SessionAdapter mAdapter;
@@ -66,9 +65,9 @@ public class WorkingFragment extends Fragment {
         workingSessionList = new ArrayList<Session>();
 
         try {
-            String[] listWorkingId = App.getSnappyDB(getActivity()).findKeys(CJayConstant.WORKING_DB);
+            String[] listWorkingId = App.getDB(getActivity()).findKeys(CJayConstant.WORKING_DB);
             for (String workingId : listWorkingId) {
-                Session session = App.getSnappyDB(getActivity()).getObject(workingId, Session.class);
+                Session session = App.getDB(getActivity()).getObject(workingId, Session.class);
                 workingSessionList.add(session);
             }
         } catch (SnappydbException e) {
@@ -84,7 +83,7 @@ public class WorkingFragment extends Fragment {
     public void onEvent(WorkingSessionCreatedEvent event) {
         Session session = null;
         try {
-            session = App.getSnappyDB(getActivity()).getObject(CJayConstant.WORKING_DB+event.getWorkingSession().getContainerId(), Session.class);
+            session = App.getDB(getActivity()).getObject(CJayConstant.WORKING_DB+event.getWorkingSession().getContainerId(), Session.class);
             workingSessionList.add(session);
             mAdapter.setData(workingSessionList);
             mAdapter.notifyDataSetChanged();
@@ -98,7 +97,7 @@ public class WorkingFragment extends Fragment {
         Session session = null;
         try {
             Session oldSession = null;
-            session = App.getSnappyDB(getActivity()).getObject(CJayConstant.WORKING_DB+event.getContainerId(), Session.class);
+            session = App.getDB(getActivity()).getObject(CJayConstant.WORKING_DB+event.getContainerId(), Session.class);
             for (Session session1 : workingSessionList){
                 if (session1.getContainerId().equals(event.getContainerId())){
                     oldSession =session1;

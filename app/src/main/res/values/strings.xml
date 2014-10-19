@@ -131,5 +131,6 @@
     <string name="image_type_description_report">Hình Giám Định</string>
     <string name="image_type_description_repaired">Hình Sửa Chữa</string>
     <string name="title_activity_my">MyActivity</string>
+	<string name="no_working_item">No available items</string>
 
 </resources>

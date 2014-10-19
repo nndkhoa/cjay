@@ -163,6 +163,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 					Intent intent = new Intent(getApplicationContext(), HomeActivity_.class);
 					startActivity(intent);
 					finish();
+
 				} else {
 
 					Logger.w("Cannot fetch user information");

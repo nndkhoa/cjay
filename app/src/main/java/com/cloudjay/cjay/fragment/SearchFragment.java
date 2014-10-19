@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.InputType;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -30,8 +32,6 @@ import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.fragment.dialog.AddContainerDialog;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.Utils;
-import com.cloudjay.cjay.util.enums.Role;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -69,8 +69,8 @@ public class SearchFragment extends Fragment {
 	@ViewById(R.id.ll_search_result)
 	LinearLayout llSearchResult;
 
-    @ViewById(android.R.id.empty)
-    TextView tvEmptyView;
+	@ViewById(android.R.id.empty)
+	TextView tvEmptyView;
 	//endregion
 
 	Pattern pattern = Pattern.compile("^[a-zA-Z]{4}");
@@ -92,20 +92,40 @@ public class SearchFragment extends Fragment {
 
 	@Click(R.id.btn_search)
 	void buttonSearchClicked() {
-        if (!TextUtils.isEmpty(etSearch.getText())) {
-            performSearch();
-        } else {
-            etSearch.setError(getResources().getString(R.string.error_empty_search_string));
-        }
+		if (!TextUtils.isEmpty(etSearch.getText())) {
+			performSearch();
+		} else {
+			etSearch.setError(getResources().getString(R.string.error_empty_search_string));
+		}
 	}
 
 	@AfterViews
 	void doAfterViews() {
+
 		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
-        lvSearch.setEmptyView(tvEmptyView);
+		lvSearch.setEmptyView(tvEmptyView);
 		lvSearch.setAdapter(mAdapter);
+
 		//Set input type for role
 		setKeyboardBasedOnRole();
+	}
+
+	private void setKeyboardBasedOnRole() {
+
+		InputFilter filter = new InputFilter() {
+			@Override
+			public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+				for (int i = start; i < end; i++) {
+					if (!Character.isLetterOrDigit(source.charAt(i))) {
+						return "";
+					}
+				}
+				return null;
+			}
+		};
+
+		etSearch.setFilters(new InputFilter[]{filter});
+		etSearch.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
 		etSearch.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -116,71 +136,43 @@ public class SearchFragment extends Fragment {
 
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				if ((Utils.getRole(getActivity())) == Role.GATE.getValue()) {
-					Matcher matcher = pattern.matcher(s);
-					if (s.length() < 4) {
-						if (etSearch.getInputType() != InputType.TYPE_CLASS_TEXT) {
-							etSearch.setInputType(InputType.TYPE_CLASS_TEXT
-									| InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-						}
-					} else if (matcher.matches()) {
-						if (etSearch.getInputType() != InputType.TYPE_CLASS_NUMBER) {
-							etSearch.setInputType(InputType.TYPE_CLASS_NUMBER);
-						}
-					}
-				} else {
-					etSearch.setInputType(InputType.TYPE_CLASS_NUMBER);
-				}
+				Matcher matcher = pattern.matcher(s);
+				if (s.length() < 4) {
 
+					if (etSearch.getInputType() != InputType.TYPE_CLASS_TEXT) {
+						etSearch.setInputType(InputType.TYPE_CLASS_TEXT
+								| InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+					}
+
+				} else if (matcher.matches()) {
+					if (etSearch.getInputType() != InputType.TYPE_CLASS_NUMBER) {
+						etSearch.setInputType(InputType.TYPE_CLASS_NUMBER);
+					}
+				}
 			}
 
 			@Override
 			public void afterTextChanged(Editable s) {
-
 			}
 		});
 
-        etSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+		etSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
 
-                if (i == EditorInfo.IME_ACTION_SEARCH) {
-                    if (!TextUtils.isEmpty(etSearch.getText())) {
-                        performSearch();
-                    } else {
-                        etSearch.setError(getResources().getString(R.string.error_empty_search_string));
-                    }
-                    return true;
-                }
+				if (TextUtils.isEmpty(etSearch.getText())) {
+					etSearch.setError(getResources().getString(R.string.error_empty_search_string));
+					return true;
+				}
 
-                return false;
-            }
-        });
-	}
+				if (i == EditorInfo.IME_ACTION_SEARCH) {
+					performSearch();
+					return true;
+				}
 
-	private void setKeyboardBasedOnRole() {
-		if ((Utils.getRole(getActivity())) == Role.GATE.getValue()) {
-			etSearch.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-		} else {
-			etSearch.setInputType(InputType.TYPE_CLASS_NUMBER);
-		}
-	}
-
-	@UiThread
-	public void onEvent(ContainerSearchedEvent event) {
-
-		Logger.Log("onEvent ContainerSearchedEvent");
-
-		showProgress(false);
-		List<Session> result = event.getSessions();
-        mAdapter.clear();
-
-		if (result.size() != 0) {
-			mAdapter.addAll(result);
-			mAdapter.notifyDataSetChanged();
-		} else {
-			showSearchResultDialog(containerID);
-		}
+				return false;
+			}
+		});
 	}
 
 	@ItemClick(R.id.lv_search_container)
@@ -194,8 +186,13 @@ public class SearchFragment extends Fragment {
 		startActivity(intent);
 	}
 
+	/**
+	 * Hiển thị kết quả không tìm thấy container
+	 *
+	 * @param containerId
+	 */
 	private void showSearchResultDialog(final String containerId) {
-		Logger.Log("Result is null");
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(R.string.dialog_search_container_title);
 		builder.setMessage("Container ID với từ khóa " + containerId + " chưa được nhập vào hệ thống");
@@ -227,6 +224,43 @@ public class SearchFragment extends Fragment {
 		dialog.show();
 	}
 
+	private void showAddContainerDialog(String containerId) {
+		FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+		AddContainerDialog addContainerDialog_ = com.cloudjay.cjay.fragment.dialog.AddContainerDialog_
+				.builder().containerId(containerId).build();
+		addContainerDialog_.show(fragmentManager, "fragment_addcontainer");
+	}
+
+	private void performSearch() {
+		showProgress(true);
+		String keyword = etSearch.getText().toString();
+
+		// Start search in background
+		containerID = keyword;
+		dataCenter.search(getActivity(), keyword);
+	}
+
+	@UiThread
+	public void onEvent(ContainerSearchedEvent event) {
+
+		Logger.Log("onEvent ContainerSearchedEvent");
+
+		showProgress(false);
+		List<Session> result = event.getSessions();
+		mAdapter.clear();
+
+		if (result.size() != 0) {
+			mAdapter.addAll(result);
+			mAdapter.notifyDataSetChanged();
+		} else {
+			showSearchResultDialog(containerID);
+		}
+	}
+
+	@UiThread
+	public void onEvent(BeginSearchOnServerEvent event) {
+		Toast.makeText(getActivity(), event.getStringEvent(), Toast.LENGTH_SHORT).show();
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -239,25 +273,4 @@ public class SearchFragment extends Fragment {
 		EventBus.getDefault().unregister(this);
 		super.onDestroy();
 	}
-
-	private void showAddContainerDialog(String containerId) {
-		FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-		AddContainerDialog addContainerDialog_ = com.cloudjay.cjay.fragment.dialog.AddContainerDialog_
-				.builder().containerId(containerId).build();
-		addContainerDialog_.show(fragmentManager, "fragment_addcontainer");
-	}
-
-    private void performSearch() {
-        showProgress(true);
-        String keyword = etSearch.getText().toString();
-
-        // Start search in background
-        containerID = keyword;
-        dataCenter.search(getActivity(), keyword);
-    }
-
-    @UiThread
-    public void onEvent(BeginSearchOnServerEvent event) {
-        Toast.makeText(getActivity(), event.getStringEvent(), Toast.LENGTH_SHORT).show();
-    }
 }
