@@ -35,11 +35,10 @@ public class WizardActivity extends FragmentActivity {
 
 		Fragment fragment;
 		Step currentStep = Step.values()[((int) step)];
-
-
-        Logger.Log(currentStep + "");
+		Logger.Log(currentStep + "");
 
 		switch (currentStep) {
+
 			// Load fragment Audit
 			case AUDIT:
 			case REPAIR:
