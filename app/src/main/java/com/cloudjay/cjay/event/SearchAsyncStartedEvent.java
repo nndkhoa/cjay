@@ -1,16 +1,16 @@
 package com.cloudjay.cjay.event;
 
 /**
- * Created by nambv on 14/10/2014.
+ * Event được trigger khi bắt đầu search session từ SERVER.
  */
-public class BeginSearchOnServerEvent {
+public class SearchAsyncStartedEvent {
     public String beginSearchOnServer;
 
     public String getStringEvent() {
         return beginSearchOnServer;
     }
 
-    public BeginSearchOnServerEvent(String beginSearchOnServer) {
+    public SearchAsyncStartedEvent(String beginSearchOnServer) {
         this.beginSearchOnServer = beginSearchOnServer;
     }
 }

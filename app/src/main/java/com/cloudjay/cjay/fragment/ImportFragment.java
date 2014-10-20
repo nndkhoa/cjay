@@ -26,6 +26,7 @@ import com.cloudjay.cjay.event.OperatorCallbackEvent;
 import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
@@ -52,8 +53,6 @@ import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_import)
 public class ImportFragment extends Fragment {
-
-	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
 
 	//region Controls and Views
 	@ViewById(R.id.btn_camera)
@@ -87,6 +86,9 @@ public class ImportFragment extends Fragment {
 	ListView lvImages;
 	//endregion
 
+	//region ATTRIBUTE
+	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+
 	@Bean
 	DataCenter dataCenter;
 
@@ -97,7 +99,10 @@ public class ImportFragment extends Fragment {
 	Operator selectedOperator;
 	List<GateImage> gateImages = null;
 
-    long preStatus = 0;
+	long preStatus = 0;
+	Session currentSession;
+	//endregion
+
 
 	public ImportFragment() {
 	}
@@ -122,23 +127,24 @@ public class ImportFragment extends Fragment {
 		// Set operator to edit text
 		etOperator.setText(selectedOperator.getOperatorName());
 
-        // Get today
-        // create today String
-        String today = StringHelper.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
-
-		//Save session with containerId, operatorId, operatorCode, dateCreated, preStatus into snappy
-		dataCenter.addSession(containerID, selectedOperator.getOperatorCode(),
-                selectedOperator.getId(), today, preStatus);
+		// Ad
+		String currentTime = StringHelper.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
+		currentSession = new Session().withContainerId(containerID)
+				.withOperatorCode(selectedOperator.getOperatorCode())
+				.withOperatorId(selectedOperator.getId())
+				.withPreStatus(preStatus)
+				.withCheckInTime(currentTime);
+		dataCenter.addSession(currentSession);
 	}
 
 	@UiThread
 	void onEvent(ImageCapturedEvent event) {
-        try {
-            dataCenter.getGateImages(CJayConstant.TYPE_IMPORT, event.getContainerId());
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
-    }
+		try {
+			dataCenter.getGateImages(CJayConstant.TYPE_IMPORT, event.getContainerId());
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
 
 	@UiThread
 	void onEvent(GateImagesGotEvent event) {
@@ -154,7 +160,7 @@ public class ImportFragment extends Fragment {
 			lvImages.setAdapter(gateImageAdapter);
 		}
 
-        // Notify change
+		// Notify change
 		gateImageAdapter.swapData(gateImages);
 
 	}
@@ -162,8 +168,8 @@ public class ImportFragment extends Fragment {
 	@AfterViews
 	void doAfterViews() {
 
-        // Set ActionBar Title
-        getActivity().getActionBar().setTitle(R.string.fragment_import_title);
+		// Set ActionBar Title
+		getActivity().getActionBar().setTitle(R.string.fragment_import_title);
 
 		// Set container ID for text View containerID
 		tvContainerCode.setText(containerID);
@@ -216,24 +222,24 @@ public class ImportFragment extends Fragment {
 		showDialogSearchOperator();
 	}
 
-    @CheckedChange(R.id.rdn_status_a)
-    void preStatusAChecked(boolean isChecked) {
-        if (isChecked == true) {
-            preStatus = 0;
-        }
-    }
+	@CheckedChange(R.id.rdn_status_a)
+	void preStatusAChecked(boolean isChecked) {
+		if (isChecked == true) {
+			preStatus = 0;
+		}
+	}
 
-    @CheckedChange(R.id.rdn_status_b)
-    void preStatusBChecked(boolean isChecked) {
-        if (isChecked == true) {
-            preStatus = 1;
-        }
-    }
+	@CheckedChange(R.id.rdn_status_b)
+	void preStatusBChecked(boolean isChecked) {
+		if (isChecked == true) {
+			preStatus = 1;
+		}
+	}
 
-    @CheckedChange(R.id.rdn_status_c)
-    void preStatusCChecked(boolean isChecked) {
-        if (isChecked == true) {
-            preStatus = 2;
-        }
-    }
+	@CheckedChange(R.id.rdn_status_c)
+	void preStatusCChecked(boolean isChecked) {
+		if (isChecked == true) {
+			preStatus = 2;
+		}
+	}
 }

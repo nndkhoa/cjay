@@ -1,7 +1,8 @@
 package com.cloudjay.cjay.event;
 
 /**
- * Created by tieubao on 10/20/14.
+ * Event được trigger khi user log out khỏi app.
+ * Được gọi từ BaseActivity.
  */
 public class UserLoggedOutEvent {
 }

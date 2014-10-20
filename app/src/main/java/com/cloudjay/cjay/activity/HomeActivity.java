@@ -72,7 +72,7 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 			String lastModifiedDate = PreferencesUtil.getPrefsValue(this, PreferencesUtil.PREF_MODIFIED_DATE);
 			if (lastModifiedDate.isEmpty()) {
 				JobManager jobManager = App.getJobManager();
-				jobManager.addJobInBackground(new GetAllSessionsJob(this, lastModifiedDate));
+				jobManager.addJobInBackground(new GetAllSessionsJob(lastModifiedDate));
 			}
 		}
 	}

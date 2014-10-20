@@ -69,7 +69,7 @@ public class UploadFragment extends Fragment {
         uploadingSessionList = new ArrayList<Session>();
 
         try {
-            String[] listUploadingId = App.getDB(getActivity()).findKeys(CJayConstant.UPLOADING_DB);
+            String[] listUploadingId = App.getDB(getActivity()).findKeys(CJayConstant.PREFIX_UPLOADING);
             for (String uploadingId : listUploadingId) {
                 Session session = App.getDB(getActivity()).getObject(uploadingId, Session.class);
                 uploadingSessionList.add(session);
@@ -87,7 +87,7 @@ public class UploadFragment extends Fragment {
         Session session = null;
         try {
             Session oldSession = null;
-            session = App.getDB(getActivity()).getObject(CJayConstant.UPLOADING_DB + event.getContainerId(), Session.class);
+            session = App.getDB(getActivity()).getObject(CJayConstant.PREFIX_UPLOADING + event.getContainerId(), Session.class);
             for (Session session1 : uploadingSessionList) {
                 if (session1.getContainerId().equals(event.getContainerId())) {
                     oldSession = session1;
@@ -109,7 +109,7 @@ public class UploadFragment extends Fragment {
         Session session = null;
         try {
             Session oldSession = null;
-            session = App.getDB(getActivity()).getObject(CJayConstant.UPLOADING_DB + event.getContainerId(), Session.class);
+            session = App.getDB(getActivity()).getObject(CJayConstant.PREFIX_UPLOADING + event.getContainerId(), Session.class);
             for (Session session1 : uploadingSessionList) {
                 if (session1.getContainerId().equals(event.getContainerId())) {
                     oldSession = session1;

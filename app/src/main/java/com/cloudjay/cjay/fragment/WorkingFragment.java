@@ -12,6 +12,7 @@ import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
@@ -31,87 +32,95 @@ import de.greenrobot.event.EventBus;
 public class WorkingFragment extends Fragment {
 
 
-    @ViewById(R.id.lv_working_container)
-    ListView lvWorking;
+	@ViewById(R.id.lv_working_container)
+	ListView lvWorking;
 
-    @ViewById(R.id.tv_empty_list_working)
-    TextView tvEmpty;
+	@ViewById(R.id.tv_empty_list_working)
+	TextView tvEmpty;
 
-    private SessionAdapter mAdapter;
+	SessionAdapter mAdapter;
+	List<Session> workingSessions;
 
-    List<Session> workingSessionList;
-
-    public WorkingFragment() {
-    }
+	public WorkingFragment() {
+	}
 
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EventBus.getDefault().register(this);
-    }
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		EventBus.getDefault().register(this);
+	}
 
-    @Override
-    public void onDestroy() {
-        EventBus.getDefault().unregister(this);
-        super.onDestroy();
-    }
+	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
 
-    /**
-     * Initial loader and set adapter for list view
-     */
-    @AfterViews
-    void init() {
-        workingSessionList = new ArrayList<Session>();
+	/**
+	 * Initial loader and set adapter for list view
+	 */
+	@AfterViews
+	void init() {
+		workingSessions = new ArrayList<Session>();
 
-        try {
-            String[] listWorkingId = App.getDB(getActivity()).findKeys(CJayConstant.WORKING_DB);
-            for (String workingId : listWorkingId) {
-                Session session = App.getDB(getActivity()).getObject(workingId, Session.class);
-                workingSessionList.add(session);
-            }
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
+		try {
+			DB db = App.getDB(getActivity().getApplicationContext());
 
-        mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
-        mAdapter.setData(workingSessionList);
-        lvWorking.setAdapter(mAdapter);
-        lvWorking.setEmptyView(tvEmpty);
-    }
+			String[] listWorkingId = db.findKeys(CJayConstant.PREFIX_WORKING);
+			for (String workingId : listWorkingId) {
+				Session session = db.getObject(workingId, Session.class);
+				workingSessions.add(session);
+			}
 
-    @UiThread
-    public void onEvent(WorkingSessionCreatedEvent event) {
-        Session session;
-        try {
-            session = App.getDB(getActivity()).getObject(CJayConstant.WORKING_DB+event.getWorkingSession().getContainerId(), Session.class);
-            workingSessionList.add(session);
-            mAdapter.setData(workingSessionList);
-            mAdapter.notifyDataSetChanged();
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
+			db.close();
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
 
-    }
-    @UiThread
-    public void onEvent(ImageCapturedEvent event) {
-        Session session = null;
-        try {
-            Session oldSession = null;
-            session = App.getDB(getActivity()).getObject(CJayConstant.WORKING_DB+event.getContainerId(), Session.class);
-            for (Session session1 : workingSessionList){
-                if (session1.getContainerId().equals(event.getContainerId())){
-                    oldSession =session1;
-                }
-            }
-            workingSessionList.remove(oldSession);
-            workingSessionList.add(session);
-            mAdapter.setData(workingSessionList);
-            mAdapter.notifyDataSetChanged();
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
+		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
+		mAdapter.setData(workingSessions);
 
-    }
+		lvWorking.setAdapter(mAdapter);
+		lvWorking.setEmptyView(tvEmpty);
+	}
+
+	/**
+	 * Sự kiện được kích hoạt khi một WorkingSession được tạo ra
+	 *
+	 * @param event
+	 */
+	@UiThread
+	public void onEvent(WorkingSessionCreatedEvent event) {
+		try {
+			Session session = App.getDB(getActivity()).getObject(CJayConstant.PREFIX_WORKING + event.getSession().getContainerId(), Session.class);
+			workingSessions.add(session);
+			mAdapter.setData(workingSessions);
+			mAdapter.notifyDataSetChanged();
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@UiThread
+	public void onEvent(ImageCapturedEvent event) {
+		Session session;
+		try {
+			Session oldSession = null;
+			session = App.getDB(getActivity()).getObject(CJayConstant.PREFIX_WORKING + event.getContainerId(), Session.class);
+			for (Session session1 : workingSessions) {
+				if (session1.getContainerId().equals(event.getContainerId())) {
+					oldSession = session1;
+				}
+			}
+			workingSessions.remove(oldSession);
+			workingSessions.add(session);
+			mAdapter.setData(workingSessions);
+			mAdapter.notifyDataSetChanged();
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+
+	}
 
 }
