@@ -30,6 +30,7 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.enums.Step;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
@@ -176,9 +177,10 @@ public class ImportFragment extends Fragment {
 
 			// Open camera activity
 			Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
-			cameraActivityIntent.putExtra("containerID", containerID);
-			cameraActivityIntent.putExtra("imageType", CJayConstant.TYPE_IMPORT);
-			cameraActivityIntent.putExtra("operatorCode", selectedOperator.getOperatorCode());
+			cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
+			cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_IMPORT);
+			cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, selectedOperator.getOperatorCode());
+            cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
 			startActivity(cameraActivityIntent);
 
 		} else {
@@ -190,12 +192,18 @@ public class ImportFragment extends Fragment {
 	@Click(R.id.btn_continue)
 	void buttonContinueClicked() {
 		// Go to next fragment
-		AuditFragment fragment = new AuditFragment_().builder().containerID(containerID).build();
+        AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID).build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 		transaction.replace(R.id.ll_main, fragment);
 		transaction.commit();
 	}
+
+    @Click(R.id.btn_complete)
+    void buttonCompletedClicked() {
+        // Finish import fragment, close Wizzard Activity and go back to Home Activity with Search Fragment tab
+
+    }
 
 	@Touch(R.id.et_operator)
 	void editTextOperatorTouched(View v, MotionEvent event) {

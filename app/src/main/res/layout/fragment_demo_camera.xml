@@ -17,6 +17,26 @@
         android:id="@+id/ll_top_camera"
         android:orientation="horizontal">
 
+        <RelativeLayout
+            android:id="@+id/left_padding_top"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <ToggleButton
+                android:id="@+id/btn_capture_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:background="@drawable/btn_toggle_blue"
+                android:shadowColor="@android:color/black"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="2"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"/>
+        </RelativeLayout>
+
     </LinearLayout>
 
     <LinearLayout
@@ -32,16 +52,18 @@
             android:layout_height="match_parent"
             android:layout_weight="1">
 
-            <ToggleButton
-                android:id="@+id/btn_capture_mode"
+            <Button
+                android:id="@+id/btn_use_gate_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:background="@drawable/btn_toggle_blue"
+                android:background="@drawable/btn_blue"
                 android:shadowColor="@android:color/black"
                 android:shadowDx="1"
                 android:shadowDy="1"
-                android:shadowRadius="2" />
+                android:shadowRadius="2"
+                android:text="@string/btn_use_gate_in_image_title"
+                android:textColor="@android:color/white"/>
         </RelativeLayout>
 
         <ImageButton
