@@ -6,8 +6,13 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.model.Session;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
@@ -18,11 +23,18 @@ import org.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_before_after_repaierd)
 public class BeforeRepairFragment extends Fragment {
+    @Bean
+    DataCenter dataCenter;
 
     public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
 
+    public final static String AUDIT_ITEM_EXTRA = "com.cloudjay.wizard.auditItem";
+
     @FragmentArg(CONTAINER_ID_EXTRA)
     public String containerID;
+
+    @FragmentArg(AUDIT_ITEM_EXTRA)
+    public AuditItem auditItem;
 
     @ViewById(R.id.tv_code_comp_repaired)
     TextView tvCompCode;
@@ -47,4 +59,14 @@ public class BeforeRepairFragment extends Fragment {
 
     @ViewById(R.id.btn_camera_repaired)
     Button btnCamera;
+
+    @AfterViews
+    void setup() {
+        tvCompCode.setText(auditItem.getComponentCode());
+        tvLocaitonCode.setText(auditItem.getLocationCode());
+        tvDamageCode.setText(auditItem.getDamageCode());
+        tvRepairCode.setText(auditItem.getRepairCode());
+        tvSize.setText("Dài "+auditItem.getHeight()+","+" Rộng "+auditItem.getLength());
+
+    }
 }
