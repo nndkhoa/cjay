@@ -104,6 +104,11 @@ public class DataCenter {
 		db.close();
 	}
 
+	/**
+	 * Search for operator
+	 *
+	 * @param keyword
+	 */
 	@Background(serial = CACHE)
 	public void searchOperator(String keyword) {
 		try {
@@ -118,6 +123,28 @@ public class DataCenter {
 			EventBus.getDefault().post(new OperatorsGotEvent(operators));
 		} catch (SnappydbException e) {
 			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Get operator from database.
+	 * Chỉ sử dụng khi biết chắc có operator ở trong database.
+	 *
+	 * @param context
+	 * @param operatorCode
+	 * @return
+	 */
+	public Operator getOperator(Context context, String operatorCode) {
+
+		try {
+			DB db = App.getDB(context);
+			String key = CJayConstant.PREFIX_OPERATOR + operatorCode;
+			Operator operator = db.getObject(key, Operator.class);
+			return operator;
+
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 
@@ -170,6 +197,29 @@ public class DataCenter {
 	//endregion
 
 	//region SESSION
+
+	/**
+	 * Only use when search container session from db.
+	 * Chỉ sử dụng khi biết chắc session đã ở trong db.
+	 *
+	 * @param context
+	 * @param containerId
+	 * @return
+	 */
+	public Session getSession(Context context, String containerId) {
+		try {
+			DB db = App.getDB(context);
+			String key = containerId;
+			Session session = db.getObject(key, Session.class);
+			db.close();
+
+			return session;
+		} catch (SnappydbException e) {
+
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 	//endregion
 

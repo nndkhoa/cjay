@@ -49,9 +49,12 @@ import java.util.List;
 import de.greenrobot.event.EventBus;
 
 /**
- * Màn hình nhập
+ * Màn hình nhập.
+ * <p/>
+ * 1. Nhận vào containerId, cố gắng Container Session từ db.
+ * 2. Cho user nhập Operator (Hãng tàu) và save Session xuống db.
+ * 3. Chụp ảnh bằng Camera.
  */
-
 @EFragment(R.layout.fragment_import)
 public class ImportFragment extends Fragment {
 
@@ -96,16 +99,38 @@ public class ImportFragment extends Fragment {
 	@FragmentArg(CONTAINER_ID_EXTRA)
 	String containerID;
 
+	String operatorCode;
+
 	GateImageAdapter gateImageAdapter = null;
-	Operator selectedOperator;
 	List<GateImage> gateImages = null;
 
 	long preStatus = 0;
 	Session currentSession;
 	//endregion
 
-
 	public ImportFragment() {
+	}
+
+	@AfterViews
+	void doAfterViews() {
+
+		// Set ActionBar Title
+		getActivity().getActionBar().setTitle(R.string.fragment_import_title);
+
+		// Trying to restore container status
+		Session tmp = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+		if (null == tmp) {
+
+			// Set container ID for text View containerID
+			tvContainerCode.setText(containerID);
+		} else {
+
+			containerID = tmp.getContainerId();
+			operatorCode = tmp.getOperatorCode();
+
+			tvContainerCode.setText(containerID);
+			etOperator.setText(operatorCode);
+		}
 	}
 
 	@Override
@@ -122,19 +147,24 @@ public class ImportFragment extends Fragment {
 
 	@UiThread
 	void onEvent(OperatorCallbackEvent event) {
+
 		// Get selected operator from search operator dialog
-		selectedOperator = event.getOperator();
+		Operator operator = event.getOperator();
+		operatorCode = operator.getOperatorCode();
 
 		// Set operator to edit text
-		etOperator.setText(selectedOperator.getOperatorName());
+		etOperator.setText(operator.getOperatorName());
 
-		// Ad
+		// Add new session to database
 		String currentTime = StringHelper.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
+
 		currentSession = new Session().withContainerId(containerID)
-				.withOperatorCode(selectedOperator.getOperatorCode())
-				.withOperatorId(selectedOperator.getId())
+				.withOperatorCode(operatorCode)
+				.withOperatorId(operator.getId())
 				.withPreStatus(preStatus)
+				.withStep(Step.IMPORT.value)
 				.withCheckInTime(currentTime);
+
 		dataCenter.addSession(currentSession);
 	}
 
@@ -154,7 +184,7 @@ public class ImportFragment extends Fragment {
 		gateImages = event.getGateImages();
 		Logger.Log("count gate images: " + gateImages.size());
 
-		//Init adapter if null and set adapter for listview
+		// Init adapter if adapter is null and set adapter for list view
 		if (gateImageAdapter == null) {
 			Logger.Log("gateImageAdapter is null");
 			gateImageAdapter = new GateImageAdapter(getActivity(), gateImages, false);
@@ -166,16 +196,9 @@ public class ImportFragment extends Fragment {
 
 	}
 
-	@AfterViews
-	void doAfterViews() {
-
-		// Set ActionBar Title
-		getActivity().getActionBar().setTitle(R.string.fragment_import_title);
-
-		// Set container ID for text View containerID
-		tvContainerCode.setText(containerID);
-	}
-
+	/**
+	 * Open Camera to take IMPORT images
+	 */
 	@Click(R.id.btn_camera)
 	void buttonCameraClicked() {
 
@@ -184,52 +207,54 @@ public class ImportFragment extends Fragment {
 			// Open camera activity
 			Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
 			cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
+			cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
 			cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_IMPORT);
-			cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, selectedOperator.getOperatorCode());
-            cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
+			cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
 			startActivity(cameraActivityIntent);
 
 		} else {
+
 			// Alert: require select operator first
 			Utils.showCrouton(getActivity(), R.string.require_select_operator_first);
 		}
 	}
 
+	/**
+	 *
+	 */
 	@Click(R.id.btn_continue)
 	void buttonContinueClicked() {
 		// Go to next fragment
-        AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID).build();
+		AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID).build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 		transaction.replace(R.id.ll_main, fragment);
 		transaction.commit();
 	}
 
-    @Click(R.id.btn_complete)
-    void buttonCompletedClicked() {
-        // Finish import fragment, close Wizzard Activity and go back to Home Activity with Search Fragment tab
+	@Click(R.id.btn_complete)
+	void buttonCompletedClicked() {
+		// Finish import fragment, close Wizzard Activity and go back to Home Activity with Search Fragment tab
 
-    }
+	}
 
 	@Touch(R.id.et_operator)
 	void editTextOperatorTouched(View v, MotionEvent event) {
 		if (event.getAction() == MotionEvent.ACTION_UP) {
-			startSearchOperator();
+			FragmentManager fm = getActivity().getSupportFragmentManager();
+			SearchOperatorDialog_ searchOperatorDialog = new SearchOperatorDialog_();
+			searchOperatorDialog.setParent(this);
+			searchOperatorDialog.show(fm, "search_operator_dialog");
 		}
 	}
 
-	private void showDialogSearchOperator() {
-		FragmentManager fm = getActivity().getSupportFragmentManager();
-		SearchOperatorDialog_ searchOperatorDialog = new SearchOperatorDialog_();
-		searchOperatorDialog.setParent(this);
-		searchOperatorDialog.show(fm, "search_operator_dialog");
-	}
+	//region HANDLE PRE-STATUS
 
-	private void startSearchOperator() {
-		// mContainerId = mContainerEditText.getText().toString();
-		showDialogSearchOperator();
-	}
-
+	/**
+	 * Handle container pre-status
+	 *
+	 * @param isChecked
+	 */
 	@CheckedChange(R.id.rdn_status_a)
 	void preStatusAChecked(boolean isChecked) {
 		if (isChecked == true) {
@@ -250,4 +275,5 @@ public class ImportFragment extends Fragment {
 			preStatus = 2;
 		}
 	}
+	//endregion
 }
