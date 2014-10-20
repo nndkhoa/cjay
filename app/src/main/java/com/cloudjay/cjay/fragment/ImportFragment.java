@@ -26,10 +26,12 @@ import com.cloudjay.cjay.event.OperatorCallbackEvent;
 import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.enums.Step;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
@@ -52,8 +54,6 @@ import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_import)
 public class ImportFragment extends Fragment {
-
-	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
 
 	//region Controls and Views
 	@ViewById(R.id.btn_camera)
@@ -87,6 +87,9 @@ public class ImportFragment extends Fragment {
 	ListView lvImages;
 	//endregion
 
+	//region ATTRIBUTE
+	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+
 	@Bean
 	DataCenter dataCenter;
 
@@ -97,7 +100,10 @@ public class ImportFragment extends Fragment {
 	Operator selectedOperator;
 	List<GateImage> gateImages = null;
 
-    long preStatus = 0;
+	long preStatus = 0;
+	Session currentSession;
+	//endregion
+
 
 	public ImportFragment() {
 	}
@@ -122,23 +128,24 @@ public class ImportFragment extends Fragment {
 		// Set operator to edit text
 		etOperator.setText(selectedOperator.getOperatorName());
 
-        // Get today
-        // create today String
-        String today = StringHelper.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
-
-		//Save session with containerId, operatorId, operatorCode, dateCreated, preStatus into snappy
-		dataCenter.addSession(containerID, selectedOperator.getOperatorCode(),
-                selectedOperator.getId(), today, preStatus);
+		// Ad
+		String currentTime = StringHelper.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
+		currentSession = new Session().withContainerId(containerID)
+				.withOperatorCode(selectedOperator.getOperatorCode())
+				.withOperatorId(selectedOperator.getId())
+				.withPreStatus(preStatus)
+				.withCheckInTime(currentTime);
+		dataCenter.addSession(currentSession);
 	}
 
 	@UiThread
 	void onEvent(ImageCapturedEvent event) {
-        try {
-            dataCenter.getGateImages(CJayConstant.TYPE_IMPORT, event.getContainerId());
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
-    }
+		try {
+			dataCenter.getGateImages(CJayConstant.TYPE_IMPORT, event.getContainerId());
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
 
 	@UiThread
 	void onEvent(GateImagesGotEvent event) {
@@ -154,7 +161,7 @@ public class ImportFragment extends Fragment {
 			lvImages.setAdapter(gateImageAdapter);
 		}
 
-        // Notify change
+		// Notify change
 		gateImageAdapter.swapData(gateImages);
 
 	}
@@ -162,8 +169,8 @@ public class ImportFragment extends Fragment {
 	@AfterViews
 	void doAfterViews() {
 
-        // Set ActionBar Title
-        getActivity().getActionBar().setTitle(R.string.fragment_import_title);
+		// Set ActionBar Title
+		getActivity().getActionBar().setTitle(R.string.fragment_import_title);
 
 		// Set container ID for text View containerID
 		tvContainerCode.setText(containerID);
@@ -176,9 +183,10 @@ public class ImportFragment extends Fragment {
 
 			// Open camera activity
 			Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
-			cameraActivityIntent.putExtra("containerID", containerID);
-			cameraActivityIntent.putExtra("imageType", CJayConstant.TYPE_IMPORT);
-			cameraActivityIntent.putExtra("operatorCode", selectedOperator.getOperatorCode());
+			cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
+			cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_IMPORT);
+			cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, selectedOperator.getOperatorCode());
+            cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
 			startActivity(cameraActivityIntent);
 
 		} else {
@@ -190,12 +198,18 @@ public class ImportFragment extends Fragment {
 	@Click(R.id.btn_continue)
 	void buttonContinueClicked() {
 		// Go to next fragment
-		AuditFragment fragment = new AuditFragment_().builder().containerID(containerID).build();
+        AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID).build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 		transaction.replace(R.id.ll_main, fragment);
 		transaction.commit();
 	}
+
+    @Click(R.id.btn_complete)
+    void buttonCompletedClicked() {
+        // Finish import fragment, close Wizzard Activity and go back to Home Activity with Search Fragment tab
+
+    }
 
 	@Touch(R.id.et_operator)
 	void editTextOperatorTouched(View v, MotionEvent event) {
@@ -216,24 +230,24 @@ public class ImportFragment extends Fragment {
 		showDialogSearchOperator();
 	}
 
-    @CheckedChange(R.id.rdn_status_a)
-    void preStatusAChecked(boolean isChecked) {
-        if (isChecked == true) {
-            preStatus = 0;
-        }
-    }
+	@CheckedChange(R.id.rdn_status_a)
+	void preStatusAChecked(boolean isChecked) {
+		if (isChecked == true) {
+			preStatus = 0;
+		}
+	}
 
-    @CheckedChange(R.id.rdn_status_b)
-    void preStatusBChecked(boolean isChecked) {
-        if (isChecked == true) {
-            preStatus = 1;
-        }
-    }
+	@CheckedChange(R.id.rdn_status_b)
+	void preStatusBChecked(boolean isChecked) {
+		if (isChecked == true) {
+			preStatus = 1;
+		}
+	}
 
-    @CheckedChange(R.id.rdn_status_c)
-    void preStatusCChecked(boolean isChecked) {
-        if (isChecked == true) {
-            preStatus = 2;
-        }
-    }
+	@CheckedChange(R.id.rdn_status_c)
+	void preStatusCChecked(boolean isChecked) {
+		if (isChecked == true) {
+			preStatus = 2;
+		}
+	}
 }

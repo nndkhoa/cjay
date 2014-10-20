@@ -5,10 +5,9 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.fragment.AuditFragment_;
+import com.cloudjay.cjay.fragment.AuditAndRepairFragment_;
 import com.cloudjay.cjay.fragment.ExportFragment_;
 import com.cloudjay.cjay.fragment.ImportFragment_;
-import com.cloudjay.cjay.fragment.RepairFragment_;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.Step;
 
@@ -43,12 +42,8 @@ public class WizardActivity extends FragmentActivity {
 		switch (currentStep) {
 			// Load fragment Audit
 			case AUDIT:
-				fragment = AuditFragment_.builder().containerID(containerID).build();
-				break;
-
-			// Load fragment Repair
 			case REPAIR:
-				fragment = RepairFragment_.builder().containerID(containerID).build();
+				fragment = AuditAndRepairFragment_.builder().containerID(containerID).build();
 				break;
 
 			// Load fragment Export

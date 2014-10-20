@@ -72,6 +72,7 @@
     <!-- Camera Button -->
     <string name="camera_done">Done</string>
     <string name="require_select_operator_first">Vui lòng chọn hãng tàu trước khi chụp</string>
+    <string name="btn_use_gate_in_image_title">Hình cổng</string>
 
     <!-- Dialog Search Operator -->
     <string name="dialog_container_owner">Hãng tàu</string>
@@ -107,11 +108,12 @@
     <string name="menu_username_title">Username</string>
     <string name="menu_refresh">Refresh</string>
     <string name="menu_role_title">Role</string>
+	<string name="logout_prompt_title">Dữ liệu sẽ mất sau khi đăng xuất. Bạn có chắc chưa?</string>
 
     <!-- Main flow fragment titles -->
     <string name="fragment_import_title">Nhập</string>
     <string name="fragment_audit_title">Giám định</string>
-    <string name="fragment_repair_title">Sửa chữa</string>
+    <string name="fragment_repair_title">Giám định và sửa chữa</string>
     <string name="fragment_export_title">Xuất</string>
 
     <!-- Text Error -->
@@ -131,5 +133,6 @@
     <string name="image_type_description_report">Hình Giám Định</string>
     <string name="image_type_description_repaired">Hình Sửa Chữa</string>
     <string name="title_activity_my">MyActivity</string>
+	<string name="no_working_item">No available items</string>
 
 </resources>

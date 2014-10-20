@@ -2,6 +2,7 @@ package com.cloudjay.cjay.fragment;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.widget.ToggleButton;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.task.jobqueue.UpLoadImageJob;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -24,7 +26,7 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.enums.ImageType;
-import com.commonsware.cwac.camera.CameraUtils;
+import com.cloudjay.cjay.util.enums.Step;
 import com.commonsware.cwac.camera.PictureTransaction;
 import com.commonsware.cwac.camera.SimpleCameraHost;
 import com.snappydb.SnappydbException;
@@ -38,6 +40,11 @@ import de.greenrobot.event.EventBus;
 
 public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
+    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+    public final static String OPERATOR_CODE_EXTRA = "com.cloudjay.wizard.operatorCode";
+    public final static String IMAGE_TYPE_EXTRA = "com.cloudjay.wizard.imageType";
+    public final static String CURRENT_STEP_EXTRA = "com.cloudjay.wizard.currentStep";
+
 
     private static final int PICTURE_SIZE_MAX_WIDTH = 640;
     private static final int PREVIEW_SIZE_MAX_WIDTH = 1280;
@@ -50,6 +57,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
     private ToggleButton btnCameraMode;
     private Button btnDone;
     private long lastFaceToast = 0L;
+    private Button btnUseGateImage;
 
     /**
      * flash mode parameter when take camera
@@ -60,6 +68,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
     String containerId;
     String depotCode;
     String operatorCode;
+    int currentStep;
 
     public static CameraFragment newInstance(boolean useFFC) {
         CameraFragment f = new CameraFragment();
@@ -85,9 +94,10 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
         // get data from arguments
         Bundle args = getArguments();
         if (args != null) {
-            containerId = args.getString("containerId");
-            mType = args.getInt("imageType");
-            operatorCode = args.getString("operatorCode");
+            containerId = args.getString(CONTAINER_ID_EXTRA);
+            mType = args.getInt(IMAGE_TYPE_EXTRA);
+            operatorCode = args.getString(OPERATOR_CODE_EXTRA);
+            currentStep = args.getInt(CURRENT_STEP_EXTRA);
         } else {
             Logger.w("Arguments is NULL!");
         }
@@ -134,10 +144,25 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
             }
         });
 
+        btnUseGateImage = (Button) results.findViewById(R.id.btn_use_gate_image);
+        btnUseGateImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Open ReuseActivity
+                Intent intent = new Intent(getActivity(), ReuseActivity_.class);
+                intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, containerId);
+                startActivity(intent);
+            }
+        });
+
         // If we are in import step, use continuing shot only
         if (mType == 0) {
             getContract().setSingleShotMode(false);
             btnCameraMode.setVisibility(View.INVISIBLE);
+        }
+
+        if (currentStep == Step.IMPORT.value) {
+            btnUseGateImage.setVisibility(View.GONE);
         }
 
         return (results);

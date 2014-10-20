@@ -36,7 +36,7 @@ public class UploadFragment extends Fragment {
     @ViewById(R.id.lv_uploading_container)
     ListView lvUploading;
 
-    @ViewById(R.id.tv_emptylist_uploading)
+    @ViewById(R.id.tv_empty_list_uploading)
     TextView tvEmpty;
 
     private UploadSessionAdapter mAdapter;
@@ -69,9 +69,9 @@ public class UploadFragment extends Fragment {
         uploadingSessionList = new ArrayList<Session>();
 
         try {
-            String[] listUploadingId = App.getSnappyDB(getActivity()).findKeys(CJayConstant.UPLOADING_DB);
+            String[] listUploadingId = App.getDB(getActivity()).findKeys(CJayConstant.PREFIX_UPLOADING);
             for (String uploadingId : listUploadingId) {
-                Session session = App.getSnappyDB(getActivity()).getObject(uploadingId, Session.class);
+                Session session = App.getDB(getActivity()).getObject(uploadingId, Session.class);
                 uploadingSessionList.add(session);
             }
         } catch (SnappydbException e) {
@@ -87,7 +87,7 @@ public class UploadFragment extends Fragment {
         Session session = null;
         try {
             Session oldSession = null;
-            session = App.getSnappyDB(getActivity()).getObject(CJayConstant.UPLOADING_DB + event.getContainerId(), Session.class);
+            session = App.getDB(getActivity()).getObject(CJayConstant.PREFIX_UPLOADING + event.getContainerId(), Session.class);
             for (Session session1 : uploadingSessionList) {
                 if (session1.getContainerId().equals(event.getContainerId())) {
                     oldSession = session1;
@@ -109,7 +109,7 @@ public class UploadFragment extends Fragment {
         Session session = null;
         try {
             Session oldSession = null;
-            session = App.getSnappyDB(getActivity()).getObject(CJayConstant.UPLOADING_DB + event.getContainerId(), Session.class);
+            session = App.getDB(getActivity()).getObject(CJayConstant.PREFIX_UPLOADING + event.getContainerId(), Session.class);
             for (Session session1 : uploadingSessionList) {
                 if (session1.getContainerId().equals(event.getContainerId())) {
                     oldSession = session1;

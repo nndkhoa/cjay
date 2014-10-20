@@ -19,13 +19,12 @@ import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Locale;
 
 /**
- * Màn hình sửa chữa
+ * A simple {@link Fragment} subclass.
  */
-@EFragment(R.layout.fragment_repair)
-public class RepairFragment extends Fragment implements ActionBar.TabListener {
+@EFragment(R.layout.fragment_audit_repair)
+public class AuditAndRepairFragment extends Fragment implements ActionBar.TabListener {
 
 	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
 
@@ -42,7 +41,8 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 	private ViewPagerAdapter mPagerAdapter;
 	public int currentPosition = 0;
 
-	public RepairFragment() {
+	public AuditAndRepairFragment() {
+		// Required empty public constructor
 	}
 
 	@Click(R.id.btn_continue)
@@ -52,7 +52,7 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 
 		// Go to next fragment
-		Fragment fragment = new ExportFragment_().builder().containerID(containerID).build();
+		android.support.v4.app.Fragment fragment = new ExportFragment_().builder().containerID(containerID).build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 		transaction.replace(R.id.ll_main, fragment);
@@ -67,13 +67,13 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 
 	private void configureActionBar() {
 
-        // Get actionbar
+		// Get actionbar
 		actionBar = getActivity().getActionBar();
 
-        // Set ActionBar Title
-        actionBar.setTitle(R.string.fragment_repair_title);
+		// Set ActionBar Title
+		actionBar.setTitle(R.string.fragment_repair_title);
 
-        // Fix tab layout
+		// Fix tab layout
 		final Method method;
 		try {
 			method = actionBar.getClass()
@@ -91,8 +91,8 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 		// Create Actionbar Tabs
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        // Set Providing Up Navigation
-        actionBar.setDisplayHomeAsUpEnabled(true);
+		// Set Providing Up Navigation
+		actionBar.setDisplayHomeAsUpEnabled(true);
 	}
 
 	private void configureViewPager() {
@@ -139,21 +139,20 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 /**
  * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
  * one of the sections/tabs/pages.
- *//*
-
+ */
 class ViewPagerAdapter extends FragmentPagerAdapter {
 
 	Context mContext;
-    String mContainerID;
+	String mContainerID;
 
 	public ViewPagerAdapter(Context context, FragmentManager fm, String containerID) {
 		super(fm);
 		mContext = context;
-        mContainerID = containerID;
+		mContainerID = containerID;
 	}
 
 	@Override
-	public Fragment getItem(int position) {
+	public android.support.v4.app.Fragment getItem(int position) {
 //		return fragments.get(position);
 
 		switch (position) {
@@ -174,7 +173,6 @@ class ViewPagerAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public CharSequence getPageTitle(int position) {
-		Locale l = Locale.getDefault();
 		switch (position) {
 			case 0:
 				return "Danh sách lỗi";
@@ -184,4 +182,4 @@ class ViewPagerAdapter extends FragmentPagerAdapter {
 		return null;
 	}
 }
-*/
+
