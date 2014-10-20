@@ -22,6 +22,7 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
     private int mType;
     private String containerId;
     private String operatorCode;
+    private int currentStep;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -29,15 +30,17 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 		setContentView(R.layout.activity_camera);
 
         // Get bundles data
-        containerId = getIntent().getStringExtra("containerID");
-        mType = getIntent().getIntExtra("imageType", 0);
-        operatorCode = getIntent().getStringExtra("operatorCode");
+        containerId = getIntent().getStringExtra(CameraFragment.CONTAINER_ID_EXTRA);
+        mType = getIntent().getIntExtra(CameraFragment.IMAGE_TYPE_EXTRA, 0);
+        operatorCode = getIntent().getStringExtra(CameraFragment.OPERATOR_CODE_EXTRA);
+        currentStep = getIntent().getIntExtra(CameraFragment.CURRENT_STEP_EXTRA, 0);
 
         //Add data get from bundle to argument
         Bundle args = new Bundle();
-        args.putString("containerId", containerId);
-        args.putInt("imageType", mType);
-        args.putString("operatorCode", operatorCode);
+        args.putString(CameraFragment.CONTAINER_ID_EXTRA, containerId);
+        args.putInt(CameraFragment.IMAGE_TYPE_EXTRA, mType);
+        args.putString(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
+        args.putInt(CameraFragment.CURRENT_STEP_EXTRA, currentStep);
 
         current = CameraFragment.newInstance(false);
         current.setArguments(args);

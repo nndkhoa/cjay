@@ -1,18 +1,25 @@
 package com.cloudjay.cjay.fragment;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.activity.CameraActivity;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.enums.Status;
+import com.cloudjay.cjay.util.enums.Step;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.UiThread;
@@ -39,8 +46,13 @@ public class IssuePendingFragment extends Fragment {
     @ViewById(R.id.tv_current_status)
     TextView tvCurrentStatus;
 
+    @ViewById(R.id.btn_camera)
+    ImageButton btnCamera;
+
     @Bean
     DataCenter dataCenter;
+
+    String operatorCode;
 
 	public IssuePendingFragment() {
 		// Required empty public constructor
@@ -68,6 +80,20 @@ public class IssuePendingFragment extends Fragment {
 
         // Set currentStatus to TextView
         tvCurrentStatus.setText((Status.values()[(int)result.get(0).getStatus()]).toString());
+
+        // Set operatorCode into variable
+        operatorCode = result.get(0).getOperatorCode();
+    }
+
+    @Click(R.id.btn_camera)
+    void buttonCameraClicked() {
+        // Open camera activity
+        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
+        cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
+        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_AUDIT);
+        cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
+        cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.AUDIT.value);
+        startActivity(cameraActivityIntent);
     }
 
     @Override

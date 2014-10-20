@@ -5,7 +5,76 @@
     tools:context="com.cloudjay.cjay.fragment.IssuePendingFragment"
     android:padding="9dp">
 
-    <TextView
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="9dp"
+        android:layout_above="@+id/ll_bottom">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_container_code"
+            android:textSize="24dp"
+            android:textStyle="bold"
+            android:paddingBottom="3dp"
+            android:text="ABCD1234567"
+            android:textColor="@color/background_button_and_line"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_divider_line"
+            android:textSize="24dp"
+            android:textStyle="bold"
+            android:paddingBottom="3dp"
+            android:text=" - "
+            android:textColor="@color/background_button_and_line"
+            android:layout_toRightOf="@+id/tv_container_code"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_current_status"
+            android:textSize="24dp"
+            android:textStyle="bold"
+            android:paddingBottom="3dp"
+            android:text="B"
+            android:textColor="@color/background_button_and_line"
+            android:layout_toRightOf="@+id/tv_divider_line"/>
+
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_camera"
+            android:text="Camera button"
+            android:layout_below="@+id/tv_container_code"
+            android:background="@drawable/btn_customize_selector"
+            android:src="@android:drawable/ic_menu_camera"
+            android:minHeight="20dp"
+            android:layout_marginBottom="6dp"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_clean"
+            android:paddingBottom="6dp"
+            android:text="Container Vệ sinh quét"
+            android:textColor="@android:color/white"
+            android:background="@color/background_btn_check_container_clean"
+            android:layout_below="@+id/btn_camera"
+            android:layout_marginBottom="6dp"/>
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/lv_audit_images"
+            android:layout_below="@+id/btn_clean">
+        </ListView>
+
+    </RelativeLayout>
+
+    <!--<TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/tv_container_code"
@@ -80,6 +149,6 @@
             android:layout_height="wrap_content"
             android:src="@android:drawable/ic_menu_camera"/>
 
-    </LinearLayout>
+    </LinearLayout>-->
 
 </RelativeLayout>

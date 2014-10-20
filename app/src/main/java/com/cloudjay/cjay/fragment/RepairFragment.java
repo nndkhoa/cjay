@@ -90,6 +90,9 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 
 		// Create Actionbar Tabs
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+        // Set Providing Up Navigation
+        actionBar.setDisplayHomeAsUpEnabled(true);
 	}
 
 	private void configureViewPager() {
@@ -136,7 +139,8 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 /**
  * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
  * one of the sections/tabs/pages.
- */
+ *//*
+
 class ViewPagerAdapter extends FragmentPagerAdapter {
 
 	Context mContext;
@@ -180,3 +184,4 @@ class ViewPagerAdapter extends FragmentPagerAdapter {
 		return null;
 	}
 }
+*/
