@@ -6,6 +6,9 @@ import java.io.File;
 
 public class CJayConstant {
 
+	// Database
+	public static final String DB_NAME = "cjay";
+
 	// File path
 	public static final String APP_DIRECTORY = "CJay";
 	public static final String BACK_UP_DIRECTORY = ".backup";
@@ -20,14 +23,25 @@ public class CJayConstant {
 
 	//For save and query in db
 	public static final String OPERATOR_KEY = "OP";
-	public static final String WORKING_DB = "Working";
-    public static final String UPLOADING_DB = "Uploading";
+	public static final String WORKING_DB = "WORKING";
+	public static final String UPLOADING_DB = "UPLOADING";
 	public static final String USER_KEY = "USER";
+	public static final String DAMAGE_CODE_KEY = "DAMAGE";
+	public static final String REPAIR_CODE_KEY = "REPAIR";
+	public static final String COMPONENT_CODE_KEY = "COMPONENT";
 
 	// `/sdcard/DCMI/CJay/`
 	public static final File APP_DIRECTORY_FILE = new File(
 			Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
 			CJayConstant.APP_DIRECTORY);
+
+	public static final File BACK_UP_DIRECTORY_FILE = new File(Environment.getExternalStorageDirectory(),
+			BACK_UP_DIRECTORY);
+
+	public static final File LOG_DIRECTORY_FILE = new File(Environment.getExternalStorageDirectory(), LOG_DIRECTORY);
+	public static final String CJAY_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
+	public static final String CJAY_DATETIME_FORMAT_NO_TIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
+	public static final String LOG_TO_FILE_FORMAT = "[%s]	-	%s\n";
 
 
 }

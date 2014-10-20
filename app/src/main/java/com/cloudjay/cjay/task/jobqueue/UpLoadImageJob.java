@@ -8,6 +8,7 @@ import com.cloudjay.cjay.api.NetworkClient_;
 import com.cloudjay.cjay.event.UpLoadingEvent;
 import com.cloudjay.cjay.event.StartUpLoadEvent;
 import com.cloudjay.cjay.event.StopUpLoadEvent;
+import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 import com.snappydb.SnappydbException;
@@ -26,17 +27,17 @@ public class UpLoadImageJob extends Job {
 
 
     public UpLoadImageJob(Context context, String uri, String imageName, String containerId) {
-        //super(new Params(2).requireNetwork().groupBy(containerId));
         super(new Params(2).requireNetwork().persist().groupBy(containerId));
-
+        Logger.e("Create Job");
         this.context = context;
-        this.containerId =containerId;
+        this.containerId = containerId;
         this.uri = uri;
-        this.imageName =imageName;
+        this.imageName = imageName;
     }
 
     @Override
     public void onAdded() {
+        Logger.e("Added Job");
         try {
             DataCenter_.getInstance_(context).addUploadingSession(containerId);
             EventBus.getDefault().post(new StartUpLoadEvent(containerId));
@@ -48,8 +49,9 @@ public class UpLoadImageJob extends Job {
 
     @Override
     public void onRun() throws Throwable {
+        Logger.e("Running Job");
         EventBus.getDefault().post(new UpLoadingEvent());
-        DataCenter_.getInstance_(context).uploadImage(context, uri,imageName, containerId);
+        DataCenter_.getInstance_(context).uploadImage(context, uri, imageName, containerId);
 
 
     }

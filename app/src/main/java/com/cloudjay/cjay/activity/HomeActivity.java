@@ -44,6 +44,8 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 	/**
 	 * > MAIN FUNCTION
 	 * <p/>
+	 * <p/>
+	 * 0. Navigate to Login Activity if user has not logged in
 	 * 1. Config action bar NAVIGATION MODE
 	 * 2. Config view pager
 	 * 3. Start JobQueue to get all session
@@ -66,10 +68,10 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 			configureViewPager();
 			forceShowActionBarOverflowMenu();
 
-			// Check if Pref don't have modified set Job Queue to get all sessions after login
+			// Run job lấy tất cả sessions nếu chưa từng lấy lần nào
 			String lastModifiedDate = PreferencesUtil.getPrefsValue(this, PreferencesUtil.PREF_MODIFIED_DATE);
 			if (lastModifiedDate.isEmpty()) {
-				JobManager jobManager = App.getJobManager(getApplicationContext());
+				JobManager jobManager = App.getJobManager();
 				jobManager.addJobInBackground(new GetAllSessionsJob(this, lastModifiedDate));
 			}
 		}

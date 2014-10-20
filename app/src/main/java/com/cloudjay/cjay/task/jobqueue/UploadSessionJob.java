@@ -22,7 +22,8 @@ public class UploadSessionJob extends Job {
     Context context;
 
     public UploadSessionJob(Context context, Session session) {
-        super(new Params(1).requireNetwork().groupBy(session.getContainerId()));
+        super(new Params(1).requireNetwork().setPersistent(true).groupBy(session.getContainerId()));
+
         this.session = session;
         this.context = context;
     }
@@ -41,6 +42,7 @@ public class UploadSessionJob extends Job {
 
 
     }
+
 
     @Override
     protected void onCancel() {

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<item
+		android:id="@+id/action_overflow"
+		android:icon="@android:drawable/ic_menu_agenda"
+		android:orderInCategory="101"
+		android:title=""
+		android:showAsAction="always">
+		<menu>
+			<item
+				android:id="@+id/menu_refresh"
+				android:menuCategory="secondary"
+				android:showAsAction="never"
+				android:icon="@android:drawable/ic_menu_rotate"
+				android:title="@string/menu_refresh"/>
+			<item
+				android:id="@+id/menu_username"
+				android:menuCategory="secondary"
+				android:showAsAction="never"
+				android:icon="@android:drawable/ic_btn_speak_now"
+				android:title="@string/menu_username_title"/>
+			<item
+				android:id="@+id/menu_role"
+				android:menuCategory="secondary"
+				android:showAsAction="never"
+				android:icon="@android:drawable/ic_menu_compass"
+				android:title="@string/menu_role_title"/>
+			<item
+				android:id="@+id/menu_logout"
+				android:menuCategory="secondary"
+				android:showAsAction="never"
+				android:icon="@android:drawable/ic_lock_power_off"
+				android:title="@string/menu_logout_title"/>
+		</menu>
+	</item>
+</menu>

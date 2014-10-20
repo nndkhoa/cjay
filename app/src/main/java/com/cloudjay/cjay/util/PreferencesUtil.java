@@ -8,6 +8,8 @@ public class PreferencesUtil {
 	public static final String PREFS = "com.cloudjay.cjay.pref";
 	public static final String PREF_CURRENT_USER = "com.cloudjay.cjay.pref_current_user";
 	public static final String PREF_TOKEN = "com.cloudjay.cjay.pref_token";
+	public static final String PREF_USER_NAME = "com.cloudjay.cjay.pref_name";
+	public static final String PREF_USER_ROLE_NAME = "com.cloudjay.cjay.pref_role_name";
 	public static final String PREF_USER_ROLE = "com.cloudjay.cjay.pref_role";
 	public static final String PREF_USER_DEPOT = "com.cloudjay.cjay.pref_depot";
     public static final String PREF_MODIFIED_DATE = "com.cloudjay.cjay.pref_modified_date";
