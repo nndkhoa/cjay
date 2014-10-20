@@ -26,7 +26,8 @@ public class UpLoadImageJob extends Job {
 
 
     public UpLoadImageJob(Context context, String uri, String imageName, String containerId) {
-        super(new Params(2).requireNetwork().groupBy(containerId));
+        //super(new Params(2).requireNetwork().groupBy(containerId));
+        super(new Params(2).requireNetwork().persist().groupBy(containerId));
 
         this.context = context;
         this.containerId =containerId;
