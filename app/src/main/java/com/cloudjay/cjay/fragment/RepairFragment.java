@@ -67,13 +67,13 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 
 	private void configureActionBar() {
 
-        // Get actionbar
+		// Get actionbar
 		actionBar = getActivity().getActionBar();
 
-        // Set ActionBar Title
-        actionBar.setTitle(R.string.fragment_repair_title);
+		// Set ActionBar Title
+		actionBar.setTitle(R.string.fragment_repair_title);
 
-        // Fix tab layout
+		// Fix tab layout
 		final Method method;
 		try {
 			method = actionBar.getClass()
@@ -91,8 +91,8 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 		// Create Actionbar Tabs
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        // Set Providing Up Navigation
-        actionBar.setDisplayHomeAsUpEnabled(true);
+		// Set Providing Up Navigation
+		actionBar.setDisplayHomeAsUpEnabled(true);
 	}
 
 	private void configureViewPager() {

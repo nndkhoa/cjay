@@ -224,6 +224,7 @@ public class ImportFragment extends Fragment {
 	 */
 	@Click(R.id.btn_continue)
 	void buttonContinueClicked() {
+
 		// Go to next fragment
 		AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID).build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
@@ -232,10 +233,13 @@ public class ImportFragment extends Fragment {
 		transaction.commit();
 	}
 
+	/**
+	 * Finish import fragment, close Wizard Activity and go back to Home Activity with Search Fragment tab
+	 */
 	@Click(R.id.btn_complete)
 	void buttonCompletedClicked() {
-		// Finish import fragment, close Wizzard Activity and go back to Home Activity with Search Fragment tab
-
+//		Job job = new UploadSessionJob(getActivity().getApplicationContext(), );
+//		App.getJobManager().addJob(job);
 	}
 
 	@Touch(R.id.et_operator)

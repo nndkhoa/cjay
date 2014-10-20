@@ -1,62 +1,65 @@
 package com.cloudjay.cjay.activity;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.fragment.CameraFragment;
+import com.cloudjay.cjay.fragment.CameraFragment_;
 
+import org.androidannotations.annotations.AfterExtras;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
+
+@EActivity(R.layout.activity_camera)
 public class CameraActivity extends Activity implements CameraFragment.Contract {
+
+	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+	public final static String OPERATOR_CODE_EXTRA = "com.cloudjay.wizard.operatorCode";
+	public final static String IMAGE_TYPE_EXTRA = "com.cloudjay.wizard.imageType";
+	public final static String CURRENT_STEP_EXTRA = "com.cloudjay.wizard.currentStep";
+
+	@Extra(IMAGE_TYPE_EXTRA)
+	int mType;
+
+	@Extra(CONTAINER_ID_EXTRA)
+	String containerId;
+
+	@Extra(OPERATOR_CODE_EXTRA)
+	String operatorCode;
+
+	@Extra(CURRENT_STEP_EXTRA)
+	int currentStep;
 
 	private static final String STATE_SINGLE_SHOT = "single_shot";
 	private static final String STATE_LOCK_TO_LANDSCAPE = "lock_to_landscape";
-	private static final int CONTENT_REQUEST = 1337;
 
 	private CameraFragment current = null;
 	private boolean singleShot = false;
 	private boolean isLockedToLandscape = true;
 
-    // Bundles data
-    private int mType;
-    private String containerId;
-    private String operatorCode;
-    private int currentStep;
+	@AfterExtras
+	void afterExtra() {
+		current = CameraFragment_.builder()
+				.currentStep(currentStep)
+				.containerId(containerId)
+				.operatorCode(operatorCode)
+				.mType(mType)
+				.build();
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_camera);
-
-        // Get bundles data
-        containerId = getIntent().getStringExtra(CameraFragment.CONTAINER_ID_EXTRA);
-        mType = getIntent().getIntExtra(CameraFragment.IMAGE_TYPE_EXTRA, 0);
-        operatorCode = getIntent().getStringExtra(CameraFragment.OPERATOR_CODE_EXTRA);
-        currentStep = getIntent().getIntExtra(CameraFragment.CURRENT_STEP_EXTRA, 0);
-
-        //Add data get from bundle to argument
-        Bundle args = new Bundle();
-        args.putString(CameraFragment.CONTAINER_ID_EXTRA, containerId);
-        args.putInt(CameraFragment.IMAGE_TYPE_EXTRA, mType);
-        args.putString(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-        args.putInt(CameraFragment.CURRENT_STEP_EXTRA, currentStep);
-
-        current = CameraFragment.newInstance(false);
-        current.setArguments(args);
-        getFragmentManager().beginTransaction()
-                .replace(R.id.container, current).commit();
-        findViewById(android.R.id.content).post(new Runnable() {
-            @Override
-            public void run() {
-                current.lockToLandscape(isLockedToLandscape);
-            }
-        });
+		getFragmentManager().beginTransaction()
+				.replace(R.id.container, current).commit();
+		findViewById(android.R.id.content).post(new Runnable() {
+			@Override
+			public void run() {
+				current.lockToLandscape(isLockedToLandscape);
+			}
+		});
 	}
 
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
-
 		setSingleShotMode(savedInstanceState.getBoolean(STATE_SINGLE_SHOT));
 		isLockedToLandscape = savedInstanceState.getBoolean(STATE_LOCK_TO_LANDSCAPE);
 		if (current != null) {
@@ -68,15 +71,6 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putBoolean(STATE_SINGLE_SHOT, isSingleShotMode());
 		outState.putBoolean(STATE_LOCK_TO_LANDSCAPE, isLockedToLandscape);
-	}
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == CONTENT_REQUEST) {
-			if (resultCode == RESULT_OK) {
-				// do nothing
-			}
-		}
 	}
 
 	@Override
