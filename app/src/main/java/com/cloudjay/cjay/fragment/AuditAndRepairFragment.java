@@ -10,6 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.widget.Button;
 
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
@@ -96,7 +97,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	}
 
 	private void configureViewPager() {
-		mPagerAdapter = new ViewPagerAdapter(getActivity(), getActivity().getSupportFragmentManager(), containerID);
+		mPagerAdapter = new ViewPagerAdapter(getActivity(), getActivity().getSupportFragmentManager(), containerID,1);
 		pager.setAdapter(mPagerAdapter);
 		pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
@@ -136,50 +137,4 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	}
 }
 
-/**
- * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
- * one of the sections/tabs/pages.
- */
-class ViewPagerAdapter extends FragmentPagerAdapter {
-
-	Context mContext;
-	String mContainerID;
-
-	public ViewPagerAdapter(Context context, FragmentManager fm, String containerID) {
-		super(fm);
-		mContext = context;
-		mContainerID = containerID;
-	}
-
-	@Override
-	public android.support.v4.app.Fragment getItem(int position) {
-//		return fragments.get(position);
-
-		switch (position) {
-			case 0:
-				return new IssuePendingFragment_().builder().containerID(mContainerID).build();
-			case 1:
-				return new IssueRepairedFragment_().builder().containerID(mContainerID).build();
-			default:
-				return null;
-		}
-
-	}
-
-	@Override
-	public int getCount() {
-		return 2;
-	}
-
-	@Override
-	public CharSequence getPageTitle(int position) {
-		switch (position) {
-			case 0:
-				return "Danh sách lỗi";
-			case 1:
-				return "Đã sữa chữa";
-		}
-		return null;
-	}
-}
 

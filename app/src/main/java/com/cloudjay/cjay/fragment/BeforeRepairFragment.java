@@ -9,6 +9,7 @@ import android.widget.TextView;
 import com.cloudjay.cjay.R;
 
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 
 /**
@@ -16,7 +17,13 @@ import org.androidannotations.annotations.ViewById;
  */
 
 @EFragment(R.layout.fragment_before_after_repaierd)
-public class BeforeRepairFragment  extends Fragment{
+public class BeforeRepairFragment extends Fragment {
+
+    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+
+    @FragmentArg(CONTAINER_ID_EXTRA)
+    public String containerID;
+
     @ViewById(R.id.tv_code_comp_repaired)
     TextView tvCompCode;
 

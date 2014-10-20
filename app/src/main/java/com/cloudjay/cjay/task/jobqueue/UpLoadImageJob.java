@@ -38,10 +38,10 @@ public class UpLoadImageJob extends Job {
     String imageName;
 
 
-    public UpLoadImageJob( String uri, String imageName, String containerId) {
+    public UpLoadImageJob(String uri, String imageName, String containerId) {
         super(new Params(2).requireNetwork().persist().groupBy(containerId));
         Logger.e("Create Job");
-        this.context = context;
+        this.context = App.getInstance().getApplicationContext();;
         this.containerId = containerId;
         this.uri = uri;
         this.imageName = imageName;
@@ -50,12 +50,12 @@ public class UpLoadImageJob extends Job {
     @Override
     public void onAdded() {
         Logger.e("Added Job");
-//        try {
-//            DataCenter_.getInstance_(context).addUploadingSession(containerId);
-//            EventBus.getDefault().post(new StartUpLoadEvent(containerId));
-//        } catch (SnappydbException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            DataCenter_.getInstance_(context).addUploadingSession(containerId);
+            EventBus.getDefault().post(new StartUpLoadEvent(containerId));
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -63,23 +63,8 @@ public class UpLoadImageJob extends Job {
     public void onRun() throws Throwable {
         Logger.e("Running Job");
         EventBus.getDefault().post(new UpLoadingEvent());
-        //Call network client to upload image
-//        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.CJAY_TMP_STORAGE).build();
-//        File image = new File(uri);
-//        TypedFile typedFile = new TypedFile("image/jpeg", image);
-//        Response response = restAdapter.create(NetworkService.class).postImageFile("image/jpeg", "media", imageName, typedFile);
-//        Logger.e("Uploaded Image");
-
-        //Change status image in db
-//        Session uploadingSession = App.getSnappyDB(context).getObject(CJayConstant.UPLOADING_DB + containerId, Session.class);
-//        for (GateImage gateImage : uploadingSession.getGateImages()) {
-//            if (gateImage.getName().equals(imageName)) {
-//                gateImage.setUploaded(true);
-//            }
-//        }
-//        App.getSnappyDB(context).put(CJayConstant.UPLOADING_DB + containerId, uploadingSession);
-//        EventBus.getDefault().post(new UploadedEvent(containerId));
-
+        DataCenter_.getInstance_(context).uploadImage(context, uri, imageName, containerId);
+        EventBus.getDefault().post(new UploadedEvent(containerId));
 
     }
 

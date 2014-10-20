@@ -10,6 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.widget.Button;
 
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
@@ -96,7 +97,7 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 	}
 
 	private void configureViewPager() {
-		mPagerAdapter = new ViewPagerAdapter(getActivity(), getActivity().getSupportFragmentManager(), containerID);
+		mPagerAdapter = new ViewPagerAdapter(getActivity(), getActivity().getSupportFragmentManager(), containerID,1);
 		pager.setAdapter(mPagerAdapter);
 		pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
