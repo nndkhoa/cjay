@@ -35,5 +35,13 @@ public class CJayConstant {
 			Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
 			CJayConstant.APP_DIRECTORY);
 
+	public static final File BACK_UP_DIRECTORY_FILE = new File(Environment.getExternalStorageDirectory(),
+			BACK_UP_DIRECTORY);
+
+	public static final File LOG_DIRECTORY_FILE = new File(Environment.getExternalStorageDirectory(), LOG_DIRECTORY);
+	public static final String CJAY_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
+	public static final String CJAY_DATETIME_FORMAT_NO_TIMEZONE = "yyyy-MM-dd'T'HH:mm:ss";
+	public static final String LOG_TO_FILE_FORMAT = "[%s]	-	%s\n";
+
 
 }

@@ -107,6 +107,7 @@
     <string name="menu_username_title">Username</string>
     <string name="menu_refresh">Refresh</string>
     <string name="menu_role_title">Role</string>
+	<string name="logout_prompt_title">Dữ liệu sẽ mất sau khi đăng xuất. Bạn có chắc chưa?</string>
 
     <!-- Main flow fragment titles -->
     <string name="fragment_import_title">Nhập</string>

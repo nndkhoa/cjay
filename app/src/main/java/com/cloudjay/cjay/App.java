@@ -52,6 +52,36 @@ public class App extends Application {
 	public void onCreate() {
 		super.onCreate();
 
+		configureDirectories();
+		configureImageLoader();
+		configureJobManager();
+		// Crashlytics.start(this);
+	}
+
+	/**
+	 * Khởi tạo các folder mặc định
+	 */
+	private void configureDirectories() {
+
+		// Init Default dirs
+		if (!CJayConstant.BACK_UP_DIRECTORY_FILE.exists()) {
+			CJayConstant.BACK_UP_DIRECTORY_FILE.mkdir();
+		}
+
+		if (!CJayConstant.LOG_DIRECTORY_FILE.exists()) {
+			CJayConstant.LOG_DIRECTORY_FILE.mkdirs();
+		}
+
+		if (!CJayConstant.APP_DIRECTORY_FILE.exists()) {
+			CJayConstant.APP_DIRECTORY_FILE.mkdir();
+		}
+	}
+
+	/**
+	 * Cấu hình Universal Image Loader
+	 */
+	private void configureImageLoader() {
+
 		// init image loader default options
 		DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
 				.cacheInMemory(true)
@@ -72,11 +102,11 @@ public class App extends Application {
 
 		// init image loader with config defined
 		ImageLoader.getInstance().init(config);
-		configureJobManager();
-
-		//		Crashlytics.start(this);
 	}
 
+	/**
+	 * Cấu hình Job Manager của JobQueue
+	 */
 	private void configureJobManager() {
 		Configuration configuration = new Configuration.Builder(this)
 				.customLogger(new CustomLogger() {
