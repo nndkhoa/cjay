@@ -317,7 +317,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
             // 2.upload image
 //TODO: Fix can't add to sql for resume task after restart app
-            App.getJobManager().addJobInBackground(new UpLoadImageJob(getActivity(), uri, imageName, containerId));
+            App.getJobManager().addJobInBackground(new UpLoadImageJob( uri, imageName, containerId));
         }
 
         void saveBitmapToFile(Bitmap bitmap, File filename) {

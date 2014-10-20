@@ -17,6 +17,7 @@ public class GetAllSessionsJob extends Job {
 	 *
 	 * @param modifiedDate
 	 */
+
 	public GetAllSessionsJob(String modifiedDate) {
 		super(new Params(1).requireNetwork().persist().setPersistent(true));
 		this.modifiedDate = modifiedDate;
