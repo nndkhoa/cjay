@@ -328,7 +328,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
         @Override
         public Camera.Parameters adjustPreviewParameters(Camera.Parameters parameters) {
             /*flashMode =
-					CameraUtils.findBestFlashModeMatch(parameters,
+                    CameraUtils.findBestFlashModeMatch(parameters,
 							Camera.Parameters.FLASH_MODE_RED_EYE,
 							Camera.Parameters.FLASH_MODE_AUTO,
 							Camera.Parameters.FLASH_MODE_ON);*/
