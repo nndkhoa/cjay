@@ -8,6 +8,9 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.adapter.GateImageAdapter;
+import com.cloudjay.cjay.adapter.RepairedImageAdapter;
+import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 
@@ -16,6 +19,8 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
+
+import java.util.List;
 
 /**
  * Created by thai on 20/10/2014.
@@ -60,13 +65,19 @@ public class BeforeRepairFragment extends Fragment {
     @ViewById(R.id.btn_camera_repaired)
     Button btnCamera;
 
+    RepairedImageAdapter imageAdapter;
+
     @AfterViews
     void setup() {
         tvCompCode.setText(auditItem.getComponentCode());
         tvLocaitonCode.setText(auditItem.getLocationCode());
         tvDamageCode.setText(auditItem.getDamageCode());
         tvRepairCode.setText(auditItem.getRepairCode());
-        tvSize.setText("Dài "+auditItem.getHeight()+","+" Rộng "+auditItem.getLength());
+        tvSize.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
+        imageAdapter = new RepairedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select);
+        List<AuditImage> auditImages = auditItem.getAuditImages();
+        imageAdapter.setData(auditImages);
+
 
     }
 }
