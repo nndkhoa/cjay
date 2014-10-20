@@ -41,7 +41,7 @@ public class UpLoadImageJob extends Job {
     public UpLoadImageJob(String uri, String imageName, String containerId) {
         super(new Params(2).requireNetwork().persist().groupBy(containerId));
         Logger.e("Create Job");
-        this.context = App.getInstance().getApplicationContext();;
+
         this.containerId = containerId;
         this.uri = uri;
         this.imageName = imageName;
@@ -50,6 +50,7 @@ public class UpLoadImageJob extends Job {
     @Override
     public void onAdded() {
         Logger.e("Added Job");
+        context = App.getInstance().getApplicationContext();;
         try {
             DataCenter_.getInstance_(context).addUploadingSession(containerId);
             EventBus.getDefault().post(new StartUpLoadEvent(containerId));
@@ -62,6 +63,7 @@ public class UpLoadImageJob extends Job {
     @Override
     public void onRun() throws Throwable {
         Logger.e("Running Job");
+        context = App.getInstance().getApplicationContext();
         EventBus.getDefault().post(new UpLoadingEvent());
         DataCenter_.getInstance_(context).uploadImage(context, uri, imageName, containerId);
         EventBus.getDefault().post(new UploadedEvent(containerId));
