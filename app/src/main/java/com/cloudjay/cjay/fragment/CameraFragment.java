@@ -188,7 +188,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	 * Take a picture, need to call auto focus before taking picture
 	 */
 	public void takeSimplePicture() {
-
+        Logger.Log("takeSimplePicture");
 		if (getContract().isSingleShotMode() == true) {
 			singleShotProcessing = true;
 			btnTakePicture.setEnabled(false);
@@ -383,6 +383,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 			super.onAutoFocus(success, camera);
 
 			btnTakePicture.setEnabled(true);
+            Logger.Log("went to autoFocus");
 			takeSimplePicture();
 		}
 
