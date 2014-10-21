@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 
 import javax.annotation.Generated;
 
-
+/* Gồm hình nhập và hình xuất */
 @Generated("org.jsonschema2pojo")
 public class GateImage {
 

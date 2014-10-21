@@ -504,4 +504,14 @@ public class DataCenter {
 		Logger.Log("insert audit image successfully");
 		App.closeDB();
 	}
+
+    public void getAuditAImages(String containerId) {
+        try {
+            Session session = App.getDB(context).getObject(containerId, Session.class);
+            List<AuditImage> auditImages = session.getAuditImages();
+
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+    }
 }

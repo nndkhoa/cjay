@@ -5,12 +5,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.adapter.AuditImageAdapter;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
+import com.cloudjay.cjay.event.ImageCapturedEvent;
+import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.enums.Status;
@@ -48,10 +52,14 @@ public class IssuePendingFragment extends Fragment {
     @ViewById(R.id.btn_camera)
     ImageButton btnCamera;
 
+    @ViewById(R.id.lv_issue_images)
+    ListView lvIssueImages;
+
     @Bean
     DataCenter dataCenter;
 
     String operatorCode;
+    AuditImageAdapter auditImageAdapter;
 
 	public IssuePendingFragment() {
 		// Required empty public constructor
@@ -93,6 +101,11 @@ public class IssuePendingFragment extends Fragment {
         cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
         cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.AUDIT.value);
         startActivity(cameraActivityIntent);
+    }
+
+    @UiThread
+    void onEvent(ImageCapturedEvent event) {
+        dataCenter.getAuditAImages(containerID);
     }
 
     @Override
