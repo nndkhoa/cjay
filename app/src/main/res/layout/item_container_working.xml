@@ -158,51 +158,6 @@
                 android:textStyle="bold"/>
         </RelativeLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2"
-            android:baselineAligned="false"
-            android:layout_marginTop="6dp">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center">
-
-                <Button
-                    android:id="@+id/btn_submit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Submit"
-                    android:textColor="@android:color/white"
-                    android:background="@drawable/btn_customize_selector"
-                    android:minHeight="30dp"
-                    android:paddingLeft="12dp"
-                    android:paddingRight="12dp"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center">
-
-                <Button
-                    android:id="@+id/btn_continue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Tiếp tục"
-                    android:textColor="@android:color/white"
-                    android:background="@drawable/btn_green_selector"
-                    android:minHeight="30dp"
-                    android:paddingLeft="12dp"
-                    android:paddingRight="12dp"/>
-            </LinearLayout>
-        </LinearLayout>
-
     </LinearLayout>
 
 

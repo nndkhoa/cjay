@@ -55,7 +55,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
             viewHolder = new ViewHolder();
 
             viewHolder.tvContainerId = (TextView) convertView.findViewById(R.id.tv_containerId_uploading);
-            viewHolder.tvCurrentPhotoUpload = (TextView) convertView.findViewById(R.id.tv_current_photo_upload);c
+            viewHolder.tvCurrentPhotoUpload = (TextView) convertView.findViewById(R.id.tv_current_photo_upload);
             viewHolder.tvTotalPhotoUpload = (TextView) convertView.findViewById(R.id.tv_total_photo_upload);
             viewHolder.ivContainer = (ImageView) convertView.findViewById(R.id.iv_container_upload);
             viewHolder.pbUpLoading = (ProgressBar) convertView.findViewById(R.id.pb_upload_progress);

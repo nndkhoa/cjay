@@ -41,9 +41,6 @@ public class SessionAdapter extends ArrayAdapter<Session> {
         TextView tvPreStatus;
         TextView tvCurrentStatus;
         TextView tvStep;
-
-        Button btnSubmit;
-        Button btnContinue;
     }
 
     @Override
@@ -67,9 +64,6 @@ public class SessionAdapter extends ArrayAdapter<Session> {
             viewHolder.tvCurrentStatus = (TextView) convertView.findViewById(R.id.tv_current_status);
             viewHolder.tvStep = (TextView) convertView.findViewById(R.id.tv_step);
 
-            viewHolder.btnSubmit = (Button) convertView.findViewById(R.id.btn_submit);
-            viewHolder.btnContinue = (Button) convertView.findViewById(R.id.btn_continue);
-
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -78,9 +72,9 @@ public class SessionAdapter extends ArrayAdapter<Session> {
         //Set data to view
         viewHolder.tvContainerId.setText(session.getContainerId());
         viewHolder.tvOperator.setText(session.getOperatorCode());
-        viewHolder.tvDateIn.setText(String.valueOf(session.getCheckInTime()));
+        viewHolder.tvDateIn.setText(session.getCheckInTime());
         if (session.getCheckOutTime() != null) {
-            viewHolder.tvDateOut.setText(String.valueOf(session.getCheckOutTime()));
+            viewHolder.tvDateOut.setText(session.getCheckOutTime());
         } else {
             viewHolder.tvDateOut.setText("");
         }
@@ -88,20 +82,6 @@ public class SessionAdapter extends ArrayAdapter<Session> {
         viewHolder.tvStep.setText((Step.values()[(int) session.getStep()]).toString());
         viewHolder.tvPreStatus.setText((Status.values()[(int) session.getPreStatus()]).toString());
         viewHolder.tvCurrentStatus.setText((Status.values()[(int) session.getStatus()]).toString());
-
-        if (!session.isProcessing()) {
-            viewHolder.btnContinue.setVisibility(View.GONE);
-            viewHolder.btnSubmit.setVisibility(View.GONE);
-        }
-
-        // Xử lý upload container session khi click vào button Submit
-        viewHolder.btnSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                App.getJobManager().addJobInBackground(new UploadSessionJob(session));
-
-            }
-        });
 
         return convertView;
     }
