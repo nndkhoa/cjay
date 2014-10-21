@@ -10,72 +10,67 @@ import java.util.Date;
 import java.util.List;
 
 public class StringHelper {
-    @SuppressLint("SimpleDateFormat")
-    public static String getCurrentTimestamp(String format) {
+	@SuppressLint("SimpleDateFormat")
+	public static String getCurrentTimestamp(String format) {
 
-        String timeStamp = "";
+		String timeStamp;
+		SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+		Date date = new Date();
+		timeStamp = dateFormat.format(date);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
-        Date date = new Date();
-        timeStamp = dateFormat.format(date);
+		return timeStamp;
+	}
 
-        return timeStamp;
-    }
+	@SuppressLint("SimpleDateFormat")
+	public static String getRelativeDate(String format, String date) {
 
-    @SuppressLint("SimpleDateFormat")
-    public static String getRelativeDate(String format, String date) {
+		if (TextUtils.isEmpty(date)) return "";
+		Date now = new Date();
 
-        if (TextUtils.isEmpty(date)) return "";
+		// 2013-11-10T21:05:24+08:00
+		SimpleDateFormat dateFormat = new SimpleDateFormat(format);
 
-        Date now = new Date();
+		Date convertedDate;
+		try {
+			convertedDate = dateFormat.parse(date);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return "";
+		}
 
-        // 2013-11-10T21:05:24+08:00
-        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+		String timeString = DateUtils.getRelativeTimeSpanString(convertedDate.getTime(), now.getTime(),
+				DateUtils.SECOND_IN_MILLIS).toString();
 
-        Date convertedDate = new Date();
-        try {
-            convertedDate = dateFormat.parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return "";
-        }
+		return timeString;
+	}
 
-        String timeString = DateUtils.getRelativeTimeSpanString(convertedDate.getTime(), now.getTime(),
-                DateUtils.SECOND_IN_MILLIS).toString();
+	@SuppressLint("SimpleDateFormat")
+	public static String getTimestamp(String oldFormat, String newFormat, String date) {
 
-        return timeString;
+		if (TextUtils.isEmpty(date)) return "";
+		SimpleDateFormat dateFormat = new SimpleDateFormat(oldFormat);
 
-    }
+		Date myDate = null;
+		try {
+			myDate = dateFormat.parse(date);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 
-    @SuppressLint("SimpleDateFormat")
-    public static String getTimestamp(String format, Date date) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
-        String timeStamp = dateFormat.format(date);
-        return timeStamp;
-    }
+		SimpleDateFormat timeFormat = new SimpleDateFormat(newFormat);
+		String timeStamp = timeFormat.format(myDate);
 
-    @SuppressLint("SimpleDateFormat")
-    public static String getTimestamp(String oldFormat, String newFormat, String date) {
+		return timeStamp;
+	}
 
-        if (TextUtils.isEmpty(date)) return "";
-
-        Logger.Log(oldFormat);
-        Logger.Log(newFormat);
-        Logger.Log(date);
-
-        SimpleDateFormat formatter = new SimpleDateFormat(newFormat);
-        String timeStamp = formatter.format(date);
-        return timeStamp;
-    }
-
-    public static String concatStringsWSep(List<String> strings, String separator) {
-        StringBuilder sb = new StringBuilder();
-        String sep = "";
-        for (String s : strings) {
-            sb.append(sep).append(s);
-            sep = separator;
-        }
-        return sb.toString();
-    }
+	public static String concatStringsWSep(List<String> strings, String separator) {
+		StringBuilder sb = new StringBuilder();
+		String sep = "";
+		for (String s : strings) {
+			sb.append(sep).append(s);
+			sep = separator;
+		}
+		return sb.toString();
+	}
 
 }
