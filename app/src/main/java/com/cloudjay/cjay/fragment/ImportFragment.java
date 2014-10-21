@@ -161,8 +161,8 @@ public class ImportFragment extends Fragment {
 		etOperator.setText(operator.getOperatorName());
 
 		// Add new session to database
-		String currentTime = StringHelper.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
-
+		String currentTime = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+		Logger.Log(currentTime);
 		currentSession = new Session().withContainerId(containerID)
 				.withOperatorCode(operatorCode)
 				.withOperatorId(operator.getId())

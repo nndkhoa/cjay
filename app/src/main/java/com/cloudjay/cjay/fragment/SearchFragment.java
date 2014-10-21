@@ -49,218 +49,220 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.fragment_search)
 public class SearchFragment extends Fragment {
 
-    //region VIEW
-    @ViewById(R.id.btn_search)
-    ImageButton btnSearch;
+	//region VIEW
+	@ViewById(R.id.btn_search)
+	ImageButton btnSearch;
 
-    @ViewById(R.id.et_search)
-    EditText editText;
+	@ViewById(R.id.et_search)
+	EditText editText;
 
-    @ViewById(R.id.lv_search_container)
-    ListView lvSearch;
+	@ViewById(R.id.lv_search_container)
+	ListView lvSearch;
 
-    @ViewById(R.id.ll_search_progress)
-    LinearLayout llSearchProgress;
+	@ViewById(R.id.ll_search_progress)
+	LinearLayout llSearchProgress;
 
-    @ViewById(R.id.ll_search_result)
-    LinearLayout llSearchResult;
+	@ViewById(R.id.ll_search_result)
+	LinearLayout llSearchResult;
 
-    @ViewById(android.R.id.empty)
-    TextView tvEmptyView;
-    //endregion
+	@ViewById(android.R.id.empty)
+	TextView tvEmptyView;
+	//endregion
 
-    @Bean
-    DataCenter dataCenter;
-    String containerID;
+	@Bean
+	DataCenter dataCenter;
+	String containerID;
 
-    @SystemService
-    InputMethodManager inputMethodManager;
+	@SystemService
+	InputMethodManager inputMethodManager;
 
-    private SessionAdapter mAdapter;
+	private SessionAdapter mAdapter;
 
-    public SearchFragment() {
-    }
+	public SearchFragment() {
+	}
 
-    /**
-     * 1. Setup search EditText
-     * 2. Setup Adapter and ListView result
-     */
-    @AfterViews
-    void doAfterViews() {
+	/**
+	 * 1. Setup search EditText
+	 * 2. Setup Adapter and ListView result
+	 */
+	@AfterViews
+	void doAfterViews() {
 
-        mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
-        lvSearch.setEmptyView(tvEmptyView);
-        lvSearch.setAdapter(mAdapter);
+		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
+		lvSearch.setEmptyView(tvEmptyView);
+		lvSearch.setAdapter(mAdapter);
 
-        //Set input type for role
-        Utils.setupEditText(editText);
+		//Set input type for role
+		Utils.setupEditText(editText);
 
-        // Set action when click `Enter` key
-        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent
-            ) {
-                if (TextUtils.isEmpty(editText.getText())) {
-                    editText.setError(getResources().getString(R.string.error_empty_search_string));
-                    return true;
-                }
-                if (i == EditorInfo.IME_ACTION_SEARCH) {
-                    performSearch();
-                    return true;
-                }
-                return false;
-            }
-        });
-    }
+		// Set action when click `Enter` key
+		editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent
+			) {
+				if (TextUtils.isEmpty(editText.getText())) {
+					editText.setError(getResources().getString(R.string.error_empty_search_string));
+					return true;
+				}
+				if (i == EditorInfo.IME_ACTION_SEARCH) {
+					performSearch();
+					return true;
+				}
+				return false;
+			}
+		});
+	}
 
-    /**
-     * User tiến hành tìm kiếm container session
-     */
-    @Click(R.id.btn_search)
-    void buttonSearchClicked() {
-        if (!TextUtils.isEmpty(editText.getText())) {
-            performSearch();
-        } else {
-            editText.setError(getResources().getString(R.string.error_empty_search_string));
-        }
-    }
+	/**
+	 * User tiến hành tìm kiếm container session
+	 */
+	@Click(R.id.btn_search)
+	void buttonSearchClicked() {
+		if (!TextUtils.isEmpty(editText.getText())) {
+			performSearch();
+		} else {
+			editText.setError(getResources().getString(R.string.error_empty_search_string));
+		}
+	}
 
-    /**
-     * Click vào list item, mở activity với step tương ứng của container
-     *
-     * @param position
-     */
-    @ItemClick(R.id.lv_search_container)
-    void searchListViewItemClicked(int position) {
+	/**
+	 * Click vào list item, mở activity với step tương ứng của container
+	 *
+	 * @param position
+	 */
+	@ItemClick(R.id.lv_search_container)
+	void searchListViewItemClicked(int position) {
 
-        // navigation to Wizard Activity
-        Session item = mAdapter.getItem(position);
-        Logger.e(position + " "+item.getContainerId() + " " +item.getStep() );
-        Intent intent = new Intent(getActivity(), WizardActivity_.class);
-        intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, item.getContainerId());
-        intent.putExtra(WizardActivity.STEP_EXTRA, item.getStep());
-        startActivity(intent);
-    }
+		// navigation to Wizard Activity
+		Session item = mAdapter.getItem(position);
+		Logger.e(position + " " + item.getContainerId() + " " + item.getStep());
+		Intent intent = new Intent(getActivity(), WizardActivity_.class);
+		intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, item.getContainerId());
+		intent.putExtra(WizardActivity.STEP_EXTRA, item.getStep());
+		startActivity(intent);
+	}
 
-    /**
-     * Hiển thị kết quả không tìm thấy container
-     *
-     * @param containerId
-     */
-    private void showSearchResultDialog(final String containerId) {
+	/**
+	 * Hiển thị kết quả không tìm thấy container
+	 *
+	 * @param containerId
+	 */
+	private void showSearchResultDialog(final String containerId) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.dialog_search_container_title);
-        builder.setMessage("Container ID với từ khóa " + containerId + " chưa được nhập vào hệ thống");
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setTitle(R.string.dialog_search_container_title);
+		builder.setMessage("Container ID với từ khóa " + containerId + " chưa được nhập vào hệ thống");
 
-        builder.setPositiveButton("Bỏ qua", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        });
+		builder.setPositiveButton("Bỏ qua", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				dialogInterface.dismiss();
+			}
+		});
 
-        // Hiển thị dialog tạo mới container
-        builder.setNegativeButton("Tạo mới", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                showAddContainerDialog(containerId);
-                dialogInterface.dismiss();
-            }
-        });
+		// Hiển thị dialog tạo mới container
+		builder.setNegativeButton("Tạo mới", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				showAddContainerDialog(containerId);
+				dialogInterface.dismiss();
+			}
+		});
 
-        AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialogInterface) {
+		AlertDialog dialog = builder.create();
+		dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+			@Override
+			public void onShow(DialogInterface dialogInterface) {
 
-                // Set background and text color for confirm button
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
-                        .setTextColor(getResources().getColor(android.R.color.white));
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
-                        .setBackgroundResource(R.drawable.btn_green_selector);
-            }
-        });
-        dialog.show();
-    }
+				// Set background and text color for confirm button
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+						.setTextColor(getResources().getColor(android.R.color.white));
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+						.setBackgroundResource(R.drawable.btn_green_selector);
+			}
+		});
+		dialog.show();
+	}
 
-    /**
-     * Hiển thị dialog tạo mới container
-     *
-     * @param containerId
-     */
-    private void showAddContainerDialog(String containerId) {
+	/**
+	 * Hiển thị dialog tạo mới container
+	 *
+	 * @param containerId
+	 */
+	private void showAddContainerDialog(String containerId) {
 
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        AddContainerDialog addContainerDialog_ = com.cloudjay.cjay.fragment.dialog.AddContainerDialog_
-                .builder().containerId(containerId).build();
-        addContainerDialog_.show(fragmentManager, "fragment_addcontainer");
-    }
+		FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+		AddContainerDialog addContainerDialog_ = com.cloudjay.cjay.fragment.dialog.AddContainerDialog_
+				.builder().containerId(containerId).build();
+		addContainerDialog_.show(fragmentManager, "fragment_addcontainer");
+	}
 
 
-    /**
-     * Begin to search in background
-     */
-    private void performSearch() {
+	/**
+	 * Begin to search in background
+	 */
+	private void performSearch() {
 
-        showProgress(true);
-        inputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-        String keyword = editText.getText().toString();
+		showProgress(true);
 
-        // Start search in background
-        containerID = keyword;
-        dataCenter.search(getActivity(), keyword);
-    }
+		inputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+		String keyword = editText.getText().toString();
 
-    @UiThread
-    void showProgress(final boolean show) {
-        llSearchProgress.setVisibility(show ? View.VISIBLE : View.GONE);
-        llSearchResult.setVisibility(show ? View.GONE : View.VISIBLE);
-    }
+		// Start search in background
+		containerID = keyword;
+		dataCenter.search(getActivity(), keyword);
+	}
 
-    /**
-     * @param event
-     */
-    @UiThread
-    public void onEvent(ContainerSearchedEvent event) {
+	@UiThread
+	void showProgress(final boolean show) {
+		llSearchProgress.setVisibility(show ? View.VISIBLE : View.GONE);
+		llSearchResult.setVisibility(show ? View.GONE : View.VISIBLE);
+	}
 
-        showProgress(false);
-        List<Session> result = event.getSessions();
-        mAdapter.clear();
+	/**
+	 * @param event
+	 */
+	@UiThread
+	public void onEvent(ContainerSearchedEvent event) {
 
-        if (result.size() != 0) {
-            mAdapter.setData(result);
-            mAdapter.notifyDataSetChanged();
-        } else {
-            showSearchResultDialog(containerID);
-        }
-    }
+		showProgress(false);
+		List<Session> result = event.getSessions();
+		mAdapter.clear();
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        llSearchResult.setVisibility(View.GONE);
-    }
+		if (result.size() != 0) {
+			mAdapter.setData(result);
+			mAdapter.notifyDataSetChanged();
+		} else {
+			showSearchResultDialog(containerID);
+		}
+	}
 
-    /**
-     * Bắt đầu search từ Server
-     *
-     * @param event
-     */
-    @UiThread
-    public void onEvent(SearchAsyncStartedEvent event) {
-        Toast.makeText(getActivity(), event.getStringEvent(), Toast.LENGTH_SHORT).show();
-    }
+	@Override
+	public void onResume() {
+		super.onResume();
+		llSearchResult.setVisibility(View.GONE);
+	}
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EventBus.getDefault().register(this);
-    }
+	/**
+	 * Bắt đầu search từ Server
+	 *
+	 * @param event
+	 */
+	@UiThread
+	public void onEvent(SearchAsyncStartedEvent event) {
+		Toast.makeText(getActivity(), event.getStringEvent(), Toast.LENGTH_SHORT).show();
+	}
 
-    @Override
-    public void onDestroy() {
-        EventBus.getDefault().unregister(this);
-        super.onDestroy();
-    }
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		EventBus.getDefault().register(this);
+	}
+
+	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
+
 }
