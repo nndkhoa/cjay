@@ -18,7 +18,7 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.activity.CameraActivity;
+import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
@@ -205,7 +205,7 @@ public class ImportFragment extends Fragment {
 		if (!TextUtils.isEmpty(tvContainerCode.getText()) && !TextUtils.isEmpty(etOperator.getText())) {
 
 			// Open camera activity
-			Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
+			Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
 			cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
 			cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
 			cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_IMPORT);

@@ -143,7 +143,7 @@ public class DataCenter {
 			return operator;
 
 		} catch (SnappydbException e) {
-			e.printStackTrace();
+			Logger.w(e.getMessage());
 			return null;
 		}
 	}
@@ -207,6 +207,7 @@ public class DataCenter {
 	 * @return
 	 */
 	public Session getSession(Context context, String containerId) {
+
 		try {
 			DB db = App.getDB(context);
 			String key = containerId;
@@ -215,8 +216,7 @@ public class DataCenter {
 
 			return session;
 		} catch (SnappydbException e) {
-
-			e.printStackTrace();
+			Logger.w(e.getMessage());
 			return null;
 		}
 	}

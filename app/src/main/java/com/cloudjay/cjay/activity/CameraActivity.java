@@ -35,9 +35,10 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 	private static final String STATE_SINGLE_SHOT = "single_shot";
 	private static final String STATE_LOCK_TO_LANDSCAPE = "lock_to_landscape";
 
-	private CameraFragment current = null;
 	private boolean singleShot = false;
+
 	private boolean isLockedToLandscape = true;
+	private CameraFragment current = null;
 
 	@AfterExtras
 	void afterExtra() {
@@ -50,12 +51,14 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 
 		getFragmentManager().beginTransaction()
 				.replace(R.id.container, current).commit();
+
 		findViewById(android.R.id.content).post(new Runnable() {
 			@Override
 			public void run() {
 				current.lockToLandscape(isLockedToLandscape);
 			}
 		});
+
 	}
 
 	@Override
@@ -75,12 +78,14 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_CAMERA && current != null
+		if (keyCode == KeyEvent.KEYCODE_CAMERA
+				&& current != null
 				&& !current.isSingleShotProcessing()) {
+
 			current.takePicture();
 			return (true);
-		}
 
+		}
 		return (super.onKeyDown(keyCode, event));
 	}
 

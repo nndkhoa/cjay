@@ -43,12 +43,15 @@ import java.util.UUID;
 @EFragment
 public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
+	//region ATTR
+
 	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
 	public final static String OPERATOR_CODE_EXTRA = "com.cloudjay.wizard.operatorCode";
 	public final static String IMAGE_TYPE_EXTRA = "com.cloudjay.wizard.imageType";
 	public final static String CURRENT_STEP_EXTRA = "com.cloudjay.wizard.currentStep";
 
 	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
+	private boolean singleShotProcessing = false;
 
 	@FragmentArg(IMAGE_TYPE_EXTRA)
 	int mType = 0;
@@ -61,15 +64,9 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 	@FragmentArg(CURRENT_STEP_EXTRA)
 	int currentStep;
+	//endregion
 
-	private boolean singleShotProcessing = false;
-
-	public static CameraFragment newInstance() {
-		CameraFragment f = new CameraFragment();
-		Bundle args = new Bundle();
-		f.setArguments(args);
-		return (f);
-	}
+	//region VIEW
 
 	@ViewById(R.id.btn_capture)
 	ImageButton btnTakePicture;
@@ -82,10 +79,11 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 	@ViewById(R.id.btn_use_gate_image)
 	Button btnUseGateImage;
+	//endregion
 
+	//region VIEW INTERACTION
 	@Click
 	void btnUseGateImageClicked() {
-
 		// Open ReuseActivity
 		Intent intent = new Intent(getActivity(), ReuseActivity_.class);
 		intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, containerId);
@@ -115,6 +113,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 			Toast.makeText(getActivity(), "Đã dừng chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
 		}
 	}
+	//endregion
 
 	/**
 	 * 1. Config camera through CameraHost
@@ -123,18 +122,24 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	@AfterViews
 	void afterView() {
 
-		// 1. CameraHost is the interface use to configure behavior of camera ~ setting
+		// CameraHost is the interface use to configure behavior of camera ~ setting
 		SimpleCameraHost.Builder builder = new SimpleCameraHost.Builder(new CameraHost(getActivity()));
 		setHost(builder.useFullBleedPreview(true).build());
 
-		// If we are in import step, use continuing shot only
-		if (mType == 0) {
-			getContract().setSingleShotMode(false);
-			btnCameraMode.setVisibility(View.INVISIBLE);
-		}
+		// Config shot mode. Default is FALSE.
+		// Configure View visibility based on current step of session
+		Step step = Step.values()[mType];
+		switch (step) {
+			case AUDIT:
+				btnCameraMode.setVisibility(View.VISIBLE);
+				btnCameraMode.setVisibility(View.VISIBLE);
+				break;
 
-		if (currentStep == Step.IMPORT.value) {
-			btnUseGateImage.setVisibility(View.GONE);
+			default:
+				getContract().setSingleShotMode(false);
+				btnUseGateImage.setVisibility(View.GONE);
+				btnCameraMode.setVisibility(View.GONE);
+				break;
 		}
 	}
 
