@@ -11,13 +11,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.annotation.Generated;
 
 
 @Generated("org.jsonschema2pojo")
-public class AuditItem {
+public class AuditItem implements Serializable{
 
     @Expose
     private long id;
