@@ -239,7 +239,7 @@ public class SearchFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        lvSearch.setVisibility(View.GONE);
+        llSearchResult.setVisibility(View.GONE);
     }
 
     /**
