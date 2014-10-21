@@ -18,7 +18,7 @@ import javax.annotation.Generated;
 
 
 @Generated("org.jsonschema2pojo")
-public class AuditItem implements Serializable{
+public class AuditItem implements Serializable {
 
     @Expose
     private long id;
@@ -78,9 +78,25 @@ public class AuditItem implements Serializable{
         return this;
     }
 
+    public JsonObject getAuditItemToUpload() {
+        JsonArray auditImage = this.getAuditImageToUpLoad();
+        JsonObject auditItem = new JsonObject();
+        auditItem.addProperty("damage_code_id", this.getDamageCodeId());
+        auditItem.addProperty("repair_code_id", this.getRepairCodeId());
+        auditItem.addProperty("component_code_id", this.getComponentCodeId());
+        auditItem.addProperty("location_code", this.getLocationCode());
+        auditItem.addProperty("length", this.getLength());
+        auditItem.addProperty("height", this.getHeight());
+        auditItem.addProperty("quantity", this.getQuantity());
+        auditItem.add("audit_images", auditImage);
+        return auditItem;
+
+    }
+
     /**
      * Get audit image name for post audit item
      * Return JSONArray of audit image list look like [{name: '....'}, {name: '....'}, ...] for upload
+     *
      * @return
      * @throws JSONException
      */
@@ -101,6 +117,7 @@ public class AuditItem implements Serializable{
     /**
      * Get repaired image name for post complete repair
      * Return JSONArray of repaired image list look like [{name: '....'}, {name: '....'}, ...] for upload
+     *
      * @return
      * @throws JSONException
      */

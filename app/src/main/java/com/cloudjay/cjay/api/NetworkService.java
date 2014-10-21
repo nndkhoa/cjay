@@ -4,6 +4,7 @@ import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
@@ -61,16 +62,16 @@ public interface NetworkService {
     public Session postContainer( @Body JsonObject jsonSessionString);
 
     @PUT(ApiEndpoint.CONTAINER_SESSION_CHECK_OUT_API)
-    public void checkOutContainerSession(@Path("id") String containerId, @Query("gate_images") String gate_image);
+    public Session checkOutContainerSession(@Path("id") String containerId, @Body JsonArray jsonGateImage);
 
     @PUT(ApiEndpoint.CONTAINER_SESSION_COMPLETE_AUDIT_API)
-    public void completeAudit(@Path("id") String containerId);
+    public Session completeAudit(@Path("id") String containerId);
 
     @PUT(ApiEndpoint.CONTAINER_SESSION_COMPLETE_REPAIR_API)
-    public void completeRepair(@Path("id") String containerId, @Query("audit_items") String audit_item);
+    public Session completeRepair(@Path("id") String containerId, @Body JsonArray audit_items);
 
     @PUT(ApiEndpoint.CONTAINER_SESSION_POST_AUDIT_ITEM_API)
-    public void postAudiItem(@Path("id") String containerId, @Query("damage_code_id") String damage_code_id, @Query("repair_code_id") String repair_code_id, @Query("component_code_id") String component_code_id, @Query("location_code") String location_code, @Query("length") Long length, @Query("height") Long height, @Query("quantity") Long quantity, @Query("audit_images") String audit_images);
+    public Session postAudiItem(@Path("id") String containerId,@Body JsonObject audit_item);
 
     // Check source v1, uploadType=media
     @POST(ApiEndpoint.CJAY_TMP_STORAGE_IMAGE)
