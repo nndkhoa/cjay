@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.enums.ImageType;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.List;
@@ -21,13 +22,23 @@ public class RepairedImageAdapter extends ArrayAdapter<AuditImage> {
     private LayoutInflater mInflater;
     private int layoutResId;
     Context context;
+    ImageType type;
 
-    public RepairedImageAdapter(Context context, int resource) {
+    /**
+     * Create Adapter for list image view
+     *
+     * @param context
+     * @param resource
+     * @param type
+     */
+    public RepairedImageAdapter(Context context, int resource, ImageType type) {
         super(context, resource);
         this.context = context;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         layoutResId = resource;
+        this.type = type;
     }
+
     private static class ViewHolder {
         ImageView imageView;
     }
@@ -42,14 +53,16 @@ public class RepairedImageAdapter extends ArrayAdapter<AuditImage> {
             convertView = mInflater.inflate(layoutResId, parent, false);
             viewHolder = new ViewHolder();
 
-         viewHolder.imageView = (ImageView) convertView.findViewById(R.id.iv_image);
+            viewHolder.imageView = (ImageView) convertView.findViewById(R.id.iv_image);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
         //Set data to view
-        ImageLoader.getInstance().displayImage(auditImage.getUrl(),viewHolder.imageView);
+        if (type == ImageType.values()[((int) auditImage.getType())]) {
+            ImageLoader.getInstance().displayImage(auditImage.getUrl(), viewHolder.imageView);
+        }
 
         return convertView;
     }

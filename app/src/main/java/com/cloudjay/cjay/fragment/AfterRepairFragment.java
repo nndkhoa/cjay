@@ -6,11 +6,20 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.adapter.RepairedImageAdapter;
+import com.cloudjay.cjay.model.AuditImage;
+import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.util.enums.ImageType;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
+
+import java.util.List;
 
 /**
  * Created by thai on 20/10/2014.
@@ -19,10 +28,18 @@ import org.androidannotations.annotations.ViewById;
 @EFragment(R.layout.fragment_before_after_repaierd)
 public class AfterRepairFragment extends Fragment {
 
+    @Bean
+    DataCenter dataCenter;
+
     public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+
+    public final static String AUDIT_ITEM_EXTRA = "com.cloudjay.wizard.auditItem";
 
     @FragmentArg(CONTAINER_ID_EXTRA)
     public String containerID;
+
+    @FragmentArg(AUDIT_ITEM_EXTRA)
+    public AuditItem auditItem;
 
     @ViewById(R.id.tv_code_comp_repaired)
     TextView tvCompCode;
@@ -47,4 +64,19 @@ public class AfterRepairFragment extends Fragment {
 
     @ViewById(R.id.btn_camera_repaired)
     Button btnCamera;
+
+    RepairedImageAdapter imageAdapter;
+
+    @AfterViews
+    void setup() {
+        tvCompCode.setText(auditItem.getComponentCode());
+        tvLocaitonCode.setText(auditItem.getLocationCode());
+        tvDamageCode.setText(auditItem.getDamageCode());
+        tvRepairCode.setText(auditItem.getRepairCode());
+        tvSize.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
+        imageAdapter = new RepairedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.REPAIRED);
+        List<AuditImage> auditImages = auditItem.getAuditImages();
+        imageAdapter.setData(auditImages);
+
+    }
 }
