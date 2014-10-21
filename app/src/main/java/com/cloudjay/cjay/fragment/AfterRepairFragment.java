@@ -122,5 +122,6 @@ public class AfterRepairFragment extends Fragment {
         }
         List<AuditImage> auditImages = auditItem.getAuditImages();
         imageAdapter.setData(auditImages);
+        imageAdapter.notifyDataSetChanged();
     }
 }
