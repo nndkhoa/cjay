@@ -6,13 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.TextView;
 
-import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
@@ -45,9 +42,6 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 		TextView tvPreStatus;
 		TextView tvCurrentStatus;
 		TextView tvStep;
-
-		Button btnSubmit;
-		Button btnContinue;
 	}
 
 	@Override
@@ -69,8 +63,6 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 			viewHolder.tvPreStatus = (TextView) convertView.findViewById(R.id.tv_pre_status);
 			viewHolder.tvCurrentStatus = (TextView) convertView.findViewById(R.id.tv_current_status);
 			viewHolder.tvStep = (TextView) convertView.findViewById(R.id.tv_step);
-			viewHolder.btnSubmit = (Button) convertView.findViewById(R.id.btn_submit);
-			viewHolder.btnContinue = (Button) convertView.findViewById(R.id.btn_continue);
 
 			convertView.setTag(viewHolder);
 		} else {
@@ -99,21 +91,6 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 		viewHolder.tvStep.setText((Step.values()[(int) session.getStep()]).toString());
 		viewHolder.tvPreStatus.setText((Status.values()[(int) session.getPreStatus()]).toString());
 		viewHolder.tvCurrentStatus.setText((Status.values()[(int) session.getStatus()]).toString());
-
-		if (!session.isProcessing()) {
-			viewHolder.btnContinue.setVisibility(View.GONE);
-			viewHolder.btnSubmit.setVisibility(View.GONE);
-		}
-
-		// Xử lý upload container session khi click vào button Submit
-		viewHolder.btnSubmit.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				App.getJobManager().addJobInBackground(new UploadSessionJob(session));
-
-			}
-		});
-
 		return convertView;
 	}
 
