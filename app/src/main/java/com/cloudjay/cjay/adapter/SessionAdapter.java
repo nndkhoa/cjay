@@ -73,13 +73,11 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 		viewHolder.tvContainerId.setText(session.getContainerId());
 		viewHolder.tvOperator.setText(session.getOperatorCode());
 
-		Logger.Log("Check in: " + session.getCheckInTime());
 		// Set datetime
 		String checkInDate = StringHelper.getTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE,
 				CJayConstant.DAY_FORMAT, session.getCheckInTime());
 		viewHolder.tvDateIn.setText(checkInDate);
 
-		Logger.Log("Check out: " + session.getCheckOutTime());
 		String checkOutDate = StringHelper.getTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE,
 				CJayConstant.DAY_FORMAT, session.getCheckOutTime());
 		if (TextUtils.isEmpty(checkOutDate)) {

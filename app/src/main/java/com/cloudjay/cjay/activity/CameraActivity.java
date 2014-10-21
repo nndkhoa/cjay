@@ -58,7 +58,6 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 				current.lockToLandscape(isLockedToLandscape);
 			}
 		});
-
 	}
 
 	@Override

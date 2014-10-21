@@ -147,10 +147,10 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 		// Config shot mode. Default is FALSE.
 		// Configure View visibility based on current step of session
-		Step step = Step.values()[mType];
+		Step step = Step.values()[currentStep];
 		switch (step) {
 			case AUDIT:
-				btnCameraMode.setVisibility(View.VISIBLE);
+				btnUseGateImage.setVisibility(View.VISIBLE);
 				btnCameraMode.setVisibility(View.VISIBLE);
 				break;
 

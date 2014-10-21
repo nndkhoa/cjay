@@ -30,6 +30,7 @@
 				android:layout_centerInParent="true"
 				android:background="@drawable/btn_toggle_blue"
 				android:shadowColor="@android:color/black"
+				android:textColor="@android:color/white"
 				android:shadowDx="1"
 				android:shadowDy="1"
 				android:shadowRadius="2"
