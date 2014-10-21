@@ -35,7 +35,6 @@ import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.Step;
 import com.path.android.jobqueue.JobManager;
-import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -119,6 +118,9 @@ public class ImportFragment extends Fragment {
 
 		// Set ActionBar Title
 		getActivity().getActionBar().setTitle(R.string.fragment_import_title);
+		etOperator.setFocusable(false);
+		etOperator.setCursorVisible(false);
+		etOperator.clearFocus();
 
 		// Trying to restore container status
 		Session tmp = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
@@ -159,8 +161,8 @@ public class ImportFragment extends Fragment {
 		etOperator.setText(operator.getOperatorName());
 
 		// Add new session to database
-		String currentTime = StringHelper.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
-
+		String currentTime = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+		Logger.Log(currentTime);
 		currentSession = new Session().withContainerId(containerID)
 				.withOperatorCode(operatorCode)
 				.withOperatorId(operator.getId())
@@ -173,11 +175,11 @@ public class ImportFragment extends Fragment {
 
 	@UiThread
 	void onEvent(ImageCapturedEvent event) {
-		try {
-			dataCenter.getGateImages(CJayConstant.TYPE_IMPORT, event.getContainerId());
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			dataCenter.getGateImages(CJayConstant.TYPE_IMPORT, event.getContainerId());
+//		} catch (SnappydbException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	@UiThread

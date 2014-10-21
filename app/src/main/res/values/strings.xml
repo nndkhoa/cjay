@@ -72,7 +72,7 @@
     <!-- Camera Button -->
     <string name="camera_done">Done</string>
     <string name="require_select_operator_first">Vui lòng chọn hãng tàu trước khi chụp</string>
-    <string name="btn_use_gate_in_image_title">Hình cổng</string>
+    <string name="btn_use_gate_in_image_title">GATE</string>
 
     <!-- Dialog Search Operator -->
     <string name="dialog_container_owner">Hãng tàu</string>

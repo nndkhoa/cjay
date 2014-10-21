@@ -1,6 +1,5 @@
 package com.cloudjay.cjay.fragment;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -144,13 +143,14 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		// CameraHost is the interface use to configure behavior of camera ~ setting
 		SimpleCameraHost.Builder builder = new SimpleCameraHost.Builder(new CameraHost(getActivity()));
 		setHost(builder.useFullBleedPreview(true).build());
+		btnTakePicture.setEnabled(true);
 
 		// Config shot mode. Default is FALSE.
 		// Configure View visibility based on current step of session
-		Step step = Step.values()[mType];
+		Step step = Step.values()[currentStep];
 		switch (step) {
 			case AUDIT:
-				btnCameraMode.setVisibility(View.VISIBLE);
+				btnUseGateImage.setVisibility(View.VISIBLE);
 				btnCameraMode.setVisibility(View.VISIBLE);
 				break;
 
@@ -188,7 +188,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	 * Take a picture, need to call auto focus before taking picture
 	 */
 	public void takeSimplePicture() {
-
 		if (getContract().isSingleShotMode() == true) {
 			singleShotProcessing = true;
 			btnTakePicture.setEnabled(false);
@@ -211,6 +210,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	 * CameraHost is the interface use to configure behavior of camera ~ setting.
 	 */
 	class CameraHost extends SimpleCameraHost {
+
 		public CameraHost(Context _ctxt) {
 			super(_ctxt);
 		}
@@ -378,8 +378,9 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		}
     
 		@Override
-		@TargetApi(16)
 		public void onAutoFocus(boolean success, Camera camera) {
+
+			Logger.Log("On auto focus");
 			super.onAutoFocus(success, camera);
 
 			btnTakePicture.setEnabled(true);

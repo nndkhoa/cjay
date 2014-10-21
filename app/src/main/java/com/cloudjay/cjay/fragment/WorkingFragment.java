@@ -1,5 +1,6 @@
 package com.cloudjay.cjay.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.widget.ListView;
@@ -7,16 +8,20 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.activity.WizardActivity;
+import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -55,6 +60,19 @@ public class WorkingFragment extends Fragment {
 	public void onDestroy() {
 		EventBus.getDefault().unregister(this);
 		super.onDestroy();
+	}
+
+	@ItemClick(R.id.lv_working_container)
+	void workingItemClicked(int position) {
+		Logger.Log("Position: " + position);
+
+		// navigation to Wizard Activity
+		Session item = mAdapter.getItem(position);
+		Intent intent = new Intent(getActivity(), WizardActivity_.class);
+		intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, item.getContainerId());
+		intent.putExtra(WizardActivity.STEP_EXTRA, item.getStep());
+		startActivity(intent);
+
 	}
 
 	/**

@@ -3,6 +3,7 @@ package com.cloudjay.cjay;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.StrictMode;
 import android.util.Log;
 
 import com.cloudjay.cjay.util.CJayConstant;
@@ -18,7 +19,6 @@ import com.path.android.jobqueue.log.CustomLogger;
 import com.snappydb.DB;
 import com.snappydb.DBFactory;
 import com.snappydb.SnappydbException;
-
 
 public class App extends Application {
 
@@ -53,6 +53,11 @@ public class App extends Application {
 		configureDirectories();
 		configureImageLoader();
 		configureJobManager();
+
+		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
+		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
+				.detectLeakedClosableObjects().penaltyLog()
+				.penaltyDeath().build());
 
 		// Crashlytics.start(this);
 	}

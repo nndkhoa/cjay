@@ -16,9 +16,8 @@ import de.greenrobot.event.EventBus;
 public class UploadSessionJob extends Job {
 	Session session;
 
-
 	public UploadSessionJob(Session session) {
-		super(new Params(1).requireNetwork().setPersistent(true).groupBy(session.getContainerId()));
+		super(new Params(1).requireNetwork().persist().groupBy(session.getContainerId()));
 		this.session = session;
 	}
 
