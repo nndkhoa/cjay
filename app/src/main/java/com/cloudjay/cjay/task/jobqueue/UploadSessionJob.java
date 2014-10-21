@@ -20,13 +20,11 @@ import de.greenrobot.event.EventBus;
  */
 public class UploadSessionJob extends Job {
     Session session;
-    Context context;
 
-    public UploadSessionJob(Context context, Session session) {
+
+    public UploadSessionJob(Session session) {
         super(new Params(1).requireNetwork().setPersistent(true).groupBy(session.getContainerId()));
-
         this.session = session;
-        this.context = context;
     }
 
     @Override
@@ -37,8 +35,8 @@ public class UploadSessionJob extends Job {
     @Override
     public void onRun() throws Throwable {
         EventBus.getDefault().post(new UpLoadingEvent());
-        this.context = App.getInstance().getApplicationContext();;
-        DataCenter_.getInstance_(context).uploadContainerSession(context,session);
+        Context context = App.getInstance().getApplicationContext();
+        DataCenter_.getInstance_(context).uploadContainerSession(context, session);
         Logger.e("Uploaded container: " + session.getContainerId());
         EventBus.getDefault().post(new UploadedEvent(session.getContainerId()));
 
