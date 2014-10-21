@@ -17,14 +17,6 @@ public class AuditImage {
     @Expose
     private String url;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     private String name;
 
     private boolean uploaded;
@@ -75,5 +67,18 @@ public class AuditImage {
         this.url = url;
         return this;
     }
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public AuditImage withName(String name) {
+		this.name = name;
+		return this;
+	}
 
 }

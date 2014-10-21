@@ -342,6 +342,14 @@ public class DataCenter {
 		}
 	}
 
+	public void addGateImage(GateImage image) throws SnappydbException {
+
+	}
+
+	public void addAuditImage(AuditImage image) throws SnappydbException {
+
+	}
+
 	/**
 	 * Add gate image for both normal session and working session
 	 *
@@ -356,6 +364,7 @@ public class DataCenter {
 	}
 
 	private void addGateImageToWorkingSession(long type, String url, String containerId, String imageName) throws SnappydbException {
+
 		containerId = CJayConstant.PREFIX_WORKING + containerId;
 		Session session = App.getDB(context).getObject(containerId, Session.class);
 		GateImage gateImage = new GateImage();

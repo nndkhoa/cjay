@@ -15,21 +15,27 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.cloudjay.cjay.App;
-import com.cloudjay.cjay.DataCenter_;
+import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.ReuseActivity_;
+import com.cloudjay.cjay.event.ImageCapturedEvent;
+import com.cloudjay.cjay.model.AuditImage;
+import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.task.jobqueue.UploadImageJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.commonsware.cwac.camera.PictureTransaction;
 import com.commonsware.cwac.camera.SimpleCameraHost;
+import com.path.android.jobqueue.JobManager;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
@@ -40,8 +46,16 @@ import java.io.FileOutputStream;
 import java.util.List;
 import java.util.UUID;
 
+import de.greenrobot.event.EventBus;
+
 @EFragment
 public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
+
+	public interface Contract {
+		boolean isSingleShotMode();
+
+		void setSingleShotMode(boolean mode);
+	}
 
 	//region ATTR
 
@@ -64,6 +78,10 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 	@FragmentArg(CURRENT_STEP_EXTRA)
 	int currentStep;
+
+	@Bean
+	DataCenter dataCenter;
+
 	//endregion
 
 	//region VIEW
@@ -92,6 +110,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 	@Click(R.id.btn_camera_done)
 	void btnDoneClicked() {
+		EventBus.getDefault().post(new ImageCapturedEvent(containerId));
 		getActivity().finish();
 	}
 
@@ -188,12 +207,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		takePicture(xact);
 	}
 
-	public interface Contract {
-		boolean isSingleShotMode();
-
-		void setSingleShotMode(boolean mode);
-	}
-
 	/**
 	 * CameraHost is the interface use to configure behavior of camera ~ setting.
 	 */
@@ -238,7 +251,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		}
 
 		/**
-		 * Add image at `uri` to job queue
+		 * Add new image to database based on `mType`.
+		 * Add image at `uri` to job queue.
 		 *
 		 * @param uri
 		 * @param imageName
@@ -247,13 +261,40 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		protected void addImageToUploadQueue(String uri, String imageName) {
 			try {
 
-				Context context = getActivity().getApplicationContext();
-				DataCenter_.getInstance_(context).addGateImage(mType, "file://" + uri, containerId, imageName);
-				App.getJobManager().addJobInBackground(new UploadImageJob(uri, imageName, containerId));
-				// EventBus.getDefault().post(new ImageCapturedEvent(containerId));
+				// Create image based on mType and add this image to database
+				ImageType type = ImageType.values()[mType];
+				switch (type) {
+					case IMPORT:
+					case EXPORT:
+
+						GateImage gateImage = new GateImage()
+								.withId(0)
+								.withType(mType)
+								.withName(imageName)
+								.withUrl("file://" + uri);
+
+						dataCenter.addGateImage(gateImage);
+						break;
+
+					case AUDIT:
+					case REPAIRED:
+					default:
+						AuditImage auditImage = new AuditImage()
+								.withId(0)
+								.withType(mType)
+								.withUrl("file://" + uri)
+								.withName(imageName);
+
+						dataCenter.addAuditImage(auditImage);
+						break;
+				}
+
+				// Add image to job queue
+				JobManager jobManager = App.getJobManager();
+				jobManager.addJobInBackground(new UploadImageJob(uri, imageName, containerId));
 
 			} catch (SnappydbException e) {
-				e.printStackTrace();
+				Utils.showCrouton(getActivity(), e.getMessage());
 			}
 		}
 

@@ -6,7 +6,7 @@ import javax.annotation.Generated;
 
 
 @Generated("org.jsonschema2pojo")
-public class GateImage{
+public class GateImage {
 
 	@Expose
 	private long id;
@@ -15,26 +15,18 @@ public class GateImage{
 	@Expose
 	private String url;
 
-    public String getName() {
-        return name;
-    }
+	@Expose
+	private String name;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	private boolean uploaded;
 
-    @Expose
-    private String name;
+	public boolean isUploaded() {
+		return uploaded;
+	}
 
-    private boolean uploaded;
-
-    public boolean isUploaded() {
-        return uploaded;
-    }
-
-    public void setUploaded(boolean isUploaded) {
-        this.uploaded = isUploaded;
-    }
+	public void setUploaded(boolean isUploaded) {
+		this.uploaded = isUploaded;
+	}
 
 	public long getId() {
 		return id;
@@ -75,4 +67,16 @@ public class GateImage{
 		return this;
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public GateImage withName(String name) {
+		this.name = name;
+		return this;
+	}
 }

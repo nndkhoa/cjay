@@ -224,7 +224,6 @@ public class ImportFragment extends Fragment {
 
 	/**
 	 * Add container session to upload queue. Then navigate user to Audit and Repair Fragment.
-	 *
 	 */
 	@Click(R.id.btn_continue)
 	void buttonContinueClicked() {

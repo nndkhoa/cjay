@@ -14,7 +14,6 @@ import com.snappydb.SnappydbException;
 import de.greenrobot.event.EventBus;
 
 public class UploadImageJob extends Job {
-
 	String containerId;
 	String uri;
 	String imageName;
@@ -43,9 +42,9 @@ public class UploadImageJob extends Job {
 
 	@Override
 	public void onRun() throws Throwable {
+		EventBus.getDefault().post(new UploadingEvent());
 
 		Context context = App.getInstance().getApplicationContext();
-		EventBus.getDefault().post(new UploadingEvent());
 		DataCenter_.getInstance_(context).uploadImage(context, uri, imageName, containerId);
 	}
 
