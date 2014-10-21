@@ -377,5 +377,4 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 			return determineBestSize(sizes);
 		}
 	}
-
 }

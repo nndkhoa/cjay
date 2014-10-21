@@ -3,9 +3,9 @@ package com.cloudjay.cjay.task.jobqueue;
 import android.content.Context;
 
 import com.cloudjay.cjay.DataCenter_;
-import com.cloudjay.cjay.event.UploadingEvent;
 import com.cloudjay.cjay.event.UploadStoppedEvent;
 import com.cloudjay.cjay.event.UploadedEvent;
+import com.cloudjay.cjay.event.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
@@ -13,9 +13,6 @@ import com.path.android.jobqueue.Params;
 
 import de.greenrobot.event.EventBus;
 
-/**
- * Created by thai on 06/10/2014.
- */
 public class UploadSessionJob extends Job {
     Session session;
     Context context;
@@ -38,8 +35,6 @@ public class UploadSessionJob extends Job {
         DataCenter_.getInstance_(context).uploadContainerSession(context,session);
         Logger.e("Uploaded container: " + session.getContainerId());
         EventBus.getDefault().post(new UploadedEvent(session.getContainerId()));
-
-
     }
 
 

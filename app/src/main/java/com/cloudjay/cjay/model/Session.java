@@ -110,7 +110,7 @@ public class Session {
     @Expose
     private List<AuditImage> auditImages;
 
-	public Session() {
+    public Session() {
     }
 
     /**
@@ -118,12 +118,12 @@ public class Session {
      *
      * @return
      */
-    public JsonObject getJsonSession()  {
+    public JsonObject getJsonSession() {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("pre_status", this.preStatus);
         jsonObject.addProperty("container_id", containerId);
         jsonObject.addProperty("operator_id", operatorId);
-        jsonObject.add("gate_images",this.getGateInImageToUpLoad());
+        jsonObject.add("gate_images", this.getGateInImageToUpLoad());
         return jsonObject;
     }
 
@@ -133,7 +133,7 @@ public class Session {
      * @return
      * @throws JSONException
      */
-    public JsonArray getGateInImageToUpLoad()  {
+    public JsonArray getGateInImageToUpLoad() {
         JsonArray gate_image = new JsonArray();
         for (GateImage gateImage : this.gateImages) {
             if (gateImage.getType() == ImageType.IMPORT.getValue()) {
@@ -152,7 +152,7 @@ public class Session {
      * @return
      * @throws JSONException
      */
-    public JsonArray getGateOutImageToUpLoad()  {
+    public JsonArray getGateOutImageToUpLoad() {
         JsonArray gate_image = new JsonArray();
         for (GateImage gateImage : this.gateImages) {
             if (gateImage.getType() == ImageType.EXPORT.getValue()) {
@@ -184,6 +184,7 @@ public class Session {
         }
         return auditItems;
     }
+
 
 
     public long getId() {
