@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -33,6 +34,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -70,6 +72,9 @@ public class SearchFragment extends Fragment {
 	DataCenter dataCenter;
 	String containerID;
 
+	@SystemService
+	InputMethodManager inputMethodManager;
+
 	private SessionAdapter mAdapter;
 
 	public SearchFragment() {
@@ -92,7 +97,8 @@ public class SearchFragment extends Fragment {
 		// Set action when click `Enter` key
 		editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
-			public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+			public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent
+			) {
 				if (TextUtils.isEmpty(editText.getText())) {
 					editText.setError(getResources().getString(R.string.error_empty_search_string));
 					return true;
@@ -194,7 +200,9 @@ public class SearchFragment extends Fragment {
 	 * Begin to search in background
 	 */
 	private void performSearch() {
+
 		showProgress(true);
+		inputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
 		String keyword = editText.getText().toString();
 
 		// Start search in background

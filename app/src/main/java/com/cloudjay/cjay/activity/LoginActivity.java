@@ -55,6 +55,9 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	@Bean
 	DataCenter dataCenter;
 
+	@SystemService
+	InputMethodManager inputMethodManager;
+
 	AccountManager accountManager;
 	AlertDialog mAlertDialog;
 	boolean mInvalidate;
@@ -237,6 +240,11 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	 * 2. Call doLogin() to send request to server
 	 */
 	void performLogin() {
+
+		// Hide Keyboard
+		inputMethodManager.hideSoftInputFromWindow(etPassword.getWindowToken(), 0);
+
+		// Check input
 		email = etEmail.getText().toString();
 		password = etPassword.getText().toString();
 

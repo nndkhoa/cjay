@@ -35,7 +35,6 @@ import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.Step;
 import com.path.android.jobqueue.JobManager;
-import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -173,11 +172,11 @@ public class ImportFragment extends Fragment {
 
 	@UiThread
 	void onEvent(ImageCapturedEvent event) {
-		try {
-			dataCenter.getGateImages(CJayConstant.TYPE_IMPORT, event.getContainerId());
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			dataCenter.getGateImages(CJayConstant.TYPE_IMPORT, event.getContainerId());
+//		} catch (SnappydbException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	@UiThread
