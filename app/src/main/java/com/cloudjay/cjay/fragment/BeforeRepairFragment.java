@@ -2,16 +2,13 @@ package com.cloudjay.cjay.fragment;
 
 import android.content.Intent;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity;
-import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.adapter.RepairedImageAdapter;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
@@ -31,7 +28,7 @@ import org.androidannotations.annotations.ViewById;
 import java.util.List;
 
 /**
- * Created by thai on 20/10/2014.
+ * Need 2 argument:String containerId, Audit item to init View.
  */
 
 @EFragment(R.layout.fragment_before_after_repaierd)

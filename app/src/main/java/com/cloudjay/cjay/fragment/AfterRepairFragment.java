@@ -29,7 +29,7 @@ import org.androidannotations.annotations.ViewById;
 import java.util.List;
 
 /**
- * Created by thai on 20/10/2014.
+ * Need 2 argument:String containerId, Audit item to init View.
  */
 
 @EFragment(R.layout.fragment_before_after_repaierd)

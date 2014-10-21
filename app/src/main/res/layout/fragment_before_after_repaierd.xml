@@ -124,8 +124,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/lv_image_repaired"
-        android:layout_above="@id/btn_camera_repaired"
-        android:layout_below="@id/ll_top_repaired">
+        android:layout_above="@+id/btn_camera_repaired"
+        android:layout_below="@+id/ll_top_repaired">
 
     </ListView>
 
