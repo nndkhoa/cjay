@@ -188,6 +188,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	 * Take a picture, need to call auto focus before taking picture
 	 */
 	public void takeSimplePicture() {
+
         Logger.Log("takeSimplePicture");
 		if (getContract().isSingleShotMode() == true) {
 			singleShotProcessing = true;
@@ -211,6 +212,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	 * CameraHost is the interface use to configure behavior of camera ~ setting.
 	 */
 	class CameraHost extends SimpleCameraHost {
+
 		public CameraHost(Context _ctxt) {
 			super(_ctxt);
 		}
@@ -379,6 +381,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 		@Override
 		public void onAutoFocus(boolean success, Camera camera) {
+
 			Logger.Log("On auto focus");
 			super.onAutoFocus(success, camera);
 

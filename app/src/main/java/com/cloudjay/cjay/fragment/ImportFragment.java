@@ -118,6 +118,9 @@ public class ImportFragment extends Fragment {
 
 		// Set ActionBar Title
 		getActivity().getActionBar().setTitle(R.string.fragment_import_title);
+		etOperator.setFocusable(false);
+		etOperator.setCursorVisible(false);
+		etOperator.clearFocus();
 
 		// Trying to restore container status
 		Session tmp = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
