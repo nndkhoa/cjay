@@ -1,5 +1,6 @@
 package com.cloudjay.cjay.fragment;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.widget.Button;
@@ -8,13 +9,19 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.activity.CameraActivity;
 import com.cloudjay.cjay.adapter.RepairedImageAdapter;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
+import com.cloudjay.cjay.util.enums.Step;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
@@ -66,17 +73,54 @@ public class AfterRepairFragment extends Fragment {
     Button btnCamera;
 
     RepairedImageAdapter imageAdapter;
+    String operatorCode;
 
     @AfterViews
     void setup() {
+        //get container operater code form containerId
+        Session tmp = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+        if (null == tmp) {
+            Utils.showCrouton(getActivity(), "Không tìm thấy container trong dữ liệu");
+        } else {
+            operatorCode = tmp.getOperatorCode();
+        }
+        // parse Data to view
         tvCompCode.setText(auditItem.getComponentCode());
         tvLocaitonCode.setText(auditItem.getLocationCode());
         tvDamageCode.setText(auditItem.getDamageCode());
         tvRepairCode.setText(auditItem.getRepairCode());
         tvSize.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
         imageAdapter = new RepairedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.REPAIRED);
+
+        //Get audit Image list form db
         List<AuditImage> auditImages = auditItem.getAuditImages();
         imageAdapter.setData(auditImages);
+    }
+    @Click(R.id.btn_camera_repaired)
+    void openCameraActivity(){
 
+        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
+        cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
+        cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
+        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_REPAIRED);
+        cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);
+        startActivity(cameraActivityIntent);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshListImage();
+    }
+
+    private void refreshListImage() {
+        Session tmp = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+        for (AuditItem currentAuditItem: tmp.getAuditItems()){
+            if (currentAuditItem.getId() == auditItem.getId()){
+                auditItem = currentAuditItem;
+            }
+        }
+        List<AuditImage> auditImages = auditItem.getAuditImages();
+        imageAdapter.setData(auditImages);
     }
 }
