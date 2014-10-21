@@ -219,8 +219,8 @@ public class SearchFragment extends Fragment {
 		mAdapter.clear();
 
 		if (result.size() != 0) {
-			mAdapter.addAll(result);
-			mAdapter.notifyDataSetChanged();
+            mAdapter.setData(result);
+            mAdapter.notifyDataSetChanged();
 		} else {
 			showSearchResultDialog(containerID);
 		}

@@ -1,6 +1,8 @@
 package com.cloudjay.cjay.fragment;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,6 +27,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
+import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -52,7 +55,7 @@ public class IssuePendingFragment extends Fragment {
     @ViewById(R.id.btn_camera)
     ImageButton btnCamera;
 
-    @ViewById(R.id.lv_issue_images)
+    @ViewById(R.id.lv_audit_images)
     ListView lvIssueImages;
 
     @Bean
@@ -101,6 +104,43 @@ public class IssuePendingFragment extends Fragment {
         cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
         cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.AUDIT.value);
         startActivity(cameraActivityIntent);
+    }
+//TODO waiting for fow form @Khai
+    @ItemClick(R.id.lv_audit_images)
+    void showApproveDiaglog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.dialog_search_container_title);
+        builder.setMessage("Lỗi này đã chưa được. Sửa luôn?");
+
+        builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //TODO show chon loi da giam dinh @Nam
+                dialogInterface.dismiss();
+            }
+        });
+
+        builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //TODO add to database
+                dialogInterface.dismiss();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+
+                // Set background and text color for confirm button
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setTextColor(getActivity().getResources().getColor(android.R.color.holo_green_dark));
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setBackgroundResource(getActivity().getResources().getColor(android.R.color.darker_gray));
+            }
+        });
+        dialog.show();
     }
 
     @UiThread

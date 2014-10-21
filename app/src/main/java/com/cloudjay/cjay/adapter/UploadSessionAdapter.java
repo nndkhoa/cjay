@@ -79,6 +79,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
                 viewHolder.tvUploadStatus.setVisibility(View.VISIBLE);
             } else {
                 viewHolder.pbUpLoading.setVisibility(View.VISIBLE);
+                viewHolder.pbUpLoading.setProgress(100 * Utils.countUploadedImage(session) / Utils.countTotalImage(session));
             }
         } else {
             viewHolder.ivUploadStatus.setImageResource(R.drawable.ic_error);
