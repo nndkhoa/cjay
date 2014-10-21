@@ -10,6 +10,7 @@ import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.event.UploadedEvent;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.model.AuditImage;
+import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Operator;
@@ -29,6 +30,7 @@ import org.androidannotations.annotations.Trace;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import de.greenrobot.event.EventBus;
 
@@ -486,6 +488,26 @@ public class DataCenter {
 
 	public void addAuditImages(String containerId, long type, String url) throws SnappydbException {
 		Session session = App.getDB(context).getObject(containerId, Session.class);
+
+        // Generate random one UUID to save auditItem
+        String uuid = UUID.randomUUID().toString();
+
+        // Create new audit item to save
+        AuditItem auditItem = new AuditItem();
+        auditItem.setId(0);
+        auditItem.setAuditItemUUID(uuid);
+
+        // Get list session's audit items
+        List<AuditItem> auditItems = session.getAuditItems();
+        if (auditItems == null) {
+            auditItems = new ArrayList<AuditItem>();
+        }
+        // Add audit item to List session's audit items
+        auditItems.add(auditItem);
+
+        // Add audit item to Session
+        session.setAuditItems(auditItems);
+
 		AuditImage auditImage = new AuditImage();
 		auditImage.setId(0);
 		auditImage.setType(type);
@@ -505,7 +527,7 @@ public class DataCenter {
 		App.closeDB();
 	}
 
-    public void getAuditAImages(String containerId) {
+    public void getAuditImages(String containerId) {
         try {
             Session session = App.getDB(context).getObject(containerId, Session.class);
             List<AuditImage> auditImages = session.getAuditImages();

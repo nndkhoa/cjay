@@ -17,6 +17,7 @@ import java.util.List;
 import javax.annotation.Generated;
 
 
+/* Field auditItemUUID để phân biệt AuditItem dưới Local, trước khi upload lên server */
 @Generated("org.jsonschema2pojo")
 public class AuditItem implements Serializable {
 
@@ -64,6 +65,10 @@ public class AuditItem implements Serializable {
     @SerializedName("modified_at")
     @Expose
     private String modifiedAt;
+
+    @SerializedName("audit_item_uuid")
+    @Expose
+    private String auditItemUUID;
 
     public long getId() {
         return id;
@@ -328,6 +333,14 @@ public class AuditItem implements Serializable {
     public AuditItem withModifiedAt(String modifiedAt) {
         this.modifiedAt = modifiedAt;
         return this;
+    }
+
+    public void setAuditItemUUID(String audiItemUUID) {
+        this.auditItemUUID = audiItemUUID;
+    }
+
+    public String getAuditItemUUID() {
+        return this.auditItemUUID;
     }
 
 }

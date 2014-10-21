@@ -188,7 +188,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	 * Take a picture, need to call auto focus before taking picture
 	 */
 	public void takeSimplePicture() {
-        Logger.Log("takeSimplePicture");
+
 		if (getContract().isSingleShotMode() == true) {
 			singleShotProcessing = true;
 			btnTakePicture.setEnabled(false);
@@ -376,14 +376,13 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 			super.onCameraFail(reason);
 			Toast.makeText(getActivity(), "Sorry, but you cannot use the camera now!", Toast.LENGTH_LONG).show();
 		}
-
+    
 		@Override
 		@TargetApi(16)
 		public void onAutoFocus(boolean success, Camera camera) {
 			super.onAutoFocus(success, camera);
 
 			btnTakePicture.setEnabled(true);
-            Logger.Log("went to autoFocus");
 			takeSimplePicture();
 		}
 
