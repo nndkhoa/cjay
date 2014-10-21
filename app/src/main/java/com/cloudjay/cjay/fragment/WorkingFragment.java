@@ -15,6 +15,7 @@ import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
@@ -63,6 +64,7 @@ public class WorkingFragment extends Fragment {
 
 	@ItemClick(R.id.lv_working_container)
 	void workingItemClicked(int position) {
+		Logger.Log("Position: " + position);
 
 		// navigation to Wizard Activity
 		Session item = mAdapter.getItem(position);

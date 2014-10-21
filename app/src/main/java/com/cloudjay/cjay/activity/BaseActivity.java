@@ -80,6 +80,7 @@ public class BaseActivity extends FragmentActivity {
 
 					// Clear preference and Database
 					PreferencesUtil.clearPrefs(getApplicationContext());
+					getApplicationContext().deleteDatabase("db_default_job_manager.db");
 					DB db = App.getDB(getApplicationContext());
 					db.destroy();
 
