@@ -22,7 +22,7 @@ public class GateImageAdapter extends BaseAdapter {
 
     private LayoutInflater inflater;
     private List<GateImage> gateImages;
-    private Context mContext;
+    private Context context;
 
     private boolean mCheckable = false;
     private ArrayList<String> mArrayCheckedImages;
@@ -30,7 +30,7 @@ public class GateImageAdapter extends BaseAdapter {
     public GateImageAdapter(Context context, List<GateImage> gateImages, boolean isCheckable) {
         this.inflater = LayoutInflater.from(context);
         this.gateImages = gateImages;
-        this.mContext = context;
+        this.context = context;
         this.mCheckable = isCheckable;
 
         mArrayCheckedImages = new ArrayList<String>();
