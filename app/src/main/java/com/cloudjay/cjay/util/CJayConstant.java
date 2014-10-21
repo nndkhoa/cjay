@@ -21,14 +21,14 @@ public class CJayConstant {
 	public static final int TYPE_AUDIT = 2;
 	public static final int TYPE_REPAIRED = 3;
 
-	//For save and query in db
-	public static final String OPERATOR_KEY = "OP";
-	public static final String WORKING_DB = "WORKING";
-	public static final String UPLOADING_DB = "UPLOADING";
-	public static final String USER_KEY = "USER";
-	public static final String DAMAGE_CODE_KEY = "DAMAGE";
-	public static final String REPAIR_CODE_KEY = "REPAIR";
-	public static final String COMPONENT_CODE_KEY = "COMPONENT";
+	// Prefix for save and query in db
+	public static final String PREFIX_OPERATOR = "OP";
+	public static final String PREFIX_WORKING = "WORKING";
+	public static final String PREFIX_UPLOADING = "UPLOADING";
+	public static final String PREFIX_USER = "USER";
+	public static final String PREFIX_DAMAGE_CODE = "DAMAGE";
+	public static final String PREFIX_REPAIR_CODE = "REPAIR";
+	public static final String PREFIX_COMPONENT_CODE = "COMPONENT";
 
 	// `/sdcard/DCMI/CJay/`
 	public static final File APP_DIRECTORY_FILE = new File(

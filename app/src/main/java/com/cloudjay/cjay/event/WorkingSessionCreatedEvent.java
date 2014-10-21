@@ -3,20 +3,22 @@ package com.cloudjay.cjay.event;
 import com.cloudjay.cjay.model.Session;
 
 /**
- * Created by thai on 10/10/2014.
+ * Sự kiện được kích hoạt khi một WorkingSession được tạo ra.
+ * Dùng để update UI của WorkingFragment.
  */
 public class WorkingSessionCreatedEvent {
-    public Session getWorkingSession() {
-        return workingSession;
-    }
 
-    public void setworkingSession(Session workingId) {
-        this.workingSession = workingId;
-    }
+	Session session;
 
-    Session workingSession;
+	public Session getSession() {
+		return session;
+	}
 
-    public WorkingSessionCreatedEvent(Session current) {
-        this.workingSession = current;
-    }
+	public void setSession(Session session) {
+		this.session = session;
+	}
+
+	public WorkingSessionCreatedEvent(Session current) {
+		this.session = current;
+	}
 }

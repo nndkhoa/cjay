@@ -67,7 +67,6 @@ public class NetworkClient {
 	 */
 	public User getCurrentUser(Context context) {
 		User result = provider.getRestAdapter(context).create(NetworkService.class).getCurrentUser();
-
 		return result;
 	}
 	//endregion

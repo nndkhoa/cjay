@@ -22,11 +22,10 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
-import com.cloudjay.cjay.event.BeginSearchOnServerEvent;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
+import com.cloudjay.cjay.event.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.fragment.dialog.AddContainerDialog;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 
 import org.androidannotations.annotations.AfterViews;
@@ -76,21 +75,10 @@ public class SearchFragment extends Fragment {
 	public SearchFragment() {
 	}
 
-	@UiThread
-	void showProgress(final boolean show) {
-		llSearchProgress.setVisibility(show ? View.VISIBLE : View.GONE);
-		llSearchResult.setVisibility(show ? View.GONE : View.VISIBLE);
-	}
-
-	@Click(R.id.btn_search)
-	void buttonSearchClicked() {
-		if (!TextUtils.isEmpty(editText.getText())) {
-			performSearch();
-		} else {
-			editText.setError(getResources().getString(R.string.error_empty_search_string));
-		}
-	}
-
+	/**
+	 * 1. Setup search EditText
+	 * 2. Setup Adapter and ListView result
+	 */
 	@AfterViews
 	void doAfterViews() {
 
@@ -116,6 +104,18 @@ public class SearchFragment extends Fragment {
 				return false;
 			}
 		});
+	}
+
+	/**
+	 * User tiến hành tìm kiếm container session
+	 */
+	@Click(R.id.btn_search)
+	void buttonSearchClicked() {
+		if (!TextUtils.isEmpty(editText.getText())) {
+			performSearch();
+		} else {
+			editText.setError(getResources().getString(R.string.error_empty_search_string));
+		}
 	}
 
 	/**
@@ -203,8 +203,17 @@ public class SearchFragment extends Fragment {
 	}
 
 	@UiThread
+	void showProgress(final boolean show) {
+		llSearchProgress.setVisibility(show ? View.VISIBLE : View.GONE);
+		llSearchResult.setVisibility(show ? View.GONE : View.VISIBLE);
+	}
+
+	/**
+	 * @param event
+	 */
+	@UiThread
 	public void onEvent(ContainerSearchedEvent event) {
-		Logger.Log("onEvent ContainerSearchedEvent");
+
 		showProgress(false);
 		List<Session> result = event.getSessions();
 		mAdapter.clear();
@@ -217,8 +226,13 @@ public class SearchFragment extends Fragment {
 		}
 	}
 
+	/**
+	 * Bắt đầu search từ Server
+	 *
+	 * @param event
+	 */
 	@UiThread
-	public void onEvent(BeginSearchOnServerEvent event) {
+	public void onEvent(SearchAsyncStartedEvent event) {
 		Toast.makeText(getActivity(), event.getStringEvent(), Toast.LENGTH_SHORT).show();
 	}
 

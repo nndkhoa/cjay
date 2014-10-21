@@ -13,7 +13,6 @@ import com.cloudjay.cjay.adapter.OperatorAdapter;
 import com.cloudjay.cjay.event.OperatorCallbackEvent;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.model.Operator;
-import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
@@ -26,6 +25,7 @@ import org.androidannotations.annotations.ViewById;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
+
 @EFragment(R.layout.dialog_select_operator)
 public class SearchOperatorDialog extends DialogFragment {
 
@@ -61,21 +61,23 @@ public class SearchOperatorDialog extends DialogFragment {
 		// Retrieve list operators
 		operators = event.getOperators();
 		// Init and set adapter
-        if (null == operatorAdapter) {
-            operatorAdapter = new OperatorAdapter(getActivity(), operators);
-            lvOperators.setAdapter(operatorAdapter);
-        }
+		if (null == operatorAdapter) {
+			operatorAdapter = new OperatorAdapter(getActivity(), operators);
+			lvOperators.setAdapter(operatorAdapter);
+		}
 
-        // Notify change
-        operatorAdapter.swapOperators(operators);
+		// Notify change
+		operatorAdapter.swapOperators(operators);
 	}
 
 	@AfterViews
-	void doAfterViews()  {
+	void doAfterViews() {
+
 		// Set title for search operator dialog
 		getDialog().setTitle(getResources().getString(R.string.dialog_operator_title));
+
 		// Begin to get operators from cache
-		dataCenter.getOperators();
+		dataCenter.searchOperator("");
 	}
 
 	@ItemClick(R.id.lv_operators_list)
@@ -84,20 +86,10 @@ public class SearchOperatorDialog extends DialogFragment {
 		this.dismiss();
 	}
 
-    @AfterTextChange(R.id.et_operator_name)
+	@AfterTextChange(R.id.et_operator_name)
 	void search(Editable text) {
-        String keyword = text.toString();
-		if (keyword.equals("")) {
-			// Get all operators
-            dataCenter.getOperators();
-		} else {
-			// Get operator(s) by keyword
-            try {
-                dataCenter.searchOperator(keyword.toUpperCase());
-            } catch (SnappydbException e) {
-                e.printStackTrace();
-            }
-        }
+		String keyword = text.toString();
+		dataCenter.searchOperator(keyword);
 	}
 
 	public void setParent(Fragment parent) {

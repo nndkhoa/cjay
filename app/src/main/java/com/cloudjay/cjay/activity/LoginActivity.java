@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.DataCenter;
@@ -123,20 +122,14 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		this.setResult(RESULT_OK, intent);
 	}
 
-	@UiThread
-	void showMessage(String s) {
-		Toast.makeText(getBaseContext(), s, Toast.LENGTH_SHORT).show();
-	}
-
 	/**
 	 * > MAIN FUNCTION
-	 *
+	 * <p/>
 	 * 1. Get data từ 2 text views username và password
 	 * 2. Validate ở client các trường hợp lỗi và thông báo
 	 * 3. Gửi username và password lên cho server
 	 * 4. Nhận token trả về và tiến hành gửi request get iso codes và operators
 	 * 5. Login thành công thì chuyển trang Home (HomeActivity)
-	 *
 	 */
 	@Background
 	void doLogin() {
@@ -151,7 +144,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 				PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_TOKEN, mToken);
 
 				// Continue to fetch List Operators and Iso Codes
-                showGettingDataTextView();
+				showGettingDataTextView();
 				dataCenter.fetchOperators(this);
 				dataCenter.fetchIsoCodes(this);
 				User user = dataCenter.getCurrentUserAsync(this);
@@ -184,7 +177,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		} catch (Exception e) {
 			e.printStackTrace();
 			showCrouton(e.getMessage());
-            showProgress(false);
+			showProgress(false);
 		}
 	}
 
@@ -215,78 +208,81 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 	@Click(R.id.btn_login)
 	void btnLoginClicked() {
-        performLogin();
+		performLogin();
 	}
 
-    @AfterViews
-    void doAfterViews() {
-        etPassword.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
+	@AfterViews
+	void doAfterViews() {
 
-                if (keyCode == EditorInfo.IME_ACTION_SEARCH ||
-                        keyCode == EditorInfo.IME_ACTION_DONE ||
-                        keyEvent.getAction() == KeyEvent.ACTION_DOWN &&
-                                keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+		// Config EditText Password auto login when user press Enter
+		etPassword.setOnKeyListener(new View.OnKeyListener() {
+			@Override
+			public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
+				if (keyCode == EditorInfo.IME_ACTION_SEARCH ||
+						keyCode == EditorInfo.IME_ACTION_DONE ||
+						keyEvent.getAction() == KeyEvent.ACTION_DOWN &&
+								keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+					if (!keyEvent.isShiftPressed()) {
+						performLogin();
+						return true;
+					}
+				}
+				return false;
+			}
+		});
+	}
 
-                    if (!keyEvent.isShiftPressed()) {
-                        performLogin();
-                        return true;
-                    }
-                }
+	/**
+	 * 1. Check input
+	 * 2. Call doLogin() to send request to server
+	 */
+	void performLogin() {
+		email = etEmail.getText().toString();
+		password = etPassword.getText().toString();
 
-                return false;
-            }
-        });
-    }
+		View focusView = null;
+		boolean cancel = false;
 
-    void performLogin() {
-        email = etEmail.getText().toString();
-        password = etPassword.getText().toString();
+		// Check for a valid password.
+		if (TextUtils.isEmpty(password)) {
+			etPassword.setError(getString(R.string.error_password_field_required));
+			focusView = etPassword;
+			cancel = true;
+		} else if (password.length() < 6) {
+			etPassword.setError(getString(R.string.error_invalid_password));
+			focusView = etPassword;
+			cancel = true;
+		}
 
-        View focusView = null;
-        boolean cancel = false;
+		// Check for a valid email address.
+		if (TextUtils.isEmpty(email)) {
+			etEmail.setError(getString(R.string.error_email_field_required));
+			focusView = etEmail;
+			cancel = true;
+		} else if (!email.contains("@")) {
+			etEmail.setError(getString(R.string.error_invalid_email));
+			focusView = etEmail;
+			cancel = true;
+		}
 
-        // Check for a valid password.
-        if (TextUtils.isEmpty(password)) {
-            etPassword.setError(getString(R.string.error_password_field_required));
-            focusView = etPassword;
-            cancel = true;
-        } else if (password.length() < 6) {
-            etPassword.setError(getString(R.string.error_invalid_password));
-            focusView = etPassword;
-            cancel = true;
-        }
+		// Done validation process. Try to log user in
+		if (cancel) {
+			focusView.requestFocus();
+		} else if (NetworkHelper.isConnected(this)) {
 
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
-            etEmail.setError(getString(R.string.error_email_field_required));
-            focusView = etEmail;
-            cancel = true;
-        } else if (!email.contains("@")) {
-            etEmail.setError(getString(R.string.error_invalid_email));
-            focusView = etEmail;
-            cancel = true;
-        }
+			if (inputManager != null) {
+				inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+			}
 
-        // Done validation process. Try to log user in
-        if (cancel) {
-            focusView.requestFocus();
-        } else if (NetworkHelper.isConnected(this)) {
+			showProgress(true);
+			doLogin();
+		} else {
+			Utils.showCrouton(this, R.string.error_connection);
+		}
+	}
 
-            if (inputManager != null) {
-                inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-            }
-
-            showProgress(true);
-            doLogin();
-        } else {
-            Utils.showCrouton(this, R.string.error_connection);
-        }
-    }
-
-    @UiThread
-    void showGettingDataTextView() {
-        tvLoginStatusMessage.setText(getResources().getString(R.string.login_progress_loading_data));
-    }
+	@UiThread
+	void showGettingDataTextView() {
+		tvLoginStatusMessage.setText(getResources().getString(R.string.login_progress_loading_data));
+	}
 }

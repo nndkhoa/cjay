@@ -2,19 +2,24 @@ package com.cloudjay.cjay.task.jobqueue;
 
 import android.content.Context;
 
+import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
-import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 
 public class GetAllSessionsJob extends Job {
 
-	Context context;
 	String modifiedDate;
 
-	public GetAllSessionsJob(Context context, String modifiedDate) {
-		super(new Params(1).requireNetwork());
-		this.context = context;
+	/**
+	 * Priority Higher is better.
+	 * Do not need to pass context into Job. Because JobQueue cannot persist Context.
+	 *
+	 * @param modifiedDate
+	 */
+
+	public GetAllSessionsJob(String modifiedDate) {
+		super(new Params(1).requireNetwork().persist().setPersistent(true));
 		this.modifiedDate = modifiedDate;
 	}
 
@@ -24,7 +29,7 @@ public class GetAllSessionsJob extends Job {
 
 	@Override
 	public void onRun() throws Throwable {
-		Logger.Log("Running fetch all sessions job");
+		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).fetchSession(context, modifiedDate);
 	}
 

@@ -45,7 +45,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
     public final static String IMAGE_TYPE_EXTRA = "com.cloudjay.wizard.imageType";
     public final static String CURRENT_STEP_EXTRA = "com.cloudjay.wizard.currentStep";
 
-
     private static final int PICTURE_SIZE_MAX_WIDTH = 640;
     private static final int PREVIEW_SIZE_MAX_WIDTH = 1280;
 
@@ -317,7 +316,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
             // 2.upload image
 //TODO: Fix can't add to sql for resume task after restart app
-            App.getJobManager().addJobInBackground(new UpLoadImageJob(getActivity(), uri, imageName, containerId));
+            App.getJobManager().addJobInBackground(new UpLoadImageJob( uri, imageName, containerId));
         }
 
         void saveBitmapToFile(Bitmap bitmap, File filename) {
@@ -353,7 +352,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
         @Override
         public Camera.Parameters adjustPreviewParameters(Camera.Parameters parameters) {
             /*flashMode =
-					CameraUtils.findBestFlashModeMatch(parameters,
+                    CameraUtils.findBestFlashModeMatch(parameters,
 							Camera.Parameters.FLASH_MODE_RED_EYE,
 							Camera.Parameters.FLASH_MODE_AUTO,
 							Camera.Parameters.FLASH_MODE_ON);*/

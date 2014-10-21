@@ -3,9 +3,7 @@ package com.cloudjay.cjay;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
-
 import android.util.Log;
-
 
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -55,6 +53,7 @@ public class App extends Application {
 		configureDirectories();
 		configureImageLoader();
 		configureJobManager();
+
 		// Crashlytics.start(this);
 	}
 
@@ -135,7 +134,9 @@ public class App extends Application {
 				.minConsumerCount(1)
 				.maxConsumerCount(3)
 				.loadFactor(3)
+				.consumerKeepAlive(120)
 				.build();
+
 		jobManager = new JobManager(this, configuration);
 	}
 

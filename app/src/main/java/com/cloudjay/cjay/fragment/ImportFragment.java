@@ -26,6 +26,7 @@ import com.cloudjay.cjay.event.OperatorCallbackEvent;
 import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
@@ -48,13 +49,14 @@ import java.util.List;
 import de.greenrobot.event.EventBus;
 
 /**
- * Màn hình nhập
+ * Màn hình nhập.
+ * <p/>
+ * 1. Nhận vào containerId, cố gắng Container Session từ db.
+ * 2. Cho user nhập Operator (Hãng tàu) và save Session xuống db.
+ * 3. Chụp ảnh bằng Camera.
  */
-
 @EFragment(R.layout.fragment_import)
 public class ImportFragment extends Fragment {
-
-	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
 
 	//region Controls and Views
 	@ViewById(R.id.btn_camera)
@@ -88,19 +90,47 @@ public class ImportFragment extends Fragment {
 	ListView lvImages;
 	//endregion
 
+	//region ATTRIBUTE
+	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+
 	@Bean
 	DataCenter dataCenter;
 
 	@FragmentArg(CONTAINER_ID_EXTRA)
 	String containerID;
 
+	String operatorCode;
+
 	GateImageAdapter gateImageAdapter = null;
-	Operator selectedOperator;
 	List<GateImage> gateImages = null;
 
-    long preStatus = 0;
+	long preStatus = 0;
+	Session currentSession;
+	//endregion
 
 	public ImportFragment() {
+	}
+
+	@AfterViews
+	void doAfterViews() {
+
+		// Set ActionBar Title
+		getActivity().getActionBar().setTitle(R.string.fragment_import_title);
+
+		// Trying to restore container status
+		Session tmp = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+		if (null == tmp) {
+
+			// Set container ID for text View containerID
+			tvContainerCode.setText(containerID);
+		} else {
+
+			containerID = tmp.getContainerId();
+			operatorCode = tmp.getOperatorCode();
+
+			tvContainerCode.setText(containerID);
+			etOperator.setText(operatorCode);
+		}
 	}
 
 	@Override
@@ -117,29 +147,35 @@ public class ImportFragment extends Fragment {
 
 	@UiThread
 	void onEvent(OperatorCallbackEvent event) {
+
 		// Get selected operator from search operator dialog
-		selectedOperator = event.getOperator();
+		Operator operator = event.getOperator();
+		operatorCode = operator.getOperatorCode();
 
 		// Set operator to edit text
-		etOperator.setText(selectedOperator.getOperatorName());
+		etOperator.setText(operator.getOperatorName());
 
-        // Get today
-        // create today String
-        String today = StringHelper.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
+		// Add new session to database
+		String currentTime = StringHelper.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
 
-		//Save session with containerId, operatorId, operatorCode, dateCreated, preStatus into snappy
-		dataCenter.addSession(containerID, selectedOperator.getOperatorCode(),
-                selectedOperator.getId(), today, preStatus);
+		currentSession = new Session().withContainerId(containerID)
+				.withOperatorCode(operatorCode)
+				.withOperatorId(operator.getId())
+				.withPreStatus(preStatus)
+				.withStep(Step.IMPORT.value)
+				.withCheckInTime(currentTime);
+
+		dataCenter.addSession(currentSession);
 	}
 
 	@UiThread
 	void onEvent(ImageCapturedEvent event) {
-        try {
-            dataCenter.getGateImages(CJayConstant.TYPE_IMPORT, event.getContainerId());
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
-    }
+		try {
+			dataCenter.getGateImages(CJayConstant.TYPE_IMPORT, event.getContainerId());
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
 
 	@UiThread
 	void onEvent(GateImagesGotEvent event) {
@@ -148,28 +184,21 @@ public class ImportFragment extends Fragment {
 		gateImages = event.getGateImages();
 		Logger.Log("count gate images: " + gateImages.size());
 
-		//Init adapter if null and set adapter for listview
+		// Init adapter if adapter is null and set adapter for list view
 		if (gateImageAdapter == null) {
 			Logger.Log("gateImageAdapter is null");
 			gateImageAdapter = new GateImageAdapter(getActivity(), gateImages, false);
 			lvImages.setAdapter(gateImageAdapter);
 		}
 
-        // Notify change
+		// Notify change
 		gateImageAdapter.swapData(gateImages);
 
 	}
 
-	@AfterViews
-	void doAfterViews() {
-
-        // Set ActionBar Title
-        getActivity().getActionBar().setTitle(R.string.fragment_import_title);
-
-		// Set container ID for text View containerID
-		tvContainerCode.setText(containerID);
-	}
-
+	/**
+	 * Open Camera to take IMPORT images
+	 */
 	@Click(R.id.btn_camera)
 	void buttonCameraClicked() {
 
@@ -178,70 +207,73 @@ public class ImportFragment extends Fragment {
 			// Open camera activity
 			Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
 			cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
+			cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
 			cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_IMPORT);
-			cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, selectedOperator.getOperatorCode());
-            cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
+			cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
 			startActivity(cameraActivityIntent);
 
 		} else {
+
 			// Alert: require select operator first
 			Utils.showCrouton(getActivity(), R.string.require_select_operator_first);
 		}
 	}
 
+	/**
+	 *
+	 */
 	@Click(R.id.btn_continue)
 	void buttonContinueClicked() {
 		// Go to next fragment
-        AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID).build();
+		AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID).build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 		transaction.replace(R.id.ll_main, fragment);
 		transaction.commit();
 	}
 
-    @Click(R.id.btn_complete)
-    void buttonCompletedClicked() {
-        // Finish import fragment, close Wizzard Activity and go back to Home Activity with Search Fragment tab
+	@Click(R.id.btn_complete)
+	void buttonCompletedClicked() {
+		// Finish import fragment, close Wizzard Activity and go back to Home Activity with Search Fragment tab
 
-    }
+	}
 
 	@Touch(R.id.et_operator)
 	void editTextOperatorTouched(View v, MotionEvent event) {
 		if (event.getAction() == MotionEvent.ACTION_UP) {
-			startSearchOperator();
+			FragmentManager fm = getActivity().getSupportFragmentManager();
+			SearchOperatorDialog_ searchOperatorDialog = new SearchOperatorDialog_();
+			searchOperatorDialog.setParent(this);
+			searchOperatorDialog.show(fm, "search_operator_dialog");
 		}
 	}
 
-	private void showDialogSearchOperator() {
-		FragmentManager fm = getActivity().getSupportFragmentManager();
-		SearchOperatorDialog_ searchOperatorDialog = new SearchOperatorDialog_();
-		searchOperatorDialog.setParent(this);
-		searchOperatorDialog.show(fm, "search_operator_dialog");
+	//region HANDLE PRE-STATUS
+
+	/**
+	 * Handle container pre-status
+	 *
+	 * @param isChecked
+	 */
+	@CheckedChange(R.id.rdn_status_a)
+	void preStatusAChecked(boolean isChecked) {
+		if (isChecked == true) {
+			preStatus = 0;
+		}
 	}
 
-	private void startSearchOperator() {
-		// mContainerId = mContainerEditText.getText().toString();
-		showDialogSearchOperator();
+	@CheckedChange(R.id.rdn_status_b)
+	void preStatusBChecked(boolean isChecked) {
+		if (isChecked == true) {
+			preStatus = 1;
+		}
 	}
 
-    @CheckedChange(R.id.rdn_status_a)
-    void preStatusAChecked(boolean isChecked) {
-        if (isChecked == true) {
-            preStatus = 0;
-        }
-    }
-
-    @CheckedChange(R.id.rdn_status_b)
-    void preStatusBChecked(boolean isChecked) {
-        if (isChecked == true) {
-            preStatus = 1;
-        }
-    }
-
-    @CheckedChange(R.id.rdn_status_c)
-    void preStatusCChecked(boolean isChecked) {
-        if (isChecked == true) {
-            preStatus = 2;
-        }
-    }
+	@CheckedChange(R.id.rdn_status_c)
+	void preStatusCChecked(boolean isChecked) {
+		if (isChecked == true) {
+			preStatus = 2;
+		}
+	}
+	//endregion
 }
