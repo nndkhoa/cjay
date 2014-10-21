@@ -204,6 +204,7 @@ public class SearchFragment extends Fragment {
 	private void performSearch() {
 
 		showProgress(true);
+
 		inputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
 		String keyword = editText.getText().toString();
 
@@ -239,7 +240,7 @@ public class SearchFragment extends Fragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-		lvSearch.setVisibility(View.GONE);
+		llSearchResult.setVisibility(View.GONE);
 	}
 
 	/**
@@ -263,4 +264,5 @@ public class SearchFragment extends Fragment {
 		EventBus.getDefault().unregister(this);
 		super.onDestroy();
 	}
+
 }
