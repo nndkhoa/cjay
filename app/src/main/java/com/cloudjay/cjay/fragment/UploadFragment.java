@@ -8,9 +8,9 @@ import android.widget.TextView;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadSessionAdapter;
-import com.cloudjay.cjay.event.UpLoadingEvent;
+import com.cloudjay.cjay.event.UploadingEvent;
 import com.cloudjay.cjay.event.StartUpLoadEvent;
-import com.cloudjay.cjay.event.StopUpLoadEvent;
+import com.cloudjay.cjay.event.UploadStoppedEvent;
 import com.cloudjay.cjay.event.UploadedEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -124,10 +124,10 @@ public class UploadFragment extends Fragment {
         }
     }
 
-    public void onEvent(StopUpLoadEvent event) {
+    public void onEvent(UploadStoppedEvent event) {
     }
 
-    public void onEvent(UpLoadingEvent event) {
+    public void onEvent(UploadingEvent event) {
 
     }
 }

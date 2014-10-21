@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.activity.CameraActivity;
+import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.PhotoExpandableListViewActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
@@ -100,7 +100,7 @@ public class ExportFragment extends Fragment {
     @Click(R.id.btn_take_export_picture)
     void buttonTakeExportPictureClicked() {
         // Open camera activity
-        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
+        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
         cameraActivityIntent.putExtra("containerID", containerID);
         cameraActivityIntent.putExtra("imageType", CJayConstant.TYPE_EXPORT);
         cameraActivityIntent.putExtra("operatorCode", operatorCode);

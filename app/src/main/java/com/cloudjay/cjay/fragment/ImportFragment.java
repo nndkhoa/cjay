@@ -16,9 +16,10 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.activity.CameraActivity;
+import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
@@ -27,11 +28,13 @@ import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.Step;
+import com.path.android.jobqueue.JobManager;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
@@ -205,7 +208,7 @@ public class ImportFragment extends Fragment {
 		if (!TextUtils.isEmpty(tvContainerCode.getText()) && !TextUtils.isEmpty(etOperator.getText())) {
 
 			// Open camera activity
-			Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
+			Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
 			cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
 			cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
 			cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_IMPORT);
@@ -220,10 +223,15 @@ public class ImportFragment extends Fragment {
 	}
 
 	/**
-	 *
+	 * Add container session to upload queue. Then navigate user to Audit and Repair Fragment.
 	 */
 	@Click(R.id.btn_continue)
 	void buttonContinueClicked() {
+
+		//Upload container
+		JobManager jobManager = App.getJobManager();
+		jobManager.addJobInBackground(new UploadSessionJob(currentSession));
+
 		// Go to next fragment
 		AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID).build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
@@ -232,10 +240,13 @@ public class ImportFragment extends Fragment {
 		transaction.commit();
 	}
 
+	/**
+	 * Finish import fragment, close Wizard Activity and go back to Home Activity with Search Fragment tab
+	 */
 	@Click(R.id.btn_complete)
 	void buttonCompletedClicked() {
-		// Finish import fragment, close Wizzard Activity and go back to Home Activity with Search Fragment tab
-
+//		Job job = new UploadSessionJob(getActivity().getApplicationContext(), );
+//		App.getJobManager().addJob(job);
 	}
 
 	@Touch(R.id.et_operator)

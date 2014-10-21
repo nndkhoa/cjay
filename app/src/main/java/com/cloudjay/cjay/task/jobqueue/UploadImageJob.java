@@ -4,26 +4,39 @@ import android.content.Context;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
+import com.cloudjay.cjay.event.StartUpLoadEvent;
 import com.cloudjay.cjay.event.UploadStoppedEvent;
-import com.cloudjay.cjay.event.UploadedEvent;
 import com.cloudjay.cjay.event.UploadingEvent;
-import com.cloudjay.cjay.model.Session;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
+import com.snappydb.SnappydbException;
 
 import de.greenrobot.event.EventBus;
 
-public class UploadSessionJob extends Job {
-	Session session;
+public class UploadImageJob extends Job {
+	String containerId;
+	String uri;
+	String imageName;
 
+	public UploadImageJob(String uri, String imageName, String containerId) {
 
-	public UploadSessionJob(Session session) {
-		super(new Params(1).requireNetwork().setPersistent(true).groupBy(session.getContainerId()));
-		this.session = session;
+		super(new Params(2).requireNetwork().persist().groupBy(containerId));
+		this.containerId = containerId;
+		this.uri = uri;
+		this.imageName = imageName;
 	}
 
 	@Override
 	public void onAdded() {
+		try {
+
+			Context context = App.getInstance().getApplicationContext();
+			DataCenter_.getInstance_(context).addUploadingSession(containerId);
+			EventBus.getDefault().post(new StartUpLoadEvent(containerId));
+
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
 
 	}
 
@@ -32,11 +45,8 @@ public class UploadSessionJob extends Job {
 		EventBus.getDefault().post(new UploadingEvent());
 
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).uploadContainerSession(context, session);
-
-		EventBus.getDefault().post(new UploadedEvent(session.getContainerId()));
+		DataCenter_.getInstance_(context).uploadImage(context, uri, imageName, containerId);
 	}
-
 
 	@Override
 	protected void onCancel() {
