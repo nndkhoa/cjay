@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
@@ -48,6 +49,9 @@ public class IssuePendingFragment extends Fragment {
 
     @ViewById(R.id.btn_camera)
     ImageButton btnCamera;
+
+    @ViewById(R.id.lv_issue_images)
+    ListView lvIssueImages;
 
     @Bean
     DataCenter dataCenter;
