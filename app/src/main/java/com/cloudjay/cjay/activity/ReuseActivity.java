@@ -11,13 +11,12 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
-import com.cloudjay.cjay.event.GateImagesGotEvent;
+import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -31,7 +30,6 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
-import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -66,6 +64,7 @@ public class ReuseActivity extends Activity {
     List<GateImage> gateImages = null;
     GateImageAdapter gateImageAdapter = null;
     private ActionMode mActionMode;
+    List<AuditImage> auditImages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,14 +130,25 @@ public class ReuseActivity extends Activity {
         // Set currentStatus to TextView
         tvCurrentStatus.setText((Status.values()[(int)result.get(0).getStatus()]).toString());
 
-        // Get gate image objects from event post back
+        // Get list audit images from event post back
+        auditImages = result.get(0).getAuditImages();
+
+        // Get gate images objects from event post back
         gateImages = new ArrayList<GateImage>();
         for(GateImage g : result.get(0).getGateImages()) {
-            Logger.Log("type: " + g.getType());
             if (g.getType() == CJayConstant.TYPE_IMPORT) {
                 gateImages.add(g);
             }
         }
+
+        for(GateImage g : gateImages) {
+            for (AuditImage a : auditImages) {
+                if (g.getName() == a.getName()) {
+                    gateImages.remove(g);
+                }
+            }
+        }
+
         Logger.Log("count gate images: " + gateImages.size());
 
         //Init adapter if null and set adapter for listview

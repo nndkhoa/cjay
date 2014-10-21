@@ -93,6 +93,7 @@
     <string name="button_upload">Tải lên</string>
     <string name="button_edit">Sửa</string>
     <string name="button_take_export_picture">Chụp hình xuất</string>
+    <string name="button_report">Báo cáo</string>
 
     <!-- Label for container item -->
     <string name="label_container_id">Container ID: </string>

@@ -1,37 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#FFF">
+    android:background="#FFF"
+    android:weightSum="4"
+    android:orientation="horizontal"
+    android:padding="6dp">
 
     <LinearLayout
-        android:id="@+id/ll_left"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
         android:orientation="vertical"
-        android:paddingLeft="3dp"
-        android:paddingRight="3dp">
+        android:layout_marginRight="6dp">
 
-        <TextView
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:gravity="center_vertical"
-            android:text="#1"
-            android:textSize="24dp" />
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/iv_issue_image"
+                android:src="@drawable/ic_launcher"/>
+
+        </RelativeLayout>
 
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/ll_right"
-        android:layout_toRightOf="@+id/ll_left"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
         android:orientation="vertical"
-        android:paddingLeft="3dp"
-        android:paddingRight="12dp">
+        android:gravity="center_vertical">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -162,39 +165,28 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/ll_right"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:orientation="vertical">
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/btn_green_selector"
-            android:text="@string/button_approve"
-            android:textColor="@android:color/white" />
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="6dp">
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/btn_customize_selector"
             android:text="@string/button_upload"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="6dp"/>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/btn_edit_selector"
-            android:text="@string/button_edit"
-            android:textColor="@android:color/white" />
+            android:text="@string/button_report"
+            android:textColor="@android:color/white"/>
 
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dip"
-        android:layout_below="@+id/ll_right"
-        android:background="@color/background_button_and_line" />
-
-</RelativeLayout>
+</LinearLayout>

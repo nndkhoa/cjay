@@ -310,7 +310,17 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
         void uploadImage(String uuid, String uri, String imageName) throws SnappydbException {
 
             // 1. Save image to local db
-            DataCenter_.getInstance_(getActivity().getApplicationContext()).addGateImage(mType, "file://" + uri, containerId, imageName);
+            if (currentStep == Step.IMPORT.value) { // Import
+                DataCenter_.getInstance_(getActivity().getApplicationContext())
+                        .addGateImage(mType, "file://" + uri, containerId, imageName);
+            } else if (currentStep == Step.AUDIT.value) { // Audit
+                DataCenter_.getInstance_(getActivity().getApplicationContext())
+                        .addAuditImages(containerId, mType, "file://" + uri);
+            } else if (currentStep == Step.REPAIR.value) { // Repaired
+
+            } else if (currentStep == Step.EXPORT.value) { // Export
+
+            }
             EventBus.getDefault().post(new ImageCapturedEvent(containerId));
             Logger.Log("save image to snappy successfully");
 

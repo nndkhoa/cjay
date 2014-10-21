@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 
 import javax.annotation.Generated;
 
-
+/* Gồm hình giám định và sửa chữa */
 @Generated("org.jsonschema2pojo")
 public class AuditImage {
 
