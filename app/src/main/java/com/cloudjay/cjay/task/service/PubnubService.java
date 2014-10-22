@@ -27,17 +27,16 @@ public class PubnubService extends Service {
 	private NotificationManager notificationManager;
 
 	// Define PubNub Key
-	private static final String PUBLISH_KEY = "publish_key";
-	private static final String SUBSCRIBE_KEY = "subscribe_key";
+	private static final String PUBLISH_KEY = "pub-c-d4a2608d-f440-4ebf-a09a-dd8a570428cd";
+	private static final String SUBSCRIBE_KEY = "sub-c-fe158864-9fcf-11e3-a937-02ee2ddab7fe";
 
 	// Define PubNub Channel
-	private static final String SESSION_CHANNEL = "session_channel";
-	private static final String ISO_CODE_CHANNEL = "iso_code_channel";
-	private static final String OPERATOR_CHANNEL = "operator_channel";
+	private static final String DEPOT_CHANNEL = "depot_channel";
+    private static final String UUID_CHANNEL = "uuid_channel";
+
 	private String[] channels = new String[]{
-			SESSION_CHANNEL,
-			ISO_CODE_CHANNEL,
-			OPERATOR_CHANNEL
+            DEPOT_CHANNEL,
+            UUID_CHANNEL,
 	};
 
 	private static final int DELAY_TIME = 200;

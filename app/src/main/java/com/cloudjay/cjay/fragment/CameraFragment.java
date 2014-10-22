@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.fragment;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -110,7 +111,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		// Open ReuseActivity
 		Intent intent = new Intent(getActivity(), ReuseActivity_.class);
 		intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, containerId);
-		startActivity(intent);
+        startActivityForResult(intent, 1);
 	}
 
 	@Click(R.id.btn_camera_done)
@@ -218,7 +219,16 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		takePicture(xact);
 	}
 
-	/**
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            getActivity().finish();
+        }
+    }
+
+    /**
 	 * CameraHost is the interface use to configure behavior of camera ~ setting.
 	 */
 	class CameraHost extends SimpleCameraHost {

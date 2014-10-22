@@ -131,7 +131,7 @@ public class ReuseActivity extends Activity {
         tvCurrentStatus.setText((Status.values()[(int)result.get(0).getStatus()]).toString());
 
         // Get list audit images from event post back
-        auditImages = result.get(0).getAuditImages();
+        auditImages = new ArrayList<AuditImage>();
 
         // Get gate images objects from event post back
         gateImages = new ArrayList<GateImage>();
@@ -140,6 +140,8 @@ public class ReuseActivity extends Activity {
                 gateImages.add(g);
             }
         }
+
+        Logger.Log("gateImages.size(): " + gateImages.size());
 
         for(GateImage g : gateImages) {
             for (AuditImage a : auditImages) {
