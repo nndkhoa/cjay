@@ -105,7 +105,7 @@ public class AuditItem implements Serializable {
      * @return
      * @throws JSONException
      */
-    public JsonArray getAuditImageToUpLoad() {
+    public JsonArray getAuditImagesToUpLoad() {
         JsonArray audit_image = new JsonArray();
         Logger.e(String.valueOf(auditImages.size()));
         for (AuditImage auditImage : this.auditImages) {

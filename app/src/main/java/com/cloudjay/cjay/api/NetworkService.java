@@ -1,5 +1,6 @@
 package com.cloudjay.cjay.api;
 
+import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
@@ -73,7 +74,12 @@ public interface NetworkService {
     @PUT(ApiEndpoint.CONTAINER_SESSION_POST_AUDIT_ITEM_API)
     public Session postAudiItem(@Path("id") String containerId,@Body JsonObject audit_item);
 
+    @PUT(ApiEndpoint.CONTAINER_SESSION_ADD_AUDIT_IMAGES_API)
+    public AuditItem addAuditImages (@Path("id") String auditId, @Body JsonArray auditImages);
+
     // Check source v1, uploadType=media
     @POST(ApiEndpoint.CJAY_TMP_STORAGE_IMAGE)
     public Response postImageFile(@Header("Content-Type") String contentType, @Query("uploadType") String uploadType, @Query("name") String imageName, @Body() TypedFile image);
+
+
 }
