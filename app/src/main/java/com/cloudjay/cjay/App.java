@@ -8,6 +8,8 @@ import android.util.Log;
 
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.Utils;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -22,130 +24,143 @@ import com.snappydb.SnappydbException;
 
 public class App extends Application {
 
-	private static App instance;
-	private static JobManager jobManager;
-	private static DB snappyDB;
+    private static App instance;
+    private static JobManager jobManager;
+    private static DB snappyDB;
+    Context mContext;
 
-	public App() {
-		instance = this;
-	}
+    public App() {
+        instance = this;
+    }
 
-	public static App getInstance() {
-		return instance;
-	}
+    public static App getInstance() {
+        return instance;
+    }
 
-	public static DB getDB(Context context) throws SnappydbException {
-		snappyDB = DBFactory.open(context, CJayConstant.DB_NAME);
-		return snappyDB;
-	}
+    public static DB getDB(Context context) throws SnappydbException {
+        snappyDB = DBFactory.open(context, CJayConstant.DB_NAME);
+        return snappyDB;
+    }
 
-	public static void closeDB() throws SnappydbException {
-		if (snappyDB != null & snappyDB.isOpen()) {
-			Logger.Log("Closing database ... ");
-			snappyDB.close();
-		}
-	}
+    public static void closeDB() throws SnappydbException {
+        if (snappyDB != null & snappyDB.isOpen()) {
+            Logger.Log("Closing database ... ");
+            snappyDB.close();
+        }
+    }
 
-	@Override
-	public void onCreate() {
-		super.onCreate();
+    @Override
+    public void onCreate() {
+        super.onCreate();
 
-		configureDirectories();
-		configureImageLoader();
-		configureJobManager();
+        configureDirectories();
+        configureImageLoader();
+        configureJobManager();
 
-		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
-		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
-				.detectLeakedClosableObjects().penaltyLog()
-				.penaltyDeath().build());
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
+                .detectLeakedClosableObjects().penaltyLog()
+                .penaltyDeath().build());
 
-		// Crashlytics.start(this);
-	}
+        // Configure Alarm Manager
+        mContext = getApplicationContext();
+        if (!Utils.isAlarmUp(mContext)) {
 
-	/**
-	 * Khởi tạo các folder mặc định
-	 */
-	private void configureDirectories() {
+            Logger.w("Alarm Manager is not running.");
+            Utils.startAlarm(mContext);
 
-		// Init Default dirs
-		if (!CJayConstant.BACK_UP_DIRECTORY_FILE.exists()) {
-			CJayConstant.BACK_UP_DIRECTORY_FILE.mkdir();
-		}
+        } else {
 
-		if (!CJayConstant.LOG_DIRECTORY_FILE.exists()) {
-			CJayConstant.LOG_DIRECTORY_FILE.mkdirs();
-		}
+            Logger.Log("Alarm is already running "
+                    + StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 
-		if (!CJayConstant.APP_DIRECTORY_FILE.exists()) {
-			CJayConstant.APP_DIRECTORY_FILE.mkdir();
-		}
-	}
+        }
+    }
 
-	/**
-	 * Cấu hình Universal Image Loader
-	 */
-	private void configureImageLoader() {
+    /**
+     * Khởi tạo các folder mặc định
+     */
+    private void configureDirectories() {
 
-		// init image loader default options
-		DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
-				.cacheInMemory(true)
-				.cacheOnDisc(true)
-				.bitmapConfig(Bitmap.Config.RGB_565)
-				.imageScaleType(ImageScaleType.IN_SAMPLE_INT)
-				.showImageForEmptyUri(R.drawable.ic_app_360)
-				.build();
+        // Init Default dirs
+        if (!CJayConstant.BACK_UP_DIRECTORY_FILE.exists()) {
+            CJayConstant.BACK_UP_DIRECTORY_FILE.mkdir();
+        }
 
-		// init image loader config
-		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
-				.defaultDisplayImageOptions(defaultOptions)
-				.discCacheSize(500 * 1024 * 1024)
-				.memoryCache(new WeakMemoryCache())
-				.threadPoolSize(3)
-				.threadPriority(Thread.MAX_PRIORITY)
-				.build();
+        if (!CJayConstant.LOG_DIRECTORY_FILE.exists()) {
+            CJayConstant.LOG_DIRECTORY_FILE.mkdirs();
+        }
 
-		// init image loader with config defined
-		ImageLoader.getInstance().init(config);
-	}
+        if (!CJayConstant.APP_DIRECTORY_FILE.exists()) {
+            CJayConstant.APP_DIRECTORY_FILE.mkdir();
+        }
+    }
 
-	/**
-	 * Cấu hình Job Manager của JobQueue
-	 */
-	private void configureJobManager() {
-		Configuration configuration = new Configuration.Builder(this)
-				.customLogger(new CustomLogger() {
-					private static final String TAG = "JOBS";
+    /**
+     * Cấu hình Universal Image Loader
+     */
+    private void configureImageLoader() {
 
-					@Override
-					public boolean isDebugEnabled() {
-						return true;
-					}
+        // init image loader default options
+        DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
+                .cacheInMemory(true)
+                .cacheOnDisc(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .imageScaleType(ImageScaleType.IN_SAMPLE_INT)
+                .showImageForEmptyUri(R.drawable.ic_app_360)
+                .build();
 
-					@Override
-					public void d(String text, Object... args) {
-						Log.d(TAG, String.format(text, args));
-					}
+        // init image loader config
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
+                .defaultDisplayImageOptions(defaultOptions)
+                .discCacheSize(500 * 1024 * 1024)
+                .memoryCache(new WeakMemoryCache())
+                .threadPoolSize(3)
+                .threadPriority(Thread.MAX_PRIORITY)
+                .build();
 
-					@Override
-					public void e(Throwable t, String text, Object... args) {
-						Log.e(TAG, String.format(text, args), t);
-					}
+        // init image loader with config defined
+        ImageLoader.getInstance().init(config);
+    }
 
-					@Override
-					public void e(String text, Object... args) {
-						Log.e(TAG, String.format(text, args));
-					}
-				})
-				.minConsumerCount(1)
-				.maxConsumerCount(3)
-				.loadFactor(3)
-				.consumerKeepAlive(120)
-				.build();
+    /**
+     * Cấu hình Job Manager của JobQueue
+     */
+    private void configureJobManager() {
+        Configuration configuration = new Configuration.Builder(this)
+                .customLogger(new CustomLogger() {
+                    private static final String TAG = "JOBS";
 
-		jobManager = new JobManager(this, configuration);
-	}
+                    @Override
+                    public boolean isDebugEnabled() {
+                        return true;
+                    }
 
-	public static JobManager getJobManager() {
-		return jobManager;
-	}
+                    @Override
+                    public void d(String text, Object... args) {
+                        Log.d(TAG, String.format(text, args));
+                    }
+
+                    @Override
+                    public void e(Throwable t, String text, Object... args) {
+                        Log.e(TAG, String.format(text, args), t);
+                    }
+
+                    @Override
+                    public void e(String text, Object... args) {
+                        Log.e(TAG, String.format(text, args));
+                    }
+                })
+                .minConsumerCount(1)
+                .maxConsumerCount(3)
+                .loadFactor(3)
+                .consumerKeepAlive(120)
+                .build();
+
+        jobManager = new JobManager(this, configuration);
+    }
+
+    public static JobManager getJobManager() {
+        return jobManager;
+    }
 }
