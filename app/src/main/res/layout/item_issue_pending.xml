@@ -158,21 +158,33 @@
             android:layout_marginLeft="6dp">
 
             <Button
+                android:id="@+id/btn_upload_pending"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/btn_customize_selector"
                 android:text="@string/button_upload"
                 android:textColor="@android:color/white"
                 android:layout_marginBottom="6dp"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
 
             <Button
+                android:id="@+id/btn_report_pending"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/btn_edit_selector"
                 android:text="@string/button_report"
                 android:textColor="@android:color/white"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btn_repair_pending"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_green_selector"
+                android:text="@string/button_report"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:visibility="gone" />
 
         </LinearLayout>
 
@@ -202,6 +214,6 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dip"
-        android:background="@color/background_button_and_line"/>
+        android:background="@color/background_button_and_line" />
 
 </LinearLayout>

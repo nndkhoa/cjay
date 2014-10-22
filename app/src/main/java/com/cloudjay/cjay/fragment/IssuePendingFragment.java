@@ -109,7 +109,7 @@ public class IssuePendingFragment extends Fragment {
         cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.AUDIT.value);
         startActivity(cameraActivityIntent);
     }
-//TODO waiting for fow form @Khai
+
     @ItemClick(R.id.lv_issue_images)
     void showApproveDiaglog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
