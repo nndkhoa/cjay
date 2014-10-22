@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.cloudjay.cjay.fragment.IssuePendingFragment"
-    android:padding="9dp">
+    android:background="@android:color/white">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -70,7 +70,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/lv_issue_images"
             android:layout_below="@+id/btn_clean"
-            tools:listitem="@layout/item_issue_pending">
+            tools:listitem="@layout/item_issue_pending"
+            android:scrollbars="none">
         </ListView>
 
     </RelativeLayout>

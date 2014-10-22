@@ -536,19 +536,46 @@ public class DataCenter {
 		auditImages.add(auditImage);
 		session.setAuditImages(auditImages);
 
+
 		App.getDB(context).put(containerId, session);
 
 		Logger.Log("insert audit image successfully");
 		App.closeDB();
-	}
+    }
 
-	public void getAuditImages(String containerId) {
+    public List<AuditItem> getAuditItems(String containerId) {
+        Session session = null;
+        try {
+            session = App.getDB(context).getObject(containerId, Session.class);
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+        List<AuditItem> auditItems = session.getAuditItems();
+
+        return auditItems;
+    }
+
+	/**
+	 * Get List audit item for normal session
+	 * @param context
+	 * @param containerId
+	 * @return
+	 */
+	public List<AuditItem> getListAuditItems(Context context, String containerId) {
 		try {
-			Session session = App.getDB(context).getObject(containerId, Session.class);
-			List<AuditImage> auditImages = session.getAuditImages();
-
+			DB db = App.getDB(context);
+			Session session = db.getObject(containerId, Session.class);
+			List<AuditItem> auditItems = new ArrayList<AuditItem>();
+			for (AuditItem currentAuditItem : session.getAuditItems()) {
+				if (currentAuditItem.getId() != 0) {
+					auditItems.add(currentAuditItem);
+				}
+			}
+			db.close();
+			return auditItems;
 		} catch (SnappydbException e) {
 			e.printStackTrace();
+			return null;
 		}
 	}
 }

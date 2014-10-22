@@ -81,6 +81,14 @@ public class AuditItem implements Serializable {
         return this;
     }
 
+
+    public void setWaterWashAudit(){
+        this.setComponentCode("FWA");
+        this.setDamageCode("DB");
+        this.setRepairCode("WW");
+        this.setLocationCode("BXXX");
+    }
+
     public JsonObject getAuditItemToUpload() {
         JsonArray auditImage = this.getAuditImagesToUpLoad();
         JsonObject auditItem = new JsonObject();

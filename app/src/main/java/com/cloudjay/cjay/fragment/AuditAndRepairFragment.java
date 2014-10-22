@@ -20,6 +20,7 @@ import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -53,7 +54,8 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 
 		// Go to next fragment
-		android.support.v4.app.Fragment fragment = new ExportFragment_().builder().containerID(containerID).build();
+		android.support.v4.app.Fragment fragment =
+                new ExportFragment_().builder().containerID(containerID).build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 		transaction.replace(R.id.ll_main, fragment);
@@ -97,7 +99,8 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	}
 
 	private void configureViewPager() {
-		mPagerAdapter = new ViewPagerAdapter(getActivity(), getActivity().getSupportFragmentManager(), containerID,1);
+		mPagerAdapter = new ViewPagerAdapter(getActivity(),
+                getActivity().getSupportFragmentManager(), containerID, 1);
 		pager.setAdapter(mPagerAdapter);
 		pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
@@ -136,5 +139,3 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 	}
 }
-
-
