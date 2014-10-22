@@ -13,11 +13,13 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Utils;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.List;
@@ -47,7 +49,7 @@ public class MergeIssueActivity extends BaseActivity {
 
     Session currentSession;
 
-    AuditMergeIssueAdapter mergeIssueAdapter;
+    AuditMergeIssueAdapter mAdapter;
 
 
     @AfterViews
@@ -57,10 +59,10 @@ public class MergeIssueActivity extends BaseActivity {
         if (null == currentSession) {
             Utils.showCrouton(this, "Không tìm thấy container trong dữ liệu");
         }
-        mergeIssueAdapter = new AuditMergeIssueAdapter(this, R.layout.item_merge_issue);
+        mAdapter = new AuditMergeIssueAdapter(this, R.layout.item_merge_issue);
         //TODO get un-uploaded audit item
         auditItems = currentSession.getAuditItems();
-        mergeIssueAdapter.setData(auditItems);
+        mAdapter.setData(auditItems);
     }
 
     @ItemClick(R.id.lv_merge_issue)
@@ -71,6 +73,20 @@ public class MergeIssueActivity extends BaseActivity {
         refresh();
     }
 
-    private void refresh() {
+    @Background
+    void refresh() {
+        List<AuditItem> list = dataCenter.getListAuditItems(this,containerID);
+        updatedData(list);
+    }
+
+    @UiThread
+    public void updatedData(List<AuditItem> auditList) {
+        mAdapter.clear();
+        if (auditList != null) {
+            for (AuditItem object : auditList) {
+                mAdapter.insert(object, mAdapter.getCount());
+            }
+        }
+        mAdapter.notifyDataSetChanged();
     }
 }
