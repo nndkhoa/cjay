@@ -147,11 +147,6 @@ public class IssuePendingFragment extends Fragment {
         dialog.show();
     }
 
-    @UiThread
-    void onEvent(ImageCapturedEvent event) {
-        dataCenter.getAuditImages(containerID);
-    }
-
     @Override
     public void onDestroy() {
         EventBus.getDefault().unregister(this);

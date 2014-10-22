@@ -4,9 +4,9 @@ import android.content.Context;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
-import com.cloudjay.cjay.event.UploadStoppedEvent;
-import com.cloudjay.cjay.event.UploadedEvent;
-import com.cloudjay.cjay.event.UploadingEvent;
+import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
+import com.cloudjay.cjay.event.upload.UploadedEvent;
+import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;

@@ -1,12 +1,9 @@
-package com.cloudjay.cjay.event;
+package com.cloudjay.cjay.event.upload;
 
-/**
- * Created by thai on 09/10/2014.
- */
-public class UploadedEvent {
+public class UploadStartedEvent {
     private String containerId;
 
-    public UploadedEvent(String containerId) {
+    public UploadStartedEvent(String containerId) {
         this.containerId= containerId;
     }
 

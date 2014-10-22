@@ -44,4 +44,5 @@ public class CJayConstant {
 	public static final String LOG_TO_FILE_FORMAT = "[%s]	-	%s\n";
 
 
+    public static final int ALARM_ID = 49482;
 }

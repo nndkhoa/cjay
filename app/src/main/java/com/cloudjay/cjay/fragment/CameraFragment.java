@@ -72,7 +72,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
 	private boolean singleShotProcessing = false;
-	private long lastFaceToast = 0L;
 
 	@FragmentArg(IMAGE_TYPE_EXTRA)
 	int mType = 0;
