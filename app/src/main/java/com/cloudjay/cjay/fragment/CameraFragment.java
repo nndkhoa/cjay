@@ -115,7 +115,9 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 	@Click(R.id.btn_capture)
 	void btnTakePictureClicked() {
-		btnTakePicture.setEnabled(false);
+//		btnTakePicture.setEnabled(false);
+
+		Logger.Log("Button Take Picture clicked");
 		autoFocus();
 	}
 
@@ -190,6 +192,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	public void takeSimplePicture() {
 
         Logger.Log("takeSimplePicture");
+
 		if (getContract().isSingleShotMode() == true) {
 			singleShotProcessing = true;
 			btnTakePicture.setEnabled(false);
@@ -381,7 +384,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 		@Override
 		public void onAutoFocus(boolean success, Camera camera) {
-
 			Logger.Log("On auto focus");
 			super.onAutoFocus(success, camera);
 
