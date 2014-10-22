@@ -112,18 +112,31 @@
             android:id="@+id/gv_images"
             android:numColumns="1"
             android:layout_below="@+id/btn_take_export_picture"
-            android:layout_above="@+id/btn_view_previous_step"
+            android:layout_above="@+id/rl_bottom"
             android:layout_marginBottom="6dp">
         </GridView>
 
-        <Button
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_view_previous_step"
             android:layout_alignParentBottom="true"
-            android:text="Xem hình các bước trước"
-            android:textColor="@android:color/white"
-            android:background="@drawable/btn_view_previous_images_step"/>
+            android:id="@+id/rl_bottom">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_view_previous_step"
+                android:text="Xem hình các bước trước"
+                android:textColor="@android:color/white"
+                android:background="@drawable/btn_view_previous_images_step"/>
+
+            <ExpandableListView
+                android:id="@+id/lv_images_expandable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/btn_view_previous_step"/>
+
+        </RelativeLayout>
 
     </RelativeLayout>
 

@@ -3,6 +3,7 @@ package com.cloudjay.cjay;
 import android.content.Context;
 
 import com.cloudjay.cjay.api.NetworkClient;
+import com.cloudjay.cjay.event.AuditImagesGotEvent;
 import com.cloudjay.cjay.event.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
@@ -487,10 +488,26 @@ public class DataCenter {
     }
 
     @Background(serial = CACHE)
-    public void getAllGateImagesByContainerId(String containerId) {
+    public void getPreviousImagesByContainerId(String containerId) {
         try {
             Session session = App.getDB(context).getObject(containerId, Session.class);
+
+            // Import and Export Images
             List<GateImage> gateImages = session.getGateImages();
+
+            // Audit and Repaired Images
+            List<AuditImage> auditImages = new ArrayList<AuditImage>();
+
+            // Get list audit images of each audit item and add to audit images list
+            for (AuditItem auditItem : session.getAuditItems()) {
+
+                List<AuditImage> childAuditImageList = auditItem.getAuditImages();
+                if (childAuditImageList != null) {
+                    auditImages.addAll(childAuditImageList);
+                }
+
+            }
+
             Logger.Log("gate images count in dataCenter: " + gateImages.size());
             EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
         } catch (SnappydbException e) {
@@ -584,5 +601,28 @@ public class DataCenter {
         List<AuditItem> auditItems = session.getAuditItems();
 
         return auditItems;
+    }
+
+    public void getAuditImages(String containerId) {
+        Session session = null;
+        try {
+            session = App.getDB(context).getObject(containerId, Session.class);
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+
+        // Audit and Repaired Images
+        List<AuditImage> auditImages = new ArrayList<AuditImage>();
+
+        // Get list audit images of each audit item and add to audit images list
+        for (AuditItem auditItem : session.getAuditItems()) {
+
+            List<AuditImage> childAuditImageList = auditItem.getAuditImages();
+            if (childAuditImageList != null) {
+                auditImages.addAll(childAuditImageList);
+            }
+        }
+
+        EventBus.getDefault().post(new AuditImagesGotEvent(auditImages));
     }
 }

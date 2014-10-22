@@ -10,7 +10,9 @@ import android.widget.GridView;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.GateImage;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 
 import java.util.ArrayList;
@@ -28,13 +30,13 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
     private final Hashtable<Integer, GridView> mGridViews;
 
     List<GateImage> mImportImages;
-    List<GateImage> mAuditImages;
-    List<GateImage> mRepairedImages;
+    List<AuditImage> mAuditImages;
+    List<AuditImage> mRepairedImages;
 
     public PhotoExpandableListAdapter(Context context, int[] imageTypes,
                                       List<GateImage> importImages,
-                                      List<GateImage> auditImages,
-                                      List<GateImage> repairedImages) {
+                                      List<AuditImage> auditImages,
+                                      List<AuditImage> repairedImages) {
 
         mContext = context;
         mGridViews = new Hashtable<Integer, GridView>();
@@ -116,15 +118,18 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
 
         GridView gridView = (GridView) convertView.findViewById(R.id.gv_images_item);
         if (groupPosition == 0) {
+            Logger.Log("groupPosition == 0");
             gridView.setAdapter(new GateImageAdapter(mContext, mImportImages, false));
         }
 
         if (groupPosition == 1) {
-            gridView.setAdapter(new GateImageAdapter(mContext, mAuditImages, false));
+            Logger.Log("groupPosition == 1");
+            gridView.setAdapter(new AuditImageAdapter(mContext, mAuditImages));
         }
 
         if (groupPosition == 2) {
-            gridView.setAdapter(new GateImageAdapter(mContext, mRepairedImages, false));
+            Logger.Log("groupPosition == 2");
+            gridView.setAdapter(new AuditImageAdapter(mContext, mRepairedImages));
         }
 
         mGridViews.put(Integer.valueOf(groupPosition), gridView);

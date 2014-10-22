@@ -58,7 +58,7 @@ public class PhotoExpandableListViewActivity extends Activity {
     void setUp() {
 
         // Load images by containerId
-        dataCenter.getAllGateImagesByContainerId(containerID);
+        dataCenter.getPreviousImagesByContainerId(containerID);
     }
 
     @UiThread
@@ -84,12 +84,12 @@ public class PhotoExpandableListViewActivity extends Activity {
            }
        }
 
-        mListAdapter = new PhotoExpandableListAdapter(this, mImageTypes, importImages, auditImages, repairedImages);
+        /*mListAdapter = new PhotoExpandableListAdapter(this, mImageTypes, importImages, auditImages, repairedImages);
         lvImagesExpandable.setAdapter(mListAdapter);
 
         for (int i = 0; i < mImageTypes.length; i++) {
             lvImagesExpandable.expandGroup(i);
-        }
+        }*/
     }
 
     @Override

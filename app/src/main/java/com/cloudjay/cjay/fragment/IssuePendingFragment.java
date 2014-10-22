@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -55,7 +56,7 @@ public class IssuePendingFragment extends Fragment {
     TextView tvCurrentStatus;
 
     @ViewById(R.id.btn_camera)
-    ImageButton btnCamera;
+    LinearLayout btnCamera;
 
     @ViewById(R.id.lv_issue_images)
     ListView lvIssueImages;
