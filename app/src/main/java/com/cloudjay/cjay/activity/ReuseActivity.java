@@ -17,6 +17,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.model.AuditImage;
+import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -65,6 +66,7 @@ public class ReuseActivity extends Activity {
     GateImageAdapter gateImageAdapter = null;
     private ActionMode mActionMode;
     List<AuditImage> auditImages;
+    List<AuditItem> auditItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +114,14 @@ public class ReuseActivity extends Activity {
         List<String> gateImageUrls = gateImageAdapter.getCheckedCJayImageUrls();
         for (int i = 0; i < gateImageUrls.size(); i++) {
             try {
-                dataCenter.addAuditImages(containerID, CJayConstant.TYPE_AUDIT, gateImageUrls.get(i));
+
+                // Create new audit image object
+                AuditImage auditImage = new AuditImage()
+                        .withId(0)
+                        .withType(CJayConstant.TYPE_AUDIT)
+                        .withUrl(gateImageUrls.get(i));
+
+                dataCenter.addAuditImages(containerID, auditImage);
             } catch (SnappydbException e) {
                 e.printStackTrace();
             }
@@ -130,8 +139,12 @@ public class ReuseActivity extends Activity {
         // Set currentStatus to TextView
         tvCurrentStatus.setText((Status.values()[(int)result.get(0).getStatus()]).toString());
 
-        // Get list audit images from event post back
+
         auditImages = new ArrayList<AuditImage>();
+
+        // Get list audit items from event post back
+        auditItems = result.get(0).getAuditItems();
+        Logger.Log("auditItems: " + auditItems.size());
 
         // Get gate images objects from event post back
         gateImages = new ArrayList<GateImage>();

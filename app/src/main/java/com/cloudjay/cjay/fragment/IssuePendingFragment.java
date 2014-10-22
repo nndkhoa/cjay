@@ -158,6 +158,7 @@ public class IssuePendingFragment extends Fragment {
         super.onResume();
 
         auditItems = dataCenter.getAuditItems(containerID);
+        Logger.Log("auditItems: " + auditItems.size());
         if (auditItems == null) {
             auditItems = new ArrayList<AuditItem>();
         }

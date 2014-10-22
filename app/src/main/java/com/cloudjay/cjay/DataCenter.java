@@ -535,7 +535,7 @@ public class DataCenter {
         App.getDB(context).put(CJayConstant.PREFIX_UPLOADING + session + session.getContainerId(), sessionUploaded);
     }
 
-    public void addAuditImages(String containerId, long type, String url) throws SnappydbException {
+    public void addAuditImages(String containerId, AuditImage auditImage) throws SnappydbException {
         Session session = App.getDB(context).getObject(containerId, Session.class);
 
         // Generate random one UUID to save auditItem
@@ -551,15 +551,6 @@ public class DataCenter {
         if (auditItems == null) {
             auditItems = new ArrayList<AuditItem>();
         }
-        // Add audit item to List session's audit items
-        auditItems.add(auditItem);
-
-        // Create new audit image object
-        AuditImage auditImage = new AuditImage();
-        auditImage.setId(0);
-        auditImage.setType(type);
-        auditImage.setUrl(url);
-        auditImage.setUploaded(false);
 
         List<AuditImage> auditImages = auditItem.getAuditImages();
         if (auditImages == null) {

@@ -116,7 +116,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 	@Click(R.id.btn_camera_done)
 	void btnDoneClicked() {
-		EventBus.getDefault().post(new ImageCapturedEvent(containerId));
+		// EventBus.getDefault().post(new ImageCapturedEvent(containerId));
 		getActivity().finish();
 	}
 
@@ -299,9 +299,20 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 						break;
 
 					case AUDIT:
+
+                        // Create new audit image object
+                        AuditImage auditImage = new AuditImage()
+                                .withId(0)
+                                .withType(mType)
+                                .withUrl("file://" + uri)
+                                .withName(imageName);
+
+                        // Save audit image to local db
+                        dataCenter.addAuditImages(containerId, auditImage);
+
 					case REPAIRED:
 					default:
-						AuditImage auditImage = new AuditImage()
+						auditImage = new AuditImage()
 								.withId(0)
 								.withType(mType)
 								.withUrl("file://" + uri)
