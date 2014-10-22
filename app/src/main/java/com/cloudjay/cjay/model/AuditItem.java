@@ -93,7 +93,6 @@ public class AuditItem implements Serializable {
         auditItem.addProperty("quantity", this.getQuantity());
         auditItem.add("audit_images", auditImage);
         return auditItem;
-
     }
 
     /**

@@ -17,6 +17,7 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
@@ -78,14 +79,28 @@ public class WorkingFragment extends Fragment {
 	 */
 	@AfterViews
 	void init() {
-		workingSessions = dataCenter.getListSessions(getActivity().getApplicationContext(),
-				CJayConstant.PREFIX_WORKING);
-
 		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
-		mAdapter.setData(workingSessions);
-
 		lvWorking.setAdapter(mAdapter);
 		lvWorking.setEmptyView(tvEmpty);
+		refresh();
+	}
+
+	@Background
+	void refresh() {
+		List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
+				CJayConstant.PREFIX_WORKING);
+		updatedData(list);
+	}
+
+	@UiThread
+	public void updatedData(List<Session> sessionList) {
+		mAdapter.clear();
+		if (sessionList != null) {
+			for (Session object : sessionList) {
+				mAdapter.insert(object, mAdapter.getCount());
+			}
+		}
+		mAdapter.notifyDataSetChanged();
 	}
 
 	/**
@@ -95,35 +110,11 @@ public class WorkingFragment extends Fragment {
 	 */
 	@UiThread
 	public void onEvent(WorkingSessionCreatedEvent event) {
-
-//		try {
-//			Session session = App.getDB(getActivity()).getObject(CJayConstant.PREFIX_WORKING + event.getSession().getContainerId(), Session.class);
-//
-//			workingSessions.add(session);
-//			mAdapter.setData(workingSessions);
-//			mAdapter.notifyDataSetChanged();
-//
-//		} catch (SnappydbException e) {
-//			e.printStackTrace();
-//		}
+		refresh();
 	}
 
 	@UiThread
 	public void onEvent(ImageCapturedEvent event) {
-
-//		String key = CJayConstant.PREFIX_WORKING + event.getContainerId();
-//		Session session = dataCenter.getSession(getActivity().getApplicationContext(), key);
-//
-//		Session oldSession = null;
-//		for (Session tmp : workingSessions) {
-//			if (tmp.getContainerId().equals(event.getContainerId())) {
-//				oldSession = tmp;
-//			}
-//		}
-//
-//		workingSessions.remove(oldSession);
-//		workingSessions.add(session);
-//		mAdapter.setData(workingSessions);
-//		mAdapter.notifyDataSetChanged();
+		refresh();
 	}
 }

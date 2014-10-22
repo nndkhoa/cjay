@@ -7,7 +7,7 @@ import com.cloudjay.cjay.event.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
-import com.cloudjay.cjay.event.UploadedEvent;
+import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;

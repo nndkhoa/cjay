@@ -4,9 +4,9 @@ import android.content.Context;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
-import com.cloudjay.cjay.event.UploadStartedEvent;
-import com.cloudjay.cjay.event.UploadStoppedEvent;
-import com.cloudjay.cjay.event.UploadingEvent;
+import com.cloudjay.cjay.event.upload.UploadStartedEvent;
+import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
+import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 import com.snappydb.SnappydbException;

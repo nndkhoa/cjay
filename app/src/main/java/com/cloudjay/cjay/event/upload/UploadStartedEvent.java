@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.event;
+package com.cloudjay.cjay.event.upload;
 
 public class UploadStartedEvent {
     private String containerId;

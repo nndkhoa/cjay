@@ -8,14 +8,15 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadSessionAdapter;
-import com.cloudjay.cjay.event.UploadStartedEvent;
-import com.cloudjay.cjay.event.UploadStoppedEvent;
-import com.cloudjay.cjay.event.UploadedEvent;
-import com.cloudjay.cjay.event.UploadingEvent;
+import com.cloudjay.cjay.event.upload.UploadStartedEvent;
+import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
+import com.cloudjay.cjay.event.upload.UploadedEvent;
+import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
@@ -28,8 +29,6 @@ import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_upload)
 public class UploadFragment extends Fragment {
-
-	private static final int LOADER_ID = 1;
 
 	@ViewById(R.id.lv_uploading_container)
 	ListView lvUploading;
@@ -68,16 +67,10 @@ public class UploadFragment extends Fragment {
 		refresh();
 	}
 
-	/**
-	 * 1. Add Session to list of uploading sessions
-	 *
-	 * @param event
-	 */
 	public void onEvent(UploadStartedEvent event) {
 		refresh();
 	}
 
-	@UiThread
 	public void onEvent(UploadedEvent event) {
 		refresh();
 	}
@@ -90,12 +83,14 @@ public class UploadFragment extends Fragment {
 		refresh();
 	}
 
+	@Background
 	void refresh() {
 		List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
 				CJayConstant.PREFIX_UPLOADING);
 		updatedData(list);
 	}
 
+	@UiThread
 	public void updatedData(List<Session> sessionList) {
 		mAdapter.clear();
 		if (sessionList != null) {

@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.event;
+package com.cloudjay.cjay.event.upload;
 
 /**
  * Created by thai on 09/10/2014.
