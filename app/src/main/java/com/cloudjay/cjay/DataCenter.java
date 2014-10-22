@@ -223,6 +223,30 @@ public class DataCenter {
 		}
 	}
 
+	/**
+	 * Get list container sessions based on param `prefix`
+	 * @param context
+	 * @param prefix
+	 * @return
+	 */
+	public List<Session> getListSessions(Context context, String prefix) {
+		try {
+			DB db = App.getDB(context);
+			String[] keysResult = db.findKeys(prefix);
+			List<Session> sessions = new ArrayList<Session>();
+
+			for (String result : keysResult) {
+				Session session = db.getObject(result, Session.class);
+				sessions.add(session);
+			}
+			db.close();
+			return sessions;
+		} catch (SnappydbException e) {
+			Logger.w(e.getMessage());
+			return null;
+		}
+	}
+
 	//endregion
 
 	/**
@@ -489,8 +513,8 @@ public class DataCenter {
 	public void addAuditImages(String containerId, long type, String url) throws SnappydbException {
 		Session session = App.getDB(context).getObject(containerId, Session.class);
 
-        // Generate random one UUID to save auditItem
-        String uuid = UUID.randomUUID().toString();
+		// Generate random one UUID to save auditItem
+		String uuid = UUID.randomUUID().toString();
 
         // Create new audit item to save
         AuditItem auditItem = new AuditItem();
@@ -502,6 +526,7 @@ public class DataCenter {
         if (auditItems == null) {
             auditItems = new ArrayList<AuditItem>();
         }
+
         // Create new audit image object
         AuditImage auditImage = new AuditImage();
         auditImage.setId(0);
@@ -531,13 +556,25 @@ public class DataCenter {
 		App.closeDB();
 	}
 
-    public void getAuditImages(String containerId) {
-        try {
-            Session session = App.getDB(context).getObject(containerId, Session.class);
-            List<AuditImage> auditImages = session.getAuditImages();
+	public void getAuditImages(String containerId) {
+		try {
+			Session session = App.getDB(context).getObject(containerId, Session.class);
+			List<AuditImage> auditImages = session.getAuditImages();
 
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
+
+    public List<AuditItem> getAuditItems(String containerId) {
+        Session session = null;
+        try {
+            session = App.getDB(context).getObject(containerId, Session.class);
         } catch (SnappydbException e) {
             e.printStackTrace();
         }
+        List<AuditItem> auditItems = session.getAuditItems();
+
+        return auditItems;
     }
 }

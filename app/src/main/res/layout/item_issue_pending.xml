@@ -4,11 +4,181 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#FFF"
-    android:weightSum="4"
-    android:orientation="horizontal"
-    android:padding="6dp">
+    android:orientation="vertical">
 
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="4"
+        android:orientation="horizontal"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="@string/label_code_component"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_code_component"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="LBH"
+                    android:textColor="@color/background_button_and_line" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="@string/label_code_location"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_code_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="LBH"
+                    android:textColor="@color/background_button_and_line" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="@string/label_code_issue"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_code_issue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="LBH"
+                    android:textColor="@color/background_button_and_line" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="@string/label_code_repair"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_code_repair"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="LBH"
+                    android:textColor="@color/background_button_and_line" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="@string/label_dimension"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_dimension"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="Dài 40, rộng 20"
+                    android:textColor="@color/background_button_and_line" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="@string/label_count"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="1"
+                    android:textColor="@color/background_button_and_line" />
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="6dp">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_customize_selector"
+                android:text="@string/button_upload"
+                android:textColor="@android:color/white"
+                android:layout_marginBottom="6dp"
+                android:textSize="14sp"/>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_edit_selector"
+                android:text="@string/button_report"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!--<LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
@@ -27,166 +197,11 @@
 
         </RelativeLayout>
 
-    </LinearLayout>
+    </LinearLayout>-->
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="2"
-        android:orientation="vertical"
-        android:gravity="center_vertical">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:text="@string/label_code_component"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tv_code_component"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:text="LBH"
-                android:textColor="@color/background_button_and_line" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:text="@string/label_code_location"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tv_code_location"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:text="LBH"
-                android:textColor="@color/background_button_and_line" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:text="@string/label_code_issue"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tv_code_issue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:text="LBH"
-                android:textColor="@color/background_button_and_line" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:text="@string/label_code_repair"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tv_code_repair"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:text="LBH"
-                android:textColor="@color/background_button_and_line" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:text="@string/label_dimension"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tv_dimension"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:text="Dài 40, rộng 20"
-                android:textColor="@color/background_button_and_line" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:text="@string/label_count"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tv_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:text="1"
-                android:textColor="@color/background_button_and_line" />
-        </RelativeLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:gravity="center_vertical"
-        android:layout_marginLeft="6dp">
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/btn_customize_selector"
-            android:text="@string/button_upload"
-            android:textColor="@android:color/white"
-            android:layout_marginBottom="6dp"/>
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/btn_edit_selector"
-            android:text="@string/button_report"
-            android:textColor="@android:color/white"/>
-
-    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dip"
+        android:background="@color/background_button_and_line"/>
 
 </LinearLayout>

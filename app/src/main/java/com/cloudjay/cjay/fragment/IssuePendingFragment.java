@@ -16,8 +16,10 @@ import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.AuditItemAdapter;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
+import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
 
@@ -30,6 +32,7 @@ import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -54,7 +57,7 @@ public class IssuePendingFragment extends Fragment {
     @ViewById(R.id.btn_camera)
     ImageButton btnCamera;
 
-    @ViewById(R.id.lv_audit_images)
+    @ViewById(R.id.lv_issue_images)
     ListView lvIssueImages;
 
     @Bean
@@ -62,6 +65,7 @@ public class IssuePendingFragment extends Fragment {
 
     String operatorCode;
     AuditItemAdapter auditItemAdapter;
+    List<AuditItem> auditItems;
 
 	public IssuePendingFragment() {
 		// Required empty public constructor
@@ -75,7 +79,7 @@ public class IssuePendingFragment extends Fragment {
 
     @AfterViews
     void setUp() {
-
+        Logger.Log("setUp");
         // Get session by containerId
         dataCenter.getSessionByContainerId(containerID);
 
@@ -92,6 +96,7 @@ public class IssuePendingFragment extends Fragment {
 
         // Set operatorCode into variable
         operatorCode = result.get(0).getOperatorCode();
+
     }
 
     @Click(R.id.btn_camera)
@@ -105,7 +110,7 @@ public class IssuePendingFragment extends Fragment {
         startActivity(cameraActivityIntent);
     }
 //TODO waiting for fow form @Khai
-    @ItemClick(R.id.lv_audit_images)
+    @ItemClick(R.id.lv_issue_images)
     void showApproveDiaglog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.dialog_search_container_title);
@@ -151,5 +156,23 @@ public class IssuePendingFragment extends Fragment {
     public void onDestroy() {
         EventBus.getDefault().unregister(this);
         super.onDestroy();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        auditItems = dataCenter.getAuditItems(containerID);
+        if (auditItems == null) {
+            auditItems = new ArrayList<AuditItem>();
+        }
+
+        if (auditItemAdapter == null) {
+            auditItemAdapter = new AuditItemAdapter(getActivity(),
+                    R.layout.item_issue_pending, auditItems);
+            lvIssueImages.setAdapter(auditItemAdapter);
+        }
+
+        auditItemAdapter.swapData(auditItems);
     }
 }

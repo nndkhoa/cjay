@@ -64,7 +64,7 @@ public class AuditImageAdapter extends BaseAdapter {
         if (view == null) {
             holder = new ViewHolder();
             view = inflater.inflate(R.layout.item_issue_pending, null);
-            holder.ivAuditImage = (ImageView) view.findViewById(R.id.iv_audit_image);
+            // holder.ivAuditImage = (ImageView) view.findViewById(R.id.iv_audit_image);
 
             view.setTag(holder);
         } else {

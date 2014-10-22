@@ -1,5 +1,7 @@
 package com.cloudjay.cjay.fragment;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -47,6 +49,11 @@ import java.util.UUID;
 
 import de.greenrobot.event.EventBus;
 
+/**
+ * 1. Để xử lý hình ảnh sau khi chụp, xem hàm CameraHost#saveImage()
+ * 2. Để xử lý upload image, xem hàm CameraHost#addImageToUploadQueue()
+ * 3.
+ */
 @EFragment
 public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
@@ -65,6 +72,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
 	private boolean singleShotProcessing = false;
+	private long lastFaceToast = 0L;
 
 	@FragmentArg(IMAGE_TYPE_EXTRA)
 	int mType = 0;
@@ -104,7 +112,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		// Open ReuseActivity
 		Intent intent = new Intent(getActivity(), ReuseActivity_.class);
 		intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, containerId);
-		startActivity(intent);
+        startActivityForResult(intent, 1);
 	}
 
 	@Click(R.id.btn_camera_done)
@@ -133,22 +141,32 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	}
 	//endregion
 
-	/**
-	 * 1. Config camera through CameraHost
-	 * 2. Config visibility of Buttons
-	 */
-	@AfterViews
-	void afterView() {
 
-		// CameraHost is the interface use to configure behavior of camera ~ setting
+	PictureTransaction xact;
+
+	@Override
+	public void onCreate(Bundle state) {
+		super.onCreate(state);
 		SimpleCameraHost.Builder builder = new SimpleCameraHost.Builder(new CameraHost(getActivity()));
 		setHost(builder.useFullBleedPreview(true).build());
-		btnTakePicture.setEnabled(true);
+
+		// You can move it to CameraHost#takeSimplePicture to tag Object
+		xact = new PictureTransaction(getHost());
+		xact.needBitmap(true);
+		xact.flashMode(Camera.Parameters.FLASH_MODE_AUTO);
+
+	}
+
+	@AfterViews
+	void afterView() {
 
 		// Config shot mode. Default is FALSE.
 		// Configure View visibility based on current step of session
 		Step step = Step.values()[currentStep];
+
+		Logger.Log("Current Step of session: " + step.toString());
 		switch (step) {
+
 			case AUDIT:
 				btnUseGateImage.setVisibility(View.VISIBLE);
 				btnCameraMode.setVisibility(View.VISIBLE);
@@ -160,6 +178,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 				btnCameraMode.setVisibility(View.GONE);
 				break;
 		}
+
 	}
 
 	@Override
@@ -188,25 +207,29 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	 * Take a picture, need to call auto focus before taking picture
 	 */
 	public void takeSimplePicture() {
+
 		if (getContract().isSingleShotMode() == true) {
 			singleShotProcessing = true;
 			btnTakePicture.setEnabled(false);
 		}
 
-		// 2.
-		PictureTransaction xact = new PictureTransaction(getHost());
-		xact.needBitmap(true);
-
-		// Tag another object along if you need to
-		// xact.tag();
-		xact.flashMode(Camera.Parameters.FLASH_MODE_AUTO);
+		// xact.tag()
 
 		// Call it with PictureTransaction to take picture with configuration in CameraHost
 		// Process image in Subclass of `CameraHost#saveImage`
 		takePicture(xact);
 	}
 
-	/**
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            getActivity().finish();
+        }
+    }
+
+    /**
 	 * CameraHost is the interface use to configure behavior of camera ~ setting.
 	 */
 	class CameraHost extends SimpleCameraHost {
@@ -217,7 +240,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 		/**
 		 * MAIN: > Process taken picture:
-		 * 1. Create proper directory
+		 * 1. Create directory
 		 * 2. Save Bitmap to File
 		 * 3. Add image to Queue
 		 *
@@ -376,13 +399,11 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 			super.onCameraFail(reason);
 			Toast.makeText(getActivity(), "Sorry, but you cannot use the camera now!", Toast.LENGTH_LONG).show();
 		}
-    
+
 		@Override
+		@TargetApi(16)
 		public void onAutoFocus(boolean success, Camera camera) {
-
-			Logger.Log("On auto focus");
 			super.onAutoFocus(success, camera);
-
 			btnTakePicture.setEnabled(true);
 			takeSimplePicture();
 		}
@@ -418,6 +439,9 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 			List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
 			return determineBestSize(sizes);
 		}
+
+
+		boolean supportsFaces = false;
 	}
 
 }

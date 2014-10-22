@@ -192,7 +192,8 @@ public class NetworkClient {
             sessions.addAll(sessionsByPage);
 
             // Update Modified day in preferences
-            PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, StringHelper.getCurrentTimestamp(CJayConstant.DAY_TIME_FORMAT));
+            String currentTime = jsonObject.get("request_time").getAsString();
+            PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, currentTime);
 
             //Get session fist page when query by day
             String lastModifiedDate = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
@@ -236,11 +237,12 @@ public class NetworkClient {
             sessions.addAll(sessionsPage);
             page = page + 1;
 
+            // Store the datetime that complete parsing process
+            String currentTime = jsonObject.get("request_time").getAsString();
+            PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, currentTime);
         } while (!next.isJsonNull());
 
-        // Store the datetime that complete parsing process
-        String currentTime = StringHelper.getCurrentTimestamp(CJayConstant.DAY_TIME_FORMAT);
-        PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, currentTime);
+
         return sessions;
     }
 
@@ -260,6 +262,7 @@ public class NetworkClient {
 
     /**
      * Upload container Session
+     *
      * @param context
      * @param containerSession
      * @return
@@ -274,6 +277,7 @@ public class NetworkClient {
 
     /**
      * check out container Session
+     *
      * @param context
      * @param containerSession
      * @return
@@ -285,6 +289,7 @@ public class NetworkClient {
 
     /**
      * put container id to server to note that this session comoleted audit
+     *
      * @param context
      * @param containerSession
      * @return
@@ -296,6 +301,7 @@ public class NetworkClient {
 
     /**
      * put to repaired session to server
+     *
      * @param context
      * @param containerSession
      * @return
@@ -307,6 +313,7 @@ public class NetworkClient {
 
     /**
      * put audit item to server
+     *
      * @param context
      * @param containerId
      * @param auditItem
@@ -315,5 +322,16 @@ public class NetworkClient {
     public Session postAuditItem(Context context, String containerId, AuditItem auditItem) {
         Session postAuditItemSession = provider.getRestAdapter(context).create(NetworkService.class).postAudiItem(containerId, auditItem.getAuditItemToUpload());
         return postAuditItemSession;
+    }
+
+    /**
+     * put audit images look like [{'name': 'XXX'}, {'name: 'AAA'}, ...] to add to audit item
+     * @param context
+     * @param auditItem
+     * @return
+     */
+    public AuditItem addAuditImage(Context context, AuditItem auditItem) {
+        AuditItem auditItemAddedImage = provider.getRestAdapter(context).create(NetworkService.class).addAuditImages(String.valueOf(auditItem.getId()), auditItem.getAuditImagesToUpLoad());
+        return auditItemAddedImage;
     }
 }

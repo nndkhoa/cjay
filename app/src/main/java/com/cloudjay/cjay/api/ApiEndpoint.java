@@ -17,8 +17,9 @@ public class ApiEndpoint {
 	public static final String CONTAINER_SESSION_COMPLETE_REPAIR_API = "/api/cjay/containers/{id}/complete-repair";
 	public static final String CONTAINER_SESSION_POST_AUDIT_ITEM_API = "/api/cjay/containers/{id}/post-audit-item";
 	public static final String CONTAINER_SESSION_COMPLETE_AUDIT_API = "/api/cjay/containers/{id}/complete-audit";
-	public static final String CONTAINER_SESSION_ADD_AUDIT_IMAGE_API = "/api/cjay/containers/{audit-item-id}/add-audit-image";
+	public static final String CONTAINER_SESSION_ADD_AUDIT_IMAGES_API = "/api/cjay/containers/{id}/add-audit-images";
 
 	public static final String CJAY_TMP_STORAGE = "https://www.googleapis.com";
 	public static final String CJAY_TMP_STORAGE_IMAGE = "/upload/storage/v1beta2/b/cjaytmp/o";
+
 }

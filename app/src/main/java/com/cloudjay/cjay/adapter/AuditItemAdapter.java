@@ -21,16 +21,22 @@ import java.util.List;
  */
 public class AuditItemAdapter extends ArrayAdapter {
 
-    private LayoutInflater inflater;
+    private LayoutInflater mInflater;
     private Context mContext;
     private List<AuditItem> auditItems;
+    private int layoutResId;
 
-    public AuditItemAdapter(Context context, int resource) {
+    public AuditItemAdapter(Context context, int resource, List<AuditItem> auditItems) {
         super(context, resource);
+        this.mContext = context;
+        this.auditItems = auditItems;
+        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        layoutResId = resource;
+
     }
 
     private class ViewHolder {
-        public ImageView ivAuditImage;
+        //public ImageView ivAuditImage;
         public TextView tvCodeComponent;
         public TextView tvCodeLocation;
         public TextView tvCodeIssue;
@@ -61,8 +67,8 @@ public class AuditItemAdapter extends ArrayAdapter {
         ViewHolder holder = null;
         if (view == null) {
             holder = new ViewHolder();
-            view = inflater.inflate(R.layout.item_issue_pending, null);
-            holder.ivAuditImage = (ImageView) view.findViewById(R.id.iv_audit_image);
+            view = mInflater.inflate(layoutResId, null);
+            // holder.ivAuditImage = (ImageView) view.findViewById(R.id.iv_audit_image);
             holder.tvCodeComponent = (TextView) view.findViewById(R.id.tv_code_component);
             holder.tvCodeIssue = (TextView) view.findViewById(R.id.tv_code_issue);
             holder.tvCodeLocation = (TextView) view.findViewById(R.id.tv_code_location);
@@ -75,9 +81,14 @@ public class AuditItemAdapter extends ArrayAdapter {
             holder = (ViewHolder) view.getTag();
         }
 
-        ImageLoader.getInstance().displayImage(auditItems.get(i).getAuditImages().get(0).getUrl(),
-                holder.ivAuditImage);
+        // ImageLoader.getInstance().displayImage(auditItems.get(i).getAuditImages().get(0).getUrl(),
+                // holder.ivAuditImage);
 
         return view;
+    }
+
+    public void swapData(List<AuditItem> auditItems) {
+        this.auditItems = auditItems;
+        notifyDataSetChanged();
     }
 }
