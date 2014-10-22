@@ -56,9 +56,6 @@ public class PhotoExpandableListViewActivity extends Activity {
 
     @AfterViews
     void setUp() {
-
-        // Load images by containerId
-        dataCenter.getPreviousImagesByContainerId(containerID);
     }
 
     @UiThread

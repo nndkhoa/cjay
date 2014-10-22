@@ -42,6 +42,7 @@ import de.greenrobot.event.EventBus;
 @EActivity(R.layout.activity_reuse)
 public class ReuseActivity extends Activity {
 
+
     public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
 
     @Extra(CONTAINER_ID_EXTRA)
@@ -169,12 +170,14 @@ public class ReuseActivity extends Activity {
         //Init adapter if null and set adapter for listview
         if (gateImageAdapter == null) {
             Logger.Log("gateImageAdapter is null");
-            gateImageAdapter = new GateImageAdapter(this, gateImages, true);
+
+	        // TODO: tieubao changed this
+            gateImageAdapter = new GateImageAdapter(this, R.layout.item_image_gridview, gateImages, true);
             gvReuseImages.setAdapter(gateImageAdapter);
         }
 
         // Notify change
-        gateImageAdapter.swapData(gateImages);
+//        gateImageAdapter.swapData(gateImages);
 
     }
 
@@ -239,4 +242,5 @@ public class ReuseActivity extends Activity {
             mActionMode = null;
         }
     }
+
 }

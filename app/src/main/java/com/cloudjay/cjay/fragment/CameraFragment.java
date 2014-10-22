@@ -295,7 +295,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 								.withName(imageName)
 								.withUrl("file://" + uri);
 
-						dataCenter.addGateImage(gateImage);
+						dataCenter.addGateImage(getActivity().getApplicationContext(), gateImage, containerId);
 						break;
 
 					case AUDIT:
@@ -318,7 +318,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 								.withUrl("file://" + uri)
 								.withName(imageName);
 
-						dataCenter.addAuditImage(auditImage);
+						dataCenter.addAuditImage(getActivity().getApplicationContext(), auditImage, containerId);
 						break;
 				}
 

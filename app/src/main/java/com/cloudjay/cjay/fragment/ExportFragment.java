@@ -175,12 +175,13 @@ public class ExportFragment extends Fragment {
 
         //Init adapter if null and set adapter for listview
         if (gateImageAdapter == null) {
-            gateImageAdapter = new GateImageAdapter(getActivity(), exportImages, false);
+            gateImageAdapter = new GateImageAdapter(getActivity(),R.layout.item_image_gridview,
+                    exportImages, false);
             gvExportImages.setAdapter(gateImageAdapter);
         }
 
         // Notify change
-        gateImageAdapter.swapData(mGateImages);
+        // gateImageAdapter.swapData(mGateImages);
 
     }
 
@@ -211,6 +212,7 @@ public class ExportFragment extends Fragment {
                 lvImagesExpandable.expandGroup(i);
             }
         }
+//        gateImageAdapter.swapData(gateImages);
 
     }
 
