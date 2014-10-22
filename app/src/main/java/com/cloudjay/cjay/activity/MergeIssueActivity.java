@@ -13,6 +13,7 @@ import com.cloudjay.cjay.util.Utils;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 
@@ -29,7 +30,7 @@ public class MergeIssueActivity extends Activity {
 
     public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
 
-    @FragmentArg(CONTAINER_ID_EXTRA)
+    @Extra(CONTAINER_ID_EXTRA)
     public String containerID;
 
     @ViewById(R.id.lv_merge_issue)
