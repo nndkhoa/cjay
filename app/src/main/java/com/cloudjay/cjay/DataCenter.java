@@ -502,9 +502,6 @@ public class DataCenter {
         if (auditItems == null) {
             auditItems = new ArrayList<AuditItem>();
         }
-        // Add audit item to List session's audit items
-        auditItems.add(auditItem);
-
         // Create new audit image object
         AuditImage auditImage = new AuditImage();
         auditImage.setId(0);
@@ -512,17 +509,21 @@ public class DataCenter {
         auditImage.setUrl(url);
         auditImage.setUploaded(false);
 
+        List<AuditImage> auditImages = auditItem.getAuditImages();
+        if (auditImages == null) {
+            auditImages = new ArrayList<AuditImage>();
+        }
+        // Add audit image to list audit images
+        auditImages.add(auditImage);
+
+        // Set list audit images to audit item
+        auditItem.setAuditImages(auditImages);
+
+        // Add audit item to List session's audit items
+        auditItems.add(auditItem);
+
         // Add audit item to Session
         session.setAuditItems(auditItems);
-
-
-
-		List<AuditImage> auditImages = session.getAuditImages();
-		if (auditImages == null) {
-			auditImages = new ArrayList<AuditImage>();
-		}
-		auditImages.add(auditImage);
-		session.setAuditImages(auditImages);
 
 		App.getDB(context).put(containerId, session);
 

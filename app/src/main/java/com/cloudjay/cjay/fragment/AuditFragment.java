@@ -1,8 +1,11 @@
 package com.cloudjay.cjay.fragment;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -30,6 +33,7 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Màn hình giám định
