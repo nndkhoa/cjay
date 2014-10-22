@@ -199,7 +199,6 @@ public class DataCenter {
 	//endregion
 
 	//region SESSION
-
 	/**
 	 * Only use when search container session from db.
 	 * Chỉ sử dụng khi biết chắc session đã ở trong db.

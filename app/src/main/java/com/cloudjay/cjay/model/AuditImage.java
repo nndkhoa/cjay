@@ -2,11 +2,13 @@ package com.cloudjay.cjay.model;
 
 import com.google.gson.annotations.Expose;
 
+import java.io.Serializable;
+
 import javax.annotation.Generated;
 
 /* Gồm hình giám định và sửa chữa */
 @Generated("org.jsonschema2pojo")
-public class AuditImage {
+public class AuditImage implements Serializable{
 
     @Expose
     private long id;
