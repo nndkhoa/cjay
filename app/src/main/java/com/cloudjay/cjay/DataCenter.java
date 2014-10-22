@@ -505,14 +505,17 @@ public class DataCenter {
         // Add audit item to List session's audit items
         auditItems.add(auditItem);
 
+        // Create new audit image object
+        AuditImage auditImage = new AuditImage();
+        auditImage.setId(0);
+        auditImage.setType(type);
+        auditImage.setUrl(url);
+        auditImage.setUploaded(false);
+
         // Add audit item to Session
         session.setAuditItems(auditItems);
 
-		AuditImage auditImage = new AuditImage();
-		auditImage.setId(0);
-		auditImage.setType(type);
-		auditImage.setUrl(url);
-		auditImage.setUploaded(false);
+
 
 		List<AuditImage> auditImages = session.getAuditImages();
 		if (auditImages == null) {
