@@ -90,6 +90,12 @@
 			android:name=".activity.MyActivity"
 			android:label="@string/title_activity_my" >
 		</activity>-->
+        <service android:name="com.cloudjay.cjay.task.service.QueueIntentService_" />
+        <receiver android:name="com.cloudjay.cjay.util.AutoStartReceiver_" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 	</application>
 
 	<uses-permission android:name="android.permission.GET_ACCOUNTS"/>

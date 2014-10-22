@@ -84,7 +84,7 @@ public class AuditItem implements Serializable {
     }
 
     public JsonObject getAuditItemToUpload() {
-        JsonArray auditImage = this.getAuditImageToUpLoad();
+        JsonArray auditImage = this.getAuditImagesToUpLoad();
         JsonObject auditItem = new JsonObject();
         auditItem.addProperty("damage_code_id", this.getDamageCodeId());
         auditItem.addProperty("repair_code_id", this.getRepairCodeId());
