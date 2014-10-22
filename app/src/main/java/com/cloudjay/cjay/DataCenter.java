@@ -478,7 +478,7 @@ public class DataCenter {
 		App.getDB(context).put(CJayConstant.PREFIX_UPLOADING + containerId, uploadingSession);
 	}
 
-	//TODO: include upload Audit Image
+	// TODO: include upload Audit Image
 	public void uploadImage(Context context, String uri, String imageName, String containerId) throws SnappydbException {
 
 		//Call network client to upload image
