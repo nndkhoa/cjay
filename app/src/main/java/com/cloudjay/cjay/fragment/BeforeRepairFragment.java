@@ -71,14 +71,24 @@ public class BeforeRepairFragment extends Fragment {
     Button btnCamera;
 
     RepairedImageAdapter imageAdapter;
+    String operatorCode;
 
     @AfterViews
     void setup() {
+        //get container operater code form containerId
+        Session tmp = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+        if (null == tmp) {
+            Utils.showCrouton(getActivity(), "Không tìm thấy container trong dữ liệu");
+        } else {
+            operatorCode = tmp.getOperatorCode();
+        }
+        // parse Data to view
         tvCompCode.setText(auditItem.getComponentCode());
         tvLocaitonCode.setText(auditItem.getLocationCode());
         tvDamageCode.setText(auditItem.getDamageCode());
         tvRepairCode.setText(auditItem.getRepairCode());
         tvSize.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
+        //TODO add fiel number to audit item model @Nam
         imageAdapter = new RepairedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.AUDIT);
         List<AuditImage> auditImages = auditItem.getAuditImages();
         imageAdapter.setData(auditImages);
@@ -101,5 +111,23 @@ public class BeforeRepairFragment extends Fragment {
         cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_REPAIRED);
         cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);
         startActivity(cameraActivityIntent);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshListImage();
+    }
+
+    private void refreshListImage() {
+        Session tmp = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+        for (AuditItem currentAuditItem: tmp.getAuditItems()){
+            if (currentAuditItem.getId() == auditItem.getId()){
+                auditItem = currentAuditItem;
+            }
+        }
+        List<AuditImage> auditImages = auditItem.getAuditImages();
+        imageAdapter.setData(auditImages);
+        imageAdapter.notifyDataSetChanged();
     }
 }

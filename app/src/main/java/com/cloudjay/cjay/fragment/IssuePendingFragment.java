@@ -12,11 +12,10 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.adapter.AuditImageAdapter;
 import com.cloudjay.cjay.activity.CameraActivity_;
+import com.cloudjay.cjay.adapter.AuditItemAdapter;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
-import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.enums.Status;
@@ -62,7 +61,7 @@ public class IssuePendingFragment extends Fragment {
     DataCenter dataCenter;
 
     String operatorCode;
-    AuditImageAdapter auditImageAdapter;
+    AuditItemAdapter auditItemAdapter;
 
 	public IssuePendingFragment() {
 		// Required empty public constructor
@@ -145,7 +144,7 @@ public class IssuePendingFragment extends Fragment {
 
     @UiThread
     void onEvent(ImageCapturedEvent event) {
-        dataCenter.getAuditAImages(containerID);
+        dataCenter.getAuditImages(containerID);
     }
 
     @Override

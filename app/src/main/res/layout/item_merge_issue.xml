@@ -22,7 +22,7 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/iv_audit_image"
+                android:id="@+id/iv_audit_image_merge"
                 android:src="@drawable/ic_launcher" />
 
         </RelativeLayout>
@@ -49,7 +49,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tv_code_component"
+                android:id="@+id/tv_code_component_merge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -70,7 +70,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tv_code_location"
+                android:id="@+id/tv_code_location_merge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -91,7 +91,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tv_code_issue"
+                android:id="@+id/tv_code_damaged_merge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -112,7 +112,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tv_code_repair"
+                android:id="@+id/tv_code_repair_merge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -133,7 +133,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tv_dimension"
+                android:id="@+id/tv_dimension_merge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -154,7 +154,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tv_count"
+                android:id="@+id/tv_count_merge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"

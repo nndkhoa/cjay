@@ -10,6 +10,7 @@ import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.event.UploadedEvent;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.model.AuditImage;
+import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Operator;
@@ -29,6 +30,7 @@ import org.androidannotations.annotations.Trace;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import de.greenrobot.event.EventBus;
 
@@ -215,6 +217,30 @@ public class DataCenter {
 			db.close();
 
 			return session;
+		} catch (SnappydbException e) {
+			Logger.w(e.getMessage());
+			return null;
+		}
+	}
+
+	/**
+	 * Get list container sessions based on param `prefix`
+	 * @param context
+	 * @param prefix
+	 * @return
+	 */
+	public List<Session> getListSessions(Context context, String prefix) {
+		try {
+			DB db = App.getDB(context);
+			String[] keysResult = db.findKeys(prefix);
+			List<Session> sessions = new ArrayList<Session>();
+
+			for (String result : keysResult) {
+				Session session = db.getObject(result, Session.class);
+				sessions.add(session);
+			}
+			db.close();
+			return sessions;
 		} catch (SnappydbException e) {
 			Logger.w(e.getMessage());
 			return null;
@@ -486,11 +512,33 @@ public class DataCenter {
 
 	public void addAuditImages(String containerId, long type, String url) throws SnappydbException {
 		Session session = App.getDB(context).getObject(containerId, Session.class);
+
+		// Generate random one UUID to save auditItem
+		String uuid = UUID.randomUUID().toString();
+
+		// Create new audit item to save
+		AuditItem auditItem = new AuditItem();
+		auditItem.setId(0);
+		auditItem.setAuditItemUUID(uuid);
+
+		// Get list session's audit items
+		List<AuditItem> auditItems = session.getAuditItems();
+		if (auditItems == null) {
+			auditItems = new ArrayList<AuditItem>();
+		}
+		// Add audit item to List session's audit items
+		auditItems.add(auditItem);
+
+		// Create new audit image object
 		AuditImage auditImage = new AuditImage();
 		auditImage.setId(0);
 		auditImage.setType(type);
 		auditImage.setUrl(url);
 		auditImage.setUploaded(false);
+
+		// Add audit item to Session
+		session.setAuditItems(auditItems);
+
 
 		List<AuditImage> auditImages = session.getAuditImages();
 		if (auditImages == null) {
@@ -505,13 +553,13 @@ public class DataCenter {
 		App.closeDB();
 	}
 
-    public void getAuditAImages(String containerId) {
-        try {
-            Session session = App.getDB(context).getObject(containerId, Session.class);
-            List<AuditImage> auditImages = session.getAuditImages();
+	public void getAuditImages(String containerId) {
+		try {
+			Session session = App.getDB(context).getObject(containerId, Session.class);
+			List<AuditImage> auditImages = session.getAuditImages();
 
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
-    }
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
 }
