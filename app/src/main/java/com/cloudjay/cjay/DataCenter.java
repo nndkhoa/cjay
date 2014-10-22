@@ -225,6 +225,7 @@ public class DataCenter {
 
 	/**
 	 * Get list container sessions based on param `prefix`
+	 *
 	 * @param context
 	 * @param prefix
 	 * @return
@@ -353,81 +354,69 @@ public class DataCenter {
 			String key = session.getContainerId();
 			db.put(key, session);
 
-			// Add working session
+			// Close db
+			db.close();
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Add container session vào list working session in database
+	 *
+	 * @param session
+	 */
+	@Background(serial = CACHE)
+	public void addWorkingSession(Session session) {
+
+		try {
+			DB db = App.getDB(context);
 			String workingKey = CJayConstant.PREFIX_WORKING + session.getContainerId();
 			session.setProcessing(true);
 			db.put(workingKey, session);
-
-			// Close db
-			db.close();
 
 			// Notify to Working Fragment
 			EventBus.getDefault().post(new WorkingSessionCreatedEvent(session));
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public void addGateImage(GateImage image) throws SnappydbException {
-
-	}
-
-	public void addAuditImage(AuditImage image) throws SnappydbException {
 
 	}
 
 	/**
-	 * Add gate image for both normal session and working session
+	 * Add image to container Session
 	 *
-	 * @param type
-	 * @param url
+	 * @param image
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	public void addGateImage(long type, String url, String containerId, String imageName) throws SnappydbException {
-		addGateImageToNormalSession(type, url, containerId, imageName);
-		addGateImageToWorkingSession(type, url, containerId, imageName);
+	public void addGateImage(Context context, GateImage image, String containerId) throws SnappydbException {
+
+		DB db = App.getDB(context);
+
+		// Add gate image to normal container session
+		Session session = db.getObject(containerId, Session.class);
+		session.getGateImages().add(image);
+
+		String key = containerId;
+		db.put(key, session);
+
+		// Add gate image to on working container session
+		key = CJayConstant.PREFIX_WORKING + containerId;
+		db.put(key, session);
+
+		db.close();
+
+
+//		// Find Session
+//		Session session = getSession(context, containerId);
+//		session.getGateImages().add(image);
+
+
 	}
 
-	private void addGateImageToWorkingSession(long type, String url, String containerId, String imageName) throws SnappydbException {
+	public void addAuditImage(Context context, AuditImage image, String containerId) throws SnappydbException {
 
-		containerId = CJayConstant.PREFIX_WORKING + containerId;
-		Session session = App.getDB(context).getObject(containerId, Session.class);
-		GateImage gateImage = new GateImage();
-		gateImage.setId(0);
-		gateImage.setType(type);
-		gateImage.setUrl(url);
-		gateImage.setName(imageName);
-
-		List<GateImage> gateImages = session.getGateImages();
-		if (gateImages == null) {
-			gateImages = new ArrayList<GateImage>();
-		}
-		gateImages.add(gateImage);
-		session.setGateImages(gateImages);
-
-		//Add update session with image to normal session in db
-		App.getDB(context).put(containerId, session);
-	}
-
-	private void addGateImageToNormalSession(long type, String url, String containerId, String imageName) throws SnappydbException {
-
-		Session session = App.getDB(context).getObject(containerId, Session.class);
-		GateImage gateImage = new GateImage();
-		gateImage.setId(0);
-		gateImage.setType(type);
-		gateImage.setUrl(url);
-		gateImage.setName(imageName);
-
-		List<GateImage> gateImages = session.getGateImages();
-		if (gateImages == null) {
-			gateImages = new ArrayList<GateImage>();
-		}
-		gateImages.add(gateImage);
-		session.setGateImages(gateImages);
-
-		//Add update session with image to normal session in db
-		App.getDB(context).put(containerId, session);
 	}
 
 	public void getGateImages(long type, String containerId) throws SnappydbException {

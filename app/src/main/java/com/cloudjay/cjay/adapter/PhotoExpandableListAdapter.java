@@ -22,122 +22,122 @@ import java.util.List;
  */
 public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
 
-    private final Context mContext;
-    private final List<String> mSectionHeaders;
-    private final int[] mImageTypes;
-    private final Hashtable<Integer, GridView> mGridViews;
+	private final Context mContext;
+	private final List<String> mSectionHeaders;
+	private final int[] mImageTypes;
+	private final Hashtable<Integer, GridView> mGridViews;
 
-    List<GateImage> mImportImages;
-    List<GateImage> mAuditImages;
-    List<GateImage> mRepairedImages;
+	List<GateImage> mImportImages;
+	List<GateImage> mAuditImages;
+	List<GateImage> mRepairedImages;
 
-    public PhotoExpandableListAdapter(Context context, int[] imageTypes,
-                                      List<GateImage> importImages,
-                                      List<GateImage> auditImages,
-                                      List<GateImage> repairedImages) {
+	public PhotoExpandableListAdapter(Context context, int[] imageTypes,
+	                                  List<GateImage> importImages,
+	                                  List<GateImage> auditImages,
+	                                  List<GateImage> repairedImages) {
 
-        mContext = context;
-        mGridViews = new Hashtable<Integer, GridView>();
-        mSectionHeaders = new ArrayList<String>();
-        mImageTypes = imageTypes;
+		mContext = context;
+		mGridViews = new Hashtable<Integer, GridView>();
+		mSectionHeaders = new ArrayList<String>();
+		mImageTypes = imageTypes;
 
-        for (int i = 0; i < mImageTypes.length; i++) {
-            mSectionHeaders.add(Utils.getImageTypeDescription(mContext, mImageTypes[i]));
-        }
+		for (int i = 0; i < mImageTypes.length; i++) {
+			mSectionHeaders.add(Utils.getImageTypeDescription(mContext, mImageTypes[i]));
+		}
 
-        mImportImages = importImages;
-        mAuditImages = auditImages;
-        mRepairedImages = repairedImages;
-    }
+		mImportImages = importImages;
+		mAuditImages = auditImages;
+		mRepairedImages = repairedImages;
+	}
 
-    @Override
-    public int getGroupCount() {
-        return mSectionHeaders.size();
-    }
+	@Override
+	public int getGroupCount() {
+		return mSectionHeaders.size();
+	}
 
-    @Override
-    public int getChildrenCount(int groupPosition) {
-        return 1;
-    }
+	@Override
+	public int getChildrenCount(int groupPosition) {
+		return 1;
+	}
 
-    @Override
-    public Object getGroup(int groupPosition) {
-        return mSectionHeaders.get(groupPosition);
-    }
+	@Override
+	public Object getGroup(int groupPosition) {
+		return mSectionHeaders.get(groupPosition);
+	}
 
-    @Override
-    public Object getChild(int groupPosition, int childPosition) {
-        return null;
-    }
+	@Override
+	public Object getChild(int groupPosition, int childPosition) {
+		return null;
+	}
 
-    @Override
-    public long getGroupId(int groupPosition) {
-        return groupPosition;
-    }
+	@Override
+	public long getGroupId(int groupPosition) {
+		return groupPosition;
+	}
 
-    @Override
-    public long getChildId(int groupPosition, int childPosition) {
-        return childPosition;
-    }
+	@Override
+	public long getChildId(int groupPosition, int childPosition) {
+		return childPosition;
+	}
 
-    @Override
-    public boolean hasStableIds() {
-        return false;
-    }
+	@Override
+	public boolean hasStableIds() {
+		return false;
+	}
 
-    @Override
-    public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+	@Override
+	public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
-        if (convertView == null) {
-            LayoutInflater infalInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = infalInflater.inflate(R.layout.expandable_list_photogrid_section, null);
-        }
+		if (convertView == null) {
+			LayoutInflater infalInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			convertView = infalInflater.inflate(R.layout.expandable_list_photogrid_section, null);
+		}
 
-        String headerTitle = (String) getGroup(groupPosition);
-        TextView sectionHeaderTextView = (TextView) convertView.findViewById(R.id.list_section_header);
-        sectionHeaderTextView.setTypeface(null, Typeface.BOLD);
-        sectionHeaderTextView.setText(headerTitle);
+		String headerTitle = (String) getGroup(groupPosition);
+		TextView sectionHeaderTextView = (TextView) convertView.findViewById(R.id.list_section_header);
+		sectionHeaderTextView.setTypeface(null, Typeface.BOLD);
+		sectionHeaderTextView.setText(headerTitle);
 
-        return convertView;
-    }
+		return convertView;
+	}
 
-    @Override
-    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+	@Override
+	public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 
-        // TODO: Inflate layout for child group view based on ```imageType```
-        // Import/Export --> GridView (R.layout.expandable_list_photogrid_item)
-        // Auditor --> ListView (R.layout.fragment_auditor_reporting)
-        // Consider to apply ViewHolder Pattern
+		// TODO: Inflate layout for child group view based on ```imageType```
+		// Import/Export --> GridView (R.layout.expandable_list_photogrid_item)
+		// Auditor --> ListView (R.layout.fragment_auditor_reporting)
+		// Consider to apply ViewHolder Pattern
 
-        if (convertView == null) {
-            LayoutInflater infalInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = infalInflater.inflate(R.layout.expandable_list_photogrid_item, null);
-        }
+		if (convertView == null) {
+			LayoutInflater infalInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			convertView = infalInflater.inflate(R.layout.expandable_list_photogrid_item, null);
+		}
 
-        GridView gridView = (GridView) convertView.findViewById(R.id.gv_images_item);
-        if (groupPosition == 0) {
-            gridView.setAdapter(new GateImageAdapter(mContext, mImportImages, false));
-        }
+		GridView gridView = (GridView) convertView.findViewById(R.id.gv_images_item);
+		if (groupPosition == 0) {
+			gridView.setAdapter(new GateImageAdapter(mContext, R.layout.item_image_gridview, mImportImages, false));
+		}
 
-        if (groupPosition == 1) {
-            gridView.setAdapter(new GateImageAdapter(mContext, mAuditImages, false));
-        }
+		if (groupPosition == 1) {
+			gridView.setAdapter(new GateImageAdapter(mContext, R.layout.item_image_gridview, mAuditImages, false));
+		}
 
-        if (groupPosition == 2) {
-            gridView.setAdapter(new GateImageAdapter(mContext, mRepairedImages, false));
-        }
+		if (groupPosition == 2) {
+			gridView.setAdapter(new GateImageAdapter(mContext, R.layout.item_image_gridview, mRepairedImages, false));
+		}
 
-        mGridViews.put(Integer.valueOf(groupPosition), gridView);
+		mGridViews.put(Integer.valueOf(groupPosition), gridView);
 
-        return convertView;
-    }
+		return convertView;
+	}
 
-    @Override
-    public boolean isChildSelectable(int groupPosition, int childPosition) {
-        return false;
-    }
+	@Override
+	public boolean isChildSelectable(int groupPosition, int childPosition) {
+		return false;
+	}
 
-    public GridView getPhotoGridView(int groupPosition) {
-        return mGridViews.get(Integer.valueOf(groupPosition));
-    }
+	public GridView getPhotoGridView(int groupPosition) {
+		return mGridViews.get(Integer.valueOf(groupPosition));
+	}
 }
