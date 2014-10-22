@@ -7,9 +7,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.List;
@@ -95,7 +93,6 @@ public class AuditItem implements Serializable {
         auditItem.addProperty("quantity", this.getQuantity());
         auditItem.add("audit_images", auditImage);
         return auditItem;
-
     }
 
     /**
