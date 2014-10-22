@@ -41,7 +41,7 @@ public class AuditItemAdapter extends ArrayAdapter {
     }
 
     private class ViewHolder {
-        //public ImageView ivAuditImage;
+        public ImageView ivAuditImage;
         public TextView tvCodeComponent;
         public TextView tvCodeLocation;
         public TextView tvCodeIssue;
@@ -76,7 +76,8 @@ public class AuditItemAdapter extends ArrayAdapter {
         if (view == null) {
             holder = new ViewHolder();
             view = mInflater.inflate(layoutResId, null);
-            // holder.ivAuditImage = (ImageView) view.findViewById(R.id.iv_audit_image);
+            holder.ivAuditImage = (ImageView) view.findViewById(R.id.iv_audit_image);
+
             holder.tvCodeComponent = (TextView) view.findViewById(R.id.tv_code_component);
             holder.tvCodeIssue = (TextView) view.findViewById(R.id.tv_code_issue);
             holder.tvCodeLocation = (TextView) view.findViewById(R.id.tv_code_location);
@@ -86,14 +87,15 @@ public class AuditItemAdapter extends ArrayAdapter {
 
             holder.btnUpload = (Button) view.findViewById(R.id.btn_upload_pending);
             holder.btnReport = (Button) view.findViewById(R.id.btn_report_pending);
+            holder.btnRepair = (Button) view.findViewById(R.id.btn_repair_pending);
 
             view.setTag(holder);
         } else {
             holder = (ViewHolder) view.getTag();
         }
 
-        // ImageLoader.getInstance().displayImage(auditItems.get(i).getAuditImages().get(0).getUrl(),
-        // holder.ivAuditImage);
+        ImageLoader.getInstance().displayImage(auditItems.get(i).getAuditImages().get(0).getUrl(),
+                holder.ivAuditImage);
         holder.btnReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -106,7 +108,7 @@ public class AuditItemAdapter extends ArrayAdapter {
 
     void showApproveDiaglog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setTitle(R.string.dialog_search_container_title);
+        builder.setTitle("Alert");
         builder.setMessage("Lỗi này đã được báo cáo chưa?");
 
         builder.setPositiveButton("Chưa", new DialogInterface.OnClickListener() {
@@ -133,18 +135,36 @@ public class AuditItemAdapter extends ArrayAdapter {
             }
         });
 
+        builder.setNeutralButton("Vệ sinh", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //TODO: do process here
+                dialogInterface.dismiss();
+            }
+        });
+
         AlertDialog dialog = builder.create();
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialogInterface) {
 
-                // Set background and text color for confirm button
+                // Set background and text color for BUTTON_NEGATIVE
                 ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
-                        .setTextColor(mContext.getResources().getColor(android.R.color.holo_green_dark));
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
-                        .setBackgroundResource(mContext.getResources().getColor(android.R.color.darker_gray));
+                        .setTextColor(mContext.getResources().getColor(android.R.color.white));
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setBackgroundResource(R.drawable.btn_green_selector);
+
+                // Set background and text color for BUTTON_NEUTRAL
                 ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEUTRAL)
-                        .setBackgroundResource(mContext.getResources().getColor(android.R.color.holo_green_dark));
+                        .setTextColor(mContext.getResources().getColor(android.R.color.white));
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEUTRAL)
+                        .setBackgroundResource(R.drawable.btn_customize_selector);
+
+                // Set background and text color for BUTTON_POSITIVE
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setTextColor(mContext.getResources().getColor(android.R.color.white));
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setBackgroundColor(mContext.getResources().getColor(android.R.color.holo_green_dark));
             }
         });
         dialog.show();
