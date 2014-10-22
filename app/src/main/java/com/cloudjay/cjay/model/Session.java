@@ -180,7 +180,7 @@ public class Session {
             jsonObject.addProperty("name", auditId);
             auditItems.add(jsonObject);
             JsonArray repairedImageName = auditItem.getRepairedImageToUpLoad();
-            jsonObject.add("audit_images", repairedImageName);
+            jsonObject.add("repair_images", repairedImageName);
         }
         return auditItems;
     }
