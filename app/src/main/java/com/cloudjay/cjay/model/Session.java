@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.model;
 
 
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -374,7 +375,7 @@ public class Session {
 	public List<GateImage> getImportImages() {
 		List<GateImage> imageList = new ArrayList<GateImage>();
 		for (GateImage gateImage: imageList) {
-			if (gateImage.getType() == ImageType.IMPORT.value) {
+			if (gateImage.getType() == CJayConstant.TYPE_IMPORT) {
 				imageList.add(gateImage);
 			}
 		}

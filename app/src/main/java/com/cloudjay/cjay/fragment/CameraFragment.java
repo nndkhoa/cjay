@@ -287,8 +287,10 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 				ImageType type = ImageType.values()[mType];
 				switch (type) {
 					case IMPORT:
+
 					case EXPORT:
 
+                        Logger.Log("save import / export image to database");
 						GateImage gateImage = new GateImage()
 								.withId(0)
 								.withType(mType)
@@ -300,19 +302,11 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 					case AUDIT:
 
-                        // Create new audit image object
-                        AuditImage auditImage = new AuditImage()
-                                .withId(0)
-                                .withType(mType)
-                                .withUrl("file://" + uri)
-                                .withName(imageName);
-
-                        // Save audit image to local db
-                        dataCenter.addAuditImages(containerId, auditImage);
-
 					case REPAIRED:
+
 					default:
-						auditImage = new AuditImage()
+                        Logger.Log("save audit / repaired image to database");
+						AuditImage auditImage = new AuditImage()
 								.withId(0)
 								.withType(mType)
 								.withUrl("file://" + uri)
@@ -323,8 +317,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 				}
 
 				// Add image to job queue
-				JobManager jobManager = App.getJobManager();
-				jobManager.addJobInBackground(new UploadImageJob(uri, imageName, containerId));
+				// JobManager jobManager = App.getJobManager();
+				// jobManager.addJobInBackground(new UploadImageJob(uri, imageName, containerId));
 
 			} catch (SnappydbException e) {
 				Utils.showCrouton(getActivity(), e.getMessage());

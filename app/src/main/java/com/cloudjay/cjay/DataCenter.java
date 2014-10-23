@@ -433,6 +433,7 @@ public class DataCenter {
 
 		db.close();
 
+        Logger.Log("addGateImage successfully");
 
 //		// Find Session
 //		Session session = getSession(context, containerId);
@@ -505,7 +506,7 @@ public class DataCenter {
 		DB db = App.getDB(context);
 
 		//Call network client to upload image
-		networkClient.uploadImage(uri, imageName);
+		//networkClient.uploadImage(uri, imageName);
 
 		// Change status image in db
 		Session session = db.getObject(CJayConstant.PREFIX_UPLOADING + containerId, Session.class);

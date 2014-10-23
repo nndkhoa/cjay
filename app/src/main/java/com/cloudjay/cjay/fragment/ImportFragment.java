@@ -205,7 +205,7 @@ public class ImportFragment extends Fragment {
 	@Background
 	void refresh() {
 		if (mSession != null) {
-			List<GateImage> list = mSession.getImportImages();
+			List<GateImage> list = mSession.getGateImages();
 			Logger.Log("Size: " + list.size());
 			updatedData(list);
 		}
