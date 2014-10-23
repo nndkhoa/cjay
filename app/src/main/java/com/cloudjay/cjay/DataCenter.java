@@ -3,6 +3,7 @@ package com.cloudjay.cjay;
 import android.content.Context;
 
 import com.cloudjay.cjay.api.NetworkClient;
+import com.cloudjay.cjay.event.AuditImagesGotEvent;
 import com.cloudjay.cjay.event.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
@@ -499,48 +500,43 @@ public class DataCenter {
 		App.getDB(context).put(CJayConstant.PREFIX_UPLOADING + session + session.getContainerId(), sessionUploaded);
 	}
 
-	public void addAuditImages(String containerId, long type, String url) throws SnappydbException {
-		Session session = App.getDB(context).getObject(containerId, Session.class);
+	public void addAuditImages(String containerId, AuditImage auditImage) throws SnappydbException {
+        Session session = App.getDB(context).getObject(containerId, Session.class);
 
-		// Generate random one UUID to save auditItem
-		String uuid = UUID.randomUUID().toString();
+        // Generate random one UUID to save auditItem
+        String uuid = UUID.randomUUID().toString();
 
-		// Create new audit item to save
-		AuditItem auditItem = new AuditItem();
-		auditItem.setId(0);
-		auditItem.setAuditItemUUID(uuid);
+        // Create new audit item to save
+        AuditItem auditItem = new AuditItem();
+        auditItem.setId(0);
+        auditItem.setAuditItemUUID(uuid);
 
-		// Get list session's audit items
-		List<AuditItem> auditItems = session.getAuditItems();
-		if (auditItems == null) {
-			auditItems = new ArrayList<AuditItem>();
-		}
-		// Add audit item to List session's audit items
-		auditItems.add(auditItem);
+        // Get list session's audit items
+        List<AuditItem> auditItems = session.getAuditItems();
+        if (auditItems == null) {
+            auditItems = new ArrayList<AuditItem>();
+        }
 
-		// Create new audit image object
-		AuditImage auditImage = new AuditImage();
-		auditImage.setId(0);
-		auditImage.setType(type);
-		auditImage.setUrl(url);
-		auditImage.setUploaded(false);
+        List<AuditImage> auditImages = auditItem.getAuditImages();
+        if (auditImages == null) {
+            auditImages = new ArrayList<AuditImage>();
+        }
+        // Add audit image to list audit images
+        auditImages.add(auditImage);
 
-		// Add audit item to Session
-		session.setAuditItems(auditItems);
+        // Set list audit images to audit item
+        auditItem.setAuditImages(auditImages);
 
+        // Add audit item to List session's audit items
+        auditItems.add(auditItem);
 
-		List<AuditImage> auditImages = session.getAuditImages();
-		if (auditImages == null) {
-			auditImages = new ArrayList<AuditImage>();
-		}
-		auditImages.add(auditImage);
-		session.setAuditImages(auditImages);
+        // Add audit item to Session
+        session.setAuditItems(auditItems);
 
+        App.getDB(context).put(containerId, session);
 
-		App.getDB(context).put(containerId, session);
-
-		Logger.Log("insert audit image successfully");
-		App.closeDB();
+        Logger.Log("insert audit image successfully");
+        App.closeDB();
     }
 
     public List<AuditItem> getAuditItems(String containerId) {
@@ -555,6 +551,28 @@ public class DataCenter {
         return auditItems;
     }
 
+    public void getAuditImages(String containerId) {
+        Session session = null;
+        try {
+            session = App.getDB(context).getObject(containerId, Session.class);
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+
+        // Audit and Repaired Images
+        List<AuditImage> auditImages = new ArrayList<AuditImage>();
+
+        // Get list audit images of each audit item and add to audit images list
+        for (AuditItem auditItem : session.getAuditItems()) {
+
+            List<AuditImage> childAuditImageList = auditItem.getAuditImages();
+            if (childAuditImageList != null) {
+                auditImages.addAll(childAuditImageList);
+            }
+        }
+
+        EventBus.getDefault().post(new AuditImagesGotEvent(auditImages));
+    }
 	/**
 	 * Get List audit item for normal session
 	 * @param context
