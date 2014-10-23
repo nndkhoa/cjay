@@ -119,6 +119,7 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
         GridView gridView = (GridView) convertView.findViewById(R.id.gv_images_item);
         if (groupPosition == 0) {
             Logger.Log("groupPosition == 0");
+            Logger.Log(mImportImages.size() + "");
             gridView.setAdapter(new GateImageAdapter(mContext, R.layout.item_image_gridview,
                     mImportImages, false));
         }
@@ -137,7 +138,6 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
 
         return convertView;
     }
-
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return false;
