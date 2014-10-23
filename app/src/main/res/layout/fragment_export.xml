@@ -12,7 +12,7 @@
         android:paddingLeft="12dp"
         android:paddingRight="12dp"
         android:orientation="vertical"
-        android:layout_above="@+id/ll_bottom">
+        android:layout_above="@id/ll_bottom">
 
         <TextView
             android:layout_width="wrap_content"
@@ -108,11 +108,10 @@
 
         <GridView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="210dp"
             android:id="@+id/gv_images"
-            android:numColumns="1"
+            android:numColumns="2"
             android:layout_below="@+id/btn_take_export_picture"
-            android:layout_above="@+id/rl_bottom"
             android:layout_marginBottom="6dp">
         </GridView>
 
@@ -120,6 +119,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
+            android:layout_below="@id/gv_images"
             android:id="@+id/rl_bottom">
 
             <Button
@@ -134,7 +134,8 @@
                 android:id="@+id/lv_images_expandable"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/btn_view_previous_step"/>
+                android:layout_below="@+id/btn_view_previous_step"
+                android:visibility="gone"/>
 
         </RelativeLayout>
 

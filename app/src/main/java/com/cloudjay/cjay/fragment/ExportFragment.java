@@ -4,6 +4,7 @@ package com.cloudjay.cjay.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.GridView;
@@ -47,10 +48,10 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.fragment_export)
 public class ExportFragment extends Fragment {
 
-	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
 
-	@FragmentArg(CONTAINER_ID_EXTRA)
-	String containerID;
+    @FragmentArg(CONTAINER_ID_EXTRA)
+    String containerID;
 
     @ViewById(R.id.tv_container_code)
     TextView tvContainerId;
@@ -92,8 +93,8 @@ public class ExportFragment extends Fragment {
     long preStatus;
     long currentStatus;
 
-	public ExportFragment() {
-	}
+    public ExportFragment() {
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -175,7 +176,7 @@ public class ExportFragment extends Fragment {
 
         //Init adapter if null and set adapter for listview
         if (gateImageAdapter == null) {
-            gateImageAdapter = new GateImageAdapter(getActivity(),R.layout.item_image_gridview,
+            gateImageAdapter = new GateImageAdapter(getActivity(), R.layout.item_image_gridview,
                     exportImages, false);
             gvExportImages.setAdapter(gateImageAdapter);
         }
@@ -207,10 +208,6 @@ public class ExportFragment extends Fragment {
             mListAdapter = new PhotoExpandableListAdapter(getActivity(),
                     mImageTypes, importImages, auditImages, repairedImages);
             lvImagesExpandable.setAdapter(mListAdapter);
-
-            for (int i = 0; i < mImageTypes.length; i++) {
-                lvImagesExpandable.expandGroup(i);
-            }
         }
 //        gateImageAdapter.swapData(gateImages);
 
@@ -224,17 +221,16 @@ public class ExportFragment extends Fragment {
         currentStatus = result.get(0).getStatus();
 
         // Set preStatus to TextView
-        tvPreStatus.setText((Status.values()[(int)preStatus]).toString());
+        tvPreStatus.setText((Status.values()[(int) preStatus]).toString());
 
         // Set currentStatus to TextView
-        tvCurrentStatus.setText((Status.values()[(int)currentStatus]).toString());
+        tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
     }
 
     @Click(R.id.btn_view_previous_step)
     void buttonViewPreClicked() {
-        Intent intent = new Intent(getActivity(), PhotoExpandableListViewActivity_.class);
-        intent.putExtra(PhotoExpandableListViewActivity_.CONTAINER_ID_EXTRA, containerID);
-        startActivity(intent);
+        lvImagesExpandable.setVisibility(lvImagesExpandable.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
+        gvExportImages.setVisibility(lvImagesExpandable.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
     }
 
     @Override
