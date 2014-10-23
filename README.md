@@ -35,6 +35,22 @@ There are 2 kinds of background task:
 
 - Do not need to run at this time but as soon as possible. e.g. upload images, upload container sessions ... For this kind of tasks, we should use `JobQueue` to let them execute jobs in queued style.
 
+## Object Status
+CJay App need to distinguish object between those status:
+
+##### Session:
+- Normal session and on Working Session
+- Enqueued session, uploading session and uploaded session
+
+##### Image:
+- Gate Image and Audit Image
+- Enqueued image, uploading image and uploaded image
+
+##### Audit item:
+- Disabled item and normal item
+- Approved item and not approved item
+- Enqueued item, uploading item and uploaded item
+
 ## README Driven Development
 
 To make sure that every people can understand your code, your algorithm and workflow, we will apply a simple version of documentation-first software process (DDD) which called [`README Driven Development`](http://tom.preston-werner.com/2010/08/23/readme-driven-development.html).
