@@ -14,7 +14,6 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
-import com.cloudjay.cjay.activity.PhotoExpandableListViewActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.adapter.PhotoExpandableListAdapter;
 import com.cloudjay.cjay.event.AuditImagesGotEvent;
@@ -196,10 +195,8 @@ public class ExportFragment extends Fragment {
         for (AuditImage a : mAuditImages) {
             // Create list audit images
             if (a.getType() == CJayConstant.TYPE_AUDIT) {
-                Logger.Log("TYPE_AUDIT");
                 auditImages.add(a);
             } else if (a.getType() == CJayConstant.TYPE_REPAIRED) {
-                Logger.Log("TYPE_REPAIRED");
                 repairedImages.add(a);
             }
         }

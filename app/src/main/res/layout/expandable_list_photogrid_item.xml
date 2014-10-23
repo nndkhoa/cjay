@@ -7,15 +7,11 @@
 
     <GridView
         android:id="@+id/gv_images_item"
+        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="3dp"
-        android:layout_marginLeft="3dp"
-        android:layout_marginRight="3dp"
-        android:layout_marginTop="3dp"
-        android:horizontalSpacing="3dp"
-        android:paddingBottom="6dp"
-        android:paddingTop="6dp"
-        android:scrollbars="none"/>
+        android:verticalSpacing="1dp"
+        android:horizontalSpacing="1dp"
+        android:stretchMode="columnWidth"
+        android:numColumns="2"/>
 
 </LinearLayout>

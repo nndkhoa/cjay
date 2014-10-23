@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
@@ -97,7 +98,6 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
 
         String headerTitle = (String) getGroup(groupPosition);
         TextView sectionHeaderTextView = (TextView) convertView.findViewById(R.id.list_section_header);
-        sectionHeaderTextView.setTypeface(null, Typeface.BOLD);
         sectionHeaderTextView.setText(headerTitle);
 
         return convertView;
@@ -118,18 +118,16 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
 
         GridView gridView = (GridView) convertView.findViewById(R.id.gv_images_item);
         if (groupPosition == 0) {
-            Logger.Log("groupPosition == 0");
             gridView.setAdapter(new GateImageAdapter(mContext, R.layout.item_image_gridview,
                     mImportImages, false));
+
         }
 
         if (groupPosition == 1) {
-            Logger.Log("groupPosition == 1");
             gridView.setAdapter(new AuditImageAdapter(mContext, mAuditImages));
         }
 
         if (groupPosition == 2) {
-            Logger.Log("groupPosition == 2");
             gridView.setAdapter(new AuditImageAdapter(mContext, mRepairedImages));
         }
 

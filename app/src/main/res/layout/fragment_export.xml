@@ -2,7 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.cloudjay.cjay.fragment.ExportFragment">
+    tools:context="com.cloudjay.cjay.fragment.ExportFragment"
+    android:background="@android:color/white">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -128,7 +129,8 @@
                 android:id="@+id/btn_view_previous_step"
                 android:text="Xem hình các bước trước"
                 android:textColor="@android:color/white"
-                android:background="@drawable/btn_view_previous_images_step"/>
+                android:background="@drawable/btn_view_previous_images_step"
+                android:layout_marginBottom="6dp"/>
 
             <ExpandableListView
                 android:id="@+id/lv_images_expandable"
