@@ -175,6 +175,7 @@ public class NetworkClient {
         // If get by day, get fist page query by day
         // => get page from key "next"
         // => get all page after that page
+        // => if next page is null => get current page by set page = 1
         if (!TextUtils.isEmpty(modifiedDate)) {
 
             // Get by lastModified Day
@@ -183,21 +184,35 @@ public class NetworkClient {
             JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionsByModifiedTime(modifiedDate);
             next = jsonObject.get("next");
             String nextString = next.toString();
+            if (!next.isJsonNull()) {
+                //get page number of fist page
+                int page = Integer.parseInt(nextString.substring(nextString.lastIndexOf("=") - 1));
 
-            //get page number of fist page
-            int page = Integer.parseInt(nextString.substring(nextString.lastIndexOf("=") + 1));
+                //get all session have page number greater then fist page
+                List<Session> sessionsByPage = this.getAllSessionsByPage(context, page);
+                sessions.addAll(sessionsByPage);
 
-            //get all session have page number greater then fist page
-            List<Session> sessionsByPage = this.getAllSessionsByPage(context, page);
-            sessions.addAll(sessionsByPage);
+                // Update Modified day in preferences
+                String currentTime = jsonObject.get("request_time").getAsString();
+                PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, currentTime);
 
-            // Update Modified day in preferences
-            String currentTime = jsonObject.get("request_time").getAsString();
-            PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, currentTime);
+                //Get session fist page when query by day
+                String lastModifiedDate = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
+                Logger.Log("Last modified date: " + lastModifiedDate);
+            } else {
+                //get all session in page 1
+                List<Session> sessionsByPage = this.getAllSessionsByPage(context, 1);
+                sessions.addAll(sessionsByPage);
 
-            //Get session fist page when query by day
-            String lastModifiedDate = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
-            Logger.Log("Last modified date: " + lastModifiedDate);
+                // Update Modified day in preferences
+                String currentTime = jsonObject.get("request_time").getAsString();
+                PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, currentTime);
+
+                //Get session fist page when query by day
+                String lastModifiedDate = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
+                Logger.Log("Last modified date: " + lastModifiedDate);
+            }
+
         }
 
         //If not, get all sessions start form page 1
@@ -326,6 +341,7 @@ public class NetworkClient {
 
     /**
      * put audit images look like [{'name': 'XXX'}, {'name: 'AAA'}, ...] to add to audit item
+     *
      * @param context
      * @param auditItem
      * @return

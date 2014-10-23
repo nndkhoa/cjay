@@ -259,6 +259,7 @@ public class DataCenter {
 	 * @throws SnappydbException
 	 */
 	public void fetchSession(Context context, String lastModifiedDate) throws SnappydbException {
+        Logger.Log("Fetching Session");
 		List<Session> sessions = networkClient.getAllSessions(context, lastModifiedDate);
 		DB db = App.getDB(context);
 		for (Session session : sessions) {

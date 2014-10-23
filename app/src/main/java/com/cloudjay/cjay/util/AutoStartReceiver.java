@@ -13,6 +13,8 @@ import org.androidannotations.annotations.EReceiver;
 public class AutoStartReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+
+        Logger.Log("**********started************");
         // Making Alarm for Queue Worker
         if (!Utils.isAlarmUp(context)) {
 
