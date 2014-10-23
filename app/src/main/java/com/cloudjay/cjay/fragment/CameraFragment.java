@@ -111,7 +111,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		// Open ReuseActivity
 		Intent intent = new Intent(getActivity(), ReuseActivity_.class);
 		intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, containerId);
-        startActivityForResult(intent, 1);
+		startActivityForResult(intent, 1);
 	}
 
 	@Click(R.id.btn_camera_done)
@@ -219,16 +219,16 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		takePicture(xact);
 	}
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
-            getActivity().finish();
-        }
-    }
+		if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+			getActivity().finish();
+		}
+	}
 
-    /**
+	/**
 	 * CameraHost is the interface use to configure behavior of camera ~ setting.
 	 */
 	class CameraHost extends SimpleCameraHost {
@@ -287,10 +287,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 				ImageType type = ImageType.values()[mType];
 				switch (type) {
 					case IMPORT:
-
 					case EXPORT:
-
-                        Logger.Log("save import / export image to database");
 						GateImage gateImage = new GateImage()
 								.withId(0)
 								.withType(mType)
@@ -301,11 +298,9 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 						break;
 
 					case AUDIT:
-
 					case REPAIRED:
-
 					default:
-                        Logger.Log("save audit / repaired image to database");
+						Logger.Log("save audit / repaired image to database");
 						AuditImage auditImage = new AuditImage()
 								.withId(0)
 								.withType(mType)

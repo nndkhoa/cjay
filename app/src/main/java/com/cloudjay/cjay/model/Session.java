@@ -104,10 +104,6 @@ public class Session {
 	@Expose
 	private List<AuditItem> auditItems;
 
-	@SerializedName("audit_images")
-	@Expose
-	private List<AuditImage> auditImages;
-
 	public Session() {
 		gateImages = new ArrayList<GateImage>();
 		auditItems = new ArrayList<AuditItem>();
@@ -355,26 +351,13 @@ public class Session {
 		return this;
 	}
 
-	public List<AuditImage> getAuditImages() {
-		return auditImages;
-	}
-
-	public void setAuditImages(List<AuditImage> auditImages) {
-		this.auditImages = auditImages;
-	}
-
-	public Session withAuditImages(List<AuditImage> auditImages) {
-		this.auditImages = auditImages;
-		return this;
-	}
-
 	/**
 	 * Get list import images in List of Gate Images
 	 * @return
 	 */
 	public List<GateImage> getImportImages() {
 		List<GateImage> imageList = new ArrayList<GateImage>();
-		for (GateImage gateImage: imageList) {
+		for (GateImage gateImage: gateImages) {
 			if (gateImage.getType() == CJayConstant.TYPE_IMPORT) {
 				imageList.add(gateImage);
 			}

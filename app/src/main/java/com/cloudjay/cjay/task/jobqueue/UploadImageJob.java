@@ -41,7 +41,6 @@ public class UploadImageJob extends Job {
 
 	@Override
 	protected void onCancel() {
-
 	}
 
 	@Override
