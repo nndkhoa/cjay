@@ -123,15 +123,15 @@ public class ImportFragment extends Fragment {
 		etOperator.setCursorVisible(false);
 		etOperator.clearFocus();
 
-		mAdapter = new GateImageAdapter(getActivity(), R.layout.item_image_gridview, gateImages, false);
-		lvImages.setAdapter(mAdapter);
-
+        mAdapter = new GateImageAdapter(getActivity(), R.layout.item_image_gridview, gateImages, false);
+        lvImages.setAdapter(mAdapter);
 		// Trying to restore container status
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 		if (null == mSession) {
 
 			// Set container ID for text View containerID
 			tvContainerCode.setText(containerID);
+
 		} else {
 
 			containerID = mSession.getContainerId();
@@ -140,9 +140,7 @@ public class ImportFragment extends Fragment {
 			tvContainerCode.setText(containerID);
 			etOperator.setText(operatorCode);
 
-			// refresh list images at the first time
-			mAdapter.addAll(mSession.getImportImages());
-			Logger.Log(mSession.getImportImages().size() + "");
+            refresh();
 		}
 	}
 
@@ -196,7 +194,7 @@ public class ImportFragment extends Fragment {
 
 		Logger.Log("onEvent Image Captured");
 
-		// Re-query container session with given containerId
+//		// Re-query container session with given containerId
 		String containerId = event.getContainerId();
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
 		refresh();
@@ -205,7 +203,7 @@ public class ImportFragment extends Fragment {
 	@Background
 	void refresh() {
 		if (mSession != null) {
-			List<GateImage> list = mSession.getGateImages();
+			List<GateImage> list = mSession.getImportImages();
 			Logger.Log("Size: " + list.size());
 			updatedData(list);
 		}
@@ -213,10 +211,11 @@ public class ImportFragment extends Fragment {
 
 	@UiThread
 	public void updatedData(List<GateImage> gateImageList) {
+        Logger.Log("Size: " + gateImageList.size());
 		mAdapter.clear();
 		if (gateImageList != null) {
 			for (GateImage object : gateImageList) {
-				mAdapter.insert(object, mAdapter.getCount());
+				mAdapter.add(object);
 			}
 		}
 		mAdapter.notifyDataSetChanged();

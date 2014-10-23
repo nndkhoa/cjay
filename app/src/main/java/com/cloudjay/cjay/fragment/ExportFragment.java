@@ -47,22 +47,22 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.fragment_export)
 public class ExportFragment extends Fragment {
 
-    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
 
-    @FragmentArg(CONTAINER_ID_EXTRA)
-    String containerID;
+	@FragmentArg(CONTAINER_ID_EXTRA)
+	String containerID;
 
-    @ViewById(R.id.tv_container_code)
-    TextView tvContainerId;
+	@ViewById(R.id.tv_container_code)
+	TextView tvContainerId;
 
-    @ViewById(R.id.btn_take_export_picture)
-    LinearLayout btnTakeExportPicture;
+	@ViewById(R.id.btn_take_export_picture)
+	LinearLayout btnTakeExportPicture;
 
-    @ViewById(R.id.gv_images)
-    GridView gvExportImages;
+	@ViewById(R.id.gv_images)
+	GridView gvExportImages;
 
-    @ViewById(R.id.btn_view_previous_step)
-    Button btnViewPreviousSteps;
+	@ViewById(R.id.btn_view_previous_step)
+	Button btnViewPreviousSteps;
 
     @ViewById(R.id.tv_status_name)
     TextView tvPreStatus;
@@ -111,7 +111,7 @@ public class ExportFragment extends Fragment {
         tvContainerId.setText(containerID);
 
         // Search session by containerId to get operatorCode
-        dataCenter.getSessionByContainerId(containerID);
+        dataCenter.getSessionByContainerId(getActivity(), containerID);
 
         // Init image types
         mImageTypes = new int[3];
@@ -121,20 +121,20 @@ public class ExportFragment extends Fragment {
 
         // Get import images by containerId
         try {
-            dataCenter.getGateImages(CJayConstant.TYPE_IMPORT, containerID);
+            dataCenter.getGateImages(getActivity(), CJayConstant.TYPE_IMPORT, containerID);
         } catch (SnappydbException e) {
             e.printStackTrace();
         }
 
         // Get export images by containerId
         try {
-            dataCenter.getGateImages(CJayConstant.TYPE_EXPORT, containerID);
+            dataCenter.getGateImages(getActivity(), CJayConstant.TYPE_EXPORT, containerID);
         } catch (SnappydbException e) {
             e.printStackTrace();
         }
 
         // Get audit and repaired images by containerId
-        dataCenter.getAuditImages(containerID);
+        dataCenter.getAuditImages(getActivity(), containerID);
     }
 
     @Click(R.id.btn_take_export_picture)
@@ -151,7 +151,7 @@ public class ExportFragment extends Fragment {
     void onEvent(ImageCapturedEvent event) {
         // Get gate images from realm
         try {
-            dataCenter.getGateImages(CJayConstant.TYPE_EXPORT, containerID);
+            dataCenter.getGateImages(getActivity(), CJayConstant.TYPE_EXPORT, containerID);
         } catch (SnappydbException e) {
             e.printStackTrace();
         }
@@ -208,31 +208,31 @@ public class ExportFragment extends Fragment {
         }
 //        gateImageAdapter.swapData(gateImages);
 
-    }
+	}
 
-    @UiThread
-    void onEvent(ContainerSearchedEvent event) {
-        List<Session> result = event.getSessions();
-        operatorCode = result.get(0).getOperatorCode();
-        preStatus = result.get(0).getPreStatus();
-        currentStatus = result.get(0).getStatus();
+	@UiThread
+	void onEvent(ContainerSearchedEvent event) {
+		List<Session> result = event.getSessions();
+		operatorCode = result.get(0).getOperatorCode();
+		preStatus = result.get(0).getPreStatus();
+		currentStatus = result.get(0).getStatus();
 
-        // Set preStatus to TextView
-        tvPreStatus.setText((Status.values()[(int) preStatus]).toString());
+		// Set preStatus to TextView
+		tvPreStatus.setText((Status.values()[(int) preStatus]).toString());
 
-        // Set currentStatus to TextView
-        tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
-    }
+		// Set currentStatus to TextView
+		tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
+	}
 
-    @Click(R.id.btn_view_previous_step)
-    void buttonViewPreClicked() {
-        lvImagesExpandable.setVisibility(lvImagesExpandable.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
-        gvExportImages.setVisibility(lvImagesExpandable.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
-    }
+	@Click(R.id.btn_view_previous_step)
+	void buttonViewPreClicked() {
+		lvImagesExpandable.setVisibility(lvImagesExpandable.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
+		gvExportImages.setVisibility(lvImagesExpandable.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
+	}
 
-    @Override
-    public void onDestroy() {
-        EventBus.getDefault().unregister(this);
-        super.onDestroy();
-    }
+	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
 }

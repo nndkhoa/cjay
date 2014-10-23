@@ -18,7 +18,7 @@ import java.util.List;
 public class GateImageAdapter extends ArrayAdapter<GateImage> {
 
 	private LayoutInflater inflater;
-	private List<GateImage> gateImages;
+	private List<GateImage> mGateImages;
 	private Context context;
 	private int resource;
 
@@ -30,7 +30,13 @@ public class GateImageAdapter extends ArrayAdapter<GateImage> {
 		super(context, resource);
 
 		this.inflater = LayoutInflater.from(context);
-		this.gateImages = gateImages;
+
+        if (gateImages == null) {
+            this.mGateImages = new ArrayList<GateImage>();
+        } else {
+            this.mGateImages = gateImages;
+        }
+
 		this.context = context;
 		this.mCheckable = isCheckable;
 		this.resource = resource;
@@ -45,15 +51,15 @@ public class GateImageAdapter extends ArrayAdapter<GateImage> {
 
 	@Override
 	public int getCount() {
-		if (gateImages != null) {
-			return gateImages.size();
+		if (mGateImages != null) {
+			return mGateImages.size();
 		}
 		return 0;
 	}
 
 	@Override
 	public GateImage getItem(int position) {
-		return gateImages.get(position);
+		return mGateImages.get(position);
 	}
 
 	@Override
@@ -80,11 +86,11 @@ public class GateImageAdapter extends ArrayAdapter<GateImage> {
 		layout.setShowCheckbox(mCheckable);
 		if (mCheckable) {
 			layout.setParentAdapter(this);
-			layout.setCJayImageUrl(gateImages.get(i).getUrl());
-			layout.setChecked(mArrayCheckedImages.contains(gateImages.get(i).getUrl()));
+			layout.setCJayImageUrl(mGateImages.get(i).getUrl());
+			layout.setChecked(mArrayCheckedImages.contains(mGateImages.get(i).getUrl()));
 		}
 
-		ImageLoader.getInstance().displayImage(gateImages.get(i).getUrl(), holder.ivGateImage);
+		ImageLoader.getInstance().displayImage(mGateImages.get(i).getUrl(), holder.ivGateImage);
 		return convertView;
 	}
 

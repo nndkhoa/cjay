@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.view.SquareImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.androidannotations.annotations.Click;
@@ -76,7 +77,7 @@ public class AuditItemAdapter extends ArrayAdapter {
         if (view == null) {
             holder = new ViewHolder();
             view = mInflater.inflate(layoutResId, null);
-            holder.ivAuditImage = (ImageView) view.findViewById(R.id.iv_audit_image);
+            holder.ivAuditImage = (SquareImageView) view.findViewById(R.id.iv_audit_image);
 
             holder.tvCodeComponent = (TextView) view.findViewById(R.id.tv_code_component);
             holder.tvCodeIssue = (TextView) view.findViewById(R.id.tv_code_issue);

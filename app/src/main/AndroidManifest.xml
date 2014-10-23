@@ -1,124 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.cloudjay.cjay">
+    package="com.cloudjay.cjay"
+    android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
 
-	<application
-		android:name=".App"
-		android:allowBackup="true"
-		android:icon="@drawable/ic_app"
-		android:label="@string/app_name"
-		android:theme="@style/AppTheme">
+    <application
+        android:name=".App"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_app"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
 
-		<meta-data
-			android:name="com.crashlytics.ApiKey"
-			android:value="d95dbe17ef52014812094c8003d8d48cd72d9197"/>
+        <meta-data
+            android:name="com.crashlytics.ApiKey"
+            android:value="d95dbe17ef52014812094c8003d8d48cd72d9197" />
 
-		<service android:name=".util.account.CJayAuthenticationService">
-			
-			<intent-filter>
-				<action android:name="android.accounts.AccountAuthenticator"/>
-			</intent-filter>
+        <service android:name=".util.account.CJayAuthenticationService">
 
-			<meta-data
-				android:name="android.accounts.AccountAuthenticator"
-				android:resource="@xml/authenticator">
-			</meta-data>
-		</service>
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
 
-		<!-- <service -->
-		<!-- android:name=".network.IsoCodeSyncService" -->
-		<!-- android:exported="true"> -->
-		<!-- <intent-filter> -->
-		<!-- <action android:name="android.content.SyncAdapter"/> -->
-		<!-- </intent-filter> -->
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator"></meta-data>
+        </service>
+
+        <!-- <service -->
+        <!-- android:name=".network.IsoCodeSyncService" -->
+        <!-- android:exported="true"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.content.SyncAdapter"/> -->
+        <!-- </intent-filter> -->
 
 
-		<!-- <meta-data -->
-		<!-- aname="android.content.SyncAdapter" -->
-		<!-- android:resource="@xml/iso_code_sync_adapter"/> -->
-		<!-- </service> -->
+        <!-- <meta-data -->
+        <!-- aname="android.content.SyncAdapter" -->
+        <!-- android:resource="@xml/iso_code_sync_adapter"/> -->
+        <!-- </service> -->
 
-		<activity
-			android:name=".activity.HomeActivity_"
-			android:label="@string/app_name"
-			android:screenOrientation="portrait">
+        <activity
+            android:name=".activity.HomeActivity_"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
 
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN"/>
-				<category android:name="android.intent.category.LAUNCHER"/>
-			</intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
 
-		</activity>
-		<activity
-			android:name=".activity.LoginActivity_"
-			android:label="@string/title_activity_login"
-			android:screenOrientation="portrait"
-			android:theme="@android:style/Theme.Holo.Light.NoActionBar">
-		</activity>
-		<activity
-			android:name=".activity.ReuseActivity_"
-			android:label="@string/title_activity_reuse"
-			android:screenOrientation="portrait">
-		</activity>
-		<activity
-			android:name=".activity.LinkIssueActivity"
-			android:label="@string/title_activity_link_issue"
-			android:screenOrientation="portrait">
-		</activity>
-		<activity
-			android:name=".activity.ReportIssueActivity"
-			android:label="@string/title_activity_report_issue"
-			android:screenOrientation="portrait">
-		</activity>
-		<activity
-			android:name=".activity.WizardActivity_"
-			android:label="@string/title_activity_main_process"
-			android:screenOrientation="portrait">
-		</activity>
-		<activity
-			android:name=".activity.CameraActivity_"
-			android:label="@string/title_activity_camera"
-			android:screenOrientation="portrait"
-			android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen">
-		</activity>
-		<activity
-			android:name=".activity.PhotoExpandableListViewActivity_"
-			android:label="@string/title_activity_view_iimages_previous_steps"
-			android:screenOrientation="portrait">
-		</activity>
-		<!--<activity
-			android:name=".activity.MyActivity"
-			android:label="@string/title_activity_my" >
-		</activity>-->
-        <service android:name="com.cloudjay.cjay.task.service.QueueIntentService_" />
-        <receiver android:name="com.cloudjay.cjay.util.AutoStartReceiver_" >
+        </activity>
+        <activity
+            android:name=".activity.LoginActivity_"
+            android:label="@string/title_activity_login"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar"></activity>
+        <activity
+            android:name=".activity.ReuseActivity_"
+            android:label="@string/title_activity_reuse"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".activity.LinkIssueActivity"
+            android:label="@string/title_activity_link_issue"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".activity.ReportIssueActivity"
+            android:label="@string/title_activity_report_issue"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".activity.WizardActivity_"
+            android:label="@string/title_activity_main_process"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".activity.CameraActivity_"
+            android:label="@string/title_activity_camera"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen"></activity>
+        <activity
+            android:name=".activity.PhotoExpandableListViewActivity_"
+            android:label="@string/title_activity_view_iimages_previous_steps"
+            android:screenOrientation="portrait"></activity>
+        <!--<activity
+            android:name=".activity.MyActivity"
+            android:label="@string/title_activity_my" >
+        </activity>-->
+        <service
+            android:name="com.cloudjay.cjay.task.service.QueueIntentService_"/>
+        <receiver android:name="com.cloudjay.cjay.util.AutoStartReceiver_">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-	</application>
+    </application>
 
-	<uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-	<uses-permission android:name="android.permission.USE_CREDENTIALS"/>
-	<uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
-	<uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
-	<uses-permission android:name="android.permission.INTERNET"/>
-	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-	<uses-permission android:name="android.permission.READ_SYNC_STATS"/>
-	<uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
-	<uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-	<uses-permission android:name="android.permission.CAMERA"/>
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-	<uses-feature
-		android:name="android.hardware.camera"
-		android:required="true"/>
-	<uses-feature
-		android:name="android.hardware.camera.front"
-		android:required="false"/>
-	<uses-feature
-		android:name="android.hardware.camera.autofocus"
-		android:required="false"/>
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
 
 </manifest>

@@ -56,7 +56,7 @@ public class IssueRepairedFragment extends Fragment {
     void setUp() {
 
         // Get session by containerId
-        dataCenter.getSessionByContainerId(containerID);
+        dataCenter.getSessionByContainerId(getActivity().getApplicationContext(), containerID);
 
         // Set text ContainerId TextView
         tvContainerId.setText(containerID);

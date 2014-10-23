@@ -55,19 +55,18 @@ public class Utils {
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         // Making Alarm for Queue Worker
-        Intent intent = new Intent(context, QueueIntentService.class);
+        Intent intent = new Intent(context, QueueIntentService_.class);
         PendingIntent pintent = PendingIntent.getService(context, CJayConstant.ALARM_ID, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         Calendar cal = Calendar.getInstance();
 
-        // start 20 seconds after boot completed
-        cal.add(Calendar.SECOND, 20);
+        // start 30 seconds after boot completed
+        cal.add(Calendar.SECOND, 30);
 
-        // Start every 10 seconds
-        // InexactRepeating allows Android to optimize the energy consumption
-        // TODO: replace setRepeating
-        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 3600 * 24,
+
+        // Start every 24 hours
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 86400000,
                 pintent);
     }
 
@@ -326,4 +325,5 @@ public class Utils {
         return PendingIntent.getService(context, CJayConstant.ALARM_ID, intent, PendingIntent.FLAG_NO_CREATE) != null;
 
     }
+
 }

@@ -66,7 +66,8 @@
 			android:id="@+id/lv_image"
 			android:layout_above="@+id/rdn_group_status"
 			android:layout_below="@+id/btn_camera"
-			android:paddingBottom="6dp">
+			android:paddingBottom="6dp"
+            tools:listitem="@layout/item_image_gridview">
 		</ListView>
 
 		<RadioGroup
