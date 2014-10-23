@@ -141,8 +141,9 @@ public class ImportFragment extends Fragment {
 			etOperator.setText(operatorCode);
 
 			// refresh list images at the first time
-			mAdapter.addAll(mSession.getImportImages());
-			Logger.Log(mSession.getImportImages().size() + "");
+			mAdapter.addAll(mSession.getImportImages
+					());
+			Logger.Log("Size: " + mSession.getImportImages().size());
 		}
 	}
 
@@ -196,16 +197,16 @@ public class ImportFragment extends Fragment {
 
 		Logger.Log("onEvent Image Captured");
 
-		// Re-query container session with given containerId
-		String containerId = event.getContainerId();
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
-		refresh();
+//		// Re-query container session with given containerId
+//		String containerId = event.getContainerId();
+//		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+//		refresh();
 	}
 
 	@Background
 	void refresh() {
 		if (mSession != null) {
-			List<GateImage> list = mSession.getImportImages();
+			List<GateImage> list = mSession.getGateImages();
 			Logger.Log("Size: " + list.size());
 			updatedData(list);
 		}

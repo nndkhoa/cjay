@@ -15,6 +15,7 @@ import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
@@ -66,8 +67,11 @@ public class WorkingFragment extends Fragment {
 	@ItemClick(R.id.lv_working_container)
 	void workingItemClicked(int position) {
 
+
 		// navigation to Wizard Activity
 		Session item = mAdapter.getItem(position);
+		Logger.Log("Clicked on container: " + item.getContainerId());
+
 		Intent intent = new Intent(getActivity(), WizardActivity_.class);
 		intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, item.getContainerId());
 		intent.putExtra(WizardActivity.STEP_EXTRA, item.getStep());

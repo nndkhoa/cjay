@@ -59,7 +59,11 @@ public class DataCenter {
 	}
 
 	public User getUser(Context context) throws SnappydbException, NullCredentialException {
-		User user = App.getDB(context).getObject(CJayConstant.PREFIX_USER, User.class);
+
+		DB db = App.getDB(context);
+		User user = db.getObject(CJayConstant.PREFIX_USER, User.class);
+		db.close();
+
 		if (null == user) {
 			return getCurrentUserAsync(context);
 		} else {
@@ -285,19 +289,22 @@ public class DataCenter {
 	public void search(Context context, String keyword) {
 		String[] keysResult;
 		try {
-
+			DB db = App.getDB(context);
 			// try to search from client database
-			keysResult = App.getDB(context).findKeys(keyword);
+			keysResult = db.findKeys(keyword);
 			List<Session> sessions = new ArrayList<Session>();
+
 			for (String result : keysResult) {
-				Session session = App.getDB(context).getObject(result, Session.class);
+				Session session = db.getObject(result, Session.class);
 				sessions.add(session);
 			}
 
+			db.close();
+
 			// Check if local search has results
 			if (sessions.size() != 0) {
-				EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
 
+				EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
 			} else {
 
 				// If there was not result in local, send search request to server
@@ -325,19 +332,24 @@ public class DataCenter {
 	public void searchAsync(Context context, String keyword) {
 
 		try {
+
 			Logger.Log("Begin to search container from server");
 			List<Session> sessions = networkClient.searchSessions(context, keyword);
 
 			if (sessions.size() != 0) {
+				DB db = App.getDB(context);
+
 				for (Session session : sessions) {
 					String key = session.getContainerId();
-					App.getDB(context).put(key, session);
+					db.put(key, session);
 				}
+
+				db.close();
 			}
 
 			EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
 		} catch (SnappydbException e) {
-			e.printStackTrace();
+			Logger.w(e.getMessage());
 		}
 	}
 
@@ -424,32 +436,31 @@ public class DataCenter {
 		Session session = db.getObject(containerId, Session.class);
 		session.getGateImages().add(image);
 
+		Logger.Log("Size: " + session.getGateImages().size());
+
 		String key = containerId;
 		db.put(key, session);
-
-		// Add gate image to on working container session
-		key = CJayConstant.PREFIX_WORKING + containerId;
-		db.put(key, session);
+//
+//		// Add gate image to on working container session
+//		key = CJayConstant.PREFIX_WORKING + containerId;
+//		db.put(key, session);
 
 		db.close();
-
-
-//		// Find Session
-//		Session session = getSession(context, containerId);
-//		session.getGateImages().add(image);
-
-
 	}
 
 	public void addAuditImage(Context context, AuditImage image, String containerId) throws SnappydbException {
 
 	}
 
-	public void getGateImages(long type, String containerId) throws SnappydbException {
-		Logger.Log("type = " + type + ", containerId = " + containerId);
-		Session session = App.getDB(context).getObject(containerId, Session.class);
-		List<GateImage> gateImagesFiltered = new ArrayList<GateImage>();
+	public void getGateImages(Context context, long type, String containerId) throws SnappydbException {
 
+		Logger.Log("type = " + type + ", containerId = " + containerId);
+		DB db = App.getDB(context);
+
+		Session session = db.getObject(containerId, Session.class);
+		db.close();
+
+		List<GateImage> gateImagesFiltered = new ArrayList<GateImage>();
 		List<GateImage> gateImages = session.getGateImages();
 		for (GateImage g : gateImages) {
 			if (g.getType() == type) {
@@ -460,15 +471,18 @@ public class DataCenter {
 	}
 
 	@Background(serial = CACHE)
-	public void getSessionByContainerId(String containerId) {
-
+	public void getSessionByContainerId(Context context, String containerId) {
 		String[] keysResult;
 		try {
-			keysResult = App.getDB(context).findKeys(containerId);
+			DB db = App.getDB(context);
+			keysResult = db.findKeys(containerId);
 			List<Session> sessions = new ArrayList<Session>();
 			for (String result : keysResult) {
-				sessions.add(App.getDB(context).getObject(result, Session.class));
+				Session tmp = db.getObject(result, Session.class);
+				sessions.add(tmp);
 			}
+
+			db.close();
 			EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
 		} catch (SnappydbException e) {
 			e.printStackTrace();
@@ -477,11 +491,15 @@ public class DataCenter {
 	}
 
 	@Background(serial = CACHE)
-	public void getAllGateImagesByContainerId(String containerId) {
+	public void getAllGateImagesByContainerId(Context context, String containerId) {
 		try {
-			Session session = App.getDB(context).getObject(containerId, Session.class);
+			DB db = App.getDB(context);
+			Session session = db.getObject(containerId, Session.class);
 			List<GateImage> gateImages = session.getGateImages();
+
 			Logger.Log("gate images count in dataCenter: " + gateImages.size());
+			db.close();
+
 			EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
 		} catch (SnappydbException e) {
 			e.printStackTrace();
@@ -505,7 +523,7 @@ public class DataCenter {
 		DB db = App.getDB(context);
 
 		//Call network client to upload image
-		networkClient.uploadImage(uri, imageName);
+		//networkClient.uploadImage(uri, imageName);
 
 		// Change status image in db
 		Session session = db.getObject(CJayConstant.PREFIX_UPLOADING + containerId, Session.class);
@@ -549,8 +567,11 @@ public class DataCenter {
 	}
 	//endregion
 
-	public void addAuditImages(String containerId, AuditImage auditImage) throws SnappydbException {
-		Session session = App.getDB(context).getObject(containerId, Session.class);
+	public void addAuditImages(Context context, String containerId, AuditImage auditImage) throws SnappydbException {
+
+		DB db = App.getDB(context);
+
+		Session session = db.getObject(containerId, Session.class);
 
 		// Generate random one UUID to save auditItem
 		String uuid = UUID.randomUUID().toString();
@@ -582,19 +603,23 @@ public class DataCenter {
 		// Add audit item to Session
 		session.setAuditItems(auditItems);
 
-		App.getDB(context).put(containerId, session);
+		db.put(containerId, session);
 
 		Logger.Log("insert audit image successfully");
-		App.closeDB();
+		db.close();
 	}
 
 	@Background(serial = CACHE)
-	public void getAuditImages(String containerId) {
+	public void getAuditImages(Context context, String containerId) {
+
+
 		Session session = null;
 		try {
-			session = App.getDB(context).getObject(containerId, Session.class);
+			DB db = App.getDB(context);
+			session = db.getObject(containerId, Session.class);
+			db.close();
 		} catch (SnappydbException e) {
-			e.printStackTrace();
+			Logger.w(e.getMessage());
 		}
 
 		// Audit and Repaired Images
@@ -602,13 +627,11 @@ public class DataCenter {
 
 		// Get list audit images of each audit item and add to audit images list
 		for (AuditItem auditItem : session.getAuditItems()) {
-
 			List<AuditImage> childAuditImageList = auditItem.getAuditImages();
 			if (childAuditImageList != null) {
 				auditImages.addAll(childAuditImageList);
 			}
 		}
-
 		EventBus.getDefault().post(new AuditImagesGotEvent(auditImages));
 	}
 

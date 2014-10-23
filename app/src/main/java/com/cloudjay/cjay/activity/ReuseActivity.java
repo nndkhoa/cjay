@@ -78,7 +78,7 @@ public class ReuseActivity extends Activity {
     @AfterViews
     void doAfterViews() {
         // Get session by containerId
-        dataCenter.getSessionByContainerId(containerID);
+        dataCenter.getSessionByContainerId(getApplicationContext(), containerID);
 
         // Set ContainerId to TextView
         tvContainerId.setText(containerID);
@@ -122,7 +122,7 @@ public class ReuseActivity extends Activity {
                         .withType(CJayConstant.TYPE_AUDIT)
                         .withUrl(gateImageUrls.get(i));
 
-                dataCenter.addAuditImages(containerID, auditImage);
+                dataCenter.addAuditImages(getApplicationContext(), containerID, auditImage);
             } catch (SnappydbException e) {
                 e.printStackTrace();
             }

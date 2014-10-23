@@ -33,6 +33,11 @@ public class CheckableImageView extends ImageView implements Checkable {
         }
     }
 
+    @Override
+    public void setScaleType(ScaleType scaleType) {
+        super.setScaleType(ScaleType.CENTER_CROP);
+    }
+
     public void toggle() {
         setChecked(!mChecked);
     }
