@@ -15,7 +15,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.aerilys.helpers.android.NetworkHelper;
@@ -83,7 +82,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	LinearLayout llRoot;
 
 	@ViewById(R.id.login_form)
-	ScrollView svLoginForm;
+	LinearLayout svLoginForm;
 
 	@ViewById(R.id.ll_search_progress)
 	LinearLayout llLoginStatus;

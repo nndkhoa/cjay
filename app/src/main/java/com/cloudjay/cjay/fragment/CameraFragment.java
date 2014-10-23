@@ -288,7 +288,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 				switch (type) {
 					case IMPORT:
 					case EXPORT:
-
 						GateImage gateImage = new GateImage()
 								.withId(0)
 								.withType(mType)
