@@ -440,7 +440,7 @@ public class DataCenter {
 
 		String key = containerId;
 		db.put(key, session);
-//
+
 //		// Add gate image to on working container session
 //		key = CJayConstant.PREFIX_WORKING + containerId;
 //		db.put(key, session);
@@ -640,18 +640,15 @@ public class DataCenter {
 	 *
 	 * @param context
 	 * @param containerId
-	 * @return
+	 * @return List Audit Item
 	 */
 	public List<AuditItem> getListAuditItems(Context context, String containerId) {
 		try {
 			DB db = App.getDB(context);
+
 			Session session = db.getObject(containerId, Session.class);
-			List<AuditItem> auditItems = new ArrayList<AuditItem>();
-			for (AuditItem currentAuditItem : session.getAuditItems()) {
-				if (currentAuditItem.getId() != 0) {
-					auditItems.add(currentAuditItem);
-				}
-			}
+			List<AuditItem> auditItems = session.getAuditItems();
+
 			db.close();
 			return auditItems;
 		} catch (SnappydbException e) {

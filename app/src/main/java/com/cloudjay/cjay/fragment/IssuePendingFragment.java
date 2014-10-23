@@ -15,6 +15,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.AuditItemAdapter;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
+import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -96,7 +97,33 @@ public class IssuePendingFragment extends Fragment {
 		// Set operatorCode into variable
 		operatorCode = result.get(0).getOperatorCode();
 
+        auditItems = result.get(0).getAuditItems();
+
+        Logger.Log("auditItems: " + auditItems.size());
+        if (auditItems == null) {
+            auditItems = new ArrayList<AuditItem>();
+        }
+
+        if (auditItemAdapter == null) {
+            auditItemAdapter = new AuditItemAdapter(getActivity(),
+                    R.layout.item_issue_pending, auditItems);
+            lvIssueImages.setAdapter(auditItemAdapter);
+        }
+
 	}
+
+    @UiThread
+    void onEvent(ImageCapturedEvent event) {
+
+        Logger.Log("on ImageCapturedEvent");
+
+        // Get list audit items
+        auditItems = dataCenter.getListAuditItems(getActivity().getApplicationContext(), containerID);
+
+        // Notify data set change
+        auditItemAdapter.swapData(auditItems);
+
+    }
 
 	@Click(R.id.btn_camera)
 	void buttonCameraClicked() {
@@ -150,25 +177,5 @@ public class IssuePendingFragment extends Fragment {
 	public void onDestroy() {
 		EventBus.getDefault().unregister(this);
 		super.onDestroy();
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-
-		auditItems = dataCenter.getListAuditItems(getActivity().getApplicationContext(), containerID);
-
-		Logger.Log("auditItems: " + auditItems.size());
-		if (auditItems == null) {
-			auditItems = new ArrayList<AuditItem>();
-		}
-
-		if (auditItemAdapter == null) {
-			auditItemAdapter = new AuditItemAdapter(getActivity(),
-					R.layout.item_issue_pending, auditItems);
-			lvIssueImages.setAdapter(auditItemAdapter);
-		}
-
-		auditItemAdapter.swapData(auditItems);
 	}
 }
