@@ -9,6 +9,7 @@ import android.widget.ImageView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.GateImage;
+import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -18,7 +19,6 @@ import java.util.List;
 public class GateImageAdapter extends ArrayAdapter<GateImage> {
 
 	private LayoutInflater inflater;
-	private List<GateImage> mGateImages;
 	private Context context;
 	private int resource;
 
@@ -26,17 +26,10 @@ public class GateImageAdapter extends ArrayAdapter<GateImage> {
 	private boolean mCheckable = false;
 	private ArrayList<String> mArrayCheckedImages;
 
-	public GateImageAdapter(Context context, int resource, List<GateImage> gateImages, boolean isCheckable) {
+	public GateImageAdapter(Context context, int resource, boolean isCheckable) {
 		super(context, resource);
 
 		this.inflater = LayoutInflater.from(context);
-
-        if (gateImages == null) {
-            this.mGateImages = new ArrayList<GateImage>();
-        } else {
-            this.mGateImages = gateImages;
-        }
-
 		this.context = context;
 		this.mCheckable = isCheckable;
 		this.resource = resource;
@@ -50,25 +43,9 @@ public class GateImageAdapter extends ArrayAdapter<GateImage> {
 	}
 
 	@Override
-	public int getCount() {
-		if (mGateImages != null) {
-			return mGateImages.size();
-		}
-		return 0;
-	}
-
-	@Override
-	public GateImage getItem(int position) {
-		return mGateImages.get(position);
-	}
-
-	@Override
-	public long getItemId(int position) {
-		return position;
-	}
-
-	@Override
 	public View getView(final int i, View convertView, ViewGroup viewGroup) {
+
+        final GateImage gateImage = getItem(i);
 
 		ViewHolder holder;
 		if (convertView == null) {
@@ -86,11 +63,11 @@ public class GateImageAdapter extends ArrayAdapter<GateImage> {
 		layout.setShowCheckbox(mCheckable);
 		if (mCheckable) {
 			layout.setParentAdapter(this);
-			layout.setCJayImageUrl(mGateImages.get(i).getUrl());
-			layout.setChecked(mArrayCheckedImages.contains(mGateImages.get(i).getUrl()));
+			layout.setCJayImageUrl(gateImage.getUrl());
+			layout.setChecked(mArrayCheckedImages.contains(gateImage.getUrl()));
 		}
 
-		ImageLoader.getInstance().displayImage(mGateImages.get(i).getUrl(), holder.ivGateImage);
+		ImageLoader.getInstance().displayImage(gateImage.getUrl(), holder.ivGateImage);
 		return convertView;
 	}
 
@@ -117,4 +94,13 @@ public class GateImageAdapter extends ArrayAdapter<GateImage> {
 	public void removeAllCheckedCJayImageUrl() {
 		mArrayCheckedImages.clear();
 	}
+
+    public void setData(List<GateImage> data) {
+        clear();
+        if (data != null) {
+            for (int i = 0; i < data.size(); i++) {
+                add(data.get(i));
+            }
+        }
+    }
 }

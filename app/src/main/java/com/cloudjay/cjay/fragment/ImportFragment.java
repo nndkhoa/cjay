@@ -47,6 +47,7 @@ import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -123,7 +124,8 @@ public class ImportFragment extends Fragment {
 		etOperator.setCursorVisible(false);
 		etOperator.clearFocus();
 
-        mAdapter = new GateImageAdapter(getActivity(), R.layout.item_image_gridview, gateImages, false);
+        mAdapter = new GateImageAdapter(getActivity(), R.layout.item_image_gridview, false);
+
         lvImages.setAdapter(mAdapter);
 		// Trying to restore container status
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);

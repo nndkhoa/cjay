@@ -118,9 +118,10 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
 
         GridView gridView = (GridView) convertView.findViewById(R.id.gv_images_item);
         if (groupPosition == 0) {
-            gridView.setAdapter(new GateImageAdapter(mContext, R.layout.item_image_gridview,
-                    mImportImages, false));
-
+            GateImageAdapter gateImageAdapter = new GateImageAdapter(mContext, R.layout.item_image_gridview,
+                    false);
+            gateImageAdapter.setData(mImportImages);
+            gridView.setAdapter(gateImageAdapter);
         }
 
         if (groupPosition == 1) {

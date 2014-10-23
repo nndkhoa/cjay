@@ -175,7 +175,8 @@ public class ReuseActivity extends Activity {
             Logger.Log("gateImageAdapter is null");
 
 	        // TODO: tieubao changed this
-            gateImageAdapter = new GateImageAdapter(this, R.layout.item_image_gridview, gateImages, true);
+            gateImageAdapter = new GateImageAdapter(this, R.layout.item_image_gridview, true);
+            gateImageAdapter.setData(gateImages);
             gvReuseImages.setAdapter(gateImageAdapter);
         }
 
