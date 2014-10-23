@@ -142,6 +142,7 @@ public class ImportFragment extends Fragment {
 
 			// refresh list images at the first time
 			mAdapter.addAll(mSession.getImportImages());
+			Logger.Log(mSession.getImportImages().size() + "");
 		}
 	}
 

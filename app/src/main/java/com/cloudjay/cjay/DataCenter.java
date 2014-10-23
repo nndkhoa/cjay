@@ -372,16 +372,41 @@ public class DataCenter {
 
 		try {
 			DB db = App.getDB(context);
-			String workingKey = CJayConstant.PREFIX_WORKING + session.getContainerId();
+
+			String key = CJayConstant.PREFIX_WORKING + session.getContainerId();
 			session.setProcessing(true);
-			db.put(workingKey, session);
+			db.put(key, session);
+
+			db.close();
 
 			// Notify to Working Fragment
 			EventBus.getDefault().post(new WorkingSessionCreatedEvent(session));
+
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
+	}
 
+	/**
+	 * Add container session vào list uploading session in database
+	 *
+	 * @param containerId
+	 * @throws SnappydbException
+	 */
+	@Background(serial = CACHE)
+	public void addUploadingSession(String containerId) {
+
+		try {
+			DB db = App.getDB(context);
+			Session session = db.getObject(containerId, Session.class);
+
+			String key = CJayConstant.PREFIX_UPLOADING + containerId;
+			db.put(key, session);
+
+			db.close();
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -463,25 +488,39 @@ public class DataCenter {
 		}
 	}
 
-	public void addUploadingSession(String containerId) throws SnappydbException {
-		Session uploadingSession = App.getDB(context).getObject(containerId, Session.class);
-		App.getDB(context).put(CJayConstant.PREFIX_UPLOADING + containerId, uploadingSession);
-	}
+	//region UPLOAD
 
-	// TODO: include upload Audit Image
+	/**
+	 * 1. Tìm session với containerId trong list uploading.
+	 * 2. Upload hình và gán field uploaded ngược vào list uploading
+	 *
+	 * @param context
+	 * @param uri
+	 * @param imageName
+	 * @param containerId
+	 * @throws SnappydbException
+	 */
 	public void uploadImage(Context context, String uri, String imageName, String containerId) throws SnappydbException {
+
+		DB db = App.getDB(context);
 
 		//Call network client to upload image
 		networkClient.uploadImage(uri, imageName);
 
-		//Change status image in db
-		Session uploadingSession = App.getDB(context).getObject(CJayConstant.PREFIX_UPLOADING + containerId, Session.class);
-		for (GateImage gateImage : uploadingSession.getGateImages()) {
-			if (gateImage.getName().equals(imageName)) {
-				gateImage.setUploaded(true);
+		// Change status image in db
+		Session session = db.getObject(CJayConstant.PREFIX_UPLOADING + containerId, Session.class);
+		if (session != null) {
+
+			for (GateImage gateImage : session.getGateImages()) {
+				if (gateImage.getName().equals(imageName)) {
+					gateImage.setUploaded(true);
+				}
 			}
+
+			db.put(CJayConstant.PREFIX_UPLOADING + containerId, session);
 		}
-		App.getDB(context).put(CJayConstant.PREFIX_UPLOADING + containerId, uploadingSession);
+
+		db.close();
 		EventBus.getDefault().post(new UploadedEvent(containerId));
 	}
 
@@ -493,88 +532,89 @@ public class DataCenter {
 	 * @throws SnappydbException
 	 */
 	public void uploadContainerSession(Context context, Session session) throws SnappydbException {
+
+		DB db = App.getDB(context);
 		networkClient.uploadContainerSession(context, session);
+
 		String key = CJayConstant.PREFIX_UPLOADING + session.getContainerId();
-		Session sessionUploaded = App.getDB(context).getObject(key, Session.class);
-		sessionUploaded.setUploaded(true);
-		App.getDB(context).put(CJayConstant.PREFIX_UPLOADING + session + session.getContainerId(), sessionUploaded);
+		Session sessionUploaded = db.getObject(key, Session.class);
+		if (sessionUploaded != null) {
+			sessionUploaded.setUploaded(true);
+			db.put(CJayConstant.PREFIX_UPLOADING + session.getContainerId(), sessionUploaded);
+		}
+
+		db.close();
+
+		// TODO: sao không thấy post Event như upload hình?
 	}
+	//endregion
 
 	public void addAuditImages(String containerId, AuditImage auditImage) throws SnappydbException {
-        Session session = App.getDB(context).getObject(containerId, Session.class);
+		Session session = App.getDB(context).getObject(containerId, Session.class);
 
-        // Generate random one UUID to save auditItem
-        String uuid = UUID.randomUUID().toString();
+		// Generate random one UUID to save auditItem
+		String uuid = UUID.randomUUID().toString();
 
-        // Create new audit item to save
-        AuditItem auditItem = new AuditItem();
-        auditItem.setId(0);
-        auditItem.setAuditItemUUID(uuid);
+		// Create new audit item to save
+		AuditItem auditItem = new AuditItem();
+		auditItem.setId(0);
+		auditItem.setAuditItemUUID(uuid);
 
-        // Get list session's audit items
-        List<AuditItem> auditItems = session.getAuditItems();
-        if (auditItems == null) {
-            auditItems = new ArrayList<AuditItem>();
-        }
+		// Get list session's audit items
+		List<AuditItem> auditItems = session.getAuditItems();
+		if (auditItems == null) {
+			auditItems = new ArrayList<AuditItem>();
+		}
 
-        List<AuditImage> auditImages = auditItem.getAuditImages();
-        if (auditImages == null) {
-            auditImages = new ArrayList<AuditImage>();
-        }
-        // Add audit image to list audit images
-        auditImages.add(auditImage);
+		List<AuditImage> auditImages = auditItem.getAuditImages();
+		if (auditImages == null) {
+			auditImages = new ArrayList<AuditImage>();
+		}
+		// Add audit image to list audit images
+		auditImages.add(auditImage);
 
-        // Set list audit images to audit item
-        auditItem.setAuditImages(auditImages);
+		// Set list audit images to audit item
+		auditItem.setAuditImages(auditImages);
 
-        // Add audit item to List session's audit items
-        auditItems.add(auditItem);
+		// Add audit item to List session's audit items
+		auditItems.add(auditItem);
 
-        // Add audit item to Session
-        session.setAuditItems(auditItems);
+		// Add audit item to Session
+		session.setAuditItems(auditItems);
 
-        App.getDB(context).put(containerId, session);
+		App.getDB(context).put(containerId, session);
 
-        Logger.Log("insert audit image successfully");
-        App.closeDB();
-    }
+		Logger.Log("insert audit image successfully");
+		App.closeDB();
+	}
 
-    public List<AuditItem> getAuditItems(String containerId) {
-        Session session = null;
-        try {
-            session = App.getDB(context).getObject(containerId, Session.class);
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
-        List<AuditItem> auditItems = session.getAuditItems();
+	@Background(serial = CACHE)
+	public void getAuditImages(String containerId) {
+		Session session = null;
+		try {
+			session = App.getDB(context).getObject(containerId, Session.class);
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
 
-        return auditItems;
-    }
+		// Audit and Repaired Images
+		List<AuditImage> auditImages = new ArrayList<AuditImage>();
 
-    public void getAuditImages(String containerId) {
-        Session session = null;
-        try {
-            session = App.getDB(context).getObject(containerId, Session.class);
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
+		// Get list audit images of each audit item and add to audit images list
+		for (AuditItem auditItem : session.getAuditItems()) {
 
-        // Audit and Repaired Images
-        List<AuditImage> auditImages = new ArrayList<AuditImage>();
+			List<AuditImage> childAuditImageList = auditItem.getAuditImages();
+			if (childAuditImageList != null) {
+				auditImages.addAll(childAuditImageList);
+			}
+		}
 
-        // Get list audit images of each audit item and add to audit images list
-        for (AuditItem auditItem : session.getAuditItems()) {
+		EventBus.getDefault().post(new AuditImagesGotEvent(auditImages));
+	}
 
-            List<AuditImage> childAuditImageList = auditItem.getAuditImages();
-            if (childAuditImageList != null) {
-                auditImages.addAll(childAuditImageList);
-            }
-        }
-
-        EventBus.getDefault().post(new AuditImagesGotEvent(auditImages));
-    }
 	/**
 	 * Get List audit item for normal session
+	 *
 	 * @param context
 	 * @param containerId
 	 * @return

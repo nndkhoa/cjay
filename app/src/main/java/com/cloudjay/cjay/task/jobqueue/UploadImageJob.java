@@ -9,7 +9,6 @@ import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
-import com.snappydb.SnappydbException;
 
 import de.greenrobot.event.EventBus;
 
@@ -28,16 +27,9 @@ public class UploadImageJob extends Job {
 
 	@Override
 	public void onAdded() {
-		try {
-
-			Context context = App.getInstance().getApplicationContext();
-			DataCenter_.getInstance_(context).addUploadingSession(containerId);
-			EventBus.getDefault().post(new UploadStartedEvent(containerId));
-
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-
+		Context context = App.getInstance().getApplicationContext();
+		DataCenter_.getInstance_(context).addUploadingSession(containerId);
+		EventBus.getDefault().post(new UploadStartedEvent(containerId));
 	}
 
 	@Override

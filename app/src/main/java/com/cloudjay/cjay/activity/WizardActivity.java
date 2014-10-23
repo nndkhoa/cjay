@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentTransaction;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.fragment.AuditAndRepairFragment_;
-import com.cloudjay.cjay.fragment.AuditFragment_;
 import com.cloudjay.cjay.fragment.ExportFragment_;
 import com.cloudjay.cjay.fragment.ImportFragment_;
 import com.cloudjay.cjay.util.Logger;
@@ -26,7 +25,7 @@ public class WizardActivity extends FragmentActivity {
 	String containerID;
 
 	@Extra(STEP_EXTRA)
-	long step = 3;
+	long step = 4;
 
 	/**
 	 * Dựa bước (step) hiện tại của container session, để tạo nên các màn hình tương ứng
@@ -40,9 +39,8 @@ public class WizardActivity extends FragmentActivity {
 
 		switch (currentStep) {
 
-			// Load fragment Audit and Reapair
+			// Load fragment Audit and Repair
 			case AUDIT:
-
 			case REPAIR:
 				fragment = AuditAndRepairFragment_.builder().containerID(containerID).build();
 				break;

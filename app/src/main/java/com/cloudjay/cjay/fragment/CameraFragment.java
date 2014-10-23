@@ -116,7 +116,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 	@Click(R.id.btn_camera_done)
 	void btnDoneClicked() {
-		// EventBus.getDefault().post(new ImageCapturedEvent(containerId));
+		EventBus.getDefault().post(new ImageCapturedEvent(containerId));
 		getActivity().finish();
 	}
 
