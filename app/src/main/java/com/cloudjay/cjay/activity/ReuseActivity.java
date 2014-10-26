@@ -123,7 +123,7 @@ public class ReuseActivity extends Activity {
                         .withType(CJayConstant.TYPE_AUDIT)
                         .withUrl(gateImageUrls.get(i));
 
-                dataCenter.addAuditImages(getApplicationContext(), containerID, auditImage);
+                dataCenter.addAuditImage(getApplicationContext(), auditImage, containerID);
             } catch (SnappydbException e) {
                 e.printStackTrace();
             }

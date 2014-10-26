@@ -25,17 +25,15 @@ import java.util.List;
 /**
  * Created by nambv on 21/10/2014.
  */
-public class AuditItemAdapter extends ArrayAdapter {
+public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
     private LayoutInflater mInflater;
     private Context mContext;
-    private List<AuditItem> auditItems;
     private int layoutResId;
 
-    public AuditItemAdapter(Context context, int resource, List<AuditItem> auditItems) {
+    public AuditItemAdapter(Context context, int resource) {
         super(context, resource);
         this.mContext = context;
-        this.auditItems = auditItems;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         layoutResId = resource;
 
@@ -55,25 +53,11 @@ public class AuditItemAdapter extends ArrayAdapter {
     }
 
     @Override
-    public int getCount() {
-        if (auditItems != null)
-            return auditItems.size();
-        return 0;
-    }
-
-    @Override
-    public AuditItem getItem(int i) {
-        return auditItems.get(i);
-    }
-
-    @Override
-    public long getItemId(int i) {
-        return i;
-    }
-
-    @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        ViewHolder holder = null;
+
+        final AuditItem auditItem = getItem(i);
+
+        ViewHolder holder;
         if (view == null) {
             holder = new ViewHolder();
             view = mInflater.inflate(layoutResId, null);
@@ -95,7 +79,7 @@ public class AuditItemAdapter extends ArrayAdapter {
             holder = (ViewHolder) view.getTag();
         }
 
-        ImageLoader.getInstance().displayImage(auditItems.get(i).getAuditImages().get(0).getUrl(),
+        ImageLoader.getInstance().displayImage(auditItem.getAuditImages().get(0).getUrl(),
                 holder.ivAuditImage);
         holder.btnReport.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -171,9 +155,13 @@ public class AuditItemAdapter extends ArrayAdapter {
         dialog.show();
     }
 
-    public void swapData(List<AuditItem> auditItems) {
-        this.auditItems = auditItems;
-        notifyDataSetChanged();
+    public void setData(List<AuditItem> data) {
+        clear();
+        if (data != null) {
+            for (int i = 0; i < data.size(); i++) {
+                add(data.get(i));
+            }
+        }
     }
 
 }
