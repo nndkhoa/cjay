@@ -147,6 +147,7 @@ public class DataCenter {
 			DB db = App.getDB(context);
 			String key = CJayConstant.PREFIX_OPERATOR + operatorCode;
 			Operator operator = db.getObject(key, Operator.class);
+            db.close();
 			return operator;
 
 		} catch (SnappydbException e) {
@@ -219,7 +220,7 @@ public class DataCenter {
 			DB db = App.getDB(context);
 			String key = containerId;
 			Session session = db.getObject(key, Session.class);
-			db.close();
+			App.closeDB();
 
 			return session;
 		} catch (SnappydbException e) {
@@ -453,22 +454,13 @@ public class DataCenter {
 
 	}
 
-	public void getGateImages(Context context, long type, String containerId) throws SnappydbException {
-
-		Logger.Log("type = " + type + ", containerId = " + containerId);
+	public void getGateImages(Context context, String containerId) throws SnappydbException {
 		DB db = App.getDB(context);
-
 		Session session = db.getObject(containerId, Session.class);
 		db.close();
 
-		List<GateImage> gateImagesFiltered = new ArrayList<GateImage>();
 		List<GateImage> gateImages = session.getGateImages();
-		for (GateImage g : gateImages) {
-			if (g.getType() == type) {
-				gateImagesFiltered.add(g);
-			}
-		}
-		EventBus.getDefault().post(new GateImagesGotEvent(gateImagesFiltered));
+		EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
 	}
 
 	@Background(serial = CACHE)

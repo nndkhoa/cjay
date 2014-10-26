@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -16,6 +17,7 @@ import android.widget.ImageView;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.MergeIssueActivity;
 import com.cloudjay.cjay.model.AuditImage;
+import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.view.CheckableImageView;
 import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -26,16 +28,18 @@ import java.util.List;
 /**
  * Created by nambv on 21/10/2014.
  */
-public class AuditImageAdapter extends BaseAdapter {
+public class AuditImageAdapter extends ArrayAdapter<AuditImage> {
 
     private LayoutInflater inflater;
     private Context mContext;
-    private List<AuditImage> auditImages;
+    private int mResource;
 
-    public AuditImageAdapter(Context context, List<AuditImage> auditImages) {
+    public AuditImageAdapter(Context context, int resource) {
+        super(context, resource);
+
         this.inflater = LayoutInflater.from(context);
         this.mContext = context;
-        this.auditImages = auditImages;
+        this.mResource = resource;
     }
 
     private class ViewHolder {
@@ -44,26 +48,11 @@ public class AuditImageAdapter extends BaseAdapter {
     }
 
     @Override
-    public int getCount() {
-        if (auditImages != null)
-            return auditImages.size();
-        return 0;
-    }
-
-    @Override
-    public AuditImage getItem(int i) {
-        return auditImages.get(i);
-    }
-
-    @Override
-    public long getItemId(int i) {
-        return i;
-    }
-
-    @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        ViewHolder holder = null;
+
         final AuditImage auditImage = getItem(i);
+
+        ViewHolder holder;
         if (view == null) {
             holder = new ViewHolder();
             view = inflater.inflate(R.layout.item_image_gridview, null);
@@ -76,13 +65,17 @@ public class AuditImageAdapter extends BaseAdapter {
         }
 
         holder.ivCheckable.setVisibility(View.GONE);
-        ImageLoader.getInstance().displayImage(auditImages.get(i).getUrl(), holder.ivAuditImage);
+        ImageLoader.getInstance().displayImage(auditImage.getUrl(), holder.ivAuditImage);
 
         return view;
     }
 
-    public void swapData(List<AuditImage> auditImages) {
-        this.auditImages = auditImages;
-        notifyDataSetChanged();
+    public void setData(List<AuditImage> data) {
+        clear();
+        if (data != null) {
+            for (int i = 0; i < data.size(); i++) {
+                add(data.get(i));
+            }
+        }
     }
 }

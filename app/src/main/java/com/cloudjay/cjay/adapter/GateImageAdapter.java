@@ -9,7 +9,6 @@ import android.widget.ImageView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.GateImage;
-import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -19,7 +18,7 @@ import java.util.List;
 public class GateImageAdapter extends ArrayAdapter<GateImage> {
 
 	private LayoutInflater inflater;
-	private Context context;
+	private Context mContext;
 	private int resource;
 
 
@@ -30,7 +29,7 @@ public class GateImageAdapter extends ArrayAdapter<GateImage> {
 		super(context, resource);
 
 		this.inflater = LayoutInflater.from(context);
-		this.context = context;
+		this.mContext = context;
 		this.mCheckable = isCheckable;
 		this.resource = resource;
 

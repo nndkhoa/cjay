@@ -364,4 +364,55 @@ public class Session {
 		}
 		return imageList;
 	}
+
+    /**
+     * Get list export images in List of Gate Images
+     * @return
+     */
+    public List<GateImage> getExportImages() {
+        List<GateImage> imageList = new ArrayList<GateImage>();
+        for (GateImage gateImage : gateImages) {
+            if (gateImage.getType() == CJayConstant.TYPE_EXPORT) {
+                imageList.add(gateImage);
+            }
+        }
+
+        return imageList;
+    }
+
+    /**
+     * Get list audit images in List of Audit Images
+     * @return
+     */
+    public List<AuditImage> getIssueImages() {
+        List<AuditImage> imageList = new ArrayList<AuditImage>();
+
+        for (AuditItem auditItem : auditItems) {
+            for (AuditImage auditImage : auditItem.getAuditImages()) {
+                if (auditImage.getType() == CJayConstant.TYPE_AUDIT) {
+                    imageList.add(auditImage);
+                }
+            }
+        }
+
+        return imageList;
+    }
+
+    /**
+     * Get list repaired images in List of Audit Images
+     * @return
+     */
+    public List<AuditImage> getRepairedImages() {
+        List<AuditImage> imageList = new ArrayList<AuditImage>();
+
+        for (AuditItem auditItem : auditItems) {
+            for (AuditImage auditImage : auditItem.getAuditImages()) {
+                if (auditImage.getType() == CJayConstant.TYPE_REPAIRED) {
+                    imageList.add(auditImage);
+                }
+            }
+        }
+
+        return imageList;
+    }
 }

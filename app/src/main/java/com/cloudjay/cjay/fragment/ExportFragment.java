@@ -17,7 +17,6 @@ import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.adapter.PhotoExpandableListAdapter;
 import com.cloudjay.cjay.event.AuditImagesGotEvent;
-import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
@@ -26,9 +25,11 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.Status;
+import com.crashlytics.android.internal.m;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
@@ -91,6 +92,7 @@ public class ExportFragment extends Fragment {
     String operatorCode;
     long preStatus;
     long currentStatus;
+    Session mSession;
 
     public ExportFragment() {
     }
@@ -107,11 +109,8 @@ public class ExportFragment extends Fragment {
         // Set ActionBar Title
         getActivity().getActionBar().setTitle(R.string.fragment_export_title);
 
-        // Set ContainerId to TextView
-        tvContainerId.setText(containerID);
-
-        // Search session by containerId to get operatorCode
-        dataCenter.getSessionByContainerId(getActivity(), containerID);
+        gateImageAdapter = new GateImageAdapter(getActivity(), R.layout.item_image_gridview, false);
+        gvExportImages.setAdapter(gateImageAdapter);
 
         // Init image types
         mImageTypes = new int[3];
@@ -119,22 +118,35 @@ public class ExportFragment extends Fragment {
         mImageTypes[1] = CJayConstant.TYPE_AUDIT;
         mImageTypes[2] = CJayConstant.TYPE_REPAIRED;
 
-        // Get import images by containerId
-        try {
-            dataCenter.getGateImages(getActivity(), CJayConstant.TYPE_IMPORT, containerID);
-        } catch (SnappydbException e) {
-            e.printStackTrace();
+        mListAdapter = new PhotoExpandableListAdapter(getActivity(),
+                mImageTypes, importImages, auditImages, repairedImages);
+        lvImagesExpandable.setAdapter(mListAdapter);
+
+        // Get session
+        mSession = dataCenter.getSession(getActivity(), containerID);
+
+        if (null == mSession) {
+            // Set ContainerId to TextView
+            tvContainerId.setText(containerID);
+        } else {
+            // Get operator code
+            containerID = mSession.getContainerId();
+            operatorCode = mSession.getOperatorCode();
+
+            // Set preStatus to TextView
+            preStatus = mSession.getPreStatus();
+            tvPreStatus.setText((Status.values()[(int) preStatus]).toString());
+
+            // Set currentStatus to TextView
+            currentStatus = mSession.getStatus();
+            tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
+
+            // Set ContainerId to TextView
+            tvContainerId.setText(containerID);
+
+            refresh();
         }
 
-        // Get export images by containerId
-        try {
-            dataCenter.getGateImages(getActivity(), CJayConstant.TYPE_EXPORT, containerID);
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
-
-        // Get audit and repaired images by containerId
-        dataCenter.getAuditImages(getActivity(), containerID);
     }
 
     @Click(R.id.btn_take_export_picture)
@@ -151,7 +163,7 @@ public class ExportFragment extends Fragment {
     void onEvent(ImageCapturedEvent event) {
         // Get gate images from realm
         try {
-            dataCenter.getGateImages(getActivity(), CJayConstant.TYPE_EXPORT, containerID);
+            dataCenter.getGateImages(getActivity(), containerID);
         } catch (SnappydbException e) {
             e.printStackTrace();
         }
@@ -201,26 +213,9 @@ public class ExportFragment extends Fragment {
         }
 
         if (mListAdapter == null) {
-            mListAdapter = new PhotoExpandableListAdapter(getActivity(),
-                    mImageTypes, importImages, auditImages, repairedImages);
-            lvImagesExpandable.setAdapter(mListAdapter);
+
         }
-//        gateImageAdapter.swapData(gateImages);
 
-	}
-
-	@UiThread
-	void onEvent(ContainerSearchedEvent event) {
-		List<Session> result = event.getSessions();
-		operatorCode = result.get(0).getOperatorCode();
-		preStatus = result.get(0).getPreStatus();
-		currentStatus = result.get(0).getStatus();
-
-		// Set preStatus to TextView
-		tvPreStatus.setText((Status.values()[(int) preStatus]).toString());
-
-		// Set currentStatus to TextView
-		tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
 	}
 
 	@Click(R.id.btn_view_previous_step)
@@ -228,6 +223,60 @@ public class ExportFragment extends Fragment {
 		lvImagesExpandable.setVisibility(lvImagesExpandable.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
 		gvExportImages.setVisibility(lvImagesExpandable.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
 	}
+
+    @Background
+    void refresh() {
+        if (mSession != null) {
+
+            // Get import and export images by containerId
+            importImages = mSession.getImportImages();
+            exportImages = mSession.getExportImages();
+
+            // Get audit and repaired images by containerId
+            auditImages = mSession.getIssueImages();
+            repairedImages = mSession.getRepairedImages();
+
+            Logger.Log("importImages: " + importImages.size());
+            Logger.Log("exportImages: " + exportImages.size());
+            Logger.Log("auditImages: " + auditImages.size());
+            Logger.Log("repairedImages: " + repairedImages.size());
+
+            updatedGridView();
+            updateExpandableListView();
+        }
+    }
+
+    @UiThread
+    public void updatedGridView() {
+        gateImageAdapter.clear();
+        if (importImages != null) {
+            for (GateImage object : exportImages) {
+                gateImageAdapter.add(object);
+            }
+        }
+        gateImageAdapter.notifyDataSetChanged();
+    }
+
+    @UiThread
+    public void updateExpandableListView() {
+        mListAdapter.mImportImages.clear();
+        mListAdapter.mAuditImages.clear();
+        mListAdapter.mRepairedImages.clear();
+
+        if (importImages != null) {
+            mListAdapter.mImportImages.addAll(importImages);
+        }
+
+        if (auditImages != null) {
+            mListAdapter.mAuditImages.addAll(auditImages);
+        }
+
+        if (repairedImages != null) {
+            mListAdapter.mRepairedImages.addAll(repairedImages);
+        }
+
+        mListAdapter.notifyDataSetChanged();
+    }
 
 	@Override
 	public void onDestroy() {

@@ -30,9 +30,9 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
     private final int[] mImageTypes;
     private final Hashtable<Integer, GridView> mGridViews;
 
-    List<GateImage> mImportImages;
-    List<AuditImage> mAuditImages;
-    List<AuditImage> mRepairedImages;
+    public List<GateImage> mImportImages;
+    public List<AuditImage> mAuditImages;
+    public List<AuditImage> mRepairedImages;
 
     public PhotoExpandableListAdapter(Context context, int[] imageTypes,
                                       List<GateImage> importImages,
@@ -125,11 +125,15 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
         }
 
         if (groupPosition == 1) {
-            gridView.setAdapter(new AuditImageAdapter(mContext, mAuditImages));
+            AuditImageAdapter auditItemAdapter = new AuditImageAdapter(mContext, R.layout.item_image_gridview);
+            auditItemAdapter.setData(mAuditImages);
+            gridView.setAdapter(auditItemAdapter);
         }
 
         if (groupPosition == 2) {
-            gridView.setAdapter(new AuditImageAdapter(mContext, mRepairedImages));
+            AuditImageAdapter auditItemAdapter = new AuditImageAdapter(mContext, R.layout.item_image_gridview);
+            auditItemAdapter.setData(mRepairedImages);
+            gridView.setAdapter(auditItemAdapter);
         }
 
         mGridViews.put(Integer.valueOf(groupPosition), gridView);
