@@ -117,7 +117,7 @@ public class ReuseActivity extends Activity {
                     mActionMode.finish();
                 }
 
-                if(mActionMode != null)
+                if (mActionMode != null)
                     mActionMode.setTitle(String.valueOf(gateImageAdapter.getCheckedCJayImageUrlsCount()) + " selected");
 
             }
@@ -127,15 +127,16 @@ public class ReuseActivity extends Activity {
 
     @Click(R.id.btn_done)
     void buttonDoneClicked() {
-        List<String> gateImageUrls = gateImageAdapter.getCheckedCJayImageUrls();
-        for (int i = 0; i < gateImageUrls.size(); i++) {
+        List<GateImage> gateImages = gateImageAdapter.getCheckedCJayImageUrls();
+        for (int i = 0; i < gateImages.size(); i++) {
             try {
 
                 // Create new audit image object
                 AuditImage auditImage = new AuditImage()
                         .withId(0)
                         .withType(CJayConstant.TYPE_AUDIT)
-                        .withUrl(gateImageUrls.get(i));
+                        .withUrl(gateImages.get(i).getUrl())
+                        .withName(gateImages.get(i).getName());
 
                 dataCenter.addAuditImage(getApplicationContext(), auditImage, containerID);
             } catch (SnappydbException e) {
@@ -155,6 +156,18 @@ public class ReuseActivity extends Activity {
         if (mSession != null) {
             List<AuditItem> auditItems = mSession.getAuditItems();
             List<GateImage> importImages = mSession.getImportImages();
+            List<GateImage> deletedImportImages = new ArrayList<GateImage>();
+            for (GateImage gateImage : importImages) {
+                for (AuditItem auditItem : auditItems) {
+                    for (AuditImage auditImage : auditItem.getAuditImages()) {
+                        if (auditImage.getName().equals(gateImage.getName())) {
+                            deletedImportImages.add(gateImage);
+                        }
+                    }
+                }
+            }
+
+            importImages.removeAll(deletedImportImages);
 
             updatedData(importImages);
         }
@@ -189,14 +202,14 @@ public class ReuseActivity extends Activity {
         @Override
         public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
 
-            ArrayList<String> selected = new ArrayList<String>();
+            ArrayList<GateImage> selected = new ArrayList<GateImage>();
             switch (menuItem.getItemId()) {
                 case R.id.item_select_all:
                     if (gateImageAdapter.getCheckedCJayImageUrlsCount() < gateImageAdapter.getCount()) {
                         // Do select all
                         Logger.Log("Do select all");
                         for (int i = 0; i < gateImageAdapter.getCount(); i++) {
-                            selected.add(gateImageAdapter.getItem(i).getUrl());
+                            selected.add(gateImageAdapter.getItem(i));
                         }
 
                         gateImageAdapter.setCheckedCJayImageUrls(selected);
