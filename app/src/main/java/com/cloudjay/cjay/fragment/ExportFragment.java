@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
@@ -25,6 +26,7 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.Status;
+import com.cloudjay.cjay.util.enums.Step;
 import com.crashlytics.android.internal.m;
 import com.snappydb.SnappydbException;
 
@@ -60,7 +62,7 @@ public class ExportFragment extends Fragment {
 	LinearLayout btnTakeExportPicture;
 
 	@ViewById(R.id.gv_images)
-	GridView gvExportImages;
+    ListView gvExportImages;
 
 	@ViewById(R.id.btn_view_previous_step)
 	Button btnViewPreviousSteps;
@@ -153,70 +155,22 @@ public class ExportFragment extends Fragment {
     void buttonTakeExportPictureClicked() {
         // Open camera activity
         Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-        cameraActivityIntent.putExtra("containerID", containerID);
-        cameraActivityIntent.putExtra("imageType", CJayConstant.TYPE_EXPORT);
-        cameraActivityIntent.putExtra("operatorCode", operatorCode);
+        cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
+        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_EXPORT);
+        cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
+        cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.EXPORT.value);
         startActivity(cameraActivityIntent);
     }
 
     @UiThread
     void onEvent(ImageCapturedEvent event) {
-        // Get gate images from realm
-        try {
-            dataCenter.getGateImages(getActivity(), containerID);
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
+        Logger.Log("onEvent Image Captured");
+
+		// Re-query container session with given containerId
+        String containerId = event.getContainerId();
+        mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+        refresh();
     }
-
-    @UiThread
-    void onEvent(GateImagesGotEvent event) {
-
-        // Get gate image objects from event post back
-        mGateImages = event.getGateImages();
-        Logger.Log("mGateImages: " + mGateImages.size());
-
-        for (GateImage g : mGateImages) {
-            // Create list import images
-            if (g.getType() == CJayConstant.TYPE_IMPORT) {
-                importImages.add(g);
-            } else if (g.getType() == CJayConstant.TYPE_EXPORT) {
-                exportImages.add(g);
-            }
-        }
-
-        //Init adapter if null and set adapter for listview
-        if (gateImageAdapter == null) {
-            gateImageAdapter = new GateImageAdapter(getActivity(), R.layout.item_image_gridview, false);
-            gvExportImages.setAdapter(gateImageAdapter);
-        }
-
-        // Notify change
-        // gateImageAdapter.swapData(mGateImages);
-
-    }
-
-    @UiThread
-    void onEvent(AuditImagesGotEvent event) {
-
-        // Get audit images from event
-        mAuditImages = event.getAuditImages();
-        Logger.Log("mAuditImages: " + mAuditImages.size());
-
-        for (AuditImage a : mAuditImages) {
-            // Create list audit images
-            if (a.getType() == CJayConstant.TYPE_AUDIT) {
-                auditImages.add(a);
-            } else if (a.getType() == CJayConstant.TYPE_REPAIRED) {
-                repairedImages.add(a);
-            }
-        }
-
-        if (mListAdapter == null) {
-
-        }
-
-	}
 
 	@Click(R.id.btn_view_previous_step)
 	void buttonViewPreClicked() {

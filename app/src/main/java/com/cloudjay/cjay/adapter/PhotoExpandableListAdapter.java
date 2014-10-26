@@ -106,11 +106,6 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 
-        // TODO: Inflate layout for child group view based on ```imageType```
-        // Import/Export --> GridView (R.layout.expandable_list_photogrid_item)
-        // Auditor --> ListView (R.layout.fragment_auditor_reporting)
-        // Consider to apply ViewHolder Pattern
-
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(R.layout.expandable_list_photogrid_item, null);

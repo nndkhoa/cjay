@@ -107,14 +107,13 @@
 
         </LinearLayout>
 
-        <GridView
+        <ListView
             android:layout_width="match_parent"
             android:layout_height="210dp"
             android:id="@+id/gv_images"
-            android:numColumns="2"
             android:layout_below="@+id/btn_take_export_picture"
             android:layout_marginBottom="6dp">
-        </GridView>
+        </ListView>
 
         <RelativeLayout
             android:layout_width="match_parent"
