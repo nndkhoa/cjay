@@ -28,6 +28,7 @@ import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
@@ -64,25 +65,38 @@ public class ReuseActivity extends Activity {
     @Bean
     DataCenter dataCenter;
 
-    List<GateImage> gateImages = null;
     GateImageAdapter gateImageAdapter = null;
     private ActionMode mActionMode;
-    List<AuditImage> auditImages;
-    List<AuditItem> auditItems;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EventBus.getDefault().register(this);
-    }
+    long currentStatus;
+    Session mSession;
 
     @AfterViews
     void doAfterViews() {
         // Get session by containerId
-        dataCenter.getSessionByContainerId(getApplicationContext(), containerID);
+        mSession = dataCenter.getSession(getApplicationContext(), containerID);
 
-        // Set ContainerId to TextView
-        tvContainerId.setText(containerID);
+        if (null == mSession) {
+
+            // Set ContainerId to TextView
+            tvContainerId.setText(containerID);
+
+        } else {
+
+            containerID = mSession.getContainerId();
+
+            // Set ContainerId to TextView
+            tvContainerId.setText(containerID);
+
+            // Set currentStatus to TextView
+            currentStatus = mSession.getStatus();
+            tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
+
+            gateImageAdapter = new GateImageAdapter(this, R.layout.item_image_gridview, true);
+            gvReuseImages.setAdapter(gateImageAdapter);
+
+            refresh();
+        }
 
         // Set item click event on grid view
         gvReuseImages.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -136,59 +150,26 @@ public class ReuseActivity extends Activity {
         this.finish();
     }
 
-    @UiThread
-    void onEvent(ContainerSearchedEvent event) {
-        List<Session> result = event.getSessions();
+    @Background
+    void refresh() {
+        if (mSession != null) {
+            List<AuditItem> auditItems = mSession.getAuditItems();
+            List<GateImage> importImages = mSession.getImportImages();
 
-        // Set currentStatus to TextView
-        tvCurrentStatus.setText((Status.values()[(int)result.get(0).getStatus()]).toString());
-
-
-        auditImages = new ArrayList<AuditImage>();
-
-        // Get list audit items from event post back
-        auditItems = result.get(0).getAuditItems();
-        Logger.Log("auditItems: " + auditItems.size());
-
-        // Get gate images objects from event post back
-        gateImages = new ArrayList<GateImage>();
-        for(GateImage g : result.get(0).getGateImages()) {
-            if (g.getType() == CJayConstant.TYPE_IMPORT) {
-                gateImages.add(g);
-            }
+            updatedData(importImages);
         }
-
-        Logger.Log("gateImages.size(): " + gateImages.size());
-
-        for(GateImage g : gateImages) {
-            for (AuditImage a : auditImages) {
-                if (g.getName() == a.getName()) {
-                    gateImages.remove(g);
-                }
-            }
-        }
-
-        Logger.Log("count gate images: " + gateImages.size());
-
-        //Init adapter if null and set adapter for listview
-        if (gateImageAdapter == null) {
-            Logger.Log("gateImageAdapter is null");
-
-	        // TODO: tieubao changed this
-            gateImageAdapter = new GateImageAdapter(this, R.layout.item_image_gridview, true);
-            gateImageAdapter.setData(gateImages);
-            gvReuseImages.setAdapter(gateImageAdapter);
-        }
-
-        // Notify change
-//        gateImageAdapter.swapData(gateImages);
-
     }
 
-    @Override
-    protected void onDestroy() {
-        EventBus.getDefault().unregister(this);
-        super.onDestroy();
+    @UiThread
+    public void updatedData(List<GateImage> importImages) {
+        Logger.Log("Size: " + importImages.size());
+        gateImageAdapter.clear();
+        if (importImages != null) {
+            for (GateImage object : importImages) {
+                gateImageAdapter.add(object);
+            }
+        }
+        gateImageAdapter.notifyDataSetChanged();
     }
 
     private class ActionModeCallBack implements ActionMode.Callback {

@@ -23,6 +23,7 @@ import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
@@ -165,6 +166,7 @@ public class IssuePendingFragment extends Fragment {
 		dialog.show();
 	}
 
+    @Background
     void refresh() {
         if (mSession != null) {
             List<AuditItem> list = mSession.getAuditItems();
