@@ -70,6 +70,7 @@ public class Utils {
                 pintent);
     }
 
+
     public static String getAppVersionName(Context ctx) {
 
         PackageInfo pInfo = null;
