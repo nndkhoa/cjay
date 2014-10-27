@@ -46,7 +46,7 @@ public class OperatorAdapter extends BaseAdapter {
 		ViewHolder holder = null;
 		if (convertView == null) {
 			holder = new ViewHolder();
-			convertView = inflater.inflate(R.layout.list_item_operator, null);
+			convertView = inflater.inflate(R.layout.item_operator, null);
 			holder.tvOperatorName = (TextView) convertView.findViewById(R.id.tv_operator_name);
 			holder.tvOperatorCode = (TextView) convertView.findViewById(R.id.tv_operator_code);
 			convertView.setTag(holder);

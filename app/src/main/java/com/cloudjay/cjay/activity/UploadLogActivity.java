@@ -48,7 +48,7 @@ public class UploadLogActivity extends Activity {
 
     @AfterViews
     void init(){
-        mAdapter = new LogUploadAdapter(this,R.layout.item_logupload);
+        mAdapter = new LogUploadAdapter(this,R.layout.item_upload_log);
         lvLogUpload.setAdapter(mAdapter);
         lvLogUpload.setEmptyView(tvEmpty);
         refresh();
