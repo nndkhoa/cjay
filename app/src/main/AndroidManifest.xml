@@ -81,6 +81,10 @@
             android:name=".activity.MergeIssueActivity_"
             android:label="@string/fragment_repair_title"
             android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".activity.DetailIssueActivity_"
+            android:label="@string/fragment_repair_title"
+            android:screenOrientation="portrait"></activity>
 		<!--<activity
 			android:name=".activity.MyActivity"
 			android:label="@string/title_activity_my" >
