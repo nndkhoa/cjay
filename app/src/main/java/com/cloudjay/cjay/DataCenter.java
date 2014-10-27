@@ -14,6 +14,7 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.IsoCode;
+import com.cloudjay.cjay.model.LogUpload;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
@@ -652,6 +653,7 @@ public class DataCenter {
 
     /**
      * Set session have containerId is hand cleaning session, upload this to server then add new session return from server to database
+     *
      * @param context
      * @param containerId
      * @return
@@ -669,5 +671,53 @@ public class DataCenter {
             return null;
         }
 
+    }
+
+    /**
+     * Get list log upload for view in Log activity by search key "LOG"
+     * @param context
+     * @param logUploadKey
+     * @return
+     */
+    public List<LogUpload> getListLogUpload(Context context, String logUploadKey) {
+        try {
+            DB db = App.getDB(context);
+            String[] keysResult = db.findKeys(logUploadKey);
+            List<LogUpload> logUploads = new ArrayList<LogUpload>();
+
+            for (String result : keysResult) {
+                LogUpload logUpload = db.getObject(result, LogUpload.class);
+                logUploads.add(logUpload);
+            }
+            db.close();
+            return logUploads;
+        } catch (SnappydbException e) {
+            Logger.w(e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Search list log upload for view in Log activity by search key "LOG" + containerId
+     * @param context
+     * @param searchKey
+     * @return
+     */
+    public List<LogUpload> searchLogUpload(Context context, String searchKey) {
+        try {
+            DB db = App.getDB(context);
+            String[] keysResult = db.findKeys(CJayConstant.PREFIX_LOGUPLOAD+searchKey);
+            List<LogUpload> logUploads = new ArrayList<LogUpload>();
+
+            for (String result : keysResult) {
+                LogUpload logUpload = db.getObject(result, LogUpload.class);
+                logUploads.add(logUpload);
+            }
+            db.close();
+            return logUploads;
+        } catch (SnappydbException e) {
+            Logger.w(e.getMessage());
+            return null;
+        }
     }
 }
