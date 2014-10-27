@@ -298,7 +298,7 @@ public class NetworkClient {
      * @return
      */
     public Session checkOutContainerSession(Context context, Session containerSession) {
-        Session checkOutSession = provider.getRestAdapter(context).create(NetworkService.class).checkOutContainerSession(containerSession.getContainerId(), containerSession.getGateOutImageToUpLoad());
+        Session checkOutSession = provider.getRestAdapter(context).create(NetworkService.class).checkOutContainerSession(containerSession.getId(), containerSession.getGateOutImageToUpLoad());
         return checkOutSession;
     }
 
@@ -310,7 +310,7 @@ public class NetworkClient {
      * @return
      */
     public Session completeAudit(Context context, Session containerSession) {
-        Session completeAuditSession = provider.getRestAdapter(context).create(NetworkService.class).completeAudit(containerSession.getContainerId());
+        Session completeAuditSession = provider.getRestAdapter(context).create(NetworkService.class).completeAudit(containerSession.getId());
         return completeAuditSession;
     }
 
@@ -322,7 +322,7 @@ public class NetworkClient {
      * @return
      */
     public Session completeRepairSession(Context context, Session containerSession) {
-        Session completeRepairSession = provider.getRestAdapter(context).create(NetworkService.class).completeRepair(containerSession.getContainerId(), containerSession.getRepairedAuditItemToUpLoad());
+        Session completeRepairSession = provider.getRestAdapter(context).create(NetworkService.class).completeRepair(containerSession.getId(), containerSession.getRepairedAuditItemToUpLoad());
         return completeRepairSession;
     }
 
@@ -330,12 +330,12 @@ public class NetworkClient {
      * put audit item to server
      *
      * @param context
-     * @param containerId
+     * @param containerSession
      * @param auditItem
      * @return
      */
-    public Session postAuditItem(Context context, String containerId, AuditItem auditItem) {
-        Session postAuditItemSession = provider.getRestAdapter(context).create(NetworkService.class).postAudiItem(containerId, auditItem.getAuditItemToUpload());
+    public Session postAuditItem(Context context, Session containerSession, AuditItem auditItem) {
+        Session postAuditItemSession = provider.getRestAdapter(context).create(NetworkService.class).postAudiItem(containerSession.getId(), auditItem.getAuditItemToUpload());
         return postAuditItemSession;
     }
 
@@ -358,7 +358,7 @@ public class NetworkClient {
      * @return
      */
     public Session setHandCleaningSession(Context context, Session session){
-        Session handCleaningSession = provider.getRestAdapter(context).create(NetworkService.class).setHandCleaningSession(String.valueOf(session.getId()));
+        Session handCleaningSession = provider.getRestAdapter(context).create(NetworkService.class).setHandCleaningSession(session.getId());
         return handCleaningSession;
     }
 }
