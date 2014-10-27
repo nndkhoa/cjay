@@ -1,10 +1,8 @@
 package com.cloudjay.cjay.activity;
 
-import android.app.Activity;
 import android.widget.ListView;
 
 import com.cloudjay.cjay.DataCenter;
-import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.AuditMergeIssueAdapter;
 import com.cloudjay.cjay.model.AuditImage;
@@ -17,7 +15,6 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
-import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;

@@ -14,6 +14,7 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.IsoCode;
+import com.cloudjay.cjay.model.LogUpload;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
@@ -38,419 +39,530 @@ import de.greenrobot.event.EventBus;
 @EBean(scope = EBean.Scope.Singleton)
 public class DataCenter {
 
-	// region DECLARE
-	// Inject the rest client
-	@Bean
-	NetworkClient networkClient;
+    // region DECLARE
+    // Inject the rest client
+    @Bean
+    NetworkClient networkClient;
 
-	Context context;
+    Context context;
 
-	public static final String NETWORK = "NETWORK";
-	public static final String CACHE = "CACHE";
+    public static final String NETWORK = "NETWORK";
+    public static final String CACHE = "CACHE";
 
-	public DataCenter(Context context) {
-		this.context = context;
-	}
-	//endregion
+    public DataCenter(Context context) {
+        this.context = context;
+    }
+    //endregion
 
-	//region USER
-	public String getToken(String email, String password) {
-		return networkClient.getToken(email, password);
-	}
+    //region USER
+    public String getToken(String email, String password) {
+        return networkClient.getToken(email, password);
+    }
 
-	public User getUser(Context context) throws SnappydbException, NullCredentialException {
+    public User getUser(Context context) throws SnappydbException, NullCredentialException {
 
-		DB db = App.getDB(context);
-		User user = db.getObject(CJayConstant.PREFIX_USER, User.class);
-		db.close();
+        DB db = App.getDB(context);
+        User user = db.getObject(CJayConstant.PREFIX_USER, User.class);
+        db.close();
 
-		if (null == user) {
-			return getCurrentUserAsync(context);
-		} else {
-			return user;
-		}
-	}
+        if (null == user) {
+            return getCurrentUserAsync(context);
+        } else {
+            return user;
+        }
+    }
 
-	public User getCurrentUserAsync(Context context) throws SnappydbException, NullCredentialException {
-		User user = networkClient.getCurrentUser(context);
+    public User getCurrentUserAsync(Context context) throws SnappydbException, NullCredentialException {
+        User user = networkClient.getCurrentUser(context);
 
-		if (null == user) {
-			throw new NullCredentialException();
-		}
+        if (null == user) {
+            throw new NullCredentialException();
+        }
 
-		// User is not null, then we need to store them to database add shared preference
-		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_USER_NAME, user.getFullName());
-		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_USER_ROLE_NAME, user.getRoleName());
-		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_USER_ROLE, user.getRole() + "");
-		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_USER_DEPOT, user.getDepotCode());
+        // User is not null, then we need to store them to database add shared preference
+        PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_USER_NAME, user.getFullName());
+        PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_USER_ROLE_NAME, user.getRoleName());
+        PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_USER_ROLE, user.getRole() + "");
+        PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_USER_DEPOT, user.getDepotCode());
 
-		DB db = App.getDB(context);
-		db.put(CJayConstant.PREFIX_USER, user);
-		db.close();
+        DB db = App.getDB(context);
+        db.put(CJayConstant.PREFIX_USER, user);
+        db.close();
 
-		return user;
-	}
-	//endregion
+        return user;
+    }
+    //endregion
 
-	//region OPERATOR
+    //region OPERATOR
 
-	/**
-	 * Fetch and save all operators to database.
-	 * Call it in Background.
-	 *
-	 * @param context
-	 * @throws SnappydbException
-	 */
-	public void fetchOperators(Context context) throws SnappydbException {
+    /**
+     * Fetch and save all operators to database.
+     * Call it in Background.
+     *
+     * @param context
+     * @throws SnappydbException
+     */
+    public void fetchOperators(Context context) throws SnappydbException {
 
-		DB db = App.getDB(context);
-		List<Operator> operators = networkClient.getOperators(context, null);
-		for (Operator operator : operators) {
-			db.put(CJayConstant.PREFIX_OPERATOR + operator.getOperatorCode(), operator);
-		}
-		db.close();
-	}
+        DB db = App.getDB(context);
+        List<Operator> operators = networkClient.getOperators(context, null);
+        for (Operator operator : operators) {
+            db.put(CJayConstant.PREFIX_OPERATOR + operator.getOperatorCode(), operator);
+        }
+        db.close();
+    }
 
-	/**
-	 * Search for operator
-	 *
-	 * @param keyword
-	 */
-	@Background(serial = CACHE)
-	public void searchOperator(String keyword) {
-		try {
-			List<Operator> operators = new ArrayList<Operator>();
-			DB db = App.getDB(context);
-			String[] keysResult = db.findKeys(CJayConstant.PREFIX_OPERATOR + keyword);
-			for (String result : keysResult) {
-				Operator operator = db.getObject(result, Operator.class);
-				operators.add(operator);
-			}
-			db.close();
-			EventBus.getDefault().post(new OperatorsGotEvent(operators));
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Get operator from database.
-	 * Chỉ sử dụng khi biết chắc có operator ở trong database.
-	 *
-	 * @param context
-	 * @param operatorCode
-	 * @return
-	 */
-	public Operator getOperator(Context context, String operatorCode) {
-
-		try {
-			DB db = App.getDB(context);
-			String key = CJayConstant.PREFIX_OPERATOR + operatorCode;
-			Operator operator = db.getObject(key, Operator.class);
+    /**
+     * Search for operator
+     *
+     * @param keyword
+     */
+    @Background(serial = CACHE)
+    public void searchOperator(String keyword) {
+        try {
+            List<Operator> operators = new ArrayList<Operator>();
+            DB db = App.getDB(context);
+            String[] keysResult = db.findKeys(CJayConstant.PREFIX_OPERATOR + keyword);
+            for (String result : keysResult) {
+                Operator operator = db.getObject(result, Operator.class);
+                operators.add(operator);
+            }
             db.close();
-			return operator;
+            EventBus.getDefault().post(new OperatorsGotEvent(operators));
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+    }
 
-		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
-			return null;
-		}
-	}
+    /**
+     * Get operator from database.
+     * Chỉ sử dụng khi biết chắc có operator ở trong database.
+     *
+     * @param context
+     * @param operatorCode
+     * @return
+     */
+    public Operator getOperator(Context context, String operatorCode) {
 
-	//endregion
+        try {
+            DB db = App.getDB(context);
+            String key = CJayConstant.PREFIX_OPERATOR + operatorCode;
+            Operator operator = db.getObject(key, Operator.class);
+            db.close();
+            return operator;
 
-	//region ISO CODE
+        } catch (SnappydbException e) {
+            Logger.w(e.getMessage());
+            return null;
+        }
+    }
 
-	/**
-	 * Fetch and save all iso codes to database.
-	 * Call it in Background
-	 *
-	 * @param context
-	 * @throws SnappydbException
-	 */
-	public void fetchIsoCodes(Context context) throws SnappydbException {
-		fetchDamageCodes(context);
-		fetchRepairCodes(context);
-		fetchComponentCodes(context);
-	}
+    //endregion
 
-	public void fetchDamageCodes(Context context) throws SnappydbException {
-		DB db = App.getDB(context);
-		List<IsoCode> damageCodes = networkClient.getDamageCodes(context, null);
-		for (IsoCode code : damageCodes) {
-			String key = CJayConstant.PREFIX_DAMAGE_CODE + code.getCode();
-			db.put(key, code);
-		}
-		db.close();
-	}
+    //region ISO CODE
 
-	public void fetchRepairCodes(Context context) throws SnappydbException {
-		DB db = App.getDB(context);
-		List<IsoCode> repairCodes = networkClient.getRepairCodes(context, null);
-		for (IsoCode code : repairCodes) {
-			String key = CJayConstant.PREFIX_REPAIR_CODE + code.getCode();
-			db.put(key, code);
-		}
-		db.close();
-	}
+    /**
+     * Fetch and save all iso codes to database.
+     * Call it in Background
+     *
+     * @param context
+     * @throws SnappydbException
+     */
+    public void fetchIsoCodes(Context context) throws SnappydbException {
+        fetchDamageCodes(context);
+        fetchRepairCodes(context);
+        fetchComponentCodes(context);
+    }
 
-	public void fetchComponentCodes(Context context) throws SnappydbException {
-		DB db = App.getDB(context);
-		List<IsoCode> componentCodes = networkClient.getComponentCodes(context, null);
-		for (IsoCode code : componentCodes) {
-			String key = CJayConstant.PREFIX_COMPONENT_CODE + code.getCode();
-			db.put(key, code);
-		}
-		db.close();
-	}
-	//endregion
+    public void fetchDamageCodes(Context context) throws SnappydbException {
+        DB db = App.getDB(context);
+        List<IsoCode> damageCodes = networkClient.getDamageCodes(context, null);
+        for (IsoCode code : damageCodes) {
+            String key = CJayConstant.PREFIX_DAMAGE_CODE + code.getCode();
+            db.put(key, code);
+        }
+        db.close();
+    }
 
-	//region SESSION
+    public void fetchRepairCodes(Context context) throws SnappydbException {
+        DB db = App.getDB(context);
+        List<IsoCode> repairCodes = networkClient.getRepairCodes(context, null);
+        for (IsoCode code : repairCodes) {
+            String key = CJayConstant.PREFIX_REPAIR_CODE + code.getCode();
+            db.put(key, code);
+        }
+        db.close();
+    }
 
-	/**
-	 * Only use when search container session from db.
-	 * Chỉ sử dụng khi biết chắc session đã ở trong db.
-	 *
-	 * @param context
-	 * @param containerId
-	 * @return
-	 */
-	public Session getSession(Context context, String containerId) {
+    public void fetchComponentCodes(Context context) throws SnappydbException {
+        DB db = App.getDB(context);
+        List<IsoCode> componentCodes = networkClient.getComponentCodes(context, null);
+        for (IsoCode code : componentCodes) {
+            String key = CJayConstant.PREFIX_COMPONENT_CODE + code.getCode();
+            db.put(key, code);
+        }
+        db.close();
+    }
+    //endregion
 
-		try {
-			DB db = App.getDB(context);
-			String key = containerId;
-			Session session = db.getObject(key, Session.class);
-			App.closeDB();
+    //region SESSION
 
-			return session;
-		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
-			return null;
-		}
-	}
+    /**
+     * Only use when search container session from db.
+     * Chỉ sử dụng khi biết chắc session đã ở trong db.
+     *
+     * @param context
+     * @param containerId
+     * @return
+     */
+    public Session getSession(Context context, String containerId) {
 
-	/**
-	 * Get list container sessions based on param `prefix`
-	 *
-	 * @param context
-	 * @param prefix
-	 * @return
-	 */
-	public List<Session> getListSessions(Context context, String prefix) {
-		try {
-			DB db = App.getDB(context);
-			String[] keysResult = db.findKeys(prefix);
-			List<Session> sessions = new ArrayList<Session>();
+        try {
+            DB db = App.getDB(context);
+            String key = containerId;
+            Session session = db.getObject(key, Session.class);
+            App.closeDB();
 
-			for (String result : keysResult) {
-				Session session = db.getObject(result, Session.class);
-				sessions.add(session);
-			}
-			db.close();
-			return sessions;
-		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
-			return null;
-		}
-	}
+            return session;
+        } catch (SnappydbException e) {
+            Logger.w(e.getMessage());
+            return null;
+        }
+    }
 
-	//endregion
+    /**
+     * Get list container sessions based on param `prefix`
+     *
+     * @param context
+     * @param prefix
+     * @return
+     */
+    public List<Session> getListSessions(Context context, String prefix) {
+        try {
+            DB db = App.getDB(context);
+            String[] keysResult = db.findKeys(prefix);
+            List<Session> sessions = new ArrayList<Session>();
 
-	/**
-	 * Fetch all container session with last modified datetime
-	 *
-	 * @param context
-	 * @param lastModifiedDate
-	 * @throws SnappydbException
-	 */
-	public void fetchSession(Context context, String lastModifiedDate) throws SnappydbException {
+            for (String result : keysResult) {
+                Session session = db.getObject(result, Session.class);
+                sessions.add(session);
+            }
+            db.close();
+            return sessions;
+        } catch (SnappydbException e) {
+            Logger.w(e.getMessage());
+            return null;
+        }
+    }
+
+    //endregion
+
+    /**
+     * Fetch all container session with last modified datetime
+     *
+     * @param context
+     * @param lastModifiedDate
+     * @throws SnappydbException
+     */
+    public void fetchSession(Context context, String lastModifiedDate) throws SnappydbException {
         Logger.Log("Fetching Session");
-		List<Session> sessions = networkClient.getAllSessions(context, lastModifiedDate);
-		DB db = App.getDB(context);
-		for (Session session : sessions) {
-			String key = session.getContainerId();
-			db.put(key, session);
-		}
-		db.close();
-	}
+        List<Session> sessions = networkClient.getAllSessions(context, lastModifiedDate);
+        DB db = App.getDB(context);
+        for (Session session : sessions) {
+            String key = session.getContainerId();
+            db.put(key, session);
+        }
+        db.close();
+    }
 
-	/**
-	 * Search container session from device database.
-	 * <p/>
-	 * > FLOW
-	 * <p/>
-	 * 1. Tìm kiếm từ database với keyword được cung cấp(không hỗ trợ full text search)
-	 * 2. Post kết quả tìm được (nếu có) thông qua EventBus
-	 * 3. Nếu không tìm thấy ở trên client thì tiến hành search ở server.
-	 *
-	 * @param context
-	 * @param keyword
-	 */
-	@Trace
-	@Background(serial = CACHE)
-	public void search(Context context, String keyword) {
-		String[] keysResult;
-		try {
-			DB db = App.getDB(context);
-			// try to search from client database
-			keysResult = db.findKeys(keyword);
-			List<Session> sessions = new ArrayList<Session>();
+    /**
+     * Search container session from device database.
+     * <p/>
+     * > FLOW
+     * <p/>
+     * 1. Tìm kiếm từ database với keyword được cung cấp(không hỗ trợ full text search)
+     * 2. Post kết quả tìm được (nếu có) thông qua EventBus
+     * 3. Nếu không tìm thấy ở trên client thì tiến hành search ở server.
+     *
+     * @param context
+     * @param keyword
+     */
+    @Trace
+    @Background(serial = CACHE)
+    public void search(Context context, String keyword) {
+        String[] keysResult;
+        try {
+            DB db = App.getDB(context);
+            // try to search from client database
+            keysResult = db.findKeys(keyword);
+            List<Session> sessions = new ArrayList<Session>();
 
-			for (String result : keysResult) {
-				Session session = db.getObject(result, Session.class);
-				sessions.add(session);
-			}
+            for (String result : keysResult) {
+                Session session = db.getObject(result, Session.class);
+                sessions.add(session);
+            }
 
-			db.close();
+            db.close();
 
-			// Check if local search has results
-			if (sessions.size() != 0) {
+            // Check if local search has results
+            if (sessions.size() != 0) {
 
-				EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
-			} else {
+                EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
+            } else {
 
-				// If there was not result in local, send search request to server
-				//  --> alert to user about that no results was found in local
-				EventBus.getDefault().post(new SearchAsyncStartedEvent(context.getResources().getString(R.string.search_on_server)));
-				searchAsync(context, keyword);
-			}
-		} catch (SnappydbException e) {
-			Logger.e(e.getMessage());
-		}
-	}
+                // If there was not result in local, send search request to server
+                //  --> alert to user about that no results was found in local
+                EventBus.getDefault().post(new SearchAsyncStartedEvent(context.getResources().getString(R.string.search_on_server)));
+                searchAsync(context, keyword);
+            }
+        } catch (SnappydbException e) {
+            Logger.e(e.getMessage());
+        }
+    }
 
-	/**
-	 * Search container session từ server
-	 * <p/>
-	 * > FLOW
-	 * <p/>
-	 * 1. Call NetworkClient#search để lấy list container sessions từ server
-	 * 2. Post kết quả trả về thông qua EventBus
-	 *
-	 * @param context
-	 * @param keyword
-	 */
-	@Background(serial = NETWORK)
-	public void searchAsync(Context context, String keyword) {
+    /**
+     * Search container session từ server
+     * <p/>
+     * > FLOW
+     * <p/>
+     * 1. Call NetworkClient#search để lấy list container sessions từ server
+     * 2. Post kết quả trả về thông qua EventBus
+     *
+     * @param context
+     * @param keyword
+     */
+    @Background(serial = NETWORK)
+    public void searchAsync(Context context, String keyword) {
 
-		try {
+        try {
 
-			Logger.Log("Begin to search container from server");
-			List<Session> sessions = networkClient.searchSessions(context, keyword);
+            Logger.Log("Begin to search container from server");
+            List<Session> sessions = networkClient.searchSessions(context, keyword);
 
-			if (sessions.size() != 0) {
-				DB db = App.getDB(context);
+            if (sessions.size() != 0) {
+                DB db = App.getDB(context);
 
-				for (Session session : sessions) {
-					String key = session.getContainerId();
-					db.put(key, session);
-				}
+                for (Session session : sessions) {
+                    String key = session.getContainerId();
+                    db.put(key, session);
+                }
 
-				db.close();
-			}
+                db.close();
+            }
 
-			EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
-		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
-		}
-	}
+            EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
+        } catch (SnappydbException e) {
+            Logger.w(e.getMessage());
+        }
+    }
 
-	/**
-	 * Thêm container session mới vào database
-	 *
-	 * @param session
-	 */
-	@Background(serial = CACHE)
-	public void addSession(Session session) {
-		try {
-			DB db = App.getDB(context);
+    /**
+     * Thêm container session mới vào database
+     *
+     * @param session
+     */
+    @Background(serial = CACHE)
+    public void addSession(Session session) {
+        try {
+            DB db = App.getDB(context);
 
-			// Add normal session
-			String key = session.getContainerId();
-			db.put(key, session);
+            // Add normal session
+            String key = session.getContainerId();
+            db.put(key, session);
 
-			// Close db
-			db.close();
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-	}
+            // Close db
+            db.close();
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+    }
 
-	/**
-	 * Add container session vào list working session in database
-	 *
-	 * @param session
-	 */
-	@Background(serial = CACHE)
-	public void addWorkingSession(Session session) {
+    /**
+     * Add container session vào list working session in database
+     *
+     * @param session
+     */
+    @Background(serial = CACHE)
+    public void addWorkingSession(Session session) {
 
-		try {
-			DB db = App.getDB(context);
+        try {
+            DB db = App.getDB(context);
 
-			String key = CJayConstant.PREFIX_WORKING + session.getContainerId();
-			session.setProcessing(true);
-			db.put(key, session);
+            String key = CJayConstant.PREFIX_WORKING + session.getContainerId();
+            session.setProcessing(true);
+            db.put(key, session);
 
-			db.close();
+            db.close();
 
-			// Notify to Working Fragment
-			EventBus.getDefault().post(new WorkingSessionCreatedEvent(session));
+            // Notify to Working Fragment
+            EventBus.getDefault().post(new WorkingSessionCreatedEvent(session));
 
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-	}
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+    }
 
-	/**
-	 * Add container session vào list uploading session in database
-	 *
-	 * @param containerId
-	 * @throws SnappydbException
-	 */
-	@Background(serial = CACHE)
-	public void addUploadingSession(String containerId) {
+    /**
+     * Add container session vào list uploading session in database
+     *
+     * @param containerId
+     * @throws SnappydbException
+     */
+    @Background(serial = CACHE)
+    public void addUploadingSession(String containerId) {
 
-		try {
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
+        try {
+            DB db = App.getDB(context);
+            Session session = db.getObject(containerId, Session.class);
 
-			String key = CJayConstant.PREFIX_UPLOADING + containerId;
-			db.put(key, session);
+            String key = CJayConstant.PREFIX_UPLOADING + containerId;
+            db.put(key, session);
 
-			db.close();
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-	}
+            db.close();
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+    }
 
-	/**
-	 * Add image to container Session
-	 *
-	 * @param image
-	 * @param containerId
-	 * @throws SnappydbException
-	 */
-	public void addGateImage(Context context, GateImage image, String containerId) throws SnappydbException {
+    /**
+     * Add image to container Session
+     *
+     * @param image
+     * @param containerId
+     * @throws SnappydbException
+     */
+    public void addGateImage(Context context, GateImage image, String containerId) throws SnappydbException {
 
-		DB db = App.getDB(context);
+        DB db = App.getDB(context);
 
-		// Add gate image to normal container session
-		Session session = db.getObject(containerId, Session.class);
-		session.getGateImages().add(image);
+        // Add gate image to normal container session
+        Session session = db.getObject(containerId, Session.class);
+        session.getGateImages().add(image);
 
-		Logger.Log("Size: " + session.getGateImages().size());
+        Logger.Log("Size: " + session.getGateImages().size());
 
-		String key = containerId;
-		db.put(key, session);
+        String key = containerId;
+        db.put(key, session);
 
 //		// Add gate image to on working container session
 //		key = CJayConstant.PREFIX_WORKING + containerId;
 //		db.put(key, session);
 
-		db.close();
-	}
+        db.close();
+    }
 
-	public void addAuditImage(Context context, AuditImage auditImage, String containerId) throws SnappydbException {
+    public void addAuditImage(Context context, AuditImage image, String containerId) throws SnappydbException {
+
+    }
+
+    public void getGateImages(Context context, String containerId) throws SnappydbException {
+        DB db = App.getDB(context);
+        Session session = db.getObject(containerId, Session.class);
+        db.close();
+
+        List<GateImage> gateImages = session.getGateImages();
+        EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
+    }
+
+    @Background(serial = CACHE)
+    public void getSessionByContainerId(Context context, String containerId) {
+        String[] keysResult;
+        try {
+            DB db = App.getDB(context);
+            keysResult = db.findKeys(containerId);
+            List<Session> sessions = new ArrayList<Session>();
+            for (String result : keysResult) {
+                Session tmp = db.getObject(result, Session.class);
+                sessions.add(tmp);
+            }
+
+            db.close();
+            EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Background(serial = CACHE)
+    public void getAllGateImagesByContainerId(Context context, String containerId) {
+        try {
+            DB db = App.getDB(context);
+            Session session = db.getObject(containerId, Session.class);
+            List<GateImage> gateImages = session.getGateImages();
+
+            Logger.Log("gate images count in dataCenter: " + gateImages.size());
+            db.close();
+
+            EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //region UPLOAD
+
+    /**
+     * 1. Tìm session với containerId trong list uploading.
+     * 2. Upload hình và gán field uploaded ngược vào list uploading
+     *
+     * @param context
+     * @param uri
+     * @param imageName
+     * @param containerId
+     * @throws SnappydbException
+     */
+    public void uploadImage(Context context, String uri, String imageName, String containerId) throws SnappydbException {
+
+        DB db = App.getDB(context);
+
+        //Call network client to upload image
+        //networkClient.uploadImage(uri, imageName);
+
+        // Change status image in db
+        Session session = db.getObject(CJayConstant.PREFIX_UPLOADING + containerId, Session.class);
+        if (session != null) {
+
+            for (GateImage gateImage : session.getGateImages()) {
+                if (gateImage.getName().equals(imageName)) {
+                    gateImage.setUploaded(true);
+                }
+            }
+
+            db.put(CJayConstant.PREFIX_UPLOADING + containerId, session);
+        }
+
+        db.close();
+        EventBus.getDefault().post(new UploadedEvent(containerId));
+    }
+
+    /**
+     * Upload container session and change status uploaded of session to true
+     *
+     * @param context
+     * @param session
+     * @throws SnappydbException
+     */
+    public void uploadContainerSession(Context context, Session session) throws SnappydbException {
+
+        DB db = App.getDB(context);
+        networkClient.uploadContainerSession(context, session);
+
+        String key = CJayConstant.PREFIX_UPLOADING + session.getContainerId();
+        Session sessionUploaded = db.getObject(key, Session.class);
+        if (sessionUploaded != null) {
+            sessionUploaded.setUploaded(true);
+            db.put(CJayConstant.PREFIX_UPLOADING + session.getContainerId(), sessionUploaded);
+        }
+
+        db.close();
+
+        // TODO: sao không thấy post Event như upload hình?
+    }
+    //endregion
+
+    public void addAuditImages(Context context, String containerId, AuditImage auditImage) throws SnappydbException {
+
         DB db = App.getDB(context);
 
         Session session = db.getObject(containerId, Session.class);
@@ -489,159 +601,123 @@ public class DataCenter {
 
         Logger.Log("insert audit image successfully");
         db.close();
-	}
+    }
 
-	public void getGateImages(Context context, String containerId) throws SnappydbException {
-		DB db = App.getDB(context);
-		Session session = db.getObject(containerId, Session.class);
-		db.close();
-
-		List<GateImage> gateImages = session.getGateImages();
-		EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
-	}
-
-	@Background(serial = CACHE)
-	public void getSessionByContainerId(Context context, String containerId) {
-		String[] keysResult;
-		try {
-			DB db = App.getDB(context);
-			keysResult = db.findKeys(containerId);
-			List<Session> sessions = new ArrayList<Session>();
-			for (String result : keysResult) {
-				Session tmp = db.getObject(result, Session.class);
-				sessions.add(tmp);
-			}
-
-			db.close();
-			EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	@Background(serial = CACHE)
-	public void getAllGateImagesByContainerId(Context context, String containerId) {
-		try {
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
-			List<GateImage> gateImages = session.getGateImages();
-
-			Logger.Log("gate images count in dataCenter: " + gateImages.size());
-			db.close();
-
-			EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-	}
-
-	//region UPLOAD
-
-	/**
-	 * 1. Tìm session với containerId trong list uploading.
-	 * 2. Upload hình và gán field uploaded ngược vào list uploading
-	 *
-	 * @param context
-	 * @param uri
-	 * @param imageName
-	 * @param containerId
-	 * @throws SnappydbException
-	 */
-	public void uploadImage(Context context, String uri, String imageName, String containerId) throws SnappydbException {
-
-		DB db = App.getDB(context);
-
-		//Call network client to upload image
-		//networkClient.uploadImage(uri, imageName);
-
-		// Change status image in db
-		Session session = db.getObject(CJayConstant.PREFIX_UPLOADING + containerId, Session.class);
-		if (session != null) {
-
-			for (GateImage gateImage : session.getGateImages()) {
-				if (gateImage.getName().equals(imageName)) {
-					gateImage.setUploaded(true);
-				}
-			}
-
-			db.put(CJayConstant.PREFIX_UPLOADING + containerId, session);
-		}
-
-		db.close();
-		EventBus.getDefault().post(new UploadedEvent(containerId));
-	}
-
-	/**
-	 * Upload container session and change status uploaded of session to true
-	 *
-	 * @param context
-	 * @param session
-	 * @throws SnappydbException
-	 */
-	public void uploadContainerSession(Context context, Session session) throws SnappydbException {
-
-		DB db = App.getDB(context);
-		networkClient.uploadContainerSession(context, session);
-
-		String key = CJayConstant.PREFIX_UPLOADING + session.getContainerId();
-		Session sessionUploaded = db.getObject(key, Session.class);
-		if (sessionUploaded != null) {
-			sessionUploaded.setUploaded(true);
-			db.put(CJayConstant.PREFIX_UPLOADING + session.getContainerId(), sessionUploaded);
-		}
-
-		db.close();
-
-		// TODO: sao không thấy post Event như upload hình?
-	}
-	//endregion
-
-	@Background(serial = CACHE)
-	public void getAuditImages(Context context, String containerId) {
+    @Background(serial = CACHE)
+    public void getAuditImages(Context context, String containerId) {
 
 
-		Session session = null;
-		try {
-			DB db = App.getDB(context);
-			session = db.getObject(containerId, Session.class);
-			db.close();
-		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
-		}
+        Session session = null;
+        try {
+            DB db = App.getDB(context);
+            session = db.getObject(containerId, Session.class);
+            db.close();
+        } catch (SnappydbException e) {
+            Logger.w(e.getMessage());
+        }
 
-		// Audit and Repaired Images
-		List<AuditImage> auditImages = new ArrayList<AuditImage>();
+        // Audit and Repaired Images
+        List<AuditImage> auditImages = new ArrayList<AuditImage>();
 
-		// Get list audit images of each audit item and add to audit images list
-		for (AuditItem auditItem : session.getAuditItems()) {
-			List<AuditImage> childAuditImageList = auditItem.getAuditImages();
-			if (childAuditImageList != null) {
-				auditImages.addAll(childAuditImageList);
-			}
-		}
-		EventBus.getDefault().post(new AuditImagesGotEvent(auditImages));
-	}
+        // Get list audit images of each audit item and add to audit images list
+        for (AuditItem auditItem : session.getAuditItems()) {
+            List<AuditImage> childAuditImageList = auditItem.getAuditImages();
+            if (childAuditImageList != null) {
+                auditImages.addAll(childAuditImageList);
+            }
+        }
+        EventBus.getDefault().post(new AuditImagesGotEvent(auditImages));
+    }
 
-	/**
-	 * Get List audit item for normal session
-	 *
-	 * @param context
-	 * @param containerId
-	 * @return List Audit Item
-	 */
-	public List<AuditItem> getListAuditItems(Context context, String containerId) {
-		try {
-			DB db = App.getDB(context);
+    /**
+     * Get List audit item for normal session
+     *
+     * @param context
+     * @param containerId
+     * @return List Audit Item
+     */
+    public List<AuditItem> getListAuditItems(Context context, String containerId) {
+        try {
+            DB db = App.getDB(context);
 
-			Session session = db.getObject(containerId, Session.class);
-			List<AuditItem> auditItems = session.getAuditItems();
+            Session session = db.getObject(containerId, Session.class);
+            List<AuditItem> auditItems = session.getAuditItems();
 
-			db.close();
-			return auditItems;
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+            db.close();
+            return auditItems;
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Set session have containerId is hand cleaning session, upload this to server then add new session return from server to database
+     *
+     * @param context
+     * @param containerId
+     * @return
+     */
+    public Session setHandCleaningSession(Context context, String containerId) {
+        try {
+            DB db = App.getDB(context);
+            Session oldSession = db.getObject(containerId, Session.class);
+            Session newSession = networkClient.setHandCleaningSession(context, oldSession);
+            db.put(newSession.getContainerId(), newSession);
+            db.close();
+            return newSession;
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+    /**
+     * Get list log upload for view in Log activity by search key "LOG"
+     * @param context
+     * @param logUploadKey
+     * @return
+     */
+    public List<LogUpload> getListLogUpload(Context context, String logUploadKey) {
+        try {
+            DB db = App.getDB(context);
+            String[] keysResult = db.findKeys(logUploadKey);
+            List<LogUpload> logUploads = new ArrayList<LogUpload>();
+
+            for (String result : keysResult) {
+                LogUpload logUpload = db.getObject(result, LogUpload.class);
+                logUploads.add(logUpload);
+            }
+            db.close();
+            return logUploads;
+        } catch (SnappydbException e) {
+            Logger.w(e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Search list log upload for view in Log activity by search key "LOG" + containerId
+     * @param context
+     * @param searchKey
+     * @return
+     */
+    public List<LogUpload> searchLogUpload(Context context, String searchKey) {
+        try {
+            DB db = App.getDB(context);
+            String[] keysResult = db.findKeys(CJayConstant.PREFIX_LOGUPLOAD+searchKey);
+            List<LogUpload> logUploads = new ArrayList<LogUpload>();
+
+            for (String result : keysResult) {
+                LogUpload logUpload = db.getObject(result, LogUpload.class);
+                logUploads.add(logUpload);
+            }
+            db.close();
+            return logUploads;
+        } catch (SnappydbException e) {
+            Logger.w(e.getMessage());
+            return null;
+        }
+    }
 }
