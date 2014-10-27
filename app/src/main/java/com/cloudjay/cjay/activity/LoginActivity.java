@@ -150,9 +150,9 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 				showGettingDataTextView();
 				dataCenter.fetchOperators(this);
 				dataCenter.fetchIsoCodes(this);
-				User user = dataCenter.getCurrentUserAsync(this);
+//				User user = dataCenter.getCurrentUserAsync(this);
 
-				if (null != user) {
+//				if (null != user) {
 
 					// Navigate to Home Activity
 					Logger.Log("Navigate to Home Activity");
@@ -160,12 +160,12 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 					startActivity(intent);
 					finish();
 
-				} else {
+//				} else {
 
-					Logger.w("Cannot fetch user information");
-					showProgress(false);
-					showCrouton(getResources().getString(R.string.error_try_again));
-				}
+//					Logger.w("Cannot fetch user information");
+//					showProgress(false);
+//					showCrouton(getResources().getString(R.string.error_try_again));
+//				}
 			} else {
 
 				Logger.w("Login failed");

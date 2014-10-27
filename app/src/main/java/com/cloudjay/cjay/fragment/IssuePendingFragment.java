@@ -44,47 +44,47 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.fragment_issue_pending)
 public class IssuePendingFragment extends Fragment {
 
-	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
 
-	@FragmentArg(CONTAINER_ID_EXTRA)
-	public String containerID;
+    @FragmentArg(CONTAINER_ID_EXTRA)
+    public String containerID;
 
-	@ViewById(R.id.tv_container_code)
-	TextView tvContainerId;
+    @ViewById(R.id.tv_container_code)
+    TextView tvContainerId;
 
-	@ViewById(R.id.tv_current_status)
-	TextView tvCurrentStatus;
+    @ViewById(R.id.tv_current_status)
+    TextView tvCurrentStatus;
 
-	@ViewById(R.id.btn_camera)
-	LinearLayout btnCamera;
+    @ViewById(R.id.btn_camera)
+    LinearLayout btnCamera;
 
     @ViewById(R.id.btn_clean)
     Button btnClean;
 
-	@ViewById(R.id.lv_audit_items)
-	ListView lvAuditItems;
+    @ViewById(R.id.lv_audit_items)
+    ListView lvAuditItems;
 
-	@Bean
-	DataCenter dataCenter;
+    @Bean
+    DataCenter dataCenter;
 
-	String operatorCode;
+    String operatorCode;
     long currentStatus;
-	AuditItemAdapter auditItemAdapter;
+    AuditItemAdapter auditItemAdapter;
 
     Session mSession;
 
-	public IssuePendingFragment() {
-		// Required empty public constructor
-	}
+    public IssuePendingFragment() {
+        // Required empty public constructor
+    }
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		EventBus.getDefault().register(this);
-	}
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
 
-	@AfterViews
-	void setUp() {
+    @AfterViews
+    void setUp() {
 
         // Get session by containerId
         mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
@@ -110,7 +110,7 @@ public class IssuePendingFragment extends Fragment {
             // Set ContainerId to TextView
             tvContainerId.setText(containerID);
         }
-	}
+    }
 
     @UiThread
     void onEvent(ImageCapturedEvent event) {
@@ -123,53 +123,61 @@ public class IssuePendingFragment extends Fragment {
         refresh();
     }
 
-	@Click(R.id.btn_camera)
-	void buttonCameraClicked() {
-		// Open camera activity
-		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
-		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_AUDIT);
-		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.AUDIT.value);
-		startActivity(cameraActivityIntent);
-	}
+    @Click(R.id.btn_clean)
+    @Background
+    void buttonCleanClicked() {
+//TODO  add to job queue @Thai
+        dataCenter.setHandCleaningSession(getActivity(), containerID);
+        getActivity().finish();
+    }
 
-	@ItemClick(R.id.lv_audit_items)
-	void showApproveDiaglog() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setTitle(R.string.dialog_search_container_title);
-		builder.setMessage("Lỗi này đã chưa được. Sửa luôn?");
+    @Click(R.id.btn_camera)
+    void buttonCameraClicked() {
+        // Open camera activity
+        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
+        cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
+        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_AUDIT);
+        cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
+        cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.AUDIT.value);
+        startActivity(cameraActivityIntent);
+    }
 
-		builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {
-				//TODO show chon loi da giam dinh @Nam
-				dialogInterface.dismiss();
-			}
-		});
+    @ItemClick(R.id.lv_audit_items)
+    void showApproveDiaglog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.dialog_search_container_title);
+        builder.setMessage("Lỗi này đã chưa được. Sửa luôn?");
 
-		builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {
-				//TODO add to database
-				dialogInterface.dismiss();
-			}
-		});
+        builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //TODO show chon loi da giam dinh @Nam
+                dialogInterface.dismiss();
+            }
+        });
 
-		AlertDialog dialog = builder.create();
-		dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-			@Override
-			public void onShow(DialogInterface dialogInterface) {
+        builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //TODO add to database
+                dialogInterface.dismiss();
+            }
+        });
 
-				// Set background and text color for confirm button
-				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
-						.setTextColor(getActivity().getResources().getColor(android.R.color.holo_green_dark));
-				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
-						.setBackgroundResource(getActivity().getResources().getColor(android.R.color.darker_gray));
-			}
-		});
-		dialog.show();
-	}
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+
+                // Set background and text color for confirm button
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setTextColor(getActivity().getResources().getColor(android.R.color.holo_green_dark));
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setBackgroundResource(getActivity().getResources().getColor(android.R.color.darker_gray));
+            }
+        });
+        dialog.show();
+    }
 
     @Background
     void refresh() {
@@ -197,9 +205,9 @@ public class IssuePendingFragment extends Fragment {
         }
     }
 
-	@Override
-	public void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
-	}
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
 }

@@ -358,7 +358,7 @@ public class NetworkClient {
      * @return
      */
     public Session setHandCleaningSession(Context context, Session session){
-        Session handCleaningSession = provider.getRestAdapter(context).create(NetworkService.class).setHandCleaningSession(session.getContainerId());
+        Session handCleaningSession = provider.getRestAdapter(context).create(NetworkService.class).setHandCleaningSession(String.valueOf(session.getId()));
         return handCleaningSession;
     }
 }
