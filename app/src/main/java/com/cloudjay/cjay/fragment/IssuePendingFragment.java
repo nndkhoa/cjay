@@ -17,6 +17,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.AuditItemAdapter;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
+import com.cloudjay.cjay.event.IssueDeletedEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -34,6 +35,7 @@ import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -182,12 +184,17 @@ public class IssuePendingFragment extends Fragment {
     @Background
     void refresh() {
         if (mSession != null) {
-            List<AuditItem> list = mSession.getAuditItems();
+            List<AuditItem> list = new ArrayList<AuditItem>();
+            Logger.Log("AuditItems: " + mSession.getAuditItems().size());
+            for (AuditItem auditItem : mSession.getAuditItems()) {
+                list.add(auditItem);
+            }
             Logger.Log("Size: " + list.size());
             updatedData(list);
         }
     }
 
+    @UiThread
     void updatedData(List<AuditItem> auditItems) {
         auditItemAdapter.clear();
 
@@ -203,6 +210,16 @@ public class IssuePendingFragment extends Fragment {
         if (auditItemAdapter.getCount() > 0) {
             btnClean.setVisibility(View.GONE);
         }
+    }
+
+    @UiThread
+    void onEvent(IssueDeletedEvent event) {
+        Logger.Log("on IssueDeletedEvent");
+
+        // Re-query container session with given containerId
+        String containerId = event.getContainerId();
+        mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+        refresh();
     }
 
     @Override

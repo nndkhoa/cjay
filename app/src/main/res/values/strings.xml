@@ -91,10 +91,11 @@
     <string name="button_approve">Duyệt</string>
     <string name="button_approved">Đã duyệt</string>
     <string name="button_upload">Tải lên</string>
-    <string name="button_edit">Sửa</string>
+    <string name="button_edit">Chỉnh sửa</string>
     <string name="button_take_export_picture">Chụp hình xuất</string>
     <string name="button_report">Báo cáo</string>
     <string name="button_take_new_audit_image">Chụp lỗi mới</string>
+    <string name="button_repair">Chỉnh sửa</string>
 
     <!-- Label for container item -->
     <string name="label_container_id">Container ID: </string>
@@ -136,5 +137,10 @@
     <string name="image_type_description_repaired">Hình Sửa Chữa</string>
 	<string name="no_working_item">No available items</string>
     <string name="chose_issue_has_been_audited">Chọn lỗi đã giám định</string>
+
+    <!-- Issue status -->
+    <string name="issue_unapproved">Chưa duyệt</string>
+    <string name="issue_approved">Đã duyệt</string>
+    <string name="issue_can_not_repair">Cấm sửa</string>
 
 </resources>

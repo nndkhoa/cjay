@@ -10,10 +10,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.activity.MergeIssueActivity;
 import com.cloudjay.cjay.activity.MergeIssueActivity_;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
@@ -32,6 +32,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
     private int layoutResId;
     private String containerId;
     private AuditImage auditImage;
+    private AuditItem mAuditItem;
 
     public AuditItemAdapter(Context context, int resource, String containerId) {
         super(context, resource);
@@ -53,6 +54,10 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
         public Button btnUpload;
         public Button btnRepair;
         public Button btnReport;
+        public Button btnEdit;
+        public TextView tvIssueStatus;
+        public LinearLayout llIssueImageView;
+        public LinearLayout llIssueDetails;
     }
 
     @Override
@@ -72,29 +77,67 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
             holder.tvDimension = (TextView) view.findViewById(R.id.tv_dimension);
             holder.tvCodeRepair = (TextView) view.findViewById(R.id.tv_code_repair);
             holder.tvCount = (TextView) view.findViewById(R.id.tv_count);
+            holder.tvIssueStatus = (TextView) view.findViewById(R.id.tv_issue_status);
 
             holder.btnUpload = (Button) view.findViewById(R.id.btn_upload_pending);
             holder.btnReport = (Button) view.findViewById(R.id.btn_report_pending);
             holder.btnRepair = (Button) view.findViewById(R.id.btn_repair_pending);
+            holder.btnEdit = (Button) view.findViewById(R.id.btn_edit_pending);
+
+            holder.llIssueDetails = (LinearLayout) view.findViewById(R.id.ll_issue_details);
+            holder.llIssueImageView = (LinearLayout) view.findViewById(R.id.ll_issue_imageview);
 
             view.setTag(holder);
         } else {
             holder = (ViewHolder) view.getTag();
         }
 
-        // Lấy những công chưa giám định
-        if (null == auditItem.getComponentCode()) {
-            auditImage = auditItem.getAuditImages().get(0);
-            ImageLoader.getInstance().displayImage(auditImage.getUrl(),
-                    holder.ivAuditImage);
+        // Lỗi nào chưa giám dịnh thì hiện hinh`, lỗi nào đã giám định roi thì hiện chi tiết lỗi
+        if (auditItem.getAudited() == true) {
+            holder.llIssueImageView.setVisibility(View.GONE);
+            holder.llIssueDetails.setVisibility(View.VISIBLE);
+            holder.btnUpload.setVisibility(View.VISIBLE);
+            holder.btnReport.setVisibility(View.GONE);
+            holder.btnEdit.setVisibility(View.VISIBLE);
 
-            holder.btnReport.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    showApproveDiaglog();
+            //Set detail textviews
+            holder.tvCodeComponent.setText(auditItem.getComponentCode());
+            holder.tvCodeIssue.setText(auditItem.getDamageCode());
+            holder.tvCodeLocation.setText(auditItem.getLocationCode());
+            holder.tvDimension.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
+            holder.tvCodeRepair.setText(auditItem.getRepairCode());
+            holder.tvCount.setText(auditItem.getQuantity() + "");
+
+            if (auditItem.getAudited()) {
+                holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_unapproved));
+            } else {
+                holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_approved));
+            }
+
+        } else {
+            holder.llIssueImageView.setVisibility(View.VISIBLE);
+            holder.llIssueDetails.setVisibility(View.GONE);
+            holder.btnUpload.setVisibility(View.GONE);
+            holder.btnReport.setVisibility(View.VISIBLE);
+            holder.btnEdit.setVisibility(View.GONE);
+
+            if (auditItem.getAuditImages() != null) {
+                if (auditItem.getAuditImages().get(0) != null) {
+                    auditImage = auditItem.getAuditImages().get(0);
+                    ImageLoader.getInstance().displayImage(auditImage.getUrl(),
+                            holder.ivAuditImage);
                 }
-            });
+            }
         }
+
+        mAuditItem = auditItem;
+
+        holder.btnReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showApproveDiaglog();
+            }
+        });
 
         return view;
     }
@@ -123,8 +166,9 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 Intent intent = new Intent(mContext, MergeIssueActivity_.class);
-                intent.putExtra(MergeIssueActivity.CONTAINER_ID_EXTRA, containerId);
-                intent.putExtra(MergeIssueActivity.AUDIT_IMAGE_EXTRA, auditImage);
+                intent.putExtra(MergeIssueActivity_.CONTAINER_ID_EXTRA, containerId);
+                intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, auditImage);
+                intent.putExtra(MergeIssueActivity_.AUDIT_ITEM_REMOVE, mAuditItem);
                 mContext.startActivity(intent);
             }
         });

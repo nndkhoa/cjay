@@ -19,7 +19,8 @@
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:orientation="vertical"
-            android:layout_marginRight="6dp">
+            android:layout_marginRight="6dp"
+            android:id="@+id/ll_issue_imageview">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -42,7 +43,8 @@
             android:layout_weight="3"
             android:orientation="vertical"
             android:gravity="center_vertical"
-            android:visibility="gone">
+            android:visibility="gone"
+            android:id="@+id/ll_issue_details">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -170,6 +172,23 @@
                     android:textColor="@color/background_button_and_line" />
             </RelativeLayout>
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_issue_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/issue_unapproved"
+                    android:background="@color/background_button_and_line"
+                    android:textColor="@android:color/white"
+                    android:padding="3dp"/>
+
+            </RelativeLayout>
+
         </LinearLayout>
 
         <LinearLayout
@@ -201,11 +220,21 @@
                 android:textSize="14sp" />
 
             <Button
+                android:id="@+id/btn_edit_pending"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_edit_selector"
+                android:text="@string/button_edit"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <Button
                 android:id="@+id/btn_repair_pending"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/btn_green_selector"
-                android:text="@string/button_report"
+                android:text="@string/button_repair"
                 android:textColor="@android:color/white"
                 android:textSize="14sp"
                 android:visibility="gone" />
