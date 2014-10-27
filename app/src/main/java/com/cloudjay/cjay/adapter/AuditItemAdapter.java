@@ -107,23 +107,21 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
                 dialogInterface.dismiss();
             }
         });
-        builder.setNegativeButton("Vệ sinh", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //TODO change status audit item to water wase
-                dialogInterface.dismiss();
-            }
-        });
+//        builder.setNegativeButton("Vệ sinh", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialogInterface, int i) {
+//                //TODO change status audit item to water wase
+//                dialogInterface.dismiss();
+//            }
+//        });
 
         builder.setNegativeButton("Rồi", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-
                 Intent intent = new Intent(mContext, MergeIssueActivity_.class);
                 intent.putExtra(MergeIssueActivity.CONTAINER_ID_EXTRA, containerId);
                 intent.putExtra(MergeIssueActivity.AUDIT_IMAGE_EXTRA, auditImage);
                 mContext.startActivity(intent);
-                dialogInterface.dismiss();
             }
         });
 
