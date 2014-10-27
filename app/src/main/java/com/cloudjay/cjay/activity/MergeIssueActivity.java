@@ -31,12 +31,12 @@ public class MergeIssueActivity extends BaseActivity {
     DataCenter dataCenter;
 
     public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
-    public final static String AUDIT_IMAGE = "com.cloudjay.wizard.auditImage";
+    public final static String AUDIT_IMAGE_EXTRA = "com.cloudjay.wizard.auditImage";
 
     @Extra(CONTAINER_ID_EXTRA)
     public String containerID;
 
-    @Extra(AUDIT_IMAGE)
+    @Extra(AUDIT_IMAGE_EXTRA)
     AuditImage auditImage;
 
     @ViewById(R.id.lv_merge_issue)

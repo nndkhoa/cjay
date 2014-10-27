@@ -102,7 +102,7 @@ public class IssuePendingFragment extends Fragment {
             tvContainerId.setText(containerID);
 
             auditItemAdapter = new AuditItemAdapter(getActivity(),
-                    R.layout.item_issue_pending);
+                    R.layout.item_issue_pending, containerID);
             lvAuditItems.setAdapter(auditItemAdapter);
 
             refresh();
