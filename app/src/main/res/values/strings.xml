@@ -32,7 +32,7 @@
     <string name="title_activity_main_process">MainProcessActivity</string>
     <string name="title_activity_camera">CameraActivity</string>
     <string name="title_activity_display">DisplayActivity</string>
-    <string name="title_activity_view_iimages_previous_steps">Hình các bước trước</string>
+    <string name="title_activity_view_images_previous_steps">Hình các bước trước</string>
     <string name="dialog_create_container_id_invalid_iso">Tạo container sai ISO</string>
     <string name="btn_search">Tìm kiếm</string>
 
@@ -134,7 +134,7 @@
     <string name="image_type_description_export">Hình Xuất</string>
     <string name="image_type_description_report">Hình Giám Định</string>
     <string name="image_type_description_repaired">Hình Sửa Chữa</string>
-    <string name="title_activity_my">MyActivity</string>
 	<string name="no_working_item">No available items</string>
+    <string name="chose_issue_has_been_audited">Chọn lỗi đã giám định</string>
 
 </resources>

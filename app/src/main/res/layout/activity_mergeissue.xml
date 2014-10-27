@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:padding="9dp">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Chọn lỗi đã giám định"
+        android:text="@string/chose_issue_has_been_audited"
         android:textColor="@color/background_button_and_line"
-        android:textSize="32sp"/>
+        android:textSize="24dp"
+        android:textStyle="bold"/>
     <ListView
         android:id="@+id/lv_merge_issue"
         android:layout_width="match_parent"

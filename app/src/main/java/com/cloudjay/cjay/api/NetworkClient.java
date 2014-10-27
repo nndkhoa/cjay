@@ -186,7 +186,7 @@ public class NetworkClient {
             String nextString = next.toString();
             if (!next.isJsonNull()) {
                 //get page number of fist page
-                int page = Integer.parseInt(nextString.substring(nextString.lastIndexOf("=") - 1));
+                int page = Integer.parseInt(nextString.substring(nextString.lastIndexOf("=") + 1));
 
                 //get all session have page number greater then fist page
                 List<Session> sessionsByPage = this.getAllSessionsByPage(context, page);
