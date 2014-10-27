@@ -19,43 +19,43 @@ def preDexEnabled = "true".equals(System.getProperty("pre-dex", "true"))
 def AAVersion = '3.1'
 
 android {
-	compileSdkVersion 19
-	buildToolsVersion "19.1.0"
+    compileSdkVersion 19
+    buildToolsVersion "19.1.0"
 
-	dexOptions {
-		// Skip pre-dexing when running on Travis CI or when disabled via -Dpre-dex=false.
-		preDexLibraries = preDexEnabled && !isTravis
-	}
+    dexOptions {
+        // Skip pre-dexing when running on Travis CI or when disabled via -Dpre-dex=false.
+        preDexLibraries = preDexEnabled && !isTravis
+    }
 
-	defaultConfig {
-		applicationId "com.cloudjay.cjay"
-		minSdkVersion 16
-		targetSdkVersion 16
+    defaultConfig {
+        applicationId "com.cloudjay.cjay"
+        minSdkVersion 16
+        targetSdkVersion 16
 
 //		versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
 //		versionName "${versionMajor}.${versionMinor}.${versionPatch}"
 
-		versionCode 40
-		versionName "2.0-alpha"
+        versionCode 40
+        versionName "2.0-alpha"
 
 //		buildConfigField "String", "GIT_SHA", "\"${gitSha}\""
 //		buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
-	}
-	buildTypes {
-		release {
-			runProguard false
-			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-		}
+    }
+    buildTypes {
+        release {
+            runProguard false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
 
-		debug {
-			applicationIdSuffix '.dev'
-			versionNameSuffix '-dev'
-		}
-	}
+        debug {
+            applicationIdSuffix '.dev'
+            versionNameSuffix '-dev'
+        }
+    }
 
-	lintOptions {
-		abortOnError false
-	}
+    lintOptions {
+        abortOnError false
+    }
 
 }
 
@@ -64,62 +64,62 @@ android {
 //apply plugin: 'groovy'
 
 dependencies {
-	apt fileTree(dir: 'libs', include: ['*.jar'])
-	compile fileTree(dir: 'libs', include: ['*.jar'])
+    apt fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(dir: 'libs', include: ['*.jar'])
 
-	compile 'com.android.support:support-v4:20.0.0'
-	compile 'eu.inmite.android.lib:android-styled-dialogs:1.2.0'
+    compile 'com.android.support:support-v4:20.0.0'
+    compile 'eu.inmite.android.lib:android-styled-dialogs:1.2.0'
 
-	compile 'com.crashlytics.android:crashlytics:1.+'
-	compile 'com.path:android-priority-jobqueue:1.1.2'
+    compile 'com.crashlytics.android:crashlytics:1.+'
+    compile 'com.path:android-priority-jobqueue:1.1.2'
 
-	compile 'com.netflix.rxjava:rxjava-core:0.16.1'
-	compile 'com.netflix.rxjava:rxjava-android:0.16.1'
+    compile 'com.netflix.rxjava:rxjava-core:0.16.1'
+    compile 'com.netflix.rxjava:rxjava-android:0.16.1'
 
-	compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.3'
-	compile 'de.greenrobot:eventbus:2.2.1'
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                compile 'com.commonsware.cwac:camera:0.6.+'
-	compile 'info.hoang8f:android-segmented:1.0.2'
+    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.3'
+    compile 'de.greenrobot:eventbus:2.2.1'
+    compile 'com.commonsware.cwac:camera:0.6.+'
+    compile 'info.hoang8f:android-segmented:1.0.2'
 
-	apt "org.androidannotations:androidannotations:$AAVersion"
-	compile "org.androidannotations:androidannotations-api:$AAVersion"
+    apt "org.androidannotations:androidannotations:$AAVersion"
+    compile "org.androidannotations:androidannotations-api:$AAVersion"
 
-	compile 'com.google.code.gson:gson:2.3'
-	compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
-	compile 'com.squareup.okhttp:okhttp:2.0.0'
-	compile 'com.squareup.retrofit:retrofit:1.6.1'
+    compile 'com.google.code.gson:gson:2.3'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
+    compile 'com.squareup.okhttp:okhttp:2.0.0'
+    compile 'com.squareup.retrofit:retrofit:1.6.1'
 
-	compile files('libs/javax.annotation-3.2-b06.jar')
-	compile files('libs/crouton-1.8.1.jar')
-	compile files('libs/Pubnub-Android-3.5.6.jar')
-	compile files('libs/helpertoolsforandroid.jar')
+    compile files('libs/javax.annotation-3.2-b06.jar')
+    compile files('libs/crouton-1.8.1.jar')
+    compile files('libs/Pubnub-Android-3.5.6.jar')
+    compile files('libs/helpertoolsforandroid.jar')
 
-	compile 'com.snappydb:snappydb-lib:0.5.0'
-	compile 'com.esotericsoftware.kryo:kryo:2.24.0'
+    compile 'com.snappydb:snappydb-lib:0.5.0'
+    compile 'com.esotericsoftware.kryo:kryo:2.24.0'
 
 //	compile 'com.android.support:support-v4:19.1.0'
 //	compile 'com.android.support:appcompat-v7:19.1.0'
 }
 
 apt {
-	arguments {
+    arguments {
 
-		androidManifestFile variant.processResources.manifestFile
-		resourcePackageName 'com.cloudjay.cjay'
+        androidManifestFile variant.processResources.manifestFile
+        resourcePackageName 'com.cloudjay.cjay'
 
-		// If you're using Android NBS flavors you should use the following line instead of hard-coded packageName
-		// resourcePackageName android.defaultConfig.packageName
+        // If you're using Android NBS flavors you should use the following line instead of hard-coded packageName
+        // resourcePackageName android.defaultConfig.packageName
 
-		// You can set optional annotation processing options here, like these commented options:
-		logLevel 'INFO'
-		// logFile '/var/log/aa.log'
-		// logLevel TRACE
-		logConsoleAppender true
-	}
+        // You can set optional annotation processing options here, like these commented options:
+        logLevel 'INFO'
+        // logFile '/var/log/aa.log'
+        // logLevel TRACE
+        logConsoleAppender true
+    }
 }
 
 task zip2jar(type: Zip, dependsOn: "compileReleaseJava") {
-	from 'build/intermediates/classes/release'
-	destinationDir = file('build/libs')
-	extension = "jar"
+    from 'build/intermediates/classes/release'
+    destinationDir = file('build/libs')
+    extension = "jar"
 }
