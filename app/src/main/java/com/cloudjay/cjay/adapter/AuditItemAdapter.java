@@ -82,15 +82,19 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
             holder = (ViewHolder) view.getTag();
         }
 
-        auditImage = auditItem.getAuditImages().get(0);
-        ImageLoader.getInstance().displayImage(auditItem.getAuditImages().get(0).getUrl(),
-                holder.ivAuditImage);
-        holder.btnReport.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showApproveDiaglog();
-            }
-        });
+        // Lấy những công chưa giám định
+        if (null == auditItem.getComponentCode()) {
+            auditImage = auditItem.getAuditImages().get(0);
+            ImageLoader.getInstance().displayImage(auditImage.getUrl(),
+                    holder.ivAuditImage);
+
+            holder.btnReport.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    showApproveDiaglog();
+                }
+            });
+        }
 
         return view;
     }

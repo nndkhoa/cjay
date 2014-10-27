@@ -715,4 +715,33 @@ public class DataCenter {
             return null;
         }
     }
+
+    // Thệm lỗi đã giám định
+    public void addIssue(Context context, AuditItem auditItem, String containerId) {
+        try {
+            DB db = App.getDB(context);
+            Session session = db.getObject(containerId, Session.class);
+
+            // Get list session's audit items
+            List<AuditItem> auditItems = session.getAuditItems();
+            if (auditItems == null) {
+                auditItems = new ArrayList<AuditItem>();
+            }
+
+            // Add audit item to List session's audit items
+            auditItems.add(auditItem);
+
+            // Add audit item to Session
+            session.setAuditItems(auditItems);
+
+            db.put(containerId, session);
+
+            Logger.Log("insert issue repaired successfully");
+            db.close();
+
+        } catch (SnappydbException e) {
+            Logger.w(e.getMessage());
+        }
+
+    }
 }

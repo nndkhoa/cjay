@@ -8,6 +8,7 @@ import com.cloudjay.cjay.adapter.AuditMergeIssueAdapter;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 
 import org.androidannotations.annotations.AfterViews;
@@ -48,6 +49,7 @@ public class MergeIssueActivity extends BaseActivity {
 
     AuditMergeIssueAdapter mAdapter;
 
+    boolean isInserted = false;
 
     @AfterViews
     void setup() {
@@ -57,9 +59,36 @@ public class MergeIssueActivity extends BaseActivity {
             Utils.showCrouton(this, "Không tìm thấy container trong dữ liệu");
         }
         mAdapter = new AuditMergeIssueAdapter(this, R.layout.item_merge_issue);
-        //TODO get un-uploaded audit item
-        auditItems = currentSession.getAuditItems();
-        mAdapter.setData(auditItems);
+        lvIssues.setAdapter(mAdapter);
+        //TODO: get un-uploaded audit item
+
+        for (AuditItem auditItem : currentSession.getAuditItems()) {
+            if (auditItem.getComponentCode() != null) {
+                isInserted = true;
+                return;
+            }
+        }
+
+        Logger.Log("isInserted: " + isInserted);
+        if (isInserted == false) {
+            // Create static issue
+            AuditItem auditItem = new AuditItem();
+            auditItem.setComponentCode("LBG");
+            auditItem.setLocationCode("LTON");
+            auditItem.setDamageCode("BR");
+            auditItem.setRepairCode("RP");
+            auditItem.setHeight(40);
+            auditItem.setLength(20);
+            auditItem.setQuantity(2);
+
+            // Insert static issue into database
+            for (int i = 0; i < 5; i++) {
+                dataCenter.addIssue(getApplicationContext(), auditItem, containerID);
+            }
+
+            refresh();
+        }
+
     }
 
     @ItemClick(R.id.lv_merge_issue)
@@ -73,6 +102,7 @@ public class MergeIssueActivity extends BaseActivity {
     @Background
     void refresh() {
         List<AuditItem> list = dataCenter.getListAuditItems(this,containerID);
+        Logger.Log("Size: " + list.size());
         updatedData(list);
     }
 

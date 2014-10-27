@@ -36,7 +36,7 @@ public class AuditMergeIssueAdapter extends ArrayAdapter<AuditItem> {
         TextView tvDamageCode;
         TextView tvRepairCode;
         TextView tvSize;
-        TextView tvNumber;
+        TextView tvQuantity;
         ImageView ivAuditImage;
     }
 
@@ -52,7 +52,7 @@ public class AuditMergeIssueAdapter extends ArrayAdapter<AuditItem> {
             viewHolder.tvDamageCode = (TextView) convertView.findViewById(R.id.tv_code_damaged_merge);
             viewHolder.tvRepairCode = (TextView) convertView.findViewById(R.id.tv_code_repair_merge);
             viewHolder.tvSize = (TextView) convertView.findViewById(R.id.tv_dimension_merge);
-            viewHolder.tvNumber = (TextView) convertView.findViewById(R.id.tv_count_merge);
+            viewHolder.tvQuantity = (TextView) convertView.findViewById(R.id.tv_quantity_merge);
             viewHolder.ivAuditImage = (ImageView) convertView.findViewById(R.id.iv_audit_image_merge);
 
         } else {
@@ -65,7 +65,7 @@ public class AuditMergeIssueAdapter extends ArrayAdapter<AuditItem> {
         viewHolder.tvDamageCode.setText(auditItem.getDamageCode());
         viewHolder.tvRepairCode.setText(auditItem.getRepairCode());
         viewHolder.tvSize.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
-        //TODO add fiel number to audit item model @Nam
+        viewHolder.tvQuantity.setText(String.valueOf(auditItem.getQuantity()));
         ImageLoader.getInstance().displayImage(auditItem.getAuditImages().get(0).getUrl(), viewHolder.ivAuditImage);
         return convertView;
     }

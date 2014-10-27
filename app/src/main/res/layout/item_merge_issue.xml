@@ -154,7 +154,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tv_count_merge"
+                android:id="@+id/tv_quantity_merge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
