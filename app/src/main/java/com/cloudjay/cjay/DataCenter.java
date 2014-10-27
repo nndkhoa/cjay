@@ -451,8 +451,45 @@ public class DataCenter {
         db.close();
     }
 
-    public void addAuditImage(Context context, AuditImage image, String containerId) throws SnappydbException {
+    public void addAuditImage(Context context, AuditImage auditImage, String containerId) throws SnappydbException {
+        DB db = App.getDB(context);
 
+        Session session = db.getObject(containerId, Session.class);
+
+        // Generate random one UUID to save auditItem
+        String uuid = UUID.randomUUID().toString();
+
+        // Create new audit item to save
+        AuditItem auditItem = new AuditItem();
+        auditItem.setId(0);
+        auditItem.setAuditItemUUID(uuid);
+
+        // Get list session's audit items
+        List<AuditItem> auditItems = session.getAuditItems();
+        if (auditItems == null) {
+            auditItems = new ArrayList<AuditItem>();
+        }
+
+        List<AuditImage> auditImages = auditItem.getAuditImages();
+        if (auditImages == null) {
+            auditImages = new ArrayList<AuditImage>();
+        }
+        // Add audit image to list audit images
+        auditImages.add(auditImage);
+
+        // Set list audit images to audit item
+        auditItem.setAuditImages(auditImages);
+
+        // Add audit item to List session's audit items
+        auditItems.add(auditItem);
+
+        // Add audit item to Session
+        session.setAuditItems(auditItems);
+
+        db.put(containerId, session);
+
+        Logger.Log("insert audit image successfully");
+        db.close();
     }
 
     public void getGateImages(Context context, String containerId) throws SnappydbException {
@@ -560,48 +597,6 @@ public class DataCenter {
         // TODO: sao không thấy post Event như upload hình?
     }
     //endregion
-
-    public void addAuditImages(Context context, String containerId, AuditImage auditImage) throws SnappydbException {
-
-        DB db = App.getDB(context);
-
-        Session session = db.getObject(containerId, Session.class);
-
-        // Generate random one UUID to save auditItem
-        String uuid = UUID.randomUUID().toString();
-
-        // Create new audit item to save
-        AuditItem auditItem = new AuditItem();
-        auditItem.setId(0);
-        auditItem.setAuditItemUUID(uuid);
-
-        // Get list session's audit items
-        List<AuditItem> auditItems = session.getAuditItems();
-        if (auditItems == null) {
-            auditItems = new ArrayList<AuditItem>();
-        }
-
-        List<AuditImage> auditImages = auditItem.getAuditImages();
-        if (auditImages == null) {
-            auditImages = new ArrayList<AuditImage>();
-        }
-        // Add audit image to list audit images
-        auditImages.add(auditImage);
-
-        // Set list audit images to audit item
-        auditItem.setAuditImages(auditImages);
-
-        // Add audit item to List session's audit items
-        auditItems.add(auditItem);
-
-        // Add audit item to Session
-        session.setAuditItems(auditItems);
-
-        db.put(containerId, session);
-
-        Logger.Log("insert audit image successfully");
-        db.close();
-    }
 
     @Background(serial = CACHE)
     public void getAuditImages(Context context, String containerId) {
