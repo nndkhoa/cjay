@@ -8,6 +8,7 @@ import android.widget.ImageView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
+import com.cloudjay.cjay.model.GateImage;
 
 /**
  * Created by nambv on 17/10/2014.
@@ -18,7 +19,7 @@ public class CheckablePhotoGridItemLayout extends CheckableFrameLayout {
     private final CheckableImageView mButton;
 
     private GateImageAdapter mParentAdapter;
-    private String mCJayImageUrl;
+    private GateImage mCJayImage;
 
     public CheckablePhotoGridItemLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -49,9 +50,9 @@ public class CheckablePhotoGridItemLayout extends CheckableFrameLayout {
         super.toggle();
 
         if (isChecked()) {
-            mParentAdapter.addCheckedCJayImageUrl(mCJayImageUrl);
+            mParentAdapter.addCheckedCJayImageUrl(mCJayImage);
         } else {
-            mParentAdapter.removeCheckedCJayImageUrl(mCJayImageUrl);
+            mParentAdapter.removeCheckedCJayImageUrl(mCJayImage);
         }
     }
 
@@ -63,12 +64,12 @@ public class CheckablePhotoGridItemLayout extends CheckableFrameLayout {
         }
     }
 
-    public void setCJayImageUrl(String cJayImageUuid) {
-        mCJayImageUrl = cJayImageUuid;
+    public void setCJayImage(GateImage cJayImageUuid) {
+        mCJayImage = cJayImageUuid;
     }
 
-    public String getCJayImageUrl() {
-        return mCJayImageUrl;
+    public GateImage getCJayImage() {
+        return mCJayImage;
     }
 
     public void setParentAdapter(GateImageAdapter parentAdapter) {

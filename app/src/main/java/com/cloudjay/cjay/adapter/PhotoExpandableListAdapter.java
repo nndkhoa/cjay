@@ -6,8 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.FrameLayout;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
@@ -15,6 +18,7 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -111,27 +115,57 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
             convertView = infalInflater.inflate(R.layout.expandable_list_photogrid_item, null);
         }
 
-        GridView gridView = (GridView) convertView.findViewById(R.id.gv_images_item);
         if (groupPosition == 0) {
+            GridView gridViewImport = (GridView) convertView.findViewById(R.id.gv_images_item);
             GateImageAdapter gateImageAdapter = new GateImageAdapter(mContext, R.layout.item_image_gridview,
                     false);
             gateImageAdapter.setData(mImportImages);
-            gridView.setAdapter(gateImageAdapter);
+            ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) gridViewImport.getLayoutParams();
+            if (gateImageAdapter.getCount() > 0) {
+                int gridViewWidth = gridViewImport.getMeasuredWidth();
+                // set height for gridview, 2 is a column count
+                params.height = gridViewWidth / 2 * (int) (1.0 * (gateImageAdapter.getCount()) / 2 + 0.5);
+            } else {
+                // set height = 0 for gridview
+                params.height = 0;
+
+            }
+            gridViewImport.setLayoutParams(params);
+            gridViewImport.setAdapter(gateImageAdapter);
         }
 
         if (groupPosition == 1) {
+            GridView gridViewAudit = (GridView) convertView.findViewById(R.id.gv_images_item);
             AuditImageAdapter auditItemAdapter = new AuditImageAdapter(mContext, R.layout.item_image_gridview);
             auditItemAdapter.setData(mAuditImages);
-            gridView.setAdapter(auditItemAdapter);
+            // Do the same for gridViewAudit to set height
+            ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) gridViewAudit.getLayoutParams();
+            if (auditItemAdapter.getCount() > 0) {
+                int gridViewWidth = gridViewAudit.getMeasuredWidth();
+                params.height = gridViewWidth / 2 * (int) (1.0 * (auditItemAdapter.getCount()) / 2 + 0.5);
+            } else {
+                params.height = 0;
+            }
+            gridViewAudit.setLayoutParams(params);
+            gridViewAudit.setAdapter(auditItemAdapter);
         }
 
         if (groupPosition == 2) {
-            AuditImageAdapter auditItemAdapter = new AuditImageAdapter(mContext, R.layout.item_image_gridview);
-            auditItemAdapter.setData(mRepairedImages);
-            gridView.setAdapter(auditItemAdapter);
-        }
+            GridView gridViewRepaired = (GridView) convertView.findViewById(R.id.gv_images_item);
+            AuditImageAdapter repairedItemAdapter = new AuditImageAdapter(mContext, R.layout.item_image_gridview);
+            repairedItemAdapter.setData(mRepairedImages);
+            // Do the same for gridViewRepaired to set height
+            ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) gridViewRepaired.getLayoutParams();
+            if (repairedItemAdapter.getCount() > 0) {
+                int gridViewWidth = gridViewRepaired.getMeasuredWidth();
+                params.height = gridViewWidth / 2 * (int) (1.0 * (repairedItemAdapter.getCount()) / 2 + 0.5);
+            } else {
+                params.height = 0;
 
-        mGridViews.put(Integer.valueOf(groupPosition), gridView);
+            }
+            gridViewRepaired.setLayoutParams(params);
+            gridViewRepaired.setAdapter(repairedItemAdapter);
+        }
 
         return convertView;
     }

@@ -16,6 +16,7 @@ import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
+import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -65,8 +66,11 @@ public class AuditFragment extends Fragment {
     @Bean
     DataCenter dataCenter;
 
-    String operatorCode;
     GateImageAdapter adapter;
+    List<AuditImage> auditImages;
+    String operatorCode;
+    long currentStatus;
+    Session mSession;
 
 	public AuditFragment() {
 	}
@@ -106,20 +110,25 @@ public class AuditFragment extends Fragment {
         getActivity().getActionBar().setTitle(R.string.fragment_audit_title);
 
         // Get session by containerId
-        dataCenter.getSessionByContainerId(getActivity().getApplicationContext(), containerID);
+        mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 
-        // Set ContainerId to TextView
-        tvContainerId.setText(containerID);
-    }
+        if (mSession != null) {
+            // Get operator code
+            containerID = mSession.getContainerId();
+            operatorCode = mSession.getOperatorCode();
 
-    @UiThread
-    void onEvent(ContainerSearchedEvent event) {
-        List<Session> result = event.getSessions();
+            // Set currentStatus to TextView
+            currentStatus = mSession.getStatus();
+            tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
 
-        // Set currentStatus to TextView
-        tvCurrentStatus.setText((Status.values()[(int)result.get(0).getStatus()]).toString());
-        // Set operatorCode into variable
-        operatorCode = result.get(0).getOperatorCode();
+            // Set ContainerId to TextView
+            tvContainerId.setText(containerID);
+
+            refresh();
+        } else {
+            // Set ContainerId to TextView
+            tvContainerId.setText(containerID);
+        }
 
     }
 
@@ -128,9 +137,7 @@ public class AuditFragment extends Fragment {
 
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Logger.Log("resultCode: " + resultCode);
+    void refresh() {
+        adapter.clear();
     }
 }

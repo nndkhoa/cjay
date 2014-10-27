@@ -23,7 +23,7 @@ public class GateImageAdapter extends ArrayAdapter<GateImage> {
 
 
 	private boolean mCheckable = false;
-	private ArrayList<String> mArrayCheckedImages;
+	private ArrayList<GateImage> mArrayCheckedImages;
 
 	public GateImageAdapter(Context context, int resource, boolean isCheckable) {
 		super(context, resource);
@@ -33,7 +33,7 @@ public class GateImageAdapter extends ArrayAdapter<GateImage> {
 		this.mCheckable = isCheckable;
 		this.resource = resource;
 
-		mArrayCheckedImages = new ArrayList<String>();
+		mArrayCheckedImages = new ArrayList<GateImage>();
 	}
 
 	private class ViewHolder {
@@ -62,27 +62,27 @@ public class GateImageAdapter extends ArrayAdapter<GateImage> {
 		layout.setShowCheckbox(mCheckable);
 		if (mCheckable) {
 			layout.setParentAdapter(this);
-			layout.setCJayImageUrl(gateImage.getUrl());
-			layout.setChecked(mArrayCheckedImages.contains(gateImage.getUrl()));
+			layout.setCJayImage(gateImage);
+			layout.setChecked(mArrayCheckedImages.contains(gateImage));
 		}
 
 		ImageLoader.getInstance().displayImage(gateImage.getUrl(), holder.ivGateImage);
 		return convertView;
 	}
 
-	public void addCheckedCJayImageUrl(String url) {
-		mArrayCheckedImages.add(url);
+	public void addCheckedCJayImageUrl(GateImage gateImage) {
+		mArrayCheckedImages.add(gateImage);
 	}
 
-	public void removeCheckedCJayImageUrl(String url) {
-		mArrayCheckedImages.remove(url);
+	public void removeCheckedCJayImageUrl(GateImage gateImage) {
+		mArrayCheckedImages.remove(gateImage);
 	}
 
-	public void setCheckedCJayImageUrls(ArrayList<String> checkedCJayImageUrls) {
+	public void setCheckedCJayImageUrls(ArrayList<GateImage> checkedCJayImageUrls) {
 		mArrayCheckedImages = checkedCJayImageUrls;
 	}
 
-	public List<String> getCheckedCJayImageUrls() {
+	public List<GateImage> getCheckedCJayImageUrls() {
 		return mArrayCheckedImages;
 	}
 

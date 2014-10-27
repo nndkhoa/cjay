@@ -14,7 +14,6 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.AuditItemAdapter;
-import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
@@ -24,6 +23,7 @@ import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
@@ -32,7 +32,6 @@ import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -57,15 +56,17 @@ public class IssuePendingFragment extends Fragment {
 	@ViewById(R.id.btn_camera)
 	LinearLayout btnCamera;
 
-	@ViewById(R.id.lv_issue_images)
-	ListView lvIssueImages;
+	@ViewById(R.id.lv_audit_items)
+	ListView lvAuditItems;
 
 	@Bean
 	DataCenter dataCenter;
 
 	String operatorCode;
+    long currentStatus;
 	AuditItemAdapter auditItemAdapter;
-	List<AuditItem> auditItems;
+
+    Session mSession;
 
 	public IssuePendingFragment() {
 		// Required empty public constructor
@@ -79,37 +80,31 @@ public class IssuePendingFragment extends Fragment {
 
 	@AfterViews
 	void setUp() {
-		Logger.Log("setUp");
-		// Get session by containerId
-		dataCenter.getSessionByContainerId(getActivity().getApplicationContext(), containerID);
 
-		// Set text ContainerId TextView
-		tvContainerId.setText(containerID);
-	}
+        // Get session by containerId
+        mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 
-	@UiThread
-	void onEvent(ContainerSearchedEvent event) {
-		List<Session> result = event.getSessions();
+        if (mSession != null) {
+            // Get operator code
+            containerID = mSession.getContainerId();
+            operatorCode = mSession.getOperatorCode();
 
-		// Set currentStatus to TextView
-		tvCurrentStatus.setText((Status.values()[(int) result.get(0).getStatus()]).toString());
+            // Set currentStatus to TextView
+            currentStatus = mSession.getStatus();
+            tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
 
-		// Set operatorCode into variable
-		operatorCode = result.get(0).getOperatorCode();
+            // Set ContainerId to TextView
+            tvContainerId.setText(containerID);
 
-        auditItems = result.get(0).getAuditItems();
-
-        Logger.Log("auditItems: " + auditItems.size());
-        if (auditItems == null) {
-            auditItems = new ArrayList<AuditItem>();
-        }
-
-        if (auditItemAdapter == null) {
             auditItemAdapter = new AuditItemAdapter(getActivity(),
-                    R.layout.item_issue_pending, auditItems);
-            lvIssueImages.setAdapter(auditItemAdapter);
-        }
+                    R.layout.item_issue_pending);
+            lvAuditItems.setAdapter(auditItemAdapter);
 
+            refresh();
+        } else {
+            // Set ContainerId to TextView
+            tvContainerId.setText(containerID);
+        }
 	}
 
     @UiThread
@@ -117,12 +112,10 @@ public class IssuePendingFragment extends Fragment {
 
         Logger.Log("on ImageCapturedEvent");
 
-        // Get list audit items
-        auditItems = dataCenter.getListAuditItems(getActivity().getApplicationContext(), containerID);
-
-        // Notify data set change
-        auditItemAdapter.swapData(auditItems);
-
+        // Re-query container session with given containerId
+        String containerId = event.getContainerId();
+        mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+        refresh();
     }
 
 	@Click(R.id.btn_camera)
@@ -136,7 +129,7 @@ public class IssuePendingFragment extends Fragment {
 		startActivity(cameraActivityIntent);
 	}
 
-	@ItemClick(R.id.lv_issue_images)
+	@ItemClick(R.id.lv_audit_items)
 	void showApproveDiaglog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(R.string.dialog_search_container_title);
@@ -172,6 +165,27 @@ public class IssuePendingFragment extends Fragment {
 		});
 		dialog.show();
 	}
+
+    @Background
+    void refresh() {
+        if (mSession != null) {
+            List<AuditItem> list = mSession.getAuditItems();
+            Logger.Log("Size: " + list.size());
+            updatedData(list);
+        }
+    }
+
+    void updatedData(List<AuditItem> auditItems) {
+        auditItemAdapter.clear();
+
+        if (auditItems != null) {
+            for (AuditItem auditItem : auditItems) {
+                auditItemAdapter.add(auditItem);
+            }
+        }
+
+        auditItemAdapter.notifyDataSetChanged();
+    }
 
 	@Override
 	public void onDestroy() {
