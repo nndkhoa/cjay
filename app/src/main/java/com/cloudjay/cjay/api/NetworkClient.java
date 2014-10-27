@@ -350,4 +350,15 @@ public class NetworkClient {
         AuditItem auditItemAddedImage = provider.getRestAdapter(context).create(NetworkService.class).addAuditImages(String.valueOf(auditItem.getId()), auditItem.getAuditImagesToUpLoad());
         return auditItemAddedImage;
     }
+
+    /**
+     * Set session is hand cleaning
+     * @param context
+     * @param session
+     * @return
+     */
+    public Session setHandCleaningSession(Context context, Session session){
+        Session handCleaningSession = provider.getRestAdapter(context).create(NetworkService.class).setHandCleaningSession(session.getContainerId());
+        return handCleaningSession;
+    }
 }
