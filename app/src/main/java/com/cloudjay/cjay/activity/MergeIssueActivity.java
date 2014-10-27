@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Created by thai on 21/10/2014.
  */
-@EActivity(R.layout.activity_mergeissue)
+@EActivity(R.layout.activity_merge_issue)
 public class MergeIssueActivity extends BaseActivity {
 
     @Bean

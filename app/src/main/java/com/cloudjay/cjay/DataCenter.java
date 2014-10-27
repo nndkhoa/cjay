@@ -73,6 +73,7 @@ public class DataCenter {
     }
 
     public User getCurrentUserAsync(Context context) throws SnappydbException, NullCredentialException {
+
         User user = networkClient.getCurrentUser(context);
 
         if (null == user) {

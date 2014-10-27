@@ -48,9 +48,8 @@
 				<action android:name="android.intent.action.MAIN"/>
 				<category android:name="android.intent.category.LAUNCHER"/>
 			</intent-filter>
-			<!--<category android:name="android.intent.category.DEFAULT"/>-->
-
 		</activity>
+
 		<activity
 			android:name=".activity.LoginActivity_"
 			android:label="@string/title_activity_login"
@@ -59,10 +58,6 @@
 		<activity
 			android:name=".activity.ReuseActivity_"
 			android:label="@string/title_activity_reuse"
-			android:screenOrientation="portrait"></activity>
-		<activity
-			android:name=".activity.LinkIssueActivity"
-			android:label="@string/title_activity_link_issue"
 			android:screenOrientation="portrait"></activity>
 		<activity
 			android:name=".activity.ReportIssueActivity"
@@ -77,14 +72,12 @@
 			android:label="@string/title_activity_camera"
 			android:screenOrientation="portrait"
 			android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen"></activity>
+
         <activity
             android:name=".activity.MergeIssueActivity_"
             android:label="@string/fragment_repair_title"
             android:screenOrientation="portrait"></activity>
-		<!--<activity
-			android:name=".activity.MyActivity"
-			android:label="@string/title_activity_my" >
-		</activity>-->
+
 		<service
 			android:name="com.cloudjay.cjay.task.service.QueueIntentService_"/>
 		<receiver android:name="com.cloudjay.cjay.util.AutoStartReceiver_">
