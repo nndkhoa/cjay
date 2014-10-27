@@ -463,6 +463,16 @@ public class DataCenter {
         AuditItem auditItem = new AuditItem();
         auditItem.setId(0);
         auditItem.setAuditItemUUID(uuid);
+        // this audit item has not been audited yet
+        auditItem.setAudited(false);
+        // this audit item has not been approved yet
+        auditItem.setApproved(false);
+        // this audit item has not been allowed to repair yet
+        auditItem.setIsAllowed(false);
+        // this audit item has not been repaired  yet
+        auditItem.setRepaired(false);
+        // this audit item has not been uploaded yet
+        auditItem.setUploaded(false);
 
         // Get list session's audit items
         List<AuditItem> auditItems = session.getAuditItems();

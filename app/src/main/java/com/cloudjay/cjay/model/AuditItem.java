@@ -68,6 +68,22 @@ public class AuditItem implements Serializable {
     @Expose
     private String auditItemUUID;
 
+    @SerializedName("is_audited")
+    @Expose
+    private boolean isAudited;
+
+    @SerializedName("is_repaired")
+    @Expose
+    private boolean isRepaired;
+
+    @SerializedName("is_approved")
+    @Expose
+    private boolean isApproved;
+
+    @SerializedName("is_uploaded")
+    @Expose
+    private boolean isUploaded;
+
     public long getId() {
         return id;
     }
@@ -348,4 +364,35 @@ public class AuditItem implements Serializable {
         return this.auditItemUUID;
     }
 
+    public void setApproved(boolean isApproved) {
+        this.isApproved = isApproved;
+    }
+
+    public boolean getApproved() {
+        return this.isApproved;
+    }
+
+    public void setRepaired(boolean isRepaired) {
+        this.isRepaired = isRepaired;
+    }
+
+    public boolean getRepaired() {
+        return this.isRepaired;
+    }
+
+    public void setAudited(boolean isAudited) {
+        this.isAudited = isAudited;
+    }
+
+    public boolean getAudited() {
+        return this.isAudited;
+    }
+
+    public void setUploaded(boolean isUploaded) {
+        this.isUploaded = isUploaded;
+    }
+
+    public boolean getUploaded() {
+        return this.isUploaded;
+    }
 }
