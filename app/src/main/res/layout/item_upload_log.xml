@@ -6,11 +6,16 @@
     <TextView
         android:id="@+id/tv_containerid_log"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="THAI0123456"
+        android:textColor="@color/background_button_and_line"
+        android:textSize="15sp"
+        android:textStyle="bold"/>
     <TextView
         android:id="@+id/tv_message_log"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="Uploading"/>
     <TextView
         android:id="@+id/tv_time_log"
         android:layout_width="wrap_content"

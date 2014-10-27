@@ -163,7 +163,6 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 					finish();
 
 //				} else {
-//
 //					Logger.w("Cannot fetch user information");
 //					showProgress(false);
 //					showCrouton(getResources().getString(R.string.error_try_again));

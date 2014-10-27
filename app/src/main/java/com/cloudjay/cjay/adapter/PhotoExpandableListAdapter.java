@@ -156,7 +156,7 @@ public class PhotoExpandableListAdapter extends BaseExpandableListAdapter {
             repairedItemAdapter.setData(mRepairedImages);
             // Do the same for gridViewRepaired to set height
             ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) gridViewRepaired.getLayoutParams();
-            if (repairedItemAdapter.getCount() > 0) {
+              if (repairedItemAdapter.getCount() > 0) {
                 int gridViewWidth = gridViewRepaired.getMeasuredWidth();
                 params.height = gridViewWidth / 2 * (int) (1.0 * (repairedItemAdapter.getCount()) / 2 + 0.5);
             } else {
