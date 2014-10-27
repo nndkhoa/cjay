@@ -54,7 +54,7 @@ public interface NetworkService {
     public JsonObject getContainerSessionsByModifiedTime(@Query("modified_after") String lastModifiedDate);
 
     @GET(ApiEndpoint.CONTAINER_SESSION_ITEM_API)
-    public Session getContainerSessionById(@Path("id") int containerId);
+    public Session getContainerSessionById(@Path("id") long containerId);
 
     @GET(ApiEndpoint.CONTAINER_SESSIONS_API)
     public JsonObject searchContainer(@Query("search") String keyword);
@@ -63,22 +63,22 @@ public interface NetworkService {
     public Session postContainer( @Body JsonObject jsonSessionString);
 
     @PUT(ApiEndpoint.CONTAINER_SESSION_CHECK_OUT_API)
-    public Session checkOutContainerSession(@Path("id") String containerId, @Body JsonArray jsonGateImage);
+    public Session checkOutContainerSession(@Path("id") long containerPk, @Body JsonArray jsonGateImage);
 
     @PUT(ApiEndpoint.CONTAINER_SESSION_COMPLETE_AUDIT_API)
-    public Session completeAudit(@Path("id") String containerId);
+    public Session completeAudit(@Path("id") long containerPk);
 
     @PUT(ApiEndpoint.CONTAINER_SESSION_COMPLETE_REPAIR_API)
-    public Session completeRepair(@Path("id") String containerId, @Body JsonArray audit_items);
+    public Session completeRepair(@Path("id") long containerPk, @Body JsonArray audit_items);
 
     @PUT(ApiEndpoint.CONTAINER_SESSION_POST_AUDIT_ITEM_API)
-    public Session postAudiItem(@Path("id") String containerId,@Body JsonObject audit_item);
+    public Session postAudiItem(@Path("id") long containerPk,@Body JsonObject audit_item);
 
     @PUT(ApiEndpoint.CONTAINER_SESSION_ADD_AUDIT_IMAGES_API)
     public AuditItem addAuditImages (@Path("id") String auditId, @Body JsonArray auditImages);
 
     @PUT(ApiEndpoint.CONTAINER_SESSION_HAND_CLEANING)
-    public Session setHandCleaningSession (@Path("id") String containerId);
+    public Session setHandCleaningSession (@Path("id") long containerPk);
 
     // Check source v1, uploadType=media
     @POST(ApiEndpoint.CJAY_TMP_STORAGE_IMAGE)
