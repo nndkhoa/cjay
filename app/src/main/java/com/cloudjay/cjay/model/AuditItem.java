@@ -376,6 +376,7 @@ public class AuditItem implements Serializable {
         this.isRepaired = isRepaired;
     }
 
+    
     public boolean getRepaired() {
         return this.isRepaired;
     }
