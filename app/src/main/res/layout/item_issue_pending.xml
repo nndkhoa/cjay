@@ -31,7 +31,7 @@
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
                     android:id="@+id/iv_audit_image"
-                    android:src="@drawable/ic_launcher"/>
+                    android:src="@drawable/ic_launcher" />
 
             </RelativeLayout>
 
@@ -200,6 +200,7 @@
             android:layout_marginLeft="6dp">
 
             <Button
+                android:focusable="false"
                 android:id="@+id/btn_upload_pending"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -208,9 +209,10 @@
                 android:textColor="@android:color/white"
                 android:layout_marginBottom="6dp"
                 android:textSize="14sp"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
             <Button
+                android:focusable="false"
                 android:id="@+id/btn_report_pending"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

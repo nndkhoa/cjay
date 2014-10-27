@@ -3,6 +3,7 @@ package com.cloudjay.cjay.fragment;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -68,7 +69,7 @@ public class BeforeRepairFragment extends Fragment {
     ListView lvImage;
 
     @ViewById(R.id.btn_camera_repaired)
-    Button btnCamera;
+    ImageButton btnCamera;
 
     RepairedImageAdapter imageAdapter;
     String operatorCode;

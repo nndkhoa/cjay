@@ -94,8 +94,8 @@
     <string name="button_edit">Chỉnh sửa</string>
     <string name="button_take_export_picture">Chụp hình xuất</string>
     <string name="button_report">Báo cáo</string>
+    <string name="button_repair">Sửa chữa</string>
     <string name="button_take_new_audit_image">Chụp lỗi mới</string>
-    <string name="button_repair">Chỉnh sửa</string>
 
     <!-- Label for container item -->
     <string name="label_container_id">Container ID: </string>

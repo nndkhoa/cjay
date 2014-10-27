@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -70,7 +71,7 @@ public class AfterRepairFragment extends Fragment {
     ListView lvImage;
 
     @ViewById(R.id.btn_camera_repaired)
-    Button btnCamera;
+    ImageButton btnCamera;
 
     RepairedImageAdapter imageAdapter;
     String operatorCode;

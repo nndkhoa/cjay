@@ -15,6 +15,8 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
+import com.cloudjay.cjay.activity.DetailIssueActivity;
+import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.adapter.AuditItemAdapter;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.IssueDeletedEvent;
@@ -145,40 +147,12 @@ public class IssuePendingFragment extends Fragment {
     }
 
     @ItemClick(R.id.lv_audit_items)
-    void showApproveDiaglog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.dialog_search_container_title);
-        builder.setMessage("Lỗi này đã chưa được. Sửa luôn?");
-
-        builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //TODO show chon loi da giam dinh @Nam
-                dialogInterface.dismiss();
-            }
-        });
-
-        builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //TODO add to database
-                dialogInterface.dismiss();
-            }
-        });
-
-        AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialogInterface) {
-
-                // Set background and text color for confirm button
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
-                        .setTextColor(getActivity().getResources().getColor(android.R.color.holo_green_dark));
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
-                        .setBackgroundResource(getActivity().getResources().getColor(android.R.color.darker_gray));
-            }
-        });
-        dialog.show();
+    void switchToDetailIssueActivity(int position) {
+        AuditItem auditItem = auditItemAdapter.getItem(position);
+        Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
+        detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
+        detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem);
+        startActivity(detailIssueActivity);
     }
 
     @Background
