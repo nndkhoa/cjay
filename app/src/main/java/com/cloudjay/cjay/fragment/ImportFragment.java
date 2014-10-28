@@ -106,7 +106,6 @@ public class ImportFragment extends Fragment {
 	String operatorCode;
 
 	GateImageAdapter mAdapter = null;
-	List<GateImage> gateImages = null;
 
 	long preStatus = 0;
 	Session mSession;
@@ -120,13 +119,14 @@ public class ImportFragment extends Fragment {
 
 		// Set ActionBar Title
 		getActivity().getActionBar().setTitle(R.string.fragment_import_title);
+
 		etOperator.setFocusable(false);
 		etOperator.setCursorVisible(false);
 		etOperator.clearFocus();
 
         mAdapter = new GateImageAdapter(getActivity(), R.layout.item_image_gridview, false);
-
         lvImages.setAdapter(mAdapter);
+
 		// Trying to restore container status
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 		if (null == mSession) {
@@ -196,7 +196,7 @@ public class ImportFragment extends Fragment {
 
 		Logger.Log("onEvent Image Captured");
 
-//		// Re-query container session with given containerId
+		// Re-query container session with given containerId
 		String containerId = event.getContainerId();
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
 		refresh();
@@ -204,22 +204,23 @@ public class ImportFragment extends Fragment {
 
 	@Background
 	void refresh() {
+
 		if (mSession != null) {
 			List<GateImage> list = mSession.getImportImages();
-			Logger.Log("Size: " + list.size());
 			updatedData(list);
 		}
 	}
 
 	@UiThread
 	public void updatedData(List<GateImage> gateImageList) {
-        Logger.Log("Size: " + gateImageList.size());
+
 		mAdapter.clear();
 		if (gateImageList != null) {
 			for (GateImage object : gateImageList) {
 				mAdapter.add(object);
 			}
 		}
+
 		mAdapter.notifyDataSetChanged();
 	}
 

@@ -23,6 +23,7 @@ import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.Field;
