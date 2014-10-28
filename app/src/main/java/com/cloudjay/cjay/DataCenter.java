@@ -22,6 +22,7 @@ import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
 import com.snappydb.DB;
@@ -818,11 +819,35 @@ public class DataCenter {
 		EventBus.getDefault().post(new IssueDeletedEvent(containerId));
 	}
 
-	public void addLogUpload(Context context, LogItem logUpload) {
-		try {
+	/**
+	 * Add log message to database. This method will be called from:
+	 * - Add container to queue
+	 * - Add image to queue
+	 * - Add issue/audit item to queue
+	 * - Begin to upload container
+	 * - Upload container successfully
+	 * - Upload container failed
+	 * - Start QueueService Task
+	 *
+	 * @param context
+	 * @param containerId
+	 * @param message
+	 */
+	public void addLog(Context context, String containerId, String message) {
+		String currentTime = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 
+		LogItem log = new LogItem();
+		log.setContainerId(containerId);
+		log.setMessage(message);
+		log.setTime(currentTime);
+
+		addLog(context, log);
+	}
+
+	public void addLog(Context context, LogItem log) {
+		try {
 			DB db = App.getDB(context);
-			db.put(CJayConstant.PREFIX_LOG + logUpload.getContainerId() + logUpload.getMessage(), logUpload);
+			db.put(CJayConstant.PREFIX_LOG + log.getContainerId() + log.getTime(), log);
 			// db.close();
 
 		} catch (SnappydbException e) {
