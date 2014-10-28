@@ -33,6 +33,12 @@
 				android:showAsAction="never"
 				android:icon="@android:drawable/ic_lock_power_off"
 				android:title="@string/menu_logout_title"/>
+            <item
+                android:id="@+id/menu_logupload"
+                android:menuCategory="secondary"
+                android:showAsAction="never"
+                android:icon="@android:drawable/ic_menu_recent_history"
+                android:title="@string/menu_logupload_title"/>
 		</menu>
 	</item>
 </menu>

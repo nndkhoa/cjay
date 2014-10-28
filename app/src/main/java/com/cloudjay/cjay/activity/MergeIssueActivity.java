@@ -20,7 +20,9 @@ import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by thai on 21/10/2014.
@@ -33,12 +35,16 @@ public class MergeIssueActivity extends BaseActivity {
 
     public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
     public final static String AUDIT_IMAGE_EXTRA = "com.cloudjay.wizard.auditImage";
+    public final static String AUDIT_ITEM_REMOVE = "com.cloudjay.wizard.auditItemRemove";
 
     @Extra(CONTAINER_ID_EXTRA)
     public String containerID;
 
     @Extra(AUDIT_IMAGE_EXTRA)
     AuditImage auditImage;
+
+    @Extra(AUDIT_ITEM_REMOVE)
+    AuditItem auditItemRemove;
 
     @ViewById(R.id.lv_merge_issue)
     ListView lvIssues;
@@ -53,6 +59,7 @@ public class MergeIssueActivity extends BaseActivity {
 
     @AfterViews
     void setup() {
+
         //get container operater code form containerId
         currentSession = dataCenter.getSession(this.getApplicationContext(), containerID);
         if (null == currentSession) {
@@ -63,16 +70,23 @@ public class MergeIssueActivity extends BaseActivity {
         //TODO: get un-uploaded audit item
 
         for (AuditItem auditItem : currentSession.getAuditItems()) {
-            if (auditItem.getComponentCode() != null) {
+            if (auditItem.getAudited() == true) {
                 isInserted = true;
-                return;
+                break;
             }
         }
 
         Logger.Log("isInserted: " + isInserted);
         if (isInserted == false) {
+
+            // Random new UUID to unique each audit item
+            String uuid = UUID.randomUUID().toString();
+
             // Create static issue
             AuditItem auditItem = new AuditItem();
+            auditItem.setId(0);
+            auditItem.setAuditItemUUID(uuid);
+            auditItem.setAudited(true);
             auditItem.setComponentCode("LBG");
             auditItem.setLocationCode("LTON");
             auditItem.setDamageCode("BR");
@@ -86,22 +100,33 @@ public class MergeIssueActivity extends BaseActivity {
                 dataCenter.addIssue(getApplicationContext(), auditItem, containerID);
             }
 
-            refresh();
         }
+
+        refresh();
 
     }
 
     @ItemClick(R.id.lv_merge_issue)
     void lvIssuesItemClicked(int position) {
-        auditItems.get(position).getAuditImages().add(auditImage);
-        currentSession.setAuditItems(auditItems);
-        dataCenter.addSession(currentSession);
+
+        AuditItem auditItem = mAdapter.getItem(position);
+        String uuid = auditItem.getAuditItemUUID();
+        Logger.Log("uuid: " + uuid);
+        dataCenter.addAuditImageToAuditedIssue(getApplicationContext(), containerID,
+                uuid, auditItemRemove, auditImage);
         refresh();
+
+        this.finish();
     }
 
     @Background
     void refresh() {
-        List<AuditItem> list = dataCenter.getListAuditItems(this,containerID);
+        List<AuditItem> list = new ArrayList<AuditItem>();
+        for (AuditItem auditItem : currentSession.getAuditItems()) {
+            if (auditItem.getAudited() == true) {
+                list.add(auditItem);
+            }
+        }
         Logger.Log("Size: " + list.size());
         updatedData(list);
     }
@@ -111,7 +136,8 @@ public class MergeIssueActivity extends BaseActivity {
         mAdapter.clear();
         if (auditList != null) {
             for (AuditItem object : auditList) {
-                mAdapter.insert(object, mAdapter.getCount());
+                //mAdapter.insert(object, mAdapter.getCount());
+                mAdapter.add(object);
             }
         }
         mAdapter.notifyDataSetChanged();

@@ -2,8 +2,10 @@ package com.cloudjay.cjay;
 
 import android.content.Context;
 
+import com.cloudjay.cjay.adapter.AuditItemAdapter;
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.AuditImagesGotEvent;
+import com.cloudjay.cjay.event.IssueDeletedEvent;
 import com.cloudjay.cjay.event.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
@@ -730,6 +732,9 @@ public class DataCenter {
     // Thệm lỗi đã giám định
     public void addIssue(Context context, AuditItem auditItem, String containerId) {
         try {
+
+            Logger.Log("auditItem.getAudited() = " + auditItem.getAudited());
+
             DB db = App.getDB(context);
             Session session = db.getObject(containerId, Session.class);
 
@@ -754,5 +759,62 @@ public class DataCenter {
             Logger.w(e.getMessage());
         }
 
+    }
+
+    // Merge hình vào lỗi đã giám định
+    public void addAuditImageToAuditedIssue(Context context,
+                                            String containerId,
+                                            String auditItemUUID,
+                                            AuditItem auditItemRemove,
+                                            AuditImage auditImage) {
+
+        try {
+            DB db = App.getDB(context);
+            Session session = db.getObject(containerId, Session.class);
+            for (AuditItem auditItem : session.getAuditItems()) {
+
+                if (auditItem.getAuditItemUUID().equals(auditItemUUID)) {
+
+                    List<AuditImage> auditImages = auditItem.getAuditImages();
+
+                    if (null == auditImages) {
+                        auditImages = new ArrayList<AuditImage>();
+                    }
+
+                    auditImages.add(auditImage);
+                    auditItem.setAuditImages(auditImages);
+
+                    break;
+                }
+            }
+
+            for (AuditItem auditItem : session.getAuditItems()) {
+                if (auditItem.getAuditItemUUID().equals(auditItemRemove.getAuditItemUUID())) {
+                    session.getAuditItems().remove(auditItem);
+                    break;
+                }
+            }
+
+            db.put(containerId, session);
+            Logger.Log("add AuditImage To AuditedIssue successfully");
+            db.close();
+
+        } catch (SnappydbException e) {
+            Logger.w(e.getMessage());
+        }
+
+        EventBus.getDefault().post(new IssueDeletedEvent(containerId));
+    }
+
+    public void addLogUpload(Context context, LogUpload logUpload) {
+        try {
+
+            DB db = App.getDB(context);
+            db.put(CJayConstant.PREFIX_LOGUPLOAD+logUpload.getContainerId()+logUpload.getMessage(),logUpload);
+            db.close();
+
+        } catch (SnappydbException e) {
+            Logger.w(e.getMessage());
+        }
     }
 }

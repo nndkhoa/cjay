@@ -2,15 +2,15 @@ package com.cloudjay.cjay.fragment;
 
 import android.content.Intent;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
-import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity;
-import com.cloudjay.cjay.adapter.RepairedImageAdapter;
+import com.cloudjay.cjay.adapter.DetailIssuedImageAdapter;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
@@ -70,9 +70,13 @@ public class AfterRepairFragment extends Fragment {
     ListView lvImage;
 
     @ViewById(R.id.btn_camera_repaired)
-    Button btnCamera;
+    LinearLayout btnCamera;
 
-    RepairedImageAdapter imageAdapter;
+
+    @ViewById(R.id.image_button_2_text)
+    TextView textViewBtnCamera;
+
+    DetailIssuedImageAdapter imageAdapter;
     String operatorCode;
 
     @AfterViews
@@ -90,11 +94,14 @@ public class AfterRepairFragment extends Fragment {
         tvDamageCode.setText(auditItem.getDamageCode());
         tvRepairCode.setText(auditItem.getRepairCode());
         tvSize.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
-        imageAdapter = new RepairedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.REPAIRED);
+        textViewBtnCamera.setText(R.string.button_add_new_repair_image);
+
+        imageAdapter = new DetailIssuedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.REPAIRED);
 
         //Get audit Image list form db
         List<AuditImage> auditImages = auditItem.getAuditImages();
         imageAdapter.setData(auditImages);
+        lvImage.setAdapter(imageAdapter);
     }
     @Click(R.id.btn_camera_repaired)
     void openCameraActivity(){

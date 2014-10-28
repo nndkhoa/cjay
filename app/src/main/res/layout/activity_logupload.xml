@@ -2,7 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="9dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,7 +25,7 @@
             android:singleLine="true"
             android:textSize="18sp"
             android:layout_marginBottom="6dp"
-            android:imeOptions="actionSearch"/>
+            android:imeOptions="actionSearch" />
 
         <ImageButton
             android:layout_width="0dp"
@@ -34,14 +35,15 @@
             android:id="@+id/btn_search_log"
             android:background="@drawable/btn_customize_selector"
             android:layout_marginBottom="12dp"
-            android:minHeight="30dp"/>
+            android:minHeight="30dp" />
     </LinearLayout>
 
     <ListView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/lv_logupload"
-        tools:listitem="@layout/item_logupload"></ListView>
+        tools:listitem="@layout/item_upload_log"
+        android:scrollbars="none"></ListView>
 
     <TextView
         android:layout_width="wrap_content"
@@ -52,6 +54,6 @@
         android:textSize="18sp"
         android:drawableTop="@drawable/ic_success"
         android:textColor="@color/background_button_and_line"
-        android:scrollbars="none"/>
+        android:scrollbars="none" />
 
 </LinearLayout>

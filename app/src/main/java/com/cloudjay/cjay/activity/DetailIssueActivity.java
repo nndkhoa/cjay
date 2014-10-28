@@ -1,20 +1,16 @@
-package com.cloudjay.cjay.fragment;
+package com.cloudjay.cjay.activity;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v4.view.ViewPager;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.adapter.ViewPagerAdapter;
+import com.cloudjay.cjay.model.AuditItem;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 
@@ -22,16 +18,20 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * Created by thai on 20/10/2014.
+ * Created by thai on 27/10/2014.
  */
-
-@EFragment(R.layout.fragment_repaired)
-public class RepairedFragment extends Fragment implements ActionBar.TabListener {
+@EActivity(R.layout.activity_detail_issue)
+public class DetailIssueActivity extends BaseActivity implements ActionBar.TabListener {
 
     public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
 
-    @FragmentArg(CONTAINER_ID_EXTRA)
+    public final static String AUDIT_ITEM_EXTRA = "com.cloudjay.wizard.auditItem";
+
+    @Extra(CONTAINER_ID_EXTRA)
     public String containerID;
+
+    @Extra(AUDIT_ITEM_EXTRA)
+    AuditItem auditItem;
 
     private FragmentTabHost mTabHost;
 
@@ -39,7 +39,7 @@ public class RepairedFragment extends Fragment implements ActionBar.TabListener 
     ViewPager pager;
 
     ActionBar actionBar;
-    private ViewPagerAdapter mPagerAdapter;
+    private com.cloudjay.cjay.adapter.ViewPagerAdapter mPagerAdapter;
     public int currentPosition = 0;
 
     @AfterViews
@@ -49,36 +49,7 @@ public class RepairedFragment extends Fragment implements ActionBar.TabListener 
     }
 
     private void configureViewPager() {
-        // Get actionbar
-        actionBar = getActivity().getActionBar();
-
-        // Set ActionBar Title
-        actionBar.setTitle(R.string.fragment_repair_title);
-
-        // Fix tab layout
-        final Method method;
-        try {
-            method = actionBar.getClass()
-                    .getDeclaredMethod("setHasEmbeddedTabs", new Class[]{Boolean.TYPE});
-            method.setAccessible(true);
-            method.invoke(actionBar, false);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        // Create Actionbar Tabs
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-        // Set Providing Up Navigation
-        actionBar.setDisplayHomeAsUpEnabled(true);
-    }
-
-    private void configureActionBar() {
-        mPagerAdapter = new ViewPagerAdapter(getActivity(), getActivity().getSupportFragmentManager(), containerID,2);
+        mPagerAdapter = new com.cloudjay.cjay.adapter.ViewPagerAdapter(this, this.getSupportFragmentManager(), containerID, auditItem, 2);
         pager.setAdapter(mPagerAdapter);
         pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
@@ -98,6 +69,36 @@ public class RepairedFragment extends Fragment implements ActionBar.TabListener 
                             .setTabListener(this)
             );
         }
+
+    }
+
+    private void configureActionBar() {
+        // Get actionbar
+        actionBar = getActionBar();
+
+        // Set ActionBar Title
+        actionBar.setTitle(R.string.fragment_repair_title);
+
+        // Fix tab layo
+        final Method method;
+        try {
+            method = actionBar.getClass()
+                    .getDeclaredMethod("setHasEmbeddedTabs", new Class[]{Boolean.TYPE});
+            method.setAccessible(true);
+            method.invoke(actionBar, false);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        // Create Actionbar Tabs
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+        // Set Providing Up Navigation
+        actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     @Override

@@ -2,8 +2,10 @@ package com.cloudjay.cjay.activity;
 
 import android.app.Activity;
 import android.text.TextUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -18,6 +20,7 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -33,7 +36,7 @@ public class UploadLogActivity extends Activity {
     ListView lvLogUpload;
 
     @ViewById(R.id.btn_search_log)
-    Button btnSearch;
+    ImageButton btnSearch;
 
     @ViewById(R.id.et_search_log)
     EditText etSearch;
@@ -43,6 +46,9 @@ public class UploadLogActivity extends Activity {
 
     @Bean
     DataCenter dataCenter;
+
+    @SystemService
+    InputMethodManager inputMethodManager;
 
     LogUploadAdapter mAdapter;
 
@@ -56,8 +62,15 @@ public class UploadLogActivity extends Activity {
 
     @Click(R.id.btn_search_log)
     void btnSearchClicked(){
+        performSearch();
+
+    }
+
+    private void performSearch() {
+        inputMethodManager.hideSoftInputFromWindow(etSearch.getWindowToken(), 0);
         if (!TextUtils.isEmpty(etSearch.getText())) {
             searchLog(etSearch.getText().toString());
+            etSearch.setText("");
         } else {
             etSearch.setError(getResources().getString(R.string.error_empty_search_string));
         }

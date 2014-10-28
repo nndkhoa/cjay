@@ -2,18 +2,21 @@ package com.cloudjay.cjay.fragment;
 
 import android.content.Intent;
 import android.support.v4.app.Fragment;
-import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity;
-import com.cloudjay.cjay.adapter.RepairedImageAdapter;
+import com.cloudjay.cjay.activity.CameraActivity_;
+import com.cloudjay.cjay.adapter.DetailIssuedImageAdapter;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
@@ -68,9 +71,12 @@ public class BeforeRepairFragment extends Fragment {
     ListView lvImage;
 
     @ViewById(R.id.btn_camera_repaired)
-    Button btnCamera;
+    LinearLayout btnCamera;
 
-    RepairedImageAdapter imageAdapter;
+    @ViewById(R.id.image_button_2_text)
+    TextView textViewBtnCamera;
+
+    DetailIssuedImageAdapter imageAdapter;
     String operatorCode;
 
     @AfterViews
@@ -88,41 +94,46 @@ public class BeforeRepairFragment extends Fragment {
         tvDamageCode.setText(auditItem.getDamageCode());
         tvRepairCode.setText(auditItem.getRepairCode());
         tvSize.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
+        textViewBtnCamera.setText(R.string.button_add_new_audit_image);
+
         //TODO add fiel number to audit item model @Nam
-        imageAdapter = new RepairedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.AUDIT);
+        imageAdapter = new DetailIssuedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.AUDIT);
         List<AuditImage> auditImages = auditItem.getAuditImages();
         imageAdapter.setData(auditImages);
+        lvImage.setAdapter(imageAdapter);
 
 
     }
-    @Click (R.id.btn_camera_repaired)
-    void openCameraActivity(){
+
+    @Click(R.id.btn_camera_repaired)
+    void openCameraActivity() {
         //get container operater code form containerId
         String operatorCode = null;
         Session tmp = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
         if (null == tmp) {
-            Utils.showCrouton(getActivity(),"Không tìm thấy container trong dữ liệu");
+            Utils.showCrouton(getActivity(), "Không tìm thấy container trong dữ liệu");
         } else {
             operatorCode = tmp.getOperatorCode();
         }
-        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
+        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
         cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
         cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_REPAIRED);
-        cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);
+        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_AUDIT);
+        cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.AUDIT.value);
         startActivity(cameraActivityIntent);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
         refreshListImage();
     }
 
     private void refreshListImage() {
         Session tmp = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
-        for (AuditItem currentAuditItem: tmp.getAuditItems()){
-            if (currentAuditItem.getId() == auditItem.getId()){
+        for (AuditItem currentAuditItem : tmp.getAuditItems()) {
+            if (currentAuditItem.getId() == auditItem.getId()) {
                 auditItem = currentAuditItem;
             }
         }

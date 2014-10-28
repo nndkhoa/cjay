@@ -19,7 +19,7 @@
             android:textStyle="bold"
             android:paddingBottom="3dp"
             android:text="ABCD1234567"
-            android:textColor="@color/background_button_and_line"/>
+            android:textColor="@color/background_button_and_line" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -30,7 +30,7 @@
             android:paddingBottom="3dp"
             android:text=" - "
             android:textColor="@color/background_button_and_line"
-            android:layout_toRightOf="@+id/tv_container_code"/>
+            android:layout_toRightOf="@+id/tv_container_code" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -41,7 +41,7 @@
             android:paddingBottom="3dp"
             android:text="B"
             android:textColor="@color/background_button_and_line"
-            android:layout_toRightOf="@+id/tv_divider_line"/>
+            android:layout_toRightOf="@+id/tv_divider_line" />
 
         <LinearLayout
             android:id="@+id/btn_camera"
@@ -61,12 +61,12 @@
                 android:text="@string/button_take_new_audit_image"
                 android:textSize="18sp"
                 android:textColor="@android:color/white"
-                android:layout_marginRight="12dp"/>
+                android:layout_marginRight="12dp" />
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@android:drawable/ic_menu_camera"/>
+                android:src="@android:drawable/ic_menu_camera" />
 
         </LinearLayout>
 
@@ -79,16 +79,17 @@
             android:textColor="@android:color/white"
             android:background="@color/background_btn_check_container_clean"
             android:layout_below="@+id/btn_camera"
-            android:layout_marginBottom="6dp"/>
+            android:layout_marginBottom="6dp" />
 
         <ListView
+
+            android:descendantFocusability="beforeDescendants"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/lv_audit_items"
             android:layout_below="@+id/btn_clean"
             tools:listitem="@layout/item_issue_pending"
-            android:scrollbars="none">
-        </ListView>
+            android:scrollbars="none"></ListView>
 
     </RelativeLayout>
 

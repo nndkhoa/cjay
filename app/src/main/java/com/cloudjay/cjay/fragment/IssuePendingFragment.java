@@ -15,8 +15,11 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
+import com.cloudjay.cjay.activity.DetailIssueActivity;
+import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.adapter.AuditItemAdapter;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
+import com.cloudjay.cjay.event.IssueDeletedEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -34,6 +37,7 @@ import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -143,51 +147,28 @@ public class IssuePendingFragment extends Fragment {
     }
 
     @ItemClick(R.id.lv_audit_items)
-    void showApproveDiaglog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.dialog_search_container_title);
-        builder.setMessage("Lỗi này đã chưa được. Sửa luôn?");
-
-        builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //TODO show chon loi da giam dinh @Nam
-                dialogInterface.dismiss();
-            }
-        });
-
-        builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //TODO add to database
-                dialogInterface.dismiss();
-            }
-        });
-
-        AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialogInterface) {
-
-                // Set background and text color for confirm button
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
-                        .setTextColor(getActivity().getResources().getColor(android.R.color.holo_green_dark));
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
-                        .setBackgroundResource(getActivity().getResources().getColor(android.R.color.darker_gray));
-            }
-        });
-        dialog.show();
+    void switchToDetailIssueActivity(int position) {
+        AuditItem auditItem = auditItemAdapter.getItem(position);
+        Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
+        detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
+        detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem);
+        startActivity(detailIssueActivity);
     }
 
     @Background
     void refresh() {
         if (mSession != null) {
-            List<AuditItem> list = mSession.getAuditItems();
+            List<AuditItem> list = new ArrayList<AuditItem>();
+            Logger.Log("AuditItems: " + mSession.getAuditItems().size());
+            for (AuditItem auditItem : mSession.getAuditItems()) {
+                list.add(auditItem);
+            }
             Logger.Log("Size: " + list.size());
             updatedData(list);
         }
     }
 
+    @UiThread
     void updatedData(List<AuditItem> auditItems) {
         auditItemAdapter.clear();
 
@@ -203,6 +184,16 @@ public class IssuePendingFragment extends Fragment {
         if (auditItemAdapter.getCount() > 0) {
             btnClean.setVisibility(View.GONE);
         }
+    }
+
+    @UiThread
+    void onEvent(IssueDeletedEvent event) {
+        Logger.Log("on IssueDeletedEvent");
+
+        // Re-query container session with given containerId
+        String containerId = event.getContainerId();
+        mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+        refresh();
     }
 
     @Override

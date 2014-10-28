@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.util.Logger;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public class AuditMergeIssueAdapter extends ArrayAdapter<AuditItem> {
 
     private static class ViewHolder {
         TextView tvCompCode;
-        TextView tvLocaitonCode;
+        TextView tvLocationCode;
         TextView tvDamageCode;
         TextView tvRepairCode;
         TextView tvSize;
@@ -43,17 +44,22 @@ public class AuditMergeIssueAdapter extends ArrayAdapter<AuditItem> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final AuditItem auditItem = getItem(position);
+
         ViewHolder viewHolder;
         if (convertView == null) {
-            convertView = mInflater.inflate(layoutResId, parent, false);
             viewHolder = new ViewHolder();
+
+            convertView = mInflater.inflate(layoutResId, null);
+
             viewHolder.tvCompCode = (TextView) convertView.findViewById(R.id.tv_code_component_merge);
-            viewHolder.tvLocaitonCode = (TextView) convertView.findViewById(R.id.tv_code_location_merge);
+            viewHolder.tvLocationCode = (TextView) convertView.findViewById(R.id.tv_code_location_merge);
             viewHolder.tvDamageCode = (TextView) convertView.findViewById(R.id.tv_code_damaged_merge);
             viewHolder.tvRepairCode = (TextView) convertView.findViewById(R.id.tv_code_repair_merge);
             viewHolder.tvSize = (TextView) convertView.findViewById(R.id.tv_dimension_merge);
             viewHolder.tvQuantity = (TextView) convertView.findViewById(R.id.tv_quantity_merge);
             viewHolder.ivAuditImage = (ImageView) convertView.findViewById(R.id.iv_audit_image_merge);
+
+            convertView.setTag(viewHolder);
 
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -61,12 +67,12 @@ public class AuditMergeIssueAdapter extends ArrayAdapter<AuditItem> {
 
         //Set data to view
         viewHolder.tvCompCode.setText(auditItem.getComponentCode());
-        viewHolder.tvLocaitonCode.setText(auditItem.getLocationCode());
+        viewHolder.tvLocationCode.setText(auditItem.getLocationCode());
         viewHolder.tvDamageCode.setText(auditItem.getDamageCode());
         viewHolder.tvRepairCode.setText(auditItem.getRepairCode());
         viewHolder.tvSize.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
         viewHolder.tvQuantity.setText(String.valueOf(auditItem.getQuantity()));
-        ImageLoader.getInstance().displayImage(auditItem.getAuditImages().get(0).getUrl(), viewHolder.ivAuditImage);
+        // ImageLoader.getInstance().displayImage(auditItem.getAuditImages().get(0).getUrl(), viewHolder.ivAuditImage);
         return convertView;
     }
 

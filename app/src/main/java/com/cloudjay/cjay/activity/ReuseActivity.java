@@ -157,11 +157,18 @@ public class ReuseActivity extends Activity {
             List<AuditItem> auditItems = mSession.getAuditItems();
             List<GateImage> importImages = mSession.getImportImages();
             List<GateImage> deletedImportImages = new ArrayList<GateImage>();
-            for (GateImage gateImage : importImages) {
-                for (AuditItem auditItem : auditItems) {
-                    for (AuditImage auditImage : auditItem.getAuditImages()) {
-                        if (auditImage.getName().equals(gateImage.getName())) {
-                            deletedImportImages.add(gateImage);
+
+            if (auditItems != null) {
+                Logger.Log("Size: " + auditItems.size());
+                for (GateImage gateImage : importImages) {
+                    for (AuditItem auditItem : auditItems) {
+
+                        if (auditItem.getAuditImages() != null) {
+                            for (AuditImage auditImage : auditItem.getAuditImages()) {
+                                if (auditImage.getName().equals(gateImage.getName())) {
+                                    deletedImportImages.add(gateImage);
+                                }
+                            }
                         }
                     }
                 }
