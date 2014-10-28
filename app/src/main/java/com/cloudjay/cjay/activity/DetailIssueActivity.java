@@ -79,7 +79,7 @@ public class DetailIssueActivity extends BaseActivity implements ActionBar.TabLi
         // Set ActionBar Title
         actionBar.setTitle(R.string.fragment_repair_title);
 
-        // Fix tab layout
+        // Fix tab layo
         final Method method;
         try {
             method = actionBar.getClass()

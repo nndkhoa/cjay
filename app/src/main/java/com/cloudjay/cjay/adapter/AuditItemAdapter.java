@@ -121,7 +121,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
             holder.btnReport.setVisibility(View.VISIBLE);
             holder.btnEdit.setVisibility(View.GONE);
 
-            if (auditItem.getAuditImages() != null) {
+            if (auditItem.getAuditImages() != null && auditItem.getAuditImages().size() != 0) {
                 if (auditItem.getAuditImages().get(0) != null) {
                     auditImage = auditItem.getAuditImages().get(0);
                     ImageLoader.getInstance().displayImage(auditImage.getUrl(),

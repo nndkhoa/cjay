@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Created by thai on 21/10/2014.
  */
-public class RepairedImageAdapter extends ArrayAdapter<AuditImage> {
+public class DetailIssuedImageAdapter extends ArrayAdapter<AuditImage> {
     private LayoutInflater mInflater;
     private int layoutResId;
     Context context;
@@ -31,7 +31,7 @@ public class RepairedImageAdapter extends ArrayAdapter<AuditImage> {
      * @param resource
      * @param type
      */
-    public RepairedImageAdapter(Context context, int resource, ImageType type) {
+    public DetailIssuedImageAdapter(Context context, int resource, ImageType type) {
         super(context, resource);
         this.context = context;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

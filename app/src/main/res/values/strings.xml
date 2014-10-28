@@ -96,6 +96,8 @@
     <string name="button_report">Báo cáo</string>
     <string name="button_repair">Sửa chữa</string>
     <string name="button_take_new_audit_image">Chụp lỗi mới</string>
+    <string name="button_add_new_audit_image">Thêm hình giám định</string>
+    <string name="button_add_new_repair_image">Thêm hình sửa chữa</string>
 
     <!-- Label for container item -->
     <string name="label_container_id">Container ID: </string>
@@ -142,5 +144,6 @@
     <string name="issue_unapproved">Chưa duyệt</string>
     <string name="issue_approved">Đã duyệt</string>
     <string name="issue_can_not_repair">Cấm sửa</string>
+
 
 </resources>
