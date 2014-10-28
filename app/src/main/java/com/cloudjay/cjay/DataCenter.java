@@ -22,6 +22,7 @@ import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
@@ -294,7 +295,6 @@ public class DataCenter {
 	 * @param context
 	 * @param keyword
 	 */
-	@Trace
 	@Background(serial = CACHE)
 	public void search(Context context, String keyword) {
 		String[] keysResult;
@@ -339,6 +339,7 @@ public class DataCenter {
 	 * @param keyword
 	 */
 	@Background(serial = NETWORK)
+	@Trace
 	public void searchAsync(Context context, String keyword) {
 
 		try {
@@ -470,16 +471,21 @@ public class DataCenter {
 		AuditItem auditItem = new AuditItem();
 		auditItem.setId(0);
 		auditItem.setAuditItemUUID(uuid);
+
 		// this audit item has not been audited yet
 		auditItem.setAudited(false);
+
 		// this audit item has not been approved yet
 		auditItem.setApproved(false);
+
 		// this audit item has not been allowed to repair yet
 		auditItem.setIsAllowed(false);
+
 		// this audit item has not been repaired  yet
 		auditItem.setRepaired(false);
+
 		// this audit item has not been uploaded yet
-		auditItem.setUploaded(false);
+		auditItem.setUploadStatus(UploadStatus.NONE);
 
 		// Get list session's audit items
 		List<AuditItem> auditItems = session.getAuditItems();
@@ -571,7 +577,7 @@ public class DataCenter {
 		DB db = App.getDB(context);
 
 		//Call network client to upload image
-		//networkClient.uploadImage(uri, imageName);
+		networkClient.uploadImage(uri, imageName);
 
 		// Change status image in db
 		Session session = db.getObject(CJayConstant.PREFIX_UPLOADING + containerId, Session.class);
@@ -579,7 +585,7 @@ public class DataCenter {
 
 			for (GateImage gateImage : session.getGateImages()) {
 				if (gateImage.getName().equals(imageName)) {
-					gateImage.setUploaded(true);
+					gateImage.setUploadStatus(UploadStatus.COMPLETE);
 				}
 			}
 
@@ -604,8 +610,9 @@ public class DataCenter {
 
 		String key = CJayConstant.PREFIX_UPLOADING + session.getContainerId();
 		Session sessionUploaded = db.getObject(key, Session.class);
+		
 		if (sessionUploaded != null) {
-			sessionUploaded.setUploaded(true);
+			sessionUploaded.setUploadStatus(UploadStatus.COMPLETE);
 			db.put(CJayConstant.PREFIX_UPLOADING + session.getContainerId(), sessionUploaded);
 		}
 

@@ -1,7 +1,6 @@
 package com.cloudjay.cjay.fragment;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -11,7 +10,6 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
-import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -25,8 +23,6 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.List;
-
-import de.greenrobot.event.EventBus;
 
 /**
  * Danh sách các container đang thao tác
@@ -45,27 +41,12 @@ public class WorkingFragment extends Fragment {
 	DataCenter dataCenter;
 
 	SessionAdapter mAdapter;
-	List<Session> workingSessions;
 
 	public WorkingFragment() {
 	}
 
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		EventBus.getDefault().register(this);
-	}
-
-	@Override
-	public void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
-	}
-
 	@ItemClick(R.id.lv_working_container)
 	void workingItemClicked(int position) {
-
 
 		// navigation to Wizard Activity
 		Session item = mAdapter.getItem(position);
@@ -90,10 +71,8 @@ public class WorkingFragment extends Fragment {
 
 	@Background
 	void refresh() {
-
 		List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
 				CJayConstant.PREFIX_WORKING);
-
 		updatedData(list);
 	}
 
@@ -106,15 +85,5 @@ public class WorkingFragment extends Fragment {
 			}
 		}
 		mAdapter.notifyDataSetChanged();
-	}
-
-	/**
-	 * Sự kiện được kích hoạt khi một WorkingSession được tạo ra
-	 *
-	 * @param event
-	 */
-	@UiThread
-	public void onEvent(WorkingSessionCreatedEvent event) {
-		refresh();
 	}
 }

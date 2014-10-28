@@ -1,12 +1,15 @@
 package com.cloudjay.cjay.model;
 
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.google.gson.annotations.Expose;
+
+import java.io.Serializable;
 
 import javax.annotation.Generated;
 
 /* Gồm hình nhập và hình xuất */
 @Generated("org.jsonschema2pojo")
-public class GateImage {
+public class GateImage implements Serializable {
 
 	@Expose
 	private long id;
@@ -18,14 +21,28 @@ public class GateImage {
 	@Expose
 	private String name;
 
-	private boolean uploaded;
+	private int uploadStatus;
 
-	public boolean isUploaded() {
-		return uploaded;
+	public int getUploadStatus() {
+		return uploadStatus;
 	}
 
-	public void setUploaded(boolean isUploaded) {
-		this.uploaded = isUploaded;
+	public void setUploadStatus(int status) {
+		this.uploadStatus = status;
+	}
+
+	public void setUploadStatus(UploadStatus status) {
+		this.uploadStatus = status.value;
+	}
+
+	public GateImage withUploadStatus(int status) {
+		this.uploadStatus = status;
+		return this;
+	}
+
+	public GateImage withUploadStatus(UploadStatus status) {
+		this.uploadStatus = status.value;
+		return this;
 	}
 
 	public long getId() {

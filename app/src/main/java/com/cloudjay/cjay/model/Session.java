@@ -3,6 +3,7 @@ package com.cloudjay.cjay.model;
 
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.enums.ImageType;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
@@ -21,6 +22,7 @@ public class Session {
 
 	public static final String FIELD_CONTAINER_ID = "container_id";
 
+	//region ATTR
 	@Expose
 	private long id;
 
@@ -58,29 +60,29 @@ public class Session {
 	@Expose
 	private String checkInTime;
 
-	public static String getFieldContainerId() {
-		return FIELD_CONTAINER_ID;
-	}
-
 	@SerializedName("check_out_time")
 	@Expose
 	private String checkOutTime;
 
-	public boolean isUploaded() {
-		return uploaded;
+	private int uploadStatus;
+
+	private boolean processing;
+
+	@SerializedName("gate_images")
+	@Expose
+	private List<GateImage> gateImages;
+
+	@SerializedName("audit_items")
+	@Expose
+	private List<AuditItem> auditItems;
+	//endregion
+
+	public Session() {
+		gateImages = new ArrayList<GateImage>();
+		auditItems = new ArrayList<AuditItem>();
 	}
 
-	public void setUploaded(boolean isUploaded) {
-		this.uploaded = isUploaded;
-	}
-
-	public Session withUploaded(boolean isUploaded) {
-		this.uploaded = isUploaded;
-		return this;
-	}
-
-	private boolean uploaded;
-
+	//region GETTER AND SETTER
 	public boolean isProcessing() {
 		return processing;
 	}
@@ -93,94 +95,6 @@ public class Session {
 		this.processing = isProcessing;
 		return this;
 	}
-
-	private boolean processing;
-
-	@SerializedName("gate_images")
-	@Expose
-	private List<GateImage> gateImages;
-
-	@SerializedName("audit_items")
-	@Expose
-	private List<AuditItem> auditItems;
-
-	public Session() {
-		gateImages = new ArrayList<GateImage>();
-		auditItems = new ArrayList<AuditItem>();
-	}
-
-	/**
-	 * Get session in Json type to upload
-	 *
-	 * @return
-	 */
-	public JsonObject getJsonSession() {
-		JsonObject jsonObject = new JsonObject();
-		jsonObject.addProperty("pre_status", this.preStatus);
-		jsonObject.addProperty("container_id", containerId);
-		jsonObject.addProperty("operator_id", operatorId);
-		jsonObject.add("gate_images", this.getGateInImageToUpLoad());
-		return jsonObject;
-	}
-
-	/**
-	 * Return JSONArray of gate-in image list look like [{name: '....'}, {name: '....'}, ...] for upload
-	 *
-	 * @return
-	 * @throws JSONException
-	 */
-	public JsonArray getGateInImageToUpLoad() {
-		JsonArray gate_image = new JsonArray();
-		for (GateImage gateImage : this.gateImages) {
-			if (gateImage.getType() == ImageType.IMPORT.getValue()) {
-				String gateImageName = gateImage.getName();
-				JsonObject jsonObject = new JsonObject();
-				jsonObject.addProperty("name", gateImageName);
-				gate_image.add(jsonObject);
-			}
-		}
-		return gate_image;
-	}
-
-	/**
-	 * Return JSONArray of gate-out image list look like [{name: '....'}, {name: '....'}, ...] for upload
-	 *
-	 * @return
-	 * @throws JSONException
-	 */
-	public JsonArray getGateOutImageToUpLoad() {
-		JsonArray gate_image = new JsonArray();
-		for (GateImage gateImage : this.gateImages) {
-			if (gateImage.getType() == ImageType.EXPORT.getValue()) {
-				String gateImageName = gateImage.getName();
-				JsonObject jsonObject = new JsonObject();
-				jsonObject.addProperty("name", gateImageName);
-				gate_image.add(jsonObject);
-			}
-		}
-		return gate_image;
-	}
-
-
-	/**
-	 * Return JSONArray of audit items list look like [{id: xx, audit_images: [{ name : '...', ...}]}, ...] for upload
-	 *
-	 * @return
-	 * @throws JSONException
-	 */
-	public JsonArray getRepairedAuditItemToUpLoad() {
-		JsonArray auditItems = new JsonArray();
-		for (AuditItem auditItem : this.auditItems) {
-			JsonObject jsonObject = new JsonObject();
-			long auditId = auditItem.getId();
-			jsonObject.addProperty("name", auditId);
-			auditItems.add(jsonObject);
-			JsonArray repairedImageName = auditItem.getRepairedImageToUpLoad();
-			jsonObject.add("repair_images", repairedImageName);
-		}
-		return auditItems;
-	}
-
 
 	public long getId() {
 		return id;
@@ -351,13 +265,37 @@ public class Session {
 		return this;
 	}
 
+	public int getUploadStatus() {
+		return uploadStatus;
+	}
+
+	public void setUploadStatus(int status) {
+		this.uploadStatus = status;
+	}
+
+	public void setUploadStatus(UploadStatus status) {
+		this.uploadStatus = status.value;
+	}
+
+	public Session withUploadStatus(int status) {
+		this.uploadStatus = status;
+		return this;
+	}
+
+	public Session withUploadStatus(UploadStatus status) {
+		this.uploadStatus = status.value;
+		return this;
+	}
+	//endregion
+
 	/**
 	 * Get list import images in List of Gate Images
+	 *
 	 * @return
 	 */
 	public List<GateImage> getImportImages() {
 		List<GateImage> imageList = new ArrayList<GateImage>();
-		for (GateImage gateImage: gateImages) {
+		for (GateImage gateImage : gateImages) {
 			if (gateImage.getType() == CJayConstant.TYPE_IMPORT) {
 				imageList.add(gateImage);
 			}
@@ -365,54 +303,129 @@ public class Session {
 		return imageList;
 	}
 
-    /**
-     * Get list export images in List of Gate Images
-     * @return
-     */
-    public List<GateImage> getExportImages() {
-        List<GateImage> imageList = new ArrayList<GateImage>();
-        for (GateImage gateImage : gateImages) {
-            if (gateImage.getType() == CJayConstant.TYPE_EXPORT) {
-                imageList.add(gateImage);
-            }
-        }
+	/**
+	 * Get list export images in List of Gate Images
+	 *
+	 * @return
+	 */
+	public List<GateImage> getExportImages() {
+		List<GateImage> imageList = new ArrayList<GateImage>();
+		for (GateImage gateImage : gateImages) {
+			if (gateImage.getType() == CJayConstant.TYPE_EXPORT) {
+				imageList.add(gateImage);
+			}
+		}
 
-        return imageList;
-    }
+		return imageList;
+	}
 
-    /**
-     * Get list audit images in List of Audit Images
-     * @return
-     */
-    public List<AuditImage> getIssueImages() {
-        List<AuditImage> imageList = new ArrayList<AuditImage>();
+	/**
+	 * Get list audit images in List of Audit Images
+	 *
+	 * @return
+	 */
+	public List<AuditImage> getIssueImages() {
+		List<AuditImage> imageList = new ArrayList<AuditImage>();
 
-        for (AuditItem auditItem : auditItems) {
-            for (AuditImage auditImage : auditItem.getAuditImages()) {
-                if (auditImage.getType() == CJayConstant.TYPE_AUDIT) {
-                    imageList.add(auditImage);
-                }
-            }
-        }
+		for (AuditItem auditItem : auditItems) {
+			for (AuditImage auditImage : auditItem.getAuditImages()) {
+				if (auditImage.getType() == CJayConstant.TYPE_AUDIT) {
+					imageList.add(auditImage);
+				}
+			}
+		}
 
-        return imageList;
-    }
+		return imageList;
+	}
 
-    /**
-     * Get list repaired images in List of Audit Images
-     * @return
-     */
-    public List<AuditImage> getRepairedImages() {
-        List<AuditImage> imageList = new ArrayList<AuditImage>();
+	/**
+	 * Get list repaired images in List of Audit Images
+	 *
+	 * @return
+	 */
+	public List<AuditImage> getRepairedImages() {
+		List<AuditImage> imageList = new ArrayList<AuditImage>();
 
-        for (AuditItem auditItem : auditItems) {
-            for (AuditImage auditImage : auditItem.getAuditImages()) {
-                if (auditImage.getType() == CJayConstant.TYPE_REPAIRED) {
-                    imageList.add(auditImage);
-                }
-            }
-        }
+		for (AuditItem auditItem : auditItems) {
+			for (AuditImage auditImage : auditItem.getAuditImages()) {
+				if (auditImage.getType() == CJayConstant.TYPE_REPAIRED) {
+					imageList.add(auditImage);
+				}
+			}
+		}
 
-        return imageList;
-    }
+		return imageList;
+	}
+
+	/**
+	 * Get session in Json type to upload
+	 *
+	 * @return
+	 */
+	public JsonObject getJsonSession() {
+		JsonObject jsonObject = new JsonObject();
+		jsonObject.addProperty("pre_status", this.preStatus);
+		jsonObject.addProperty("container_id", containerId);
+		jsonObject.addProperty("operator_id", operatorId);
+		jsonObject.add("gate_images", this.getGateInImageToUpLoad());
+		return jsonObject;
+	}
+
+	/**
+	 * Return JSONArray of gate-in image list look like [{name: '....'}, {name: '....'}, ...] for upload
+	 *
+	 * @return
+	 * @throws JSONException
+	 */
+	public JsonArray getGateInImageToUpLoad() {
+		JsonArray gate_image = new JsonArray();
+		for (GateImage gateImage : this.gateImages) {
+			if (gateImage.getType() == ImageType.IMPORT.getValue()) {
+				String gateImageName = gateImage.getName();
+				JsonObject jsonObject = new JsonObject();
+				jsonObject.addProperty("name", gateImageName);
+				gate_image.add(jsonObject);
+			}
+		}
+		return gate_image;
+	}
+
+	/**
+	 * Return JSONArray of gate-out image list look like [{name: '....'}, {name: '....'}, ...] for upload
+	 *
+	 * @return
+	 * @throws JSONException
+	 */
+	public JsonArray getGateOutImageToUpLoad() {
+		JsonArray gate_image = new JsonArray();
+		for (GateImage gateImage : this.gateImages) {
+			if (gateImage.getType() == ImageType.EXPORT.getValue()) {
+				String gateImageName = gateImage.getName();
+				JsonObject jsonObject = new JsonObject();
+				jsonObject.addProperty("name", gateImageName);
+				gate_image.add(jsonObject);
+			}
+		}
+		return gate_image;
+	}
+
+	/**
+	 * Return JSONArray of audit items list look like [{id: xx, audit_images: [{ name : '...', ...}]}, ...] for upload
+	 *
+	 * @return
+	 * @throws JSONException
+	 */
+	public JsonArray getRepairedAuditItemToUpLoad() {
+		JsonArray auditItems = new JsonArray();
+		for (AuditItem auditItem : this.auditItems) {
+			JsonObject jsonObject = new JsonObject();
+			long auditId = auditItem.getId();
+			jsonObject.addProperty("name", auditId);
+			auditItems.add(jsonObject);
+			JsonArray repairedImageName = auditItem.getRepairedImageToUpLoad();
+			jsonObject.add("repair_images", repairedImageName);
+		}
+		return auditItems;
+	}
+
 }

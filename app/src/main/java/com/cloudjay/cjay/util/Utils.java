@@ -199,7 +199,7 @@ public class Utils {
 			for (AuditItem auditItem : auditItems) {
 				List<AuditImage> auditImages = auditItem.getAuditImages();
 				for (AuditImage auditImage : auditImages) {
-					if (auditImage.isUploaded()) {
+					if (auditImage.isUploadStatus()) {
 						uploadedImage = uploadedImage + 1;
 					}
 				}
@@ -208,7 +208,7 @@ public class Utils {
 		}
 		List<GateImage> gateImages = session.getGateImages();
 		for (GateImage gateImage : gateImages) {
-			if (gateImage.isUploaded()) {
+			if (gateImage.isUploadStatus()) {
 				uploadedImage = uploadedImage + 1;
 			}
 		}

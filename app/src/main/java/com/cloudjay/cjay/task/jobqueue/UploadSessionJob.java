@@ -44,6 +44,10 @@ public class UploadSessionJob extends Job {
 
 	@Override
 	protected boolean shouldReRunOnThrowable(Throwable throwable) {
+
+		// TODO: @thai: Assign upload status of container to ERROR
+
+
 		EventBus.getDefault().post(new UploadStoppedEvent());
 		return true;
 	}
