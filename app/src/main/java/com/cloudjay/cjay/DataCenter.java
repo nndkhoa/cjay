@@ -297,6 +297,7 @@ public class DataCenter {
 	 */
 	@Background(serial = CACHE)
 	public void search(Context context, String keyword) {
+
 		String[] keysResult;
 		try {
 			DB db = App.getDB(context);
@@ -610,7 +611,7 @@ public class DataCenter {
 
 		String key = CJayConstant.PREFIX_UPLOADING + session.getContainerId();
 		Session sessionUploaded = db.getObject(key, Session.class);
-		
+
 		if (sessionUploaded != null) {
 			sessionUploaded.setUploadStatus(UploadStatus.COMPLETE);
 			db.put(CJayConstant.PREFIX_UPLOADING + session.getContainerId(), sessionUploaded);

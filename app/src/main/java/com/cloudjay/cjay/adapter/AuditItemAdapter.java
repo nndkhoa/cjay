@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,245 +28,249 @@ import java.util.List;
  */
 public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
-    private LayoutInflater mInflater;
-    private Context mContext;
-    private int layoutResId;
-    private String containerId;
-    private AuditImage auditImage;
-    private AuditItem mAuditItem;
+	private LayoutInflater mInflater;
+	private Context mContext;
+	private int layoutResId;
+	private String containerId;
+	private AuditImage auditImage;
+	private AuditItem mAuditItem;
 
-    public AuditItemAdapter(Context context, int resource, String containerId) {
-        super(context, resource);
-        this.mContext = context;
-        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        layoutResId = resource;
-        this.containerId = containerId;
+	public AuditItemAdapter(Context context, int resource, String containerId) {
+		super(context, resource);
+		this.mContext = context;
+		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		layoutResId = resource;
+		this.containerId = containerId;
 
-    }
+	}
 
-    private class ViewHolder {
-        public ImageView ivAuditImage;
-        public TextView tvCodeComponent;
-        public TextView tvCodeLocation;
-        public TextView tvCodeIssue;
-        public TextView tvCodeRepair;
-        public TextView tvDimension;
-        public TextView tvCount;
-        public Button btnUpload;
-        public Button btnRepair;
-        public Button btnReport;
-        public Button btnEdit;
-        public TextView tvIssueStatus;
-        public LinearLayout llIssueImageView;
-        public LinearLayout llIssueDetails;
-    }
+	private class ViewHolder {
+		public ImageView ivAuditImage;
+		public TextView tvCodeComponent;
+		public TextView tvCodeLocation;
+		public TextView tvCodeIssue;
+		public TextView tvCodeRepair;
+		public TextView tvDimension;
+		public TextView tvCount;
+		public Button btnUpload;
+		public Button btnRepair;
+		public Button btnReport;
+		public Button btnEdit;
+		public TextView tvIssueStatus;
+		public LinearLayout llIssueImageView;
+		public LinearLayout llIssueDetails;
+	}
 
-    @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
+	@Override
+	public View getView(int i, View view, ViewGroup viewGroup) {
 
-        final AuditItem auditItem = getItem(i);
+		final AuditItem auditItem = getItem(i);
 
-        ViewHolder holder;
-        if (view == null) {
-            holder = new ViewHolder();
-            view = mInflater.inflate(layoutResId, null);
-            holder.ivAuditImage = (SquareImageView) view.findViewById(R.id.iv_audit_image);
+		ViewHolder holder;
+		if (view == null) {
+			holder = new ViewHolder();
+			view = mInflater.inflate(layoutResId, null);
+			holder.ivAuditImage = (SquareImageView) view.findViewById(R.id.iv_audit_image);
 
-            holder.tvCodeComponent = (TextView) view.findViewById(R.id.tv_code_component);
-            holder.tvCodeIssue = (TextView) view.findViewById(R.id.tv_code_issue);
-            holder.tvCodeLocation = (TextView) view.findViewById(R.id.tv_code_location);
-            holder.tvDimension = (TextView) view.findViewById(R.id.tv_dimension);
-            holder.tvCodeRepair = (TextView) view.findViewById(R.id.tv_code_repair);
-            holder.tvCount = (TextView) view.findViewById(R.id.tv_count);
-            holder.tvIssueStatus = (TextView) view.findViewById(R.id.tv_issue_status);
+			holder.tvCodeComponent = (TextView) view.findViewById(R.id.tv_code_component);
+			holder.tvCodeIssue = (TextView) view.findViewById(R.id.tv_code_issue);
+			holder.tvCodeLocation = (TextView) view.findViewById(R.id.tv_code_location);
+			holder.tvDimension = (TextView) view.findViewById(R.id.tv_dimension);
+			holder.tvCodeRepair = (TextView) view.findViewById(R.id.tv_code_repair);
+			holder.tvCount = (TextView) view.findViewById(R.id.tv_count);
+			holder.tvIssueStatus = (TextView) view.findViewById(R.id.tv_issue_status);
 
-            holder.btnUpload = (Button) view.findViewById(R.id.btn_upload_pending);
-            holder.btnReport = (Button) view.findViewById(R.id.btn_report_pending);
-            holder.btnRepair = (Button) view.findViewById(R.id.btn_repair_pending);
-            holder.btnEdit = (Button) view.findViewById(R.id.btn_edit_pending);
+			holder.btnUpload = (Button) view.findViewById(R.id.btn_upload_pending);
+			holder.btnReport = (Button) view.findViewById(R.id.btn_report_pending);
+			holder.btnRepair = (Button) view.findViewById(R.id.btn_repair_pending);
+			holder.btnEdit = (Button) view.findViewById(R.id.btn_edit_pending);
 
-            holder.llIssueDetails = (LinearLayout) view.findViewById(R.id.ll_issue_details);
-            holder.llIssueImageView = (LinearLayout) view.findViewById(R.id.ll_issue_imageview);
+			holder.llIssueDetails = (LinearLayout) view.findViewById(R.id.ll_issue_details);
+			holder.llIssueImageView = (LinearLayout) view.findViewById(R.id.ll_issue_imageview);
 
-            view.setTag(holder);
-        } else {
-            holder = (ViewHolder) view.getTag();
-        }
+			view.setTag(holder);
+		} else {
+			holder = (ViewHolder) view.getTag();
+		}
 
-        // Lỗi nào chưa giám dịnh thì hiện hinh`, lỗi nào đã giám định roi thì hiện chi tiết lỗi
-        if (auditItem.getAudited() == true) {
-            holder.llIssueImageView.setVisibility(View.GONE);
-            holder.llIssueDetails.setVisibility(View.VISIBLE);
-            holder.btnUpload.setVisibility(View.VISIBLE);
-            holder.btnReport.setVisibility(View.GONE);
-            holder.btnEdit.setVisibility(View.VISIBLE);
+		// Lỗi nào chưa giám dịnh thì hiện hinh`, lỗi nào đã giám định roi thì hiện chi tiết lỗi
+		if (auditItem.getAudited() == true) {
+			holder.llIssueImageView.setVisibility(View.GONE);
+			holder.llIssueDetails.setVisibility(View.VISIBLE);
+			holder.btnUpload.setVisibility(View.VISIBLE);
+			holder.btnReport.setVisibility(View.GONE);
+			holder.btnEdit.setVisibility(View.VISIBLE);
 
-            //Set detail textviews
-            holder.tvCodeComponent.setText(auditItem.getComponentCode());
-            holder.tvCodeIssue.setText(auditItem.getDamageCode());
-            holder.tvCodeLocation.setText(auditItem.getLocationCode());
-            holder.tvDimension.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
-            holder.tvCodeRepair.setText(auditItem.getRepairCode());
-            holder.tvCount.setText(auditItem.getQuantity() + "");
+			//Set detail textviews
+			holder.tvCodeComponent.setText(auditItem.getComponentCode());
+			holder.tvCodeIssue.setText(auditItem.getDamageCode());
+			holder.tvCodeLocation.setText(auditItem.getLocationCode());
+			holder.tvDimension.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
+			holder.tvCodeRepair.setText(auditItem.getRepairCode());
+			holder.tvCount.setText(auditItem.getQuantity() + "");
 
-            if (auditItem.getAudited()) {
-                holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_unapproved));
-            } else {
-                holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_approved));
-            }
+			if (auditItem.getAudited()) {
+				holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_unapproved));
+			} else {
+				holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_approved));
+			}
 
-        } else {
-            holder.llIssueImageView.setVisibility(View.VISIBLE);
-            holder.llIssueDetails.setVisibility(View.GONE);
-            holder.btnUpload.setVisibility(View.GONE);
-            holder.btnReport.setVisibility(View.VISIBLE);
-            holder.btnEdit.setVisibility(View.GONE);
+		} else {
+			holder.llIssueImageView.setVisibility(View.VISIBLE);
+			holder.llIssueDetails.setVisibility(View.GONE);
+			holder.btnUpload.setVisibility(View.GONE);
+			holder.btnReport.setVisibility(View.VISIBLE);
+			holder.btnEdit.setVisibility(View.GONE);
 
-            if (auditItem.getAuditImages() != null && auditItem.getAuditImages().size() != 0) {
-                if (auditItem.getAuditImages().get(0) != null) {
-                    auditImage = auditItem.getAuditImages().get(0);
-                    ImageLoader.getInstance().displayImage(auditImage.getUrl(),
-                            holder.ivAuditImage);
-                }
-            }
-        }
-        //TODO set event to show repair buttion
-        holder.btnRepair.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showRepairDiaglog();
-            }
-        });
+			if (auditItem.getAuditImages() != null && auditItem.getAuditImages().size() != 0) {
+				if (auditItem.getAuditImages().get(0) != null) {
+					auditImage = auditItem.getAuditImages().get(0);
+					ImageLoader.getInstance().displayImage(auditImage.getUrl(),
+							holder.ivAuditImage);
+				}
+			}
+		}
+		//TODO set event to show repair buttion
+		holder.btnRepair.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				showRepairDiaglog();
+			}
+		});
 
 
-        mAuditItem = auditItem;
+		mAuditItem = auditItem;
 
-        holder.btnReport.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showApproveDiaglog();
-            }
-        });
+		holder.btnReport.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				showApproveDiaglog();
+			}
+		});
 
-        return view;
-    }
+		return view;
+	}
 
-    private void showRepairDiaglog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setTitle(R.string.dialog_search_container_title);
-        builder.setMessage("Lỗi này đã chưa được. Sửa luôn?");
+	private void showRepairDiaglog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+		builder.setTitle(R.string.dialog_search_container_title);
+		builder.setMessage("Lỗi này đã chưa được. Sửa luôn?");
 
-        builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //TODO show chon loi da giam dinh @Nam
-                dialogInterface.dismiss();
-            }
-        });
+		builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				//TODO show chon loi da giam dinh @Nam
+				dialogInterface.dismiss();
+			}
+		});
 
-        builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //TODO add to database
-                dialogInterface.dismiss();
-            }
-        });
+		builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				//TODO add to database
+				dialogInterface.dismiss();
+			}
+		});
 
-        AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialogInterface) {
+		AlertDialog dialog = builder.create();
+		dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+			@Override
+			public void onShow(DialogInterface dialogInterface) {
 
-                // Set background and text color for BUTTON_NEGATIVE
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
-                        .setTextColor(mContext.getResources().getColor(android.R.color.white));
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
-                        .setBackgroundResource(R.drawable.btn_green_selector);
+				// Set background and text color for BUTTON_NEGATIVE
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+						.setTextColor(mContext.getResources().getColor(android.R.color.white));
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+						.setBackgroundResource(R.drawable.btn_green_selector);
 
-                // Set background and text color for BUTTON_POSITIVE
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
-                        .setTextColor(mContext.getResources().getColor(android.R.color.white));
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
-                        .setBackgroundColor(mContext.getResources().getColor(android.R.color.darker_gray));
-            }
-        });
-        dialog.show();
+				// Set background and text color for BUTTON_POSITIVE
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+						.setTextColor(mContext.getResources().getColor(android.R.color.white));
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+						.setBackgroundColor(mContext.getResources().getColor(android.R.color.darker_gray));
+			}
+		});
+		dialog.show();
 
-    }
+	}
 
-    void showApproveDiaglog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setTitle("Alert");
-        builder.setMessage("Lỗi này đã được báo cáo chưa?");
+	void showApproveDiaglog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+		builder.setTitle("Alert");
+		builder.setMessage("Lỗi này đã được báo cáo chưa?");
 
-        builder.setPositiveButton("Chưa", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //TODO add to database
-                dialogInterface.dismiss();
-            }
-        });
+		builder.setPositiveButton("Chưa", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				// TODO add to database
+				dialogInterface.dismiss();
+			}
+		});
 //        builder.setNegativeButton("Vệ sinh", new DialogInterface.OnClickListener() {
 //            @Override
 //            public void onClick(DialogInterface dialogInterface, int i) {
-//                //TODO change status audit item to water wase
+//                // TODO change status audit item to water wase
 //                dialogInterface.dismiss();
 //            }
 //        });
 
-        builder.setNegativeButton("Rồi", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                Intent intent = new Intent(mContext, MergeIssueActivity_.class);
+		builder.setNegativeButton("Rồi", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+
+				Intent intent = new Intent(mContext, MergeIssueActivity_.class);
+
                 intent.putExtra(MergeIssueActivity_.CONTAINER_ID_EXTRA, containerId);
                 intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, auditImage);
                 intent.putExtra(MergeIssueActivity_.AUDIT_ITEM_REMOVE, mAuditItem);
-                mContext.startActivity(intent);
-            }
-        });
 
-        builder.setNeutralButton("Vệ sinh", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //TODO: do process here
-                dialogInterface.dismiss();
-            }
-        });
+				mContext.startActivity(intent);
+			}
+		});
 
-        AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialogInterface) {
+		builder.setNeutralButton("Vệ sinh", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				// TODO: do process here
 
-                // Set background and text color for BUTTON_NEGATIVE
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
-                        .setTextColor(mContext.getResources().getColor(android.R.color.white));
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
-                        .setBackgroundResource(R.drawable.btn_green_selector);
+				dialogInterface.dismiss();
+			}
+		});
 
-                // Set background and text color for BUTTON_NEUTRAL
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEUTRAL)
-                        .setTextColor(mContext.getResources().getColor(android.R.color.white));
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEUTRAL)
-                        .setBackgroundResource(R.drawable.btn_customize_selector);
+		AlertDialog dialog = builder.create();
+		dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+			@Override
+			public void onShow(DialogInterface dialogInterface) {
 
-                // Set background and text color for BUTTON_POSITIVE
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
-                        .setTextColor(mContext.getResources().getColor(android.R.color.white));
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
-                        .setBackgroundColor(mContext.getResources().getColor(android.R.color.darker_gray));
-            }
-        });
-        dialog.show();
-    }
+				// Set background and text color for BUTTON_NEGATIVE
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+						.setTextColor(mContext.getResources().getColor(android.R.color.white));
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+						.setBackgroundResource(R.drawable.btn_green_selector);
 
-    public void setData(List<AuditItem> data) {
-        clear();
-        if (data != null) {
-            for (int i = 0; i < data.size(); i++) {
-                add(data.get(i));
-            }
-        }
-    }
+				// Set background and text color for BUTTON_NEUTRAL
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEUTRAL)
+						.setTextColor(mContext.getResources().getColor(android.R.color.white));
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEUTRAL)
+						.setBackgroundResource(R.drawable.btn_customize_selector);
+
+				// Set background and text color for BUTTON_POSITIVE
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+						.setTextColor(mContext.getResources().getColor(android.R.color.white));
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+						.setBackgroundColor(mContext.getResources().getColor(android.R.color.darker_gray));
+			}
+		});
+		dialog.show();
+	}
+
+	public void setData(List<AuditItem> data) {
+		clear();
+		if (data != null) {
+			for (int i = 0; i < data.size(); i++) {
+				add(data.get(i));
+			}
+		}
+	}
 
 }
