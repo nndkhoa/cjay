@@ -17,6 +17,11 @@ public class UploadImageJob extends Job {
 	String uri;
 	String imageName;
 
+	@Override
+	protected int getRetryLimit() {
+		return 5;
+	}
+
 	public UploadImageJob(String uri, String imageName, String containerId) {
 
 		super(new Params(2).requireNetwork().persist().groupBy(containerId).setPersistent(true));
@@ -28,7 +33,7 @@ public class UploadImageJob extends Job {
 	@Override
 	public void onAdded() {
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).addUploadingSession(containerId);
+		DataCenter_.getInstance_(context).addUploadSession(containerId);
 		EventBus.getDefault().post(new UploadStartedEvent(containerId));
 	}
 

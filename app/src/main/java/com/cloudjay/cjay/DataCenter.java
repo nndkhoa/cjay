@@ -416,12 +416,11 @@ public class DataCenter {
 	 * @throws SnappydbException
 	 */
 	@Background(serial = CACHE)
-	public void addUploadingSession(String containerId) {
+	public void addUploadSession(String containerId) {
 
 		try {
 			DB db = App.getDB(context);
 			Session session = db.getObject(containerId, Session.class);
-
 			String key = CJayConstant.PREFIX_UPLOADING + containerId;
 			db.put(key, session);
 
@@ -597,7 +596,9 @@ public class DataCenter {
 	}
 
 	/**
-	 * Upload container session and change status uploaded of session to true
+	 * 1. Upload container session
+	 * 2. Change status uploaded of session to COMPLETE
+	 * 3. Remove this container from TAB WORKING
 	 *
 	 * @param context
 	 * @param session
@@ -616,10 +617,13 @@ public class DataCenter {
 			String key = result.getContainerId();
 			result.setUploadStatus(UploadStatus.COMPLETE);
 			db.put(key, result);
+
+			// Then remove them from WORKING
+			String workingKey = CJayConstant.PREFIX_WORKING + key;
+			db.del(workingKey);
 		}
 
-//		// db.close();
-		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
+		// db.close();
 	}
 	//endregion
 
@@ -635,7 +639,7 @@ public class DataCenter {
 		}
 
 		// Audit and Repaired Images
-		List<AuditImage> auditImages = new ArrayList<AuditImage>();
+		List<AuditImage> auditImages = new ArrayList<>();
 
 		// Get list audit images of each audit item and add to audit images list
 		for (AuditItem auditItem : session.getAuditItems()) {
@@ -774,7 +778,15 @@ public class DataCenter {
 
 	}
 
-	// Merge hình vào lỗi đã giám định
+	/**
+	 * Merge hình vào lỗi đã giám định.
+	 *
+	 * @param context
+	 * @param containerId
+	 * @param auditItemUUID
+	 * @param auditItemRemove
+	 * @param auditImage
+	 */
 	public void addAuditImageToAuditedIssue(Context context,
 	                                        String containerId,
 	                                        String auditItemUUID,
@@ -787,11 +799,9 @@ public class DataCenter {
 			for (AuditItem auditItem : session.getAuditItems()) {
 
 				if (auditItem.getAuditItemUUID().equals(auditItemUUID)) {
-
 					List<AuditImage> auditImages = auditItem.getAuditImages();
-
 					if (null == auditImages) {
-						auditImages = new ArrayList<AuditImage>();
+						auditImages = new ArrayList<>();
 					}
 
 					auditImages.add(auditImage);

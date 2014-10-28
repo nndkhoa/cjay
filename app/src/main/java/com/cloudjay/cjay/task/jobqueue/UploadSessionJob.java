@@ -37,11 +37,11 @@ public class UploadSessionJob extends Job {
 		// Notify container is being uploaded
 		EventBus.getDefault().post(new UploadingEvent());
 
-		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).uploadSession(context, session);
-
-		// Notify container was uploaded
-		EventBus.getDefault().post(new UploadedEvent(session.getContainerId()));
+//		Context context = App.getInstance().getApplicationContext();
+//		DataCenter_.getInstance_(context).uploadSession(context, session);
+//
+//		// Notify container was uploaded
+//		EventBus.getDefault().post(new UploadedEvent(session.getContainerId()));
 	}
 
 
@@ -52,7 +52,6 @@ public class UploadSessionJob extends Job {
 
 	@Override
 	protected boolean shouldReRunOnThrowable(Throwable throwable) {
-
 		EventBus.getDefault().post(new UploadStoppedEvent());
 		return true;
 	}
