@@ -127,12 +127,13 @@
     <string name="error_empty_search_string">Vui lòng nhập từ khóa tìm kiếm</string>
 
     <!-- Label for error item -->
-    <string name="label_code_component">CODE component</string>
-    <string name="label_code_location">CODE vị trí</string>
-    <string name="label_code_issue">CODE hư hỏng</string>
-    <string name="label_code_repair">CODE sửa chữa</string>
-    <string name="label_dimension">Kích thước</string>
-    <string name="label_count">Số lượng</string>
+    <string name="label_code_component">CODE component:</string>
+    <string name="label_code_location">CODE vị trí:</string>
+    <string name="label_code_issue">CODE hư hỏng:</string>
+    <string name="label_code_repair">CODE sửa chữa:</string>
+    <string name="label_dimension">Kích thước:</string>
+    <string name="label_count">Số lượng:</string>
+    <string name="label_status">Trạng thái:</string>
 
     <!-- Image Type Descriptions -->
     <string name="image_type_description_import">Hình Nhập</string>

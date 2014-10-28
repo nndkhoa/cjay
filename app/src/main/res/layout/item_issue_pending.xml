@@ -178,6 +178,13 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="@string/label_status"
+                    android:textStyle="bold" />
+
+                <TextView
                     android:id="@+id/tv_issue_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

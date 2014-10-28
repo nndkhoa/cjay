@@ -38,6 +38,8 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -164,7 +166,26 @@ public class IssuePendingFragment extends Fragment {
                 list.add(auditItem);
             }
             Logger.Log("Size: " + list.size());
+            
+            //Sort list audit
+            Comparator<AuditItem> comparator  = new Comparator<AuditItem>() {
+                @Override
+                public int compare(AuditItem auditItem, AuditItem auditItem2) {
+                    if (!auditItem.getAudited()){
+                        if (auditItem2.getAudited()){
+                            return 1;
+                        }else {
+                            return -1;
+                        }
+                    } else {
+                        return -1;
+                    }
+                }
+            };
+
+            Collections.sort(list, comparator);
             updatedData(list);
+
         }
     }
 
