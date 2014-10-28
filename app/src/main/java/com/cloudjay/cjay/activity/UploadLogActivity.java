@@ -3,7 +3,6 @@ package com.cloudjay.cjay.activity;
 import android.app.Activity;
 import android.text.TextUtils;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -12,7 +11,7 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.LogUploadAdapter;
-import com.cloudjay.cjay.model.LogUpload;
+import com.cloudjay.cjay.model.LogItem;
 import com.cloudjay.cjay.util.CJayConstant;
 
 import org.androidannotations.annotations.AfterViews;
@@ -77,22 +76,22 @@ public class UploadLogActivity extends Activity {
     }
 
     private void searchLog(String key) {
-        List<LogUpload> list = dataCenter.searchLogUpload(this.getApplicationContext(),key);
+        List<LogItem> list = dataCenter.searchLog(this.getApplicationContext(), key);
         updatedData(list);
     }
 
     @Background
     void refresh() {
-        List<LogUpload> list = dataCenter.getListLogUpload(this.getApplicationContext(),
-                CJayConstant.PREFIX_LOGUPLOAD);
+        List<LogItem> list = dataCenter.getListLogItems(this.getApplicationContext(),
+		        CJayConstant.PREFIX_LOGUPLOAD);
         updatedData(list);
     }
 
     @UiThread
-    public void updatedData(List<LogUpload> logUploadList) {
+    public void updatedData(List<LogItem> logUploadList) {
         mAdapter.clear();
         if (logUploadList != null) {
-            for (LogUpload object : logUploadList) {
+            for (LogItem object : logUploadList) {
                 mAdapter.insert(object, mAdapter.getCount());
             }
         }

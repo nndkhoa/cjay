@@ -19,7 +19,7 @@ import javax.annotation.Generated;
 
 
 @Generated("org.jsonschema2pojo")
-public class Session {
+public class Session implements Serializable{
 
 	public static final String FIELD_CONTAINER_ID = "container_id";
 
@@ -67,8 +67,6 @@ public class Session {
 
 	private int uploadStatus;
 
-	private boolean processing;
-
 	@SerializedName("gate_images")
 	@Expose
 	private List<GateImage> gateImages;
@@ -84,18 +82,6 @@ public class Session {
 	}
 
 	//region GETTER AND SETTER
-	public boolean isProcessing() {
-		return processing;
-	}
-
-	public void setProcessing(boolean isProcessing) {
-		this.processing = isProcessing;
-	}
-
-	public Session withProcessing(boolean isProcessing) {
-		this.processing = isProcessing;
-		return this;
-	}
 
 	public long getId() {
 		return id;

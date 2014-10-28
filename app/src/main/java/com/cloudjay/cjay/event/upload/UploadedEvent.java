@@ -1,8 +1,5 @@
 package com.cloudjay.cjay.event.upload;
 
-/**
- * Created by thai on 09/10/2014.
- */
 public class UploadedEvent {
     private String containerId;
 

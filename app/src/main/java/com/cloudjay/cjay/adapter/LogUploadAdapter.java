@@ -8,14 +8,14 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.model.LogUpload;
+import com.cloudjay.cjay.model.LogItem;
 
 import java.util.List;
 
 /**
  * Created by thai on 27/10/2014.
  */
-public class LogUploadAdapter extends ArrayAdapter<LogUpload> {
+public class LogUploadAdapter extends ArrayAdapter<LogItem> {
 
     private LayoutInflater mInflater;
     private int layoutResId;
@@ -36,7 +36,7 @@ public class LogUploadAdapter extends ArrayAdapter<LogUpload> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        LogUpload logUpload = getItem(position);
+        LogItem logUpload = getItem(position);
 
         ViewHolder viewHolder;
         if (convertView == null) {
@@ -58,7 +58,7 @@ public class LogUploadAdapter extends ArrayAdapter<LogUpload> {
         return convertView;
     }
 
-    public void setData(List<LogUpload> data) {
+    public void setData(List<LogItem> data) {
         clear();
         if (data != null) {
             for (int i = 0; i < data.size(); i++) {

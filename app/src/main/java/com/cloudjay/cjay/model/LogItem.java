@@ -1,9 +1,6 @@
 package com.cloudjay.cjay.model;
 
-/**
- * Created by thai on 23/10/2014.
- */
-public class LogUpload {
+public class LogItem {
     public String getContainerId() {
         return containerId;
     }

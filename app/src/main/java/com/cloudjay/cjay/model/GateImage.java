@@ -9,7 +9,7 @@ import javax.annotation.Generated;
 
 /* Gồm hình nhập và hình xuất */
 @Generated("org.jsonschema2pojo")
-public class GateImage {
+public class GateImage implements Serializable{
 
 	@Expose
 	private long id;

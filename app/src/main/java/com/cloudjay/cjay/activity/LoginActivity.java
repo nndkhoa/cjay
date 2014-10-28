@@ -149,8 +149,8 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 				// Continue to fetch List Operators and Iso Codes
 				showGettingDataTextView();
-				dataCenter.fetchOperators(this);
-				dataCenter.fetchIsoCodes(this);
+				dataCenter.fetchOperators(getApplicationContext());
+				dataCenter.fetchIsoCodes(getApplicationContext());
 
 				// TODO: bug in getCurrentUserAsync()
 //				User user = dataCenter.getCurrentUserAsync(this);

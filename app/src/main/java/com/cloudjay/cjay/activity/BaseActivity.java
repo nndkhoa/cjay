@@ -65,7 +65,7 @@ public class BaseActivity extends FragmentActivity {
 	void logoutItemClicked() {
 		showLogoutPrompt();
 	}
-    @OptionsItem(R.id.menu_logupload)
+    @OptionsItem(R.id.menu_upload_log)
     void loguploadItemClicked(){
         switchToLogUploadActivity();
     }

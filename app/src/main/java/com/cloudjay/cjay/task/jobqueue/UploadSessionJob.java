@@ -16,6 +16,11 @@ import de.greenrobot.event.EventBus;
 public class UploadSessionJob extends Job {
 	Session session;
 
+	@Override
+	protected int getRetryLimit() {
+		return 2;
+	}
+
 	public UploadSessionJob(Session session) {
 		super(new Params(1).requireNetwork().persist().groupBy(session.getContainerId()));
 		this.session = session;
@@ -28,11 +33,14 @@ public class UploadSessionJob extends Job {
 
 	@Override
 	public void onRun() throws Throwable {
+
+		// Notify container is being uploaded
 		EventBus.getDefault().post(new UploadingEvent());
 
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).uploadContainerSession(context, session);
+		DataCenter_.getInstance_(context).uploadSession(context, session);
 
+		// Notify container was uploaded
 		EventBus.getDefault().post(new UploadedEvent(session.getContainerId()));
 	}
 
@@ -44,9 +52,6 @@ public class UploadSessionJob extends Job {
 
 	@Override
 	protected boolean shouldReRunOnThrowable(Throwable throwable) {
-
-		// TODO: @thai: Assign upload status of container to ERROR
-
 
 		EventBus.getDefault().post(new UploadStoppedEvent());
 		return true;

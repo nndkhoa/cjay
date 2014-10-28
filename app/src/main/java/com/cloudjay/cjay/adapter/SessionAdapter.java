@@ -48,7 +48,6 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 	public View getView(int position, View convertView, ViewGroup parent) {
 
 		final Session session = getItem(position);
-		boolean isSessionProcessing = session.isProcessing();
 
 		// Apply ViewHolder pattern for better performance
 		ViewHolder viewHolder;
@@ -88,7 +87,13 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 
 		viewHolder.tvStep.setText((Step.values()[(int) session.getStep()]).toString());
 		viewHolder.tvPreStatus.setText((Status.values()[(int) session.getPreStatus()]).toString());
-		viewHolder.tvCurrentStatus.setText((Status.values()[(int) session.getStatus()]).toString());
+
+		try {
+			viewHolder.tvCurrentStatus.setText((Status.values()[(int) session.getStatus()]).toString());
+		} catch (ArrayIndexOutOfBoundsException e) {
+			e.printStackTrace();
+		}
+
 		return convertView;
 	}
 
