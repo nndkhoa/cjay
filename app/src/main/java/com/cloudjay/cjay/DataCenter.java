@@ -725,13 +725,14 @@ public class DataCenter {
 	public List<LogItem> searchLog(Context context, String searchKey) {
 		try {
 			DB db = App.getDB(context);
-			String[] keysResult = db.findKeys(CJayConstant.PREFIX_LOGUPLOAD + searchKey);
+			String[] keysResult = db.findKeys(CJayConstant.PREFIX_LOG + searchKey);
 			List<LogItem> logUploads = new ArrayList<>();
 
 			for (String result : keysResult) {
 				LogItem logUpload = db.getObject(result, LogItem.class);
 				logUploads.add(logUpload);
 			}
+
 			// db.close();
 			return logUploads;
 		} catch (SnappydbException e) {
@@ -752,7 +753,7 @@ public class DataCenter {
 			// Get list session's audit items
 			List<AuditItem> auditItems = session.getAuditItems();
 			if (auditItems == null) {
-				auditItems = new ArrayList<AuditItem>();
+				auditItems = new ArrayList<>();
 			}
 
 			// Add audit item to List session's audit items
@@ -821,7 +822,7 @@ public class DataCenter {
 		try {
 
 			DB db = App.getDB(context);
-			db.put(CJayConstant.PREFIX_LOGUPLOAD + logUpload.getContainerId() + logUpload.getMessage(), logUpload);
+			db.put(CJayConstant.PREFIX_LOG + logUpload.getContainerId() + logUpload.getMessage(), logUpload);
 			// db.close();
 
 		} catch (SnappydbException e) {

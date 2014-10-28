@@ -29,7 +29,7 @@ public class CJayConstant {
 	public static final String PREFIX_DAMAGE_CODE = "DAMAGE";
 	public static final String PREFIX_REPAIR_CODE = "REPAIR";
 	public static final String PREFIX_COMPONENT_CODE = "COMPONENT";
-    public static final String PREFIX_LOGUPLOAD = "LOG";
+    public static final String PREFIX_LOG = "LOG";
 
 	// `/sdcard/DCMI/CJay/`
 	public static final File APP_DIRECTORY_FILE = new File(
