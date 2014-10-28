@@ -9,10 +9,8 @@ import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
-import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
-import com.cloudjay.cjay.util.StringHelper;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -166,7 +164,7 @@ public class NetworkClient {
         }
     }
 
-    @Trace(tag = "NetworkClient")
+    @Trace
     public List<Session> getAllSessions(Context context, String modifiedDate) {
 
         List<Session> sessions = new ArrayList<Session>();
@@ -199,7 +197,9 @@ public class NetworkClient {
                 //Get session fist page when query by day
                 String lastModifiedDate = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
                 Logger.Log("Last modified date: " + lastModifiedDate);
+
             } else {
+
                 //get all session in page 1
                 List<Session> sessionsByPage = this.getAllSessionsByPage(context, 1);
                 sessions.addAll(sessionsByPage);
