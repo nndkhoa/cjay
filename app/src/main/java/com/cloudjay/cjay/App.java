@@ -25,148 +25,156 @@ import com.snappydb.SnappydbException;
 
 public class App extends Application {
 
-    private static App instance;
-    private static JobManager jobManager;
-    private static DB snappyDB;
-    Context mContext;
+	private static App instance;
+	private static JobManager jobManager;
+	private static DB snappyDB;
+	Context mContext;
 
-    public App() {
-        instance = this;
-    }
+	public App() {
+		instance = this;
+	}
 
-    public static App getInstance() {
-        return instance;
-    }
+	public static App getInstance() {
+		return instance;
+	}
 
-    public static DB getDB(Context context) throws SnappydbException {
-        snappyDB = DBFactory.open(context, CJayConstant.DB_NAME);
-        return snappyDB;
-    }
+	public static DB getDB(Context context) throws SnappydbException {
 
-    public static void closeDB() throws SnappydbException {
-        if (snappyDB != null & snappyDB.isOpen()) {
-            Logger.Log("Closing database ... ");
-            snappyDB.close();
-        }
-    }
+		StackTraceElement[] trace = new Throwable().getStackTrace();
+		Logger.Log("Open DB " + trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
+		snappyDB = DBFactory.open(context, CJayConstant.DB_NAME);
+		return snappyDB;
+	}
 
-        configureDirectories();
-        configureImageLoader();
-        configureJobManager();
+	public static void closeDB() throws SnappydbException {
 
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
-                .detectLeakedClosableObjects().penaltyLog()
-                .penaltyDeath().build());
+		if (snappyDB != null & snappyDB.isOpen()) {
 
-        // Configure Alarm Manager
-        // Check if user logged in => check alarm manager
-        mContext = getApplicationContext();
-        if (!PreferencesUtil.getPrefsValue(mContext, PreferencesUtil.PREF_TOKEN).isEmpty()) {
-            if (!Utils.isAlarmUp(mContext)) {
+			StackTraceElement[] trace = new Throwable().getStackTrace();
+			Logger.Log("Close DB " + trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
 
-                Logger.w("Alarm Manager is not running.");
-                Utils.startAlarm(mContext);
+			snappyDB.close();
+		}
+	}
 
-            } else {
+	@Override
+	public void onCreate() {
+		super.onCreate();
 
-                Logger.Log("Alarm is already running "
-                        + StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+		configureDirectories();
+		configureImageLoader();
+		configureJobManager();
 
-            }
-        } else {
-            Logger.Log("UnLogged in");
-        }
-    }
+		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
+		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
+				.detectLeakedClosableObjects().penaltyLog()
+				.penaltyDeath().build());
 
-    /**
-     * Khởi tạo các folder mặc định
-     */
-    private void configureDirectories() {
+		// Configure Alarm Manager
+		// Check if user logged in => check alarm manager
+		mContext = getApplicationContext();
+		if (!PreferencesUtil.getPrefsValue(mContext, PreferencesUtil.PREF_TOKEN).isEmpty()) {
+			if (!Utils.isAlarmUp(mContext)) {
 
-        // Init Default dirs
-        if (!CJayConstant.BACK_UP_DIRECTORY_FILE.exists()) {
-            CJayConstant.BACK_UP_DIRECTORY_FILE.mkdir();
-        }
+				Logger.w("Alarm Manager is not running.");
+				Utils.startAlarm(mContext);
 
-        if (!CJayConstant.LOG_DIRECTORY_FILE.exists()) {
-            CJayConstant.LOG_DIRECTORY_FILE.mkdirs();
-        }
+			} else {
 
-        if (!CJayConstant.APP_DIRECTORY_FILE.exists()) {
-            CJayConstant.APP_DIRECTORY_FILE.mkdir();
-        }
-    }
+				Logger.Log("Alarm is already running "
+						+ StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 
-    /**
-     * Cấu hình Universal Image Loader
-     */
-    private void configureImageLoader() {
+			}
+		} else {
+			Logger.Log("UnLogged in");
+		}
+	}
 
-        // init image loader default options
-        DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
-                .cacheInMemory(true)
-                .cacheOnDisc(true)
-                .bitmapConfig(Bitmap.Config.RGB_565)
-                .imageScaleType(ImageScaleType.IN_SAMPLE_INT)
-                .showImageForEmptyUri(R.drawable.ic_app_360)
-                .build();
+	/**
+	 * Khởi tạo các folder mặc định
+	 */
+	private void configureDirectories() {
 
-        // init image loader config
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
-                .defaultDisplayImageOptions(defaultOptions)
-                .discCacheSize(500 * 1024 * 1024)
-                .memoryCache(new WeakMemoryCache())
-                .threadPoolSize(3)
-                .threadPriority(Thread.MAX_PRIORITY)
-                .build();
+		// Init Default dirs
+		if (!CJayConstant.BACK_UP_DIRECTORY_FILE.exists()) {
+			CJayConstant.BACK_UP_DIRECTORY_FILE.mkdir();
+		}
 
-        // init image loader with config defined
-        ImageLoader.getInstance().init(config);
-    }
+		if (!CJayConstant.LOG_DIRECTORY_FILE.exists()) {
+			CJayConstant.LOG_DIRECTORY_FILE.mkdirs();
+		}
 
-    /**
-     * Cấu hình Job Manager của JobQueue
-     */
-    private void configureJobManager() {
-        Configuration configuration = new Configuration.Builder(this)
-                .customLogger(new CustomLogger() {
-                    private static final String TAG = "JOBS";
+		if (!CJayConstant.APP_DIRECTORY_FILE.exists()) {
+			CJayConstant.APP_DIRECTORY_FILE.mkdir();
+		}
+	}
 
-                    @Override
-                    public boolean isDebugEnabled() {
-                        return true;
-                    }
+	/**
+	 * Cấu hình Universal Image Loader
+	 */
+	private void configureImageLoader() {
 
-                    @Override
-                    public void d(String text, Object... args) {
-                        Log.d(TAG, String.format(text, args));
-                    }
+		// init image loader default options
+		DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
+				.cacheInMemory(true)
+				.cacheOnDisc(true)
+				.bitmapConfig(Bitmap.Config.RGB_565)
+				.imageScaleType(ImageScaleType.IN_SAMPLE_INT)
+				.showImageOnLoading(R.drawable.ic_app_360)
+				.build();
 
-                    @Override
-                    public void e(Throwable t, String text, Object... args) {
-                        Log.e(TAG, String.format(text, args), t);
-                    }
+		// init image loader config
+		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
+				.defaultDisplayImageOptions(defaultOptions)
+				.discCacheSize(500 * 1024 * 1024)
+				.memoryCache(new WeakMemoryCache())
+				.threadPoolSize(3)
+				.threadPriority(Thread.MAX_PRIORITY)
+				.build();
 
-                    @Override
-                    public void e(String text, Object... args) {
-                        Log.e(TAG, String.format(text, args));
-                    }
-                })
-                .minConsumerCount(1)
-                .maxConsumerCount(3)
-                .loadFactor(3)
-                .consumerKeepAlive(120)
-                .build();
+		// init image loader with config defined
+		ImageLoader.getInstance().init(config);
+	}
 
-        jobManager = new JobManager(this, configuration);
-    }
+	/**
+	 * Cấu hình Job Manager của JobQueue
+	 */
+	private void configureJobManager() {
+		Configuration configuration = new Configuration.Builder(this)
+				.customLogger(new CustomLogger() {
+					private static final String TAG = "JOBS";
 
-    public static JobManager getJobManager() {
-        return jobManager;
-    }
+					@Override
+					public boolean isDebugEnabled() {
+						return true;
+					}
+
+					@Override
+					public void d(String text, Object... args) {
+						Log.d(TAG, String.format(text, args));
+					}
+
+					@Override
+					public void e(Throwable t, String text, Object... args) {
+						Log.e(TAG, String.format(text, args), t);
+					}
+
+					@Override
+					public void e(String text, Object... args) {
+						Log.e(TAG, String.format(text, args));
+					}
+				})
+				.minConsumerCount(1)
+				.maxConsumerCount(3)
+				.loadFactor(3)
+				.consumerKeepAlive(120)
+				.build();
+
+		jobManager = new JobManager(this, configuration);
+	}
+
+	public static JobManager getJobManager() {
+		return jobManager;
+	}
 }

@@ -18,10 +18,7 @@ import java.util.List;
 public class GateImageAdapter extends ArrayAdapter<GateImage> {
 
 	private LayoutInflater inflater;
-	private Context mContext;
 	private int resource;
-
-
 	private boolean mCheckable = false;
 	private ArrayList<GateImage> mArrayCheckedImages;
 
@@ -29,11 +26,10 @@ public class GateImageAdapter extends ArrayAdapter<GateImage> {
 		super(context, resource);
 
 		this.inflater = LayoutInflater.from(context);
-		this.mContext = context;
 		this.mCheckable = isCheckable;
 		this.resource = resource;
 
-		mArrayCheckedImages = new ArrayList<GateImage>();
+		mArrayCheckedImages = new ArrayList<>();
 	}
 
 	private class ViewHolder {
@@ -44,7 +40,7 @@ public class GateImageAdapter extends ArrayAdapter<GateImage> {
 	@Override
 	public View getView(final int i, View convertView, ViewGroup viewGroup) {
 
-        final GateImage gateImage = getItem(i);
+		final GateImage gateImage = getItem(i);
 
 		ViewHolder holder;
 		if (convertView == null) {
@@ -58,7 +54,7 @@ public class GateImageAdapter extends ArrayAdapter<GateImage> {
 			holder = (ViewHolder) convertView.getTag();
 		}
 
-		CheckablePhotoGridItemLayout layout = (CheckablePhotoGridItemLayout) holder.photoLayout;
+		CheckablePhotoGridItemLayout layout = holder.photoLayout;
 		layout.setShowCheckbox(mCheckable);
 		if (mCheckable) {
 			layout.setParentAdapter(this);
@@ -94,12 +90,12 @@ public class GateImageAdapter extends ArrayAdapter<GateImage> {
 		mArrayCheckedImages.clear();
 	}
 
-    public void setData(List<GateImage> data) {
-        clear();
-        if (data != null) {
-            for (int i = 0; i < data.size(); i++) {
-                add(data.get(i));
-            }
-        }
-    }
+	public void setData(List<GateImage> data) {
+		clear();
+		if (data != null) {
+			for (int i = 0; i < data.size(); i++) {
+				add(data.get(i));
+			}
+		}
+	}
 }

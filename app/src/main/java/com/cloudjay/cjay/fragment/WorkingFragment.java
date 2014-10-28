@@ -11,7 +11,6 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
-import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -91,8 +90,10 @@ public class WorkingFragment extends Fragment {
 
 	@Background
 	void refresh() {
+
 		List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
 				CJayConstant.PREFIX_WORKING);
+
 		updatedData(list);
 	}
 
@@ -114,11 +115,6 @@ public class WorkingFragment extends Fragment {
 	 */
 	@UiThread
 	public void onEvent(WorkingSessionCreatedEvent event) {
-		refresh();
-	}
-
-	@UiThread
-	public void onEvent(ImageCapturedEvent event) {
 		refresh();
 	}
 }

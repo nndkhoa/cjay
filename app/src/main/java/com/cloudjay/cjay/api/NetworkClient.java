@@ -164,7 +164,6 @@ public class NetworkClient {
         }
     }
 
-    @Trace
     public List<Session> getAllSessions(Context context, String modifiedDate) {
 
         List<Session> sessions = new ArrayList<Session>();
