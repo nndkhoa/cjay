@@ -806,4 +806,15 @@ public class DataCenter {
         EventBus.getDefault().post(new IssueDeletedEvent(containerId));
     }
 
+    public void addLogUpload(Context context, LogUpload logUpload) {
+        try {
+
+            DB db = App.getDB(context);
+            db.put(CJayConstant.PREFIX_LOGUPLOAD+logUpload.getContainerId()+logUpload.getMessage(),logUpload);
+            db.close();
+
+        } catch (SnappydbException e) {
+            Logger.w(e.getMessage());
+        }
+    }
 }

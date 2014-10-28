@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <TextView
         android:id="@+id/tv_containerid_log"
         android:layout_width="wrap_content"
@@ -10,15 +12,22 @@
         android:text="THAI0123456"
         android:textColor="@color/background_button_and_line"
         android:textSize="15sp"
-        android:textStyle="bold"/>
+        android:textStyle="bold" />
+
     <TextView
         android:id="@+id/tv_message_log"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Uploading"/>
+        android:text="Uploading" />
+
     <TextView
         android:id="@+id/tv_time_log"
+        android:text="Em của ngày hôm qua"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/background_button_and_line"></View>
 
 </LinearLayout>
