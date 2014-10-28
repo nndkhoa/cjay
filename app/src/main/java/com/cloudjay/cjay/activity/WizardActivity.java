@@ -16,7 +16,7 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 
 @EActivity(R.layout.activity_wizard)
-public class WizardActivity extends FragmentActivity {
+public class WizardActivity extends BaseActivity {
 
 	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
 	public final static String STEP_EXTRA = "com.cloudjay.wizard.step";
