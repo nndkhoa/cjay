@@ -23,13 +23,13 @@
 				android:title="@string/menu_upload_log_title"/>
 			<item
 				android:id="@+id/menu_username"
-				android:icon="@android:drawable/ic_btn_speak_now"
+				android:icon="@drawable/ic_user"
 				android:menuCategory="secondary"
 				android:showAsAction="never"
 				android:title="@string/menu_username_title"/>
 			<item
 				android:id="@+id/menu_role"
-				android:icon="@android:drawable/ic_menu_compass"
+				android:icon="@drawable/ic_role"
 				android:menuCategory="secondary"
 				android:showAsAction="never"
 				android:title="@string/menu_role_title"/>
