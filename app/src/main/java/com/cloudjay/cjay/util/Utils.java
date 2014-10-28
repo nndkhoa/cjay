@@ -23,6 +23,7 @@ import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.service.QueueIntentService_;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
@@ -199,16 +200,17 @@ public class Utils {
 			for (AuditItem auditItem : auditItems) {
 				List<AuditImage> auditImages = auditItem.getAuditImages();
 				for (AuditImage auditImage : auditImages) {
-					if (auditImage.isUploadStatus()) {
+					if (auditImage.getUploadStatus() == UploadStatus.COMPLETE.value) {
 						uploadedImage = uploadedImage + 1;
 					}
 				}
 
 			}
 		}
+
 		List<GateImage> gateImages = session.getGateImages();
 		for (GateImage gateImage : gateImages) {
-			if (gateImage.isUploadStatus()) {
+			if (gateImage.getUploadStatus() == UploadStatus.COMPLETE.value) {
 				uploadedImage = uploadedImage + 1;
 			}
 		}
