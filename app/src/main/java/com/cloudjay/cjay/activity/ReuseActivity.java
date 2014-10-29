@@ -147,7 +147,7 @@ public class ReuseActivity extends Activity {
         Intent resultIntent = new Intent();
         setResult(Activity.RESULT_OK, resultIntent);
 
-        EventBus.getDefault().post(new ImageCapturedEvent(containerID));
+        EventBus.getDefault().post(new ImageCapturedEvent(containerID, CJayConstant.TYPE_AUDIT, null));
         this.finish();
     }
 

@@ -4,6 +4,7 @@ package com.cloudjay.cjay.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -19,6 +20,7 @@ import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.adapter.AuditItemAdapter;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.IssueDeletedEvent;
+import com.cloudjay.cjay.event.IssueMergedEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.jobqueue.UploadSessionHandCleaningJob;
@@ -124,10 +126,21 @@ public class IssuePendingFragment extends Fragment {
 
 		Logger.Log("on ImageCapturedEvent");
 
-		// Re-query container session with given containerId
-		String containerId = event.getContainerId();
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
-		refresh();
+        int imageType = event.getImageType();
+
+        if (imageType == CJayConstant.TYPE_AUDIT) { // if audit
+            // Re-query container session with given containerId
+            String containerId = event.getContainerId();
+            mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+            refresh();
+        } else if (imageType == CJayConstant.TYPE_REPAIRED) { // if repaired
+            Logger.Log("Open AfterRepair Fragment");
+            AuditItem auditItem = event.getAuditItem();
+            Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
+            detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
+            detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem);
+            startActivity(detailIssueActivity);
+        }
 	}
 
 	@Click(R.id.btn_clean)
@@ -209,6 +222,18 @@ public class IssuePendingFragment extends Fragment {
 			btnClean.setVisibility(View.GONE);
 		}
 	}
+
+    @UiThread
+    void onEvent(IssueMergedEvent event) {
+        Logger.Log("on IssueMergedEvent");
+
+        // Delete merged audit item containerId
+        String containerId = event.getContainerId();
+        String auditItemRemoveUUID = event.getAuditItemRemoveUUID();
+        dataCenter.deleteAuditItemAfterMerge(getActivity().getApplicationContext(),
+                containerId, auditItemRemoveUUID);
+        refresh();
+    }
 
 	@UiThread
 	void onEvent(IssueDeletedEvent event) {

@@ -259,7 +259,8 @@ public class ImportFragment extends Fragment {
 		jobManager.addJobInBackground(new UploadSessionJob(mSession));
 
 		// Go to next fragment
-		AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID).build();
+		AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID)
+                .tabType(1).build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 		transaction.replace(R.id.ll_main, fragment);

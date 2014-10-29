@@ -7,6 +7,7 @@ import com.cloudjay.cjay.event.AuditImagesGotEvent;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
 import com.cloudjay.cjay.event.IssueDeletedEvent;
+import com.cloudjay.cjay.event.IssueMergedEvent;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.event.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
@@ -791,7 +792,7 @@ public class DataCenter {
 	public void addAuditImageToAuditedIssue(Context context,
 	                                        String containerId,
 	                                        String auditItemUUID,
-	                                        AuditItem auditItemRemove,
+	                                        String auditItemRemove,
 	                                        AuditImage auditImage) {
 
 		try {
@@ -812,13 +813,6 @@ public class DataCenter {
 				}
 			}
 
-			for (AuditItem auditItem : session.getAuditItems()) {
-				if (auditItem.getAuditItemUUID().equals(auditItemRemove.getAuditItemUUID())) {
-					session.getAuditItems().remove(auditItem);
-					break;
-				}
-			}
-
 			db.put(containerId, session);
 			Logger.Log("add AuditImage To AuditedIssue successfully");
 			// db.close();
@@ -827,7 +821,7 @@ public class DataCenter {
 			Logger.w(e.getMessage());
 		}
 
-		EventBus.getDefault().post(new IssueDeletedEvent(containerId));
+		EventBus.getDefault().post(new IssueMergedEvent(containerId, auditItemRemove));
 	}
 
 	/**
@@ -954,4 +948,27 @@ public class DataCenter {
 
 		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
 	}
+
+    // Xóa lỗi sau khi merge
+    public void deleteAuditItemAfterMerge(Context context, String containerId, String auditItemUUID) {
+        try {
+            DB db = App.getDB(context);
+            Session session = db.getObject(containerId, Session.class);
+
+            for (AuditItem auditItem : session.getAuditItems()) {
+                if (auditItem.getAuditItemUUID().equals(auditItemUUID)) {
+                    session.getAuditItems().remove(auditItem);
+                    break;
+                }
+            }
+
+            db.put(containerId, session);
+            Logger.Log("delete audit item successfully");
+
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+
+        EventBus.getDefault().post(new IssueDeletedEvent(containerId));
+    }
 }

@@ -25,9 +25,13 @@ import java.lang.reflect.Method;
 public class AuditAndRepairFragment extends Fragment implements ActionBar.TabListener {
 
 	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+    public final static String TAB_TYPE_EXTRA = "com.cloudjay.wizard.tabtype";
 
 	@FragmentArg(CONTAINER_ID_EXTRA)
 	public String containerID;
+
+    @FragmentArg(TAB_TYPE_EXTRA)
+    public int tabType;
 
 	@ViewById(R.id.pager)
 	ViewPager pager;
@@ -96,7 +100,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 	private void configureViewPager() {
 		mPagerAdapter = new ViewPagerAdapter(getActivity(),
-                getActivity().getSupportFragmentManager(), containerID, 1);
+                getActivity().getSupportFragmentManager(), containerID, tabType);
 		pager.setAdapter(mPagerAdapter);
 		pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
