@@ -9,6 +9,7 @@ import javax.annotation.Generated;
 @Generated("org.jsonschema2pojo")
 public class IsoCode {
 
+	// key = CJayConstant.PREFIX_DAMAGE_CODE + "DB"
 	@Expose
 	private long id;
 	@Expose

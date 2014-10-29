@@ -1,8 +1,13 @@
-package com.cloudjay.cjay.util;
+package com.cloudjay.cjay.task.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+
+import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.StringUtils;
+import com.cloudjay.cjay.util.Utils;
 
 import org.androidannotations.annotations.EReceiver;
 
@@ -23,7 +28,7 @@ public class AutoStartReceiver extends BroadcastReceiver {
 
         } else {
             Logger.Log("Alarm is already running "
-                    + StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+                    + StringUtils.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
         }
     }
 }

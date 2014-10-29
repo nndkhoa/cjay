@@ -109,7 +109,7 @@ public class AfterRepairFragment extends Fragment {
         Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
         cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
         cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_REPAIRED);
+        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.REPAIRED.value);
         cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);
         startActivity(cameraActivityIntent);
     }

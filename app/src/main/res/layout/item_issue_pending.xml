@@ -206,17 +206,31 @@
             android:gravity="center_vertical"
             android:layout_marginLeft="6dp">
 
-            <Button
-                android:focusable="false"
-                android:id="@+id/btn_upload_pending"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/btn_customize_selector"
-                android:text="@string/button_upload"
-                android:textColor="@android:color/white"
-                android:layout_marginBottom="6dp"
-                android:textSize="14sp"
-                android:visibility="gone" />
+                android:layout_marginBottom="6dp">
+
+                <Button
+                    android:focusable="false"
+                    android:id="@+id/btn_upload_pending"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/btn_customize_selector"
+                    android:text="@string/button_upload"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/iv_uploading"
+                    android:background="@drawable/btn_customize_selector"
+                    android:src="@android:drawable/stat_sys_upload"
+                    android:visibility="gone"/>
+
+            </FrameLayout>
 
             <Button
                 android:focusable="false"

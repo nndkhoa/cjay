@@ -8,6 +8,7 @@ import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 
@@ -36,7 +37,7 @@ public class UploadAuditItemJob extends Job {
 
         Context context = App.getInstance().getApplicationContext();
         DataCenter_.getInstance_(context).addUploadSession(containerId);
-        EventBus.getDefault().post(new UploadStartedEvent(containerId));
+        EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.AUDIT_ITEM));
 
     }
 
@@ -47,7 +48,7 @@ public class UploadAuditItemJob extends Job {
         //Add Log
         DataCenter_.getInstance_(context).addLog(context,containerId, "Bắt đầu thêm lỗi");
 
-        EventBus.getDefault().post(new UploadingEvent());
+//        EventBus.getDefault().post(new UploadingEvent());
 
         DataCenter_.getInstance_(context).upLoadAuditItem(context, containerId,auditItem);
 
@@ -70,7 +71,7 @@ public class UploadAuditItemJob extends Job {
         //Add Log
         DataCenter_.getInstance_(context).addLog(context,containerId, "Thêm lỗi bị gián đoạn");
 
-        EventBus.getDefault().post(new UploadStoppedEvent());
+        EventBus.getDefault().post(new UploadStoppedEvent(containerId));
         return true;
     }
 }

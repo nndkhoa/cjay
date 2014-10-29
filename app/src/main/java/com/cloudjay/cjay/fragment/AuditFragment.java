@@ -18,6 +18,7 @@ import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 
 import org.androidannotations.annotations.AfterViews;
@@ -96,7 +97,7 @@ public class AuditFragment extends Fragment {
         // Open camera activity
         Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
         cameraActivityIntent.putExtra("containerID", containerID);
-        cameraActivityIntent.putExtra("imageType", CJayConstant.TYPE_EXPORT);
+        cameraActivityIntent.putExtra("imageType", ImageType.EXPORT.value);
         cameraActivityIntent.putExtra("operatorCode", operatorCode);
         startActivity(cameraActivityIntent);
     }

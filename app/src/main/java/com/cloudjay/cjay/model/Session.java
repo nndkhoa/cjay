@@ -1,8 +1,8 @@
 package com.cloudjay.cjay.model;
 
 
-import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.enums.ImageType;
+import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -283,7 +283,7 @@ public class Session implements Serializable {
 	public List<GateImage> getImportImages() {
 		List<GateImage> imageList = new ArrayList<GateImage>();
 		for (GateImage gateImage : gateImages) {
-			if (gateImage.getType() == CJayConstant.TYPE_IMPORT) {
+			if (gateImage.getType() == ImageType.IMPORT.value) {
 				imageList.add(gateImage);
 			}
 		}
@@ -298,7 +298,7 @@ public class Session implements Serializable {
 	public List<GateImage> getExportImages() {
 		List<GateImage> imageList = new ArrayList<GateImage>();
 		for (GateImage gateImage : gateImages) {
-			if (gateImage.getType() == CJayConstant.TYPE_EXPORT) {
+			if (gateImage.getType() == ImageType.EXPORT.value) {
 				imageList.add(gateImage);
 			}
 		}
@@ -316,7 +316,7 @@ public class Session implements Serializable {
 
 		for (AuditItem auditItem : auditItems) {
 			for (AuditImage auditImage : auditItem.getAuditImages()) {
-				if (auditImage.getType() == CJayConstant.TYPE_AUDIT) {
+				if (auditImage.getType() == ImageType.AUDIT.value) {
 					imageList.add(auditImage);
 				}
 			}
@@ -335,7 +335,7 @@ public class Session implements Serializable {
 
 		for (AuditItem auditItem : auditItems) {
 			for (AuditImage auditImage : auditItem.getAuditImages()) {
-				if (auditImage.getType() == CJayConstant.TYPE_REPAIRED) {
+				if (auditImage.getType() == ImageType.REPAIRED.value) {
 					imageList.add(auditImage);
 				}
 			}
@@ -415,4 +415,64 @@ public class Session implements Serializable {
 		return auditItems;
 	}
 
+
+	/**
+	 * Check if container has repair images or not
+	 *
+	 * @return
+	 */
+	public boolean hasRepairImages() {
+		for (AuditItem item : auditItems) {
+			for (AuditImage image : item.getAuditImages()) {
+				if (image.getType() == ImageType.REPAIRED.value) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Use it to check if container session is valid or not
+	 */
+	public boolean isValidToUpload(Step step) {
+
+		switch (step) {
+
+			// Chỉ cần có ít nhất một tấm hình IMPORT là hợp lệ
+			case IMPORT:
+				for (GateImage image : gateImages) {
+					if (image.getType() == ImageType.IMPORT.value) return true;
+				}
+				return false;
+
+			// Tất cả các item đều được gán lỗi và có hình
+			case AUDIT:
+				for (AuditItem item : auditItems) {
+					if (item.getAudited() == false)
+						return false;
+				}
+
+				return true;
+
+			// Tất cả các item đều phải có hình sau sửa chữa
+			case REPAIR:
+				for (AuditItem item : auditItems) {
+					if (item.getRepaired() == false) {
+						return false;
+					}
+				}
+
+				return true;
+
+			// Chỉ cần có ít nhất một tấm hình EXPORT là hợp lệ
+			case EXPORT:
+				for (GateImage image : gateImages) {
+					if (image.getType() == ImageType.EXPORT.value) return true;
+				}
+				return false;
+		}
+
+		return false;
+	}
 }

@@ -6,6 +6,7 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
+import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
@@ -13,10 +14,7 @@ import com.path.android.jobqueue.Params;
 
 import de.greenrobot.event.EventBus;
 
-/**
- * Use it to mark session audited
- */
-public class UploadCompleteAuditJob extends Job {
+public class UploadCompleteRepairJob extends Job {
 	Session session;
 	String containerId;
 
@@ -25,7 +23,7 @@ public class UploadCompleteAuditJob extends Job {
 		return 2;
 	}
 
-	public UploadCompleteAuditJob(String containerId) {
+	public UploadCompleteRepairJob(String containerId) {
 		super(new Params(1).requireNetwork().persist().groupBy(containerId));
 		this.containerId = containerId;
 	}
@@ -44,28 +42,28 @@ public class UploadCompleteAuditJob extends Job {
 		Context context = App.getInstance().getApplicationContext();
 
 		//Add Log
-		DataCenter_.getInstance_(context).addLog(context, containerId, "Bắt đầu tải lên giám định");
+		DataCenter_.getInstance_(context).addLog(context, containerId, "Bắt đầu tải lên đã sữa");
 
-//        EventBus.getDefault().post(new UploadingEvent());
+//		EventBus.getDefault().post(new UploadingEvent());
 
-		DataCenter_.getInstance_(context).uploadCompleteAuditSession(context, containerId);
+		DataCenter_.getInstance_(context).uploadCompleteRepairSession(context, containerId);
 
 		//Add Log
-		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Tải lên giám định hoàn tất");
+		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Tải lên đã sữa hoàn tất");
 	}
 
 
 	@Override
 	protected void onCancel() {
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Không thể tải lên giám định");
+		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Không thể tải lên đã sữa");
 	}
 
 	@Override
 	protected boolean shouldReRunOnThrowable(Throwable throwable) {
 		Context context = App.getInstance().getApplicationContext();
 		//Add Log
-		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Tải lên giám định bị gián đoạn");
+		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Tải lên giám định bị đã sữa");
 
 		EventBus.getDefault().post(new UploadStoppedEvent(containerId));
 		return true;

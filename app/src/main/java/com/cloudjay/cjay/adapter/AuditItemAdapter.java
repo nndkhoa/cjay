@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,15 +14,20 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.App;
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.MergeIssueActivity_;
+import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.task.jobqueue.UploadAuditItemJob;
-import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
+import com.cloudjay.cjay.util.enums.ImageType;
+import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.view.SquareImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.path.android.jobqueue.JobManager;
+import com.snappydb.SnappydbException;
 
 import java.util.List;
 
@@ -37,15 +41,15 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 	private int layoutResId;
 	private String containerId;
 	private AuditImage auditImage;
-	private AuditItem mAuditItem;
+	private String operatorCode;
 
-	public AuditItemAdapter(Context context, int resource, String containerId) {
+	public AuditItemAdapter(Context context, int resource, String containerId, String operatorCode) {
 		super(context, resource);
 		this.mContext = context;
 		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		layoutResId = resource;
 		this.containerId = containerId;
-
+		this.operatorCode = operatorCode;
 	}
 
 	private class ViewHolder {
@@ -63,6 +67,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		public TextView tvIssueStatus;
 		public LinearLayout llIssueImageView;
 		public LinearLayout llIssueDetails;
+		public ImageView ivUploading;
 	}
 
 	@Override
@@ -70,7 +75,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 		final AuditItem auditItem = getItem(i);
 
-		ViewHolder holder;
+		final ViewHolder holder;
 		if (view == null) {
 			holder = new ViewHolder();
 			view = mInflater.inflate(layoutResId, null);
@@ -88,6 +93,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			holder.btnReport = (Button) view.findViewById(R.id.btn_report_pending);
 			holder.btnRepair = (Button) view.findViewById(R.id.btn_repair_pending);
 			holder.btnEdit = (Button) view.findViewById(R.id.btn_edit_pending);
+			holder.ivUploading = (ImageView) view.findViewById(R.id.iv_uploading);
 
 			holder.llIssueDetails = (LinearLayout) view.findViewById(R.id.ll_issue_details);
 			holder.llIssueImageView = (LinearLayout) view.findViewById(R.id.ll_issue_imageview);
@@ -119,6 +125,37 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_approved));
 			}
 
+			holder.btnRepair.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					if (!auditItem.getApproved()) {
+						// Show repair dialog
+						showRepairDiaglog();
+					} else {
+						// Open camera activity to take repair image
+						openCamera();
+					}
+				}
+			});
+
+			holder.btnUpload.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					//1. Ẩn button Edit, Hiện icon Uploading, Hiện button Repair
+					holder.btnUpload.setVisibility(View.GONE);
+					holder.btnEdit.setVisibility(View.GONE);
+					holder.ivUploading.setVisibility(View.VISIBLE);
+					holder.btnRepair.setVisibility(View.VISIBLE);
+
+					//2. Add container session to upload queue
+					JobManager jobManager = App.getJobManager();
+					jobManager.addJob(new UploadAuditItemJob(containerId, auditItem));
+
+					//TODO: 3. When upload completed, hide icon Uploading @Nam*/
+
+				}
+			});
+
 		} else {
 			holder.llIssueImageView.setVisibility(View.VISIBLE);
 			holder.llIssueDetails.setVisibility(View.GONE);
@@ -133,47 +170,26 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 							holder.ivAuditImage);
 				}
 			}
+
+			holder.btnReport.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					showApproveDiaglog(auditItem);
+				}
+			});
 		}
-		//TODO set event to show repair buttion
-		holder.btnRepair.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				showRepairDiaglog();
-			}
-		});
-
-
-		mAuditItem = auditItem;
-
-		holder.btnReport.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				showApproveDiaglog();
-			}
-		});
-
-        holder.btnUpload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //TODO lam hieu ung di nhe con cho =))
-                // Add container session to upload queue
-                JobManager jobManager = App.getJobManager();
-                jobManager.addJob(new UploadAuditItemJob(containerId, auditItem));
-            }
-        });
 
 		return view;
 	}
 
 	private void showRepairDiaglog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-		builder.setTitle(R.string.dialog_search_container_title);
-		builder.setMessage("Lỗi này đã chưa được. Sửa luôn?");
+		builder.setTitle("Alert");
+		builder.setMessage("Lỗi này chưa được duyệt. Sửa luôn?");
 
 		builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
-				//TODO show chon loi da giam dinh @Nam
 				dialogInterface.dismiss();
 			}
 		});
@@ -181,7 +197,8 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
-				//TODO add to database
+				// Open camera activity to take repair image
+				openCamera();
 				dialogInterface.dismiss();
 			}
 		});
@@ -208,7 +225,8 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 	}
 
-	void showApproveDiaglog() {
+	void showApproveDiaglog(final AuditItem item) {
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 		builder.setTitle("Alert");
 		builder.setMessage("Lỗi này đã được báo cáo chưa?");
@@ -216,38 +234,39 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		builder.setPositiveButton("Chưa", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
-				// TODO add to database
 				dialogInterface.dismiss();
+
+				// TODO: @vule: open ReportIssueActivity
 			}
 		});
-//        builder.setNegativeButton("Vệ sinh", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialogInterface, int i) {
-//                // TODO change status audit item to water wase
-//                dialogInterface.dismiss();
-//            }
-//        });
 
 		builder.setNegativeButton("Rồi", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
 
 				Intent intent = new Intent(mContext, MergeIssueActivity_.class);
-
-                intent.putExtra(MergeIssueActivity_.CONTAINER_ID_EXTRA, containerId);
-                intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, auditImage);
-                intent.putExtra(MergeIssueActivity_.AUDIT_ITEM_REMOVE, mAuditItem);
+				intent.putExtra(MergeIssueActivity_.CONTAINER_ID_EXTRA, containerId);
+				intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, auditImage);
+				intent.putExtra(MergeIssueActivity_.AUDIT_ITEM_REMOVE_UUID, item.getAuditItemUUID());
 
 				mContext.startActivity(intent);
 			}
 		});
 
 		builder.setNeutralButton("Vệ sinh", new DialogInterface.OnClickListener() {
+
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
-				// TODO: do process here
+				try {
 
-				dialogInterface.dismiss();
+					// change status audit item to water wash
+					DataCenter_.getInstance_(mContext).setWaterWashType(mContext, item, containerId);
+					dialogInterface.dismiss();
+
+				} catch (SnappydbException e) {
+					// TODO: Handle exception
+					e.printStackTrace();
+				}
 			}
 		});
 
@@ -287,4 +306,12 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		}
 	}
 
+	void openCamera() {
+		Intent cameraActivityIntent = new Intent(mContext, CameraActivity_.class);
+		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerId);
+		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
+		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.REPAIRED.value);
+		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);
+		mContext.startActivity(cameraActivityIntent);
+	}
 }

@@ -10,7 +10,7 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.task.jobqueue.UploadCompleteAuditJob;
-import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
+import com.cloudjay.cjay.task.jobqueue.UploadCompleteRepairJob;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
@@ -51,9 +51,9 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 
 	@Click(R.id.btn_complete_repair)
 	void buttonContinueClick() {
-        // Add containerId to upload complete repair queue
-        JobManager jobManager = App.getJobManager();
-        jobManager.addJob(new UploadCompleteRepairJob(containerID));
+		// Add containerId to upload complete repair queue
+		JobManager jobManager = App.getJobManager();
+		jobManager.addJob(new UploadCompleteRepairJob(containerID));
 
 	     /* Remove all tabs */
 		actionBar.removeAllTabs();
@@ -70,14 +70,14 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
     @Click(R.id.btn_complete_audit)
     void buttonCompleteAuditClicked(){
         // Add containerId to upload complete audit queue
-        JobManager jobManager = App.getJobManager();
-        jobManager.addJob(new UploadCompleteAuditJob(containerID));
+	    JobManager jobManager = App.getJobManager();
+	    jobManager.addJob(new UploadCompleteAuditJob(containerID));
     }
 
 	@AfterViews
 	void doAfterViews() {
 		configureActionBar();
-		configureViewPager();
+		configureViewPager(1);
 	}
 
 	private void configureActionBar() {
@@ -110,8 +110,8 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 		actionBar.setDisplayHomeAsUpEnabled(true);
 	}
 
-	private void configureViewPager() {
-		mPagerAdapter = new ViewPagerAdapter(getActivity(), getActivity().getSupportFragmentManager(), containerID,1);
+	private void configureViewPager(int tabType) {
+		mPagerAdapter = new ViewPagerAdapter(getActivity(), getActivity().getSupportFragmentManager(), containerID, tabType);
 		pager.setAdapter(mPagerAdapter);
 		pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 

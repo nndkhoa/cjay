@@ -21,12 +21,13 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
+import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.task.jobqueue.UploadImageJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
-import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.StringUtils;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
@@ -39,6 +40,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 
@@ -69,6 +71,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	public final static String OPERATOR_CODE_EXTRA = "com.cloudjay.wizard.operatorCode";
 	public final static String IMAGE_TYPE_EXTRA = "com.cloudjay.wizard.imageType";
 	public final static String CURRENT_STEP_EXTRA = "com.cloudjay.wizard.currentStep";
+    // This Extra bundle is use to open Detail Issue Activity only
+    public final static String AUDIT_ITEM_UUID_EXTRA = "com.cloudjay.wizard.auditItemUUID";
 
 	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
 	private boolean singleShotProcessing = false;
@@ -84,6 +88,9 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 	@FragmentArg(CURRENT_STEP_EXTRA)
 	int currentStep;
+
+    @FragmentArg(AUDIT_ITEM_UUID_EXTRA)
+    AuditItem auditItem;
 
 	@Bean
 	DataCenter dataCenter;
@@ -116,7 +123,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 	@Click(R.id.btn_camera_done)
 	void btnDoneClicked() {
-		EventBus.getDefault().post(new ImageCapturedEvent(containerId));
+		EventBus.getDefault().post(new ImageCapturedEvent(containerId, mType, auditItem));
 		getActivity().finish();
 	}
 
@@ -300,7 +307,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 					case AUDIT:
 					case REPAIRED:
 					default:
-						Logger.Log("save audit / repaired image to database");
 						AuditImage auditImage = new AuditImage()
 								.withId(0)
 								.withType(mType)
@@ -373,7 +379,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 			String imageType = getImageTypeString(mType);
 
 			// create today String
-			String today = StringHelper.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
+			String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
 			String depotCode = PreferencesUtil.getPrefsValue(getActivity(), PreferencesUtil.PREF_USER_DEPOT);
 
 			// create directory to save images

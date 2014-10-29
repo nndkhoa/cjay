@@ -4,10 +4,13 @@ import android.content.Context;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
+import com.cloudjay.cjay.event.SessionsFetchedEvent;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 
-public class GetAllSessionsJob extends Job {
+import de.greenrobot.event.EventBus;
+
+public class FetchSessionsJob extends Job {
 
 	String modifiedDate;
 
@@ -18,7 +21,7 @@ public class GetAllSessionsJob extends Job {
 	 * @param modifiedDate
 	 */
 
-	public GetAllSessionsJob(String modifiedDate) {
+	public FetchSessionsJob(String modifiedDate) {
 		super(new Params(1).requireNetwork().persist().setPersistent(true));
 		this.modifiedDate = modifiedDate;
 	}
@@ -31,6 +34,9 @@ public class GetAllSessionsJob extends Job {
 	public void onRun() throws Throwable {
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).fetchSession(context, modifiedDate);
+
+		// Notify UI that all data was downloaded
+		EventBus.getDefault().post(new SessionsFetchedEvent());
 	}
 
 	@Override

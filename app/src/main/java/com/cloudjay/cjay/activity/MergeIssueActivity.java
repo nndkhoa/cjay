@@ -7,7 +7,9 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.AuditMergeIssueAdapter;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 
@@ -25,7 +27,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Created by thai on 21/10/2014.
+ * Màn hình chữa các lỗi đã giám định và chưa được upload
  */
 @EActivity(R.layout.activity_merge_issue)
 public class MergeIssueActivity extends BaseActivity {
@@ -35,7 +37,7 @@ public class MergeIssueActivity extends BaseActivity {
 
     public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
     public final static String AUDIT_IMAGE_EXTRA = "com.cloudjay.wizard.auditImage";
-    public final static String AUDIT_ITEM_REMOVE = "com.cloudjay.wizard.auditItemRemove";
+    public final static String AUDIT_ITEM_REMOVE_UUID = "com.cloudjay.wizard.auditItemRemoveUUID";
 
     @Extra(CONTAINER_ID_EXTRA)
     public String containerID;
@@ -43,8 +45,8 @@ public class MergeIssueActivity extends BaseActivity {
     @Extra(AUDIT_IMAGE_EXTRA)
     AuditImage auditImage;
 
-    @Extra(AUDIT_ITEM_REMOVE)
-    AuditItem auditItemRemove;
+    @Extra(AUDIT_ITEM_REMOVE_UUID)
+    String auditItemRemoveUUID;
 
     @ViewById(R.id.lv_merge_issue)
     ListView lvIssues;
@@ -74,30 +76,41 @@ public class MergeIssueActivity extends BaseActivity {
             }
         }
 
-        Logger.Log("isInserted: " + isInserted);
         if (isInserted == false) {
-
-            // Random new UUID to unique each audit item
-            String uuid = UUID.randomUUID().toString();
-
-            // Create static issue
-            AuditItem auditItem = new AuditItem();
-            auditItem.setId(0);
-            auditItem.setAuditItemUUID(uuid);
-            auditItem.setAudited(true);
-            auditItem.setComponentCode("LBG");
-            auditItem.setLocationCode("LTON");
-            auditItem.setDamageCode("BR");
-            auditItem.setRepairCode("RP");
-            auditItem.setHeight(40);
-            auditItem.setLength(20);
-            auditItem.setQuantity(2);
-
             // Insert static issue into database
             for (int i = 0; i < 5; i++) {
-                dataCenter.addIssue(getApplicationContext(), auditItem, containerID);
-            }
 
+                Logger.Log("PREFIX_COMPONENT_CODE");
+                IsoCode componentCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_COMPONENT_CODE);
+
+                Logger.Log("PREFIX_DAMAGE_CODE");
+                IsoCode damageCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_DAMAGE_CODE);
+
+                Logger.Log("PREFIX_REPAIR_CODE");
+                IsoCode repairCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_REPAIR_CODE);
+
+                // Random new UUID to unique each audit item
+                String uuid = UUID.randomUUID().toString();
+
+                // Create static issue
+                AuditItem auditItem = new AuditItem();
+                auditItem.setId(0);
+                auditItem.setAuditItemUUID(uuid);
+                auditItem.setAudited(true);
+                auditItem.setComponentCode(componentCode.getCode());
+                auditItem.setComponentCodeId(componentCode.getId());
+                auditItem.setDamageCode(damageCode.getCode());
+                auditItem.setComponentCodeId(damageCode.getId());
+                auditItem.setRepairCode(repairCode.getCode());
+                auditItem.setComponentCodeId(repairCode.getId());
+                auditItem.setLocationCode("XXXX");
+                auditItem.setHeight(40);
+                auditItem.setLength(20);
+                auditItem.setQuantity(2);
+
+                dataCenter.addIssue(getApplicationContext(), auditItem, containerID);
+
+            }
         }
 
         refresh();
@@ -111,7 +124,7 @@ public class MergeIssueActivity extends BaseActivity {
         String uuid = auditItem.getAuditItemUUID();
         Logger.Log("uuid: " + uuid);
         dataCenter.addAuditImageToAuditedIssue(getApplicationContext(), containerID,
-                uuid, auditItemRemove, auditImage);
+                uuid, auditItemRemoveUUID, auditImage);
         refresh();
 
         this.finish();
@@ -121,7 +134,7 @@ public class MergeIssueActivity extends BaseActivity {
     void refresh() {
         List<AuditItem> list = new ArrayList<AuditItem>();
         for (AuditItem auditItem : currentSession.getAuditItems()) {
-            if (auditItem.getAudited() == true) {
+            if (auditItem.getAudited() == true && auditItem.getId() == 0) {
                 list.add(auditItem);
             }
         }

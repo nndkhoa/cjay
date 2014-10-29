@@ -31,8 +31,9 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.StringUtils;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.path.android.jobqueue.JobManager;
 
@@ -68,7 +69,7 @@ public class ImportFragment extends Fragment {
 	@ViewById(R.id.btn_complete_repair)
 	Button btnContinue;
 
-	@ViewById(R.id.btn_complete)
+	@ViewById(R.id.btn_complete_audit)
 	Button btnComplete;
 
 	@ViewById(R.id.et_operator)
@@ -106,7 +107,7 @@ public class ImportFragment extends Fragment {
 
 	GateImageAdapter mAdapter = null;
 
-	long preStatus = 0;
+	long preStatus = 1;
 	Session mSession;
 	//endregion
 
@@ -126,6 +127,7 @@ public class ImportFragment extends Fragment {
 		mAdapter = new GateImageAdapter(getActivity(), R.layout.item_image_gridview, false);
 		lvImages.setAdapter(mAdapter);
 
+
 		// Trying to restore container status
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 		if (null == mSession) {
@@ -140,6 +142,18 @@ public class ImportFragment extends Fragment {
 
 			tvContainerCode.setText(containerID);
 			etOperator.setText(operatorCode);
+
+			switch ((int) preStatus) {
+				case 0:
+					rdnStatusA.setChecked(true);
+					break;
+				case 1:
+					rdnStatusB.setChecked(true);
+					break;
+				case 2:
+					rdnStatusC.setChecked(true);
+					break;
+			}
 
 			refresh();
 		}
@@ -168,7 +182,7 @@ public class ImportFragment extends Fragment {
 		etOperator.setText(operator.getOperatorName());
 
 		// Add new session to database
-		String currentTime = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+		String currentTime = StringUtils.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 
 		mSession = new Session().withContainerId(containerID)
 				.withOperatorCode(operatorCode)
@@ -237,7 +251,7 @@ public class ImportFragment extends Fragment {
 			Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
 			cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
 			cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-			cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_IMPORT);
+			cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
 			cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
 			startActivity(cameraActivityIntent);
 
@@ -254,12 +268,18 @@ public class ImportFragment extends Fragment {
 	@Click(R.id.btn_complete_repair)
 	void buttonContinueClicked() {
 
-		//Upload container
+		if (mSession.isValidToUpload(Step.IMPORT) == false) {
+			Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+			return;
+		}
+
+		// Add current container to job queue
 		JobManager jobManager = App.getJobManager();
 		jobManager.addJobInBackground(new UploadSessionJob(mSession));
 
 		// Go to next fragment
-		AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID).build();
+		AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID)
+				.tabType(1).build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 		transaction.replace(R.id.ll_main, fragment);
@@ -269,12 +289,17 @@ public class ImportFragment extends Fragment {
 	/**
 	 * Finish import fragment, close Wizard Activity and go back to Home Activity with Search Fragment tab
 	 */
-	@Click(R.id.btn_complete)
+	@Click(R.id.btn_complete_audit)
 	void buttonCompletedClicked() {
+
+		if (mSession.isValidToUpload(Step.IMPORT) == false) {
+			Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+			return;
+		}
 
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJob(new UploadSessionJob(mSession));
+		jobManager.addJobInBackground(new UploadSessionJob(mSession));
 
 		// Navigate to HomeActivity
 		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
@@ -304,6 +329,7 @@ public class ImportFragment extends Fragment {
 	void preStatusAChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 0;
+			btnContinue.setVisibility(View.GONE);
 		}
 	}
 
@@ -311,6 +337,7 @@ public class ImportFragment extends Fragment {
 	void preStatusBChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 1;
+			btnContinue.setVisibility(View.VISIBLE);
 		}
 	}
 
@@ -318,6 +345,7 @@ public class ImportFragment extends Fragment {
 	void preStatusCChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 2;
+			btnContinue.setVisibility(View.VISIBLE);
 		}
 	}
 	//endregion

@@ -3,7 +3,6 @@ package com.cloudjay.cjay.activity;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -152,9 +151,8 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 				dataCenter.fetchOperators(getApplicationContext());
 				dataCenter.fetchIsoCodes(getApplicationContext());
 
-				// TODO: bug in getCurrentUserAsync()
-//				User user = dataCenter.getCurrentUserAsync(this);
-//				if (null != user) {
+				User user = dataCenter.getCurrentUserAsync(this);
+				if (null != user) {
 
 					// Navigate to Home Activity
 					Logger.Log("Navigate to Home Activity");
@@ -162,11 +160,11 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 					startActivity(intent);
 					finish();
 
-//				} else {
-//					Logger.w("Cannot fetch user information");
-//					showProgress(false);
-//					showCrouton(getResources().getString(R.string.error_try_again));
-//				}
+				} else {
+					Logger.w("Cannot fetch user information");
+					showProgress(false);
+					showCrouton(getResources().getString(R.string.error_try_again));
+				}
 
 			} else {
 
