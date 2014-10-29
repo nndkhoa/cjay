@@ -84,10 +84,10 @@
     <string name="search_on_server">Bắt đầu tìm kiếm trên server</string>
 
     <!-- Button titles -->
-    <string name="button_completed">Hoàn tất</string>
+    <string name="button_completed">Hoàn tất giám định</string>
     <string name="button_audit_now">Giám định ngay</string>
     <string name="button_repair_now">Sửa chữa ngay</string>
-    <string name="button_export_now">Xuất ngay</string>
+    <string name="button_export_now">Hoàn tất sữa chửa</string>
     <string name="button_add_issues_image">Bổ sung lỗi</string>
     <string name="button_approve">Duyệt</string>
     <string name="button_approved">Đã duyệt</string>
@@ -124,7 +124,7 @@
     <string name="fragment_export_title">Xuất</string>
 
     <!-- Text Error -->
-    <string name="error_empty_search_string">Vui lòng nhập từ khóa tìm kiếm</string>
+    <string name="error_empty_search_string">Vui lòng nhập 6 ký tự trở lên để tìm kiếm</string>
 
     <!-- Label for error item -->
     <string name="label_code_component">CODE component:</string>

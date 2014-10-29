@@ -14,12 +14,10 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
-import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.Status;
 
 import org.androidannotations.annotations.AfterViews;
@@ -44,7 +42,7 @@ public class AuditFragment extends Fragment {
 	String containerID;
 
 	//region VIEW
-	@ViewById(R.id.btn_continue)
+	@ViewById(R.id.btn_complete_repair)
 	Button btnContinue;
 
 	@ViewById(R.id.btn_reuse_gate_in_image)
@@ -75,7 +73,7 @@ public class AuditFragment extends Fragment {
 	public AuditFragment() {
 	}
 
-	@Click(R.id.btn_continue)
+	@Click(R.id.btn_complete_repair)
 	void buttonContinueClicked() {
 		//Go to next fragment
 		RepairFragment fragment = new RepairFragment_().builder().containerID(containerID).build();

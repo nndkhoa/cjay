@@ -10,16 +10,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.MergeIssueActivity_;
+import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.enums.Step;
+import com.cloudjay.cjay.task.jobqueue.UploadAuditItemJob;
+import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
 import com.cloudjay.cjay.view.SquareImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.path.android.jobqueue.JobManager;
 
 import java.util.List;
 
@@ -34,14 +43,16 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 	private String containerId;
 	private AuditImage auditImage;
 	private AuditItem mAuditItem;
+    private String operatorCode;
+    private final View mHolder = null;
 
-	public AuditItemAdapter(Context context, int resource, String containerId) {
+	public AuditItemAdapter(Context context, int resource, String containerId, String operatorCode) {
 		super(context, resource);
 		this.mContext = context;
 		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		layoutResId = resource;
 		this.containerId = containerId;
-
+        this.operatorCode = operatorCode;
 	}
 
 	private class ViewHolder {
@@ -59,6 +70,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		public TextView tvIssueStatus;
 		public LinearLayout llIssueImageView;
 		public LinearLayout llIssueDetails;
+        public ImageView ivUploading;
 	}
 
 	@Override
@@ -66,7 +78,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 		final AuditItem auditItem = getItem(i);
 
-		ViewHolder holder;
+		final ViewHolder holder;
 		if (view == null) {
 			holder = new ViewHolder();
 			view = mInflater.inflate(layoutResId, null);
@@ -84,6 +96,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			holder.btnReport = (Button) view.findViewById(R.id.btn_report_pending);
 			holder.btnRepair = (Button) view.findViewById(R.id.btn_repair_pending);
 			holder.btnEdit = (Button) view.findViewById(R.id.btn_edit_pending);
+            holder.ivUploading = (ImageView) view.findViewById(R.id.iv_uploading);
 
 			holder.llIssueDetails = (LinearLayout) view.findViewById(R.id.ll_issue_details);
 			holder.llIssueImageView = (LinearLayout) view.findViewById(R.id.ll_issue_imageview);
@@ -130,14 +143,37 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				}
 			}
 		}
-		//TODO set event to show repair buttion
+		//TODO: if audit item has not been audited yet, show repair dialog, otherwise, go straight to Camera
 		holder.btnRepair.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				showRepairDiaglog();
+                if (!auditItem.getApproved()) {
+                    // Show repair dialog
+                    showRepairDiaglog();
+                } else {
+                    // Open camera activity to take repair image
+                    openCamera();
+                }
 			}
 		});
 
+        holder.btnUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //1. Ẩn button Edit, Hiện icon Uploading, Hiện button Repair
+                holder.btnUpload.setVisibility(View.GONE);
+                holder.btnEdit.setVisibility(View.GONE);
+                holder.ivUploading.setVisibility(View.VISIBLE);
+                holder.btnRepair.setVisibility(View.VISIBLE);
+
+                //2. Add container session to upload queue
+                JobManager jobManager = App.getJobManager();
+                jobManager.addJob(new UploadAuditItemJob(containerId, auditItem));
+
+                //TODO: 3. When upload completed, hide icon Uploading (Remove comment line below) @Nam
+
+            }
+        });
 
 		mAuditItem = auditItem;
 
@@ -153,13 +189,12 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 	private void showRepairDiaglog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-		builder.setTitle(R.string.dialog_search_container_title);
-		builder.setMessage("Lỗi này đã chưa được. Sửa luôn?");
+		builder.setTitle("Alert");
+		builder.setMessage("Lỗi này chưa được duyệt. Sửa luôn?");
 
 		builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
-				//TODO show chon loi da giam dinh @Nam
 				dialogInterface.dismiss();
 			}
 		});
@@ -167,7 +202,8 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
-				//TODO add to database
+                // Open camera activity to take repair image
+                openCamera();
 				dialogInterface.dismiss();
 			}
 		});
@@ -273,4 +309,12 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		}
 	}
 
+    void openCamera() {
+        Intent cameraActivityIntent = new Intent(mContext, CameraActivity_.class);
+        cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerId);
+        cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
+        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_IMPORT);
+        cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
+        mContext.startActivity(cameraActivityIntent);
+    }
 }

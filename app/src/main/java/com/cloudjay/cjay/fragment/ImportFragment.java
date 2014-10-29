@@ -31,7 +31,7 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.StringUtils;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.Step;
 import com.path.android.jobqueue.JobManager;
@@ -65,7 +65,7 @@ public class ImportFragment extends Fragment {
 	@ViewById(R.id.btn_camera)
 	ImageButton btnCamera;
 
-	@ViewById(R.id.btn_continue)
+	@ViewById(R.id.btn_complete_repair)
 	Button btnContinue;
 
 	@ViewById(R.id.btn_complete)
@@ -168,7 +168,7 @@ public class ImportFragment extends Fragment {
 		etOperator.setText(operator.getOperatorName());
 
 		// Add new session to database
-		String currentTime = StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+		String currentTime = StringUtils.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 
 		mSession = new Session().withContainerId(containerID)
 				.withOperatorCode(operatorCode)
@@ -251,7 +251,7 @@ public class ImportFragment extends Fragment {
 	/**
 	 * Add container session to upload queue. Then navigate user to Audit and Repair Fragment.
 	 */
-	@Click(R.id.btn_continue)
+	@Click(R.id.btn_complete_repair)
 	void buttonContinueClicked() {
 
 		// Add current container to job queue

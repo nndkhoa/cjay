@@ -9,7 +9,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class StringHelper {
+public class StringUtils {
+
+	/**
+	 * Get current timestamp based on input format
+	 *
+	 * @param format
+	 * @return
+	 */
 	@SuppressLint("SimpleDateFormat")
 	public static String getCurrentTimestamp(String format) {
 

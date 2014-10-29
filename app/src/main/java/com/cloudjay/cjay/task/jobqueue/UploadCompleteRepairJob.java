@@ -13,25 +13,27 @@ import com.path.android.jobqueue.Params;
 
 import de.greenrobot.event.EventBus;
 
-public class UploadSessionJob extends Job {
+public class UploadCompleteRepairJob extends Job {
 	Session session;
+	String containerId;
 
 	@Override
 	protected int getRetryLimit() {
 		return 2;
 	}
 
-	public UploadSessionJob(Session session) {
-		super(new Params(1).requireNetwork().persist().groupBy(session.getContainerId()));
-		this.session = session;
+	public UploadCompleteRepairJob(String containerId) {
+		super(new Params(1).requireNetwork().persist().groupBy(containerId));
+		this.containerId = containerId;
 	}
 
 	@Override
 	public void onAdded() {
-		// Add container to collection UPLOAD
+
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).addUploadSession(session.getContainerId());
-		EventBus.getDefault().post(new UploadStartedEvent(session.getContainerId()));
+		DataCenter_.getInstance_(context).addUploadSession(containerId);
+		EventBus.getDefault().post(new UploadStartedEvent(containerId));
+
 	}
 
 	@Override
@@ -39,30 +41,32 @@ public class UploadSessionJob extends Job {
 		Context context = App.getInstance().getApplicationContext();
 
 		//Add Log
-		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Bắt đầu khởi tạo");
+		DataCenter_.getInstance_(context).addLog(context, containerId, "Bắt đầu tải lên đã sữa");
 
 		EventBus.getDefault().post(new UploadingEvent());
-		DataCenter_.getInstance_(context).uploadSession(context, session);
+
+		DataCenter_.getInstance_(context).uploadCompleteRepairSession(context, containerId);
 
 		//Add Log
-		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Khởi tạo hoàn tất");
+		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Tải lên đã sữa hoàn tất");
+
+
 	}
 
 
 	@Override
 	protected void onCancel() {
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Không thể khởi tạo");
+		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Không thể tải lên đã sữa");
 	}
 
 	@Override
 	protected boolean shouldReRunOnThrowable(Throwable throwable) {
 		Context context = App.getInstance().getApplicationContext();
-
 		//Add Log
-		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Khởi tạo bị gián đoạn");
-		EventBus.getDefault().post(new UploadStoppedEvent());
+		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Tải lên giám định bị đã sữa");
 
+		EventBus.getDefault().post(new UploadStoppedEvent());
 		return true;
 	}
 }

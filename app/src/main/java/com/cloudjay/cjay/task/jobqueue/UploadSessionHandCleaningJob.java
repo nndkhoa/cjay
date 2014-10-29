@@ -5,7 +5,6 @@ import android.content.Context;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
-import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
 import com.path.android.jobqueue.Job;
@@ -13,25 +12,21 @@ import com.path.android.jobqueue.Params;
 
 import de.greenrobot.event.EventBus;
 
-public class UploadSessionJob extends Job {
+public class UploadSessionHandCleaningJob extends Job {
 	Session session;
 
-	@Override
-	protected int getRetryLimit() {
-		return 2;
-	}
-
-	public UploadSessionJob(Session session) {
+	public UploadSessionHandCleaningJob(Session session) {
 		super(new Params(1).requireNetwork().persist().groupBy(session.getContainerId()));
 		this.session = session;
 	}
 
 	@Override
 	public void onAdded() {
-		// Add container to collection UPLOAD
+
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).addUploadSession(session.getContainerId());
 		EventBus.getDefault().post(new UploadStartedEvent(session.getContainerId()));
+
 	}
 
 	@Override
@@ -39,30 +34,28 @@ public class UploadSessionJob extends Job {
 		Context context = App.getInstance().getApplicationContext();
 
 		//Add Log
-		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Bắt đầu khởi tạo");
-
+		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Bắt đầu thiết lập là container vệ sinh quét");
 		EventBus.getDefault().post(new UploadingEvent());
-		DataCenter_.getInstance_(context).uploadSession(context, session);
+		DataCenter_.getInstance_(context).setHandCleaningSession(context, session.getContainerId());
 
 		//Add Log
-		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Khởi tạo hoàn tất");
-	}
+		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Hoàn tất thiết lập là container vệ sinh quét");
 
+	}
 
 	@Override
 	protected void onCancel() {
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Không thể khởi tạo");
+		//Add Log
+		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Không thể thiết lập là container vệ sinh quét");
+
 	}
 
 	@Override
 	protected boolean shouldReRunOnThrowable(Throwable throwable) {
 		Context context = App.getInstance().getApplicationContext();
-
 		//Add Log
-		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Khởi tạo bị gián đoạn");
-		EventBus.getDefault().post(new UploadStoppedEvent());
-
-		return true;
+		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Thiết lập là container vệ sinh quét bị gián đoạn");
+		return false;
 	}
 }

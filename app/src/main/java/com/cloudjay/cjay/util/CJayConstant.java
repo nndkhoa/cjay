@@ -46,5 +46,6 @@ public class CJayConstant {
 
 
     public static final int ALARM_ID = 49482;
+	public static final int ALARM_INTERVAL = 86400;
 
 }
