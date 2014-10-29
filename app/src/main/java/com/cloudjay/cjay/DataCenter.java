@@ -1013,7 +1013,7 @@ public class DataCenter {
 
         for (AuditItem auditItem : session.getAuditItems()) {
             if (auditItem.getAuditItemUUID().equals(item.getAuditItemUUID())) {
-                session.getAuditItems().remove(this);
+                session.getAuditItems().remove(auditItem);
                 break;
             }
         }
