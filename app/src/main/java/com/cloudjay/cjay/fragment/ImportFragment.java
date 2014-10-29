@@ -268,6 +268,8 @@ public class ImportFragment extends Fragment {
 	@Click(R.id.btn_complete_repair)
 	void buttonContinueClicked() {
 
+
+
 		// Add current container to job queue
 		JobManager jobManager = App.getJobManager();
 		jobManager.addJobInBackground(new UploadSessionJob(mSession));
