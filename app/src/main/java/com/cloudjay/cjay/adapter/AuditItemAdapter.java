@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.App;
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.MergeIssueActivity_;
@@ -26,6 +27,7 @@ import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.view.SquareImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.path.android.jobqueue.JobManager;
+import com.snappydb.SnappydbException;
 
 import java.util.List;
 
@@ -165,7 +167,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				JobManager jobManager = App.getJobManager();
 				jobManager.addJob(new UploadAuditItemJob(containerId, auditItem));
 
-                //TODO: 3. When upload completed, hide icon Uploading @Nam
+				//TODO: 3. When upload completed, hide icon Uploading @Nam
 
 			}
 		});
@@ -173,7 +175,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		holder.btnReport.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				showApproveDiaglog(auditItem.getAuditItemUUID());
+				showApproveDiaglog(auditItem.getAuditItemUUID(), auditItem);
 			}
 		});
 
@@ -223,7 +225,8 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 	}
 
-	void showApproveDiaglog(final String auditItemRemoveUUID) {
+	void showApproveDiaglog(final String tmpItemUUID, final AuditItem item) {
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 		builder.setTitle("Alert");
 		builder.setMessage("Lỗi này đã được báo cáo chưa?");
@@ -231,37 +234,39 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		builder.setPositiveButton("Chưa", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
-				// TODO add to database
 				dialogInterface.dismiss();
+
+				// TODO: @vule: open ReportIssueActivity
 			}
 		});
-//        builder.setNegativeButton("Vệ sinh", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialogInterface, int i) {
-//                // TODO change status audit item to water wase
-//                dialogInterface.dismiss();
-//            }
-//        });
 
 		builder.setNegativeButton("Rồi", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
 
 				Intent intent = new Intent(mContext, MergeIssueActivity_.class);
-                intent.putExtra(MergeIssueActivity_.CONTAINER_ID_EXTRA, containerId);
-                intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, auditImage);
-                intent.putExtra(MergeIssueActivity_.AUDIT_ITEM_REMOVE_UUID, auditItemRemoveUUID);
+				intent.putExtra(MergeIssueActivity_.CONTAINER_ID_EXTRA, containerId);
+				intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, auditImage);
+				intent.putExtra(MergeIssueActivity_.AUDIT_ITEM_REMOVE_UUID, tmpItemUUID);
 
 				mContext.startActivity(intent);
 			}
 		});
 
 		builder.setNeutralButton("Vệ sinh", new DialogInterface.OnClickListener() {
+			
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
-				// TODO: do process here
+				try {
 
-				dialogInterface.dismiss();
+					// change status audit item to water wash
+					DataCenter_.getInstance_(mContext).setWaterWashType(mContext, item);
+					dialogInterface.dismiss();
+
+				} catch (SnappydbException e) {
+					// TODO: Handle exception
+					e.printStackTrace();
+				}
 			}
 		});
 
@@ -301,12 +306,12 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		}
 	}
 
-    void openCamera() {
-        Intent cameraActivityIntent = new Intent(mContext, CameraActivity_.class);
-        cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerId);
-        cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_REPAIRED);
-        cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);
-        mContext.startActivity(cameraActivityIntent);
-    }
+	void openCamera() {
+		Intent cameraActivityIntent = new Intent(mContext, CameraActivity_.class);
+		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerId);
+		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
+		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_REPAIRED);
+		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);
+		mContext.startActivity(cameraActivityIntent);
+	}
 }

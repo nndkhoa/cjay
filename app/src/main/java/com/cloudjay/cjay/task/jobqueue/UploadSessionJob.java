@@ -14,7 +14,13 @@ import com.path.android.jobqueue.Params;
 import de.greenrobot.event.EventBus;
 
 public class UploadSessionJob extends Job {
+
 	Session session;
+
+	/**
+	 * Dùng để phân biệt xem có cần clear Working hay không?
+	 */
+	int type;
 
 	@Override
 	protected int getRetryLimit() {

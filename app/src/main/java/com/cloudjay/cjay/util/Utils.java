@@ -372,5 +372,4 @@ public class Utils {
 		return PendingIntent.getService(context, CJayConstant.ALARM_ID, intent, PendingIntent.FLAG_NO_CREATE) != null;
 
 	}
-
 }
