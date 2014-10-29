@@ -23,6 +23,7 @@ import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.service.QueueIntentService_;
+import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
@@ -74,6 +75,18 @@ public class Utils {
 
 		// Start every 24 hours
 		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), CJayConstant.ALARM_INTERVAL * 1000, pIntent);
+	}
+
+	/**
+	 * Use to check if alarm is up or not
+	 *
+	 * @param context
+	 * @return
+	 */
+	public static boolean isAlarmUp(Context context) {
+		Intent intent = new Intent(context, QueueIntentService_.class);
+		return PendingIntent.getService(context, CJayConstant.ALARM_ID, intent, PendingIntent.FLAG_NO_CREATE) != null;
+
 	}
 
 	/**
@@ -365,11 +378,5 @@ public class Utils {
 			public void afterTextChanged(Editable s) {
 			}
 		});
-	}
-
-	public static boolean isAlarmUp(Context context) {
-		Intent intent = new Intent(context, QueueIntentService_.class);
-		return PendingIntent.getService(context, CJayConstant.ALARM_ID, intent, PendingIntent.FLAG_NO_CREATE) != null;
-
 	}
 }

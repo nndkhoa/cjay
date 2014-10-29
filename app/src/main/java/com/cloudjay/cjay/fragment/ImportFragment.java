@@ -268,15 +268,13 @@ public class ImportFragment extends Fragment {
 	@Click(R.id.btn_complete_repair)
 	void buttonContinueClicked() {
 
-
-
 		// Add current container to job queue
 		JobManager jobManager = App.getJobManager();
 		jobManager.addJobInBackground(new UploadSessionJob(mSession));
 
 		// Go to next fragment
 		AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID)
-                .tabType(1).build();
+				.tabType(1).build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 		transaction.replace(R.id.ll_main, fragment);
