@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
+import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
@@ -29,29 +30,42 @@ public class UploadSessionJob extends Job {
 	@Override
 	public void onAdded() {
 
+        Context context = App.getInstance().getApplicationContext();
+        DataCenter_.getInstance_(context).addUploadSession(session.getContainerId());
+        EventBus.getDefault().post(new UploadStartedEvent(session.getContainerId()));
+
 	}
 
 	@Override
 	public void onRun() throws Throwable {
+        Context context = App.getInstance().getApplicationContext();
 
-		// Notify container is being uploaded
+        //Add Log
+        DataCenter_.getInstance_(context).addLog(context,session.getContainerId(), "Bắt đầu khởi tạo");
+
 		EventBus.getDefault().post(new UploadingEvent());
 
-//		Context context = App.getInstance().getApplicationContext();
-//		DataCenter_.getInstance_(context).uploadSession(context, session);
-//
-//		// Notify container was uploaded
-//		EventBus.getDefault().post(new UploadedEvent(session.getContainerId()));
+		DataCenter_.getInstance_(context).uploadSession(context, session);
+
+        //Add Log
+        DataCenter_.getInstance_(context).addLog(context,session.getContainerId(), "Khởi tạo hoàn tất");
+
+
 	}
 
 
 	@Override
 	protected void onCancel() {
-
+        Context context = App.getInstance().getApplicationContext();
+        DataCenter_.getInstance_(context).addLog(context,session.getContainerId(), "Không thể khởi tạo");
 	}
 
 	@Override
 	protected boolean shouldReRunOnThrowable(Throwable throwable) {
+        Context context = App.getInstance().getApplicationContext();
+        //Add Log
+        DataCenter_.getInstance_(context).addLog(context,session.getContainerId(), "Khởi tạo bị gián đoạn");
+
 		EventBus.getDefault().post(new UploadStoppedEvent());
 		return true;
 	}

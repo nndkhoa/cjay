@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.MergeIssueActivity_;
@@ -23,8 +24,11 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.enums.Step;
+import com.cloudjay.cjay.task.jobqueue.UploadAuditItemJob;
+import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
 import com.cloudjay.cjay.view.SquareImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.path.android.jobqueue.JobManager;
 
 import java.util.List;
 
@@ -40,6 +44,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 	private AuditImage auditImage;
 	private AuditItem mAuditItem;
     private String operatorCode;
+    private final View mHolder = null;
 
 	public AuditItemAdapter(Context context, int resource, String containerId, String operatorCode) {
 		super(context, resource);
@@ -161,10 +166,12 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
                 holder.ivUploading.setVisibility(View.VISIBLE);
                 holder.btnRepair.setVisibility(View.VISIBLE);
 
-                //TODO: 2. Upload audit item to server @Thai
+                //2. Add container session to upload queue
+                JobManager jobManager = App.getJobManager();
+                jobManager.addJob(new UploadAuditItemJob(containerId, auditItem));
 
-                //TODO: 3. When upload completed, hide icon Uploading (Remove comment line below) @Thai
-                // holder.ivUploading.setVisibility(View.GONE);
+                //TODO: 3. When upload completed, hide icon Uploading (Remove comment line below) @Nam
+
             }
         });
 

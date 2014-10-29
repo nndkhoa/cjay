@@ -31,13 +31,12 @@ public class UploadImageJob extends Job {
 
 	@Override
 	public void onAdded() {
-		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).addUploadSession(containerId);
-		EventBus.getDefault().post(new UploadStartedEvent(containerId));
+
 	}
 
 	@Override
 	public void onRun() throws Throwable {
+
 		EventBus.getDefault().post(new UploadingEvent());
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).uploadImage(context, uri, imageName, containerId);
@@ -45,6 +44,8 @@ public class UploadImageJob extends Job {
 
 	@Override
 	protected void onCancel() {
+        Context context = App.getInstance().getApplicationContext();
+        DataCenter_.getInstance_(context).addLog(context,containerId, "Không thể tải lên hình: "+imageName);
 	}
 
 	@Override

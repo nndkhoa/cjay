@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
@@ -20,10 +21,13 @@ import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.IssueDeletedEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.jobqueue.UpLoadSessionHandCleaning;
+import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
+import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
@@ -130,8 +134,10 @@ public class IssuePendingFragment extends Fragment {
 	@Click(R.id.btn_clean)
 	@Background
 	void buttonCleanClicked() {
-//TODO  add to job queue @Thai
-		dataCenter.setHandCleaningSession(getActivity(), containerID);
+        // Add container session to upload queue
+        JobManager jobManager = App.getJobManager();
+        jobManager.addJob(new UpLoadSessionHandCleaning(mSession));
+
 		getActivity().finish();
 	}
 

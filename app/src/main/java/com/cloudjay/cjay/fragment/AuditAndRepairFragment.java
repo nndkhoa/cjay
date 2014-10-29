@@ -1,10 +1,7 @@
 package com.cloudjay.cjay.fragment;
 
 import android.app.ActionBar;
-import android.content.Context;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.widget.Button;
@@ -20,7 +17,6 @@ import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,7 +32,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	@ViewById(R.id.pager)
 	ViewPager pager;
 
-	@ViewById(R.id.btn_continue)
+	@ViewById(R.id.btn_complete_repair)
 	Button btnContinue;
 
 	ActionBar actionBar;
@@ -47,7 +43,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 		// Required empty public constructor
 	}
 
-	@Click(R.id.btn_continue)
+	@Click(R.id.btn_complete_repair)
 	void buttonContinueClick() {
 	     /* Remove all tabs */
 		actionBar.removeAllTabs();

@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
@@ -23,11 +24,13 @@ import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.jobqueue.UploadExportSessionJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
 import com.crashlytics.android.internal.m;
+import com.path.android.jobqueue.JobManager;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
@@ -66,6 +69,9 @@ public class ExportFragment extends Fragment {
 
 	@ViewById(R.id.btn_view_previous_step)
 	Button btnViewPreviousSteps;
+
+    @ViewById(R.id.btn_complete)
+    Button btnComplete;
 
     @ViewById(R.id.tv_status_name)
     TextView tvPreStatus;
@@ -178,6 +184,12 @@ public class ExportFragment extends Fragment {
 		gvExportImages.setVisibility(lvImagesExpandable.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
 	}
 
+    @Click(R.id.btn_complete)
+    void btnCompleteClicked(){
+        // Add container session to upload queue
+        JobManager jobManager = App.getJobManager();
+        jobManager.addJob(new UploadExportSessionJob(mSession));
+    }
     @Background
     void refresh() {
         if (mSession != null) {

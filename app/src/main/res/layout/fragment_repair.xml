@@ -23,7 +23,7 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_complete"
+            android:id="@+id/btn_complete_audit"
             android:layout_weight="1"
             android:text="@string/button_completed"
             android:textColor="@android:color/white"
@@ -32,7 +32,7 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_continue"
+            android:id="@+id/btn_complete_repair"
             android:layout_weight="1"
             android:text="@string/button_export_now"
             android:textColor="@android:color/white"

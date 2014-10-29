@@ -65,7 +65,7 @@ public class ImportFragment extends Fragment {
 	@ViewById(R.id.btn_camera)
 	ImageButton btnCamera;
 
-	@ViewById(R.id.btn_continue)
+	@ViewById(R.id.btn_complete_repair)
 	Button btnContinue;
 
 	@ViewById(R.id.btn_complete)
@@ -251,7 +251,7 @@ public class ImportFragment extends Fragment {
 	/**
 	 * Add container session to upload queue. Then navigate user to Audit and Repair Fragment.
 	 */
-	@Click(R.id.btn_continue)
+	@Click(R.id.btn_complete_repair)
 	void buttonContinueClicked() {
 
 		//Upload container
