@@ -973,13 +973,16 @@ public class DataCenter {
 	}
 
 	/**
-	 * Set lỗi thuộc loại vệ sinh
+	 * Set lỗi thuộc loại vệ sinh.
+     * 1.
 	 *
 	 * @param context
 	 * @param item
 	 * @throws SnappydbException
 	 */
-	public void setWaterWashType(Context context, final AuditItem item) throws SnappydbException {
+	public void setWaterWashType(Context context, final AuditItem item, String containerId) throws SnappydbException {
+
+        Logger.Log("setWaterWashType");
 
 		DB db = App.getDB(context);
 
@@ -1002,10 +1005,21 @@ public class DataCenter {
 		item.setComponentCode(componentCode.getCode());
 
 		item.setLocationCode("BXXX");
+        item.setAudited(true);
 
 		// Add audit images
 		// --> Nếu nhiều image cùng thuộc một lỗi vệ sinh, thì tính là một
+        Session session = db.getObject(containerId, Session.class);
 
+        for (AuditItem auditItem : session.getAuditItems()) {
+            if (auditItem.getAuditItemUUID().equals(item.getAuditItemUUID())) {
+                session.getAuditItems().remove(this);
+                break;
+            }
+        }
+        session.getAuditItems().add(item);
+        db.put(containerId, session);
 
+        EventBus.getDefault().post(new IssueDeletedEvent(containerId));
 	}
 }
