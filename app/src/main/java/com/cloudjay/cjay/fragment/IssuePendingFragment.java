@@ -179,6 +179,7 @@ public class IssuePendingFragment extends Fragment {
 			List<AuditItem> list = new ArrayList<AuditItem>();
 			Logger.Log("AuditItems: " + mSession.getAuditItems().size());
 			for (AuditItem auditItem : mSession.getAuditItems()) {
+                Logger.Log("audited: " + auditItem.getAudited());
 				list.add(auditItem);
 			}
 			Logger.Log("Size: " + list.size());

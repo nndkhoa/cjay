@@ -175,7 +175,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		holder.btnReport.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				showApproveDiaglog(auditItem.getAuditItemUUID(), auditItem);
+				showApproveDiaglog(auditItem);
 			}
 		});
 
@@ -225,7 +225,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 	}
 
-	void showApproveDiaglog(final String tmpItemUUID, final AuditItem item) {
+	void showApproveDiaglog(final AuditItem item) {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 		builder.setTitle("Alert");
@@ -247,7 +247,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				Intent intent = new Intent(mContext, MergeIssueActivity_.class);
 				intent.putExtra(MergeIssueActivity_.CONTAINER_ID_EXTRA, containerId);
 				intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, auditImage);
-				intent.putExtra(MergeIssueActivity_.AUDIT_ITEM_REMOVE_UUID, tmpItemUUID);
+				intent.putExtra(MergeIssueActivity_.AUDIT_ITEM_REMOVE_UUID, item.getAuditItemUUID());
 
 				mContext.startActivity(intent);
 			}
@@ -260,7 +260,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				try {
 
 					// change status audit item to water wash
-					DataCenter_.getInstance_(mContext).setWaterWashType(mContext, item);
+					DataCenter_.getInstance_(mContext).setWaterWashType(mContext, item, containerId);
 					dialogInterface.dismiss();
 
 				} catch (SnappydbException e) {
