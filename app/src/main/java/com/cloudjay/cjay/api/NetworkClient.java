@@ -179,7 +179,7 @@ public class NetworkClient {
 
 			JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionsByModifiedTime(modifiedDate);
 			next = jsonObject.get("next");
-			String nextString = next.toString();
+			String nextString = next.getAsString();
 			if (!next.isJsonNull()) {
 				//get page number of fist page
 				int page = Integer.parseInt(nextString.substring(nextString.lastIndexOf("=") + 1));
