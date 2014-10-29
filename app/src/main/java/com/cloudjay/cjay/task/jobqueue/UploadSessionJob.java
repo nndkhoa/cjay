@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
+import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
@@ -29,6 +30,10 @@ public class UploadSessionJob extends Job {
 	@Override
 	public void onAdded() {
 
+		// Add container to collection UPLOAD
+		Context context = App.getInstance().getApplicationContext();
+		DataCenter_.getInstance_(context).addUploadSession(session.getContainerId());
+		EventBus.getDefault().post(new UploadStartedEvent(session.getContainerId()));
 	}
 
 	@Override
@@ -37,11 +42,11 @@ public class UploadSessionJob extends Job {
 		// Notify container is being uploaded
 		EventBus.getDefault().post(new UploadingEvent());
 
-//		Context context = App.getInstance().getApplicationContext();
-//		DataCenter_.getInstance_(context).uploadSession(context, session);
-//
-//		// Notify container was uploaded
-//		EventBus.getDefault().post(new UploadedEvent(session.getContainerId()));
+		Context context = App.getInstance().getApplicationContext();
+		DataCenter_.getInstance_(context).uploadSession(context, session);
+
+		// Notify container was uploaded
+		EventBus.getDefault().post(new UploadedEvent(session.getContainerId()));
 	}
 
 

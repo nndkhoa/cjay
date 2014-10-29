@@ -254,7 +254,7 @@ public class ImportFragment extends Fragment {
 	@Click(R.id.btn_continue)
 	void buttonContinueClicked() {
 
-		//Upload container
+		// Add current container to job queue
 		JobManager jobManager = App.getJobManager();
 		jobManager.addJobInBackground(new UploadSessionJob(mSession));
 
@@ -274,7 +274,7 @@ public class ImportFragment extends Fragment {
 
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJob(new UploadSessionJob(mSession));
+		jobManager.addJobInBackground(new UploadSessionJob(mSession));
 
 		// Navigate to HomeActivity
 		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
