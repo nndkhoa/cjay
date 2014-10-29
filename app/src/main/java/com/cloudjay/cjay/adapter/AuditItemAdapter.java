@@ -22,7 +22,7 @@ import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.task.jobqueue.UploadAuditItemJob;
-import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.view.SquareImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -254,7 +254,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		});
 
 		builder.setNeutralButton("Vệ sinh", new DialogInterface.OnClickListener() {
-			
+
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
 				try {
@@ -310,7 +310,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		Intent cameraActivityIntent = new Intent(mContext, CameraActivity_.class);
 		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerId);
 		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_REPAIRED);
+		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.REPAIRED.value);
 		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);
 		mContext.startActivity(cameraActivityIntent);
 	}

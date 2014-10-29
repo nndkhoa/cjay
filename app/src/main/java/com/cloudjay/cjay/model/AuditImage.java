@@ -1,5 +1,6 @@
 package com.cloudjay.cjay.model;
 
+import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.google.gson.annotations.Expose;
 
@@ -69,6 +70,11 @@ public class AuditImage implements Serializable {
 
 	public AuditImage withType(long type) {
 		this.type = type;
+		return this;
+	}
+
+	public AuditImage withType(ImageType type) {
+		this.type = type.value;
 		return this;
 	}
 

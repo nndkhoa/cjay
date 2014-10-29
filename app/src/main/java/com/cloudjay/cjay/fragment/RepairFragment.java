@@ -51,9 +51,9 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 
 	@Click(R.id.btn_complete_repair)
 	void buttonContinueClick() {
-        // Add containerId to upload complete repair queue
-        JobManager jobManager = App.getJobManager();
-        jobManager.addJob(new UploadCompleteRepairJob(containerID));
+		// Add containerId to upload complete repair queue
+		JobManager jobManager = App.getJobManager();
+		jobManager.addJob(new UploadCompleteRepairJob(containerID));
 
 	     /* Remove all tabs */
 		actionBar.removeAllTabs();
@@ -70,8 +70,8 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
     @Click(R.id.btn_complete_audit)
     void buttonCompleteAuditClicked(){
         // Add containerId to upload complete audit queue
-        JobManager jobManager = App.getJobManager();
-        jobManager.addJob(new UploadCompleteAuditJob(containerID));
+	    JobManager jobManager = App.getJobManager();
+	    jobManager.addJob(new UploadCompleteAuditJob(containerID));
     }
 
 	@AfterViews

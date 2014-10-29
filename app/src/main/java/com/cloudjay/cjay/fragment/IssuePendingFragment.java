@@ -4,7 +4,6 @@ package com.cloudjay.cjay.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -24,8 +23,8 @@ import com.cloudjay.cjay.event.IssueMergedEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.jobqueue.UploadSessionHandCleaningJob;
-import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
 import com.path.android.jobqueue.JobManager;
@@ -124,34 +123,33 @@ public class IssuePendingFragment extends Fragment {
 	@UiThread
 	void onEvent(ImageCapturedEvent event) {
 
-		Logger.Log("on ImageCapturedEvent");
+		ImageType imageType = ImageType.values()[event.getImageType()];
+		switch (imageType) {
+			case AUDIT:
+				// Re-query container session with given containerId
+				String containerId = event.getContainerId();
+				mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+				refresh();
+				break;
 
-        int imageType = event.getImageType();
-
-        if (imageType == CJayConstant.TYPE_AUDIT) { // if audit
-
-            // Re-query container session with given containerId
-            String containerId = event.getContainerId();
-            mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
-            refresh();
-
-        } else if (imageType == CJayConstant.TYPE_REPAIRED) { // if repaired
-
-            Logger.Log("Open AfterRepair Fragment");
-            AuditItem auditItem = event.getAuditItem();
-            Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
-            detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
-            detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem);
-            startActivity(detailIssueActivity);
-        }
+			case REPAIRED:
+			default:
+				Logger.Log("Open AfterRepair Fragment");
+				AuditItem auditItem = event.getAuditItem();
+				Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
+				detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
+				detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem);
+				startActivity(detailIssueActivity);
+				break;
+		}
 	}
 
 	@Click(R.id.btn_clean)
 	@Background
 	void buttonCleanClicked() {
-        // Add container session to upload queue
-        JobManager jobManager = App.getJobManager();
-        jobManager.addJob(new UploadSessionHandCleaningJob(mSession));
+		// Add container session to upload queue
+		JobManager jobManager = App.getJobManager();
+		jobManager.addJob(new UploadSessionHandCleaningJob(mSession));
 
 		getActivity().finish();
 	}
@@ -161,7 +159,7 @@ public class IssuePendingFragment extends Fragment {
 		// Open camera activity
 		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
 		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
-		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_AUDIT);
+		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.AUDIT.value);
 		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
 		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.AUDIT.value);
 		startActivity(cameraActivityIntent);
@@ -182,7 +180,7 @@ public class IssuePendingFragment extends Fragment {
 			List<AuditItem> list = new ArrayList<AuditItem>();
 			Logger.Log("AuditItems: " + mSession.getAuditItems().size());
 			for (AuditItem auditItem : mSession.getAuditItems()) {
-                Logger.Log("audited: " + auditItem.getAudited());
+				Logger.Log("audited: " + auditItem.getAudited());
 				list.add(auditItem);
 			}
 			Logger.Log("Size: " + list.size());
@@ -227,17 +225,17 @@ public class IssuePendingFragment extends Fragment {
 		}
 	}
 
-    @UiThread
-    void onEvent(IssueMergedEvent event) {
-        Logger.Log("on IssueMergedEvent");
+	@UiThread
+	void onEvent(IssueMergedEvent event) {
+		Logger.Log("on IssueMergedEvent");
 
-        // Delete merged audit item containerId
-        String containerId = event.getContainerId();
-        String auditItemRemoveUUID = event.getAuditItemRemoveUUID();
-        dataCenter.deleteAuditItemAfterMerge(getActivity().getApplicationContext(),
-                containerId, auditItemRemoveUUID);
-        refresh();
-    }
+		// Delete merged audit item containerId
+		String containerId = event.getContainerId();
+		String auditItemRemoveUUID = event.getAuditItemRemoveUUID();
+		dataCenter.deleteAuditItemAfterMerge(getActivity().getApplicationContext(),
+				containerId, auditItemRemoveUUID);
+		refresh();
+	}
 
 	@UiThread
 	void onEvent(IssueDeletedEvent event) {

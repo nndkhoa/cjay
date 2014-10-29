@@ -16,11 +16,6 @@ public class CJayConstant {
 	public static final String DAY_FORMAT = "yyyy-MM-dd";
 	public static final String DAY_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
-	public static final int TYPE_IMPORT = 0;
-	public static final int TYPE_EXPORT = 1;
-	public static final int TYPE_AUDIT = 2;
-	public static final int TYPE_REPAIRED = 3;
-
 	// Prefix for save and query in db
 	public static final String PREFIX_OPERATOR = "OP";
 	public static final String PREFIX_WORKING = "WORKING";

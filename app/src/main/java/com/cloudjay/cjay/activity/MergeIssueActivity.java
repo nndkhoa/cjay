@@ -7,7 +7,9 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.AuditMergeIssueAdapter;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 
@@ -74,7 +76,7 @@ public class MergeIssueActivity extends BaseActivity {
             }
         }
 
-        Logger.Log("isInserted: " + isInserted);
+        /*Logger.Log("isInserted: " + isInserted);
         if (isInserted == false) {
 
             // Insert static issue into database
@@ -99,7 +101,16 @@ public class MergeIssueActivity extends BaseActivity {
                 dataCenter.addIssue(getApplicationContext(), auditItem, containerID);
             }
 
-        }
+        }*/
+
+        Logger.Log("PREFIX_COMPONENT_CODE");
+        IsoCode componentCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_COMPONENT_CODE);
+
+        Logger.Log("PREFIX_DAMAGE_CODE");
+        IsoCode damageCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_DAMAGE_CODE);
+
+        Logger.Log("PREFIX_REPAIR_CODE");
+        IsoCode repairCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_REPAIR_CODE);
 
         refresh();
 

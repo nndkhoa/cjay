@@ -36,6 +36,7 @@ import org.androidannotations.annotations.Trace;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import de.greenrobot.event.EventBus;
@@ -1022,4 +1023,41 @@ public class DataCenter {
 
         EventBus.getDefault().post(new IssueDeletedEvent(containerId));
 	}
+
+    public List<IsoCode> getListIsoCodes(Context context, String prefix) {
+        try {
+            DB db = App.getDB(context);
+            String[] keyResults = db.findKeys(prefix);
+            List<IsoCode> isoCodes = new ArrayList<IsoCode>();
+            for (String result : keyResults) {
+                IsoCode isoCode = db.getObject(result, IsoCode.class);
+                isoCodes.add(isoCode);
+                Logger.Log("getCode: " + isoCode.getCode());
+                Logger.Log("getId: " + isoCode.getId());
+            }
+
+            return isoCodes;
+
+        } catch (SnappydbException e) {
+            Logger.e(e.getMessage());
+            return null;
+        }
+    }
+
+    public IsoCode getIsoCode(Context context, String prefix) {
+        try {
+            DB db = App.getDB(context);
+            String[] keyResults = db.findKeys(prefix);
+            IsoCode isoCode = db.getObject(keyResults[new Random().nextInt(keyResults.length)], IsoCode.class);
+
+            Logger.Log("getCode: " + isoCode.getCode());
+            Logger.Log("getId: " + isoCode.getId());
+
+            return isoCode;
+
+        } catch (SnappydbException e) {
+            Logger.e(e.getMessage());
+            return null;
+        }
+    }
 }

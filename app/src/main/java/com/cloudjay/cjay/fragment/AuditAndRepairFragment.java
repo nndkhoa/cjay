@@ -1,15 +1,26 @@
 package com.cloudjay.cjay.fragment;
 
 import android.app.ActionBar;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.view.View;
 import android.widget.Button;
 
+import com.cloudjay.cjay.App;
+import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.activity.HomeActivity_;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
+import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.jobqueue.UploadCompleteAuditJob;
+import com.cloudjay.cjay.task.jobqueue.UploadCompleteRepairJob;
+import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.enums.Step;
+import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
@@ -19,7 +30,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Fragment giám định và sửa chữa.
+ * <p/>
+ * 1. Khi lần đầu vào, chỉ hiển thị nút `Hoàn tất giám định` và theo luồng xử lý thông thường
+ * 2. Nếu user chụp hình sau sửa chữa thì có nghĩa user cần sửa chữa ngay sau khi giám định.
+ * 2.1 Lúc này bấm nút `Hoàn tất giám định` sẽ không đóng Activity
+ * 2.2
  */
 @EFragment(R.layout.fragment_audit_repair)
 public class AuditAndRepairFragment extends Fragment implements ActionBar.TabListener {
@@ -33,11 +49,17 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	@FragmentArg(TAB_TYPE_EXTRA)
 	public int tabType;
 
+	@Bean
+	DataCenter dataCenter;
+
 	@ViewById(R.id.pager)
 	ViewPager pager;
 
 	@ViewById(R.id.btn_complete_repair)
-	Button btnContinue;
+	Button btnCompleteRepair;
+
+	@ViewById(R.id.btn_complete_audit)
+	Button btnCompleteAudit;
 
 	ActionBar actionBar;
 	private ViewPagerAdapter mPagerAdapter;
@@ -47,19 +69,71 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 		// Required empty public constructor
 	}
 
-	@Click(R.id.btn_complete_repair)
-	void buttonContinueClick() {
-	     /* Remove all tabs */
-		actionBar.removeAllTabs();
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+	@Click(R.id.btn_complete_audit)
+	void btnCompleteAuditClicked() {
+		Session session = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+		if (session != null) {
+			if (!session.isValidToUpload(Step.AUDIT)) {
+				Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+				return;
+			}
+		} else {
+			Utils.showCrouton(getActivity(), "Sth goes wrong. Container Id " + containerID + " not found");
+		}
 
-		// Go to next fragment
-		android.support.v4.app.Fragment fragment =
-				new ExportFragment_().builder().containerID(containerID).build();
-		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
-		transaction.replace(R.id.ll_main, fragment);
-		transaction.commit();
+		// PUT /api/cjay/containers/{pk}/complete-audit
+		JobManager jobManager = App.getJobManager();
+		jobManager.addJob(new UploadCompleteAuditJob(containerID));
+
+		// Hide this button
+		btnCompleteAudit.setVisibility(View.GONE);
+
+		// Check if this session has repair image or not
+		if (session.hasRepairImages()) {
+			btnCompleteRepair.setVisibility(View.VISIBLE);
+		} else {
+			// Navigate to HomeActivity
+			Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
+			startActivity(intent);
+			getActivity().finish();
+		}
+	}
+
+	@Click(R.id.btn_complete_repair)
+	void btnCompleteRepairClicked() {
+
+		Session session = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+		if (session != null) {
+			if (!session.isValidToUpload(Step.REPAIR)) {
+				Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+				return;
+			}
+		} else {
+			Utils.showCrouton(getActivity(), "Sth goes wrong. Container Id " + containerID + " not found");
+		}
+
+		// Add containerId to upload complete repair queue
+		// PUT /api/cjay/containers/{pk}/complete-repair
+		JobManager jobManager = App.getJobManager();
+		jobManager.addJob(new UploadCompleteRepairJob(containerID));
+
+		// Navigate to HomeActivity
+		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
+		startActivity(intent);
+		getActivity().finish();
+
+//	     /* Remove all tabs */
+//		actionBar.removeAllTabs();
+//		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+//
+//		// Go to next fragment
+//		android.support.v4.app.Fragment fragment =
+//				new ExportFragment_().builder().containerID(containerID).build();
+//
+//		FragmentTransaction transaction = getFragmentManager().beginTransaction();
+//		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+//		transaction.replace(R.id.ll_main, fragment);
+//		transaction.commit();
 	}
 
 	@AfterViews

@@ -50,8 +50,6 @@ public class UploadCompleteRepairJob extends Job {
 
 		//Add Log
 		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Tải lên đã sữa hoàn tất");
-
-
 	}
 
 

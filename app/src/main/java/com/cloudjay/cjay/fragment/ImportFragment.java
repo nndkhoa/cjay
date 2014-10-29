@@ -33,6 +33,7 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringUtils;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.path.android.jobqueue.JobManager;
 
@@ -68,7 +69,7 @@ public class ImportFragment extends Fragment {
 	@ViewById(R.id.btn_complete_repair)
 	Button btnContinue;
 
-	@ViewById(R.id.btn_complete)
+	@ViewById(R.id.btn_complete_audit)
 	Button btnComplete;
 
 	@ViewById(R.id.et_operator)
@@ -250,7 +251,7 @@ public class ImportFragment extends Fragment {
 			Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
 			cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
 			cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-			cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_IMPORT);
+			cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
 			cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
 			startActivity(cameraActivityIntent);
 
@@ -288,7 +289,7 @@ public class ImportFragment extends Fragment {
 	/**
 	 * Finish import fragment, close Wizard Activity and go back to Home Activity with Search Fragment tab
 	 */
-	@Click(R.id.btn_complete)
+	@Click(R.id.btn_complete_audit)
 	void buttonCompletedClicked() {
 
 		if (mSession.isValidToUpload(Step.IMPORT) == false) {

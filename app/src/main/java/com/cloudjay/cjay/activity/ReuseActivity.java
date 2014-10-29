@@ -23,6 +23,7 @@ import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
 import com.snappydb.SnappydbException;
@@ -134,7 +135,7 @@ public class ReuseActivity extends Activity {
                 // Create new audit image object
                 AuditImage auditImage = new AuditImage()
                         .withId(0)
-                        .withType(CJayConstant.TYPE_AUDIT)
+                        .withType(ImageType.AUDIT)
                         .withUrl(gateImages.get(i).getUrl())
                         .withName(gateImages.get(i).getName());
 
@@ -147,7 +148,7 @@ public class ReuseActivity extends Activity {
         Intent resultIntent = new Intent();
         setResult(Activity.RESULT_OK, resultIntent);
 
-        EventBus.getDefault().post(new ImageCapturedEvent(containerID, CJayConstant.TYPE_AUDIT, null));
+        EventBus.getDefault().post(new ImageCapturedEvent(containerID, ImageType.AUDIT, null));
         this.finish();
     }
 

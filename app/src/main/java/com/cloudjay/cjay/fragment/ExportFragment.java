@@ -23,9 +23,9 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.jobqueue.UploadExportSessionJob;
-import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
 import com.path.android.jobqueue.JobManager;
@@ -67,7 +67,7 @@ public class ExportFragment extends Fragment {
 	@ViewById(R.id.btn_view_previous_step)
 	Button btnViewPreviousSteps;
 
-	@ViewById(R.id.btn_complete)
+	@ViewById(R.id.btn_complete_audit)
 	Button btnComplete;
 
 	@ViewById(R.id.tv_status_name)
@@ -83,8 +83,6 @@ public class ExportFragment extends Fragment {
 	DataCenter dataCenter;
 
 	GateImageAdapter gateImageAdapter = null;
-	List<GateImage> mGateImages = null;
-	List<AuditImage> mAuditImages = null;
 
 	PhotoExpandableListAdapter mListAdapter;
 	int[] mImageTypes;
@@ -119,9 +117,9 @@ public class ExportFragment extends Fragment {
 
 		// Init image types
 		mImageTypes = new int[3];
-		mImageTypes[0] = CJayConstant.TYPE_IMPORT;
-		mImageTypes[1] = CJayConstant.TYPE_AUDIT;
-		mImageTypes[2] = CJayConstant.TYPE_REPAIRED;
+		mImageTypes[0] = ImageType.IMPORT.value;
+		mImageTypes[1] = ImageType.AUDIT.value;
+		mImageTypes[2] = ImageType.REPAIRED.value;
 
 		mListAdapter = new PhotoExpandableListAdapter(getActivity(),
 				mImageTypes, importImages, auditImages, repairedImages);
@@ -160,7 +158,7 @@ public class ExportFragment extends Fragment {
 		// Open camera activity
 		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
 		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
-		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_EXPORT);
+		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.EXPORT.value);
 		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
 		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.EXPORT.value);
 		startActivity(cameraActivityIntent);
@@ -182,7 +180,7 @@ public class ExportFragment extends Fragment {
 		gvExportImages.setVisibility(lvImagesExpandable.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
 	}
 
-	@Click(R.id.btn_complete)
+	@Click(R.id.btn_complete_audit)
 	void btnCompleteClicked() {
 
 		if (mSession.isValidToUpload(Step.EXPORT) == false) {

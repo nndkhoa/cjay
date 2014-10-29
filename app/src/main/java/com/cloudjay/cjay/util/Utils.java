@@ -23,7 +23,7 @@ import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.service.QueueIntentService_;
-import com.cloudjay.cjay.util.enums.Step;
+import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
@@ -278,19 +278,21 @@ public class Utils {
 		return uploadedImage;
 	}
 
-	public static String getImageTypeDescription(Context ctx, int imageType) {
+	public static String getImageTypeDescription(Context ctx, int type) {
+
+		ImageType imageType = ImageType.values()[type];
 
 		switch (imageType) {
-			case CJayConstant.TYPE_IMPORT:
+			case IMPORT:
 				return ctx.getResources().getString(R.string.image_type_description_import);
 
-			case CJayConstant.TYPE_EXPORT:
+			case EXPORT:
 				return ctx.getResources().getString(R.string.image_type_description_export);
 
-			case CJayConstant.TYPE_AUDIT:
+			case AUDIT:
 				return ctx.getResources().getString(R.string.image_type_description_report);
 
-			case CJayConstant.TYPE_REPAIRED:
+			case REPAIRED:
 			default:
 				return ctx.getResources().getString(R.string.image_type_description_repaired);
 		}
