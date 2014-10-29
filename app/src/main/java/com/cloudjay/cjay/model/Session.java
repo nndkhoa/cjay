@@ -67,8 +67,6 @@ public class Session implements Serializable {
 
 	private int uploadStatus;
 
-	private boolean processing;
-
 	@SerializedName("gate_images")
 	@Expose
 	private List<GateImage> gateImages;
@@ -84,18 +82,6 @@ public class Session implements Serializable {
 	}
 
 	//region GETTER AND SETTER
-	public boolean isProcessing() {
-		return processing;
-	}
-
-	public void setProcessing(boolean isProcessing) {
-		this.processing = isProcessing;
-	}
-
-	public Session withProcessing(boolean isProcessing) {
-		this.processing = isProcessing;
-		return this;
-	}
 
 	public long getId() {
 		return id;

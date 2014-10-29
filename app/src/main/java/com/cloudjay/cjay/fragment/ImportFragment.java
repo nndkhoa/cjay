@@ -20,6 +20,7 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
+import com.cloudjay.cjay.activity.HomeActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.OperatorCallbackEvent;
@@ -33,7 +34,6 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringHelper;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.Step;
-import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
@@ -47,7 +47,6 @@ import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -66,7 +65,7 @@ public class ImportFragment extends Fragment {
 	@ViewById(R.id.btn_camera)
 	ImageButton btnCamera;
 
-	@ViewById(R.id.btn_continue)
+	@ViewById(R.id.btn_complete_repair)
 	Button btnContinue;
 
 	@ViewById(R.id.btn_complete)
@@ -124,8 +123,8 @@ public class ImportFragment extends Fragment {
 		etOperator.setCursorVisible(false);
 		etOperator.clearFocus();
 
-        mAdapter = new GateImageAdapter(getActivity(), R.layout.item_image_gridview, false);
-        lvImages.setAdapter(mAdapter);
+		mAdapter = new GateImageAdapter(getActivity(), R.layout.item_image_gridview, false);
+		lvImages.setAdapter(mAdapter);
 
 		// Trying to restore container status
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
@@ -142,7 +141,7 @@ public class ImportFragment extends Fragment {
 			tvContainerCode.setText(containerID);
 			etOperator.setText(operatorCode);
 
-            refresh();
+			refresh();
 		}
 	}
 
@@ -252,7 +251,7 @@ public class ImportFragment extends Fragment {
 	/**
 	 * Add container session to upload queue. Then navigate user to Audit and Repair Fragment.
 	 */
-	@Click(R.id.btn_continue)
+	@Click(R.id.btn_complete_repair)
 	void buttonContinueClicked() {
 
 		//Upload container
@@ -272,10 +271,15 @@ public class ImportFragment extends Fragment {
 	 */
 	@Click(R.id.btn_complete)
 	void buttonCompletedClicked() {
+
+		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
-		Job job = new UploadSessionJob(mSession);
-		jobManager.addJobInBackground(job);
-        getActivity().finish();
+		jobManager.addJob(new UploadSessionJob(mSession));
+
+		// Navigate to HomeActivity
+		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
+		startActivity(intent);
+		getActivity().finish();
 	}
 
 	@Touch(R.id.et_operator)

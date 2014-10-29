@@ -65,17 +65,14 @@ public class BaseActivity extends FragmentActivity {
 	void logoutItemClicked() {
 		showLogoutPrompt();
 	}
-    @OptionsItem(R.id.menu_logupload)
-    void loguploadItemClicked(){
-        switchToLogUploadActivity();
-    }
 
-    private void switchToLogUploadActivity() {
-        Intent intent = new Intent(getApplicationContext(), UploadLogActivity_.class);
-        startActivity(intent);
-    }
+	@OptionsItem(R.id.menu_upload_log)
+	void uploadLogMenuItemClicked() {
+		Intent intent = new Intent(getApplicationContext(), LogActivity_.class);
+		startActivity(intent);
+	}
 
-    protected void showLogoutPrompt() {
+	protected void showLogoutPrompt() {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.logout_prompt_title);

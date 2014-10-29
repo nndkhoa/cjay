@@ -17,8 +17,12 @@ public class UploadImageJob extends Job {
 	String uri;
 	String imageName;
 
-	public UploadImageJob(String uri, String imageName, String containerId) {
+	@Override
+	protected int getRetryLimit() {
+		return 5;
+	}
 
+	public UploadImageJob(String uri, String imageName, String containerId) {
 		super(new Params(2).requireNetwork().persist().groupBy(containerId).setPersistent(true));
 		this.containerId = containerId;
 		this.uri = uri;
@@ -40,6 +44,8 @@ public class UploadImageJob extends Job {
 
 	@Override
 	protected void onCancel() {
+        Context context = App.getInstance().getApplicationContext();
+        DataCenter_.getInstance_(context).addLog(context,containerId, "Không thể tải lên hình: "+imageName);
 	}
 
 	@Override

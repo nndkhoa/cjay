@@ -17,6 +17,11 @@ import de.greenrobot.event.EventBus;
 public class UploadSessionJob extends Job {
 	Session session;
 
+	@Override
+	protected int getRetryLimit() {
+		return 2;
+	}
+
 	public UploadSessionJob(Session session) {
 		super(new Params(1).requireNetwork().persist().groupBy(session.getContainerId()));
 		this.session = session;
@@ -26,17 +31,24 @@ public class UploadSessionJob extends Job {
 	public void onAdded() {
 
         Context context = App.getInstance().getApplicationContext();
-        DataCenter_.getInstance_(context).addUploadingSession(session.getContainerId());
+        DataCenter_.getInstance_(context).addUploadSession(session.getContainerId());
         EventBus.getDefault().post(new UploadStartedEvent(session.getContainerId()));
 
 	}
 
 	@Override
 	public void onRun() throws Throwable {
+        Context context = App.getInstance().getApplicationContext();
+
+        //Add Log
+        DataCenter_.getInstance_(context).addLog(context,session.getContainerId(), "Bắt đầu khởi tạo");
 
 		EventBus.getDefault().post(new UploadingEvent());
-		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).uploadContainerSession(context, session);
+
+		DataCenter_.getInstance_(context).uploadSession(context, session);
+
+        //Add Log
+        DataCenter_.getInstance_(context).addLog(context,session.getContainerId(), "Khởi tạo hoàn tất");
 
 
 	}
@@ -44,14 +56,15 @@ public class UploadSessionJob extends Job {
 
 	@Override
 	protected void onCancel() {
-
+        Context context = App.getInstance().getApplicationContext();
+        DataCenter_.getInstance_(context).addLog(context,session.getContainerId(), "Không thể khởi tạo");
 	}
 
 	@Override
 	protected boolean shouldReRunOnThrowable(Throwable throwable) {
-
-		// TODO: @thai: Assign upload status of container to ERROR
-
+        Context context = App.getInstance().getApplicationContext();
+        //Add Log
+        DataCenter_.getInstance_(context).addLog(context,session.getContainerId(), "Khởi tạo bị gián đoạn");
 
 		EventBus.getDefault().post(new UploadStoppedEvent());
 		return true;

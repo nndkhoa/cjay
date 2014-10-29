@@ -1,16 +1,17 @@
 package com.cloudjay.cjay.fragment;
 
 import android.app.ActionBar;
-import android.content.Context;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.widget.Button;
 
+import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
+import com.cloudjay.cjay.task.jobqueue.UploadCompleteAuditJob;
+import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
+import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
@@ -20,7 +21,6 @@ import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Locale;
 
 /**
  * Màn hình sửa chữa
@@ -36,8 +36,11 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 	@ViewById(R.id.pager)
 	ViewPager pager;
 
-	@ViewById(R.id.btn_continue)
-	Button btnContinue;
+	@ViewById(R.id.btn_complete_repair)
+	Button btnCompleteRepair;
+
+    @ViewById(R.id.btn_complete_audit)
+    Button btnCompleteAudit;
 
 	ActionBar actionBar;
 	private ViewPagerAdapter mPagerAdapter;
@@ -46,8 +49,12 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 	public RepairFragment() {
 	}
 
-	@Click(R.id.btn_continue)
+	@Click(R.id.btn_complete_repair)
 	void buttonContinueClick() {
+        // Add containerId to upload complete repair queue
+        JobManager jobManager = App.getJobManager();
+        jobManager.addJob(new UploadCompleteRepairJob(containerID));
+
 	     /* Remove all tabs */
 		actionBar.removeAllTabs();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
@@ -59,6 +66,13 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 		transaction.replace(R.id.ll_main, fragment);
 		transaction.commit();
 	}
+
+    @Click(R.id.btn_complete_audit)
+    void buttonCompleteAuditClicked(){
+        // Add containerId to upload complete audit queue
+        JobManager jobManager = App.getJobManager();
+        jobManager.addJob(new UploadCompleteAuditJob(containerID));
+    }
 
 	@AfterViews
 	void doAfterViews() {

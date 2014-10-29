@@ -84,10 +84,10 @@
     <string name="search_on_server">Bắt đầu tìm kiếm trên server</string>
 
     <!-- Button titles -->
-    <string name="button_completed">Hoàn tất</string>
+    <string name="button_completed">Hoàn tất giám định</string>
     <string name="button_audit_now">Giám định ngay</string>
     <string name="button_repair_now">Sửa chữa ngay</string>
-    <string name="button_export_now">Xuất ngay</string>
+    <string name="button_export_now">Hoàn tất sữa chửa</string>
     <string name="button_add_issues_image">Bổ sung lỗi</string>
     <string name="button_approve">Duyệt</string>
     <string name="button_approved">Đã duyệt</string>
@@ -114,7 +114,7 @@
     <string name="menu_username_title">Username</string>
     <string name="menu_refresh">Refresh</string>
     <string name="menu_role_title">Role</string>
-    <string name="menu_logupload_title">Log</string>
+    <string name="menu_upload_log_title">Log</string>
 	<string name="logout_prompt_title">Dữ liệu sẽ mất sau khi đăng xuất. Bạn có chắc chưa?</string>
 
     <!-- Main flow fragment titles -->

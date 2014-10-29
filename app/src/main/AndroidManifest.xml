@@ -82,7 +82,7 @@
             android:label="@string/fragment_repair_title"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".activity.UploadLogActivity_"
+            android:name=".activity.LogActivity_"
             android:label="@string/title_activity_log"
             android:screenOrientation="portrait"></activity>
 

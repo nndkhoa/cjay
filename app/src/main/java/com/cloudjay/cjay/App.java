@@ -27,7 +27,7 @@ public class App extends Application {
 
 	private static App instance;
 	private static JobManager jobManager;
-	private static DB snappyDB;
+	private static DB snappyDB = null;
 	Context mContext;
 
 	public App() {
@@ -40,20 +40,21 @@ public class App extends Application {
 
 	public static DB getDB(Context context) throws SnappydbException {
 
-		StackTraceElement[] trace = new Throwable().getStackTrace();
-		Logger.Log("Open DB " + trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
+//		StackTraceElement[] trace = new Throwable().getStackTrace();
+//		Logger.Log("Open DB " + trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
 
-		snappyDB = DBFactory.open(context, CJayConstant.DB_NAME);
+		if (snappyDB == null || snappyDB.isOpen() == false) {
+			snappyDB = DBFactory.open(context, CJayConstant.DB_NAME);
+		}
+
 		return snappyDB;
 	}
 
 	public static void closeDB() throws SnappydbException {
 
-		if (snappyDB != null & snappyDB.isOpen()) {
-
+		if (snappyDB != null && snappyDB.isOpen()) {
 			StackTraceElement[] trace = new Throwable().getStackTrace();
-			Logger.Log("Close DB " + trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
-
+//			Logger.Log("Close DB " + trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
 			snappyDB.close();
 		}
 	}
@@ -61,6 +62,12 @@ public class App extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+
+		try {
+			closeDB();
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
 
 		configureDirectories();
 		configureImageLoader();

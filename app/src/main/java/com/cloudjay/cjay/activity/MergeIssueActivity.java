@@ -49,9 +49,7 @@ public class MergeIssueActivity extends BaseActivity {
     @ViewById(R.id.lv_merge_issue)
     ListView lvIssues;
 
-    List<AuditItem> auditItems;
-
-    Session currentSession;
+	Session currentSession;
 
     AuditMergeIssueAdapter mAdapter;
 
