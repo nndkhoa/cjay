@@ -166,7 +166,7 @@ public class IssuePendingFragment extends Fragment {
                 list.add(auditItem);
             }
             Logger.Log("Size: " + list.size());
-            
+
             //Sort list audit
             Comparator<AuditItem> comparator  = new Comparator<AuditItem>() {
                 @Override

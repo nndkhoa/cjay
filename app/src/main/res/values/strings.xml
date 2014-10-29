@@ -124,7 +124,7 @@
     <string name="fragment_export_title">Xuất</string>
 
     <!-- Text Error -->
-    <string name="error_empty_search_string">Vui lòng nhập từ khóa tìm kiếm</string>
+    <string name="error_empty_search_string">Vui lòng nhập 6 ký tự trở lên để tìm kiếm</string>
 
     <!-- Label for error item -->
     <string name="label_code_component">CODE component:</string>

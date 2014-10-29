@@ -274,7 +274,8 @@ public class ImportFragment extends Fragment {
 	void buttonCompletedClicked() {
 		JobManager jobManager = App.getJobManager();
 		Job job = new UploadSessionJob(mSession);
-		jobManager.addJob(job);
+		jobManager.addJobInBackground(job);
+        getActivity().finish();
 	}
 
 	@Touch(R.id.et_operator)

@@ -158,7 +158,6 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
         builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                //TODO show chon loi da giam dinh @Nam
                 dialogInterface.dismiss();
             }
         });

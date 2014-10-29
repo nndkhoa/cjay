@@ -617,8 +617,7 @@ public class DataCenter {
 		}
 
 		db.close();
-
-		// TODO: sao không thấy post Event như upload hình?
+        EventBus.getDefault().post(new UploadedEvent(session.getContainerId()));
 	}
 	//endregion
 

@@ -11,6 +11,7 @@ import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONException;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ import javax.annotation.Generated;
 
 
 @Generated("org.jsonschema2pojo")
-public class Session {
+public class Session implements Serializable {
 
 	public static final String FIELD_CONTAINER_ID = "container_id";
 

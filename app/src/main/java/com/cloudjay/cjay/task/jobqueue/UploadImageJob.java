@@ -27,13 +27,12 @@ public class UploadImageJob extends Job {
 
 	@Override
 	public void onAdded() {
-		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).addUploadingSession(containerId);
-		EventBus.getDefault().post(new UploadStartedEvent(containerId));
+
 	}
 
 	@Override
 	public void onRun() throws Throwable {
+
 		EventBus.getDefault().post(new UploadingEvent());
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).uploadImage(context, uri, imageName, containerId);
