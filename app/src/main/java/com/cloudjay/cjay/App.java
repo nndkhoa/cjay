@@ -8,8 +8,7 @@ import android.util.Log;
 
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.PreferencesUtil;
-import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.StringUtils;
 import com.cloudjay.cjay.util.Utils;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -81,20 +80,14 @@ public class App extends Application {
 		// Configure Alarm Manager
 		// Check if user logged in => check alarm manager
 		mContext = getApplicationContext();
-		if (!PreferencesUtil.getPrefsValue(mContext, PreferencesUtil.PREF_TOKEN).isEmpty()) {
-			if (!Utils.isAlarmUp(mContext)) {
 
-				Logger.w("Alarm Manager is not running.");
-				Utils.startAlarm(mContext);
-
-			} else {
-
-				Logger.Log("Alarm is already running "
-						+ StringHelper.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
-
-			}
+		if (!Utils.isAlarmUp(mContext)) {
+			Logger.w("Alarm Manager is not running.");
+			Utils.startAlarm(mContext);
 		} else {
-			Logger.Log("UnLogged in");
+			Logger.Log("Alarm is already running "
+					+ StringUtils.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
+
 		}
 	}
 

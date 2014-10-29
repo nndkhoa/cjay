@@ -20,9 +20,9 @@ import com.cloudjay.cjay.activity.MergeIssueActivity_;
 import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.task.jobqueue.UploadAuditItemJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.enums.Step;
-import com.cloudjay.cjay.task.jobqueue.UploadAuditItemJob;
 import com.cloudjay.cjay.view.SquareImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.path.android.jobqueue.JobManager;
@@ -39,7 +39,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 	private int layoutResId;
 	private String containerId;
 	private AuditImage auditImage;
-    private String operatorCode;
+	private String operatorCode;
 
 	public AuditItemAdapter(Context context, int resource, String containerId, String operatorCode) {
 		super(context, resource);
@@ -47,7 +47,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		layoutResId = resource;
 		this.containerId = containerId;
-        this.operatorCode = operatorCode;
+		this.operatorCode = operatorCode;
 	}
 
 	private class ViewHolder {
@@ -65,7 +65,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		public TextView tvIssueStatus;
 		public LinearLayout llIssueImageView;
 		public LinearLayout llIssueDetails;
-        public ImageView ivUploading;
+		public ImageView ivUploading;
 	}
 
 	@Override
@@ -91,7 +91,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			holder.btnReport = (Button) view.findViewById(R.id.btn_report_pending);
 			holder.btnRepair = (Button) view.findViewById(R.id.btn_repair_pending);
 			holder.btnEdit = (Button) view.findViewById(R.id.btn_edit_pending);
-            holder.ivUploading = (ImageView) view.findViewById(R.id.iv_uploading);
+			holder.ivUploading = (ImageView) view.findViewById(R.id.iv_uploading);
 
 			holder.llIssueDetails = (LinearLayout) view.findViewById(R.id.ll_issue_details);
 			holder.llIssueImageView = (LinearLayout) view.findViewById(R.id.ll_issue_imageview);
@@ -142,33 +142,33 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		holder.btnRepair.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-                if (!auditItem.getApproved()) {
-                    // Show repair dialog
-                    showRepairDiaglog();
-                } else {
-                    // Open camera activity to take repair image
-                    openCamera();
-                }
+				if (!auditItem.getApproved()) {
+					// Show repair dialog
+					showRepairDiaglog();
+				} else {
+					// Open camera activity to take repair image
+					openCamera();
+				}
 			}
 		});
 
-        holder.btnUpload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //1. Ẩn button Edit, Hiện icon Uploading, Hiện button Repair
-                holder.btnUpload.setVisibility(View.GONE);
-                holder.btnEdit.setVisibility(View.GONE);
-                holder.ivUploading.setVisibility(View.VISIBLE);
-                holder.btnRepair.setVisibility(View.VISIBLE);
+		holder.btnUpload.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				//1. Ẩn button Edit, Hiện icon Uploading, Hiện button Repair
+				holder.btnUpload.setVisibility(View.GONE);
+				holder.btnEdit.setVisibility(View.GONE);
+				holder.ivUploading.setVisibility(View.VISIBLE);
+				holder.btnRepair.setVisibility(View.VISIBLE);
 
-                //2. Add container session to upload queue
-                JobManager jobManager = App.getJobManager();
-                jobManager.addJob(new UploadAuditItemJob(containerId, auditItem));
+				//2. Add container session to upload queue
+				JobManager jobManager = App.getJobManager();
+				jobManager.addJob(new UploadAuditItemJob(containerId, auditItem));
 
                 //TODO: 3. When upload completed, hide icon Uploading @Nam
 
-            }
-        });
+			}
+		});
 
 		holder.btnReport.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -195,8 +195,8 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
-                // Open camera activity to take repair image
-                openCamera();
+				// Open camera activity to take repair image
+				openCamera();
 				dialogInterface.dismiss();
 			}
 		});
@@ -248,7 +248,6 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			public void onClick(DialogInterface dialogInterface, int i) {
 
 				Intent intent = new Intent(mContext, MergeIssueActivity_.class);
-
                 intent.putExtra(MergeIssueActivity_.CONTAINER_ID_EXTRA, containerId);
                 intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, auditImage);
                 intent.putExtra(MergeIssueActivity_.AUDIT_ITEM_REMOVE_UUID, auditItemRemoveUUID);

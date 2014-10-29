@@ -17,13 +17,12 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.fragment.SearchFragment_;
 import com.cloudjay.cjay.fragment.UploadFragment_;
 import com.cloudjay.cjay.fragment.WorkingFragment_;
-import com.cloudjay.cjay.task.jobqueue.GetAllSessionsJob;
+import com.cloudjay.cjay.task.jobqueue.FetchSessionsJob;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.Field;
@@ -73,7 +72,7 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 			String lastModifiedDate = PreferencesUtil.getPrefsValue(this, PreferencesUtil.PREF_MODIFIED_DATE);
 			if (lastModifiedDate.isEmpty()) {
 				JobManager jobManager = App.getJobManager();
-				jobManager.addJobInBackground(new GetAllSessionsJob(lastModifiedDate));
+				jobManager.addJobInBackground(new FetchSessionsJob(lastModifiedDate));
 			}
 		}
 	}

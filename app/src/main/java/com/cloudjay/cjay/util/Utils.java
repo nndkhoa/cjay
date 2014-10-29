@@ -37,6 +37,13 @@ import de.keyboardsurfer.android.widget.crouton.Style;
 
 public class Utils {
 
+	/**
+	 * Check a intent service is running or not
+	 *
+	 * @param ctx
+	 * @param serviceName
+	 * @return
+	 */
 	public static boolean isRunning(Context ctx, String serviceName) {
 
 		ActivityManager manager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
@@ -49,26 +56,32 @@ public class Utils {
 		return false;
 	}
 
+	/**
+	 * Init alarm manager to start QueueIntentService
+	 *
+	 * @param context
+	 */
 	public static void startAlarm(Context context) {
-
-		Logger.Log("start Alarm Manager");
 		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
 		// Making Alarm for Queue Worker
 		Intent intent = new Intent(context, QueueIntentService_.class);
-		PendingIntent pIntent = PendingIntent.getService(context, CJayConstant.ALARM_ID, intent,
-				PendingIntent.FLAG_UPDATE_CURRENT);
-
-		Calendar cal = Calendar.getInstance();
+		PendingIntent pIntent = PendingIntent.getService(context, CJayConstant.ALARM_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 		// start 30 seconds after boot completed
+		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.SECOND, 30);
 
 		// Start every 24 hours
-		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 86400 * 1000,
-				pIntent);
+		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), CJayConstant.ALARM_INTERVAL * 1000, pIntent);
 	}
 
+	/**
+	 * Get app version name
+	 *
+	 * @param ctx
+	 * @return
+	 */
 	public static String getAppVersionName(Context ctx) {
 
 		PackageInfo pInfo = null;
@@ -80,6 +93,12 @@ public class Utils {
 		return pInfo.versionName;
 	}
 
+	/**
+	 * Display a pretty alert
+	 *
+	 * @param context
+	 * @param textResId
+	 */
 	public static void showCrouton(Activity context, int textResId) {
 		Crouton.cancelAllCroutons();
 		final Crouton crouton = Crouton.makeText(context, textResId, Style.ALERT);
@@ -93,6 +112,12 @@ public class Utils {
 		crouton.show();
 	}
 
+	/**
+	 * Display a pretty alert
+	 *
+	 * @param context
+	 * @param message
+	 */
 	public static void showCrouton(Activity context, String message) {
 		Crouton.cancelAllCroutons();
 		final Crouton crouton = Crouton.makeText(context, message, Style.ALERT);
@@ -106,11 +131,22 @@ public class Utils {
 		crouton.show();
 	}
 
+	/**
+	 * Return role of current user
+	 *
+	 * @param context
+	 * @return
+	 */
 	public static int getRole(Context context) {
 		return Integer.valueOf(PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_USER_ROLE));
 	}
 
-	//Check containerID is valid or not
+	/**
+	 * Check containerID is valid or not
+	 *
+	 * @param containerId
+	 * @return
+	 */
 	public static boolean isContainerIdValid(String containerId) {
 
 		//if (!Logger.isDebuggable()) {
@@ -131,6 +167,12 @@ public class Utils {
 		//return true;
 	}
 
+	/**
+	 * Check if container id is valid based on ISO 6346
+	 *
+	 * @param containerID
+	 * @return
+	 */
 	public static boolean simpleValid(String containerID) {
 		Pattern pattern = Pattern.compile("^([A-Z]+){4,4}+(\\d{7,7}+)$");
 		Matcher matcher = pattern.matcher(containerID);
@@ -138,6 +180,12 @@ public class Utils {
 		return true;
 	}
 
+	/**
+	 * Replace a null string by space
+	 *
+	 * @param in
+	 * @return
+	 */
 	public static String replaceNullBySpace(String in) {
 		return in == null || in.equals("") ? " " : in;
 	}

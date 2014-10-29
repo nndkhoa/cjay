@@ -27,7 +27,7 @@ import com.cloudjay.cjay.task.jobqueue.UploadImageJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
-import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.StringUtils;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
@@ -307,7 +307,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 					case AUDIT:
 					case REPAIRED:
 					default:
-						Logger.Log("save audit / repaired image to database");
 						AuditImage auditImage = new AuditImage()
 								.withId(0)
 								.withType(mType)
@@ -380,7 +379,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 			String imageType = getImageTypeString(mType);
 
 			// create today String
-			String today = StringHelper.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
+			String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
 			String depotCode = PreferencesUtil.getPrefsValue(getActivity(), PreferencesUtil.PREF_USER_DEPOT);
 
 			// create directory to save images

@@ -23,8 +23,7 @@ import com.cloudjay.cjay.event.IssueDeletedEvent;
 import com.cloudjay.cjay.event.IssueMergedEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.jobqueue.UpLoadSessionHandCleaning;
-import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
+import com.cloudjay.cjay.task.jobqueue.UploadSessionHandCleaningJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.Status;
@@ -149,7 +148,7 @@ public class IssuePendingFragment extends Fragment {
 	void buttonCleanClicked() {
         // Add container session to upload queue
         JobManager jobManager = App.getJobManager();
-        jobManager.addJob(new UpLoadSessionHandCleaning(mSession));
+        jobManager.addJob(new UploadSessionHandCleaningJob(mSession));
 
 		getActivity().finish();
 	}

@@ -8,6 +8,7 @@ import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 
@@ -35,7 +36,7 @@ public class UploadCompleteAuditJob extends Job {
 
         Context context = App.getInstance().getApplicationContext();
         DataCenter_.getInstance_(context).addUploadSession(containerId);
-        EventBus.getDefault().post(new UploadStartedEvent(containerId));
+        EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.AUDIT_ITEM));
 
     }
 
@@ -46,7 +47,7 @@ public class UploadCompleteAuditJob extends Job {
         //Add Log
         DataCenter_.getInstance_(context).addLog(context,containerId, "Bắt đầu tải lên giám định");
 
-        EventBus.getDefault().post(new UploadingEvent());
+//        EventBus.getDefault().post(new UploadingEvent());
 
         DataCenter_.getInstance_(context).uploadCompleteAuditSession(context, containerId);
 
@@ -69,7 +70,7 @@ public class UploadCompleteAuditJob extends Job {
         //Add Log
         DataCenter_.getInstance_(context).addLog(context,session.getContainerId(), "Tải lên giám định bị gián đoạn");
 
-        EventBus.getDefault().post(new UploadStoppedEvent());
+        EventBus.getDefault().post(new UploadStoppedEvent(containerId));
         return true;
     }
 }

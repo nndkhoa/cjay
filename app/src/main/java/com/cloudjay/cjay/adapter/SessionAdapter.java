@@ -11,8 +11,7 @@ import android.widget.TextView;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.StringHelper;
+import com.cloudjay.cjay.util.StringUtils;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
 
@@ -73,11 +72,11 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 		viewHolder.tvOperator.setText(session.getOperatorCode());
 
 		// Set datetime
-		String checkInDate = StringHelper.getTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE,
+		String checkInDate = StringUtils.getTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE,
 				CJayConstant.DAY_FORMAT, session.getCheckInTime());
 		viewHolder.tvDateIn.setText(checkInDate);
 
-		String checkOutDate = StringHelper.getTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE,
+		String checkOutDate = StringUtils.getTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE,
 				CJayConstant.DAY_FORMAT, session.getCheckOutTime());
 		if (TextUtils.isEmpty(checkOutDate)) {
 			viewHolder.tvDateOut.setText("");
