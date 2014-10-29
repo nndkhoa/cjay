@@ -3,6 +3,7 @@ package com.cloudjay.cjay.model;
 
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.enums.ImageType;
+import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -415,4 +416,44 @@ public class Session implements Serializable {
 		return auditItems;
 	}
 
+	public boolean isValidToUpload(Step step) {
+
+		switch (step) {
+
+			// Chỉ cần có ít nhất một tấm hình IMPORT là hợp lệ
+			case IMPORT:
+				for (GateImage image : gateImages) {
+					if (image.getType() == ImageType.IMPORT.value) return true;
+				}
+				return false;
+
+			// Tất cả các item đều được gán lỗi và có hình
+			case AUDIT:
+				for (AuditItem item : auditItems) {
+					if (item.getAudited() == false)
+						return false;
+				}
+
+				return true;
+
+			// Tất cả các item đều phải có hình sau sửa chữa
+			case REPAIR:
+				for (AuditItem item : auditItems) {
+					if (item.getRepaired() == false) {
+						return false;
+					}
+				}
+
+				return true;
+
+			// Chỉ cần có ít nhất một tấm hình EXPORT là hợp lệ
+			case EXPORT:
+				for (GateImage image : gateImages) {
+					if (image.getType() == ImageType.EXPORT.value) return true;
+				}
+				return false;
+		}
+
+		return false;
+	}
 }
