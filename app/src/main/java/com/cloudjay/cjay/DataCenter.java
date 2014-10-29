@@ -869,7 +869,7 @@ public class DataCenter {
 		Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
 		if (result != null) {
-			db.close();
+			// db.close();
 			// Update container back to database
 			String key = result.getContainerId();
 			result.setUploadStatus(UploadStatus.COMPLETE);
@@ -950,7 +950,12 @@ public class DataCenter {
 		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
 	}
 
-	// Xóa lỗi sau khi merge
+	/**
+     * Xóa lỗi sau khi merge
+     * @param context
+     * @param containerId
+     * @param auditItemUUID
+     */
 	public void deleteAuditItemAfterMerge(Context context, String containerId, String auditItemUUID) {
 		try {
 			DB db = App.getDB(context);
@@ -975,7 +980,14 @@ public class DataCenter {
 
 	/**
 	 * Set lỗi thuộc loại vệ sinh.
-     * 1.
+     * 1. Get Water Wash Damage Code
+     * 2. Get Water Wash Repair Code
+     * 3. Get Water Wash Component Code
+     * 4. Tạo danh sách các Audit Item cần xóa, bao gồm:
+     *  - Các audit item là lỗi vệ sinh
+     *  - Audit Item hiện tại chưa là lỗi vệ sinh
+     *  5. Xóa list này
+     *  6. Thêm lỗi đã cập nhật thành lỗi vệ sinh vào database
 	 *
 	 * @param context
 	 * @param item
@@ -1008,15 +1020,36 @@ public class DataCenter {
 		item.setLocationCode("BXXX");
         item.setAudited(true);
 
-		// Add audit images
-		// --> Nếu nhiều image cùng thuộc một lỗi vệ sinh, thì tính là một
         Session session = db.getObject(containerId, Session.class);
 
+        List<AuditItem> removeList = new ArrayList<AuditItem>();
+
+        // --> Nếu nhiều image cùng thuộc một lỗi vệ sinh, thì tính là một
         for (AuditItem auditItem : session.getAuditItems()) {
-            if (auditItem.getAuditItemUUID().equals(item.getAuditItemUUID())) {
-                session.getAuditItems().remove(auditItem);
-                break;
+
+            if (auditItem != null) {
+                if (auditItem.getAuditItemUUID() != null &&
+                        auditItem.getAuditItemUUID().equals(item.getAuditItemUUID())) {
+                    removeList.add(auditItem);
+                }
+
+                if (auditItem.getComponentCode() != null
+                        && auditItem.getComponentCode().equals(componentCode.getCode())
+                        && auditItem.getDamageCode() != null
+                        && auditItem.getDamageCode().equals(damageCode.getCode())
+                        && auditItem.getRepairCode() != null
+                        && auditItem.getRepairCode().equals(repairCode.getCode())
+                        && auditItem.getLocationCode() != null
+                        && auditItem.getLocationCode().equals("BXXX")) {
+                    removeList.add(auditItem);
+                }
             }
+        }
+
+        session.getAuditItems().removeAll(removeList);
+        if (session.getAuditItems() == null) {
+            List<AuditItem> newList = new ArrayList<AuditItem>();
+            session.setAuditItems(newList);
         }
         session.getAuditItems().add(item);
         db.put(containerId, session);
@@ -1044,6 +1077,12 @@ public class DataCenter {
         }
     }
 
+    /**
+     * Get random iso codes include
+     * @param context
+     * @param prefix
+     * @return
+     */
     public IsoCode getIsoCode(Context context, String prefix) {
         try {
             DB db = App.getDB(context);

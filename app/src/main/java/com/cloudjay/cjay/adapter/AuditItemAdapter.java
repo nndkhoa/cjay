@@ -125,6 +125,37 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_approved));
 			}
 
+			holder.btnRepair.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					if (!auditItem.getApproved()) {
+						// Show repair dialog
+						showRepairDiaglog();
+					} else {
+						// Open camera activity to take repair image
+						openCamera();
+					}
+				}
+			});
+
+			holder.btnUpload.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					//1. Ẩn button Edit, Hiện icon Uploading, Hiện button Repair
+					holder.btnUpload.setVisibility(View.GONE);
+					holder.btnEdit.setVisibility(View.GONE);
+					holder.ivUploading.setVisibility(View.VISIBLE);
+					holder.btnRepair.setVisibility(View.VISIBLE);
+
+					//2. Add container session to upload queue
+					JobManager jobManager = App.getJobManager();
+					jobManager.addJob(new UploadAuditItemJob(containerId, auditItem));
+
+					//TODO: 3. When upload completed, hide icon Uploading @Nam*/
+
+				}
+			});
+
 		} else {
 			holder.llIssueImageView.setVisibility(View.VISIBLE);
 			holder.llIssueDetails.setVisibility(View.GONE);
@@ -139,45 +170,14 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 							holder.ivAuditImage);
 				}
 			}
-		}
 
-		holder.btnRepair.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				if (!auditItem.getApproved()) {
-					// Show repair dialog
-					showRepairDiaglog();
-				} else {
-					// Open camera activity to take repair image
-					openCamera();
+			holder.btnReport.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					showApproveDiaglog(auditItem);
 				}
-			}
-		});
-
-		holder.btnUpload.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				//1. Ẩn button Edit, Hiện icon Uploading, Hiện button Repair
-				holder.btnUpload.setVisibility(View.GONE);
-				holder.btnEdit.setVisibility(View.GONE);
-				holder.ivUploading.setVisibility(View.VISIBLE);
-				holder.btnRepair.setVisibility(View.VISIBLE);
-
-				//2. Add container session to upload queue
-				JobManager jobManager = App.getJobManager();
-				jobManager.addJob(new UploadAuditItemJob(containerId, auditItem));
-
-				//TODO: 3. When upload completed, hide icon Uploading @Nam
-
-			}
-		});
-
-		holder.btnReport.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				showApproveDiaglog(auditItem);
-			}
-		});
+			});
+		}
 
 		return view;
 	}
