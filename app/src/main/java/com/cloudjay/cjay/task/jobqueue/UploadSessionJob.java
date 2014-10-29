@@ -8,6 +8,7 @@ import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 
@@ -28,10 +29,11 @@ public class UploadSessionJob extends Job {
 
 	@Override
 	public void onAdded() {
+
 		// Add container to collection UPLOAD
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).addUploadSession(session.getContainerId());
-		EventBus.getDefault().post(new UploadStartedEvent(session.getContainerId()));
+		EventBus.getDefault().post(new UploadStartedEvent(session.getContainerId(), UploadType.SESSION));
 	}
 
 	@Override

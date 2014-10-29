@@ -300,7 +300,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 					case AUDIT:
 					case REPAIRED:
 					default:
-						Logger.Log("save audit / repaired image to database");
 						AuditImage auditImage = new AuditImage()
 								.withId(0)
 								.withType(mType)

@@ -6,7 +6,7 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
-import com.cloudjay.cjay.event.upload.UploadingEvent;
+import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 
@@ -32,25 +32,41 @@ public class UploadImageJob extends Job {
 	@Override
 	public void onAdded() {
 
+		// Image is uploaded in background, but we still need to notify Upload Fragment
+		// in case container session upload status is > UPLOADING.
+		// It will notify fragment upload to update UI
+		EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.IMAGE));
 	}
 
 	@Override
 	public void onRun() throws Throwable {
 
-		EventBus.getDefault().post(new UploadingEvent());
+//		// Notify to fragment upload that image is being uploaded.
+//		EventBus.getDefault().post(new UploadingEvent(containerId, UploadType.IMAGE));
+
+		// Call data center to upload image
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).uploadImage(context, uri, imageName, containerId);
 	}
 
 	@Override
 	protected void onCancel() {
-        Context context = App.getInstance().getApplicationContext();
-        DataCenter_.getInstance_(context).addLog(context,containerId, "Không thể tải lên hình: "+imageName);
+
+		// Job has exceeded retry attempts or shouldReRunOnThrowable() has returned false.
+		// TODO: Set image upload Status is ERROR and notify to Upload Fragment
+
+		Context context = App.getInstance().getApplicationContext();
+		EventBus.getDefault().post(new UploadStoppedEvent(containerId));
+		DataCenter_.getInstance_(context).addLog(context, containerId, "Không thể tải lên hình: " + imageName);
 	}
 
 	@Override
 	protected boolean shouldReRunOnThrowable(Throwable throwable) {
-		EventBus.getDefault().post(new UploadStoppedEvent());
+
+		if (getCurrentRunCount() >= getRetryLimit()) {
+			return false;
+		}
+
 		return true;
 	}
 }
