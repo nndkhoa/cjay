@@ -21,6 +21,7 @@ import com.cloudjay.cjay.adapter.AuditItemAdapter;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.IssueDeletedEvent;
 import com.cloudjay.cjay.event.IssueMergedEvent;
+import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.jobqueue.UploadSessionHandCleaningJob;
@@ -245,6 +246,12 @@ public class IssuePendingFragment extends Fragment {
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
 		refresh();
 	}
+
+    @UiThread
+    void onEvent(UploadedEvent event) {
+        Logger.Log("upload complete");
+        refresh();
+    }
 
 	@Override
 	public void onDestroy() {
