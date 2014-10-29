@@ -7,6 +7,7 @@ import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 
@@ -25,7 +26,7 @@ public class UploadSessionHandCleaningJob extends Job {
 
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).addUploadSession(session.getContainerId());
-		EventBus.getDefault().post(new UploadStartedEvent(session.getContainerId()));
+		EventBus.getDefault().post(new UploadStartedEvent(session.getContainerId(), UploadType.SESSION));
 
 	}
 
@@ -35,7 +36,7 @@ public class UploadSessionHandCleaningJob extends Job {
 
 		//Add Log
 		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Bắt đầu thiết lập là container vệ sinh quét");
-		EventBus.getDefault().post(new UploadingEvent());
+//		EventBus.getDefault().post(new UploadingEvent());
 		DataCenter_.getInstance_(context).setHandCleaningSession(context, session.getContainerId());
 
 		//Add Log

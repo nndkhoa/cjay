@@ -272,8 +272,8 @@ public class DataCenter {
 	 * @param lastModifiedDate
 	 * @throws SnappydbException
 	 */
+	@Trace
 	public void fetchSession(Context context, String lastModifiedDate) throws SnappydbException {
-		Logger.Log("Fetching Session");
 		List<Session> sessions = networkClient.getAllSessions(context, lastModifiedDate);
 		DB db = App.getDB(context);
 		for (Session session : sessions) {
@@ -612,7 +612,6 @@ public class DataCenter {
 		Logger.Log("Uploaded Session Id: " + result.getId());
 
 		if (result != null) {
-			db.close();
 
 			// Update container back to database
 			String key = result.getContainerId();

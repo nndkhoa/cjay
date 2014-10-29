@@ -3,7 +3,6 @@ package com.cloudjay.cjay.activity;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -21,7 +20,8 @@ import android.widget.TextView;
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.event.SessionsFetchedEvent;
+import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
@@ -36,6 +36,7 @@ import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
+import de.greenrobot.event.EventBus;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 import retrofit.RetrofitError;
@@ -156,11 +157,11 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 //				User user = dataCenter.getCurrentUserAsync(this);
 //				if (null != user) {
 
-					// Navigate to Home Activity
-					Logger.Log("Navigate to Home Activity");
-					Intent intent = new Intent(getApplicationContext(), HomeActivity_.class);
-					startActivity(intent);
-					finish();
+				// Navigate to Home Activity
+				Logger.Log("Navigate to Home Activity");
+				Intent intent = new Intent(getApplicationContext(), HomeActivity_.class);
+				startActivity(intent);
+				finish();
 
 //				} else {
 //					Logger.w("Cannot fetch user information");
