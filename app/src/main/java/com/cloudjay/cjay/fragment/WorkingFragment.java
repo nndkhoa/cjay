@@ -13,6 +13,7 @@ import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.event.upload.ContainerUploadedEvent;
+import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -114,6 +115,11 @@ public class WorkingFragment extends Fragment {
 
 	@Trace
 	public void onEvent(WorkingSessionCreatedEvent event) {
+		refresh();
+	}
+
+	@Trace
+	public void onEvent(UploadedEvent event) {
 		refresh();
 	}
 

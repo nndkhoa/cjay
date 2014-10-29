@@ -949,26 +949,63 @@ public class DataCenter {
 		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
 	}
 
-    // Xóa lỗi sau khi merge
-    public void deleteAuditItemAfterMerge(Context context, String containerId, String auditItemUUID) {
-        try {
-            DB db = App.getDB(context);
-            Session session = db.getObject(containerId, Session.class);
+	// Xóa lỗi sau khi merge
+	public void deleteAuditItemAfterMerge(Context context, String containerId, String auditItemUUID) {
+		try {
+			DB db = App.getDB(context);
+			Session session = db.getObject(containerId, Session.class);
 
-            for (AuditItem auditItem : session.getAuditItems()) {
-                if (auditItem.getAuditItemUUID().equals(auditItemUUID)) {
-                    session.getAuditItems().remove(auditItem);
-                    break;
-                }
-            }
+			for (AuditItem auditItem : session.getAuditItems()) {
+				if (auditItem.getAuditItemUUID().equals(auditItemUUID)) {
+					session.getAuditItems().remove(auditItem);
+					break;
+				}
+			}
 
-            db.put(containerId, session);
-            Logger.Log("delete audit item successfully");
+			db.put(containerId, session);
+			Logger.Log("delete audit item successfully");
 
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
 
-        EventBus.getDefault().post(new IssueDeletedEvent(containerId));
-    }
+		EventBus.getDefault().post(new IssueDeletedEvent(containerId));
+	}
+
+	/**
+	 * Set lỗi thuộc loại vệ sinh
+	 *
+	 * @param context
+	 * @param item
+	 * @throws SnappydbException
+	 */
+	public void setWaterWashType(Context context, final AuditItem item) throws SnappydbException {
+
+		DB db = App.getDB(context);
+
+		// Add Iso Code
+		String damageKey = CJayConstant.PREFIX_DAMAGE_CODE + "DB";
+		String repairKey = CJayConstant.PREFIX_REPAIR_CODE + "WW";
+		String componentKey = CJayConstant.PREFIX_COMPONENT_CODE + "FWA";
+
+		IsoCode damageCode = db.getObject(damageKey, IsoCode.class);
+		IsoCode repairCode = db.getObject(repairKey, IsoCode.class);
+		IsoCode componentCode = db.getObject(componentKey, IsoCode.class);
+
+		item.setDamageCodeId(damageCode.getId());
+		item.setDamageCode(damageCode.getCode());
+
+		item.setRepairCodeId(repairCode.getId());
+		item.setRepairCode(repairCode.getCode());
+
+		item.setComponentCodeId(componentCode.getId());
+		item.setComponentCode(componentCode.getCode());
+
+		item.setLocationCode("BXXX");
+
+		// Add audit images
+		// --> Nếu nhiều image cùng thuộc một lỗi vệ sinh, thì tính là một
+
+
+	}
 }
