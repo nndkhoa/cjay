@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Created by thai on 21/10/2014.
+ * Màn hình chữa các lỗi đã giám định và chưa được upload
  */
 @EActivity(R.layout.activity_merge_issue)
 public class MergeIssueActivity extends BaseActivity {
@@ -76,11 +76,18 @@ public class MergeIssueActivity extends BaseActivity {
             }
         }
 
-        /*Logger.Log("isInserted: " + isInserted);
         if (isInserted == false) {
-
             // Insert static issue into database
             for (int i = 0; i < 5; i++) {
+
+                Logger.Log("PREFIX_COMPONENT_CODE");
+                IsoCode componentCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_COMPONENT_CODE);
+
+                Logger.Log("PREFIX_DAMAGE_CODE");
+                IsoCode damageCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_DAMAGE_CODE);
+
+                Logger.Log("PREFIX_REPAIR_CODE");
+                IsoCode repairCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_REPAIR_CODE);
 
                 // Random new UUID to unique each audit item
                 String uuid = UUID.randomUUID().toString();
@@ -90,27 +97,21 @@ public class MergeIssueActivity extends BaseActivity {
                 auditItem.setId(0);
                 auditItem.setAuditItemUUID(uuid);
                 auditItem.setAudited(true);
-                auditItem.setComponentCode("LBG_" + i);
-                auditItem.setLocationCode("LTON_" + i);
-                auditItem.setDamageCode("BR_" + i);
-                auditItem.setRepairCode("RP_" + i);
+                auditItem.setComponentCode(componentCode.getCode());
+                auditItem.setComponentCodeId(componentCode.getId());
+                auditItem.setDamageCode(damageCode.getCode());
+                auditItem.setComponentCodeId(damageCode.getId());
+                auditItem.setRepairCode(repairCode.getCode());
+                auditItem.setComponentCodeId(repairCode.getId());
+                auditItem.setLocationCode("XXXX");
                 auditItem.setHeight(40);
                 auditItem.setLength(20);
                 auditItem.setQuantity(2);
 
                 dataCenter.addIssue(getApplicationContext(), auditItem, containerID);
+
             }
-
-        }*/
-
-        Logger.Log("PREFIX_COMPONENT_CODE");
-        IsoCode componentCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_COMPONENT_CODE);
-
-        Logger.Log("PREFIX_DAMAGE_CODE");
-        IsoCode damageCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_DAMAGE_CODE);
-
-        Logger.Log("PREFIX_REPAIR_CODE");
-        IsoCode repairCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_REPAIR_CODE);
+        }
 
         refresh();
 
@@ -133,7 +134,7 @@ public class MergeIssueActivity extends BaseActivity {
     void refresh() {
         List<AuditItem> list = new ArrayList<AuditItem>();
         for (AuditItem auditItem : currentSession.getAuditItems()) {
-            if (auditItem.getAudited() == true) {
+            if (auditItem.getAudited() == true && auditItem.getId() == 0) {
                 list.add(auditItem);
             }
         }

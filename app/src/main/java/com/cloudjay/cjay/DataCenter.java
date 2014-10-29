@@ -1008,15 +1008,33 @@ public class DataCenter {
 		item.setLocationCode("BXXX");
         item.setAudited(true);
 
-		// Add audit images
-		// --> Nếu nhiều image cùng thuộc một lỗi vệ sinh, thì tính là một
         Session session = db.getObject(containerId, Session.class);
 
+        List<AuditItem> removeList = new ArrayList<AuditItem>();
+
+        // --> Nếu nhiều image cùng thuộc một lỗi vệ sinh, thì tính là một
         for (AuditItem auditItem : session.getAuditItems()) {
+
             if (auditItem.getAuditItemUUID().equals(item.getAuditItemUUID())) {
-                session.getAuditItems().remove(auditItem);
-                break;
+                removeList.add(auditItem);
             }
+
+            if (auditItem.getComponentCode() != null
+                    && auditItem.getComponentCode().equals(componentCode.getCode())
+                    && auditItem.getDamageCode() != null
+                    && auditItem.getDamageCode().equals(damageCode.getCode())
+                    && auditItem.getRepairCode() != null
+                    && auditItem.getRepairCode().equals(repairCode.getCode())
+                    && auditItem.getLocationCode() != null
+                    && auditItem.getLocationCode().equals("BXXX")) {
+                removeList.add(auditItem);
+            }
+        }
+
+        session.getAuditItems().removeAll(removeList);
+        if (session.getAuditItems() == null) {
+            List<AuditItem> newList = new ArrayList<AuditItem>();
+            session.setAuditItems(newList);
         }
         session.getAuditItems().add(item);
         db.put(containerId, session);
