@@ -612,7 +612,6 @@ public class DataCenter {
         Logger.Log("Uploaded Session Id: " + result.getId());
 
         if (result != null) {
-            db.close();
 
             // Update container back to database
             String key = result.getContainerId();
