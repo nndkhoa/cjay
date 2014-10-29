@@ -127,7 +127,6 @@ public class ImportFragment extends Fragment {
 		lvImages.setAdapter(mAdapter);
 
 
-
 		// Trying to restore container status
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 		if (null == mSession) {
@@ -143,17 +142,17 @@ public class ImportFragment extends Fragment {
 			tvContainerCode.setText(containerID);
 			etOperator.setText(operatorCode);
 
-            switch((int)preStatus) {
-                case 0:
-                    rdnStatusA.setChecked(true);
-                    break;
-                case 1:
-                    rdnStatusB.setChecked(true);
-                    break;
-                case 2:
-                    rdnStatusC.setChecked(true);
-                    break;
-            }
+			switch ((int) preStatus) {
+				case 0:
+					rdnStatusA.setChecked(true);
+					break;
+				case 1:
+					rdnStatusB.setChecked(true);
+					break;
+				case 2:
+					rdnStatusC.setChecked(true);
+					break;
+			}
 
 			refresh();
 		}
@@ -268,6 +267,11 @@ public class ImportFragment extends Fragment {
 	@Click(R.id.btn_complete_repair)
 	void buttonContinueClicked() {
 
+		if (mSession.isValidToUpload(Step.IMPORT) == false) {
+			Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+			return;
+		}
+
 		// Add current container to job queue
 		JobManager jobManager = App.getJobManager();
 		jobManager.addJobInBackground(new UploadSessionJob(mSession));
@@ -286,6 +290,11 @@ public class ImportFragment extends Fragment {
 	 */
 	@Click(R.id.btn_complete)
 	void buttonCompletedClicked() {
+
+		if (mSession.isValidToUpload(Step.IMPORT) == false) {
+			Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+			return;
+		}
 
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
@@ -319,7 +328,7 @@ public class ImportFragment extends Fragment {
 	void preStatusAChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 0;
-            btnContinue.setVisibility(View.GONE);
+			btnContinue.setVisibility(View.GONE);
 		}
 	}
 
@@ -327,7 +336,7 @@ public class ImportFragment extends Fragment {
 	void preStatusBChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 1;
-            btnContinue.setVisibility(View.VISIBLE);
+			btnContinue.setVisibility(View.VISIBLE);
 		}
 	}
 
@@ -335,7 +344,7 @@ public class ImportFragment extends Fragment {
 	void preStatusCChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 2;
-            btnContinue.setVisibility(View.VISIBLE);
+			btnContinue.setVisibility(View.VISIBLE);
 		}
 	}
 	//endregion

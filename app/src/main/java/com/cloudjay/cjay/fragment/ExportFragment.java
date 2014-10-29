@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ExpandableListView;
-import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -16,10 +15,9 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
+import com.cloudjay.cjay.activity.HomeActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.adapter.PhotoExpandableListAdapter;
-import com.cloudjay.cjay.event.AuditImagesGotEvent;
-import com.cloudjay.cjay.event.GateImagesGotEvent;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.GateImage;
@@ -27,11 +25,10 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.jobqueue.UploadExportSessionJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
-import com.crashlytics.android.internal.m;
 import com.path.android.jobqueue.JobManager;
-import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
@@ -65,118 +62,119 @@ public class ExportFragment extends Fragment {
 	LinearLayout btnTakeExportPicture;
 
 	@ViewById(R.id.gv_images)
-    ListView gvExportImages;
+	ListView gvExportImages;
 
 	@ViewById(R.id.btn_view_previous_step)
 	Button btnViewPreviousSteps;
 
-    @ViewById(R.id.btn_complete)
-    Button btnComplete;
+	@ViewById(R.id.btn_complete)
+	Button btnComplete;
 
-    @ViewById(R.id.tv_status_name)
-    TextView tvPreStatus;
+	@ViewById(R.id.tv_status_name)
+	TextView tvPreStatus;
 
-    @ViewById(R.id.tv_current_status)
-    TextView tvCurrentStatus;
+	@ViewById(R.id.tv_current_status)
+	TextView tvCurrentStatus;
 
-    @ViewById(R.id.lv_images_expandable)
-    ExpandableListView lvImagesExpandable;
+	@ViewById(R.id.lv_images_expandable)
+	ExpandableListView lvImagesExpandable;
 
-    @Bean
-    DataCenter dataCenter;
+	@Bean
+	DataCenter dataCenter;
 
-    GateImageAdapter gateImageAdapter = null;
-    List<GateImage> mGateImages = null;
-    List<AuditImage> mAuditImages = null;
+	GateImageAdapter gateImageAdapter = null;
+	List<GateImage> mGateImages = null;
+	List<AuditImage> mAuditImages = null;
 
-    PhotoExpandableListAdapter mListAdapter;
-    int[] mImageTypes;
+	PhotoExpandableListAdapter mListAdapter;
+	int[] mImageTypes;
 
-    List<GateImage> importImages = new ArrayList<GateImage>();
-    List<AuditImage> auditImages = new ArrayList<AuditImage>();
-    List<AuditImage> repairedImages = new ArrayList<AuditImage>();
-    List<GateImage> exportImages = new ArrayList<GateImage>();
+	List<GateImage> importImages = new ArrayList<GateImage>();
+	List<AuditImage> auditImages = new ArrayList<AuditImage>();
+	List<AuditImage> repairedImages = new ArrayList<AuditImage>();
+	List<GateImage> exportImages = new ArrayList<GateImage>();
 
-    String operatorCode;
-    long preStatus;
-    long currentStatus;
-    Session mSession;
+	String operatorCode;
+	long preStatus;
+	long currentStatus;
+	Session mSession;
 
-    public ExportFragment() {
-    }
+	public ExportFragment() {
+	}
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EventBus.getDefault().register(this);
-    }
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		EventBus.getDefault().register(this);
+	}
 
-    @AfterViews
-    void setUp() {
+	@AfterViews
+	void setUp() {
 
-        // Set ActionBar Title
-        getActivity().getActionBar().setTitle(R.string.fragment_export_title);
+		// Set ActionBar Title
+		getActivity().getActionBar().setTitle(R.string.fragment_export_title);
 
-        gateImageAdapter = new GateImageAdapter(getActivity(), R.layout.item_image_gridview, false);
-        gvExportImages.setAdapter(gateImageAdapter);
+		gateImageAdapter = new GateImageAdapter(getActivity(), R.layout.item_image_gridview, false);
+		gvExportImages.setAdapter(gateImageAdapter);
 
-        // Init image types
-        mImageTypes = new int[3];
-        mImageTypes[0] = CJayConstant.TYPE_IMPORT;
-        mImageTypes[1] = CJayConstant.TYPE_AUDIT;
-        mImageTypes[2] = CJayConstant.TYPE_REPAIRED;
+		// Init image types
+		mImageTypes = new int[3];
+		mImageTypes[0] = CJayConstant.TYPE_IMPORT;
+		mImageTypes[1] = CJayConstant.TYPE_AUDIT;
+		mImageTypes[2] = CJayConstant.TYPE_REPAIRED;
 
-        mListAdapter = new PhotoExpandableListAdapter(getActivity(),
-                mImageTypes, importImages, auditImages, repairedImages);
-        lvImagesExpandable.setAdapter(mListAdapter);
+		mListAdapter = new PhotoExpandableListAdapter(getActivity(),
+				mImageTypes, importImages, auditImages, repairedImages);
+		lvImagesExpandable.setAdapter(mListAdapter);
 
-        // Get session
-        mSession = dataCenter.getSession(getActivity(), containerID);
+		// Get session
+		mSession = dataCenter.getSession(getActivity(), containerID);
 
-        if (null == mSession) {
-            // Set ContainerId to TextView
-            tvContainerId.setText(containerID);
-        } else {
-            // Get operator code
-            containerID = mSession.getContainerId();
-            operatorCode = mSession.getOperatorCode();
+		if (null == mSession) {
+			// Set ContainerId to TextView
+			tvContainerId.setText(containerID);
+		} else {
+			// Get operator code
+			containerID = mSession.getContainerId();
+			operatorCode = mSession.getOperatorCode();
 
-            // Set preStatus to TextView
-            preStatus = mSession.getPreStatus();
-            tvPreStatus.setText((Status.values()[(int) preStatus]).toString());
+			// Set preStatus to TextView
+			preStatus = mSession.getPreStatus();
+			tvPreStatus.setText((Status.values()[(int) preStatus]).toString());
 
-            // Set currentStatus to TextView
-            currentStatus = mSession.getStatus();
-            tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
+			// Set currentStatus to TextView
+			currentStatus = mSession.getStatus();
+			tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
 
-            // Set ContainerId to TextView
-            tvContainerId.setText(containerID);
+			// Set ContainerId to TextView
+			tvContainerId.setText(containerID);
 
-            refresh();
-        }
+			refresh();
+		}
 
-    }
+	}
 
-    @Click(R.id.btn_take_export_picture)
-    void buttonTakeExportPictureClicked() {
-        // Open camera activity
-        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-        cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
-        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_EXPORT);
-        cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-        cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.EXPORT.value);
-        startActivity(cameraActivityIntent);
-    }
+	@Click(R.id.btn_take_export_picture)
+	void buttonTakeExportPictureClicked() {
 
-    @UiThread
-    void onEvent(ImageCapturedEvent event) {
-        Logger.Log("onEvent Image Captured");
+		// Open camera activity
+		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
+		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
+		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_EXPORT);
+		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
+		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.EXPORT.value);
+		startActivity(cameraActivityIntent);
+	}
+
+	@UiThread
+	void onEvent(ImageCapturedEvent event) {
+		Logger.Log("onEvent Image Captured");
 
 		// Re-query container session with given containerId
-        String containerId = event.getContainerId();
-        mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
-        refresh();
-    }
+		String containerId = event.getContainerId();
+		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+		refresh();
+	}
 
 	@Click(R.id.btn_view_previous_step)
 	void buttonViewPreClicked() {
@@ -184,65 +182,77 @@ public class ExportFragment extends Fragment {
 		gvExportImages.setVisibility(lvImagesExpandable.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
 	}
 
-    @Click(R.id.btn_complete)
-    void btnCompleteClicked(){
-        // Add container session to upload queue
-        JobManager jobManager = App.getJobManager();
-        jobManager.addJob(new UploadExportSessionJob(mSession));
-    }
-    @Background
-    void refresh() {
-        if (mSession != null) {
+	@Click(R.id.btn_complete)
+	void btnCompleteClicked() {
 
-            // Get import and export images by containerId
-            importImages = mSession.getImportImages();
-            exportImages = mSession.getExportImages();
+		if (mSession.isValidToUpload(Step.EXPORT) == false) {
+			Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+			return;
+		}
 
-            // Get audit and repaired images by containerId
-            auditImages = mSession.getIssueImages();
-            repairedImages = mSession.getRepairedImages();
+		// Add container session to upload queue
+		JobManager jobManager = App.getJobManager();
+		jobManager.addJob(new UploadExportSessionJob(mSession));
 
-            Logger.Log("importImages: " + importImages.size());
-            Logger.Log("exportImages: " + exportImages.size());
-            Logger.Log("auditImages: " + auditImages.size());
-            Logger.Log("repairedImages: " + repairedImages.size());
+		// Navigate to HomeActivity
+		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
+		startActivity(intent);
+		getActivity().finish();
+	}
 
-            updatedGridView();
-            updateExpandableListView();
-        }
-    }
+	@Background
+	void refresh() {
+		if (mSession != null) {
 
-    @UiThread
-    public void updatedGridView() {
-        gateImageAdapter.clear();
-        if (importImages != null) {
-            for (GateImage object : exportImages) {
-                gateImageAdapter.add(object);
-            }
-        }
-        gateImageAdapter.notifyDataSetChanged();
-    }
+			// Get import and export images by containerId
+			importImages = mSession.getImportImages();
+			exportImages = mSession.getExportImages();
 
-    @UiThread
-    public void updateExpandableListView() {
-        mListAdapter.mImportImages.clear();
-        mListAdapter.mAuditImages.clear();
-        mListAdapter.mRepairedImages.clear();
+			// Get audit and repaired images by containerId
+			auditImages = mSession.getIssueImages();
+			repairedImages = mSession.getRepairedImages();
 
-        if (importImages != null) {
-            mListAdapter.mImportImages.addAll(importImages);
-        }
+			Logger.Log("importImages: " + importImages.size());
+			Logger.Log("exportImages: " + exportImages.size());
+			Logger.Log("auditImages: " + auditImages.size());
+			Logger.Log("repairedImages: " + repairedImages.size());
 
-        if (auditImages != null) {
-            mListAdapter.mAuditImages.addAll(auditImages);
-        }
+			updatedGridView();
+			updateExpandableListView();
+		}
+	}
 
-        if (repairedImages != null) {
-            mListAdapter.mRepairedImages.addAll(repairedImages);
-        }
+	@UiThread
+	public void updatedGridView() {
+		gateImageAdapter.clear();
+		if (importImages != null) {
+			for (GateImage object : exportImages) {
+				gateImageAdapter.add(object);
+			}
+		}
+		gateImageAdapter.notifyDataSetChanged();
+	}
 
-        mListAdapter.notifyDataSetChanged();
-    }
+	@UiThread
+	public void updateExpandableListView() {
+		mListAdapter.mImportImages.clear();
+		mListAdapter.mAuditImages.clear();
+		mListAdapter.mRepairedImages.clear();
+
+		if (importImages != null) {
+			mListAdapter.mImportImages.addAll(importImages);
+		}
+
+		if (auditImages != null) {
+			mListAdapter.mAuditImages.addAll(auditImages);
+		}
+
+		if (repairedImages != null) {
+			mListAdapter.mRepairedImages.addAll(repairedImages);
+		}
+
+		mListAdapter.notifyDataSetChanged();
+	}
 
 	@Override
 	public void onDestroy() {

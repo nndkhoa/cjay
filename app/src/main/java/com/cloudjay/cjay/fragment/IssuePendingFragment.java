@@ -129,11 +129,14 @@ public class IssuePendingFragment extends Fragment {
         int imageType = event.getImageType();
 
         if (imageType == CJayConstant.TYPE_AUDIT) { // if audit
+
             // Re-query container session with given containerId
             String containerId = event.getContainerId();
             mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
             refresh();
+
         } else if (imageType == CJayConstant.TYPE_REPAIRED) { // if repaired
+
             Logger.Log("Open AfterRepair Fragment");
             AuditItem auditItem = event.getAuditItem();
             Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);

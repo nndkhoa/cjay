@@ -25,13 +25,13 @@ import java.lang.reflect.Method;
 public class AuditAndRepairFragment extends Fragment implements ActionBar.TabListener {
 
 	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
-    public final static String TAB_TYPE_EXTRA = "com.cloudjay.wizard.tabtype";
+	public final static String TAB_TYPE_EXTRA = "com.cloudjay.wizard.tabtype";
 
 	@FragmentArg(CONTAINER_ID_EXTRA)
 	public String containerID;
 
-    @FragmentArg(TAB_TYPE_EXTRA)
-    public int tabType;
+	@FragmentArg(TAB_TYPE_EXTRA)
+	public int tabType;
 
 	@ViewById(R.id.pager)
 	ViewPager pager;
@@ -55,7 +55,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 		// Go to next fragment
 		android.support.v4.app.Fragment fragment =
-                new ExportFragment_().builder().containerID(containerID).build();
+				new ExportFragment_().builder().containerID(containerID).build();
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 		transaction.replace(R.id.ll_main, fragment);
@@ -100,7 +100,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 	private void configureViewPager() {
 		mPagerAdapter = new ViewPagerAdapter(getActivity(),
-                getActivity().getSupportFragmentManager(), containerID, tabType);
+				getActivity().getSupportFragmentManager(), containerID, tabType);
 		pager.setAdapter(mPagerAdapter);
 		pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
