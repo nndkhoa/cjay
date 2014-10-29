@@ -42,7 +42,8 @@ public class WizardActivity extends BaseActivity {
 			// Load fragment Audit and Repair
 			case AUDIT:
 			case REPAIR:
-				fragment = AuditAndRepairFragment_.builder().containerID(containerID).build();
+				fragment = AuditAndRepairFragment_.builder().containerID(containerID)
+                        .tabType(1).build();
 				break;
 
 			// Load fragment Export

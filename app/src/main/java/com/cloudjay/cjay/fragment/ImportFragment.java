@@ -106,7 +106,7 @@ public class ImportFragment extends Fragment {
 
 	GateImageAdapter mAdapter = null;
 
-	long preStatus = 0;
+	long preStatus = 1;
 	Session mSession;
 	//endregion
 
@@ -126,6 +126,8 @@ public class ImportFragment extends Fragment {
 		mAdapter = new GateImageAdapter(getActivity(), R.layout.item_image_gridview, false);
 		lvImages.setAdapter(mAdapter);
 
+
+
 		// Trying to restore container status
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 		if (null == mSession) {
@@ -140,6 +142,18 @@ public class ImportFragment extends Fragment {
 
 			tvContainerCode.setText(containerID);
 			etOperator.setText(operatorCode);
+
+            switch((int)preStatus) {
+                case 0:
+                    rdnStatusA.setChecked(true);
+                    break;
+                case 1:
+                    rdnStatusB.setChecked(true);
+                    break;
+                case 2:
+                    rdnStatusC.setChecked(true);
+                    break;
+            }
 
 			refresh();
 		}
@@ -305,6 +319,7 @@ public class ImportFragment extends Fragment {
 	void preStatusAChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 0;
+            btnContinue.setVisibility(View.GONE);
 		}
 	}
 
@@ -312,6 +327,7 @@ public class ImportFragment extends Fragment {
 	void preStatusBChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 1;
+            btnContinue.setVisibility(View.VISIBLE);
 		}
 	}
 
@@ -319,6 +335,7 @@ public class ImportFragment extends Fragment {
 	void preStatusCChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 2;
+            btnContinue.setVisibility(View.VISIBLE);
 		}
 	}
 	//endregion
