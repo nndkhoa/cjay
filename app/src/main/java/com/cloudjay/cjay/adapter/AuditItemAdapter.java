@@ -4,13 +4,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -25,7 +23,6 @@ import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.task.jobqueue.UploadAuditItemJob;
-import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
 import com.cloudjay.cjay.view.SquareImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.path.android.jobqueue.JobManager;
@@ -42,9 +39,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 	private int layoutResId;
 	private String containerId;
 	private AuditImage auditImage;
-	private AuditItem mAuditItem;
     private String operatorCode;
-    private final View mHolder = null;
 
 	public AuditItemAdapter(Context context, int resource, String containerId, String operatorCode) {
 		super(context, resource);
@@ -143,7 +138,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				}
 			}
 		}
-		//TODO: if audit item has not been audited yet, show repair dialog, otherwise, go straight to Camera
+
 		holder.btnRepair.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -170,17 +165,15 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
                 JobManager jobManager = App.getJobManager();
                 jobManager.addJob(new UploadAuditItemJob(containerId, auditItem));
 
-                //TODO: 3. When upload completed, hide icon Uploading (Remove comment line below) @Nam
+                //TODO: 3. When upload completed, hide icon Uploading @Nam
 
             }
         });
 
-		mAuditItem = auditItem;
-
 		holder.btnReport.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				showApproveDiaglog();
+				showApproveDiaglog(auditItem.getAuditItemUUID());
 			}
 		});
 
@@ -230,7 +223,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 	}
 
-	void showApproveDiaglog() {
+	void showApproveDiaglog(final String auditItemRemoveUUID) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 		builder.setTitle("Alert");
 		builder.setMessage("Lỗi này đã được báo cáo chưa?");
@@ -258,7 +251,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
                 intent.putExtra(MergeIssueActivity_.CONTAINER_ID_EXTRA, containerId);
                 intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, auditImage);
-                intent.putExtra(MergeIssueActivity_.AUDIT_ITEM_REMOVE, mAuditItem);
+                intent.putExtra(MergeIssueActivity_.AUDIT_ITEM_REMOVE_UUID, auditItemRemoveUUID);
 
 				mContext.startActivity(intent);
 			}
@@ -313,8 +306,8 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
         Intent cameraActivityIntent = new Intent(mContext, CameraActivity_.class);
         cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerId);
         cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_IMPORT);
-        cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
+        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, CJayConstant.TYPE_REPAIRED);
+        cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);
         mContext.startActivity(cameraActivityIntent);
     }
 }

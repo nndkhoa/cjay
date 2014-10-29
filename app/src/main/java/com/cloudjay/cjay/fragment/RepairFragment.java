@@ -77,7 +77,7 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 	@AfterViews
 	void doAfterViews() {
 		configureActionBar();
-		configureViewPager();
+		configureViewPager(1);
 	}
 
 	private void configureActionBar() {
@@ -110,8 +110,8 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 		actionBar.setDisplayHomeAsUpEnabled(true);
 	}
 
-	private void configureViewPager() {
-		mPagerAdapter = new ViewPagerAdapter(getActivity(), getActivity().getSupportFragmentManager(), containerID,1);
+	private void configureViewPager(int tabType) {
+		mPagerAdapter = new ViewPagerAdapter(getActivity(), getActivity().getSupportFragmentManager(), containerID, tabType);
 		pager.setAdapter(mPagerAdapter);
 		pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 

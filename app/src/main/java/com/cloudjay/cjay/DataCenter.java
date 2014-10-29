@@ -7,6 +7,7 @@ import com.cloudjay.cjay.event.AuditImagesGotEvent;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
 import com.cloudjay.cjay.event.IssueDeletedEvent;
+import com.cloudjay.cjay.event.IssueMergedEvent;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.event.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
@@ -786,18 +787,20 @@ public class DataCenter {
      * @param context
      * @param containerId
      * @param auditItemUUID
-     * @param auditItemRemove
+     * @param auditItemRemoveUUID
      * @param auditImage
      */
     public void addAuditImageToAuditedIssue(Context context,
                                             String containerId,
                                             String auditItemUUID,
-                                            AuditItem auditItemRemove,
+                                            String auditItemRemoveUUID,
                                             AuditImage auditImage) {
 
         try {
             DB db = App.getDB(context);
             Session session = db.getObject(containerId, Session.class);
+
+            // Insert audit image into audited audit item
             for (AuditItem auditItem : session.getAuditItems()) {
 
                 if (auditItem.getAuditItemUUID().equals(auditItemUUID)) {
@@ -809,26 +812,20 @@ public class DataCenter {
                     auditImages.add(auditImage);
                     auditItem.setAuditImages(auditImages);
 
+                    Logger.Log("Size audit images: " + auditImages.size());
+
                     break;
                 }
             }
 
-            for (AuditItem auditItem : session.getAuditItems()) {
-                if (auditItem.getAuditItemUUID().equals(auditItemRemove.getAuditItemUUID())) {
-                    session.getAuditItems().remove(auditItem);
-                    break;
-                }
-            }
-
-            db.put(containerId, session);
-            Logger.Log("add AuditImage To AuditedIssue successfully");
+            Logger.Log("merge audit item successfully");
             // db.close();
 
         } catch (SnappydbException e) {
             Logger.w(e.getMessage());
         }
 
-        EventBus.getDefault().post(new IssueDeletedEvent(containerId));
+        EventBus.getDefault().post(new IssueMergedEvent(containerId, auditItemRemoveUUID));
     }
 
     /**
@@ -954,5 +951,28 @@ public class DataCenter {
         }
 
         EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
+    }
+
+    // Xóa lỗi sau khi merge
+    public void deleteAuditItemAfterMerge(Context context, String containerId, String auditItemUUID) {
+        try {
+            DB db = App.getDB(context);
+            Session session = db.getObject(containerId, Session.class);
+
+            for (AuditItem auditItem : session.getAuditItems()) {
+                if (auditItem.getAuditItemUUID().equals(auditItemUUID)) {
+                    session.getAuditItems().remove(auditItem);
+                    break;
+                }
+            }
+
+            db.put(containerId, session);
+            Logger.Log("delete audit item successfully");
+
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+
+        EventBus.getDefault().post(new IssueDeletedEvent(containerId));
     }
 }
