@@ -68,7 +68,7 @@ public class ImportFragment extends Fragment {
 	@ViewById(R.id.btn_complete_repair)
 	Button btnContinue;
 
-	@ViewById(R.id.btn_complete)
+	@ViewById(R.id.btn_complete_audit)
 	Button btnComplete;
 
 	@ViewById(R.id.et_operator)
@@ -284,7 +284,7 @@ public class ImportFragment extends Fragment {
 	/**
 	 * Finish import fragment, close Wizard Activity and go back to Home Activity with Search Fragment tab
 	 */
-	@Click(R.id.btn_complete)
+	@Click(R.id.btn_complete_audit)
 	void buttonCompletedClicked() {
 
 		// Add container session to upload queue

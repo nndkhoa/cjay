@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ExpandableListView;
-import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -18,8 +17,6 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.adapter.PhotoExpandableListAdapter;
-import com.cloudjay.cjay.event.AuditImagesGotEvent;
-import com.cloudjay.cjay.event.GateImagesGotEvent;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.GateImage;
@@ -29,9 +26,7 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
-import com.crashlytics.android.internal.m;
 import com.path.android.jobqueue.JobManager;
-import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
@@ -70,7 +65,7 @@ public class ExportFragment extends Fragment {
 	@ViewById(R.id.btn_view_previous_step)
 	Button btnViewPreviousSteps;
 
-    @ViewById(R.id.btn_complete)
+    @ViewById(R.id.btn_complete_audit)
     Button btnComplete;
 
     @ViewById(R.id.tv_status_name)
@@ -184,7 +179,7 @@ public class ExportFragment extends Fragment {
 		gvExportImages.setVisibility(lvImagesExpandable.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
 	}
 
-    @Click(R.id.btn_complete)
+    @Click(R.id.btn_complete_audit)
     void btnCompleteClicked(){
         // Add container session to upload queue
         JobManager jobManager = App.getJobManager();

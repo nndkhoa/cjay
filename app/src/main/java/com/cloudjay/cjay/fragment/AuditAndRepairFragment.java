@@ -37,7 +37,10 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	ViewPager pager;
 
 	@ViewById(R.id.btn_complete_repair)
-	Button btnContinue;
+	Button btnCompleteRepair;
+
+    @ViewById(R.id.btn_complete_audit)
+    Button btnCompleteAudit;
 
 	ActionBar actionBar;
 	private ViewPagerAdapter mPagerAdapter;
