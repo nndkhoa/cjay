@@ -506,6 +506,8 @@ public class DataCenter {
 		try {
 			DB db = App.getDB(context);
 			Session session = db.getObject(containerId, Session.class);
+            session.checkRetry();
+            db.put(containerId,Session.class);
 			String key = CJayConstant.PREFIX_UPLOADING + containerId;
 			db.put(key, session);
 

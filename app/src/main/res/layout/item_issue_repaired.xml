@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:weightSum="6"
     android:padding="3dp">
 
-    <ImageView
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:id="@+id/iv_repaired_image"
-        android:background="@drawable/ic_app"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_toRightOf="@+id/iv_repaired_image"
         android:paddingLeft="3dp"
+        android:layout_weight="6"
         android:paddingRight="12dp"
         android:paddingTop="6dp"
         android:paddingBottom="6dp">
@@ -41,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="LBH"
-                android:textColor="@color/background_button_and_line"/>
+                android:textColor="@color/background_button_and_line" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -62,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="LBH"
-                android:textColor="@color/background_button_and_line"/>
+                android:textColor="@color/background_button_and_line" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -83,7 +78,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="LBH"
-                android:textColor="@color/background_button_and_line"/>
+                android:textColor="@color/background_button_and_line" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -104,7 +99,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="LBH"
-                android:textColor="@color/background_button_and_line"/>
+                android:textColor="@color/background_button_and_line" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -125,7 +120,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="Dài 40, rộng 20"
-                android:textColor="@color/background_button_and_line"/>
+                android:textColor="@color/background_button_and_line" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -146,16 +141,48 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="1"
-                android:textColor="@color/background_button_and_line"/>
+                android:textColor="@color/background_button_and_line" />
         </RelativeLayout>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/label_status"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/tv_issue_status"
+                android:layout_width="68dp"
+                android:layout_height="22dp"
+                android:layout_alignParentRight="true"
+                android:textAppearance="@android:style/TextAppearance.Small"
+                android:text="@string/issue_approved"
+                android:textColor="#fff"
+                android:background="@color/background_button_and_line" />
+        </RelativeLayout>
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dip"
-        android:background="@color/background_button_and_line"
-        android:layout_below="@+id/iv_repaired_image"
-        android:layout_marginTop="6dp"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_gravity="center_vertical"
+        android:paddingRight="6dp">
 
-</RelativeLayout>
+        <Button
+            android:id="@+id/tv_code_repair_repaired"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@android:style/TextAppearance.Small"
+            android:text="Bổ sung"
+            android:textColor="#fff"
+            android:background="@color/background_btn_check_container_clean" />
+    </LinearLayout>
+
+</LinearLayout>
