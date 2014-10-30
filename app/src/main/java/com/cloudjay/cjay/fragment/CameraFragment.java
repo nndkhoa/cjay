@@ -319,7 +319,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 				// Add image to job queue
 				JobManager jobManager = App.getJobManager();
-				jobManager.addJobInBackground(new UploadImageJob(uri, imageName, containerId));
+				jobManager.addJobInBackground(new UploadImageJob(uri, imageName, containerId, type));
 
 			} catch (SnappydbException e) {
 				Utils.showCrouton(getActivity(), e.getMessage());
