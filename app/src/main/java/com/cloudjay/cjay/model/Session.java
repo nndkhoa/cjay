@@ -31,6 +31,16 @@ public class Session implements Serializable {
     @Expose
     private long step;
 
+    public long getServerStep() {
+        return serverStep;
+    }
+
+    public void setServerStep(long serverStep) {
+        this.serverStep = serverStep;
+    }
+
+    private long serverStep;
+
     @SerializedName("pre_status")
     @Expose
     private long preStatus;
