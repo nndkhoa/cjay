@@ -732,6 +732,8 @@ public class DataCenter {
     }
 
     /**
+     * -1. Change local step to import
+     * 0. Check for make sure all gate image have uploaded
      * 1. Upload container session
      * 2. Change status uploaded of session to COMPLETE
      * 3. Remove this container from TAB WORKING
@@ -741,6 +743,13 @@ public class DataCenter {
      * @throws SnappydbException
      */
     public void uploadSession(Context context, Session session) throws SnappydbException {
+
+        DB db = App.getDB(context);
+
+        // Change local step to import
+        session.setLocalStep(Step.AUDIT.value);
+        db.put(session.getContainerId(),session);
+
         // Check for make sure all gate image have uploaded
         for (GateImage gateImage : session.getGateImages()) {
             if (gateImage.getUploadStatus() != UploadStatus.COMPLETE.value && gateImage.getType() == ImageType.IMPORT.value) {
@@ -750,7 +759,7 @@ public class DataCenter {
         }
 
         // Upload container session to server
-        DB db = App.getDB(context);
+
         Session result = networkClient.uploadSession(context, session);
         Logger.Log("Uploaded Session Id: " + result.getId());
 
@@ -785,7 +794,7 @@ public class DataCenter {
         }
 
         // Check for make sure this container had uploaded to be import step
-        if (oldSession.getServerStep() != Step.IMPORT.value) {
+        if (oldSession.getStep() != Step.AUDIT.value) {
             //TODO Note to Khoa this upload audit item have to retry upload import session @Han
             uploadSession(context, oldSession);
         }
@@ -823,7 +832,7 @@ public class DataCenter {
         }
 
         // Check for make sure this container had uploaded to be import step
-        if (oldSession.getServerStep() != Step.AVAILABLE.value) {
+        if (oldSession.getStep() != Step.AVAILABLE.value) {
             //TODO Note to Khoa this upload export session have to retry upload complete repair @Han
             uploadCompleteRepairSession(context, oldSession.getContainerId());
         }
@@ -851,6 +860,10 @@ public class DataCenter {
 
         DB db = App.getDB(context);
         Session oldSession = db.getObject(containerId, Session.class);
+
+        // Change local step to audit
+        oldSession.setLocalStep(Step.REPAIR.value);
+        db.put(oldSession.getContainerId(),oldSession);
 
         // Check for make sure all audit item had uploaded
         for (AuditItem auditItem : oldSession.getAuditItems()) {
@@ -884,6 +897,10 @@ public class DataCenter {
 
         DB db = App.getDB(context);
         Session oldSession = db.getObject(containerId, Session.class);
+
+        // Change local step to repair
+        oldSession.setLocalStep(Step.AVAILABLE.value);
+        db.put(oldSession.getContainerId(),oldSession);
 
         // Check for sure all repaired image had uploaded
         for (AuditItem auditItem : oldSession.getAuditItems()) {

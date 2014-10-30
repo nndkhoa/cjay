@@ -31,15 +31,15 @@ public class Session implements Serializable {
     @Expose
     private long step;
 
-    public long getServerStep() {
-        return serverStep;
+    public long getLocalStep() {
+        return localStep;
     }
 
-    public void setServerStep(long serverStep) {
-        this.serverStep = serverStep;
+    public void setLocalStep(long localStep) {
+        this.localStep = localStep;
     }
 
-    private long serverStep;
+    private long localStep;
 
     @SerializedName("pre_status")
     @Expose
