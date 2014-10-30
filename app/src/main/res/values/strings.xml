@@ -116,7 +116,7 @@
     <string name="menu_refresh">Refresh</string>
     <string name="menu_role_title">Role</string>
     <string name="menu_upload_log_title">Log</string>
-	<string name="logout_prompt_title">Dữ liệu sẽ mất sau khi đăng xuất. Bạn có chắc chưa?</string>
+    <string name="logout_prompt_title">Dữ liệu sẽ mất sau khi đăng xuất. Bạn có chắc chưa?</string>
 
     <!-- Main flow fragment titles -->
     <string name="fragment_import_title">Nhập</string>
@@ -134,6 +134,7 @@
     <string name="label_code_repair">CODE sửa chữa:</string>
     <string name="label_dimension">Kích thước:</string>
     <string name="label_count">Số lượng:</string>
+
     <string name="label_status">Trạng thái:</string>
 
     <!-- Image Type Descriptions -->
@@ -141,14 +142,13 @@
     <string name="image_type_description_export">Hình Xuất</string>
     <string name="image_type_description_report">Hình Giám Định</string>
     <string name="image_type_description_repaired">Hình Sửa Chữa</string>
-	<string name="no_working_item">No available items</string>
+    <string name="no_working_item">No available items</string>
     <string name="chose_issue_has_been_audited">Chọn lỗi đã giám định</string>
 
     <!-- Issue status -->
     <string name="issue_unapproved">Chưa duyệt</string>
     <string name="issue_approved">Đã duyệt</string>
     <string name="issue_can_not_repair">Cấm sửa</string>
-
 
 
 </resources>
