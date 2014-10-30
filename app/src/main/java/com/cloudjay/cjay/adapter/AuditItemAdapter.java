@@ -22,8 +22,10 @@ import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.task.jobqueue.UploadAuditItemJob;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.view.SquareImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.path.android.jobqueue.JobManager;
@@ -105,11 +107,23 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 		// Lỗi nào chưa giám dịnh thì hiện hinh`, lỗi nào đã giám định roi thì hiện chi tiết lỗi
 		if (auditItem.getAudited() == true) {
+
 			holder.llIssueImageView.setVisibility(View.GONE);
 			holder.llIssueDetails.setVisibility(View.VISIBLE);
-			holder.btnUpload.setVisibility(View.VISIBLE);
-			holder.btnReport.setVisibility(View.GONE);
-			holder.btnEdit.setVisibility(View.VISIBLE);
+
+            switch (auditItem.getUploadStatus()) {
+                case 1:
+                    holder.btnUpload.setVisibility(View.GONE);
+                    holder.btnEdit.setVisibility(View.GONE);
+                    holder.ivUploading.setVisibility(View.VISIBLE);
+                    holder.btnRepair.setVisibility(View.VISIBLE);
+                    break;
+                default:
+                    holder.btnUpload.setVisibility(View.VISIBLE);
+                    holder.btnEdit.setVisibility(View.VISIBLE);
+                    holder.ivUploading.setVisibility(View.GONE);
+                    holder.btnRepair.setVisibility(View.GONE);
+            }
 
 			//Set detail textviews
 			holder.tvCodeComponent.setText(auditItem.getComponentCode());
@@ -119,7 +133,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			holder.tvCodeRepair.setText(auditItem.getRepairCode());
 			holder.tvCount.setText(auditItem.getQuantity() + "");
 
-			if (auditItem.getAudited()) {
+			if (!auditItem.getApproved()) {
 				holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_unapproved));
 			} else {
 				holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_approved));
@@ -141,27 +155,21 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			holder.btnUpload.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
-					//1. Ẩn button Edit, Hiện icon Uploading, Hiện button Repair
-					holder.btnUpload.setVisibility(View.GONE);
-					holder.btnEdit.setVisibility(View.GONE);
-					holder.ivUploading.setVisibility(View.VISIBLE);
-					holder.btnRepair.setVisibility(View.VISIBLE);
+					//1. Update upload status
+                    auditItem.setUploadStatus(UploadStatus.UPLOADING);
+                    notifyDataSetChanged();
 
 					//2. Add container session to upload queue
 					JobManager jobManager = App.getJobManager();
 					jobManager.addJob(new UploadAuditItemJob(containerId, auditItem));
 
 					//TODO: 3. When upload completed, hide icon Uploading @Nam*/
-
 				}
 			});
 
 		} else {
 			holder.llIssueImageView.setVisibility(View.VISIBLE);
 			holder.llIssueDetails.setVisibility(View.GONE);
-			holder.btnUpload.setVisibility(View.GONE);
-			holder.btnReport.setVisibility(View.VISIBLE);
-			holder.btnEdit.setVisibility(View.GONE);
 
 			if (auditItem.getAuditImages() != null && auditItem.getAuditImages().size() != 0) {
 				if (auditItem.getAuditImages().get(0) != null) {
@@ -172,11 +180,11 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			}
 
 			holder.btnReport.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View view) {
-					showApproveDiaglog(auditItem);
-				}
-			});
+                @Override
+                public void onClick(View view) {
+                    showApproveDiaglog(auditItem);
+                }
+            });
 		}
 
 		return view;
