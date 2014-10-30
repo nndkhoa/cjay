@@ -57,6 +57,12 @@ public class AuditItem implements Serializable {
 	@Expose
 	private String locationCode;
 
+	/**
+	 * Id of Container Session
+	 */
+	@Expose
+	private long session;
+
 	@Expose
 	private double length;
 
@@ -363,6 +369,14 @@ public class AuditItem implements Serializable {
 	public AuditItem withUploadStatus(UploadStatus status) {
 		this.uploadStatus = status.value;
 		return this;
+	}
+
+	public long getSession() {
+		return session;
+	}
+
+	public void setSession(long session) {
+		this.session = session;
 	}
 	//endregion
 
