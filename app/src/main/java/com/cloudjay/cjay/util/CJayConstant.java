@@ -40,7 +40,10 @@ public class CJayConstant {
 	public static final String LOG_TO_FILE_FORMAT = "[%s]	-	%s\n";
 
 
-    public static final int ALARM_ID = 49482;
+    public static final int ALARM_QUEUE_ID = 49482;
+	public static final int ALARM_PUBNUB_ID = 43452;
 	public static final int ALARM_INTERVAL = 86400;
+
+	public static final int NOTIFICATION_ID = 98234;
 
 }

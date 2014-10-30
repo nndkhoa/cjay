@@ -73,21 +73,21 @@
 			android:screenOrientation="portrait"
 			android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen"></activity>
 
-        <activity
-            android:name=".activity.MergeIssueActivity_"
-            android:label="@string/fragment_repair_title"
-            android:screenOrientation="portrait"></activity>
-        <activity
-            android:name=".activity.DetailIssueActivity_"
-            android:label="@string/fragment_repair_title"
-            android:screenOrientation="portrait"></activity>
-        <activity
-            android:name=".activity.LogActivity_"
-            android:label="@string/title_activity_log"
-            android:screenOrientation="portrait"></activity>
+		<activity
+			android:name=".activity.MergeIssueActivity_"
+			android:label="@string/fragment_repair_title"
+			android:screenOrientation="portrait"></activity>
+		<activity
+			android:name=".activity.DetailIssueActivity_"
+			android:label="@string/fragment_repair_title"
+			android:screenOrientation="portrait"></activity>
+		<activity
+			android:name=".activity.LogActivity_"
+			android:label="@string/title_activity_log"
+			android:screenOrientation="portrait"></activity>
 
-		<service
-			android:name="com.cloudjay.cjay.task.service.QueueIntentService_"/>
+		<service android:name=".task.service.PubnubService_"/>
+		<service android:name="com.cloudjay.cjay.task.service.QueueIntentService_"/>
 		<receiver android:name="com.cloudjay.cjay.util.AutoStartReceiver_">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED"/>
