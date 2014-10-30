@@ -1099,4 +1099,8 @@ public class DataCenter {
             return null;
         }
     }
+
+    public void changeUploadState() {
+
+    }
 }

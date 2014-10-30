@@ -116,22 +116,21 @@ public class App extends Application {
 	private void configureImageLoader() {
 
 		// init image loader default options
-		DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
-				.cacheInMemory(true)
-				.cacheOnDisc(true)
-				.bitmapConfig(Bitmap.Config.RGB_565)
-				.imageScaleType(ImageScaleType.IN_SAMPLE_INT)
-				.showImageOnLoading(R.drawable.ic_app_360)
-				.build();
+        DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
+                .imageScaleType(ImageScaleType.EXACTLY)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .cacheOnDisk(true)
+                .cacheInMemory(true)
+                .showImageOnLoading(R.drawable.ic_app_360)
+                .build();
 
 		// init image loader config
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
 				.defaultDisplayImageOptions(defaultOptions)
-				.discCacheSize(500 * 1024 * 1024)
-				.memoryCache(new WeakMemoryCache())
-				.threadPoolSize(3)
-				.threadPriority(Thread.MAX_PRIORITY)
-				.build();
+                .memoryCacheSize(41943040)
+                .diskCacheSize(104857600)
+                .threadPoolSize(10)
+                .build();
 
 		// init image loader with config defined
 		ImageLoader.getInstance().init(config);
