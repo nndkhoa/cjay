@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.PowerManager;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.DataCenter;
@@ -43,8 +42,7 @@ public class PubnubService extends Service {
 	 */
 	NotificationManager notificationManager;
 
-	PowerManager.WakeLock wl = null;
-
+//	PowerManager.WakeLock wl = null;
 //	private static final String CHANNEL_DEPOT_EXTRA = "com.cloudjay.cjay.pubnub.depot_channel";
 //	private static final String CHANNEL_UUID_EXTRA = "com.cloudjay.cjay.pubnub.uuid_channel";
 
@@ -60,28 +58,39 @@ public class PubnubService extends Service {
 	 * Display notification in Notification Center
 	 *
 	 * @param channel
-	 * @param message
+	 * @param objectType
+	 * @param objectId
+	 * @param messageId
 	 */
 	private void pushNotification(String channel, String objectType, long objectId, long messageId) {
 
+		// Notify to server that message was received.
+		dataCenter.gotMessage(getApplicationContext(), channel, messageId);
 
+		// Get data from notification
 		if (objectType.equals("Container")) {
+			dataCenter.getSessionById(getApplicationContext(), objectId);
 
 		} else if (objectType.equals("AuditItem")) {
+			dataCenter.getAuditItemById(getApplicationContext(), objectId);
 
 		} else if (objectType.equals("Damage")) {
+			dataCenter.getDamageCodeById(getApplicationContext(), objectId);
 
 		} else if (objectType.equals("Repair")) {
+			dataCenter.getRepairCodeById(getApplicationContext(), objectId);
 
 		} else if (objectType.equals("Component")) {
+			dataCenter.getComponentCodeById(getApplicationContext(), objectId);
 
 		} else if (objectType.equals("Operator")) {
+			dataCenter.getOperatorById(getApplicationContext(), objectId);
 
 		} else {
 			Logger.e("Cannot parse notification");
 		}
 
-//		//Todo: Push notification
+//		// TODO: Display message in notification Center
 //		Notification notification = new Notification.Builder(this).setContentTitle(channel)
 //				.setContentText(message)
 //				.setSmallIcon(R.drawable.ic_app_360)

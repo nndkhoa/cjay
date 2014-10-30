@@ -163,6 +163,10 @@ public class DataCenter {
 		}
 	}
 
+	public void getOperatorById(Context context, long id) {
+
+	}
+
 	//endregion
 
 	//region ISO CODE
@@ -212,6 +216,7 @@ public class DataCenter {
 
 	/**
 	 * Get random iso codes include
+	 *
 	 * @param context
 	 * @param prefix
 	 * @return
@@ -233,7 +238,6 @@ public class DataCenter {
 		}
 	}
 
-
 	public List<IsoCode> getListIsoCodes(Context context, String prefix) {
 		try {
 			DB db = App.getDB(context);
@@ -254,9 +258,25 @@ public class DataCenter {
 		}
 	}
 
+	public void getDamageCodeById(Context context, long id) {
+
+	}
+
+	public void getRepairCodeById(Context context, long id) {
+
+	}
+
+	public void getComponentCodeById(Context context, long id) {
+
+	}
 	//endregion
 
 	//region SESSION
+
+	//
+	public void getSessionById(Context context, long id) {
+
+	}
 
 	@Background(serial = CACHE)
 	public void getSessionByContainerId(Context context, String containerId) {
@@ -412,7 +432,6 @@ public class DataCenter {
 		}
 	}
 
-
 	/**
 	 * Fetch all container session with last modified datetime
 	 *
@@ -495,7 +514,6 @@ public class DataCenter {
 			e.printStackTrace();
 		}
 	}
-
 
 	/**
 	 * Set session have containerId is hand cleaning session, upload this to server then add new session return from server to database
@@ -828,7 +846,11 @@ public class DataCenter {
 
 	//endregion
 
-	//region AUDIT ITEM
+	//region AUDIT
+
+	public void getAuditItemById(Context context, long id) {
+
+	}
 
 	/**
 	 * Merge hình vào lỗi đã giám định.
@@ -1137,11 +1159,12 @@ public class DataCenter {
 	//endregion
 
 	//region NOTIFICATION
+
 	/**
 	 * Gửi request lên server thông báo đã nhận được notification.
 	 * /pubnub-retry/got-message?reciever_channel=<channel_uuid>&message_id=<message_id>
 	 */
-	public void gotMessage(Context context, String channel, String messageId) {
+	public void gotMessage(Context context, String channel, long messageId) {
 
 	}
 	//endregion
