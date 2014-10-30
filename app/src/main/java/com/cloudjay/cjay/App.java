@@ -27,7 +27,6 @@ public class App extends Application {
 	private static App instance;
 	private static JobManager jobManager;
 	private static DB snappyDB = null;
-	Context mContext;
 
 	public App() {
 		instance = this;
@@ -52,7 +51,7 @@ public class App extends Application {
 	public static void closeDB() throws SnappydbException {
 
 		if (snappyDB != null && snappyDB.isOpen()) {
-			StackTraceElement[] trace = new Throwable().getStackTrace();
+//			StackTraceElement[] trace = new Throwable().getStackTrace();
 //			Logger.Log("Close DB " + trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
 			snappyDB.close();
 		}
@@ -62,6 +61,7 @@ public class App extends Application {
 	public void onCreate() {
 		super.onCreate();
 
+		// Trying to close snappy db then re-open it for fresh usage
 		try {
 			closeDB();
 		} catch (SnappydbException e) {
@@ -71,19 +71,23 @@ public class App extends Application {
 		configureDirectories();
 		configureImageLoader();
 		configureJobManager();
+		configureAlarmManager();
 
 		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
 		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
 				.detectLeakedClosableObjects().penaltyLog()
 				.penaltyDeath().build());
+	}
 
-		// Configure Alarm Manager
-		// Check if user logged in => check alarm manager
-		mContext = getApplicationContext();
 
-		if (!Utils.isAlarmUp(mContext)) {
-			Logger.w("Alarm Manager is not running.");
-			Utils.startAlarm(mContext);
+	/**
+	 * Configure Alarm Manager
+	 */
+	private void configureAlarmManager() {
+		if (!Utils.isAlarmUp(getApplicationContext())) {
+			Logger.w("Alarm Manager is not running. Starting alarm ...");
+			Utils.startAlarm(getApplicationContext());
+
 		} else {
 			Logger.Log("Alarm is already running "
 					+ StringUtils.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));

@@ -53,7 +53,7 @@ public class UploadImageJob extends Job {
 	protected void onCancel() {
 
 		// Job has exceeded retry attempts or shouldReRunOnThrowable() has returned false.
-		// TODO: Set image upload Status is ERROR and notify to Upload Fragment
+		// TODO: Set image upload Status to ERROR and notify to Upload Fragment
 
 		Context context = App.getInstance().getApplicationContext();
 		EventBus.getDefault().post(new UploadStoppedEvent(containerId));

@@ -97,13 +97,11 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 	/**
 	 * Add account to Account Manager
-	 *
-	 * @param email
+	 *  @param email
 	 * @param password
 	 * @param token
-	 * @param authTokenType
 	 */
-	void addNewAccount(String email, String password, String token, String authTokenType) {
+	void addNewAccount(String email, String password, String token) {
 
 		AccountManager manager = AccountManager.get(this);
 		String accountType = this.getIntent().getStringExtra(
@@ -143,7 +141,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 			if (null != mToken) {
 
 				Logger.Log("Login successfully");
-				addNewAccount(email, password, mToken, AccountGeneral.AUTH_TOKEN_TYPE);
+				addNewAccount(email, password, mToken);
 				PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_TOKEN, mToken);
 
 				// Continue to fetch List Operators and Iso Codes
@@ -153,6 +151,9 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 				User user = dataCenter.getCurrentUserAsync(this);
 				if (null != user) {
+
+					// Subscribe to channel
+
 
 					// Navigate to Home Activity
 					Logger.Log("Navigate to Home Activity");
