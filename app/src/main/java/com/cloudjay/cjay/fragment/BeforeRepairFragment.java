@@ -47,13 +47,13 @@ public class BeforeRepairFragment extends Fragment {
 
     public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
 
-    public final static String AUDIT_ITEM_EXTRA = "com.cloudjay.wizard.auditItem";
+    public final static String AUDIT_ITEM_EXTRA = "com.cloudjay.wizard.auditItemUUID";
 
     @FragmentArg(CONTAINER_ID_EXTRA)
     public String containerID;
 
     @FragmentArg(AUDIT_ITEM_EXTRA)
-    public AuditItem auditItem;
+    public String auditItemUUID;;
 
     @ViewById(R.id.tv_code_comp_repaired)
     TextView tvCompCode;
@@ -84,8 +84,8 @@ public class BeforeRepairFragment extends Fragment {
 
     DetailIssuedImageAdapter imageAdapter;
     String operatorCode;
-	String auditItemUUID;
 	Session mSession;
+	AuditItem auditItem;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -102,6 +102,7 @@ public class BeforeRepairFragment extends Fragment {
         } else {
             operatorCode = mSession.getOperatorCode();
         }
+		auditItem = dataCenter.getAuditItemByUUID(getActivity(), containerID, auditItemUUID);
         // parse Data to view
         tvCompCode.setText(auditItem.getComponentCode());
         tvLocaitonCode.setText(auditItem.getLocationCode());
@@ -127,15 +128,13 @@ public class BeforeRepairFragment extends Fragment {
         cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
         cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.AUDIT.value);
         cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.AUDIT.value);
-		cameraActivityIntent.putExtra(CameraFragment.AUDIT_ITEM_UUID_EXTRA, auditItem);
+		cameraActivityIntent.putExtra(CameraFragment.AUDIT_ITEM_UUID_EXTRA, auditItemUUID);
         startActivity(cameraActivityIntent);
     }
 
 	@Background
     void refreshListImage() {
 		if (auditItem != null) {
-			auditItemUUID = auditItem.getAuditItemUUID();
-
 			List<AuditImage> list = auditItem.getListIssueImages();
 			updatedData(list);
 		}

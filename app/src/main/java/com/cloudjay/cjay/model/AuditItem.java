@@ -19,7 +19,7 @@ import javax.annotation.Generated;
 
 /* Field auditItemUUID để phân biệt AuditItem dưới Local, trước khi upload lên server */
 @Generated("org.jsonschema2pojo")
-public class AuditItem implements Serializable {
+public class AuditItem {
 
 	//region ATTR
 	@Expose

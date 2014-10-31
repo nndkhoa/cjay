@@ -19,7 +19,7 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
 
     Context mContext;
     String mContainerID;
-    AuditItem auditItem;
+    String auditItemUUID;
     int mType;
 
     /**
@@ -27,15 +27,15 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
      *
      * @param context
      * @param containerID
-     * @param auditItem
+     * @param auditItemUUID
      * @param type
      * @paramTfm
      */
-    public ViewPagerAdapter(Context context, FragmentManager fm, String containerID, AuditItem auditItem, int type) {
+    public ViewPagerAdapter(Context context, FragmentManager fm, String containerID, String auditItemUUID, int type) {
         super(fm);
         mContext = context;
         mContainerID = containerID;
-        this.auditItem = auditItem;
+        this.auditItemUUID = auditItemUUID;
         mType = type;
     }
     /**
@@ -69,9 +69,9 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
         } else if (mType == 2) {
             switch (position) {
                 case 0:
-                    return new BeforeRepairFragment_().builder().containerID(mContainerID).auditItem(auditItem).build();
+                    return new BeforeRepairFragment_().builder().containerID(mContainerID).auditItemUUID(auditItemUUID).build();
                 case 1:
-                    return new AfterRepairFragment_().builder().containerID(mContainerID).auditItem(auditItem).build();
+                    return new AfterRepairFragment_().builder().containerID(mContainerID).auditItemUUID(auditItemUUID).build();
                 default:
                     return null;
             }

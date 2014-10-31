@@ -15,7 +15,7 @@ import de.greenrobot.event.EventBus;
 
 public class UploadSessionJob extends Job {
 
-	Session session;
+	String containerId;
 
 	/**
 	 * Dùng để phân biệt xem có cần clear Working hay không?
@@ -27,9 +27,9 @@ public class UploadSessionJob extends Job {
 		return 2;
 	}
 
-	public UploadSessionJob(Session session) {
-		super(new Params(1).requireNetwork().persist().groupBy(session.getContainerId()));
-		this.session = session;
+	public UploadSessionJob(String containerId) {
+		super(new Params(1).requireNetwork().persist().groupBy(containerId));
+		this.containerId = containerId;
 	}
 
 	@Override
@@ -37,8 +37,8 @@ public class UploadSessionJob extends Job {
 
 		// Add container to collection UPLOAD
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).addUploadSession(session.getContainerId());
-		EventBus.getDefault().post(new UploadStartedEvent(session.getContainerId(), UploadType.SESSION));
+		DataCenter_.getInstance_(context).addUploadSession(containerId);
+		EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.SESSION));
 	}
 
 	@Override
@@ -46,20 +46,20 @@ public class UploadSessionJob extends Job {
 		Context context = App.getInstance().getApplicationContext();
 
 		//Add Log
-		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Bắt đầu khởi tạo");
+		DataCenter_.getInstance_(context).addLog(context, containerId, "Bắt đầu khởi tạo");
 
 //		EventBus.getDefault().post(new UploadingEvent());
-		DataCenter_.getInstance_(context).uploadSession(context, session);
+		DataCenter_.getInstance_(context).uploadSession(context, containerId);
 
 		//Add Log
-		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Khởi tạo hoàn tất");
+		DataCenter_.getInstance_(context).addLog(context, containerId, "Khởi tạo hoàn tất");
 	}
 
 
 	@Override
 	protected void onCancel() {
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Không thể khởi tạo");
+		DataCenter_.getInstance_(context).addLog(context, containerId, "Không thể khởi tạo");
 	}
 
 	@Override
@@ -67,8 +67,8 @@ public class UploadSessionJob extends Job {
 		Context context = App.getInstance().getApplicationContext();
 
 		//Add Log
-		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Khởi tạo bị gián đoạn");
-		EventBus.getDefault().post(new UploadStoppedEvent(session.getContainerId()));
+		DataCenter_.getInstance_(context).addLog(context, containerId, "Khởi tạo bị gián đoạn");
+		EventBus.getDefault().post(new UploadStoppedEvent(containerId));
 
 		return true;
 	}

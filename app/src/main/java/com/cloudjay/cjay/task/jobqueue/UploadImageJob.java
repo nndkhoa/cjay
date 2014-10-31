@@ -6,6 +6,7 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
+import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
@@ -16,17 +17,19 @@ public class UploadImageJob extends Job {
 	String containerId;
 	String uri;
 	String imageName;
+	ImageType imageType;
 
 	@Override
 	protected int getRetryLimit() {
 		return 5;
 	}
 
-	public UploadImageJob(String uri, String imageName, String containerId) {
+	public UploadImageJob(String uri, String imageName, String containerId, ImageType imageType) {
 		super(new Params(2).requireNetwork().persist().groupBy(containerId).setPersistent(true));
 		this.containerId = containerId;
 		this.uri = uri;
 		this.imageName = imageName;
+		this.imageType = imageType;
 	}
 
 	@Override
@@ -46,7 +49,7 @@ public class UploadImageJob extends Job {
 
 		// Call data center to upload image
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).uploadImage(context, uri, imageName, containerId);
+		DataCenter_.getInstance_(context).uploadImage(context, uri, imageName, containerId, imageType);
 	}
 
 	@Override

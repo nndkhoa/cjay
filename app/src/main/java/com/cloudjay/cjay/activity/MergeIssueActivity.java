@@ -43,7 +43,7 @@ public class MergeIssueActivity extends BaseActivity {
     public String containerID;
 
     @Extra(AUDIT_IMAGE_EXTRA)
-    AuditImage auditImage;
+    String auditImageUUID;
 
     @Extra(AUDIT_ITEM_REMOVE_UUID)
     String auditItemRemoveUUID;
@@ -131,7 +131,7 @@ public class MergeIssueActivity extends BaseActivity {
         String uuid = auditItem.getAuditItemUUID();
         Logger.Log("uuid: " + uuid);
         dataCenter.addAuditImageToAuditedIssue(getApplicationContext(), containerID,
-                uuid, auditItemRemoveUUID, auditImage);
+                uuid, auditItemRemoveUUID, auditImageUUID);
         refresh();
 
         this.finish();

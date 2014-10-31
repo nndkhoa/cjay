@@ -36,7 +36,7 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 	int currentStep;
 
     @Extra(AUDIT_ITEM_UUID_EXTRA)
-    AuditItem auditItem;
+    String auditItemUUID;
 
 	private static final String STATE_SINGLE_SHOT = "single_shot";
 	private static final String STATE_LOCK_TO_LANDSCAPE = "lock_to_landscape";
@@ -53,7 +53,7 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 				.containerId(containerId)
 				.operatorCode(operatorCode)
 				.mType(mType)
-                .auditItem(auditItem)
+                .auditItemUUID(auditItemUUID)
 				.build();
 
 		getFragmentManager().beginTransaction()

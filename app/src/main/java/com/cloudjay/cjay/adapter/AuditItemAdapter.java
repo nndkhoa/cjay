@@ -177,7 +177,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 					//2. Add container session to upload queue
 					JobManager jobManager = App.getJobManager();
-					jobManager.addJob(new UploadAuditItemJob(containerId, auditItem));
+					jobManager.addJob(new UploadAuditItemJob(containerId, auditItem.getAuditItemUUID()));
 				}
 			});
 
@@ -268,7 +268,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 				Intent intent = new Intent(mContext, MergeIssueActivity_.class);
 				intent.putExtra(MergeIssueActivity_.CONTAINER_ID_EXTRA, containerId);
-				intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, auditImage);
+				intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, auditImage.getAuditImageUUID());
 				intent.putExtra(MergeIssueActivity_.AUDIT_ITEM_REMOVE_UUID, item.getAuditItemUUID());
 
 				mContext.startActivity(intent);
@@ -334,7 +334,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
 		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.REPAIRED.value);
 		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);
-		cameraActivityIntent.putExtra(CameraFragment.AUDIT_ITEM_UUID_EXTRA, mAuditItem);
+		cameraActivityIntent.putExtra(CameraFragment.AUDIT_ITEM_UUID_EXTRA, mAuditItem.getAuditItemUUID());
 		mContext.startActivity(cameraActivityIntent);
 	}
 }
