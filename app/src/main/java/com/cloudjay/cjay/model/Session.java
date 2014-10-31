@@ -99,7 +99,7 @@ public class Session implements Serializable {
 
 	public Session() {
 		gateImages = new ArrayList<GateImage>();
-		auditItems = new ArrayList<AuditItem>();
+//		auditItems = new ArrayList<AuditItem>();
 	}
 
 	//region GETTER AND SETTER
@@ -436,7 +436,6 @@ public class Session implements Serializable {
 		return auditItems;
 	}
 
-
 	/**
 	 * Check if container has repair images or not
 	 *
@@ -541,4 +540,57 @@ public class Session implements Serializable {
 			this.retry = true;
 		}
 	}
+
+
+	/**
+	 * Count total image off session
+	 *
+	 * @param session
+	 * @return
+	 */
+	public int getTotalImage() {
+
+		int totalImage = 0;
+		List<AuditItem> auditItems = this.getAuditItems();
+
+		if (auditItems != null) {
+			for (AuditItem auditItem : auditItems) {
+				totalImage = totalImage + auditItem.getAuditImages().size();
+			}
+			totalImage = totalImage + this.getGateImages().size();
+			return totalImage;
+
+		} else {
+
+			totalImage = this.getGateImages().size();
+			return totalImage;
+		}
+	}
+
+	public int getUploadedImage() {
+		int uploadedImage = 0;
+		List<AuditItem> auditItems = this.getAuditItems();
+
+		if (auditItems != null) {
+			for (AuditItem auditItem : auditItems) {
+
+				List<AuditImage> auditImages = auditItem.getAuditImages();
+				for (AuditImage auditImage : auditImages) {
+					if (auditImage.getUploadStatus() == UploadStatus.COMPLETE.value) {
+						uploadedImage = uploadedImage + 1;
+					}
+				}
+
+			}
+		}
+
+		List<GateImage> gateImages = this.getGateImages();
+		for (GateImage gateImage : gateImages) {
+			if (gateImage.getUploadStatus() == UploadStatus.COMPLETE.value) {
+				uploadedImage = uploadedImage + 1;
+			}
+		}
+		return uploadedImage;
+	}
+
 }

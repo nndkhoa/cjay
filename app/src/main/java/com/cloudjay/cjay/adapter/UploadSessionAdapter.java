@@ -24,7 +24,6 @@ import com.cloudjay.cjay.task.jobqueue.UploadExportSessionJob;
 import com.cloudjay.cjay.task.jobqueue.UploadImageJob;
 import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
@@ -92,10 +91,11 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 		// Set data to view
 		ImageLoader.getInstance().displayImage(session.getGateImages().get(0).getUrl(), viewHolder.ivContainer);
 		viewHolder.tvContainerId.setText(session.getContainerId());
-		viewHolder.tvTotalPhotoUpload.setText(String.valueOf(Utils.countTotalImage(session)));
-		viewHolder.tvCurrentPhotoUpload.setText(String.valueOf(Utils.countUploadedImage(session)));
+		viewHolder.tvTotalPhotoUpload.setText(session.getTotalImage() + "");
+		viewHolder.tvCurrentPhotoUpload.setText(session.getUploadedImage() + "");
 
 		UploadStatus status = UploadStatus.values()[session.getUploadStatus()];
+		Logger.Log(session.getContainerId() + " -> Upload Status: " + status.name());
 		switch (status) {
 
 			//
@@ -120,7 +120,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 
 					if (NetworkHelper.isConnected(context)) {
 						viewHolder.pbUpLoading.setVisibility(View.VISIBLE);
-						viewHolder.pbUpLoading.setProgress(100 * Utils.countUploadedImage(session) / Utils.countTotalImage(session));
+						viewHolder.pbUpLoading.setProgress(100 * session.getUploadedImage() / session.getTotalImage());
 					} else {
 
 						// Display icon Retry
