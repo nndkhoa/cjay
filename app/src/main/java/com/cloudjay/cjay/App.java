@@ -73,10 +73,10 @@ public class App extends Application {
         configureJobManager();
         configureAlarmManager();
 
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
+        /*StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
         StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
                 .detectLeakedClosableObjects().penaltyLog()
-                .penaltyDeath().build());
+                .penaltyDeath().build());*/
     }
 
 

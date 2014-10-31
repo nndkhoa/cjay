@@ -894,19 +894,27 @@ public class DataCenter {
 
         // Upload audit item session to server
 		Session result = networkClient.postAuditItem(context, oldSession, auditItem);
-		Logger.Log("Add AuditItem to Session Id: " + result.getId());
+		String key = result.getContainerId();
 
-		if (result != null) {
-			// db.close();
-			// Update container back to database
-			String key = result.getContainerId();
-			result.setUploadStatus(UploadStatus.COMPLETE);
-			db.put(key, result);
+		List<AuditItem> listLocal = oldSession.getAuditItems();
 
-			// Then remove them from WORKING
-			String workingKey = CJayConstant.PREFIX_WORKING + key;
-			db.del(workingKey);
+		for (int i = 0; i < listLocal.size(); i++) {
+			for (int j = 0; j < result.getAuditItems().size(); j++) {
+
+				if (listLocal.get(i).getAuditItemUUID().equals(
+						result.getAuditItems().get(j).getAuditItemUUID())) {
+					AuditItem itemLocal = listLocal.get(i);
+
+					itemLocal.setId(result.getAuditItems().get(j).getId());
+					itemLocal.setUploadStatus(UploadStatus.COMPLETE.value);
+					itemLocal.setAuditImages(result.getAuditItems().get(j).getAuditImages());
+				}
+
+			}
 		}
+
+		oldSession.setAuditItems(listLocal);
+		db.put(key, oldSession);
 
 		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
 	}
@@ -962,6 +970,7 @@ public class DataCenter {
         for (AuditItem auditItem : oldSession.getAuditItems()) {
             if (auditItem.getUploadStatus() != UploadStatus.COMPLETE.value) {
                 //TODO Note to Khoa this upload complete audit session have to retry upload audit item @Han
+				Logger.Log("containerId: " + containerId);
                 uploadAuditItem(context, containerId, auditItem);
             }
         }
@@ -1258,6 +1267,37 @@ public class DataCenter {
 
 		EventBus.getDefault().post(new IssueDeletedEvent(containerId));
 	}
+
+    /**
+     * Change audit item's upload status
+     * @param context
+     * @param containerId
+     * @param auditItem
+     */
+    public void changeUploadState(Context context, String containerId,
+                                  AuditItem auditItem) {
+        try {
+            DB db = App.getDB(context);
+            Session session = db.getObject(containerId, Session.class);
+
+            List<AuditItem> list = session.getAuditItems();
+
+            for (AuditItem item : list) {
+                if (item.getAuditItemUUID() == auditItem.getAuditItemUUID()) {
+                    item.setUploadStatus(auditItem.getUploadStatus());
+                }
+            }
+
+            session.setAuditItems(list);
+            db.put(containerId, session);
+
+
+
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+
+    }
 
 	//endregion
 

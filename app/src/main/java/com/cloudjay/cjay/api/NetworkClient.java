@@ -332,8 +332,21 @@ public class NetworkClient {
      * @return
      */
     public Session postAuditItem(Context context, Session containerSession, AuditItem auditItem) {
-        Session postAuditItemSession = provider.getRestAdapter(context).create(NetworkService.class).postAudiItem(containerSession.getId(), auditItem.getAuditItemToUpload());
-        return postAuditItemSession;
+		Logger.Log("containerSession: " + containerSession.getId());
+		Logger.Log("auditItem: " + auditItem.getAuditItemToUpload());
+
+		String auditItemUUID = auditItem.getAuditItemUUID();
+		Session postAuditItemSession = provider.getRestAdapter(context).create(NetworkService.class).postAudiItem(containerSession.getId(), auditItem.getAuditItemToUpload());
+		List<AuditItem> list = postAuditItemSession.getAuditItems();
+		for (AuditItem item : list) {
+			if (item.equals(auditItem)) {
+				Logger.Log("Set here");
+				item.setAuditItemUUID(auditItemUUID);
+			}
+		}
+
+		postAuditItemSession.setAuditItems(list);
+		return postAuditItemSession;
     }
 
     /**
