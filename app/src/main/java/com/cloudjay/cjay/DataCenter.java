@@ -24,6 +24,7 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringUtils;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
@@ -488,6 +489,7 @@ public class DataCenter {
 	 * @return
 	 */
 	public List<Session> getListSessions(Context context, String prefix) {
+        int len = prefix.length();
 
 		try {
 			DB db = App.getDB(context);
@@ -495,7 +497,9 @@ public class DataCenter {
 			List<Session> sessions = new ArrayList<>();
 
 			for (String result : keysResult) {
-				Session session = db.getObject(result, Session.class);
+                String newKey = result.substring(len);
+                Logger.Log(newKey);
+				Session session = db.getObject(newKey, Session.class);
 				sessions.add(session);
 			}
 			// db.close();
@@ -807,21 +811,22 @@ public class DataCenter {
 				case IMPORT:
 					for (GateImage gateImage : session.getGateImages()) {
 						if (gateImage.getName().equals(imageName) && gateImage.getType() == ImageType.IMPORT.value) {
-							gateImage.setUploadStatus(UploadStatus.COMPLETE);
+                            Logger.Log(imageName+" "+ gateImage.getType());
+                            gateImage.setUploadStatus(UploadStatus.COMPLETE.value);
 						}
 					}
 				case AUDIT:
 					for (AuditItem auditItem : session.getAuditItems()) {
 						for (AuditImage auditImage : auditItem.getAuditImages())
 							if (auditImage.getName().equals(imageName) && auditImage.getType() == ImageType.AUDIT.value) {
-								auditImage.setUploadStatus(UploadStatus.COMPLETE);
+                                auditImage.setUploadStatus(UploadStatus.COMPLETE.value);
 							}
 					}
 				case REPAIRED:
 					for (AuditItem auditItem : session.getAuditItems()) {
 						for (AuditImage auditImage : auditItem.getAuditImages())
 							if (auditImage.getName().equals(imageName) && auditImage.getType() == ImageType.REPAIRED.value) {
-								auditImage.setUploadStatus(UploadStatus.COMPLETE);
+                                auditImage.setUploadStatus(UploadStatus.COMPLETE.value);
 							}
 					}
 				case EXPORT:
@@ -837,7 +842,7 @@ public class DataCenter {
 			db.put(key, session);
 		}
 
-		// db.close();
+//		db.close();
 		EventBus.getDefault().post(new UploadedEvent(containerId));
 	}
 
@@ -864,7 +869,7 @@ public class DataCenter {
 			if (gateImage.getUploadStatus() != UploadStatus.COMPLETE.value && gateImage.getType() == ImageType.IMPORT.value) {
 
 				//TODO Note to Khoa this upload import session have to retry upload Image @Han
-				uploadImage(context, gateImage.getUrl(), gateImage.getName(), session.getContainerId(), ImageType.IMPORT);
+                uploadImage(context, Utils.parseUrltoUri(gateImage.getUrl()), gateImage.getName(), session.getContainerId(), ImageType.IMPORT);
 			}
 		}
 
@@ -895,7 +900,7 @@ public class DataCenter {
 		for (AuditImage auditImage : auditItem.getAuditImages()) {
 			if (auditImage.getUploadStatus() != UploadStatus.COMPLETE.value && auditImage.getType() == ImageType.AUDIT.value) {
 				//TODO Note to Khoa this upload audit Item have to retry upload Image @Han
-				uploadImage(context, auditImage.getUrl(), auditImage.getName(), containerId, ImageType.AUDIT);
+                uploadImage(context, Utils.parseUrltoUri(auditImage.getUrl()), auditImage.getName(), containerId, ImageType.AUDIT);
 			}
 		}
 
@@ -933,7 +938,7 @@ public class DataCenter {
 		for (GateImage gateImage : session.getGateImages()) {
 			if (gateImage.getUploadStatus() != UploadStatus.COMPLETE.value && gateImage.getType() == ImageType.EXPORT.value) {
 				//TODO Note to Khoa this upload export session have to retry upload Image @Han
-				uploadImage(context, gateImage.getUrl(), gateImage.getName(), session.getContainerId(), ImageType.EXPORT);
+                uploadImage(context, Utils.parseUrltoUri(gateImage.getUrl()), gateImage.getName(), session.getContainerId(), ImageType.EXPORT);
 			}
 		}
 
@@ -1013,7 +1018,7 @@ public class DataCenter {
 			for (AuditImage auditImage : auditItem.getAuditImages()) {
 				if (auditImage.getUploadStatus() != UploadStatus.COMPLETE.value && auditImage.getType() == ImageType.REPAIRED.value) {
 					//TODO Note to Khoa this upload complete repair session have to retry upload repaired item @Han
-					uploadImage(context, auditImage.getUrl(), auditImage.getName(), containerId, ImageType.REPAIRED);
+                    uploadImage(context, Utils.parseUrltoUri(auditImage.getUrl()), auditImage.getName(), containerId, ImageType.REPAIRED);
 				}
 			}
 		}
