@@ -501,7 +501,6 @@ public class DataCenter {
 		try {
 			db = App.getDB(context);
 			keysResult = db.findKeys(prefix);
-
 		} catch (SnappydbException e) {
 			Logger.e(e.getMessage());
 			return null;
@@ -652,8 +651,28 @@ public class DataCenter {
 
 	//endregion
 
-	//region IMAGE
+	//region IMAG
+	public AuditImage getAuditImageByUUId(Context context,String containerId, String auditItemUUID, String auditImageUUID) {
 
+		try {
+			DB db = App.getDB(context);
+			Session localSession = db.getObject(containerId, Session.class);
+			if (localSession != null) {
+				for (AuditItem auditItem : localSession.getAuditItems()) {
+					if (auditItem.getAuditItemUUID().equals(auditItemUUID)) {
+						for (AuditImage auditImage : auditItem.getAuditImages()){
+							if (auditImage.getAuditImageUUID().equals(auditImageUUID))
+								return auditImage;
+						}
+					}
+				}
+			}
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+		return null;
+
+	}
 	/**
 	 * Add image to container Session
 	 *
@@ -849,6 +868,7 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
+
 	public boolean uploadImage(Context context, String uri, String imageName, String containerId, ImageType imageType) throws SnappydbException {
 
 		try {
@@ -886,7 +906,6 @@ public class DataCenter {
 		// Check for make sure all gate image have uploaded
 		for (GateImage gateImage : session.getGateImages()) {
 			if (gateImage.getUploadStatus() != UploadStatus.COMPLETE.value && gateImage.getType() == ImageType.IMPORT.value) {
-
 				//TODO Note to Khoa this upload import session have to retry upload Image @Han
 				uploadImage(context, Utils.parseUrltoUri(gateImage.getUrl()), gateImage.getName(), session.getContainerId(), ImageType.IMPORT);
 			}
@@ -1080,6 +1099,36 @@ public class DataCenter {
 	//endregion
 
 	//region AUDIT
+
+	/**
+	 * Get audit item from local by id.
+	 * <p/>
+	 * 1. Đầu tiên sẽ lấy session từ server.
+	 * 2. Kiểm tra trong db có tồn tại session này chưa
+	 * 2.1 Nếu có thì update
+	 * 2.2 Không có thì tạo mới
+	 *
+	 * @param context
+	 * @param id
+	 */
+	public AuditItem getAuditItemByUUId(Context context, String id, String containerId) {
+
+
+		try {
+			DB db = App.getDB(context);
+			Session localSession = db.getObject(containerId, Session.class);
+			if (localSession != null) {
+				for (AuditItem auditItem : localSession.getAuditItems()) {
+					if (auditItem.getAuditItemUUID().equals(id)) {
+						return auditItem;
+					}
+				}
+			}
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	/**
 	 * Get audit item from server by id.
@@ -1436,5 +1485,7 @@ public class DataCenter {
 	public void gotMessage(Context context, String channel, long messageId) {
 		networkClient.gotMessageFromPubNub(channel, messageId);
 	}
+
+
 	// endregion
 }

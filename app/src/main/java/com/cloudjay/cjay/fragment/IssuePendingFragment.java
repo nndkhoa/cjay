@@ -139,7 +139,7 @@ public class IssuePendingFragment extends Fragment {
                 AuditItem auditItem = event.getAuditItem();
                 Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
                 detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
-                detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem);
+                detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getAuditItemUUID());
                 startActivity(detailIssueActivity);
                 break;
         }
@@ -171,7 +171,7 @@ public class IssuePendingFragment extends Fragment {
         if (auditItem.getAudited()) {
             Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
             detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
-            detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem);
+            detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getAuditItemUUID());
             startActivity(detailIssueActivity);
         }
     }

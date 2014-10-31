@@ -21,7 +21,6 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
-import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.task.jobqueue.UploadImageJob;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -89,7 +88,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	int currentStep;
 
 	@FragmentArg(AUDIT_ITEM_UUID_EXTRA)
-	AuditItem auditItem;
+	String auditItemUUID;
 
 	@Bean
 	DataCenter dataCenter;
@@ -122,7 +121,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 	@Click(R.id.btn_camera_done)
 	void btnDoneClicked() {
-		EventBus.getDefault().post(new ImageCapturedEvent(containerId, mType, auditItem));
+		EventBus.getDefault().post(new ImageCapturedEvent(containerId, mType, auditItemUUID));
 		getActivity().finish();
 	}
 
@@ -311,7 +310,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 								.withId(0)
 								.withType(mType)
 								.withUrl("file://" + uri)
-								.withName(imageName);
+								.withName(imageName).withUUID(UUID.randomUUID().toString());
 
 						dataCenter.addAuditImage(getActivity().getApplicationContext(), auditImage, containerId);
 						break;
