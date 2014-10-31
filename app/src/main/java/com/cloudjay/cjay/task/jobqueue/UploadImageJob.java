@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
-import com.cloudjay.cjay.event.upload.UploadStartedEvent;
+import com.cloudjay.cjay.event.upload.ItemEnqueueEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadType;
@@ -38,7 +38,7 @@ public class UploadImageJob extends Job {
 		// Image is uploaded in background, but we still need to notify Upload Fragment
 		// in case container session upload status is > UPLOADING.
 		// It will notify fragment upload to update UI
-		EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.IMAGE));
+		EventBus.getDefault().post(new ItemEnqueueEvent(containerId, UploadType.IMAGE));
 	}
 
 	@Override
