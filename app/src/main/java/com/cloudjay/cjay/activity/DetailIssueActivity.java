@@ -5,10 +5,12 @@ import android.app.FragmentTransaction;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v4.view.ViewPager;
 
+import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.AuditItem;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.FragmentArg;
@@ -31,12 +33,15 @@ public class DetailIssueActivity extends BaseActivity implements ActionBar.TabLi
     public String containerID;
 
     @Extra(AUDIT_ITEM_EXTRA)
-    AuditItem auditItem;
+    String auditItemUUID;
 
     private FragmentTabHost mTabHost;
 
     @ViewById(R.id.pager_repaired)
     ViewPager pager;
+
+	@Bean
+	DataCenter dataCenter;
 
     ActionBar actionBar;
     private com.cloudjay.cjay.adapter.ViewPagerAdapter mPagerAdapter;
@@ -49,6 +54,8 @@ public class DetailIssueActivity extends BaseActivity implements ActionBar.TabLi
     }
 
     private void configureViewPager() {
+		AuditItem auditItem = dataCenter.getAuditItemByUUId(getApplicationContext(), auditItemUUID, containerID);
+
         mPagerAdapter = new com.cloudjay.cjay.adapter.ViewPagerAdapter(this, this.getSupportFragmentManager(), containerID, auditItem.getAuditItemUUID(), 2);
         pager.setAdapter(mPagerAdapter);
         pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {

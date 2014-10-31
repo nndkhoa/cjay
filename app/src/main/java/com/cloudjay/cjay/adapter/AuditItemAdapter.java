@@ -118,6 +118,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 					holder.btnUpload.setVisibility(View.GONE);
 					holder.btnEdit.setVisibility(View.GONE);
 					holder.ivUploading.setVisibility(View.VISIBLE);
+					holder.btnRepair.setVisibility(View.VISIBLE);
 					break;
 
 				case COMPLETE:
@@ -174,8 +175,8 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 					notifyDataSetChanged();
 
 					//2. Add container session to upload queue
-					JobManager jobManager = App.getJobManager();
-					jobManager.addJob(new UploadAuditItemJob(containerId, auditItem));
+					/*JobManager jobManager = App.getJobManager();
+					jobManager.addJob(new UploadAuditItemJob(containerId, auditItem));*/
 				}
 			});
 

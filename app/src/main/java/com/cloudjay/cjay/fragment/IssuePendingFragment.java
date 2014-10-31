@@ -161,6 +161,7 @@ public class IssuePendingFragment extends Fragment {
         Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
         cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
         cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
+		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.AUDIT.value);
         cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.AUDIT.value);
         startActivity(cameraActivityIntent);
     }
@@ -175,7 +176,6 @@ public class IssuePendingFragment extends Fragment {
             startActivity(detailIssueActivity);
         }
     }
-
     @Background
     void refresh() {
         if (mSession != null) {

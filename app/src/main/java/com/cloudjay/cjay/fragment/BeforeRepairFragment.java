@@ -22,10 +22,12 @@ import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.List;
@@ -79,17 +81,18 @@ public class BeforeRepairFragment extends Fragment {
 	DetailIssuedImageAdapter imageAdapter;
 	String operatorCode;
 	AuditItem auditItem;
+	Session mSession;
 
 	@AfterViews
 	void setup() {
 		//get container operater code form containerId
-		Session tmp = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+		Session mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 
 
-		if (null == tmp) {
+		if (null == mSession) {
 			Utils.showCrouton(getActivity(), "Không tìm thấy container trong dữ liệu");
 		} else {
-			operatorCode = tmp.getOperatorCode();
+			operatorCode = mSession.getOperatorCode();
 		}
 		auditItem = dataCenter.getAuditItemByUUId(getActivity(), auditItemUUID, containerID);
 		if (auditItem != null) {
@@ -99,13 +102,14 @@ public class BeforeRepairFragment extends Fragment {
 			tvDamageCode.setText(auditItem.getDamageCode());
 			tvRepairCode.setText(auditItem.getRepairCode());
 			tvSize.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
+			tvNumber.setText(auditItem.getQuantity() + "");
 			textViewBtnCamera.setText(R.string.button_add_new_audit_image);
 
-			//TODO add fiel number to audit item model @Nam
 			imageAdapter = new DetailIssuedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.AUDIT);
-			List<AuditImage> auditImages = auditItem.getAuditImages();
-			imageAdapter.setData(auditImages);
 			lvImage.setAdapter(imageAdapter);
+
+			refreshListImage();
+
 		}
 
 	}
@@ -113,13 +117,6 @@ public class BeforeRepairFragment extends Fragment {
 	@Click(R.id.btn_camera_repaired)
 	void openCameraActivity() {
 		//get container operater code form containerId
-		String operatorCode = null;
-		Session tmp = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
-		if (null == tmp) {
-			Utils.showCrouton(getActivity(), "Không tìm thấy container trong dữ liệu");
-		} else {
-			operatorCode = tmp.getOperatorCode();
-		}
 		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
 		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
 		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
@@ -128,22 +125,24 @@ public class BeforeRepairFragment extends Fragment {
 		startActivity(cameraActivityIntent);
 	}
 
-	@Override
-	public void onResume() {
-		super.onResume();
-
-		refreshListImage();
+	@Background
+	private void refreshListImage() {
+		if (auditItem != null) {
+			List<AuditImage> list = auditItem.getAuditImages();
+			updatedData(list);
+		}
 	}
 
-	private void refreshListImage() {
-		Session tmp = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
-		for (AuditItem currentAuditItem : tmp.getAuditItems()) {
-			if (currentAuditItem.getId() == auditItem.getId()) {
-				auditItem = currentAuditItem;
+	@UiThread
+	public void updatedData(List<AuditImage> gateImageList) {
+
+		imageAdapter.clear();
+		if (gateImageList != null) {
+			for (AuditImage object : gateImageList) {
+				imageAdapter.add(object);
 			}
 		}
-		List<AuditImage> auditImages = auditItem.getAuditImages();
-		imageAdapter.setData(auditImages);
+
 		imageAdapter.notifyDataSetChanged();
 	}
 }

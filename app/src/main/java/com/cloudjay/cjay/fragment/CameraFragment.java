@@ -291,6 +291,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 				// Create image based on mType and add this image to database
 				ImageType type = ImageType.values()[mType];
+				Logger.Log("type: " + type);
 				switch (type) {
 					case IMPORT:
 					case EXPORT:
