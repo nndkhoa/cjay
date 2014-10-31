@@ -479,7 +479,7 @@ public class DataCenter {
         auditItem.setApproved(false);
 
         // this audit item has not been allowed to repair yet
-        auditItem.setIsAllowed(false);
+        auditItem.setIsAllowed(true);
 
         // this audit item has not been repaired  yet
         auditItem.setRepaired(false);

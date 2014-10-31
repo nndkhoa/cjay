@@ -28,6 +28,8 @@ import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.view.SquareImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.imageaware.ImageAware;
+import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
 import com.path.android.jobqueue.JobManager;
 import com.snappydb.SnappydbException;
 
@@ -147,21 +149,31 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			holder.tvCodeRepair.setText(auditItem.getRepairCode());
 			holder.tvCount.setText(auditItem.getQuantity() + "");
 
-			if (!auditItem.getApproved()) {
-				holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_unapproved));
+			if (!auditItem.isIsAllowed()) {
+				holder.tvIssueStatus.setText("Cấm sửa");
 			} else {
-				holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_approved));
+				if (!auditItem.getApproved()) {
+					holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_unapproved));
+				} else {
+					holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_approved));
+				}
 			}
 
 			holder.btnRepair.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
-					if (!auditItem.getApproved()) {
-						// Show repair dialog
-						showRepairDiaglog();
+
+					if (!auditItem.isIsAllowed()) {
+						// Nếu lỗi này cấm sửa, hiện dialog cấm sửa
+						showPreventRepairDialog();
 					} else {
-						// Open camera activity to take repair image
-						openCamera();
+						if (!auditItem.getApproved()) {
+							// Show repair dialog
+							showRepairDiaglog();
+						} else {
+							// Open camera activity to take repair image
+							openCamera();
+						}
 					}
 				}
 			});
@@ -188,8 +200,9 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			if (auditItem.getAuditImages() != null && auditItem.getAuditImages().size() != 0) {
 				if (auditItem.getAuditImages().get(0) != null) {
 					auditImage = auditItem.getAuditImages().get(0);
+					ImageAware imageAware = new ImageViewAware(holder.ivAuditImage, false);
 					ImageLoader.getInstance().displayImage(auditImage.getUrl(),
-							holder.ivAuditImage);
+							imageAware);
 				}
 			}
 
@@ -336,5 +349,14 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);
 		cameraActivityIntent.putExtra(CameraFragment.AUDIT_ITEM_UUID_EXTRA, mAuditItem);
 		mContext.startActivity(cameraActivityIntent);
+	}
+
+	void showPreventRepairDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+		builder.setTitle("Alert");
+		builder.setMessage("Lỗi này không được sửa");
+
+		AlertDialog dialog = builder.create();
+		dialog.show();
 	}
 }

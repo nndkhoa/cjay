@@ -26,6 +26,7 @@ public class DetailIssueActivity extends BaseActivity implements ActionBar.TabLi
     public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
 
     public final static String AUDIT_ITEM_EXTRA = "com.cloudjay.wizard.auditItem";
+	public final static String SELECTED_TAB = "com.cloudjay.wizzard.selectedTab";
 
     @Extra(CONTAINER_ID_EXTRA)
     public String containerID;
@@ -33,7 +34,8 @@ public class DetailIssueActivity extends BaseActivity implements ActionBar.TabLi
     @Extra(AUDIT_ITEM_EXTRA)
     AuditItem auditItem;
 
-    private FragmentTabHost mTabHost;
+	@Extra(SELECTED_TAB)
+	int selectedTab;
 
     @ViewById(R.id.pager_repaired)
     ViewPager pager;
@@ -63,11 +65,17 @@ public class DetailIssueActivity extends BaseActivity implements ActionBar.TabLi
 
         // For each of the sections in the app, add a tab to the action bar.
         for (int i = 0; i < mPagerAdapter.getCount(); i++) {
-            actionBar.addTab(
-                    actionBar.newTab()
-                            .setText(mPagerAdapter.getPageTitle(i))
-                            .setTabListener(this)
-            );
+			if (i == selectedTab) {
+				actionBar.addTab(
+						actionBar.newTab()
+								.setText(mPagerAdapter.getPageTitle(i))
+								.setTabListener(this), true);
+			} else {
+				actionBar.addTab(
+						actionBar.newTab()
+								.setText(mPagerAdapter.getPageTitle(i))
+								.setTabListener(this), false);
+			}
         }
 
     }

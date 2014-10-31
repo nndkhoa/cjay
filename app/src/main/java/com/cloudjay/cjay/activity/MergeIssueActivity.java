@@ -114,6 +114,7 @@ public class MergeIssueActivity extends BaseActivity {
                 auditItem.setHeight(40);
                 auditItem.setLength(20);
                 auditItem.setQuantity(2);
+				auditItem.setIsAllowed(true);
 
                 dataCenter.addIssue(getApplicationContext(), auditItem, containerID);
 

@@ -140,6 +140,7 @@ public class IssuePendingFragment extends Fragment {
 				Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
 				detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
 				detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem);
+				detailIssueActivity.putExtra(DetailIssueActivity.SELECTED_TAB, 1);
 				startActivity(detailIssueActivity);
 				break;
 		}
@@ -173,6 +174,7 @@ public class IssuePendingFragment extends Fragment {
 			Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
 			detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
 			detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem);
+			detailIssueActivity.putExtra(DetailIssueActivity.SELECTED_TAB, 0);
 			startActivity(detailIssueActivity);
 		}
 	}

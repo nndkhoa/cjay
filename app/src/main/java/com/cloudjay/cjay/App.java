@@ -72,10 +72,10 @@ public class App extends Application {
 		configureImageLoader();
 		configureJobManager();
 
-		/*StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
+		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
 		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
 				.detectLeakedClosableObjects().penaltyLog()
-				.penaltyDeath().build());*/
+				.penaltyDeath().build());
 
 		// Configure Alarm Manager
 		// Check if user logged in => check alarm manager
@@ -116,21 +116,22 @@ public class App extends Application {
 	private void configureImageLoader() {
 
 		// init image loader default options
-        DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
-                .imageScaleType(ImageScaleType.EXACTLY)
-                .bitmapConfig(Bitmap.Config.RGB_565)
-                .cacheOnDisk(true)
-                .cacheInMemory(true)
-                .showImageOnLoading(R.drawable.ic_app_360)
-                .build();
+		DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
+				.cacheInMemory(true)
+				.cacheOnDisc(true)
+				.bitmapConfig(Bitmap.Config.RGB_565)
+				.imageScaleType(ImageScaleType.IN_SAMPLE_INT)
+				.showImageForEmptyUri(R.drawable.ic_app_360)
+				.build();
 
 		// init image loader config
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
 				.defaultDisplayImageOptions(defaultOptions)
-                .memoryCacheSize(41943040)
-                .diskCacheSize(104857600)
-                .threadPoolSize(10)
-                .build();
+				.discCacheSize(500 * 1024 * 1024)
+				.memoryCache(new WeakMemoryCache())
+				.threadPoolSize(3)
+				.threadPriority(Thread.MAX_PRIORITY)
+				.build();
 
 		// init image loader with config defined
 		ImageLoader.getInstance().init(config);
