@@ -40,7 +40,6 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 
@@ -71,8 +70,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	public final static String OPERATOR_CODE_EXTRA = "com.cloudjay.wizard.operatorCode";
 	public final static String IMAGE_TYPE_EXTRA = "com.cloudjay.wizard.imageType";
 	public final static String CURRENT_STEP_EXTRA = "com.cloudjay.wizard.currentStep";
-    // This Extra bundle is use to open Detail Issue Activity only
-    public final static String AUDIT_ITEM_UUID_EXTRA = "com.cloudjay.wizard.auditItemUUID";
+	// This Extra bundle is use to open Detail Issue Activity only
+	public final static String AUDIT_ITEM_UUID_EXTRA = "com.cloudjay.wizard.auditItemUUID";
 
 	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
 	private boolean singleShotProcessing = false;
@@ -89,8 +88,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	@FragmentArg(CURRENT_STEP_EXTRA)
 	int currentStep;
 
-    @FragmentArg(AUDIT_ITEM_UUID_EXTRA)
-    AuditItem auditItem;
+	@FragmentArg(AUDIT_ITEM_UUID_EXTRA)
+	AuditItem auditItem;
 
 	@Bean
 	DataCenter dataCenter;
@@ -130,7 +129,9 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	@Click(R.id.btn_capture)
 	void btnTakePictureClicked() {
 		btnTakePicture.setEnabled(false);
-		autoFocus();
+//		autoFocus();
+		btnTakePicture.setEnabled(true);
+		takeSimplePicture();
 	}
 
 	@Click(R.id.btn_capture_mode)
@@ -409,8 +410,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		@TargetApi(16)
 		public void onAutoFocus(boolean success, Camera camera) {
 			super.onAutoFocus(success, camera);
-			btnTakePicture.setEnabled(true);
-			takeSimplePicture();
+//			btnTakePicture.setEnabled(true);
+//			takeSimplePicture();
 		}
 
 		/**
