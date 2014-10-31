@@ -4,8 +4,10 @@ import android.content.Context;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
-import com.cloudjay.cjay.event.upload.UploadStartedEvent;
+import com.cloudjay.cjay.event.upload.ItemEnqueueEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
+import com.cloudjay.cjay.event.upload.UploadedEvent;
+import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
@@ -17,7 +19,7 @@ public class UploadImageJob extends Job {
 	String containerId;
 	String uri;
 	String imageName;
-    ImageType imageType;
+	ImageType imageType;
 
 	@Override
 	protected int getRetryLimit() {
@@ -29,7 +31,7 @@ public class UploadImageJob extends Job {
 		this.containerId = containerId;
 		this.uri = uri;
 		this.imageName = imageName;
-        this.imageType = imageType;
+		this.imageType = imageType;
 	}
 
 	@Override
@@ -38,38 +40,37 @@ public class UploadImageJob extends Job {
 		// Image is uploaded in background, but we still need to notify Upload Fragment
 		// in case container session upload status is > UPLOADING.
 		// It will notify fragment upload to update UI
-		EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.IMAGE));
+		EventBus.getDefault().post(new ItemEnqueueEvent(containerId, UploadType.IMAGE));
 	}
 
 	@Override
 	public void onRun() throws Throwable {
 
-//		// Notify to fragment upload that image is being uploaded.
-//		EventBus.getDefault().post(new UploadingEvent(containerId, UploadType.IMAGE));
+		// Notify to fragment upload that image is being uploaded.
+		EventBus.getDefault().post(new UploadingEvent(containerId, UploadType.IMAGE));
 
 		// Call data center to upload image
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).uploadImage(context, uri, imageName, containerId, imageType);
+
+		EventBus.getDefault().post(new UploadedEvent(containerId));
 	}
 
 	@Override
+	protected boolean shouldReRunOnThrowable(Throwable throwable) {
+		return true;
+	}
+
+	/**
+	 * // Job has exceeded retry attempts or shouldReRunOnThrowable() has returned false.
+	 */
+	@Override
 	protected void onCancel() {
 
-		// Job has exceeded retry attempts or shouldReRunOnThrowable() has returned false.
 		// TODO: Set image upload Status to ERROR and notify to Upload Fragment
 
 		Context context = App.getInstance().getApplicationContext();
 		EventBus.getDefault().post(new UploadStoppedEvent(containerId));
 		DataCenter_.getInstance_(context).addLog(context, containerId, "Không thể tải lên hình: " + imageName);
-	}
-
-	@Override
-	protected boolean shouldReRunOnThrowable(Throwable throwable) {
-
-		if (getCurrentRunCount() >= getRetryLimit()) {
-			return false;
-		}
-
-		return true;
 	}
 }

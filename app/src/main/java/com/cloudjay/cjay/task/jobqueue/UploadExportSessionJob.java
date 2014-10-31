@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
-import com.cloudjay.cjay.event.upload.UploadStartedEvent;
+import com.cloudjay.cjay.event.upload.ItemEnqueueEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.enums.UploadType;
@@ -34,7 +34,7 @@ public class UploadExportSessionJob extends Job {
 
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).addUploadSession(session.getContainerId());
-		EventBus.getDefault().post(new UploadStartedEvent(session.getContainerId(), UploadType.SESSION));
+		EventBus.getDefault().post(new ItemEnqueueEvent(session.getContainerId(), UploadType.SESSION));
 
 	}
 

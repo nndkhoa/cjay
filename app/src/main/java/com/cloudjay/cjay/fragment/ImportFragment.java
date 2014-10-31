@@ -20,7 +20,6 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
-import com.cloudjay.cjay.activity.HomeActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.OperatorCallbackEvent;
@@ -302,9 +301,7 @@ public class ImportFragment extends Fragment {
 		jobManager.addJobInBackground(new UploadSessionJob(mSession));
 
 		// Navigate to HomeActivity
-//		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
-//		startActivity(intent);
-//		getActivity().finish();
+		getActivity().finish();
 	}
 
 	@Touch(R.id.et_operator)

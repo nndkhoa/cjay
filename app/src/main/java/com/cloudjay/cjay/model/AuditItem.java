@@ -439,4 +439,21 @@ public class AuditItem {
 		}
 		return repaired_image;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof AuditItem) {
+			AuditItem temp = (AuditItem) obj;
+
+			if (this.componentCodeId == temp.componentCodeId
+					&& this.damageCodeId == temp.damageCodeId
+					&& this.repairCodeId == temp.repairCodeId) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		return super.equals(obj);
+	}
 }
