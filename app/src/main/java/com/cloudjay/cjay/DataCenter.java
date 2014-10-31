@@ -24,7 +24,9 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringUtils;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
+import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
 import com.snappydb.DB;
@@ -632,6 +634,8 @@ public class DataCenter {
 	}
 
 	/**
+	 * -1. Change local step to import
+	 * 0. Check for make sure all gate image have uploaded
 	 * 1. Upload container session
 	 * 2. Change status uploaded of session to COMPLETE
 	 * 3. Remove this container from TAB WORKING
@@ -640,11 +644,23 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	public void uploadSession(Context context, String containerId) throws SnappydbException {
-
-		// Upload container session to server
+	public void uploadImportSession(Context context, String containerId) throws SnappydbException {
 		DB db = App.getDB(context);
 		Session oldSession = db.getObject(containerId, Session.class);
+
+		// Change local step to import
+		oldSession.setLocalStep(Step.AUDIT.value);
+		db.put(oldSession.getContainerId(), oldSession);
+
+		// Check for make sure all gate image have uploaded
+		for (GateImage gateImage : oldSession.getGateImages()) {
+			if (gateImage.getUploadStatus() != UploadStatus.COMPLETE.value && gateImage.getType() == ImageType.IMPORT.value) {
+				//TODO Note to Khoa this upload import session have to retry upload Image @Han
+				uploadImage(context, Utils.parseUrltoUri(gateImage.getUrl()), gateImage.getName(), oldSession.getContainerId(), ImageType.IMPORT);
+			}
+		}
+
+		// Upload container session to server
 		Session result = networkClient.uploadSession(context, oldSession);
 		Logger.Log("Uploaded Session Id: " + result.getId());
 

@@ -30,6 +30,16 @@ public class Session {
 	@Expose
 	private long step;
 
+	public long getLocalStep() {
+		return localStep;
+	}
+
+	public void setLocalStep(long localStep) {
+		this.localStep = localStep;
+	}
+
+	private long localStep;
+
 	@SerializedName("pre_status")
 	@Expose
 	private long preStatus;

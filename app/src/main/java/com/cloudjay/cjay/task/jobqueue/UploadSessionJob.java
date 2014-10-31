@@ -6,7 +6,6 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
-import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
@@ -49,7 +48,7 @@ public class UploadSessionJob extends Job {
 		DataCenter_.getInstance_(context).addLog(context, containerId, "Bắt đầu khởi tạo");
 
 //		EventBus.getDefault().post(new UploadingEvent());
-		DataCenter_.getInstance_(context).uploadSession(context, containerId);
+		DataCenter_.getInstance_(context).uploadImportSession(context, containerId);
 
 		//Add Log
 		DataCenter_.getInstance_(context).addLog(context, containerId, "Khởi tạo hoàn tất");
