@@ -35,395 +35,404 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
 public class Utils {
 
-	public static void logOut(Context context) {
+    public static void logOut(Context context) {
 
-		// Clear preference and Database
-		PreferencesUtil.clearPrefs(context);
-		context.deleteDatabase("db_default_job_manager.db");
+        // Clear preference and Database
+        PreferencesUtil.clearPrefs(context);
+        context.deleteDatabase("db_default_job_manager.db");
 
-		try {
-			DB db = App.getDB(context);
-			db.destroy();
-		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
-		}
-	}
+        try {
+            DB db = App.getDB(context);
+            db.destroy();
+        } catch (SnappydbException e) {
+            Logger.w(e.getMessage());
+        }
+    }
 
-	/**
-	 * Start pubnub service
-	 *
-	 * @param context
-	 */
-	public void startPubnubService(Context context) {
+    /**
+     * Start pubnub service
+     *
+     * @param context
+     */
+    public void startPubnubService(Context context) {
 
-		if (Utils.isRunning(context, PubnubService_.class.getName())) {
-			Intent intent = new Intent(context, PubnubService_.class);
-			context.startService(intent);
-		}
-	}
+        if (Utils.isRunning(context, PubnubService_.class.getName())) {
+            Intent intent = new Intent(context, PubnubService_.class);
+            context.startService(intent);
+        }
+    }
 
-	/**
-	 * Check a intent service is running or not
-	 *
-	 * @param ctx
-	 * @param serviceName
-	 * @return
-	 */
-	public static boolean isRunning(Context ctx, String serviceName) {
+    /**
+     * Check a intent service is running or not
+     *
+     * @param ctx
+     * @param serviceName
+     * @return
+     */
+    public static boolean isRunning(Context ctx, String serviceName) {
 
-		ActivityManager manager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
-		for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-			if (service.service.getClassName().equals(serviceName)) {
-				return true;
-			}
-		}
+        ActivityManager manager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (service.service.getClassName().equals(serviceName)) {
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Init alarm manager to start QueueIntentService and PubnubService
-	 *
-	 * @param context
-	 */
-	public static void startAlarm(Context context) {
-		// start 30 seconds after boot completed
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.SECOND, 30);
+    /**
+     * Init alarm manager to start QueueIntentService and PubnubService
+     *
+     * @param context
+     */
+    public static void startAlarm(Context context) {
+        // start 30 seconds after boot completed
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.SECOND, 30);
 
-		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-		// Making Alarm for Queue Worker
-		Intent intent = new Intent(context, QueueIntentService_.class);
-		PendingIntent pQueueIntent = PendingIntent.getService(context, CJayConstant.ALARM_QUEUE_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        // Making Alarm for Queue Worker
+        Intent intent = new Intent(context, QueueIntentService_.class);
+        PendingIntent pQueueIntent = PendingIntent.getService(context, CJayConstant.ALARM_QUEUE_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-		// Start every 24 hours
-		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
-				CJayConstant.ALARM_INTERVAL * 1000, pQueueIntent);
+        // Start every 24 hours
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
+                CJayConstant.ALARM_INTERVAL * 1000, pQueueIntent);
 
-		// --------
-		// Configure Pubnub Service
-		Intent pubnubIntent = new Intent(context, PubnubService.class);
-		PendingIntent pPubnubIntent = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        // --------
+        // Configure Pubnub Service
+        Intent pubnubIntent = new Intent(context, PubnubService.class);
+        PendingIntent pPubnubIntent = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-		// wake up every 5 minutes to ensure service stays alive
-		alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
-				(5 * 60 * 1000), pPubnubIntent);
-	}
+        // wake up every 5 minutes to ensure service stays alive
+        alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+                (5 * 60 * 1000), pPubnubIntent);
+    }
 
-	/**
-	 * Use to check if alarm is up or not
-	 *
-	 * @param context
-	 * @return
-	 */
-	public static boolean isAlarmUp(Context context) {
+    /**
+     * Use to check if alarm is up or not
+     *
+     * @param context
+     * @return
+     */
+    public static boolean isAlarmUp(Context context) {
 
-		Intent queueIntent = new Intent(context, QueueIntentService_.class);
-		Intent pubnubIntent = new Intent(context, PubnubService_.class);
+        Intent queueIntent = new Intent(context, QueueIntentService_.class);
+        Intent pubnubIntent = new Intent(context, PubnubService_.class);
 
-		if (PendingIntent.getService(context, CJayConstant.ALARM_QUEUE_ID, queueIntent, PendingIntent.FLAG_NO_CREATE) != null &&
-				PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_NO_CREATE) != null)
-			return true;
-		else
-			return false;
-	}
+        if (PendingIntent.getService(context, CJayConstant.ALARM_QUEUE_ID, queueIntent, PendingIntent.FLAG_NO_CREATE) != null &&
+                PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_NO_CREATE) != null)
+            return true;
+        else
+            return false;
+    }
 
-	/**
-	 * Get app version name
-	 *
-	 * @param ctx
-	 * @return
-	 */
-	public static String getAppVersionName(Context ctx) {
+    /**
+     * Get app version name
+     *
+     * @param ctx
+     * @return
+     */
+    public static String getAppVersionName(Context ctx) {
 
-		PackageInfo pInfo = null;
-		try {
-			pInfo = ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0);
-		} catch (PackageManager.NameNotFoundException e) {
-			e.printStackTrace();
-		}
-		return pInfo.versionName;
-	}
+        PackageInfo pInfo = null;
+        try {
+            pInfo = ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return pInfo.versionName;
+    }
 
-	/**
-	 * Display a pretty alert
-	 *
-	 * @param context
-	 * @param textResId
-	 */
-	public static void showCrouton(Activity context, int textResId) {
-		Crouton.cancelAllCroutons();
-		final Crouton crouton = Crouton.makeText(context, textResId, Style.ALERT);
-		crouton.setConfiguration(new de.keyboardsurfer.android.widget.crouton.Configuration.Builder().setDuration(de.keyboardsurfer.android.widget.crouton.Configuration.DURATION_INFINITE).build());
-		crouton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Crouton.hide(crouton);
-			}
-		});
-		crouton.show();
-	}
+    /**
+     * Display a pretty alert
+     *
+     * @param context
+     * @param textResId
+     */
+    public static void showCrouton(Activity context, int textResId) {
+        Crouton.cancelAllCroutons();
+        final Crouton crouton = Crouton.makeText(context, textResId, Style.ALERT);
+        crouton.setConfiguration(new de.keyboardsurfer.android.widget.crouton.Configuration.Builder().setDuration(Configuration.DURATION_LONG).build());
+        crouton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Crouton.hide(crouton);
+            }
+        });
+        crouton.show();
+    }
 
-	/**
-	 * Display a pretty alert
-	 *
-	 * @param context
-	 * @param message
-	 */
-	public static void showCrouton(Activity context, String message) {
-		Crouton.cancelAllCroutons();
-		final Crouton crouton = Crouton.makeText(context, message, Style.ALERT);
-		crouton.setConfiguration(new de.keyboardsurfer.android.widget.crouton.Configuration.Builder().setDuration(de.keyboardsurfer.android.widget.crouton.Configuration.DURATION_INFINITE).build());
-		crouton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Crouton.hide(crouton);
-			}
-		});
-		crouton.show();
-	}
+    /**
+     * Display a pretty alert
+     *
+     * @param context
+     * @param message
+     */
+    public static void showCrouton(Activity context, String message) {
+        Crouton.cancelAllCroutons();
+        final Crouton crouton = Crouton.makeText(context, message, Style.ALERT);
+        crouton.setConfiguration(new de.keyboardsurfer.android.widget.crouton.Configuration.Builder().setDuration(Configuration.DURATION_LONG).build());
+        crouton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Crouton.hide(crouton);
+            }
+        });
+        crouton.show();
+    }
 
-	/**
-	 * Return role of current user
-	 *
-	 * @param context
-	 * @return
-	 */
-	public static int getRole(Context context) {
-		return Integer.valueOf(PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_USER_ROLE));
-	}
+    /**
+     * Return role of current user
+     *
+     * @param context
+     * @return
+     */
+    public static int getRole(Context context) {
+        return Integer.valueOf(PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_USER_ROLE));
+    }
 
-	/**
-	 * Check containerID is valid or not
-	 *
-	 * @param containerId
-	 * @return
-	 */
-	public static boolean isContainerIdValid(String containerId) {
+    /**
+     * Check containerID is valid or not
+     *
+     * @param containerId
+     * @return
+     */
+    public static boolean isContainerIdValid(String containerId) {
 
-		//if (!Logger.isDebuggable()) {
+        //if (!Logger.isDebuggable()) {
 
-		int crc = ContCheckDigit.getCRC(containerId);
-		if (crc == 10) {
-			crc = 0;
-		}
+        int crc = ContCheckDigit.getCRC(containerId);
+        if (crc == 10) {
+            crc = 0;
+        }
 
-		char lastChar = containerId.charAt(containerId.length() - 1);
-		if (Character.getNumericValue(lastChar) == crc) {
-			return true;
-		} else {
-			return false;
-		}
-		//}
+        char lastChar = containerId.charAt(containerId.length() - 1);
+        if (Character.getNumericValue(lastChar) == crc) {
+            return true;
+        } else {
+            return false;
+        }
+        //}
 
-		//return true;
-	}
+        //return true;
+    }
 
-	/**
-	 * Check if container id is valid based on ISO 6346
-	 *
-	 * @param containerID
-	 * @return
-	 */
-	public static boolean simpleValid(String containerID) {
-		Pattern pattern = Pattern.compile("^([A-Z]+){4,4}+(\\d{7,7}+)$");
-		Matcher matcher = pattern.matcher(containerID);
-		if (!matcher.matches()) return false;
-		return true;
-	}
+    /**
+     * Check if container id is valid based on ISO 6346
+     *
+     * @param containerID
+     * @return
+     */
+    public static boolean simpleValid(String containerID) {
+        Pattern pattern = Pattern.compile("^([A-Z]+){4,4}+(\\d{7,7}+)$");
+        Matcher matcher = pattern.matcher(containerID);
+        if (!matcher.matches()) return false;
+        return true;
+    }
 
-	/**
-	 * Replace a null string by space
-	 *
-	 * @param in
-	 * @return
-	 */
-	public static String replaceNullBySpace(String in) {
-		return in == null || in.equals("") ? " " : in;
-	}
+    /**
+     * Replace a null string by space
+     *
+     * @param in
+     * @return
+     */
+    public static String replaceNullBySpace(String in) {
+        return in == null || in.equals("") ? " " : in;
+    }
 
-	/**
-	 * Convert container session json to Session Object.
-	 * Need to check if container is existed or not. (should use insert or update concept)
-	 *
-	 * @param context
-	 * @param session
-	 * @return
-	 */
-	public static Session parseSession(Context context, Session session) throws SnappydbException {
+    /**
+     * Convert container session json to Session Object.
+     * Need to check if container is existed or not. (should use insert or update concept)
+     *
+     * @param context
+     * @param session
+     * @return
+     */
+    public static Session parseSession(Context context, Session session) throws SnappydbException {
 
-		//Check available session
-		DB snappyDb = App.getDB(context);
-		Session found = snappyDb.getObject(session.getContainerId(), Session.class);
+        //Check available session
+        DB snappyDb = App.getDB(context);
+        Session found = snappyDb.getObject(session.getContainerId(), Session.class);
 
-		// If hasn't -> create
-		if (found == null) {
-			snappyDb.put(session.getContainerId(), session);
-			return session;
-		}
+        // If hasn't -> create
+        if (found == null) {
+            snappyDb.put(session.getContainerId(), session);
+            return session;
+        }
 
-		// else -> update
-		else {
-			snappyDb.del(session.getContainerId());
-			snappyDb.put(session.getContainerId(), session);
-			return session;
-		}
-
-
-	}
-
-	/**
-	 * Count total image off session
-	 *
-	 * @param session
-	 * @return
-	 */
-	public static int countTotalImage(Session session) {
-		int totalImage = 0;
-		List<AuditItem> auditItems = session.getAuditItems();
-		if (auditItems != null) {
-			for (AuditItem auditItem : auditItems) {
-				totalImage = totalImage + auditItem.getAuditImages().size();
-			}
-			totalImage = totalImage + session.getGateImages().size();
-			return totalImage;
-		} else {
-			totalImage = session.getGateImages().size();
-			return totalImage;
-		}
-	}
-
-	public static int countUploadedImage(Session session) {
-		int uploadedImage = 0;
-		List<AuditItem> auditItems = session.getAuditItems();
-		if (auditItems != null) {
-			for (AuditItem auditItem : auditItems) {
-				List<AuditImage> auditImages = auditItem.getAuditImages();
-				for (AuditImage auditImage : auditImages) {
-					if (auditImage.getUploadStatus() == UploadStatus.COMPLETE.value) {
-						uploadedImage = uploadedImage + 1;
-					}
-				}
-
-			}
-		}
-
-		List<GateImage> gateImages = session.getGateImages();
-		for (GateImage gateImage : gateImages) {
-			if (gateImage.getUploadStatus() == UploadStatus.COMPLETE.value) {
-				uploadedImage = uploadedImage + 1;
-			}
-		}
-		return uploadedImage;
-	}
-
-	public static String getImageTypeDescription(Context ctx, int type) {
-
-		ImageType imageType = ImageType.values()[type];
-
-		switch (imageType) {
-			case IMPORT:
-				return ctx.getResources().getString(R.string.image_type_description_import);
-
-			case EXPORT:
-				return ctx.getResources().getString(R.string.image_type_description_export);
-
-			case AUDIT:
-				return ctx.getResources().getString(R.string.image_type_description_report);
-
-			case REPAIRED:
-			default:
-				return ctx.getResources().getString(R.string.image_type_description_repaired);
-		}
-	}
-
-	/**
-	 * Cấu hình cho Text box theo chuẩn iso
-	 */
-	public static void setupEditText(final EditText editText) {
-
-		final Pattern pattern = Pattern.compile("^[a-zA-Z]{4}");
-
-		// Cấu hình filter cho text box
-		// Chỉ cho phép nhập chữ vào số
-		InputFilter isLetterAndDigitFilter = new InputFilter() {
-
-			@Override
-			public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-
-				for (int i = start; i < end; i++) {
-					if (!Character.isLetterOrDigit(source.charAt(i))) {
-						return "";
-					}
-				}
-				return null;
-			}
-		};
-
-		// Chỉ cho phép nhập 4 kí tự và 7 số
-		InputFilter validCharacterFilter = new InputFilter() {
-			@Override
-			public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-
-				// dest là kết quả sau khi được append source character vào
-				// source là kí tự được user nhập vào
-
-				if (dest.length() > 10)
-					return "";
+        // else -> update
+        else {
+            snappyDb.del(session.getContainerId());
+            snappyDb.put(session.getContainerId(), session);
+            return session;
+        }
 
 
-				if (dest.length() < 4) {
-					Pattern temp = Pattern.compile("^[a-zA-Z]");
-					Matcher matcher = temp.matcher(source);
-					if (!matcher.matches()) {
-						return "";
-					}
-					return source.toString().toUpperCase();
-				} else {
-					Pattern temp = Pattern.compile("[0-9]$");
-					Matcher matcher = temp.matcher(source);
-					if (!matcher.matches()) {
-						return "";
-					}
-					return source.toString().toUpperCase();
-				}
-			}
-		};
+    }
 
-		// Set input filter for search text box
-		editText.setFilters(new InputFilter[]{isLetterAndDigitFilter, validCharacterFilter});
+    /**
+     * Count total image off session
+     *
+     * @param session
+     * @return
+     */
+    public static int countTotalImage(Session session) {
+        int totalImage = 0;
+        List<AuditItem> auditItems = session.getAuditItems();
+        if (auditItems != null) {
+            for (AuditItem auditItem : auditItems) {
+                totalImage = totalImage + auditItem.getAuditImages().size();
+            }
+            totalImage = totalImage + session.getGateImages().size();
+            return totalImage;
+        } else {
+            totalImage = session.getGateImages().size();
+            return totalImage;
+        }
+    }
 
-		// Set keyboard type
-		editText.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-		editText.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-			}
+    public static int countUploadedImage(Session session) {
+        int uploadedImage = 0;
+        List<AuditItem> auditItems = session.getAuditItems();
+        if (auditItems != null) {
+            for (AuditItem auditItem : auditItems) {
+                List<AuditImage> auditImages = auditItem.getAuditImages();
+                for (AuditImage auditImage : auditImages) {
+                    if (auditImage.getUploadStatus() == UploadStatus.COMPLETE.value) {
+                        uploadedImage = uploadedImage + 1;
+                    }
+                }
 
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				Matcher matcher = pattern.matcher(s);
-				if (s.length() < 4) {
-					if (editText.getInputType() != InputType.TYPE_CLASS_TEXT) {
-						editText.setInputType(InputType.TYPE_CLASS_TEXT
-								| InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-					}
-				} else if (matcher.matches()) {
-					if (editText.getInputType() != InputType.TYPE_CLASS_NUMBER) {
-						editText.setInputType(InputType.TYPE_CLASS_NUMBER);
-					}
-				}
-			}
+            }
+        }
 
-			@Override
-			public void afterTextChanged(Editable s) {
-			}
-		});
-	}
+        List<GateImage> gateImages = session.getGateImages();
+        for (GateImage gateImage : gateImages) {
+            if (gateImage.getUploadStatus() == UploadStatus.COMPLETE.value) {
+                uploadedImage = uploadedImage + 1;
+            }
+        }
+        return uploadedImage;
+    }
+
+    public static String getImageTypeDescription(Context ctx, int type) {
+
+        ImageType imageType = ImageType.values()[type];
+
+        switch (imageType) {
+            case IMPORT:
+                return ctx.getResources().getString(R.string.image_type_description_import);
+
+            case EXPORT:
+                return ctx.getResources().getString(R.string.image_type_description_export);
+
+            case AUDIT:
+                return ctx.getResources().getString(R.string.image_type_description_report);
+
+            case REPAIRED:
+            default:
+                return ctx.getResources().getString(R.string.image_type_description_repaired);
+        }
+    }
+
+    /**
+     * Cấu hình cho Text box theo chuẩn iso
+     */
+    public static void setupEditText(final EditText editText) {
+
+        final Pattern pattern = Pattern.compile("^[a-zA-Z]{4}");
+
+        // Cấu hình filter cho text box
+        // Chỉ cho phép nhập chữ vào số
+        InputFilter isLetterAndDigitFilter = new InputFilter() {
+
+            @Override
+            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+
+                for (int i = start; i < end; i++) {
+                    if (!Character.isLetterOrDigit(source.charAt(i))) {
+                        return "";
+                    }
+                }
+                return null;
+            }
+        };
+
+        // Chỉ cho phép nhập 4 kí tự và 7 số
+        InputFilter validCharacterFilter = new InputFilter() {
+            @Override
+            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+
+                // dest là kết quả sau khi được append source character vào
+                // source là kí tự được user nhập vào
+
+                if (dest.length() > 10)
+                    return "";
+
+
+                if (dest.length() < 4) {
+                    Pattern temp = Pattern.compile("^[a-zA-Z]");
+                    Matcher matcher = temp.matcher(source);
+                    if (!matcher.matches()) {
+                        return "";
+                    }
+                    return source.toString().toUpperCase();
+                } else {
+                    Pattern temp = Pattern.compile("[0-9]$");
+                    Matcher matcher = temp.matcher(source);
+                    if (!matcher.matches()) {
+                        return "";
+                    }
+                    return source.toString().toUpperCase();
+                }
+            }
+        };
+
+        // Set input filter for search text box
+        editText.setFilters(new InputFilter[]{isLetterAndDigitFilter, validCharacterFilter});
+
+        // Set keyboard type
+        editText.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Matcher matcher = pattern.matcher(s);
+                if (s.length() < 4) {
+                    if (editText.getInputType() != InputType.TYPE_CLASS_TEXT) {
+                        editText.setInputType(InputType.TYPE_CLASS_TEXT
+                                | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                    }
+                } else if (matcher.matches()) {
+                    if (editText.getInputType() != InputType.TYPE_CLASS_NUMBER) {
+                        editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+    }
+
+    public static String parseUrltoUri(String url) {
+        if (url.contains("file://")) {
+            String uri = url.substring(7);
+            return uri;
+        }
+        return null;
+    }
 }
