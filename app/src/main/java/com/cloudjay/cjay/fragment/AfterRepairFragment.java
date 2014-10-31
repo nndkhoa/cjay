@@ -40,13 +40,13 @@ public class AfterRepairFragment extends Fragment {
 
     public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
 
-    public final static String AUDIT_ITEM_EXTRA = "com.cloudjay.wizard.auditItem";
+    public final static String AUDIT_ITEM_EXTRA = "com.cloudjay.wizard.auditItemUUID";
 
     @FragmentArg(CONTAINER_ID_EXTRA)
     public String containerID;
 
-    @FragmentArg(AUDIT_ITEM_EXTRA)
-    public AuditItem auditItem;
+	@FragmentArg(AUDIT_ITEM_EXTRA)
+	public String auditItemUUID;
 
     @ViewById(R.id.tv_code_comp_repaired)
     TextView tvCompCode;
@@ -78,6 +78,7 @@ public class AfterRepairFragment extends Fragment {
 
     DetailIssuedImageAdapter imageAdapter;
     String operatorCode;
+	AuditItem auditItem;
 
     @AfterViews
     void setup() {
@@ -88,20 +89,23 @@ public class AfterRepairFragment extends Fragment {
         } else {
             operatorCode = tmp.getOperatorCode();
         }
-        // parse Data to view
-        tvCompCode.setText(auditItem.getComponentCode());
-        tvLocaitonCode.setText(auditItem.getLocationCode());
-        tvDamageCode.setText(auditItem.getDamageCode());
-        tvRepairCode.setText(auditItem.getRepairCode());
-        tvSize.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
-        textViewBtnCamera.setText(R.string.button_add_new_repair_image);
+	    auditItem = dataCenter.getAuditItemByUUId(getActivity(), auditItemUUID, containerID);
+	    if (auditItem != null) {
+		    // parse Data to view
+		    tvCompCode.setText(auditItem.getComponentCode());
+		    tvLocaitonCode.setText(auditItem.getLocationCode());
+		    tvDamageCode.setText(auditItem.getDamageCode());
+		    tvRepairCode.setText(auditItem.getRepairCode());
+		    tvSize.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
+		    textViewBtnCamera.setText(R.string.button_add_new_repair_image);
 
-        imageAdapter = new DetailIssuedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.REPAIRED);
+		    imageAdapter = new DetailIssuedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.REPAIRED);
 
-        //Get audit Image list form db
-        List<AuditImage> auditImages = auditItem.getAuditImages();
-        imageAdapter.setData(auditImages);
-        lvImage.setAdapter(imageAdapter);
+		    //Get audit Image list form db
+		    List<AuditImage> auditImages = auditItem.getAuditImages();
+		    imageAdapter.setData(auditImages);
+		    lvImage.setAdapter(imageAdapter);
+	    }
     }
     @Click(R.id.btn_camera_repaired)
     void openCameraActivity(){

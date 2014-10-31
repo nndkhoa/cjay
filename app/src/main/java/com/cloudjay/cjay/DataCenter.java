@@ -489,7 +489,7 @@ public class DataCenter {
 	 * @return
 	 */
 	public List<Session> getListSessions(Context context, String prefix) {
-        int len = prefix.length();
+		int len = prefix.length();
 
 		try {
 			DB db = App.getDB(context);
@@ -497,8 +497,8 @@ public class DataCenter {
 			List<Session> sessions = new ArrayList<>();
 
 			for (String result : keysResult) {
-                String newKey = result.substring(len);
-                Logger.Log(newKey);
+				String newKey = result.substring(len);
+				Logger.Log(newKey);
 				Session session = db.getObject(newKey, Session.class);
 				sessions.add(session);
 			}
@@ -543,12 +543,12 @@ public class DataCenter {
 			String key = session.getContainerId();
 			db.put(key, session);
 
-            // Close db
-            // db.close();
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
-    }
+			// Close db
+			// db.close();
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * Add container session vào list working session in database
@@ -621,8 +621,28 @@ public class DataCenter {
 
 	//endregion
 
-	//region IMAGE
+	//region IMAG
+	public AuditImage getAuditImageByUUId(Context context,String containerId, String auditItemUUID, String auditImageUUID) {
 
+		try {
+			DB db = App.getDB(context);
+			Session localSession = db.getObject(containerId, Session.class);
+			if (localSession != null) {
+				for (AuditItem auditItem : localSession.getAuditItems()) {
+					if (auditItem.getAuditItemUUID().equals(auditItemUUID)) {
+						for (AuditImage auditImage : auditItem.getAuditImages()){
+							if (auditImage.getAuditImageUUID().equals(auditImageUUID))
+								return auditImage;
+						}
+					}
+				}
+			}
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+		return null;
+
+	}
 	/**
 	 * Add image to container Session
 	 *
@@ -778,47 +798,47 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-    public void uploadImage(Context context, String uri, String imageName, String containerId, ImageType imageType) throws SnappydbException {
+	public void uploadImage(Context context, String uri, String imageName, String containerId, ImageType imageType) throws SnappydbException {
 
 		DB db = App.getDB(context);
 
 		//Call network client to upload image
 		networkClient.uploadImage(uri, imageName);
 
-        // Change status image in db
-        String key = containerId;
-        Session session = db.getObject(key, Session.class);
-        if (session != null) {
-            switch (imageType) {
-                case IMPORT:
-                    for (GateImage gateImage : session.getGateImages()) {
-                        if (gateImage.getName().equals(imageName) && gateImage.getType() == ImageType.IMPORT.value) {
-                            Logger.Log(imageName+" "+ gateImage.getType());
-                            gateImage.setUploadStatus(UploadStatus.COMPLETE.value);
-                        }
-                    }
-                case AUDIT:
-                    for (AuditItem auditItem : session.getAuditItems()) {
-                        for (AuditImage auditImage : auditItem.getAuditImages())
-                            if (auditImage.getName().equals(imageName) && auditImage.getType() == ImageType.AUDIT.value) {
-                                auditImage.setUploadStatus(UploadStatus.COMPLETE.value);
-                            }
-                    }
-                case REPAIRED:
-                    for (AuditItem auditItem : session.getAuditItems()) {
-                        for (AuditImage auditImage : auditItem.getAuditImages())
-                            if (auditImage.getName().equals(imageName) && auditImage.getType() == ImageType.REPAIRED.value) {
-                                auditImage.setUploadStatus(UploadStatus.COMPLETE.value);
-                            }
-                    }
-                case EXPORT:
-			for (GateImage gateImage : session.getGateImages()) {
-                        if (gateImage.getName().equals(imageName) && gateImage.getType() == ImageType.EXPORT.value) {
-                            gateImage.setUploadStatus(UploadStatus.COMPLETE);
-                        }
-                    }
+		// Change status image in db
+		String key = containerId;
+		Session session = db.getObject(key, Session.class);
+		if (session != null) {
+			switch (imageType) {
+				case IMPORT:
+					for (GateImage gateImage : session.getGateImages()) {
+						if (gateImage.getName().equals(imageName) && gateImage.getType() == ImageType.IMPORT.value) {
+							Logger.Log(imageName + " " + gateImage.getType());
+							gateImage.setUploadStatus(UploadStatus.COMPLETE.value);
+						}
+					}
+				case AUDIT:
+					for (AuditItem auditItem : session.getAuditItems()) {
+						for (AuditImage auditImage : auditItem.getAuditImages())
+							if (auditImage.getName().equals(imageName) && auditImage.getType() == ImageType.AUDIT.value) {
+								auditImage.setUploadStatus(UploadStatus.COMPLETE.value);
+							}
+					}
+				case REPAIRED:
+					for (AuditItem auditItem : session.getAuditItems()) {
+						for (AuditImage auditImage : auditItem.getAuditImages())
+							if (auditImage.getName().equals(imageName) && auditImage.getType() == ImageType.REPAIRED.value) {
+								auditImage.setUploadStatus(UploadStatus.COMPLETE.value);
+							}
+					}
+				case EXPORT:
+					for (GateImage gateImage : session.getGateImages()) {
+						if (gateImage.getName().equals(imageName) && gateImage.getType() == ImageType.EXPORT.value) {
+							gateImage.setUploadStatus(UploadStatus.COMPLETE);
+						}
+					}
 
-            }
+			}
 
 
 			db.put(key, session);
@@ -829,8 +849,8 @@ public class DataCenter {
 	}
 
 	/**
-     * -1. Change local step to import
-     * 0. Check for make sure all gate image have uploaded
+	 * -1. Change local step to import
+	 * 0. Check for make sure all gate image have uploaded
 	 * 1. Upload container session
 	 * 2. Change status uploaded of session to COMPLETE
 	 * 3. Remove this container from TAB WORKING
@@ -841,19 +861,19 @@ public class DataCenter {
 	 */
 	public void uploadSession(Context context, Session session) throws SnappydbException {
 
-        DB db = App.getDB(context);
+		DB db = App.getDB(context);
 
-        // Change local step to import
-        session.setLocalStep(Step.AUDIT.value);
-        db.put(session.getContainerId(), session);
+		// Change local step to import
+		session.setLocalStep(Step.AUDIT.value);
+		db.put(session.getContainerId(), session);
 
-        // Check for make sure all gate image have uploaded
-        for (GateImage gateImage : session.getGateImages()) {
-            if (gateImage.getUploadStatus() != UploadStatus.COMPLETE.value && gateImage.getType() == ImageType.IMPORT.value) {
-                //TODO Note to Khoa this upload import session have to retry upload Image @Han
-                uploadImage(context, Utils.parseUrltoUri(gateImage.getUrl()), gateImage.getName(), session.getContainerId(), ImageType.IMPORT);
-            }
-        }
+		// Check for make sure all gate image have uploaded
+		for (GateImage gateImage : session.getGateImages()) {
+			if (gateImage.getUploadStatus() != UploadStatus.COMPLETE.value && gateImage.getType() == ImageType.IMPORT.value) {
+				//TODO Note to Khoa this upload import session have to retry upload Image @Han
+				uploadImage(context, Utils.parseUrltoUri(gateImage.getUrl()), gateImage.getName(), session.getContainerId(), ImageType.IMPORT);
+			}
+		}
 
 		// Upload container session to server
 
@@ -881,21 +901,21 @@ public class DataCenter {
 		DB db = App.getDB(context);
 		Session oldSession = db.getObject(containerId, Session.class);
 
-        //Check for make sure all image of this audit item had uploaded
-        for (AuditImage auditImage : auditItem.getAuditImages()) {
-            if (auditImage.getUploadStatus() != UploadStatus.COMPLETE.value && auditImage.getType() == ImageType.AUDIT.value) {
-                //TODO Note to Khoa this upload audit Item have to retry upload Image @Han
-                uploadImage(context, Utils.parseUrltoUri(auditImage.getUrl()), auditImage.getName(), containerId, ImageType.AUDIT);
-            }
-        }
+		//Check for make sure all image of this audit item had uploaded
+		for (AuditImage auditImage : auditItem.getAuditImages()) {
+			if (auditImage.getUploadStatus() != UploadStatus.COMPLETE.value && auditImage.getType() == ImageType.AUDIT.value) {
+				//TODO Note to Khoa this upload audit Item have to retry upload Image @Han
+				uploadImage(context, Utils.parseUrltoUri(auditImage.getUrl()), auditImage.getName(), containerId, ImageType.AUDIT);
+			}
+		}
 
-        // Check for make sure this container had uploaded to be import step
-        if (oldSession.getStep() != Step.AUDIT.value) {
-            //TODO Note to Khoa this upload audit item have to retry upload import session @Han
-            uploadSession(context, oldSession);
-        }
+		// Check for make sure this container had uploaded to be import step
+		if (oldSession.getStep() != Step.AUDIT.value) {
+			//TODO Note to Khoa this upload audit item have to retry upload import session @Han
+			uploadSession(context, oldSession);
+		}
 
-        // Upload audit item session to server
+		// Upload audit item session to server
 		Session result = networkClient.postAuditItem(context, oldSession, auditItem);
 		Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
@@ -919,21 +939,21 @@ public class DataCenter {
 		DB db = App.getDB(context);
 		Session oldSession = db.getObject(session.getContainerId(), Session.class);
 
-        //Check for make sure all image of this audit item had uploaded
-        for (GateImage gateImage : session.getGateImages()) {
-            if (gateImage.getUploadStatus() != UploadStatus.COMPLETE.value && gateImage.getType() == ImageType.EXPORT.value) {
-                //TODO Note to Khoa this upload export session have to retry upload Image @Han
-                uploadImage(context, Utils.parseUrltoUri(gateImage.getUrl()), gateImage.getName(), session.getContainerId(), ImageType.EXPORT);
-            }
-        }
+		//Check for make sure all image of this audit item had uploaded
+		for (GateImage gateImage : session.getGateImages()) {
+			if (gateImage.getUploadStatus() != UploadStatus.COMPLETE.value && gateImage.getType() == ImageType.EXPORT.value) {
+				//TODO Note to Khoa this upload export session have to retry upload Image @Han
+				uploadImage(context, Utils.parseUrltoUri(gateImage.getUrl()), gateImage.getName(), session.getContainerId(), ImageType.EXPORT);
+			}
+		}
 
-        // Check for make sure this container had uploaded to be import step
-        if (oldSession.getStep() != Step.AVAILABLE.value) {
-            //TODO Note to Khoa this upload export session have to retry upload complete repair @Han
-            uploadCompleteRepairSession(context, oldSession.getContainerId());
-        }
+		// Check for make sure this container had uploaded to be import step
+		if (oldSession.getStep() != Step.AVAILABLE.value) {
+			//TODO Note to Khoa this upload export session have to retry upload complete repair @Han
+			uploadCompleteRepairSession(context, oldSession.getContainerId());
+		}
 
-        // Upload audit item session to server
+		// Upload audit item session to server
 		Session result = networkClient.checkOutContainerSession(context, oldSession);
 		Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
@@ -957,19 +977,19 @@ public class DataCenter {
 		DB db = App.getDB(context);
 		Session oldSession = db.getObject(containerId, Session.class);
 
-        // Change local step to audit
-        oldSession.setLocalStep(Step.REPAIR.value);
-        db.put(oldSession.getContainerId(), oldSession);
+		// Change local step to audit
+		oldSession.setLocalStep(Step.REPAIR.value);
+		db.put(oldSession.getContainerId(), oldSession);
 
-        // Check for make sure all audit item had uploaded
-        for (AuditItem auditItem : oldSession.getAuditItems()) {
-            if (auditItem.getUploadStatus() != UploadStatus.COMPLETE.value) {
-                //TODO Note to Khoa this upload complete audit session have to retry upload audit item @Han
-                uploadAuditItem(context, containerId, auditItem);
-            }
-        }
+		// Check for make sure all audit item had uploaded
+		for (AuditItem auditItem : oldSession.getAuditItems()) {
+			if (auditItem.getUploadStatus() != UploadStatus.COMPLETE.value) {
+				//TODO Note to Khoa this upload complete audit session have to retry upload audit item @Han
+				uploadAuditItem(context, containerId, auditItem);
+			}
+		}
 
-        // Upload complete audit session to server
+		// Upload complete audit session to server
 		Session result = networkClient.completeAudit(context, oldSession);
 		Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
@@ -994,27 +1014,27 @@ public class DataCenter {
 		DB db = App.getDB(context);
 		Session oldSession = db.getObject(containerId, Session.class);
 
-        // Change local step to repair
-        oldSession.setLocalStep(Step.AVAILABLE.value);
-        db.put(oldSession.getContainerId(), oldSession);
+		// Change local step to repair
+		oldSession.setLocalStep(Step.AVAILABLE.value);
+		db.put(oldSession.getContainerId(), oldSession);
 
-        // Check for sure all repaired image had uploaded
-        for (AuditItem auditItem : oldSession.getAuditItems()) {
-            for (AuditImage auditImage : auditItem.getAuditImages()) {
-                if (auditImage.getUploadStatus() != UploadStatus.COMPLETE.value && auditImage.getType() == ImageType.REPAIRED.value) {
-                    //TODO Note to Khoa this upload complete repair session have to retry upload repaired item @Han
-                    uploadImage(context, Utils.parseUrltoUri(auditImage.getUrl()), auditImage.getName(), containerId, ImageType.REPAIRED);
-                }
-            }
-        }
+		// Check for sure all repaired image had uploaded
+		for (AuditItem auditItem : oldSession.getAuditItems()) {
+			for (AuditImage auditImage : auditItem.getAuditImages()) {
+				if (auditImage.getUploadStatus() != UploadStatus.COMPLETE.value && auditImage.getType() == ImageType.REPAIRED.value) {
+					//TODO Note to Khoa this upload complete repair session have to retry upload repaired item @Han
+					uploadImage(context, Utils.parseUrltoUri(auditImage.getUrl()), auditImage.getName(), containerId, ImageType.REPAIRED);
+				}
+			}
+		}
 
-        // Check for sure session is complete audit step had uploaded to server
-        if (oldSession.getStep() != Step.AUDIT.value) {
-            //TODO Note to Khoa this upload complete repair session have to retry upload complete audit @Han
-            uploadCompleteAuditSession(context, containerId);
-        }
+		// Check for sure session is complete audit step had uploaded to server
+		if (oldSession.getStep() != Step.AUDIT.value) {
+			//TODO Note to Khoa this upload complete repair session have to retry upload complete audit @Han
+			uploadCompleteAuditSession(context, containerId);
+		}
 
-        // Upload complete repair session to server
+		// Upload complete repair session to server
 		Session result = networkClient.completeRepairSession(context, oldSession);
 		Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
@@ -1037,6 +1057,36 @@ public class DataCenter {
 	//endregion
 
 	//region AUDIT
+
+	/**
+	 * Get audit item from local by id.
+	 * <p/>
+	 * 1. Đầu tiên sẽ lấy session từ server.
+	 * 2. Kiểm tra trong db có tồn tại session này chưa
+	 * 2.1 Nếu có thì update
+	 * 2.2 Không có thì tạo mới
+	 *
+	 * @param context
+	 * @param id
+	 */
+	public AuditItem getAuditItemByUUId(Context context, String id, String containerId) {
+
+
+		try {
+			DB db = App.getDB(context);
+			Session localSession = db.getObject(containerId, Session.class);
+			if (localSession != null) {
+				for (AuditItem auditItem : localSession.getAuditItems()) {
+					if (auditItem.getAuditItemUUID().equals(id)) {
+						return auditItem;
+					}
+				}
+			}
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	/**
 	 * Get audit item from server by id.
@@ -1362,5 +1412,7 @@ public class DataCenter {
 	public void gotMessage(Context context, String channel, long messageId) {
 		networkClient.gotMessageFromPubNub(channel, messageId);
 	}
+
+
 	// endregion
 }

@@ -25,7 +25,7 @@ public class DetailIssueActivity extends BaseActivity implements ActionBar.TabLi
 
     public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
 
-    public final static String AUDIT_ITEM_EXTRA = "com.cloudjay.wizard.auditItem";
+    public final static String AUDIT_ITEM_EXTRA = "com.cloudjay.wizard.auditItemUUID";
 
     @Extra(CONTAINER_ID_EXTRA)
     public String containerID;
@@ -49,7 +49,7 @@ public class DetailIssueActivity extends BaseActivity implements ActionBar.TabLi
     }
 
     private void configureViewPager() {
-        mPagerAdapter = new com.cloudjay.cjay.adapter.ViewPagerAdapter(this, this.getSupportFragmentManager(), containerID, auditItem, 2);
+        mPagerAdapter = new com.cloudjay.cjay.adapter.ViewPagerAdapter(this, this.getSupportFragmentManager(), containerID, auditItem.getAuditItemUUID(), 2);
         pager.setAdapter(mPagerAdapter);
         pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 

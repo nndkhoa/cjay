@@ -9,21 +9,21 @@ import com.cloudjay.cjay.util.enums.ImageType;
 public class ImageCapturedEvent {
 	private String containerId;
 	private int imageType;
-	private AuditItem auditItem;
+	private String auditItemUUID;
 
-	public ImageCapturedEvent(String containerId, int imageType, AuditItem auditItem) {
+	public ImageCapturedEvent(String containerId, int imageType, String auditItemUUID) {
 
 		this.containerId = containerId;
 		this.imageType = imageType;
-		this.auditItem = auditItem;
+		this.auditItemUUID = auditItemUUID;
 
 	}
 
-	public ImageCapturedEvent(String containerId, ImageType imageType, AuditItem auditItem) {
+	public ImageCapturedEvent(String containerId, ImageType imageType, String auditItemUUID) {
 
 		this.containerId = containerId;
 		this.imageType = imageType.value;
-		this.auditItem = auditItem;
+		this.auditItemUUID = auditItemUUID;
 
 	}
 
