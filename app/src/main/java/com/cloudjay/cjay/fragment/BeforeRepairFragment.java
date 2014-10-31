@@ -126,7 +126,7 @@ public class BeforeRepairFragment extends Fragment {
 	}
 
 	@Background
-	private void refreshListImage() {
+	public void refreshListImage() {
 		if (auditItem != null) {
 			List<AuditImage> list = auditItem.getAuditImages();
 			updatedData(list);
