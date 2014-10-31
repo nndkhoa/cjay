@@ -446,6 +446,8 @@ public class AuditItem {
 	public List<AuditImage> getListIssueImages() {
 		List<AuditImage> imageList = new ArrayList<AuditImage>();
 
+		Logger.Log("getAuditImages: " + this.getAuditImages().size());
+
 		for (AuditImage auditImage : this.getAuditImages()) {
 			if (auditImage.getType() == ImageType.AUDIT.value) {
 				imageList.add(auditImage);

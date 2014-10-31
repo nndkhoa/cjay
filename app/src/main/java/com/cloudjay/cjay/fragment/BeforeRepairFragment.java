@@ -102,7 +102,8 @@ public class BeforeRepairFragment extends Fragment {
         } else {
             operatorCode = mSession.getOperatorCode();
         }
-		auditItem = dataCenter.getAuditItemByUUID(getActivity(), containerID, auditItemUUID);
+		auditItem = dataCenter.getAuditItemByUUID(getActivity().getApplicationContext(),
+				containerID, auditItemUUID);
         // parse Data to view
         tvCompCode.setText(auditItem.getComponentCode());
         tvLocaitonCode.setText(auditItem.getLocationCode());
