@@ -19,7 +19,7 @@ import javax.annotation.Generated;
 
 
 @Generated("org.jsonschema2pojo")
-public class Session implements Serializable {
+public class Session {
 
 	public static final String FIELD_CONTAINER_ID = "container_id";
 
@@ -29,6 +29,16 @@ public class Session implements Serializable {
 
 	@Expose
 	private long step;
+
+	public long getLocalStep() {
+		return localStep;
+	}
+
+	public void setLocalStep(long localStep) {
+		this.localStep = localStep;
+	}
+
+	private long localStep;
 
 	@SerializedName("pre_status")
 	@Expose

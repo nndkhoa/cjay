@@ -71,8 +71,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	public final static String OPERATOR_CODE_EXTRA = "com.cloudjay.wizard.operatorCode";
 	public final static String IMAGE_TYPE_EXTRA = "com.cloudjay.wizard.imageType";
 	public final static String CURRENT_STEP_EXTRA = "com.cloudjay.wizard.currentStep";
-    // This Extra bundle is use to open Detail Issue Activity only
-    public final static String AUDIT_ITEM_UUID_EXTRA = "com.cloudjay.wizard.auditItemUUID";
+	// This Extra bundle is use to open Detail Issue Activity only
+	public final static String AUDIT_ITEM_UUID_EXTRA = "com.cloudjay.wizard.auditItemUUID";
 
 	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
 	private boolean singleShotProcessing = false;
@@ -89,8 +89,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	@FragmentArg(CURRENT_STEP_EXTRA)
 	int currentStep;
 
-    @FragmentArg(AUDIT_ITEM_UUID_EXTRA)
-    AuditItem auditItem;
+	@FragmentArg(AUDIT_ITEM_UUID_EXTRA)
+	String auditItemUUID;
 
 	@Bean
 	DataCenter dataCenter;
@@ -123,7 +123,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 	@Click(R.id.btn_camera_done)
 	void btnDoneClicked() {
-		EventBus.getDefault().post(new ImageCapturedEvent(containerId, mType, auditItem));
+		EventBus.getDefault().post(new ImageCapturedEvent(containerId, mType, auditItemUUID));
 		getActivity().finish();
 	}
 
@@ -312,7 +312,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 								.withId(0)
 								.withType(mType)
 								.withUrl("file://" + uri)
-								.withName(imageName);
+								.withName(imageName).withUUID(UUID.randomUUID().toString());
+						AuditItem auditItem = dataCenter.getAuditItemByUUID(getActivity(), containerId, auditItemUUID);
 						if (null == auditItem) {
 							// Tạo lỗi giám đinh/ sửa mới
 							dataCenter.addAuditImage(getActivity().getApplicationContext(), auditImage, containerId);
@@ -327,7 +328,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 				// Add image to job queue
 				JobManager jobManager = App.getJobManager();
-				jobManager.addJobInBackground(new UploadImageJob(uri, imageName, containerId));
+				jobManager.addJobInBackground(new UploadImageJob(uri, imageName, containerId, type));
 
 			} catch (SnappydbException e) {
 				Utils.showCrouton(getActivity(), e.getMessage());

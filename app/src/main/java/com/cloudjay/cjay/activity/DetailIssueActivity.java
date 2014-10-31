@@ -51,7 +51,7 @@ public class DetailIssueActivity extends BaseActivity implements ActionBar.TabLi
     }
 
     private void configureViewPager() {
-        mPagerAdapter = new com.cloudjay.cjay.adapter.ViewPagerAdapter(this, this.getSupportFragmentManager(), containerID, auditItem, 2);
+        mPagerAdapter = new com.cloudjay.cjay.adapter.ViewPagerAdapter(this, this.getSupportFragmentManager(), containerID, auditItem.getAuditItemUUID(), 2);
         pager.setAdapter(mPagerAdapter);
         pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 

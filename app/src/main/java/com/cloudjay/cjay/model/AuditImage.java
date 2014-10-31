@@ -3,6 +3,7 @@ package com.cloudjay.cjay.model;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
@@ -10,7 +11,7 @@ import javax.annotation.Generated;
 
 /* Gồm hình giám định và sửa chữa */
 @Generated("org.jsonschema2pojo")
-public class AuditImage implements Serializable {
+public class AuditImage {
 
 	@Expose
 	private long id;
@@ -24,6 +25,18 @@ public class AuditImage implements Serializable {
 	private String name;
 
 	private int uploadStatus;
+
+	public String getAuditImageUUID() {
+		return auditImageUUID;
+	}
+
+	public void setAuditImageUUID(String auditImageUUID) {
+		this.auditImageUUID = auditImageUUID;
+	}
+
+	@SerializedName("audit_image_uuid")
+	@Expose
+	private String auditImageUUID;
 
 	public int getUploadStatus() {
 		return uploadStatus;
@@ -104,4 +117,8 @@ public class AuditImage implements Serializable {
 		return this;
 	}
 
+	public AuditImage withUUID(String s) {
+		this.auditImageUUID = s;
+		return this;
+	}
 }

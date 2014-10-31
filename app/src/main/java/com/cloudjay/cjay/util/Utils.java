@@ -381,4 +381,12 @@ public class Utils {
 			}
 		});
 	}
+
+	public static String parseUrltoUri(String url) {
+		if (url.contains("file://")) {
+			String uri = url.substring(7);
+			return uri;
+		}
+		return null;
+	}
 }

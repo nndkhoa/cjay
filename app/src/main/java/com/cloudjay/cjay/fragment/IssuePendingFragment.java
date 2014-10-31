@@ -136,11 +136,11 @@ public class IssuePendingFragment extends Fragment {
 			case REPAIRED:
 			default:
 				Logger.Log("Open AfterRepair Fragment");
-				AuditItem auditItem = event.getAuditItem();
+				String auditItemUUID = event.getAuditItemUUID();
+				AuditItem auditItem = dataCenter.getAuditItemByUUID(getActivity(),containerID,auditItemUUID);
 				Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
 				detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
-				detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem);
-				detailIssueActivity.putExtra(DetailIssueActivity.SELECTED_TAB, 1);
+				detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getAuditItemUUID());
 				startActivity(detailIssueActivity);
 				break;
 		}
@@ -151,7 +151,7 @@ public class IssuePendingFragment extends Fragment {
 	void buttonCleanClicked() {
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJob(new UploadSessionHandCleaningJob(mSession));
+		jobManager.addJob(new UploadSessionHandCleaningJob(mSession.getContainerId()));
 
 		getActivity().finish();
 	}
@@ -173,7 +173,7 @@ public class IssuePendingFragment extends Fragment {
 		if (auditItem.getAudited()) {
 			Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
 			detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
-			detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem);
+			detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getAuditItemUUID());
 			detailIssueActivity.putExtra(DetailIssueActivity.SELECTED_TAB, 0);
 			startActivity(detailIssueActivity);
 		}
