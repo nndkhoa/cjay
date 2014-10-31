@@ -169,10 +169,12 @@ public class IssuePendingFragment extends Fragment {
 	@ItemClick(R.id.lv_audit_items)
 	void switchToDetailIssueActivity(int position) {
 		AuditItem auditItem = auditItemAdapter.getItem(position);
-		Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
-		detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
-		detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem);
-		startActivity(detailIssueActivity);
+		if (auditItem.getAudited()) {
+			Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
+			detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
+			detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem);
+			startActivity(detailIssueActivity);
+		}
 	}
 
 	@Background
