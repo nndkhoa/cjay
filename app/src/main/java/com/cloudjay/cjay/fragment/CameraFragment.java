@@ -130,7 +130,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	void btnTakePictureClicked() {
 		btnTakePicture.setEnabled(false);
 //		autoFocus();
-		btnTakePicture.setEnabled(true);
 		takeSimplePicture();
 	}
 
@@ -257,7 +256,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		@Override
 		public void saveImage(PictureTransaction xact, Bitmap capturedBitmap) {
 
-			if (useSingleShotMode()) {
+			if (!useSingleShotMode()) {
 				singleShotProcessing = false;
 				getActivity().runOnUiThread(new Runnable() {
 					@Override
