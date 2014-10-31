@@ -307,13 +307,21 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 					case AUDIT:
 					case REPAIRED:
 					default:
+
 						AuditImage auditImage = new AuditImage()
 								.withId(0)
 								.withType(mType)
 								.withUrl("file://" + uri)
 								.withName(imageName);
+						if (null == auditItem) {
+							// Tạo lỗi giám đinh/ sửa mới
+							dataCenter.addAuditImage(getActivity().getApplicationContext(), auditImage, containerId);
+						} else {
+							// Thêm hình vào lỗi đã sữa chữa/  giám định
+							auditItem.getAuditImages().add(auditImage);
+							dataCenter.updateAuditItem(getActivity().getApplicationContext(), containerId, auditItem);
+						}
 
-						dataCenter.addAuditImage(getActivity().getApplicationContext(), auditImage, containerId);
 						break;
 				}
 

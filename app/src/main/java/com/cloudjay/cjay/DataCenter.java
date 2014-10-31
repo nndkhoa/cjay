@@ -1133,4 +1133,44 @@ public class DataCenter {
         }
 
     }
+
+	public void updateAuditItem(Context mContext, String containerId,
+										 AuditItem auditItem) {
+		try {
+			DB db = App.getDB(context);
+			Session session = db.getObject(containerId, Session.class);
+
+			AuditItem temp = getAuditItemByUUID(context, containerId, auditItem.getAuditItemUUID());
+			if (temp != null) {
+				session.getAuditItems().remove(temp);
+				session.getAuditItems().add(auditItem);
+			}
+
+			db.put(containerId, session);
+
+			Logger.Log ("update successfully");
+
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public AuditItem getAuditItemByUUID(Context context, String containerId,
+										String auditItemUUID) {
+		try {
+			DB db = App.getDB(context);
+			Session session = db.getObject(containerId, Session.class);
+
+			for (AuditItem auditItem : session.getAuditItems()) {
+				if (auditItem.getAuditItemUUID().equals(auditItemUUID)) {
+					return auditItem;
+				}
+			}
+			return null;
+
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 }
