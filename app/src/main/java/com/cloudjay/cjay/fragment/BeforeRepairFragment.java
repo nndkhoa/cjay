@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.fragment;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -12,6 +13,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.DetailIssuedImageAdapter;
+import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
@@ -31,6 +33,8 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.List;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Need 2 argument:String containerId, Audit item to init View.
@@ -80,9 +84,16 @@ public class BeforeRepairFragment extends Fragment {
 
     DetailIssuedImageAdapter imageAdapter;
     String operatorCode;
+	String auditItemUUID;
 	Session mSession;
 
-    @AfterViews
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		EventBus.getDefault().register(this);
+	}
+
+	@AfterViews
     void setup() {
         //get container operater code form containerId
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
@@ -123,6 +134,8 @@ public class BeforeRepairFragment extends Fragment {
 	@Background
     void refreshListImage() {
 		if (auditItem != null) {
+			auditItemUUID = auditItem.getAuditItemUUID();
+
 			List<AuditImage> list = auditItem.getAuditImages();
 			updatedData(list);
 		}
@@ -139,5 +152,21 @@ public class BeforeRepairFragment extends Fragment {
 		}
 
 		imageAdapter.notifyDataSetChanged();
+	}
+
+	@UiThread
+	void onEvent (ImageCapturedEvent event) {
+		Logger.Log ("on ImageCapturedEvent");
+
+		// Requery audit item by uuid to update listview
+		auditItem = dataCenter.getAuditItemByUUID(getActivity().getApplicationContext(),
+				containerID,auditItemUUID);
+		refreshListImage();
+	}
+
+	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
 	}
 }
