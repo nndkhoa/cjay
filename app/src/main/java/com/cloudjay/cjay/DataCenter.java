@@ -510,14 +510,14 @@ public class DataCenter {
 		for (String result : keysResult) {
 
 			String newKey = result.substring(len);
-			addLog(context, newKey, "Cannot retrieve this container");
+			addLog(context, newKey, prefix + " | Cannot retrieve this container");
 			Session session;
 			try {
 				session = db.getObject(newKey, Session.class);
 				sessions.add(session);
 			} catch (SnappydbException e) {
 				e.printStackTrace();
-			// db.close();
+				// db.close();
 			}
 		}
 
@@ -804,7 +804,6 @@ public class DataCenter {
 		Session session = db.getObject(key, Session.class);
 
 		if (session != null) {
-			Logger.Log("imageType: " + imageType);
 			switch (type) {
 
 				case AUDIT:
@@ -1306,34 +1305,34 @@ public class DataCenter {
 		EventBus.getDefault().post(new IssueDeletedEvent(containerId));
 	}
 
-    /**
-     * Change audit item's upload status
-     * @param context
-     * @param containerId
-     * @param auditItem
-     */
-    public void changeUploadState(Context context, String containerId,
-                                  AuditItem auditItem) {
-        try {
-            DB db = App.getDB(context);
-            Session session = db.getObject(containerId, Session.class);
+	/**
+	 * Change audit item's upload status
+	 *
+	 * @param context
+	 * @param containerId
+	 * @param auditItem
+	 */
+	public void changeUploadState(Context context, String containerId,
+	                              AuditItem auditItem) {
+		try {
+			DB db = App.getDB(context);
+			Session session = db.getObject(containerId, Session.class);
 
-            List<AuditItem> list = session.getAuditItems();
+			List<AuditItem> list = session.getAuditItems();
 
-            for (AuditItem item : list) {
-                if (item.getAuditItemUUID() == auditItem.getAuditItemUUID()) {
-                    item.setUploadStatus(auditItem.getUploadStatus());
-                }
-            }
+			for (AuditItem item : list) {
+				if (item.getAuditItemUUID() == auditItem.getAuditItemUUID()) {
+					item.setUploadStatus(auditItem.getUploadStatus());
+				}
+			}
 
-            session.setAuditItems(list);
-            db.put(containerId, session);
+			session.setAuditItems(list);
+			db.put(containerId, session);
 
 
-
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
 
 	}
 
