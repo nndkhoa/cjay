@@ -1120,7 +1120,7 @@ public class DataCenter {
             for (AuditItem item : list) {
                 if (item.getAuditItemUUID() == auditItem.getAuditItemUUID()) {
                     item.setUploadStatus(auditItem.getUploadStatus());
-                }
+                }auditItem
             }
 
             session.setAuditItems(list);
