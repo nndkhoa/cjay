@@ -21,7 +21,7 @@ public class UploadImageJob extends Job {
 
 	@Override
 	protected int getRetryLimit() {
-		return 5;
+		return 1;
 	}
 
 	public UploadImageJob(String uri, String imageName, String containerId, ImageType imageType) {

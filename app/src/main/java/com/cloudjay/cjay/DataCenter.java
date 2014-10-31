@@ -489,6 +489,7 @@ public class DataCenter {
 	 * @return
 	 */
 	public List<Session> getListSessions(Context context, String prefix) {
+        int len = prefix.length();
 
 		try {
 			DB db = App.getDB(context);
@@ -496,7 +497,9 @@ public class DataCenter {
 			List<Session> sessions = new ArrayList<>();
 
 			for (String result : keysResult) {
-				Session session = db.getObject(result, Session.class);
+                String newKey = result.substring(len);
+                Logger.Log(newKey);
+				Session session = db.getObject(newKey, Session.class);
 				sessions.add(session);
 			}
 			// db.close();
