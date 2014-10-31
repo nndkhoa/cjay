@@ -8,7 +8,7 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadSessionAdapter;
-import com.cloudjay.cjay.event.upload.UploadStartedEvent;
+import com.cloudjay.cjay.event.upload.ItemEnqueueEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
@@ -88,7 +88,7 @@ public class UploadFragment extends Fragment {
 
 
 	//region Handle EventBus
-	public void onEvent(UploadStartedEvent event) {
+	public void onEvent(ItemEnqueueEvent event) {
 		refresh();
 	}
 
