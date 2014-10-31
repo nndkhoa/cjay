@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.fragment;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -10,11 +11,14 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity;
+import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.DetailIssuedImageAdapter;
+import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
@@ -29,6 +33,8 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.List;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Need 2 argument:String containerId, Audit item to init View.
@@ -80,7 +86,14 @@ public class AfterRepairFragment extends Fragment {
 
     DetailIssuedImageAdapter imageAdapter;
     String operatorCode;
+	String auditItemUUID;
 	Session mSession;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		EventBus.getDefault().register(this);
+	}
 
     @AfterViews
     void setup() {
@@ -108,18 +121,21 @@ public class AfterRepairFragment extends Fragment {
     @Click(R.id.btn_camera_repaired)
     void openCameraActivity(){
 
-        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
+        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
         cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
         cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
         cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.REPAIRED.value);
         cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);
+		cameraActivityIntent.putExtra(CameraFragment.AUDIT_ITEM_UUID_EXTRA, auditItem);
         startActivity(cameraActivityIntent);
     }
 
 	@Background
     void refreshListImage() {
 		if (auditItem != null) {
-			List<AuditImage> list = auditItem.getAuditImages();
+			auditItemUUID = auditItem.getAuditItemUUID();
+
+			List<AuditImage> list = auditItem.getListRepairedImages();
 			updatedData(list);
 		}
     }
@@ -135,5 +151,21 @@ public class AfterRepairFragment extends Fragment {
 		}
 
 		imageAdapter.notifyDataSetChanged();
+	}
+
+	@UiThread
+	void onEvent (ImageCapturedEvent event) {
+		Logger.Log("on ImageCapturedEvent");
+
+		// Requery audit item by uuid to update listview
+		auditItem = dataCenter.getAuditItemByUUID(getActivity().getApplicationContext(),
+				containerID,auditItemUUID);
+		refreshListImage();
+	}
+
+	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
 	}
 }

@@ -136,7 +136,7 @@ public class BeforeRepairFragment extends Fragment {
 		if (auditItem != null) {
 			auditItemUUID = auditItem.getAuditItemUUID();
 
-			List<AuditImage> list = auditItem.getAuditImages();
+			List<AuditImage> list = auditItem.getListIssueImages();
 			updatedData(list);
 		}
     }

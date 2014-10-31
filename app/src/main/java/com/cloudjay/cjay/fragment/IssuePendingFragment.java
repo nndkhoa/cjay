@@ -185,6 +185,7 @@ public class IssuePendingFragment extends Fragment {
 			for (AuditItem auditItem : mSession.getAuditItems()) {
                 Logger.Log("getId: " + auditItem.getId());
                 Logger.Log("getUploadStatus: " + auditItem.getUploadStatus());
+				Logger.Log("getAuditItemUUID: " + auditItem.getAuditItemUUID());
 				list.add(auditItem);
 			}
 			Logger.Log("Size: " + list.size());

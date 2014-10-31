@@ -442,4 +442,26 @@ public class AuditItem implements Serializable {
 
         return super.equals(obj);
     }
+
+	public List<AuditImage> getListIssueImages() {
+		List<AuditImage> imageList = new ArrayList<AuditImage>();
+
+		for (AuditImage auditImage : this.getAuditImages()) {
+			if (auditImage.getType() == ImageType.AUDIT.value) {
+				imageList.add(auditImage);
+			}
+		}
+		return imageList;
+	}
+
+	public List<AuditImage> getListRepairedImages() {
+		List<AuditImage> imageList = new ArrayList<AuditImage>();
+
+		for (AuditImage auditImage : this.getAuditImages()) {
+			if (auditImage.getType() == ImageType.REPAIRED.value) {
+				imageList.add(auditImage);
+			}
+		}
+		return imageList;
+	}
 }
