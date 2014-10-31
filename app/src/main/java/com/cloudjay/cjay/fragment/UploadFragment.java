@@ -60,6 +60,7 @@ public class UploadFragment extends Fragment {
 	/**
 	 * Initial loader and set adapter for list view
 	 */
+	@Trace
 	@AfterViews
 	void initLoader() {
 		mAdapter = new UploadSessionAdapter(getActivity(), R.layout.item_upload);
@@ -68,6 +69,7 @@ public class UploadFragment extends Fragment {
 		refresh();
 	}
 
+	@Trace
 	@Background
 	void refresh() {
 		List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
@@ -75,6 +77,7 @@ public class UploadFragment extends Fragment {
 		updatedData(list);
 	}
 
+	@Trace
 	@UiThread
 	public void updatedData(List<Session> sessionList) {
 		mAdapter.clear();
