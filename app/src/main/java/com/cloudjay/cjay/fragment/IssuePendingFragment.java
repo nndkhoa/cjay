@@ -53,200 +53,202 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.fragment_issue_pending)
 public class IssuePendingFragment extends Fragment {
 
-	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
 
-	@FragmentArg(CONTAINER_ID_EXTRA)
-	public String containerID;
+    @FragmentArg(CONTAINER_ID_EXTRA)
+    public String containerID;
 
-	@ViewById(R.id.tv_container_code)
-	TextView tvContainerId;
+    @ViewById(R.id.tv_container_code)
+    TextView tvContainerId;
 
-	@ViewById(R.id.tv_current_status)
-	TextView tvCurrentStatus;
+    @ViewById(R.id.tv_current_status)
+    TextView tvCurrentStatus;
 
-	@ViewById(R.id.btn_camera)
-	LinearLayout btnCamera;
+    @ViewById(R.id.btn_camera)
+    LinearLayout btnCamera;
 
-	@ViewById(R.id.btn_clean)
-	Button btnClean;
+    @ViewById(R.id.btn_clean)
+    Button btnClean;
 
-	@ViewById(R.id.lv_audit_items)
-	ListView lvAuditItems;
+    @ViewById(R.id.lv_audit_items)
+    ListView lvAuditItems;
 
-	@Bean
-	DataCenter dataCenter;
+    @Bean
+    DataCenter dataCenter;
 
-	String operatorCode;
-	long currentStatus;
-	AuditItemAdapter auditItemAdapter;
+    String operatorCode;
+    long currentStatus;
+    AuditItemAdapter auditItemAdapter;
 
-	Session mSession;
+    Session mSession;
 
-	public IssuePendingFragment() {
-		// Required empty public constructor
-	}
+    public IssuePendingFragment() {
+        // Required empty public constructor
+    }
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		EventBus.getDefault().register(this);
-	}
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
 
-	@AfterViews
-	void setUp() {
+    @AfterViews
+    void setUp() {
 
-		// Get session by containerId
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+        // Get session by containerId
+        mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 
-		if (mSession != null) {
-			// Get operator code
-			containerID = mSession.getContainerId();
-			operatorCode = mSession.getOperatorCode();
+        if (mSession != null) {
+            // Get operator code
+            containerID = mSession.getContainerId();
+            operatorCode = mSession.getOperatorCode();
 
-			// Set currentStatus to TextView
-			currentStatus = mSession.getStatus();
-			tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
+            // Set currentStatus to TextView
+            currentStatus = mSession.getStatus();
+            tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
 
-			// Set ContainerId to TextView
-			tvContainerId.setText(containerID);
+            // Set ContainerId to TextView
+            tvContainerId.setText(containerID);
 
-			auditItemAdapter = new AuditItemAdapter(getActivity(),
-					R.layout.item_issue_pending, containerID, operatorCode);
-			lvAuditItems.setAdapter(auditItemAdapter);
+            auditItemAdapter = new AuditItemAdapter(getActivity(),
+                    R.layout.item_issue_pending, containerID, operatorCode);
+            lvAuditItems.setAdapter(auditItemAdapter);
 
-			refresh();
-		} else {
-			// Set ContainerId to TextView
-			tvContainerId.setText(containerID);
-		}
-	}
+            refresh();
+        } else {
+            // Set ContainerId to TextView
+            tvContainerId.setText(containerID);
+        }
+    }
 
-	@UiThread
-	void onEvent(ImageCapturedEvent event) {
+    @UiThread
+    void onEvent(ImageCapturedEvent event) {
 
-		ImageType imageType = ImageType.values()[event.getImageType()];
-		switch (imageType) {
-			case AUDIT:
-				// Re-query container session with given containerId
-				String containerId = event.getContainerId();
-				mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
-				refresh();
-				break;
+        ImageType imageType = ImageType.values()[event.getImageType()];
+        switch (imageType) {
+            case AUDIT:
+                // Re-query container session with given containerId
+                String containerId = event.getContainerId();
+                mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+                refresh();
+                break;
 
-			case REPAIRED:
-			default:
-				Logger.Log("Open AfterRepair Fragment");
-				AuditItem auditItem = event.getAuditItem();
-				Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
-				detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
-				detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem);
-				startActivity(detailIssueActivity);
-				break;
-		}
-	}
+            case REPAIRED:
+            default:
+                Logger.Log("Open AfterRepair Fragment");
+                AuditItem auditItem = event.getAuditItem();
+                Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
+                detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
+                detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem);
+                startActivity(detailIssueActivity);
+                break;
+        }
+    }
 
-	@Click(R.id.btn_clean)
-	@Background
-	void buttonCleanClicked() {
-		// Add container session to upload queue
-		JobManager jobManager = App.getJobManager();
-		jobManager.addJob(new UploadSessionHandCleaningJob(mSession));
+    @Click(R.id.btn_clean)
+    @Background
+    void buttonCleanClicked() {
+        // Add container session to upload queue
+        JobManager jobManager = App.getJobManager();
+        jobManager.addJob(new UploadSessionHandCleaningJob(mSession));
 
-		getActivity().finish();
-	}
+        getActivity().finish();
+    }
 
-	@Click(R.id.btn_camera)
-	void buttonCameraClicked() {
-		// Open camera activity
-		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
-		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.AUDIT.value);
-		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.AUDIT.value);
-		startActivity(cameraActivityIntent);
-	}
+    @Click(R.id.btn_camera)
+    void buttonCameraClicked() {
+        // Open camera activity
+        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
+        cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
+        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.AUDIT.value);
+        cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
+        cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.AUDIT.value);
+        startActivity(cameraActivityIntent);
+    }
 
-	@ItemClick(R.id.lv_audit_items)
-	void switchToDetailIssueActivity(int position) {
-		AuditItem auditItem = auditItemAdapter.getItem(position);
-		Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
-		detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
-		detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem);
-		startActivity(detailIssueActivity);
-	}
+    @ItemClick(R.id.lv_audit_items)
+    void switchToDetailIssueActivity(int position) {
+        AuditItem auditItem = auditItemAdapter.getItem(position);
+        if (auditItem.getAudited()) {
+            Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
+            detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
+            detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem);
+            startActivity(detailIssueActivity);
+        }
+    }
 
-	@Background
-	void refresh() {
-		if (mSession != null) {
-			List<AuditItem> list = new ArrayList<AuditItem>();
-			Logger.Log("AuditItems: " + mSession.getAuditItems().size());
-			for (AuditItem auditItem : mSession.getAuditItems()) {
-				Logger.Log("audited: " + auditItem.getAudited());
-				list.add(auditItem);
-			}
-			Logger.Log("Size: " + list.size());
+    @Background
+    void refresh() {
+        if (mSession != null) {
+            List<AuditItem> list = new ArrayList<AuditItem>();
+            Logger.Log("AuditItems: " + mSession.getAuditItems().size());
+            for (AuditItem auditItem : mSession.getAuditItems()) {
+                Logger.Log("audited: " + auditItem.getAudited());
+                list.add(auditItem);
+            }
+            Logger.Log("Size: " + list.size());
 
-			//Sort list audit
-			Comparator<AuditItem> comparator = new Comparator<AuditItem>() {
-				@Override
-				public int compare(AuditItem auditItem, AuditItem auditItem2) {
-					if (!auditItem.getAudited()) {
-						if (auditItem2.getAudited()) {
-							return 1;
-						} else {
-							return -1;
-						}
-					} else {
-						return -1;
-					}
-				}
-			};
+            //Sort list audit
+            Comparator<AuditItem> comparator = new Comparator<AuditItem>() {
+                @Override
+                public int compare(AuditItem auditItem, AuditItem auditItem2) {
+                    if (!auditItem.getAudited()) {
+                        if (auditItem2.getAudited()) {
+                            return 1;
+                        } else {
+                            return -1;
+                        }
+                    } else {
+                        return -1;
+                    }
+                }
+            };
 
-			Collections.sort(list, comparator);
-			updatedData(list);
+            Collections.sort(list, comparator);
+            updatedData(list);
 
-		}
-	}
+        }
+    }
 
-	@UiThread
-	void updatedData(List<AuditItem> auditItems) {
-		auditItemAdapter.clear();
+    @UiThread
+    void updatedData(List<AuditItem> auditItems) {
+        auditItemAdapter.clear();
 
-		if (auditItems != null) {
-			for (AuditItem auditItem : auditItems) {
-				auditItemAdapter.add(auditItem);
-			}
-		}
+        if (auditItems != null) {
+            for (AuditItem auditItem : auditItems) {
+                auditItemAdapter.add(auditItem);
+            }
+        }
 
-		auditItemAdapter.notifyDataSetChanged();
+        auditItemAdapter.notifyDataSetChanged();
 
-		// If container has audit image(s), hide button Container Ve sinh - quet
-		if (auditItemAdapter.getCount() > 0) {
-			btnClean.setVisibility(View.GONE);
-		}
-	}
+        // If container has audit image(s), hide button Container Ve sinh - quet
+        if (auditItemAdapter.getCount() > 0) {
+            btnClean.setVisibility(View.GONE);
+        }
+    }
 
-	@UiThread
-	void onEvent(IssueMergedEvent event) {
-		Logger.Log("on IssueMergedEvent");
+    @UiThread
+    void onEvent(IssueMergedEvent event) {
+        Logger.Log("on IssueMergedEvent");
 
-		// Delete merged audit item containerId
-		String containerId = event.getContainerId();
-		String auditItemRemoveUUID = event.getAuditItemRemoveUUID();
-		dataCenter.deleteAuditItemAfterMerge(getActivity().getApplicationContext(),
-				containerId, auditItemRemoveUUID);
-		refresh();
-	}
+        // Delete merged audit item containerId
+        String containerId = event.getContainerId();
+        String auditItemRemoveUUID = event.getAuditItemRemoveUUID();
+        dataCenter.deleteAuditItemAfterMerge(getActivity().getApplicationContext(),
+                containerId, auditItemRemoveUUID);
+        refresh();
+    }
 
-	@UiThread
-	void onEvent(IssueDeletedEvent event) {
-		Logger.Log("on IssueDeletedEvent");
+    @UiThread
+    void onEvent(IssueDeletedEvent event) {
+        Logger.Log("on IssueDeletedEvent");
 
-		// Re-query container session with given containerId
-		String containerId = event.getContainerId();
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
-		refresh();
-	}
+        // Re-query container session with given containerId
+        String containerId = event.getContainerId();
+        mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+        refresh();
+    }
 
     @UiThread
     void onEvent(UploadedEvent event) {
@@ -254,9 +256,9 @@ public class IssuePendingFragment extends Fragment {
         refresh();
     }
 
-	@Override
-	public void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
-	}
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
 }

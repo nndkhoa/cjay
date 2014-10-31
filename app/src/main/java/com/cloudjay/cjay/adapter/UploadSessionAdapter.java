@@ -132,7 +132,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
             case IMPORT:
                 for (GateImage image : session.getGateImages()) {
                     if (image.getType() == ImageType.IMPORT.value && image.getUploadStatus() != UploadStatus.ERROR.value) {
-                        jobManager.addJobInBackground(new UploadImageJob(image.getUrl(), image.getName(), session.getContainerId()));
+                        jobManager.addJobInBackground(new UploadImageJob(image.getUrl(), image.getName(), session.getContainerId(),ImageType.IMPORT));
                     }
                     ;
                 }
@@ -144,7 +144,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
                     if (item.getUploadStatus() == UploadStatus.ERROR.value) {
                         for (AuditImage auditImage : item.getAuditImages()) {
                             if (auditImage.getUploadStatus() != UploadStatus.ERROR.value && auditImage.getType() == ImageType.AUDIT.value) {
-                                jobManager.addJobInBackground(new UploadImageJob(auditImage.getUrl(), auditImage.getName(), session.getContainerId()));
+                                jobManager.addJobInBackground(new UploadImageJob(auditImage.getUrl(), auditImage.getName(), session.getContainerId(),ImageType.AUDIT));
                             }
                         }
                     }
@@ -158,7 +158,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
                     if (item.getUploadStatus() == UploadStatus.ERROR.value) {
                         for (AuditImage auditImage : item.getAuditImages()) {
                             if (auditImage.getUploadStatus() != UploadStatus.ERROR.value && auditImage.getType() == ImageType.REPAIRED.value) {
-                                jobManager.addJobInBackground(new UploadImageJob(auditImage.getUrl(), auditImage.getName(), session.getContainerId()));
+                                jobManager.addJobInBackground(new UploadImageJob(auditImage.getUrl(), auditImage.getName(), session.getContainerId(), ImageType.REPAIRED));
                             }
                         }
                     }
@@ -170,7 +170,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
             case EXPORT:
                 for (GateImage image : session.getGateImages()) {
                     if (image.getType() == ImageType.EXPORT.value && image.getUploadStatus() != UploadStatus.ERROR.value) {
-                        jobManager.addJobInBackground(new UploadImageJob(image.getUrl(), image.getName(), session.getContainerId()));
+                        jobManager.addJobInBackground(new UploadImageJob(image.getUrl(), image.getName(), session.getContainerId(), ImageType.EXPORT));
                     }
                     ;
                 }

@@ -24,6 +24,8 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringUtils;
+import com.cloudjay.cjay.util.enums.ImageType;
+import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
 import com.snappydb.DB;
@@ -278,7 +280,6 @@ public class DataCenter {
 	 * @param type
 	 */
 	public void addIsoCode(Context context, IsoCode isoCode, IsoCode.Type type) {
-
 		try {
 			DB db = App.getDB(context);
 			String key;
@@ -773,7 +774,7 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	public void uploadImage(Context context, String uri, String imageName, String containerId) throws SnappydbException {
+    public void uploadImage(Context context, String uri, String imageName, String containerId, ImageType imageType) throws SnappydbException {
 
 		DB db = App.getDB(context);
 
@@ -784,12 +785,36 @@ public class DataCenter {
 		String key = containerId;
 		Session session = db.getObject(key, Session.class);
 		if (session != null) {
-
+            switch (imageType) {
+                case IMPORT:
+                    for (GateImage gateImage : session.getGateImages()) {
+                        if (gateImage.getName().equals(imageName) && gateImage.getType() == ImageType.IMPORT.value) {
+                            gateImage.setUploadStatus(UploadStatus.COMPLETE);
+                        }
+                    }
+                case AUDIT:
+                    for (AuditItem auditItem : session.getAuditItems()) {
+                        for (AuditImage auditImage : auditItem.getAuditImages())
+                            if (auditImage.getName().equals(imageName) && auditImage.getType() == ImageType.AUDIT.value) {
+                                auditImage.setUploadStatus(UploadStatus.COMPLETE);
+                            }
+                    }
+                case REPAIRED:
+                    for (AuditItem auditItem : session.getAuditItems()) {
+                        for (AuditImage auditImage : auditItem.getAuditImages())
+                            if (auditImage.getName().equals(imageName) && auditImage.getType() == ImageType.REPAIRED.value) {
+                                auditImage.setUploadStatus(UploadStatus.COMPLETE);
+                            }
+                    }
+                case EXPORT:
 			for (GateImage gateImage : session.getGateImages()) {
-				if (gateImage.getName().equals(imageName)) {
+                        if (gateImage.getName().equals(imageName) && gateImage.getType() == ImageType.EXPORT.value) {
 					gateImage.setUploadStatus(UploadStatus.COMPLETE);
 				}
 			}
+
+            }
+
 
 			db.put(key, session);
 		}
@@ -799,6 +824,8 @@ public class DataCenter {
 	}
 
 	/**
+     * -1. Change local step to import
+     * 0. Check for make sure all gate image have uploaded
 	 * 1. Upload container session
 	 * 2. Change status uploaded of session to COMPLETE
 	 * 3. Remove this container from TAB WORKING
@@ -809,8 +836,22 @@ public class DataCenter {
 	 */
 	public void uploadSession(Context context, Session session) throws SnappydbException {
 
+        DB db = App.getDB(context);
+
+        // Change local step to import
+        session.setLocalStep(Step.AUDIT.value);
+        db.put(session.getContainerId(), session);
+
+        // Check for make sure all gate image have uploaded
+        for (GateImage gateImage : session.getGateImages()) {
+            if (gateImage.getUploadStatus() != UploadStatus.COMPLETE.value && gateImage.getType() == ImageType.IMPORT.value) {
+                //TODO Note to Khoa this upload import session have to retry upload Image @Han
+                uploadImage(context, gateImage.getUrl(), gateImage.getName(), session.getContainerId(), ImageType.IMPORT);
+            }
+        }
+
 		// Upload container session to server
-		DB db = App.getDB(context);
+
 		Session result = networkClient.uploadSession(context, session);
 		Logger.Log("Uploaded Session Id: " + result.getId());
 
@@ -831,9 +872,25 @@ public class DataCenter {
 	}
 
 	public void uploadAuditItem(Context context, String containerId, AuditItem auditItem) throws SnappydbException {
-		// Upload audit item session to server
+
 		DB db = App.getDB(context);
 		Session oldSession = db.getObject(containerId, Session.class);
+
+        //Check for make sure all image of this audit item had uploaded
+        for (AuditImage auditImage : auditItem.getAuditImages()) {
+            if (auditImage.getUploadStatus() != UploadStatus.COMPLETE.value && auditImage.getType() == ImageType.AUDIT.value) {
+                //TODO Note to Khoa this upload audit Item have to retry upload Image @Han
+                uploadImage(context, auditImage.getUrl(), auditImage.getName(), containerId, ImageType.AUDIT);
+            }
+        }
+
+        // Check for make sure this container had uploaded to be import step
+        if (oldSession.getStep() != Step.AUDIT.value) {
+            //TODO Note to Khoa this upload audit item have to retry upload import session @Han
+            uploadSession(context, oldSession);
+        }
+
+        // Upload audit item session to server
 		Session result = networkClient.postAuditItem(context, oldSession, auditItem);
 		Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
@@ -853,9 +910,25 @@ public class DataCenter {
 	}
 
 	public void uploadExportSession(Context context, Session session) throws SnappydbException {
-		// Upload audit item session to server
+
 		DB db = App.getDB(context);
 		Session oldSession = db.getObject(session.getContainerId(), Session.class);
+
+        //Check for make sure all image of this audit item had uploaded
+        for (GateImage gateImage : session.getGateImages()) {
+            if (gateImage.getUploadStatus() != UploadStatus.COMPLETE.value && gateImage.getType() == ImageType.EXPORT.value) {
+                //TODO Note to Khoa this upload export session have to retry upload Image @Han
+                uploadImage(context, gateImage.getUrl(), gateImage.getName(), session.getContainerId(), ImageType.EXPORT);
+            }
+        }
+
+        // Check for make sure this container had uploaded to be import step
+        if (oldSession.getStep() != Step.AVAILABLE.value) {
+            //TODO Note to Khoa this upload export session have to retry upload complete repair @Han
+            uploadCompleteRepairSession(context, oldSession.getContainerId());
+        }
+
+        // Upload audit item session to server
 		Session result = networkClient.checkOutContainerSession(context, oldSession);
 		Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
@@ -875,9 +948,23 @@ public class DataCenter {
 	}
 
 	public void uploadCompleteAuditSession(Context context, String containerId) throws SnappydbException {
-		// Upload complete audit session to server
+
 		DB db = App.getDB(context);
 		Session oldSession = db.getObject(containerId, Session.class);
+
+        // Change local step to audit
+        oldSession.setLocalStep(Step.REPAIR.value);
+        db.put(oldSession.getContainerId(), oldSession);
+
+        // Check for make sure all audit item had uploaded
+        for (AuditItem auditItem : oldSession.getAuditItems()) {
+            if (auditItem.getUploadStatus() != UploadStatus.COMPLETE.value) {
+                //TODO Note to Khoa this upload complete audit session have to retry upload audit item @Han
+                uploadAuditItem(context, containerId, auditItem);
+            }
+        }
+
+        // Upload complete audit session to server
 		Session result = networkClient.completeAudit(context, oldSession);
 		Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
@@ -898,9 +985,31 @@ public class DataCenter {
 	}
 
 	public void uploadCompleteRepairSession(Context context, String containerId) throws SnappydbException {
-		// Upload complete repair session to server
+
 		DB db = App.getDB(context);
 		Session oldSession = db.getObject(containerId, Session.class);
+
+        // Change local step to repair
+        oldSession.setLocalStep(Step.AVAILABLE.value);
+        db.put(oldSession.getContainerId(), oldSession);
+
+        // Check for sure all repaired image had uploaded
+        for (AuditItem auditItem : oldSession.getAuditItems()) {
+            for (AuditImage auditImage : auditItem.getAuditImages()) {
+                if (auditImage.getUploadStatus() != UploadStatus.COMPLETE.value && auditImage.getType() == ImageType.REPAIRED.value) {
+                    //TODO Note to Khoa this upload complete repair session have to retry upload repaired item @Han
+                    uploadImage(context, auditImage.getUrl(), auditImage.getName(), containerId, ImageType.REPAIRED);
+                }
+            }
+        }
+
+        // Check for sure session is complete audit step had uploaded to server
+        if (oldSession.getStep() != Step.AUDIT.value) {
+            //TODO Note to Khoa this upload complete repair session have to retry upload complete audit @Han
+            uploadCompleteAuditSession(context, containerId);
+        }
+
+        // Upload complete repair session to server
 		Session result = networkClient.completeRepairSession(context, oldSession);
 		Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
