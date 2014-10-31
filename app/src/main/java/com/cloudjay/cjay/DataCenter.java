@@ -473,7 +473,7 @@ public class DataCenter {
             db.put(key, session);
 
             // Close db
-            // db.close();
+            db.close();
         } catch (SnappydbException e) {
             e.printStackTrace();
         }
@@ -714,44 +714,49 @@ public class DataCenter {
         networkClient.uploadImage(uri, imageName);
 
         // Change status image in db
-        String key = containerId;
-        Session session = db.getObject(key, Session.class);
+        Session session = db.getObject(containerId, Session.class);
         if (session != null) {
             switch (imageType) {
                 case IMPORT:
                     for (GateImage gateImage : session.getGateImages()) {
                         if (gateImage.getName().equals(imageName) && gateImage.getType() == ImageType.IMPORT.value) {
-                            gateImage.setUploadStatus(UploadStatus.COMPLETE);
+                            Logger.Log(imageName+" "+ gateImage.getType());
+                            gateImage.setUploadStatus(UploadStatus.COMPLETE.value);
                         }
                     }
                 case AUDIT:
                     for (AuditItem auditItem : session.getAuditItems()) {
                         for (AuditImage auditImage : auditItem.getAuditImages())
                             if (auditImage.getName().equals(imageName) && auditImage.getType() == ImageType.AUDIT.value) {
-                                auditImage.setUploadStatus(UploadStatus.COMPLETE);
+                                auditImage.setUploadStatus(UploadStatus.COMPLETE.value);
                             }
                     }
                 case REPAIRED:
                     for (AuditItem auditItem : session.getAuditItems()) {
                         for (AuditImage auditImage : auditItem.getAuditImages())
                             if (auditImage.getName().equals(imageName) && auditImage.getType() == ImageType.REPAIRED.value) {
-                                auditImage.setUploadStatus(UploadStatus.COMPLETE);
+                                auditImage.setUploadStatus(UploadStatus.COMPLETE.value);
                             }
                     }
                 case EXPORT:
                     for (GateImage gateImage : session.getGateImages()) {
                         if (gateImage.getName().equals(imageName) && gateImage.getType() == ImageType.EXPORT.value) {
-                            gateImage.setUploadStatus(UploadStatus.COMPLETE);
+                            gateImage.setUploadStatus(UploadStatus.COMPLETE.value);
                         }
                     }
 
             }
-
-
-            db.put(key, session);
+            for (GateImage gateImage : session.getGateImages()) {
+                if (gateImage.getName().equals(imageName) && gateImage.getType() == ImageType.IMPORT.value) {
+                    Logger.Log(imageName+" "+ gateImage.getUploadStatus());
+//                    gateImage.setUploadStatus(UploadStatus.COMPLETE);
+                }
+            }
+            db.put(containerId, session);
+            Logger.Log("Saved session after upload image");
         }
 
-        // db.close();
+        db.close();
         EventBus.getDefault().post(new UploadedEvent(containerId));
     }
 
@@ -778,6 +783,7 @@ public class DataCenter {
         for (GateImage gateImage : session.getGateImages()) {
             if (gateImage.getUploadStatus() != UploadStatus.COMPLETE.value && gateImage.getType() == ImageType.IMPORT.value) {
                 //TODO Note to Khoa this upload import session have to retry upload Image @Han
+               Logger.Log(gateImage.getUrl()+" "+ gateImage.getName()+" "+gateImage.getType()+ " "+gateImage.getUploadStatus());
                 uploadImage(context, gateImage.getUrl(), gateImage.getName(), session.getContainerId(), ImageType.IMPORT);
             }
         }

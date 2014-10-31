@@ -302,9 +302,9 @@ public class ImportFragment extends Fragment {
 		jobManager.addJobInBackground(new UploadSessionJob(mSession));
 
 		// Navigate to HomeActivity
-		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
-		startActivity(intent);
-		getActivity().finish();
+//		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
+//		startActivity(intent);
+//		getActivity().finish();
 	}
 
 	@Touch(R.id.et_operator)
