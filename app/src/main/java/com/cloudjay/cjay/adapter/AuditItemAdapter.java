@@ -44,6 +44,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 	private String containerId;
 	private AuditImage auditImage;
 	private String operatorCode;
+	private AuditItem mAuditItem;
 
 	public AuditItemAdapter(Context context, int resource, String containerId, String operatorCode) {
 		super(context, resource);
@@ -76,6 +77,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 	public View getView(int i, View view, ViewGroup viewGroup) {
 
 		final AuditItem auditItem = getItem(i);
+		mAuditItem = auditItem;
 
 		final ViewHolder holder;
 		if (view == null) {
@@ -332,6 +334,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
 		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.REPAIRED.value);
 		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);
+		cameraActivityIntent.putExtra(CameraFragment.AUDIT_ITEM_UUID_EXTRA, mAuditItem);
 		mContext.startActivity(cameraActivityIntent);
 	}
 }

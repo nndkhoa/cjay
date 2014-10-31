@@ -20,10 +20,12 @@ import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.List;
@@ -78,15 +80,16 @@ public class AfterRepairFragment extends Fragment {
 
     DetailIssuedImageAdapter imageAdapter;
     String operatorCode;
+	Session mSession;
 
     @AfterViews
     void setup() {
         //get container operater code form containerId
-        Session tmp = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
-        if (null == tmp) {
+		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+        if (null == mSession) {
             Utils.showCrouton(getActivity(), "Không tìm thấy container trong dữ liệu");
         } else {
-            operatorCode = tmp.getOperatorCode();
+            operatorCode = mSession.getOperatorCode();
         }
         // parse Data to view
         tvCompCode.setText(auditItem.getComponentCode());
@@ -94,14 +97,13 @@ public class AfterRepairFragment extends Fragment {
         tvDamageCode.setText(auditItem.getDamageCode());
         tvRepairCode.setText(auditItem.getRepairCode());
         tvSize.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
+		tvNumber.setText(auditItem.getQuantity() + "");
         textViewBtnCamera.setText(R.string.button_add_new_repair_image);
 
         imageAdapter = new DetailIssuedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.REPAIRED);
+		lvImage.setAdapter(imageAdapter);
 
-        //Get audit Image list form db
-        List<AuditImage> auditImages = auditItem.getAuditImages();
-        imageAdapter.setData(auditImages);
-        lvImage.setAdapter(imageAdapter);
+		refreshListImage();
     }
     @Click(R.id.btn_camera_repaired)
     void openCameraActivity(){
@@ -114,21 +116,24 @@ public class AfterRepairFragment extends Fragment {
         startActivity(cameraActivityIntent);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        refreshListImage();
+	@Background
+    void refreshListImage() {
+		if (auditItem != null) {
+			List<AuditImage> list = auditItem.getAuditImages();
+			updatedData(list);
+		}
     }
 
-    private void refreshListImage() {
-        Session tmp = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
-        for (AuditItem currentAuditItem: tmp.getAuditItems()){
-            if (currentAuditItem.getId() == auditItem.getId()){
-                auditItem = currentAuditItem;
-            }
-        }
-        List<AuditImage> auditImages = auditItem.getAuditImages();
-        imageAdapter.setData(auditImages);
-        imageAdapter.notifyDataSetChanged();
-    }
+	@UiThread
+	void updatedData(List<AuditImage> imageList) {
+
+		imageAdapter.clear();
+		if (imageList != null) {
+			for (AuditImage object : imageList) {
+				imageAdapter.add(object);
+			}
+		}
+
+		imageAdapter.notifyDataSetChanged();
+	}
 }

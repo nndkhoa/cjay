@@ -36,6 +36,6 @@ public class ImageCapturedEvent {
 	}
 
 	public AuditItem getAuditItem() {
-		return this.getAuditItem();
+		return this.auditItem;
 	}
 }
