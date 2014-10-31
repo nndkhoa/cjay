@@ -9,8 +9,8 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadSessionAdapter;
 import com.cloudjay.cjay.event.upload.ItemEnqueueEvent;
-import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
-import com.cloudjay.cjay.event.upload.UploadedEvent;
+import com.cloudjay.cjay.event.upload.UploadFailedEvent;
+import com.cloudjay.cjay.event.upload.UploadSucceedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -26,7 +26,6 @@ import org.androidannotations.annotations.ViewById;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
-
 
 @EFragment(R.layout.fragment_upload)
 public class UploadFragment extends Fragment {
@@ -95,7 +94,7 @@ public class UploadFragment extends Fragment {
 		refresh();
 	}
 
-	public void onEvent(UploadStoppedEvent event) {
+	public void onEvent(UploadFailedEvent event) {
 		refresh();
 	}
 
@@ -104,7 +103,7 @@ public class UploadFragment extends Fragment {
 	}
 
 	@Trace
-	public void onEvent(UploadedEvent event) {
+	public void onEvent(UploadSucceedEvent event) {
 		refresh();
 	}
 	//endregion

@@ -5,7 +5,7 @@ import android.content.Context;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.ItemEnqueueEvent;
-import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
+import com.cloudjay.cjay.event.upload.UploadFailedEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
@@ -68,7 +68,7 @@ public class UploadExportSessionJob extends Job {
 		//Add Log
 		DataCenter_.getInstance_(context).addLog(context, session.getContainerId(), "Xuất bị gián đoạn");
 
-		EventBus.getDefault().post(new UploadStoppedEvent(session.getContainerId()));
+		EventBus.getDefault().post(new UploadFailedEvent(session.getContainerId()));
 		return true;
 	}
 }

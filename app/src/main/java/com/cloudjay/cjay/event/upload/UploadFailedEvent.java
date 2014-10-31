@@ -1,9 +1,9 @@
 package com.cloudjay.cjay.event.upload;
 
-public class UploadStoppedEvent {
+public class UploadFailedEvent {
 	public String containerId;
 
-	public UploadStoppedEvent(String containerId) {
+	public UploadFailedEvent(String containerId) {
 		this.containerId = containerId;
 	}
 

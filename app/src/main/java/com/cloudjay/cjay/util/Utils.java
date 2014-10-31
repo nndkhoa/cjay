@@ -18,20 +18,15 @@ import android.widget.EditText;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.model.AuditImage;
-import com.cloudjay.cjay.model.AuditItem;
-import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.service.PubnubService;
 import com.cloudjay.cjay.task.service.PubnubService_;
 import com.cloudjay.cjay.task.service.QueueIntentService_;
 import com.cloudjay.cjay.util.enums.ImageType;
-import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
 import java.util.Calendar;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -180,6 +175,25 @@ public class Utils {
 	public static void showCrouton(Activity context, String message) {
 		Crouton.cancelAllCroutons();
 		final Crouton crouton = Crouton.makeText(context, message, Style.ALERT);
+		crouton.setConfiguration(new de.keyboardsurfer.android.widget.crouton.Configuration.Builder().setDuration(Configuration.DURATION_LONG).build());
+		crouton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Crouton.hide(crouton);
+			}
+		});
+		crouton.show();
+	}
+
+	/**
+	 * Display a pretty alert
+	 *
+	 * @param context
+	 * @param message
+	 */
+	public static void showCrouton(Activity context, String message, Style style) {
+		Crouton.cancelAllCroutons();
+		final Crouton crouton = Crouton.makeText(context, message, style);
 		crouton.setConfiguration(new de.keyboardsurfer.android.widget.crouton.Configuration.Builder().setDuration(Configuration.DURATION_LONG).build());
 		crouton.setOnClickListener(new View.OnClickListener() {
 			@Override
