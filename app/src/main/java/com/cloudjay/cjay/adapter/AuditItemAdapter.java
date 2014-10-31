@@ -108,16 +108,28 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		// Lỗi nào chưa giám dịnh thì hiện hinh`, lỗi nào đã giám định roi thì hiện chi tiết lỗi
 		if (auditItem.getAudited() == true) {
 
+            UploadStatus status = UploadStatus.values()[((int) auditItem.getUploadStatus())];
+
 			holder.llIssueImageView.setVisibility(View.GONE);
 			holder.llIssueDetails.setVisibility(View.VISIBLE);
 
-            switch (auditItem.getUploadStatus()) {
-                case 1:
+            switch (status) {
+                case UPLOADING:
                     holder.btnUpload.setVisibility(View.GONE);
                     holder.btnEdit.setVisibility(View.GONE);
                     holder.ivUploading.setVisibility(View.VISIBLE);
+                    break;
+
+                case COMPLETE:
+                    holder.btnUpload.setVisibility(View.GONE);
+                    holder.btnEdit.setVisibility(View.GONE);
+                    holder.ivUploading.setVisibility(View.GONE);
                     holder.btnRepair.setVisibility(View.VISIBLE);
                     break;
+
+                case ERROR:
+                    // TODO: show retry button
+
                 default:
                     holder.btnUpload.setVisibility(View.VISIBLE);
                     holder.btnEdit.setVisibility(View.VISIBLE);
@@ -156,14 +168,14 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				@Override
 				public void onClick(View view) {
 					//1. Update upload status
-                    auditItem.setUploadStatus(UploadStatus.UPLOADING);
+                    auditItem.setUploadStatus(UploadStatus.UPLOADING.value);
+                    DataCenter_.getInstance_(mContext).changeUploadState(mContext,
+                            containerId, auditItem);
                     notifyDataSetChanged();
 
 					//2. Add container session to upload queue
 					JobManager jobManager = App.getJobManager();
 					jobManager.addJob(new UploadAuditItemJob(containerId, auditItem));
-
-					//TODO: 3. When upload completed, hide icon Uploading @Nam*/
 				}
 			});
 

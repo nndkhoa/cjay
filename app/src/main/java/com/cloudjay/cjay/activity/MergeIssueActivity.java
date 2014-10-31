@@ -67,16 +67,23 @@ public class MergeIssueActivity extends BaseActivity {
         }
         mAdapter = new AuditMergeIssueAdapter(this, R.layout.item_merge_issue);
         lvIssues.setAdapter(mAdapter);
-        //TODO: get un-uploaded audit item
+        //TODO: get un-uploaded audit itemint
 
+        int count = 0;
         for (AuditItem auditItem : currentSession.getAuditItems()) {
             if (auditItem.getAudited() == true) {
-                isInserted = true;
-                break;
+                count++;
             }
         }
 
-        if (isInserted == false) {
+        if (count <= 1) {
+            isInserted = false;
+        } else {
+            isInserted = true;
+        }
+
+        Logger.Log("count: " + count);
+        if (!isInserted) {
             // Insert static issue into database
             for (int i = 0; i < 5; i++) {
 
@@ -100,9 +107,9 @@ public class MergeIssueActivity extends BaseActivity {
                 auditItem.setComponentCode(componentCode.getCode());
                 auditItem.setComponentCodeId(componentCode.getId());
                 auditItem.setDamageCode(damageCode.getCode());
-                auditItem.setComponentCodeId(damageCode.getId());
+                auditItem.setDamageCodeId(damageCode.getId());
                 auditItem.setRepairCode(repairCode.getCode());
-                auditItem.setComponentCodeId(repairCode.getId());
+                auditItem.setRepairCodeId(repairCode.getId());
                 auditItem.setLocationCode("XXXX");
                 auditItem.setHeight(40);
                 auditItem.setLength(20);

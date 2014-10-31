@@ -181,7 +181,8 @@ public class IssuePendingFragment extends Fragment {
 			List<AuditItem> list = new ArrayList<AuditItem>();
 			Logger.Log("AuditItems: " + mSession.getAuditItems().size());
 			for (AuditItem auditItem : mSession.getAuditItems()) {
-				Logger.Log("audited: " + auditItem.getAudited());
+                Logger.Log("getId: " + auditItem.getId());
+                Logger.Log("getUploadStatus: " + auditItem.getUploadStatus());
 				list.add(auditItem);
 			}
 			Logger.Log("Size: " + list.size());
@@ -251,6 +252,9 @@ public class IssuePendingFragment extends Fragment {
     @UiThread
     void onEvent(UploadedEvent event) {
         Logger.Log("upload complete");
+        // Re-query container session with given containerId
+        String containerId = event.getContainerId();
+        mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
         refresh();
     }
 

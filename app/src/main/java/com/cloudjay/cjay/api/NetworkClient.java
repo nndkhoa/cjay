@@ -23,6 +23,8 @@ import org.androidannotations.annotations.EBean;
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import retrofit.RestAdapter;
@@ -332,7 +334,21 @@ public class NetworkClient {
 	 * @return
 	 */
 	public Session postAuditItem(Context context, Session containerSession, AuditItem auditItem) {
+
+        Logger.Log("containerSession: " + containerSession.getId());
+        Logger.Log("auditItem: " + auditItem.getAuditItemToUpload());
+
+        String auditItemUUID = auditItem.getAuditItemUUID();
 		Session postAuditItemSession = provider.getRestAdapter(context).create(NetworkService.class).postAudiItem(containerSession.getId(), auditItem.getAuditItemToUpload());
+        List<AuditItem> list = postAuditItemSession.getAuditItems();
+        for (AuditItem item : list) {
+            if (item.equals(auditItem)) {
+                Logger.Log("Set here");
+                item.setAuditItemUUID(auditItemUUID);
+            }
+        }
+
+        postAuditItemSession.setAuditItems(list);
 		return postAuditItemSession;
 	}
 

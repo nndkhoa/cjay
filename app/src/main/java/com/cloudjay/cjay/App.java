@@ -72,10 +72,10 @@ public class App extends Application {
 		configureImageLoader();
 		configureJobManager();
 
-		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
+		/*StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
 		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
 				.detectLeakedClosableObjects().penaltyLog()
-				.penaltyDeath().build());
+				.penaltyDeath().build());*/
 
 		// Configure Alarm Manager
 		// Check if user logged in => check alarm manager
