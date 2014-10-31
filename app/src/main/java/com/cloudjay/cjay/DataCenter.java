@@ -807,6 +807,7 @@ public class DataCenter {
 		String key = containerId;
 		Session session = db.getObject(key, Session.class);
 		if (session != null) {
+			Logger.Log("imageType: " + imageType);
 			switch (imageType) {
 				case IMPORT:
 					for (GateImage gateImage : session.getGateImages()) {
@@ -815,6 +816,7 @@ public class DataCenter {
                             gateImage.setUploadStatus(UploadStatus.COMPLETE.value);
 						}
 					}
+					break;
 				case AUDIT:
 					for (AuditItem auditItem : session.getAuditItems()) {
 						for (AuditImage auditImage : auditItem.getAuditImages())
@@ -822,6 +824,7 @@ public class DataCenter {
                                 auditImage.setUploadStatus(UploadStatus.COMPLETE.value);
 							}
 					}
+					break;
 				case REPAIRED:
 					for (AuditItem auditItem : session.getAuditItems()) {
 						for (AuditImage auditImage : auditItem.getAuditImages())
@@ -829,13 +832,14 @@ public class DataCenter {
                                 auditImage.setUploadStatus(UploadStatus.COMPLETE.value);
 							}
 					}
+					break;
 				case EXPORT:
 					for (GateImage gateImage : session.getGateImages()) {
 						if (gateImage.getName().equals(imageName) && gateImage.getType() == ImageType.EXPORT.value) {
 							gateImage.setUploadStatus(UploadStatus.COMPLETE);
 						}
 					}
-
+					break;
 			}
 
 
