@@ -504,40 +504,49 @@ public class Session implements Serializable {
 	 */
 	public void checkRetry() {
 
-		if (step == Step.REPAIR.value) {
-			for (AuditItem auditItem : auditItems) {
-				for (AuditImage auditImage : auditItem.getAuditImages()) {
-					if (auditImage.getType() == ImageType.REPAIRED.value) {
-						File file = new File(auditImage.getUrl());
-						if (!file.exists()) {
-							this.retry = false;
+		Step tmp = Step.values()[((int) step)];
+		switch (tmp) {
+
+			case REPAIR:
+				for (AuditItem auditItem : auditItems) {
+					for (AuditImage auditImage : auditItem.getAuditImages()) {
+						if (auditImage.getType() == ImageType.REPAIRED.value) {
+							File file = new File(auditImage.getUrl());
+							if (!file.exists()) {
+								this.retry = false;
+							}
 						}
 					}
 				}
-			}
 
-			this.retry = true;
+				this.retry = true;
+				break;
 
-		} else if (step == Step.AUDIT.value) {
-			for (AuditItem auditItem : auditItems) {
-				for (AuditImage auditImage : auditItem.getAuditImages()) {
-					if (auditImage.getType() == ImageType.AUDIT.value) {
-						File file = new File(auditImage.getUrl());
-						if (!file.exists()) {
-							this.retry = false;
+			case AUDIT:
+				for (AuditItem auditItem : auditItems) {
+					for (AuditImage auditImage : auditItem.getAuditImages()) {
+						if (auditImage.getType() == ImageType.AUDIT.value) {
+							File file = new File(auditImage.getUrl());
+							if (!file.exists()) {
+								this.retry = false;
+							}
 						}
 					}
 				}
-			}
-			this.retry = true;
-		} else {
-			for (GateImage gateImage : gateImages) {
-				File file = new File(gateImage.getUrl());
-				if (!file.exists()) {
-					this.retry = false;
+				this.retry = true;
+				break;
+
+			case IMPORT:
+			case EXPORT:
+			default:
+				for (GateImage gateImage : gateImages) {
+					File file = new File(gateImage.getUrl());
+					if (!file.exists()) {
+						this.retry = false;
+					}
 				}
-			}
-			this.retry = true;
+				this.retry = true;
+				break;
 		}
 	}
 

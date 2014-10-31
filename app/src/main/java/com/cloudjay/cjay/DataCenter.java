@@ -11,7 +11,7 @@ import com.cloudjay.cjay.event.IssueMergedEvent;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.event.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
-import com.cloudjay.cjay.event.upload.UploadedEvent;
+import com.cloudjay.cjay.event.upload.UploadSucceedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
@@ -972,7 +972,7 @@ public class DataCenter {
 		oldSession.setAuditItems(listLocal);
 		db.put(key, oldSession);
 
-		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
+		EventBus.getDefault().post(new UploadSucceedEvent(result.getContainerId()));
 	}
 
 	public void uploadExportSession(Context context, Session session) throws SnappydbException {
@@ -1010,7 +1010,7 @@ public class DataCenter {
 			db.del(workingKey);
 		}
 
-		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
+		EventBus.getDefault().post(new UploadSucceedEvent(result.getContainerId()));
 	}
 
 	public void uploadCompleteAuditSession(Context context, String containerId) throws SnappydbException {
@@ -1047,7 +1047,7 @@ public class DataCenter {
 			db.del(workingKey);
 		}
 
-		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
+		EventBus.getDefault().post(new UploadSucceedEvent(result.getContainerId()));
 
 	}
 
@@ -1092,7 +1092,7 @@ public class DataCenter {
 			db.del(workingKey);
 		}
 
-		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
+		EventBus.getDefault().post(new UploadSucceedEvent(result.getContainerId()));
 	}
 
 

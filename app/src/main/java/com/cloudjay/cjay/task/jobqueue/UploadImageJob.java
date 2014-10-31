@@ -5,13 +5,15 @@ import android.content.Context;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.ItemEnqueueEvent;
-import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
-import com.cloudjay.cjay.event.upload.UploadedEvent;
+import com.cloudjay.cjay.event.upload.UploadFailedEvent;
+import com.cloudjay.cjay.event.upload.UploadSucceedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.util.enums.ImageType;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
+import com.snappydb.SnappydbException;
 
 import de.greenrobot.event.EventBus;
 
@@ -36,11 +38,19 @@ public class UploadImageJob extends Job {
 
 	@Override
 	public void onAdded() {
+		try {
 
-		// Image is uploaded in background, but we still need to notify Upload Fragment
-		// in case container session upload status is > UPLOADING.
-		// It will notify fragment upload to update UI
-		EventBus.getDefault().post(new ItemEnqueueEvent(containerId, UploadType.IMAGE));
+			// Set ít status to UPLOADING
+			Context context = App.getInstance().getApplicationContext();
+			DataCenter_.getInstance_(context).setUploadStatus(context, containerId, imageName, imageType, UploadStatus.UPLOADING);
+
+			// Image is uploaded in background, but we still need to notify Upload Fragment
+			// in case container session upload status is > UPLOADING.
+			// It will notify fragment upload to update UI
+			EventBus.getDefault().post(new ItemEnqueueEvent(containerId, UploadType.IMAGE));
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -49,11 +59,11 @@ public class UploadImageJob extends Job {
 		// Notify to fragment upload that image is being uploaded.
 		EventBus.getDefault().post(new UploadingEvent(containerId, UploadType.IMAGE));
 
-		// Call data center to upload image
+		// Call data center to upload image then set upload status to COMPLETE
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).uploadImage(context, uri, imageName, containerId, imageType);
 
-		EventBus.getDefault().post(new UploadedEvent(containerId));
+		EventBus.getDefault().post(new UploadSucceedEvent(containerId));
 	}
 
 	@Override
@@ -67,10 +77,14 @@ public class UploadImageJob extends Job {
 	@Override
 	protected void onCancel() {
 
-		// TODO: Set image upload Status to ERROR and notify to Upload Fragment
-
+		// Set image upload Status to ERROR and notify to Upload Fragment
 		Context context = App.getInstance().getApplicationContext();
-		EventBus.getDefault().post(new UploadStoppedEvent(containerId));
-		DataCenter_.getInstance_(context).addLog(context, containerId, "Không thể tải lên hình: " + imageName);
+		try {
+			DataCenter_.getInstance_(context).setUploadStatus(context, containerId, imageName, imageType, UploadStatus.ERROR);
+			DataCenter_.getInstance_(context).addLog(context, containerId, "Không thể tải lên hình: " + imageName);
+			EventBus.getDefault().post(new UploadFailedEvent(containerId));
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -5,8 +5,8 @@ import android.content.Context;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.ItemEnqueueEvent;
-import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
-import com.cloudjay.cjay.event.upload.UploadedEvent;
+import com.cloudjay.cjay.event.upload.UploadFailedEvent;
+import com.cloudjay.cjay.event.upload.UploadSucceedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.enums.UploadStatus;
@@ -72,7 +72,7 @@ public class UploadSessionJob extends Job {
 
 		// Upload thành công
 		DataCenter_.getInstance_(context).addLog(context, containerId, "Upload thành công");
-		EventBus.getDefault().post(new UploadedEvent(containerId));
+		EventBus.getDefault().post(new UploadSucceedEvent(containerId));
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class UploadSessionJob extends Job {
 		// Set status ERROR vào container id
 		DataCenter_.getInstance_(context).addLog(context, containerId, "Upload thất bại");
 		DataCenter_.getInstance_(context).setSessionStatus(context, containerId, UploadStatus.ERROR);
-		EventBus.getDefault().post(new UploadStoppedEvent(containerId));
+		EventBus.getDefault().post(new UploadFailedEvent(containerId));
 	}
 
 }

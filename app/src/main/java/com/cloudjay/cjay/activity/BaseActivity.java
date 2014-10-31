@@ -27,6 +27,7 @@ import org.androidannotations.annotations.OptionsItem;
 import java.lang.reflect.Method;
 
 import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 /**
  * Activity chung. Các Activity khác sẽ kế thừa BaseActivity để sử dụng menu items và các hàm chung.
@@ -118,9 +119,7 @@ public class BaseActivity extends FragmentActivity {
 	}
 
 	public void onEventMainThread(SessionsFetchedEvent event) {
-		Utils.showCrouton(this, "All sessions are fetched");
-
-//		UIHelper.toast(getApplicationContext(), "All sessions are fetched");
+		Utils.showCrouton(this, "All sessions are fetched", Style.CONFIRM);
 	}
 
 	public void onEvent(UserLoggedOutEvent event) {

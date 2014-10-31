@@ -20,7 +20,7 @@ import com.cloudjay.cjay.adapter.AuditItemAdapter;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.IssueDeletedEvent;
 import com.cloudjay.cjay.event.IssueMergedEvent;
-import com.cloudjay.cjay.event.upload.UploadedEvent;
+import com.cloudjay.cjay.event.upload.UploadSucceedEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.jobqueue.UploadSessionHandCleaningJob;
@@ -250,7 +250,7 @@ public class IssuePendingFragment extends Fragment {
     }
 
     @UiThread
-    void onEvent(UploadedEvent event) {
+    void onEvent(UploadSucceedEvent event) {
         Logger.Log("upload complete");
 
 		// Re-query container session with given containerId

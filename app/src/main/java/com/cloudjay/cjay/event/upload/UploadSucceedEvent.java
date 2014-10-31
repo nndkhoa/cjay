@@ -1,9 +1,9 @@
 package com.cloudjay.cjay.event.upload;
 
-public class UploadedEvent {
+public class UploadSucceedEvent {
     private String containerId;
 
-    public UploadedEvent(String containerId) {
+    public UploadSucceedEvent(String containerId) {
         this.containerId= containerId;
     }
 
