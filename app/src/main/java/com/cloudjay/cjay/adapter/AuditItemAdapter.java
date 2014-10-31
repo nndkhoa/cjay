@@ -266,7 +266,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 				Intent intent = new Intent(mContext, MergeIssueActivity_.class);
 				intent.putExtra(MergeIssueActivity_.CONTAINER_ID_EXTRA, containerId);
-				intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, auditImage);
+				intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, auditImage.getAuditImageUUID());
 				intent.putExtra(MergeIssueActivity_.AUDIT_ITEM_REMOVE_UUID, item.getAuditItemUUID());
 
 				mContext.startActivity(intent);
