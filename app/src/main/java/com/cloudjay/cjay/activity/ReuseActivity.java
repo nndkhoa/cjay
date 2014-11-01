@@ -39,6 +39,7 @@ import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import de.greenrobot.event.EventBus;
 
@@ -131,13 +132,16 @@ public class ReuseActivity extends Activity {
         List<GateImage> gateImages = gateImageAdapter.getCheckedCJayImageUrls();
         for (int i = 0; i < gateImages.size(); i++) {
             try {
-
+				// Getting the last part of the referrer url
+				String name = gateImages.get(i).getUrl().substring(gateImages.get(i).getUrl().lastIndexOf("/") + 1,
+						gateImages.get(i).getUrl().length());
                 // Create new audit image object
                 AuditImage auditImage = new AuditImage()
                         .withId(0)
                         .withType(ImageType.AUDIT)
                         .withUrl(gateImages.get(i).getUrl())
-                        .withName(gateImages.get(i).getName());
+                        .withName(name)
+						.withUUID(UUID.randomUUID().toString());
 
                 dataCenter.addAuditImage(getApplicationContext(), auditImage, containerID);
             } catch (SnappydbException e) {
