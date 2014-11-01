@@ -485,4 +485,17 @@ public class Session {
 
 		return false;
 	}
+
+	public List<AuditItem> getListRepairedItem() {
+
+		List<AuditItem> list = new ArrayList<AuditItem>();
+
+		for (AuditItem auditItem : this.getAuditItems()) {
+			if (auditItem.getRepaired()) {
+				list.add(auditItem);
+			}
+		}
+
+		return list;
+	}
 }

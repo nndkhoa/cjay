@@ -186,11 +186,14 @@ public class IssuePendingFragment extends Fragment {
 			List<AuditItem> list = new ArrayList<AuditItem>();
 			Logger.Log("AuditItems: " + mSession.getAuditItems().size());
 			for (AuditItem auditItem : mSession.getAuditItems()) {
-                Logger.Log("getId: " + auditItem.getId());
-                Logger.Log("getUploadStatus: " + auditItem.getUploadStatus());
-				Logger.Log("getComponentCode: " + auditItem.getComponentCode());
-				Logger.Log("getAuditImages: " + auditItem.getAuditImages().size());
-				list.add(auditItem);
+				if (!auditItem.getRepaired()) {
+					Logger.Log("getId: " + auditItem.getId());
+					Logger.Log("getUploadStatus: " + auditItem.getUploadStatus());
+					Logger.Log("getComponentCode: " + auditItem.getComponentCode());
+					Logger.Log("getAuditImages: " + auditItem.getAuditImages().size());
+					Logger.Log("getRepaired: " + auditItem.getRepaired());
+					list.add(auditItem);
+				}
 			}
 			Logger.Log("Size: " + list.size());
 
