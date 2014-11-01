@@ -277,6 +277,8 @@ public class ImportFragment extends Fragment {
 		JobManager jobManager = App.getJobManager();
 		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId()));
 
+
+
 		// Go to next fragment
 		AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID)
 				.tabType(1).build();
@@ -302,8 +304,8 @@ public class ImportFragment extends Fragment {
 		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId()));
 
 		// Navigate to HomeActivity
-		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
-		startActivity(intent);
+//		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
+//		startActivity(intent);
 		getActivity().finish();
 	}
 

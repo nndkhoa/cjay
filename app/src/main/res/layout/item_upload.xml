@@ -7,9 +7,9 @@
 
 	<ImageView
 		android:id="@+id/iv_container_upload"
-		android:layout_width="60dp"
-		android:layout_height="60dp"
-		android:padding="6dp"
+		android:layout_width="80dp"
+		android:layout_height="80dp"
+		android:adjustViewBounds="true"
 		android:scaleType="centerCrop"
 		android:src="@drawable/ic_launcher"/>
 
@@ -80,11 +80,12 @@
 	</LinearLayout>
 
 
-	<ImageView
+	<ImageButton
 		android:id="@+id/iv_upload_result"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:visibility="gone"
-		android:src="@drawable/ic_success"/>
-
+		android:background="@null"
+		android:clickable="false"
+		android:src="@drawable/ic_success"
+		android:visibility="gone"/>
 </LinearLayout>

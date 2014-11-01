@@ -24,7 +24,6 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringUtils;
-import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
@@ -251,22 +250,35 @@ public class DataCenter {
 	 */
 	public List<Session> getListSessions(Context context, String prefix) {
 
+		int len = prefix.length();
+
+		DB db;
+		String[] keysResult;
+		List<Session> sessions = new ArrayList<>();
+
 		try {
-			DB db = App.getDB(context);
-			String[] keysResult = db.findKeys(prefix);
-			List<Session> sessions = new ArrayList<>();
-
-			for (String result : keysResult) {
-				Session session = db.getObject(result, Session.class);
-				sessions.add(session);
-			}
-			// db.close();
-
-			return sessions;
+			db = App.getDB(context);
+			keysResult = db.findKeys(prefix);
 		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
+			Logger.e(e.getMessage());
 			return null;
 		}
+
+		for (String result : keysResult) {
+
+			String newKey = result.substring(len);
+			addLog(context, newKey, prefix + " | Cannot retrieve this container");
+			Session session;
+			try {
+				session = db.getObject(newKey, Session.class);
+				sessions.add(session);
+			} catch (SnappydbException e) {
+				e.printStackTrace();
+				// db.close();
+			}
+		}
+
+		return sessions;
 	}
 
 	//endregion
@@ -584,7 +596,7 @@ public class DataCenter {
 			networkClient.uploadImage(uri, imageName);
 
 			// Change image status to COMPLETE
-			setUploadStatus(context, containerId, imageName, imageType, UploadStatus.COMPLETE);
+			setImageUploadStatus(context, containerId, imageName, imageType, UploadStatus.COMPLETE);
 
 			return true;
 		} catch (RetrofitError e) {
@@ -593,7 +605,7 @@ public class DataCenter {
 		}
 	}
 
-	private void setUploadStatus(Context context, String containerId, String imageName, ImageType imageType, UploadStatus status) throws SnappydbException {
+	private void setImageUploadStatus(Context context, String containerId, String imageName, ImageType imageType, UploadStatus status) throws SnappydbException {
 
 		DB db = App.getDB(context);
 
@@ -653,12 +665,12 @@ public class DataCenter {
 		db.put(oldSession.getContainerId(), oldSession);
 
 		// Check for make sure all gate image have uploaded
-		for (GateImage gateImage : oldSession.getGateImages()) {
-			if (gateImage.getUploadStatus() != UploadStatus.COMPLETE.value && gateImage.getType() == ImageType.IMPORT.value) {
-				//TODO Note to Khoa this upload import session have to retry upload Image @Han
-				uploadImage(context, Utils.parseUrltoUri(gateImage.getUrl()), gateImage.getName(), oldSession.getContainerId(), ImageType.IMPORT);
-			}
-		}
+//		for (GateImage gateImage : oldSession.getGateImages()) {
+//			if (gateImage.getUploadStatus() != UploadStatus.COMPLETE.value && gateImage.getType() == ImageType.IMPORT.value) {
+//				//TODO Note to Khoa this upload import session have to retry upload Image @Han
+//				uploadImage(context, Utils.parseUrltoUri(gateImage.getUrl()), gateImage.getName(), oldSession.getContainerId(), ImageType.IMPORT);
+//			}
+//		}
 
 		// Upload container session to server
 		Session result = networkClient.uploadSession(context, oldSession);
@@ -668,15 +680,11 @@ public class DataCenter {
 
 			// Update container back to database
 			String key = result.getContainerId();
-			result.setUploadStatus(UploadStatus.COMPLETE);
-			db.put(key, result);
 
 			// Then remove them from WORKING
 			String workingKey = CJayConstant.PREFIX_WORKING + key;
 			db.del(workingKey);
 		}
-
-		EventBus.getDefault().post(new UploadedEvent(containerId));
 		// db.close();
 	}
 	//endregion
@@ -1255,5 +1263,24 @@ public class DataCenter {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	/**
+	 * Change upload status of session
+	 * @param context
+	 * @param containerId
+	 * @param status
+	 * @throws SnappydbException
+	 */
+	public void changeUploadState(Context context, String containerId, UploadStatus status) throws SnappydbException {
+
+		DB db = App.getDB(context);
+		Session session = db.getObject(containerId, Session.class);
+
+		session.setUploadStatus(status.value);
+
+		Logger.Log(session.getContainerId() + " -> Upload Status: " + status.name());
+
+		db.put(containerId,session);
 	}
 }

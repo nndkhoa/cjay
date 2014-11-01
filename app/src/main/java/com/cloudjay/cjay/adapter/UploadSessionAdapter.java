@@ -5,15 +5,31 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.aerilys.helpers.android.NetworkHelper;
+import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.model.AuditImage;
+import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.jobqueue.UploadAuditItemJob;
+import com.cloudjay.cjay.task.jobqueue.UploadCompleteAuditJob;
+import com.cloudjay.cjay.task.jobqueue.UploadCompleteRepairJob;
+import com.cloudjay.cjay.task.jobqueue.UploadExportSessionJob;
+import com.cloudjay.cjay.task.jobqueue.UploadImageJob;
+import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.enums.ImageType;
+import com.cloudjay.cjay.util.enums.Step;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.path.android.jobqueue.JobManager;
 
 import java.util.List;
 
@@ -40,14 +56,14 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 		TextView tvTotalPhotoUpload;
 		ImageView ivContainer;
 		ProgressBar pbUpLoading;
-		ImageView ivUploadStatus;
+		ImageButton btnUploadStatus;
 		TextView tvUploadStatus;
 	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 
-		Session session = getItem(position);
+		final Session session = getItem(position);
 		// Apply ViewHolder pattern for better performance
 		ViewHolder viewHolder;
 		if (convertView == null) {
@@ -59,7 +75,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 			viewHolder.tvTotalPhotoUpload = (TextView) convertView.findViewById(R.id.tv_total_photo_upload);
 			viewHolder.ivContainer = (ImageView) convertView.findViewById(R.id.iv_container_upload);
 			viewHolder.pbUpLoading = (ProgressBar) convertView.findViewById(R.id.pb_upload_progress);
-			viewHolder.ivUploadStatus = (ImageView) convertView.findViewById(R.id.iv_upload_result);
+			viewHolder.btnUploadStatus = (ImageButton) convertView.findViewById(R.id.iv_upload_result);
 			viewHolder.tvUploadStatus = (TextView) convertView.findViewById(R.id.tv_upload_status);
 			convertView.setTag(viewHolder);
 		} else {
@@ -70,25 +86,111 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 		viewHolder.tvContainerId.setText(session.getContainerId());
 		viewHolder.tvTotalPhotoUpload.setText(String.valueOf(Utils.countTotalImage(session)));
 		viewHolder.tvCurrentPhotoUpload.setText(String.valueOf(Utils.countUploadedImage(session)));
-		if (NetworkHelper.isConnected(context)) {
-			if (Utils.countTotalImage(session) == Utils.countUploadedImage(session)) {
-				viewHolder.ivUploadStatus.setVisibility(View.VISIBLE);
+		UploadStatus status = UploadStatus.values()[session.getUploadStatus()];
+		Logger.Log(session.getContainerId() + " -> Upload Status: " + status.name());
+		switch (status) {
+
+			//
+			case COMPLETE:
+				viewHolder.btnUploadStatus.setVisibility(View.VISIBLE);
 				viewHolder.pbUpLoading.setVisibility(View.GONE);
-				viewHolder.ivUploadStatus.setImageResource(R.drawable.ic_success);
+				viewHolder.btnUploadStatus.setImageResource(R.drawable.ic_success);
 				viewHolder.tvUploadStatus.setText("Hoàn tất tải lên");
 				viewHolder.tvUploadStatus.setVisibility(View.VISIBLE);
-			} else {
-				viewHolder.pbUpLoading.setVisibility(View.VISIBLE);
-				viewHolder.pbUpLoading.setProgress(100 * Utils.countUploadedImage(session) / Utils.countTotalImage(session));
-			}
-		} else {
-			viewHolder.ivUploadStatus.setImageResource(R.drawable.ic_error);
-			viewHolder.pbUpLoading.setVisibility(View.GONE);
-			viewHolder.tvUploadStatus.setVisibility(View.VISIBLE);
+				break;
 
+			case ERROR:
+				viewHolder.btnUploadStatus.setImageResource(R.drawable.ic_error);
+				viewHolder.btnUploadStatus.setVisibility(View.VISIBLE);
+				viewHolder.pbUpLoading.setVisibility(View.GONE);
+				viewHolder.tvUploadStatus.setVisibility(View.VISIBLE);
+				break;
+
+			case UPLOADING:
+			default:
+				if (session.canRetry()) {
+
+					if (NetworkHelper.isConnected(context)) {
+						viewHolder.pbUpLoading.setVisibility(View.VISIBLE);
+						viewHolder.pbUpLoading.setProgress(100 * session.getUploadedImage() / session.getTotalImage());
+					} else {
+
+						// Display icon Retry
+						viewHolder.btnUploadStatus.setImageResource(R.drawable.ic_refresh);
+						viewHolder.btnUploadStatus.setClickable(true);
+						viewHolder.btnUploadStatus.setVisibility(View.VISIBLE);
+						viewHolder.pbUpLoading.setVisibility(View.GONE);
+						viewHolder.tvUploadStatus.setVisibility(View.VISIBLE);
+
+						// Set event to retry button
+						viewHolder.btnUploadStatus.setOnClickListener(new View.OnClickListener() {
+							@Override
+							public void onClick(View view) {
+								uploadCurrentStep(session);
+							}
+						});
+					}
+
+				}
+				break;
 		}
-
 		return convertView;
+	}
+
+	private void uploadCurrentStep(Session session) {
+		JobManager jobManager = App.getJobManager();
+		Step step = Step.values()[((int) session.getStep())];
+
+		//Retry upload base on step
+		switch (step) {
+			//In step import check all image, upload all error image then upload session
+			case IMPORT:
+				for (GateImage image : session.getGateImages()) {
+					if (image.getType() == ImageType.IMPORT.value && image.getUploadStatus() != UploadStatus.ERROR.value) {
+						jobManager.addJobInBackground(new UploadImageJob(image.getUrl(), image.getName(), session.getContainerId(), ImageType.IMPORT));
+					}
+					;
+				}
+				jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId()));
+
+				// In step audit check all image of item, upload all error image then upload error audit item => complete audit
+			case AUDIT:
+				for (AuditItem item : session.getAuditItems()) {
+					if (item.getUploadStatus() == UploadStatus.ERROR.value) {
+						for (AuditImage auditImage : item.getAuditImages()) {
+							if (auditImage.getUploadStatus() != UploadStatus.ERROR.value && auditImage.getType() == ImageType.AUDIT.value) {
+								jobManager.addJobInBackground(new UploadImageJob(auditImage.getUrl(), auditImage.getName(), session.getContainerId(), ImageType.AUDIT));
+							}
+						}
+					}
+					jobManager.addJobInBackground(new UploadAuditItemJob(session.getContainerId(), item.getAuditItemUUID()));
+				}
+				jobManager.addJobInBackground(new UploadCompleteAuditJob(session.getContainerId()));
+
+				// In step repaired check all image of item, upload all error image then upload error repaired item => complete repair
+			case REPAIR:
+				for (AuditItem item : session.getAuditItems()) {
+					if (item.getUploadStatus() == UploadStatus.ERROR.value) {
+						for (AuditImage auditImage : item.getAuditImages()) {
+							if (auditImage.getUploadStatus() != UploadStatus.ERROR.value && auditImage.getType() == ImageType.REPAIRED.value) {
+								jobManager.addJobInBackground(new UploadImageJob(auditImage.getUrl(), auditImage.getName(), session.getContainerId(), ImageType.REPAIRED));
+							}
+						}
+					}
+					jobManager.addJobInBackground(new UploadCompleteRepairJob(session.getContainerId()));
+				}
+				jobManager.addJobInBackground(new UploadCompleteRepairJob(session.getContainerId()));
+
+				//In step export check all image, upload all error image then upload session
+			case EXPORT:
+				for (GateImage image : session.getGateImages()) {
+					if (image.getType() == ImageType.EXPORT.value && image.getUploadStatus() != UploadStatus.ERROR.value) {
+						jobManager.addJobInBackground(new UploadImageJob(image.getUrl(), image.getName(), session.getContainerId(), ImageType.EXPORT));
+					}
+					;
+				}
+				jobManager.addJobInBackground(new UploadExportSessionJob(session));
+		}
 	}
 
 	public void setData(List<Session> data) {

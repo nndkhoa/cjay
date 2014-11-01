@@ -11,6 +11,7 @@ import com.cloudjay.cjay.adapter.UploadSessionAdapter;
 import com.cloudjay.cjay.event.upload.ContainerUploadedEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
+import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -100,6 +101,10 @@ public class UploadFragment extends Fragment {
 	}
 
 	public void onEvent(UploadingEvent event) {
+		refresh();
+	}
+
+	public void onEvent(UploadedEvent event) {
 		refresh();
 	}
 	//endregion
