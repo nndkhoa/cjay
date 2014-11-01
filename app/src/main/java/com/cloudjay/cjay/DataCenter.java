@@ -655,10 +655,6 @@ public class DataCenter {
 		DB db = App.getDB(context);
 		Session oldSession = db.getObject(containerId, Session.class);
 
-		// Change local step to import
-		oldSession.setLocalStep(Step.AUDIT.value);
-		db.put(oldSession.getContainerId(), oldSession);
-
 		// Check for make sure all gate image have uploaded
 		for (GateImage gateImage : oldSession.getGateImages()) {
 			if (gateImage.getUploadStatus() != UploadStatus.COMPLETE.value && gateImage.getType() == ImageType.IMPORT.value) {
@@ -673,13 +669,13 @@ public class DataCenter {
 		Logger.Log("Uploaded Session Id: " + result.getId());
 
 		if (result != null) {
+			//Add local step to reuslt from server
+			result.setLocalStep(oldSession.getLocalStep());
 
 			// Update container back to database
 			String key = result.getContainerId();
+			db.put(key,result);
 
-			// Then remove them from WORKING
-			String workingKey = CJayConstant.PREFIX_WORKING + key;
-			db.del(workingKey);
 		}
 		// db.close();
 	}
@@ -1283,5 +1279,24 @@ public class DataCenter {
 		Logger.Log(session.getContainerId() + " -> Upload Status: " + status.name());
 
 		db.put(containerId, session);
+	}
+
+	public void changeStepSession(Context context, String containerId, Step step) throws SnappydbException {
+		DB db = App.getDB(context);
+		Session session = db.getObject(containerId, Session.class);
+		session.setLocalStep(step.value);
+		db.put(containerId,session);
+
+	}
+
+	public void removeWorkingSession(Context context, String containerId) {
+		try {
+			DB db = App.getDB(context);
+			String workingKey = CJayConstant.PREFIX_WORKING+containerId;
+			db.del(workingKey);
+
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
 	}
 }

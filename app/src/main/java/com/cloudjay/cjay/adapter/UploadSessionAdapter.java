@@ -139,7 +139,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 
 	private void uploadCurrentStep(Session session) {
 		JobManager jobManager = App.getJobManager();
-		Step step = Step.values()[((int) session.getStep())];
+		Step step = Step.values()[((int) session.getLocalStep())];
 
 		//Retry upload base on step
 		switch (step) {

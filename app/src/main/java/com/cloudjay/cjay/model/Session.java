@@ -12,7 +12,6 @@ import com.google.gson.annotations.SerializedName;
 import org.json.JSONException;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,18 +27,18 @@ public class Session {
 	@Expose
 	private long id;
 
+	private long localStep;
+
+	public long getStep() {
+		return step;
+	}
+
+	public void setStep(long step) {
+		this.step = step;
+	}
+
 	@Expose
 	private long step;
-
-	public long getLocalStep() {
-		return localStep;
-	}
-
-	public void setLocalStep(long localStep) {
-		this.localStep = localStep;
-	}
-
-	private long localStep;
 
 	public boolean canRetry() {
 		return retry;
@@ -117,16 +116,16 @@ public class Session {
 		return this;
 	}
 
-	public long getStep() {
-		return step;
+	public long getLocalStep() {
+		return localStep;
 	}
 
-	public void setStep(long step) {
-		this.step = step;
+	public void setLocalStep(long localStep) {
+		this.localStep = localStep;
 	}
 
 	public Session withStep(long step) {
-		this.step = step;
+		this.localStep = step;
 		return this;
 	}
 
@@ -498,14 +497,14 @@ public class Session {
 	}
 
 	/**
-	 * Check image in current step of session, if non image is missing => true
+	 * Check image in current localStep of session, if non image is missing => true
 	 * Else return false
 	 *
 	 * @return
 	 */
 	public void checkRetry() {
 
-		if (step == Step.REPAIR.value) {
+		if (localStep == Step.REPAIR.value) {
 			for (AuditItem auditItem : auditItems) {
 				for (AuditImage auditImage : auditItem.getAuditImages()) {
 					if (auditImage.getType() == ImageType.REPAIRED.value) {
@@ -519,7 +518,7 @@ public class Session {
 
 			this.retry = true;
 
-		} else if (step == Step.AUDIT.value) {
+		} else if (localStep == Step.AUDIT.value) {
 			for (AuditItem auditItem : auditItems) {
 				for (AuditImage auditImage : auditItem.getAuditImages()) {
 					if (auditImage.getType() == ImageType.AUDIT.value) {

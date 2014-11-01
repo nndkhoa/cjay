@@ -84,7 +84,7 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 			viewHolder.tvDateOut.setText(checkOutDate);
 		}
 
-		viewHolder.tvStep.setText((Step.values()[(int) session.getStep()]).toString());
+		viewHolder.tvStep.setText((Step.values()[(int) session.getLocalStep()]).toString());
 		viewHolder.tvPreStatus.setText((Status.values()[(int) session.getPreStatus()]).toString());
 
 		try {

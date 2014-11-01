@@ -3,10 +3,12 @@ package com.cloudjay.cjay.task.jobqueue;
 import android.content.Context;
 
 import com.cloudjay.cjay.App;
+import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadedEvent;
+import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
@@ -42,9 +44,11 @@ public class UploadSessionJob extends Job {
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).addUploadSession(containerId);
 
-		//Change status uploadding
+		//Change status uploadding, step audit, remove from WORKING
 		try {
 			DataCenter_.getInstance_(context).changeUploadState(context,containerId, UploadStatus.UPLOADING);
+			DataCenter_.getInstance_(context).changeStepSession(context,containerId, Step.AUDIT);
+			DataCenter_.getInstance_(context).removeWorkingSession(context,containerId );
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}

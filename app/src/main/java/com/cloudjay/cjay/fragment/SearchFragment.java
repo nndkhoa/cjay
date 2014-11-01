@@ -135,10 +135,10 @@ public class SearchFragment extends Fragment {
 
 		// navigation to Wizard Activity
 		Session item = mAdapter.getItem(position);
-		Logger.e(position + " " + item.getContainerId() + " " + item.getStep());
+		Logger.e(position + " " + item.getContainerId() + " " + item.getLocalStep());
 		Intent intent = new Intent(getActivity(), WizardActivity_.class);
 		intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, item.getContainerId());
-		intent.putExtra(WizardActivity.STEP_EXTRA, item.getStep());
+		intent.putExtra(WizardActivity.STEP_EXTRA, item.getLocalStep());
 		startActivity(intent);
 	}
 
