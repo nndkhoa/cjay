@@ -319,10 +319,13 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 						AuditItem auditItem = dataCenter.getAuditItemByUUID(getActivity(), containerId, auditItemUUID);
 						if (null == auditItem) {
 							// Tạo lỗi giám đinh/ sửa mới
+							Logger.Log("new type: " + auditImage.getType());
 							dataCenter.addAuditImage(getActivity().getApplicationContext(), auditImage, containerId);
 						} else {
+							Logger.Log("getComponentCode: " + auditItem.getComponentCode());
 							// Thêm hình vào lỗi đã sữa chữa/  giám định
 							auditItem.getAuditImages().add(auditImage);
+							Logger.Log("exist type: " + auditImage.getType());
 							dataCenter.updateAuditItem(getActivity().getApplicationContext(), containerId, auditItem);
 						}
 
