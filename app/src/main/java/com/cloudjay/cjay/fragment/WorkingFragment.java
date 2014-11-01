@@ -81,7 +81,6 @@ public class WorkingFragment extends Fragment {
 		refresh();
 	}
 
-	@Background
 	void refresh() {
 		if (mAdapter != null) {
 			List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),

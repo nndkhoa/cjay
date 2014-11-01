@@ -37,9 +37,18 @@ public class UploadSessionJob extends Job {
 	@Override
 	public void onAdded() {
 
+
 		// Add container to collection UPLOAD
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).addUploadSession(containerId);
+
+		//Change status uploadding
+		try {
+			DataCenter_.getInstance_(context).changeUploadState(context,containerId, UploadStatus.UPLOADING);
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+
 		EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.SESSION));
 	}
 
@@ -49,9 +58,6 @@ public class UploadSessionJob extends Job {
 
 		//Add Log
 		DataCenter_.getInstance_(context).addLog(context, containerId, "Bắt đầu khởi tạo");
-
-		//Change status uploadding
-		DataCenter_.getInstance_(context).changeUploadState(context,containerId, UploadStatus.UPLOADING);
 
 //		EventBus.getDefault().post(new UploadingEvent());
 		DataCenter_.getInstance_(context).uploadImportSession(context, containerId);

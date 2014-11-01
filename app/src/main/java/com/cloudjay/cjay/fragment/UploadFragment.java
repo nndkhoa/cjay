@@ -68,7 +68,6 @@ public class UploadFragment extends Fragment {
 		refresh();
 	}
 
-	@Background
 	void refresh() {
 		List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
 				CJayConstant.PREFIX_UPLOADING);

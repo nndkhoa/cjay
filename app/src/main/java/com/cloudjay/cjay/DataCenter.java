@@ -24,6 +24,7 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringUtils;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
@@ -388,7 +389,6 @@ public class DataCenter {
 	 *
 	 * @param session
 	 */
-	@Background(serial = CACHE)
 	public void addSession(Session session) {
 		try {
 			DB db = App.getDB(context);
@@ -409,7 +409,6 @@ public class DataCenter {
 	 *
 	 * @param session
 	 */
-	@Background(serial = CACHE)
 	public void addWorkingSession(Session session) {
 
 		try {
@@ -433,7 +432,6 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	@Background(serial = CACHE)
 	public void addUploadSession(String containerId) {
 
 		try {
@@ -665,12 +663,13 @@ public class DataCenter {
 		db.put(oldSession.getContainerId(), oldSession);
 
 		// Check for make sure all gate image have uploaded
-//		for (GateImage gateImage : oldSession.getGateImages()) {
-//			if (gateImage.getUploadStatus() != UploadStatus.COMPLETE.value && gateImage.getType() == ImageType.IMPORT.value) {
-//				//TODO Note to Khoa this upload import session have to retry upload Image @Han
-//				uploadImage(context, Utils.parseUrltoUri(gateImage.getUrl()), gateImage.getName(), oldSession.getContainerId(), ImageType.IMPORT);
-//			}
-//		}
+		for (GateImage gateImage : oldSession.getGateImages()) {
+			if (gateImage.getUploadStatus() != UploadStatus.COMPLETE.value && gateImage.getType() == ImageType.IMPORT.value) {
+				//TODO Note to Khoa this upload import session have to retry upload Image @Han
+				uploadImage(context, Utils.parseUrltoUri(gateImage.getUrl()), gateImage.getName(), oldSession.getContainerId(), ImageType.IMPORT);
+			}
+		}
+
 
 		// Upload container session to server
 		Session result = networkClient.uploadSession(context, oldSession);
@@ -886,6 +885,7 @@ public class DataCenter {
 
 	/**
 	 * Get audit Image by UUID
+	 *
 	 * @param context
 	 * @param containerId
 	 * @param auditItemUUID
@@ -954,7 +954,7 @@ public class DataCenter {
 		// Upload audit item session to server
 		DB db = App.getDB(context);
 		Session oldSession = db.getObject(containerId, Session.class);
-		AuditItem oldAuditItem = getAuditItemByUUID(context,containerId,oldAuditItemUUID);
+		AuditItem oldAuditItem = getAuditItemByUUID(context, containerId, oldAuditItemUUID);
 		Session result = networkClient.postAuditItem(context, oldSession, oldAuditItem);
 		String key = result.getContainerId();
 
@@ -1267,6 +1267,7 @@ public class DataCenter {
 
 	/**
 	 * Change upload status of session
+	 *
 	 * @param context
 	 * @param containerId
 	 * @param status
@@ -1281,6 +1282,6 @@ public class DataCenter {
 
 		Logger.Log(session.getContainerId() + " -> Upload Status: " + status.name());
 
-		db.put(containerId,session);
+		db.put(containerId, session);
 	}
 }

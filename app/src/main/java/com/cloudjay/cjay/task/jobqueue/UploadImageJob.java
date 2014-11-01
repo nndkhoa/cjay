@@ -47,7 +47,7 @@ public class UploadImageJob extends Job {
 	public void onRun() throws Throwable {
 
 //		// Notify to fragment upload that image is being uploaded.
-		EventBus.getDefault().post(new UploadingEvent(containerId, UploadType.IMAGE));
+//		EventBus.getDefault().post(new UploadingEvent(containerId, UploadType.IMAGE));
 
 		// Call data center to upload image
 		Context context = App.getInstance().getApplicationContext();
