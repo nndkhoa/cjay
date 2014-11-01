@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.fragment;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.widget.ListView;
@@ -8,6 +9,8 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.activity.DetailIssueActivity;
+import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.adapter.RepairedItemAdapter;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
@@ -21,6 +24,7 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
+import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -93,6 +97,18 @@ public class IssueRepairedFragment extends Fragment {
 			tvContainerId.setText(containerID);
 		}
     }
+
+	@ItemClick(R.id.lv_repaired_items)
+	void switchToDetailIssueActivity(int position) {
+		AuditItem auditItem = mAdapter.getItem(position);
+		if (auditItem.getAudited()) {
+			Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
+			detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
+			detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getAuditItemUUID());
+			detailIssueActivity.putExtra(DetailIssueActivity.SELECTED_TAB, 0);
+			startActivity(detailIssueActivity);
+		}
+	}
 
 	@Background
 	void refresh() {

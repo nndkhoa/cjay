@@ -140,6 +140,10 @@ public class MergeIssueActivity extends BaseActivity {
 
     @Background
     void refresh() {
+
+		//get container operater code form containerId
+		currentSession = dataCenter.getSession(this.getApplicationContext(), containerID);
+
         List<AuditItem> list = new ArrayList<AuditItem>();
         for (AuditItem auditItem : currentSession.getAuditItems()) {
             if (auditItem.getAudited() == true && auditItem.getId() == 0) {
