@@ -69,9 +69,9 @@ public class UploadFragment extends Fragment {
 	}
 
 	void refresh() {
-		List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
-				CJayConstant.PREFIX_UPLOADING);
-		updatedData(list);
+//		List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
+//				CJayConstant.PREFIX_UPLOADING);
+//		updatedData(list);
 	}
 
 	@UiThread
