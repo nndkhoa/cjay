@@ -308,11 +308,14 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 					case REPAIRED:
 					default:
 
+						Logger.Log("mType: " + mType);
+
 						AuditImage auditImage = new AuditImage()
 								.withId(0)
 								.withType(mType)
 								.withUrl("file://" + uri)
-								.withName(imageName).withUUID(UUID.randomUUID().toString());
+								.withName(imageName)
+								.withUUID(UUID.randomUUID().toString());
 						AuditItem auditItem = dataCenter.getAuditItemByUUID(getActivity(), containerId, auditItemUUID);
 						if (null == auditItem) {
 							// Tạo lỗi giám đinh/ sửa mới
