@@ -127,7 +127,6 @@ public class DataCenter {
 	 *
 	 * @param keyword
 	 */
-	@Background(serial = CACHE)
 	public void searchOperator(String keyword) {
 		try {
 			List<Operator> operators = new ArrayList<Operator>();
@@ -251,22 +250,35 @@ public class DataCenter {
 	 */
 	public List<Session> getListSessions(Context context, String prefix) {
 
+		int len = prefix.length();
+
+		DB db;
+		String[] keysResult;
+		List<Session> sessions = new ArrayList<>();
+
 		try {
-			DB db = App.getDB(context);
-			String[] keysResult = db.findKeys(prefix);
-			List<Session> sessions = new ArrayList<>();
-
-			for (String result : keysResult) {
-				Session session = db.getObject(result, Session.class);
-				sessions.add(session);
-			}
-			// db.close();
-
-			return sessions;
+			db = App.getDB(context);
+			keysResult = db.findKeys(prefix);
 		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
+			Logger.e(e.getMessage());
 			return null;
 		}
+
+		for (String result : keysResult) {
+
+			String newKey = result.substring(len);
+			addLog(context, newKey, prefix + " | Cannot retrieve this container");
+			Session session;
+			try {
+				session = db.getObject(newKey, Session.class);
+				sessions.add(session);
+			} catch (SnappydbException e) {
+				e.printStackTrace();
+				// db.close();
+			}
+		}
+
+		return sessions;
 	}
 
 	//endregion
@@ -376,7 +388,6 @@ public class DataCenter {
 	 *
 	 * @param session
 	 */
-	@Background(serial = CACHE)
 	public void addSession(Session session) {
 		try {
 			DB db = App.getDB(context);
@@ -397,7 +408,6 @@ public class DataCenter {
 	 *
 	 * @param session
 	 */
-	@Background(serial = CACHE)
 	public void addWorkingSession(Session session) {
 
 		try {
@@ -421,7 +431,6 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	@Background(serial = CACHE)
 	public void addUploadSession(String containerId) {
 
 		try {
@@ -528,7 +537,6 @@ public class DataCenter {
 		EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
 	}
 
-	@Background(serial = CACHE)
 	public void getSessionByContainerId(Context context, String containerId) {
 		String[] keysResult;
 		try {
@@ -548,7 +556,6 @@ public class DataCenter {
 
 	}
 
-	@Background(serial = CACHE)
 	public void getAllGateImagesByContainerId(Context context, String containerId) {
 		try {
 			DB db = App.getDB(context);
@@ -584,7 +591,7 @@ public class DataCenter {
 			networkClient.uploadImage(uri, imageName);
 
 			// Change image status to COMPLETE
-			setUploadStatus(context, containerId, imageName, imageType, UploadStatus.COMPLETE);
+			setImageUploadStatus(context, containerId, imageName, imageType, UploadStatus.COMPLETE);
 
 			return true;
 		} catch (RetrofitError e) {
@@ -593,7 +600,7 @@ public class DataCenter {
 		}
 	}
 
-	private void setUploadStatus(Context context, String containerId, String imageName, ImageType imageType, UploadStatus status) throws SnappydbException {
+	private void setImageUploadStatus(Context context, String containerId, String imageName, ImageType imageType, UploadStatus status) throws SnappydbException {
 
 		DB db = App.getDB(context);
 
@@ -660,6 +667,7 @@ public class DataCenter {
 			}
 		}
 
+
 		// Upload container session to server
 		Session result = networkClient.uploadSession(context, oldSession);
 		Logger.Log("Uploaded Session Id: " + result.getId());
@@ -668,20 +676,15 @@ public class DataCenter {
 
 			// Update container back to database
 			String key = result.getContainerId();
-			result.setUploadStatus(UploadStatus.COMPLETE);
-			db.put(key, result);
 
 			// Then remove them from WORKING
 			String workingKey = CJayConstant.PREFIX_WORKING + key;
 			db.del(workingKey);
 		}
-
-		EventBus.getDefault().post(new UploadedEvent(containerId));
 		// db.close();
 	}
 	//endregion
 
-	@Background(serial = CACHE)
 	public void getAuditImages(Context context, String containerId) {
 		Session session = null;
 		try {
@@ -882,6 +885,7 @@ public class DataCenter {
 
 	/**
 	 * Get audit Image by UUID
+	 *
 	 * @param context
 	 * @param containerId
 	 * @param auditItemUUID
@@ -950,7 +954,7 @@ public class DataCenter {
 		// Upload audit item session to server
 		DB db = App.getDB(context);
 		Session oldSession = db.getObject(containerId, Session.class);
-		AuditItem oldAuditItem = getAuditItemByUUID(context,containerId,oldAuditItemUUID);
+		AuditItem oldAuditItem = getAuditItemByUUID(context, containerId, oldAuditItemUUID);
 		Session result = networkClient.postAuditItem(context, oldSession, oldAuditItem);
 		String key = result.getContainerId();
 
@@ -1259,5 +1263,25 @@ public class DataCenter {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	/**
+	 * Change upload status of session
+	 *
+	 * @param context
+	 * @param containerId
+	 * @param status
+	 * @throws SnappydbException
+	 */
+	public void changeUploadState(Context context, String containerId, UploadStatus status) throws SnappydbException {
+
+		DB db = App.getDB(context);
+		Session session = db.getObject(containerId, Session.class);
+
+		session.setUploadStatus(status.value);
+
+		Logger.Log(session.getContainerId() + " -> Upload Status: " + status.name());
+
+		db.put(containerId, session);
 	}
 }

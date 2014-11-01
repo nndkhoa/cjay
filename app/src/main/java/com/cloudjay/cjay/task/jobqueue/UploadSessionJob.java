@@ -6,9 +6,12 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
+import com.cloudjay.cjay.event.upload.UploadedEvent;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
+import com.snappydb.SnappydbException;
 
 import de.greenrobot.event.EventBus;
 
@@ -34,9 +37,18 @@ public class UploadSessionJob extends Job {
 	@Override
 	public void onAdded() {
 
+
 		// Add container to collection UPLOAD
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).addUploadSession(containerId);
+
+		//Change status uploadding
+		try {
+			DataCenter_.getInstance_(context).changeUploadState(context,containerId, UploadStatus.UPLOADING);
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+
 		EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.SESSION));
 	}
 
@@ -52,6 +64,11 @@ public class UploadSessionJob extends Job {
 
 		//Add Log
 		DataCenter_.getInstance_(context).addLog(context, containerId, "Khởi tạo hoàn tất");
+
+		//Change status uploadded
+		DataCenter_.getInstance_(context).changeUploadState(context,containerId, UploadStatus.COMPLETE);
+
+		EventBus.getDefault().post(new UploadedEvent(containerId));
 	}
 
 
@@ -59,6 +76,13 @@ public class UploadSessionJob extends Job {
 	protected void onCancel() {
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).addLog(context, containerId, "Không thể khởi tạo");
+
+		//Change status error
+		try {
+			DataCenter_.getInstance_(context).changeUploadState(context,containerId, UploadStatus.ERROR);
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override

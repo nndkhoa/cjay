@@ -11,6 +11,7 @@ import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONException;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,16 @@ public class Session {
 	}
 
 	private long localStep;
+
+	public boolean canRetry() {
+		return retry;
+	}
+
+	public void setRetry(boolean retry) {
+		this.retry = retry;
+	}
+
+	private boolean retry;
 
 	@SerializedName("pre_status")
 	@Expose
@@ -484,6 +495,104 @@ public class Session {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Check image in current step of session, if non image is missing => true
+	 * Else return false
+	 *
+	 * @return
+	 */
+	public void checkRetry() {
+
+		if (step == Step.REPAIR.value) {
+			for (AuditItem auditItem : auditItems) {
+				for (AuditImage auditImage : auditItem.getAuditImages()) {
+					if (auditImage.getType() == ImageType.REPAIRED.value) {
+						File file = new File(auditImage.getUrl());
+						if (!file.exists()) {
+							this.retry = false;
+						}
+					}
+				}
+			}
+
+			this.retry = true;
+
+		} else if (step == Step.AUDIT.value) {
+			for (AuditItem auditItem : auditItems) {
+				for (AuditImage auditImage : auditItem.getAuditImages()) {
+					if (auditImage.getType() == ImageType.AUDIT.value) {
+						File file = new File(auditImage.getUrl());
+						if (!file.exists()) {
+							this.retry = false;
+						}
+					}
+				}
+			}
+			this.retry = true;
+		} else {
+			for (GateImage gateImage : gateImages) {
+				File file = new File(gateImage.getUrl());
+				if (!file.exists()) {
+					this.retry = false;
+				}
+			}
+			this.retry = true;
+		}
+	}
+
+
+	/**
+	 * Count total image off session
+	 *
+	 * @param session
+	 * @return
+	 */
+	public int getTotalImage() {
+
+		int totalImage = 0;
+		List<AuditItem> auditItems = this.getAuditItems();
+
+		if (auditItems != null) {
+			for (AuditItem auditItem : auditItems) {
+				totalImage = totalImage + auditItem.getAuditImages().size();
+			}
+			totalImage = totalImage + this.getGateImages().size();
+			return totalImage;
+
+		} else {
+
+			totalImage = this.getGateImages().size();
+			return totalImage;
+		}
+	}
+
+
+	public int getUploadedImage() {
+		int uploadedImage = 0;
+		List<AuditItem> auditItems = this.getAuditItems();
+
+		if (auditItems != null) {
+			for (AuditItem auditItem : auditItems) {
+
+				List<AuditImage> auditImages = auditItem.getAuditImages();
+				for (AuditImage auditImage : auditImages) {
+					if (auditImage.getUploadStatus() == UploadStatus.COMPLETE.value) {
+						uploadedImage = uploadedImage + 1;
+					}
+				}
+
+			}
+		}
+
+		List<GateImage> gateImages = this.getGateImages();
+		for (GateImage gateImage : gateImages) {
+			if (gateImage.getUploadStatus() == UploadStatus.COMPLETE.value) {
+				uploadedImage = uploadedImage + 1;
+			}
+		}
+		return uploadedImage;
 	}
 
 	public List<AuditItem> getListRepairedItem() {
