@@ -166,7 +166,7 @@ public class ReuseActivity extends Activity {
 
                         if (auditItem.getAuditImages() != null) {
                             for (AuditImage auditImage : auditItem.getAuditImages()) {
-                                if (auditImage.getName().equals(gateImage.getName())) {
+                                if (auditImage.getUrl().equals(gateImage.getUrl())) {
                                     deletedImportImages.add(gateImage);
                                 }
                             }

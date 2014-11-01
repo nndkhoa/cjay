@@ -13,6 +13,7 @@ import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.Status;
 
 import org.androidannotations.annotations.AfterViews;
@@ -115,7 +116,10 @@ public class IssueRepairedFragment extends Fragment {
 
 	@UiThread
 	void onEvent(ImageCapturedEvent event) {
-		//TODO: update listview after taken repaired image
+		Logger.Log("on ImageCapturedEvent");
+
+		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+		refresh();
 	}
 
     @Override
