@@ -266,12 +266,15 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 				});
 			}
 
+			//Random UUID
+			String uuid = UUID.randomUUID().toString();
+
 			// Save bitmap
-			File photo = getFile();
+			File photo = getFile(uuid);
 			saveBitmapToFile(capturedBitmap, photo);
 
 			// Add taken picture to job queue
-			addImageToUploadQueue(photo.getAbsolutePath(), photo.getName());
+			addImageToUploadQueue(photo.getAbsolutePath(), photo.getName(), uuid);
 		}
 
 		@Override
@@ -287,7 +290,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		 * @param imageName
 		 * @throws SnappydbException
 		 */
-		protected void addImageToUploadQueue(String uri, String imageName) {
+		protected void addImageToUploadQueue(String uri, String imageName, String uuid) {
 			try {
 
 				// Create image based on mType and add this image to database
@@ -299,7 +302,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 								.withId(0)
 								.withType(mType)
 								.withName(imageName)
-								.withUrl("file://" + uri);
+								.withUrl("file://" + uri)
+								.withUUID(uuid);
 
 						dataCenter.addGateImage(getActivity().getApplicationContext(), gateImage, containerId);
 						break;
@@ -315,7 +319,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 								.withType(mType)
 								.withUrl("file://" + uri)
 								.withName(imageName)
-								.withUUID(UUID.randomUUID().toString());
+								.withUUID(uuid);
 						AuditItem auditItem = dataCenter.getAuditItemByUUID(getActivity(), containerId, auditItemUUID);
 						if (null == auditItem) {
 							// Tạo lỗi giám đinh/ sửa mới
@@ -390,10 +394,9 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		 *
 		 * @return
 		 */
-		protected File getFile() {
+		protected File getFile(String uuid) {
 
 			// Save Bitmap to Files
-			String uuid = UUID.randomUUID().toString();
 			String imageType = getImageTypeString(mType);
 
 			// create today String

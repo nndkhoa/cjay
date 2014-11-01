@@ -850,22 +850,24 @@ public class DataCenter {
 			DB db = App.getDB(context);
 			Session session = db.getObject(containerId, Session.class);
 
-			for (AuditItem auditItem : session.getAuditItems()) {
-				if (auditItem.getAuditItemUUID().equals(auditItemUUID)) {
-					AuditImage auditImage = getAuditImageByUUId(context, containerId,
-							auditItemRemove, auditImageUUID);
-					if (auditImage != null) {
-						Logger.Log("Begin to add");
-						auditItem.getAuditImages().add(auditImage);
-					}
-					break;
-				}
-			}
+			// Get audit image of audit item will be merged
+			AuditImage auditImage = getAuditImageByUUId(context, containerId,
+					auditItemRemove, auditImageUUID);
 
+			// Remove audit item will be merged
 			AuditItem removeItem = getAuditItemByUUID(context, containerId, auditItemRemove);
 			if (removeItem != null) {
 				Logger.Log("Begin to remove");
 				session.getAuditItems().remove(removeItem);
+			}
+
+			AuditItem itemMerged = getAuditItemByUUID(context, containerId, auditItemUUID);
+			if (itemMerged != null) {
+				AuditItem tmp = itemMerged;
+				tmp.getAuditImages().add(auditImage);
+
+				session.getAuditItems().add(tmp);
+				session.getAuditItems().remove(itemMerged);
 			}
 
 			db.put(containerId, session);

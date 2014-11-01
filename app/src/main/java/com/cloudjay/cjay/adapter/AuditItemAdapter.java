@@ -48,6 +48,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 	private String operatorCode;
 	private String mAuditItemUUID;
 	private String mComponentCode;
+	private String mAuditImageUUID;
 
 	public AuditItemAdapter(Context context, int resource, String containerId, String operatorCode) {
 		super(context, resource);
@@ -210,6 +211,10 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			holder.btnReport.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+					Logger.Log(auditItem.getAuditImages().get(0).getAuditImageUUID());
+					Logger.Log(auditItem.getAuditImages().get(0).getName());
+					Logger.Log(auditItem.getAuditImages().get(0).getUrl());
+					Logger.Log(auditItem.getAuditImages().get(0).getType() + "");
                     showApproveDiaglog(auditItem);
                 }
             });
@@ -281,9 +286,11 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
 
+				Logger.Log("getAuditImageUUID: " + item.getAuditImages().get(0).getAuditImageUUID());
+
 				Intent intent = new Intent(mContext, MergeIssueActivity_.class);
 				intent.putExtra(MergeIssueActivity_.CONTAINER_ID_EXTRA, containerId);
-				intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, auditImage.getAuditImageUUID());
+				intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, item.getAuditImages().get(0).getAuditImageUUID());
 				intent.putExtra(MergeIssueActivity_.AUDIT_ITEM_REMOVE_UUID, item.getAuditItemUUID());
 
 				mContext.startActivity(intent);

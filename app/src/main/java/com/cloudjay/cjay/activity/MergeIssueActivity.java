@@ -130,7 +130,9 @@ public class MergeIssueActivity extends BaseActivity {
 
         AuditItem auditItem = mAdapter.getItem(position);
         String uuid = auditItem.getAuditItemUUID();
-        Logger.Log("uuid: " + uuid);
+		Logger.Log("auditImageUUID: " + auditImageUUID);
+		Logger.Log("auditItemRemoveUUID: " + auditItemRemoveUUID);
+		Logger.Log("uuid: " + uuid);
         dataCenter.addAuditImageToAuditedIssue(getApplicationContext(), containerID,
                 uuid, auditItemRemoveUUID, auditImageUUID);
         refresh();
