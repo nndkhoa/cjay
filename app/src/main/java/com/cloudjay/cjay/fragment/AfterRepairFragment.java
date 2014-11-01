@@ -134,8 +134,8 @@ public class AfterRepairFragment extends Fragment {
 	@Background
     void refreshListImage() {
 		if (auditItem != null) {
-			/*List<AuditImage> list = auditItem.getListRepairedImages();
-			updatedData(list);*/
+			List<AuditImage> list = auditItem.getListRepairedImages();
+			updatedData(list);
 		}
     }
 
