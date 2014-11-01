@@ -84,9 +84,9 @@ public class WorkingFragment extends Fragment {
 	@Background
 	void refresh() {
 		if (mAdapter != null) {
-			List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
-					CJayConstant.PREFIX_WORKING);
-			updatedData(list);
+//			List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
+//					CJayConstant.PREFIX_WORKING);
+//			updatedData(list);
 		}
 	}
 

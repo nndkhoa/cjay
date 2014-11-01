@@ -850,19 +850,23 @@ public class DataCenter {
 		try {
 			DB db = App.getDB(context);
 			Session session = db.getObject(containerId, Session.class);
+
 			for (AuditItem auditItem : session.getAuditItems()) {
-
 				if (auditItem.getAuditItemUUID().equals(auditItemUUID)) {
-					List<AuditImage> auditImages = auditItem.getAuditImages();
-					if (null == auditImages) {
-						auditImages = new ArrayList<>();
+					AuditImage auditImage = getAuditImageByUUId(context, containerId,
+							auditItemRemove, auditImageUUID);
+					if (auditImage != null) {
+						Logger.Log("Begin to add");
+						auditItem.getAuditImages().add(auditImage);
 					}
-
-					auditImages.add(getAuditImageByUUId(context, containerId, auditItemUUID, auditImageUUID));
-					auditItem.setAuditImages(auditImages);
-
 					break;
 				}
+			}
+
+			AuditItem removeItem = getAuditItemByUUID(context, containerId, auditItemRemove);
+			if (removeItem != null) {
+				Logger.Log("Begin to remove");
+				session.getAuditItems().remove(removeItem);
 			}
 
 			db.put(containerId, session);
