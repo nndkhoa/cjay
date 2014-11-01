@@ -166,8 +166,7 @@ public class App extends Application {
 					}
 				})
 				.minConsumerCount(1)
-				.maxConsumerCount(3)
-				.loadFactor(3)
+				.maxConsumerCount(1)
 				.consumerKeepAlive(120)
 				.build();
 

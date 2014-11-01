@@ -127,7 +127,6 @@ public class DataCenter {
 	 *
 	 * @param keyword
 	 */
-	@Background(serial = CACHE)
 	public void searchOperator(String keyword) {
 		try {
 			List<Operator> operators = new ArrayList<Operator>();
@@ -538,7 +537,6 @@ public class DataCenter {
 		EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
 	}
 
-	@Background(serial = CACHE)
 	public void getSessionByContainerId(Context context, String containerId) {
 		String[] keysResult;
 		try {
@@ -558,7 +556,6 @@ public class DataCenter {
 
 	}
 
-	@Background(serial = CACHE)
 	public void getAllGateImagesByContainerId(Context context, String containerId) {
 		try {
 			DB db = App.getDB(context);
@@ -688,7 +685,6 @@ public class DataCenter {
 	}
 	//endregion
 
-	@Background(serial = CACHE)
 	public void getAuditImages(Context context, String containerId) {
 		Session session = null;
 		try {
