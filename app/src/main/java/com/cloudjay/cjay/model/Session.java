@@ -606,4 +606,31 @@ public class Session {
 
 		return list;
 	}
+
+	public Session mergeSession(Session session) {
+		this.setId(session.getId());
+		this.setStep(session.getStep());
+		this.setCheckInTime(session.getCheckInTime());
+		this.setCheckOutTime(session.getCheckOutTime());
+		//merge Gate Image
+		List<GateImage> mergedGateImages = new ArrayList<GateImage>();
+		for (GateImage gateImageServer : session.getGateImages()) {
+			for (GateImage gateImage : this.getGateImages()) {
+				gateImage.mergeGateImage(gateImageServer);
+				mergedGateImages.add(gateImage);
+			}
+		}
+		this.setGateImages(mergedGateImages);
+
+		//merge Audit Item
+		List<AuditItem> mergedAuditItem = new ArrayList<AuditItem>();
+		for (AuditItem auditItemServer : session.getAuditItems()) {
+			for (AuditItem auditItem : this.getAuditItems()) {
+				auditItem.mergeAuditItem(auditItemServer);
+				mergedAuditItem.add(auditItem);
+			}
+		}
+		this.setAuditItems(mergedAuditItem);
+		return this;
+	}
 }

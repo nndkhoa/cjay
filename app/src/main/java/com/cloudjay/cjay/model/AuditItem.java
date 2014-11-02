@@ -440,22 +440,22 @@ public class AuditItem {
 		return repaired_image;
 	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof AuditItem) {
-            AuditItem temp = (AuditItem) obj;
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof AuditItem) {
+			AuditItem temp = (AuditItem) obj;
 
-            if (this.componentCodeId == temp.componentCodeId
-                    && this.damageCodeId == temp.damageCodeId
-                    && this.repairCodeId == temp.repairCodeId) {
-                return true;
-            } else {
-                return false;
-            }
-        }
+			if (this.componentCodeId == temp.componentCodeId
+					&& this.damageCodeId == temp.damageCodeId
+					&& this.repairCodeId == temp.repairCodeId) {
+				return true;
+			} else {
+				return false;
+			}
+		}
 
-        return super.equals(obj);
-    }
+		return super.equals(obj);
+	}
 
 	public List<AuditImage> getListIssueImages() {
 		List<AuditImage> imageList = new ArrayList<AuditImage>();
@@ -477,5 +477,21 @@ public class AuditItem {
 			}
 		}
 		return imageList;
+	}
+
+	public AuditItem mergeAuditItem(AuditItem auditItemServer) {
+		this.setId(auditItemServer.getId());
+		this.setIsAllowed(auditItemServer.isIsAllowed());
+
+		//merge audit Image
+		List<AuditImage> mergedAuditImages = new ArrayList<AuditImage>();
+		for (AuditImage auditImageServer : auditItemServer.getAuditImages()) {
+			for (AuditImage auditImage : this.getAuditImages()) {
+				auditImage.mergeAuditImage(auditImageServer);
+				mergedAuditImages.add(auditImage);
+			}
+		}
+		this.setAuditImages(mergedAuditImages);
+		return this;
 	}
 }

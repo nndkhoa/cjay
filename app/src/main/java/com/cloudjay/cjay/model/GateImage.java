@@ -112,4 +112,9 @@ public class GateImage {
 		this.gateImageUUID = gateImageUUID;
 		return this;
 	}
+
+	public GateImage mergeGateImage(GateImage gateImageServer) {
+		this.setId(gateImageServer.getId());
+		return this;
+	}
 }
