@@ -10,7 +10,7 @@ import android.widget.ListView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.OperatorAdapter;
-import com.cloudjay.cjay.event.operator.OperatorCallbackEvent;
+import com.cloudjay.cjay.event.operator.OperatorChosenEvent;
 import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
 import com.cloudjay.cjay.model.Operator;
 
@@ -82,7 +82,7 @@ public class SearchOperatorDialog extends DialogFragment {
 
 	@ItemClick(R.id.lv_operators_list)
 	void listViewOperatorsItemClicked(Operator selectedOperator) {
-		EventBus.getDefault().post(new OperatorCallbackEvent(selectedOperator));
+		EventBus.getDefault().post(new OperatorChosenEvent(selectedOperator));
 		this.dismiss();
 	}
 

@@ -22,7 +22,7 @@ import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.jobqueue.UploadExportSessionJob;
+import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -190,7 +190,7 @@ public class ExportFragment extends Fragment {
 
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJob(new UploadExportSessionJob(mSession));
+		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getStep(), true));
 
 		// Navigate to HomeActivity
 		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
