@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.model;
 
 
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
@@ -129,7 +130,8 @@ public class Session {
 		this.localStep = step;
 		return this;
 	}
-	public Session withStep(int step){
+
+	public Session withStep(int step) {
 		this.step = step;
 		return this;
 	}
@@ -629,17 +631,19 @@ public class Session {
 		}
 		this.setGateImages(mergedGateImages);
 
-		//merge Audit Item
-		List<AuditItem> mergedAuditItem = new ArrayList<AuditItem>();
-		for (AuditItem auditItemServer : session.getAuditItems()) {
-			for (AuditItem auditItem : this.getAuditItems()) {
-				if (auditItem.getAuditItemUUID().equals(auditItemServer.getAuditItemUUID())) {
-					auditItem.mergeAuditItem(auditItemServer);
-					mergedAuditItem.add(auditItem);
+		//merge Audit Item  if audit item from server != null
+		if (session.getAuditItems().size() != 0) {
+			List<AuditItem> mergedAuditItem = new ArrayList<AuditItem>();
+			for (AuditItem auditItemServer : session.getAuditItems()) {
+				for (AuditItem auditItem : this.getAuditItems()) {
+					if (auditItem.getAuditItemUUID().equals(auditItemServer.getAuditItemUUID())) {
+						auditItem.mergeAuditItem(auditItemServer);
+						mergedAuditItem.add(auditItem);
+					}
 				}
 			}
+			this.setAuditItems(mergedAuditItem);
 		}
-		this.setAuditItems(mergedAuditItem);
 		return this;
 	}
 }
