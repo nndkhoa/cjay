@@ -783,12 +783,12 @@ public class DataCenter {
 		Logger.Log("Uploaded Session Id: " + result.getId());
 
 		if (result != null) {
-			//Add local step to reuslt from server
-			result.setLocalStep(oldSession.getLocalStep());
+			//merge session
+			oldSession.mergeSession(result);
 
 			// Update container back to database
 			String key = result.getContainerId();
-			db.put(key, result);
+			db.put(key, oldSession);
 
 		}
 

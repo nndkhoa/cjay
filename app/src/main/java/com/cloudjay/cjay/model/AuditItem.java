@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.model;
 
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.google.gson.JsonArray;
@@ -487,8 +488,10 @@ public class AuditItem {
 		List<AuditImage> mergedAuditImages = new ArrayList<AuditImage>();
 		for (AuditImage auditImageServer : auditItemServer.getAuditImages()) {
 			for (AuditImage auditImage : this.getAuditImages()) {
-				auditImage.mergeAuditImage(auditImageServer);
-				mergedAuditImages.add(auditImage);
+				if (auditImage.getName().equals(Utils.getImageNameFromUrl(auditImageServer.getUrl()))){
+					auditImage.mergeAuditImage(auditImageServer);
+					mergedAuditImages.add(auditImage);
+				}
 			}
 		}
 		this.setAuditImages(mergedAuditImages);
