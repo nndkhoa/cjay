@@ -9,6 +9,7 @@ import android.widget.ImageView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.GateImage;
+import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.imageaware.ImageAware;
@@ -94,11 +95,13 @@ public class GateImageAdapter extends ArrayAdapter<GateImage> {
 	}
 
 	public void setData(List<GateImage> data) {
-		clear();
+		this.clear();
 		if (data != null) {
 			for (int i = 0; i < data.size(); i++) {
-				add(data.get(i));
+				// add(data.get(i));
+				this.insert(data.get(i), this.getCount());
 			}
 		}
+		this.notifyDataSetChanged();
 	}
 }

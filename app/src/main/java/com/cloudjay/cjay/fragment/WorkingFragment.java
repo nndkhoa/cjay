@@ -11,8 +11,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
-import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
-import com.cloudjay.cjay.event.upload.ContainerUploadedEvent;
+import com.cloudjay.cjay.event.session.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.model.Session;
@@ -91,13 +90,7 @@ public class WorkingFragment extends Fragment {
 
 	@UiThread
 	public void updatedData(List<Session> sessionList) {
-		mAdapter.clear();
-		if (sessionList != null) {
-			for (Session object : sessionList) {
-				mAdapter.insert(object, mAdapter.getCount());
-			}
-		}
-		mAdapter.notifyDataSetChanged();
+		mAdapter.setData(sessionList);
 	}
 
 	@Override
@@ -111,6 +104,8 @@ public class WorkingFragment extends Fragment {
 		EventBus.getDefault().unregister(this);
 		super.onDestroy();
 	}
+
+	//region EVENT HANDLER
 
 	@Trace
 	public void onEvent(UploadStartedEvent event) {
@@ -126,9 +121,5 @@ public class WorkingFragment extends Fragment {
 	public void onEvent(UploadedEvent event) {
 		refresh();
 	}
-
-	@Trace
-	public void onEvent(ContainerUploadedEvent event) {
-		refresh();
-	}
+	//endregion
 }

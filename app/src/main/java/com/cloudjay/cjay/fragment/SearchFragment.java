@@ -23,8 +23,8 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
-import com.cloudjay.cjay.event.ContainerSearchedEvent;
-import com.cloudjay.cjay.event.SearchAsyncStartedEvent;
+import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
+import com.cloudjay.cjay.event.session.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.fragment.dialog.AddContainerDialog;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
@@ -196,7 +196,6 @@ public class SearchFragment extends Fragment {
 				.builder().containerId(containerId).build();
 		addContainerDialog_.show(fragmentManager, "fragment_addcontainer");
 	}
-
 
 	/**
 	 * Begin to search in background

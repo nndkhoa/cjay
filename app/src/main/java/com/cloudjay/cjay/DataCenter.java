@@ -4,13 +4,13 @@ import android.content.Context;
 
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.AuditImagesGotEvent;
-import com.cloudjay.cjay.event.ContainerSearchedEvent;
+import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
+import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
+import com.cloudjay.cjay.event.session.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.event.issue.IssueDeletedEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
-import com.cloudjay.cjay.event.OperatorsGotEvent;
-import com.cloudjay.cjay.event.SearchAsyncStartedEvent;
-import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
+import com.cloudjay.cjay.event.session.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
@@ -477,7 +477,6 @@ public class DataCenter {
 	public void searchAsync(Context context, String keyword) {
 
 		try {
-
 			Logger.Log("Begin to search container from server");
 			List<Session> sessions = networkClient.searchSessions(context, keyword);
 
@@ -488,8 +487,6 @@ public class DataCenter {
 					String key = session.getContainerId();
 					db.put(key, session);
 				}
-
-				// db.close();
 			}
 
 			EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
