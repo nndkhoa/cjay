@@ -1,7 +1,9 @@
 package com.cloudjay.cjay.activity;
 
+import android.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.view.MenuItem;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.fragment.AuditAndRepairFragment_;
@@ -29,11 +31,19 @@ public class WizardActivity extends BaseActivity {
 	@Extra(STEP_EXTRA)
 	long step = 4;
 
+	ActionBar actionBar;
+
 	/**
 	 * Dựa bước (step) hiện tại của container session, để tạo nên các màn hình tương ứng
 	 */
 	@AfterViews
 	void configFragment() {
+
+		// Get actionbar
+		actionBar = getActionBar();
+
+		// Set Providing Up Navigation
+		actionBar.setDisplayHomeAsUpEnabled(true);
 
 		Fragment fragment;
 		Step currentStep = Step.values()[((int) step)];
@@ -63,5 +73,16 @@ public class WizardActivity extends BaseActivity {
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 		transaction.add(R.id.ll_main, fragment);
 		transaction.commit();
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				super.onBackPressed();
+				return true;
+		}
+
+		return super.onOptionsItemSelected(item);
 	}
 }

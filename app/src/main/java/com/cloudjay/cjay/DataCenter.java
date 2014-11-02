@@ -30,6 +30,8 @@ import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
@@ -799,7 +801,11 @@ public class DataCenter {
 
 		// Upload container session to server
 		Session result = networkClient.uploadSession(context, oldSession);
-		Logger.Log("Uploaded Session Id: " + result.getId());
+
+		GsonBuilder builder = new GsonBuilder();
+		Gson gson = builder.create();
+
+		Logger.Log("result: " + gson.toJson(result));
 
 		if (result != null) {
 			//merge session
@@ -1160,7 +1166,11 @@ public class DataCenter {
 		DB db = App.getDB(context);
 		Session oldSession = db.getObject(containerId, Session.class);
 		Session result = networkClient.completeAudit(context, oldSession);
-		Logger.Log("Add AuditItem to Session Id: " + result.getId());
+
+		GsonBuilder builder = new GsonBuilder();
+		Gson gson = builder.create();
+
+		Logger.Log("result: " + gson.toJson(result));
 
 		if (result != null) {
 

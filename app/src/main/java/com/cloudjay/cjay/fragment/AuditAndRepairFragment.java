@@ -166,9 +166,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 		// Create Actionbar Tabs
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-		// Set Providing Up Navigation
-		actionBar.setDisplayHomeAsUpEnabled(true);
 	}
 
 	private void configureViewPager() {

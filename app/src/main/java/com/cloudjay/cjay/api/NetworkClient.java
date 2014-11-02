@@ -12,6 +12,7 @@ import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -310,6 +311,12 @@ public class NetworkClient {
 	 * @return
 	 */
 	public Session completeAudit(Context context, Session containerSession) {
+
+		GsonBuilder builder = new GsonBuilder();
+		Gson gson = builder.create();
+
+		Logger.Log("containerSession: " + gson.toJson(containerSession));
+
 		Session completeAuditSession = provider.getRestAdapter(context).create(NetworkService.class).completeAudit(containerSession.getId());
 		return completeAuditSession;
 	}

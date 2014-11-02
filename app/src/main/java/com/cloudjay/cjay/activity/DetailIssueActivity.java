@@ -3,7 +3,9 @@ package com.cloudjay.cjay.activity;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.support.v4.app.FragmentTabHost;
+import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
+import android.view.MenuItem;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.AuditItem;
@@ -126,4 +128,15 @@ public class DetailIssueActivity extends BaseActivity implements ActionBar.TabLi
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
 
     }
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				super.onBackPressed();
+				return true;
+		}
+
+		return super.onOptionsItemSelected(item);
+	}
 }
