@@ -10,8 +10,8 @@ import android.widget.ListView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.OperatorAdapter;
-import com.cloudjay.cjay.event.OperatorCallbackEvent;
-import com.cloudjay.cjay.event.OperatorsGotEvent;
+import com.cloudjay.cjay.event.operator.OperatorCallbackEvent;
+import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
 import com.cloudjay.cjay.model.Operator;
 
 import org.androidannotations.annotations.AfterTextChange;

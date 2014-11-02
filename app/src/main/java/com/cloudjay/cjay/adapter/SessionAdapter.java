@@ -97,11 +97,13 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 	}
 
 	public void setData(List<Session> data) {
-		clear();
+		this.clear();
 		if (data != null) {
 			for (int i = 0; i < data.size(); i++) {
-				add(data.get(i));
+				// add(data.get(i));
+				this.insert(data.get(i), this.getCount());
 			}
 		}
+		this.notifyDataSetChanged();
 	}
 }

@@ -20,10 +20,9 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
-import com.cloudjay.cjay.activity.HomeActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
-import com.cloudjay.cjay.event.OperatorCallbackEvent;
+import com.cloudjay.cjay.event.operator.OperatorCallbackEvent;
 import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
@@ -114,6 +113,11 @@ public class ImportFragment extends Fragment {
 	public ImportFragment() {
 	}
 
+	/**
+	 * 1. Config Action Bar
+	 * 2. Initial variables
+	 * 3. Restore container information
+	 */
 	@AfterViews
 	void doAfterViews() {
 
@@ -126,7 +130,6 @@ public class ImportFragment extends Fragment {
 
 		mAdapter = new GateImageAdapter(getActivity(), R.layout.item_image_gridview, false);
 		lvImages.setAdapter(mAdapter);
-
 
 		// Trying to restore container status
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
@@ -171,6 +174,7 @@ public class ImportFragment extends Fragment {
 		super.onDestroy();
 	}
 
+	//region EVENT HANDLER
 	@UiThread
 	void onEvent(OperatorCallbackEvent event) {
 
@@ -214,10 +218,10 @@ public class ImportFragment extends Fragment {
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
 		refresh();
 	}
+	//endregion
 
 	@Background
 	void refresh() {
-
 		if (mSession != null) {
 			List<GateImage> list = mSession.getImportImages();
 			updatedData(list);
@@ -226,15 +230,7 @@ public class ImportFragment extends Fragment {
 
 	@UiThread
 	public void updatedData(List<GateImage> gateImageList) {
-
-		mAdapter.clear();
-		if (gateImageList != null) {
-			for (GateImage object : gateImageList) {
-				mAdapter.add(object);
-			}
-		}
-
-		mAdapter.notifyDataSetChanged();
+		mAdapter.setData(gateImageList);
 	}
 
 	//region VIEW INTERACTION
@@ -276,7 +272,6 @@ public class ImportFragment extends Fragment {
 		// Add current container to job queue
 		JobManager jobManager = App.getJobManager();
 		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId()));
-
 
 
 		// Go to next fragment

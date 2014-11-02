@@ -12,7 +12,7 @@ import android.view.Window;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.event.SessionsFetchedEvent;
+import com.cloudjay.cjay.event.session.ContainersFetchedEvent;
 import com.cloudjay.cjay.event.UserLoggedOutEvent;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -23,7 +23,6 @@ import com.snappydb.SnappydbException;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsItem;
-import org.androidannotations.annotations.UiThread;
 
 import java.lang.reflect.Method;
 
@@ -118,7 +117,7 @@ public class BaseActivity extends FragmentActivity {
 		super.onDestroy();
 	}
 
-	public void onEvent(SessionsFetchedEvent event) {
+	public void onEvent(ContainersFetchedEvent event) {
 		Utils.showCrouton(this, "All sessions are fetched");
 	}
 

@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.event;
+package com.cloudjay.cjay.event.operator;
 
 import com.cloudjay.cjay.model.Operator;
 
