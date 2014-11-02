@@ -60,6 +60,9 @@ android {
     }
     productFlavors {
     }
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+    }
 }
 
 //evaluationDependsOn(":app")
@@ -74,24 +77,27 @@ dependencies {
     compile 'com.path:android-priority-jobqueue:1.1.2'
     compile 'com.netflix.rxjava:rxjava-core:0.16.1'
     compile 'com.netflix.rxjava:rxjava-android:0.16.1'
-    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.1'
+    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.3'
     compile 'de.greenrobot:eventbus:2.2.1'
     compile 'com.commonsware.cwac:camera:0.6.+'
     compile 'info.hoang8f:android-segmented:1.0.2'
-
-    apt "org.androidannotations:androidannotations:$AAVersion"
-    compile "org.androidannotations:androidannotations-api:$AAVersion"
 
     compile 'com.google.code.gson:gson:2.3'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
     compile 'com.squareup.okhttp:okhttp:2.0.0'
     compile 'com.squareup.retrofit:retrofit:1.6.1'
+    compile 'com.snappydb:snappydb-lib:0.5.0'
+    compile 'com.esotericsoftware.kryo:kryo:2.24.0'
+
+    apt "org.androidannotations:androidannotations:$AAVersion"
+    compile "org.androidannotations:androidannotations-api:$AAVersion"
+
     compile files('libs/javax.annotation-3.2-b06.jar')
     compile files('libs/crouton-1.8.1.jar')
     compile files('libs/Pubnub-Android-3.5.6.jar')
     compile files('libs/helpertoolsforandroid.jar')
-    compile 'com.snappydb:snappydb-lib:0.5.0'
-    compile 'com.esotericsoftware.kryo:kryo:2.24.0'
+    compile files('libs/commons-lang-2.6.jar')
+
 }
 
 apt {

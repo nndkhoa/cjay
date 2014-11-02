@@ -25,6 +25,12 @@ public class AuditItem {
 	@Expose
 	private long id;
 
+	/**
+	 * Id of Container Session
+	 */
+	@Expose
+	private long session;
+
 	@SerializedName("damage_code")
 	@Expose
 	private String damageCode;
@@ -363,6 +369,14 @@ public class AuditItem {
 	public AuditItem withUploadStatus(UploadStatus status) {
 		this.uploadStatus = status.value;
 		return this;
+	}
+
+	public long getSession() {
+		return session;
+	}
+
+	public void setSession(long session) {
+		this.session = session;
 	}
 	//endregion
 

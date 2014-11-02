@@ -166,6 +166,24 @@ public class DataCenter {
 		}
 	}
 
+	/**
+	 * Get operator from server by id
+	 *
+	 * @param context
+	 * @param id
+	 */
+	public void getOperatorById(Context context, long id) {
+
+		Operator operator = networkClient.getOperatorById(id);
+		try {
+			DB db = App.getDB(context);
+			String key = CJayConstant.PREFIX_OPERATOR + operator.getOperatorCode();
+			db.put(key, operator);
+
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
 	//endregion
 
 	//region ISO CODE
@@ -183,7 +201,14 @@ public class DataCenter {
 		fetchComponentCodes(context);
 	}
 
+	/**
+	 * fetch damage codes from server
+	 *
+	 * @param context
+	 * @throws SnappydbException
+	 */
 	public void fetchDamageCodes(Context context) throws SnappydbException {
+
 		DB db = App.getDB(context);
 		List<IsoCode> damageCodes = networkClient.getDamageCodes(context, null);
 		for (IsoCode code : damageCodes) {
@@ -193,6 +218,12 @@ public class DataCenter {
 		// db.close();
 	}
 
+	/**
+	 * fetch repair codes from server
+	 *
+	 * @param context
+	 * @throws SnappydbException
+	 */
 	public void fetchRepairCodes(Context context) throws SnappydbException {
 		DB db = App.getDB(context);
 		List<IsoCode> repairCodes = networkClient.getRepairCodes(context, null);
@@ -203,6 +234,12 @@ public class DataCenter {
 		// db.close();
 	}
 
+	/**
+	 * fetch component code from server
+	 *
+	 * @param context
+	 * @throws SnappydbException
+	 */
 	public void fetchComponentCodes(Context context) throws SnappydbException {
 		DB db = App.getDB(context);
 		List<IsoCode> componentCodes = networkClient.getComponentCodes(context, null);
@@ -212,9 +249,87 @@ public class DataCenter {
 		}
 		// db.close();
 	}
+
+	/**
+	 * Use it to add single iso code to DB
+	 *
+	 * @param context
+	 * @param isoCode
+	 * @param type
+	 */
+	public void addIsoCode(Context context, IsoCode isoCode, IsoCode.Type type) {
+		try {
+			DB db = App.getDB(context);
+			String key;
+			switch (type) {
+				case DAMAGE:
+					key = CJayConstant.PREFIX_DAMAGE_CODE + isoCode.getCode();
+					break;
+				case REPAIR:
+					key = CJayConstant.PREFIX_REPAIR_CODE + isoCode.getCode();
+					break;
+				case COMPONENT:
+				default:
+					key = CJayConstant.PREFIX_COMPONENT_CODE + isoCode.getCode();
+					break;
+			}
+			db.put(key, isoCode);
+
+		} catch (SnappydbException e) {
+			Logger.e(e.getMessage());
+		}
+	}
+
+	/**
+	 * get single damage code by Id
+	 *
+	 * @param context
+	 * @param id
+	 */
+	public void getDamageCodeById(Context context, long id) {
+		IsoCode isoCode = networkClient.getDamageCodeById(id);
+		addIsoCode(context, isoCode, IsoCode.Type.DAMAGE);
+	}
+
+	/**
+	 * get single repair code by Id
+	 *
+	 * @param context
+	 * @param id
+	 */
+	public void getRepairCodeById(Context context, long id) {
+		IsoCode isoCode = networkClient.getRepairCodeById(id);
+		addIsoCode(context, isoCode, IsoCode.Type.REPAIR);
+	}
+
+	/**
+	 * get single component code by Id
+	 *
+	 * @param context
+	 * @param id
+	 */
+	public void getComponentCodeById(Context context, long id) {
+		IsoCode isoCode = networkClient.getComponentCodeById(id);
+		addIsoCode(context, isoCode, IsoCode.Type.COMPONENT);
+	}
 	//endregion
 
 	//region SESSION
+
+	//
+	public Session getSessionById(Context context, long id) {
+		Session session = networkClient.getSessionById(id);
+		Session localSession = getSession(context, session.getContainerId());
+
+		if (localSession == null) {
+			addSession(session);
+		} else {
+			// Container session is already existed
+			// TODO: merge session with the existed one
+		}
+
+		return session;
+	}
 
 	/**
 	 * Only use when search container session from db.
@@ -674,7 +789,7 @@ public class DataCenter {
 
 			// Update container back to database
 			String key = result.getContainerId();
-			db.put(key,result);
+			db.put(key, result);
 
 		}
 		// db.close();
@@ -1287,18 +1402,64 @@ public class DataCenter {
 		DB db = App.getDB(context);
 		Session session = db.getObject(containerId, Session.class);
 		session.setLocalStep(step.value);
-		db.put(containerId,session);
+		db.put(containerId, session);
 
 	}
 
 	public void removeWorkingSession(Context context, String containerId) {
 		try {
 			DB db = App.getDB(context);
-			String workingKey = CJayConstant.PREFIX_WORKING+containerId;
+			String workingKey = CJayConstant.PREFIX_WORKING + containerId;
 			db.del(workingKey);
 
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
 	}
+
+
+	//region NOTIFICATION
+
+	/**
+	 * Gửi request lên server thông báo đã nhận được notification.
+	 */
+	public void gotMessage(Context context, String channel, long messageId) {
+		networkClient.gotMessageFromPubNub(channel, messageId);
+	}
+
+	// endregion
+
+	//region AUDIT ITEM
+	/**
+	 * Get audit item from server by id.
+	 * <p/>
+	 * 1. Đầu tiên sẽ lấy session từ server.
+	 * 2. Kiểm tra trong db có tồn tại session này chưa
+	 * 2.1 Nếu có thì update
+	 * 2.2 Không có thì tạo mới
+	 *
+	 * @param context
+	 * @param id
+	 */
+	public void getAuditItemById(Context context, long id) {
+
+		AuditItem auditItem = networkClient.getAuditItemById(id);
+
+		long sessionId = auditItem.getSession();
+		Session session = getSessionById(context, sessionId);
+		String key = session.getContainerId();
+
+		try {
+			DB db = App.getDB(context);
+			Session localSession = db.getObject(key, Session.class);
+			if (localSession == null) { // container không tồn tại ở client
+				db.put(key, localSession);
+			} else {
+				// TODO: merge audit item to this container session
+			}
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
+	//endregion
 }

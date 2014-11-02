@@ -84,5 +84,22 @@ public interface NetworkService {
     @POST(ApiEndpoint.CJAY_TMP_STORAGE_IMAGE)
     public Response postImageFile(@Header("Content-Type") String contentType, @Query("uploadType") String uploadType, @Query("name") String imageName, @Body() TypedFile image);
 
+	//Use for PubNub
+	@GET(ApiEndpoint.PUBNUB_AUDITITEM)
+	public AuditItem getAuditItemById(@Path("id") long id);
 
+	@GET(ApiEndpoint.PUBNUB_DAMAGECODE)
+	public IsoCode getDamageCodesById(@Path("id") long id);
+
+	@GET(ApiEndpoint.PUBNUB_REPAIRCODE)
+	public IsoCode getRepairCodeById(@Path("id") long id);
+
+	@GET(ApiEndpoint.PUBNUB_COMPONENTCODE)
+	public IsoCode getComponentCodeById(@Path("id") long id);
+
+	@GET(ApiEndpoint.PUBNUB_OPERATOR)
+	Operator getOperatorById(@Path("id") long id);
+
+	@GET(ApiEndpoint.PUBNUB_GOTMESSAGE)
+	void gotMessageFromPubNub(@Query("reciever_channel") String channel,@Query("message_id") long messageId);
 }

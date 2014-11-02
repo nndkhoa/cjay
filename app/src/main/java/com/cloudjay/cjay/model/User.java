@@ -32,17 +32,29 @@ public class User {
 	@SerializedName("full_name")
 	@Expose
 	private String fullName;
+
 	@SerializedName("avatar_url")
 	@Expose
 	private String avatarUrl;
+
 	@Expose
 	private long role;
+
 	@SerializedName("role_name")
 	@Expose
 	private String roleName;
+
 	@SerializedName("depot_code")
 	@Expose
 	private String depotCode;
+
+	@SerializedName("channel_uuid")
+	@Expose
+	private String channelUuid;
+
+	@SerializedName("channel_depot")
+	@Expose
+	private String channelDepot;
 
 	public long getId() {
 		return id;
@@ -185,6 +197,22 @@ public class User {
 	public User withDepotCode(String depotCode) {
 		this.depotCode = depotCode;
 		return this;
+	}
+
+	public String getChannelDepot() {
+		return channelDepot;
+	}
+
+	public void setChannelDepot(String channelDepot) {
+		this.channelDepot = channelDepot;
+	}
+
+	public String getChannelUuid() {
+		return channelUuid;
+	}
+
+	public void setChannelUuid(String channelUuid) {
+		this.channelUuid = channelUuid;
 	}
 
 	@Override

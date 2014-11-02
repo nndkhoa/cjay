@@ -22,6 +22,7 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.service.PubnubService_;
 import com.cloudjay.cjay.task.service.QueueIntentService_;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
@@ -37,6 +38,20 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
 public class Utils {
+
+	public static void logOut(Context context) {
+
+		// Clear preference and Database
+		PreferencesUtil.clearPrefs(context);
+		context.deleteDatabase("db_default_job_manager.db");
+
+		try {
+			DB db = App.getDB(context);
+			db.destroy();
+		} catch (SnappydbException e) {
+			Logger.w(e.getMessage());
+		}
+	}
 
 	/**
 	 * Check a intent service is running or not
@@ -63,18 +78,29 @@ public class Utils {
 	 * @param context
 	 */
 	public static void startAlarm(Context context) {
-		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-
-		// Making Alarm for Queue Worker
-		Intent intent = new Intent(context, QueueIntentService_.class);
-		PendingIntent pIntent = PendingIntent.getService(context, CJayConstant.ALARM_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 		// start 30 seconds after boot completed
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.SECOND, 30);
 
+		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+		// Making Alarm for Queue Worker
+		Intent intent = new Intent(context, QueueIntentService_.class);
+		PendingIntent pQueueIntent = PendingIntent.getService(context, CJayConstant.ALARM_QUEUE_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
 		// Start every 24 hours
-		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), CJayConstant.ALARM_INTERVAL * 1000, pIntent);
+		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
+				CJayConstant.ALARM_INTERVAL * 1000, pQueueIntent);
+
+		// --------
+		// Configure Pubnub Service
+		Intent pubnubIntent = new Intent(context, PubnubService_.class);
+		PendingIntent pPubnubIntent = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+		// wake up every 5 minutes to ensure service stays alive
+		alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+				(5 * 60 * 1000), pPubnubIntent);
 	}
 
 	/**
@@ -84,10 +110,17 @@ public class Utils {
 	 * @return
 	 */
 	public static boolean isAlarmUp(Context context) {
-		Intent intent = new Intent(context, QueueIntentService_.class);
-		return PendingIntent.getService(context, CJayConstant.ALARM_ID, intent, PendingIntent.FLAG_NO_CREATE) != null;
 
+		Intent queueIntent = new Intent(context, QueueIntentService_.class);
+		Intent pubnubIntent = new Intent(context, PubnubService_.class);
+
+		if (PendingIntent.getService(context, CJayConstant.ALARM_QUEUE_ID, queueIntent, PendingIntent.FLAG_NO_CREATE) != null &&
+				PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_NO_CREATE) != null)
+			return true;
+		else
+			return false;
 	}
+
 
 	/**
 	 * Get app version name
