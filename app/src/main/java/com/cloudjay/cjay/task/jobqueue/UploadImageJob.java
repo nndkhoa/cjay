@@ -4,14 +4,23 @@ import android.content.Context;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
+import com.cloudjay.cjay.api.NetworkClient_;
 import com.cloudjay.cjay.event.upload.ItemEnqueueEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
+import com.cloudjay.cjay.model.AuditImage;
+import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.model.GateImage;
+import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
+import com.snappydb.DB;
+import com.snappydb.SnappydbException;
 
 import de.greenrobot.event.EventBus;
 
@@ -51,9 +60,50 @@ public class UploadImageJob extends Job {
 
 		// Call data center to upload image
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).uploadImage(context, uri, imageName, containerId, imageType);
+		NetworkClient_.getInstance_(context).uploadImage(uri, imageName);
+
+		// Change image status to COMPLETE
+		setUploadStatus(context, containerId, imageName, imageType, UploadStatus.COMPLETE);
 
 		EventBus.getDefault().post(new UploadedEvent(containerId));
+	}
+
+	private void setUploadStatus(Context context, String containerId, String imageName, ImageType type, UploadStatus status) throws SnappydbException {
+		DB db = App.getDB(context);
+
+		// Change status image in db
+		String key = containerId;
+		Session session = db.getObject(key, Session.class);
+
+		if (session != null) {
+			switch (type) {
+
+				case AUDIT:
+				case REPAIRED:
+					for (AuditItem auditItem : session.getAuditItems()) {
+						for (AuditImage auditImage : auditItem.getAuditImages()) {
+							if (auditImage.getName().equals(imageName) && auditImage.getType() == type.value) {
+								auditImage.setUploadStatus(status);
+							}
+						}
+					}
+					break;
+
+				case IMPORT:
+				case EXPORT:
+				default:
+					for (GateImage gateImage : session.getGateImages()) {
+						if (gateImage.getName().equals(imageName) && gateImage.getType() == type.value) {
+							Logger.Log(imageName + " " + gateImage.getType());
+							gateImage.setUploadStatus(status);
+							break;
+						}
+					}
+					break;
+			}
+
+			db.put(key, session);
+		}
 	}
 
 	@Override

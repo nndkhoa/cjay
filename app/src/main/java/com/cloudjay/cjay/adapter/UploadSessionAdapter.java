@@ -171,7 +171,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 							}
 						}
 					}
-					jobManager.addJobInBackground(new UploadAuditItemJob(session.getContainerId(), item));
+					jobManager.addJobInBackground(new UploadAuditItemJob(session.getContainerId(), item.getAuditItemUUID()));
 				}
 				jobManager.addJobInBackground(new UploadCompleteAuditJob(session.getContainerId()));
 

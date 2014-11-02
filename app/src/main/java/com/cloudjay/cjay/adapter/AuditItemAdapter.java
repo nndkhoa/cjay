@@ -175,7 +175,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 					//2. Add container session to upload queue
 					JobManager jobManager = App.getJobManager();
-					jobManager.addJob(new UploadAuditItemJob(containerId, auditItem));
+					jobManager.addJob(new UploadAuditItemJob(containerId, auditItem.getAuditItemUUID()));
 				}
 			});
 

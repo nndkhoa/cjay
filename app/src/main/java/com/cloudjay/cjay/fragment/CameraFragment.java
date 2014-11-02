@@ -268,7 +268,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 			// Save bitmap
 			File photo = getFile();
 			saveBitmapToFile(capturedBitmap, photo);
-
 			// Add taken picture to job queue
 			addImageToUploadQueue(photo.getAbsolutePath(), photo.getName());
 		}

@@ -929,10 +929,11 @@ public class DataCenter {
 		// db.close();
 	}
 
-	public void uploadAuditItem(Context context, String containerId, AuditItem auditItem) throws SnappydbException {
+	public void uploadAuditItem(Context context, String containerId, String auditItemUUID) throws SnappydbException {
 
 		DB db = App.getDB(context);
 		Session oldSession = db.getObject(containerId, Session.class);
+		AuditItem auditItem = getAuditItemByUUId(context,auditItemUUID,containerId);
 
 		//Check for make sure all image of this audit item had uploaded
 		for (AuditImage auditImage : auditItem.getAuditImages()) {
@@ -1027,7 +1028,7 @@ public class DataCenter {
 			if (auditItem.getUploadStatus() != UploadStatus.COMPLETE.value) {
 				//TODO Note to Khoa this upload complete audit session have to retry upload audit item @Han
 				Logger.Log("containerId: " + containerId);
-				uploadAuditItem(context, containerId, auditItem);
+				uploadAuditItem(context, containerId, auditItem.getAuditItemUUID());
 			}
 		}
 
