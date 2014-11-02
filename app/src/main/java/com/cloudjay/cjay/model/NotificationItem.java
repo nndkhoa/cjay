@@ -18,7 +18,7 @@ public class NotificationItem {
 	private long objectId;
 	@SerializedName("message_id")
 	@Expose
-	private long messageId;
+	private String messageId;
 
 	public String getObjectType() {
 		return objectType;
@@ -46,15 +46,15 @@ public class NotificationItem {
 		return this;
 	}
 
-	public long getMessageId() {
+	public String getMessageId() {
 		return messageId;
 	}
 
-	public void setMessageId(long messageId) {
+	public void setMessageId(String messageId) {
 		this.messageId = messageId;
 	}
 
-	public NotificationItem withMessageId(long messageId) {
+	public NotificationItem withMessageId(String messageId) {
 		this.messageId = messageId;
 		return this;
 	}

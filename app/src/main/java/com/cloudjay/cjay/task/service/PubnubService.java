@@ -156,7 +156,7 @@ public class PubnubService extends Service {
 			b.putString("channel", channel);
 			b.putString("object_type", item.getObjectType());
 			b.putLong("object_id", item.getObjectId());
-			b.putLong("message_id", item.getMessageId());
+			b.putString("message_id", item.getMessageId());
 			msg.setData(b);
 			handler.sendMessage(msg);
 		} catch (Exception e) {
