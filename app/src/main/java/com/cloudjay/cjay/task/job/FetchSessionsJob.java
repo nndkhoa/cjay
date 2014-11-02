@@ -35,7 +35,7 @@ public class FetchSessionsJob extends Job {
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).fetchSession(context, modifiedDate);
 
-		// Notify UI that all data was downloaded
+		// Notify UI that all data was fetched
 		EventBus.getDefault().post(new ContainersFetchedEvent());
 	}
 

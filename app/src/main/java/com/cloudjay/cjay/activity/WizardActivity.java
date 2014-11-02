@@ -23,6 +23,9 @@ public class WizardActivity extends BaseActivity {
 	@Extra(CONTAINER_ID_EXTRA)
 	String containerID;
 
+	/**
+	 * This is current local step
+	 */
 	@Extra(STEP_EXTRA)
 	long step = 4;
 

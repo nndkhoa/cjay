@@ -409,7 +409,10 @@ public class DataCenter {
 		List<Session> sessions = networkClient.getAllSessions(context, lastModifiedDate);
 		DB db = App.getDB(context);
 		for (Session session : sessions) {
+
 			String key = session.getContainerId();
+			session.setLocalStep(session.getStep());
+			
 			db.put(key, session);
 		}
 
@@ -491,7 +494,7 @@ public class DataCenter {
 			EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
 		} catch (SnappydbException e) {
 			Logger.w(e.getMessage());
-		} catch (RetrofitError error){
+		} catch (RetrofitError error) {
 			Logger.w(error.getMessage());
 			EventBus.getDefault().post(new ContainerSearchedEvent(true));
 		}
