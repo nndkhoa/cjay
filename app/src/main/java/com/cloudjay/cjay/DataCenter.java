@@ -427,8 +427,8 @@ public class DataCenter {
 	 * @param context
 	 * @param keyword
 	 */
-	@Background(serial = CACHE)
-	public void search(Context context, String keyword) throws RetrofitError {
+	@Background
+	public void search(Context context, String keyword) {
 
 		String[] keysResult;
 		try {
@@ -472,9 +472,9 @@ public class DataCenter {
 	 * @param context
 	 * @param keyword
 	 */
-	@Background(serial = NETWORK)
+	@Background
 	@Trace
-	public void searchAsync(Context context, String keyword) throws RetrofitError {
+	public void searchAsync(Context context, String keyword) {
 
 		try {
 			Logger.Log("Begin to search container from server");
@@ -494,6 +494,9 @@ public class DataCenter {
 			EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
 		} catch (SnappydbException e) {
 			Logger.w(e.getMessage());
+		} catch (RetrofitError error){
+			Logger.w(error.getMessage());
+			EventBus.getDefault().post(new ContainerSearchedEvent(true));
 		}
 	}
 

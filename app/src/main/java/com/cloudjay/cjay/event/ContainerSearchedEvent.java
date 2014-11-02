@@ -26,8 +26,22 @@ public class ContainerSearchedEvent {
 
 	private List<Session> sessions;
 
+	public boolean isFailed() {
+		return failed;
+	}
+
+	public void setFailed(boolean failed) {
+		this.failed = failed;
+	}
+
+	private boolean failed = false;
+
 	public ContainerSearchedEvent(List<Session> sessions) {
 		this.sessions = sessions;
+	}
+
+	public ContainerSearchedEvent(boolean failed) {
+		this.failed = failed;
 	}
 
 	public boolean isSingleChange() {

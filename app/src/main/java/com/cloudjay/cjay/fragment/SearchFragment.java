@@ -212,12 +212,7 @@ public class SearchFragment extends Fragment {
 
 		// Start search in background
 		containerID = keyword;
-		try {
-			dataCenter.search(getActivity(), keyword);
-		} catch (RetrofitError error){
-			Logger.e(error.getMessage());
-			Toast.makeText(getActivity(), "Đang trong quá trình cập nhật dữ liệu, vui lòng thử lại sau", Toast.LENGTH_SHORT).show();
-		}
+		dataCenter.search(getActivity(), keyword);
 
 	}
 
@@ -252,15 +247,19 @@ public class SearchFragment extends Fragment {
 	public void onEvent(ContainerSearchedEvent event) {
 
 		showProgress(false);
-		List<Session> result = event.getSessions();
-
-		mAdapter.clear();
-		if (result.size() != 0) {
-			mAdapter.setData(result);
-			mAdapter.notifyDataSetChanged();
-
+		if (event.isFailed()) {
+			llSearchResult.setVisibility(View.GONE);
+			Toast.makeText(getActivity(), "Đang trong quá trình cập nhật dữ liệu, vui lòng thử lại sau", Toast.LENGTH_SHORT).show();
 		} else {
-			showSearchResultDialog(containerID);
+			List<Session> result = event.getSessions();
+			mAdapter.clear();
+			if (result.size() != 0) {
+				mAdapter.setData(result);
+				mAdapter.notifyDataSetChanged();
+
+			} else {
+				showSearchResultDialog(containerID);
+			}
 		}
 	}
 	//endregion
