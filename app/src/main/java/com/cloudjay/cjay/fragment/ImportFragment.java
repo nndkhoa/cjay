@@ -271,7 +271,7 @@ public class ImportFragment extends Fragment {
 
 		// Add current container to job queue
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getStep(), false));
+		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), false));
 
 		// Go to next fragment
 		AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID)
