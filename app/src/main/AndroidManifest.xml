@@ -60,7 +60,7 @@
 			android:label="@string/title_activity_reuse"
 			android:screenOrientation="portrait"></activity>
 		<activity
-			android:name=".activity.ReportIssueActivity"
+			android:name=".activity.ReportIssueActivity_"
 			android:label="@string/title_activity_report_issue"
 			android:screenOrientation="portrait"></activity>
 		<activity

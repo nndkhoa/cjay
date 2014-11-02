@@ -148,6 +148,7 @@
     <string name="issue_unapproved">Chưa duyệt</string>
     <string name="issue_approved">Đã duyệt</string>
     <string name="issue_can_not_repair">Cấm sửa</string>
+    <string name="issue_code_missing_warning">Xin vui lòng nhập code</string>
 
 
 

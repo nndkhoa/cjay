@@ -4,5 +4,13 @@
 		<item >@string/standard</item>
 		<item >@string/ffc</item>
 	</string-array>
-
+    <string-array name="issue_report_tabs">
+        <item>PHOTO</item>
+        <item>CODE component</item>
+        <item>CODE vị trí</item>
+        <item>CODE hư hỏng</item>
+        <item>CODE sửa chữa</item>
+        <item>Kích thước</item>
+        <item>Số lượng</item>
+    </string-array>
 </resources>

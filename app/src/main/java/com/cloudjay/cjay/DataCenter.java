@@ -8,6 +8,7 @@ import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
 import com.cloudjay.cjay.event.IssueDeletedEvent;
 import com.cloudjay.cjay.event.IssueMergedEvent;
+import com.cloudjay.cjay.event.IssueUpdatedEvent;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.event.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
@@ -912,6 +913,16 @@ public class DataCenter {
 
 	}
 
+    public AuditImage getAuditImageByUUId(Context context, String auditImageUUID) {
+        try {
+            DB db = App.getDB(context);
+            return db.getObject(auditImageUUID, AuditImage.class);
+        } catch (SnappydbException e) {
+            Logger.e(e.getMessage());
+        }
+        return null;
+    }
+
 	/**
 	 * Add log message to database. This method will be called from:
 	 * - Add container to queue
@@ -1199,6 +1210,28 @@ public class DataCenter {
 		}
 	}
 
+    public IsoCode getIsoCode(Context context, String prefix, String code) {
+        try {
+            DB db = App.getDB(context);
+            String[] keyResults = db.findKeys(prefix + code);
+            if (keyResults.length > 0) {
+                IsoCode isoCode = db.getObject(keyResults[0], IsoCode.class);
+
+                Logger.Log("getCode: " + isoCode.getCode());
+                Logger.Log("getId: " + isoCode.getId());
+
+                return isoCode;
+            } else {
+                return null;
+            }
+
+
+        } catch (SnappydbException e) {
+            Logger.e(e.getMessage());
+            return null;
+        }
+    }
+
 	public void changeUploadState(Context context, String containerId,
 	                              AuditItem auditItem) {
 		try {
@@ -1236,6 +1269,8 @@ public class DataCenter {
 			}
 
 			db.put(containerId, session);
+
+            EventBus.getDefault().post(new IssueUpdatedEvent(containerId));
 
 			Logger.Log("update successfully");
 

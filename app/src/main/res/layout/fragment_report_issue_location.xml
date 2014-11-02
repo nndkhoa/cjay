@@ -1,0 +1,105 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:paddingBottom="10dp"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
+        android:paddingTop="10dp" >
+
+        <EditText
+            android:id="@+id/locationCode0"
+            style="@style/IssueReportLocationCodeEditText"
+            android:tag="0" />
+
+        <EditText
+            android:id="@+id/locationCode1"
+            style="@style/IssueReportLocationCodeEditText"
+            android:tag="1" />
+
+        <EditText
+            android:id="@+id/locationCode2"
+            style="@style/IssueReportLocationCodeEditText"
+            android:tag="2" />
+
+        <EditText
+            android:id="@+id/locationCode3"
+            style="@style/IssueReportLocationCodeEditText"
+            android:tag="3" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:paddingBottom="2dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="2dp" >
+
+        <Button
+            android:id="@+id/btnCode0"
+            style="@style/IssueReportLocationCodeButton" />
+
+        <Button
+            android:id="@+id/btnCode1"
+            style="@style/IssueReportLocationCodeButton" />
+
+        <Button
+            android:id="@+id/btnCode2"
+            style="@style/IssueReportLocationCodeButton" />
+
+        <Button
+            android:id="@+id/btnCode3"
+            style="@style/IssueReportLocationCodeButton" />
+
+        <Button
+            android:id="@+id/btnCode4"
+            style="@style/IssueReportLocationCodeButton" />
+
+        <Button
+            android:id="@+id/btnCode5"
+            style="@style/IssueReportLocationCodeButton" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:paddingBottom="2dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="2dp" >
+
+        <Button
+            android:id="@+id/btnCode6"
+            style="@style/IssueReportLocationCodeButton" />
+
+        <Button
+            android:id="@+id/btnCode7"
+            style="@style/IssueReportLocationCodeButton" />
+
+        <Button
+            android:id="@+id/btnCode8"
+            style="@style/IssueReportLocationCodeButton" />
+
+        <Button
+            android:id="@+id/btnCode9"
+            style="@style/IssueReportLocationCodeButton" />
+
+        <Button
+            android:id="@+id/btnCode10"
+            style="@style/IssueReportLocationCodeButton" />
+
+        <Button
+            android:id="@+id/btnCode11"
+            style="@style/IssueReportLocationCodeButton" />
+    </LinearLayout>
+
+</LinearLayout>

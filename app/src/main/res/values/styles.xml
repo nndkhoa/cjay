@@ -39,4 +39,33 @@
         <item name="android:backgroundSplit">@android:color/white</item>
     </style>
 
+    <style name="CJayListView">
+        <item name="android:scrollbars">none</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:choiceMode">singleChoice</item>
+        <item name="android:textColor">@android:color/background_dark</item>
+        <!--<item name="android:textAppearance">@android:attr/textAppearanceListItem</item>-->
+    </style>
+
+    <style name="IssueReportLocationCodeEditText">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginLeft">10dp</item>
+        <item name="android:layout_marginRight">10dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">40sp</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+        <item name="android:background">@drawable/textview_location_background</item>
+    </style>
+
+    <style name="IssueReportLocationCodeButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginLeft">2dp</item>
+        <item name="android:layout_marginRight">2dp</item>
+        <item name="android:text">"X"</item> <!-- a place holder, actual text assigned at runtime -->
+    </style>
+
 </resources>

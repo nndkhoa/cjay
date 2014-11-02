@@ -1,24 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.cloudjay.cjay.activity.ReportIssueActivity">
-
+    android:paddingLeft="2dp"
+    android:paddingRight="2dp" >
 
     <ImageView
-        android:id="@+id/iv_audit_image"
+        android:id="@+id/item_picture"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"
+        android:layout_weight="1"
+        android:contentDescription="ID"
         android:src="@drawable/ic_app"
         android:scaleType="fitCenter" />
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pv_pager"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="7" />
 
 </LinearLayout>

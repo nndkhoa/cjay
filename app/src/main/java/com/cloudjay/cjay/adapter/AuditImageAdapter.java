@@ -1,25 +1,15 @@
 package com.cloudjay.cjay.adapter;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.FragmentManager;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.activity.MergeIssueActivity;
 import com.cloudjay.cjay.model.AuditImage;
-import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.view.CheckableImageView;
-import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.imageaware.ImageAware;
 import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;

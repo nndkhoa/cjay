@@ -18,6 +18,7 @@ import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.MergeIssueActivity_;
+import com.cloudjay.cjay.activity.ReportIssueActivity_;
 import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
@@ -276,9 +277,13 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		builder.setPositiveButton("Chưa", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
-				dialogInterface.dismiss();
 
-				// TODO: @vule: open ReportIssueActivity
+                Intent intent = new Intent(mContext, ReportIssueActivity_.class);
+                intent.putExtra(ReportIssueActivity_.CONTAINER_ID_EXTRA, containerId);
+                intent.putExtra(ReportIssueActivity_.AUDIT_IMAGE_EXTRA, item.getAuditImages().get(0).getAuditImageUUID());
+                intent.putExtra(ReportIssueActivity_.AUDIT_ITEM_EXTRA, item.getAuditItemUUID());
+
+                mContext.startActivity(intent);
 			}
 		});
 
