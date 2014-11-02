@@ -160,7 +160,7 @@ public class ExportFragment extends Fragment {
 		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
 		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.EXPORT.value);
 		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.EXPORT.value);
+		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.EXPORTED.value);
 		startActivity(cameraActivityIntent);
 	}
 
@@ -183,7 +183,7 @@ public class ExportFragment extends Fragment {
 	@Click(R.id.btn_complete_audit)
 	void btnCompleteClicked() {
 
-		if (mSession.isValidToUpload(Step.EXPORT) == false) {
+		if (mSession.isValidToUpload(Step.EXPORTED) == false) {
 			Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
 			return;
 		}

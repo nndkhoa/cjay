@@ -295,6 +295,7 @@ public class ImportFragment extends Fragment {
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
 		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getStep(), true));
+		Logger.e(String.valueOf(mSession.getStep()));
 
 		// Navigate to HomeActivity
 //		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);

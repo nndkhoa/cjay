@@ -181,7 +181,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 				jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), step.value, true));
 
 				//In step export check all image, upload all error image then upload session
-			case EXPORT:
+			case EXPORTED:
 				for (GateImage image : session.getGateImages()) {
 					if (image.getType() == ImageType.EXPORT.value && image.getUploadStatus() != UploadStatus.ERROR.value) {
 						jobManager.addJobInBackground(new UploadImageJob(image.getUrl(), image.getName(), session.getContainerId(), ImageType.EXPORT));

@@ -486,8 +486,8 @@ public class Session {
 
 				return true;
 
-			// Chỉ cần có ít nhất một tấm hình EXPORT là hợp lệ
-			case EXPORT:
+			// Chỉ cần có ít nhất một tấm hình EXPORTED là hợp lệ
+			case EXPORTED:
 				for (GateImage image : gateImages) {
 					if (image.getType() == ImageType.EXPORT.value) return true;
 				}

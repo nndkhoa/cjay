@@ -64,6 +64,35 @@ public class UploadSessionJob extends Job {
 			dataCenter.changeUploadState(context, containerId, UploadStatus.UPLOADING);
 			dataCenter.changeSessionLocalStep(context, containerId, Step.AUDIT);
 
+			Step step = Step.values()[currentStep];
+			switch (step) {
+				case EXPORTED:
+
+					dataCenter.addLog(context, containerId, "EXPORTED | Bắt đầu quá trình upload");
+					dataCenter.changeSessionLocalStep(context, containerId, Step.EXPORTED);
+					break;
+
+				case AUDIT:
+					dataCenter.addLog(context, containerId, "AUDIT | Bắt đầu quá trình upload");
+					dataCenter.changeSessionLocalStep(context, containerId, Step.REPAIR);
+					break;
+
+				case REPAIR:
+					dataCenter.addLog(context, containerId, "REPAIR | Bắt đầu quá trình upload");
+					dataCenter.changeSessionLocalStep(context, containerId, Step.AVAILABLE);
+					break;
+
+				case IMPORT:
+					dataCenter.addLog(context, containerId, "IMPORT | Bắt đầu quá trình upload");
+					dataCenter.changeSessionLocalStep(context, containerId, Step.AUDIT);
+					break;
+
+				default:
+					dataCenter.addLog(context, containerId, "HAND CLEANING | Bắt đầu quá trình upload");
+					dataCenter.changeSessionLocalStep(context, containerId, Step.AVAILABLE);
+					break;
+			}
+
 			if (needToClearFromWorking) {
 				DataCenter_.getInstance_(context).removeWorkingSession(context, containerId);
 			}
@@ -93,9 +122,9 @@ public class UploadSessionJob extends Job {
 
 		Step step = Step.values()[currentStep];
 		switch (step) {
-			case EXPORT:
+			case AVAILABLE:
 
-				dataCenter.addLog(context, containerId, "EXPORT | Bắt đầu quá trình upload");
+				dataCenter.addLog(context, containerId, "EXPORTED | Bắt đầu quá trình upload");
 				dataCenter.uploadExportSession(context, containerId);
 				break;
 
