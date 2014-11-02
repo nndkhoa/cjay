@@ -422,4 +422,10 @@ public class Utils {
 		}
 		return null;
 	}
+
+	public static String getImageNameFromUrl(String url) {
+		String name = url.substring(url.lastIndexOf("/") + 1,
+				url.length());
+		return name;
+	}
 }

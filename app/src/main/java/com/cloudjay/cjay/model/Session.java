@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.model;
 
 
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
@@ -616,8 +617,10 @@ public class Session {
 		List<GateImage> mergedGateImages = new ArrayList<GateImage>();
 		for (GateImage gateImageServer : session.getGateImages()) {
 			for (GateImage gateImage : this.getGateImages()) {
-				gateImage.mergeGateImage(gateImageServer);
-				mergedGateImages.add(gateImage);
+				if (gateImage.getName().equals(Utils.getImageNameFromUrl(gateImageServer.getUrl()))) {
+					gateImage.mergeGateImage(gateImageServer);
+					mergedGateImages.add(gateImage);
+				}
 			}
 		}
 		this.setGateImages(mergedGateImages);
@@ -626,8 +629,10 @@ public class Session {
 		List<AuditItem> mergedAuditItem = new ArrayList<AuditItem>();
 		for (AuditItem auditItemServer : session.getAuditItems()) {
 			for (AuditItem auditItem : this.getAuditItems()) {
-				auditItem.mergeAuditItem(auditItemServer);
-				mergedAuditItem.add(auditItem);
+				if (auditItem.getAuditItemUUID().equals(auditItemServer.getAuditItemUUID())) {
+					auditItem.mergeAuditItem(auditItemServer);
+					mergedAuditItem.add(auditItem);
+				}
 			}
 		}
 		this.setAuditItems(mergedAuditItem);

@@ -347,7 +347,6 @@ public class NetworkClient {
                 item.setAuditItemUUID(auditItemUUID);
             }
         }
-
         postAuditItemSession.setAuditItems(list);
 		return postAuditItemSession;
 	}
