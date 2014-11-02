@@ -94,7 +94,7 @@ dependencies {
 
     compile files('libs/javax.annotation-3.2-b06.jar')
     compile files('libs/crouton-1.8.1.jar')
-
+    compile files('libs/bcprov-jdk15on-1.47.jar')
     compile files('libs/Pubnub-Android-3.7.0.jar')
     compile files('libs/helpertoolsforandroid.jar')
     compile files('libs/commons-lang-2.6.jar')

@@ -167,6 +167,7 @@ public class PubnubService extends Service {
 //		}
 
 		notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
 		pubnub = new Pubnub(PUBLISH_KEY, SUBSCRIBE_KEY);
 		if (TextUtils.isEmpty(depotChannel) || TextUtils.isEmpty(uuidChannel)) {
 
