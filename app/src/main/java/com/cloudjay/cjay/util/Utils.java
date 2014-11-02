@@ -12,11 +12,13 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 
 import com.cloudjay.cjay.App;
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
@@ -95,12 +97,17 @@ public class Utils {
 
 		// --------
 		// Configure Pubnub Service
-		Intent pubnubIntent = new Intent(context, PubnubService_.class);
-		PendingIntent pPubnubIntent = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-		// wake up every 5 minutes to ensure service stays alive
-		alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
-				(5 * 60 * 1000), pPubnubIntent);
+		String token = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_TOKEN);
+
+		if (!TextUtils.isEmpty(token)) {
+			Intent pubnubIntent = new Intent(context, PubnubService_.class);
+			PendingIntent pPubnubIntent = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+			// wake up every 5 minutes to ensure service stays alive
+			alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+					(5 * 60 * 1000), pPubnubIntent);
+		}
 	}
 
 	/**

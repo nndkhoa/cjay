@@ -153,6 +153,10 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 				User user = dataCenter.getCurrentUserAsync(this);
 				if (null != user) {
 
+					if (!Utils.isAlarmUp(getApplicationContext())) {
+						Utils.startAlarm(getApplicationContext());
+					}
+
 					// Navigate to Home Activity
 					Logger.Log("Navigate to Home Activity");
 					Intent intent = new Intent(getApplicationContext(), HomeActivity_.class);
