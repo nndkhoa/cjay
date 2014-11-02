@@ -6,8 +6,8 @@ import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.AuditImagesGotEvent;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
-import com.cloudjay.cjay.event.IssueDeletedEvent;
-import com.cloudjay.cjay.event.IssueMergedEvent;
+import com.cloudjay.cjay.event.issue.IssueDeletedEvent;
+import com.cloudjay.cjay.event.issue.IssueMergedEvent;
 import com.cloudjay.cjay.event.OperatorsGotEvent;
 import com.cloudjay.cjay.event.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
@@ -157,7 +157,6 @@ public class DataCenter {
 			DB db = App.getDB(context);
 			String key = CJayConstant.PREFIX_OPERATOR + operatorCode;
 			Operator operator = db.getObject(key, Operator.class);
-			// db.close();
 			return operator;
 
 		} catch (SnappydbException e) {
@@ -434,6 +433,7 @@ public class DataCenter {
 		String[] keysResult;
 		try {
 			DB db = App.getDB(context);
+
 			// try to search from client database
 			keysResult = db.findKeys(keyword);
 			List<Session> sessions = new ArrayList<>();
@@ -1430,6 +1430,7 @@ public class DataCenter {
 	// endregion
 
 	//region AUDIT ITEM
+
 	/**
 	 * Get audit item from server by id.
 	 * <p/>

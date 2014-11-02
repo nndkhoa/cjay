@@ -219,29 +219,13 @@ public class SearchFragment extends Fragment {
 		llSearchResult.setVisibility(show ? View.GONE : View.VISIBLE);
 	}
 
-	/**
-	 * @param event
-	 */
-	@UiThread
-	public void onEvent(ContainerSearchedEvent event) {
-
-		showProgress(false);
-		List<Session> result = event.getSessions();
-		mAdapter.clear();
-
-		if (result.size() != 0) {
-			mAdapter.setData(result);
-			mAdapter.notifyDataSetChanged();
-		} else {
-			showSearchResultDialog(containerID);
-		}
-	}
-
 	@Override
 	public void onResume() {
 		super.onResume();
 		llSearchResult.setVisibility(View.GONE);
 	}
+
+	//region EVENT HANDLER
 
 	/**
 	 * Bắt đầu search từ Server
@@ -252,6 +236,26 @@ public class SearchFragment extends Fragment {
 	public void onEvent(SearchAsyncStartedEvent event) {
 		Toast.makeText(getActivity(), event.getStringEvent(), Toast.LENGTH_SHORT).show();
 	}
+
+	/**
+	 * @param event
+	 */
+	@UiThread
+	public void onEvent(ContainerSearchedEvent event) {
+
+		showProgress(false);
+		List<Session> result = event.getSessions();
+
+		mAdapter.clear();
+		if (result.size() != 0) {
+			mAdapter.setData(result);
+			mAdapter.notifyDataSetChanged();
+
+		} else {
+			showSearchResultDialog(containerID);
+		}
+	}
+	//endregion
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
