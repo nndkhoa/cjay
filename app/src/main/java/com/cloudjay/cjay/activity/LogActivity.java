@@ -1,5 +1,6 @@
 package com.cloudjay.cjay.activity;
 
+import android.app.Activity;
 import android.text.TextUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -25,7 +26,7 @@ import org.androidannotations.annotations.ViewById;
 import java.util.List;
 
 @EActivity(R.layout.activity_log)
-public class LogActivity extends BaseActivity {
+public class LogActivity extends Activity {
 
 	@ViewById(R.id.lv_log)
 	ListView lvLog;
@@ -75,7 +76,6 @@ public class LogActivity extends BaseActivity {
 		updatedData(list);
 	}
 
-	@Background
 	void refresh() {
 		List<LogItem> list = dataCenter.getListLogItems(this.getApplicationContext(),
 				CJayConstant.PREFIX_LOG);

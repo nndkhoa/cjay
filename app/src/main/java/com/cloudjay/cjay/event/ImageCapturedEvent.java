@@ -19,7 +19,7 @@ public class ImageCapturedEvent {
 
 	}
 
-	public ImageCapturedEvent(String containerId, ImageType imageType, String auditItemUUID) {
+	public ImageCapturedEvent(String containerId, ImageType imageType,String auditItemUUID) {
 
 		this.containerId = containerId;
 		this.imageType = imageType.value;
@@ -35,7 +35,7 @@ public class ImageCapturedEvent {
 		return this.imageType;
 	}
 
-	public AuditItem getAuditItem() {
-		return this.getAuditItem();
+	public String getAuditItemUUID() {
+		return this.auditItemUUID;
 	}
 }

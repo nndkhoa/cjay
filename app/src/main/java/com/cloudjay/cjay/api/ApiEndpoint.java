@@ -24,10 +24,10 @@ public class ApiEndpoint {
 	public static final String CJAY_TMP_STORAGE = "https://www.googleapis.com";
 	public static final String CJAY_TMP_STORAGE_IMAGE = "/upload/storage/v1beta2/b/cjaytmp/o";
 
-    public static final String PUBNUB_AUDITITEM = "/api/cjay/audit-items/{id}";
-    public static final String PUBNUB_DAMAGECODE = "/api/cjay/damage-codes/{id}";
-    public static final String PUBNUB_REPAIRCODE = "/api/cjay/repair-codes/{id}";
-    public static final String PUBNUB_COMPONENTCODE = "/api/cjay/component-codes/{id}";
-    public static final String PUBNUB_OPERATOR = "/api/cjay/repair-codes/{id}";
-    public static final String PUBNUB_GOTMESSAGE = "/pubnub-retry/got-message";
+	public static final String PUBNUB_AUDITITEM = "/api/cjay/audit-items/{id}";
+	public static final String PUBNUB_DAMAGECODE = "/api/cjay/damage-codes/{id}";
+	public static final String PUBNUB_REPAIRCODE = "/api/cjay/repair-codes/{id}";
+	public static final String PUBNUB_COMPONENTCODE = "/api/cjay/component-codes/{id}";
+	public static final String PUBNUB_OPERATOR = "/api/cjay/repair-codes/{id}";
+	public static final String PUBNUB_GOTMESSAGE = "/pubnub-retry/got-message";
 }

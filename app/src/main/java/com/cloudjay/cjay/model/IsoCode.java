@@ -26,12 +26,12 @@ public class IsoCode {
 		}
 	}
 
+
+	// key = CJayConstant.PREFIX_DAMAGE_CODE + "DB"
 	@Expose
 	private long id;
-
 	@Expose
 	private String code;
-
 	@SerializedName("full_name")
 	@Expose
 	private String fullName;

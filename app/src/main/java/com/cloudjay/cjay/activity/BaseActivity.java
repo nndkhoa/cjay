@@ -23,6 +23,7 @@ import com.snappydb.SnappydbException;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.UiThread;
 
 import java.lang.reflect.Method;
 
@@ -117,10 +118,8 @@ public class BaseActivity extends FragmentActivity {
 		super.onDestroy();
 	}
 
-	public void onEventMainThread(SessionsFetchedEvent event) {
+	public void onEvent(SessionsFetchedEvent event) {
 		Utils.showCrouton(this, "All sessions are fetched");
-
-//		UIHelper.toast(getApplicationContext(), "All sessions are fetched");
 	}
 
 	public void onEvent(UserLoggedOutEvent event) {

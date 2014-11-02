@@ -8,7 +8,8 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadSessionAdapter;
-import com.cloudjay.cjay.event.upload.ItemEnqueueEvent;
+import com.cloudjay.cjay.event.upload.ContainerUploadedEvent;
+import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
@@ -19,7 +20,6 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -60,7 +60,6 @@ public class UploadFragment extends Fragment {
 	/**
 	 * Initial loader and set adapter for list view
 	 */
-	@Trace
 	@AfterViews
 	void initLoader() {
 		mAdapter = new UploadSessionAdapter(getActivity(), R.layout.item_upload);
@@ -69,15 +68,12 @@ public class UploadFragment extends Fragment {
 		refresh();
 	}
 
-	@Trace
-	@Background
 	void refresh() {
 		List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
 				CJayConstant.PREFIX_UPLOADING);
 		updatedData(list);
 	}
 
-	@Trace
 	@UiThread
 	public void updatedData(List<Session> sessionList) {
 		mAdapter.clear();
@@ -91,7 +87,11 @@ public class UploadFragment extends Fragment {
 
 
 	//region Handle EventBus
-	public void onEvent(ItemEnqueueEvent event) {
+	public void onEvent(UploadStartedEvent event) {
+		refresh();
+	}
+
+	public void onEvent(ContainerUploadedEvent event) {
 		refresh();
 	}
 
@@ -103,7 +103,6 @@ public class UploadFragment extends Fragment {
 		refresh();
 	}
 
-	@Trace
 	public void onEvent(UploadedEvent event) {
 		refresh();
 	}

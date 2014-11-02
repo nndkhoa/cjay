@@ -7,6 +7,7 @@ import android.view.KeyEvent;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.fragment.CameraFragment_;
+import com.cloudjay.cjay.model.AuditItem;
 
 import org.androidannotations.annotations.AfterExtras;
 import org.androidannotations.annotations.EActivity;
@@ -19,8 +20,7 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 	public final static String OPERATOR_CODE_EXTRA = "com.cloudjay.wizard.operatorCode";
 	public final static String IMAGE_TYPE_EXTRA = "com.cloudjay.wizard.imageType";
 	public final static String CURRENT_STEP_EXTRA = "com.cloudjay.wizard.currentStep";
-
-    // This Extra bundle is used to open Detail Issue Activity only
+    // This Extra bundle is use to open Detail Issue Activity only
     public final static String AUDIT_ITEM_UUID_EXTRA = "com.cloudjay.wizard.auditItemUUID";
 
 	@Extra(IMAGE_TYPE_EXTRA)

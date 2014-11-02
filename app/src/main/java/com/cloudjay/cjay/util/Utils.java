@@ -22,7 +22,6 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.service.PubnubService;
 import com.cloudjay.cjay.task.service.PubnubService_;
 import com.cloudjay.cjay.task.service.QueueIntentService_;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -35,7 +34,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
@@ -52,19 +50,6 @@ public class Utils {
 			db.destroy();
 		} catch (SnappydbException e) {
 			Logger.w(e.getMessage());
-		}
-	}
-
-	/**
-	 * Start pubnub service
-	 *
-	 * @param context
-	 */
-	public void startPubnubService(Context context) {
-
-		if (Utils.isRunning(context, PubnubService_.class.getName())) {
-			Intent intent = new Intent(context, PubnubService_.class);
-			context.startService(intent);
 		}
 	}
 
@@ -88,11 +73,12 @@ public class Utils {
 	}
 
 	/**
-	 * Init alarm manager to start QueueIntentService and PubnubService
+	 * Init alarm manager to start QueueIntentService
 	 *
 	 * @param context
 	 */
 	public static void startAlarm(Context context) {
+
 		// start 30 seconds after boot completed
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.SECOND, 30);
@@ -109,7 +95,7 @@ public class Utils {
 
 		// --------
 		// Configure Pubnub Service
-		Intent pubnubIntent = new Intent(context, PubnubService.class);
+		Intent pubnubIntent = new Intent(context, PubnubService_.class);
 		PendingIntent pPubnubIntent = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 		// wake up every 5 minutes to ensure service stays alive
@@ -134,6 +120,7 @@ public class Utils {
 		else
 			return false;
 	}
+
 
 	/**
 	 * Get app version name
@@ -161,7 +148,7 @@ public class Utils {
 	public static void showCrouton(Activity context, int textResId) {
 		Crouton.cancelAllCroutons();
 		final Crouton crouton = Crouton.makeText(context, textResId, Style.ALERT);
-		crouton.setConfiguration(new de.keyboardsurfer.android.widget.crouton.Configuration.Builder().setDuration(Configuration.DURATION_LONG).build());
+		crouton.setConfiguration(new de.keyboardsurfer.android.widget.crouton.Configuration.Builder().setDuration(de.keyboardsurfer.android.widget.crouton.Configuration.DURATION_INFINITE).build());
 		crouton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -180,7 +167,7 @@ public class Utils {
 	public static void showCrouton(Activity context, String message) {
 		Crouton.cancelAllCroutons();
 		final Crouton crouton = Crouton.makeText(context, message, Style.ALERT);
-		crouton.setConfiguration(new de.keyboardsurfer.android.widget.crouton.Configuration.Builder().setDuration(Configuration.DURATION_LONG).build());
+		crouton.setConfiguration(new de.keyboardsurfer.android.widget.crouton.Configuration.Builder().setDuration(de.keyboardsurfer.android.widget.crouton.Configuration.DURATION_INFINITE).build());
 		crouton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -277,6 +264,51 @@ public class Utils {
 		}
 
 
+	}
+
+	/**
+	 * Count total image off session
+	 *
+	 * @param session
+	 * @return
+	 */
+	public static int countTotalImage(Session session) {
+		int totalImage = 0;
+		List<AuditItem> auditItems = session.getAuditItems();
+		if (auditItems != null) {
+			for (AuditItem auditItem : auditItems) {
+				totalImage = totalImage + auditItem.getAuditImages().size();
+			}
+			totalImage = totalImage + session.getGateImages().size();
+			return totalImage;
+		} else {
+			totalImage = session.getGateImages().size();
+			return totalImage;
+		}
+	}
+
+	public static int countUploadedImage(Session session) {
+		int uploadedImage = 0;
+		List<AuditItem> auditItems = session.getAuditItems();
+		if (auditItems != null) {
+			for (AuditItem auditItem : auditItems) {
+				List<AuditImage> auditImages = auditItem.getAuditImages();
+				for (AuditImage auditImage : auditImages) {
+					if (auditImage.getUploadStatus() == UploadStatus.COMPLETE.value) {
+						uploadedImage = uploadedImage + 1;
+					}
+				}
+
+			}
+		}
+
+		List<GateImage> gateImages = session.getGateImages();
+		for (GateImage gateImage : gateImages) {
+			if (gateImage.getUploadStatus() == UploadStatus.COMPLETE.value) {
+				uploadedImage = uploadedImage + 1;
+			}
+		}
+		return uploadedImage;
 	}
 
 	public static String getImageTypeDescription(Context ctx, int type) {

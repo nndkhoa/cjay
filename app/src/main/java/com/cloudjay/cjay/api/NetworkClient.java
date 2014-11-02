@@ -23,6 +23,8 @@ import org.androidannotations.annotations.EBean;
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import retrofit.RestAdapter;
@@ -78,7 +80,7 @@ public class NetworkClient {
 	 * @param imageName
 	 * @return
 	 */
-	public Response uploadImage(String uri, String imageName) throws RetrofitError {
+	public Response uploadImage(String uri, String imageName) {
 
 		// Init explicit rest adapter for upload to Google Cloud Storage
 		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.CJAY_TMP_STORAGE).build();
@@ -260,18 +262,15 @@ public class NetworkClient {
 	}
 
 	public List<Session> searchSessions(Context context, String keyword) {
-		List<Session> sessions = new ArrayList<>();
-		try {
-			JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).searchContainer(keyword);
-			JsonArray results = jsonObject.getAsJsonArray("results");
-			Gson gson = new Gson();
-			Type listType = new TypeToken<List<Session>>() {
-			}.getType();
-			List<Session> sessionsPage = gson.fromJson(results, listType);
-			sessions.addAll(sessionsPage);
-		} catch (RetrofitError e) {
-			e.printStackTrace();
-		}
+
+		List<Session> sessions = new ArrayList<Session>();
+		JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).searchContainer(keyword);
+		JsonArray results = jsonObject.getAsJsonArray("results");
+		Gson gson = new Gson();
+		Type listType = new TypeToken<List<Session>>() {
+		}.getType();
+		List<Session> sessionsPage = gson.fromJson(results, listType);
+		sessions.addAll(sessionsPage);
 
 		return sessions;
 	}
@@ -335,20 +334,21 @@ public class NetworkClient {
 	 * @return
 	 */
 	public Session postAuditItem(Context context, Session containerSession, AuditItem auditItem) {
-		Logger.Log("containerSession: " + containerSession.getId());
-		Logger.Log("auditItem: " + auditItem.getAuditItemToUpload());
 
-		String auditItemUUID = auditItem.getAuditItemUUID();
+        Logger.Log("containerSession: " + containerSession.getId());
+        Logger.Log("auditItem: " + auditItem.getAuditItemToUpload());
+
+        String auditItemUUID = auditItem.getAuditItemUUID();
 		Session postAuditItemSession = provider.getRestAdapter(context).create(NetworkService.class).postAudiItem(containerSession.getId(), auditItem.getAuditItemToUpload());
-		List<AuditItem> list = postAuditItemSession.getAuditItems();
-		for (AuditItem item : list) {
-			if (item.equals(auditItem)) {
-				Logger.Log("Set here");
-				item.setAuditItemUUID(auditItemUUID);
-			}
-		}
+        List<AuditItem> list = postAuditItemSession.getAuditItems();
+        for (AuditItem item : list) {
+            if (item.equals(auditItem)) {
+                Logger.Log("Set here");
+                item.setAuditItemUUID(auditItemUUID);
+            }
+        }
 
-		postAuditItemSession.setAuditItems(list);
+        postAuditItemSession.setAuditItems(list);
 		return postAuditItemSession;
 	}
 
@@ -375,6 +375,7 @@ public class NetworkClient {
 		Session handCleaningSession = provider.getRestAdapter(context).create(NetworkService.class).setHandCleaningSession(session.getId());
 		return handCleaningSession;
 	}
+
 
 	/**
 	 * Get audit item through id by pubnub

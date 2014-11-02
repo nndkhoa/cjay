@@ -22,6 +22,10 @@ public class AuditImage {
 	@Expose
 	private String url;
 
+	private String name;
+
+	private int uploadStatus;
+
 	public String getAuditImageUUID() {
 		return auditImageUUID;
 	}
@@ -33,11 +37,6 @@ public class AuditImage {
 	@SerializedName("audit_image_uuid")
 	@Expose
 	private String auditImageUUID;
-
-
-	private String name;
-
-	private int uploadStatus;
 
 	public int getUploadStatus() {
 		return uploadStatus;

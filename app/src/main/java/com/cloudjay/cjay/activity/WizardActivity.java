@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.activity;
 
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 
 import com.cloudjay.cjay.R;
@@ -42,7 +43,7 @@ public class WizardActivity extends BaseActivity {
 			case AUDIT:
 			case REPAIR:
 				fragment = AuditAndRepairFragment_.builder().containerID(containerID)
-						.tabType(1).build();
+                        .tabType(1).build();
 				break;
 
 			// Load fragment Export

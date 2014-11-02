@@ -17,10 +17,10 @@
 		android:layout_width="0px"
 		android:layout_height="wrap_content"
 		android:layout_weight="1"
-		android:gravity="center_vertical"
-		android:orientation="vertical"
 		android:paddingLeft="12dp"
-		android:paddingRight="12dp">
+		android:paddingRight="12dp"
+		android:gravity="center_vertical"
+		android:orientation="vertical">
 
 		<TextView
 			android:id="@+id/tv_containerId_uploading"
@@ -87,6 +87,5 @@
 		android:background="@null"
 		android:clickable="false"
 		android:src="@drawable/ic_success"
-		android:visibility="visible"/>
-
+		android:visibility="gone"/>
 </LinearLayout>

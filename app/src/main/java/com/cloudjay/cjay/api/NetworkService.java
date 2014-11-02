@@ -60,7 +60,7 @@ public interface NetworkService {
     public JsonObject searchContainer(@Query("search") String keyword);
 
     @POST(ApiEndpoint.CONTAINER_SESSIONS_API)
-    public Session postContainer(@Body JsonObject jsonSessionString);
+    public Session postContainer( @Body JsonObject jsonSessionString);
 
     @PUT(ApiEndpoint.CONTAINER_SESSION_CHECK_OUT_API)
     public Session checkOutContainerSession(@Path("id") long containerPk, @Body JsonArray jsonGateImage);
@@ -72,35 +72,34 @@ public interface NetworkService {
     public Session completeRepair(@Path("id") long containerPk, @Body JsonArray audit_items);
 
     @PUT(ApiEndpoint.CONTAINER_SESSION_POST_AUDIT_ITEM_API)
-    public Session postAudiItem(@Path("id") long containerPk, @Body JsonObject audit_item);
+    public Session postAudiItem(@Path("id") long containerPk,@Body JsonObject audit_item);
 
     @PUT(ApiEndpoint.CONTAINER_SESSION_ADD_AUDIT_IMAGES_API)
-    public AuditItem addAuditImages(@Path("id") String auditId, @Body JsonArray auditImages);
+    public AuditItem addAuditImages (@Path("id") String auditId, @Body JsonArray auditImages);
 
     @PUT(ApiEndpoint.CONTAINER_SESSION_HAND_CLEANING)
-    public Session setHandCleaningSession(@Path("id") long containerPk);
+    public Session setHandCleaningSession (@Path("id") long containerPk);
 
     // Check source v1, uploadType=media
     @POST(ApiEndpoint.CJAY_TMP_STORAGE_IMAGE)
     public Response postImageFile(@Header("Content-Type") String contentType, @Query("uploadType") String uploadType, @Query("name") String imageName, @Body() TypedFile image);
 
+	//Use for PubNub
+	@GET(ApiEndpoint.PUBNUB_AUDITITEM)
+	public AuditItem getAuditItemById(@Path("id") long id);
 
-    //Use for PubNub
-    @GET(ApiEndpoint.PUBNUB_AUDITITEM)
-    public AuditItem getAuditItemById(@Path("id") long id);
+	@GET(ApiEndpoint.PUBNUB_DAMAGECODE)
+	public IsoCode getDamageCodesById(@Path("id") long id);
 
-    @GET(ApiEndpoint.PUBNUB_DAMAGECODE)
-    public IsoCode getDamageCodesById(@Path("id") long id);
+	@GET(ApiEndpoint.PUBNUB_REPAIRCODE)
+	public IsoCode getRepairCodeById(@Path("id") long id);
 
-    @GET(ApiEndpoint.PUBNUB_REPAIRCODE)
-    public IsoCode getRepairCodeById(@Path("id") long id);
+	@GET(ApiEndpoint.PUBNUB_COMPONENTCODE)
+	public IsoCode getComponentCodeById(@Path("id") long id);
 
-    @GET(ApiEndpoint.PUBNUB_COMPONENTCODE)
-    public IsoCode getComponentCodeById(@Path("id") long id);
+	@GET(ApiEndpoint.PUBNUB_OPERATOR)
+	Operator getOperatorById(@Path("id") long id);
 
-    @GET(ApiEndpoint.PUBNUB_OPERATOR)
-    Operator getOperatorById(@Path("id") long id);
-
-    @GET(ApiEndpoint.PUBNUB_GOTMESSAGE)
-    void gotMessageFromPubNub(@Query("reciever_channel") String channel,@Query("message_id") long messageId);
+	@GET(ApiEndpoint.PUBNUB_GOTMESSAGE)
+	void gotMessageFromPubNub(@Query("reciever_channel") String channel,@Query("message_id") long messageId);
 }

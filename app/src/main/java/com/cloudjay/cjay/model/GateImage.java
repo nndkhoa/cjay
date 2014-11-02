@@ -21,6 +21,9 @@ public class GateImage {
 	@Expose
 	private String name;
 
+	@Expose
+	private String gateImageUUID;
+
 	private int uploadStatus;
 
 	public int getUploadStatus() {
@@ -94,6 +97,19 @@ public class GateImage {
 
 	public GateImage withName(String name) {
 		this.name = name;
+		return this;
+	}
+
+	public void setGateImageUUID(String gateImageUUID) {
+		this.gateImageUUID = gateImageUUID;
+	}
+
+	public String getGateImageUUID() {
+		return this.gateImageUUID;
+	}
+
+	public GateImage withUUID(String gateImageUUID) {
+		this.gateImageUUID = gateImageUUID;
 		return this;
 	}
 }

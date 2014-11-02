@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.cloudjay.cjay.fragment.IssueRepairedFragment"
-    android:padding="9dp">
+    android:padding="9dp"
+    android:background="@android:color/white">
 
     <TextView
         android:layout_width="wrap_content"
@@ -13,7 +14,7 @@
         android:textStyle="bold"
         android:paddingBottom="3dp"
         android:text="ABCD1234567"
-        android:textColor="@color/background_button_and_line" />
+        android:textColor="@color/background_button_and_line"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -24,7 +25,7 @@
         android:paddingBottom="3dp"
         android:text=" - "
         android:textColor="@color/background_button_and_line"
-        android:layout_toRightOf="@+id/tv_container_code" />
+        android:layout_toRightOf="@+id/tv_container_code"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -35,7 +36,7 @@
         android:paddingBottom="3dp"
         android:text="B"
         android:textColor="@color/background_button_and_line"
-        android:layout_toRightOf="@+id/tv_divider_line" />
+        android:layout_toRightOf="@+id/tv_divider_line"/>
 
     <View
         android:layout_width="match_parent"
@@ -43,12 +44,12 @@
         android:background="@color/background_button_and_line"
         android:layout_marginBottom="6dp"
         android:layout_below="@+id/tv_container_code"
-        android:id="@+id/v_line" />
+        android:id="@+id/v_line"/>
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/lv_repaired_imgs"
+        android:id="@+id/lv_repaired_items"
         android:scrollbars="none"
         android:layout_below="@+id/v_line"
         tools:listitem="@layout/item_issue_repaired"></ListView>

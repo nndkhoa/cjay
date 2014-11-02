@@ -1,22 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
-    android:layout_width="wrap_content"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:weightSum="6"
-    android:padding="3dp">
-
+    android:weightSum="4"
+    android:orientation="horizontal"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
         android:orientation="vertical"
-        android:paddingLeft="3dp"
-        android:layout_weight="6"
-        android:paddingRight="12dp"
-        android:paddingTop="6dp"
-        android:paddingBottom="6dp">
+        android:layout_marginRight="6dp"
+        android:gravity="center_vertical">
+
+        <com.cloudjay.cjay.view.SquareImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/iv_repaired_image"
+            android:src="@drawable/ic_app"
+            android:scaleType="centerCrop" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="3"
+        android:orientation="vertical"
+        android:layout_marginRight="6dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -36,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="LBH"
-                android:textColor="@color/background_button_and_line" />
+                android:textColor="@color/background_button_and_line"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -57,7 +72,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="LBH"
-                android:textColor="@color/background_button_and_line" />
+                android:textColor="@color/background_button_and_line"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -78,7 +93,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="LBH"
-                android:textColor="@color/background_button_and_line" />
+                android:textColor="@color/background_button_and_line"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -99,7 +114,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="LBH"
-                android:textColor="@color/background_button_and_line" />
+                android:textColor="@color/background_button_and_line"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -120,7 +135,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="Dài 40, rộng 20"
-                android:textColor="@color/background_button_and_line" />
+                android:textColor="@color/background_button_and_line"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -141,48 +156,9 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="1"
-                android:textColor="@color/background_button_and_line" />
+                android:textColor="@color/background_button_and_line"/>
         </RelativeLayout>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:text="@string/label_status"
-                android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/tv_issue_status"
-                android:layout_width="68dp"
-                android:layout_height="22dp"
-                android:layout_alignParentRight="true"
-                android:textAppearance="@android:style/TextAppearance.Small"
-                android:text="@string/issue_approved"
-                android:textColor="#fff"
-                android:background="@color/background_button_and_line" />
-        </RelativeLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_gravity="center_vertical"
-        android:paddingRight="6dp">
-
-        <Button
-            android:id="@+id/tv_code_repair_repaired"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="@android:style/TextAppearance.Small"
-            android:text="Bổ sung"
-            android:textColor="#fff"
-            android:background="@color/background_btn_check_container_clean" />
     </LinearLayout>
 
 </LinearLayout>

@@ -12,7 +12,6 @@ import com.google.gson.annotations.SerializedName;
 import org.json.JSONException;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,18 +27,28 @@ public class Session {
 	@Expose
 	private long id;
 
+	private long localStep;
+
+	public long getStep() {
+		return step;
+	}
+
+	public void setStep(long step) {
+		this.step = step;
+	}
+
 	@Expose
 	private long step;
 
-	public long getLocalStep() {
-		return localStep;
+	public boolean canRetry() {
+		return retry;
 	}
 
-	public void setLocalStep(long localStep) {
-		this.localStep = localStep;
+	public void setRetry(boolean retry) {
+		this.retry = retry;
 	}
 
-	private long localStep;
+	private boolean retry;
 
 	@SerializedName("pre_status")
 	@Expose
@@ -78,16 +87,6 @@ public class Session {
 
 	private int uploadStatus;
 
-	public boolean canRetry() {
-		return retry;
-	}
-
-	public void setRetry(boolean retry) {
-		this.retry = retry;
-	}
-
-	private boolean retry;
-
 	@SerializedName("gate_images")
 	@Expose
 	private List<GateImage> gateImages;
@@ -99,7 +98,7 @@ public class Session {
 
 	public Session() {
 		gateImages = new ArrayList<GateImage>();
-//		auditItems = new ArrayList<AuditItem>();
+		auditItems = new ArrayList<AuditItem>();
 	}
 
 	//region GETTER AND SETTER
@@ -117,16 +116,16 @@ public class Session {
 		return this;
 	}
 
-	public long getStep() {
-		return step;
+	public long getLocalStep() {
+		return localStep;
 	}
 
-	public void setStep(long step) {
-		this.step = step;
+	public void setLocalStep(long localStep) {
+		this.localStep = localStep;
 	}
 
 	public Session withStep(long step) {
-		this.step = step;
+		this.localStep = step;
 		return this;
 	}
 
@@ -436,6 +435,7 @@ public class Session {
 		return auditItems;
 	}
 
+
 	/**
 	 * Check if container has repair images or not
 	 *
@@ -497,14 +497,14 @@ public class Session {
 	}
 
 	/**
-	 * Check image in current step of session, if non image is missing => true
+	 * Check image in current localStep of session, if non image is missing => true
 	 * Else return false
 	 *
 	 * @return
 	 */
 	public void checkRetry() {
 
-		if (step == Step.REPAIR.value) {
+		if (localStep == Step.REPAIR.value) {
 			for (AuditItem auditItem : auditItems) {
 				for (AuditImage auditImage : auditItem.getAuditImages()) {
 					if (auditImage.getType() == ImageType.REPAIRED.value) {
@@ -518,7 +518,7 @@ public class Session {
 
 			this.retry = true;
 
-		} else if (step == Step.AUDIT.value) {
+		} else if (localStep == Step.AUDIT.value) {
 			for (AuditItem auditItem : auditItems) {
 				for (AuditImage auditImage : auditItem.getAuditImages()) {
 					if (auditImage.getType() == ImageType.AUDIT.value) {
@@ -567,6 +567,7 @@ public class Session {
 		}
 	}
 
+
 	public int getUploadedImage() {
 		int uploadedImage = 0;
 		List<AuditItem> auditItems = this.getAuditItems();
@@ -593,4 +594,16 @@ public class Session {
 		return uploadedImage;
 	}
 
+	public List<AuditItem> getListRepairedItem() {
+
+		List<AuditItem> list = new ArrayList<AuditItem>();
+
+		for (AuditItem auditItem : this.getAuditItems()) {
+			if (auditItem.getRepaired()) {
+				list.add(auditItem);
+			}
+		}
+
+		return list;
+	}
 }

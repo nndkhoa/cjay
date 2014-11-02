@@ -28,6 +28,8 @@ import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.view.SquareImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.imageaware.ImageAware;
+import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
 import com.path.android.jobqueue.JobManager;
 import com.snappydb.SnappydbException;
 
@@ -44,6 +46,9 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 	private String containerId;
 	private AuditImage auditImage;
 	private String operatorCode;
+	private String mAuditItemUUID;
+	private String mComponentCode;
+	private String mAuditImageUUID;
 
 	public AuditItemAdapter(Context context, int resource, String containerId, String operatorCode) {
 		super(context, resource);
@@ -108,34 +113,34 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		// Lỗi nào chưa giám dịnh thì hiện hinh`, lỗi nào đã giám định roi thì hiện chi tiết lỗi
 		if (auditItem.getAudited() == true) {
 
-			UploadStatus status = UploadStatus.values()[((int) auditItem.getUploadStatus())];
+            UploadStatus status = UploadStatus.values()[((int) auditItem.getUploadStatus())];
 
 			holder.llIssueImageView.setVisibility(View.GONE);
 			holder.llIssueDetails.setVisibility(View.VISIBLE);
 
-			switch (status) {
-				case UPLOADING:
-					holder.btnUpload.setVisibility(View.GONE);
-					holder.btnEdit.setVisibility(View.GONE);
-					holder.ivUploading.setVisibility(View.VISIBLE);
-					break;
+            switch (status) {
+                case UPLOADING:
+                    holder.btnUpload.setVisibility(View.GONE);
+                    holder.btnEdit.setVisibility(View.GONE);
+                    holder.ivUploading.setVisibility(View.VISIBLE);
+                    break;
 
-				case COMPLETE:
-					holder.btnUpload.setVisibility(View.GONE);
-					holder.btnEdit.setVisibility(View.GONE);
-					holder.ivUploading.setVisibility(View.GONE);
-					holder.btnRepair.setVisibility(View.VISIBLE);
-					break;
+                case COMPLETE:
+                    holder.btnUpload.setVisibility(View.GONE);
+                    holder.btnEdit.setVisibility(View.GONE);
+                    holder.ivUploading.setVisibility(View.GONE);
+                    holder.btnRepair.setVisibility(View.VISIBLE);
+                    break;
 
-				case ERROR:
-					// TODO: show retry button
+                case ERROR:
+                    // TODO: show retry button
 
-				default:
-					holder.btnUpload.setVisibility(View.VISIBLE);
-					holder.btnEdit.setVisibility(View.VISIBLE);
-					holder.ivUploading.setVisibility(View.GONE);
-					holder.btnRepair.setVisibility(View.GONE);
-			}
+                default:
+                    holder.btnUpload.setVisibility(View.VISIBLE);
+                    holder.btnEdit.setVisibility(View.VISIBLE);
+                    holder.ivUploading.setVisibility(View.GONE);
+                    holder.btnRepair.setVisibility(View.GONE);
+            }
 
 			//Set detail textviews
 			holder.tvCodeComponent.setText(auditItem.getComponentCode());
@@ -145,21 +150,32 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			holder.tvCodeRepair.setText(auditItem.getRepairCode());
 			holder.tvCount.setText(auditItem.getQuantity() + "");
 
-			if (!auditItem.getApproved()) {
-				holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_unapproved));
+			if (!auditItem.isIsAllowed()) {
+				holder.tvIssueStatus.setText("Cấm sửa");
 			} else {
-				holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_approved));
+				if (!auditItem.getApproved()) {
+					holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_unapproved));
+				} else {
+					holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_approved));
+				}
 			}
 
 			holder.btnRepair.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
-					if (!auditItem.getApproved()) {
-						// Show repair dialog
-						showRepairDiaglog();
+					mAuditItemUUID = auditItem.getAuditItemUUID();
+					mComponentCode = auditItem.getComponentCode();
+					if (!auditItem.isIsAllowed()) {
+						// Nếu lỗi này cấm sửa, hiện dialog cấm sửa
+						showPreventRepairDialog();
 					} else {
-						// Open camera activity to take repair image
-						openCamera();
+						if (!auditItem.getApproved()) {
+							// Show repair dialog
+							showRepairDiaglog();
+						} else {
+							// Open camera activity to take repair image
+							openCamera();
+						}
 					}
 				}
 			});
@@ -168,10 +184,10 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				@Override
 				public void onClick(View view) {
 					//1. Update upload status
-					auditItem.setUploadStatus(UploadStatus.UPLOADING.value);
-					DataCenter_.getInstance_(mContext).changeUploadState(mContext,
-							containerId, auditItem);
-					notifyDataSetChanged();
+                    auditItem.setUploadStatus(UploadStatus.UPLOADING.value);
+                    DataCenter_.getInstance_(mContext).changeUploadState(mContext,
+                            containerId, auditItem);
+                    notifyDataSetChanged();
 
 					//2. Add container session to upload queue
 					JobManager jobManager = App.getJobManager();
@@ -186,17 +202,22 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			if (auditItem.getAuditImages() != null && auditItem.getAuditImages().size() != 0) {
 				if (auditItem.getAuditImages().get(0) != null) {
 					auditImage = auditItem.getAuditImages().get(0);
+					ImageAware imageAware = new ImageViewAware(holder.ivAuditImage, false);
 					ImageLoader.getInstance().displayImage(auditImage.getUrl(),
-							holder.ivAuditImage);
+							imageAware);
 				}
 			}
 
 			holder.btnReport.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View view) {
-					showApproveDiaglog(auditItem);
-				}
-			});
+                @Override
+                public void onClick(View view) {
+					Logger.Log(auditItem.getAuditImages().get(0).getAuditImageUUID());
+					Logger.Log(auditItem.getAuditImages().get(0).getName());
+					Logger.Log(auditItem.getAuditImages().get(0).getUrl());
+					Logger.Log(auditItem.getAuditImages().get(0).getType() + "");
+                    showApproveDiaglog(auditItem);
+                }
+            });
 		}
 
 		return view;
@@ -218,6 +239,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
 				// Open camera activity to take repair image
+				Logger.Log("mComponentCode: " + mComponentCode);
 				openCamera();
 				dialogInterface.dismiss();
 			}
@@ -264,9 +286,11 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
 
+				Logger.Log("getAuditImageUUID: " + item.getAuditImages().get(0).getAuditImageUUID());
+
 				Intent intent = new Intent(mContext, MergeIssueActivity_.class);
 				intent.putExtra(MergeIssueActivity_.CONTAINER_ID_EXTRA, containerId);
-				intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, auditImage.getAuditImageUUID());
+				intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, item.getAuditImages().get(0).getAuditImageUUID());
 				intent.putExtra(MergeIssueActivity_.AUDIT_ITEM_REMOVE_UUID, item.getAuditItemUUID());
 
 				mContext.startActivity(intent);
@@ -332,6 +356,16 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
 		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.REPAIRED.value);
 		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);
+		cameraActivityIntent.putExtra(CameraFragment.AUDIT_ITEM_UUID_EXTRA, mAuditItemUUID);
 		mContext.startActivity(cameraActivityIntent);
+	}
+
+	void showPreventRepairDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+		builder.setTitle("Alert");
+		builder.setMessage("Lỗi này không được sửa");
+
+		AlertDialog dialog = builder.create();
+		dialog.show();
 	}
 }

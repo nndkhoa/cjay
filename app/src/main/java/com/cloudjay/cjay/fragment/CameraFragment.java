@@ -21,6 +21,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
+import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.task.jobqueue.UploadImageJob;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -39,6 +40,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 
@@ -128,8 +130,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	@Click(R.id.btn_capture)
 	void btnTakePictureClicked() {
 		btnTakePicture.setEnabled(false);
-//		autoFocus();
-		takeSimplePicture();
+		autoFocus();
 	}
 
 	@Click(R.id.btn_capture_mode)
@@ -255,7 +256,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		@Override
 		public void saveImage(PictureTransaction xact, Bitmap capturedBitmap) {
 
-			if (!useSingleShotMode()) {
+			if (useSingleShotMode()) {
 				singleShotProcessing = false;
 				getActivity().runOnUiThread(new Runnable() {
 					@Override
@@ -265,11 +266,14 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 				});
 			}
 
+			//Random UUID
+			String uuid = UUID.randomUUID().toString();
+
 			// Save bitmap
-			File photo = getFile();
+			File photo = getFile(uuid);
 			saveBitmapToFile(capturedBitmap, photo);
 			// Add taken picture to job queue
-			addImageToUploadQueue(photo.getAbsolutePath(), photo.getName());
+			addImageToUploadQueue(photo.getAbsolutePath(), photo.getName(), uuid);
 		}
 
 		@Override
@@ -285,7 +289,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		 * @param imageName
 		 * @throws SnappydbException
 		 */
-		protected void addImageToUploadQueue(String uri, String imageName) {
+		protected void addImageToUploadQueue(String uri, String imageName, String uuid) {
 			try {
 
 				// Create image based on mType and add this image to database
@@ -297,7 +301,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 								.withId(0)
 								.withType(mType)
 								.withName(imageName)
-								.withUrl("file://" + uri);
+								.withUrl("file://" + uri)
+								.withUUID(uuid);
 
 						dataCenter.addGateImage(getActivity().getApplicationContext(), gateImage, containerId);
 						break;
@@ -305,13 +310,31 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 					case AUDIT:
 					case REPAIRED:
 					default:
+
+						Logger.Log("mType: " + mType);
+
 						AuditImage auditImage = new AuditImage()
 								.withId(0)
 								.withType(mType)
 								.withUrl("file://" + uri)
-								.withName(imageName).withUUID(UUID.randomUUID().toString());
+								.withName(imageName)
+								.withUUID(uuid);
+						AuditItem auditItem = dataCenter.getAuditItemByUUID(getActivity(), containerId, auditItemUUID);
+						if (null == auditItem) {
+							// Tạo lỗi giám đinh/ sửa mới
+							Logger.Log("new type: " + auditImage.getType());
+							dataCenter.addAuditImage(getActivity().getApplicationContext(), auditImage, containerId);
+						} else {
+							Logger.Log("getComponentCode: " + auditItem.getComponentCode());
+							// Thêm hình vào lỗi đã sữa chữa/  giám định
+							auditItem.getAuditImages().add(auditImage);
+							if (mType == ImageType.REPAIRED.value) {
+								Logger.Log("setRepaired");
+								auditItem.setRepaired(true);
+							}
+							dataCenter.updateAuditItem(getActivity().getApplicationContext(), containerId, auditItem);
+						}
 
-						dataCenter.addAuditImage(getActivity().getApplicationContext(), auditImage, containerId);
 						break;
 				}
 
@@ -370,10 +393,9 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		 *
 		 * @return
 		 */
-		protected File getFile() {
+		protected File getFile(String uuid) {
 
 			// Save Bitmap to Files
-			String uuid = UUID.randomUUID().toString();
 			String imageType = getImageTypeString(mType);
 
 			// create today String
@@ -407,8 +429,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		@TargetApi(16)
 		public void onAutoFocus(boolean success, Camera camera) {
 			super.onAutoFocus(success, camera);
-//			btnTakePicture.setEnabled(true);
-//			takeSimplePicture();
+			btnTakePicture.setEnabled(true);
+			takeSimplePicture();
 		}
 
 		/**

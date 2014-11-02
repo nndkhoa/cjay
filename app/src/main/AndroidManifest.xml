@@ -88,7 +88,8 @@
 
 		<service android:name=".task.service.PubnubService_"/>
 		<service android:name="com.cloudjay.cjay.task.service.QueueIntentService_"/>
-		<receiver android:name="com.cloudjay.cjay.util.AutoStartReceiver_">
+
+		<receiver android:name=".task.receiver.AutoStartReceiver_">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED"/>
 			</intent-filter>

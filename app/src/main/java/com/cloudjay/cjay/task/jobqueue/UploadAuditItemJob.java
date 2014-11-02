@@ -4,8 +4,9 @@ import android.content.Context;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
-import com.cloudjay.cjay.event.upload.ItemEnqueueEvent;
+import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
+import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
@@ -18,7 +19,7 @@ import de.greenrobot.event.EventBus;
  */
 public class UploadAuditItemJob extends Job {
     String containerId;
-	String auditItemUUID;
+    String auditItemUUID;
 
     @Override
     protected int getRetryLimit() {
@@ -36,7 +37,7 @@ public class UploadAuditItemJob extends Job {
 
         Context context = App.getInstance().getApplicationContext();
         DataCenter_.getInstance_(context).addUploadSession(containerId);
-        EventBus.getDefault().post(new ItemEnqueueEvent(containerId, UploadType.AUDIT_ITEM));
+        EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.AUDIT_ITEM));
 
     }
 
@@ -47,10 +48,9 @@ public class UploadAuditItemJob extends Job {
         //Add Log
         DataCenter_.getInstance_(context).addLog(context,containerId, "Bắt đầu thêm lỗi");
 
-        //EventBus.getDefault().post(new UploadingEvent());
+//        EventBus.getDefault().post(new UploadingEvent());
 
-        DataCenter_.getInstance_(context).uploadAuditItem(context, containerId, auditItemUUID);
-
+        DataCenter_.getInstance_(context).upLoadAuditItem(context, containerId,auditItemUUID);
         //Add Log
         DataCenter_.getInstance_(context).addLog(context,containerId, "Khởi tạo thêm lỗi");
 
