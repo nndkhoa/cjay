@@ -12,6 +12,10 @@ import com.cloudjay.cjay.util.Utils;
 
 import org.androidannotations.annotations.EReceiver;
 
+/**
+ * AutoStart Receiver được gọi khi máy Boot thành công. AutoStart Receiver sẽ kiểm tra
+ * và gọi alarm manager để trigger JobManager & PubNub Service.
+ */
 @EReceiver
 public class AutoStartReceiver extends BroadcastReceiver {
 
@@ -19,6 +23,7 @@ public class AutoStartReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 
 		Logger.Log("**********started************");
+
 		// Start alarm manager
 		if (!Utils.isAlarmUp(context)) {
 			Logger.Log("Alarm Manager is not running. Starting alarm ...");
@@ -27,11 +32,5 @@ public class AutoStartReceiver extends BroadcastReceiver {
 			Logger.Log("Alarm is already running "
 					+ StringUtils.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 		}
-
-//		// Start Pubnub Service
-//		if (Utils.isRunning(context, PubnubService_.class.getName())) {
-//			Intent serviceIntent = new Intent(context, PubnubService_.class);
-//			context.startService(serviceIntent);
-//		}
 	}
 }
