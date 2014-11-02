@@ -153,7 +153,7 @@ public class IssuePendingFragment extends Fragment {
 	void buttonCleanClicked() {
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJob(new UploadSessionJob(mSession.getContainerId(), Step.CLEAR.value, false));
+		jobManager.addJob(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), false));
 
 		getActivity().finish();
 	}

@@ -143,7 +143,6 @@ public class UploadSessionJob extends Job {
 				dataCenter.uploadImportSession(context, containerId);
 				break;
 
-			case CLEAR:
 			default:
 				dataCenter.addLog(context, containerId, "HAND CLEANING | Bắt đầu quá trình upload");
 				dataCenter.setHandCleaningSession(context, containerId);
