@@ -109,23 +109,23 @@ public class PubnubService extends Service {
 	}
 
 	@Background
-	private void getNotificationOperator(Context context, long objectId) {
+	void getNotificationOperator(Context context, long objectId) {
 		dataCenter.getOperatorById(context, objectId);
 	}
 
 	@Background
-	private void getNotificationComponentCode(Context context, long objectId) {
+	void getNotificationComponentCode(Context context, long objectId) {
 		dataCenter.getComponentCodeById(context, objectId);
 	}
 
 	@Background
-	private void getNotificationRepairCode(Context context, long objectId) {
+	void getNotificationRepairCode(Context context, long objectId) {
 		dataCenter.getRepairCodeById(context, objectId);
 
 	}
 
 	@Background
-	private void getNotificationDamageCode(Context context, long objectId) {
+	void getNotificationDamageCode(Context context, long objectId) {
 		dataCenter.getDamageCodeById(context, objectId);
 	}
 
