@@ -192,6 +192,7 @@ public class ImportFragment extends Fragment {
 				.withOperatorCode(operatorCode)
 				.withOperatorId(operator.getId())
 				.withPreStatus(preStatus)
+				.withLocalStep(Step.IMPORT.value)
 				.withStep(Step.IMPORT.value)
 				.withCheckInTime(currentTime);
 
@@ -294,8 +295,8 @@ public class ImportFragment extends Fragment {
 
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getStep(), true));
-		Logger.e(String.valueOf(mSession.getStep()));
+		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), true));
+		Logger.e(String.valueOf(mSession.getLocalStep()));
 
 		// Navigate to HomeActivity
 //		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);

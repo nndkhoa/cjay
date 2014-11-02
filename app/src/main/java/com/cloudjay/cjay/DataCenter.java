@@ -1068,6 +1068,9 @@ public class DataCenter {
 	public void upLoadAuditItem(Context context, String containerId, String oldAuditItemUUID) throws SnappydbException {
 		// Upload audit item session to server
 		DB db = App.getDB(context);
+
+		Logger.Log("old auditem item uuid: " + oldAuditItemUUID);
+
 		Session oldSession = db.getObject(containerId, Session.class);
 		AuditItem oldAuditItem = getAuditItemByUUID(context, containerId, oldAuditItemUUID);
 		Session result = networkClient.postAuditItem(context, oldSession, oldAuditItem);

@@ -125,8 +125,12 @@ public class Session {
 		this.localStep = localStep;
 	}
 
-	public Session withStep(int step) {
+	public Session withLocalStep(int step) {
 		this.localStep = step;
+		return this;
+	}
+	public Session withStep(int step){
+		this.step = step;
 		return this;
 	}
 
@@ -470,7 +474,7 @@ public class Session {
 			// Tất cả các item đều được gán lỗi và có hình
 			case AUDIT:
 				for (AuditItem item : auditItems) {
-					if (item.getAudited() == false)
+					if (item.getAudited() == false || item.getUploadStatus() == UploadStatus.NONE.value)
 						return false;
 				}
 
