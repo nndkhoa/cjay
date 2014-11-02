@@ -11,6 +11,8 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.imageaware.ImageAware;
+import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +64,8 @@ public class GateImageAdapter extends ArrayAdapter<GateImage> {
 			layout.setChecked(mArrayCheckedImages.contains(gateImage));
 		}
 
-		ImageLoader.getInstance().displayImage(gateImage.getUrl(), holder.ivGateImage);
+		ImageAware imageAware = new ImageViewAware(holder.ivGateImage, false);
+		ImageLoader.getInstance().displayImage(gateImage.getUrl(), imageAware);
 		return convertView;
 	}
 

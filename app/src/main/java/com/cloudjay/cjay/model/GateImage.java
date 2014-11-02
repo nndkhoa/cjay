@@ -9,7 +9,7 @@ import javax.annotation.Generated;
 
 /* Gồm hình nhập và hình xuất */
 @Generated("org.jsonschema2pojo")
-public class GateImage implements Serializable{
+public class GateImage {
 
 	@Expose
 	private long id;
@@ -20,6 +20,9 @@ public class GateImage implements Serializable{
 
 	@Expose
 	private String name;
+
+	@Expose
+	private String gateImageUUID;
 
 	private int uploadStatus;
 
@@ -94,6 +97,19 @@ public class GateImage implements Serializable{
 
 	public GateImage withName(String name) {
 		this.name = name;
+		return this;
+	}
+
+	public void setGateImageUUID(String gateImageUUID) {
+		this.gateImageUUID = gateImageUUID;
+	}
+
+	public String getGateImageUUID() {
+		return this.gateImageUUID;
+	}
+
+	public GateImage withUUID(String gateImageUUID) {
+		this.gateImageUUID = gateImageUUID;
 		return this;
 	}
 }

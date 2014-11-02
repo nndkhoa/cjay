@@ -11,6 +11,8 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.enums.ImageType;
+import com.cloudjay.cjay.view.CheckableImageView;
+import com.cloudjay.cjay.view.SquareImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.List;
@@ -40,7 +42,9 @@ public class DetailIssuedImageAdapter extends ArrayAdapter<AuditImage> {
     }
 
     private static class ViewHolder {
-        ImageView imageView;
+		SquareImageView imageView;
+		CheckableImageView checkView;
+
     }
 
     @Override
@@ -53,13 +57,16 @@ public class DetailIssuedImageAdapter extends ArrayAdapter<AuditImage> {
             convertView = mInflater.inflate(layoutResId, parent, false);
             viewHolder = new ViewHolder();
 
-            viewHolder.imageView = (ImageView) convertView.findViewById(R.id.iv_image);
+            viewHolder.imageView = (SquareImageView) convertView.findViewById(R.id.iv_image);
+			viewHolder.checkView = (CheckableImageView) convertView.findViewById(R.id.cb_select);
+
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
         //Set data to view
+		viewHolder.checkView.setVisibility(View.GONE);
         if (type == ImageType.values()[((int) auditImage.getType())]) {
             ImageLoader.getInstance().displayImage(auditImage.getUrl(), viewHolder.imageView);
         }

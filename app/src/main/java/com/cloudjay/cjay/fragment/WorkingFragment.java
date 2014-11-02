@@ -12,13 +12,14 @@ import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
 import com.cloudjay.cjay.event.WorkingSessionCreatedEvent;
-import com.cloudjay.cjay.event.upload.UploadSucceedEvent;
+import com.cloudjay.cjay.event.upload.ContainerUploadedEvent;
+import com.cloudjay.cjay.event.upload.UploadStartedEvent;
+import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
@@ -65,7 +66,7 @@ public class WorkingFragment extends Fragment {
 
 		Intent intent = new Intent(getActivity(), WizardActivity_.class);
 		intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, item.getContainerId());
-		intent.putExtra(WizardActivity.STEP_EXTRA, item.getStep());
+		intent.putExtra(WizardActivity.STEP_EXTRA, item.getLocalStep());
 		startActivity(intent);
 	}
 
@@ -80,7 +81,6 @@ public class WorkingFragment extends Fragment {
 		refresh();
 	}
 
-	@Background
 	void refresh() {
 		if (mAdapter != null) {
 			List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
@@ -110,6 +110,11 @@ public class WorkingFragment extends Fragment {
 	public void onDestroy() {
 		EventBus.getDefault().unregister(this);
 		super.onDestroy();
+	}
+
+	@Trace
+	public void onEvent(UploadStartedEvent event) {
+		refresh();
 	}
 
 	@Trace

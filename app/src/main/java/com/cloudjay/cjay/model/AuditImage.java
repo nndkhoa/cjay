@@ -39,6 +39,18 @@ public class AuditImage {
 
 	private int uploadStatus;
 
+	public String getAuditImageUUID() {
+		return auditImageUUID;
+	}
+
+	public void setAuditImageUUID(String auditImageUUID) {
+		this.auditImageUUID = auditImageUUID;
+	}
+
+	@SerializedName("audit_image_uuid")
+	@Expose
+	private String auditImageUUID;
+
 	public int getUploadStatus() {
 		return uploadStatus;
 	}

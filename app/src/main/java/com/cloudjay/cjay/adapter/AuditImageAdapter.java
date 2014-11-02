@@ -21,6 +21,8 @@ import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.view.CheckableImageView;
 import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.imageaware.ImageAware;
+import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +67,8 @@ public class AuditImageAdapter extends ArrayAdapter<AuditImage> {
         }
 
         holder.ivCheckable.setVisibility(View.GONE);
-        ImageLoader.getInstance().displayImage(auditImage.getUrl(), holder.ivAuditImage);
+		ImageAware imageAware = new ImageViewAware(holder.ivAuditImage, false);
+        ImageLoader.getInstance().displayImage(auditImage.getUrl(), imageAware);
 
         return view;
     }

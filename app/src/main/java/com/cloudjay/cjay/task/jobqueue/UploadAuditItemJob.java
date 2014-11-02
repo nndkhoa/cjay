@@ -18,17 +18,17 @@ import de.greenrobot.event.EventBus;
  */
 public class UploadAuditItemJob extends Job {
     String containerId;
-    AuditItem auditItem;
+    String auditItemUUID;
 
     @Override
     protected int getRetryLimit() {
         return 2;
     }
 
-    public UploadAuditItemJob(String containerId, AuditItem auditItem) {
+    public UploadAuditItemJob(String containerId, String auditItemUUID) {
         super(new Params(1).requireNetwork().persist().groupBy(containerId));
         this.containerId = containerId;
-        this.auditItem = auditItem;
+        this.auditItemUUID = auditItemUUID;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class UploadAuditItemJob extends Job {
 
         //EventBus.getDefault().post(new UploadingEvent());
 
-        DataCenter_.getInstance_(context).uploadAuditItem(context, containerId, auditItem);
+        DataCenter_.getInstance_(context).upLoadAuditItem(context, containerId,auditItemUUID);
 
         //Add Log
         DataCenter_.getInstance_(context).addLog(context,containerId, "Khởi tạo thêm lỗi");

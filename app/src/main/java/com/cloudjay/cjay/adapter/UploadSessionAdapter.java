@@ -24,6 +24,7 @@ import com.cloudjay.cjay.task.jobqueue.UploadExportSessionJob;
 import com.cloudjay.cjay.task.jobqueue.UploadImageJob;
 import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
@@ -68,8 +69,6 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 	public View getView(int position, View convertView, ViewGroup parent) {
 
 		final Session session = getItem(position);
-
-		// Inflate UI
 		// Apply ViewHolder pattern for better performance
 		ViewHolder viewHolder;
 		if (convertView == null) {
@@ -91,9 +90,8 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 		// Set data to view
 		ImageLoader.getInstance().displayImage(session.getGateImages().get(0).getUrl(), viewHolder.ivContainer);
 		viewHolder.tvContainerId.setText(session.getContainerId());
-		viewHolder.tvTotalPhotoUpload.setText(session.getTotalImage() + "");
-		viewHolder.tvCurrentPhotoUpload.setText(session.getUploadedImage() + "");
-
+		viewHolder.tvTotalPhotoUpload.setText(String.valueOf(Utils.countTotalImage(session)));
+		viewHolder.tvCurrentPhotoUpload.setText(String.valueOf(Utils.countUploadedImage(session)));
 		UploadStatus status = UploadStatus.values()[session.getUploadStatus()];
 		Logger.Log(session.getContainerId() + " -> Upload Status: " + status.name());
 		switch (status) {
@@ -147,7 +145,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 
 	private void uploadCurrentStep(Session session) {
 		JobManager jobManager = App.getJobManager();
-		Step step = Step.values()[((int) session.getStep())];
+		Step step = Step.values()[((int) session.getLocalStep())];
 
 		//Retry upload base on step
 		switch (step) {
@@ -159,7 +157,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 					}
 					;
 				}
-				jobManager.addJobInBackground(new UploadSessionJob(session));
+				jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId()));
 
 				// In step audit check all image of item, upload all error image then upload error audit item => complete audit
 			case AUDIT:
@@ -171,7 +169,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 							}
 						}
 					}
-					jobManager.addJobInBackground(new UploadAuditItemJob(session.getContainerId(), item));
+					jobManager.addJobInBackground(new UploadAuditItemJob(session.getContainerId(), item.getAuditItemUUID()));
 				}
 				jobManager.addJobInBackground(new UploadCompleteAuditJob(session.getContainerId()));
 

@@ -12,7 +12,6 @@ import com.google.gson.annotations.SerializedName;
 import org.json.JSONException;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +19,7 @@ import javax.annotation.Generated;
 
 
 @Generated("org.jsonschema2pojo")
-public class Session implements Serializable {
+public class Session {
 
 	public static final String FIELD_CONTAINER_ID = "container_id";
 
@@ -28,18 +27,28 @@ public class Session implements Serializable {
 	@Expose
 	private long id;
 
+	private long localStep;
+
+	public long getStep() {
+		return step;
+	}
+
+	public void setStep(long step) {
+		this.step = step;
+	}
+
 	@Expose
 	private long step;
 
-	public long getLocalStep() {
-		return localStep;
+	public boolean canRetry() {
+		return retry;
 	}
 
-	public void setLocalStep(long localStep) {
-		this.localStep = localStep;
+	public void setRetry(boolean retry) {
+		this.retry = retry;
 	}
 
-	private long localStep;
+	private boolean retry;
 
 	@SerializedName("pre_status")
 	@Expose
@@ -117,16 +126,16 @@ public class Session implements Serializable {
 		return this;
 	}
 
-	public long getStep() {
-		return step;
+	public long getLocalStep() {
+		return localStep;
 	}
 
-	public void setStep(long step) {
-		this.step = step;
+	public void setLocalStep(long localStep) {
+		this.localStep = localStep;
 	}
 
 	public Session withStep(long step) {
-		this.step = step;
+		this.localStep = step;
 		return this;
 	}
 
@@ -497,56 +506,47 @@ public class Session implements Serializable {
 	}
 
 	/**
-	 * Check image in current step of session, if non image is missing => true
+	 * Check image in current localStep of session, if non image is missing => true
 	 * Else return false
 	 *
 	 * @return
 	 */
 	public void checkRetry() {
 
-		Step tmp = Step.values()[((int) step)];
-		switch (tmp) {
-
-			case REPAIR:
-				for (AuditItem auditItem : auditItems) {
-					for (AuditImage auditImage : auditItem.getAuditImages()) {
-						if (auditImage.getType() == ImageType.REPAIRED.value) {
-							File file = new File(auditImage.getUrl());
-							if (!file.exists()) {
-								this.retry = false;
-							}
+		if (localStep == Step.REPAIR.value) {
+			for (AuditItem auditItem : auditItems) {
+				for (AuditImage auditImage : auditItem.getAuditImages()) {
+					if (auditImage.getType() == ImageType.REPAIRED.value) {
+						File file = new File(auditImage.getUrl());
+						if (!file.exists()) {
+							this.retry = false;
 						}
 					}
 				}
+			}
 
-				this.retry = true;
-				break;
+			this.retry = true;
 
-			case AUDIT:
-				for (AuditItem auditItem : auditItems) {
-					for (AuditImage auditImage : auditItem.getAuditImages()) {
-						if (auditImage.getType() == ImageType.AUDIT.value) {
-							File file = new File(auditImage.getUrl());
-							if (!file.exists()) {
-								this.retry = false;
-							}
+		} else if (localStep == Step.AUDIT.value) {
+			for (AuditItem auditItem : auditItems) {
+				for (AuditImage auditImage : auditItem.getAuditImages()) {
+					if (auditImage.getType() == ImageType.AUDIT.value) {
+						File file = new File(auditImage.getUrl());
+						if (!file.exists()) {
+							this.retry = false;
 						}
 					}
 				}
-				this.retry = true;
-				break;
-
-			case IMPORT:
-			case EXPORT:
-			default:
-				for (GateImage gateImage : gateImages) {
-					File file = new File(gateImage.getUrl());
-					if (!file.exists()) {
-						this.retry = false;
-					}
+			}
+			this.retry = true;
+		} else {
+			for (GateImage gateImage : gateImages) {
+				File file = new File(gateImage.getUrl());
+				if (!file.exists()) {
+					this.retry = false;
 				}
-				this.retry = true;
-				break;
+			}
+			this.retry = true;
 		}
 	}
 
@@ -576,6 +576,7 @@ public class Session implements Serializable {
 		}
 	}
 
+
 	public int getUploadedImage() {
 		int uploadedImage = 0;
 		List<AuditItem> auditItems = this.getAuditItems();
@@ -602,4 +603,16 @@ public class Session implements Serializable {
 		return uploadedImage;
 	}
 
+	public List<AuditItem> getListRepairedItem() {
+
+		List<AuditItem> list = new ArrayList<AuditItem>();
+
+		for (AuditItem auditItem : this.getAuditItems()) {
+			if (auditItem.getRepaired()) {
+				list.add(auditItem);
+			}
+		}
+
+		return list;
+	}
 }

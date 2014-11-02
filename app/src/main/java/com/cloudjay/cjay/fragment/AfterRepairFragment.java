@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.fragment;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -10,23 +11,30 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity;
+import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.DetailIssuedImageAdapter;
+import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.List;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Need 2 argument:String containerId, Audit item to init View.
@@ -45,8 +53,8 @@ public class AfterRepairFragment extends Fragment {
     @FragmentArg(CONTAINER_ID_EXTRA)
     public String containerID;
 
-	@FragmentArg(AUDIT_ITEM_EXTRA)
-	public String auditItemUUID;
+    @FragmentArg(AUDIT_ITEM_EXTRA)
+    public String auditItemUUID;
 
     @ViewById(R.id.tv_code_comp_repaired)
     TextView tvCompCode;
@@ -79,60 +87,84 @@ public class AfterRepairFragment extends Fragment {
     DetailIssuedImageAdapter imageAdapter;
     String operatorCode;
 	AuditItem auditItem;
+	Session mSession;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		EventBus.getDefault().register(this);
+	}
 
     @AfterViews
     void setup() {
         //get container operater code form containerId
-        Session tmp = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
-        if (null == tmp) {
+		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+        if (null == mSession) {
             Utils.showCrouton(getActivity(), "Không tìm thấy container trong dữ liệu");
         } else {
-            operatorCode = tmp.getOperatorCode();
+            operatorCode = mSession.getOperatorCode();
         }
-	    auditItem = dataCenter.getAuditItemByUUId(getActivity(), auditItemUUID, containerID);
-	    if (auditItem != null) {
-		    // parse Data to view
-		    tvCompCode.setText(auditItem.getComponentCode());
-		    tvLocaitonCode.setText(auditItem.getLocationCode());
-		    tvDamageCode.setText(auditItem.getDamageCode());
-		    tvRepairCode.setText(auditItem.getRepairCode());
-		    tvSize.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
-		    textViewBtnCamera.setText(R.string.button_add_new_repair_image);
+	    auditItem = dataCenter.getAuditItemByUUID(getActivity(), containerID, auditItemUUID);
+        // parse Data to view
+        tvCompCode.setText(auditItem.getComponentCode());
+        tvLocaitonCode.setText(auditItem.getLocationCode());
+        tvDamageCode.setText(auditItem.getDamageCode());
+        tvRepairCode.setText(auditItem.getRepairCode());
+        tvSize.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
+		tvNumber.setText(auditItem.getQuantity() + "");
+        textViewBtnCamera.setText(R.string.button_add_new_repair_image);
 
-		    imageAdapter = new DetailIssuedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.REPAIRED);
+        imageAdapter = new DetailIssuedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.REPAIRED);
+		lvImage.setAdapter(imageAdapter);
 
-		    //Get audit Image list form db
-		    List<AuditImage> auditImages = auditItem.getAuditImages();
-		    imageAdapter.setData(auditImages);
-		    lvImage.setAdapter(imageAdapter);
-	    }
+		refreshListImage();
     }
     @Click(R.id.btn_camera_repaired)
     void openCameraActivity(){
 
-        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity.class);
+        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
         cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
         cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
         cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.REPAIRED.value);
         cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);
+		cameraActivityIntent.putExtra(CameraFragment.AUDIT_ITEM_UUID_EXTRA, auditItemUUID);
         startActivity(cameraActivityIntent);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        refreshListImage();
+	@Background
+    void refreshListImage() {
+		if (auditItem != null) {
+			List<AuditImage> list = auditItem.getListRepairedImages();
+			updatedData(list);
+		}
     }
 
-    private void refreshListImage() {
-        Session tmp = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
-        for (AuditItem currentAuditItem: tmp.getAuditItems()){
-            if (currentAuditItem.getId() == auditItem.getId()){
-                auditItem = currentAuditItem;
-            }
-        }
-        List<AuditImage> auditImages = auditItem.getAuditImages();
-        imageAdapter.setData(auditImages);
-        imageAdapter.notifyDataSetChanged();
-    }
+	@UiThread
+	void updatedData(List<AuditImage> imageList) {
+
+		imageAdapter.clear();
+		if (imageList != null) {
+			for (AuditImage object : imageList) {
+				imageAdapter.add(object);
+			}
+		}
+
+		imageAdapter.notifyDataSetChanged();
+	}
+
+	@UiThread
+	void onEvent (ImageCapturedEvent event) {
+		Logger.Log("on ImageCapturedEvent");
+
+		// Requery audit item by uuid to update listview
+		auditItem = dataCenter.getAuditItemByUUID(getActivity().getApplicationContext(),
+				containerID,auditItemUUID);
+		refreshListImage();
+	}
+
+	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
 }

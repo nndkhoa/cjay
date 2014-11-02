@@ -440,20 +440,42 @@ public class AuditItem {
 		return repaired_image;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof AuditItem) {
-			AuditItem temp = (AuditItem) obj;
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof AuditItem) {
+            AuditItem temp = (AuditItem) obj;
 
-			if (this.componentCodeId == temp.componentCodeId
-					&& this.damageCodeId == temp.damageCodeId
-					&& this.repairCodeId == temp.repairCodeId) {
-				return true;
-			} else {
-				return false;
+            if (this.componentCodeId == temp.componentCodeId
+                    && this.damageCodeId == temp.damageCodeId
+                    && this.repairCodeId == temp.repairCodeId) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        return super.equals(obj);
+    }
+
+	public List<AuditImage> getListIssueImages() {
+		List<AuditImage> imageList = new ArrayList<AuditImage>();
+
+		for (AuditImage auditImage : this.getAuditImages()) {
+			if (auditImage.getType() == ImageType.AUDIT.value) {
+				imageList.add(auditImage);
 			}
 		}
+		return imageList;
+	}
 
-		return super.equals(obj);
+	public List<AuditImage> getListRepairedImages() {
+		List<AuditImage> imageList = new ArrayList<AuditImage>();
+
+		for (AuditImage auditImage : this.getAuditImages()) {
+			if (auditImage.getType() == ImageType.REPAIRED.value) {
+				imageList.add(auditImage);
+			}
+		}
+		return imageList;
 	}
 }

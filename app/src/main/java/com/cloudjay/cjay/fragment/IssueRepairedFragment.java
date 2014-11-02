@@ -1,20 +1,30 @@
 package com.cloudjay.cjay.fragment;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.activity.DetailIssueActivity;
+import com.cloudjay.cjay.activity.DetailIssueActivity_;
+import com.cloudjay.cjay.adapter.RepairedItemAdapter;
 import com.cloudjay.cjay.event.ContainerSearchedEvent;
+import com.cloudjay.cjay.event.ImageCapturedEvent;
+import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.Status;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
+import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -39,8 +49,17 @@ public class IssueRepairedFragment extends Fragment {
     @ViewById(R.id.tv_current_status)
     TextView tvCurrentStatus;
 
+	@ViewById(R.id.lv_repaired_items)
+	ListView lvRepairedItem;
+
     @Bean
     DataCenter dataCenter;
+
+	Session mSession;
+	long currentStatus;
+	RepairedItemAdapter mAdapter;
+	List<AuditItem> repairedList;
+
 
 	public IssueRepairedFragment() {
 		// Required empty public constructor
@@ -56,19 +75,68 @@ public class IssueRepairedFragment extends Fragment {
     void setUp() {
 
         // Get session by containerId
-        dataCenter.getSessionByContainerId(getActivity().getApplicationContext(), containerID);
+		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 
-        // Set text ContainerId TextView
-        tvContainerId.setText(containerID);
+		if (mSession != null) {
+
+			// Set text ContainerId TextView
+			tvContainerId.setText(mSession.getContainerId());
+
+			// Set currentStatus to TextView
+			currentStatus = mSession.getStatus();
+			tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
+
+			mAdapter = new RepairedItemAdapter(getActivity().getApplicationContext(),
+					R.layout.item_issue_repaired);
+			lvRepairedItem.setAdapter(mAdapter);
+
+			refresh();
+
+		} else {
+			// Set text ContainerId TextView
+			tvContainerId.setText(containerID);
+		}
     }
 
-    @UiThread
-    void onEvent(ContainerSearchedEvent event) {
-        List<Session> result = event.getSessions();
+	@ItemClick(R.id.lv_repaired_items)
+	void switchToDetailIssueActivity(int position) {
+		AuditItem auditItem = mAdapter.getItem(position);
+		if (auditItem.getAudited()) {
+			Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
+			detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
+			detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getAuditItemUUID());
+			detailIssueActivity.putExtra(DetailIssueActivity.SELECTED_TAB, 0);
+			startActivity(detailIssueActivity);
+		}
+	}
 
-        // Set currentStatus to TextView
-        tvCurrentStatus.setText((Status.values()[(int)result.get(0).getStatus()]).toString());
-    }
+	@Background
+	void refresh() {
+		if (mSession != null) {
+			repairedList = mSession.getListRepairedItem();
+			updatedData(repairedList);
+		}
+	}
+
+	@UiThread
+	void updatedData(List<AuditItem> repairedItemLists) {
+		mAdapter.clear();
+		if (repairedItemLists != null) {
+			for (AuditItem item : repairedItemLists) {
+				mAdapter.add(item);
+			}
+		}
+
+		mAdapter.notifyDataSetChanged();
+	}
+
+	@UiThread
+	void onEvent(ImageCapturedEvent event) {
+		Logger.Log("on ImageCapturedEvent");
+
+		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+		refresh();
+	}
 
     @Override
     public void onDestroy() {

@@ -8,9 +8,10 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadSessionAdapter;
-import com.cloudjay.cjay.event.upload.ItemEnqueueEvent;
-import com.cloudjay.cjay.event.upload.UploadFailedEvent;
-import com.cloudjay.cjay.event.upload.UploadSucceedEvent;
+import com.cloudjay.cjay.event.upload.ContainerUploadedEvent;
+import com.cloudjay.cjay.event.upload.UploadStartedEvent;
+import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
+import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -68,8 +69,6 @@ public class UploadFragment extends Fragment {
 		refresh();
 	}
 
-	@Trace
-	@Background
 	void refresh() {
 		List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
 				CJayConstant.PREFIX_UPLOADING);
@@ -104,6 +103,10 @@ public class UploadFragment extends Fragment {
 
 	@Trace
 	public void onEvent(UploadSucceedEvent event) {
+		refresh();
+	}
+
+	public void onEvent(UploadedEvent event) {
 		refresh();
 	}
 	//endregion

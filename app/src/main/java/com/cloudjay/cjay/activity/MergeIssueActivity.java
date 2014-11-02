@@ -42,8 +42,8 @@ public class MergeIssueActivity extends BaseActivity {
 	@Extra(CONTAINER_ID_EXTRA)
 	public String containerID;
 
-	@Extra(AUDIT_IMAGE_EXTRA)
-	String auditImageUUID;
+    @Extra(AUDIT_IMAGE_EXTRA)
+    String auditImageUUID;
 
 	@Extra(AUDIT_ITEM_REMOVE_UUID)
 	String auditItemRemoveUUID;
@@ -53,105 +53,118 @@ public class MergeIssueActivity extends BaseActivity {
 
 	Session currentSession;
 
-	AuditMergeIssueAdapter mAdapter;
+    AuditMergeIssueAdapter mAdapter;
 
-	boolean isInserted = false;
+    boolean isInserted = false;
 
-	@AfterViews
-	void setup() {
+    @AfterViews
+    void setup() {
+
+        //get container operater code form containerId
+        currentSession = dataCenter.getSession(this.getApplicationContext(), containerID);
+        if (null == currentSession) {
+            Utils.showCrouton(this, "Không tìm thấy container trong dữ liệu");
+        }
+        mAdapter = new AuditMergeIssueAdapter(this, R.layout.item_merge_issue);
+        lvIssues.setAdapter(mAdapter);
+        //TODO: get un-uploaded audit itemint
+
+        int count = 0;
+        for (AuditItem auditItem : currentSession.getAuditItems()) {
+            if (auditItem.getAudited() == true) {
+                count++;
+            }
+        }
+
+        if (count <= 1) {
+            isInserted = false;
+        } else {
+            isInserted = true;
+        }
+
+        Logger.Log("count: " + count);
+        if (!isInserted) {
+            // Insert static issue into database
+            for (int i = 0; i < 5; i++) {
+
+                Logger.Log("PREFIX_COMPONENT_CODE");
+                IsoCode componentCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_COMPONENT_CODE);
+
+                Logger.Log("PREFIX_DAMAGE_CODE");
+                IsoCode damageCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_DAMAGE_CODE);
+
+                Logger.Log("PREFIX_REPAIR_CODE");
+                IsoCode repairCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_REPAIR_CODE);
+
+                // Random new UUID to unique each audit item
+                String uuid = UUID.randomUUID().toString();
+
+                // Create static issue
+                AuditItem auditItem = new AuditItem();
+                auditItem.setId(0);
+                auditItem.setAuditItemUUID(uuid);
+                auditItem.setAudited(true);
+                auditItem.setComponentCode(componentCode.getCode());
+                auditItem.setComponentCodeId(componentCode.getId());
+                auditItem.setDamageCode(damageCode.getCode());
+                auditItem.setDamageCodeId(damageCode.getId());
+                auditItem.setRepairCode(repairCode.getCode());
+                auditItem.setRepairCodeId(repairCode.getId());
+                auditItem.setLocationCode("XXXX");
+                auditItem.setHeight(40);
+                auditItem.setLength(20);
+                auditItem.setQuantity(2);
+				auditItem.setIsAllowed(true);
+
+                dataCenter.addIssue(getApplicationContext(), auditItem, containerID);
+
+            }
+        }
+
+        refresh();
+
+    }
+
+    @ItemClick(R.id.lv_merge_issue)
+    void lvIssuesItemClicked(int position) {
+
+        AuditItem auditItem = mAdapter.getItem(position);
+        String uuid = auditItem.getAuditItemUUID();
+		Logger.Log("auditImageUUID: " + auditImageUUID);
+		Logger.Log("auditItemRemoveUUID: " + auditItemRemoveUUID);
+		Logger.Log("uuid: " + uuid);
+        dataCenter.addAuditImageToAuditedIssue(getApplicationContext(), containerID,
+                uuid, auditItemRemoveUUID, auditImageUUID);
+        refresh();
+
+        this.finish();
+    }
+
+    @Background
+    void refresh() {
 
 		//get container operater code form containerId
 		currentSession = dataCenter.getSession(this.getApplicationContext(), containerID);
-		if (null == currentSession) {
-			Utils.showCrouton(this, "Không tìm thấy container trong dữ liệu");
-		}
-		mAdapter = new AuditMergeIssueAdapter(this, R.layout.item_merge_issue);
-		lvIssues.setAdapter(mAdapter);
-		//TODO: get un-uploaded audit item
 
-		for (AuditItem auditItem : currentSession.getAuditItems()) {
-			if (auditItem.getAudited() == true) {
-				isInserted = true;
-				break;
-			}
-		}
+        List<AuditItem> list = new ArrayList<AuditItem>();
+        for (AuditItem auditItem : currentSession.getAuditItems()) {
+            if (auditItem.getAudited() == true && auditItem.getId() == 0) {
+                list.add(auditItem);
+            }
+        }
+        Logger.Log("Size: " + list.size());
+        updatedData(list);
+    }
 
-		if (isInserted == false) {
-			// Insert static issue into database
-			for (int i = 0; i < 5; i++) {
-
-				Logger.Log("PREFIX_COMPONENT_CODE");
-				IsoCode componentCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_COMPONENT_CODE);
-
-				Logger.Log("PREFIX_DAMAGE_CODE");
-				IsoCode damageCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_DAMAGE_CODE);
-
-				Logger.Log("PREFIX_REPAIR_CODE");
-				IsoCode repairCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_REPAIR_CODE);
-
-				// Random new UUID to unique each audit item
-				String uuid = UUID.randomUUID().toString();
-
-				// Create static issue
-				AuditItem auditItem = new AuditItem();
-				auditItem.setId(0);
-				auditItem.setAuditItemUUID(uuid);
-				auditItem.setAudited(true);
-				auditItem.setComponentCode(componentCode.getCode());
-				auditItem.setComponentCodeId(componentCode.getId());
-				auditItem.setDamageCode(damageCode.getCode());
-				auditItem.setComponentCodeId(damageCode.getId());
-				auditItem.setRepairCode(repairCode.getCode());
-				auditItem.setComponentCodeId(repairCode.getId());
-				auditItem.setLocationCode("XXXX");
-				auditItem.setHeight(40);
-				auditItem.setLength(20);
-				auditItem.setQuantity(2);
-
-				dataCenter.addIssue(getApplicationContext(), auditItem, containerID);
-
-			}
-		}
-
-		refresh();
-
-	}
-
-	@ItemClick(R.id.lv_merge_issue)
-	void lvIssuesItemClicked(int position) {
-
-		AuditItem auditItem = mAdapter.getItem(position);
-		String uuid = auditItem.getAuditItemUUID();
-		Logger.Log("uuid: " + uuid);
-		AuditImage auditImage = dataCenter.getAuditImageByUUId(getApplicationContext(), containerID, auditItemRemoveUUID, auditImageUUID);
-		dataCenter.addAuditImageToAuditedIssue(getApplicationContext(), containerID,
-				uuid, auditItemRemoveUUID, auditImage);
-		refresh();
-
-		this.finish();
-	}
-
-	@Background
-	void refresh() {
-		List<AuditItem> list = new ArrayList<AuditItem>();
-		for (AuditItem auditItem : currentSession.getAuditItems()) {
-			if (auditItem.getAudited() == true && auditItem.getId() == 0) {
-				list.add(auditItem);
-			}
-		}
-		Logger.Log("Size: " + list.size());
-		updatedData(list);
-	}
-
-	@UiThread
-	public void updatedData(List<AuditItem> auditList) {
-		mAdapter.clear();
-		if (auditList != null) {
-			for (AuditItem object : auditList) {
-				//mAdapter.insert(object, mAdapter.getCount());
-				mAdapter.add(object);
-			}
-		}
-		mAdapter.notifyDataSetChanged();
-	}
+    @UiThread
+    public void updatedData(List<AuditItem> auditList) {
+        mAdapter.clear();
+        if (auditList != null) {
+            for (AuditItem object : auditList) {
+                //mAdapter.insert(object, mAdapter.getCount());
+                mAdapter.add(object);
+            }
+        }
+        mAdapter.notifyDataSetChanged();
+    }
 }
