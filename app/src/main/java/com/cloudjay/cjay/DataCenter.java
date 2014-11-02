@@ -719,6 +719,8 @@ public class DataCenter {
 
 	private void setImageUploadStatus(Context context, String containerId, String imageName, ImageType imageType, UploadStatus status) throws SnappydbException {
 
+		Logger.Log("imageName: " + imageName);
+
 		DB db = App.getDB(context);
 
 		// Change status image in db
@@ -729,9 +731,22 @@ public class DataCenter {
 			switch (imageType) {
 
 				case AUDIT:
+					for (AuditItem auditItem : session.getAuditItems()) {
+						for (AuditImage auditImage : auditItem.getListIssueImages()) {
+
+							Logger.Log("auditImage: " + auditImage.getName());
+
+							if (auditImage.getName().equals(imageName) && auditImage.getType() == imageType.value) {
+								auditImage.setUploadStatus(status);
+							}
+						}
+					}
 				case REPAIRED:
 					for (AuditItem auditItem : session.getAuditItems()) {
-						for (AuditImage auditImage : auditItem.getAuditImages()) {
+						for (AuditImage auditImage : auditItem.getListRepairedImages()) {
+
+							Logger.Log("auditImage: " + auditImage.getName());
+
 							if (auditImage.getName().equals(imageName) && auditImage.getType() == imageType.value) {
 								auditImage.setUploadStatus(status);
 							}
