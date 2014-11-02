@@ -193,6 +193,7 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
         // save db records and refresh list
         mDataCenter.updateAuditItem(getApplicationContext(), mContainerId, mAuditItem);
+        // TODO: SAVING DOES NOT WORK, NOT SURE WHY :(
 
         // go back
         onBackPressed();
