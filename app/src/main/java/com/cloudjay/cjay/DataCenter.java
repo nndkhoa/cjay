@@ -1503,7 +1503,8 @@ public class DataCenter {
 	/**
 	 * Gửi request lên server thông báo đã nhận được notification.
 	 */
-	public void gotMessage(Context context, String channel, long messageId) {
+	@Background
+	public void gotMessage(Context context, String channel, String messageId) {
 		networkClient.gotMessageFromPubNub(channel, messageId);
 	}
 

@@ -17,6 +17,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 
@@ -336,19 +337,19 @@ public class NetworkClient {
 	 */
 	public Session postAuditItem(Context context, Session containerSession, AuditItem auditItem) {
 
-        Logger.Log("containerSession: " + containerSession.getId());
-        Logger.Log("auditItem: " + auditItem.getAuditItemToUpload());
+		Logger.Log("containerSession: " + containerSession.getId());
+		Logger.Log("auditItem: " + auditItem.getAuditItemToUpload());
 
-        String auditItemUUID = auditItem.getAuditItemUUID();
+		String auditItemUUID = auditItem.getAuditItemUUID();
 		Session postAuditItemSession = provider.getRestAdapter(context).create(NetworkService.class).postAudiItem(containerSession.getId(), auditItem.getAuditItemToUpload());
-        List<AuditItem> list = postAuditItemSession.getAuditItems();
-        for (AuditItem item : list) {
-            if (item.equals(auditItem)) {
-                Logger.Log("Set here");
-                item.setAuditItemUUID(auditItemUUID);
-            }
-        }
-        postAuditItemSession.setAuditItems(list);
+		List<AuditItem> list = postAuditItemSession.getAuditItems();
+		for (AuditItem item : list) {
+			if (item.equals(auditItem)) {
+				Logger.Log("Set here");
+				item.setAuditItemUUID(auditItemUUID);
+			}
+		}
+		postAuditItemSession.setAuditItems(list);
 		return postAuditItemSession;
 	}
 
@@ -427,8 +428,9 @@ public class NetworkClient {
 		return operator;
 	}
 
-
-	public void gotMessageFromPubNub(String channel, long messageId) {
-		provider.getRestAdapter(context).create(NetworkService.class).gotMessageFromPubNub(channel, messageId);
+	public void gotMessageFromPubNub(String channel, String messageId) {
+		Response response = provider.getRestAdapter(context).create(NetworkService.class).gotMessageFromPubNub(channel, messageId);
+		Logger.Log(response.getHeaders().toString());
+		Logger.Log(response.getBody().toString());
 	}
 }

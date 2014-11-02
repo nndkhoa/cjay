@@ -101,5 +101,5 @@ public interface NetworkService {
 	Operator getOperatorById(@Path("id") long id);
 
 	@GET(ApiEndpoint.PUBNUB_GOTMESSAGE)
-	void gotMessageFromPubNub(@Query("reciever_channel") String channel,@Query("message_id") long messageId);
+	public Response gotMessageFromPubNub(@Query("reciever_channel") String channel,@Query("message_id") String messageId);
 }
