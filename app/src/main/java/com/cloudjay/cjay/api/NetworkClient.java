@@ -89,6 +89,7 @@ public class NetworkClient {
 
 		// Begin to post image
 		Response response = restAdapter.create(NetworkService.class).postImageFile("image/jpeg", "media", imageName, typedFile);
+		imageFile.exists();
 		return response;
 	}
 	//endregion
@@ -156,7 +157,7 @@ public class NetworkClient {
 	 * @param id
 	 * @return
 	 */
-	public Session getSessionById(int id) {
+	public Session getSessionById(long id) {
 		Session result = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionById(id);
 		if (id != result.getId()) {
 			return null;
@@ -347,7 +348,6 @@ public class NetworkClient {
                 item.setAuditItemUUID(auditItemUUID);
             }
         }
-
         postAuditItemSession.setAuditItems(list);
 		return postAuditItemSession;
 	}
@@ -374,5 +374,61 @@ public class NetworkClient {
 	public Session setHandCleaningSession(Context context, Session session) {
 		Session handCleaningSession = provider.getRestAdapter(context).create(NetworkService.class).setHandCleaningSession(session.getId());
 		return handCleaningSession;
+	}
+
+
+	/**
+	 * Get audit item through id by pubnub
+	 *
+	 * @param id
+	 */
+	public AuditItem getAuditItemById(long id) {
+		AuditItem auditItem = provider.getRestAdapter(context).create(NetworkService.class).getAuditItemById(id);
+		return auditItem;
+	}
+
+	/**
+	 * Get damageCode through id by pubnub
+	 *
+	 * @param id
+	 */
+	public IsoCode getDamageCodeById(long id) {
+		IsoCode damageCode = provider.getRestAdapter(context).create(NetworkService.class).getDamageCodesById(id);
+		return damageCode;
+	}
+
+	/**
+	 * Get repairCode through id by pubnub
+	 *
+	 * @param id
+	 */
+	public IsoCode getRepairCodeById(long id) {
+		IsoCode repairCode = provider.getRestAdapter(context).create(NetworkService.class).getRepairCodeById(id);
+		return repairCode;
+	}
+
+	/**
+	 * Get componetCode through id by pubnub
+	 *
+	 * @param id
+	 */
+	public IsoCode getComponentCodeById(long id) {
+		IsoCode componetCode = provider.getRestAdapter(context).create(NetworkService.class).getComponentCodeById(id);
+		return componetCode;
+	}
+
+	/**
+	 * Get operator through id by pubnub
+	 *
+	 * @param id
+	 */
+	public Operator getOperatorById(long id) {
+		Operator operator = provider.getRestAdapter(context).create(NetworkService.class).getOperatorById(id);
+		return operator;
+	}
+
+
+	public void gotMessageFromPubNub(String channel, long messageId) {
+		provider.getRestAdapter(context).create(NetworkService.class).gotMessageFromPubNub(channel, messageId);
 	}
 }

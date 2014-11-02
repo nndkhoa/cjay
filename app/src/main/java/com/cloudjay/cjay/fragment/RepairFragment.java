@@ -2,16 +2,11 @@ package com.cloudjay.cjay.fragment;
 
 import android.app.ActionBar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.widget.Button;
 
-import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
-import com.cloudjay.cjay.task.jobqueue.UploadCompleteAuditJob;
-import com.cloudjay.cjay.task.jobqueue.UploadCompleteRepairJob;
-import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
@@ -39,8 +34,8 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 	@ViewById(R.id.btn_complete_repair)
 	Button btnCompleteRepair;
 
-    @ViewById(R.id.btn_complete_audit)
-    Button btnCompleteAudit;
+	@ViewById(R.id.btn_complete_audit)
+	Button btnCompleteAudit;
 
 	ActionBar actionBar;
 	private ViewPagerAdapter mPagerAdapter;
@@ -51,28 +46,30 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 
 	@Click(R.id.btn_complete_repair)
 	void buttonContinueClick() {
-		// Add containerId to upload complete repair queue
-		JobManager jobManager = App.getJobManager();
-		jobManager.addJob(new UploadCompleteRepairJob(containerID));
 
-	     /* Remove all tabs */
-		actionBar.removeAllTabs();
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-
-		// Go to next fragment
-		Fragment fragment = new ExportFragment_().builder().containerID(containerID).build();
-		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
-		transaction.replace(R.id.ll_main, fragment);
-		transaction.commit();
+//		// Add containerId to upload complete repair queue
+//		JobManager jobManager = App.getJobManager();
+//		jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), step.value, true));
+//
+//	     /* Remove all tabs */
+//		actionBar.removeAllTabs();
+//		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+//
+//		// Go to next fragment
+//		Fragment fragment = new ExportFragment_().builder().containerID(containerID).build();
+//		FragmentTransaction transaction = getFragmentManager().beginTransaction();
+//		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+//		transaction.replace(R.id.ll_main, fragment);
+//		transaction.commit();
 	}
 
-    @Click(R.id.btn_complete_audit)
-    void buttonCompleteAuditClicked(){
-        // Add containerId to upload complete audit queue
-	    JobManager jobManager = App.getJobManager();
-	    jobManager.addJob(new UploadCompleteAuditJob(containerID));
-    }
+	@Click(R.id.btn_complete_audit)
+	void buttonCompleteAuditClicked() {
+
+//		// Add containerId to upload complete audit queue
+//		JobManager jobManager = App.getJobManager();
+//		jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), step.value, true));
+	}
 
 	@AfterViews
 	void doAfterViews() {

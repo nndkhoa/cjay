@@ -18,13 +18,13 @@ import com.cloudjay.cjay.activity.DetailIssueActivity;
 import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.adapter.AuditItemAdapter;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
-import com.cloudjay.cjay.event.IssueDeletedEvent;
-import com.cloudjay.cjay.event.IssueMergedEvent;
 import com.cloudjay.cjay.event.IssueUpdatedEvent;
+import com.cloudjay.cjay.event.issue.IssueDeletedEvent;
+import com.cloudjay.cjay.event.issue.IssueMergedEvent;
 import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.jobqueue.UploadSessionHandCleaningJob;
+import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
@@ -138,7 +138,7 @@ public class IssuePendingFragment extends Fragment {
 			default:
 				Logger.Log("Open AfterRepair Fragment");
 				String auditItemUUID = event.getAuditItemUUID();
-				AuditItem auditItem = dataCenter.getAuditItemByUUID(getActivity(),containerID,auditItemUUID);
+				AuditItem auditItem = dataCenter.getAuditItemByUUID(getActivity(), containerID, auditItemUUID);
 				Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
 				detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
 				detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getAuditItemUUID());
@@ -153,7 +153,7 @@ public class IssuePendingFragment extends Fragment {
 	void buttonCleanClicked() {
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJob(new UploadSessionHandCleaningJob(mSession.getContainerId()));
+		jobManager.addJob(new UploadSessionJob(mSession.getContainerId(), Step.CLEAR.value, false));
 
 		getActivity().finish();
 	}
@@ -260,24 +260,24 @@ public class IssuePendingFragment extends Fragment {
 		refresh();
 	}
 
-    @UiThread
-    void onEvent(IssueUpdatedEvent event) {
-        Logger.Log("on IssueUpdatedEvent");
+	@UiThread
+	void onEvent(IssueUpdatedEvent event) {
+		Logger.Log("on IssueUpdatedEvent");
 
-        // Re-query container session with given containerId
-        String containerId = event.getContainerId();
-        mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
-        refresh();
-    }
+		// Re-query container session with given containerId
+		String containerId = event.getContainerId();
+		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+		refresh();
+	}
 
-    @UiThread
-    void onEvent(UploadedEvent event) {
-        Logger.Log("upload complete");
-        // Re-query container session with given containerId
-        String containerId = event.getContainerId();
-        mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
-        refresh();
-    }
+	@UiThread
+	void onEvent(UploadedEvent event) {
+		Logger.Log("upload complete");
+		// Re-query container session with given containerId
+		String containerId = event.getContainerId();
+		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+		refresh();
+	}
 
 	@Override
 	public void onDestroy() {

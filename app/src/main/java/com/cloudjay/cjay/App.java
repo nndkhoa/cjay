@@ -27,7 +27,6 @@ public class App extends Application {
 	private static App instance;
 	private static JobManager jobManager;
 	private static DB snappyDB = null;
-	Context mContext;
 
 	public App() {
 		instance = this;
@@ -35,6 +34,10 @@ public class App extends Application {
 
 	public static App getInstance() {
 		return instance;
+	}
+
+	public static JobManager getJobManager() {
+		return jobManager;
 	}
 
 	public static DB getDB(Context context) throws SnappydbException {
@@ -52,7 +55,7 @@ public class App extends Application {
 	public static void closeDB() throws SnappydbException {
 
 		if (snappyDB != null && snappyDB.isOpen()) {
-			StackTraceElement[] trace = new Throwable().getStackTrace();
+//			StackTraceElement[] trace = new Throwable().getStackTrace();
 //			Logger.Log("Close DB " + trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
 			snappyDB.close();
 		}
@@ -71,19 +74,25 @@ public class App extends Application {
 		configureDirectories();
 		configureImageLoader();
 		configureJobManager();
+		configureAlarmManager();
 
 		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
-		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
-				.detectLeakedClosableObjects().penaltyLog()
-				.penaltyDeath().build());
+		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().build());
+		
+//		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
+//				.detectLeakedClosableObjects().penaltyLog()
+//				.penaltyDeath().build());
 
-		// Configure Alarm Manager
-		// Check if user logged in => check alarm manager
-		mContext = getApplicationContext();
+	}
 
-		if (!Utils.isAlarmUp(mContext)) {
-			Logger.w("Alarm Manager is not running.");
-			Utils.startAlarm(mContext);
+	/**
+	 * Configure Alarm Manager
+	 */
+	private void configureAlarmManager() {
+		if (!Utils.isAlarmUp(getApplicationContext())) {
+			Logger.w("Alarm Manager is not running. Starting alarm ...");
+			Utils.startAlarm(getApplicationContext());
+
 		} else {
 			Logger.Log("Alarm is already running "
 					+ StringUtils.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
@@ -122,6 +131,7 @@ public class App extends Application {
 				.bitmapConfig(Bitmap.Config.RGB_565)
 				.imageScaleType(ImageScaleType.IN_SAMPLE_INT)
 				.showImageForEmptyUri(R.drawable.ic_app_360)
+				.showImageOnLoading(R.drawable.ic_app_360)
 				.build();
 
 		// init image loader config
@@ -129,6 +139,7 @@ public class App extends Application {
 				.defaultDisplayImageOptions(defaultOptions)
 				.discCacheSize(500 * 1024 * 1024)
 				.memoryCache(new WeakMemoryCache())
+				.memoryCacheSize(40 * 1024 * 1024)
 				.threadPoolSize(3)
 				.threadPriority(Thread.MAX_PRIORITY)
 				.build();
@@ -167,13 +178,10 @@ public class App extends Application {
 				})
 				.minConsumerCount(1)
 				.maxConsumerCount(1)
+				.loadFactor(3)
 				.consumerKeepAlive(120)
 				.build();
 
 		jobManager = new JobManager(this, configuration);
-	}
-
-	public static JobManager getJobManager() {
-		return jobManager;
 	}
 }

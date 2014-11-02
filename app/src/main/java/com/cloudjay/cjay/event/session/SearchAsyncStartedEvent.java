@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.event;
+package com.cloudjay.cjay.event.session;
 
 /**
  * Event được trigger khi bắt đầu search session từ SERVER.

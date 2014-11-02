@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.event;
+package com.cloudjay.cjay.event.issue;
 
 /**
  * Created by nambv on 28/10/2014.

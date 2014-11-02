@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -23,8 +24,8 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
-import com.cloudjay.cjay.event.ContainerSearchedEvent;
-import com.cloudjay.cjay.event.SearchAsyncStartedEvent;
+import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
+import com.cloudjay.cjay.event.session.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.fragment.dialog.AddContainerDialog;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
@@ -42,6 +43,7 @@ import org.androidannotations.annotations.ViewById;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
+import retrofit.RetrofitError;
 
 /**
  * Tab search container
@@ -137,6 +139,7 @@ public class SearchFragment extends Fragment {
 		Session item = mAdapter.getItem(position);
 		Logger.e(position + " " + item.getContainerId() + " " + item.getLocalStep());
 		Intent intent = new Intent(getActivity(), WizardActivity_.class);
+
 		intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, item.getContainerId());
 		intent.putExtra(WizardActivity.STEP_EXTRA, item.getLocalStep());
 		startActivity(intent);
@@ -197,7 +200,6 @@ public class SearchFragment extends Fragment {
 		addContainerDialog_.show(fragmentManager, "fragment_addcontainer");
 	}
 
-
 	/**
 	 * Begin to search in background
 	 */
@@ -211,6 +213,7 @@ public class SearchFragment extends Fragment {
 		// Start search in background
 		containerID = keyword;
 		dataCenter.search(getActivity(), keyword);
+
 	}
 
 	@UiThread
@@ -219,29 +222,13 @@ public class SearchFragment extends Fragment {
 		llSearchResult.setVisibility(show ? View.GONE : View.VISIBLE);
 	}
 
-	/**
-	 * @param event
-	 */
-	@UiThread
-	public void onEvent(ContainerSearchedEvent event) {
-
-		showProgress(false);
-		List<Session> result = event.getSessions();
-		mAdapter.clear();
-
-		if (result.size() != 0) {
-			mAdapter.setData(result);
-			mAdapter.notifyDataSetChanged();
-		} else {
-			showSearchResultDialog(containerID);
-		}
-	}
-
 	@Override
 	public void onResume() {
 		super.onResume();
 		llSearchResult.setVisibility(View.GONE);
 	}
+
+	//region EVENT HANDLER
 
 	/**
 	 * Bắt đầu search từ Server
@@ -252,6 +239,30 @@ public class SearchFragment extends Fragment {
 	public void onEvent(SearchAsyncStartedEvent event) {
 		Toast.makeText(getActivity(), event.getStringEvent(), Toast.LENGTH_SHORT).show();
 	}
+
+	/**
+	 * @param event
+	 */
+	@UiThread
+	public void onEvent(ContainerSearchedEvent event) {
+
+		showProgress(false);
+		if (event.isFailed()) {
+			llSearchResult.setVisibility(View.GONE);
+			Toast.makeText(getActivity(), "Đang trong quá trình cập nhật dữ liệu, vui lòng thử lại sau", Toast.LENGTH_SHORT).show();
+		} else {
+			List<Session> result = event.getSessions();
+			mAdapter.clear();
+			if (result.size() != 0) {
+				mAdapter.setData(result);
+				mAdapter.notifyDataSetChanged();
+
+			} else {
+				showSearchResultDialog(containerID);
+			}
+		}
+	}
+	//endregion
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

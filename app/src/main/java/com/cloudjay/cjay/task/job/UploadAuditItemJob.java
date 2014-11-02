@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.task.jobqueue;
+package com.cloudjay.cjay.task.job;
 
 import android.content.Context;
 
@@ -6,8 +6,6 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
-import com.cloudjay.cjay.event.upload.UploadingEvent;
-import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
@@ -51,7 +49,6 @@ public class UploadAuditItemJob extends Job {
 //        EventBus.getDefault().post(new UploadingEvent());
 
         DataCenter_.getInstance_(context).upLoadAuditItem(context, containerId,auditItemUUID);
-
         //Add Log
         DataCenter_.getInstance_(context).addLog(context,containerId, "Khởi tạo thêm lỗi");
 

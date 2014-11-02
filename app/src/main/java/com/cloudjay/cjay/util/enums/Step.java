@@ -5,7 +5,8 @@ public enum Step {
 	AUDIT(0),
 	REPAIR(1),
 	AVAILABLE(2),
-	EXPORT(3),
+	EXPORTED(3),
+	CLEAR(5),
     IMPORT(4);
 
 	public final int value;

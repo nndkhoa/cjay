@@ -9,6 +9,24 @@ import javax.annotation.Generated;
 @Generated("org.jsonschema2pojo")
 public class IsoCode {
 
+	public enum Type {
+
+		DAMAGE(0),
+		REPAIR(1),
+		COMPONENT(2);
+
+		public final int value;
+
+		Type(int value) {
+			this.value = value;
+		}
+
+		public int getValue() {
+			return value;
+		}
+	}
+
+
 	// key = CJayConstant.PREFIX_DAMAGE_CODE + "DB"
 	@Expose
 	private long id;

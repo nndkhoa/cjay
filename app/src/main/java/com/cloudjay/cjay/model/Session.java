@@ -1,6 +1,8 @@
 package com.cloudjay.cjay.model;
 
 
+import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
@@ -27,18 +29,18 @@ public class Session {
 	@Expose
 	private long id;
 
-	private long localStep;
+	private int localStep;
 
-	public long getStep() {
+	public int getStep() {
 		return step;
 	}
 
-	public void setStep(long step) {
+	public void setStep(int step) {
 		this.step = step;
 	}
 
 	@Expose
-	private long step;
+	private int step;
 
 	public boolean canRetry() {
 		return retry;
@@ -116,16 +118,21 @@ public class Session {
 		return this;
 	}
 
-	public long getLocalStep() {
+	public int getLocalStep() {
 		return localStep;
 	}
 
-	public void setLocalStep(long localStep) {
+	public void setLocalStep(int localStep) {
 		this.localStep = localStep;
 	}
 
-	public Session withStep(long step) {
+	public Session withLocalStep(int step) {
 		this.localStep = step;
+		return this;
+	}
+
+	public Session withStep(int step) {
+		this.step = step;
 		return this;
 	}
 
@@ -469,7 +476,7 @@ public class Session {
 			// Tất cả các item đều được gán lỗi và có hình
 			case AUDIT:
 				for (AuditItem item : auditItems) {
-					if (item.getAudited() == false)
+					if (item.getAudited() == false || item.getUploadStatus() == UploadStatus.NONE.value)
 						return false;
 				}
 
@@ -485,8 +492,8 @@ public class Session {
 
 				return true;
 
-			// Chỉ cần có ít nhất một tấm hình EXPORT là hợp lệ
-			case EXPORT:
+			// Chỉ cần có ít nhất một tấm hình EXPORTED là hợp lệ
+			case EXPORTED:
 				for (GateImage image : gateImages) {
 					if (image.getType() == ImageType.EXPORT.value) return true;
 				}
@@ -605,5 +612,38 @@ public class Session {
 		}
 
 		return list;
+	}
+
+	public Session mergeSession(Session session) {
+		this.setId(session.getId());
+		this.setStep(session.getStep());
+		this.setCheckInTime(session.getCheckInTime());
+		this.setCheckOutTime(session.getCheckOutTime());
+		//merge Gate Image
+		List<GateImage> mergedGateImages = new ArrayList<GateImage>();
+		for (GateImage gateImageServer : session.getGateImages()) {
+			for (GateImage gateImage : this.getGateImages()) {
+				if (gateImage.getName().equals(Utils.getImageNameFromUrl(gateImageServer.getUrl()))) {
+					gateImage.mergeGateImage(gateImageServer);
+					mergedGateImages.add(gateImage);
+				}
+			}
+		}
+		this.setGateImages(mergedGateImages);
+
+		//merge Audit Item  if audit item from server != null
+		if (session.getAuditItems().size() != 0) {
+			List<AuditItem> mergedAuditItem = new ArrayList<AuditItem>();
+			for (AuditItem auditItemServer : session.getAuditItems()) {
+				for (AuditItem auditItem : this.getAuditItems()) {
+					if (auditItem.getAuditItemUUID().equals(auditItemServer.getAuditItemUUID())) {
+						auditItem.mergeAuditItem(auditItemServer);
+						mergedAuditItem.add(auditItem);
+					}
+				}
+			}
+			this.setAuditItems(mergedAuditItem);
+		}
+		return this;
 	}
 }

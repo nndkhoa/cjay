@@ -1,7 +1,6 @@
 package com.cloudjay.cjay.activity;
 
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 
 import com.cloudjay.cjay.R;
@@ -24,6 +23,9 @@ public class WizardActivity extends BaseActivity {
 	@Extra(CONTAINER_ID_EXTRA)
 	String containerID;
 
+	/**
+	 * This is current local step
+	 */
 	@Extra(STEP_EXTRA)
 	long step = 4;
 
@@ -35,7 +37,7 @@ public class WizardActivity extends BaseActivity {
 
 		Fragment fragment;
 		Step currentStep = Step.values()[((int) step)];
-		Logger.Log(currentStep + "");
+		Logger.Log("Current step: " + currentStep.name());
 
 		switch (currentStep) {
 
@@ -43,7 +45,7 @@ public class WizardActivity extends BaseActivity {
 			case AUDIT:
 			case REPAIR:
 				fragment = AuditAndRepairFragment_.builder().containerID(containerID)
-                        .tabType(1).build();
+						.tabType(1).build();
 				break;
 
 			// Load fragment Export
@@ -52,6 +54,7 @@ public class WizardActivity extends BaseActivity {
 				break;
 
 			// Load fragment Import
+			case IMPORT:
 			default:
 				fragment = ImportFragment_.builder().containerID(containerID).build();
 				break;

@@ -6,6 +6,8 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Generated;
 
@@ -119,6 +121,11 @@ public class AuditImage {
 
 	public AuditImage withUUID(String s) {
 		this.auditImageUUID = s;
+		return this;
+	}
+
+	public AuditImage mergeAuditImage(AuditImage auditImageServer) {
+		this.setId(auditImageServer.getId());
 		return this;
 	}
 }

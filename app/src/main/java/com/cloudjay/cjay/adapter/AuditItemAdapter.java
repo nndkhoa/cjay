@@ -22,7 +22,7 @@ import com.cloudjay.cjay.activity.ReportIssueActivity_;
 import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
-import com.cloudjay.cjay.task.jobqueue.UploadAuditItemJob;
+import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;

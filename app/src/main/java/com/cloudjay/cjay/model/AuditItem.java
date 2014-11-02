@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.model;
 
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.google.gson.JsonArray;
@@ -24,6 +25,12 @@ public class AuditItem {
 	//region ATTR
 	@Expose
 	private long id;
+
+	/**
+	 * Id of Container Session
+	 */
+	@Expose
+	private long session;
 
 	@SerializedName("damage_code")
 	@Expose
@@ -364,6 +371,14 @@ public class AuditItem {
 		this.uploadStatus = status.value;
 		return this;
 	}
+
+	public long getSession() {
+		return session;
+	}
+
+	public void setSession(long session) {
+		this.session = session;
+	}
 	//endregion
 
 	public AuditItem() {
@@ -426,22 +441,22 @@ public class AuditItem {
 		return repaired_image;
 	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof AuditItem) {
-            AuditItem temp = (AuditItem) obj;
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof AuditItem) {
+			AuditItem temp = (AuditItem) obj;
 
-            if (this.componentCodeId == temp.componentCodeId
-                    && this.damageCodeId == temp.damageCodeId
-                    && this.repairCodeId == temp.repairCodeId) {
-                return true;
-            } else {
-                return false;
-            }
-        }
+			if (this.componentCodeId == temp.componentCodeId
+					&& this.damageCodeId == temp.damageCodeId
+					&& this.repairCodeId == temp.repairCodeId) {
+				return true;
+			} else {
+				return false;
+			}
+		}
 
-        return super.equals(obj);
-    }
+		return super.equals(obj);
+	}
 
 	public List<AuditImage> getListIssueImages() {
 		List<AuditImage> imageList = new ArrayList<AuditImage>();
@@ -463,5 +478,23 @@ public class AuditItem {
 			}
 		}
 		return imageList;
+	}
+
+	public AuditItem mergeAuditItem(AuditItem auditItemServer) {
+		this.setId(auditItemServer.getId());
+		this.setIsAllowed(auditItemServer.isIsAllowed());
+
+		//merge audit Image
+		List<AuditImage> mergedAuditImages = new ArrayList<AuditImage>();
+		for (AuditImage auditImageServer : auditItemServer.getAuditImages()) {
+			for (AuditImage auditImage : this.getAuditImages()) {
+				if (auditImage.getName().equals(Utils.getImageNameFromUrl(auditImageServer.getUrl()))){
+					auditImage.mergeAuditImage(auditImageServer);
+					mergedAuditImages.add(auditImage);
+				}
+			}
+		}
+		this.setAuditImages(mergedAuditImages);
+		return this;
 	}
 }

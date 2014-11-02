@@ -22,7 +22,7 @@ import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.jobqueue.UploadExportSessionJob;
+import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -160,7 +160,7 @@ public class ExportFragment extends Fragment {
 		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
 		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.EXPORT.value);
 		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.EXPORT.value);
+		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.EXPORTED.value);
 		startActivity(cameraActivityIntent);
 	}
 
@@ -183,14 +183,14 @@ public class ExportFragment extends Fragment {
 	@Click(R.id.btn_complete_audit)
 	void btnCompleteClicked() {
 
-		if (mSession.isValidToUpload(Step.EXPORT) == false) {
+		if (mSession.isValidToUpload(Step.EXPORTED) == false) {
 			Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
 			return;
 		}
 
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJob(new UploadExportSessionJob(mSession));
+		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getStep(), true));
 
 		// Navigate to HomeActivity
 		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);

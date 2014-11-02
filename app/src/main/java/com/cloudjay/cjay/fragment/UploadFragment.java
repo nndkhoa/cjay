@@ -8,7 +8,6 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadSessionAdapter;
-import com.cloudjay.cjay.event.upload.ContainerUploadedEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadedEvent;
@@ -17,7 +16,6 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
@@ -86,12 +84,8 @@ public class UploadFragment extends Fragment {
 	}
 
 
-	//region Handle EventBus
+	//region EVENT HANDLER
 	public void onEvent(UploadStartedEvent event) {
-		refresh();
-	}
-
-	public void onEvent(ContainerUploadedEvent event) {
 		refresh();
 	}
 

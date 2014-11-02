@@ -23,7 +23,7 @@ import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
-import com.cloudjay.cjay.task.jobqueue.UploadImageJob;
+import com.cloudjay.cjay.task.job.UploadImageJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -40,7 +40,6 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 
@@ -272,7 +271,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 			// Save bitmap
 			File photo = getFile(uuid);
 			saveBitmapToFile(capturedBitmap, photo);
-
 			// Add taken picture to job queue
 			addImageToUploadQueue(photo.getAbsolutePath(), photo.getName(), uuid);
 		}

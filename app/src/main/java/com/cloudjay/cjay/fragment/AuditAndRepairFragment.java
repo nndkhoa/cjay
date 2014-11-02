@@ -13,8 +13,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.HomeActivity_;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.jobqueue.UploadCompleteAuditJob;
-import com.cloudjay.cjay.task.jobqueue.UploadCompleteRepairJob;
+import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.Step;
 import com.path.android.jobqueue.JobManager;
@@ -83,7 +82,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 		// PUT /api/cjay/containers/{pk}/complete-audit
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJob(new UploadCompleteAuditJob(containerID));
+		jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), session.getStep(), true));
 
 		// Hide this button
 		btnCompleteAudit.setVisibility(View.GONE);
@@ -115,7 +114,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 		// Add containerId to upload complete repair queue
 		// PUT /api/cjay/containers/{pk}/complete-repair
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJob(new UploadCompleteRepairJob(containerID));
+		jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), session.getStep(), true));
 
 		// Navigate to HomeActivity
 		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
