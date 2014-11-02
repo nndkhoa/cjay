@@ -15,6 +15,8 @@ import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubError;
@@ -142,7 +144,10 @@ public class PubnubService extends Service {
 			Logger.Log("Channel: " + channel);
 			Logger.Log("Message: " + message.toString());
 
-			NotificationItem item = (NotificationItem) message;
+
+			Gson gson = new Gson();
+			NotificationItem item=gson.fromJson((JsonElement) message,NotificationItem.class);
+//			NotificationItem item = (NotificationItem) message;
 			Bundle b = new Bundle();
 			b.putString("channel", channel);
 			b.putString("object_type", item.getObjectType());

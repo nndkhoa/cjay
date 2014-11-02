@@ -269,7 +269,7 @@
                 android:background="@drawable/btn_edit_selector"
                 android:text="@string/button_edit"
                 android:textColor="@android:color/white"
-                android:textSize="14sp" />
+                android:textSize="12sp" />
 
             <Button
                 android:id="@+id/btn_repair_pending"
@@ -278,7 +278,7 @@
                 android:background="@drawable/btn_green_selector"
                 android:text="@string/button_repair"
                 android:textColor="@android:color/white"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:visibility="gone" />
 
         </LinearLayout>
