@@ -55,8 +55,6 @@ public class MergeIssueActivity extends BaseActivity {
 
     AuditMergeIssueAdapter mAdapter;
 
-    boolean isInserted = false;
-
     @AfterViews
     void setup() {
 
@@ -67,59 +65,6 @@ public class MergeIssueActivity extends BaseActivity {
         }
         mAdapter = new AuditMergeIssueAdapter(this, R.layout.item_merge_issue);
         lvIssues.setAdapter(mAdapter);
-        //TODO: get un-uploaded audit itemint
-
-        int count = 0;
-        for (AuditItem auditItem : currentSession.getAuditItems()) {
-            if (auditItem.getAudited() == true) {
-                count++;
-            }
-        }
-
-        if (count <= 1) {
-            isInserted = false;
-        } else {
-            isInserted = true;
-        }
-
-        Logger.Log("count: " + count);
-        if (!isInserted) {
-            // Insert static issue into database
-            for (int i = 0; i < 5; i++) {
-
-                Logger.Log("PREFIX_COMPONENT_CODE");
-                IsoCode componentCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_COMPONENT_CODE);
-
-                Logger.Log("PREFIX_DAMAGE_CODE");
-                IsoCode damageCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_DAMAGE_CODE);
-
-                Logger.Log("PREFIX_REPAIR_CODE");
-                IsoCode repairCode = dataCenter.getIsoCode(getApplicationContext(), CJayConstant.PREFIX_REPAIR_CODE);
-
-                // Random new UUID to unique each audit item
-                String uuid = UUID.randomUUID().toString();
-
-                // Create static issue
-                AuditItem auditItem = new AuditItem();
-                auditItem.setId(0);
-                auditItem.setAuditItemUUID(uuid);
-                auditItem.setAudited(true);
-                auditItem.setComponentCode(componentCode.getCode());
-                auditItem.setComponentCodeId(componentCode.getId());
-                auditItem.setDamageCode(damageCode.getCode());
-                auditItem.setDamageCodeId(damageCode.getId());
-                auditItem.setRepairCode(repairCode.getCode());
-                auditItem.setRepairCodeId(repairCode.getId());
-                auditItem.setLocationCode("XXXX");
-                auditItem.setHeight(40);
-                auditItem.setLength(20);
-                auditItem.setQuantity(2);
-				auditItem.setIsAllowed(true);
-
-                dataCenter.addIssue(getApplicationContext(), auditItem, containerID);
-
-            }
-        }
 
         refresh();
 
