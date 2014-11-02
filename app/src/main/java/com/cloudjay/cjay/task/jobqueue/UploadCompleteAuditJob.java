@@ -7,9 +7,12 @@ import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.enums.Step;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
+import com.snappydb.SnappydbException;
 
 import de.greenrobot.event.EventBus;
 
@@ -33,8 +36,19 @@ public class UploadCompleteAuditJob extends Job {
 	@Override
 	public void onAdded() {
 
+		// Add container to collection UPLOAD
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).addUploadSession(containerId);
+
+		//Change status uploadding, step repair, remove from WORKING
+		try {
+			DataCenter_.getInstance_(context).changeUploadState(context,containerId, UploadStatus.UPLOADING);
+			DataCenter_.getInstance_(context).changeStepSession(context,containerId, Step.REPAIR);
+			DataCenter_.getInstance_(context).removeWorkingSession(context,containerId );
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+
 		EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.AUDIT_ITEM));
 
 	}

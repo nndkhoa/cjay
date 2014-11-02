@@ -428,7 +428,7 @@ public class DataCenter {
 	 * @param keyword
 	 */
 	@Background(serial = CACHE)
-	public void search(Context context, String keyword) {
+	public void search(Context context, String keyword) throws RetrofitError {
 
 		String[] keysResult;
 		try {
@@ -474,10 +474,9 @@ public class DataCenter {
 	 */
 	@Background(serial = NETWORK)
 	@Trace
-	public void searchAsync(Context context, String keyword) {
+	public void searchAsync(Context context, String keyword) throws RetrofitError {
 
 		try {
-
 			Logger.Log("Begin to search container from server");
 			List<Session> sessions = networkClient.searchSessions(context, keyword);
 

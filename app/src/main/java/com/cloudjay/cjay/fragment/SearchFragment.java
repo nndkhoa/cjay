@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -42,6 +43,7 @@ import org.androidannotations.annotations.ViewById;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
+import retrofit.RetrofitError;
 
 /**
  * Tab search container
@@ -210,7 +212,13 @@ public class SearchFragment extends Fragment {
 
 		// Start search in background
 		containerID = keyword;
-		dataCenter.search(getActivity(), keyword);
+		try {
+			dataCenter.search(getActivity(), keyword);
+		} catch (RetrofitError error){
+			Logger.e(error.getMessage());
+			Toast.makeText(getActivity(), "Đang trong quá trình cập nhật dữ liệu, vui lòng thử lại sau", Toast.LENGTH_SHORT).show();
+		}
+
 	}
 
 	@UiThread
