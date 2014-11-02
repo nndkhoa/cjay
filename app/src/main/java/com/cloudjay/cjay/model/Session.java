@@ -27,18 +27,18 @@ public class Session {
 	@Expose
 	private long id;
 
-	private long localStep;
+	private int localStep;
 
-	public long getStep() {
+	public int getStep() {
 		return step;
 	}
 
-	public void setStep(long step) {
+	public void setStep(int step) {
 		this.step = step;
 	}
 
 	@Expose
-	private long step;
+	private int step;
 
 	public boolean canRetry() {
 		return retry;
@@ -116,15 +116,15 @@ public class Session {
 		return this;
 	}
 
-	public long getLocalStep() {
+	public int getLocalStep() {
 		return localStep;
 	}
 
-	public void setLocalStep(long localStep) {
+	public void setLocalStep(int localStep) {
 		this.localStep = localStep;
 	}
 
-	public Session withStep(long step) {
+	public Session withStep(int step) {
 		this.localStep = step;
 		return this;
 	}

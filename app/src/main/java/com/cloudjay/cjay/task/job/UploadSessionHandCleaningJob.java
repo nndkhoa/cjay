@@ -1,13 +1,10 @@
-package com.cloudjay.cjay.task.jobqueue;
+package com.cloudjay.cjay.task.job;
 
 import android.content.Context;
 
 import com.cloudjay.cjay.App;
-import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
-import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
-import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
@@ -17,28 +14,16 @@ import com.snappydb.SnappydbException;
 
 import de.greenrobot.event.EventBus;
 
-public class UploadSessionJob extends Job {
-
+public class UploadSessionHandCleaningJob extends Job {
 	String containerId;
 
-	/**
-	 * Dùng để phân biệt xem có cần clear Working hay không?
-	 */
-	int type;
-
-	@Override
-	protected int getRetryLimit() {
-		return 2;
-	}
-
-	public UploadSessionJob(String containerId) {
+	public UploadSessionHandCleaningJob(String containerId) {
 		super(new Params(1).requireNetwork().persist().groupBy(containerId));
 		this.containerId = containerId;
 	}
 
 	@Override
 	public void onAdded() {
-
 
 		// Add container to collection UPLOAD
 		Context context = App.getInstance().getApplicationContext();
@@ -47,13 +32,14 @@ public class UploadSessionJob extends Job {
 		//Change status uploadding, step audit, remove from WORKING
 		try {
 			DataCenter_.getInstance_(context).changeUploadState(context,containerId, UploadStatus.UPLOADING);
-			DataCenter_.getInstance_(context).changeStepSession(context,containerId, Step.AUDIT);
+			DataCenter_.getInstance_(context).changeStepSession(context,containerId, Step.EXPORT);
 			DataCenter_.getInstance_(context).removeWorkingSession(context,containerId );
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
 
 		EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.SESSION));
+
 	}
 
 	@Override
@@ -61,42 +47,28 @@ public class UploadSessionJob extends Job {
 		Context context = App.getInstance().getApplicationContext();
 
 		//Add Log
-		DataCenter_.getInstance_(context).addLog(context, containerId, "Bắt đầu khởi tạo");
-
+		DataCenter_.getInstance_(context).addLog(context, containerId, "Bắt đầu thiết lập là container vệ sinh quét");
 //		EventBus.getDefault().post(new UploadingEvent());
-		DataCenter_.getInstance_(context).uploadImportSession(context, containerId);
+		DataCenter_.getInstance_(context).setHandCleaningSession(context, containerId);
 
 		//Add Log
-		DataCenter_.getInstance_(context).addLog(context, containerId, "Khởi tạo hoàn tất");
+		DataCenter_.getInstance_(context).addLog(context, containerId, "Hoàn tất thiết lập là container vệ sinh quét");
 
-		//Change status uploadded
-		DataCenter_.getInstance_(context).changeUploadState(context,containerId, UploadStatus.COMPLETE);
-
-		EventBus.getDefault().post(new UploadedEvent(containerId));
 	}
-
 
 	@Override
 	protected void onCancel() {
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).addLog(context, containerId, "Không thể khởi tạo");
+		//Add Log
+		DataCenter_.getInstance_(context).addLog(context, containerId, "Không thể thiết lập là container vệ sinh quét");
 
-		//Change status error
-		try {
-			DataCenter_.getInstance_(context).changeUploadState(context,containerId, UploadStatus.ERROR);
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
 	protected boolean shouldReRunOnThrowable(Throwable throwable) {
 		Context context = App.getInstance().getApplicationContext();
-
 		//Add Log
-		DataCenter_.getInstance_(context).addLog(context, containerId, "Khởi tạo bị gián đoạn");
-		EventBus.getDefault().post(new UploadStoppedEvent(containerId));
-
-		return true;
+		DataCenter_.getInstance_(context).addLog(context, containerId, "Thiết lập là container vệ sinh quét bị gián đoạn");
+		return false;
 	}
 }

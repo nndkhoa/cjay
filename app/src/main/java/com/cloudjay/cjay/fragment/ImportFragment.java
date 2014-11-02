@@ -22,12 +22,12 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
-import com.cloudjay.cjay.event.operator.OperatorCallbackEvent;
+import com.cloudjay.cjay.event.operator.OperatorChosenEvent;
 import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
+import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringUtils;
@@ -176,7 +176,7 @@ public class ImportFragment extends Fragment {
 
 	//region EVENT HANDLER
 	@UiThread
-	void onEvent(OperatorCallbackEvent event) {
+	void onEvent(OperatorChosenEvent event) {
 
 		// Get selected operator from search operator dialog
 		Operator operator = event.getOperator();
@@ -199,7 +199,6 @@ public class ImportFragment extends Fragment {
 		// add working session also post an event
 		dataCenter.addSession(mSession);
 		dataCenter.addWorkingSession(mSession);
-
 	}
 
 	/**
@@ -271,8 +270,7 @@ public class ImportFragment extends Fragment {
 
 		// Add current container to job queue
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId()));
-
+		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getStep(), false));
 
 		// Go to next fragment
 		AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID)
@@ -296,7 +294,7 @@ public class ImportFragment extends Fragment {
 
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId()));
+		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getStep(), true));
 
 		// Navigate to HomeActivity
 //		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
