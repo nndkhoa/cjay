@@ -4,13 +4,13 @@ import android.content.Context;
 
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.AuditImagesGotEvent;
-import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.GateImagesGotEvent;
-import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
-import com.cloudjay.cjay.event.session.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.event.issue.IssueDeletedEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
+import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
+import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.session.SearchAsyncStartedEvent;
+import com.cloudjay.cjay.event.session.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
@@ -72,7 +72,7 @@ public class DataCenter {
 
 		DB db = App.getDB(context);
 		User user = db.getObject(CJayConstant.PREFIX_USER, User.class);
-		// db.close();
+
 
 		if (null == user) {
 			return getCurrentUserAsync(context);
@@ -97,7 +97,7 @@ public class DataCenter {
 
 		DB db = App.getDB(context);
 		db.put(CJayConstant.PREFIX_USER, user);
-		// db.close();
+
 
 		return user;
 	}
@@ -119,7 +119,7 @@ public class DataCenter {
 		for (Operator operator : operators) {
 			db.put(CJayConstant.PREFIX_OPERATOR + operator.getOperatorCode(), operator);
 		}
-		// db.close();
+
 	}
 
 	/**
@@ -136,7 +136,7 @@ public class DataCenter {
 				Operator operator = db.getObject(result, Operator.class);
 				operators.add(operator);
 			}
-			// db.close();
+
 			EventBus.getDefault().post(new OperatorsGotEvent(operators));
 		} catch (SnappydbException e) {
 			e.printStackTrace();
@@ -214,7 +214,7 @@ public class DataCenter {
 			String key = CJayConstant.PREFIX_DAMAGE_CODE + code.getCode();
 			db.put(key, code);
 		}
-		// db.close();
+
 	}
 
 	/**
@@ -230,7 +230,7 @@ public class DataCenter {
 			String key = CJayConstant.PREFIX_REPAIR_CODE + code.getCode();
 			db.put(key, code);
 		}
-		// db.close();
+
 	}
 
 	/**
@@ -246,7 +246,7 @@ public class DataCenter {
 			String key = CJayConstant.PREFIX_COMPONENT_CODE + code.getCode();
 			db.put(key, code);
 		}
-		// db.close();
+
 	}
 
 	/**
@@ -346,7 +346,7 @@ public class DataCenter {
 			DB db = App.getDB(context);
 			String key = containerId;
 			Session session = db.getObject(key, Session.class);
-			// db.close();
+
 
 			return session;
 		} catch (SnappydbException e) {
@@ -388,7 +388,7 @@ public class DataCenter {
 				sessions.add(session);
 			} catch (SnappydbException e) {
 				e.printStackTrace();
-				// db.close();
+
 			}
 		}
 
@@ -412,7 +412,7 @@ public class DataCenter {
 			String key = session.getContainerId();
 			db.put(key, session);
 		}
-		// db.close();
+
 	}
 
 	/**
@@ -443,7 +443,6 @@ public class DataCenter {
 				sessions.add(session);
 			}
 
-			// db.close();
 
 			// Check if local search has results
 			if (sessions.size() != 0) {
@@ -509,7 +508,7 @@ public class DataCenter {
 			db.put(key, session);
 
 			// Close db
-			// db.close();
+
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
@@ -527,7 +526,7 @@ public class DataCenter {
 
 			String key = CJayConstant.PREFIX_WORKING + session.getContainerId();
 			db.put(key, session);
-			// db.close();
+
 
 			// Notify to Working Fragment
 			EventBus.getDefault().post(new WorkingSessionCreatedEvent(session));
@@ -551,7 +550,7 @@ public class DataCenter {
 			String key = CJayConstant.PREFIX_UPLOADING + containerId;
 			db.put(key, session);
 
-			// db.close();
+
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
@@ -581,7 +580,7 @@ public class DataCenter {
 //		key = CJayConstant.PREFIX_WORKING + containerId;
 //		db.put(key, session);
 
-		// db.close();
+
 	}
 
 	public void addAuditImage(Context context, AuditImage auditImage, String containerId) throws SnappydbException {
@@ -637,13 +636,13 @@ public class DataCenter {
 		db.put(containerId, session);
 
 		Logger.Log("insert audit image successfully");
-		// db.close();
+
 	}
 
 	public void getGateImages(Context context, String containerId) throws SnappydbException {
 		DB db = App.getDB(context);
 		Session session = db.getObject(containerId, Session.class);
-		// db.close();
+
 
 		List<GateImage> gateImages = session.getGateImages();
 		EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
@@ -660,7 +659,7 @@ public class DataCenter {
 				sessions.add(tmp);
 			}
 
-			// db.close();
+
 			EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
 		} catch (SnappydbException e) {
 			e.printStackTrace();
@@ -675,7 +674,7 @@ public class DataCenter {
 			List<GateImage> gateImages = session.getGateImages();
 
 			Logger.Log("gate images count in dataCenter: " + gateImages.size());
-			// db.close();
+
 
 			EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
 		} catch (SnappydbException e) {
@@ -789,7 +788,7 @@ public class DataCenter {
 			db.put(key, result);
 
 		}
-		// db.close();
+
 	}
 	//endregion
 
@@ -798,7 +797,7 @@ public class DataCenter {
 		try {
 			DB db = App.getDB(context);
 			session = db.getObject(containerId, Session.class);
-			// db.close();
+
 		} catch (SnappydbException e) {
 			Logger.w(e.getMessage());
 		}
@@ -830,7 +829,7 @@ public class DataCenter {
 			Session session = db.getObject(containerId, Session.class);
 			List<AuditItem> auditItems = session.getAuditItems();
 
-			// db.close();
+
 			return auditItems;
 		} catch (SnappydbException e) {
 			e.printStackTrace();
@@ -851,7 +850,7 @@ public class DataCenter {
 			Session oldSession = db.getObject(containerId, Session.class);
 			Session newSession = networkClient.setHandCleaningSession(context, oldSession);
 			db.put(newSession.getContainerId(), newSession);
-			// db.close();
+
 			return newSession;
 		} catch (SnappydbException e) {
 			e.printStackTrace();
@@ -877,7 +876,7 @@ public class DataCenter {
 				LogItem logUpload = db.getObject(result, LogItem.class);
 				logUploads.add(logUpload);
 			}
-			// db.close();
+
 			return logUploads;
 		} catch (SnappydbException e) {
 			Logger.w(e.getMessage());
@@ -903,7 +902,7 @@ public class DataCenter {
 				logUploads.add(logUpload);
 			}
 
-			// db.close();
+
 			return logUploads;
 		} catch (SnappydbException e) {
 			Logger.w(e.getMessage());
@@ -935,7 +934,7 @@ public class DataCenter {
 			db.put(containerId, session);
 
 			Logger.Log("insert issue audited successfully");
-			// db.close();
+
 
 		} catch (SnappydbException e) {
 			Logger.w(e.getMessage());
@@ -984,7 +983,7 @@ public class DataCenter {
 
 			db.put(containerId, session);
 			Logger.Log("add AuditImage To AuditedIssue successfully");
-			// db.close();
+
 
 		} catch (SnappydbException e) {
 			Logger.w(e.getMessage());
@@ -1053,7 +1052,7 @@ public class DataCenter {
 		try {
 			DB db = App.getDB(context);
 			db.put(CJayConstant.PREFIX_LOG + log.getContainerId() + log.getTime(), log);
-			// db.close();
+
 
 		} catch (SnappydbException e) {
 			Logger.w(e.getMessage());
@@ -1091,15 +1090,16 @@ public class DataCenter {
 		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
 	}
 
-	public void uploadExportSession(Context context, Session session) throws SnappydbException {
+	public void uploadExportSession(Context context, String containerId) throws SnappydbException {
+
 		// Upload audit item session to server
 		DB db = App.getDB(context);
-		Session oldSession = db.getObject(session.getContainerId(), Session.class);
+		Session oldSession = db.getObject(containerId, Session.class);
 		Session result = networkClient.checkOutContainerSession(context, oldSession);
 		Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
 		if (result != null) {
-			db.close();
+
 			// Update container back to database
 			String key = result.getContainerId();
 			result.setUploadStatus(UploadStatus.COMPLETE);
@@ -1113,7 +1113,14 @@ public class DataCenter {
 		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
 	}
 
-	public void uploadCompleteAuditSession(Context context, String containerId) throws SnappydbException {
+	/**
+	 * Upload audited container session
+	 *
+	 * @param context
+	 * @param containerId
+	 * @throws SnappydbException
+	 */
+	public void uploadAuditedSession(Context context, String containerId) throws SnappydbException {
 		// Upload complete audit session to server
 		DB db = App.getDB(context);
 		Session oldSession = db.getObject(containerId, Session.class);
@@ -1121,7 +1128,7 @@ public class DataCenter {
 		Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
 		if (result != null) {
-			// db.close();
+
 			// Update container back to database
 			String key = result.getContainerId();
 			result.setUploadStatus(UploadStatus.COMPLETE);
@@ -1136,7 +1143,15 @@ public class DataCenter {
 
 	}
 
-	public void uploadCompleteRepairSession(Context context, String containerId) throws SnappydbException {
+	/**
+	 * Upload repaired container session
+	 *
+	 * @param context
+	 * @param containerId
+	 * @throws SnappydbException
+	 */
+	public void uploadRepairedSession(Context context, String containerId) throws SnappydbException {
+
 		// Upload complete repair session to server
 		DB db = App.getDB(context);
 		Session oldSession = db.getObject(containerId, Session.class);
@@ -1144,7 +1159,7 @@ public class DataCenter {
 		Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
 		if (result != null) {
-			db.close();
+
 			// Update container back to database
 			String key = result.getContainerId();
 			result.setUploadStatus(UploadStatus.COMPLETE);
@@ -1386,16 +1401,24 @@ public class DataCenter {
 	public void changeUploadState(Context context, String containerId, UploadStatus status) throws SnappydbException {
 
 		DB db = App.getDB(context);
-		Session session = db.getObject(containerId, Session.class);
-
-		session.setUploadStatus(status.value);
+		String key = containerId;
+		Session session = db.getObject(key, Session.class);
+		session.setUploadStatus(status);
 
 		Logger.Log(session.getContainerId() + " -> Upload Status: " + status.name());
-
 		db.put(containerId, session);
 	}
 
-	public void changeStepSession(Context context, String containerId, Step step) throws SnappydbException {
+	/**
+	 * Change local step of given session
+	 *
+	 * @param context
+	 * @param containerId
+	 * @param step
+	 * @throws SnappydbException
+	 */
+	public void changeSessionLocalStep(Context context, String containerId, Step step) throws SnappydbException {
+
 		DB db = App.getDB(context);
 		Session session = db.getObject(containerId, Session.class);
 		session.setLocalStep(step.value);
@@ -1404,6 +1427,7 @@ public class DataCenter {
 	}
 
 	public void removeWorkingSession(Context context, String containerId) {
+
 		try {
 			DB db = App.getDB(context);
 			String workingKey = CJayConstant.PREFIX_WORKING + containerId;

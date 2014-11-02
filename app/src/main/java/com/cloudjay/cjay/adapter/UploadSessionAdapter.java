@@ -17,12 +17,9 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.jobqueue.UploadAuditItemJob;
-import com.cloudjay.cjay.task.jobqueue.UploadCompleteAuditJob;
-import com.cloudjay.cjay.task.jobqueue.UploadCompleteRepairJob;
-import com.cloudjay.cjay.task.jobqueue.UploadExportSessionJob;
-import com.cloudjay.cjay.task.jobqueue.UploadImageJob;
-import com.cloudjay.cjay.task.jobqueue.UploadSessionJob;
+import com.cloudjay.cjay.task.job.UploadAuditItemJob;
+import com.cloudjay.cjay.task.job.UploadImageJob;
+import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -151,10 +148,11 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 					}
 					;
 				}
-				jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId()));
+				jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), step.value, true));
 
 				// In step audit check all image of item, upload all error image then upload error audit item => complete audit
 			case AUDIT:
+
 				for (AuditItem item : session.getAuditItems()) {
 					if (item.getUploadStatus() == UploadStatus.ERROR.value) {
 						for (AuditImage auditImage : item.getAuditImages()) {
@@ -165,7 +163,8 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 					}
 					jobManager.addJobInBackground(new UploadAuditItemJob(session.getContainerId(), item.getAuditItemUUID()));
 				}
-				jobManager.addJobInBackground(new UploadCompleteAuditJob(session.getContainerId()));
+
+				jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), step.value, true));
 
 				// In step repaired check all image of item, upload all error image then upload error repaired item => complete repair
 			case REPAIR:
@@ -177,9 +176,9 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 							}
 						}
 					}
-					jobManager.addJobInBackground(new UploadCompleteRepairJob(session.getContainerId()));
+					jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), step.value, true));
 				}
-				jobManager.addJobInBackground(new UploadCompleteRepairJob(session.getContainerId()));
+				jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), step.value, true));
 
 				//In step export check all image, upload all error image then upload session
 			case EXPORT:
@@ -189,7 +188,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 					}
 					;
 				}
-				jobManager.addJobInBackground(new UploadExportSessionJob(session));
+				jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), step.value, true));
 		}
 	}
 

@@ -23,7 +23,7 @@ import com.cloudjay.cjay.event.issue.IssueMergedEvent;
 import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.jobqueue.UploadSessionHandCleaningJob;
+import com.cloudjay.cjay.task.job.UploadSessionHandCleaningJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
