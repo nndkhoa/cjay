@@ -26,6 +26,7 @@
             android:id="@+id/btn_complete_audit"
             android:layout_weight="1"
             android:text="@string/button_audit_complete"
+            android:textSize="15sp"
             android:textColor="@android:color/white"
             android:background="@drawable/btn_green_selector"/>
 
@@ -35,6 +36,7 @@
             android:id="@+id/btn_complete_repair"
             android:layout_weight="1"
             android:text="@string/button_repair_complete"
+            android:textSize="15sp"
             android:textColor="@android:color/white"
             android:background="@drawable/btn_customize_selector"/>
 
