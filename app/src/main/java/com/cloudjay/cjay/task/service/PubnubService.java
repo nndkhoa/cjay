@@ -2,6 +2,7 @@ package com.cloudjay.cjay.task.service;
 
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,8 +26,10 @@ import com.pubnub.api.PubnubError;
 import com.pubnub.api.PubnubException;
 import com.snappydb.SnappydbException;
 
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EService;
+import org.androidannotations.annotations.Trace;
 import org.json.JSONObject;
 
 /**
@@ -67,29 +70,29 @@ public class PubnubService extends Service {
 	 * @param objectId
 	 * @param messageId
 	 */
-	private void pushNotification(String channel, String objectType, long objectId, long messageId) {
+	public void pushNotification(String channel, String objectType, long objectId, String messageId) {
 
 		// Notify to server that message was received.
 		dataCenter.gotMessage(getApplicationContext(), channel, messageId);
 
 		// Get data from notification
 		if (objectType.equals("Container")) {
-			dataCenter.getSessionById(getApplicationContext(), objectId);
+			getNotificationSession(getApplicationContext(), objectId);
 
 		} else if (objectType.equals("AuditItem")) {
-			dataCenter.getAuditItemById(getApplicationContext(), objectId);
+			getNotificationAuditItem(getApplicationContext(), objectId);
 
 		} else if (objectType.equals("Damage")) {
-			dataCenter.getDamageCodeById(getApplicationContext(), objectId);
+			getNotificationDamageCode(getApplicationContext(), objectId);
 
 		} else if (objectType.equals("Repair")) {
-			dataCenter.getRepairCodeById(getApplicationContext(), objectId);
+			getNotificationRepairCode(getApplicationContext(), objectId);
 
 		} else if (objectType.equals("Component")) {
-			dataCenter.getComponentCodeById(getApplicationContext(), objectId);
+			getNotificationComponentCode(getApplicationContext(), objectId);
 
 		} else if (objectType.equals("Operator")) {
-			dataCenter.getOperatorById(getApplicationContext(), objectId);
+			getNotificationOperator(getApplicationContext(), objectId);
 
 		} else {
 			Logger.e("Cannot parse notification");
@@ -103,6 +106,37 @@ public class PubnubService extends Service {
 //				.setDefaults(Notification.DEFAULT_SOUND).build();
 //
 //		notificationManager.notify(1, notification);
+	}
+
+	@Background
+	private void getNotificationOperator(Context context, long objectId) {
+		dataCenter.getOperatorById(context, objectId);
+	}
+
+	@Background
+	private void getNotificationComponentCode(Context context, long objectId) {
+		dataCenter.getComponentCodeById(context, objectId);
+	}
+
+	@Background
+	private void getNotificationRepairCode(Context context, long objectId) {
+		dataCenter.getRepairCodeById(context, objectId);
+
+	}
+
+	@Background
+	private void getNotificationDamageCode(Context context, long objectId) {
+		dataCenter.getDamageCodeById(context, objectId);
+	}
+
+	@Background
+	public void getNotificationAuditItem(Context context, long objectId) {
+		dataCenter.getAuditItemById(context, objectId);
+	}
+
+	@Background
+	public void getNotificationSession(Context context, long objectId) {
+		dataCenter.getSessionById(context, objectId);
 	}
 
 	@Override
@@ -120,7 +154,7 @@ public class PubnubService extends Service {
 			final String channel = b.getString("channel");
 			final String objectType = b.getString("object_type");
 			final long objectId = b.getLong("object_id");
-			final long messageId = b.getLong("message_id");
+			final String messageId = b.getString("message_id");
 
 			Handler handler = new Handler();
 			handler.postDelayed(new Runnable() {
@@ -148,9 +182,9 @@ public class PubnubService extends Service {
 			Logger.Log("Message: " + message.toString());
 
 			JsonParser jsonParser = new JsonParser();
-			JsonObject jo = (JsonObject)jsonParser.parse(message.toString());
+			JsonObject jo = (JsonObject) jsonParser.parse(message.toString());
 			Gson gson = new Gson();
-			NotificationItem item=gson.fromJson(jo,NotificationItem.class);
+			NotificationItem item = gson.fromJson(jo, NotificationItem.class);
 //			NotificationItem item = (NotificationItem) message;
 			Bundle b = new Bundle();
 			b.putString("channel", channel);
