@@ -497,4 +497,21 @@ public class AuditItem {
 		this.setAuditImages(mergedAuditImages);
 		return this;
 	}
+
+    public boolean isWashTypeItemExisted() {
+
+        if (this.getComponentCode() != null
+                && this.getDamageCode() != null
+                && this.getRepairCode() != null
+                && this.getLocationCode() != null) {
+            if (this.getComponentCode().equals("FWA")
+                    && this.getDamageCode().equals("DB")
+                    && this.getRepairCode().equals("WW")
+                    && this.getLocationCode().equals("BXXX")) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
