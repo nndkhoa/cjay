@@ -12,10 +12,13 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.HomeActivity_;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
+import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.Step;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
@@ -73,6 +76,9 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 		Session session = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 		if (session != null) {
 			if (!session.isValidToUpload(Step.AUDIT)) {
+				for (AuditItem auditItem:session.getAuditItems()){
+					Logger.e("UPLOAD AUDIT ITEM: "+auditItem.getUploadStatus());
+				}
 				Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
 				return;
 			}
