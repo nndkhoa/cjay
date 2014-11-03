@@ -876,10 +876,12 @@ public class DataCenter {
 		try {
 			DB db = App.getDB(context);
 			Session oldSession = db.getObject(containerId, Session.class);
-			Session newSession = networkClient.setHandCleaningSession(context, oldSession);
-			db.put(newSession.getContainerId(), newSession);
+			Session result = networkClient.setHandCleaningSession(context, oldSession);
+			//merge session
+			oldSession.mergeSession(result);
+			db.put(oldSession.getContainerId(), oldSession);
 
-			return newSession;
+			return oldSession;
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 			return null;
