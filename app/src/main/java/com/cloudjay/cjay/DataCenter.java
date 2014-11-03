@@ -1276,7 +1276,7 @@ public class DataCenter {
         boolean isExisted = false;
 		List<AuditItem> list = session.getAuditItems();
         for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).isWashTypeItemExisted()) {
+            if (list.get(i).isWashTypeItem()) {
                 list.get(i).getAuditImages().add(item.getAuditImages().get(0));
                 isExisted = true;
                 Logger.Log("existed");

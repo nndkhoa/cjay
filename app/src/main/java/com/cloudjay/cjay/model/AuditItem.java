@@ -498,7 +498,7 @@ public class AuditItem {
 		return this;
 	}
 
-    public boolean isWashTypeItemExisted() {
+    public boolean isWashTypeItem() {
 
         if (this.getComponentCode() != null
                 && this.getDamageCode() != null

@@ -196,6 +196,27 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				}
 			});
 
+            holder.btnEdit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    // Validate: if this is wash type item, cannot edit
+                    if (auditItem.isWashTypeItem()) {
+                        showPreventRepairDialog();
+                    } else {
+                        Logger.Log("getAuditItemUUID: " + auditItem.getAuditItemUUID());
+
+                        Intent intent = new Intent(mContext, ReportIssueActivity_.class);
+                        intent.putExtra(ReportIssueActivity_.CONTAINER_ID_EXTRA, containerId);
+                        intent.putExtra(ReportIssueActivity_.AUDIT_IMAGE_EXTRA, auditItem.getAuditImages().get(0).getAuditImageUUID());
+                        intent.putExtra(ReportIssueActivity_.AUDIT_ITEM_EXTRA, auditItem.getAuditItemUUID());
+
+                        mContext.startActivity(intent);
+                    }
+
+                }
+            });
+
 		} else {
 			holder.llIssueImageView.setVisibility(View.VISIBLE);
 			holder.llIssueDetails.setVisibility(View.GONE);
@@ -375,4 +396,5 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		AlertDialog dialog = builder.create();
 		dialog.show();
 	}
+
 }

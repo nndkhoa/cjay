@@ -146,7 +146,7 @@ public class ImportFragment extends Fragment {
 			tvContainerCode.setText(containerID);
 
             Operator operator = dataCenter.getOperator(getActivity().getApplicationContext(), operatorCode);
-			etOperator.setText(operator.getOperatorName()); 
+			etOperator.setText(operator.getOperatorName());
 
             preStatus = mSession.getPreStatus();
 
