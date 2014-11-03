@@ -178,13 +178,18 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		} catch (RetrofitError error) {
 
 			showProgress(false);
-			etPassword.setError(getString(R.string.error_invalid_password));
+			setError(getString(R.string.error_invalid_password));
 			showCrouton(error.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			showCrouton(e.getMessage());
 			showProgress(false);
 		}
+	}
+
+	@UiThread
+	void setError(String msg) {
+		etPassword.setError(msg);
 	}
 
 	@UiThread

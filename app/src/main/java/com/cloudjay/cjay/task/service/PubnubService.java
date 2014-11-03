@@ -10,9 +10,11 @@ import android.os.IBinder;
 import android.os.Message;
 import android.text.TextUtils;
 
+import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.model.NotificationItem;
 import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.task.job.GetNotificationJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
@@ -20,6 +22,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.path.android.jobqueue.JobManager;
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubError;
@@ -72,31 +75,9 @@ public class PubnubService extends Service {
 	 */
 	public void pushNotification(String channel, String objectType, long objectId, String messageId) {
 
-		// Notify to server that message was received.
-		dataCenter.gotMessage(getApplicationContext(), channel, messageId);
+		JobManager jobManager = App.getJobManager();
+		jobManager.addJobInBackground(new GetNotificationJob(channel,messageId, objectType,objectId));
 
-		// Get data from notification
-		if (objectType.equals("Container")) {
-			getNotificationSession(getApplicationContext(), objectId);
-
-		} else if (objectType.equals("AuditItem")) {
-			getNotificationAuditItem(getApplicationContext(), objectId);
-
-		} else if (objectType.equals("Damage")) {
-			getNotificationDamageCode(getApplicationContext(), objectId);
-
-		} else if (objectType.equals("Repair")) {
-			getNotificationRepairCode(getApplicationContext(), objectId);
-
-		} else if (objectType.equals("Component")) {
-			getNotificationComponentCode(getApplicationContext(), objectId);
-
-		} else if (objectType.equals("Operator")) {
-			getNotificationOperator(getApplicationContext(), objectId);
-
-		} else {
-			Logger.e("Cannot parse notification");
-		}
 
 //		// TODO: Display message in notification Center
 //		Notification notification = new Notification.Builder(this).setContentTitle(channel)
@@ -108,36 +89,6 @@ public class PubnubService extends Service {
 //		notificationManager.notify(1, notification);
 	}
 
-	@Background
-	void getNotificationOperator(Context context, long objectId) {
-		dataCenter.getOperatorById(context, objectId);
-	}
-
-	@Background
-	void getNotificationComponentCode(Context context, long objectId) {
-		dataCenter.getComponentCodeById(context, objectId);
-	}
-
-	@Background
-	void getNotificationRepairCode(Context context, long objectId) {
-		dataCenter.getRepairCodeById(context, objectId);
-
-	}
-
-	@Background
-	void getNotificationDamageCode(Context context, long objectId) {
-		dataCenter.getDamageCodeById(context, objectId);
-	}
-
-	@Background
-	public void getNotificationAuditItem(Context context, long objectId) {
-		dataCenter.getAuditItemById(context, objectId);
-	}
-
-	@Background
-	public void getNotificationSession(Context context, long objectId) {
-		dataCenter.getSessionById(context, objectId);
-	}
 
 	@Override
 	public IBinder onBind(Intent intent) {

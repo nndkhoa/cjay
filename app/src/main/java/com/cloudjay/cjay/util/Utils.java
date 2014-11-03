@@ -128,6 +128,20 @@ public class Utils {
 			return false;
 	}
 
+	public static void cancelAlarm(Context context) {
+
+		Logger.Log("stop Alarm Manager");
+
+		Intent intent = new Intent(context, QueueIntentService_.class);
+		PendingIntent sender = PendingIntent.getService(context, CJayConstant.ALARM_QUEUE_ID, intent,
+				PendingIntent.FLAG_UPDATE_CURRENT);
+
+		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+		alarmManager.cancel(sender);
+		sender.cancel();
+	}
+
 
 	/**
 	 * Get app version name
