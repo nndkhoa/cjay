@@ -22,6 +22,8 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
@@ -95,6 +97,7 @@ public class BeforeRepairFragment extends Fragment {
 
 	@AfterViews
     void setup() {
+
         //get container operater code form containerId
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
         if (null == mSession) {
@@ -104,20 +107,30 @@ public class BeforeRepairFragment extends Fragment {
         }
 		auditItem = dataCenter.getAuditItemByUUID(getActivity().getApplicationContext(),
 				containerID, auditItemUUID);
-        // parse Data to view
-        tvCompCode.setText(auditItem.getComponentCode());
-        tvLocaitonCode.setText(auditItem.getLocationCode());
-        tvDamageCode.setText(auditItem.getDamageCode());
-        tvRepairCode.setText(auditItem.getRepairCode());
-        tvSize.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
-        textViewBtnCamera.setText(R.string.button_add_new_audit_image);
-		tvNumber.setText(auditItem.getQuantity() + "");
 
-        imageAdapter = new DetailIssuedImageAdapter(
-				getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.AUDIT);
-		lvImage.setAdapter(imageAdapter);
+		if (auditItem != null) {
 
-		refreshListImage();
+			GsonBuilder builder = new GsonBuilder();
+			Gson gson = builder.create();
+
+			Logger.Log("auditItem: " + gson.toJson(auditItem));
+
+
+			// parse Data to view
+			tvCompCode.setText(auditItem.getComponentCode());
+			tvLocaitonCode.setText(auditItem.getLocationCode());
+			tvDamageCode.setText(auditItem.getDamageCode());
+			tvRepairCode.setText(auditItem.getRepairCode());
+			tvSize.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
+			textViewBtnCamera.setText(R.string.button_add_new_audit_image);
+			tvNumber.setText(auditItem.getQuantity() + "");
+
+			imageAdapter = new DetailIssuedImageAdapter(
+					getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.AUDIT);
+			lvImage.setAdapter(imageAdapter);
+
+			refreshListImage();
+		}
 
     }
 

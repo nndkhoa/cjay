@@ -38,6 +38,7 @@ import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.SquareImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -153,6 +154,8 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
     @AfterViews
     void afterViews() {
+
+		Logger.Log(mAuditItemUuid);
 
         mSession = mDataCenter.getSession(getApplicationContext(), mContainerId);
         mAuditItem = mDataCenter.getAuditItemByUUID(getApplicationContext(), mContainerId, mAuditItemUuid);

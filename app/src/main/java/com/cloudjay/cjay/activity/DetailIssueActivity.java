@@ -9,6 +9,7 @@ import android.view.MenuItem;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
@@ -48,6 +49,7 @@ public class DetailIssueActivity extends BaseActivity implements ActionBar.TabLi
 
     @AfterViews
     void doAfterViews() {
+
         configureActionBar();
         configureViewPager();
     }
