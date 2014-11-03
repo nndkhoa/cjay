@@ -384,13 +384,13 @@ public class DataCenter {
 		for (String result : keysResult) {
 
 			String newKey = result.substring(len);
-			addLog(context, newKey, prefix + " | Cannot retrieve this container");
 			Session session;
 			try {
 				session = db.getObject(newKey, Session.class);
 				sessions.add(session);
 			} catch (SnappydbException e) {
 				e.printStackTrace();
+				addLog(context, newKey, prefix + " | Cannot retrieve this container");
 
 			}
 		}
@@ -415,7 +415,7 @@ public class DataCenter {
 
 			String key = session.getContainerId();
 			session.setLocalStep(session.getStep());
-			
+
 			db.put(key, session);
 		}
 
@@ -1053,15 +1053,15 @@ public class DataCenter {
 
 	}
 
-    public AuditImage getAuditImageByUUId(Context context, String auditImageUUID) {
-        try {
-            DB db = App.getDB(context);
-            return db.getObject(auditImageUUID, AuditImage.class);
-        } catch (SnappydbException e) {
-            Logger.e(e.getMessage());
-        }
-        return null;
-    }
+	public AuditImage getAuditImageByUUId(Context context, String auditImageUUID) {
+		try {
+			DB db = App.getDB(context);
+			return db.getObject(auditImageUUID, AuditImage.class);
+		} catch (SnappydbException e) {
+			Logger.e(e.getMessage());
+		}
+		return null;
+	}
 
 	/**
 	 * Add log message to database. This method will be called from:
@@ -1371,27 +1371,27 @@ public class DataCenter {
 		}
 	}
 
-    public IsoCode getIsoCode(Context context, String prefix, String code) {
-        try {
-            DB db = App.getDB(context);
-            String[] keyResults = db.findKeys(prefix + code);
-            if (keyResults.length > 0) {
-                IsoCode isoCode = db.getObject(keyResults[0], IsoCode.class);
+	public IsoCode getIsoCode(Context context, String prefix, String code) {
+		try {
+			DB db = App.getDB(context);
+			String[] keyResults = db.findKeys(prefix + code);
+			if (keyResults.length > 0) {
+				IsoCode isoCode = db.getObject(keyResults[0], IsoCode.class);
 
-                Logger.Log("getCode: " + isoCode.getCode());
-                Logger.Log("getId: " + isoCode.getId());
+				Logger.Log("getCode: " + isoCode.getCode());
+				Logger.Log("getId: " + isoCode.getId());
 
-                return isoCode;
-            } else {
-                return null;
-            }
+				return isoCode;
+			} else {
+				return null;
+			}
 
 
-        } catch (SnappydbException e) {
-            Logger.e(e.getMessage());
-            return null;
-        }
-    }
+		} catch (SnappydbException e) {
+			Logger.e(e.getMessage());
+			return null;
+		}
+	}
 
 	public void changeUploadState(Context context, String containerId,
 	                              AuditItem auditItem) {
@@ -1400,20 +1400,20 @@ public class DataCenter {
 			Session session = db.getObject(containerId, Session.class);
 
 			List<AuditItem> list = session.getAuditItems();
-
 			for (AuditItem item : list) {
-				if (item.getAuditItemUUID() == auditItem.getAuditItemUUID()) {
+				if (item.getAuditItemUUID().equals(auditItem.getAuditItemUUID())) {
+					Logger.e(item.getAuditItemUUID());
+					Logger.e(auditItem.getAuditItemUUID());
 					item.setUploadStatus(auditItem.getUploadStatus());
 				}
 			}
 
 			session.setAuditItems(list);
 			db.put(containerId, session);
-
-
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
+
 
 	}
 
@@ -1436,7 +1436,6 @@ public class DataCenter {
 			List<AuditItem> list = session.getAuditItems();
 
 
-
 			for (int i = 0; i < list.size(); i++) {
 				if (list.get(i).getAuditItemUUID().equals(auditItem.getAuditItemUUID())) {
 					list.remove(i);
@@ -1455,7 +1454,7 @@ public class DataCenter {
 
 			db.put(containerId, session);
 
-            EventBus.getDefault().post(new IssueUpdatedEvent(containerId));
+			EventBus.getDefault().post(new IssueUpdatedEvent(containerId));
 
 			Logger.Log("update successfully");
 
