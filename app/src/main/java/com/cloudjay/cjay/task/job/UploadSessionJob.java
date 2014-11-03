@@ -9,6 +9,7 @@ import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
@@ -17,6 +18,7 @@ import com.path.android.jobqueue.Params;
 import com.snappydb.SnappydbException;
 
 import de.greenrobot.event.EventBus;
+import retrofit.RetrofitError;
 
 public class UploadSessionJob extends Job {
 
@@ -28,6 +30,7 @@ public class UploadSessionJob extends Job {
 	 */
 	boolean needToClearFromWorking;
 
+
 	@Override
 	protected int getRetryLimit() {
 		return 1;
@@ -38,6 +41,7 @@ public class UploadSessionJob extends Job {
 		this.containerId = containerId;
 		this.currentStep = step;
 		this.needToClearFromWorking = clearFromWorking;
+
 	}
 
 	/**
@@ -114,6 +118,7 @@ public class UploadSessionJob extends Job {
 	@Override
 	public void onRun() throws Throwable {
 
+
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
 
@@ -157,12 +162,37 @@ public class UploadSessionJob extends Job {
 		EventBus.getDefault().post(new UploadedEvent(containerId));
 	}
 
+	/**
+	 * Retry to upload
+	 *
+	 * @param throwable
+	 * @return
+	 */
+	@Override
+	protected boolean shouldReRunOnThrowable(Throwable throwable) {
+
+		if (throwable instanceof RetrofitError) {
+			Context context = App.getInstance().getApplicationContext();
+			DataCenter_.getInstance_(context).addLog(context, containerId, "Quá trình upload bị gián đoạn");
+
+			//if it is a 4xx error, stop
+			RetrofitError retrofitError = (RetrofitError) throwable;
+			Logger.Log("Retrofit response: " + retrofitError.getSuccessType().toString());
+
+			return retrofitError.getResponse().getStatus() < 400 || retrofitError.getResponse().getStatus() > 499;
+		}
+
+		// Notify upload process is retrying
+
+		return true;
+	}
 
 	/**
 	 * Quá trình upload thất bại. Gán status ERROR container
 	 */
 	@Override
 	protected void onCancel() {
+
 		//Change status error
 		try {
 
@@ -174,22 +204,5 @@ public class UploadSessionJob extends Job {
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
-	}
-
-
-	/**
-	 * Retry to upload
-	 *
-	 * @param throwable
-	 * @return
-	 */
-	@Override
-	protected boolean shouldReRunOnThrowable(Throwable throwable) {
-		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).addLog(context, containerId, "Quá trình upload bị gián đoạn");
-
-		// Notify upload process is retrying
-
-		return true;
 	}
 }
