@@ -29,7 +29,7 @@ public class WizardActivity extends BaseActivity {
 	 * This is current local step
 	 */
 	@Extra(STEP_EXTRA)
-	long step = 4;
+	int step = 4;
 
 	ActionBar actionBar;
 

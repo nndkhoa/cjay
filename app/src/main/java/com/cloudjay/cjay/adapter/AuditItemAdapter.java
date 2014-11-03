@@ -278,6 +278,8 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
 
+				Logger.Log("getAuditItemUUID: " + item.getAuditItemUUID());
+
                 Intent intent = new Intent(mContext, ReportIssueActivity_.class);
                 intent.putExtra(ReportIssueActivity_.CONTAINER_ID_EXTRA, containerId);
                 intent.putExtra(ReportIssueActivity_.AUDIT_IMAGE_EXTRA, item.getAuditImages().get(0).getAuditImageUUID());
