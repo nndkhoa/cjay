@@ -876,10 +876,12 @@ public class DataCenter {
 		try {
 			DB db = App.getDB(context);
 			Session oldSession = db.getObject(containerId, Session.class);
-			Session newSession = networkClient.setHandCleaningSession(context, oldSession);
-			db.put(newSession.getContainerId(), newSession);
+			Session result = networkClient.setHandCleaningSession(context, oldSession);
+			//merge session
+			oldSession.mergeSession(result);
+			db.put(oldSession.getContainerId(), oldSession);
 
-			return newSession;
+			return oldSession;
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 			return null;
@@ -1334,8 +1336,6 @@ public class DataCenter {
 			for (String result : keyResults) {
 				IsoCode isoCode = db.getObject(result, IsoCode.class);
 				isoCodes.add(isoCode);
-				Logger.Log("getCode: " + isoCode.getCode());
-				Logger.Log("getId: " + isoCode.getId());
 			}
 
 			return isoCodes;
@@ -1423,10 +1423,34 @@ public class DataCenter {
 			DB db = App.getDB(context);
 			Session session = db.getObject(containerId, Session.class);
 
-			AuditItem temp = getAuditItemByUUID(context, containerId, auditItem.getAuditItemUUID());
-			if (temp != null) {
-				session.getAuditItems().remove(temp);
-				session.getAuditItems().add(auditItem);
+			Logger.Log("Before: ");
+			for (AuditItem item : session.getAuditItems()) {
+				Logger.Log("item uuid: " + item.getAuditItemUUID());
+			}
+
+			GsonBuilder builder = new GsonBuilder();
+			Gson gson = builder.create();
+
+			AuditItem removeItem = null;
+
+			List<AuditItem> list = session.getAuditItems();
+
+
+
+			for (int i = 0; i < list.size(); i++) {
+				if (list.get(i).getAuditItemUUID().equals(auditItem.getAuditItemUUID())) {
+					list.remove(i);
+				}
+			}
+
+			list.add(auditItem);
+
+			// Set modified list to session
+			session.setAuditItems(list);
+
+			Logger.Log("After: ");
+			for (AuditItem item : session.getAuditItems()) {
+				Logger.Log("item uuid: " + item.getAuditItemUUID());
 			}
 
 			db.put(containerId, session);

@@ -6,9 +6,12 @@ import android.text.TextUtils;
 
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.cloudjay.cjay.util.Utils;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.EIntentService;
+
+import retrofit.RetrofitError;
 
 @EIntentService
 public class QueueIntentService extends IntentService {
@@ -28,6 +31,9 @@ public class QueueIntentService extends IntentService {
 
 		} catch (SnappydbException e) {
 			e.printStackTrace();
+		} catch (RetrofitError e){
+			e.printStackTrace();
+			Utils.cancelAlarm(getApplicationContext());
 		}
 	}
 }

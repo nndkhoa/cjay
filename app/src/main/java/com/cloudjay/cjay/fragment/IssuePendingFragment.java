@@ -153,7 +153,7 @@ public class IssuePendingFragment extends Fragment {
 	void buttonCleanClicked() {
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJob(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), false));
+		jobManager.addJob(new UploadSessionJob(mSession.getContainerId(), Step.CLEAR.value, true));
 
 		getActivity().finish();
 	}
@@ -172,6 +172,7 @@ public class IssuePendingFragment extends Fragment {
 	@ItemClick(R.id.lv_audit_items)
 	void switchToDetailIssueActivity(int position) {
 		AuditItem auditItem = auditItemAdapter.getItem(position);
+		Logger.Log("getAuditItemUUID: " + auditItem.getAuditItemUUID());
 		if (auditItem.getAudited()) {
 			Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
 			detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
@@ -193,6 +194,7 @@ public class IssuePendingFragment extends Fragment {
 					Logger.Log("getComponentCode: " + auditItem.getComponentCode());
 					Logger.Log("getAuditImages: " + auditItem.getAuditImages().size());
 					Logger.Log("getRepaired: " + auditItem.getRepaired());
+					Logger.Log("getAuditItemUUID: " + auditItem.getAuditItemUUID());
 					list.add(auditItem);
 				}
 			}
