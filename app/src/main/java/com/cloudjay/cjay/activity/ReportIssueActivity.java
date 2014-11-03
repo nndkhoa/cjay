@@ -21,6 +21,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.TextUtils;
 import android.util.SparseArray;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -38,6 +39,7 @@ import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.view.SquareImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
@@ -144,7 +146,7 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
     ViewPager mPager;
 
     @ViewById(R.id.iv_audit_image)
-    ImageView mImageView;
+	SquareImageView mImageView;
 
     @Bean
     DataCenter mDataCenter;
@@ -193,6 +195,8 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
 		// Set audited is true before saving
 		mAuditItem.setAudited(true);
+		// Set is allowed to repair = true before saving
+		mAuditItem.setIsAllowed(true);
 		// save db records and refresh list
         mDataCenter.updateAuditItem(getApplicationContext(), mContainerId, mAuditItem);
 
@@ -331,10 +335,7 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
         switch (position) {
             case TAB_ISSUE_PHOTO:
                 // hide the small image because we are displaying a larger version
-                if (p.weight > 0) {
-                    p.weight = 0;
-                    mImageView.setLayoutParams(p);
-                }
+				mImageView.setVisibility(View.GONE);
                 break;
 
             case TAB_ISSUE_DIMENSION:
@@ -353,9 +354,8 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
             default:
                 // show the small image
-                if (p.weight == 0) {
-                    p.weight = 3;
-                    mImageView.setLayoutParams(p);
+                if (mImageView.getVisibility() == View.GONE) {
+					mImageView.setVisibility(View.VISIBLE);
                 }
                 break;
         }
