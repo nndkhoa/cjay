@@ -8,12 +8,8 @@ import com.cloudjay.cjay.model.User;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.List;
 
-import retrofit.Callback;
 import retrofit.client.Response;
 import retrofit.http.Body;
 import retrofit.http.Field;
@@ -85,21 +81,21 @@ public interface NetworkService {
     public Response postImageFile(@Header("Content-Type") String contentType, @Query("uploadType") String uploadType, @Query("name") String imageName, @Body() TypedFile image);
 
 	//Use for PubNub
-	@GET(ApiEndpoint.PUBNUB_AUDITITEM)
+	@GET(ApiEndpoint.PUBNUB_AUDIT_ITEM)
 	public AuditItem getAuditItemById(@Path("id") long id);
 
-	@GET(ApiEndpoint.PUBNUB_DAMAGECODE)
+	@GET(ApiEndpoint.PUBNUB_DAMAGE_CODE)
 	public IsoCode getDamageCodesById(@Path("id") long id);
 
-	@GET(ApiEndpoint.PUBNUB_REPAIRCODE)
+	@GET(ApiEndpoint.PUBNUB_REPAIR_CODE)
 	public IsoCode getRepairCodeById(@Path("id") long id);
 
-	@GET(ApiEndpoint.PUBNUB_COMPONENTCODE)
+	@GET(ApiEndpoint.PUBNUB_COMPONENT_CODE)
 	public IsoCode getComponentCodeById(@Path("id") long id);
 
 	@GET(ApiEndpoint.PUBNUB_OPERATOR)
 	Operator getOperatorById(@Path("id") long id);
 
-	@GET(ApiEndpoint.PUBNUB_GOTMESSAGE)
-	public Response gotMessageFromPubNub(@Query("reciever_channel") String channel,@Query("message_id") String messageId);
+	@POST(ApiEndpoint.PUBNUB_GOT_MESSAGE)
+	public Response gotMessageFromPubNub(@Query("receiver_channel") String channel,@Query("message_id") String messageId);
 }

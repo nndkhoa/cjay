@@ -18,7 +18,6 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.cloudjay.cjay.App;
-import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
@@ -31,6 +30,7 @@ import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -448,5 +448,33 @@ public class Utils {
 		String name = url.substring(url.lastIndexOf("/") + 1,
 				url.length());
 		return name;
+	}
+
+	public static boolean canReachInternet() {
+
+        //StackTraceElement[] trace = new Throwable().getStackTrace();
+        //Logger.Log(trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
+
+
+        Runtime runtime = Runtime.getRuntime();
+
+		try {
+			Process mIpAddrProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
+			int mExitValue = mIpAddrProcess.waitFor();
+			// System.out.println(" mExitValue " + mExitValue);
+
+			if (mExitValue == 0) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (InterruptedException ignore) {
+			ignore.printStackTrace();
+			System.out.println(" Exception:" + ignore);
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println(" Exception:" + e);
+		}
+		return false;
 	}
 }

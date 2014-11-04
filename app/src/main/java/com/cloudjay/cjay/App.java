@@ -18,6 +18,8 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.path.android.jobqueue.JobManager;
 import com.path.android.jobqueue.config.Configuration;
 import com.path.android.jobqueue.log.CustomLogger;
+import com.path.android.jobqueue.network.NetworkUtil;
+import com.path.android.jobqueue.persistentQueue.sqlite.SqliteJobQueue;
 import com.snappydb.DB;
 import com.snappydb.DBFactory;
 import com.snappydb.SnappydbException;
@@ -78,7 +80,7 @@ public class App extends Application {
 
 		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
 		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().build());
-		
+
 //		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
 //				.detectLeakedClosableObjects().penaltyLog()
 //				.penaltyDeath().build());
@@ -152,7 +154,16 @@ public class App extends Application {
 	 * Cấu hình Job Manager của JobQueue
 	 */
 	private void configureJobManager() {
+
 		Configuration configuration = new Configuration.Builder(this)
+				.networkUtil(new NetworkUtil() {
+					@Override
+					public boolean isConnected(Context context) {
+						return Utils.canReachInternet();
+					}
+				})
+				.queueFactory(new JobManager.DefaultQueueFactory())
+				.jobSerializer(new SqliteJobQueue.JavaSerializer())
 				.customLogger(new CustomLogger() {
 					private static final String TAG = "JOBS";
 
@@ -177,9 +188,9 @@ public class App extends Application {
 					}
 				})
 				.minConsumerCount(1)
-				.maxConsumerCount(1)
+				.maxConsumerCount(3)
 				.loadFactor(3)
-				.consumerKeepAlive(120)
+				.consumerKeepAlive(60)
 				.build();
 
 		jobManager = new JobManager(this, configuration);

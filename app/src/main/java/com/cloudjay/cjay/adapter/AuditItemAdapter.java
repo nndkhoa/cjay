@@ -185,6 +185,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				@Override
 				public void onClick(View view) {
 					//1. Update upload status
+
                     auditItem.setUploadStatus(UploadStatus.UPLOADING.value);
                     DataCenter_.getInstance_(mContext).changeUploadState(mContext,
                             containerId, auditItem);
@@ -195,6 +196,27 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 					jobManager.addJob(new UploadAuditItemJob(containerId, auditItem.getAuditItemUUID()));
 				}
 			});
+
+            holder.btnEdit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    // Validate: if this is wash type item, cannot edit
+                    if (!auditItem.isIsAllowed()) {
+                        showPreventRepairDialog();
+                    } else {
+                        Logger.Log("getAuditItemUUID: " + auditItem.getAuditItemUUID());
+
+                        Intent intent = new Intent(mContext, ReportIssueActivity_.class);
+                        intent.putExtra(ReportIssueActivity_.CONTAINER_ID_EXTRA, containerId);
+                        intent.putExtra(ReportIssueActivity_.AUDIT_IMAGE_EXTRA, auditItem.getAuditImages().get(0).getAuditImageUUID());
+                        intent.putExtra(ReportIssueActivity_.AUDIT_ITEM_EXTRA, auditItem.getAuditItemUUID());
+
+                        mContext.startActivity(intent);
+                    }
+
+                }
+            });
 
 		} else {
 			holder.llIssueImageView.setVisibility(View.VISIBLE);
@@ -372,7 +394,15 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		builder.setTitle("Alert");
 		builder.setMessage("Lỗi này không được sửa");
 
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
 		AlertDialog dialog = builder.create();
 		dialog.show();
 	}
+
 }

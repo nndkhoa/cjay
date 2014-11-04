@@ -126,7 +126,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 		// PUT /api/cjay/containers/{pk}/complete-audit
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), session.getStep(), true));
+		jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), session.getLocalStep(), true));
 
 		// Hide this button
 		btnCompleteAudit.setVisibility(View.GONE);
