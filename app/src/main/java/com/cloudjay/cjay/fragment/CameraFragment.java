@@ -216,6 +216,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		if (getContract().isSingleShotMode() == true) {
 			singleShotProcessing = true;
 			btnTakePicture.setEnabled(false);
+            btnDone.setEnabled(false);
 		}
 
 		// xact.tag()
@@ -261,6 +262,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 					@Override
 					public void run() {
 						btnTakePicture.setEnabled(true);
+                        btnDone.setEnabled(true);
 					}
 				});
 			}
@@ -429,6 +431,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		public void onAutoFocus(boolean success, Camera camera) {
 			super.onAutoFocus(success, camera);
 			btnTakePicture.setEnabled(true);
+            btnDone.setEnabled(true);
 			takeSimplePicture();
 		}
 
