@@ -199,6 +199,7 @@ public class IssuePendingFragment extends Fragment {
 					Logger.Log("getAuditImages: " + auditItem.getAuditImages().size());
 					Logger.Log("getRepaired: " + auditItem.getRepaired());
 					Logger.Log("getAuditItemUUID: " + auditItem.getAuditItemUUID());
+                    Logger.Log("getIsAllow: " + auditItem.isIsAllowed());
 					list.add(auditItem);
 				}
 			}
@@ -228,6 +229,10 @@ public class IssuePendingFragment extends Fragment {
 
 	@UiThread
 	void updatedData(List<AuditItem> auditItems) {
+        if (auditItemAdapter == null) {
+            auditItemAdapter = new AuditItemAdapter(getActivity(),
+                    R.layout.item_issue_pending, containerID, operatorCode);
+        }
 		auditItemAdapter.clear();
 
 		if (auditItems != null) {

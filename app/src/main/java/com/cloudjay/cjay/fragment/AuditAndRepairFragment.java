@@ -72,6 +72,8 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	private ViewPagerAdapter mPagerAdapter;
 	public int currentPosition = 0;
 
+    Session mSession;
+
 	public AuditAndRepairFragment() {
 		// Required empty public constructor
 	}
@@ -91,31 +93,28 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 
 	private void checkForShowButton() {
-		Session session = DataCenter_.getInstance_(getActivity()).getSession(getActivity(), containerID);
 
-        Logger.Log("getId: " + session.getId());
-
-		if (session.getLocalStep() == Step.REPAIR.value) {
-			btnCompleteAudit.setVisibility(View.GONE);
-			btnCompleteRepair.setVisibility(View.VISIBLE);
-		}
-		if (session.getLocalStep() == Step.AUDIT.value) {
-			if (session.hasRepairImages()) {
-				btnCompleteAudit.setVisibility(View.VISIBLE);
-				btnCompleteRepair.setVisibility(View.VISIBLE);
-			} else {
-				btnCompleteAudit.setVisibility(View.VISIBLE);
-				btnCompleteRepair.setVisibility(View.GONE);
-			}
-		}
+        if (mSession.getLocalStep() == Step.REPAIR.value) {
+            btnCompleteAudit.setVisibility(View.GONE);
+            btnCompleteRepair.setVisibility(View.VISIBLE);
+        }
+        if (mSession.getLocalStep() == Step.AUDIT.value) {
+            if (mSession.hasRepairImages()) {
+                btnCompleteAudit.setVisibility(View.VISIBLE);
+                btnCompleteRepair.setVisibility(View.VISIBLE);
+            } else {
+                btnCompleteAudit.setVisibility(View.VISIBLE);
+                btnCompleteRepair.setVisibility(View.GONE);
+            }
+        }
 	}
 
 	@Click(R.id.btn_complete_audit)
 	void btnCompleteAuditClicked() {
-		Session session = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
-		if (session != null) {
-			if (!session.isValidToUpload(Step.AUDIT)) {
-				for (AuditItem auditItem : session.getAuditItems()) {
+		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+		if (mSession != null) {
+			if (!mSession.isValidToUpload(Step.AUDIT)) {
+				for (AuditItem auditItem : mSession.getAuditItems()) {
 					Logger.e("UPLOAD AUDIT ITEM: " + auditItem.getUploadStatus());
 				}
 				Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
@@ -127,13 +126,13 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 		// PUT /api/cjay/containers/{pk}/complete-audit
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), session.getLocalStep(), true));
+		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), true));
 
 		// Hide this button
 		btnCompleteAudit.setVisibility(View.GONE);
 
 		// Check if this session has repair image or not
-		if (session.hasRepairImages()) {
+		if (mSession.hasRepairImages()) {
 			btnCompleteRepair.setVisibility(View.VISIBLE);
 		} else {
 			// Navigate to HomeActivity
@@ -144,9 +143,9 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	@Click(R.id.btn_complete_repair)
 	void btnCompleteRepairClicked() {
 
-		Session session = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
-		if (session != null) {
-			if (!session.isValidToUpload(Step.REPAIR)) {
+		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+		if (mSession != null) {
+			if (!mSession.isValidToUpload(Step.REPAIR)) {
 				Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
 				return;
 			}
@@ -157,7 +156,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 		// Add containerId to upload complete repair queue
 		// PUT /api/cjay/containers/{pk}/complete-repair
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), session.getStep(), true));
+		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getStep(), true));
 
 		// Navigate to HomeActivity
 		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
@@ -180,9 +179,15 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 	@AfterViews
 	void doAfterViews() {
+
+        mSession = dataCenter.getSession(getActivity(), containerID);
+        Logger.Log("current step: " + mSession.getLocalStep());
+
 		configureActionBar();
 		configureViewPager();
-		checkForShowButton();
+        if (mSession != null) {
+            checkForShowButton();
+        }
 	}
 
 	private void configureActionBar() {
@@ -255,6 +260,9 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 	@UiThread
 	public void onEvent(ImageCapturedEvent event) {
+
+        //requery to update button
+        mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 		checkForShowButton();
 	}
 }

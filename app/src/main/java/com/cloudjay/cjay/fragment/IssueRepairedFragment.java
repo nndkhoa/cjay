@@ -119,6 +119,12 @@ public class IssueRepairedFragment extends Fragment {
 
 	@UiThread
 	void updatedData(List<AuditItem> repairedItemLists) {
+
+        if (mAdapter == null) {
+            mAdapter = new RepairedItemAdapter(getActivity().getApplicationContext(),
+                    R.layout.item_issue_repaired);
+        }
+
 		mAdapter.clear();
 		if (repairedItemLists != null) {
 			for (AuditItem item : repairedItemLists) {

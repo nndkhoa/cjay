@@ -485,9 +485,10 @@ public class Session {
 				return true;
 
 			// Tất cả các item đều phải có hình sau sửa chữa
+            // Loi cam sua thi field cho phep sua phai la false
 			case REPAIR:
 				for (AuditItem item : auditItems) {
-					if (item.getRepaired() == false) {
+					if (item.getRepaired() == false && item.isIsAllowed() == true) {
 						return false;
 					}
 				}
