@@ -185,6 +185,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				@Override
 				public void onClick(View view) {
 					//1. Update upload status
+
                     auditItem.setUploadStatus(UploadStatus.UPLOADING.value);
                     DataCenter_.getInstance_(mContext).changeUploadState(mContext,
                             containerId, auditItem);

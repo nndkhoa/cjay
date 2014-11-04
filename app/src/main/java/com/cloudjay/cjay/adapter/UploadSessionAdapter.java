@@ -136,10 +136,11 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 
 	private void uploadCurrentStep(Session session) {
 		JobManager jobManager = App.getJobManager();
-		Step step = Step.values()[((int) session.getLocalStep())];
+		Step step = Step.values()[session.getLocalStep()];
 
 		//Retry upload base on step
 		switch (step) {
+
 			//In step import check all image, upload all error image then upload session
 			case IMPORT:
 				for (GateImage image : session.getGateImages()) {
@@ -148,6 +149,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 					}
 					;
 				}
+
 				jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), step.value, true));
 
 				// In step audit check all image of item, upload all error image then upload error audit item => complete audit
@@ -199,5 +201,6 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 				add(data.get(i));
 			}
 		}
+		notifyDataSetChanged();
 	}
 }
