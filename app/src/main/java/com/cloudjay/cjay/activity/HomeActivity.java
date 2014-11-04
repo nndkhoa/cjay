@@ -17,9 +17,9 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.fragment.SearchFragment_;
 import com.cloudjay.cjay.fragment.UploadFragment_;
 import com.cloudjay.cjay.fragment.WorkingFragment_;
-import com.cloudjay.cjay.jq.JobManager;
 import com.cloudjay.cjay.task.job.FetchSessionsJob;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;

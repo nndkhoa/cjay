@@ -717,7 +717,8 @@ public class DataCenter {
 
 			return true;
 		} catch (RetrofitError e) {
-			e.printStackTrace();
+
+			Logger.w(e.getMessage());
 			return false;
 		}
 	}
@@ -798,6 +799,7 @@ public class DataCenter {
 		if (result != null) {
 			//merge session
 			oldSession.mergeSession(result);
+            Logger.Log("Session id: " + oldSession.getId());
 
 			// Update container back to database
 			String key = result.getContainerId();
@@ -1097,6 +1099,7 @@ public class DataCenter {
 		String key = result.getContainerId();
 
 		oldSession.mergeSession(result);
+
 		db.put(key, oldSession);
 
 		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
@@ -1114,7 +1117,8 @@ public class DataCenter {
 
 			// Update container back to database
 			String key = result.getContainerId();
-			result.setUploadStatus(UploadStatus.COMPLETE);
+			oldSession.setUploadStatus(UploadStatus.COMPLETE);
+			oldSession.mergeSession(result);
 			db.put(key, result);
 
 			// Then remove them from WORKING
@@ -1147,8 +1151,9 @@ public class DataCenter {
 
 			// Update container back to database
 			String key = result.getContainerId();
-			result.setUploadStatus(UploadStatus.COMPLETE);
-			db.put(key, result);
+			oldSession.setUploadStatus(UploadStatus.COMPLETE);
+			oldSession.mergeSession(result);
+			db.put(key, oldSession);
 
 			// Then remove them from WORKING
 			String workingKey = CJayConstant.PREFIX_WORKING + key;
@@ -1178,7 +1183,8 @@ public class DataCenter {
 
 			// Update container back to database
 			String key = result.getContainerId();
-			result.setUploadStatus(UploadStatus.COMPLETE);
+			oldSession.setUploadStatus(UploadStatus.COMPLETE);
+			oldSession.mergeSession(result);
 			db.put(key, result);
 
 			// Then remove them from WORKING
@@ -1235,7 +1241,7 @@ public class DataCenter {
 	 */
 	public void setWaterWashType(Context context, final AuditItem item, String containerId) throws SnappydbException {
 
-		Logger.Log("setWaterWashType");
+		Logger.Log("audit item selected: " + item.getAuditItemUUID());
 
 		DB db = App.getDB(context);
 
@@ -1252,6 +1258,14 @@ public class DataCenter {
 				break;
 			}
 		}
+
+        for (int i = 0; i < list.size(); i++) {
+
+            if (list.get(i).getAuditItemUUID().equals(item.getAuditItemUUID())) {
+                Logger.Log("remove this");
+                list.remove(i);
+            }
+        }
 
 		if (!isExisted) {
 
@@ -1279,13 +1293,6 @@ public class DataCenter {
 			item.setIsAllowed(true);
 
 			list.add(item);
-		}
-
-		for (int i = 0; i < list.size(); i++) {
-			if (list.get(i).getAuditItemUUID().equals(item.getAuditItemUUID())) {
-				Logger.Log("remove this");
-				list.remove(i);
-			}
 		}
 
 		session.setAuditItems(list);
@@ -1493,8 +1500,7 @@ public class DataCenter {
 		try {
 			networkClient.gotMessageFromPubNub(channel, messageId);
 		} catch (RetrofitError e) {
-			Logger.e(e.getResponse().toString());
-			Logger.e(e.getMessage().toString());
+			Logger.e(e.getMessage());
 		}
 	}
 
@@ -1520,6 +1526,7 @@ public class DataCenter {
 		long sessionId = auditItem.getSession();
 		Session session = getSessionById(context, sessionId);
 		return session;
+
 	}
 	//endregion
 }

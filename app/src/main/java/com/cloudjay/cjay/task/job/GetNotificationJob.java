@@ -13,9 +13,6 @@ import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 
-/**
- * Created by thai on 03/11/2014.
- */
 public class GetNotificationJob extends Job {
 	String channel;
 	String messageId;

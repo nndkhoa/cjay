@@ -107,17 +107,14 @@ public class WorkingFragment extends Fragment {
 
 	//region EVENT HANDLER
 
-	@Trace
 	public void onEvent(UploadStartedEvent event) {
 		refresh();
 	}
 
-	@Trace
 	public void onEvent(WorkingSessionCreatedEvent event) {
 		refresh();
 	}
 
-	@Trace
 	public void onEvent(UploadedEvent event) {
 		refresh();
 	}

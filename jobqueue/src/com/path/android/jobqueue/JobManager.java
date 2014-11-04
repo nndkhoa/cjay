@@ -1,18 +1,11 @@
-package com.cloudjay.cjay.jq;
+package com.path.android.jobqueue;
 
 import android.content.Context;
 
-import com.path.android.jobqueue.AsyncAddCallback;
-import com.path.android.jobqueue.BaseJob;
-import com.path.android.jobqueue.CopyOnWriteGroupSet;
-import com.path.android.jobqueue.Job;
-import com.path.android.jobqueue.JobHolder;
-import com.path.android.jobqueue.JobQueue;
-import com.path.android.jobqueue.JobStatus;
-import com.path.android.jobqueue.QueueFactory;
 import com.path.android.jobqueue.cachedQueue.CachedJobQueue;
 import com.path.android.jobqueue.config.Configuration;
 import com.path.android.jobqueue.di.DependencyInjector;
+import com.path.android.jobqueue.executor.JobConsumerExecutor;
 import com.path.android.jobqueue.log.JqLog;
 import com.path.android.jobqueue.network.NetworkEventProvider;
 import com.path.android.jobqueue.network.NetworkUtil;
@@ -38,6 +31,7 @@ public class JobManager implements NetworkEventProvider.Listener {
 	public static final long NS_PER_MS = 1000000;
 	public static final long NOT_RUNNING_SESSION_ID = Long.MIN_VALUE;
 	public static final long NOT_DELAYED_JOB_DELAY = Long.MIN_VALUE;
+	
 	@SuppressWarnings("FieldCanBeLocal")//used for testing
 	private final long sessionId;
 	private boolean running;
@@ -311,6 +305,31 @@ public class JobManager implements NetworkEventProvider.Listener {
 		return jobHolder;
 	}
 
+	/**
+	 * #tieubao changed this!
+	 * 1. Get all jobs that have same groupId
+	 * 2. Remove them and re-add in bottom of data table
+	 *
+	 * @param jobHolder
+	 */
+	private void reAddGroup(JobHolder jobHolder) {
+
+		JqLog.d("re-adding job %s", jobHolder.getId());
+		if (jobHolder.getBaseJob().isPersistent()) {
+			synchronized (persistentJobQueue) {
+				persistentJobQueue.reAddGroup(jobHolder);
+			}
+		} else {
+			synchronized (nonPersistentJobQueue) {
+				nonPersistentJobQueue.reAddGroup(jobHolder);
+			}
+		}
+
+		if (jobHolder.getGroupId() != null) {
+			runningJobGroups.remove(jobHolder.getGroupId());
+		}
+	}
+
 	private void reAddJob(JobHolder jobHolder) {
 		JqLog.d("re-adding job %s", jobHolder.getId());
 		if (jobHolder.getBaseJob().isPersistent()) {
@@ -426,6 +445,7 @@ public class JobManager implements NetworkEventProvider.Listener {
 
 		@Override
 		public JobHolder getNextJob(int wait, TimeUnit waitDuration) {
+
 			//be optimistic
 			JobHolder nextJob = JobManager.this.getNextJob();
 			if (nextJob != null) {
@@ -483,6 +503,17 @@ public class JobManager implements NetworkEventProvider.Listener {
 			//if we can't detect network changes, assume we have network otherwise nothing will trigger a consumer
 			//noinspection SimplifiableConditionalExpression
 			return countReadyJobs(networkUtil instanceof NetworkEventProvider ? hasNetwork() : true);
+		}
+
+		/**
+		 * #tieubao
+		 * This method is belong to JobConsumerExecutor.Contract.
+		 * @param jobHolder
+		 */
+		@Override
+		public void reAddGroup(JobHolder jobHolder) {
+			JqLog.d("Re-add group " + jobHolder.getGroupId());
+			JobManager.this.reAddGroup(jobHolder);
 		}
 	};
 

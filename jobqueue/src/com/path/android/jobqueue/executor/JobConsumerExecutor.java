@@ -1,6 +1,5 @@
-package com.cloudjay.cjay.jq;
+package com.path.android.jobqueue.executor;
 
-import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.JobHolder;
 import com.path.android.jobqueue.JobManager;
 import com.path.android.jobqueue.JobQueue;
@@ -45,7 +44,7 @@ public class JobConsumerExecutor {
 	}
 
 	private boolean canIDie() {
-		if(doINeedANewThread(true, false) == false) {
+		if (doINeedANewThread(true, false) == false) {
 			return true;
 		}
 		return false;
@@ -53,22 +52,22 @@ public class JobConsumerExecutor {
 
 	private boolean doINeedANewThread(boolean inConsumerThread, boolean addIfNeeded) {
 		//if network provider cannot notify us, we have to busy wait
-		if(contract.isRunning() == false) {
-			if(inConsumerThread) {
+		if (contract.isRunning() == false) {
+			if (inConsumerThread) {
 				activeConsumerCount.decrementAndGet();
 			}
 			return false;
 		}
 
 		synchronized (threadGroup) {
-			if(isAboveLoadFactor(inConsumerThread) && canAddMoreConsumers()) {
-				if(addIfNeeded) {
+			if (isAboveLoadFactor(inConsumerThread) && canAddMoreConsumers()) {
+				if (addIfNeeded) {
 					addConsumer();
 				}
 				return true;
 			}
 		}
-		if(inConsumerThread) {
+		if (inConsumerThread) {
 			activeConsumerCount.decrementAndGet();
 		}
 		return false;
@@ -97,7 +96,7 @@ public class JobConsumerExecutor {
 			boolean res =
 					consumerCnt < minConsumerSize ||
 							consumerCnt * loadFactor < contract.countRemainingReadyJobs() + runningJobHolders.size();
-			if(JqLog.isDebugEnabled()) {
+			if (JqLog.isDebugEnabled()) {
 				JqLog.d("%s: load factor check. %s = (%d < %d)|| (%d * %d < %d + %d). consumer thread: %s", Thread.currentThread().getName(), res,
 						consumerCnt, minConsumerSize,
 						consumerCnt, loadFactor, contract.countRemainingReadyJobs(), runningJobHolders.size(), inConsumerThread);
@@ -125,7 +124,8 @@ public class JobConsumerExecutor {
 
 	/**
 	 * returns true if job is currently handled by one of the executor threads
-	 * @param id id of the job
+	 *
+	 * @param id         id of the job
 	 * @param persistent boolean flag to distinguish id conflicts
 	 * @return true if job is currently handled here
 	 */
@@ -134,7 +134,7 @@ public class JobConsumerExecutor {
 	}
 
 	/**
-	 * contract between the {@link JobManager} and {@link JobConsumerExecutor}
+	 * contract between the {@link JobManager} and {@link com.path.android.jobqueue.executor.JobConsumerExecutor}
 	 */
 	public static interface Contract {
 		/**
@@ -145,18 +145,21 @@ public class JobConsumerExecutor {
 		/**
 		 * should insert the given {@link JobHolder} to related {@link JobQueue}. if it already exists, should replace the
 		 * existing one.
+		 *
 		 * @param jobHolder
 		 */
 		public void insertOrReplace(JobHolder jobHolder);
 
 		/**
 		 * should remove the job from the related {@link JobQueue}
+		 *
 		 * @param jobHolder
 		 */
 		public void removeJob(JobHolder jobHolder);
 
 		/**
 		 * should return the next job which is available to be run.
+		 *
 		 * @param wait
 		 * @param waitUnit
 		 * @return next job to execute or null if no jobs are available
@@ -167,15 +170,18 @@ public class JobConsumerExecutor {
 		 * @return the number of Jobs that are ready to be run
 		 */
 		public int countRemainingReadyJobs();
+
+		public void reAddGroup(JobHolder nextJob);
 	}
 
 	/**
-	 * a simple {@link Runnable} that can take jobs from the {@link Contract} and execute them
+	 * a simple {@link Runnable} that can take jobs from the {@link com.path.android.jobqueue.executor.JobConsumerExecutor.Contract} and execute them
 	 */
 	private static class JobConsumer implements Runnable {
 		private final Contract contract;
 		private final JobConsumerExecutor executor;
 		private boolean didRunOnce = false;
+
 		public JobConsumer(Contract contract, JobConsumerExecutor executor) {
 			this.executor = executor;
 			this.contract = contract;
@@ -186,37 +192,52 @@ public class JobConsumerExecutor {
 			boolean canDie;
 			do {
 				try {
-					if(JqLog.isDebugEnabled()) {
-						if(didRunOnce == false) {
+					if (JqLog.isDebugEnabled()) {
+						if (didRunOnce == false) {
 							JqLog.d("starting consumer %s", Thread.currentThread().getName());
 							didRunOnce = true;
 						} else {
 							JqLog.d("re-running consumer %s", Thread.currentThread().getName());
 						}
 					}
+
 					JobHolder nextJob;
 					do {
-
 						nextJob = contract.isRunning() ? contract.getNextJob(executor.keepAliveSeconds, TimeUnit.SECONDS) : null;
 						if (nextJob != null) {
-
 							executor.onBeforeRun(nextJob);
 							if (nextJob.safeRun(nextJob.getRunCount())) {
-								Logger.Log("Ready to remove job " + nextJob.getGroupId());
-								contract.removeJob(nextJob);
+								// contract.removeJob(nextJob);
+
+								/**
+								 * Job không còn giá trị sử dụng ở thời gian điểm hiện tại, cần kiểm tra
+								 * xem có cần add vào sau hay không?
+								 */
+
+								JqLog.d("RunCount: " + nextJob.getRunCount());
+
+								if (nextJob.getRunCount() <= nextJob.getBaseJob().getRetryLimit()) {
+
+									JqLog.d("--> Ready to remove job #" + nextJob.getId() + " / Group: " + nextJob.getGroupId());
+									contract.removeJob(nextJob);
+
+								} else {
+
+									JqLog.d("--> Re-add group " + nextJob.getGroupId());
+									contract.reAddGroup(nextJob);
+								}
+
 							} else {
 								contract.insertOrReplace(nextJob);
 							}
-
 							executor.onAfterRun(nextJob);
 						}
-
 					} while (nextJob != null);
 				} finally {
 					//to avoid creating a new thread for no reason, consider not killing this one first
 					canDie = executor.canIDie();
-					if(JqLog.isDebugEnabled()) {
-						if(canDie) {
+					if (JqLog.isDebugEnabled()) {
+						if (canDie) {
 							JqLog.d("finishing consumer %s", Thread.currentThread().getName());
 						} else {
 							JqLog.d("didn't allow me to die, re-running %s", Thread.currentThread().getName());

@@ -32,7 +32,7 @@ public class UploadSessionJob extends Job {
 
 
 	@Override
-	protected int getRetryLimit() {
+	public int getRetryLimit() {
 		return 1;
 	}
 

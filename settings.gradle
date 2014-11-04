@@ -1,1 +1,1 @@
-include ':app', ':robospock'
+include ':app', ':robospock', ':jobqueue'

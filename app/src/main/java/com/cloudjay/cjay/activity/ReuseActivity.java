@@ -130,8 +130,8 @@ public class ReuseActivity extends Activity {
         for (int i = 0; i < gateImages.size(); i++) {
             try {
 				// Getting the last part of the referrer url
-				String name = gateImages.get(i).getUrl().substring(gateImages.get(i).getUrl().lastIndexOf("/") + 1,
-						gateImages.get(i).getUrl().length());
+				String name = gateImages.get(i).getName();
+                Logger.Log("name: " + name);
                 // Create new audit image object
                 AuditImage auditImage = new AuditImage()
                         .withId(0)

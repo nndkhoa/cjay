@@ -74,7 +74,7 @@ dependencies {
     compile 'com.android.support:support-v4:20.0.0'
     compile 'eu.inmite.android.lib:android-styled-dialogs:1.2.0'
     compile 'com.crashlytics.android:crashlytics:1.+'
-    compile 'com.path:android-priority-jobqueue:1.1.2'
+//    compile 'com.path:android-priority-jobqueue:1.1.2'
     compile 'com.netflix.rxjava:rxjava-core:0.16.1'
     compile 'com.netflix.rxjava:rxjava-android:0.16.1'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.3'
@@ -103,7 +103,7 @@ dependencies {
     compile 'com.esotericsoftware.kryo:kryo:2.24.0'
     compile 'org.droidparts:droidparts:2.6.2'
 
-
+    compile project(":jobqueue")
 }
 
 apt {

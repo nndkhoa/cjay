@@ -20,10 +20,11 @@ public class UploadAuditItemJob extends Job {
 	String containerId;
 	String auditItemUUID;
 
-	@Override
-	protected int getRetryLimit() {
-		return 2;
-	}
+    @Override
+    public int getRetryLimit() {
+        return 2;
+    }
+
 
 	public UploadAuditItemJob(String containerId, String auditItemUUID) {
 		super(new Params(1).requireNetwork().persist().groupBy(containerId));

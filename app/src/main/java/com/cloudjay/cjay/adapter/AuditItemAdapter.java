@@ -20,7 +20,6 @@ import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.MergeIssueActivity_;
 import com.cloudjay.cjay.activity.ReportIssueActivity_;
 import com.cloudjay.cjay.fragment.CameraFragment;
-import com.cloudjay.cjay.jq.JobManager;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
@@ -34,6 +33,7 @@ import com.google.gson.GsonBuilder;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.imageaware.ImageAware;
 import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
+import com.path.android.jobqueue.JobManager;
 import com.snappydb.SnappydbException;
 
 import java.util.List;
