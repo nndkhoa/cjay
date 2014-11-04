@@ -810,6 +810,7 @@ public class DataCenter {
 		if (result != null) {
 			//merge session
 			oldSession.mergeSession(result);
+            Logger.Log("Session id: " + oldSession.getId());
 
 			// Update container back to database
 			String key = result.getContainerId();
