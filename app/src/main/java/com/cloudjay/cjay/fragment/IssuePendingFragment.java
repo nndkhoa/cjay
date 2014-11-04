@@ -139,6 +139,7 @@ public class IssuePendingFragment extends Fragment {
 
 			case REPAIRED:
 			default:
+
 				Logger.Log("Open AfterRepair Fragment");
 				String auditItemUUID = event.getAuditItemUUID();
 				AuditItem auditItem = dataCenter.getAuditItemByUUID(getActivity(), containerID, auditItemUUID);
