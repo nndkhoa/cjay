@@ -45,4 +45,5 @@ public class CJayConstant {
 	public static final int ALARM_INTERVAL = 86400;
 	public static final int NOTIFICATION_ID = 98234;
 
+	public static final int RETRY_THRESHOLD = 3;
 }

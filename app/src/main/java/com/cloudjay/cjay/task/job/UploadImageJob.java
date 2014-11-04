@@ -7,6 +7,7 @@ import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadedEvent;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
@@ -24,8 +25,8 @@ public class UploadImageJob extends Job {
 	ImageType imageType;
 
 	@Override
-	protected int getRetryLimit() {
-		return 2;
+	public int getRetryLimit() {
+		return CJayConstant.RETRY_THRESHOLD;
 	}
 
 	public UploadImageJob(String uri, String imageName, String containerId, ImageType imageType) {

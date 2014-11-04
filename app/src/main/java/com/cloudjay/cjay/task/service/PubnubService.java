@@ -11,7 +11,6 @@ import android.text.TextUtils;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
-import com.cloudjay.cjay.jq.JobManager;
 import com.cloudjay.cjay.model.NotificationItem;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.task.job.GetNotificationJob;
@@ -21,6 +20,7 @@ import com.cloudjay.cjay.util.exception.NullCredentialException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.path.android.jobqueue.JobManager;
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubError;
@@ -71,7 +71,7 @@ public class PubnubService extends Service {
 	public void pushNotification(String channel, String objectType, long objectId, String messageId) {
 
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new GetNotificationJob(channel,messageId, objectType,objectId));
+		jobManager.addJobInBackground(new GetNotificationJob(channel, messageId, objectType,objectId));
 
 
 //		// TODO: Display message in notification Center
@@ -96,6 +96,7 @@ public class PubnubService extends Service {
 	private final Handler handler = new Handler() {
 
 		public void handleMessage(Message msg) {
+
 			Bundle b = msg.getData();
 			final String channel = b.getString("channel");
 			final String objectType = b.getString("object_type");
@@ -207,14 +208,14 @@ public class PubnubService extends Service {
 
 				@Override
 				public void successCallback(String channel, Object message) {
-					Logger.Log("Success: " + message.toString());
-					notifyUser(channel, message);
+//					Logger.Log("Success: " + message.toString());
+					notifyUser(uuidChannel, message);
 				}
 
 				@Override
 				public void errorCallback(String channel, PubnubError pubnubError) {
 					Logger.e("Error: " + pubnubError.toString());
-					notifyUser(channel, pubnubError.toString());
+					notifyUser(uuidChannel, pubnubError.toString());
 				}
 			});
 

@@ -421,8 +421,8 @@ public class NetworkClient {
 	 * @param id
 	 */
 	public IsoCode getComponentCodeById(long id) {
-		IsoCode componetCode = provider.getRestAdapter(context).create(NetworkService.class).getComponentCodeById(id);
-		return componetCode;
+		IsoCode componentCode = provider.getRestAdapter(context).create(NetworkService.class).getComponentCodeById(id);
+		return componentCode;
 	}
 
 	/**
@@ -436,8 +436,10 @@ public class NetworkClient {
 	}
 
 	public void gotMessageFromPubNub(String channel, String messageId) {
+
 		Response response = provider.getRestAdapter(context).create(NetworkService.class).gotMessageFromPubNub(channel, messageId);
-		Logger.Log(response.getHeaders().toString());
-		Logger.Log(response.getBody().toString());
+
+//		Logger.Log(response.getHeaders().toString());
+//		Logger.Log(response.getBody().toString());
 	}
 }

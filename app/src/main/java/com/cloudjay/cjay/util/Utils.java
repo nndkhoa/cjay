@@ -488,11 +488,11 @@ public class Utils {
 				return false;
 			}
 		} catch (InterruptedException ignore) {
-			ignore.printStackTrace();
-			System.out.println(" Exception:" + ignore);
+//			ignore.printStackTrace();
+//			System.out.println(" Exception:" + ignore);
 		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println(" Exception:" + e);
+//			e.printStackTrace();
+//			System.out.println(" Exception:" + e);
 		}
 		return false;
 	}

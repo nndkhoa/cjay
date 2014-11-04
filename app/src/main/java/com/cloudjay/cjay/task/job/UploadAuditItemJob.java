@@ -20,7 +20,7 @@ public class UploadAuditItemJob extends Job {
     String auditItemUUID;
 
     @Override
-    protected int getRetryLimit() {
+    public int getRetryLimit() {
         return 2;
     }
 
