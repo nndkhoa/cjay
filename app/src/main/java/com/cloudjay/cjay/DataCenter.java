@@ -384,13 +384,13 @@ public class DataCenter {
 		for (String result : keysResult) {
 
 			String newKey = result.substring(len);
-			addLog(context, newKey, prefix + " | Cannot retrieve this container");
 			Session session;
 			try {
 				session = db.getObject(newKey, Session.class);
 				sessions.add(session);
 			} catch (SnappydbException e) {
 				e.printStackTrace();
+				addLog(context, newKey, prefix + " | Cannot retrieve this container");
 
 			}
 		}
@@ -415,7 +415,7 @@ public class DataCenter {
 
 			String key = session.getContainerId();
 			session.setLocalStep(session.getStep());
-			
+
 			db.put(key, session);
 		}
 
@@ -1053,15 +1053,15 @@ public class DataCenter {
 
 	}
 
-    public AuditImage getAuditImageByUUId(Context context, String auditImageUUID) {
-        try {
-            DB db = App.getDB(context);
-            return db.getObject(auditImageUUID, AuditImage.class);
-        } catch (SnappydbException e) {
-            Logger.e(e.getMessage());
-        }
-        return null;
-    }
+	public AuditImage getAuditImageByUUId(Context context, String auditImageUUID) {
+		try {
+			DB db = App.getDB(context);
+			return db.getObject(auditImageUUID, AuditImage.class);
+		} catch (SnappydbException e) {
+			Logger.e(e.getMessage());
+		}
+		return null;
+	}
 
 	/**
 	 * Add log message to database. This method will be called from:
@@ -1270,59 +1270,56 @@ public class DataCenter {
 
 		DB db = App.getDB(context);
 
-		// Add Iso Code
-		String damageKey = CJayConstant.PREFIX_DAMAGE_CODE + "DB";
-		String repairKey = CJayConstant.PREFIX_REPAIR_CODE + "WW";
-		String componentKey = CJayConstant.PREFIX_COMPONENT_CODE + "FWA";
-
-		IsoCode damageCode = db.getObject(damageKey, IsoCode.class);
-		IsoCode repairCode = db.getObject(repairKey, IsoCode.class);
-		IsoCode componentCode = db.getObject(componentKey, IsoCode.class);
-
-		item.setDamageCodeId(damageCode.getId());
-		item.setDamageCode(damageCode.getCode());
-
-		item.setRepairCodeId(repairCode.getId());
-		item.setRepairCode(repairCode.getCode());
-
-		item.setComponentCodeId(componentCode.getId());
-		item.setComponentCode(componentCode.getCode());
-
-		item.setLocationCode("BXXX");
-		item.setAudited(true);
-
 		Session session = db.getObject(containerId, Session.class);
 
-		List<AuditItem> removeList = new ArrayList<AuditItem>();
+        // --> Nếu nhiều image cùng thuộc một lỗi vệ sinh, thì tính là một
+        boolean isExisted = false;
+		List<AuditItem> list = session.getAuditItems();
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).isWashTypeItem()) {
+                list.get(i).getAuditImages().add(item.getAuditImages().get(0));
+                isExisted = true;
+                Logger.Log("existed");
+                break;
+            }
+        }
 
-		// --> Nếu nhiều image cùng thuộc một lỗi vệ sinh, thì tính là một
-		for (AuditItem auditItem : session.getAuditItems()) {
+        if (!isExisted) {
 
-			if (auditItem != null) {
-				if (auditItem.getAuditItemUUID() != null &&
-						auditItem.getAuditItemUUID().equals(item.getAuditItemUUID())) {
-					removeList.add(auditItem);
-				}
+            Logger.Log("create new");
+            // Add Iso Code
+            String damageKey = CJayConstant.PREFIX_DAMAGE_CODE + "DB";
+            String repairKey = CJayConstant.PREFIX_REPAIR_CODE + "WW";
+            String componentKey = CJayConstant.PREFIX_COMPONENT_CODE + "FWA";
 
-				if (auditItem.getComponentCode() != null
-						&& auditItem.getComponentCode().equals(componentCode.getCode())
-						&& auditItem.getDamageCode() != null
-						&& auditItem.getDamageCode().equals(damageCode.getCode())
-						&& auditItem.getRepairCode() != null
-						&& auditItem.getRepairCode().equals(repairCode.getCode())
-						&& auditItem.getLocationCode() != null
-						&& auditItem.getLocationCode().equals("BXXX")) {
-					removeList.add(auditItem);
-				}
-			}
-		}
+            IsoCode damageCode = db.getObject(damageKey, IsoCode.class);
+            IsoCode repairCode = db.getObject(repairKey, IsoCode.class);
+            IsoCode componentCode = db.getObject(componentKey, IsoCode.class);
 
-		session.getAuditItems().removeAll(removeList);
-		if (session.getAuditItems() == null) {
-			List<AuditItem> newList = new ArrayList<AuditItem>();
-			session.setAuditItems(newList);
-		}
-		session.getAuditItems().add(item);
+            item.setDamageCodeId(damageCode.getId());
+            item.setDamageCode(damageCode.getCode());
+
+            item.setRepairCodeId(repairCode.getId());
+            item.setRepairCode(repairCode.getCode());
+
+            item.setComponentCodeId(componentCode.getId());
+            item.setComponentCode(componentCode.getCode());
+
+            item.setLocationCode("BXXX");
+            item.setAudited(true);
+
+            list.add(item);
+        }
+
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getAuditItemUUID().equals(item.getAuditItemUUID())) {
+                Logger.Log("remove this");
+                list.remove(i);
+            }
+        }
+
+        session.setAuditItems(list);
+
 		db.put(containerId, session);
 
 		EventBus.getDefault().post(new IssueDeletedEvent(containerId));
@@ -1371,27 +1368,27 @@ public class DataCenter {
 		}
 	}
 
-    public IsoCode getIsoCode(Context context, String prefix, String code) {
-        try {
-            DB db = App.getDB(context);
-            String[] keyResults = db.findKeys(prefix + code);
-            if (keyResults.length > 0) {
-                IsoCode isoCode = db.getObject(keyResults[0], IsoCode.class);
+	public IsoCode getIsoCode(Context context, String prefix, String code) {
+		try {
+			DB db = App.getDB(context);
+			String[] keyResults = db.findKeys(prefix + code);
+			if (keyResults.length > 0) {
+				IsoCode isoCode = db.getObject(keyResults[0], IsoCode.class);
 
-                Logger.Log("getCode: " + isoCode.getCode());
-                Logger.Log("getId: " + isoCode.getId());
+				Logger.Log("getCode: " + isoCode.getCode());
+				Logger.Log("getId: " + isoCode.getId());
 
-                return isoCode;
-            } else {
-                return null;
-            }
+				return isoCode;
+			} else {
+				return null;
+			}
 
 
-        } catch (SnappydbException e) {
-            Logger.e(e.getMessage());
-            return null;
-        }
-    }
+		} catch (SnappydbException e) {
+			Logger.e(e.getMessage());
+			return null;
+		}
+	}
 
 	public void changeUploadState(Context context, String containerId,
 	                              AuditItem auditItem) {
@@ -1400,20 +1397,20 @@ public class DataCenter {
 			Session session = db.getObject(containerId, Session.class);
 
 			List<AuditItem> list = session.getAuditItems();
-
 			for (AuditItem item : list) {
-				if (item.getAuditItemUUID() == auditItem.getAuditItemUUID()) {
+				if (item.getAuditItemUUID().equals(auditItem.getAuditItemUUID())) {
+					Logger.e(item.getAuditItemUUID());
+					Logger.e(auditItem.getAuditItemUUID());
 					item.setUploadStatus(auditItem.getUploadStatus());
 				}
 			}
 
 			session.setAuditItems(list);
 			db.put(containerId, session);
-
-
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
+
 
 	}
 
@@ -1423,20 +1420,7 @@ public class DataCenter {
 			DB db = App.getDB(context);
 			Session session = db.getObject(containerId, Session.class);
 
-			Logger.Log("Before: ");
-			for (AuditItem item : session.getAuditItems()) {
-				Logger.Log("item uuid: " + item.getAuditItemUUID());
-			}
-
-			GsonBuilder builder = new GsonBuilder();
-			Gson gson = builder.create();
-
-			AuditItem removeItem = null;
-
 			List<AuditItem> list = session.getAuditItems();
-
-
-
 			for (int i = 0; i < list.size(); i++) {
 				if (list.get(i).getAuditItemUUID().equals(auditItem.getAuditItemUUID())) {
 					list.remove(i);
@@ -1448,14 +1432,9 @@ public class DataCenter {
 			// Set modified list to session
 			session.setAuditItems(list);
 
-			Logger.Log("After: ");
-			for (AuditItem item : session.getAuditItems()) {
-				Logger.Log("item uuid: " + item.getAuditItemUUID());
-			}
-
 			db.put(containerId, session);
 
-            EventBus.getDefault().post(new IssueUpdatedEvent(containerId));
+			EventBus.getDefault().post(new IssueUpdatedEvent(containerId));
 
 			Logger.Log("update successfully");
 
