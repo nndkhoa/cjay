@@ -635,17 +635,16 @@ public class Session {
 
 		//merge Audit Item  if audit item from server != null
 		if (session.getAuditItems().size() != 0) {
-			List<AuditItem> mergedAuditItem = new ArrayList<AuditItem>();
-			for (AuditItem auditItemServer : session.getAuditItems()) {
-				for (AuditItem auditItem : this.getAuditItems()) {
+			List<AuditItem> localList = this.getAuditItems();
+			for (AuditItem auditItem : this.getAuditItems()) {
+				for (AuditItem auditItemServer : session.getAuditItems()) {
 					if (auditItem.equals(auditItemServer)) {
 						auditItem.setUploadStatus(UploadStatus.COMPLETE);
 						auditItem.mergeAuditItem(auditItemServer);
-						mergedAuditItem.add(auditItem);
 					}
 				}
 			}
-			this.setAuditItems(mergedAuditItem);
+			this.setAuditItems(localList);
 		}
 		return this;
 	}
