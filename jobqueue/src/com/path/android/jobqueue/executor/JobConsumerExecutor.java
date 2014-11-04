@@ -200,28 +200,33 @@ public class JobConsumerExecutor {
 							JqLog.d("re-running consumer %s", Thread.currentThread().getName());
 						}
 					}
+
 					JobHolder nextJob;
 					do {
 						nextJob = contract.isRunning() ? contract.getNextJob(executor.keepAliveSeconds, TimeUnit.SECONDS) : null;
 						if (nextJob != null) {
 							executor.onBeforeRun(nextJob);
 							if (nextJob.safeRun(nextJob.getRunCount())) {
-								contract.removeJob(nextJob);
-
+								// contract.removeJob(nextJob);
 
 								/**
 								 * Job không còn giá trị sử dụng ở thời gian điểm hiện tại, cần kiểm tra
 								 * xem có cần add vào sau hay không?
 								 */
 
-								JqLog.d("Ready to remove job " + nextJob.getGroupId());
 								JqLog.d("RunCount: " + nextJob.getRunCount());
 
-								if (nextJob.getRunCount() < 3) {
+								if (nextJob.getRunCount() <= nextJob.getBaseJob().getRetryLimit()) {
+
+									JqLog.d("--> Ready to remove job #" + nextJob.getId() + " / Group: " + nextJob.getGroupId());
 									contract.removeJob(nextJob);
+
 								} else {
+
+									JqLog.d("--> Re-add group " + nextJob.getGroupId());
 									contract.reAddGroup(nextJob);
 								}
+
 							} else {
 								contract.insertOrReplace(nextJob);
 							}

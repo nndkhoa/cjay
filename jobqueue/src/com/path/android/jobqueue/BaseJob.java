@@ -14,6 +14,7 @@ import java.io.Serializable;
  */
 @Deprecated
 abstract public class BaseJob implements Serializable {
+
     public static final int DEFAULT_RETRY_LIMIT = 20;
     private boolean requiresNetwork;
     private String groupId;

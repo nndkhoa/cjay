@@ -206,7 +206,7 @@ public class SqliteJobQueue implements JobQueue {
 	}
 
 	@Override
-	public void reAddJob(JobHolder jobHolder) {
+	public void reAddGroup(JobHolder jobHolder) {
 
 		if (jobHolder.getId() == null) {
 			return;

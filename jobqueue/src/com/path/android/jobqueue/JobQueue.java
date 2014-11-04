@@ -95,9 +95,12 @@ public interface JobQueue {
 	 */
 	List<JobHolder> findJobByGroupId(String groupId);
 
+
+
+
 	/**
 	 * @param jobHolder
 	 * @return
 	 */
-	void reAddJob(JobHolder jobHolder);
+	void reAddGroup(JobHolder jobHolder);
 }

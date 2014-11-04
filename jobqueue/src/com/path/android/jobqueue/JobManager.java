@@ -31,6 +31,7 @@ public class JobManager implements NetworkEventProvider.Listener {
 	public static final long NS_PER_MS = 1000000;
 	public static final long NOT_RUNNING_SESSION_ID = Long.MIN_VALUE;
 	public static final long NOT_DELAYED_JOB_DELAY = Long.MIN_VALUE;
+	
 	@SuppressWarnings("FieldCanBeLocal")//used for testing
 	private final long sessionId;
 	private boolean running;
@@ -316,14 +317,14 @@ public class JobManager implements NetworkEventProvider.Listener {
 		JqLog.d("re-adding job %s", jobHolder.getId());
 		if (jobHolder.getBaseJob().isPersistent()) {
 			synchronized (persistentJobQueue) {
-				persistentJobQueue.insertOrReplace(jobHolder);
-//				persistentJobQueue
+				persistentJobQueue.reAddGroup(jobHolder);
 			}
 		} else {
 			synchronized (nonPersistentJobQueue) {
-				nonPersistentJobQueue.insertOrReplace(jobHolder);
+				nonPersistentJobQueue.reAddGroup(jobHolder);
 			}
 		}
+
 		if (jobHolder.getGroupId() != null) {
 			runningJobGroups.remove(jobHolder.getGroupId());
 		}
@@ -504,8 +505,14 @@ public class JobManager implements NetworkEventProvider.Listener {
 			return countReadyJobs(networkUtil instanceof NetworkEventProvider ? hasNetwork() : true);
 		}
 
+		/**
+		 * #tieubao
+		 * This method is belong to JobConsumerExecutor.Contract.
+		 * @param jobHolder
+		 */
 		@Override
 		public void reAddGroup(JobHolder jobHolder) {
+			JqLog.d("Re-add group " + jobHolder.getGroupId());
 			JobManager.this.reAddGroup(jobHolder);
 		}
 	};

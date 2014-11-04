@@ -105,8 +105,8 @@ public class CachedJobQueue implements JobQueue {
 	}
 
 	@Override
-	public void reAddJob(JobHolder jobHolder) {
-		delegate.reAddJob(jobHolder);
+	public void reAddGroup(JobHolder jobHolder) {
+		delegate.reAddGroup(jobHolder);
 	}
 
 	private static class Cache {

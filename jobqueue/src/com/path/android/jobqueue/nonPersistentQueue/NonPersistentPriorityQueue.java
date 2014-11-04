@@ -114,7 +114,7 @@ public class NonPersistentPriorityQueue implements JobQueue {
 	}
 
 	@Override
-	public void reAddJob(JobHolder jobHolder) {
+	public void reAddGroup(JobHolder jobHolder) {
 
 	}
 
