@@ -452,13 +452,16 @@ public class Utils {
 
 	public static boolean canReachInternet() {
 
-		System.out.println(" executeCommand");
-		Runtime runtime = Runtime.getRuntime();
+        //StackTraceElement[] trace = new Throwable().getStackTrace();
+        //Logger.Log(trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
+
+
+        Runtime runtime = Runtime.getRuntime();
 
 		try {
 			Process mIpAddrProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
 			int mExitValue = mIpAddrProcess.waitFor();
-			System.out.println(" mExitValue " + mExitValue);
+			// System.out.println(" mExitValue " + mExitValue);
 
 			if (mExitValue == 0) {
 				return true;

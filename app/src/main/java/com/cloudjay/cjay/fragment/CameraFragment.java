@@ -129,6 +129,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	@Click(R.id.btn_capture)
 	void btnTakePictureClicked() {
 		btnTakePicture.setEnabled(false);
+        btnDone.setEnabled(false);
 		autoFocus();
 	}
 
@@ -213,7 +214,11 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	 */
 	public void takeSimplePicture() {
 
+        Logger.Log("takeSimplePicture");
+
 		if (getContract().isSingleShotMode() == true) {
+
+            Logger.Log("getContract().isSingleShotMode()");
 			singleShotProcessing = true;
 			btnTakePicture.setEnabled(false);
             btnDone.setEnabled(false);
@@ -256,6 +261,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		@Override
 		public void saveImage(PictureTransaction xact, Bitmap capturedBitmap) {
 
+            Logger.Log("saveImage");
 			if (useSingleShotMode()) {
 				singleShotProcessing = false;
 				getActivity().runOnUiThread(new Runnable() {
@@ -429,10 +435,14 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		@Override
 		@TargetApi(16)
 		public void onAutoFocus(boolean success, Camera camera) {
+            Logger.Log("onAutoFocus");
 			super.onAutoFocus(success, camera);
-			btnTakePicture.setEnabled(true);
+
+            btnTakePicture.setEnabled(true);
             btnDone.setEnabled(true);
+
 			takeSimplePicture();
+
 		}
 
 		/**
