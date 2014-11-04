@@ -185,6 +185,25 @@ public class Utils {
 	 * @param context
 	 * @param message
 	 */
+	public static void showCrouton(Activity context, String message, Style style) {
+		Crouton.cancelAllCroutons();
+		final Crouton crouton = Crouton.makeText(context, message, style);
+		crouton.setConfiguration(new de.keyboardsurfer.android.widget.crouton.Configuration.Builder().setDuration(de.keyboardsurfer.android.widget.crouton.Configuration.DURATION_INFINITE).build());
+		crouton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Crouton.hide(crouton);
+			}
+		});
+		crouton.show();
+	}
+
+	/**
+	 * Display a pretty alert
+	 *
+	 * @param context
+	 * @param message
+	 */
 	public static void showCrouton(Activity context, String message) {
 		Crouton.cancelAllCroutons();
 		final Crouton crouton = Crouton.makeText(context, message, Style.ALERT);

@@ -715,7 +715,7 @@ public class DataCenter {
 
 			return true;
 		} catch (RetrofitError e) {
-			e.printStackTrace();
+			Logger.w(e.getResponse().getBody().toString());
 			return false;
 		}
 	}
@@ -1524,7 +1524,8 @@ public class DataCenter {
         try {
             networkClient.gotMessageFromPubNub(channel, messageId);
         } catch (RetrofitError e) {
-            Logger.e(e.getResponse().toString());
+	        e.printStackTrace();
+//            Logger.e(e.getResponse().getBody().toString());
         }
     }
 

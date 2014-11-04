@@ -12,8 +12,8 @@ import android.view.Window;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.event.session.ContainersFetchedEvent;
 import com.cloudjay.cjay.event.UserLoggedOutEvent;
+import com.cloudjay.cjay.event.session.ContainersFetchedEvent;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
@@ -23,10 +23,12 @@ import com.snappydb.SnappydbException;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.UiThread;
 
 import java.lang.reflect.Method;
 
 import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 /**
  * Activity chung. Các Activity khác sẽ kế thừa BaseActivity để sử dụng menu items và các hàm chung.
@@ -117,8 +119,9 @@ public class BaseActivity extends FragmentActivity {
 		super.onDestroy();
 	}
 
+	@UiThread
 	public void onEvent(ContainersFetchedEvent event) {
-		Utils.showCrouton(this, "All sessions are fetched");
+		Utils.showCrouton(this, "All sessions are fetched", Style.INFO);
 	}
 
 	public void onEvent(UserLoggedOutEvent event) {

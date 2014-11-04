@@ -24,61 +24,61 @@ import retrofit.mime.TypedFile;
 
 public interface NetworkService {
 
-    @FormUrlEncoded
-    @POST(ApiEndpoint.TOKEN_API)
-    public JsonObject getToken(@Field("username") String username, @Field("password") String password);
+	@FormUrlEncoded
+	@POST(ApiEndpoint.TOKEN_API)
+	public JsonObject getToken(@Field("username") String username, @Field("password") String password);
 
-    @GET(ApiEndpoint.CURRENT_USER_API)
-    public User getCurrentUser();
+	@GET(ApiEndpoint.CURRENT_USER_API)
+	public User getCurrentUser();
 
-    @GET(ApiEndpoint.LIST_REPAIR_CODES_API)
-    public List<IsoCode> getRepairCodes(@Query("modified_after") String lastModifiedDate);
+	@GET(ApiEndpoint.LIST_REPAIR_CODES_API)
+	public List<IsoCode> getRepairCodes(@Query("modified_after") String lastModifiedDate);
 
-    @GET(ApiEndpoint.LIST_DAMAGE_CODES_API)
-    public List<IsoCode> getDamageCodes(@Query("modified_after") String lastModifiedDate);
+	@GET(ApiEndpoint.LIST_DAMAGE_CODES_API)
+	public List<IsoCode> getDamageCodes(@Query("modified_after") String lastModifiedDate);
 
-    @GET(ApiEndpoint.LIST_COMPONENT_CODES_API)
-    public List<IsoCode> getComponentCodes(@Query("modified_after") String lastModifiedDate);
+	@GET(ApiEndpoint.LIST_COMPONENT_CODES_API)
+	public List<IsoCode> getComponentCodes(@Query("modified_after") String lastModifiedDate);
 
-    @GET(ApiEndpoint.LIST_OPERATORS_API)
-    public List<Operator> getOperators(@Query("modified_since") String lastModifiedDate);
+	@GET(ApiEndpoint.LIST_OPERATORS_API)
+	public List<Operator> getOperators(@Query("modified_since") String lastModifiedDate);
 
-    @GET(ApiEndpoint.CONTAINER_SESSIONS_API)
-    public JsonObject getContainerSessionsByPage(@Query("page") int page, @Query("modified_after") String lastModifiedDate);
+	@GET(ApiEndpoint.CONTAINER_SESSIONS_API)
+	public JsonObject getContainerSessionsByPage(@Query("page") int page, @Query("modified_after") String lastModifiedDate);
 
-    @GET(ApiEndpoint.CONTAINER_SESSIONS_API)
-    public JsonObject getContainerSessionsByModifiedTime(@Query("modified_after") String lastModifiedDate);
+	@GET(ApiEndpoint.CONTAINER_SESSIONS_API)
+	public JsonObject getContainerSessionsByModifiedTime(@Query("modified_after") String lastModifiedDate);
 
-    @GET(ApiEndpoint.CONTAINER_SESSION_ITEM_API)
-    public Session getContainerSessionById(@Path("id") long containerId);
+	@GET(ApiEndpoint.CONTAINER_SESSION_ITEM_API)
+	public Session getContainerSessionById(@Path("id") long containerId);
 
-    @GET(ApiEndpoint.CONTAINER_SESSIONS_API)
-    public JsonObject searchContainer(@Query("search") String keyword);
+	@GET(ApiEndpoint.CONTAINER_SESSIONS_API)
+	public JsonObject searchContainer(@Query("search") String keyword);
 
-    @POST(ApiEndpoint.CONTAINER_SESSIONS_API)
-    public Session postContainer( @Body JsonObject jsonSessionString);
+	@POST(ApiEndpoint.CONTAINER_SESSIONS_API)
+	public Session postContainer(@Body JsonObject jsonSessionString);
 
-    @PUT(ApiEndpoint.CONTAINER_SESSION_CHECK_OUT_API)
-    public Session checkOutContainerSession(@Path("id") long containerPk, @Body JsonArray jsonGateImage);
+	@PUT(ApiEndpoint.CONTAINER_SESSION_CHECK_OUT_API)
+	public Session checkOutContainerSession(@Path("id") long containerPk, @Body JsonArray jsonGateImage);
 
-    @PUT(ApiEndpoint.CONTAINER_SESSION_COMPLETE_AUDIT_API)
-    public Session completeAudit(@Path("id") long containerPk);
+	@PUT(ApiEndpoint.CONTAINER_SESSION_COMPLETE_AUDIT_API)
+	public Session completeAudit(@Path("id") long containerPk);
 
-    @PUT(ApiEndpoint.CONTAINER_SESSION_COMPLETE_REPAIR_API)
-    public Session completeRepair(@Path("id") long containerPk, @Body JsonArray audit_items);
+	@PUT(ApiEndpoint.CONTAINER_SESSION_COMPLETE_REPAIR_API)
+	public Session completeRepair(@Path("id") long containerPk, @Body JsonArray audit_items);
 
-    @PUT(ApiEndpoint.CONTAINER_SESSION_POST_AUDIT_ITEM_API)
-    public Session postAudiItem(@Path("id") long containerPk,@Body JsonObject audit_item);
+	@PUT(ApiEndpoint.CONTAINER_SESSION_POST_AUDIT_ITEM_API)
+	public Session postAudiItem(@Path("id") long containerPk, @Body JsonObject audit_item);
 
-    @PUT(ApiEndpoint.CONTAINER_SESSION_ADD_AUDIT_IMAGES_API)
-    public AuditItem addAuditImages (@Path("id") String auditId, @Body JsonArray auditImages);
+	@PUT(ApiEndpoint.CONTAINER_SESSION_ADD_AUDIT_IMAGES_API)
+	public AuditItem addAuditImages(@Path("id") String auditId, @Body JsonArray auditImages);
 
-    @PUT(ApiEndpoint.CONTAINER_SESSION_HAND_CLEANING)
-    public Session setHandCleaningSession (@Path("id") long containerPk);
+	@PUT(ApiEndpoint.CONTAINER_SESSION_HAND_CLEANING)
+	public Session setHandCleaningSession(@Path("id") long containerPk);
 
-    // Check source v1, uploadType=media
-    @POST(ApiEndpoint.CJAY_TMP_STORAGE_IMAGE)
-    public Response postImageFile(@Header("Content-Type") String contentType, @Query("uploadType") String uploadType, @Query("name") String imageName, @Body() TypedFile image);
+	// Check source v1, uploadType=media
+	@POST(ApiEndpoint.CJAY_TMP_STORAGE_IMAGE)
+	public Response postImageFile(@Header("Content-Type") String contentType, @Query("uploadType") String uploadType, @Query("name") String imageName, @Body() TypedFile image);
 
 	//Use for PubNub
 	@GET(ApiEndpoint.PUBNUB_AUDIT_ITEM)
@@ -96,6 +96,7 @@ public interface NetworkService {
 	@GET(ApiEndpoint.PUBNUB_OPERATOR)
 	Operator getOperatorById(@Path("id") long id);
 
+	@FormUrlEncoded
 	@POST(ApiEndpoint.PUBNUB_GOT_MESSAGE)
-	public Response gotMessageFromPubNub(@Query("receiver_channel") String channel,@Query("message_id") String messageId);
+	public Response gotMessageFromPubNub(@Field("receiver_channel") String channel, @Field("message_id") String messageId);
 }

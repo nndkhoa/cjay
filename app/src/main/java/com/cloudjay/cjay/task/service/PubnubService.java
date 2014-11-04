@@ -185,25 +185,25 @@ public class PubnubService extends Service {
 		try {
 			pubnub.subscribe(channels, new Callback() {
 
-				@Override
-				public void connectCallback(String channel, Object message) {
-					System.out.println("SUBSCRIBE : CONNECT on channel:" + channel
-							+ " : " + message.getClass() + " : "
-							+ message.toString());
-				}
-
-				@Override
-				public void disconnectCallback(String channel, Object message) {
-					System.out.println("SUBSCRIBE : DISCONNECT on channel:" + channel
-							+ " : " + message.getClass() + " : "
-							+ message.toString());
-				}
-
-				public void reconnectCallback(String channel, Object message) {
-					System.out.println("SUBSCRIBE : RECONNECT on channel:" + channel
-							+ " : " + message.getClass() + " : "
-							+ message.toString());
-				}
+//				@Override
+//				public void connectCallback(String channel, Object message) {
+//					System.out.println("SUBSCRIBE : CONNECT on channel:" + channel
+//							+ " : " + message.getClass() + " : "
+//							+ message.toString());
+//				}
+//
+//				@Override
+//				public void disconnectCallback(String channel, Object message) {
+//					System.out.println("SUBSCRIBE : DISCONNECT on channel:" + channel
+//							+ " : " + message.getClass() + " : "
+//							+ message.toString());
+//				}
+//
+//				public void reconnectCallback(String channel, Object message) {
+//					System.out.println("SUBSCRIBE : RECONNECT on channel:" + channel
+//							+ " : " + message.getClass() + " : "
+//							+ message.toString());
+//				}
 
 				@Override
 				public void successCallback(String channel, Object message) {
