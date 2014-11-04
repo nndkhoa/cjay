@@ -22,6 +22,7 @@ import com.cloudjay.cjay.event.IssueUpdatedEvent;
 import com.cloudjay.cjay.event.issue.IssueDeletedEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
 import com.cloudjay.cjay.event.upload.UploadedEvent;
+import com.cloudjay.cjay.jq.JobManager;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
@@ -29,7 +30,6 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
-import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;

@@ -20,6 +20,7 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
+import com.cloudjay.cjay.jq.JobManager;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
@@ -33,7 +34,6 @@ import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.commonsware.cwac.camera.PictureTransaction;
 import com.commonsware.cwac.camera.SimpleCameraHost;
-import com.path.android.jobqueue.JobManager;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;

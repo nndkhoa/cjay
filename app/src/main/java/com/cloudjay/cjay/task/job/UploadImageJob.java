@@ -30,6 +30,8 @@ public class UploadImageJob extends Job {
 
 	public UploadImageJob(String uri, String imageName, String containerId, ImageType imageType) {
 		super(new Params(1).requireNetwork().persist().groupBy(containerId).setPersistent(true));
+
+//		super(new Params(1).persist().groupBy(containerId).setPersistent(true));
 		this.containerId = containerId;
 		this.uri = uri;
 		this.imageName = imageName;

@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.os.StrictMode;
 import android.util.Log;
 
+import com.cloudjay.cjay.jq.JobManager;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringUtils;
@@ -15,7 +16,6 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-import com.path.android.jobqueue.JobManager;
 import com.path.android.jobqueue.config.Configuration;
 import com.path.android.jobqueue.log.CustomLogger;
 import com.path.android.jobqueue.network.NetworkUtil;
@@ -27,7 +27,6 @@ import com.snappydb.SnappydbException;
 public class App extends Application {
 
 	private static App instance;
-	private static JobManager jobManager;
 	private static DB snappyDB = null;
 
 	public App() {
@@ -36,10 +35,6 @@ public class App extends Application {
 
 	public static App getInstance() {
 		return instance;
-	}
-
-	public static JobManager getJobManager() {
-		return jobManager;
 	}
 
 	public static DB getDB(Context context) throws SnappydbException {
@@ -156,6 +151,7 @@ public class App extends Application {
 	private void configureJobManager() {
 
 		Configuration configuration = new Configuration.Builder(this)
+
 				.networkUtil(new NetworkUtil() {
 					@Override
 					public boolean isConnected(Context context) {
@@ -195,4 +191,10 @@ public class App extends Application {
 
 		jobManager = new JobManager(this, configuration);
 	}
+
+	private static JobManager jobManager;
+	public static JobManager getJobManager() {
+		return jobManager;
+	}
+
 }

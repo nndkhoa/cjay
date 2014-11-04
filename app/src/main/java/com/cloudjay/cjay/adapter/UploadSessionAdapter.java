@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.aerilys.helpers.android.NetworkHelper;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.jq.JobManager;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
@@ -26,14 +27,9 @@ import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.path.android.jobqueue.JobManager;
 
 import java.util.List;
 
-
-/**
- * Created by thai on 09/10/2014.
- */
 public class UploadSessionAdapter extends ArrayAdapter<Session> {
 
 	private LayoutInflater mInflater;

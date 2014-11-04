@@ -24,6 +24,7 @@ import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.operator.OperatorChosenEvent;
 import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
+import com.cloudjay.cjay.jq.JobManager;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
@@ -34,7 +35,6 @@ import com.cloudjay.cjay.util.StringUtils;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
-import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;

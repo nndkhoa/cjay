@@ -2,7 +2,6 @@ package com.cloudjay.cjay.task.service;
 
 import android.app.NotificationManager;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,6 +11,7 @@ import android.text.TextUtils;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.jq.JobManager;
 import com.cloudjay.cjay.model.NotificationItem;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.task.job.GetNotificationJob;
@@ -19,21 +19,16 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.path.android.jobqueue.JobManager;
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubError;
 import com.pubnub.api.PubnubException;
 import com.snappydb.SnappydbException;
 
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EService;
-import org.androidannotations.annotations.Trace;
-import org.json.JSONObject;
 
 /**
  * Pubnub service is used to handle notification from Server by using Pubnub API
