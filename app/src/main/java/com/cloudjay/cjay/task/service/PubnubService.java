@@ -1,5 +1,6 @@
 package com.cloudjay.cjay.task.service;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.text.TextUtils;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.jq.JobManager;
 import com.cloudjay.cjay.model.NotificationItem;
 import com.cloudjay.cjay.model.User;
@@ -71,17 +73,8 @@ public class PubnubService extends Service {
 	public void pushNotification(String channel, String objectType, long objectId, String messageId) {
 
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new GetNotificationJob(channel,messageId, objectType,objectId));
+		jobManager.addJobInBackground(new GetNotificationJob(channel, messageId, objectType, objectId));
 
-
-//		// TODO: Display message in notification Center
-//		Notification notification = new Notification.Builder(this).setContentTitle(channel)
-//				.setContentText(message)
-//				.setSmallIcon(R.drawable.ic_app_360)
-//				.setAutoCancel(true)
-//				.setDefaults(Notification.DEFAULT_SOUND).build();
-//
-//		notificationManager.notify(1, notification);
 	}
 
 

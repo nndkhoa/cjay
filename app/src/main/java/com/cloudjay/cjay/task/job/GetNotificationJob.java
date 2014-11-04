@@ -1,10 +1,14 @@
 package com.cloudjay.cjay.task.job;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
+import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
@@ -39,10 +43,12 @@ public class GetNotificationJob extends Job {
 
 		// Get data from notification
 		if (objectType.equals("Container")) {
-			DataCenter_.getInstance_(context).getSessionById(context, objectId);
+			Session session = DataCenter_.getInstance_(context).getSessionById(context, objectId);
+			pushNotification(session);
 
 		} else if (objectType.equals("AuditItem")) {
-			DataCenter_.getInstance_(context).getAuditItemById(context, objectId);
+			Session session = DataCenter_.getInstance_(context).getAuditItemById(context, objectId);
+			pushNotification(session);
 
 		} else if (objectType.equals("Damage")) {
 			DataCenter_.getInstance_(context).getDamageCodeById(context, objectId);
@@ -64,11 +70,24 @@ public class GetNotificationJob extends Job {
 		DataCenter_.getInstance_(context).gotMessage(context, channel, messageId);
 	}
 
+	public void pushNotification(Session session) {
+		Context context = App.getInstance().getApplicationContext();
+
+		NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		Notification notification = new Notification.Builder(context).setContentTitle("Đã cập nhật thông tin")
+				.setContentText(session.getContainerId())
+				.setSmallIcon(R.drawable.ic_app_360)
+				.setAutoCancel(true)
+				.setDefaults(Notification.DEFAULT_SOUND).build();
+
+		notificationManager.notify(1, notification);
+	}
+
 	@Override
 	protected void onCancel() {
 		//Add LOG
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).addLog(context,objectType, objectId+" | "+messageId);
+		DataCenter_.getInstance_(context).addLog(context, objectType, objectId + " | " + messageId);
 	}
 
 	@Override

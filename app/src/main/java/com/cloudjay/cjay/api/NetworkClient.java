@@ -11,6 +11,7 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -354,6 +355,7 @@ public class NetworkClient {
 			if (item.equals(auditItem)) {
 				Logger.Log("Set here");
 				item.setAuditItemUUID(auditItemUUID);
+				item.setUploadStatus(UploadStatus.COMPLETE);
 			}
 		}
 		postAuditItemSession.setAuditItems(list);
