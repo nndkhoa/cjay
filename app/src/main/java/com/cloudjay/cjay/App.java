@@ -193,7 +193,6 @@ public class App extends Application {
 				.consumerKeepAlive(60)
 				.build();
 
-
 		jobManager = new JobManager(this, configuration);
 	}
 }

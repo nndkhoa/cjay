@@ -18,6 +18,7 @@ import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.MergeIssueActivity_;
+import com.cloudjay.cjay.activity.ReportIssueActivity_;
 import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
