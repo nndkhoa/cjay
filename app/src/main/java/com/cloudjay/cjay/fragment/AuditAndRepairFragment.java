@@ -2,6 +2,7 @@ package com.cloudjay.cjay.fragment;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.View;
@@ -9,15 +10,18 @@ import android.widget.Button;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.HomeActivity_;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.jq.JobManager;
+import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 
 import org.androidannotations.annotations.AfterViews;
@@ -29,6 +33,8 @@ import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Fragment giám định và sửa chữa.
@@ -70,13 +76,44 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 		// Required empty public constructor
 	}
 
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		EventBus.getDefault().register(this);
+	}
+
+	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
+
+
+	private void checkForShowButton() {
+		Session session = DataCenter_.getInstance_(getActivity()).getSession(getActivity(), containerID);
+		if (session.getLocalStep() == Step.REPAIR.value) {
+			btnCompleteAudit.setVisibility(View.GONE);
+			btnCompleteRepair.setVisibility(View.VISIBLE);
+		}
+		if (session.getLocalStep() == Step.AUDIT.value) {
+			if (session.hasRepairImages()) {
+				btnCompleteAudit.setVisibility(View.VISIBLE);
+				btnCompleteRepair.setVisibility(View.VISIBLE);
+			} else {
+				btnCompleteAudit.setVisibility(View.VISIBLE);
+				btnCompleteRepair.setVisibility(View.GONE);
+		}
+	}
+	}
+
 	@Click(R.id.btn_complete_audit)
 	void btnCompleteAuditClicked() {
 		Session session = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 		if (session != null) {
 			if (!session.isValidToUpload(Step.AUDIT)) {
-				for (AuditItem auditItem:session.getAuditItems()){
-					Logger.e("UPLOAD AUDIT ITEM: "+auditItem.getUploadStatus());
+				for (AuditItem auditItem : session.getAuditItems()) {
+					Logger.e("UPLOAD AUDIT ITEM: " + auditItem.getUploadStatus());
 				}
 				Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
 				return;
@@ -87,7 +124,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 		// PUT /api/cjay/containers/{pk}/complete-audit
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), session.getStep(), true));
+		jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), session.getLocalStep(), true));
 
 		// Hide this button
 		btnCompleteAudit.setVisibility(View.GONE);
@@ -97,8 +134,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			btnCompleteRepair.setVisibility(View.VISIBLE);
 		} else {
 			// Navigate to HomeActivity
-			Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
-			startActivity(intent);
 			getActivity().finish();
 		}
 	}
@@ -144,6 +179,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	void doAfterViews() {
 		configureActionBar();
 		configureViewPager();
+		checkForShowButton();
 	}
 
 	private void configureActionBar() {
@@ -212,5 +248,9 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	@Override
 	public void onTabReselected(ActionBar.Tab tab, android.app.FragmentTransaction fragmentTransaction) {
 
+	}
+
+	public void onEvent(ImageCapturedEvent event) {
+		checkForShowButton();
 	}
 }

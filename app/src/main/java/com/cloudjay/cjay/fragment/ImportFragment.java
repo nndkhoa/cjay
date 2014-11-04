@@ -47,6 +47,7 @@ import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -108,6 +109,7 @@ public class ImportFragment extends Fragment {
 
 	long preStatus = 1;
 	Session mSession;
+    List<GateImage> list = new ArrayList<GateImage>();
 	//endregion
 
 	public ImportFragment() {
@@ -192,18 +194,22 @@ public class ImportFragment extends Fragment {
 		// Add new session to database
 		String currentTime = StringUtils.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 
-		mSession = new Session().withContainerId(containerID)
-				.withOperatorCode(operatorCode)
-				.withOperatorId(operator.getId())
-				.withPreStatus(preStatus)
-				.withLocalStep(Step.IMPORT.value)
-				.withStep(Step.IMPORT.value)
-				.withCheckInTime(currentTime);
+        mSession = new Session().withContainerId(containerID)
+                .withOperatorCode(operatorCode)
+                .withOperatorId(operator.getId())
+                .withPreStatus(preStatus)
+                .withLocalStep(Step.IMPORT.value)
+                .withStep(Step.IMPORT.value)
+                .withCheckInTime(currentTime);
 
-		// Save normal session and working session.
-		// add working session also post an event
-		dataCenter.addSession(mSession);
-		dataCenter.addWorkingSession(mSession);
+        if (mSession != null) {
+            mSession.setGateImages(list);
+        }
+
+        // Save normal session and working session.
+        // add working session also post an event
+        dataCenter.addSession(mSession);
+        dataCenter.addWorkingSession(mSession);
 	}
 
 	/**
@@ -227,14 +233,14 @@ public class ImportFragment extends Fragment {
 	@Background
 	void refresh() {
 		if (mSession != null) {
-			List<GateImage> list = mSession.getImportImages();
-			updatedData(list);
+			list = mSession.getImportImages();
+			updatedData();
 		}
 	}
 
 	@UiThread
-	public void updatedData(List<GateImage> gateImageList) {
-		mAdapter.setData(gateImageList);
+	public void updatedData() {
+		mAdapter.setData(list);
 	}
 
 	//region VIEW INTERACTION

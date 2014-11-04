@@ -1307,6 +1307,7 @@ public class DataCenter {
 
             item.setLocationCode("BXXX");
             item.setAudited(true);
+            item.setIsAllowed(true);
 
             list.add(item);
         }
@@ -1491,6 +1492,8 @@ public class DataCenter {
 	 */
 	public void changeSessionLocalStep(Context context, String containerId, Step step) throws SnappydbException {
 
+        Logger.Log("set local step: " + step.value);
+
 		DB db = App.getDB(context);
 		Session session = db.getObject(containerId, Session.class);
 		session.setLocalStep(step.value);
@@ -1518,8 +1521,12 @@ public class DataCenter {
 	 */
 	@Background
 	public void gotMessage(Context context, String channel, String messageId) {
-		networkClient.gotMessageFromPubNub(channel, messageId);
-	}
+        try {
+            networkClient.gotMessageFromPubNub(channel, messageId);
+        } catch (RetrofitError e) {
+            Logger.e(e.getResponse().toString());
+        }
+    }
 
 	// endregion
 
