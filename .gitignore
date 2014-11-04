@@ -38,3 +38,4 @@ proguard/
 
 realm_version_check.timestamp
 app/src/main/res/values/com_crashlytics_export_strings.xml
+/jobqueue/build
