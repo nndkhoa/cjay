@@ -1527,7 +1527,7 @@ public class DataCenter {
 		try {
 			networkClient.gotMessageFromPubNub(channel, messageId);
 		} catch (RetrofitError e) {
-			Logger.e(e.getBody().toString());
+			Logger.e(e.getResponse().toString());
 			Logger.e(e.getMessage().toString());
 		}
 	}

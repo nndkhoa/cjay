@@ -96,6 +96,7 @@ public interface NetworkService {
 	@GET(ApiEndpoint.PUBNUB_OPERATOR)
 	Operator getOperatorById(@Path("id") long id);
 
+	@FormUrlEncoded
 	@POST(ApiEndpoint.PUBNUB_GOT_MESSAGE)
-	public Response gotMessageFromPubNub(@Query("receiver_channel") String channel,@Query("message_id") String messageId);
+	public Response gotMessageFromPubNub(@Field("receiver_channel") String channel,@Field("message_id") String messageId);
 }
