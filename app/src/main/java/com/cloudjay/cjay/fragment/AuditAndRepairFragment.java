@@ -92,6 +92,9 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 	private void checkForShowButton() {
 		Session session = DataCenter_.getInstance_(getActivity()).getSession(getActivity(), containerID);
+
+        Logger.Log("getId: " + session.getId());
+
 		if (session.getLocalStep() == Step.REPAIR.value) {
 			btnCompleteAudit.setVisibility(View.GONE);
 			btnCompleteRepair.setVisibility(View.VISIBLE);

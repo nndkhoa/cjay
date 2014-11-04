@@ -1132,6 +1132,9 @@ public class DataCenter {
 		}
 
 		oldSession.setAuditItems(listLocal);
+
+        Logger.Log("after merge: " + oldSession.getAuditItems().size());
+
 		db.put(key, oldSession);
 
 		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
@@ -1270,7 +1273,7 @@ public class DataCenter {
 	 */
 	public void setWaterWashType(Context context, final AuditItem item, String containerId) throws SnappydbException {
 
-		Logger.Log("setWaterWashType");
+		Logger.Log("audit item selected: " + item.getAuditItemUUID());
 
 		DB db = App.getDB(context);
 
@@ -1287,6 +1290,14 @@ public class DataCenter {
 				break;
 			}
 		}
+
+        for (int i = 0; i < list.size(); i++) {
+
+            if (list.get(i).getAuditItemUUID().equals(item.getAuditItemUUID())) {
+                Logger.Log("remove this");
+                list.remove(i);
+            }
+        }
 
 		if (!isExisted) {
 
@@ -1314,13 +1325,6 @@ public class DataCenter {
 			item.setIsAllowed(true);
 
 			list.add(item);
-		}
-
-		for (int i = 0; i < list.size(); i++) {
-			if (list.get(i).getAuditItemUUID().equals(item.getAuditItemUUID())) {
-				Logger.Log("remove this");
-				list.remove(i);
-			}
 		}
 
 		session.setAuditItems(list);
@@ -1552,18 +1556,30 @@ public class DataCenter {
 
 		AuditItem auditItem = networkClient.getAuditItemById(id);
 
-		long sessionId = auditItem.getSession();
-		Session session = getSessionById(context, sessionId);
-		String key = session.getContainerId();
+        if (auditItem != null) {
 
-		DB db = App.getDB(context);
-		Session localSession = db.getObject(key, Session.class);
-		if (localSession == null) { // container không tồn tại ở client
-			db.put(key, localSession);
-		} else {
-			localSession.mergeSession(session);
-			db.put(key, localSession);
-		}
+            GsonBuilder builder = new GsonBuilder();
+            Gson gson = builder.create();
+
+            long sessionId = auditItem.getSession();
+            Session session = getSessionById(context, sessionId);
+            String key = session.getContainerId();
+
+            Logger.Log("session: " + gson.toJson(session));
+
+            DB db = App.getDB(context);
+            Session localSession = db.getObject(key, Session.class);
+
+            Logger.Log("localSession: " + gson.toJson(localSession));
+
+            if (localSession == null) { // container không tồn tại ở client
+                db.put(key, localSession);
+            } else {
+                localSession.mergeSession(session);
+                db.put(key, localSession);
+            }
+        }
+
 	}
 	//endregion
 }
