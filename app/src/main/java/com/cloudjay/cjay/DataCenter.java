@@ -319,18 +319,20 @@ public class DataCenter {
 	//region SESSION
 
 	//
-	public Session getSessionById(Context context, long id) {
+	public Session getSessionById(Context context, long id) throws SnappydbException {
+
+		DB db = App.getDB(context);
+
 		Session session = networkClient.getSessionById(id);
 		Session localSession = getSession(context, session.getContainerId());
 
 		if (localSession == null) {
 			addSession(session);
 		} else {
-			// Container session is already existed
-			// TODO: merge session with the existed one
+			localSession.mergeSession(session);
+			db.put(session.getContainerId(), localSession);
 		}
-
-		return session;
+		return localSession;
 	}
 
 	/**
@@ -811,6 +813,7 @@ public class DataCenter {
 			//merge session
 			oldSession.mergeSession(result);
 
+			Logger.e(oldSession.getId() + "");
 			// Update container back to database
 			String key = result.getContainerId();
 			db.put(key, oldSession);
@@ -1524,8 +1527,8 @@ public class DataCenter {
         try {
             networkClient.gotMessageFromPubNub(channel, messageId);
         } catch (RetrofitError e) {
-	        e.printStackTrace();
-//            Logger.e(e.getResponse().getBody().toString());
+			Logger.e(e.getResponse().toString());
+			Logger.e(e.getMessage().toString());
         }
     }
 
@@ -1544,7 +1547,7 @@ public class DataCenter {
 	 * @param context
 	 * @param id
 	 */
-	public void getAuditItemById(Context context, long id) {
+	public void getAuditItemById(Context context, long id) throws SnappydbException {
 
 		AuditItem auditItem = networkClient.getAuditItemById(id);
 
@@ -1552,16 +1555,13 @@ public class DataCenter {
 		Session session = getSessionById(context, sessionId);
 		String key = session.getContainerId();
 
-		try {
 			DB db = App.getDB(context);
 			Session localSession = db.getObject(key, Session.class);
 			if (localSession == null) { // container không tồn tại ở client
 				db.put(key, localSession);
 			} else {
-				// TODO: merge audit item to this container session
-			}
-		} catch (SnappydbException e) {
-			e.printStackTrace();
+			localSession.mergeSession(session);
+			db.put(key, localSession);
 		}
 	}
 	//endregion
