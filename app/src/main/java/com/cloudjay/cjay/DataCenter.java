@@ -319,18 +319,20 @@ public class DataCenter {
 	//region SESSION
 
 	//
-	public Session getSessionById(Context context, long id) {
+	public Session getSessionById(Context context, long id) throws SnappydbException {
+
+		DB db = App.getDB(context);
+
 		Session session = networkClient.getSessionById(id);
 		Session localSession = getSession(context, session.getContainerId());
 
 		if (localSession == null) {
 			addSession(session);
 		} else {
-			// Container session is already existed
-			// TODO: merge session with the existed one
+			localSession.mergeSession(session);
+			db.put(session.getContainerId(), localSession);
 		}
-
-		return session;
+		return localSession;
 	}
 
 	/**
@@ -811,6 +813,7 @@ public class DataCenter {
 			//merge session
 			oldSession.mergeSession(result);
 
+			Logger.e(oldSession.getId() + "");
 			// Update container back to database
 			String key = result.getContainerId();
 			db.put(key, oldSession);
@@ -1272,54 +1275,54 @@ public class DataCenter {
 
 		Session session = db.getObject(containerId, Session.class);
 
-        // --> Nếu nhiều image cùng thuộc một lỗi vệ sinh, thì tính là một
-        boolean isExisted = false;
+		// --> Nếu nhiều image cùng thuộc một lỗi vệ sinh, thì tính là một
+		boolean isExisted = false;
 		List<AuditItem> list = session.getAuditItems();
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).isWashTypeItem()) {
-                list.get(i).getAuditImages().add(item.getAuditImages().get(0));
-                isExisted = true;
-                Logger.Log("existed");
-                break;
-            }
-        }
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).isWashTypeItem()) {
+				list.get(i).getAuditImages().add(item.getAuditImages().get(0));
+				isExisted = true;
+				Logger.Log("existed");
+				break;
+			}
+		}
 
-        if (!isExisted) {
+		if (!isExisted) {
 
-            Logger.Log("create new");
-            // Add Iso Code
-            String damageKey = CJayConstant.PREFIX_DAMAGE_CODE + "DB";
-            String repairKey = CJayConstant.PREFIX_REPAIR_CODE + "WW";
-            String componentKey = CJayConstant.PREFIX_COMPONENT_CODE + "FWA";
+			Logger.Log("create new");
+			// Add Iso Code
+			String damageKey = CJayConstant.PREFIX_DAMAGE_CODE + "DB";
+			String repairKey = CJayConstant.PREFIX_REPAIR_CODE + "WW";
+			String componentKey = CJayConstant.PREFIX_COMPONENT_CODE + "FWA";
 
-            IsoCode damageCode = db.getObject(damageKey, IsoCode.class);
-            IsoCode repairCode = db.getObject(repairKey, IsoCode.class);
-            IsoCode componentCode = db.getObject(componentKey, IsoCode.class);
+			IsoCode damageCode = db.getObject(damageKey, IsoCode.class);
+			IsoCode repairCode = db.getObject(repairKey, IsoCode.class);
+			IsoCode componentCode = db.getObject(componentKey, IsoCode.class);
 
-            item.setDamageCodeId(damageCode.getId());
-            item.setDamageCode(damageCode.getCode());
+			item.setDamageCodeId(damageCode.getId());
+			item.setDamageCode(damageCode.getCode());
 
-            item.setRepairCodeId(repairCode.getId());
-            item.setRepairCode(repairCode.getCode());
+			item.setRepairCodeId(repairCode.getId());
+			item.setRepairCode(repairCode.getCode());
 
-            item.setComponentCodeId(componentCode.getId());
-            item.setComponentCode(componentCode.getCode());
+			item.setComponentCodeId(componentCode.getId());
+			item.setComponentCode(componentCode.getCode());
 
-            item.setLocationCode("BXXX");
-            item.setAudited(true);
-            item.setIsAllowed(true);
+			item.setLocationCode("BXXX");
+			item.setAudited(true);
+			item.setIsAllowed(true);
 
-            list.add(item);
-        }
+			list.add(item);
+		}
 
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getAuditItemUUID().equals(item.getAuditItemUUID())) {
-                Logger.Log("remove this");
-                list.remove(i);
-            }
-        }
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).getAuditItemUUID().equals(item.getAuditItemUUID())) {
+				Logger.Log("remove this");
+				list.remove(i);
+			}
+		}
 
-        session.setAuditItems(list);
+		session.setAuditItems(list);
 
 		db.put(containerId, session);
 
@@ -1492,7 +1495,7 @@ public class DataCenter {
 	 */
 	public void changeSessionLocalStep(Context context, String containerId, Step step) throws SnappydbException {
 
-        Logger.Log("set local step: " + step.value);
+		Logger.Log("set local step: " + step.value);
 
 		DB db = App.getDB(context);
 		Session session = db.getObject(containerId, Session.class);
@@ -1521,12 +1524,13 @@ public class DataCenter {
 	 */
 	@Background
 	public void gotMessage(Context context, String channel, String messageId) {
-        try {
-            networkClient.gotMessageFromPubNub(channel, messageId);
-        } catch (RetrofitError e) {
-            Logger.e(e.getResponse().toString());
-        }
-    }
+		try {
+			networkClient.gotMessageFromPubNub(channel, messageId);
+		} catch (RetrofitError e) {
+			Logger.e(e.getBody().toString());
+			Logger.e(e.getMessage().toString());
+		}
+	}
 
 	// endregion
 
@@ -1543,7 +1547,7 @@ public class DataCenter {
 	 * @param context
 	 * @param id
 	 */
-	public void getAuditItemById(Context context, long id) {
+	public void getAuditItemById(Context context, long id) throws SnappydbException {
 
 		AuditItem auditItem = networkClient.getAuditItemById(id);
 
@@ -1551,16 +1555,13 @@ public class DataCenter {
 		Session session = getSessionById(context, sessionId);
 		String key = session.getContainerId();
 
-		try {
-			DB db = App.getDB(context);
-			Session localSession = db.getObject(key, Session.class);
-			if (localSession == null) { // container không tồn tại ở client
-				db.put(key, localSession);
-			} else {
-				// TODO: merge audit item to this container session
-			}
-		} catch (SnappydbException e) {
-			e.printStackTrace();
+		DB db = App.getDB(context);
+		Session localSession = db.getObject(key, Session.class);
+		if (localSession == null) { // container không tồn tại ở client
+			db.put(key, localSession);
+		} else {
+			localSession.mergeSession(session);
+			db.put(key, localSession);
 		}
 	}
 	//endregion

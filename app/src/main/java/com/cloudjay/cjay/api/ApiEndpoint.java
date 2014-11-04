@@ -29,5 +29,5 @@ public class ApiEndpoint {
 	public static final String PUBNUB_REPAIR_CODE = "/api/cjay/repair-codes/{id}";
 	public static final String PUBNUB_COMPONENT_CODE = "/api/cjay/component-codes/{id}";
 	public static final String PUBNUB_OPERATOR = "/api/cjay/repair-codes/{id}";
-	public static final String PUBNUB_GOT_MESSAGE = "/pubnub-retry/got-message";
+	public static final String PUBNUB_GOT_MESSAGE = "/pubnub-retry/got-message/";
 }
