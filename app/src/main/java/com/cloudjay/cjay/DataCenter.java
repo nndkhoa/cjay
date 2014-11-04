@@ -1307,6 +1307,7 @@ public class DataCenter {
 
             item.setLocationCode("BXXX");
             item.setAudited(true);
+            item.setIsAllowed(true);
 
             list.add(item);
         }

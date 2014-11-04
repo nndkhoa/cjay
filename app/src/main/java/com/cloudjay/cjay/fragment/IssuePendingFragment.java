@@ -96,6 +96,8 @@ public class IssuePendingFragment extends Fragment {
 	@AfterViews
 	void setUp() {
 
+        Logger.Log("on setUp");
+
 		// Get session by containerId
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 
@@ -124,6 +126,7 @@ public class IssuePendingFragment extends Fragment {
 
 	@UiThread
 	void onEvent(ImageCapturedEvent event) {
+        Logger.Log("on ImageCapturedEvent");
 
 		ImageType imageType = ImageType.values()[event.getImageType()];
 		switch (imageType) {

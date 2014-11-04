@@ -47,6 +47,7 @@ import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -108,7 +109,7 @@ public class ImportFragment extends Fragment {
 
 	long preStatus = 1;
 	Session mSession;
-    List<GateImage> list;
+    List<GateImage> list = new ArrayList<GateImage>();
 	//endregion
 
 	public ImportFragment() {

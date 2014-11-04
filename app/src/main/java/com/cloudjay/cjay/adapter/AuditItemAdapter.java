@@ -202,7 +202,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
                 public void onClick(View view) {
 
                     // Validate: if this is wash type item, cannot edit
-                    if (auditItem.isWashTypeItem()) {
+                    if (!auditItem.isIsAllowed()) {
                         showPreventRepairDialog();
                     } else {
                         Logger.Log("getAuditItemUUID: " + auditItem.getAuditItemUUID());
@@ -393,6 +393,13 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 		builder.setTitle("Alert");
 		builder.setMessage("Lỗi này không được sửa");
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
 
 		AlertDialog dialog = builder.create();
 		dialog.show();
