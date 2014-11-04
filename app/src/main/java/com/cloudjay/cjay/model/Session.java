@@ -636,6 +636,8 @@ public class Session {
 		//merge Audit Item  if audit item from server != null
 		if (session.getAuditItems().size() != 0) {
 			List<AuditItem> mergedAuditItem = new ArrayList<AuditItem>();
+			List<AuditItem> totalMergedAuditItem = new ArrayList<AuditItem>();
+			//Merge loi
 			for (AuditItem auditItemServer : session.getAuditItems()) {
 				for (AuditItem auditItem : this.getAuditItems()) {
 					if (auditItem.equals(auditItemServer)) {
@@ -645,7 +647,16 @@ public class Session {
 					}
 				}
 			}
-			this.setAuditItems(mergedAuditItem);
+			//Them cac loi server chua co
+			totalMergedAuditItem.addAll(mergedAuditItem);
+			for (AuditItem auditItem : this.getAuditItems()) {
+				for (AuditItem auditItemMerged : mergedAuditItem){
+					if (!auditItem.equals(auditItemMerged) && !totalMergedAuditItem.contains(auditItem)){
+						totalMergedAuditItem.add(auditItem);
+					}
+				}
+			}
+			this.setAuditItems(totalMergedAuditItem);
 		}
 		return this;
 	}
