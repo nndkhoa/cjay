@@ -14,14 +14,13 @@ import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.HomeActivity_;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
+import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.jq.JobManager;
-import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
-import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 
 import org.androidannotations.annotations.AfterViews;
@@ -29,6 +28,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.InvocationTargetException;
@@ -103,8 +103,8 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			} else {
 				btnCompleteAudit.setVisibility(View.VISIBLE);
 				btnCompleteRepair.setVisibility(View.GONE);
+			}
 		}
-	}
 	}
 
 	@Click(R.id.btn_complete_audit)
@@ -250,6 +250,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 	}
 
+	@UiThread
 	public void onEvent(ImageCapturedEvent event) {
 		checkForShowButton();
 	}
