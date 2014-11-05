@@ -213,6 +213,7 @@ public class PubnubService extends Service {
 
 			} catch (PubnubException e) {
 				Logger.e(e.getMessage());
+				dataCenter.addLog(getApplicationContext(), "PubNub", "Cannot subscribe channels");
 			}
 		}
 	}

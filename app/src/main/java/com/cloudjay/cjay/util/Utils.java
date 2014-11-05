@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
@@ -125,10 +126,10 @@ public class Utils {
 		boolean pubnubUp = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_NO_CREATE) != null;
 
 		if (!queueUp)
-			Logger.Log("Queue Service is not running");
+			Logger.w("Queue Service is not running");
 
 		if (!pubnubUp)
-			Logger.Log("Pubnub Service is not running");
+			Logger.w("Pubnub Service is not running");
 
 		if (queueUp && pubnubUp)
 			return true;
@@ -196,7 +197,8 @@ public class Utils {
 	public static void showCrouton(Activity context, String message, Style style) {
 		Crouton.cancelAllCroutons();
 		final Crouton crouton = Crouton.makeText(context, message, style);
-		crouton.setConfiguration(new de.keyboardsurfer.android.widget.crouton.Configuration.Builder().setDuration(de.keyboardsurfer.android.widget.crouton.Configuration.DURATION_INFINITE).build());
+		crouton.setConfiguration(new Configuration.Builder()
+				.setDuration(Configuration.DURATION_SHORT).build());
 		crouton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {

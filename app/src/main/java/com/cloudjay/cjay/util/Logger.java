@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.cloudjay.cjay.BuildConfig;
+import com.google.gson.Gson;
 
 /**
  *
@@ -162,4 +163,9 @@ public final class Logger {
 		Logger.isUserActivitiesLoggable = isUserActivitiesLoggable;
 	}
 
+	public static void logJson(Object object) {
+		Gson gson = new Gson();
+		String s = gson.toJson(object);
+		d(s);
+	}
 }
