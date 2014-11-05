@@ -71,7 +71,7 @@ public class PubnubService extends Service {
 	public void pushNotification(String channel, String objectType, long objectId, String messageId) {
 
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new GetNotificationJob(channel, messageId, objectType,objectId));
+		jobManager.addJobInBackground(new GetNotificationJob(channel, messageId, objectType, objectId));
 
 
 //		// TODO: Display message in notification Center
@@ -181,6 +181,7 @@ public class PubnubService extends Service {
 			}
 		}
 
+
 		String[] channels = new String[]{depotChannel, uuidChannel};
 
 		try {
@@ -220,7 +221,8 @@ public class PubnubService extends Service {
 			});
 
 		} catch (PubnubException e) {
-			e.printStackTrace();
+			Logger.e(e.getMessage());
+
 		}
 	}
 }

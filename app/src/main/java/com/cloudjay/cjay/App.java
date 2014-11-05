@@ -15,12 +15,10 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-
 import com.path.android.jobqueue.JobManager;
 import com.path.android.jobqueue.config.Configuration;
 import com.path.android.jobqueue.log.CustomLogger;
 import com.path.android.jobqueue.network.NetworkUtil;
-import com.path.android.jobqueue.persistentQueue.sqlite.SqliteJobQueue;
 import com.snappydb.DB;
 import com.snappydb.DBFactory;
 import com.snappydb.SnappydbException;
@@ -87,7 +85,9 @@ public class App extends Application {
 	 * Configure Alarm Manager
 	 */
 	private void configureAlarmManager() {
+
 		if (!Utils.isAlarmUp(getApplicationContext())) {
+			
 			Logger.w("Alarm Manager is not running. Starting alarm ...");
 			Utils.startAlarm(getApplicationContext());
 
@@ -159,8 +159,6 @@ public class App extends Application {
 						return Utils.canReachInternet();
 					}
 				})
-				.queueFactory(new JobManager.DefaultQueueFactory())
-				.jobSerializer(new SqliteJobQueue.JavaSerializer())
 				.customLogger(new CustomLogger() {
 					private static final String TAG = "JOBS";
 
@@ -194,6 +192,7 @@ public class App extends Application {
 	}
 
 	private static JobManager jobManager;
+
 	public static JobManager getJobManager() {
 		return jobManager;
 	}
