@@ -483,12 +483,14 @@ public class AuditItem {
 	public AuditItem mergeAuditItem(AuditItem auditItemServer) {
 		this.setId(auditItemServer.getId());
 		this.setIsAllowed(auditItemServer.isIsAllowed());
+        /*if (!auditItemServer.isIsAllowed())
+            this.setRepaired(true);*/
 
 		//merge audit Image
 		List<AuditImage> mergedAuditImages = new ArrayList<AuditImage>();
 		for (AuditImage auditImageServer : auditItemServer.getAuditImages()) {
-			for (AuditImage auditImage : this.getAuditImages()) {
-				if (auditImage.getName().equals(Utils.getImageNameFromUrl(auditImageServer.getUrl()))){
+			for (AuditImage auditImage : this.auditImages) {
+				if (auditImage.getName().equals(Utils.getImageNameFromUrl(auditImageServer.getUrl()))) {
 					auditImage.mergeAuditImage(auditImageServer);
 					mergedAuditImages.add(auditImage);
 				}
@@ -498,20 +500,20 @@ public class AuditItem {
 		return this;
 	}
 
-    public boolean isWashTypeItem() {
+	public boolean isWashTypeItem() {
 
-        if (this.getComponentCode() != null
-                && this.getDamageCode() != null
-                && this.getRepairCode() != null
-                && this.getLocationCode() != null) {
-            if (this.getComponentCode().equals("FWA")
-                    && this.getDamageCode().equals("DB")
-                    && this.getRepairCode().equals("WW")
-                    && this.getLocationCode().equals("BXXX")) {
-                return true;
-            }
-        }
+		if (this.getComponentCode() != null
+				&& this.getDamageCode() != null
+				&& this.getRepairCode() != null
+				&& this.getLocationCode() != null) {
+			if (this.getComponentCode().equals("FWA")
+					&& this.getDamageCode().equals("DB")
+					&& this.getRepairCode().equals("WW")
+					&& this.getLocationCode().equals("BXXX")) {
+				return true;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 }

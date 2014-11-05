@@ -793,29 +793,14 @@ public class DataCenter {
 		DB db = App.getDB(context);
 		Session oldSession = db.getObject(containerId, Session.class);
 
-		// Check for make sure all gate image have uploaded
-		for (GateImage gateImage : oldSession.getGateImages()) {
-			if (gateImage.getUploadStatus() != UploadStatus.COMPLETE.value && gateImage.getType() == ImageType.IMPORT.value) {
-				//TODO Note to Khoa this upload import session have to retry upload Image @Han
-				uploadImage(context, Utils.parseUrltoUri(gateImage.getUrl()), gateImage.getName(), oldSession.getContainerId(), ImageType.IMPORT);
-			}
-		}
-
-
 		// Upload container session to server
 		Session result = networkClient.uploadSession(context, oldSession);
-
-		GsonBuilder builder = new GsonBuilder();
-		Gson gson = builder.create();
-
-		Logger.Log("result: " + gson.toJson(result));
 
 		if (result != null) {
 			//merge session
 			oldSession.mergeSession(result);
             Logger.Log("Session id: " + oldSession.getId());
 
-			Logger.e(oldSession.getId() + "");
 			// Update container back to database
 			String key = result.getContainerId();
 			db.put(key, oldSession);
@@ -1108,33 +1093,12 @@ public class DataCenter {
 		// Upload audit item session to server
 		DB db = App.getDB(context);
 
-		Logger.Log("old auditem item uuid: " + oldAuditItemUUID);
-
 		Session oldSession = db.getObject(containerId, Session.class);
 		AuditItem oldAuditItem = getAuditItemByUUID(context, containerId, oldAuditItemUUID);
 		Session result = networkClient.postAuditItem(context, oldSession, oldAuditItem);
 		String key = result.getContainerId();
 
-		List<AuditItem> listLocal = oldSession.getAuditItems();
-
-		for (int i = 0; i < listLocal.size(); i++) {
-			for (int j = 0; j < result.getAuditItems().size(); j++) {
-
-				if (listLocal.get(i).getAuditItemUUID().equals(
-						result.getAuditItems().get(j).getAuditItemUUID())) {
-					AuditItem itemLocal = listLocal.get(i);
-
-					itemLocal.setId(result.getAuditItems().get(j).getId());
-					itemLocal.setUploadStatus(UploadStatus.COMPLETE.value);
-					itemLocal.setAuditImages(result.getAuditItems().get(j).getAuditImages());
-				}
-
-			}
-		}
-
-		oldSession.setAuditItems(listLocal);
-
-        Logger.Log("after merge: " + oldSession.getAuditItems().size());
+		oldSession.mergeSession(result);
 
 		db.put(key, oldSession);
 
@@ -1153,7 +1117,8 @@ public class DataCenter {
 
 			// Update container back to database
 			String key = result.getContainerId();
-			result.setUploadStatus(UploadStatus.COMPLETE);
+			oldSession.setUploadStatus(UploadStatus.COMPLETE);
+			oldSession.mergeSession(result);
 			db.put(key, result);
 
 			// Then remove them from WORKING
@@ -1186,8 +1151,9 @@ public class DataCenter {
 
 			// Update container back to database
 			String key = result.getContainerId();
-			result.setUploadStatus(UploadStatus.COMPLETE);
-			db.put(key, result);
+			oldSession.setUploadStatus(UploadStatus.COMPLETE);
+			oldSession.mergeSession(result);
+			db.put(key, oldSession);
 
 			// Then remove them from WORKING
 			String workingKey = CJayConstant.PREFIX_WORKING + key;
@@ -1217,7 +1183,8 @@ public class DataCenter {
 
 			// Update container back to database
 			String key = result.getContainerId();
-			result.setUploadStatus(UploadStatus.COMPLETE);
+			oldSession.setUploadStatus(UploadStatus.COMPLETE);
+			oldSession.mergeSession(result);
 			db.put(key, result);
 
 			// Then remove them from WORKING
@@ -1552,33 +1519,13 @@ public class DataCenter {
 	 * @param context
 	 * @param id
 	 */
-	public void getAuditItemById(Context context, long id) throws SnappydbException {
+	public Session getAuditItemById(Context context, long id) throws SnappydbException {
 
 		AuditItem auditItem = networkClient.getAuditItemById(id);
 
-        if (auditItem != null) {
-
-            GsonBuilder builder = new GsonBuilder();
-            Gson gson = builder.create();
-
-            long sessionId = auditItem.getSession();
-            Session session = getSessionById(context, sessionId);
-            String key = session.getContainerId();
-
-            Logger.Log("session: " + gson.toJson(session));
-
-            DB db = App.getDB(context);
-            Session localSession = db.getObject(key, Session.class);
-
-            Logger.Log("localSession: " + gson.toJson(localSession));
-
-            if (localSession == null) { // container không tồn tại ở client
-                db.put(key, localSession);
-            } else {
-                localSession.mergeSession(session);
-                db.put(key, localSession);
-            }
-        }
+		long sessionId = auditItem.getSession();
+		Session session = getSessionById(context, sessionId);
+		return session;
 
 	}
 	//endregion

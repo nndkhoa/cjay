@@ -6,6 +6,8 @@ import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
@@ -483,9 +485,10 @@ public class Session {
 				return true;
 
 			// Tất cả các item đều phải có hình sau sửa chữa
+            // Loi cam sua thi field cho phep sua phai la false
 			case REPAIR:
 				for (AuditItem item : auditItems) {
-					if (item.getRepaired() == false) {
+					if (item.getRepaired() == false && item.isIsAllowed() == true) {
 						return false;
 					}
 				}
@@ -633,16 +636,16 @@ public class Session {
 
 		//merge Audit Item  if audit item from server != null
 		if (session.getAuditItems().size() != 0) {
-			List<AuditItem> mergedAuditItem = new ArrayList<AuditItem>();
-			for (AuditItem auditItemServer : session.getAuditItems()) {
-				for (AuditItem auditItem : this.getAuditItems()) {
-					if (auditItem.getAuditItemUUID().equals(auditItemServer.getAuditItemUUID())) {
+			List<AuditItem> localList = this.getAuditItems();
+			for (AuditItem auditItem : this.getAuditItems()) {
+				for (AuditItem auditItemServer : session.getAuditItems()) {
+					if (auditItem.equals(auditItemServer)) {
+						auditItem.setUploadStatus(UploadStatus.COMPLETE);
 						auditItem.mergeAuditItem(auditItemServer);
-						mergedAuditItem.add(auditItem);
 					}
 				}
 			}
-			this.setAuditItems(mergedAuditItem);
+			this.setAuditItems(localList);
 		}
 		return this;
 	}
