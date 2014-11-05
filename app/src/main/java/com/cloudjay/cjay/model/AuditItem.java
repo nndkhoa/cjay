@@ -487,12 +487,11 @@ public class AuditItem {
             this.setRepaired(true);*/
 
 		//merge audit Image
-		List<AuditImage> mergedAuditImages = new ArrayList<AuditImage>();
-		for (AuditImage auditImageServer : auditItemServer.getAuditImages()) {
-			for (AuditImage auditImage : this.auditImages) {
+		List<AuditImage> mergedAuditImages = this.auditImages;
+		for (AuditImage auditImage : this.auditImages) {
+			for (AuditImage auditImageServer : auditItemServer.getAuditImages()) {
 				if (auditImage.getName().equals(Utils.getImageNameFromUrl(auditImageServer.getUrl()))) {
 					auditImage.mergeAuditImage(auditImageServer);
-					mergedAuditImages.add(auditImage);
 				}
 			}
 		}
