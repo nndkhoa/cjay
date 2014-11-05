@@ -145,6 +145,12 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 		if (mSession != null) {
+
+            if(mSession.getLocalStep() == Step.AUDIT.value) {
+                Utils.showCrouton(getActivity(), "Container chua giam dinh xong");
+                return;
+            }
+
 			if (!mSession.isValidToUpload(Step.REPAIR)) {
 				Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
 				return;
