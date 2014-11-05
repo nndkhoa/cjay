@@ -723,7 +723,6 @@ public class DataCenter {
 	}
 
 	/**
-	 *
 	 * Change upload status of given image
 	 *
 	 * @param context
@@ -1189,27 +1188,30 @@ public class DataCenter {
 	 * @throws SnappydbException
 	 */
 	public void uploadRepairedSession(Context context, String containerId) throws SnappydbException {
+		try {// Upload complete repair session to server
+			DB db = App.getDB(context);
+			Session oldSession = db.getObject(containerId, Session.class);
+			Session result = networkClient.completeRepairSession(context, oldSession);
+			Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
-		// Upload complete repair session to server
-		DB db = App.getDB(context);
-		Session oldSession = db.getObject(containerId, Session.class);
-		Session result = networkClient.completeRepairSession(context, oldSession);
-		Logger.Log("Add AuditItem to Session Id: " + result.getId());
+			if (result != null) {
 
-		if (result != null) {
+				// Update container back to database
+				String key = result.getContainerId();
+				oldSession.setUploadStatus(UploadStatus.COMPLETE);
+				oldSession.mergeSession(result);
+				db.put(key, result);
 
-			// Update container back to database
-			String key = result.getContainerId();
-			oldSession.setUploadStatus(UploadStatus.COMPLETE);
-			oldSession.mergeSession(result);
-			db.put(key, result);
+				// Then remove them from WORKING
+				String workingKey = CJayConstant.PREFIX_WORKING + key;
+				db.del(workingKey);
+			}
 
-			// Then remove them from WORKING
-			String workingKey = CJayConstant.PREFIX_WORKING + key;
-			db.del(workingKey);
+			EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
+		} catch (RetrofitError error) {
+			Logger.e(error.getResponse().getHeaders().toString());
+			Logger.e(error.getResponse().getBody().mimeType());
 		}
-
-		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
 	}
 
 	/**
