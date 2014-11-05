@@ -67,7 +67,7 @@ android {
                 def formattedDate = date.format('yyyyMMddHHmmss')
                 variant.outputFile = new File(
                         file.parent,
-                        file.name.replace("-release", "-" + formattedDate)
+                        file.name.replace("app-release", "CJay-" + defaultConfig.versionName + '-' + formattedDate)
                 )
             }
         }
