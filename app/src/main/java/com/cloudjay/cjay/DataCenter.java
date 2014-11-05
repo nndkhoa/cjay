@@ -537,6 +537,9 @@ public class DataCenter {
 			String key = CJayConstant.PREFIX_WORKING + session.getContainerId();
 			db.put(key, session);
 
+			// Log
+			Step step = Step.values()[session.getLocalStep()];
+			Logger.Log("Add container " + session.getContainerId() + " | " + step.name() + " to Working collection");
 
 			// Notify to Working Fragment
 			EventBus.getDefault().post(new WorkingSessionCreatedEvent(session));
@@ -560,6 +563,8 @@ public class DataCenter {
 			String key = CJayConstant.PREFIX_UPLOADING + containerId;
 			db.put(key, session);
 
+			Step step = Step.values()[session.getLocalStep()];
+			Logger.Log("Add container " + session.getContainerId() + " | " + step.name() + " to Upload collection");
 
 		} catch (SnappydbException e) {
 			e.printStackTrace();
@@ -734,8 +739,6 @@ public class DataCenter {
 	 */
 	private void setImageUploadStatus(Context context, String containerId, String imageName, ImageType imageType, UploadStatus status) throws SnappydbException {
 
-		Logger.Log("imageName: " + imageName);
-
 		DB db = App.getDB(context);
 
 		// Change status image in db
@@ -754,6 +757,8 @@ public class DataCenter {
 								if (auditImage.getName().contains(imageName) && auditImage.getType() == imageType.value) {
 									auditImage.setUploadStatus(status);
 								}
+							} else {
+								Logger.wtf(auditImage.getUrl() + " does not have image name");
 							}
 						}
 					}
@@ -767,6 +772,8 @@ public class DataCenter {
 								if (auditImage.getName().contains(imageName) && auditImage.getType() == imageType.value) {
 									auditImage.setUploadStatus(status);
 								}
+							} else {
+								Logger.wtf(auditImage.getUrl() + " does not have image name");
 							}
 						}
 					}
@@ -778,10 +785,15 @@ public class DataCenter {
 					for (GateImage gateImage : session.getGateImages()) {
 						if (gateImage.getName() != null) {
 							if (gateImage.getName().contains(imageName) && gateImage.getType() == imageType.value) {
-								Logger.Log(imageName + " | " + gateImage.getType());
+
+								Logger.Log("Found & set upload status: " + imageName +
+										" | " + ImageType.values()[((int) gateImage.getType())].name());
+
 								gateImage.setUploadStatus(status);
 								break;
 							}
+						} else {
+							Logger.wtf(gateImage.getUrl() + " does not have image name");
 						}
 					}
 					break;
@@ -1496,12 +1508,18 @@ public class DataCenter {
 
 	}
 
+	/**
+	 * @param context
+	 * @param containerId
+	 */
 	public void removeWorkingSession(Context context, String containerId) {
 
 		try {
 			DB db = App.getDB(context);
 			String workingKey = CJayConstant.PREFIX_WORKING + containerId;
 			db.del(workingKey);
+
+			Logger.Log("REMOVE container " + containerId + " from Working collection");
 
 		} catch (SnappydbException e) {
 			e.printStackTrace();

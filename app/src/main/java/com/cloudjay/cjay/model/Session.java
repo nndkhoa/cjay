@@ -6,8 +6,6 @@ import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
@@ -485,7 +483,7 @@ public class Session {
 				return true;
 
 			// Tất cả các item đều phải có hình sau sửa chữa
-            // Loi cam sua thi field cho phep sua phai la false
+			// Loi cam sua thi field cho phep sua phai la false
 			case REPAIR:
 				for (AuditItem item : auditItems) {
 					if (item.getRepaired() == false && item.isIsAllowed() == true) {
@@ -626,10 +624,17 @@ public class Session {
 		List<GateImage> mergedGateImages = new ArrayList<GateImage>();
 		for (GateImage gateImageServer : session.getGateImages()) {
 			for (GateImage gateImage : this.getGateImages()) {
-				if (gateImage.getName().equals(Utils.getImageNameFromUrl(gateImageServer.getUrl()))) {
-					gateImage.mergeGateImage(gateImageServer);
-					mergedGateImages.add(gateImage);
+
+				if (gateImage.getName() != null) {
+					if (gateImage.getName().equals(Utils.getImageNameFromUrl(gateImageServer.getUrl()))) {
+						gateImage.mergeGateImage(gateImageServer);
+						mergedGateImages.add(gateImage);
+					}
+
+				} else {
+					Logger.wtf(gateImage.getUrl() + " do not have image name");
 				}
+
 			}
 		}
 		this.setGateImages(mergedGateImages);

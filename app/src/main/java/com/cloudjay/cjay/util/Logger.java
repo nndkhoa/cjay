@@ -12,13 +12,11 @@ import com.google.gson.Gson;
 public final class Logger {
 
 	/**
-	 *
 	 * Adjust this field for properly logs
-	 *
+	 * <p/>
 	 * PRODUCTION => PRODUCTION_MODE = true
-	 *
+	 * <p/>
 	 * DEVELOPMENT => PRODUCTION_MODE = false
-	 *
 	 */
 	private static boolean isDebuggable = BuildConfig.DEBUG;
 
@@ -166,6 +164,6 @@ public final class Logger {
 	public static void logJson(Object object) {
 		Gson gson = new Gson();
 		String s = gson.toJson(object);
-		d(s);
+		d("Json: " + s);
 	}
 }
