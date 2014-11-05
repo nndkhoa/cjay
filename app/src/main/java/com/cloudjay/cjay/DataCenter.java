@@ -1279,7 +1279,8 @@ public class DataCenter {
 		boolean isExisted = false;
 		List<AuditItem> list = session.getAuditItems();
 		for (int i = 0; i < list.size(); i++) {
-			if (list.get(i).isWashTypeItem()) {
+            // neu da ton tai loi ve sinh va chua duoc upload thi them hinh vao loi ve sinh
+			if (list.get(i).isWashTypeItem() && list.get(i).getId() == 0) {
 				list.get(i).getAuditImages().add(item.getAuditImages().get(0));
 				isExisted = true;
 				Logger.Log("existed");
