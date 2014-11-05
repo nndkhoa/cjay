@@ -20,6 +20,7 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.path.android.jobqueue.JobManager;
 
@@ -267,8 +268,13 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	@UiThread
 	public void onEvent(ImageCapturedEvent event) {
 
+        int imageType = event.getImageType();
+        if (imageType == ImageType.AUDIT.value) {
+            mSession.setLocalStep(Step.AUDIT.value);
+            dataCenter.addSession(mSession);
+        }
         //requery to update button
         mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
-		checkForShowButton();
+        checkForShowButton();
 	}
 }
