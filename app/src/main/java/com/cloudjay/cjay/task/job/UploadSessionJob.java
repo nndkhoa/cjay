@@ -41,7 +41,6 @@ public class UploadSessionJob extends Job {
 		this.containerId = containerId;
 		this.currentStep = step;
 		this.needToClearFromWorking = clearFromWorking;
-
 	}
 
 	/**

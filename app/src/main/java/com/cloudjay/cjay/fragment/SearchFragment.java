@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -43,7 +42,6 @@ import org.androidannotations.annotations.ViewById;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
-import retrofit.RetrofitError;
 
 /**
  * Tab search container
@@ -137,9 +135,11 @@ public class SearchFragment extends Fragment {
 
 		// navigation to Wizard Activity
 		Session item = mAdapter.getItem(position);
-		Logger.e(position + " " + item.getContainerId() + " " + item.getLocalStep());
-		Intent intent = new Intent(getActivity(), WizardActivity_.class);
+		dataCenter.addWorkingSession(item);
 
+		Logger.e(position + " " + item.getContainerId() + " " + item.getLocalStep());
+
+		Intent intent = new Intent(getActivity(), WizardActivity_.class);
 		intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, item.getContainerId());
 		intent.putExtra(WizardActivity.STEP_EXTRA, item.getLocalStep());
 		startActivity(intent);

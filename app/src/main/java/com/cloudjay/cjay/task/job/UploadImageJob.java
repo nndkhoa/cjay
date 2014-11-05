@@ -8,6 +8,7 @@ import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
@@ -28,8 +29,6 @@ public class UploadImageJob extends Job {
 
 	public UploadImageJob(String uri, String imageName, String containerId, ImageType imageType) {
 		super(new Params(1).requireNetwork().persist().groupBy(containerId).setPersistent(true));
-
-//		super(new Params(1).persist().groupBy(containerId).setPersistent(true));
 		this.containerId = containerId;
 		this.uri = uri;
 		this.imageName = imageName;
@@ -51,6 +50,8 @@ public class UploadImageJob extends Job {
 //		// Notify to fragment upload that image is being uploaded.
 //		EventBus.getDefault().post(new UploadingEvent(containerId, UploadType.IMAGE));
 
+		Logger.Log(containerId + " | Uploading image: " + imageName);
+
 		// Call data center to upload image
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).uploadImage(context, uri, imageName, containerId, imageType);
@@ -70,7 +71,6 @@ public class UploadImageJob extends Job {
 
 	@Override
 	protected boolean shouldReRunOnThrowable(Throwable throwable) {
-
 		return true;
 	}
 }
