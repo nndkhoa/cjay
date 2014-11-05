@@ -1,6 +1,5 @@
 package com.cloudjay.cjay.task.service;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
@@ -172,12 +171,12 @@ public class PubnubService extends Service {
 				// Log out instantly
 				Utils.logOut(getApplicationContext());
 			}
-		}
 
-		String[] channels = new String[]{depotChannel, uuidChannel};
+			String[] channels = new String[]{depotChannel, uuidChannel};
 
-		try {
-			pubnub.subscribe(channels, new Callback() {
+			// TODO: does it need to check if pubnub is already subcribed or not?
+			try {
+				pubnub.subscribe(channels, new Callback() {
 
 //				@Override
 //				public void connectCallback(String channel, Object message) {
@@ -199,21 +198,23 @@ public class PubnubService extends Service {
 //							+ message.toString());
 //				}
 
-				@Override
-				public void successCallback(String channel, Object message) {
+					@Override
+					public void successCallback(String channel, Object message) {
 //					Logger.Log("Success: " + message.toString());
-					notifyUser(uuidChannel, message);
-				}
+						notifyUser(uuidChannel, message);
+					}
 
-				@Override
-				public void errorCallback(String channel, PubnubError pubnubError) {
-					Logger.e("Error: " + pubnubError.toString());
-					notifyUser(uuidChannel, pubnubError.toString());
-				}
-			});
+					@Override
+					public void errorCallback(String channel, PubnubError pubnubError) {
+						Logger.e("Error: " + pubnubError.toString());
+						notifyUser(uuidChannel, pubnubError.toString());
+					}
+				});
 
-		} catch (PubnubException e) {
-			e.printStackTrace();
+			} catch (PubnubException e) {
+				Logger.e(e.getMessage());
+				dataCenter.addLog(getApplicationContext(), "PubNub", "Cannot subscribe channels");
+			}
 		}
 	}
 }

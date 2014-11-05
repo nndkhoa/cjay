@@ -21,6 +21,7 @@ public class QueueIntentService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
+
 		try {
 			String token = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_TOKEN);
 
@@ -31,7 +32,8 @@ public class QueueIntentService extends IntentService {
 
 		} catch (SnappydbException e) {
 			e.printStackTrace();
-		} catch (RetrofitError e){
+
+		} catch (RetrofitError e) {
 			e.printStackTrace();
 			Utils.cancelAlarm(getApplicationContext());
 		}

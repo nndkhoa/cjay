@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
@@ -99,8 +100,8 @@ public class Utils {
 		// Configure Pubnub Service
 
 		String token = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_TOKEN);
-
 		if (!TextUtils.isEmpty(token)) {
+
 			Intent pubnubIntent = new Intent(context, PubnubService_.class);
 			PendingIntent pPubnubIntent = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -121,8 +122,16 @@ public class Utils {
 		Intent queueIntent = new Intent(context, QueueIntentService_.class);
 		Intent pubnubIntent = new Intent(context, PubnubService_.class);
 
-		if (PendingIntent.getService(context, CJayConstant.ALARM_QUEUE_ID, queueIntent, PendingIntent.FLAG_NO_CREATE) != null &&
-				PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_NO_CREATE) != null)
+		boolean queueUp = PendingIntent.getService(context, CJayConstant.ALARM_QUEUE_ID, queueIntent, PendingIntent.FLAG_NO_CREATE) != null;
+		boolean pubnubUp = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_NO_CREATE) != null;
+
+		if (!queueUp)
+			Logger.w("Queue Service is not running");
+
+		if (!pubnubUp)
+			Logger.w("Pubnub Service is not running");
+
+		if (queueUp && pubnubUp)
 			return true;
 		else
 			return false;
@@ -188,7 +197,8 @@ public class Utils {
 	public static void showCrouton(Activity context, String message, Style style) {
 		Crouton.cancelAllCroutons();
 		final Crouton crouton = Crouton.makeText(context, message, style);
-		crouton.setConfiguration(new de.keyboardsurfer.android.widget.crouton.Configuration.Builder().setDuration(de.keyboardsurfer.android.widget.crouton.Configuration.DURATION_INFINITE).build());
+		crouton.setConfiguration(new Configuration.Builder()
+				.setDuration(Configuration.DURATION_SHORT).build());
 		crouton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -471,11 +481,11 @@ public class Utils {
 
 	public static boolean canReachInternet() {
 
-        //StackTraceElement[] trace = new Throwable().getStackTrace();
-        //Logger.Log(trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
+		//StackTraceElement[] trace = new Throwable().getStackTrace();
+		//Logger.Log(trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
 
 
-        Runtime runtime = Runtime.getRuntime();
+		Runtime runtime = Runtime.getRuntime();
 
 		try {
 			Process mIpAddrProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");

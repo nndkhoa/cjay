@@ -25,7 +25,6 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringUtils;
-import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
@@ -723,6 +722,17 @@ public class DataCenter {
 		}
 	}
 
+	/**
+	 *
+	 * Change upload status of given image
+	 *
+	 * @param context
+	 * @param containerId
+	 * @param imageName
+	 * @param imageType
+	 * @param status
+	 * @throws SnappydbException
+	 */
 	private void setImageUploadStatus(Context context, String containerId, String imageName, ImageType imageType, UploadStatus status) throws SnappydbException {
 
 		Logger.Log("imageName: " + imageName);
@@ -741,20 +751,23 @@ public class DataCenter {
 						for (AuditImage auditImage : auditItem.getListIssueImages()) {
 
 							Logger.Log("auditImage: " + auditImage.getName());
-
-							if (auditImage.getName().equals(imageName) && auditImage.getType() == imageType.value) {
-								auditImage.setUploadStatus(status);
+							if (auditImage.getName() != null) {
+								if (auditImage.getName().contains(imageName) && auditImage.getType() == imageType.value) {
+									auditImage.setUploadStatus(status);
+								}
 							}
 						}
 					}
+
 				case REPAIRED:
 					for (AuditItem auditItem : session.getAuditItems()) {
 						for (AuditImage auditImage : auditItem.getListRepairedImages()) {
 
 							Logger.Log("auditImage: " + auditImage.getName());
-
-							if (auditImage.getName().equals(imageName) && auditImage.getType() == imageType.value) {
-								auditImage.setUploadStatus(status);
+							if (auditImage.getName() != null) {
+								if (auditImage.getName().contains(imageName) && auditImage.getType() == imageType.value) {
+									auditImage.setUploadStatus(status);
+								}
 							}
 						}
 					}
@@ -764,18 +777,22 @@ public class DataCenter {
 				case EXPORT:
 				default:
 					for (GateImage gateImage : session.getGateImages()) {
-						if (gateImage.getName().equals(imageName) && gateImage.getType() == imageType.value) {
-							Logger.Log(imageName + " " + gateImage.getType());
-							gateImage.setUploadStatus(status);
-							break;
+						if (gateImage.getName() != null) {
+							if (gateImage.getName().contains(imageName) && gateImage.getType() == imageType.value) {
+								Logger.Log(imageName + " | " + gateImage.getType());
+								gateImage.setUploadStatus(status);
+								break;
+							}
 						}
 					}
 					break;
 			}
 
 			db.put(key, session);
-		}
 
+			Session tmp = db.getObject(key, Session.class);
+			Logger.logJson(tmp);
+		}
 	}
 
 	/**
@@ -799,7 +816,7 @@ public class DataCenter {
 		if (result != null) {
 			//merge session
 			oldSession.mergeSession(result);
-            Logger.Log("Session id: " + oldSession.getId());
+			Logger.Log("Session id: " + oldSession.getId());
 
 			// Update container back to database
 			String key = result.getContainerId();
@@ -1259,13 +1276,13 @@ public class DataCenter {
 			}
 		}
 
-        for (int i = 0; i < list.size(); i++) {
+		for (int i = 0; i < list.size(); i++) {
 
-            if (list.get(i).getAuditItemUUID().equals(item.getAuditItemUUID())) {
-                Logger.Log("remove this");
-                list.remove(i);
-            }
-        }
+			if (list.get(i).getAuditItemUUID().equals(item.getAuditItemUUID())) {
+				Logger.Log("remove this");
+				list.remove(i);
+			}
+		}
 
 		if (!isExisted) {
 

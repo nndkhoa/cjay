@@ -121,7 +121,7 @@ public class BaseActivity extends FragmentActivity {
 
 	@UiThread
 	public void onEvent(ContainersFetchedEvent event) {
-		Utils.showCrouton(this, "All sessions are fetched", Style.INFO);
+		Utils.showCrouton(this, "All sessions are fetched", Style.CONFIRM);
 	}
 
 	public void onEvent(UserLoggedOutEvent event) {
