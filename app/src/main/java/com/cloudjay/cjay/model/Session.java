@@ -429,7 +429,8 @@ public class Session {
 	 * @return
 	 * @throws JSONException
 	 */
-	public JsonArray getRepairedAuditItemToUpLoad() {
+	public JsonObject getRepairedAuditItemToUpLoad() {
+		JsonObject auditItemsPut = new JsonObject();
 		JsonArray auditItems = new JsonArray();
 		for (AuditItem auditItem : this.auditItems) {
 			JsonObject jsonObject = new JsonObject();
@@ -439,7 +440,8 @@ public class Session {
 			JsonArray repairedImageName = auditItem.getRepairedImageToUpLoad();
 			jsonObject.add("repair_images", repairedImageName);
 		}
-		return auditItems;
+		auditItemsPut.add("audit_items",auditItems);
+		return auditItemsPut;
 	}
 
 

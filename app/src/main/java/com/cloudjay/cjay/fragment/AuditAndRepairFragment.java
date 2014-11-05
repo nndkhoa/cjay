@@ -20,6 +20,7 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.path.android.jobqueue.JobManager;
 
@@ -83,6 +84,9 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		EventBus.getDefault().register(this);
+
+		mSession = dataCenter.getSession(getActivity(), containerID);
+		Logger.Log("current step: " + mSession.getLocalStep());
 	}
 
 	@Override
@@ -186,9 +190,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	@AfterViews
 	void doAfterViews() {
 
-        mSession = dataCenter.getSession(getActivity(), containerID);
-        Logger.Log("current step: " + mSession.getLocalStep());
-
 		configureActionBar();
 		configureViewPager();
         if (mSession != null) {
@@ -269,6 +270,12 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
         //requery to update button
         mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
-		checkForShowButton();
+
+        int imageType = event.getImageType();
+        if (imageType == ImageType.AUDIT.value) {
+            mSession.setLocalStep(Step.AUDIT.value);
+            dataCenter.addSession(mSession);
+        }
+        checkForShowButton();
 	}
 }
