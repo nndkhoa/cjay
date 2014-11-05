@@ -757,6 +757,8 @@ public class DataCenter {
 								if (auditImage.getName().contains(imageName) && auditImage.getType() == imageType.value) {
 									auditImage.setUploadStatus(status);
 								}
+							} else {
+								Logger.wtf(auditImage.getUrl() + " does not have image name");
 							}
 						}
 					}
@@ -770,6 +772,8 @@ public class DataCenter {
 								if (auditImage.getName().contains(imageName) && auditImage.getType() == imageType.value) {
 									auditImage.setUploadStatus(status);
 								}
+							} else {
+								Logger.wtf(auditImage.getUrl() + " does not have image name");
 							}
 						}
 					}
@@ -788,6 +792,8 @@ public class DataCenter {
 								gateImage.setUploadStatus(status);
 								break;
 							}
+						} else {
+							Logger.wtf(gateImage.getUrl() + " does not have image name");
 						}
 					}
 					break;
