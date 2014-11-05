@@ -331,6 +331,7 @@ public class NetworkClient {
 	 * @return
 	 */
 	public Session completeRepairSession(Context context, Session containerSession) {
+		Logger.e(containerSession.getRepairedAuditItemToUpLoad().toString());
 		Session completeRepairSession = provider.getRestAdapter(context).create(NetworkService.class).completeRepair(containerSession.getId(), containerSession.getRepairedAuditItemToUpLoad());
 		return completeRepairSession;
 	}

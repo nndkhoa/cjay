@@ -436,7 +436,7 @@ public class Session {
 		for (AuditItem auditItem : this.auditItems) {
 			JsonObject jsonObject = new JsonObject();
 			long auditId = auditItem.getId();
-			jsonObject.addProperty("name", auditId);
+			jsonObject.addProperty("id", auditId);
 			auditItems.add(jsonObject);
 			JsonArray repairedImageName = auditItem.getRepairedImageToUpLoad();
 			jsonObject.add("repair_images", repairedImageName);
