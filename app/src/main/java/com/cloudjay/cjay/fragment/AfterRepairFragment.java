@@ -122,6 +122,11 @@ public class AfterRepairFragment extends Fragment {
     @Click(R.id.btn_camera_repaired)
     void openCameraActivity(){
 
+        if (!auditItem.isIsAllowed()) {
+            Utils.showCrouton(getActivity(), "Loi nay khong duoc phep sua");
+            return;
+        }
+
         Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
         cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
         cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);

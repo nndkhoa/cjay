@@ -321,20 +321,14 @@ public class DataCenter {
 	public Session getSessionById(Context context, long id) throws SnappydbException {
 
 		DB db = App.getDB(context);
-		GsonBuilder builder = new GsonBuilder();
-		Gson gson = builder.create();
 
 		Session session = networkClient.getSessionById(id);
-		Session localSession = db.getObject( session.getContainerId(),Session.class);
-
-		Logger.Log("server session: " + gson.toJson(session));
-		Logger.Log("local session: " + gson.toJson(localSession));
+		Session localSession = getSession(context, session.getContainerId());
 
 		if (localSession == null) {
 			addSession(session);
 		} else {
 			localSession.mergeSession(session);
-			Logger.Log("merged session: " + gson.toJson(localSession));
 			db.put(session.getContainerId(), localSession);
 		}
 		return localSession;
@@ -1206,32 +1200,27 @@ public class DataCenter {
 	 * @throws SnappydbException
 	 */
 	public void uploadRepairedSession(Context context, String containerId) throws SnappydbException {
-		try {// Upload complete repair session to server
-			DB db = App.getDB(context);GsonBuilder builder = new GsonBuilder();
 
-			Session oldSession = db.getObject(containerId, Session.class);
-			Session result = networkClient.completeRepairSession(context, oldSession);
+		// Upload complete repair session to server
+		DB db = App.getDB(context);
+		Session oldSession = db.getObject(containerId, Session.class);
+		Session result = networkClient.completeRepairSession(context, oldSession);
+		Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
-			if (result != null) {
+		if (result != null) {
 
-				// Update container back to database
-				String key = result.getContainerId();
-				oldSession.setUploadStatus(UploadStatus.COMPLETE);
-				oldSession.mergeSession(result);
-				db.put(key, result);
+			// Update container back to database
+			String key = result.getContainerId();
+			oldSession.setUploadStatus(UploadStatus.COMPLETE);
+			oldSession.mergeSession(result);
+			db.put(key, result);
 
-				// Then remove them from WORKING
-				String workingKey = CJayConstant.PREFIX_WORKING + key;
-				db.del(workingKey);
-			}
-
-			EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
-		} catch (RetrofitError error) {
-			GsonBuilder builder = new GsonBuilder();
-			Gson gson = builder.create();
-
-			Logger.Log("result: " + gson.toJson(error));
+			// Then remove them from WORKING
+			String workingKey = CJayConstant.PREFIX_WORKING + key;
+			db.del(workingKey);
 		}
+
+		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
 	}
 
 	/**

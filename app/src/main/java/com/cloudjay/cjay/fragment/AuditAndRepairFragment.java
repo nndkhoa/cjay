@@ -166,7 +166,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 		// Add containerId to upload complete repair queue
 		// PUT /api/cjay/containers/{pk}/complete-repair
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getStep(), true));
+		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), true));
 
 		// Navigate to HomeActivity
 		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
