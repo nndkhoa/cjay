@@ -117,7 +117,6 @@ public class UploadSessionJob extends Job {
 	@Override
 	public void onRun() throws Throwable {
 
-
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
 
@@ -125,6 +124,8 @@ public class UploadSessionJob extends Job {
 		EventBus.getDefault().post(new UploadingEvent(containerId, UploadType.SESSION));
 
 		Step step = Step.values()[currentStep];
+		Logger.Log(" >> Uploading container " + containerId + " | " + step.name());
+
 		switch (step) {
 			case AVAILABLE:
 
