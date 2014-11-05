@@ -321,14 +321,20 @@ public class DataCenter {
 	public Session getSessionById(Context context, long id) throws SnappydbException {
 
 		DB db = App.getDB(context);
+		GsonBuilder builder = new GsonBuilder();
+		Gson gson = builder.create();
 
 		Session session = networkClient.getSessionById(id);
-		Session localSession = getSession(context, session.getContainerId());
+		Session localSession = db.getObject( session.getContainerId(),Session.class);
+
+		Logger.Log("server session: " + gson.toJson(session));
+		Logger.Log("local session: " + gson.toJson(localSession));
 
 		if (localSession == null) {
 			addSession(session);
 		} else {
 			localSession.mergeSession(session);
+			Logger.Log("merged session: " + gson.toJson(localSession));
 			db.put(session.getContainerId(), localSession);
 		}
 		return localSession;
@@ -1201,10 +1207,10 @@ public class DataCenter {
 	 */
 	public void uploadRepairedSession(Context context, String containerId) throws SnappydbException {
 		try {// Upload complete repair session to server
-			DB db = App.getDB(context);
+			DB db = App.getDB(context);GsonBuilder builder = new GsonBuilder();
+
 			Session oldSession = db.getObject(containerId, Session.class);
 			Session result = networkClient.completeRepairSession(context, oldSession);
-			Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
 			if (result != null) {
 
@@ -1221,8 +1227,10 @@ public class DataCenter {
 
 			EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
 		} catch (RetrofitError error) {
-			Logger.e(error.getResponse().getHeaders().toString());
-			Logger.e(error.getResponse().getBody().mimeType());
+			GsonBuilder builder = new GsonBuilder();
+			Gson gson = builder.create();
+
+			Logger.Log("result: " + gson.toJson(error));
 		}
 	}
 

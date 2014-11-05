@@ -490,6 +490,8 @@ public class AuditItem {
 		List<AuditImage> mergedAuditImages = this.auditImages;
 		for (AuditImage auditImage : this.auditImages) {
 			for (AuditImage auditImageServer : auditItemServer.getAuditImages()) {
+				Logger.e(auditImage.getName());
+				Logger.e(auditImageServer.getUrl());
 				if (auditImage.getName().equals(Utils.getImageNameFromUrl(auditImageServer.getUrl()))) {
 					auditImage.mergeAuditImage(auditImageServer);
 				}

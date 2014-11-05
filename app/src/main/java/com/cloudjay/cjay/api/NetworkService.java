@@ -65,7 +65,7 @@ public interface NetworkService {
 	public Session completeAudit(@Path("id") long containerPk);
 
 	@PUT(ApiEndpoint.CONTAINER_SESSION_COMPLETE_REPAIR_API)
-	public Session completeRepair(@Path("id") long containerPk, @Body JsonArray audit_items);
+	public Session completeRepair(@Path("id") long containerPk, @Body JsonObject audit_items);
 
 	@PUT(ApiEndpoint.CONTAINER_SESSION_POST_AUDIT_ITEM_API)
 	public Session postAudiItem(@Path("id") long containerPk, @Body JsonObject audit_item);

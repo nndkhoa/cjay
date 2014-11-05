@@ -83,6 +83,9 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		EventBus.getDefault().register(this);
+
+		mSession = dataCenter.getSession(getActivity(), containerID);
+		Logger.Log("current step: " + mSession.getLocalStep());
 	}
 
 	@Override
@@ -185,9 +188,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 	@AfterViews
 	void doAfterViews() {
-
-        mSession = dataCenter.getSession(getActivity(), containerID);
-        Logger.Log("current step: " + mSession.getLocalStep());
 
 		configureActionBar();
 		configureViewPager();
