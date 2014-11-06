@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.activity.HomeActivity;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
@@ -35,6 +37,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.ItemLongClick;
 import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
@@ -144,6 +147,18 @@ public class SearchFragment extends Fragment {
 		intent.putExtra(WizardActivity.STEP_EXTRA, item.getLocalStep());
 		startActivity(intent);
 	}
+
+	@ItemLongClick(R.id.lv_search_container)
+	void showexportImmediatelyButton(int position) {
+
+		//Get session from position
+		Session item = mAdapter.getItem(position);
+		HomeActivity activity = (HomeActivity) getActivity();
+		activity.exportSessionContainerId = item.getContainerId();
+		activity.showMenuExportImmediately(true);
+
+	}
+
 
 	/**
 	 * Hiển thị kết quả không tìm thấy container

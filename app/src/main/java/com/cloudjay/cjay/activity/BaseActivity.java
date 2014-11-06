@@ -11,12 +11,17 @@ import android.view.Window;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.UserLoggedOutEvent;
 import com.cloudjay.cjay.event.session.ContainersFetchedEvent;
+import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.enums.Step;
+import com.path.android.jobqueue.JobManager;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
@@ -24,6 +29,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.Method;
 
@@ -39,12 +45,19 @@ public class BaseActivity extends FragmentActivity {
 	public DataCenter getDataCenter() {
 		return dataCenter;
 	}
+	public String exportSessionContainerId;
+
+	private Menu menu;
+
+	MenuItem exportMenu;
+
 
 	@Bean
 	DataCenter dataCenter;
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		this.menu = menu;
 		getMenuInflater().inflate(R.menu.base, menu);
 
 		String name = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_USER_NAME);
@@ -53,7 +66,12 @@ public class BaseActivity extends FragmentActivity {
 		menu.findItem(R.id.menu_username).setTitle(name);
 		menu.findItem(R.id.menu_role).setTitle(roleName);
 
+		exportMenu = menu.findItem(R.id.menu_export);
+
 		return true;
+	}
+	public void showMenuExportImmediately(boolean show){
+		exportMenu.setVisible(show);
 	}
 
 	@Override
@@ -63,6 +81,21 @@ public class BaseActivity extends FragmentActivity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	@OptionsItem(R.id.menu_export)
+	void exportSession(){
+		//Export session immediately
+		Session session = dataCenter.getSession(this,exportSessionContainerId);
+		Step step = Step.values()[session.getLocalStep()];
+		if (session.isValidToUpload(step)){
+			//Add upload sesion to job
+			JobManager jobManager = App.getJobManager();
+			jobManager.addJobInBackground(new UploadSessionJob(exportSessionContainerId,Step.EXPORTIMMEDIATELY.value, true));
+		} else {
+			Utils.showCrouton(this,"Container này không thể xuất chỉ định");
+		}
+		exportMenu.setVisible(false);
+
 	}
 
 	@OptionsItem(R.id.menu_logout)

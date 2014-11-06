@@ -321,20 +321,14 @@ public class DataCenter {
 	public Session getSessionById(Context context, long id) throws SnappydbException {
 
 		DB db = App.getDB(context);
-		GsonBuilder builder = new GsonBuilder();
-		Gson gson = builder.create();
 
 		Session session = networkClient.getSessionById(id);
-		Session localSession = db.getObject( session.getContainerId(),Session.class);
-
-		Logger.Log("server session: " + gson.toJson(session));
-		Logger.Log("local session: " + gson.toJson(localSession));
+		Session localSession = db.getObject(session.getContainerId(), Session.class);
 
 		if (localSession == null) {
 			addSession(session);
 		} else {
 			localSession.mergeSession(session);
-			Logger.Log("merged session: " + gson.toJson(localSession));
 			db.put(session.getContainerId(), localSession);
 		}
 		return localSession;
@@ -1207,7 +1201,11 @@ public class DataCenter {
 	 */
 	public void uploadRepairedSession(Context context, String containerId) throws SnappydbException {
 		try {// Upload complete repair session to server
-			DB db = App.getDB(context);GsonBuilder builder = new GsonBuilder();
+			DB db = App.getDB(context);
+			GsonBuilder builder = new GsonBuilder();
+
+			GsonBuilder builder1 = new GsonBuilder();
+			Gson gson = builder.create();
 
 			Session oldSession = db.getObject(containerId, Session.class);
 			Session result = networkClient.completeRepairSession(context, oldSession);
@@ -1290,7 +1288,7 @@ public class DataCenter {
 		boolean isExisted = false;
 		List<AuditItem> list = session.getAuditItems();
 		for (int i = 0; i < list.size(); i++) {
-            // neu da ton tai loi ve sinh va chua duoc upload thi them hinh vao loi ve sinh
+			// neu da ton tai loi ve sinh va chua duoc upload thi them hinh vao loi ve sinh
 			if (list.get(i).isWashTypeItem() && list.get(i).getId() == 0) {
 				list.get(i).getAuditImages().add(item.getAuditImages().get(0));
 				isExisted = true;
@@ -1573,6 +1571,12 @@ public class DataCenter {
 		Session session = getSessionById(context, sessionId);
 		return session;
 
+	}
+
+	public void exportSessionImmediately(Context context, String containerId) {
+		Logger.Log("Export Immediately container: "+containerId);
+		Session session = getSession(context, containerId);
+		Session result = networkClient.exportSessionImmediately(context,session);
 	}
 	//endregion
 }
