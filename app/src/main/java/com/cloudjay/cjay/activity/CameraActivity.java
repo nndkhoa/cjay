@@ -94,7 +94,7 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 				&& current != null
 				&& !current.isSingleShotProcessing()) {
 
-			current.takePicture();
+			current.takeSimplePicture();
 			return (true);
 
 		}
