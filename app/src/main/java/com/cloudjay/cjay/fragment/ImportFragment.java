@@ -19,7 +19,9 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
+import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
+import com.cloudjay.cjay.event.EventMenuCreated;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.operator.OperatorChosenEvent;
 import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
@@ -296,7 +298,6 @@ public class ImportFragment extends Fragment {
 
         // Update session into database
         dataCenter.addSession(mSession);
-        dataCenter.addWorkingSession(mSession);
 
 		// Navigate to HomeActivity
 //		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
@@ -355,4 +356,9 @@ public class ImportFragment extends Fragment {
 		}
 	}
 	//endregion
+
+	public void onEvent(EventMenuCreated event) {
+		WizardActivity activity = (WizardActivity) getActivity();
+		activity.showMenuExportImmediately(false);
+	}
 }

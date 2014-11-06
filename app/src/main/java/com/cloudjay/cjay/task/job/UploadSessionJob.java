@@ -70,23 +70,19 @@ public class UploadSessionJob extends Job {
 			dataCenter.addUploadSession(containerId);
 
 			dataCenter.changeUploadState(context, containerId, UploadStatus.UPLOADING);
-			//dataCenter.changeSessionLocalStep(context, containerId, Step.AUDIT);
 
 			Step step = Step.values()[currentStep];
 			switch (step) {
 				case EXPORTED:
 
-					dataCenter.addLog(context, containerId, "EXPORTED | Bắt đầu quá trình upload");
 					dataCenter.changeSessionLocalStep(context, containerId, Step.EXPORTED);
 					break;
 
 				case AUDIT:
-					dataCenter.addLog(context, containerId, "AUDIT | Bắt đầu quá trình upload");
 					dataCenter.changeSessionLocalStep(context, containerId, Step.REPAIR);
 					break;
 
 				case REPAIR:
-					dataCenter.addLog(context, containerId, "REPAIR | Bắt đầu quá trình upload");
 					dataCenter.changeSessionLocalStep(context, containerId, Step.AVAILABLE);
 					break;
 
@@ -97,11 +93,9 @@ public class UploadSessionJob extends Job {
                             dataCenter.changeSessionLocalStep(context, containerId, Step.AUDIT);
                         }
                     }
-
 					break;
 
 				default:
-					dataCenter.addLog(context, containerId, "HAND CLEANING | Bắt đầu quá trình upload");
 					dataCenter.changeSessionLocalStep(context, containerId, Step.AVAILABLE);
 					break;
 			}

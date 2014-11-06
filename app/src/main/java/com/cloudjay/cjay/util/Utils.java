@@ -289,36 +289,6 @@ public class Utils {
 	}
 
 	/**
-	 * Convert container session json to Session Object.
-	 * Need to check if container is existed or not. (should use insert or update concept)
-	 *
-	 * @param context
-	 * @param session
-	 * @return
-	 */
-	public static Session parseSession(Context context, Session session) throws SnappydbException {
-
-		//Check available session
-		DB snappyDb = App.getDB(context);
-		Session found = snappyDb.getObject(session.getContainerId(), Session.class);
-
-		// If hasn't -> create
-		if (found == null) {
-			snappyDb.put(session.getContainerId(), session);
-			return session;
-		}
-
-		// else -> update
-		else {
-			snappyDb.del(session.getContainerId());
-			snappyDb.put(session.getContainerId(), session);
-			return session;
-		}
-
-
-	}
-
-	/**
 	 * Count total image off session
 	 *
 	 * @param session

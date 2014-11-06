@@ -323,6 +323,7 @@ public class DataCenter {
 		DB db = App.getDB(context);
 
 		Session session = networkClient.getSessionById(id);
+
 		Session localSession = getSession(context, session.getContainerId());
 
 		if (localSession == null) {
@@ -1284,7 +1285,7 @@ public class DataCenter {
 		boolean isExisted = false;
 		List<AuditItem> list = session.getAuditItems();
 		for (int i = 0; i < list.size(); i++) {
-            // neu da ton tai loi ve sinh va chua duoc upload thi them hinh vao loi ve sinh
+			// neu da ton tai loi ve sinh va chua duoc upload thi them hinh vao loi ve sinh
 			if (list.get(i).isWashTypeItem() && list.get(i).getId() == 0) {
 				list.get(i).getAuditImages().add(item.getAuditImages().get(0));
 				isExisted = true;
@@ -1568,5 +1569,6 @@ public class DataCenter {
 		return session;
 
 	}
+
 	//endregion
 }

@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.activity.HomeActivity;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
@@ -22,6 +23,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.ItemLongClick;
 import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
@@ -67,6 +69,17 @@ public class WorkingFragment extends Fragment {
 		intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, item.getContainerId());
 		intent.putExtra(WizardActivity.STEP_EXTRA, item.getLocalStep());
 		startActivity(intent);
+	}
+
+	@ItemLongClick(R.id.lv_working_container)
+	void showexportImmediatelyButton(int position) {
+
+		//Get session from position
+		Session item = mAdapter.getItem(position);
+		HomeActivity activity = (HomeActivity) getActivity();
+		activity.exportSessionContainerId = item.getContainerId();
+		activity.showMenuExportImmediately(true);
+
 	}
 
 	/**
