@@ -21,8 +21,8 @@ apply plugin: 'crashlytics'
 def versionMajor = 2
 def versionMinor = 0
 def versionPatch = 0
-def versionBuild = 0 // bump for dogfood builds, public betas, etc.
-def versionTag = 'alpha'
+def versionBuild = 0
+def versionTag = '-alpha' // bump for dogfood builds, public betas, etc.
 
 def gitSha = 'git rev-parse --short HEAD'.execute([], project.rootDir).text.trim()
 def buildTime = new Date().format("yyyy-MM-dd'T'HH:mm'Z'", TimeZone.getTimeZone("UTC"))
@@ -36,6 +36,29 @@ android {
     compileSdkVersion 19
     buildToolsVersion '19.1.0'
 
+    // Generate version build from file
+    def Properties versionProps = new Properties()
+    def versionPropsFile = file('version.properties')
+    if (versionPropsFile.exists())
+        versionProps.load(new FileInputStream(versionPropsFile))
+
+    versionBuild = (versionProps['VERSION_CODE'] ?: "0").toInteger() + 1
+    versionProps['VERSION_CODE'] = versionBuild.toString()
+    versionProps.store(versionPropsFile.newWriter(), null)
+
+    defaultConfig {
+
+        applicationId 'com.cloudjay.cjay'
+        minSdkVersion 16
+        targetSdkVersion 16
+
+        versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}${versionTag}"
+
+        buildConfigField "String", "GIT_SHA", "\"${gitSha}\""
+        buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
+    }
+
     dexOptions {
         // Skip pre-dexing when running on Travis CI or when disabled via -Dpre-dex=false.
         preDexLibraries = preDexEnabled && !isTravis
@@ -46,22 +69,21 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
 
-    defaultConfig {
-
-        applicationId 'com.cloudjay.cjay'
-        minSdkVersion 16
-        targetSdkVersion 16
-
-        versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
-        versionName "${versionMajor}.${versionMinor}.${versionPatch}.${versionTag}"
-
-        buildConfigField "String", "GIT_SHA", "\"${gitSha}\""
-        buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
-    }
     buildTypes {
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            applicationVariants.all { variant ->
+
+                def file = variant.outputFile
+                def date = new Date();
+                def formattedDate = date.format('yyyyMMddHHmmss')
+                variant.outputFile = new File(
+                        file.parent,
+                        file.name.replace("app-release", "CJay-" + defaultConfig.versionName + '-' + formattedDate)
+                )
+            }
         }
 
         debug {
@@ -88,7 +110,6 @@ dependencies {
     compile 'com.android.support:support-v4:20.0.0'
     compile 'eu.inmite.android.lib:android-styled-dialogs:1.2.0'
     compile 'com.crashlytics.android:crashlytics:1.+'
-//    compile 'com.path:android-priority-jobqueue:1.1.2'
     compile 'com.netflix.rxjava:rxjava-core:0.16.1'
     compile 'com.netflix.rxjava:rxjava-android:0.16.1'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.3'

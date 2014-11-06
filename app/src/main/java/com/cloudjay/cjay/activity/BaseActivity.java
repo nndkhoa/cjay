@@ -100,7 +100,7 @@ public class BaseActivity extends FragmentActivity {
 			}
 
 		} else {
-			Utils.showCrouton(this,"Container này không thể xuất chỉ định");
+			Utils.showCrouton(this,"Hoàn tất bước hiện tại để xuất chỉ định");
 		}
 		exportMenu.setVisible(false);
 

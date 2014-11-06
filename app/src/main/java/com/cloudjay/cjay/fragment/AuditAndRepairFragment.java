@@ -170,7 +170,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 		// Navigate to HomeActivity
 		getActivity().finish();
-
 //	     /* Remove all tabs */
 //		actionBar.removeAllTabs();
 //		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);

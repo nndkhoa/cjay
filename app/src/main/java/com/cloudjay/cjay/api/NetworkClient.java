@@ -446,8 +446,4 @@ public class NetworkClient {
 //		Logger.Log(response.getBody().toString());
 	}
 
-	public Session exportSessionImmediately(Context context, Session session) {
-		//TODO add server method @Thai
-		return null;
-	}
 }

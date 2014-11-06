@@ -323,7 +323,8 @@ public class DataCenter {
 		DB db = App.getDB(context);
 
 		Session session = networkClient.getSessionById(id);
-		Session localSession = db.getObject(session.getContainerId(), Session.class);
+
+		Session localSession = getSession(context, session.getContainerId());
 
 		if (localSession == null) {
 			addSession(session);
@@ -1200,36 +1201,27 @@ public class DataCenter {
 	 * @throws SnappydbException
 	 */
 	public void uploadRepairedSession(Context context, String containerId) throws SnappydbException {
-		try {// Upload complete repair session to server
-			DB db = App.getDB(context);
-			GsonBuilder builder = new GsonBuilder();
 
-			GsonBuilder builder1 = new GsonBuilder();
-			Gson gson = builder.create();
+		// Upload complete repair session to server
+		DB db = App.getDB(context);
+		Session oldSession = db.getObject(containerId, Session.class);
+		Session result = networkClient.completeRepairSession(context, oldSession);
+		Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
-			Session oldSession = db.getObject(containerId, Session.class);
-			Session result = networkClient.completeRepairSession(context, oldSession);
+		if (result != null) {
 
-			if (result != null) {
+			// Update container back to database
+			String key = result.getContainerId();
+			oldSession.setUploadStatus(UploadStatus.COMPLETE);
+			oldSession.mergeSession(result);
+			db.put(key, result);
 
-				// Update container back to database
-				String key = result.getContainerId();
-				oldSession.setUploadStatus(UploadStatus.COMPLETE);
-				oldSession.mergeSession(result);
-				db.put(key, result);
-
-				// Then remove them from WORKING
-				String workingKey = CJayConstant.PREFIX_WORKING + key;
-				db.del(workingKey);
-			}
-
-			EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
-		} catch (RetrofitError error) {
-			GsonBuilder builder = new GsonBuilder();
-			Gson gson = builder.create();
-
-			Logger.Log("result: " + gson.toJson(error));
+			// Then remove them from WORKING
+			String workingKey = CJayConstant.PREFIX_WORKING + key;
+			db.del(workingKey);
 		}
+
+		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
 	}
 
 	/**
@@ -1573,10 +1565,5 @@ public class DataCenter {
 
 	}
 
-	public void forceExportSession(Context context, String containerId) {
-		Logger.Log("Export Immediately container: "+containerId);
-		Session session = getSession(context, containerId);
-		Session result = networkClient.exportSessionImmediately(context,session);
-	}
 	//endregion
 }

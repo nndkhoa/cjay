@@ -128,9 +128,12 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 	@Click(R.id.btn_capture)
 	void btnTakePictureClicked() {
-		btnTakePicture.setEnabled(false);
-        btnDone.setEnabled(false);
-		autoFocus();
+
+        takeSimplePicture();
+
+		//btnTakePicture.setEnabled(false);
+        //btnDone.setEnabled(false);
+		//autoFocus();
 	}
 
 	@Click(R.id.btn_capture_mode)
@@ -441,7 +444,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
             btnTakePicture.setEnabled(true);
             btnDone.setEnabled(true);
 
-			takeSimplePicture();
+			//takeSimplePicture();
 
 		}
 

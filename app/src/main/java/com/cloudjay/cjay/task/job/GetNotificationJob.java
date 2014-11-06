@@ -72,8 +72,8 @@ public class GetNotificationJob extends Job {
 
 		NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		Notification notification = new Notification.Builder(context).setContentTitle("Đã cập nhật thông tin")
-				.setContentText(session.getContainerId())
-				.setSmallIcon(R.drawable.ic_app_360)
+				.setContentText(" → Container " + session.getContainerId())
+				.setSmallIcon(R.drawable.ic_app_small)
 				.setAutoCancel(true)
 				.setDefaults(Notification.DEFAULT_SOUND).build();
 
