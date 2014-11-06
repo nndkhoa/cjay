@@ -70,8 +70,9 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	public final static String OPERATOR_CODE_EXTRA = "com.cloudjay.wizard.operatorCode";
 	public final static String IMAGE_TYPE_EXTRA = "com.cloudjay.wizard.imageType";
 	public final static String CURRENT_STEP_EXTRA = "com.cloudjay.wizard.currentStep";
-	// This Extra bundle is use to open Detail Issue Activity only
+	// These Extra bundles is use to open Detail Issue Activity only
 	public final static String AUDIT_ITEM_UUID_EXTRA = "com.cloudjay.wizard.auditItemUUID";
+    public final static String IS_OPENED = "com.cloudjay.wizard.isOpened";
 
 	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
 	private boolean singleShotProcessing = false;
@@ -90,6 +91,9 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 	@FragmentArg(AUDIT_ITEM_UUID_EXTRA)
 	String auditItemUUID;
+
+    @FragmentArg(IS_OPENED)
+    boolean isOpened;
 
 	@Bean
 	DataCenter dataCenter;
@@ -122,7 +126,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 	@Click(R.id.btn_camera_done)
 	void btnDoneClicked() {
-		EventBus.getDefault().post(new ImageCapturedEvent(containerId, mType, auditItemUUID));
+		EventBus.getDefault().post(new ImageCapturedEvent(containerId, mType, auditItemUUID, isOpened));
 		getActivity().finish();
 	}
 
@@ -168,6 +172,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
 	@AfterViews
 	void afterView() {
+
+        Logger.Log("isOpened: " + isOpened);
 
 		// Config shot mode. Default is FALSE.
 		// Configure View visibility based on current step of session

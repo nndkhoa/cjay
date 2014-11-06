@@ -140,15 +140,18 @@ public class IssuePendingFragment extends Fragment {
 			case REPAIRED:
 			default:
 
-				Logger.Log("Open AfterRepair Fragment");
-				String auditItemUUID = event.getAuditItemUUID();
-				AuditItem auditItem = dataCenter.getAuditItemByUUID(getActivity(), containerID, auditItemUUID);
-				Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
-				detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
-				detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getAuditItemUUID());
-				detailIssueActivity.putExtra(DetailIssueActivity.SELECTED_TAB, 1);
-				startActivity(detailIssueActivity);
-				break;
+                if (!event.isOpened()) {
+
+                    Logger.Log("Open AfterRepair Fragment");
+                    String auditItemUUID = event.getAuditItemUUID();
+                    AuditItem auditItem = dataCenter.getAuditItemByUUID(getActivity(), containerID, auditItemUUID);
+                    Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
+                    detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
+                    detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getAuditItemUUID());
+                    detailIssueActivity.putExtra(DetailIssueActivity.SELECTED_TAB, 1);
+                    startActivity(detailIssueActivity);
+                    break;
+                }
 		}
 	}
 
@@ -164,12 +167,14 @@ public class IssuePendingFragment extends Fragment {
 
 	@Click(R.id.btn_camera)
 	void buttonCameraClicked() {
+
 		// Open camera activity
 		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
 		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
 		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.AUDIT.value);
 		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
 		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.AUDIT.value);
+        cameraActivityIntent.putExtra(CameraFragment.IS_OPENED, false);
 		startActivity(cameraActivityIntent);
 	}
 
