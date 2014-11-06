@@ -44,207 +44,210 @@ import de.greenrobot.event.EventBus;
 public class ReuseActivity extends Activity {
 
 
-    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
 
-    @Extra(CONTAINER_ID_EXTRA)
-    String containerID;
+	@Extra(CONTAINER_ID_EXTRA)
+	String containerID;
 
-    @ViewById(R.id.btn_done)
-    Button btnDone;
+	@ViewById(R.id.btn_done)
+	Button btnDone;
 
-    @ViewById(R.id.gv_reuse_images)
-    GridView gvReuseImages;
+	@ViewById(R.id.gv_reuse_images)
+	GridView gvReuseImages;
 
-    @ViewById(R.id.tv_container_code)
-    TextView tvContainerId;
+	@ViewById(R.id.tv_container_code)
+	TextView tvContainerId;
 
-    @ViewById(R.id.tv_current_status)
-    TextView tvCurrentStatus;
+	@ViewById(R.id.tv_current_status)
+	TextView tvCurrentStatus;
 
-    @Bean
-    DataCenter dataCenter;
+	@Bean
+	DataCenter dataCenter;
 
-    GateImageAdapter gateImageAdapter = null;
-    private ActionMode mActionMode;
+	GateImageAdapter gateImageAdapter = null;
+	private ActionMode mActionMode;
 
-    long currentStatus;
-    Session mSession;
+	long currentStatus;
+	Session mSession;
 
-    @AfterViews
-    void doAfterViews() {
-        // Get session by containerId
-        mSession = dataCenter.getSession(getApplicationContext(), containerID);
+	@AfterViews
+	void doAfterViews() {
+		// Get session by containerId
+		mSession = dataCenter.getSession(getApplicationContext(), containerID);
 
-	    if ( mActionMode == null) {
-		    // there are some selected items, start the actionMode
-		    mActionMode = startActionMode(new ActionModeCallBack());
-	    }
+		if (mActionMode == null) {
+			// there are some selected items, start the actionMode
+			mActionMode = startActionMode(new ActionModeCallBack());
+		}
 
-        if (null == mSession) {
+		if (null == mSession) {
 
-            // Set ContainerId to TextView
-            tvContainerId.setText(containerID);
+			// Set ContainerId to TextView
+			tvContainerId.setText(containerID);
 
-        } else {
+		} else {
 
-            containerID = mSession.getContainerId();
+			containerID = mSession.getContainerId();
 
-            // Set ContainerId to TextView
-            tvContainerId.setText(containerID);
+			// Set ContainerId to TextView
+			tvContainerId.setText(containerID);
 
-            // Set currentStatus to TextView
-            currentStatus = mSession.getStatus();
-            tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
+			// Set currentStatus to TextView
+			currentStatus = mSession.getStatus();
+			tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
 
-            gateImageAdapter = new GateImageAdapter(this, R.layout.item_image_gridview, true);
-            gvReuseImages.setAdapter(gateImageAdapter);
+			gateImageAdapter = new GateImageAdapter(this, R.layout.item_image_gridview, true);
+			gvReuseImages.setAdapter(gateImageAdapter);
 
-            refresh();
-        }
+			refresh();
+		}
 
-        // Set item click event on grid view
-        gvReuseImages.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                CheckablePhotoGridItemLayout layout = (CheckablePhotoGridItemLayout)
-                        view.findViewById(R.id.photo_layout);
-                layout.toggle();
-                boolean hasCheckedItems = gateImageAdapter.getCheckedCJayImageUrlsCount() > 0;
-
-                Logger.Log("count : " + gateImageAdapter.getCheckedCJayImageUrlsCount());
+		// Set item click event on grid view
+		gvReuseImages.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+				CheckablePhotoGridItemLayout layout = (CheckablePhotoGridItemLayout)
+						view.findViewById(R.id.photo_layout);
+				layout.toggle();
 
 
-                if (mActionMode != null)
-                    mActionMode.setTitle(String.valueOf(gateImageAdapter.getCheckedCJayImageUrlsCount()) + " selected");
+				if (mActionMode != null)
+					mActionMode.setTitle(String.valueOf(gateImageAdapter.getCheckedCJayImageUrlsCount()) + " selected");
 
-            }
-        });
+			}
+		});
 
-    }
+	}
 
-    @Click(R.id.btn_done)
-    void buttonDoneClicked() {
-        List<GateImage> gateImages = gateImageAdapter.getCheckedCJayImageUrls();
-        for (int i = 0; i < gateImages.size(); i++) {
-            try {
+	@Click(R.id.btn_done)
+	void buttonDoneClicked() {
+		donePickImage();
+	}
+
+	private void donePickImage() {
+		List<GateImage> gateImages = gateImageAdapter.getCheckedCJayImageUrls();
+		for (int i = 0; i < gateImages.size(); i++) {
+			try {
 				// Getting the last part of the referrer url
 				String name = gateImages.get(i).getName();
-                Logger.Log("name: " + name);
-                // Create new audit image object
-                AuditImage auditImage = new AuditImage()
-                        .withId(0)
-                        .withType(ImageType.AUDIT)
-                        .withUrl(gateImages.get(i).getUrl())
-                        .withName(name)
+				Logger.Log("name: " + name);
+				// Create new audit image object
+				AuditImage auditImage = new AuditImage()
+						.withId(0)
+						.withType(ImageType.AUDIT)
+						.withUrl(gateImages.get(i).getUrl())
+						.withName(name)
 						.withUUID(UUID.randomUUID().toString());
 
-                dataCenter.addAuditImage(getApplicationContext(), auditImage, containerID);
-            } catch (SnappydbException e) {
-                e.printStackTrace();
-            }
-        }
+				dataCenter.addAuditImage(getApplicationContext(), auditImage, containerID);
+			} catch (SnappydbException e) {
+				e.printStackTrace();
+			}
+		}
 
-        Intent resultIntent = new Intent();
-        setResult(Activity.RESULT_OK, resultIntent);
+		Intent resultIntent = new Intent();
+		setResult(Activity.RESULT_OK, resultIntent);
 
-        EventBus.getDefault().post(new ImageCapturedEvent(containerID, ImageType.AUDIT, null));
-        this.finish();
-    }
+		EventBus.getDefault().post(new ImageCapturedEvent(containerID, ImageType.AUDIT, null));
+		this.finish();
+	}
 
-    @Background
-    void refresh() {
-        if (mSession != null) {
-            List<AuditItem> auditItems = mSession.getAuditItems();
-            List<GateImage> importImages = mSession.getImportImages();
-            List<GateImage> deletedImportImages = new ArrayList<GateImage>();
+	@Background
+	void refresh() {
+		if (mSession != null) {
+			List<AuditItem> auditItems = mSession.getAuditItems();
+			List<GateImage> importImages = mSession.getImportImages();
+			List<GateImage> deletedImportImages = new ArrayList<GateImage>();
 
-            if (auditItems != null) {
-                Logger.Log("Size: " + auditItems.size());
-                for (GateImage gateImage : importImages) {
-                    for (AuditItem auditItem : auditItems) {
+			if (auditItems != null) {
+				Logger.Log("Size: " + auditItems.size());
+				for (GateImage gateImage : importImages) {
+					for (AuditItem auditItem : auditItems) {
 
-                        if (auditItem.getAuditImages() != null) {
-                            for (AuditImage auditImage : auditItem.getAuditImages()) {
-                                if (auditImage.getUrl().equals(gateImage.getUrl())) {
-                                    deletedImportImages.add(gateImage);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+						if (auditItem.getAuditImages() != null) {
+							for (AuditImage auditImage : auditItem.getAuditImages()) {
+								if (auditImage.getUrl().equals(gateImage.getUrl())) {
+									deletedImportImages.add(gateImage);
+								}
+							}
+						}
+					}
+				}
+			}
 
-            importImages.removeAll(deletedImportImages);
+			importImages.removeAll(deletedImportImages);
 
-            updatedData(importImages);
-        }
-    }
+			updatedData(importImages);
+		}
+	}
 
-    @UiThread
-    public void updatedData(List<GateImage> importImages) {
-        Logger.Log("Size: " + importImages.size());
-        gateImageAdapter.clear();
-        if (importImages != null) {
-            for (GateImage object : importImages) {
-                gateImageAdapter.add(object);
-            }
-        }
-        gateImageAdapter.notifyDataSetChanged();
-    }
+	@UiThread
+	public void updatedData(List<GateImage> importImages) {
+		Logger.Log("Size: " + importImages.size());
+		gateImageAdapter.clear();
+		if (importImages != null) {
+			for (GateImage object : importImages) {
+				gateImageAdapter.add(object);
+			}
+		}
+		gateImageAdapter.notifyDataSetChanged();
+	}
 
-    private class ActionModeCallBack implements ActionMode.Callback {
+	private class ActionModeCallBack implements ActionMode.Callback {
 
-        @Override
-        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-            // inflate contextual menu
-            actionMode.getMenuInflater().inflate(R.menu.contextual_grid_view, menu);
-            return true;
-        }
+		@Override
+		public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+			// inflate contextual menu
+			actionMode.getMenuInflater().inflate(R.menu.contextual_grid_view, menu);
+			return true;
+		}
 
-        @Override
-        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-            return false;
-        }
+		@Override
+		public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+			return false;
+		}
 
-        @Override
-        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+		@Override
+		public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
 
-            ArrayList<GateImage> selected = new ArrayList<GateImage>();
-            switch (menuItem.getItemId()) {
-                case R.id.item_select_all:
-                    if (gateImageAdapter.getCheckedCJayImageUrlsCount() < gateImageAdapter.getCount()) {
-                        // Do select all
-                        Logger.Log("Do select all");
-                        for (int i = 0; i < gateImageAdapter.getCount(); i++) {
-                            selected.add(gateImageAdapter.getItem(i));
-                        }
+			ArrayList<GateImage> selected = new ArrayList<GateImage>();
+			switch (menuItem.getItemId()) {
+				case R.id.item_select_all:
+					if (gateImageAdapter.getCheckedCJayImageUrlsCount() < gateImageAdapter.getCount()) {
+						// Do select all
+						Logger.Log("Do select all");
+						for (int i = 0; i < gateImageAdapter.getCount(); i++) {
+							selected.add(gateImageAdapter.getItem(i));
+						}
 
-                        gateImageAdapter.setCheckedCJayImageUrls(selected);
-                        gateImageAdapter.notifyDataSetChanged();
+						gateImageAdapter.setCheckedCJayImageUrls(selected);
+						gateImageAdapter.notifyDataSetChanged();
 
-                        Logger.Log("selected: " + selected.size());
-                        actionMode.setTitle(String.valueOf(selected.size()) + " selected");
+						Logger.Log("selected: " + selected.size());
+						actionMode.setTitle(String.valueOf(selected.size()) + " selected");
 
-                    }
-                    break;
-                case R.id.item_unselect_all:
-                    // Do unselect all
-                    Logger.Log("Do unselect all");
-                    selected.clear();
-                    gateImageAdapter.removeAllCheckedCJayImageUrl();
-                    gateImageAdapter.notifyDataSetChanged();
+					}
+					break;
+				case R.id.item_unselect_all:
+					// Do unselect all
+					Logger.Log("Do unselect all");
+					selected.clear();
+					gateImageAdapter.removeAllCheckedCJayImageUrl();
+					gateImageAdapter.notifyDataSetChanged();
 
-                    break;
-            }
+					mActionMode.setTitle(String.valueOf(gateImageAdapter.getCheckedCJayImageUrlsCount()) + " selected");
 
-            return false;
-        }
+					break;
+			}
 
-        @Override
-        public void onDestroyActionMode(ActionMode actionMode) {
-            // remove selection
-            mActionMode = null;
-        }
-    }
+			return false;
+		}
+
+		@Override
+		public void onDestroyActionMode(ActionMode actionMode) {
+			donePickImage();
+		}
+
+	}
 
 }
