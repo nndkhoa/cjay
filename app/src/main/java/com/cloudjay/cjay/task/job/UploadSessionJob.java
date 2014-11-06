@@ -9,6 +9,7 @@ import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
+import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
@@ -24,6 +25,7 @@ public class UploadSessionJob extends Job {
 
 	String containerId;
 	int currentStep;
+    Session mSession;
 
 	/**
 	 * Dùng để phân biệt xem có cần clear Working hay không?
@@ -37,6 +39,7 @@ public class UploadSessionJob extends Job {
 	}
 
 	public UploadSessionJob(String containerId, int step, boolean clearFromWorking) {
+        // step is local step
 		super(new Params(1).requireNetwork().persist().groupBy(containerId));
 		this.containerId = containerId;
 		this.currentStep = step;
@@ -56,6 +59,8 @@ public class UploadSessionJob extends Job {
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
 
+        mSession = DataCenter_.getInstance_(context).getSession(context, containerId);
+
 		// Set session upload status to UPLOADING
 		// Add session to Collection Upload
 		// Change status uploading, currentStep audit, remove from WORKING
@@ -65,34 +70,34 @@ public class UploadSessionJob extends Job {
 			dataCenter.addUploadSession(containerId);
 
 			dataCenter.changeUploadState(context, containerId, UploadStatus.UPLOADING);
-			dataCenter.changeSessionLocalStep(context, containerId, Step.AUDIT);
 
 			Step step = Step.values()[currentStep];
 			switch (step) {
 				case EXPORTED:
 
-					dataCenter.addLog(context, containerId, "EXPORTED | Bắt đầu quá trình upload");
 					dataCenter.changeSessionLocalStep(context, containerId, Step.EXPORTED);
 					break;
 
 				case AUDIT:
-					dataCenter.addLog(context, containerId, "AUDIT | Bắt đầu quá trình upload");
 					dataCenter.changeSessionLocalStep(context, containerId, Step.REPAIR);
 					break;
 
 				case REPAIR:
-					dataCenter.addLog(context, containerId, "REPAIR | Bắt đầu quá trình upload");
 					dataCenter.changeSessionLocalStep(context, containerId, Step.AVAILABLE);
 					break;
 
 				case IMPORT:
 					dataCenter.addLog(context, containerId, "IMPORT | Bắt đầu quá trình upload");
-					dataCenter.changeSessionLocalStep(context, containerId, Step.AUDIT);
+                    if (mSession != null) {
+                        if (mSession.getLocalStep() != Step.AVAILABLE.value) {
+                            dataCenter.changeSessionLocalStep(context, containerId, Step.AUDIT);
+                        }
+                    }
 					break;
 
 				default:
-					dataCenter.addLog(context, containerId, "HAND CLEANING | Bắt đầu quá trình upload");
-					dataCenter.changeSessionLocalStep(context, containerId, Step.AVAILABLE);
+                    Logger.Log("jump to default");
+					dataCenter.changeSessionLocalStep(context, containerId, Step.EXPORTED);
 					break;
 			}
 
@@ -128,7 +133,7 @@ public class UploadSessionJob extends Job {
 
 		switch (step) {
 			case AVAILABLE:
-
+                Logger.Log("jump to AVAILABLE");
 				dataCenter.addLog(context, containerId, "EXPORTED | Bắt đầu quá trình upload");
 				dataCenter.uploadExportSession(context, containerId);
 				break;
@@ -139,6 +144,7 @@ public class UploadSessionJob extends Job {
 				break;
 
 			case REPAIR:
+                Logger.Log("repair to export");
 				dataCenter.addLog(context, containerId, "REPAIR | Bắt đầu quá trình upload");
 				dataCenter.uploadRepairedSession(context, containerId);
 				break;

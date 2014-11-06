@@ -3,7 +3,10 @@ package com.cloudjay.cjay.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ExpandableListView;
@@ -16,8 +19,10 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.HomeActivity_;
+import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.adapter.PhotoExpandableListAdapter;
+import com.cloudjay.cjay.event.EventMenuCreated;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.GateImage;
@@ -67,7 +72,7 @@ public class ExportFragment extends Fragment {
 	@ViewById(R.id.btn_view_previous_step)
 	Button btnViewPreviousSteps;
 
-	@ViewById(R.id.btn_complete_audit)
+	@ViewById(R.id.btn_complete_import)
 	Button btnComplete;
 
 	@ViewById(R.id.tv_status_name)
@@ -180,7 +185,7 @@ public class ExportFragment extends Fragment {
 		gvExportImages.setVisibility(lvImagesExpandable.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
 	}
 
-	@Click(R.id.btn_complete_audit)
+	@Click(R.id.btn_complete_import)
 	void btnCompleteClicked() {
 
 		if (mSession.isValidToUpload(Step.EXPORTED) == false) {
@@ -256,5 +261,10 @@ public class ExportFragment extends Fragment {
 	public void onDestroy() {
 		EventBus.getDefault().unregister(this);
 		super.onDestroy();
+	}
+
+	public void onEvent(EventMenuCreated event) {
+		WizardActivity activity = (WizardActivity) getActivity();
+		activity.showMenuExportImmediately(false);
 	}
 }

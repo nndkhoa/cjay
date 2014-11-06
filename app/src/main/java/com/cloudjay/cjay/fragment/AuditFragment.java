@@ -17,7 +17,6 @@ import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 
@@ -43,7 +42,7 @@ public class AuditFragment extends Fragment {
 	String containerID;
 
 	//region VIEW
-	@ViewById(R.id.btn_complete_repair)
+	@ViewById(R.id.btn_done)
 	Button btnContinue;
 
 	@ViewById(R.id.btn_reuse_gate_in_image)
@@ -74,7 +73,7 @@ public class AuditFragment extends Fragment {
 	public AuditFragment() {
 	}
 
-	@Click(R.id.btn_complete_repair)
+	@Click(R.id.btn_done)
 	void buttonContinueClicked() {
 		//Go to next fragment
 		RepairFragment fragment = new RepairFragment_().builder().containerID(containerID).build();

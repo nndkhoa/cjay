@@ -27,6 +27,7 @@ import com.cloudjay.cjay.task.service.PubnubService_;
 import com.cloudjay.cjay.task.service.QueueIntentService_;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
+import com.pubnub.api.Pubnub;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
@@ -43,6 +44,10 @@ import de.keyboardsurfer.android.widget.crouton.Style;
 public class Utils {
 
 	public static void logOut(Context context) {
+
+        // Unsubscribe channel pubnub
+        Pubnub pubnub = new Pubnub(CJayConstant.PUBLISH_KEY, CJayConstant.SUBSCRIBE_KEY);
+        pubnub.unsubscribeAllChannels();
 
 		// Clear preference and Database
 		PreferencesUtil.clearPrefs(context);
@@ -284,36 +289,6 @@ public class Utils {
 	 */
 	public static String replaceNullBySpace(String in) {
 		return in == null || in.equals("") ? " " : in;
-	}
-
-	/**
-	 * Convert container session json to Session Object.
-	 * Need to check if container is existed or not. (should use insert or update concept)
-	 *
-	 * @param context
-	 * @param session
-	 * @return
-	 */
-	public static Session parseSession(Context context, Session session) throws SnappydbException {
-
-		//Check available session
-		DB snappyDb = App.getDB(context);
-		Session found = snappyDb.getObject(session.getContainerId(), Session.class);
-
-		// If hasn't -> create
-		if (found == null) {
-			snappyDb.put(session.getContainerId(), session);
-			return session;
-		}
-
-		// else -> update
-		else {
-			snappyDb.del(session.getContainerId());
-			snappyDb.put(session.getContainerId(), session);
-			return session;
-		}
-
-
 	}
 
 	/**

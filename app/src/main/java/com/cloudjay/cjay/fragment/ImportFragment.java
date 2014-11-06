@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -20,7 +19,9 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
+import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
+import com.cloudjay.cjay.event.EventMenuCreated;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.operator.OperatorChosenEvent;
 import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
@@ -28,9 +29,7 @@ import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
-import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.StringUtils;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
@@ -66,10 +65,10 @@ public class ImportFragment extends Fragment {
 	@ViewById(R.id.btn_camera)
 	ImageButton btnCamera;
 
-	@ViewById(R.id.btn_complete_repair)
+	@ViewById(R.id.btn_done)
 	Button btnContinue;
 
-	@ViewById(R.id.btn_complete_audit)
+	@ViewById(R.id.btn_complete_import)
 	Button btnComplete;
 
 	@ViewById(R.id.et_operator)
@@ -148,7 +147,9 @@ public class ImportFragment extends Fragment {
 			tvContainerCode.setText(containerID);
 
             Operator operator = dataCenter.getOperator(getActivity().getApplicationContext(), operatorCode);
-			etOperator.setText(operator.getOperatorName());
+            if (operator != null) {
+                etOperator.setText(operator.getOperatorName());
+            }
 
             preStatus = mSession.getPreStatus();
 
@@ -191,23 +192,13 @@ public class ImportFragment extends Fragment {
 		// Set operator to edit text
 		etOperator.setText(operator.getOperatorName());
 
-		// Add new session to database
-		String currentTime = StringUtils.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-
-        mSession = new Session().withContainerId(containerID)
-                .withOperatorCode(operatorCode)
-                .withOperatorId(operator.getId())
-                .withPreStatus(preStatus)
-                .withLocalStep(Step.IMPORT.value)
-                .withStep(Step.IMPORT.value)
-                .withCheckInTime(currentTime);
-
         if (mSession != null) {
+            mSession.setOperatorId(operator.getId());
+            mSession.setOperatorCode(operator.getOperatorCode());
             mSession.setGateImages(list);
         }
 
-        // Save normal session and working session.
-        // add working session also post an event
+        // Save session
         dataCenter.addSession(mSession);
         dataCenter.addWorkingSession(mSession);
 	}
@@ -226,6 +217,7 @@ public class ImportFragment extends Fragment {
 		// Re-query container session with given containerId
 		String containerId = event.getContainerId();
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+
 		refresh();
 	}
 	//endregion
@@ -234,6 +226,7 @@ public class ImportFragment extends Fragment {
 	void refresh() {
 		if (mSession != null) {
 			list = mSession.getImportImages();
+            Logger.Log("Size: " + list.size());
 			updatedData();
 		}
 	}
@@ -251,8 +244,6 @@ public class ImportFragment extends Fragment {
 	@Click(R.id.btn_camera)
 	void buttonCameraClicked() {
 
-		if (!TextUtils.isEmpty(tvContainerCode.getText()) && !TextUtils.isEmpty(etOperator.getText())) {
-
 			// Open camera activity
 			Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
 			cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
@@ -260,18 +251,12 @@ public class ImportFragment extends Fragment {
 			cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
 			cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
 			startActivity(cameraActivityIntent);
-
-		} else {
-
-			// Alert: require select operator first
-			Utils.showCrouton(getActivity(), R.string.require_select_operator_first);
-		}
 	}
 
 	/**
 	 * Add container session to upload queue. Then navigate user to Audit and Repair Fragment.
 	 */
-	@Click(R.id.btn_complete_repair)
+	@Click(R.id.btn_done)
 	void buttonContinueClicked() {
 
 		if (mSession.isValidToUpload(Step.IMPORT) == false) {
@@ -283,19 +268,19 @@ public class ImportFragment extends Fragment {
 		JobManager jobManager = App.getJobManager();
 		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), false));
 
-		// Go to next fragment
-		AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID)
-				.tabType(1).build();
-		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
-		transaction.replace(R.id.ll_main, fragment);
-		transaction.commit();
+        // Go to audit and repair fragment
+        AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID)
+                .tabType(1).build();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+        transaction.replace(R.id.ll_main, fragment);
+        transaction.commit();
 	}
 
 	/**
 	 * Finish import fragment, close Wizard Activity and go back to Home Activity with Search Fragment tab
 	 */
-	@Click(R.id.btn_complete_audit)
+	@Click(R.id.btn_complete_import)
 	void buttonCompletedClicked() {
 
 		if (mSession.isValidToUpload(Step.IMPORT) == false) {
@@ -307,6 +292,12 @@ public class ImportFragment extends Fragment {
 		JobManager jobManager = App.getJobManager();
 		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), true));
 		Logger.e(String.valueOf(mSession.getLocalStep()));
+
+        // Set local step to AVAILABLE
+        mSession.setLocalStep(Step.AVAILABLE.value);
+
+        // Update session into database
+        dataCenter.addSession(mSession);
 
 		// Navigate to HomeActivity
 //		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
@@ -336,6 +327,9 @@ public class ImportFragment extends Fragment {
 	void preStatusAChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 0;
+            mSession.setPreStatus(preStatus);
+            dataCenter.addSession(mSession);
+            dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.GONE);
 		}
 	}
@@ -344,6 +338,9 @@ public class ImportFragment extends Fragment {
 	void preStatusBChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 1;
+            mSession.setPreStatus(preStatus);
+            dataCenter.addSession(mSession);
+            dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.VISIBLE);
 		}
 	}
@@ -352,8 +349,16 @@ public class ImportFragment extends Fragment {
 	void preStatusCChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 2;
+            mSession.setPreStatus(preStatus);
+            dataCenter.addSession(mSession);
+            dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.VISIBLE);
 		}
 	}
 	//endregion
+
+	public void onEvent(EventMenuCreated event) {
+		WizardActivity activity = (WizardActivity) getActivity();
+		activity.showMenuExportImmediately(false);
+	}
 }
