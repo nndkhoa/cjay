@@ -9,6 +9,7 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
@@ -77,7 +78,7 @@ public class GetNotificationJob extends Job {
 				.setAutoCancel(true)
 				.setDefaults(Notification.DEFAULT_SOUND).build();
 
-		notificationManager.notify(1, notification);
+		notificationManager.notify(CJayConstant.NOTIFICATION_ID, notification);
 	}
 
 	@Override
