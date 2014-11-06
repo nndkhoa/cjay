@@ -1205,7 +1205,8 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	public void uploadRepairedSession(Context context, String containerId) throws SnappydbException {
+	public void
+    uploadRepairedSession(Context context, String containerId) throws SnappydbException {
 
 		// Upload complete repair session to server
 		DB db = App.getDB(context);
@@ -1213,13 +1214,21 @@ public class DataCenter {
 		Session result = networkClient.completeRepairSession(context, oldSession);
 		Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+
+        Logger.Log("result: " + gson.toJson(result));
+
 		if (result != null) {
 
 			// Update container back to database
 			String key = result.getContainerId();
 			oldSession.setUploadStatus(UploadStatus.COMPLETE);
 			oldSession.mergeSession(result);
-			db.put(key, result);
+
+            Logger.Log("mergeSession: " + gson.toJson(oldSession));
+
+			db.put(key, oldSession);
 
 			// Then remove them from WORKING
 			String workingKey = CJayConstant.PREFIX_WORKING + key;
@@ -1487,9 +1496,18 @@ public class DataCenter {
 		DB db = App.getDB(context);
 		String key = containerId;
 		Session session = db.getObject(key, Session.class);
+
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+
+        Logger.Log("before change status upload: " + gson.toJson(session));
+
 		session.setUploadStatus(status);
 
 		Logger.Log(session.getContainerId() + " -> Upload Status: " + status.name());
+
+        Logger.Log("after change status upload: " + gson.toJson(session));
+
 		db.put(containerId, session);
 	}
 

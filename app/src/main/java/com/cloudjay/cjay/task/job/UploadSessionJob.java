@@ -143,6 +143,7 @@ public class UploadSessionJob extends Job {
 				break;
 
 			case REPAIR:
+                Logger.Log("repair to export");
 				dataCenter.addLog(context, containerId, "REPAIR | Bắt đầu quá trình upload");
 				dataCenter.uploadRepairedSession(context, containerId);
 				break;
