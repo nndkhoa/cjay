@@ -88,11 +88,13 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_CAMERA
+		if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
+                || keyCode == KeyEvent.KEYCODE_VOLUME_UP
+                || keyCode == KeyEvent.KEYCODE_CAMERA
 				&& current != null
 				&& !current.isSingleShotProcessing()) {
 
-			current.takePicture();
+			current.takeSimplePicture();
 			return (true);
 
 		}
