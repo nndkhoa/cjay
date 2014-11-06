@@ -59,7 +59,7 @@ public interface NetworkService {
 	public Session postContainer(@Body JsonObject jsonSessionString);
 
 	@PUT(ApiEndpoint.CONTAINER_SESSION_CHECK_OUT_API)
-	public Session checkOutContainerSession(@Path("id") long containerPk, @Body JsonArray jsonGateImage);
+	public Session checkOutContainerSession(@Path("id") long containerPk, @Body JsonObject jsonGateImage);
 
 	@PUT(ApiEndpoint.CONTAINER_SESSION_COMPLETE_AUDIT_API)
 	public Session completeAudit(@Path("id") long containerPk);
