@@ -1,15 +1,20 @@
 package com.cloudjay.cjay.activity;
 
 import android.app.ActionBar;
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.AttributeSet;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.fragment.AuditAndRepairFragment_;
 import com.cloudjay.cjay.fragment.ExportFragment_;
 import com.cloudjay.cjay.fragment.ImportFragment_;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.enums.Step;
 
 import org.androidannotations.annotations.AfterViews;
@@ -38,7 +43,7 @@ public class WizardActivity extends BaseActivity {
 	 */
 	@AfterViews
 	void configFragment() {
-
+		this.exportSessionContainerId = containerID;
 		// Get actionbar
 		actionBar = getActionBar();
 
@@ -73,6 +78,21 @@ public class WizardActivity extends BaseActivity {
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 		transaction.add(R.id.ll_main, fragment);
 		transaction.commit();
+
+	}
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.base, menu);
+
+		String name = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_USER_NAME);
+		String roleName = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_USER_ROLE_NAME);
+
+		menu.findItem(R.id.menu_username).setTitle(name);
+		menu.findItem(R.id.menu_role).setTitle(roleName);
+		exportMenu = menu.findItem(R.id.menu_export);
+		exportMenu.setVisible(true);
+
+		return true;
 	}
 
 	@Override

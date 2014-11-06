@@ -84,8 +84,6 @@ public class UploadSessionJob extends Job {
 				case IMPORT:
 					dataCenter.changeSessionLocalStep(context, containerId, Step.AUDIT);
 					break;
-				case EXPORTIMMEDIATELY:
-					dataCenter.changeSessionLocalStep(context, containerId, Step.EXPORTED);
 
 				default:
 					dataCenter.changeSessionLocalStep(context, containerId, Step.AVAILABLE);
@@ -142,9 +140,6 @@ public class UploadSessionJob extends Job {
 				dataCenter.addLog(context, containerId, "IMPORT | Bắt đầu quá trình upload");
 				dataCenter.uploadImportSession(context, containerId);
 				break;
-			case EXPORTIMMEDIATELY:
-				dataCenter.addLog(context,containerId,"EXPORT IMMEDIATELY | Bắt đầu quá trình upload");
-				dataCenter.exportSessionImmediately(context,containerId);
 
 			default:
 				dataCenter.addLog(context, containerId, "HAND CLEANING | Bắt đầu quá trình upload");

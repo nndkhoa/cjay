@@ -87,7 +87,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/background_button_and_line"
-            android:text="Chọn các hình trên"
+            android:text="Xong"
             android:textColor="@android:color/white" />
 
     </LinearLayout>

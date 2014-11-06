@@ -1573,7 +1573,7 @@ public class DataCenter {
 
 	}
 
-	public void exportSessionImmediately(Context context, String containerId) {
+	public void forceExportSession(Context context, String containerId) {
 		Logger.Log("Export Immediately container: "+containerId);
 		Session session = getSession(context, containerId);
 		Session result = networkClient.exportSessionImmediately(context,session);

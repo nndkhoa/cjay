@@ -16,6 +16,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.UserLoggedOutEvent;
 import com.cloudjay.cjay.event.session.ContainersFetchedEvent;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.job.UploadForceExportSessionJob;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -90,7 +91,7 @@ public class BaseActivity extends FragmentActivity {
 		if (session.isValidToUpload(step)){
 			//Add upload sesion to job
 			JobManager jobManager = App.getJobManager();
-			jobManager.addJobInBackground(new UploadSessionJob(exportSessionContainerId,Step.EXPORTIMMEDIATELY.value, true));
+			jobManager.addJobInBackground(new UploadForceExportSessionJob(exportSessionContainerId, true));
 		} else {
 			Utils.showCrouton(this,"Container này không thể xuất chỉ định");
 		}
