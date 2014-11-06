@@ -9,6 +9,7 @@ import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
+import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
@@ -24,6 +25,7 @@ public class UploadSessionJob extends Job {
 
 	String containerId;
 	int currentStep;
+    Session mSession;
 
 	/**
 	 * Dùng để phân biệt xem có cần clear Working hay không?
@@ -37,6 +39,7 @@ public class UploadSessionJob extends Job {
 	}
 
 	public UploadSessionJob(String containerId, int step, boolean clearFromWorking) {
+        // step is local step
 		super(new Params(1).requireNetwork().persist().groupBy(containerId));
 		this.containerId = containerId;
 		this.currentStep = step;
@@ -55,6 +58,8 @@ public class UploadSessionJob extends Job {
 		// Add container to collection UPLOAD
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
+
+        mSession = DataCenter_.getInstance_(context).getSession(context, containerId);
 
 		// Set session upload status to UPLOADING
 		// Add session to Collection Upload
@@ -82,11 +87,17 @@ public class UploadSessionJob extends Job {
 					break;
 
 				case IMPORT:
-					dataCenter.changeSessionLocalStep(context, containerId, Step.AUDIT);
+					dataCenter.addLog(context, containerId, "IMPORT | Bắt đầu quá trình upload");
+                    if (mSession != null) {
+                        if (mSession.getLocalStep() != Step.AVAILABLE.value) {
+                            dataCenter.changeSessionLocalStep(context, containerId, Step.AUDIT);
+                        }
+                    }
 					break;
 
 				default:
-					dataCenter.changeSessionLocalStep(context, containerId, Step.AVAILABLE);
+                    Logger.Log("jump to default");
+					dataCenter.changeSessionLocalStep(context, containerId, Step.EXPORTED);
 					break;
 			}
 
@@ -122,7 +133,7 @@ public class UploadSessionJob extends Job {
 
 		switch (step) {
 			case AVAILABLE:
-
+                Logger.Log("jump to AVAILABLE");
 				dataCenter.addLog(context, containerId, "EXPORTED | Bắt đầu quá trình upload");
 				dataCenter.uploadExportSession(context, containerId);
 				break;
@@ -133,6 +144,7 @@ public class UploadSessionJob extends Job {
 				break;
 
 			case REPAIR:
+                Logger.Log("repair to export");
 				dataCenter.addLog(context, containerId, "REPAIR | Bắt đầu quá trình upload");
 				dataCenter.uploadRepairedSession(context, containerId);
 				break;

@@ -31,10 +31,10 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 	@ViewById(R.id.pager)
 	ViewPager pager;
 
-	@ViewById(R.id.btn_complete_repair)
+	@ViewById(R.id.btn_done)
 	Button btnCompleteRepair;
 
-	@ViewById(R.id.btn_complete_audit)
+	@ViewById(R.id.btn_complete_import)
 	Button btnCompleteAudit;
 
 	ActionBar actionBar;
@@ -44,7 +44,7 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 	public RepairFragment() {
 	}
 
-	@Click(R.id.btn_complete_repair)
+	@Click(R.id.btn_done)
 	void buttonContinueClick() {
 
 //		// Add containerId to upload complete repair queue
@@ -63,7 +63,7 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 //		transaction.commit();
 	}
 
-	@Click(R.id.btn_complete_audit)
+	@Click(R.id.btn_complete_import)
 	void buttonCompleteAuditClicked() {
 
 //		// Add containerId to upload complete audit queue

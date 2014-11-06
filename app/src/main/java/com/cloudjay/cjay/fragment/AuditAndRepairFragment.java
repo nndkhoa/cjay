@@ -10,7 +10,6 @@ import android.widget.Button;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
-import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.HomeActivity_;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
@@ -63,10 +62,10 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	@ViewById(R.id.pager)
 	ViewPager pager;
 
-	@ViewById(R.id.btn_complete_repair)
+	@ViewById(R.id.btn_done)
 	Button btnCompleteRepair;
 
-	@ViewById(R.id.btn_complete_audit)
+	@ViewById(R.id.btn_complete_import)
 	Button btnCompleteAudit;
 
 	ActionBar actionBar;
@@ -113,7 +112,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
         }
 	}
 
-	@Click(R.id.btn_complete_audit)
+	@Click(R.id.btn_complete_import)
 	void btnCompleteAuditClicked() {
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 		if (mSession != null) {
@@ -144,14 +143,14 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 		}
 	}
 
-	@Click(R.id.btn_complete_repair)
+	@Click(R.id.btn_done)
 	void btnCompleteRepairClicked() {
 
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 		if (mSession != null) {
 
             if(mSession.getLocalStep() == Step.AUDIT.value) {
-                Utils.showCrouton(getActivity(), "Container chua giam dinh xong");
+                Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
                 return;
             }
 

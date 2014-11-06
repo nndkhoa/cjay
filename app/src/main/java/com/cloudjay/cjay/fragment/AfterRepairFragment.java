@@ -122,6 +122,13 @@ public class AfterRepairFragment extends Fragment {
     @Click(R.id.btn_camera_repaired)
     void openCameraActivity(){
 
+        // Notify user that audit item is not uploaded yet
+        if (auditItem.getId() == 0) {
+            Utils.showCrouton(getActivity(), "Loi nay chua duoc giam dinh");
+            return;
+        }
+
+        // Notify user that audit item is not allow to prepare
         if (!auditItem.isIsAllowed()) {
             Utils.showCrouton(getActivity(), "Loi nay khong duoc phep sua");
             return;
@@ -133,6 +140,7 @@ public class AfterRepairFragment extends Fragment {
         cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.REPAIRED.value);
         cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);
 		cameraActivityIntent.putExtra(CameraFragment.AUDIT_ITEM_UUID_EXTRA, auditItemUUID);
+        cameraActivityIntent.putExtra(CameraFragment.IS_OPENED, true);
         startActivity(cameraActivityIntent);
     }
 

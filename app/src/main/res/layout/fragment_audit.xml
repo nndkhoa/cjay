@@ -96,7 +96,7 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_complete_audit"
+            android:id="@+id/btn_complete_import"
             android:layout_weight="1"
             android:text="@string/button_completed"
             android:textColor="@android:color/white"
@@ -105,7 +105,7 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_complete_repair"
+            android:id="@+id/btn_done"
             android:layout_weight="1"
             android:text="@string/button_audit_complete"
             android:textColor="@android:color/white"

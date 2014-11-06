@@ -481,8 +481,10 @@ public class AuditItem {
 	}
 
 	public AuditItem mergeAuditItem(AuditItem auditItemServer) {
+
 		this.setId(auditItemServer.getId());
 		this.setIsAllowed(auditItemServer.isIsAllowed());
+        this.setAudited(true);
         /*if (!auditItemServer.isIsAllowed())
             this.setRepaired(true);*/
 

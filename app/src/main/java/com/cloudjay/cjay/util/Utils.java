@@ -27,6 +27,7 @@ import com.cloudjay.cjay.task.service.PubnubService_;
 import com.cloudjay.cjay.task.service.QueueIntentService_;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
+import com.pubnub.api.Pubnub;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
@@ -43,6 +44,10 @@ import de.keyboardsurfer.android.widget.crouton.Style;
 public class Utils {
 
 	public static void logOut(Context context) {
+
+        // Unsubscribe channel pubnub
+        Pubnub pubnub = new Pubnub(CJayConstant.PUBLISH_KEY, CJayConstant.SUBSCRIBE_KEY);
+        pubnub.unsubscribeAllChannels();
 
 		// Clear preference and Database
 		PreferencesUtil.clearPrefs(context);

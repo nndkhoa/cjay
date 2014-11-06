@@ -10,13 +10,14 @@ public class ImageCapturedEvent {
 	private String containerId;
 	private int imageType;
 	private String auditItemUUID;
+    private boolean isOpened;
 
-	public ImageCapturedEvent(String containerId, int imageType, String auditItemUUID) {
+	public ImageCapturedEvent(String containerId, int imageType, String auditItemUUID, boolean isOpened) {
 
 		this.containerId = containerId;
 		this.imageType = imageType;
 		this.auditItemUUID = auditItemUUID;
-
+        this.isOpened = isOpened;
 	}
 
 	public ImageCapturedEvent(String containerId, ImageType imageType,String auditItemUUID) {
@@ -38,4 +39,8 @@ public class ImageCapturedEvent {
 	public String getAuditItemUUID() {
 		return this.auditItemUUID;
 	}
+
+    public boolean isOpened() {
+        return this.isOpened;
+    }
 }

@@ -22,6 +22,7 @@ import com.google.gson.reflect.TypeToken;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
+import org.bouncycastle.asn1.crmf.ProofOfPossession;
 
 import java.io.File;
 import java.lang.reflect.Type;
@@ -301,8 +302,18 @@ public class NetworkClient {
 	 * @return
 	 */
 	public Session checkOutContainerSession(Context context, Session containerSession) {
-		Session checkOutSession = provider.getRestAdapter(context).create(NetworkService.class).checkOutContainerSession(containerSession.getId(), containerSession.getGateOutImageToUpLoad());
-		return checkOutSession;
+        Logger.Log("containerSession: " + containerSession.getId());
+        Logger.Log("size gate outs: " + containerSession.getGateOutImageToUpLoad());
+        try {
+            Session checkOutSession = provider.getRestAdapter(context).create(NetworkService.class).checkOutContainerSession(containerSession.getId(), containerSession.getGateOutImageToUpLoad());
+            return checkOutSession;
+        } catch (RetrofitError e) {
+            Logger.Log(e.getResponse().getReason().toString());
+            Logger.Log(e.getResponse().getBody().toString());
+            Logger.Log(e.getResponse().getStatus() + "");
+        }
+
+		return null;
 	}
 
 	/**
