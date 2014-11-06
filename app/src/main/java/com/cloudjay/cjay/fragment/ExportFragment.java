@@ -67,7 +67,7 @@ public class ExportFragment extends Fragment {
 	@ViewById(R.id.btn_view_previous_step)
 	Button btnViewPreviousSteps;
 
-	@ViewById(R.id.btn_complete_audit)
+	@ViewById(R.id.btn_complete_import)
 	Button btnComplete;
 
 	@ViewById(R.id.tv_status_name)
@@ -180,7 +180,7 @@ public class ExportFragment extends Fragment {
 		gvExportImages.setVisibility(lvImagesExpandable.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
 	}
 
-	@Click(R.id.btn_complete_audit)
+	@Click(R.id.btn_complete_import)
 	void btnCompleteClicked() {
 
 		if (mSession.isValidToUpload(Step.EXPORTED) == false) {

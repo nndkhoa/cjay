@@ -470,6 +470,12 @@ public class Session {
 
 			// Chỉ cần có ít nhất một tấm hình IMPORT là hợp lệ
 			case IMPORT:
+
+                // Required operator
+                if (this.getOperatorId() == 0) {
+                    return false;
+                }
+
 				for (GateImage image : gateImages) {
 					if (image.getType() == ImageType.IMPORT.value) return true;
 				}
@@ -622,6 +628,14 @@ public class Session {
 		this.setStep(session.getStep());
 		this.setCheckInTime(session.getCheckInTime());
 		this.setCheckOutTime(session.getCheckOutTime());
+
+        // local step is always greater or equal to step
+        Logger.Log("localStep client: " + this.getLocalStep());
+        Logger.Log("Step server: " + session.getStep());
+        if (this.getLocalStep() < session.getStep()) {
+            this.setLocalStep(session.getStep());
+        }
+
 		//merge Gate Image
 		List<GateImage> mergedGateImages = new ArrayList<GateImage>();
 		for (GateImage gateImageServer : session.getGateImages()) {

@@ -824,6 +824,11 @@ public class DataCenter {
 		// Upload container session to server
 		Session result = networkClient.uploadSession(context, oldSession);
 
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+
+        Logger.Log("result: " + gson.toJson(result));
+
 		if (result != null) {
 			//merge session
 			oldSession.mergeSession(result);

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -28,9 +27,7 @@ import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
-import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.StringUtils;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
@@ -66,10 +63,10 @@ public class ImportFragment extends Fragment {
 	@ViewById(R.id.btn_camera)
 	ImageButton btnCamera;
 
-	@ViewById(R.id.btn_complete_repair)
+	@ViewById(R.id.btn_done)
 	Button btnContinue;
 
-	@ViewById(R.id.btn_complete_audit)
+	@ViewById(R.id.btn_complete_import)
 	Button btnComplete;
 
 	@ViewById(R.id.et_operator)
@@ -201,6 +198,7 @@ public class ImportFragment extends Fragment {
 
         // Save session
         dataCenter.addSession(mSession);
+        dataCenter.addWorkingSession(mSession);
 	}
 
 	/**
@@ -256,7 +254,7 @@ public class ImportFragment extends Fragment {
 	/**
 	 * Add container session to upload queue. Then navigate user to Audit and Repair Fragment.
 	 */
-	@Click(R.id.btn_complete_repair)
+	@Click(R.id.btn_done)
 	void buttonContinueClicked() {
 
 		if (mSession.isValidToUpload(Step.IMPORT) == false) {
@@ -268,19 +266,19 @@ public class ImportFragment extends Fragment {
 		JobManager jobManager = App.getJobManager();
 		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), false));
 
-		// Go to next fragment
-		AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID)
-				.tabType(1).build();
-		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
-		transaction.replace(R.id.ll_main, fragment);
-		transaction.commit();
+        // Go to audit and repair fragment
+        AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID)
+                .tabType(1).build();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+        transaction.replace(R.id.ll_main, fragment);
+        transaction.commit();
 	}
 
 	/**
 	 * Finish import fragment, close Wizard Activity and go back to Home Activity with Search Fragment tab
 	 */
-	@Click(R.id.btn_complete_audit)
+	@Click(R.id.btn_complete_import)
 	void buttonCompletedClicked() {
 
 		if (mSession.isValidToUpload(Step.IMPORT) == false) {
@@ -292,6 +290,13 @@ public class ImportFragment extends Fragment {
 		JobManager jobManager = App.getJobManager();
 		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), true));
 		Logger.e(String.valueOf(mSession.getLocalStep()));
+
+        // Set local step to AVAILABLE
+        mSession.setLocalStep(Step.AVAILABLE.value);
+
+        // Update session into database
+        dataCenter.addSession(mSession);
+        dataCenter.addWorkingSession(mSession);
 
 		// Navigate to HomeActivity
 //		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
