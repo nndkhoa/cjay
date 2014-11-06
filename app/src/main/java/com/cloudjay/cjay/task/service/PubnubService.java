@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.PowerManager;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.App;
@@ -14,6 +15,7 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.model.NotificationItem;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.task.job.GetNotificationJob;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
@@ -36,10 +38,6 @@ import org.androidannotations.annotations.EService;
 @EService
 public class PubnubService extends Service {
 
-	// Define PubNub Key
-	public static final String PUBLISH_KEY = "pub-c-d4a2608d-f440-4ebf-a09a-dd8a570428cd";
-	public static final String SUBSCRIBE_KEY = "sub-c-fe158864-9fcf-11e3-a937-02ee2ddab7fe";
-
 	@Bean
 	DataCenter dataCenter;
 
@@ -47,10 +45,8 @@ public class PubnubService extends Service {
 	 * Notification manager is used for display message in Notification Center
 	 */
 	NotificationManager notificationManager;
+	PowerManager.WakeLock wl = null;
 
-//	PowerManager.WakeLock wl = null;
-//	private static final String CHANNEL_DEPOT_EXTRA = "com.cloudjay.cjay.pubnub.depot_channel";
-//	private static final String CHANNEL_UUID_EXTRA = "com.cloudjay.cjay.pubnub.uuid_channel";
 
 	private static final int DELAY_TIME = 200;
 
@@ -148,7 +144,7 @@ public class PubnubService extends Service {
 
 		notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-		pubnub = new Pubnub(PUBLISH_KEY, SUBSCRIBE_KEY);
+		pubnub = new Pubnub(CJayConstant.PUBLISH_KEY, CJayConstant.SUBSCRIBE_KEY);
 		if (TextUtils.isEmpty(depotChannel) || TextUtils.isEmpty(uuidChannel)) {
 
 			// Get info from Database
