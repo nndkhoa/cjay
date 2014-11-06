@@ -56,8 +56,6 @@ public class PubnubService extends Service {
 
 	String depotChannel;
 	String uuidChannel;
-
-	// Initial PubNub
 	Pubnub pubnub;
 
 	/**
@@ -171,11 +169,15 @@ public class PubnubService extends Service {
 				// Log out instantly
 				Utils.logOut(getApplicationContext());
 			}
+		}
 
+		if (TextUtils.isEmpty(depotChannel) || TextUtils.isEmpty(uuidChannel)) {
 			String[] channels = new String[]{depotChannel, uuidChannel};
 
 			// TODO: does it need to check if pubnub is already subcribed or not?
 			try {
+
+				pubnub.setUUID(uuidChannel);
 				pubnub.subscribe(channels, new Callback() {
 
 //				@Override
