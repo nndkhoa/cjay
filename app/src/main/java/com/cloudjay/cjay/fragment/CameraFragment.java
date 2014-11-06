@@ -240,6 +240,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		}
 	}
 
+
 	/**
 	 * CameraHost is the interface use to configure behavior of camera ~ setting.
 	 */

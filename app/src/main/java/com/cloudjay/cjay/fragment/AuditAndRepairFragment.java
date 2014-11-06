@@ -172,7 +172,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
 		startActivity(intent);
 		getActivity().finish();
-
 //	     /* Remove all tabs */
 //		actionBar.removeAllTabs();
 //		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
