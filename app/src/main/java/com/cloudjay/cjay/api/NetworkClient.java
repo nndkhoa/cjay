@@ -302,9 +302,18 @@ public class NetworkClient {
 	 * @return
 	 */
 	public Session checkOutContainerSession(Context context, Session containerSession) {
+        Logger.Log("containerSession: " + containerSession.getId());
         Logger.Log("size gate outs: " + containerSession.getGateOutImageToUpLoad());
-		Session checkOutSession = provider.getRestAdapter(context).create(NetworkService.class).checkOutContainerSession(containerSession.getId(), containerSession.getGateOutImageToUpLoad());
-		return checkOutSession;
+        try {
+            Session checkOutSession = provider.getRestAdapter(context).create(NetworkService.class).checkOutContainerSession(containerSession.getId(), containerSession.getGateOutImageToUpLoad());
+            return checkOutSession;
+        } catch (RetrofitError e) {
+            Logger.Log(e.getResponse().getReason().toString());
+            Logger.Log(e.getResponse().getBody().toString());
+            Logger.Log(e.getResponse().getStatus() + "");
+        }
+
+		return null;
 	}
 
 	/**

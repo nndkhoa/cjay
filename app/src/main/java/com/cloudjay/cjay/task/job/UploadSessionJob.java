@@ -96,7 +96,8 @@ public class UploadSessionJob extends Job {
 					break;
 
 				default:
-					dataCenter.changeSessionLocalStep(context, containerId, Step.AVAILABLE);
+                    Logger.Log("jump to default");
+					dataCenter.changeSessionLocalStep(context, containerId, Step.EXPORTED);
 					break;
 			}
 
@@ -132,7 +133,7 @@ public class UploadSessionJob extends Job {
 
 		switch (step) {
 			case AVAILABLE:
-
+                Logger.Log("jump to AVAILABLE");
 				dataCenter.addLog(context, containerId, "EXPORTED | Bắt đầu quá trình upload");
 				dataCenter.uploadExportSession(context, containerId);
 				break;
