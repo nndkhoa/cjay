@@ -13,10 +13,10 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.event.EventMenuCreated;
 import com.cloudjay.cjay.event.UserLoggedOutEvent;
 import com.cloudjay.cjay.event.session.ContainersFetchedEvent;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.job.UploadForceExportSessionJob;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -84,14 +84,21 @@ public class BaseActivity extends FragmentActivity {
 		return super.onOptionsItemSelected(item);
 	}
 	@OptionsItem(R.id.menu_export)
-	void exportSession(){
+	void exportSession() {
 		//Export session immediately
 		Session session = dataCenter.getSession(this,exportSessionContainerId);
 		Step step = Step.values()[session.getLocalStep()];
 		if (session.isValidToUpload(step)){
-			//Add upload sesion to job
-			JobManager jobManager = App.getJobManager();
-			jobManager.addJobInBackground(new UploadForceExportSessionJob(exportSessionContainerId, true));
+			try {
+				dataCenter.changeSessionLocalStep(this, exportSessionContainerId,Step.AVAILABLE);
+				Intent intent = new Intent(this, WizardActivity_.class);
+				intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, exportSessionContainerId);
+				intent.putExtra(WizardActivity.STEP_EXTRA, Step.AVAILABLE.value);
+				startActivity(intent);
+			} catch (SnappydbException e) {
+				e.printStackTrace();
+			}
+
 		} else {
 			Utils.showCrouton(this,"Container này không thể xuất chỉ định");
 		}

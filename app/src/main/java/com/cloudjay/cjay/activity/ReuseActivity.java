@@ -75,6 +75,11 @@ public class ReuseActivity extends Activity {
         // Get session by containerId
         mSession = dataCenter.getSession(getApplicationContext(), containerID);
 
+	    if ( mActionMode == null) {
+		    // there are some selected items, start the actionMode
+		    mActionMode = startActionMode(new ActionModeCallBack());
+	    }
+
         if (null == mSession) {
 
             // Set ContainerId to TextView
@@ -108,13 +113,6 @@ public class ReuseActivity extends Activity {
 
                 Logger.Log("count : " + gateImageAdapter.getCheckedCJayImageUrlsCount());
 
-                if (hasCheckedItems && mActionMode == null) {
-                    // there are some selected items, start the actionMode
-                    mActionMode = startActionMode(new ActionModeCallBack());
-                } else if (!hasCheckedItems && mActionMode != null) {
-                    // there no selected items, finish the actionMode
-                    mActionMode.finish();
-                }
 
                 if (mActionMode != null)
                     mActionMode.setTitle(String.valueOf(gateImageAdapter.getCheckedCJayImageUrlsCount()) + " selected");
@@ -236,7 +234,6 @@ public class ReuseActivity extends Activity {
                     gateImageAdapter.removeAllCheckedCJayImageUrl();
                     gateImageAdapter.notifyDataSetChanged();
 
-                    actionMode.finish();
                     break;
             }
 
