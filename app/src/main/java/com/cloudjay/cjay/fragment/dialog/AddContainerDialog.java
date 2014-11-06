@@ -6,12 +6,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
+import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
+import com.cloudjay.cjay.fragment.CameraFragment;
+import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.StringUtils;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.enums.ImageType;
+import com.cloudjay.cjay.util.enums.Step;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
@@ -26,6 +35,11 @@ public class AddContainerDialog extends SimpleDialogFragment {
 
 	@ViewById(R.id.et_container_id)
 	EditText etContainerID;
+
+    @Bean
+    DataCenter dataCenter;
+
+    Session mSession;
 
 	@Override
 	protected Builder build(final Builder builder) {
@@ -58,9 +72,13 @@ public class AddContainerDialog extends SimpleDialogFragment {
 						getNeutralButton().setVisibility(View.GONE);
 
 						// Start workflow
-						Intent intent = new Intent(getActivity(), WizardActivity_.class);
-						intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, containerId);
-						startActivity(intent);
+						//Intent intent = new Intent(getActivity(), WizardActivity_.class);
+						//intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, containerId);
+						//startActivity(intent);
+
+                        createContainerSession();
+                        openCamera();
+
 						dismiss();
 					}
 				}
@@ -77,10 +95,9 @@ public class AddContainerDialog extends SimpleDialogFragment {
 		builder.setNeutralButton("Taọ sai ISO", new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Intent intent = new Intent(getActivity(), WizardActivity_.class);
-				intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, containerId);
-				startActivity(intent);
-				dismiss();
+
+                createContainerSession();
+                openCamera();
 			}
 		});
 
@@ -122,4 +139,37 @@ public class AddContainerDialog extends SimpleDialogFragment {
 			}
 		}
 	}
+
+    void createContainerSession() {
+        // Add new session to database
+        String currentTime = StringUtils.getCurrentTimestamp(CJayConstant.
+                CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+
+        // Create container session
+        mSession = new Session().withContainerId(containerId)
+                .withLocalStep(Step.IMPORT.value)
+                .withStep(Step.IMPORT.value)
+                .withCheckInTime(currentTime);
+
+        // Save normal session and working session.
+        // add working session also post an event
+        dataCenter.addSession(mSession);
+        dataCenter.addWorkingSession(mSession);
+    }
+
+    void openCamera() {
+
+        Intent intent = new Intent(getActivity(), WizardActivity_.class);
+        intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, containerId);
+        startActivity(intent);
+
+        // Open camera activity
+        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
+        cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerId);
+        cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, "");
+        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
+        cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
+        startActivity(cameraActivityIntent);
+        dismiss();
+    }
 }

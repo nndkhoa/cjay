@@ -148,7 +148,9 @@ public class ImportFragment extends Fragment {
 			tvContainerCode.setText(containerID);
 
             Operator operator = dataCenter.getOperator(getActivity().getApplicationContext(), operatorCode);
-			etOperator.setText(operator.getOperatorName());
+            if (operator != null) {
+                etOperator.setText(operator.getOperatorName());
+            }
 
             preStatus = mSession.getPreStatus();
 
@@ -191,25 +193,14 @@ public class ImportFragment extends Fragment {
 		// Set operator to edit text
 		etOperator.setText(operator.getOperatorName());
 
-		// Add new session to database
-		String currentTime = StringUtils.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-
-        mSession = new Session().withContainerId(containerID)
-                .withOperatorCode(operatorCode)
-                .withOperatorId(operator.getId())
-                .withPreStatus(preStatus)
-                .withLocalStep(Step.IMPORT.value)
-                .withStep(Step.IMPORT.value)
-                .withCheckInTime(currentTime);
-
         if (mSession != null) {
+            mSession.setOperatorId(operator.getId());
+            mSession.setOperatorCode(operator.getOperatorCode());
             mSession.setGateImages(list);
         }
 
-        // Save normal session and working session.
-        // add working session also post an event
+        // Save session
         dataCenter.addSession(mSession);
-        dataCenter.addWorkingSession(mSession);
 	}
 
 	/**
@@ -226,6 +217,7 @@ public class ImportFragment extends Fragment {
 		// Re-query container session with given containerId
 		String containerId = event.getContainerId();
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+
 		refresh();
 	}
 	//endregion
@@ -234,6 +226,7 @@ public class ImportFragment extends Fragment {
 	void refresh() {
 		if (mSession != null) {
 			list = mSession.getImportImages();
+            Logger.Log("Size: " + list.size());
 			updatedData();
 		}
 	}
@@ -251,8 +244,6 @@ public class ImportFragment extends Fragment {
 	@Click(R.id.btn_camera)
 	void buttonCameraClicked() {
 
-		if (!TextUtils.isEmpty(tvContainerCode.getText()) && !TextUtils.isEmpty(etOperator.getText())) {
-
 			// Open camera activity
 			Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
 			cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
@@ -260,12 +251,6 @@ public class ImportFragment extends Fragment {
 			cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
 			cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
 			startActivity(cameraActivityIntent);
-
-		} else {
-
-			// Alert: require select operator first
-			Utils.showCrouton(getActivity(), R.string.require_select_operator_first);
-		}
 	}
 
 	/**
@@ -336,6 +321,9 @@ public class ImportFragment extends Fragment {
 	void preStatusAChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 0;
+            mSession.setPreStatus(preStatus);
+            dataCenter.addSession(mSession);
+            dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.GONE);
 		}
 	}
@@ -344,6 +332,9 @@ public class ImportFragment extends Fragment {
 	void preStatusBChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 1;
+            mSession.setPreStatus(preStatus);
+            dataCenter.addSession(mSession);
+            dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.VISIBLE);
 		}
 	}
@@ -352,6 +343,9 @@ public class ImportFragment extends Fragment {
 	void preStatusCChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 2;
+            mSession.setPreStatus(preStatus);
+            dataCenter.addSession(mSession);
+            dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.VISIBLE);
 		}
 	}

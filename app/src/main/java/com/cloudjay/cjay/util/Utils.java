@@ -44,6 +44,8 @@ public class Utils {
 
 	public static void logOut(Context context) {
 
+        // Unsubcribe channel pubnub
+
 		// Clear preference and Database
 		PreferencesUtil.clearPrefs(context);
 		context.deleteDatabase("db_default_job_manager.db");
