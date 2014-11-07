@@ -74,7 +74,7 @@ public class AuditItem {
 
 	@SerializedName("is_allowed")
 	@Expose
-	private boolean isAllowed;
+	private Boolean isAllowed;
 
 	@SerializedName("audit_images")
 	@Expose
@@ -262,15 +262,15 @@ public class AuditItem {
 		return this;
 	}
 
-	public boolean isIsAllowed() {
+	public Boolean isIsAllowed() {
 		return isAllowed;
 	}
 
-	public void setIsAllowed(boolean isAllowed) {
+	public void setIsAllowed(Boolean isAllowed) {
 		this.isAllowed = isAllowed;
 	}
 
-	public AuditItem withIsAllowed(boolean isAllowed) {
+	public AuditItem withIsAllowed(Boolean isAllowed) {
 		this.isAllowed = isAllowed;
 		return this;
 	}

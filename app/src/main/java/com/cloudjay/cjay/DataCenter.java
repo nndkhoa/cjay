@@ -542,15 +542,32 @@ public class DataCenter {
 	 */
 	@Trace
 	public void fetchSession(Context context, String lastModifiedDate) throws SnappydbException {
-		List<Session> sessions = networkClient.getAllSessions(context, lastModifiedDate);
-		DB db = App.getDB(context);
-		for (Session session : sessions) {
+		String newModifiedDay;
+		//Get current page from preferences
+		//if current page is null =>> next page use to get session = 1
+		// else next page to get session = current page +1
+		do {
+			int nextPage;
+			String currentPage = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE);
+			if (currentPage.isEmpty()) {
+				nextPage = 1;
+			} else {
+				nextPage = Integer.valueOf(currentPage) + 1;
+			}
 
-			String key = session.getContainerId();
-			session.setLocalStep(session.getStep());
+			List<Session> sessions = networkClient.getSessionByPage(context, nextPage, lastModifiedDate);
+			DB db = App.getDB(context);
+			for (Session session : sessions) {
 
-			db.put(key, session);
-		}
+				String key = session.getContainerId();
+				session.setLocalStep(session.getStep());
+
+				db.put(key, session);
+			}
+			Logger.Log("Fetched page: " + nextPage);
+			newModifiedDay = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
+			Logger.Log("Current Modified day: " + newModifiedDay);
+		} while (lastModifiedDate.equals(newModifiedDay));
 
 	}
 
@@ -1062,28 +1079,6 @@ public class DataCenter {
 		Session result = networkClient.uploadSession(context, session);
 		Logger.logJson(result);
 
-		// Update container back to database
-		if (result != null) {
-			session.mergeSession(result);
-			String key = result.getContainerId();
-			db.put(key, session);
-		}
-	}
-
-	/**
-	 * Upload export session
-	 *
-	 * @param context
-	 * @param containerId
-	 * @throws SnappydbException
-	 */
-	public void uploadExportSession(Context context, String containerId) throws SnappydbException {
-
-		// Upload audit item session to server
-		DB db = App.getDB(context);
-		Session session = db.getObject(containerId, Session.class);
-		Session result = networkClient.checkOutContainerSession(context, session);
-
 		if (result != null) {
 
 			// Update container back to database
@@ -1300,6 +1295,29 @@ public class DataCenter {
 
 		EventBus.getDefault().post(new IssueDeletedEvent(containerId));
 	}
+
+	public void uploadExportSession(Context context, String containerId) throws SnappydbException {
+
+		// Upload audit item session to server
+		DB db = App.getDB(context);
+		Session oldSession = db.getObject(containerId, Session.class);
+		Session result = networkClient.checkOutContainerSession(context, oldSession);
+		Logger.Log("Add AuditItem to Session Id: " + result.getId());
+
+		if (result != null) {
+
+			// Update container back to database
+			String key = result.getContainerId();
+			oldSession.setUploadStatus(UploadStatus.COMPLETE);
+			oldSession.mergeSession(result);
+			db.put(key, result);
+
+			// Then remove them from WORKING
+			String workingKey = CJayConstant.PREFIX_WORKING + key;
+			db.del(workingKey);
+		}
+	}
+
 
 	/**
 	 * Update given audit item
