@@ -4,10 +4,9 @@ import android.content.Context;
 
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.AuditImagesGotEvent;
-import com.cloudjay.cjay.event.GateImagesGotEvent;
-import com.cloudjay.cjay.event.IssueUpdatedEvent;
 import com.cloudjay.cjay.event.issue.IssueDeletedEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
+import com.cloudjay.cjay.event.issue.IssueUpdatedEvent;
 import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
 import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.session.SearchAsyncStartedEvent;
@@ -400,32 +399,6 @@ public class DataCenter {
 	//region SESSION
 
 	/**
-	 * Set session have containerId is hand cleaning session, upload this to server then add new session return from server to database
-	 *
-	 * @param context
-	 * @param containerId
-	 * @return
-	 */
-	public Session setHandCleaningSession(Context context, String containerId) {
-		try {
-			DB db = App.getDB(context);
-
-			Session session = db.getObject(containerId, Session.class);
-			Session result = networkClient.setHandCleaningSession(context, session);
-
-			// merge session
-			session.mergeSession(result);
-			db.put(session.getContainerId(), session);
-			return session;
-
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-			return null;
-		}
-
-	}
-
-	/**
 	 * get Session from server
 	 *
 	 * @param context
@@ -772,11 +745,11 @@ public class DataCenter {
 	 * @param auditItemRemove
 	 * @param auditImageUUID
 	 */
-	public void addAuditImageToAuditedIssue(Context context,
-	                                        String containerId,
-	                                        String auditItemUUID,
-	                                        String auditItemRemove,
-	                                        String auditImageUUID) {
+	public void addAuditImageToAuditedItem(Context context,
+	                                       String containerId,
+	                                       String auditItemUUID,
+	                                       String auditItemRemove,
+	                                       String auditImageUUID) {
 
 		try {
 			DB db = App.getDB(context);
@@ -787,13 +760,13 @@ public class DataCenter {
 					auditItemRemove, auditImageUUID);
 
 			// Remove audit item will be merged
-			AuditItem removeItem = getAuditItemByUUID(context, containerId, auditItemRemove);
+			AuditItem removeItem = getAuditItem(context, containerId, auditItemRemove);
 			if (removeItem != null) {
 				Logger.Log("Begin to remove");
 				session.getAuditItems().remove(removeItem);
 			}
 
-			AuditItem itemMerged = getAuditItemByUUID(context, containerId, auditItemUUID);
+			AuditItem itemMerged = getAuditItem(context, containerId, auditItemUUID);
 			if (itemMerged != null) {
 				AuditItem tmp = itemMerged;
 				tmp.getAuditImages().add(auditImage);
@@ -805,7 +778,6 @@ public class DataCenter {
 			db.put(containerId, session);
 			Logger.Log("add AuditImage To AuditedIssue successfully");
 
-
 		} catch (SnappydbException e) {
 			Logger.w(e.getMessage());
 		}
@@ -815,6 +787,7 @@ public class DataCenter {
 
 	public void getAuditImages(Context context, String containerId) {
 		Session session = null;
+
 		try {
 			DB db = App.getDB(context);
 			session = db.getObject(containerId, Session.class);
@@ -849,13 +822,19 @@ public class DataCenter {
 
 		try {
 			DB db = App.getDB(context);
-			Session localSession = db.getObject(containerId, Session.class);
-			if (localSession != null) {
-				for (AuditItem auditItem : localSession.getAuditItems()) {
-					if (auditItem.getAuditItemUUID().equals(auditItemUUID)) {
+			Session session = db.getObject(containerId, Session.class);
+
+			if (session != null) {
+
+				// Find audit item
+				for (AuditItem auditItem : session.getAuditItems()) {
+					if (auditItem.getUuid().equals(auditItemUUID)) {
+
+						// Find audit image
 						for (AuditImage auditImage : auditItem.getAuditImages()) {
 							if (auditImage.getAuditImageUUID().equals(auditImageUUID))
 								return auditImage;
+
 						}
 					}
 				}
@@ -863,20 +842,9 @@ public class DataCenter {
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
-		return null;
 
-	}
-
-	public AuditImage getAuditImageByUUId(Context context, String auditImageUUID) {
-		try {
-			DB db = App.getDB(context);
-			return db.getObject(auditImageUUID, AuditImage.class);
-		} catch (SnappydbException e) {
-			Logger.e(e.getMessage());
-		}
 		return null;
 	}
-
 
 	/**
 	 * Add image to container Session
@@ -893,21 +861,22 @@ public class DataCenter {
 		Session session = db.getObject(containerId, Session.class);
 		session.getGateImages().add(image);
 
-		Logger.Log("Size: " + session.getGateImages().size());
-
 		String key = containerId;
 		db.put(key, session);
 
-//		// Add gate image to on working container session
-//		key = CJayConstant.PREFIX_WORKING + containerId;
-//		db.put(key, session);
-
-
 	}
 
+	/**
+	 * Add audit image to tmp audit item in given container session
+	 *
+	 * @param context
+	 * @param auditImage
+	 * @param containerId
+	 * @throws SnappydbException
+	 */
 	public void addAuditImage(Context context, AuditImage auditImage, String containerId) throws SnappydbException {
-		DB db = App.getDB(context);
 
+		DB db = App.getDB(context);
 		Session session = db.getObject(containerId, Session.class);
 
 		// Generate random one UUID to save auditItem
@@ -916,37 +885,25 @@ public class DataCenter {
 		// Create new audit item to save
 		AuditItem auditItem = new AuditItem();
 		auditItem.setId(0);
-		auditItem.setAuditItemUUID(uuid);
-
-		// this audit item has not been audited yet
+		auditItem.setUuid(uuid);
 		auditItem.setAudited(false);
-
-		// this audit item has not been approved yet
 		auditItem.setApproved(false);
-
-		// this audit item has not been allowed to repair yet
 		auditItem.setIsAllowed(false);
-
-		// this audit item has not been repaired  yet
 		auditItem.setRepaired(false);
-
-		// this audit item has not been uploaded yet
 		auditItem.setUploadStatus(UploadStatus.NONE);
 
 		// Get list session's audit items
 		List<AuditItem> auditItems = session.getAuditItems();
 		if (auditItems == null) {
-			auditItems = new ArrayList<AuditItem>();
+			auditItems = new ArrayList<>();
 		}
 
 		List<AuditImage> auditImages = auditItem.getAuditImages();
 		if (auditImages == null) {
-			auditImages = new ArrayList<AuditImage>();
+			auditImages = new ArrayList<>();
 		}
 		// Add audit image to list audit images
 		auditImages.add(auditImage);
-
-		// Set list audit images to audit item
 		auditItem.setAuditImages(auditImages);
 
 		// Add audit item to List session's audit items
@@ -957,63 +914,7 @@ public class DataCenter {
 
 		db.put(containerId, session);
 
-		Logger.Log("insert audit image successfully");
-
-	}
-
-	public void getGateImages(Context context, String containerId) throws SnappydbException {
-		DB db = App.getDB(context);
-		Session session = db.getObject(containerId, Session.class);
-
-
-		List<GateImage> gateImages = session.getGateImages();
-		EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
-	}
-
-	public void getAllGateImagesByContainerId(Context context, String containerId) {
-		try {
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
-			List<GateImage> gateImages = session.getGateImages();
-
-			Logger.Log("gate images count in dataCenter: " + gateImages.size());
-
-
-			EventBus.getDefault().post(new GateImagesGotEvent(gateImages));
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-	}
-	//endregion
-
-	//region UPLOAD
-
-	/**
-	 * 1. Tìm session với containerId trong list uploading.
-	 * 2. Upload hình và gán field uploaded ngược vào list uploading
-	 *
-	 * @param context
-	 * @param uri
-	 * @param imageName
-	 * @param containerId
-	 * @throws SnappydbException
-	 */
-
-	public boolean uploadImage(Context context, String uri, String imageName, String containerId, ImageType imageType) throws SnappydbException {
-
-		try {
-			//Call network client to upload image
-			networkClient.uploadImage(uri, imageName);
-
-			// Change image status to COMPLETE
-			setImageUploadStatus(context, containerId, imageName, imageType, UploadStatus.COMPLETE);
-
-			return true;
-		} catch (RetrofitError e) {
-
-			Logger.w(e.getMessage());
-			return false;
-		}
+		Logger.Log("Insert audit image successfully");
 	}
 
 	/**
@@ -1095,6 +996,60 @@ public class DataCenter {
 		}
 	}
 
+	//endregion
+
+	//region UPLOAD
+
+	/**
+	 * 1. Tìm session với containerId trong list uploading.
+	 * 2. Upload hình và gán field uploaded ngược vào list uploading
+	 *
+	 * @param context
+	 * @param uri
+	 * @param imageName
+	 * @param containerId
+	 * @throws SnappydbException
+	 */
+	public boolean uploadImage(Context context, String uri, String imageName, String containerId, ImageType imageType) throws SnappydbException {
+
+		try {
+			//Call network client to upload image
+			networkClient.uploadImage(uri, imageName);
+
+			// Change image status to COMPLETE
+			setImageUploadStatus(context, containerId, imageName, imageType, UploadStatus.COMPLETE);
+			return true;
+
+		} catch (RetrofitError e) {
+			Logger.w(e.getMessage());
+			return false;
+		}
+	}
+
+	/**
+	 * @param context
+	 * @param containerId
+	 * @param oldAuditItemUUID
+	 * @throws SnappydbException
+	 */
+	public void uploadAuditItem(Context context, String containerId, String oldAuditItemUUID) throws SnappydbException {
+
+		DB db = App.getDB(context);
+		Session session = db.getObject(containerId, Session.class);
+
+		AuditItem oldAuditItem = getAuditItem(context, containerId, oldAuditItemUUID);
+
+		Session result = networkClient.postAuditItem(context, session, oldAuditItem);
+		String key = result.getContainerId();
+
+		session.mergeSession(result);
+
+		db.put(key, session);
+
+		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
+	}
+
+
 	/**
 	 * -1. Change local step to import
 	 * 0. Check for make sure all gate image have uploaded
@@ -1131,37 +1086,26 @@ public class DataCenter {
 
 	}
 
-
-	public void uploadAuditItem(Context context, String containerId, String oldAuditItemUUID) throws SnappydbException {
-		// Upload audit item session to server
-		DB db = App.getDB(context);
-
-		Session oldSession = db.getObject(containerId, Session.class);
-		AuditItem oldAuditItem = getAuditItemByUUID(context, containerId, oldAuditItemUUID);
-		Session result = networkClient.postAuditItem(context, oldSession, oldAuditItem);
-		String key = result.getContainerId();
-
-		oldSession.mergeSession(result);
-
-		db.put(key, oldSession);
-
-		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
-	}
-
+	/**
+	 * Upload export session
+	 *
+	 * @param context
+	 * @param containerId
+	 * @throws SnappydbException
+	 */
 	public void uploadExportSession(Context context, String containerId) throws SnappydbException {
 
 		// Upload audit item session to server
 		DB db = App.getDB(context);
-		Session oldSession = db.getObject(containerId, Session.class);
-		Session result = networkClient.checkOutContainerSession(context, oldSession);
-		Logger.Log("Add AuditItem to Session Id: " + result.getId());
+		Session session = db.getObject(containerId, Session.class);
+		Session result = networkClient.checkOutContainerSession(context, session);
 
 		if (result != null) {
 
 			// Update container back to database
 			String key = result.getContainerId();
-			oldSession.setUploadStatus(UploadStatus.COMPLETE);
-			oldSession.mergeSession(result);
+			session.setUploadStatus(UploadStatus.COMPLETE);
+			session.mergeSession(result);
 			db.put(key, result);
 
 			// Then remove them from WORKING
@@ -1179,16 +1123,11 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	public void uploadAuditedSession(Context context, String containerId) throws SnappydbException {
+	public void uploadAuditSession(Context context, String containerId) throws SnappydbException {
 		// Upload complete audit session to server
 		DB db = App.getDB(context);
 		Session oldSession = db.getObject(containerId, Session.class);
 		Session result = networkClient.completeAudit(context, oldSession);
-
-		GsonBuilder builder = new GsonBuilder();
-		Gson gson = builder.create();
-
-		Logger.Log("result: " + gson.toJson(result));
 
 		if (result != null) {
 
@@ -1214,14 +1153,12 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	public void
-	uploadRepairedSession(Context context, String containerId) throws SnappydbException {
+	public void uploadRepairSession(Context context, String containerId) throws SnappydbException {
 
 		// Upload complete repair session to server
 		DB db = App.getDB(context);
 		Session oldSession = db.getObject(containerId, Session.class);
 		Session result = networkClient.completeRepairSession(context, oldSession);
-		Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
 		GsonBuilder builder = new GsonBuilder();
 		Gson gson = builder.create();
@@ -1245,6 +1182,32 @@ public class DataCenter {
 		}
 
 		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
+	}
+
+	/**
+	 * Set session have containerId is hand cleaning session, upload this to server then add new session return from server to database
+	 *
+	 * @param context
+	 * @param containerId
+	 * @return
+	 */
+	public Session setHandCleaningSession(Context context, String containerId) {
+		try {
+			DB db = App.getDB(context);
+
+			Session session = db.getObject(containerId, Session.class);
+			Session result = networkClient.setHandCleaningSession(context, session);
+
+			// merge session
+			session.mergeSession(result);
+			db.put(session.getContainerId(), session);
+			return session;
+
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+			return null;
+		}
+
 	}
 
 	//endregion
@@ -1364,26 +1327,46 @@ public class DataCenter {
 	 * @param containerId
 	 * @param auditItemUUID
 	 */
-	public void deleteAuditItemAfterMerge(Context context, String containerId, String auditItemUUID) {
+	public void removeAuditItem(Context context, String containerId, String auditItemUUID) {
 		try {
+			// find session
 			DB db = App.getDB(context);
 			Session session = db.getObject(containerId, Session.class);
 
-			for (AuditItem auditItem : session.getAuditItems()) {
-				if (auditItem.getAuditItemUUID().equals(auditItemUUID)) {
-					session.getAuditItems().remove(auditItem);
-					break;
-				}
+			// Remove audit item from session
+			if (session != null) {
+				session.removeAuditItem(auditItemUUID);
+				db.put(containerId, session);
 			}
-
-			db.put(containerId, session);
-			Logger.Log("delete audit item successfully");
 
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
 
 		EventBus.getDefault().post(new IssueDeletedEvent(containerId));
+	}
+
+	/**
+	 * Update given audit item
+	 *
+	 * @param context
+	 * @param containerId
+	 * @param auditItem
+	 */
+	public void updateAuditItem(Context context, String containerId, AuditItem auditItem) {
+		try {
+			// find session
+			DB db = App.getDB(context);
+			Session session = db.getObject(containerId, Session.class);
+			session.updateAuditItem(auditItem);
+			db.put(containerId, session);
+
+			// Notify that an audit item is updated
+			EventBus.getDefault().post(new IssueUpdatedEvent(containerId));
+
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -1398,41 +1381,42 @@ public class DataCenter {
 	 * 6. Thêm lỗi đã cập nhật thành lỗi vệ sinh vào database
 	 *
 	 * @param context
-	 * @param item
+	 * @param auditItem
 	 * @throws SnappydbException
 	 */
-	public void setWaterWashType(Context context, final AuditItem item, String containerId) throws SnappydbException {
+	public void setWaterWashType(Context context, final AuditItem auditItem, String containerId) throws SnappydbException {
 
-		Logger.Log("audit item selected: " + item.getAuditItemUUID());
+		Logger.Log("Selected audit item: " + auditItem.getUuid());
 
+		// Find session
 		DB db = App.getDB(context);
-
 		Session session = db.getObject(containerId, Session.class);
 
-		// --> Nếu nhiều image cùng thuộc một lỗi vệ sinh, thì tính là một
+		// --> Nếu nhiều image cùng được chọn là lỗi vệ sinh, thì gộp tất cả vào một lỗi
 		boolean isExisted = false;
 		List<AuditItem> list = session.getAuditItems();
 		for (int i = 0; i < list.size(); i++) {
+
 			// neu da ton tai loi ve sinh va chua duoc upload thi them hinh vao loi ve sinh
 			if (list.get(i).isWashTypeItem() && list.get(i).getId() == 0) {
-				list.get(i).getAuditImages().add(item.getAuditImages().get(0));
+				list.get(i).getAuditImages().add(auditItem.getAuditImages().get(0));
 				isExisted = true;
 				Logger.Log("existed");
 				break;
 			}
 		}
 
+		// Remove temporary audit item
 		for (int i = 0; i < list.size(); i++) {
-
-			if (list.get(i).getAuditItemUUID().equals(item.getAuditItemUUID())) {
-				Logger.Log("remove this");
+			if (list.get(i).equals(auditItem)) {
 				list.remove(i);
 			}
 		}
 
 		if (!isExisted) {
 
-			Logger.Log("create new");
+			Logger.Log("Create new audit item");
+
 			// Add Iso Code
 			String damageKey = CJayConstant.PREFIX_DAMAGE_CODE + "DB";
 			String repairKey = CJayConstant.PREFIX_REPAIR_CODE + "WW";
@@ -1442,86 +1426,29 @@ public class DataCenter {
 			IsoCode repairCode = db.getObject(repairKey, IsoCode.class);
 			IsoCode componentCode = db.getObject(componentKey, IsoCode.class);
 
-			item.setDamageCodeId(damageCode.getId());
-			item.setDamageCode(damageCode.getCode());
+			auditItem.setDamageCodeId(damageCode.getId());
+			auditItem.setDamageCode(damageCode.getCode());
 
-			item.setRepairCodeId(repairCode.getId());
-			item.setRepairCode(repairCode.getCode());
+			auditItem.setRepairCodeId(repairCode.getId());
+			auditItem.setRepairCode(repairCode.getCode());
 
-			item.setComponentCodeId(componentCode.getId());
-			item.setComponentCode(componentCode.getCode());
+			auditItem.setComponentCodeId(componentCode.getId());
+			auditItem.setComponentCode(componentCode.getCode());
 
-			item.setLocationCode("BXXX");
-			item.setAudited(true);
-			item.setIsAllowed(true);
+			auditItem.setLocationCode("BXXX");
+			auditItem.setAudited(true);
+			auditItem.setIsAllowed(true);
 
-			list.add(item);
+			list.add(auditItem);
 		}
 
 		session.setAuditItems(list);
-
 		db.put(containerId, session);
-
 		EventBus.getDefault().post(new IssueDeletedEvent(containerId));
 	}
 
 	/**
-	 * Get List audit item for normal session
-	 *
-	 * @param context
-	 * @param containerId
-	 * @return List Audit Item
-	 */
-	public List<AuditItem> getListAuditItems(Context context, String containerId) {
-		try {
-			DB db = App.getDB(context);
-
-			Session session = db.getObject(containerId, Session.class);
-			List<AuditItem> auditItems = session.getAuditItems();
-
-
-			return auditItems;
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	// Thệm lỗi đã giám định
-	public void addIssue(Context context, AuditItem auditItem, String containerId) {
-		try {
-
-			Logger.Log("auditItem.getAudited() = " + auditItem.getAudited());
-
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
-
-			// Get list session's audit items
-			List<AuditItem> auditItems = session.getAuditItems();
-			if (auditItems == null) {
-				auditItems = new ArrayList<>();
-			}
-
-			// Add audit item to List session's audit items
-			auditItems.add(auditItem);
-
-			// Add audit item to Session
-			session.setAuditItems(auditItems);
-
-			db.put(containerId, session);
-
-			Logger.Log("insert issue audited successfully");
-
-
-		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
-		}
-
-	}
-
-	/**
 	 * Get audit item from server by id.
-	 * <p/>
 	 * 1. Đầu tiên sẽ lấy session từ server.
 	 * 2. Kiểm tra trong db có tồn tại session này chưa
 	 * 2.1 Nếu có thì update
@@ -1530,28 +1457,34 @@ public class DataCenter {
 	 * @param context
 	 * @param id
 	 */
-	public Session getAuditItemById(Context context, long id) throws SnappydbException {
+	public Session getAuditItemAsyncById(Context context, long id) throws SnappydbException {
 
 		AuditItem auditItem = networkClient.getAuditItemById(id);
+		if (auditItem != null) {
 
-		long sessionId = auditItem.getSession();
-		Session session = getSessionAsyncById(context, sessionId);
-		return session;
+			long sessionId = auditItem.getSession();
+			Session session = getSessionAsyncById(context, sessionId);
+			return session;
+		}
 
+		return null;
 	}
 
-
-	public void changeUploadState(Context context, String containerId,
-	                              AuditItem auditItem) {
+	/**
+	 * Change upload status of an audit item
+	 *
+	 * @param context
+	 * @param containerId
+	 * @param auditItem
+	 */
+	public void changeUploadStatus(Context context, String containerId, AuditItem auditItem) {
 		try {
 			DB db = App.getDB(context);
 			Session session = db.getObject(containerId, Session.class);
 
 			List<AuditItem> list = session.getAuditItems();
 			for (AuditItem item : list) {
-				if (item.getAuditItemUUID().equals(auditItem.getAuditItemUUID())) {
-					Logger.e(item.getAuditItemUUID());
-					Logger.e(auditItem.getAuditItemUUID());
+				if (item.equals(auditItem)) {
 					item.setUploadStatus(auditItem.getUploadStatus());
 				}
 			}
@@ -1565,47 +1498,24 @@ public class DataCenter {
 
 	}
 
-	public void updateAuditItem(Context context, String containerId,
-	                            AuditItem auditItem) {
+	/**
+	 * Return Audit item of given container
+	 *
+	 * @param context
+	 * @param containerId
+	 * @param itemUuid
+	 * @return
+	 */
+	public AuditItem getAuditItem(Context context, String containerId, String itemUuid) {
+
 		try {
 			DB db = App.getDB(context);
 			Session session = db.getObject(containerId, Session.class);
-
-			List<AuditItem> list = session.getAuditItems();
-			for (int i = 0; i < list.size(); i++) {
-				if (list.get(i).getAuditItemUUID().equals(auditItem.getAuditItemUUID())) {
-					list.remove(i);
-				}
+			if (session != null) {
+				return session.getAuditItem(itemUuid);
+			} else {
+				return null;
 			}
-
-			list.add(auditItem);
-
-			// Set modified list to session
-			session.setAuditItems(list);
-
-			db.put(containerId, session);
-
-			EventBus.getDefault().post(new IssueUpdatedEvent(containerId));
-
-			Logger.Log("update successfully");
-
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public AuditItem getAuditItemByUUID(Context context, String containerId,
-	                                    String auditItemUUID) {
-		try {
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
-
-			for (AuditItem auditItem : session.getAuditItems()) {
-				if (auditItem.getAuditItemUUID().equals(auditItemUUID)) {
-					return auditItem;
-				}
-			}
-			return null;
 
 		} catch (SnappydbException e) {
 			e.printStackTrace();

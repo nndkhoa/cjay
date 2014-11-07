@@ -11,14 +11,13 @@ import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONException;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Generated;
 
 
-/* Field auditItemUUID để phân biệt AuditItem dưới Local, trước khi upload lên server */
+/* Field uuid để phân biệt AuditItem dưới Local, trước khi upload lên server */
 @Generated("org.jsonschema2pojo")
 public class AuditItem {
 
@@ -89,9 +88,7 @@ public class AuditItem {
 	@Expose
 	private String modifiedAt;
 
-	@SerializedName("audit_item_uuid")
-	@Expose
-	private String auditItemUUID;
+	private String uuid;
 
 	@SerializedName("is_audited")
 	@Expose
@@ -317,12 +314,12 @@ public class AuditItem {
 		return this;
 	}
 
-	public void setAuditItemUUID(String audiItemUUID) {
-		this.auditItemUUID = audiItemUUID;
+	public void setUuid(String audiItemUUID) {
+		this.uuid = audiItemUUID;
 	}
 
-	public String getAuditItemUUID() {
-		return this.auditItemUUID;
+	public String getUuid() {
+		return this.uuid;
 	}
 
 	public void setApproved(boolean isApproved) {
@@ -444,11 +441,12 @@ public class AuditItem {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof AuditItem) {
-			AuditItem temp = (AuditItem) obj;
+			AuditItem tmp = (AuditItem) obj;
 
-			if (this.componentCodeId == temp.componentCodeId
-					&& this.damageCodeId == temp.damageCodeId
-					&& this.repairCodeId == temp.repairCodeId) {
+			if ((this.componentCodeId == tmp.componentCodeId
+					&& this.damageCodeId == tmp.damageCodeId
+					&& this.repairCodeId == tmp.repairCodeId
+					&& this.locationCode.equals(tmp.getLocationCode())) || (this.uuid.equals(tmp.uuid))) {
 				return true;
 			} else {
 				return false;
@@ -484,9 +482,9 @@ public class AuditItem {
 
 		this.setId(auditItemServer.getId());
 		this.setIsAllowed(auditItemServer.isIsAllowed());
-        this.setAudited(true);
-        /*if (!auditItemServer.isIsAllowed())
-            this.setRepaired(true);*/
+		this.setAudited(true);
+		/*if (!auditItemServer.isIsAllowed())
+	        this.setRepaired(true);*/
 
 		//merge audit Image
 		List<AuditImage> mergedAuditImages = this.auditImages;

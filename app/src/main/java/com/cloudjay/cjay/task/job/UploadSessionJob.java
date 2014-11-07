@@ -140,13 +140,13 @@ public class UploadSessionJob extends Job {
 
 			case AUDIT:
 				dataCenter.addLog(context, containerId, "AUDIT | Bắt đầu quá trình upload");
-				dataCenter.uploadAuditedSession(context, containerId);
+				dataCenter.uploadAuditSession(context, containerId);
 				break;
 
 			case REPAIR:
                 Logger.Log("repair to export");
 				dataCenter.addLog(context, containerId, "REPAIR | Bắt đầu quá trình upload");
-				dataCenter.uploadRepairedSession(context, containerId);
+				dataCenter.uploadRepairSession(context, containerId);
 				break;
 
 			case IMPORT:

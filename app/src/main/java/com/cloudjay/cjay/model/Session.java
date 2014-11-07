@@ -442,7 +442,7 @@ public class Session {
 			JsonArray repairedImageName = auditItem.getRepairedImageToUpLoad();
 			jsonObject.add("repair_images", repairedImageName);
 		}
-		auditItemsPut.add("audit_items",auditItems);
+		auditItemsPut.add("audit_items", auditItems);
 		return auditItemsPut;
 	}
 
@@ -472,10 +472,10 @@ public class Session {
 			// Chỉ cần có ít nhất một tấm hình IMPORT là hợp lệ
 			case IMPORT:
 
-                // Required operator
-                if (this.getOperatorId() == 0) {
-                    return false;
-                }
+				// Required operator
+				if (this.getOperatorId() == 0) {
+					return false;
+				}
 
 				for (GateImage image : gateImages) {
 					if (image.getType() == ImageType.IMPORT.value) return true;
@@ -622,6 +622,42 @@ public class Session {
 		return list;
 	}
 
+	/**
+	 * Get audit item that have given uuid
+	 *
+	 * @param auditItemUUID
+	 * @return
+	 */
+	public AuditItem getAuditItem(String auditItemUUID) {
+		for (AuditItem item : auditItems) {
+			if (item.getUuid().equals(auditItemUUID)) {
+				return item;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 *
+	 * @param uuid
+	 */
+	public boolean removeAuditItem(String uuid) {
+		for (AuditItem item : auditItems) {
+			if (item.getUuid().equals(uuid)) {
+				auditItems.remove(item);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 *
+	 * @param newSession
+	 * @return
+	 */
 	public Session mergeSession(Session newSession) {
 
 		this.setId(newSession.getId());
@@ -629,12 +665,12 @@ public class Session {
 		this.setCheckInTime(newSession.getCheckInTime());
 		this.setCheckOutTime(newSession.getCheckOutTime());
 
-        // local step is always greater or equal to step
-        Logger.Log("localStep client: " + this.getLocalStep());
-        Logger.Log("Step server: " + newSession.getStep());
-        if (this.getLocalStep() < newSession.getStep()) {
-            this.setLocalStep(newSession.getStep());
-        }
+		// local step is always greater or equal to step
+		Logger.Log("localStep client: " + this.getLocalStep());
+		Logger.Log("Step server: " + newSession.getStep());
+		if (this.getLocalStep() < newSession.getStep()) {
+			this.setLocalStep(newSession.getStep());
+		}
 
 		//merge Gate Image
 		List<GateImage> mergedGateImages = new ArrayList<GateImage>();
@@ -669,5 +705,25 @@ public class Session {
 			this.setAuditItems(localList);
 		}
 		return this;
+	}
+
+	/**
+	 * Find and update audit item information
+	 *
+	 * @param auditItem
+	 * @return
+	 */
+	public boolean updateAuditItem(AuditItem auditItem) {
+
+		// find and replace with the new one
+		for (AuditItem item : auditItems) {
+			if (item.equals(auditItem)) {
+				auditItems.remove(item);
+				auditItems.add(auditItem);
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

@@ -19,16 +19,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
-import org.bouncycastle.asn1.crmf.ProofOfPossession;
 
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import retrofit.RestAdapter;
@@ -359,13 +355,13 @@ public class NetworkClient {
 		Logger.Log("containerSession: " + containerSession.getId());
 		Logger.Log("auditItem: " + auditItem.getAuditItemToUpload());
 
-		String auditItemUUID = auditItem.getAuditItemUUID();
+		String auditItemUUID = auditItem.getUuid();
 		Session postAuditItemSession = provider.getRestAdapter(context).create(NetworkService.class).postAudiItem(containerSession.getId(), auditItem.getAuditItemToUpload());
 		List<AuditItem> list = postAuditItemSession.getAuditItems();
 		for (AuditItem item : list) {
 			if (item.equals(auditItem)) {
 				Logger.Log("Set here");
-				item.setAuditItemUUID(auditItemUUID);
+				item.setUuid(auditItemUUID);
 				item.setUploadStatus(UploadStatus.COMPLETE);
 			}
 		}
