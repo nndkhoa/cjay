@@ -150,7 +150,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			if (!auditItem.isIsAllowed()) {
 				holder.tvIssueStatus.setText("Cấm sửa");
 			} else {
-				if (!auditItem.getApproved()) {
+				if (auditItem.isIsAllowed() == null) {
 					holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_unapproved));
 				} else {
 					holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_approved));
@@ -166,7 +166,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 						// Nếu lỗi này cấm sửa, hiện dialog cấm sửa
 						showPreventRepairDialog();
 					} else {
-						if (!auditItem.getApproved()) {
+						if (auditItem.isIsAllowed() == null) {
 							// Show repair dialog
 							showRepairDiaglog();
 						} else {
