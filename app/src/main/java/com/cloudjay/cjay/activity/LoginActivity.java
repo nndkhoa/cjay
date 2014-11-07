@@ -107,8 +107,11 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		AccountManager manager = AccountManager.get(this);
 		String accountType = this.getIntent().getStringExtra(
 				PARAM_AUTH_TOKEN_TYPE);
+
 		if (accountType == null) {
-			accountType = AccountGeneral.ACCOUNT_TYPE;
+			// accountType = AccountGeneral.ACCOUNT_TYPE;
+			accountType = getApplicationContext().getPackageName();
+			Logger.Log("Account type: " + accountType);
 		}
 
 		final Account account = new Account(email, accountType);

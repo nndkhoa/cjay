@@ -3,11 +3,14 @@ package com.cloudjay.cjay.util;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -19,6 +22,7 @@ import android.widget.EditText;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.activity.HomeActivity_;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
@@ -43,16 +47,74 @@ import de.keyboardsurfer.android.widget.crouton.Style;
 
 public class Utils {
 
+	/**
+	 * Create notification
+	 * @param context
+	 */
+	public static void keepNotificationAlive(Context context) {
+
+		String contentText;
+		String tickerText;
+		String contentTitle;
+
+		Intent intent = new Intent(context, HomeActivity_.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+
+		PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
+				intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+		if (Utils.canReachInternet()) {
+			tickerText = "Connected to Internet";
+			contentText = "Connected";
+			contentTitle = "CJay Network";
+
+		} else {
+			tickerText = "Disconnected from Internet";
+			contentText = "No connectivity";
+			contentTitle = "CJay Network";
+		}
+
+		// Change notification message to connected
+		Notification.Builder builder = new Notification.Builder(context)
+				.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_app_small))
+				.setSmallIcon(R.drawable.ic_app_small).setTicker(tickerText)
+				.setWhen(System.currentTimeMillis())
+				.setContentTitle(contentTitle)
+				.setOngoing(true)
+				.setContentText(contentText)
+				.setContentIntent(contentIntent);
+
+		NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		notificationManager.notify(CJayConstant.PERMANENT_NOTIFICATION_ID, builder.build());
+
+	}
+
+	/**
+	 * Log user out
+	 * 1. Unsubscribe all pubnub channel
+	 * 2. Clear all preference data
+	 * 3. Delete JobQueue DB
+	 * 4. Delete snappy DB
+	 *
+	 * @param context
+	 */
 	public static void logOut(Context context) {
 
-        // Unsubscribe channel pubnub
-        Pubnub pubnub = new Pubnub(CJayConstant.PUBLISH_KEY, CJayConstant.SUBSCRIBE_KEY);
-        pubnub.unsubscribeAllChannels();
+		// Unsubscribe channels pubnub
+		Logger.Log("Unsubscribe all channels");
+		Pubnub pubnub = new Pubnub(CJayConstant.PUBLISH_KEY, CJayConstant.SUBSCRIBE_KEY);
+		pubnub.unsubscribeAllChannels();
 
 		// Clear preference and Database
+		Logger.Log("Clear all preferences");
 		PreferencesUtil.clearPrefs(context);
 		context.deleteDatabase("db_default_job_manager.db");
 
+		// Delete database
+		Logger.Log("Delete snappy database");
 		try {
 			DB db = App.getDB(context);
 			db.destroy();

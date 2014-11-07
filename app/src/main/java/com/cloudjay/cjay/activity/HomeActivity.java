@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -19,6 +20,7 @@ import com.cloudjay.cjay.fragment.UploadFragment_;
 import com.cloudjay.cjay.fragment.WorkingFragment_;
 import com.cloudjay.cjay.task.job.FetchSessionsJob;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.cloudjay.cjay.util.Utils;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
@@ -41,10 +43,23 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 	PagerAdapter mPagerAdapter;
 	ActionBar actionBar;
 
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+
+		// Fix StrictMode activity instance count violation
+		// http://stackoverflow.com/questions/21145261/strictmode-activity-instance-count-violation-2-instances-1-expected-on-rotati
+		System.gc();
+		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		System.gc();
+	}
+
 	/**
 	 * > MAIN FUNCTION
-	 * <p/>
-	 * <p/>
 	 * 0. Navigate to Login Activity if user has not logged in
 	 * 1. Config action bar NAVIGATION MODE
 	 * 2. Config view pager
@@ -75,6 +90,8 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 				jobManager.addJobInBackground(new FetchSessionsJob(lastModifiedDate));
 			}
 		}
+
+		Utils.keepNotificationAlive(this);
 	}
 
 	/**

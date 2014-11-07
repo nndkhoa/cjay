@@ -47,7 +47,6 @@ public class PubnubService extends Service {
 	NotificationManager notificationManager;
 	PowerManager.WakeLock wl = null;
 
-
 	private static final int DELAY_TIME = 200;
 
 	String depotChannel;
@@ -116,9 +115,10 @@ public class PubnubService extends Service {
 
 			JsonParser jsonParser = new JsonParser();
 			JsonObject jo = (JsonObject) jsonParser.parse(message.toString());
+
 			Gson gson = new Gson();
 			NotificationItem item = gson.fromJson(jo, NotificationItem.class);
-//			NotificationItem item = (NotificationItem) message;
+
 			Bundle b = new Bundle();
 			b.putString("channel", channel);
 			b.putString("object_type", item.getObjectType());
@@ -167,34 +167,33 @@ public class PubnubService extends Service {
 			}
 		}
 
-		if (TextUtils.isEmpty(depotChannel) || TextUtils.isEmpty(uuidChannel)) {
-			String[] channels = new String[]{depotChannel, uuidChannel};
+		if (!TextUtils.isEmpty(depotChannel) && !TextUtils.isEmpty(uuidChannel) && Utils.canReachInternet()) {
 
-			// TODO: does it need to check if pubnub is already subcribed or not?
 			try {
-
+				Logger.Log(" > Prepare to subscribe to Pubnub channels");
+				String[] channels = new String[]{depotChannel, uuidChannel};
 				pubnub.setUUID(uuidChannel);
 				pubnub.subscribe(channels, new Callback() {
 
-//				@Override
-//				public void connectCallback(String channel, Object message) {
-//					System.out.println("SUBSCRIBE : CONNECT on channel:" + channel
-//							+ " : " + message.getClass() + " : "
-//							+ message.toString());
-//				}
-//
-//				@Override
-//				public void disconnectCallback(String channel, Object message) {
-//					System.out.println("SUBSCRIBE : DISCONNECT on channel:" + channel
-//							+ " : " + message.getClass() + " : "
-//							+ message.toString());
-//				}
-//
-//				public void reconnectCallback(String channel, Object message) {
-//					System.out.println("SUBSCRIBE : RECONNECT on channel:" + channel
-//							+ " : " + message.getClass() + " : "
-//							+ message.toString());
-//				}
+					@Override
+					public void connectCallback(String channel, Object message) {
+						System.out.println("SUBSCRIBE : CONNECT on channel:" + channel
+								+ " : " + message.getClass() + " : "
+								+ message.toString());
+					}
+
+					@Override
+					public void disconnectCallback(String channel, Object message) {
+						System.out.println("SUBSCRIBE : DISCONNECT on channel:" + channel
+								+ " : " + message.getClass() + " : "
+								+ message.toString());
+					}
+
+					public void reconnectCallback(String channel, Object message) {
+						System.out.println("SUBSCRIBE : RECONNECT on channel:" + channel
+								+ " : " + message.getClass() + " : "
+								+ message.toString());
+					}
 
 					@Override
 					public void successCallback(String channel, Object message) {
@@ -205,14 +204,20 @@ public class PubnubService extends Service {
 					@Override
 					public void errorCallback(String channel, PubnubError pubnubError) {
 						Logger.e("Error: " + pubnubError.toString());
-						notifyUser(uuidChannel, pubnubError.toString());
 					}
 				});
 
 			} catch (PubnubException e) {
+
 				Logger.e(e.getMessage());
 				dataCenter.addLog(getApplicationContext(), "PubNub", "Cannot subscribe channels");
+
 			}
+		} else {
+
+			Logger.Log("Auto stop Pubnub service");
+			stopSelf();
+
 		}
 	}
 }

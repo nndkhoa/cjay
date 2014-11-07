@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <account-authenticator
-    android:accountType= "com.cloudjay.cjay"
-    android:icon="@drawable/ic_launcher"
+    android:accountType= "com.cloudjay.cjay.dev"
+    android:icon="@drawable/ic_app"
     android:label="@string/app_name"
-    android:smallIcon="@drawable/ic_launcher"
+    android:smallIcon="@drawable/ic_app_360"
     xmlns:android="http://schemas.android.com/apk/res/android">
+
 </account-authenticator>

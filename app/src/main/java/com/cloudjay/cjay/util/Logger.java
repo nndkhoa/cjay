@@ -21,7 +21,6 @@ public final class Logger {
 	private static boolean isDebuggable = BuildConfig.DEBUG;
 
 	private volatile static Logger instance;
-	private static boolean isUserActivitiesLoggable = BuildConfig.DEBUG;
 	static String className;
 	static String methodName;
 
@@ -151,14 +150,6 @@ public final class Logger {
 
 	public void setDebuggable(boolean enable) {
 		isDebuggable = enable;
-	}
-
-	public static boolean isUserActivitiesLoggable() {
-		return isUserActivitiesLoggable;
-	}
-
-	public void setUserActivitiesLoggable(boolean isUserActivitiesLoggable) {
-		Logger.isUserActivitiesLoggable = isUserActivitiesLoggable;
 	}
 
 	public static void logJson(Object object) {
