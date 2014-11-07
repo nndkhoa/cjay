@@ -14,10 +14,12 @@ import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -69,20 +71,8 @@ public class UploadFragment extends Fragment {
 	void refresh() {
 		List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
 				CJayConstant.PREFIX_UPLOADING);
-		updatedData(list);
+		mAdapter.setData(list);
 	}
-
-	@UiThread
-	public void updatedData(List<Session> sessionList) {
-		mAdapter.clear();
-		if (sessionList != null) {
-			for (Session object : sessionList) {
-				mAdapter.insert(object, mAdapter.getCount());
-			}
-		}
-		mAdapter.notifyDataSetChanged();
-	}
-
 
 	//region EVENT HANDLER
 	public void onEvent(UploadStartedEvent event) {

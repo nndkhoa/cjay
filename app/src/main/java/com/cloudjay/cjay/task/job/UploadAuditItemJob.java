@@ -3,27 +3,27 @@ package com.cloudjay.cjay.task.job;
 import android.content.Context;
 
 import com.cloudjay.cjay.App;
+import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
-import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.event.upload.UploadedEvent;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 
 import de.greenrobot.event.EventBus;
 
-/**
- * Created by thai on 29/10/2014.
- */
 public class UploadAuditItemJob extends Job {
+
 	String containerId;
 	String auditItemUUID;
 
-    @Override
-    public int getRetryLimit() {
-        return 2;
-    }
+	@Override
+	public int getRetryLimit() {
+		return 2;
+	}
 
 
 	public UploadAuditItemJob(String containerId, String auditItemUUID) {
@@ -43,22 +43,18 @@ public class UploadAuditItemJob extends Job {
 
 	@Override
 	public void onRun() throws Throwable {
-		Context context = App.getInstance().getApplicationContext();
 
-		//Add Log
-		DataCenter_.getInstance_(context).addLog(context, containerId, "Bắt đầu thêm lỗi");
+		Context context = App.getInstance().getApplicationContext();
+		DataCenter dataCenter = DataCenter_.getInstance_(context);
+
+		dataCenter.addLog(context, containerId, "Bắt đầu upload audit item: " + auditItemUUID);
 
 //        EventBus.getDefault().post(new UploadingEvent());
 
-		DataCenter_.getInstance_(context).uploadAuditItem(context, containerId, auditItemUUID);
-		//Add Log
-		DataCenter_.getInstance_(context).addLog(context, containerId, "Khởi tạo thêm lỗi");
-
-		Session session = DataCenter_.getInstance_(context).getSession(context, containerId);
-
-
+		dataCenter.uploadAuditItem(context, containerId, auditItemUUID);
+		dataCenter.changeUploadStatus(context, containerId, auditItemUUID, UploadStatus.COMPLETE);
+		EventBus.getDefault().post(new UploadedEvent(containerId));
 	}
-
 
 	@Override
 	protected void onCancel() {

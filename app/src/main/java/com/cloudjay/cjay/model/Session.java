@@ -625,12 +625,12 @@ public class Session {
 	/**
 	 * Get audit item that have given uuid
 	 *
-	 * @param auditItemUUID
+	 * @param itemUuid
 	 * @return
 	 */
-	public AuditItem getAuditItem(String auditItemUUID) {
+	public AuditItem getAuditItem(String itemUuid) {
 		for (AuditItem item : auditItems) {
-			if (item.getUuid().equals(auditItemUUID)) {
+			if (item.getUuid().equals(itemUuid)) {
 				return item;
 			}
 		}
@@ -724,6 +724,24 @@ public class Session {
 			}
 		}
 
+		return false;
+	}
+
+	/**
+	 * Change audit item upload status
+	 *
+	 * @param containerId
+	 * @param itemUuid
+	 * @param status
+	 * @return
+	 */
+	public boolean changeUploadStatus(String containerId, String itemUuid, UploadStatus status) {
+		for (AuditItem item : auditItems) {
+			if (item.getUuid().equals(itemUuid)) {
+				item.setUploadStatus(status);
+				return true;
+			}
+		}
 		return false;
 	}
 }

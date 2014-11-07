@@ -11,7 +11,6 @@ import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
 import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.session.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.event.session.WorkingSessionCreatedEvent;
-import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
@@ -465,6 +464,7 @@ public class DataCenter {
 	 * @param prefix
 	 * @return
 	 */
+	@Trace
 	public List<Session> getListSessions(Context context, String prefix) {
 
 		int len = prefix.length();
@@ -505,22 +505,12 @@ public class DataCenter {
 	 * @param status
 	 * @throws SnappydbException
 	 */
-	public void changeUploadState(Context context, String containerId, UploadStatus status) throws SnappydbException {
-
+	public void changeUploadStatus(Context context, String containerId, UploadStatus status) throws SnappydbException {
 		DB db = App.getDB(context);
 		String key = containerId;
 		Session session = db.getObject(key, Session.class);
-
-		GsonBuilder builder = new GsonBuilder();
-		Gson gson = builder.create();
-//		Logger.Log("before change status upload: " + gson.toJson(session));
-
-		Logger.logJson(session);
 		session.setUploadStatus(status);
-
 		Logger.Log(session.getContainerId() + " -> Upload Status: " + status.name());
-//		Logger.Log("after change status upload: " + gson.toJson(session));
-
 		db.put(containerId, session);
 	}
 
@@ -672,6 +662,7 @@ public class DataCenter {
 	 *
 	 * @param session
 	 */
+	@Trace
 	public void addWorkingSession(Session session) {
 
 		try {
@@ -718,6 +709,7 @@ public class DataCenter {
 	 * @param context
 	 * @param containerId
 	 */
+	@Trace
 	public void removeWorkingSession(Context context, String containerId) {
 
 		try {
@@ -1027,26 +1019,27 @@ public class DataCenter {
 	}
 
 	/**
+	 * Upload audit item to server
+	 *
 	 * @param context
 	 * @param containerId
-	 * @param oldAuditItemUUID
+	 * @param itemUuid
 	 * @throws SnappydbException
 	 */
-	public void uploadAuditItem(Context context, String containerId, String oldAuditItemUUID) throws SnappydbException {
+	public void uploadAuditItem(Context context, String containerId, String itemUuid) throws SnappydbException {
 
+		// Find audit item based on item uuid
 		DB db = App.getDB(context);
 		Session session = db.getObject(containerId, Session.class);
+		AuditItem auditItem = session.getAuditItem(itemUuid);
 
-		AuditItem oldAuditItem = getAuditItem(context, containerId, oldAuditItemUUID);
-
-		Session result = networkClient.postAuditItem(context, session, oldAuditItem);
-		String key = result.getContainerId();
-
+		// Merge result
+		Session result = networkClient.postAuditItem(context, session, auditItem);
 		session.mergeSession(result);
 
+		// Update to db
+		String key = result.getContainerId();
 		db.put(key, session);
-
-		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
 	}
 
 
@@ -1063,27 +1056,18 @@ public class DataCenter {
 	 */
 	public void uploadImportSession(Context context, String containerId) throws SnappydbException {
 		DB db = App.getDB(context);
-		Session oldSession = db.getObject(containerId, Session.class);
+		Session session = db.getObject(containerId, Session.class);
 
 		// Upload container session to server
-		Session result = networkClient.uploadSession(context, oldSession);
+		Session result = networkClient.uploadSession(context, session);
+		Logger.logJson(result);
 
-		GsonBuilder builder = new GsonBuilder();
-		Gson gson = builder.create();
-
-		Logger.Log("result: " + gson.toJson(result));
-
+		// Update container back to database
 		if (result != null) {
-			//merge session
-			oldSession.mergeSession(result);
-			Logger.Log("Session id: " + oldSession.getId());
-
-			// Update container back to database
+			session.mergeSession(result);
 			String key = result.getContainerId();
-			db.put(key, oldSession);
-
+			db.put(key, session);
 		}
-
 	}
 
 	/**
@@ -1104,16 +1088,10 @@ public class DataCenter {
 
 			// Update container back to database
 			String key = result.getContainerId();
-			session.setUploadStatus(UploadStatus.COMPLETE);
 			session.mergeSession(result);
 			db.put(key, result);
-
-			// Then remove them from WORKING
-			String workingKey = CJayConstant.PREFIX_WORKING + key;
-			db.del(workingKey);
 		}
 
-		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
 	}
 
 	/**
@@ -1124,26 +1102,18 @@ public class DataCenter {
 	 * @throws SnappydbException
 	 */
 	public void uploadAuditSession(Context context, String containerId) throws SnappydbException {
+
 		// Upload complete audit session to server
 		DB db = App.getDB(context);
 		Session oldSession = db.getObject(containerId, Session.class);
 		Session result = networkClient.completeAudit(context, oldSession);
 
+		// Update container back to database
 		if (result != null) {
-
-			// Update container back to database
 			String key = result.getContainerId();
-			oldSession.setUploadStatus(UploadStatus.COMPLETE);
 			oldSession.mergeSession(result);
 			db.put(key, oldSession);
-
-			// Then remove them from WORKING
-			String workingKey = CJayConstant.PREFIX_WORKING + key;
-			db.del(workingKey);
 		}
-
-		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
-
 	}
 
 	/**
@@ -1157,31 +1127,15 @@ public class DataCenter {
 
 		// Upload complete repair session to server
 		DB db = App.getDB(context);
-		Session oldSession = db.getObject(containerId, Session.class);
-		Session result = networkClient.completeRepairSession(context, oldSession);
-
-		GsonBuilder builder = new GsonBuilder();
-		Gson gson = builder.create();
-
-		Logger.Log("result: " + gson.toJson(result));
+		Session session = db.getObject(containerId, Session.class);
+		Session result = networkClient.completeRepairSession(context, session);
 
 		if (result != null) {
-
 			// Update container back to database
 			String key = result.getContainerId();
-			oldSession.setUploadStatus(UploadStatus.COMPLETE);
-			oldSession.mergeSession(result);
-
-			Logger.Log("mergeSession: " + gson.toJson(oldSession));
-
-			db.put(key, oldSession);
-
-			// Then remove them from WORKING
-			String workingKey = CJayConstant.PREFIX_WORKING + key;
-			db.del(workingKey);
+			session.mergeSession(result);
+			db.put(key, session);
 		}
-
-		EventBus.getDefault().post(new UploadedEvent(result.getContainerId()));
 	}
 
 	/**
@@ -1201,6 +1155,7 @@ public class DataCenter {
 			// merge session
 			session.mergeSession(result);
 			db.put(session.getContainerId(), session);
+
 			return session;
 
 		} catch (SnappydbException e) {
@@ -1225,8 +1180,8 @@ public class DataCenter {
 		try {
 			DB db = App.getDB(context);
 			String[] keysResult = db.findKeys(logUploadKey);
-			List<LogItem> logUploads = new ArrayList<>();
 
+			List<LogItem> logUploads = new ArrayList<>();
 			for (String result : keysResult) {
 				LogItem logUpload = db.getObject(result, LogItem.class);
 				logUploads.add(logUpload);
@@ -1276,14 +1231,14 @@ public class DataCenter {
 	 * - Start QueueService Task
 	 *
 	 * @param context
-	 * @param containerId
+	 * @param title
 	 * @param message
 	 */
-	public void addLog(Context context, String containerId, String message) {
+	public void addLog(Context context, String title, String message) {
 		String currentTime = StringUtils.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 
 		LogItem log = new LogItem();
-		log.setContainerId(containerId);
+		log.setContainerId(title);
 		log.setMessage(message);
 		log.setTime(currentTime);
 
@@ -1307,7 +1262,7 @@ public class DataCenter {
 	/**
 	 * Gửi request lên server thông báo đã nhận được notification.
 	 */
-	@Background
+	@Background(serial = NETWORK)
 	public void gotMessage(Context context, String channel, String messageId) {
 		try {
 			networkClient.gotMessageFromPubNub(channel, messageId);
@@ -1494,8 +1449,25 @@ public class DataCenter {
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
+	}
 
-
+	/**
+	 * Change upload status of audit item
+	 *
+	 * @param context
+	 * @param containerId
+	 * @param itemUuid
+	 * @param status
+	 */
+	public void changeUploadStatus(Context context, String containerId, String itemUuid, UploadStatus status) {
+		try {
+			DB db = App.getDB(context);
+			Session session = db.getObject(containerId, Session.class);
+			session.changeUploadStatus(containerId, itemUuid, status);
+			db.put(containerId, session);
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -1522,5 +1494,6 @@ public class DataCenter {
 			return null;
 		}
 	}
+
 	//endregion
 }

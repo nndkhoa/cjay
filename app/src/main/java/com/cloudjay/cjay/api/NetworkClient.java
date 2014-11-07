@@ -444,6 +444,12 @@ public class NetworkClient {
 		return operator;
 	}
 
+	/**
+	 * Notify to server that we already receive notification message
+	 *
+	 * @param channel
+	 * @param messageId
+	 */
 	public void gotMessageFromPubNub(String channel, String messageId) {
 
 		Response response = provider.getRestAdapter(context).create(NetworkService.class).gotMessageFromPubNub(channel, messageId);

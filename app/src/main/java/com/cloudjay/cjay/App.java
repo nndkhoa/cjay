@@ -139,10 +139,11 @@ public class App extends Application {
 				.defaultDisplayImageOptions(defaultOptions)
 				.discCacheSize(500 * 1024 * 1024)
 				.memoryCache(new WeakMemoryCache())
-				.memoryCacheSize(40 * 1024 * 1024)
 				.threadPoolSize(3)
 				.threadPriority(Thread.MAX_PRIORITY)
 				.build();
+
+		// .memoryCacheSize(40 * 1024 * 1024)
 
 		// init image loader with config defined
 		ImageLoader.getInstance().init(config);
