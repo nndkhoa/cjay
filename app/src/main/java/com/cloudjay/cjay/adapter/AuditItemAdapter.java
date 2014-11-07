@@ -46,7 +46,6 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 	private String operatorCode;
 	private String mAuditItemUUID;
 	private String mComponentCode;
-	private String mAuditImageUUID;
 
 	public AuditItemAdapter(Context context, int resource, String containerId, String operatorCode) {
 		super(context, resource);
@@ -109,8 +108,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		}
 		// Lỗi nào chưa giám dịnh thì hiện hinh`, lỗi nào đã giám định roi thì hiện chi tiết lỗi
 		if (auditItem.getAudited() == true) {
-
-			UploadStatus status = UploadStatus.values()[((int) auditItem.getUploadStatus())];
+			UploadStatus status = UploadStatus.values()[auditItem.getUploadStatus()];
 
 			holder.llIssueImageView.setVisibility(View.GONE);
 			holder.llIssueDetails.setVisibility(View.VISIBLE);
@@ -180,11 +178,10 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			holder.btnUpload.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
-					//1. Update upload status
 
-					auditItem.setUploadStatus(UploadStatus.UPLOADING.value);
+					//1. Update upload status
 					DataCenter_.getInstance_(mContext).changeUploadStatus(mContext,
-							containerId, auditItem);
+							containerId, auditItem, UploadStatus.UPLOADING);
 					notifyDataSetChanged();
 
 					//2. Add container session to upload queue

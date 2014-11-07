@@ -380,6 +380,10 @@ public class AuditItem {
 
 	public AuditItem() {
 		auditImages = new ArrayList<>();
+		locationCode = "";
+		componentCodeId = 0;
+		repairCodeId = 0;
+		damageCodeId = 0;
 	}
 
 	public JsonObject getAuditItemToUpload() {

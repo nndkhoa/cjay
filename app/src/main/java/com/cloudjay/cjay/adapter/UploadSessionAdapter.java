@@ -192,7 +192,6 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 	}
 
 	public void setData(List<Session> data) {
-		ThreadPreconditions.checkOnMainThread();
 		clear();
 		if (data != null) {
 			for (int i = 0; i < data.size(); i++) {
