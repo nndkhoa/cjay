@@ -73,7 +73,7 @@ public class RepairedItemAdapter extends ArrayAdapter<AuditItem> {
 			holder.tvCodeComponent.setText(auditItem.getComponentCode());
 			holder.tvCodeIssue.setText(auditItem.getDamageCode());
 			holder.tvCodeLocation.setText(auditItem.getLocationCode());
-			holder.tvDimension.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
+			holder.tvDimension.setText("Dài " + auditItem.getLength() + "," + " Rộng " + auditItem.getHeight());
 			holder.tvCodeRepair.setText(auditItem.getRepairCode());
 			holder.tvCount.setText(auditItem.getQuantity() + "");
 

@@ -71,7 +71,7 @@ public class AuditMergeIssueAdapter extends ArrayAdapter<AuditItem> {
         viewHolder.tvLocationCode.setText(auditItem.getLocationCode());
         viewHolder.tvDamageCode.setText(auditItem.getDamageCode());
         viewHolder.tvRepairCode.setText(auditItem.getRepairCode());
-        viewHolder.tvSize.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
+        viewHolder.tvSize.setText("Dài " + auditItem.getLength() + "," + " Rộng " + auditItem.getHeight());
         viewHolder.tvQuantity.setText(String.valueOf(auditItem.getQuantity()));
         ImageLoader.getInstance().displayImage(auditItem.getAuditImages().get(0).getUrl(), viewHolder.ivAuditImage);
         return convertView;
