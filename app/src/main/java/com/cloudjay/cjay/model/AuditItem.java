@@ -384,6 +384,7 @@ public class AuditItem {
 		componentCodeId = 0;
 		repairCodeId = 0;
 		damageCodeId = 0;
+		isAllowed = null;
 	}
 
 	public JsonObject getAuditItemToUpload() {
