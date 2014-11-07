@@ -77,7 +77,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 		}
 
 		//Set data to view
-		ImageLoader.getInstance().displayImage(session.getGateImages().get(0).getUrl(), viewHolder.ivContainer);
+		//ImageLoader.getInstance().displayImage(session.getGateImages().get(0).getUrl(), viewHolder.ivContainer);
 		viewHolder.tvContainerId.setText(session.getContainerId());
 		viewHolder.tvTotalPhotoUpload.setText(String.valueOf(Utils.countTotalImage(session)));
 		viewHolder.tvCurrentPhotoUpload.setText(String.valueOf(Utils.countUploadedImage(session)));

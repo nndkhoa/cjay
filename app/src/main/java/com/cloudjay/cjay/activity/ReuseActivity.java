@@ -159,6 +159,8 @@ public class ReuseActivity extends Activity {
 			List<GateImage> importImages = mSession.getImportImages();
 			List<GateImage> deletedImportImages = new ArrayList<GateImage>();
 
+            Logger.Log("import size: " + mSession.getImportImages().size());
+
 			if (auditItems != null) {
 				Logger.Log("Size: " + auditItems.size());
 				for (GateImage gateImage : importImages) {
