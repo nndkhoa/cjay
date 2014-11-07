@@ -397,6 +397,7 @@ public class NetworkClient {
 			}
 		}
 		postAuditItemSession.setAuditItems(list);
+		Logger.logJson(postAuditItemSession);
 		return postAuditItemSession;
 	}
 
