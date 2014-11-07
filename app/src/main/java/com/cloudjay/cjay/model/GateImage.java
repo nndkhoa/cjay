@@ -116,4 +116,19 @@ public class GateImage {
 		this.setId(gateImageServer.getId());
 		return this;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+
+		if (o instanceof GateImage) {
+			GateImage tmp = (GateImage) o;
+
+			if (tmp.getUrl().contains(this.getName()) || this.getUrl().contains(tmp.getName())) {
+				return true;
+			}
+			return false;
+		}
+
+		return super.equals(o);
+	}
 }

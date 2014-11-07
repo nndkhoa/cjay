@@ -71,8 +71,14 @@ public class UploadFragment extends Fragment {
 	void refresh() {
 		List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
 				CJayConstant.PREFIX_UPLOADING);
-		mAdapter.setData(list);
+		updatedData(list);
 	}
+
+	@UiThread
+	public void updatedData(List<Session> sessionList) {
+		mAdapter.setData(sessionList);
+	}
+
 
 	//region EVENT HANDLER
 	public void onEvent(UploadStartedEvent event) {

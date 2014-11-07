@@ -654,6 +654,7 @@ public class Session {
 	}
 
 	/**
+	 * Merge
 	 *
 	 * @param newSession
 	 * @return
@@ -666,13 +667,14 @@ public class Session {
 		this.setCheckOutTime(newSession.getCheckOutTime());
 
 		// local step is always greater or equal to step
-		Logger.Log("localStep client: " + this.getLocalStep());
-		Logger.Log("Step server: " + newSession.getStep());
+		Logger.Log("Local Step: " + this.getLocalStep());
+		Logger.Log("Server Step: " + newSession.getStep());
+
 		if (this.getLocalStep() < newSession.getStep()) {
 			this.setLocalStep(newSession.getStep());
 		}
 
-		//merge Gate Image
+		// merge Gate Image
 		List<GateImage> mergedGateImages = new ArrayList<GateImage>();
 		for (GateImage gateImageServer : newSession.getGateImages()) {
 			for (GateImage gateImage : this.getGateImages()) {

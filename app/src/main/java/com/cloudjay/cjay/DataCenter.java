@@ -1450,23 +1450,8 @@ public class DataCenter {
 	 * @param containerId
 	 * @param auditItem
 	 */
-	public void changeUploadStatus(Context context, String containerId, AuditItem auditItem) {
-		try {
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
-
-			List<AuditItem> list = session.getAuditItems();
-			for (AuditItem item : list) {
-				if (item.equals(auditItem)) {
-					item.setUploadStatus(auditItem.getUploadStatus());
-				}
-			}
-
-			session.setAuditItems(list);
-			db.put(containerId, session);
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
+	public void changeUploadStatus(Context context, String containerId, AuditItem auditItem, UploadStatus status) {
+		changeUploadStatus(context, containerId, auditItem.getUuid(), status);
 	}
 
 	/**
