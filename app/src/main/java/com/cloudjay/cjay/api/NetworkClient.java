@@ -258,10 +258,42 @@ public class NetworkClient {
 			page = page + 1;
 
 			// Store the datetime that complete parsing process
-			String currentTime = jsonObject.get("request_time").getAsString();
-			PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, currentTime);
+			if (next.isJsonNull()) {
+				String currentTime = jsonObject.get("request_time").getAsString();
+				PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, currentTime);
+			}
+
 		} while (!next.isJsonNull());
 
+
+		return sessions;
+	}
+
+	public List<Session> getSessionByPage(Context context, int page, String modifiedDate) {
+		List<Session> sessions = new ArrayList<Session>();
+
+		JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionsByPage(page, modifiedDate);
+		// Parse list sessions nằm bên trong key `results` của kết quả trả về
+		JsonArray results = jsonObject.getAsJsonArray("results");
+		JsonElement next = jsonObject.get("next");
+
+		Gson gson = new Gson();
+		Type listType = new TypeToken<List<Session>>() {
+		}.getType();
+
+		List<Session> sessionsPage = gson.fromJson(results, listType);
+		sessions.addAll(sessionsPage);
+
+		if (!next.isJsonNull()) {
+			//Update current page
+			String currentPage = String.valueOf(page);
+			PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE, currentPage);
+
+		} else {
+			// Store the datetime that complete parsing process
+			String currentTime = jsonObject.get("request_time").getAsString();
+			PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, currentTime);
+		}
 
 		return sessions;
 	}
@@ -302,16 +334,15 @@ public class NetworkClient {
 	 * @return
 	 */
 	public Session checkOutContainerSession(Context context, Session containerSession) {
-        Logger.Log("containerSession: " + containerSession.getId());
-        Logger.Log("size gate outs: " + containerSession.getGateOutImageToUpLoad());
-        try {
-            Session checkOutSession = provider.getRestAdapter(context).create(NetworkService.class).checkOutContainerSession(containerSession.getId(), containerSession.getGateOutImageToUpLoad());
-            return checkOutSession;
-        } catch (RetrofitError e) {
-            Logger.Log(e.getResponse().getReason().toString());
-            Logger.Log(e.getResponse().getBody().toString());
-            Logger.Log(e.getResponse().getStatus() + "");
-        }
+
+		try {
+			Session checkOutSession = provider.getRestAdapter(context).create(NetworkService.class).checkOutContainerSession(containerSession.getId(), containerSession.getGateOutImageToUpLoad());
+			return checkOutSession;
+		} catch (RetrofitError e) {
+			Logger.Log(e.getResponse().getReason().toString());
+			Logger.Log(e.getResponse().getBody().toString());
+			Logger.Log(e.getResponse().getStatus() + "");
+		}
 
 		return null;
 	}

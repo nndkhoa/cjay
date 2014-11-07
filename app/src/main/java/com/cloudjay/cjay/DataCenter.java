@@ -411,15 +411,32 @@ public class DataCenter {
 	 */
 	@Trace
 	public void fetchSession(Context context, String lastModifiedDate) throws SnappydbException {
-		List<Session> sessions = networkClient.getAllSessions(context, lastModifiedDate);
-		DB db = App.getDB(context);
-		for (Session session : sessions) {
+		String newModifiedDay;
+		//Get current page from preferences
+		//if current page is null =>> next page use to get session = 1
+		// else next page to get session = current page +1
+		do {
+			int nextPage;
+			String currentPage = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE);
+			if (currentPage.isEmpty()) {
+				nextPage = 1;
+			} else {
+				nextPage = Integer.valueOf(currentPage) + 1;
+			}
 
-			String key = session.getContainerId();
-			session.setLocalStep(session.getStep());
+			List<Session> sessions = networkClient.getSessionByPage(context, nextPage, lastModifiedDate);
+			DB db = App.getDB(context);
+			for (Session session : sessions) {
 
-			db.put(key, session);
-		}
+				String key = session.getContainerId();
+				session.setLocalStep(session.getStep());
+
+				db.put(key, session);
+			}
+			Logger.Log("Fetched page: " + nextPage);
+			newModifiedDay = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
+			Logger.Log("Current Modified day: " + newModifiedDay);
+		} while (lastModifiedDate.equals(newModifiedDay));
 
 	}
 
@@ -825,10 +842,10 @@ public class DataCenter {
 		// Upload container session to server
 		Session result = networkClient.uploadSession(context, oldSession);
 
-        GsonBuilder builder = new GsonBuilder();
-        Gson gson = builder.create();
+		GsonBuilder builder = new GsonBuilder();
+		Gson gson = builder.create();
 
-        Logger.Log("result: " + gson.toJson(result));
+		Logger.Log("result: " + gson.toJson(result));
 
 		if (result != null) {
 			//merge session
@@ -1206,7 +1223,7 @@ public class DataCenter {
 	 * @throws SnappydbException
 	 */
 	public void
-    uploadRepairedSession(Context context, String containerId) throws SnappydbException {
+	uploadRepairedSession(Context context, String containerId) throws SnappydbException {
 
 		// Upload complete repair session to server
 		DB db = App.getDB(context);
@@ -1214,10 +1231,10 @@ public class DataCenter {
 		Session result = networkClient.completeRepairSession(context, oldSession);
 		Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
-        GsonBuilder builder = new GsonBuilder();
-        Gson gson = builder.create();
+		GsonBuilder builder = new GsonBuilder();
+		Gson gson = builder.create();
 
-        Logger.Log("result: " + gson.toJson(result));
+		Logger.Log("result: " + gson.toJson(result));
 
 		if (result != null) {
 
@@ -1226,7 +1243,7 @@ public class DataCenter {
 			oldSession.setUploadStatus(UploadStatus.COMPLETE);
 			oldSession.mergeSession(result);
 
-            Logger.Log("mergeSession: " + gson.toJson(oldSession));
+			Logger.Log("mergeSession: " + gson.toJson(oldSession));
 
 			db.put(key, oldSession);
 
@@ -1497,16 +1514,16 @@ public class DataCenter {
 		String key = containerId;
 		Session session = db.getObject(key, Session.class);
 
-        GsonBuilder builder = new GsonBuilder();
-        Gson gson = builder.create();
+		GsonBuilder builder = new GsonBuilder();
+		Gson gson = builder.create();
 
-        Logger.Log("before change status upload: " + gson.toJson(session));
+		Logger.Log("before change status upload: " + gson.toJson(session));
 
 		session.setUploadStatus(status);
 
 		Logger.Log(session.getContainerId() + " -> Upload Status: " + status.name());
 
-        Logger.Log("after change status upload: " + gson.toJson(session));
+		Logger.Log("after change status upload: " + gson.toJson(session));
 
 		db.put(containerId, session);
 	}

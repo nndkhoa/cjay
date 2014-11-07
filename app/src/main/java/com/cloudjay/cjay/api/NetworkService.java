@@ -32,22 +32,22 @@ public interface NetworkService {
 	public User getCurrentUser();
 
 	@GET(ApiEndpoint.LIST_REPAIR_CODES_API)
-	public List<IsoCode> getRepairCodes(@Query("modified_after") String lastModifiedDate);
+	public List<IsoCode> getRepairCodes(@Query("modified_since") String lastModifiedDate);
 
 	@GET(ApiEndpoint.LIST_DAMAGE_CODES_API)
-	public List<IsoCode> getDamageCodes(@Query("modified_after") String lastModifiedDate);
+	public List<IsoCode> getDamageCodes(@Query("modified_since") String lastModifiedDate);
 
 	@GET(ApiEndpoint.LIST_COMPONENT_CODES_API)
-	public List<IsoCode> getComponentCodes(@Query("modified_after") String lastModifiedDate);
+	public List<IsoCode> getComponentCodes(@Query("modified_since") String lastModifiedDate);
 
 	@GET(ApiEndpoint.LIST_OPERATORS_API)
 	public List<Operator> getOperators(@Query("modified_since") String lastModifiedDate);
 
 	@GET(ApiEndpoint.CONTAINER_SESSIONS_API)
-	public JsonObject getContainerSessionsByPage(@Query("page") int page, @Query("modified_after") String lastModifiedDate);
+	public JsonObject getContainerSessionsByPage(@Query("page") int page, @Query("modified_since") String lastModifiedDate);
 
 	@GET(ApiEndpoint.CONTAINER_SESSIONS_API)
-	public JsonObject getContainerSessionsByModifiedTime(@Query("modified_after") String lastModifiedDate);
+	public JsonObject getContainerSessionsByModifiedTime(@Query("modified_since") String lastModifiedDate);
 
 	@GET(ApiEndpoint.CONTAINER_SESSION_ITEM_API)
 	public Session getContainerSessionById(@Path("id") long containerId);
