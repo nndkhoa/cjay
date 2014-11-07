@@ -50,7 +50,7 @@ public class UploadAuditItemJob extends Job {
 
 //        EventBus.getDefault().post(new UploadingEvent());
 
-		DataCenter_.getInstance_(context).upLoadAuditItem(context, containerId, auditItemUUID);
+		DataCenter_.getInstance_(context).uploadAuditItem(context, containerId, auditItemUUID);
 		//Add Log
 		DataCenter_.getInstance_(context).addLog(context, containerId, "Khởi tạo thêm lỗi");
 

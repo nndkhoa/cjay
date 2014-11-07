@@ -217,7 +217,6 @@ public class NetworkClient {
 				String lastModifiedDate = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
 				Logger.Log("Last modified date: " + lastModifiedDate);
 			}
-
 		}
 
 		//If not, get all sessions start form page 1

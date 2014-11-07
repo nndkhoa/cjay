@@ -446,7 +446,6 @@ public class Session {
 		return auditItemsPut;
 	}
 
-
 	/**
 	 * Check if container has repair images or not
 	 *
@@ -559,7 +558,6 @@ public class Session {
 		}
 	}
 
-
 	/**
 	 * Count total image off session
 	 *
@@ -584,7 +582,6 @@ public class Session {
 			return totalImage;
 		}
 	}
-
 
 	public int getUploadedImage() {
 		int uploadedImage = 0;
@@ -625,22 +622,23 @@ public class Session {
 		return list;
 	}
 
-	public Session mergeSession(Session session) {
-		this.setId(session.getId());
-		this.setStep(session.getStep());
-		this.setCheckInTime(session.getCheckInTime());
-		this.setCheckOutTime(session.getCheckOutTime());
+	public Session mergeSession(Session newSession) {
+
+		this.setId(newSession.getId());
+		this.setStep(newSession.getStep());
+		this.setCheckInTime(newSession.getCheckInTime());
+		this.setCheckOutTime(newSession.getCheckOutTime());
 
         // local step is always greater or equal to step
         Logger.Log("localStep client: " + this.getLocalStep());
-        Logger.Log("Step server: " + session.getStep());
-        if (this.getLocalStep() < session.getStep()) {
-            this.setLocalStep(session.getStep());
+        Logger.Log("Step server: " + newSession.getStep());
+        if (this.getLocalStep() < newSession.getStep()) {
+            this.setLocalStep(newSession.getStep());
         }
 
 		//merge Gate Image
 		List<GateImage> mergedGateImages = new ArrayList<GateImage>();
-		for (GateImage gateImageServer : session.getGateImages()) {
+		for (GateImage gateImageServer : newSession.getGateImages()) {
 			for (GateImage gateImage : this.getGateImages()) {
 
 				if (gateImage.getName() != null) {
@@ -658,10 +656,10 @@ public class Session {
 		this.setGateImages(mergedGateImages);
 
 		//merge Audit Item  if audit item from server != null
-		if (session.getAuditItems().size() != 0) {
+		if (newSession.getAuditItems().size() != 0) {
 			List<AuditItem> localList = this.getAuditItems();
 			for (AuditItem auditItem : this.getAuditItems()) {
-				for (AuditItem auditItemServer : session.getAuditItems()) {
+				for (AuditItem auditItemServer : newSession.getAuditItems()) {
 					if (auditItem.equals(auditItemServer)) {
 						auditItem.setUploadStatus(UploadStatus.COMPLETE);
 						auditItem.mergeAuditItem(auditItemServer);

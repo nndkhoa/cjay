@@ -45,6 +45,7 @@ import org.androidannotations.annotations.ViewById;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 /**
  * Tab search container
@@ -263,8 +264,10 @@ public class SearchFragment extends Fragment {
 
 		showProgress(false);
 		if (event.isFailed()) {
+
 			llSearchResult.setVisibility(View.GONE);
-			Toast.makeText(getActivity(), "Đang trong quá trình cập nhật dữ liệu, vui lòng thử lại sau", Toast.LENGTH_SHORT).show();
+			Utils.showCrouton(getActivity(), "Đang xảy ra sự cố \nXin thử lại sau", Style.ALERT);
+
 		} else {
 			List<Session> result = event.getSessions();
 			mAdapter.clear();
