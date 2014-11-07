@@ -69,7 +69,7 @@ public class UploadSessionJob extends Job {
 			dataCenter.addLog(context, containerId, "Container được add vào hàng đợi");
 			dataCenter.addUploadSession(containerId);
 
-			dataCenter.changeUploadState(context, containerId, UploadStatus.UPLOADING);
+			dataCenter.changeUploadStatus(context, containerId, UploadStatus.UPLOADING);
 
 			Step step = Step.values()[currentStep];
 			switch (step) {
@@ -140,13 +140,13 @@ public class UploadSessionJob extends Job {
 
 			case AUDIT:
 				dataCenter.addLog(context, containerId, "AUDIT | Bắt đầu quá trình upload");
-				dataCenter.uploadAuditedSession(context, containerId);
+				dataCenter.uploadAuditSession(context, containerId);
 				break;
 
 			case REPAIR:
                 Logger.Log("repair to export");
 				dataCenter.addLog(context, containerId, "REPAIR | Bắt đầu quá trình upload");
-				dataCenter.uploadRepairedSession(context, containerId);
+				dataCenter.uploadRepairSession(context, containerId);
 				break;
 
 			case IMPORT:
@@ -161,7 +161,7 @@ public class UploadSessionJob extends Job {
 		}
 
 		// Change upload status to COMPLETE
-		DataCenter_.getInstance_(context).changeUploadState(context, containerId, UploadStatus.COMPLETE);
+		DataCenter_.getInstance_(context).changeUploadStatus(context, containerId, UploadStatus.COMPLETE);
 
 		// Upload thành công
 		DataCenter_.getInstance_(context).addLog(context, containerId, "Upload container session thành công");
@@ -204,7 +204,7 @@ public class UploadSessionJob extends Job {
 
 			Context context = App.getInstance().getApplicationContext();
 			DataCenter_.getInstance_(context).addLog(context, containerId, "Upload thất bại");
-			DataCenter_.getInstance_(context).changeUploadState(context, containerId, UploadStatus.ERROR);
+			DataCenter_.getInstance_(context).changeUploadStatus(context, containerId, UploadStatus.ERROR);
 			EventBus.getDefault().post(new UploadStoppedEvent(containerId));
 
 		} catch (SnappydbException e) {

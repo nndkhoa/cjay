@@ -28,8 +28,6 @@ import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.view.SquareImageView;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.imageaware.ImageAware;
 import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
@@ -162,7 +160,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			holder.btnRepair.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
-					mAuditItemUUID = auditItem.getAuditItemUUID();
+					mAuditItemUUID = auditItem.getUuid();
 					mComponentCode = auditItem.getComponentCode();
 					if (!auditItem.isIsAllowed()) {
 						// Nếu lỗi này cấm sửa, hiện dialog cấm sửa
@@ -185,13 +183,13 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 					//1. Update upload status
 
 					auditItem.setUploadStatus(UploadStatus.UPLOADING.value);
-					DataCenter_.getInstance_(mContext).changeUploadState(mContext,
+					DataCenter_.getInstance_(mContext).changeUploadStatus(mContext,
 							containerId, auditItem);
 					notifyDataSetChanged();
 
 					//2. Add container session to upload queue
 					JobManager jobManager = App.getJobManager();
-					jobManager.addJob(new UploadAuditItemJob(containerId, auditItem.getAuditItemUUID()));
+					jobManager.addJob(new UploadAuditItemJob(containerId, auditItem.getUuid()));
 				}
 			});
 
@@ -203,12 +201,12 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 					if (!auditItem.isIsAllowed()) {
 						showPreventRepairDialog();
 					} else {
-						Logger.Log("getAuditItemUUID: " + auditItem.getAuditItemUUID());
+						Logger.Log("getUuid: " + auditItem.getUuid());
 
 						Intent intent = new Intent(mContext, ReportIssueActivity_.class);
 						intent.putExtra(ReportIssueActivity_.CONTAINER_ID_EXTRA, containerId);
 						intent.putExtra(ReportIssueActivity_.AUDIT_IMAGE_EXTRA, auditItem.getAuditImages().get(0).getAuditImageUUID());
-						intent.putExtra(ReportIssueActivity_.AUDIT_ITEM_EXTRA, auditItem.getAuditItemUUID());
+						intent.putExtra(ReportIssueActivity_.AUDIT_ITEM_EXTRA, auditItem.getUuid());
 
 						mContext.startActivity(intent);
 					}
@@ -298,12 +296,12 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
 
-				Logger.Log("getAuditItemUUID: " + item.getAuditItemUUID());
+				Logger.Log("getUuid: " + item.getUuid());
 
 				Intent intent = new Intent(mContext, ReportIssueActivity_.class);
 				intent.putExtra(ReportIssueActivity_.CONTAINER_ID_EXTRA, containerId);
 				intent.putExtra(ReportIssueActivity_.AUDIT_IMAGE_EXTRA, item.getAuditImages().get(0).getAuditImageUUID());
-				intent.putExtra(ReportIssueActivity_.AUDIT_ITEM_EXTRA, item.getAuditItemUUID());
+				intent.putExtra(ReportIssueActivity_.AUDIT_ITEM_EXTRA, item.getUuid());
 
 				mContext.startActivity(intent);
 			}
@@ -318,7 +316,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				Intent intent = new Intent(mContext, MergeIssueActivity_.class);
 				intent.putExtra(MergeIssueActivity_.CONTAINER_ID_EXTRA, containerId);
 				intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, item.getAuditImages().get(0).getAuditImageUUID());
-				intent.putExtra(MergeIssueActivity_.AUDIT_ITEM_REMOVE_UUID, item.getAuditItemUUID());
+				intent.putExtra(MergeIssueActivity_.AUDIT_ITEM_REMOVE_UUID, item.getUuid());
 
 				mContext.startActivity(intent);
 			}

@@ -3,21 +3,18 @@ package com.cloudjay.cjay.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.activity.CameraActivity;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.DetailIssuedImageAdapter;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -105,7 +102,7 @@ public class BeforeRepairFragment extends Fragment {
         } else {
             operatorCode = mSession.getOperatorCode();
         }
-		auditItem = dataCenter.getAuditItemByUUID(getActivity().getApplicationContext(),
+		auditItem = dataCenter.getAuditItem(getActivity().getApplicationContext(),
 				containerID, auditItemUUID);
 
 		if (auditItem != null) {
@@ -172,8 +169,8 @@ public class BeforeRepairFragment extends Fragment {
 		Logger.Log ("on ImageCapturedEvent");
 
 		// Requery audit item by uuid to update listview
-		auditItem = dataCenter.getAuditItemByUUID(getActivity().getApplicationContext(),
-				containerID,auditItemUUID);
+		auditItem = dataCenter.getAuditItem(getActivity().getApplicationContext(),
+				containerID, auditItemUUID);
 		refreshListImage();
 	}
 

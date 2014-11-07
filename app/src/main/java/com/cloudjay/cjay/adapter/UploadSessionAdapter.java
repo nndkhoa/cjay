@@ -21,6 +21,7 @@ import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.task.job.UploadImageJob;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.ThreadPreconditions;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
@@ -74,16 +75,16 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 		} else {
 			viewHolder = (ViewHolder) convertView.getTag();
 		}
+
 		//Set data to view
 		ImageLoader.getInstance().displayImage(session.getGateImages().get(0).getUrl(), viewHolder.ivContainer);
 		viewHolder.tvContainerId.setText(session.getContainerId());
 		viewHolder.tvTotalPhotoUpload.setText(String.valueOf(Utils.countTotalImage(session)));
 		viewHolder.tvCurrentPhotoUpload.setText(String.valueOf(Utils.countUploadedImage(session)));
 		UploadStatus status = UploadStatus.values()[session.getUploadStatus()];
-		Logger.Log(session.getContainerId() + " -> Upload Status: " + status.name());
+
 		switch (status) {
 
-			//
 			case COMPLETE:
 				viewHolder.btnUploadStatus.setVisibility(View.VISIBLE);
 				viewHolder.pbUpLoading.setVisibility(View.GONE);
@@ -159,7 +160,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 							}
 						}
 					}
-					jobManager.addJobInBackground(new UploadAuditItemJob(session.getContainerId(), item.getAuditItemUUID()));
+					jobManager.addJobInBackground(new UploadAuditItemJob(session.getContainerId(), item.getUuid()));
 				}
 
 				jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), step.value, true));
@@ -191,6 +192,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 	}
 
 	public void setData(List<Session> data) {
+		ThreadPreconditions.checkOnMainThread();
 		clear();
 		if (data != null) {
 			for (int i = 0; i < data.size(); i++) {

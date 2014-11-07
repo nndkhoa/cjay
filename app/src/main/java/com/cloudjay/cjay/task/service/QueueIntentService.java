@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.DataCenter_;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 import com.snappydb.SnappydbException;
@@ -25,9 +26,11 @@ public class QueueIntentService extends IntentService {
 		try {
 			String token = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_TOKEN);
 
-			if (!TextUtils.isEmpty(token)) {
+			if (!TextUtils.isEmpty(token) && Utils.canReachInternet()) {
 				String lastModifiedTime = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_MODIFIED_DATE);
 				DataCenter_.getInstance_(getApplicationContext()).fetchSession(getApplicationContext(), lastModifiedTime);
+			} else {
+				Logger.w("There was problems. Please check credential or connectivity.");
 			}
 
 		} catch (SnappydbException e) {

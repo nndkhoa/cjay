@@ -43,21 +43,6 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 	PagerAdapter mPagerAdapter;
 	ActionBar actionBar;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-
-		// Fix StrictMode activity instance count violation
-		// http://stackoverflow.com/questions/21145261/strictmode-activity-instance-count-violation-2-instances-1-expected-on-rotati
-		System.gc();
-		super.onCreate(savedInstanceState);
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		System.gc();
-	}
-
 	/**
 	 * > MAIN FUNCTION
 	 * 0. Navigate to Login Activity if user has not logged in

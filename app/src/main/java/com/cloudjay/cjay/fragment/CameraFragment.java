@@ -335,7 +335,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 								.withUrl("file://" + uri)
 								.withName(imageName)
 								.withUUID(uuid);
-						AuditItem auditItem = dataCenter.getAuditItemByUUID(getActivity(), containerId, auditItemUUID);
+						AuditItem auditItem = dataCenter.getAuditItem(getActivity(), containerId, auditItemUUID);
 						if (null == auditItem) {
 							// Tạo lỗi giám đinh/ sửa mới
 							Logger.Log("new type: " + auditImage.getType());

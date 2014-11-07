@@ -442,10 +442,9 @@ public class Session {
 			JsonArray repairedImageName = auditItem.getRepairedImageToUpLoad();
 			jsonObject.add("repair_images", repairedImageName);
 		}
-		auditItemsPut.add("audit_items",auditItems);
+		auditItemsPut.add("audit_items", auditItems);
 		return auditItemsPut;
 	}
-
 
 	/**
 	 * Check if container has repair images or not
@@ -473,10 +472,10 @@ public class Session {
 			// Chỉ cần có ít nhất một tấm hình IMPORT là hợp lệ
 			case IMPORT:
 
-                // Required operator
-                if (this.getOperatorId() == 0) {
-                    return false;
-                }
+				// Required operator
+				if (this.getOperatorId() == 0) {
+					return false;
+				}
 
 				for (GateImage image : gateImages) {
 					if (image.getType() == ImageType.IMPORT.value) return true;
@@ -559,7 +558,6 @@ public class Session {
 		}
 	}
 
-
 	/**
 	 * Count total image off session
 	 *
@@ -584,7 +582,6 @@ public class Session {
 			return totalImage;
 		}
 	}
-
 
 	public int getUploadedImage() {
 		int uploadedImage = 0;
@@ -625,22 +622,59 @@ public class Session {
 		return list;
 	}
 
-	public Session mergeSession(Session session) {
-		this.setId(session.getId());
-		this.setStep(session.getStep());
-		this.setCheckInTime(session.getCheckInTime());
-		this.setCheckOutTime(session.getCheckOutTime());
+	/**
+	 * Get audit item that have given uuid
+	 *
+	 * @param itemUuid
+	 * @return
+	 */
+	public AuditItem getAuditItem(String itemUuid) {
+		for (AuditItem item : auditItems) {
+			if (item.getUuid().equals(itemUuid)) {
+				return item;
+			}
+		}
 
-        // local step is always greater or equal to step
-        Logger.Log("localStep client: " + this.getLocalStep());
-        Logger.Log("Step server: " + session.getStep());
-        if (this.getLocalStep() < session.getStep()) {
-            this.setLocalStep(session.getStep());
-        }
+		return null;
+	}
+
+	/**
+	 *
+	 * @param uuid
+	 */
+	public boolean removeAuditItem(String uuid) {
+		for (AuditItem item : auditItems) {
+			if (item.getUuid().equals(uuid)) {
+				auditItems.remove(item);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 *
+	 * @param newSession
+	 * @return
+	 */
+	public Session mergeSession(Session newSession) {
+
+		this.setId(newSession.getId());
+		this.setStep(newSession.getStep());
+		this.setCheckInTime(newSession.getCheckInTime());
+		this.setCheckOutTime(newSession.getCheckOutTime());
+
+		// local step is always greater or equal to step
+		Logger.Log("localStep client: " + this.getLocalStep());
+		Logger.Log("Step server: " + newSession.getStep());
+		if (this.getLocalStep() < newSession.getStep()) {
+			this.setLocalStep(newSession.getStep());
+		}
 
 		//merge Gate Image
 		List<GateImage> mergedGateImages = new ArrayList<GateImage>();
-		for (GateImage gateImageServer : session.getGateImages()) {
+		for (GateImage gateImageServer : newSession.getGateImages()) {
 			for (GateImage gateImage : this.getGateImages()) {
 
 				if (gateImage.getName() != null) {
@@ -658,10 +692,10 @@ public class Session {
 		this.setGateImages(mergedGateImages);
 
 		//merge Audit Item  if audit item from server != null
-		if (session.getAuditItems().size() != 0) {
+		if (newSession.getAuditItems().size() != 0) {
 			List<AuditItem> localList = this.getAuditItems();
 			for (AuditItem auditItem : this.getAuditItems()) {
-				for (AuditItem auditItemServer : session.getAuditItems()) {
+				for (AuditItem auditItemServer : newSession.getAuditItems()) {
 					if (auditItem.equals(auditItemServer)) {
 						auditItem.setUploadStatus(UploadStatus.COMPLETE);
 						auditItem.mergeAuditItem(auditItemServer);
@@ -671,5 +705,43 @@ public class Session {
 			this.setAuditItems(localList);
 		}
 		return this;
+	}
+
+	/**
+	 * Find and update audit item information
+	 *
+	 * @param auditItem
+	 * @return
+	 */
+	public boolean updateAuditItem(AuditItem auditItem) {
+
+		// find and replace with the new one
+		for (AuditItem item : auditItems) {
+			if (item.equals(auditItem)) {
+				auditItems.remove(item);
+				auditItems.add(auditItem);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Change audit item upload status
+	 *
+	 * @param containerId
+	 * @param itemUuid
+	 * @param status
+	 * @return
+	 */
+	public boolean changeUploadStatus(String containerId, String itemUuid, UploadStatus status) {
+		for (AuditItem item : auditItems) {
+			if (item.getUuid().equals(itemUuid)) {
+				item.setUploadStatus(status);
+				return true;
+			}
+		}
+		return false;
 	}
 }

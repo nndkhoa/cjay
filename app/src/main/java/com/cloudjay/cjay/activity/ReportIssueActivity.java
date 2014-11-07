@@ -1,7 +1,5 @@
 package com.cloudjay.cjay.activity;
 
-import java.sql.SQLException;
-
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
@@ -23,14 +21,11 @@ import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.event.IssueUpdatedEvent;
 import com.cloudjay.cjay.fragment.*;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.AuditImage;
@@ -39,13 +34,8 @@ import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.view.SquareImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.snappydb.DB;
-import com.snappydb.SnappydbException;
-
-import de.greenrobot.event.EventBus;
 
 // slide 20
 
@@ -158,7 +148,7 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 		Logger.Log(mAuditItemUuid);
 
         mSession = mDataCenter.getSession(getApplicationContext(), mContainerId);
-        mAuditItem = mDataCenter.getAuditItemByUUID(getApplicationContext(), mContainerId, mAuditItemUuid);
+        mAuditItem = mDataCenter.getAuditItem(getApplicationContext(), mContainerId, mAuditItemUuid);
         mAuditImage = mDataCenter.getAuditImageByUUId(getApplicationContext(), mContainerId, mAuditItemUuid, mAuditImageUuid);
 
         mImageLoader = ImageLoader.getInstance();
