@@ -410,7 +410,8 @@ public class Session {
 	 * @return
 	 * @throws JSONException
 	 */
-	public JsonArray getGateOutImageToUpLoad() {
+	public JsonObject getGateOutImageToUpLoad() {
+		JsonObject checkOutJson = new JsonObject();
 		JsonArray gate_image = new JsonArray();
 		for (GateImage gateImage : this.gateImages) {
 			if (gateImage.getType() == ImageType.EXPORT.getValue()) {
@@ -420,7 +421,8 @@ public class Session {
 				gate_image.add(jsonObject);
 			}
 		}
-		return gate_image;
+		checkOutJson.add("gate_images", gate_image);
+		return checkOutJson;
 	}
 
 	/**
