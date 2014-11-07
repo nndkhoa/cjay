@@ -1,12 +1,7 @@
 package com.cloudjay.cjay.model;
 
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.UploadStatus;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
-
-import java.io.Serializable;
 
 import javax.annotation.Generated;
 
@@ -18,6 +13,7 @@ public class GateImage {
 	private long id;
 	@Expose
 	private long type;
+
 	@Expose
 	private String url;
 
@@ -119,5 +115,20 @@ public class GateImage {
 	public GateImage mergeGateImage(GateImage gateImageServer) {
 		this.setId(gateImageServer.getId());
 		return this;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+
+		if (o instanceof GateImage) {
+			GateImage tmp = (GateImage) o;
+
+			if (tmp.getUrl().contains(this.getName()) || this.getUrl().contains(tmp.getName())) {
+				return true;
+			}
+			return false;
+		}
+
+		return super.equals(o);
 	}
 }

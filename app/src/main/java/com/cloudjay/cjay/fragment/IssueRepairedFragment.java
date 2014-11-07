@@ -103,7 +103,7 @@ public class IssueRepairedFragment extends Fragment {
 		if (auditItem.getAudited()) {
 			Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
 			detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
-			detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getAuditItemUUID());
+			detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getUuid());
 			detailIssueActivity.putExtra(DetailIssueActivity.SELECTED_TAB, 0);
 			startActivity(detailIssueActivity);
 		}

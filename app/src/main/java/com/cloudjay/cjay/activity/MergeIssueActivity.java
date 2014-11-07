@@ -5,11 +5,8 @@ import android.widget.ListView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.AuditMergeIssueAdapter;
-import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
-import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 
@@ -24,7 +21,6 @@ import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Màn hình chữa các lỗi đã giám định và chưa được upload
@@ -74,12 +70,12 @@ public class MergeIssueActivity extends BaseActivity {
     void lvIssuesItemClicked(int position) {
 
         AuditItem auditItem = mAdapter.getItem(position);
-        String uuid = auditItem.getAuditItemUUID();
+        String uuid = auditItem.getUuid();
 		Logger.Log("auditImageUUID: " + auditImageUUID);
 		Logger.Log("auditItemRemoveUUID: " + auditItemRemoveUUID);
 		Logger.Log("uuid: " + uuid);
-        dataCenter.addAuditImageToAuditedIssue(getApplicationContext(), containerID,
-                uuid, auditItemRemoveUUID, auditImageUUID);
+        dataCenter.addAuditImageToAuditedItem(getApplicationContext(), containerID,
+		        uuid, auditItemRemoveUUID, auditImageUUID);
         refresh();
 
         this.finish();

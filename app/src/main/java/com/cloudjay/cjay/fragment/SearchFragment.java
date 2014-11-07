@@ -45,6 +45,7 @@ import org.androidannotations.annotations.ViewById;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 /**
  * Tab search container
@@ -140,8 +141,7 @@ public class SearchFragment extends Fragment {
 		Session item = mAdapter.getItem(position);
 		dataCenter.addWorkingSession(item);
 
-		Logger.e(position + " " + item.getContainerId() + " " + item.getLocalStep());
-
+		// Open Wizard Activity
 		Intent intent = new Intent(getActivity(), WizardActivity_.class);
 		intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, item.getContainerId());
 		intent.putExtra(WizardActivity.STEP_EXTRA, item.getLocalStep());
@@ -149,16 +149,14 @@ public class SearchFragment extends Fragment {
 	}
 
 	@ItemLongClick(R.id.lv_search_container)
-	void showexportImmediatelyButton(int position) {
+	void searchListViewItemLongClicked(int position) {
 
 		//Get session from position
 		Session item = mAdapter.getItem(position);
 		HomeActivity activity = (HomeActivity) getActivity();
 		activity.exportSessionContainerId = item.getContainerId();
 		activity.showMenuExportImmediately(true);
-
 	}
-
 
 	/**
 	 * Hiển thị kết quả không tìm thấy container
@@ -263,8 +261,10 @@ public class SearchFragment extends Fragment {
 
 		showProgress(false);
 		if (event.isFailed()) {
+
 			llSearchResult.setVisibility(View.GONE);
-			Toast.makeText(getActivity(), "Đang trong quá trình cập nhật dữ liệu, vui lòng thử lại sau", Toast.LENGTH_SHORT).show();
+			Utils.showCrouton(getActivity(), "Đang xảy ra sự cố \nXin thử lại sau", Style.ALERT);
+
 		} else {
 			List<Session> result = event.getSessions();
 			mAdapter.clear();

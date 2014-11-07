@@ -50,6 +50,7 @@
                 android:focusable="false"
                 android:id="@+id/btn_report_pending"
                 android:layout_width="match_parent"
+                android:minHeight="32dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/btn_edit_selector"
                 android:text="@string/button_report"
@@ -220,10 +221,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
+                    android:textSize="11sp"
                     android:text="@string/issue_unapproved"
                     android:background="@color/background_button_and_line"
                     android:textColor="@android:color/white"
-                    android:padding="3dp"/>
+                    android:paddingLeft="6dp"
+	                android:paddingRight="6dp"
+	                android:paddingTop="0dp"
+	                android:paddingBottom="0dp"/>
 
             </RelativeLayout>
 
@@ -249,6 +254,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/btn_customize_selector"
                     android:text="@string/button_upload"
+                    android:minHeight="32dp"
                     android:textColor="@android:color/white"
                     android:textSize="14sp" />
 
@@ -268,6 +274,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/btn_edit_selector"
                 android:text="@string/button_edit"
+                android:minHeight="32dp"
                 android:textColor="@android:color/white"
                 android:textSize="12sp" />
 
@@ -277,6 +284,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/btn_green_selector"
                 android:text="@string/button_repair"
+                android:minHeight="32dp"
                 android:textColor="@android:color/white"
                 android:textSize="12sp"
                 android:visibility="gone" />

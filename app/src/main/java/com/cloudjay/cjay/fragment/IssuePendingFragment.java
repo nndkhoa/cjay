@@ -18,7 +18,7 @@ import com.cloudjay.cjay.activity.DetailIssueActivity;
 import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.adapter.AuditItemAdapter;
 import com.cloudjay.cjay.event.ImageCapturedEvent;
-import com.cloudjay.cjay.event.IssueUpdatedEvent;
+import com.cloudjay.cjay.event.issue.IssueUpdatedEvent;
 import com.cloudjay.cjay.event.issue.IssueDeletedEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
 import com.cloudjay.cjay.event.upload.UploadedEvent;
@@ -144,10 +144,10 @@ public class IssuePendingFragment extends Fragment {
 
                     Logger.Log("Open AfterRepair Fragment");
                     String auditItemUUID = event.getAuditItemUUID();
-                    AuditItem auditItem = dataCenter.getAuditItemByUUID(getActivity(), containerID, auditItemUUID);
+                    AuditItem auditItem = dataCenter.getAuditItem(getActivity(), containerID, auditItemUUID);
                     Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
                     detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
-                    detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getAuditItemUUID());
+                    detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getUuid());
                     detailIssueActivity.putExtra(DetailIssueActivity.SELECTED_TAB, 1);
                     startActivity(detailIssueActivity);
                     break;
@@ -181,11 +181,11 @@ public class IssuePendingFragment extends Fragment {
 	@ItemClick(R.id.lv_audit_items)
 	void switchToDetailIssueActivity(int position) {
 		AuditItem auditItem = auditItemAdapter.getItem(position);
-		Logger.Log("getAuditItemUUID: " + auditItem.getAuditItemUUID());
+		Logger.Log("getUuid: " + auditItem.getUuid());
 		if (auditItem.getAudited()) {
 			Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
 			detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
-			detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getAuditItemUUID());
+			detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getUuid());
 			detailIssueActivity.putExtra(DetailIssueActivity.SELECTED_TAB, 0);
 			startActivity(detailIssueActivity);
 		}
@@ -203,7 +203,7 @@ public class IssuePendingFragment extends Fragment {
 					Logger.Log("getComponentCode: " + auditItem.getComponentCode());
 					Logger.Log("getAuditImages: " + auditItem.getAuditImages().size());
 					Logger.Log("getRepaired: " + auditItem.getRepaired());
-					Logger.Log("getAuditItemUUID: " + auditItem.getAuditItemUUID());
+					Logger.Log("getUuid: " + auditItem.getUuid());
                     Logger.Log("getIsAllow: " + auditItem.isIsAllowed());
 					list.add(auditItem);
 				}
@@ -261,7 +261,7 @@ public class IssuePendingFragment extends Fragment {
 		// Delete merged audit item containerId
 		String containerId = event.getContainerId();
 		String auditItemRemoveUUID = event.getAuditItemRemoveUUID();
-		dataCenter.deleteAuditItemAfterMerge(getActivity().getApplicationContext(),
+		dataCenter.removeAuditItem(getActivity().getApplicationContext(),
 				containerId, auditItemRemoveUUID);
 		refresh();
 	}

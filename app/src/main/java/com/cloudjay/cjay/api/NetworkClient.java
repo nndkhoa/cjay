@@ -19,16 +19,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
-import org.bouncycastle.asn1.crmf.ProofOfPossession;
 
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import retrofit.RestAdapter;
@@ -217,7 +213,6 @@ public class NetworkClient {
 				String lastModifiedDate = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
 				Logger.Log("Last modified date: " + lastModifiedDate);
 			}
-
 		}
 
 		//If not, get all sessions start form page 1
@@ -258,10 +253,42 @@ public class NetworkClient {
 			page = page + 1;
 
 			// Store the datetime that complete parsing process
-			String currentTime = jsonObject.get("request_time").getAsString();
-			PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, currentTime);
+			if (next.isJsonNull()) {
+				String currentTime = jsonObject.get("request_time").getAsString();
+				PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, currentTime);
+			}
+
 		} while (!next.isJsonNull());
 
+
+		return sessions;
+	}
+
+	public List<Session> getSessionByPage(Context context, int page, String modifiedDate) {
+		List<Session> sessions = new ArrayList<Session>();
+
+		JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionsByPage(page, modifiedDate);
+		// Parse list sessions nằm bên trong key `results` của kết quả trả về
+		JsonArray results = jsonObject.getAsJsonArray("results");
+		JsonElement next = jsonObject.get("next");
+
+		Gson gson = new Gson();
+		Type listType = new TypeToken<List<Session>>() {
+		}.getType();
+
+		List<Session> sessionsPage = gson.fromJson(results, listType);
+		sessions.addAll(sessionsPage);
+
+		if (!next.isJsonNull()) {
+			//Update current page
+			String currentPage = String.valueOf(page);
+			PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE, currentPage);
+
+		} else {
+			// Store the datetime that complete parsing process
+			String currentTime = jsonObject.get("request_time").getAsString();
+			PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, currentTime);
+		}
 
 		return sessions;
 	}
@@ -302,16 +329,15 @@ public class NetworkClient {
 	 * @return
 	 */
 	public Session checkOutContainerSession(Context context, Session containerSession) {
-        Logger.Log("containerSession: " + containerSession.getId());
-        Logger.Log("size gate outs: " + containerSession.getGateOutImageToUpLoad());
-        try {
-            Session checkOutSession = provider.getRestAdapter(context).create(NetworkService.class).checkOutContainerSession(containerSession.getId(), containerSession.getGateOutImageToUpLoad());
-            return checkOutSession;
-        } catch (RetrofitError e) {
-            Logger.Log(e.getResponse().getReason().toString());
-            Logger.Log(e.getResponse().getBody().toString());
-            Logger.Log(e.getResponse().getStatus() + "");
-        }
+
+		try {
+			Session checkOutSession = provider.getRestAdapter(context).create(NetworkService.class).checkOutContainerSession(containerSession.getId(), containerSession.getGateOutImageToUpLoad());
+			return checkOutSession;
+		} catch (RetrofitError e) {
+			Logger.Log(e.getResponse().getReason().toString());
+			Logger.Log(e.getResponse().getBody().toString());
+			Logger.Log(e.getResponse().getStatus() + "");
+		}
 
 		return null;
 	}
@@ -360,17 +386,18 @@ public class NetworkClient {
 		Logger.Log("containerSession: " + containerSession.getId());
 		Logger.Log("auditItem: " + auditItem.getAuditItemToUpload());
 
-		String auditItemUUID = auditItem.getAuditItemUUID();
+		String auditItemUUID = auditItem.getUuid();
 		Session postAuditItemSession = provider.getRestAdapter(context).create(NetworkService.class).postAudiItem(containerSession.getId(), auditItem.getAuditItemToUpload());
 		List<AuditItem> list = postAuditItemSession.getAuditItems();
 		for (AuditItem item : list) {
 			if (item.equals(auditItem)) {
 				Logger.Log("Set here");
-				item.setAuditItemUUID(auditItemUUID);
+				item.setUuid(auditItemUUID);
 				item.setUploadStatus(UploadStatus.COMPLETE);
 			}
 		}
 		postAuditItemSession.setAuditItems(list);
+		Logger.logJson(postAuditItemSession);
 		return postAuditItemSession;
 	}
 
@@ -449,6 +476,12 @@ public class NetworkClient {
 		return operator;
 	}
 
+	/**
+	 * Notify to server that we already receive notification message
+	 *
+	 * @param channel
+	 * @param messageId
+	 */
 	public void gotMessageFromPubNub(String channel, String messageId) {
 
 		Response response = provider.getRestAdapter(context).create(NetworkService.class).gotMessageFromPubNub(channel, messageId);

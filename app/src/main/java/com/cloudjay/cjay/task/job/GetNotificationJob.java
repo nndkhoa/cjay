@@ -5,7 +5,6 @@ import android.app.NotificationManager;
 import android.content.Context;
 
 import com.cloudjay.cjay.App;
-import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.Session;
@@ -41,24 +40,24 @@ public class GetNotificationJob extends Job {
 
 		// Get data from notification
 		if (objectType.equals("Container")) {
-			Session session = DataCenter_.getInstance_(context).getSessionById(context, objectId);
+			Session session = DataCenter_.getInstance_(context).getSessionAsyncById(context, objectId);
 			pushNotification(session);
 
 		} else if (objectType.equals("AuditItem")) {
-			Session session = DataCenter_.getInstance_(context).getAuditItemById(context, objectId);
+			Session session = DataCenter_.getInstance_(context).getAuditItemAsyncById(context, objectId);
 			pushNotification(session);
 
 		} else if (objectType.equals("Damage")) {
-			DataCenter_.getInstance_(context).getDamageCodeById(context, objectId);
+			DataCenter_.getInstance_(context).getDamageCodeAsyncById(context, objectId);
 
 		} else if (objectType.equals("Repair")) {
-			DataCenter_.getInstance_(context).getRepairCodeById(context, objectId);
+			DataCenter_.getInstance_(context).getRepairCodeAsyncById(context, objectId);
 
 		} else if (objectType.equals("Component")) {
-			DataCenter_.getInstance_(context).getComponentCodeById(context, objectId);
+			DataCenter_.getInstance_(context).getComponentCodeAsyncById(context, objectId);
 
 		} else if (objectType.equals("Operator")) {
-			DataCenter_.getInstance_(context).getOperatorById(context, objectId);
+			DataCenter_.getInstance_(context).getOperatorAsyncById(context, objectId);
 
 		} else {
 			Logger.e("Cannot parse notification");
