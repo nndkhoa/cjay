@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -147,9 +148,11 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 			if (auditItem.isIsAllowed() == null) {
 				holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_unapproved));
+				holder.tvIssueStatus.setBackgroundColor(Color.parseColor("#FACC2E"));
 			} else {
 				if (!auditItem.isIsAllowed()) {
 					holder.tvIssueStatus.setText("Cấm sửa");
+					holder.tvIssueStatus.setBackgroundColor(Color.parseColor("#DF0101"));
 				} else {
 					holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_approved));
 				}
