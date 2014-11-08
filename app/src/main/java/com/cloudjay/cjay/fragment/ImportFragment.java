@@ -143,7 +143,6 @@ public class ImportFragment extends Fragment {
 
 			containerID = mSession.getContainerId();
 			operatorCode = mSession.getOperatorCode();
-
 			tvContainerCode.setText(containerID);
 
             Operator operator = dataCenter.getOperator(getActivity().getApplicationContext(), operatorCode);
@@ -152,7 +151,6 @@ public class ImportFragment extends Fragment {
             }
 
             preStatus = mSession.getPreStatus();
-
 			switch ((int) preStatus) {
 				case 0:
 					rdnStatusA.setChecked(true);

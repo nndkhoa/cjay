@@ -1,6 +1,7 @@
 package com.cloudjay.cjay;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.AuditImagesGotEvent;
@@ -447,7 +448,6 @@ public class DataCenter {
 			DB db = App.getDB(context);
 			String key = containerId;
 			Session session = db.getObject(key, Session.class);
-			Logger.logJson(session, Session.class);
 
 			return session;
 		} catch (SnappydbException e) {
@@ -947,10 +947,8 @@ public class DataCenter {
 
 				case AUDIT:
 					for (AuditItem auditItem : session.getAuditItems()) {
-						for (AuditImage auditImage : auditItem.getListIssueImages()) {
-
-							Logger.Log("auditImage: " + auditImage.getName());
-							if (auditImage.getName() != null) {
+						for (AuditImage auditImage : auditItem.getListAuditedImages()) {
+							if (!TextUtils.isEmpty(auditImage.getName())) {
 								if (auditImage.getName().contains(imageName) && auditImage.getType() == imageType.value) {
 									auditImage.setUploadStatus(status);
 								}
@@ -963,9 +961,7 @@ public class DataCenter {
 				case REPAIRED:
 					for (AuditItem auditItem : session.getAuditItems()) {
 						for (AuditImage auditImage : auditItem.getListRepairedImages()) {
-
-							Logger.Log("auditImage: " + auditImage.getName());
-							if (auditImage.getName() != null) {
+							if (!TextUtils.isEmpty(auditImage.getName())) {
 								if (auditImage.getName().contains(imageName) && auditImage.getType() == imageType.value) {
 									auditImage.setUploadStatus(status);
 								}
@@ -995,11 +991,7 @@ public class DataCenter {
 					}
 					break;
 			}
-
 			db.put(key, session);
-
-			Session tmp = db.getObject(key, Session.class);
-			Logger.logJson(tmp, Session.class);
 		}
 	}
 
@@ -1075,7 +1067,6 @@ public class DataCenter {
 
 			// Upload container session to server
 			Session result = networkClient.uploadSession(context, session);
-			Logger.logJson(result, Session.class);
 
 			if (result != null) {
 

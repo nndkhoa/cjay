@@ -465,7 +465,7 @@ public class AuditItem {
 		return super.equals(obj);
 	}
 
-	public List<AuditImage> getListIssueImages() {
+	public List<AuditImage> getListAuditedImages() {
 		List<AuditImage> imageList = new ArrayList<AuditImage>();
 
 		for (AuditImage auditImage : this.getAuditImages()) {

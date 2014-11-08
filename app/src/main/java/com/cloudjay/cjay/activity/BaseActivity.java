@@ -43,8 +43,6 @@ public class BaseActivity extends FragmentActivity {
 	}
 	public String exportSessionContainerId;
 
-	private Menu menu;
-
 	MenuItem exportMenu;
 
 
@@ -53,7 +51,6 @@ public class BaseActivity extends FragmentActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		this.menu = menu;
 		getMenuInflater().inflate(R.menu.base, menu);
 
 		String name = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_USER_NAME);

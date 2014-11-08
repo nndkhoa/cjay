@@ -311,7 +311,6 @@ public class NetworkClient {
 			}
 		}
 		result.setAuditItems(list);
-		Logger.logJson(result, Session.class);
 		return result;
 	}
 
