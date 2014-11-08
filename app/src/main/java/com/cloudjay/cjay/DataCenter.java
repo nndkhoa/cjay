@@ -1016,10 +1016,6 @@ public class DataCenter {
 						for (GateImage gateImage : session.getGateImages()) {
 							if (gateImage.getName() != null) {
 								if (gateImage.getName().contains(imageName) && gateImage.getType() == imageType.value) {
-
-//									Logger.Log("Found & set upload status: " + imageName +
-//											" | " + ImageType.values()[((int) gateImage.getType())].name());
-
 									gateImage.setUploadStatus(status);
 									break;
 								}

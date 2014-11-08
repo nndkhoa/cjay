@@ -8,6 +8,7 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadSessionAdapter;
+import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
@@ -63,20 +64,22 @@ public class UploadFragment extends Fragment {
 		mAdapter = new UploadSessionAdapter(getActivity(), R.layout.item_upload);
 		lvUploading.setAdapter(mAdapter);
 		lvUploading.setEmptyView(tvEmpty);
-		refresh();
-	}
 
-	void refresh() {
 		List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
 				CJayConstant.PREFIX_UPLOADING);
 		updatedData(list);
+	}
+
+	void refresh() {
+		if (mAdapter != null) {
+			dataCenter.getSessionsInBackground(getActivity().getApplicationContext(), CJayConstant.PREFIX_UPLOADING);
+		}
 	}
 
 	@UiThread
 	public void updatedData(List<Session> sessionList) {
 		mAdapter.setData(sessionList);
 	}
-
 
 	//region EVENT HANDLER
 	public void onEvent(UploadStartedEvent event) {
@@ -93,6 +96,10 @@ public class UploadFragment extends Fragment {
 
 	public void onEvent(UploadSucceededEvent event) {
 		refresh();
+	}
+
+	public void onEvent(ContainersGotEvent event) {
+		updatedData(event.getSessions());
 	}
 	//endregion
 
