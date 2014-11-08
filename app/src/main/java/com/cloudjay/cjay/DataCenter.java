@@ -1084,7 +1084,7 @@ public class DataCenter {
 			// Update container back to database
 			String key = result.getContainerId();
 			session.mergeSession(result);
-			db.put(key, result);
+			db.put(key, session);
 		}
 
 	}
@@ -1310,7 +1310,7 @@ public class DataCenter {
 			String key = result.getContainerId();
 			oldSession.setUploadStatus(UploadStatus.COMPLETE);
 			oldSession.mergeSession(result);
-			db.put(key, result);
+			db.put(key, oldSession);
 
 			// Then remove them from WORKING
 			String workingKey = CJayConstant.PREFIX_WORKING + key;

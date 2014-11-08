@@ -141,15 +141,15 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			holder.tvCodeComponent.setText(auditItem.getComponentCode());
 			holder.tvCodeIssue.setText(auditItem.getDamageCode());
 			holder.tvCodeLocation.setText(auditItem.getLocationCode());
-			holder.tvDimension.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
+			holder.tvDimension.setText("Dài " + auditItem.getLength() + "," + " Rộng " + auditItem.getHeight());
 			holder.tvCodeRepair.setText(auditItem.getRepairCode());
 			holder.tvCount.setText(auditItem.getQuantity() + "");
 
-			if (!auditItem.isIsAllowed()) {
-				holder.tvIssueStatus.setText("Cấm sửa");
+			if (auditItem.isIsAllowed() == null) {
+				holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_unapproved));
 			} else {
-				if (!auditItem.getApproved()) {
-					holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_unapproved));
+				if (!auditItem.isIsAllowed()) {
+					holder.tvIssueStatus.setText("Cấm sửa");
 				} else {
 					holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_approved));
 				}
@@ -160,13 +160,13 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				public void onClick(View view) {
 					mAuditItemUUID = auditItem.getUuid();
 					mComponentCode = auditItem.getComponentCode();
-					if (!auditItem.isIsAllowed()) {
-						// Nếu lỗi này cấm sửa, hiện dialog cấm sửa
-						showPreventRepairDialog();
+					if (auditItem.isIsAllowed() == null) {
+						// Show repair dialog
+						showRepairDiaglog();
+
 					} else {
-						if (!auditItem.getApproved()) {
-							// Show repair dialog
-							showRepairDiaglog();
+						if (!auditItem.isIsAllowed()) {// Nếu lỗi này cấm sửa, hiện dialog cấm sửa
+							showPreventRepairDialog();
 						} else {
 							// Open camera activity to take repair image
 							openCamera();

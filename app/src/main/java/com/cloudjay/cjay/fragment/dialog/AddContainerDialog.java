@@ -149,7 +149,8 @@ public class AddContainerDialog extends SimpleDialogFragment {
         mSession = new Session().withContainerId(containerId)
                 .withLocalStep(Step.IMPORT.value)
                 .withStep(Step.IMPORT.value)
-                .withCheckInTime(currentTime);
+                .withCheckInTime(currentTime)
+                .withPreStatus(1);
 
         // Save normal session and working session.
         // add working session also post an event

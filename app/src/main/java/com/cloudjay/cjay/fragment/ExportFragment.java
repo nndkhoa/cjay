@@ -264,7 +264,7 @@ public class ExportFragment extends Fragment {
 	}
 
 	public void onEvent(EventMenuCreated event) {
-		WizardActivity activity = (WizardActivity) getActivity();
-		activity.showMenuExportImmediately(false);
+		Logger.e("EVENT BUSS MENU CREATE");
+		event.getMenu().findItem(R.id.menu_export).setVisible(false);
 	}
 }

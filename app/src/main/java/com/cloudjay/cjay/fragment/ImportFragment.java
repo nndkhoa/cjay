@@ -182,6 +182,10 @@ public class ImportFragment extends Fragment {
 	}
 
 	//region EVENT HANDLER
+	void onEvent(EventMenuCreated event){
+		Logger.e("EVENT BUSS MENU CREATE");
+		event.getMenu().findItem(R.id.menu_export).setVisible(false);
+	}
 	@UiThread
 	void onEvent(OperatorChosenEvent event) {
 
