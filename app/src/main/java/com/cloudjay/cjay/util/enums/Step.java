@@ -7,7 +7,7 @@ public enum Step {
 	AVAILABLE(2),
 	EXPORTED(3),
 	IMPORT(4),
-	CLEAR(5);
+	HAND_CLEAN(5);
 
 	public final int value;
 
@@ -27,7 +27,7 @@ public enum Step {
 			return "Đã xuất";
 		} else if (value == IMPORT.value) {
 			return "Nhập";
-		} else if (value == CLEAR.value) {
+		} else if (value == HAND_CLEAN.value) {
 			return "Vệ sinh - Quét";
 		}
 

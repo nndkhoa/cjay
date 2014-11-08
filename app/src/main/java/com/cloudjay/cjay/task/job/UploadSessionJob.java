@@ -38,6 +38,7 @@ public class UploadSessionJob extends Job {
 	}
 
 	public UploadSessionJob(String containerId, int step, boolean clearFromWorking) {
+
         // step is local step
 		super(new Params(1).requireNetwork().persist().groupBy(containerId));
 		this.containerId = containerId;
@@ -114,40 +115,33 @@ public class UploadSessionJob extends Job {
 	@Override
 	public void onRun() throws Throwable {
 
+		// Bắt đầu quá trình upload
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
-
-		// Bắt đầu quá trình upload
 		EventBus.getDefault().post(new UploadingEvent(containerId, UploadType.SESSION));
-
 		Step step = Step.values()[currentStep];
-		Logger.Log(" >> Uploading container " + containerId + " | " + step.name());
+
+		Logger.Log(" >> Uploading container: " + containerId + " | " + step.name());
+		dataCenter.addLog(context, containerId, step.name() + " | Bắt đầu quá trình upload");
 
 		switch (step) {
 			case AVAILABLE:
-                Logger.Log("jump to AVAILABLE");
-				dataCenter.addLog(context, containerId, "EXPORTED | Bắt đầu quá trình upload");
 				dataCenter.uploadExportSession(context, containerId);
 				break;
 
 			case AUDIT:
-				dataCenter.addLog(context, containerId, "AUDIT | Bắt đầu quá trình upload");
 				dataCenter.uploadAuditSession(context, containerId);
 				break;
 
 			case REPAIR:
-                Logger.Log("repair to export");
-				dataCenter.addLog(context, containerId, "REPAIR | Bắt đầu quá trình upload");
 				dataCenter.uploadRepairSession(context, containerId);
 				break;
 
 			case IMPORT:
-				dataCenter.addLog(context, containerId, "IMPORT | Bắt đầu quá trình upload");
 				dataCenter.uploadImportSession(context, containerId);
 				break;
 
 			default:
-				dataCenter.addLog(context, containerId, "HAND CLEANING | Bắt đầu quá trình upload");
 				dataCenter.setHandCleaningSession(context, containerId);
 				break;
 		}
@@ -156,7 +150,7 @@ public class UploadSessionJob extends Job {
 		DataCenter_.getInstance_(context).changeUploadStatus(context, containerId, UploadStatus.COMPLETE);
 
 		// Upload thành công
-		DataCenter_.getInstance_(context).addLog(context, containerId, "Upload container session thành công");
+		DataCenter_.getInstance_(context).addLog(context, containerId, "Upload container thành công");
 		EventBus.getDefault().post(new UploadedEvent(containerId));
 	}
 
@@ -171,7 +165,7 @@ public class UploadSessionJob extends Job {
 
 		if (throwable instanceof RetrofitError) {
 			Context context = App.getInstance().getApplicationContext();
-			DataCenter_.getInstance_(context).addLog(context, containerId, "Quá trình upload bị gián đoạn");
+			DataCenter_.getInstance_(context).addLog(context, containerId, "Upload bị gián đoạn");
 
 			//if it is a 4xx error, stop
 			RetrofitError retrofitError = (RetrofitError) throwable;
@@ -181,7 +175,6 @@ public class UploadSessionJob extends Job {
 		}
 
 		// Notify upload process is retrying
-
 		return true;
 	}
 

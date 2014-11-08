@@ -100,7 +100,6 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 		this.clear();
 		if (data != null) {
 			for (int i = 0; i < data.size(); i++) {
-				// add(data.get(i));
 				this.insert(data.get(i), this.getCount());
 			}
 		}

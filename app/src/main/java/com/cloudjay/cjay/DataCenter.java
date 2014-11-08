@@ -931,65 +931,72 @@ public class DataCenter {
 	 * @param status
 	 * @throws SnappydbException
 	 */
-	private void setImageUploadStatus(Context context, String containerId, String imageName, ImageType imageType, UploadStatus status) throws SnappydbException {
+	public boolean changeImageUploadStatus(Context context, String containerId, String imageName, ImageType imageType, UploadStatus status) {
 
-		DB db = App.getDB(context);
+		try {
+			DB db = App.getDB(context);
 
-		// Change status image in db
-		String key = containerId;
-		Session session = db.getObject(key, Session.class);
+			// Change status image in db
+			String key = containerId;
+			Session session = db.getObject(key, Session.class);
 
-		if (session != null) {
-			switch (imageType) {
+			if (session != null) {
+				switch (imageType) {
 
-				case AUDIT:
-					for (AuditItem auditItem : session.getAuditItems()) {
-						for (AuditImage auditImage : auditItem.getListAuditedImages()) {
-							if (!TextUtils.isEmpty(auditImage.getName())) {
-								if (auditImage.getName().contains(imageName) && auditImage.getType() == imageType.value) {
-									auditImage.setUploadStatus(status);
+					case AUDIT:
+						for (AuditItem auditItem : session.getAuditItems()) {
+							for (AuditImage auditImage : auditItem.getListAuditedImages()) {
+								if (!TextUtils.isEmpty(auditImage.getName())) {
+									if (auditImage.getName().contains(imageName) && auditImage.getType() == imageType.value) {
+										auditImage.setUploadStatus(status);
+									}
+								} else {
+									Logger.wtf(auditImage.getUrl() + " does not have image name");
+								}
+							}
+						}
+
+					case REPAIRED:
+						for (AuditItem auditItem : session.getAuditItems()) {
+							for (AuditImage auditImage : auditItem.getListRepairedImages()) {
+								if (!TextUtils.isEmpty(auditImage.getName())) {
+									if (auditImage.getName().contains(imageName) && auditImage.getType() == imageType.value) {
+										auditImage.setUploadStatus(status);
+									}
+								} else {
+									Logger.wtf(auditImage.getUrl() + " does not have image name");
+								}
+							}
+						}
+						break;
+
+					case IMPORT:
+					case EXPORT:
+					default:
+						for (GateImage gateImage : session.getGateImages()) {
+							if (gateImage.getName() != null) {
+								if (gateImage.getName().contains(imageName) && gateImage.getType() == imageType.value) {
+
+									Logger.Log("Found & set upload status: " + imageName +
+											" | " + ImageType.values()[((int) gateImage.getType())].name());
+
+									gateImage.setUploadStatus(status);
+									break;
 								}
 							} else {
-								Logger.wtf(auditImage.getUrl() + " does not have image name");
+								Logger.wtf(gateImage.getUrl() + " does not have image name");
 							}
 						}
-					}
-
-				case REPAIRED:
-					for (AuditItem auditItem : session.getAuditItems()) {
-						for (AuditImage auditImage : auditItem.getListRepairedImages()) {
-							if (!TextUtils.isEmpty(auditImage.getName())) {
-								if (auditImage.getName().contains(imageName) && auditImage.getType() == imageType.value) {
-									auditImage.setUploadStatus(status);
-								}
-							} else {
-								Logger.wtf(auditImage.getUrl() + " does not have image name");
-							}
-						}
-					}
-					break;
-
-				case IMPORT:
-				case EXPORT:
-				default:
-					for (GateImage gateImage : session.getGateImages()) {
-						if (gateImage.getName() != null) {
-							if (gateImage.getName().contains(imageName) && gateImage.getType() == imageType.value) {
-
-								Logger.Log("Found & set upload status: " + imageName +
-										" | " + ImageType.values()[((int) gateImage.getType())].name());
-
-								gateImage.setUploadStatus(status);
-								break;
-							}
-						} else {
-							Logger.wtf(gateImage.getUrl() + " does not have image name");
-						}
-					}
-					break;
+						break;
+				}
+				db.put(key, session);
+				return true;
 			}
-			db.put(key, session);
+		} catch (SnappydbException e) {
+			e.printStackTrace();
 		}
+
+		return false;
 	}
 
 	//endregion
@@ -1013,7 +1020,7 @@ public class DataCenter {
 			networkClient.uploadImage(uri, imageName);
 
 			// Change image status to COMPLETE
-			setImageUploadStatus(context, containerId, imageName, imageType, UploadStatus.COMPLETE);
+			changeImageUploadStatus(context, containerId, imageName, imageType, UploadStatus.COMPLETE);
 			return true;
 
 		} catch (RetrofitError e) {
@@ -1321,6 +1328,7 @@ public class DataCenter {
 	 */
 	public void updateAuditItem(Context context, String containerId, AuditItem auditItem) {
 		try {
+
 			// find session
 			DB db = App.getDB(context);
 			Session session = db.getObject(containerId, Session.class);
@@ -1443,8 +1451,8 @@ public class DataCenter {
 	 * @param containerId
 	 * @param auditItem
 	 */
-	public void changeUploadStatus(Context context, String containerId, AuditItem auditItem, UploadStatus status) {
-		changeUploadStatus(context, containerId, auditItem.getUuid(), status);
+	public boolean changeUploadStatus(Context context, String containerId, AuditItem auditItem, UploadStatus status) {
+		return changeUploadStatus(context, containerId, auditItem.getUuid(), status);
 	}
 
 	/**
@@ -1455,15 +1463,17 @@ public class DataCenter {
 	 * @param itemUuid
 	 * @param status
 	 */
-	public void changeUploadStatus(Context context, String containerId, String itemUuid, UploadStatus status) {
+	public boolean changeUploadStatus(Context context, String containerId, String itemUuid, UploadStatus status) {
 		try {
 			DB db = App.getDB(context);
 			Session session = db.getObject(containerId, Session.class);
 			session.changeUploadStatus(containerId, itemUuid, status);
 			db.put(containerId, session);
+			return true;
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
+		return false;
 	}
 
 	/**

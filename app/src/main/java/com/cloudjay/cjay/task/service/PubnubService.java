@@ -215,7 +215,7 @@ public class PubnubService extends Service {
 			}
 		} else {
 
-			Logger.Log("Auto stop Pubnub service");
+			Logger.w("Auto stop Pubnub service");
 			stopSelf();
 
 		}

@@ -728,6 +728,7 @@ public class Session {
 	public boolean updateAuditItem(AuditItem auditItem) {
 
 		// find and replace with the new one
+		Logger.Log("Update audit item");
 		for (AuditItem item : auditItems) {
 			if (item.equals(auditItem)) {
 				auditItems.remove(item);

@@ -366,7 +366,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 					default:
 
 						Logger.Log("mType: " + mType);
-
 						AuditImage auditImage = new AuditImage()
 								.withId(0)
 								.withType(mType)
@@ -375,18 +374,19 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 								.withUUID(uuid);
 
 						AuditItem auditItem = dataCenter.getAuditItem(getActivity(), containerId, auditItemUUID);
+
+						// Create temporary audit item
 						if (null == auditItem) {
-							// Tạo lỗi giám đinh/ sửa mới
-							Logger.Log("new type: " + auditImage.getType());
+							Logger.Log("Create new Audit Item: " + auditImage.getType());
 							dataCenter.addAuditImage(getActivity().getApplicationContext(), auditImage, containerId);
+
 						} else {
-							Logger.Log("getComponentCode: " + auditItem.getComponentCode());
-							// Thêm hình vào lỗi đã sữa chữa/  giám định
+
 							auditItem.getAuditImages().add(auditImage);
 							if (mType == ImageType.REPAIRED.value) {
-								Logger.Log("setRepaired");
 								auditItem.setRepaired(true);
 							}
+
 							dataCenter.updateAuditItem(getActivity().getApplicationContext(), containerId, auditItem);
 						}
 

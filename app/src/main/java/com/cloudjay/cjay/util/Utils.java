@@ -529,7 +529,8 @@ public class Utils {
 
 		Runtime runtime = Runtime.getRuntime();
 		try {
-			Process mIpAddrProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
+//			Process mIpAddrProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
+			Process mIpAddrProcess = runtime.exec("/system/bin/ping -c 1 www.google.com");
 			int mExitValue = mIpAddrProcess.waitFor();
 			if (mExitValue == 0) {
 				return true;
