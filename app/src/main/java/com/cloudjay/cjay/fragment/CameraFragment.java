@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -41,6 +42,8 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
+import org.androidannotations.annotations.Trace;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.io.File;
@@ -72,7 +75,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	public final static String CURRENT_STEP_EXTRA = "com.cloudjay.wizard.currentStep";
 	// These Extra bundles is use to open Detail Issue Activity only
 	public final static String AUDIT_ITEM_UUID_EXTRA = "com.cloudjay.wizard.auditItemUUID";
-    public final static String IS_OPENED = "com.cloudjay.wizard.isOpened";
+	public final static String IS_OPENED = "com.cloudjay.wizard.isOpened";
 
 	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
 	private boolean singleShotProcessing = false;
@@ -92,8 +95,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	@FragmentArg(AUDIT_ITEM_UUID_EXTRA)
 	String auditItemUUID;
 
-    @FragmentArg(IS_OPENED)
-    boolean isOpened;
+	@FragmentArg(IS_OPENED)
+	boolean isOpened;
 
 	@Bean
 	DataCenter dataCenter;
@@ -101,6 +104,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	//endregion
 
 	//region VIEW
+	@ViewById(R.id.tv_camera_done)
+	TextView tvSavingImage;
 
 	@ViewById(R.id.btn_capture)
 	ImageButton btnTakePicture;
@@ -133,10 +138,10 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	@Click(R.id.btn_capture)
 	void btnTakePictureClicked() {
 
-        takeSimplePicture();
+		takeSimplePicture();
 
 		//btnTakePicture.setEnabled(false);
-        //btnDone.setEnabled(false);
+		//btnDone.setEnabled(false);
 		//autoFocus();
 	}
 
@@ -173,7 +178,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	@AfterViews
 	void afterView() {
 
-        Logger.Log("isOpened: " + isOpened);
+		Logger.Log("isOpened: " + isOpened);
 
 		// Config shot mode. Default is FALSE.
 		// Configure View visibility based on current step of session
@@ -221,16 +226,18 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	/**
 	 * Take a picture, need to call auto focus before taking picture
 	 */
+	@UiThread
 	public void takeSimplePicture() {
+		showProgressSavingImage(true);
 
-        Logger.Log("takeSimplePicture");
+
+		Logger.Log("takeSimplePicture");
 
 		if (getContract().isSingleShotMode() == true) {
 
-            Logger.Log("getContract().isSingleShotMode()");
+			Logger.Log("getContract().isSingleShotMode()");
 			singleShotProcessing = true;
-			btnTakePicture.setEnabled(false);
-            btnDone.setEnabled(false);
+
 		}
 
 		// xact.tag()
@@ -238,6 +245,26 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		// Call it with PictureTransaction to take picture with configuration in CameraHost
 		// Process image in Subclass of `CameraHost#saveImage`
 		takePicture(xact);
+	}
+
+	private void showProgressSavingImage(boolean show) {
+		btnTakePicture.setEnabled(show ? false : true);
+		btnDone.setEnabled(show ? false : true);
+		btnDone.setVisibility(show ? View.GONE : View.VISIBLE);
+		tvSavingImage.setVisibility(show ? View.VISIBLE : View.GONE);
+	}
+
+	/**
+	 * User for override back button on Camera Activity
+	 *
+	 * @return
+	 */
+	public void onBackPress() {
+		if (btnDone.getVisibility() == View.GONE) {
+			Toast.makeText(getActivity(), "Vui lòng thử lại khi đã lưu hình xong",Toast.LENGTH_SHORT).show();
+		} else {
+			getActivity().finish();
+		}
 	}
 
 	@Override
@@ -248,6 +275,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 			getActivity().finish();
 		}
 	}
+
 
 	/**
 	 * CameraHost is the interface use to configure behavior of camera ~ setting.
@@ -263,6 +291,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		 * 1. Create directory
 		 * 2. Save Bitmap to File
 		 * 3. Add image to Queue
+		 * 4. Enable button done, take picture
 		 *
 		 * @param xact
 		 * @param capturedBitmap
@@ -270,16 +299,10 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		@Override
 		public void saveImage(PictureTransaction xact, Bitmap capturedBitmap) {
 
-            Logger.Log("saveImage");
+			Logger.Log("saveImage");
 			if (useSingleShotMode()) {
 				singleShotProcessing = false;
-				getActivity().runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						btnTakePicture.setEnabled(true);
-                        btnDone.setEnabled(true);
-					}
-				});
+
 			}
 
 			//Random UUID
@@ -290,6 +313,12 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 			saveBitmapToFile(capturedBitmap, photo);
 			// Add taken picture to job queue
 			addImageToUploadQueue(photo.getAbsolutePath(), photo.getName(), uuid);
+			getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					showProgressSavingImage(false);
+				}
+			});
 		}
 
 		@Override
@@ -445,11 +474,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		@Override
 		@TargetApi(16)
 		public void onAutoFocus(boolean success, Camera camera) {
-            Logger.Log("onAutoFocus");
+			Logger.Log("onAutoFocus");
 			super.onAutoFocus(success, camera);
-
-            btnTakePicture.setEnabled(true);
-            btnDone.setEnabled(true);
 
 			//takeSimplePicture();
 

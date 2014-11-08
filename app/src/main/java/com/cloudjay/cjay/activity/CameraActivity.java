@@ -108,6 +108,11 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 	}
 
 	@Override
+	public void onBackPressed() {
+		current.onBackPress();
+	}
+
+	@Override
 	public boolean isSingleShotMode() {
 		return (singleShot);
 	}
