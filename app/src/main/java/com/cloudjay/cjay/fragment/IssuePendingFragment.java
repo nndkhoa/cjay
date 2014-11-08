@@ -17,12 +17,12 @@ import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.DetailIssueActivity;
 import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.adapter.AuditItemAdapter;
-import com.cloudjay.cjay.event.ImageCapturedEvent;
+import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.issue.IssueUpdatedEvent;
 import com.cloudjay.cjay.event.issue.IssueDeletedEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
-import com.cloudjay.cjay.event.upload.UploadedEvent;
+import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
@@ -288,7 +288,7 @@ public class IssuePendingFragment extends Fragment {
 	}
 
 	@UiThread
-	void onEvent(UploadedEvent event) {
+	void onEvent(UploadSucceededEvent event) {
 		Logger.Log("upload complete");
 		// Re-query container session with given containerId
 		String containerId = event.getContainerId();

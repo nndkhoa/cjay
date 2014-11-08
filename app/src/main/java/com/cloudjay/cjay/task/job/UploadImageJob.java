@@ -3,11 +3,10 @@ package com.cloudjay.cjay.task.job;
 import android.content.Context;
 
 import com.cloudjay.cjay.App;
-import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
-import com.cloudjay.cjay.event.upload.UploadedEvent;
+import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -60,8 +59,7 @@ public class UploadImageJob extends Job {
 		// Call data center to upload image
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).uploadImage(context, uri, imageName, containerId, imageType);
-//		DataCenter_.getInstance_(context).changeImageUploadStatus(context, containerId, imageName, imageType, UploadStatus.COMPLETE);
-		EventBus.getDefault().post(new UploadedEvent(containerId));
+		EventBus.getDefault().post(new UploadSucceededEvent(containerId, UploadType.IMAGE));
 	}
 
 	@Override

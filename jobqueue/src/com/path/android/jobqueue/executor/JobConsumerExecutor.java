@@ -218,12 +218,12 @@ public class JobConsumerExecutor {
 
 								if (nextJob.getRunCount() <= nextJob.getBaseJob().getRetryLimit()) {
 
-									JqLog.d("--> Ready to remove job #" + nextJob.getId() + " / Group: " + nextJob.getGroupId());
+									JqLog.i("--> Ready to remove job #" + nextJob.getId() + " / Group: " + nextJob.getGroupId());
 									contract.removeJob(nextJob);
 
 								} else {
 
-									JqLog.d("--> Re-add group " + nextJob.getGroupId());
+									JqLog.i("--> Re-add group " + nextJob.getGroupId());
 									contract.reAddGroup(nextJob);
 								}
 

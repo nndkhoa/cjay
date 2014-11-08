@@ -4,12 +4,13 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.api.NetworkClient;
-import com.cloudjay.cjay.event.AuditImagesGotEvent;
+import com.cloudjay.cjay.event.image.AuditImagesGotEvent;
 import com.cloudjay.cjay.event.issue.IssueDeletedEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
 import com.cloudjay.cjay.event.issue.IssueUpdatedEvent;
 import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
 import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
+import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.event.session.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.event.session.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.model.AuditImage;
@@ -443,7 +444,6 @@ public class DataCenter {
 	public Session getSession(Context context, String containerId) {
 
 		try {
-
 			DB db = App.getDB(context);
 			String key = containerId;
 			Session session = db.getObject(key, Session.class);
@@ -492,6 +492,45 @@ public class DataCenter {
 		}
 
 		return sessions;
+	}
+
+	/**
+	 * Get list container sessions based on param `prefix`
+	 *
+	 * @param context
+	 * @param prefix
+	 * @return
+	 */
+	@Background(serial = CACHE)
+	public void getSessionsInBackground(Context context, String prefix) {
+
+		int len = prefix.length();
+
+		DB db = null;
+		String[] keysResult = new String[0];
+		List<Session> sessions = new ArrayList<>();
+
+		try {
+			db = App.getDB(context);
+			keysResult = db.findKeys(prefix);
+		} catch (SnappydbException e) {
+			Logger.e(e.getMessage());
+		}
+
+		for (String result : keysResult) {
+
+			String newKey = result.substring(len);
+			Session session;
+			try {
+				session = db.getObject(newKey, Session.class);
+				sessions.add(session);
+			} catch (SnappydbException e) {
+				e.printStackTrace();
+				addLog(context, newKey, prefix + " | Cannot retrieve this container");
+			}
+		}
+
+		EventBus.getDefault().post(new ContainersGotEvent(sessions));
 	}
 
 	/**
@@ -931,7 +970,8 @@ public class DataCenter {
 	 * @param status
 	 * @throws SnappydbException
 	 */
-	public boolean changeImageUploadStatus(Context context, String containerId, String imageName, ImageType imageType, UploadStatus status) {
+	@Background(serial = CACHE)
+	public void changeImageUploadStatus(Context context, String containerId, String imageName, ImageType imageType, UploadStatus status) {
 
 		try {
 			DB db = App.getDB(context);
@@ -977,8 +1017,8 @@ public class DataCenter {
 							if (gateImage.getName() != null) {
 								if (gateImage.getName().contains(imageName) && gateImage.getType() == imageType.value) {
 
-									Logger.Log("Found & set upload status: " + imageName +
-											" | " + ImageType.values()[((int) gateImage.getType())].name());
+//									Logger.Log("Found & set upload status: " + imageName +
+//											" | " + ImageType.values()[((int) gateImage.getType())].name());
 
 									gateImage.setUploadStatus(status);
 									break;
@@ -990,13 +1030,13 @@ public class DataCenter {
 						break;
 				}
 				db.put(key, session);
-				return true;
+//				return true;
 			}
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
 
-		return false;
+//		return false;
 	}
 
 	//endregion

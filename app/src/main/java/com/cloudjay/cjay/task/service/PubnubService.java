@@ -110,7 +110,6 @@ public class PubnubService extends Service {
 
 		Message msg = handler.obtainMessage();
 		try {
-			Logger.Log("Channel: " + channel);
 			Logger.Log("Message: " + message.toString());
 
 			JsonParser jsonParser = new JsonParser();

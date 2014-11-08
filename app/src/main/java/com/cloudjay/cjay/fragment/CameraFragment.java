@@ -20,7 +20,7 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.ReuseActivity_;
-import com.cloudjay.cjay.event.ImageCapturedEvent;
+import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
@@ -228,19 +228,12 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	@UiThread
 	public void takeSimplePicture() {
 		showProgressSavingImage(true);
-
-
-		Logger.Log("takeSimplePicture");
-
 		if (getContract().isSingleShotMode() == true) {
-
 			Logger.Log("getContract().isSingleShotMode()");
 			singleShotProcessing = true;
-
 		}
 
 		// xact.tag()
-
 		// Call it with PictureTransaction to take picture with configuration in CameraHost
 		// Process image in Subclass of `CameraHost#saveImage`
 		takePicture(xact);
@@ -299,10 +292,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		@Override
 		public void saveImage(PictureTransaction xact, Bitmap capturedBitmap) {
 			try {
-				Logger.Log("saveImage");
 				if (useSingleShotMode()) {
 					singleShotProcessing = false;
-
 				}
 
 				//Random UUID
@@ -311,6 +302,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 				// Save bitmap
 				File photo = getFile(uuid);
 				saveBitmapToFile(capturedBitmap, photo);
+
 				// Add taken picture to job queue
 				addImageToUploadQueue(photo.getAbsolutePath(), photo.getName(), uuid);
 				getActivity().runOnUiThread(new Runnable() {
@@ -319,6 +311,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 						showProgressSavingImage(false);
 					}
 				});
+
 			} catch (Exception e) {
 				getActivity().runOnUiThread(new Runnable() {
 					@Override
@@ -521,9 +514,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 			List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
 			return determineBestSize(sizes);
 		}
-
-
-		boolean supportsFaces = false;
 	}
 
 }

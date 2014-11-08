@@ -7,7 +7,7 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
-import com.cloudjay.cjay.event.upload.UploadedEvent;
+import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
@@ -151,7 +151,7 @@ public class UploadSessionJob extends Job {
 
 		// Upload thành công
 		DataCenter_.getInstance_(context).addLog(context, containerId, "Upload container thành công");
-		EventBus.getDefault().post(new UploadedEvent(containerId));
+		EventBus.getDefault().post(new UploadSucceededEvent(containerId, UploadType.SESSION));
 	}
 
 	/**

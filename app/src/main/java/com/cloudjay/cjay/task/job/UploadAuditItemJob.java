@@ -7,7 +7,7 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
-import com.cloudjay.cjay.event.upload.UploadedEvent;
+import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
@@ -53,7 +53,7 @@ public class UploadAuditItemJob extends Job {
 
 		dataCenter.uploadAuditItem(context, containerId, auditItemUUID);
 		dataCenter.changeUploadStatus(context, containerId, auditItemUUID, UploadStatus.COMPLETE);
-		EventBus.getDefault().post(new UploadedEvent(containerId));
+		EventBus.getDefault().post(new UploadSucceededEvent(containerId, UploadType.AUDIT_ITEM));
 	}
 
 	@Override

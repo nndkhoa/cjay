@@ -74,9 +74,8 @@ public class App extends Application {
 		configureJobManager();
 		configureAlarmManager();
 
-		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
-		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().build());
-
+//		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
+//		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().build());
 //		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
 //				.detectLeakedClosableObjects().penaltyLog()
 //				.penaltyDeath().build());
@@ -183,6 +182,11 @@ public class App extends Application {
 					@Override
 					public void e(String text, Object... args) {
 						Log.e(TAG, String.format(text, args));
+					}
+
+					@Override
+					public void i(String text, Object... args) {
+						Log.i(TAG, String.format(text, args));
 					}
 				})
 				.minConsumerCount(1)
