@@ -21,6 +21,7 @@ import com.cloudjay.cjay.event.ImageCapturedEvent;
 import com.cloudjay.cjay.event.issue.IssueUpdatedEvent;
 import com.cloudjay.cjay.event.issue.IssueDeletedEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
+import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadedEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
@@ -288,6 +289,15 @@ public class IssuePendingFragment extends Fragment {
 
 	@UiThread
 	void onEvent(UploadedEvent event) {
+		Logger.Log("upload complete");
+		// Re-query container session with given containerId
+		String containerId = event.getContainerId();
+		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+		refresh();
+	}
+
+	@UiThread
+	void onEvent(UploadStartedEvent event){
 		Logger.Log("upload complete");
 		// Re-query container session with given containerId
 		String containerId = event.getContainerId();

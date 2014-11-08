@@ -896,9 +896,8 @@ public class DataCenter {
 		auditItem.setId(0);
 		auditItem.setUuid(uuid);
 		auditItem.setAudited(false);
-		auditItem.setApproved(false);
-		auditItem.setIsAllowed(false);
 		auditItem.setRepaired(false);
+		auditItem.setIsAllowed(null);
 		auditItem.setUploadStatus(UploadStatus.NONE);
 
 		// Get list session's audit items

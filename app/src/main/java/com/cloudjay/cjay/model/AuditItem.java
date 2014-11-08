@@ -98,10 +98,6 @@ public class AuditItem {
 	@Expose
 	private boolean isRepaired;
 
-	@SerializedName("is_approved")
-	@Expose
-	private boolean isApproved;
-
 	private int uploadStatus;
 	//endregion
 
@@ -320,14 +316,6 @@ public class AuditItem {
 
 	public String getUuid() {
 		return this.uuid;
-	}
-
-	public void setApproved(boolean isApproved) {
-		this.isApproved = isApproved;
-	}
-
-	public boolean getApproved() {
-		return this.isApproved;
 	}
 
 	public void setRepaired(boolean isRepaired) {

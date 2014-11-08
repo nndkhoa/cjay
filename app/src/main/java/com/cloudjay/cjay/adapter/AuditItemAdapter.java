@@ -119,6 +119,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 					holder.btnUpload.setVisibility(View.GONE);
 					holder.btnEdit.setVisibility(View.GONE);
 					holder.ivUploading.setVisibility(View.VISIBLE);
+					holder.btnRepair.setVisibility(View.VISIBLE);
 					break;
 
 				case COMPLETE:
