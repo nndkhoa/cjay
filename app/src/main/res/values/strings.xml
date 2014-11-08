@@ -72,7 +72,7 @@
     <string name="dialog_container_id_invalid_iso">Container ID không đúng chuẩn ISO</string>
 
     <!-- Camera Button -->
-    <string name="camera_done">Done</string>
+    <string name="camera_done">Xong</string>
     <string name="require_select_operator_first">Vui lòng chọn hãng tàu trước khi chụp</string>
     <string name="btn_use_gate_in_image_title">GATE</string>
 
@@ -149,7 +149,7 @@
     <string name="issue_approved">Đã duyệt</string>
     <string name="issue_can_not_repair">Cấm sửa</string>
     <string name="issue_code_missing_warning">Xin vui lòng nhập code</string>
-
+	<string name="camera_saving">Đang lưu ảnh...</string>
 
 
 </resources>

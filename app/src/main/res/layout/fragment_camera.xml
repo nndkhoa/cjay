@@ -95,6 +95,21 @@
 				android:paddingRight="12dp"
 				android:shadowDx="1"
 				android:text="@string/camera_done"/>
+			<TextView
+				android:gravity="center"
+				android:id="@+id/tv_camera_done"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_centerInParent="true"
+				android:layout_marginLeft="12dp"
+				android:layout_marginRight="12dp"
+				android:minHeight="40dp"
+				android:paddingLeft="12dp"
+				android:paddingRight="12dp"
+				android:shadowDx="1"
+				android:textColor="#FFF"
+				android:visibility="gone"
+				android:text="@string/camera_saving"/>
 		</RelativeLayout>
 	</LinearLayout>
 
