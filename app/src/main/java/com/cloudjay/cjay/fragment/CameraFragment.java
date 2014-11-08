@@ -261,7 +261,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	 */
 	public void onBackPress() {
 		if (btnDone.getVisibility() == View.GONE) {
-			Toast.makeText(getActivity(), "Vui lòng thử lại khi đã lưu hình xong",Toast.LENGTH_SHORT).show();
+			Toast.makeText(getActivity(), "Vui lòng thử lại khi đã lưu hình xong", Toast.LENGTH_SHORT).show();
 		} else {
 			EventBus.getDefault().post(new ImageCapturedEvent(containerId, mType, auditItemUUID, isOpened));
 			getActivity().finish();
@@ -299,27 +299,36 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 		 */
 		@Override
 		public void saveImage(PictureTransaction xact, Bitmap capturedBitmap) {
+			try {
+				Logger.Log("saveImage");
+				if (useSingleShotMode()) {
+					singleShotProcessing = false;
 
-			Logger.Log("saveImage");
-			if (useSingleShotMode()) {
-				singleShotProcessing = false;
-
-			}
-
-			//Random UUID
-			String uuid = UUID.randomUUID().toString();
-
-			// Save bitmap
-			File photo = getFile(uuid);
-			saveBitmapToFile(capturedBitmap, photo);
-			// Add taken picture to job queue
-			addImageToUploadQueue(photo.getAbsolutePath(), photo.getName(), uuid);
-			getActivity().runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					showProgressSavingImage(false);
 				}
-			});
+
+				//Random UUID
+				String uuid = UUID.randomUUID().toString();
+
+				// Save bitmap
+				File photo = getFile(uuid);
+				saveBitmapToFile(capturedBitmap, photo);
+				// Add taken picture to job queue
+				addImageToUploadQueue(photo.getAbsolutePath(), photo.getName(), uuid);
+				getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						showProgressSavingImage(false);
+					}
+				});
+			} catch (Exception e) {
+				getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						Toast.makeText(getActivity(), "Không thể lưu hình, vui lòng thử lại", Toast.LENGTH_SHORT).show();
+						showProgressSavingImage(false);
+					}
+				});
+			}
 		}
 
 		@Override
