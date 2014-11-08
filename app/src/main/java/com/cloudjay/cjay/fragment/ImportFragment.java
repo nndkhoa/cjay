@@ -184,6 +184,7 @@ public class ImportFragment extends Fragment {
 		Logger.e("EVENT BUSS MENU CREATE");
 		event.getMenu().findItem(R.id.menu_export).setVisible(false);
 	}
+
 	@UiThread
 	void onEvent(OperatorChosenEvent event) {
 
@@ -226,7 +227,6 @@ public class ImportFragment extends Fragment {
 	void refresh() {
 		if (mSession != null) {
 			list = mSession.getImportImages();
-            Logger.Log("Size: " + list.size());
 			updatedData();
 		}
 	}
@@ -291,13 +291,7 @@ public class ImportFragment extends Fragment {
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
 		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), true));
-		Logger.e(String.valueOf(mSession.getLocalStep()));
-
-        // Set local step to AVAILABLE
-        mSession.setLocalStep(Step.AVAILABLE.value);
-
-        // Update session into database
-        dataCenter.addSession(mSession);
+		Logger.Log("Local step: " + Step.values()[mSession.getLocalStep()]);
 
 		// Navigate to HomeActivity
 		getActivity().finish();

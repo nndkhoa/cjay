@@ -32,7 +32,6 @@ public class UploadSessionJob extends Job {
 	 */
 	boolean needToClearFromWorking;
 
-
 	@Override
 	public int getRetryLimit() {
 		return 1;
@@ -65,16 +64,19 @@ public class UploadSessionJob extends Job {
 		// Add session to Collection Upload
 		// Change status uploading, currentStep audit, remove from WORKING
 		try {
-
-			dataCenter.addLog(context, containerId, "Container được add vào hàng đợi");
 			dataCenter.addUploadSession(containerId);
 			dataCenter.changeUploadStatus(context, containerId, UploadStatus.UPLOADING);
 
 			Step step = Step.values()[currentStep];
+			dataCenter.addLog(context, containerId, step.name() + " | Add container vào Queue");
 			switch (step) {
-				case EXPORTED:
 
-					dataCenter.changeSessionLocalStep(context, containerId, Step.EXPORTED);
+				case IMPORT:
+					if (mSession.getPreStatus() == 0) {
+						dataCenter.changeSessionLocalStep(context, containerId, Step.AVAILABLE);
+					} else {
+						dataCenter.changeSessionLocalStep(context, containerId, Step.AUDIT);
+					}
 					break;
 
 				case AUDIT:
@@ -85,17 +87,8 @@ public class UploadSessionJob extends Job {
 					dataCenter.changeSessionLocalStep(context, containerId, Step.AVAILABLE);
 					break;
 
-				case IMPORT:
-					dataCenter.addLog(context, containerId, "IMPORT | Bắt đầu quá trình upload");
-                    if (mSession != null) {
-                        if (mSession.getLocalStep() != Step.AVAILABLE.value) {
-                            dataCenter.changeSessionLocalStep(context, containerId, Step.AUDIT);
-                        }
-                    }
-					break;
-
+				case EXPORTED:
 				default:
-                    Logger.Log("jump to default");
 					dataCenter.changeSessionLocalStep(context, containerId, Step.EXPORTED);
 					break;
 			}

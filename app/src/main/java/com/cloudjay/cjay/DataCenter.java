@@ -440,7 +440,6 @@ public class DataCenter {
 	 * @param containerId
 	 * @return
 	 */
-	@Trace
 	public Session getSession(Context context, String containerId) {
 
 		try {
@@ -463,7 +462,6 @@ public class DataCenter {
 	 * @param prefix
 	 * @return
 	 */
-	@Trace
 	public List<Session> getListSessions(Context context, String prefix) {
 
 		int len = prefix.length();
@@ -725,7 +723,6 @@ public class DataCenter {
 	 * @param context
 	 * @param containerId
 	 */
-	@Trace
 	public void removeWorkingSession(Context context, String containerId) {
 
 		try {
