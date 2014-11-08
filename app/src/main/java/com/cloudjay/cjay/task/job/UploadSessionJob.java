@@ -68,7 +68,6 @@ public class UploadSessionJob extends Job {
 
 			dataCenter.addLog(context, containerId, "Container được add vào hàng đợi");
 			dataCenter.addUploadSession(containerId);
-
 			dataCenter.changeUploadStatus(context, containerId, UploadStatus.UPLOADING);
 
 			Step step = Step.values()[currentStep];

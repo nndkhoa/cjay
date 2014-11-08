@@ -27,8 +27,6 @@ import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
@@ -841,7 +839,7 @@ public class DataCenter {
 
 						// Find audit image
 						for (AuditImage auditImage : auditItem.getAuditImages()) {
-							if (auditImage.getAuditImageUUID().equals(auditImageUUID))
+							if (auditImage.getUuid().equals(auditImageUUID))
 								return auditImage;
 
 						}
@@ -897,8 +895,8 @@ public class DataCenter {
 		auditItem.setUuid(uuid);
 		auditItem.setAudited(false);
 		auditItem.setApproved(false);
-		auditItem.setIsAllowed(false);
-		auditItem.setRepaired(false);
+		auditItem.setAllowed(false);
+		auditItem.isRepaired(false);
 		auditItem.setUploadStatus(UploadStatus.NONE);
 
 		// Get list session's audit items
@@ -1059,7 +1057,6 @@ public class DataCenter {
 		db.put(key, session);
 	}
 
-
 	/**
 	 * -1. Change local step to import
 	 * 0. Check for make sure all gate image have uploaded
@@ -1130,6 +1127,35 @@ public class DataCenter {
 			String key = result.getContainerId();
 			session.mergeSession(result);
 			db.put(key, session);
+		}
+	}
+
+	/**
+	 *
+	 *
+	 * @param context
+	 * @param containerId
+	 * @throws SnappydbException
+	 */
+	public void uploadExportSession(Context context, String containerId) throws SnappydbException {
+
+		// Upload audit item session to server
+		DB db = App.getDB(context);
+		Session oldSession = db.getObject(containerId, Session.class);
+		Session result = networkClient.checkOutContainerSession(context, oldSession);
+		Logger.Log("Add AuditItem to Session Id: " + result.getId());
+
+		if (result != null) {
+
+			// Update container back to database
+			String key = result.getContainerId();
+			oldSession.setUploadStatus(UploadStatus.COMPLETE);
+			oldSession.mergeSession(result);
+			db.put(key, oldSession);
+
+			// Then remove them from WORKING
+			String workingKey = CJayConstant.PREFIX_WORKING + key;
+			db.del(workingKey);
 		}
 	}
 
@@ -1296,29 +1322,6 @@ public class DataCenter {
 		EventBus.getDefault().post(new IssueDeletedEvent(containerId));
 	}
 
-	public void uploadExportSession(Context context, String containerId) throws SnappydbException {
-
-		// Upload audit item session to server
-		DB db = App.getDB(context);
-		Session oldSession = db.getObject(containerId, Session.class);
-		Session result = networkClient.checkOutContainerSession(context, oldSession);
-		Logger.Log("Add AuditItem to Session Id: " + result.getId());
-
-		if (result != null) {
-
-			// Update container back to database
-			String key = result.getContainerId();
-			oldSession.setUploadStatus(UploadStatus.COMPLETE);
-			oldSession.mergeSession(result);
-			db.put(key, oldSession);
-
-			// Then remove them from WORKING
-			String workingKey = CJayConstant.PREFIX_WORKING + key;
-			db.del(workingKey);
-		}
-	}
-
-
 	/**
 	 * Update given audit item
 	 *
@@ -1410,7 +1413,7 @@ public class DataCenter {
 
 			auditItem.setLocationCode("BXXX");
 			auditItem.setAudited(true);
-			auditItem.setIsAllowed(true);
+			auditItem.setAllowed(true);
 
 			list.add(auditItem);
 		}

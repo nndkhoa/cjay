@@ -488,7 +488,7 @@ public class Session {
 			// Tất cả các item đều được gán lỗi và có hình
 			case AUDIT:
 				for (AuditItem item : auditItems) {
-					if (item.getAudited() == false || item.getUploadStatus() == UploadStatus.NONE.value)
+					if (item.isAudited() == false || item.getUploadStatus() == UploadStatus.NONE.value)
 						return false;
 				}
 
@@ -498,7 +498,7 @@ public class Session {
 			// Loi cam sua thi field cho phep sua phai la false
 			case REPAIR:
 				for (AuditItem item : auditItems) {
-					if (item.getRepaired() == false && item.isIsAllowed() == true) {
+					if (item.getRepaired() == false && item.isAllowed() == true) {
 						return false;
 					}
 				}
@@ -642,7 +642,6 @@ public class Session {
 	}
 
 	/**
-	 *
 	 * @param uuid
 	 */
 	public boolean removeAuditItem(String uuid) {
@@ -683,15 +682,15 @@ public class Session {
 
 		// Difference được khởi tạo là danh sách tổng hợp của client và server
 		// Difference thường là danh sách hình mới từ server
-		List<GateImage> difference = new ArrayList<>();
-		difference.addAll(gateImages);
-		difference.addAll(newSession.getGateImages());
+		List<GateImage> diffGateImages = new ArrayList<>();
+		diffGateImages.addAll(gateImages);
+		diffGateImages.addAll(newSession.getGateImages());
 
 		gateImages.retainAll(newSession.getGateImages());
-		difference.removeAll(gateImages);
+		diffGateImages.removeAll(gateImages);
 
 		// Khởi tạo các thông tin còn thiếu của list difference
-		for (GateImage image : difference) {
+		for (GateImage image : diffGateImages) {
 			if (TextUtils.isEmpty(image.getName())) {
 				image.setName(Utils.getImageNameFromUrl(image.getUrl()));
 			}
@@ -701,25 +700,22 @@ public class Session {
 			}
 		}
 
-		gateImages.addAll(difference);
+		gateImages.addAll(diffGateImages);
 
 		// Merge Audit Items
 		// Tìm danh sách Audit Item giống nhau, giữ danh sách local và set new id
 		// Tim danh audit item khác nhau
-		
 
-		if (newSession.getAuditItems().size() != 0) {
-			List<AuditItem> localList = this.getAuditItems();
-			for (AuditItem auditItem : this.getAuditItems()) {
-				for (AuditItem auditItemServer : newSession.getAuditItems()) {
-					if (auditItem.equals(auditItemServer)) {
-						auditItem.setUploadStatus(UploadStatus.COMPLETE);
-						auditItem.mergeAuditItem(auditItemServer);
-					}
-				}
-			}
-			this.setAuditItems(localList);
+		if (newSession.getAuditItems() != null && newSession.getAuditItems().size() != 0) {
+			List<AuditItem> diffAuditItems = new ArrayList<>();
+			diffAuditItems.addAll(auditItems);
+			diffAuditItems.addAll(newSession.getAuditItems());
+
+			auditItems.retainAll(newSession.getAuditItems());
+			diffAuditItems.removeAll(auditItems);
+			auditItems.addAll(diffAuditItems);
 		}
+
 		return this;
 	}
 

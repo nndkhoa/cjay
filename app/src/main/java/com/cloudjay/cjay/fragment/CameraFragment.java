@@ -346,8 +346,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 							// Thêm hình vào lỗi đã sữa chữa/  giám định
 							auditItem.getAuditImages().add(auditImage);
 							if (mType == ImageType.REPAIRED.value) {
-								Logger.Log("setRepaired");
-								auditItem.setRepaired(true);
+								Logger.Log("isRepaired");
+								auditItem.isRepaired(true);
 							}
 							dataCenter.updateAuditItem(getActivity().getApplicationContext(), containerId, auditItem);
 						}

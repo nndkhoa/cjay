@@ -125,9 +125,9 @@ public class AfterRepairFragment extends Fragment {
 			Utils.showCrouton(getActivity(), "Loi nay chua duoc giam dinh");
 			return;
 		}
-		if (auditItem.isIsAllowed() != null) {
+		if (auditItem.isAllowed() != null) {
 			// Notify user that audit item is not allow to repare
-			if (!auditItem.isIsAllowed()) {
+			if (!auditItem.isAllowed()) {
 				Utils.showCrouton(getActivity(), "Loi nay khong duoc phep sua");
 				return;
 			}

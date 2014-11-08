@@ -1,13 +1,14 @@
 package com.cloudjay.cjay.model;
 
+import android.text.TextUtils;
+
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -28,17 +29,17 @@ public class AuditImage {
 
 	private int uploadStatus;
 
-	public String getAuditImageUUID() {
-		return auditImageUUID;
+	public String getUuid() {
+		return uuid;
 	}
 
-	public void setAuditImageUUID(String auditImageUUID) {
-		this.auditImageUUID = auditImageUUID;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
 	@SerializedName("audit_image_uuid")
 	@Expose
-	private String auditImageUUID;
+	private String uuid;
 
 	public int getUploadStatus() {
 		return uploadStatus;
@@ -120,12 +121,48 @@ public class AuditImage {
 	}
 
 	public AuditImage withUUID(String s) {
-		this.auditImageUUID = s;
+		this.uuid = s;
 		return this;
+	}
+
+	public AuditImage() {
+		url = "";
+		name = Utils.getImageNameFromUrl(url);
+		id = 0;
+		uploadStatus = 0;
+		type = 0;
+		uuid = UUID.randomUUID().toString();
 	}
 
 	public AuditImage mergeAuditImage(AuditImage auditImageServer) {
 		this.setId(auditImageServer.getId());
 		return this;
+	}
+
+
+	/**
+	 * Nên so sánh object local --> server
+	 *
+	 * @param o
+	 * @return
+	 */
+	@Override
+	public boolean equals(Object o) {
+
+		if (o instanceof AuditImage) {
+			AuditImage tmp = (AuditImage) o;
+
+			if (!TextUtils.isEmpty(name) && tmp.getUrl().contains(name)) {
+				id = tmp.getId();
+
+				return true;
+			} else if (!TextUtils.isEmpty(tmp.getName()) && url.contains(tmp.getName())) {
+
+				return true;
+			}
+			return false;
+		}
+
+		return super.equals(o);
 	}
 }

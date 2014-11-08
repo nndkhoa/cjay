@@ -182,7 +182,7 @@ public class IssuePendingFragment extends Fragment {
 	void switchToDetailIssueActivity(int position) {
 		AuditItem auditItem = auditItemAdapter.getItem(position);
 		Logger.Log("getUuid: " + auditItem.getUuid());
-		if (auditItem.getAudited()) {
+		if (auditItem.isAudited()) {
 			Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
 			detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
 			detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getUuid());
@@ -204,7 +204,7 @@ public class IssuePendingFragment extends Fragment {
 					Logger.Log("getAuditImages: " + auditItem.getAuditImages().size());
 					Logger.Log("getRepaired: " + auditItem.getRepaired());
 					Logger.Log("getUuid: " + auditItem.getUuid());
-                    Logger.Log("getIsAllow: " + auditItem.isIsAllowed());
+                    Logger.Log("getIsAllow: " + auditItem.isAllowed());
 					list.add(auditItem);
 				}
 			}
@@ -214,8 +214,8 @@ public class IssuePendingFragment extends Fragment {
 			Comparator<AuditItem> comparator = new Comparator<AuditItem>() {
 				@Override
 				public int compare(AuditItem auditItem, AuditItem auditItem2) {
-					if (!auditItem.getAudited()) {
-						if (auditItem2.getAudited()) {
+					if (!auditItem.isAudited()) {
+						if (auditItem2.isAudited()) {
 							return 1;
 						} else {
 							return -1;
