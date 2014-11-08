@@ -49,6 +49,7 @@ public class Utils {
 
 	/**
 	 * Create notification
+	 *
 	 * @param context
 	 */
 	public static void keepNotificationAlive(Context context) {
@@ -511,35 +512,32 @@ public class Utils {
 	}
 
 	public static String getImageNameFromUrl(String url) {
-		String name = url.substring(url.lastIndexOf("/") + 1,
-				url.length());
+		if (TextUtils.isEmpty(url)) {
+			return "";
+		}
+
+		String name = url.substring(url.lastIndexOf("/") + 1, url.length());
 		return name;
 	}
 
+	/**
+	 * Use to find out when device is truely connect to internet
+	 *
+	 * @return
+	 */
 	public static boolean canReachInternet() {
 
-		//StackTraceElement[] trace = new Throwable().getStackTrace();
-		//Logger.Log(trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
-
-
 		Runtime runtime = Runtime.getRuntime();
-
 		try {
 			Process mIpAddrProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
 			int mExitValue = mIpAddrProcess.waitFor();
-			// System.out.println(" mExitValue " + mExitValue);
-
 			if (mExitValue == 0) {
 				return true;
 			} else {
 				return false;
 			}
 		} catch (InterruptedException ignore) {
-//			ignore.printStackTrace();
-//			System.out.println(" Exception:" + ignore);
 		} catch (IOException e) {
-//			e.printStackTrace();
-//			System.out.println(" Exception:" + e);
 		}
 		return false;
 	}
