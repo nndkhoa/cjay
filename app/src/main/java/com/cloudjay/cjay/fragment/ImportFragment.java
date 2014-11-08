@@ -108,7 +108,7 @@ public class ImportFragment extends Fragment {
 
 	long preStatus = 1;
 	Session mSession;
-    List<GateImage> list = new ArrayList<GateImage>();
+    List<GateImage> list = new ArrayList<>();
 	//endregion
 
 	public ImportFragment() {

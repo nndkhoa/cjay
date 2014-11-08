@@ -301,8 +301,8 @@ public class NetworkClient {
 		Logger.Log("auditItem: " + auditItem.getAuditItemToUpload());
 
 		String auditItemUUID = auditItem.getUuid();
-		Session postAuditItemSession = provider.getRestAdapter(context).create(NetworkService.class).postAudiItem(containerSession.getId(), auditItem.getAuditItemToUpload());
-		List<AuditItem> list = postAuditItemSession.getAuditItems();
+		Session result = provider.getRestAdapter(context).create(NetworkService.class).postAudiItem(containerSession.getId(), auditItem.getAuditItemToUpload());
+		List<AuditItem> list = result.getAuditItems();
 		for (AuditItem item : list) {
 			if (item.equals(auditItem)) {
 				Logger.Log("Set here");
@@ -310,9 +310,9 @@ public class NetworkClient {
 				item.setUploadStatus(UploadStatus.COMPLETE);
 			}
 		}
-		postAuditItemSession.setAuditItems(list);
-		Logger.logJson(postAuditItemSession);
-		return postAuditItemSession;
+		result.setAuditItems(list);
+		Logger.logJson(result, Session.class);
+		return result;
 	}
 
 	/**

@@ -413,7 +413,7 @@ public class DataCenter {
 
 			// Find local session
 			String key = session.getContainerId();
-			Session localSession = db.getObject(key, Session.class);
+			Session localSession = getSession(context, session.getContainerId());
 
 			if (localSession == null) {
 				addSession(session);
@@ -447,6 +447,7 @@ public class DataCenter {
 			DB db = App.getDB(context);
 			String key = containerId;
 			Session session = db.getObject(key, Session.class);
+			Logger.logJson(session, Session.class);
 
 			return session;
 		} catch (SnappydbException e) {
@@ -999,7 +1000,7 @@ public class DataCenter {
 			db.put(key, session);
 
 			Session tmp = db.getObject(key, Session.class);
-			Logger.logJson(tmp);
+			Logger.logJson(tmp, Session.class);
 		}
 	}
 
@@ -1075,7 +1076,7 @@ public class DataCenter {
 
 			// Upload container session to server
 			Session result = networkClient.uploadSession(context, session);
-			Logger.logJson(result);
+			Logger.logJson(result, Session.class);
 
 			if (result != null) {
 
@@ -1085,7 +1086,7 @@ public class DataCenter {
 				db.put(key, session);
 			}
 		} catch (RetrofitError error){
-			Logger.logJson(error);
+			Logger.logJson(error, RetrofitError.class);
 		}
 
 	}
