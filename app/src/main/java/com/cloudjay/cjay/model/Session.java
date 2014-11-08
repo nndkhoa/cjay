@@ -498,7 +498,7 @@ public class Session {
 			// Loi cam sua thi field cho phep sua phai la false
 			case REPAIR:
 				for (AuditItem item : auditItems) {
-					if (item.getRepaired() == false && item.isAllowed() == true) {
+					if (item.isRepaired() == false && item.isAllowed() == true) {
 						return false;
 					}
 				}
@@ -617,7 +617,7 @@ public class Session {
 		List<AuditItem> list = new ArrayList<AuditItem>();
 
 		for (AuditItem auditItem : this.getAuditItems()) {
-			if (auditItem.getRepaired()) {
+			if (auditItem.isRepaired()) {
 				list.add(auditItem);
 			}
 		}

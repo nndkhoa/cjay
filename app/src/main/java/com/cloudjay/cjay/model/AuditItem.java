@@ -333,11 +333,11 @@ public class AuditItem {
 		return this.approved;
 	}
 
-	public void isRepaired(boolean isRepaired) {
+	public void setRepaired(boolean isRepaired) {
 		this.repaired = isRepaired;
 	}
 
-	public boolean getRepaired() {
+	public boolean isRepaired() {
 		return this.repaired;
 	}
 

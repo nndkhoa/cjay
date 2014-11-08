@@ -895,9 +895,8 @@ public class DataCenter {
 		auditItem.setId(0);
 		auditItem.setUuid(uuid);
 		auditItem.setAudited(false);
-		auditItem.setApproved(false);
-		auditItem.setAllowed(false);
-		auditItem.isRepaired(false);
+		auditItem.setRepaired(false);
+		auditItem.setAllowed(null);
 		auditItem.setUploadStatus(UploadStatus.NONE);
 
 		// Get list session's audit items
@@ -1085,7 +1084,7 @@ public class DataCenter {
 				session.mergeSession(result);
 				db.put(key, session);
 			}
-		} catch (RetrofitError error){
+		} catch (RetrofitError error) {
 			Logger.logJson(error, RetrofitError.class);
 		}
 
@@ -1136,8 +1135,6 @@ public class DataCenter {
 	}
 
 	/**
-	 *
-	 *
 	 * @param context
 	 * @param containerId
 	 * @throws SnappydbException

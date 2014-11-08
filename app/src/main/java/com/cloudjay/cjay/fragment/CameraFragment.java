@@ -42,7 +42,6 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
-import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -385,8 +384,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 							// Thêm hình vào lỗi đã sữa chữa/  giám định
 							auditItem.getAuditImages().add(auditImage);
 							if (mType == ImageType.REPAIRED.value) {
-								Logger.Log("isRepaired");
-								auditItem.isRepaired(true);
+								Logger.Log("setRepaired");
+								auditItem.setRepaired(true);
 							}
 							dataCenter.updateAuditItem(getActivity().getApplicationContext(), containerId, auditItem);
 						}
