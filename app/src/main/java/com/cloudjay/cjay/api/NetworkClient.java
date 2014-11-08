@@ -11,6 +11,7 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -166,64 +167,6 @@ public class NetworkClient {
 		}
 	}
 
-	public List<Session> getAllSessions(Context context, String modifiedDate) {
-
-		List<Session> sessions = new ArrayList<Session>();
-		JsonElement next;
-
-		// If get by day, get fist page query by day
-		// => get page from key "next"
-		// => get all page after that page
-		// => if next page is null => get current page by set page = 1
-		if (!TextUtils.isEmpty(modifiedDate)) {
-
-			// Get by lastModified Day
-			Logger.Log("Fetch data by time");
-
-			JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionsByModifiedTime(modifiedDate);
-			next = jsonObject.get("next");
-			String nextString = next.getAsString();
-			if (!next.isJsonNull()) {
-				//get page number of fist page
-				int page = Integer.parseInt(nextString.substring(nextString.lastIndexOf("=") + 1));
-
-				//get all session have page number greater then fist page
-				List<Session> sessionsByPage = this.getAllSessionsByPage(context, page);
-				sessions.addAll(sessionsByPage);
-
-				// Update Modified day in preferences
-				String currentTime = jsonObject.get("request_time").getAsString();
-				PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, currentTime);
-
-				//Get session fist page when query by day
-				String lastModifiedDate = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
-				Logger.Log("Last modified date: " + lastModifiedDate);
-
-			} else {
-
-				//get all session in page 1
-				List<Session> sessionsByPage = this.getAllSessionsByPage(context, 1);
-				sessions.addAll(sessionsByPage);
-
-				// Update Modified day in preferences
-				String currentTime = jsonObject.get("request_time").getAsString();
-				PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, currentTime);
-
-				//Get session fist page when query by day
-				String lastModifiedDate = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
-				Logger.Log("Last modified date: " + lastModifiedDate);
-			}
-		}
-
-		//If not, get all sessions start form page 1
-		else {
-			Logger.Log("Fetching all page");
-			sessions = getAllSessionsByPage(context, 1);
-		}
-
-		return sessions;
-	}
-
 	/**
 	 * Get all container sessions from server with input page.
 	 * <p/>
@@ -233,41 +176,11 @@ public class NetworkClient {
 	 * @param page
 	 * @return
 	 */
-	public List<Session> getAllSessionsByPage(Context context, int page) {
-
-		List<Session> sessions = new ArrayList<Session>();
-		JsonElement next;
-		do {
-			JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionsByPage(page, null);
-
-			// Parse list sessions nằm bên trong key `results` của kết quả trả về
-			JsonArray results = jsonObject.getAsJsonArray("results");
-			next = jsonObject.get("next");
-
-			Gson gson = new Gson();
-			Type listType = new TypeToken<List<Session>>() {
-			}.getType();
-
-			List<Session> sessionsPage = gson.fromJson(results, listType);
-			sessions.addAll(sessionsPage);
-			page = page + 1;
-
-			// Store the datetime that complete parsing process
-			if (next.isJsonNull()) {
-				String currentTime = jsonObject.get("request_time").getAsString();
-				PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE, currentTime);
-			}
-
-		} while (!next.isJsonNull());
-
-
-		return sessions;
-	}
-
 	public List<Session> getSessionByPage(Context context, int page, String modifiedDate) {
-		List<Session> sessions = new ArrayList<Session>();
+		List<Session> sessions = new ArrayList<>();
 
 		JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).getContainerSessionsByPage(page, modifiedDate);
+
 		// Parse list sessions nằm bên trong key `results` của kết quả trả về
 		JsonArray results = jsonObject.getAsJsonArray("results");
 		JsonElement next = jsonObject.get("next");
@@ -280,6 +193,7 @@ public class NetworkClient {
 		sessions.addAll(sessionsPage);
 
 		if (!next.isJsonNull()) {
+
 			//Update current page
 			String currentPage = String.valueOf(page);
 			PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE, currentPage);
@@ -295,7 +209,7 @@ public class NetworkClient {
 
 	public List<Session> searchSessions(Context context, String keyword) {
 
-		List<Session> sessions = new ArrayList<Session>();
+		List<Session> sessions = new ArrayList<>();
 		JsonObject jsonObject = provider.getRestAdapter(context).create(NetworkService.class).searchContainer(keyword);
 		JsonArray results = jsonObject.getAsJsonArray("results");
 		Gson gson = new Gson();

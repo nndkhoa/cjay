@@ -348,7 +348,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 								.withType(mType)
 								.withName(imageName)
 								.withUrl("file://" + uri)
-								.withUUID(uuid);
+								.withUuid(uuid);
 
 						dataCenter.addGateImage(getActivity().getApplicationContext(), gateImage, containerId);
 						break;

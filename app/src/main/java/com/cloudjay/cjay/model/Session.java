@@ -1,6 +1,8 @@
 package com.cloudjay.cjay.model;
 
 
+import android.text.TextUtils;
+
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -16,6 +18,7 @@ import org.json.JSONException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -674,26 +677,37 @@ public class Session {
 			this.setLocalStep(newSession.getStep());
 		}
 
-		// merge Gate Image
-		List<GateImage> mergedGateImages = new ArrayList<GateImage>();
-		for (GateImage gateImageServer : newSession.getGateImages()) {
-			for (GateImage gateImage : this.getGateImages()) {
+		// Merge Gate Images
+		// Tìm danh sách hình giống nhau, giữ danh sách local và set new id
+		// Tìm danh sách hình khác nhau
 
-				if (gateImage.getName() != null) {
-					if (gateImage.getName().equals(Utils.getImageNameFromUrl(gateImageServer.getUrl()))) {
-						gateImage.mergeGateImage(gateImageServer);
-						mergedGateImages.add(gateImage);
-					}
+		// Difference được khởi tạo là danh sách tổng hợp của client và server
+		// Difference thường là danh sách hình mới từ server
+		List<GateImage> difference = new ArrayList<>();
+		difference.addAll(gateImages);
+		difference.addAll(newSession.getGateImages());
 
-				} else {
-					Logger.wtf(gateImage.getUrl() + " do not have image name");
-				}
+		gateImages.retainAll(newSession.getGateImages());
+		difference.removeAll(gateImages);
 
+		// Khởi tạo các thông tin còn thiếu của list difference
+		for (GateImage image : difference) {
+			if (TextUtils.isEmpty(image.getName())) {
+				image.setName(Utils.getImageNameFromUrl(image.getUrl()));
+			}
+
+			if (TextUtils.isEmpty(image.getUuid())) {
+				image.setUuid(UUID.randomUUID().toString());
 			}
 		}
-		this.setGateImages(mergedGateImages);
 
-		//merge Audit Item  if audit item from server != null
+		gateImages.addAll(difference);
+
+		// Merge Audit Items
+		// Tìm danh sách Audit Item giống nhau, giữ danh sách local và set new id
+		// Tim danh audit item khác nhau
+		
+
 		if (newSession.getAuditItems().size() != 0) {
 			List<AuditItem> localList = this.getAuditItems();
 			for (AuditItem auditItem : this.getAuditItems()) {

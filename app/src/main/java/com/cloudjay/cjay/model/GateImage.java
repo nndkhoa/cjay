@@ -1,7 +1,12 @@
 package com.cloudjay.cjay.model;
 
+import android.text.TextUtils;
+
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.google.gson.annotations.Expose;
+
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -21,7 +26,7 @@ public class GateImage {
 	private String name;
 
 	@Expose
-	private String gateImageUUID;
+	private String uuid;
 
 	private int uploadStatus;
 
@@ -99,16 +104,16 @@ public class GateImage {
 		return this;
 	}
 
-	public void setGateImageUUID(String gateImageUUID) {
-		this.gateImageUUID = gateImageUUID;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
-	public String getGateImageUUID() {
-		return this.gateImageUUID;
+	public String getUuid() {
+		return this.uuid;
 	}
 
-	public GateImage withUUID(String gateImageUUID) {
-		this.gateImageUUID = gateImageUUID;
+	public GateImage withUuid(String newUuid) {
+		this.uuid = newUuid;
 		return this;
 	}
 
@@ -117,13 +122,34 @@ public class GateImage {
 		return this;
 	}
 
+	public GateImage() {
+
+		url = "";
+		name = Utils.getImageNameFromUrl(url);
+		id = 0;
+		uploadStatus = 0;
+		type = 0;
+		uuid = UUID.randomUUID().toString();
+	}
+
+	/**
+	 * Nên so sánh object local --> server
+	 *
+	 * @param o
+	 * @return
+	 */
 	@Override
 	public boolean equals(Object o) {
 
 		if (o instanceof GateImage) {
 			GateImage tmp = (GateImage) o;
 
-			if (tmp.getUrl().contains(this.getName()) || this.getUrl().contains(tmp.getName())) {
+			if (!TextUtils.isEmpty(name) && tmp.getUrl().contains(name)) {
+				id = tmp.getId();
+
+				return true;
+			} else if (!TextUtils.isEmpty(tmp.getName()) && url.contains(tmp.getName())) {
+
 				return true;
 			}
 			return false;

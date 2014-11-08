@@ -225,7 +225,6 @@ public class ImportFragment extends Fragment {
 	}
 	//endregion
 
-	@Background
 	void refresh() {
 		if (mSession != null) {
 			list = mSession.getImportImages();
