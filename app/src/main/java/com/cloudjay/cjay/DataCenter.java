@@ -1072,19 +1072,23 @@ public class DataCenter {
 	 * @throws SnappydbException
 	 */
 	public void uploadImportSession(Context context, String containerId) throws SnappydbException {
-		DB db = App.getDB(context);
-		Session session = db.getObject(containerId, Session.class);
+		try {
+			DB db = App.getDB(context);
+			Session session = db.getObject(containerId, Session.class);
 
-		// Upload container session to server
-		Session result = networkClient.uploadSession(context, session);
-		Logger.logJson(result);
+			// Upload container session to server
+			Session result = networkClient.uploadSession(context, session);
+			Logger.logJson(result);
 
-		if (result != null) {
+			if (result != null) {
 
-			// Update container back to database
-			String key = result.getContainerId();
-			session.mergeSession(result);
-			db.put(key, session);
+				// Update container back to database
+				String key = result.getContainerId();
+				session.mergeSession(result);
+				db.put(key, session);
+			}
+		} catch (RetrofitError error){
+			Logger.logJson(error);
 		}
 
 	}
