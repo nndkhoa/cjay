@@ -26,6 +26,7 @@ import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
+import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.view.SquareImageView;
@@ -109,7 +110,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		}
 		// Lỗi nào chưa giám dịnh thì hiện hinh`, lỗi nào đã giám định roi thì hiện chi tiết lỗi
 		if (auditItem.isAudited() == true) {
-			UploadStatus status = UploadStatus.values()[auditItem.getUploadStatus()];
+			final UploadStatus status = UploadStatus.values()[auditItem.getUploadStatus()];
 
 			holder.llIssueImageView.setVisibility(View.GONE);
 			holder.llIssueDetails.setVisibility(View.VISIBLE);
@@ -184,6 +185,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				public void onClick(View view) {
 
 					//1. Update upload status
+                    auditItem.setUploadStatus(UploadStatus.UPLOADING);
 					DataCenter_.getInstance_(mContext).changeUploadStatus(mContext,
 							containerId, auditItem, UploadStatus.UPLOADING);
 					notifyDataSetChanged();
