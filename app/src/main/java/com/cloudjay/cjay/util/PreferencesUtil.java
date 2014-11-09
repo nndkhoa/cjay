@@ -14,6 +14,7 @@ public class PreferencesUtil {
 	public static final String PREF_USER_DEPOT = "com.cloudjay.cjay.pref_depot";
     public static final String PREF_MODIFIED_DATE = "com.cloudjay.cjay.pref_modified_date";
 	public static final String PREF_MODIFIED_PAGE = "com.cloudjay.cjay.pref_modified_page";
+	public static final String PREF_FIRST_PAGE_MODIFIED_DATE = "com.cloudjay.cjay.pref_first_page_modified_date";
 
 	public static void clearPrefs(Context context) {
 		SharedPreferences settings = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);

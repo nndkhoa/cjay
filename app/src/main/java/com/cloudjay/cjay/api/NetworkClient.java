@@ -193,6 +193,11 @@ public class NetworkClient {
 		sessions.addAll(sessionsPage);
 
 		if (!next.isJsonNull()) {
+			//Store first page modified_since to retry immediately after fetched
+			if (page == 1){
+				String firstPageTime = jsonObject.get("request_time").getAsString();
+				PreferencesUtil.storePrefsValue(context,PreferencesUtil.PREF_FIRST_PAGE_MODIFIED_DATE, firstPageTime);
+			}
 
 			//Update current page
 			String currentPage = String.valueOf(page);
