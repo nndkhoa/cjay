@@ -420,9 +420,9 @@ public class DataCenter {
 
 			if (session == null) {
 				//Merge Session from server to local type
-				session.changeToLocalFormat();
-				addSession(session);
-				return session;
+				result.changeToLocalFormat();
+				addSession(result);
+				return result;
 
 			} else {
 
