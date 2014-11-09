@@ -39,11 +39,13 @@ public class UploadSessionJob extends Job {
 
 	public UploadSessionJob(String containerId, int step, boolean clearFromWorking) {
 
+		super(new Params(1).requireNetwork().persist().groupBy(containerId).setPersistent(true));
+
         // step is local step
-		super(new Params(1).requireNetwork().persist().groupBy(containerId));
 		this.containerId = containerId;
 		this.currentStep = step;
 		this.needToClearFromWorking = clearFromWorking;
+
 	}
 
 	/**

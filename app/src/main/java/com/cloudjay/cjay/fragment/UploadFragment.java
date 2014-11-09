@@ -19,6 +19,7 @@ import com.cloudjay.cjay.util.CJayConstant;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -64,10 +65,7 @@ public class UploadFragment extends Fragment {
 		mAdapter = new UploadSessionAdapter(getActivity(), R.layout.item_upload);
 		lvUploading.setAdapter(mAdapter);
 		lvUploading.setEmptyView(tvEmpty);
-
-		List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
-				CJayConstant.PREFIX_UPLOADING);
-		updatedData(list);
+		refresh();
 	}
 
 	void refresh() {
@@ -99,7 +97,8 @@ public class UploadFragment extends Fragment {
 	}
 
 	public void onEvent(ContainersGotEvent event) {
-		updatedData(event.getSessions());
+		if (event.getPrefix().equals(CJayConstant.PREFIX_UPLOADING))
+			updatedData(event.getSessions());
 	}
 	//endregion
 

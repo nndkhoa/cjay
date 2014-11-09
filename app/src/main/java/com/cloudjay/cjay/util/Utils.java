@@ -520,6 +520,10 @@ public class Utils {
 		return name;
 	}
 
+	public static String subString(String s) {
+		return s.substring(s.length() - 53);
+	}
+
 	/**
 	 * Use to find out when device is truely connect to internet
 	 *

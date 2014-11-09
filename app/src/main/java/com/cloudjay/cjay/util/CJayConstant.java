@@ -46,7 +46,7 @@ public class CJayConstant {
 	public static final int NOTIFICATION_ID = 98234;
 	public static final int PERMANENT_NOTIFICATION_ID = 1639;
 
-	public static final int RETRY_THRESHOLD = 3;
+	public static final int RETRY_THRESHOLD = 2;
 
 	// Pubnub
 	public static final String PUBLISH_KEY = "pub-c-d4a2608d-f440-4ebf-a09a-dd8a570428cd";

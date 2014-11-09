@@ -409,15 +409,15 @@ public class DataCenter {
 
 		// Get session from server
 		DB db = App.getDB(context);
-		Session session = networkClient.getSessionById(id);
+		Session result = networkClient.getSessionById(id);
 
-		if (session != null) {
+		if (result != null) {
 
 			// Find local session
-			String key = session.getContainerId();
-			Session localSession = getSession(context, session.getContainerId());
+			String key = result.getContainerId();
+			Session session = getSession(context, result.getContainerId());
 
-			if (localSession == null) {
+			if (session == null) {
 				//Merge Session from server to local type
 				session.mergeSession(session);
 				addSession(session);
@@ -426,9 +426,9 @@ public class DataCenter {
 			} else {
 
 				// merge result from server to local session
-				localSession.mergeSession(session);
-				db.put(key, localSession);
-				return localSession;
+				session.mergeSession(result);
+				db.put(key, session);
+				return session;
 			}
 		}
 
@@ -531,7 +531,7 @@ public class DataCenter {
 			}
 		}
 
-		EventBus.getDefault().post(new ContainersGotEvent(sessions));
+		EventBus.getDefault().post(new ContainersGotEvent(sessions, prefix));
 	}
 
 	/**
@@ -810,6 +810,7 @@ public class DataCenter {
 
 		try {
 			DB db = App.getDB(context);
+
 			String workingKey = CJayConstant.PREFIX_WORKING + containerId;
 			db.del(workingKey);
 
@@ -1087,30 +1088,23 @@ public class DataCenter {
 	 * 1. Tìm session với containerId trong list uploading.
 	 * 2. Upload hình và gán field uploaded ngược vào list uploading
 	 *
-	 * @param context
 	 * @param uri
 	 * @param imageName
-	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	public boolean uploadImage(Context context, String uri, String imageName, String containerId, ImageType imageType) throws SnappydbException {
+	public void uploadImage(String uri, String imageName) throws SnappydbException {
 
-		try {
-			//Call network client to upload image
-			networkClient.uploadImage(uri, imageName);
+		//Call network client to upload image
+		networkClient.uploadImage(uri, imageName);
 
-			// Change image status to COMPLETE
-			changeImageUploadStatus(context, containerId, imageName, imageType, UploadStatus.COMPLETE);
-			return true;
-
-		} catch (RetrofitError e) {
-			Logger.w(e.getMessage());
-			return false;
-		}
 	}
 
 	/**
-	 * Upload audit item to server
+	 * Upload audit item to server.
+	 * 1. Get audit item based on uuid
+	 * 2. Upload to server
+	 * 3. Assign uuid to response audit item
+	 * 4. Replace result with local audit item in container session
 	 *
 	 * @param context
 	 * @param containerId
@@ -1124,12 +1118,15 @@ public class DataCenter {
 		Session session = db.getObject(containerId, Session.class);
 		AuditItem auditItem = session.getAuditItem(itemUuid);
 
-		// Merge result
-		Session result = networkClient.postAuditItem(context, session, auditItem);
-		session.mergeSession(result);
+//		// Merge result
+//		Session result = networkClient.postAuditItem(context, session, auditItem);
+//		session.mergeSession(result);
+
+		AuditItem result = networkClient.addAuditImage(context, auditItem );
+		session.updateAuditItem(result);
 
 		// Update to db
-		String key = result.getContainerId();
+		String key = containerId;
 		db.put(key, session);
 	}
 
@@ -1176,14 +1173,14 @@ public class DataCenter {
 
 		// Upload complete audit session to server
 		DB db = App.getDB(context);
-		Session oldSession = db.getObject(containerId, Session.class);
-		Session result = networkClient.completeAudit(context, oldSession);
+		Session session = db.getObject(containerId, Session.class);
+		Session result = networkClient.completeAudit(context, session);
 
 		// Update container back to database
 		if (result != null) {
 			String key = result.getContainerId();
-			oldSession.mergeSession(result);
-			db.put(key, oldSession);
+			session.mergeSession(result);
+			db.put(key, session);
 		}
 	}
 
@@ -1218,21 +1215,17 @@ public class DataCenter {
 
 		// Upload audit item session to server
 		DB db = App.getDB(context);
-		Session oldSession = db.getObject(containerId, Session.class);
-		Session result = networkClient.checkOutContainerSession(context, oldSession);
+		Session session = db.getObject(containerId, Session.class);
+		Session result = networkClient.checkOutContainerSession(context, session);
 		Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
 		if (result != null) {
 
 			// Update container back to database
 			String key = result.getContainerId();
-			oldSession.setUploadStatus(UploadStatus.COMPLETE);
-			oldSession.mergeSession(result);
-			db.put(key, oldSession);
-
-			// Then remove them from WORKING
-			String workingKey = CJayConstant.PREFIX_WORKING + key;
-			db.del(workingKey);
+			session.setUploadStatus(UploadStatus.COMPLETE);
+			session.mergeSession(result);
+			db.put(key, session);
 		}
 	}
 
@@ -1531,8 +1524,8 @@ public class DataCenter {
 	 * @param containerId
 	 * @param auditItem
 	 */
-	public boolean changeUploadStatus(Context context, String containerId, AuditItem auditItem, UploadStatus status) {
-		return changeUploadStatus(context, containerId, auditItem.getUuid(), status);
+	public void changeUploadStatus(Context context, String containerId, AuditItem auditItem, UploadStatus status) throws SnappydbException {
+		changeUploadStatus(context, containerId, auditItem.getUuid(), status);
 	}
 
 	/**
@@ -1543,17 +1536,11 @@ public class DataCenter {
 	 * @param itemUuid
 	 * @param status
 	 */
-	public boolean changeUploadStatus(Context context, String containerId, String itemUuid, UploadStatus status) {
-		try {
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
-			session.changeUploadStatus(containerId, itemUuid, status);
-			db.put(containerId, session);
-			return true;
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-		return false;
+	public void changeUploadStatus(Context context, String containerId, String itemUuid, UploadStatus status) throws SnappydbException{
+		DB db = App.getDB(context);
+		Session session = db.getObject(containerId, Session.class);
+		session.changeUploadStatus(containerId, itemUuid, status);
+		db.put(containerId, session);
 	}
 
 	/**

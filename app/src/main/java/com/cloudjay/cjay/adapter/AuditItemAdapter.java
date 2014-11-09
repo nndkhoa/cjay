@@ -186,8 +186,12 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 					//1. Update upload status
                     auditItem.setUploadStatus(UploadStatus.UPLOADING);
-					DataCenter_.getInstance_(mContext).changeUploadStatus(mContext,
-							containerId, auditItem, UploadStatus.UPLOADING);
+					try {
+						DataCenter_.getInstance_(mContext).changeUploadStatus(mContext,
+								containerId, auditItem, UploadStatus.UPLOADING);
+					} catch (SnappydbException e) {
+						e.printStackTrace();
+					}
 					notifyDataSetChanged();
 
 					//2. Add container session to upload queue
