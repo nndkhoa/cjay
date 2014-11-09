@@ -74,6 +74,7 @@ public class IssueRepairedFragment extends Fragment {
     void setUp() {
 
         // Get session by containerId
+	    // TODO: bug
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 
 		if (mSession != null) {

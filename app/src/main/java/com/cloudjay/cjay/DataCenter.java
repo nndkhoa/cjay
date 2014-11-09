@@ -1446,6 +1446,7 @@ public class DataCenter {
 
 		// --> Nếu nhiều image cùng được chọn là lỗi vệ sinh, thì gộp tất cả vào một lỗi
 		boolean isExisted = false;
+
 		List<AuditItem> list = session.getAuditItems();
 		for (int i = 0; i < list.size(); i++) {
 
@@ -1453,6 +1454,7 @@ public class DataCenter {
 			if (list.get(i).isWashTypeItem() && list.get(i).getId() == 0) {
 				list.get(i).getAuditImages().add(auditItem.getAuditImages().get(0));
 				isExisted = true;
+				Logger.Log("Images size: " + list.get(i).getAuditImages().size());
 				Logger.Log("existed");
 				break;
 			}
@@ -1460,7 +1462,8 @@ public class DataCenter {
 
 		// Remove temporary audit item
 		for (int i = 0; i < list.size(); i++) {
-			if (list.get(i).equals(auditItem)) {
+			AuditItem tmp = list.get(i);
+			if (tmp.equals(auditItem)) {
 				list.remove(i);
 			}
 		}
@@ -1496,6 +1499,7 @@ public class DataCenter {
 
 		session.setAuditItems(list);
 		db.put(containerId, session);
+
 		EventBus.getDefault().post(new IssueDeletedEvent(containerId));
 	}
 

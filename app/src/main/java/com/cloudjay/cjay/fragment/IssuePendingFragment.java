@@ -122,13 +122,12 @@ public class IssuePendingFragment extends Fragment {
 		}
 	}
 
-
 	@Click(R.id.btn_clean)
-	@Background
 	void buttonCleanClicked() {
+
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJob(new UploadSessionJob(mSession.getContainerId(), Step.HAND_CLEAN.value, true));
+		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), Step.HAND_CLEAN.value, true));
 
 		getActivity().finish();
 	}
@@ -200,6 +199,7 @@ public class IssuePendingFragment extends Fragment {
 		updatedData(list);
 	}
 
+	@Trace
 	@UiThread
 	void updatedData(List<AuditItem> auditItems) {
 
@@ -224,7 +224,6 @@ public class IssuePendingFragment extends Fragment {
 	}
 
 	//region EVENT HANDLER
-	@Trace
 	void onEvent(ImageCapturedEvent event) {
 		Logger.Log("on ImageCapturedEvent");
 
@@ -254,6 +253,7 @@ public class IssuePendingFragment extends Fragment {
 		}
 	}
 
+	@UiThread
 	void onEvent(IssueMergedEvent event) {
 		Logger.Log("on IssueMergedEvent");
 
@@ -265,6 +265,8 @@ public class IssuePendingFragment extends Fragment {
 		refresh();
 	}
 
+	@Trace
+	@UiThread
 	void onEvent(IssueDeletedEvent event) {
 		Logger.Log("on IssueDeletedEvent");
 
@@ -274,6 +276,7 @@ public class IssuePendingFragment extends Fragment {
 		refresh();
 	}
 
+	@UiThread
 	void onEvent(IssueUpdatedEvent event) {
 		Logger.Log("on IssueUpdatedEvent");
 

@@ -55,6 +55,7 @@ public class MergeIssueActivity extends BaseActivity {
     void setup() {
 
         //get container operater code form containerId
+	    // TODO: bug
         currentSession = dataCenter.getSession(this.getApplicationContext(), containerID);
         if (null == currentSession) {
             Utils.showCrouton(this, "Không tìm thấy container trong dữ liệu");

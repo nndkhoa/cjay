@@ -108,6 +108,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		} else {
 			holder = (ViewHolder) view.getTag();
 		}
+
 		// Lỗi nào chưa giám dịnh thì hiện hinh`, lỗi nào đã giám định roi thì hiện chi tiết lỗi
 		if (auditItem.isAudited() == true) {
 			final UploadStatus status = UploadStatus.values()[auditItem.getUploadStatus()];
@@ -237,10 +238,10 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			holder.btnReport.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
-					Logger.Log(auditItem.getAuditImages().get(0).getUuid());
-					Logger.Log(auditItem.getAuditImages().get(0).getName());
-					Logger.Log(auditItem.getAuditImages().get(0).getUrl());
-					Logger.Log(auditItem.getAuditImages().get(0).getType() + "");
+//					Logger.Log(auditItem.getAuditImages().get(0).getUuid());
+//					Logger.Log(auditItem.getAuditImages().get(0).getName());
+//					Logger.Log(auditItem.getAuditImages().get(0).getUrl());
+//					Logger.Log(auditItem.getAuditImages().get(0).getType() + "");
 					showApproveDiaglog(auditItem);
 				}
 			});
@@ -334,13 +335,11 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
 				try {
-
 					// change status audit item to water wash
 					DataCenter_.getInstance_(mContext).setWaterWashType(mContext, item, containerId);
 					dialogInterface.dismiss();
 
 				} catch (SnappydbException e) {
-					// TODO: Handle exception
 					e.printStackTrace();
 				}
 			}

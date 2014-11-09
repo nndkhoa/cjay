@@ -451,13 +451,27 @@ public class AuditItem {
 		if (obj instanceof AuditItem) {
 			AuditItem tmp = (AuditItem) obj;
 
-			if (tmp.uuid != null && this.uuid != null) {
-				if (id != 0
-						&& tmp.id != 0
-						&& (this.id == tmp.id || (this.uuid.equals(tmp.uuid)))) {
+			// local compare
+			if (this.id == 0 && tmp.id == 0) {
+				if (uuid.equals(tmp.uuid)) {
 					return true;
 				} else {
 					return false;
+				}
+			} else if (this.id != 0 && tmp.id != 0) {
+				// already uploaded item compare
+				if (id == tmp.id) {
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				if (tmp.uuid != null && this.uuid != null) {
+					if (this.uuid.equals(tmp.uuid)) {
+						return true;
+					} else {
+						return false;
+					}
 				}
 			}
 		}

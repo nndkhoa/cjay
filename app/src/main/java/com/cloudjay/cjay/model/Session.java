@@ -490,6 +490,7 @@ public class Session {
 
 			// Tất cả các item đều được gán lỗi và có hình
 			case AUDIT:
+
 				if (auditItems.size() == 0) {
 					return false;
 				}
@@ -504,6 +505,11 @@ public class Session {
 			// Tất cả các item đều phải có hình sau sửa chữa
 			// Loi cam sua thi field cho phep sua phai la false
 			case REPAIR:
+
+				if (auditItems.size() == 0) {
+					return false;
+				}
+
 				for (AuditItem item : auditItems) {
 					if (item.isRepaired() == false && item.isAllowed() == true) {
 						return false;
