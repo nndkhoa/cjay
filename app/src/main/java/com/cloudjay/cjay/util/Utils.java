@@ -521,7 +521,7 @@ public class Utils {
 	}
 
 	public static String subString(String s) {
-		return s.substring(s.length() - 53);
+		return s.substring(s.length() - 53, s.length() - 32);
 	}
 
 	/**
