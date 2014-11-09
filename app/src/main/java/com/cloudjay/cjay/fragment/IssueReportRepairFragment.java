@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
@@ -42,6 +43,9 @@ public class IssueReportRepairFragment extends IssueReportFragment {
 
 	@ViewById(R.id.lv_repair)
 	ListView mRepairListView;
+
+    @ViewById(R.id.tv_code_fullname)
+    TextView mRepairNameTextView;
 
 	@SystemService
 	InputMethodManager inputMethodManager;
@@ -76,6 +80,7 @@ public class IssueReportRepairFragment extends IssueReportFragment {
 			public void didClearText() {
 				mRepairCode = "";
 				mRepairName = "";
+                mRepairNameTextView.setText("");
 			}
 		});
 
@@ -96,6 +101,7 @@ public class IssueReportRepairFragment extends IssueReportFragment {
 
 		ignoreSearch = true;
 		mRepairEditText.setText(mRepairName);
+        mRepairNameTextView.setText(mRepairName);
 		ignoreSearch = false;
 
         // refresh repair list
@@ -135,6 +141,7 @@ public class IssueReportRepairFragment extends IssueReportFragment {
         mRepairName = item.getFullName();
         ignoreSearch = true;
         mRepairEditText.setText(mRepairName);
+        mRepairNameTextView.setText(mRepairName);
         ignoreSearch = false;
 
         // hide keyboard

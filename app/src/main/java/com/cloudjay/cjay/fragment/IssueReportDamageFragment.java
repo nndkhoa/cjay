@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
@@ -43,6 +44,9 @@ public class IssueReportDamageFragment extends IssueReportFragment {
 
 	@ViewById(R.id.lv_damage)
 	ListView mDamageListView;
+
+    @ViewById(R.id.tv_code_fullname)
+    TextView mDamageNameTextView;
 
 	@SystemService
 	InputMethodManager inputMethodManager;
@@ -79,6 +83,7 @@ public class IssueReportDamageFragment extends IssueReportFragment {
 			public void didClearText() {
 				mDamageCode = "";
 				mDamageName = "";
+                mDamageNameTextView.setText("");
 			}
 		});
 
@@ -99,6 +104,7 @@ public class IssueReportDamageFragment extends IssueReportFragment {
 
 		ignoreSearch = true;
 		mDamageEditText.setText(mDamageName);
+        mDamageNameTextView.setText(mDamageName);
 		ignoreSearch = false;
 
         // refresh damage list
@@ -122,6 +128,7 @@ public class IssueReportDamageFragment extends IssueReportFragment {
         mDamageName = item.getFullName();
         ignoreSearch = true;
         mDamageEditText.setText(mDamageName);
+        mDamageNameTextView.setText(mDamageName);
         ignoreSearch = false;
 
         // hide keyboard

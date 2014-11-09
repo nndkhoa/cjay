@@ -23,7 +23,7 @@
             android:textStyle="bold"
             android:paddingBottom="3dp"
             android:text="ABCD1234567"
-            android:textColor="@color/background_button_and_line"/>
+            android:textColor="@color/background_cjay"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -33,7 +33,7 @@
             android:textStyle="bold"
             android:paddingBottom="3dp"
             android:text=" - "
-            android:textColor="@color/background_button_and_line"
+            android:textColor="@color/background_cjay"
             android:layout_toRightOf="@+id/tv_container_code"/>
 
         <TextView
@@ -44,13 +44,13 @@
             android:textStyle="bold"
             android:paddingBottom="3dp"
             android:text="B"
-            android:textColor="@color/background_button_and_line"
+            android:textColor="@color/background_cjay"
             android:layout_toRightOf="@+id/tv_divider_line"/>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dip"
-            android:background="@color/background_button_and_line"
+            android:background="@color/background_cjay"
             android:layout_marginBottom="6dp"
             android:layout_below="@+id/tv_container_code"
             android:id="@+id/v_line"/>
@@ -68,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="16dp"
                 android:text="Lúc nhập bãi: "
-                android:textColor="@color/background_button_and_line"/>
+                android:textColor="@color/background_cjay"/>
 
             <TextView
                 android:layout_width="match_parent"

@@ -9,7 +9,7 @@
 		android:layout_height="wrap_content"
 		android:id="@+id/lv_uploading_container"
 		android:dividerHeight="1dip"
-		android:divider="@color/background_button_and_line"
+		android:divider="@color/background_cjay"
 		android:scrollbars="none"
 		tools:listitem="@layout/item_upload"
 		>
@@ -24,7 +24,7 @@
 		android:id="@+id/tv_empty_list_uploading"
 		android:drawableTop="@drawable/ic_success"
 		android:textSize="18sp"
-		android:textColor="@color/background_button_and_line"
+		android:textColor="@color/background_cjay"
 		android:visibility="gone"
 		/>
 

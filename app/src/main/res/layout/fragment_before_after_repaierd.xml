@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_code_comp_repaired"
                 android:layout_alignParentRight="true"
-                android:textColor="@color/background_button_and_line" />
+                android:textColor="@color/background_cjay" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -50,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_code_location_repaired"
                 android:layout_alignParentRight="true"
-                android:textColor="@color/background_button_and_line" />
+                android:textColor="@color/background_cjay" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -68,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_code_damaged_repaired"
                 android:layout_alignParentRight="true"
-                android:textColor="@color/background_button_and_line" />
+                android:textColor="@color/background_cjay" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -86,7 +86,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_code_repair_repaired"
                 android:layout_alignParentRight="true"
-                android:textColor="@color/background_button_and_line" />
+                android:textColor="@color/background_cjay" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -104,7 +104,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_size_repaired"
                 android:layout_alignParentRight="true"
-                android:textColor="@color/background_button_and_line" />
+                android:textColor="@color/background_cjay" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -122,7 +122,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_number_repaired"
                 android:layout_alignParentRight="true"
-                android:textColor="@color/background_button_and_line" />
+                android:textColor="@color/background_cjay" />
         </RelativeLayout>
     </LinearLayout>
 

@@ -420,7 +420,7 @@ public class DataCenter {
 
 			if (session == null) {
 				//Merge Session from server to local type
-				session.mergeSession(session);
+				session.changeToLocalFormat();
 				addSession(session);
 				return session;
 
@@ -622,8 +622,21 @@ public class DataCenter {
 			for (Session session : sessions) {
 
 				String key = session.getContainerId();
-				session.mergeSession(session);
-				db.put(key, session);
+				String[] searchResult = db.findKeys(key);
+				if (session.getStep() == Step.EXPORTED.value) {
+					if (searchResult.length != 0) {
+						db.del(key);
+					}
+				} else {
+					if (searchResult.length == 0){
+						session.changeToLocalFormat();
+						addSession(session);
+					} else {
+						Session local = db.getObject(key,Session.class);
+						local.mergeSession(session);
+						db.put(key,local);
+					}
+				}
 			}
 
 			Logger.Log("Fetched page: " + nextPage);
@@ -661,13 +674,26 @@ public class DataCenter {
 
 			List<Session> sessions = networkClient.getSessionByPage(context, nextPage, lastModifiedDate);
 			DB db = App.getDB(context);
+
 			for (Session session : sessions) {
-
 				String key = session.getContainerId();
-				session.mergeSession(session);
-
-				db.put(key, session);
+				String[] searchResult = db.findKeys(key);
+				if (session.getStep() == Step.EXPORTED.value) {
+					if (searchResult.length != 0) {
+						db.del(key);
+					}
+				} else {
+					if (searchResult.length == 0){
+						session.changeToLocalFormat();
+						addSession(session);
+					} else {
+						Session local = db.getObject(key,Session.class);
+						local.mergeSession(session);
+						db.put(key,local);
+					}
+				}
 			}
+
 			Logger.Log("Fetched first page time, page: " + nextPage);
 			newModifiedDay = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
 			Logger.Log("Current Modified day: " + newModifiedDay);
@@ -1147,7 +1173,7 @@ public class DataCenter {
 //		Session result = networkClient.postAuditItem(context, session, auditItem);
 //		session.mergeSession(result);
 
-		AuditItem result = networkClient.addAuditImage(context, auditItem );
+		AuditItem result = networkClient.addAuditImage(context, auditItem);
 		session.updateAuditItem(result);
 
 		// Update to db
@@ -1561,7 +1587,7 @@ public class DataCenter {
 	 * @param itemUuid
 	 * @param status
 	 */
-	public void changeUploadStatus(Context context, String containerId, String itemUuid, UploadStatus status) throws SnappydbException{
+	public void changeUploadStatus(Context context, String containerId, String itemUuid, UploadStatus status) throws SnappydbException {
 		DB db = App.getDB(context);
 		Session session = db.getObject(containerId, Session.class);
 		session.changeUploadStatus(containerId, itemUuid, status);

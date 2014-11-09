@@ -640,11 +640,13 @@ public class Session {
 	 * @return
 	 */
 	public AuditItem getAuditItem(String itemUuid) {
-		for (AuditItem item : auditItems) {
-			if (item.getUuid().equals(itemUuid)) {
-				return item;
-			}
-		}
+
+        if (!TextUtils.isEmpty(itemUuid)) {
+            for (AuditItem item : auditItems)
+                if (itemUuid.equals(item.getUuid())) {
+                    return item;
+                }
+        }
 
 		return null;
 	}
@@ -653,12 +655,15 @@ public class Session {
 	 * @param uuid
 	 */
 	public boolean removeAuditItem(String uuid) {
-		for (AuditItem item : auditItems) {
-			if (item.getUuid().equals(uuid)) {
-				auditItems.remove(item);
-				return true;
-			}
-		}
+
+        if (!TextUtils.isEmpty(uuid)) {
+            for (AuditItem item : auditItems) {
+                if (uuid.equals(item.getUuid())) {
+                    auditItems.remove(item);
+                    return true;
+                }
+            }
+        }
 
 		return false;
 	}
@@ -792,5 +797,37 @@ public class Session {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Add some field to make new session return from server look like local session
+	 * - Set localstep = step
+	 * - Gen UUID for each audit item, image
+	 * - Set upload status of all image is uploaded
+	 * - Set name for all image
+	 * - Set upload status of all audit item is uploaded
+	 * @param session
+	 * @return
+	 */
+	public Session changeToLocalFormat(){
+		this.setLocalStep(this.getStep());
+
+		for (GateImage gateImage : this.getGateImages()){
+			gateImage.setName(Utils.getImageNameFromUrl(gateImage.getUrl()));
+			gateImage.setUploadStatus(UploadStatus.COMPLETE.value);
+			gateImage.setUuid(UUID.randomUUID().toString());
+		}
+
+		for (AuditItem auditItem : this.getAuditItems()){
+			auditItem.setUuid(UUID.randomUUID().toString());
+			auditItem.setUploadStatus(UploadStatus.COMPLETE.value);
+			for (AuditImage auditImage:auditItem.getAuditImages()){
+				auditImage.setName(Utils.getImageNameFromUrl(auditImage.getUrl()));
+				auditImage.setUploadStatus(UploadStatus.COMPLETE.value);
+				auditImage.setUuid(UUID.randomUUID().toString());
+			}
+		}
+
+		return  this;
 	}
 }

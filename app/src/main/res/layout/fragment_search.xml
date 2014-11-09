@@ -65,7 +65,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dip"
-            android:background="@color/background_button_and_line"
+            android:background="@color/background_cjay"
             android:layout_marginBottom="6dp"/>
 
         <TextView
@@ -73,7 +73,7 @@
             android:layout_height="wrap_content"
             android:text="Kết quả tìm kiếm"
             android:textSize="18sp"
-            android:textColor="@color/background_button_and_line"
+            android:textColor="@color/background_cjay"
             android:layout_marginBottom="6dp"/>
 
         <RelativeLayout
@@ -85,7 +85,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/lv_search_container"
                 android:dividerHeight="1dip"
-                android:divider="@color/background_button_and_line"
+                android:divider="@color/background_cjay"
                 android:scrollbars="none">
             </ListView>
 

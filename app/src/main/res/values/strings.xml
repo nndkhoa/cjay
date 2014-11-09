@@ -130,10 +130,12 @@
     <!-- Label for error item -->
     <string name="label_code_component">CODE component:</string>
     <string name="label_code_location">CODE vị trí:</string>
-    <string name="label_code_issue">CODE hư hỏng:</string>
+    <string name="label_code_damage">CODE hư hỏng:</string>
     <string name="label_code_repair">CODE sửa chữa:</string>
     <string name="label_dimension">Kích thước:</string>
-    <string name="label_count">Số lượng:</string>
+    <string name="label_length">Dài:</string>
+    <string name="label_height">Rộng:</string>
+    <string name="label_quantity">Số lượng:</string>
     <string name="label_status">Trạng thái:</string>
 
     <!-- Image Type Descriptions -->
