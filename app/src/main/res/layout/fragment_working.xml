@@ -11,7 +11,7 @@
 		android:layout_height="wrap_content"
 		android:id="@+id/lv_working_container"
         android:dividerHeight="1dip"
-        android:divider="@color/background_button_and_line"
+        android:divider="@color/background_cjay"
         android:scrollbars="none"></ListView>
 
     <TextView
@@ -22,7 +22,7 @@
         android:id="@+id/tv_empty_list_working"
         android:textSize="18sp"
         android:drawableTop="@drawable/ic_success"
-        android:textColor="@color/background_button_and_line"
+        android:textColor="@color/background_cjay"
         android:scrollbars="none"/>
 
 </FrameLayout>

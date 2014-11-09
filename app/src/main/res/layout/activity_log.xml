@@ -56,7 +56,7 @@
         android:id="@+id/tv_empty_list_working_log"
         android:textSize="18sp"
         android:drawableTop="@drawable/ic_success"
-        android:textColor="@color/background_button_and_line"
+        android:textColor="@color/background_cjay"
         android:scrollbars="none" />
 
 </LinearLayout>

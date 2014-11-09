@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="LBH"
-                android:textColor="@color/background_button_and_line"/>
+                android:textColor="@color/background_cjay"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -72,7 +72,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="LBH"
-                android:textColor="@color/background_button_and_line"/>
+                android:textColor="@color/background_cjay"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -84,7 +84,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:text="@string/label_code_issue"
+                android:text="@string/label_code_damage"
                 android:textStyle="bold" />
 
             <TextView
@@ -93,7 +93,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="LBH"
-                android:textColor="@color/background_button_and_line"/>
+                android:textColor="@color/background_cjay"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -114,7 +114,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="LBH"
-                android:textColor="@color/background_button_and_line"/>
+                android:textColor="@color/background_cjay"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -135,7 +135,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="Dài 40, rộng 20"
-                android:textColor="@color/background_button_and_line"/>
+                android:textColor="@color/background_cjay"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -147,7 +147,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:text="@string/label_count"
+                android:text="@string/label_quantity"
                 android:textStyle="bold" />
 
             <TextView
@@ -156,7 +156,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="1"
-                android:textColor="@color/background_button_and_line"/>
+                android:textColor="@color/background_cjay"/>
         </RelativeLayout>
 
     </LinearLayout>

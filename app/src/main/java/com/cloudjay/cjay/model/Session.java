@@ -640,11 +640,13 @@ public class Session {
 	 * @return
 	 */
 	public AuditItem getAuditItem(String itemUuid) {
-		for (AuditItem item : auditItems) {
-			if (item.getUuid().equals(itemUuid)) {
-				return item;
-			}
-		}
+
+        if (!TextUtils.isEmpty(itemUuid)) {
+            for (AuditItem item : auditItems)
+                if (itemUuid.equals(item.getUuid())) {
+                    return item;
+                }
+        }
 
 		return null;
 	}
@@ -653,12 +655,15 @@ public class Session {
 	 * @param uuid
 	 */
 	public boolean removeAuditItem(String uuid) {
-		for (AuditItem item : auditItems) {
-			if (item.getUuid().equals(uuid)) {
-				auditItems.remove(item);
-				return true;
-			}
-		}
+
+        if (!TextUtils.isEmpty(uuid)) {
+            for (AuditItem item : auditItems) {
+                if (uuid.equals(item.getUuid())) {
+                    auditItems.remove(item);
+                    return true;
+                }
+            }
+        }
 
 		return false;
 	}

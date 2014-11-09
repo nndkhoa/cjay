@@ -21,8 +21,9 @@ import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
@@ -34,8 +35,6 @@ import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.view.SquareImageView;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 // slide 20
 
@@ -44,76 +43,12 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 public class ReportIssueActivity extends BaseActivity implements OnPageChangeListener,
         AuditorIssueReportListener, TabListener {
 
-    public class AuditorIssueReportTabPageAdaptor extends FragmentPagerAdapter {
-        private String[] locations;
-        SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
-
-        public AuditorIssueReportTabPageAdaptor(FragmentManager fm, String[] locations) {
-            super(fm);
-            this.locations = locations;
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            registeredFragments.remove(position);
-            super.destroyItem(container, position, object);
-        }
-
-        @Override
-        public int getCount() {
-            return locations.length;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            IssueReportFragment fragment;
-
-            switch (position) {
-                case TAB_ISSUE_PHOTO:
-                    fragment = new IssueReportPhotoFragment_();
-                    ((IssueReportPhotoFragment_) fragment).setCJayImage(mAuditImage);
-                    break;
-                case TAB_ISSUE_LOCATION:
-                    fragment = new IssueReportLocationFragment_();
-                    break;
-                case TAB_ISSUE_DAMAGE:
-                    fragment = new IssueReportDamageFragment_();
-                    break;
-                case TAB_ISSUE_REPAIR:
-                    fragment = new IssueReportRepairFragment_();
-                    break;
-                case TAB_ISSUE_COMPONENT:
-                    fragment = new IssueReportComponentFragment_();
-                    break;
-                case TAB_ISSUE_DIMENSION:
-                    fragment = new IssueReportDimensionFragment_();
-                    break;
-                case TAB_ISSUE_QUANTITY:
-                default:
-                    fragment = new IssueReportQuantityFragment_();
-                    break;
-            }
-
-            fragment.setAuditItem(mAuditItem);
-
-            return fragment;
-        }
-
-        public Fragment getRegisteredFragment(int position) {
-            return registeredFragments.get(position);
-        }
-
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            Fragment fragment = (Fragment) super.instantiateItem(container, position);
-            registeredFragments.put(position, fragment);
-            return fragment;
-        }
-    }
-
     public static final String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
     public static final String AUDIT_ITEM_EXTRA = "com.cloudjay.wizard.auditItem";
     public static final String AUDIT_IMAGE_EXTRA = "com.cloudjay.wizard.auditImage";
+
+    public static final int ISSUE_REPORT_SUMMARY_CODE = 2;
+    public static final int ISSUE_REPORT_SUMMARY_STATS = 1;
 
     private AuditorIssueReportTabPageAdaptor mViewPagerAdapter;
 
@@ -121,8 +56,6 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
     private Session mSession;
     private AuditItem mAuditItem;
     private AuditImage mAuditImage;
-
-    private ImageLoader mImageLoader;;
 
     @Extra(CONTAINER_ID_EXTRA)
     String mContainerId = "";
@@ -136,8 +69,20 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
     @ViewById(R.id.pv_pager)
     ViewPager mPager;
 
-    @ViewById(R.id.iv_audit_image)
-	SquareImageView mImageView;
+    @ViewById(R.id.tv_code_label)
+    TextView mTvCodeLabel;
+
+    @ViewById(R.id.tv_code_fullname)
+    TextView mTvCodeFullName;
+
+    @ViewById(R.id.tv_length)
+    TextView mTvLength;
+
+    @ViewById(R.id.tv_height)
+    TextView mTvHeight;
+
+    @ViewById(R.id.tv_quantity)
+    TextView mTvQuantity;
 
     @Bean
     DataCenter mDataCenter;
@@ -150,9 +95,6 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
         mSession = mDataCenter.getSession(getApplicationContext(), mContainerId);
         mAuditItem = mDataCenter.getAuditItem(getApplicationContext(), mContainerId, mAuditItemUuid);
         mAuditImage = mDataCenter.getAuditImageByUUId(getApplicationContext(), mContainerId, mAuditItemUuid, mAuditImageUuid);
-
-        mImageLoader = ImageLoader.getInstance();
-        mImageLoader.displayImage(mAuditImage.getUrl(), mImageView);
 
         // Set Activity Title
         setTitle(mSession.getContainerId());
@@ -320,37 +262,91 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
         int position = tab.getPosition();
         mPager.setCurrentItem(position);
 
-        LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) mImageView.getLayoutParams();
+        showKeyboard(tab);
+//        showIssueDetailSummary(tab);
+    }
+
+    private void showKeyboard(Tab tab) {
+        int position = tab.getPosition();
 
         // show keyboard for specific tabs
         switch (position) {
-            case TAB_ISSUE_PHOTO:
-                // hide the small image because we are displaying a larger version
-				mImageView.setVisibility(View.GONE);
-                break;
-
             case TAB_ISSUE_DIMENSION:
             case TAB_ISSUE_QUANTITY:
                 IssueReportFragment fragment = (IssueReportFragment) mViewPagerAdapter.getRegisteredFragment(position);
                 if (fragment != null) {
                     fragment.showKeyboard();
                 }
-
-                // show the small image
-                if (p.weight == 0) {
-                    p.weight = 3;
-                    mImageView.setLayoutParams(p);
-                }
                 break;
 
             default:
-                // show the small image
-                if (mImageView.getVisibility() == View.GONE) {
-					mImageView.setVisibility(View.VISIBLE);
-                }
                 break;
         }
     }
+//
+//    private void showIssueDetailSummary(Tab tab) {
+//        int position = tab.getPosition();
+//        int displayChild = 0;
+//        IssueReportFragment fragment = (IssueReportFragment) mViewPagerAdapter.getRegisteredFragment(position);
+//
+//        if (fragment != null) {
+//            switch (position) {
+//                case TAB_ISSUE_COMPONENT:
+//                    mTvCodeLabel.setText(getString(R.string.label_code_component));
+//                    mTvCodeFullName.setText(fragment.getCurrentValue(
+//                            getString(R.string.label_code_component)));
+//                    displayChild = ISSUE_REPORT_SUMMARY_CODE;
+//                    break;
+//
+//                case TAB_ISSUE_DAMAGE:
+//                    mTvCodeLabel.setText(getString(R.string.label_code_damage));
+//                    mTvCodeFullName.setText(fragment.getCurrentValue(
+//                            getString(R.string.label_code_damage)));
+//                    displayChild = ISSUE_REPORT_SUMMARY_CODE;
+//                    break;
+//
+//                case TAB_ISSUE_REPAIR:
+//                    mTvCodeLabel.setText(getString(R.string.label_code_repair));
+//                    mTvCodeFullName.setText(fragment.getCurrentValue(
+//                            getString(R.string.label_code_repair)));
+//                    displayChild = ISSUE_REPORT_SUMMARY_CODE;
+//                    break;
+//
+//                case TAB_ISSUE_LOCATION:
+//                    mTvCodeLabel.setText(getString(R.string.label_code_location));
+//                    mTvCodeFullName.setText(fragment.getCurrentValue(
+//                            getString(R.string.label_code_location)));
+//                    displayChild = ISSUE_REPORT_SUMMARY_CODE;
+//                    break;
+//
+//                case TAB_ISSUE_DIMENSION:
+//
+//                    mTvLength.setText(fragment.getCurrentValue(
+//                            getString(R.string.label_length)));
+//                    mTvHeight.setText(fragment.getCurrentValue(
+//                            getString(R.string.label_height)));
+//                    mTvQuantity.setText(fragment.getCurrentValue(
+//                            getString(R.string.label_quantity)));
+//                    displayChild = ISSUE_REPORT_SUMMARY_STATS;
+//                    break;
+//
+//                default:
+//                    // do nothing
+//                    break;
+//            }
+//        }
+//
+//        if (displayChild > 0) {
+//            if (mVfIssueSummary.getDisplayedChild() != displayChild) {
+//                mVfIssueSummary.setDisplayedChild(displayChild);
+//            }
+//            if (mVfIssueSummary.getVisibility() == View.GONE) {
+//                mVfIssueSummary.setVisibility(View.VISIBLE);
+//            }
+//        } else {
+//            mVfIssueSummary.setVisibility(View.GONE);
+//        }
+//    }
 
     @Override
     public void onTabUnselected(Tab tab, FragmentTransaction ft) {
@@ -375,6 +371,70 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
             default:
                 break;
+        }
+    }
+
+    public class AuditorIssueReportTabPageAdaptor extends FragmentPagerAdapter {
+        private String[] locations;
+        SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
+
+        public AuditorIssueReportTabPageAdaptor(FragmentManager fm, String[] locations) {
+            super(fm);
+            this.locations = locations;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            registeredFragments.remove(position);
+            super.destroyItem(container, position, object);
+        }
+
+        @Override
+        public int getCount() {
+            return locations.length;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            IssueReportFragment fragment;
+
+            switch (position) {
+                case TAB_ISSUE_PHOTO:
+                    fragment = new IssueReportPhotoFragment_();
+                    ((IssueReportPhotoFragment_) fragment).setCJayImage(mAuditImage);
+                    break;
+                case TAB_ISSUE_LOCATION:
+                    fragment = new IssueReportLocationFragment_();
+                    break;
+                case TAB_ISSUE_DAMAGE:
+                    fragment = new IssueReportDamageFragment_();
+                    break;
+                case TAB_ISSUE_REPAIR:
+                    fragment = new IssueReportRepairFragment_();
+                    break;
+                case TAB_ISSUE_COMPONENT:
+                    fragment = new IssueReportComponentFragment_();
+                    break;
+                case TAB_ISSUE_DIMENSION:
+                default:
+                    fragment = new IssueReportDimensionFragment_();
+                    break;
+            }
+
+            fragment.setAuditItem(mAuditItem);
+
+            return fragment;
+        }
+
+        public Fragment getRegisteredFragment(int position) {
+            return registeredFragments.get(position);
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Fragment fragment = (Fragment) super.instantiateItem(container, position);
+            registeredFragments.put(position, fragment);
+            return fragment;
         }
     }
 }

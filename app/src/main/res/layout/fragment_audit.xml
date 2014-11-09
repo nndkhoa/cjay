@@ -19,7 +19,7 @@
             android:textStyle="bold"
             android:paddingBottom="3dp"
             android:text="ABCD1234567"
-            android:textColor="@color/background_button_and_line"/>
+            android:textColor="@color/background_cjay"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -29,7 +29,7 @@
             android:textStyle="bold"
             android:paddingBottom="3dp"
             android:text=" - "
-            android:textColor="@color/background_button_and_line"
+            android:textColor="@color/background_cjay"
             android:layout_toRightOf="@+id/tv_container_code"/>
 
         <TextView
@@ -40,7 +40,7 @@
             android:textStyle="bold"
             android:paddingBottom="3dp"
             android:text="B"
-            android:textColor="@color/background_button_and_line"
+            android:textColor="@color/background_cjay"
             android:layout_toRightOf="@+id/tv_divider_line"/>
 
         <ImageButton

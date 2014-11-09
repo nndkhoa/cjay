@@ -21,8 +21,8 @@
     <!-- style simple dialog color -->
     <style name="DialogStyleLight.Custom">
         <!-- anything can be left out: -->
-        <item name="titleTextColor">@color/background_button_and_line</item>
-        <item name="titleSeparatorColor">@color/background_button_and_line</item>
+        <item name="titleTextColor">@color/background_cjay</item>
+        <item name="titleSeparatorColor">@color/background_cjay</item>
         <item name="messageTextColor">@android:color/black</item>
         <item name="buttonTextColor">@android:color/black</item>
         <item name="buttonSeparatorColor">@android:color/white</item>
@@ -39,12 +39,26 @@
         <item name="android:backgroundSplit">@android:color/white</item>
     </style>
 
-    <style name="CJayListView">
-        <item name="android:scrollbars">none</item>
+    <style name="IssueReportEditText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:layout_marginLeft">15dp</item>
+        <item name="android:layout_marginRight">15dp</item>
+        <item name="android:inputType">textNoSuggestions</item>
+        <item name="android:selectAllOnFocus">true</item>
+        <item name="android:background">@drawable/border_gray_singleline</item>
+    </style>
+
+    <style name="IssueReportList">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_marginLeft">15dp</item>
+        <item name="android:layout_marginRight">15dp</item>
         <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:scrollbars">none</item>
         <item name="android:choiceMode">singleChoice</item>
-        <item name="android:textColor">@android:color/background_dark</item>
-        <!--<item name="android:textAppearance">@android:attr/textAppearanceListItem</item>-->
+        <item name="android:minHeight">30dp</item>
     </style>
 
     <style name="IssueReportLocationCodeEditText">

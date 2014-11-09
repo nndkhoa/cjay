@@ -12,5 +12,4 @@ public abstract class IssueReportFragment extends Fragment {
 	public abstract void showKeyboard();
 
 	public abstract boolean validateAndSaveData();
-
 }

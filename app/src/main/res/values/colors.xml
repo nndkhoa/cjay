@@ -19,7 +19,7 @@
     <!-- Main Colors -->
     <color name="tab_background_stacked">#128AB2</color>
     <color name="actionbar_background">#373737</color>
-    <color name="background_button_and_line">#0091CC</color>
+    <color name="background_cjay">#0091CC</color>
     <color name="background_btn_gate_in">#006185</color>
     <color name="background_btn_check_container_clean">#006425</color>
 

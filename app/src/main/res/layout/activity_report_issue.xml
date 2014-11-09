@@ -8,47 +8,9 @@
     android:padding="6dp"
     tools:context="com.cloudjay.cjay.activity.ReportIssueActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="7">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2">
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="3">
-
-            <com.cloudjay.cjay.view.SquareImageView
-                android:id="@+id/iv_audit_image"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="3"
-                android:src="@drawable/ic_app"
-                android:scaleType="centerCrop" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2">
-
-        </LinearLayout>
-
-    </LinearLayout>
-
     <android.support.v4.view.ViewPager
         android:id="@+id/pv_pager"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="7" />
+        android:layout_height="match_parent" />
 
 </LinearLayout>

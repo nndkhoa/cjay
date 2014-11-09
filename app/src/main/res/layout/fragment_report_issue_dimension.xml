@@ -3,48 +3,77 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingLeft="30dp"
-    android:paddingRight="30dp" >
+    android:paddingLeft="2dp"
+    android:paddingRight="2dp" >
+
+    <include
+        layout="@layout/section_report_issue_summary2"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_margin="5dp"
+        android:paddingLeft="10dp">
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="right"
-            android:text="Dài"
+            android:text="@string/label_length"
             android:textStyle="bold" />
 
         <EditText
             android:id="@+id/length"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="4"
+            android:layout_weight="3"
             android:inputType="numberDecimal"
-            android:selectAllOnFocus="true" />
+            android:selectAllOnFocus="true"
+            style="@style/IssueReportEditText" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_margin="5dp"
+        android:paddingLeft="10dp">
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="right"
-            android:text="Rộng"
+            android:text="@string/label_height"
             android:textStyle="bold" />
         <EditText
             android:id="@+id/height"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="4"
+            android:layout_weight="3"
             android:inputType="numberDecimal"
-            android:selectAllOnFocus="true" />
+            android:selectAllOnFocus="true"
+            style="@style/IssueReportEditText" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="5dp"
+        android:paddingLeft="10dp">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/label_quantity"
+            android:textStyle="bold" />
+        <EditText
+            android:id="@+id/quantity"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:inputType="numberDecimal"
+            android:selectAllOnFocus="true"
+            style="@style/IssueReportEditText" />
     </LinearLayout>
 
 </LinearLayout>
