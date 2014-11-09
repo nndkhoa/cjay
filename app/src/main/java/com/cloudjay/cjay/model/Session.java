@@ -686,7 +686,6 @@ public class Session {
 			this.setLocalStep(newSession.getStep());
 		}
 
-
 		// Merge Gate Images
 		// Tìm danh sách hình giống nhau, giữ danh sách local và set new id
 		// Tìm danh sách hình khác nhau
