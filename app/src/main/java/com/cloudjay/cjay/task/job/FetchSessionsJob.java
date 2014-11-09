@@ -33,7 +33,7 @@ public class FetchSessionsJob extends Job {
 	@Override
 	public void onRun() throws Throwable {
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).fetchSession(context, modifiedDate);
+		DataCenter_.getInstance_(context).fetchSession(context, modifiedDate, true);
 
 		// Notify UI that all data was fetched
 		EventBus.getDefault().post(new ContainersFetchedEvent());

@@ -498,6 +498,11 @@ public class AuditItem {
 		// Merge list audit images
 		List<AuditImage> diffImages = new ArrayList<>();
 		diffImages.addAll(auditImages);
+
+		//Set upload status for all audit image get from server is uploaded
+		for (AuditImage auditImage : newItem.getAuditImages()) {
+			auditImage.setUploadStatus(UploadStatus.COMPLETE.value);
+		}
 		diffImages.addAll(newItem.getAuditImages());
 
 		auditImages.retainAll(newItem.getAuditImages());

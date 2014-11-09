@@ -421,9 +421,9 @@ public class DataCenter {
 			if (session == null) {
 
 				//Merge Session from server to local type
-				session.changeToLocalFormat();
-				addSession(session);
-				return session;
+				result.changeToLocalFormat();
+				addSession(result);
+				return result;
 
 			} else {
 
@@ -591,6 +591,7 @@ public class DataCenter {
 
 	/**
 	 * Fetch all container session with last modified datetime
+	 * If refetchWithFistPageTime == true => after fetch all page, fetch again with modified_since is the time of fetched page 1
 	 * <p/>
 	 * 1.Get current page from preferences
 	 * 2.If current page is null =>> next page use to get session = 1
@@ -600,10 +601,11 @@ public class DataCenter {
 	 *
 	 * @param context
 	 * @param lastModifiedDate
+	 * @param refetchWithFistPageTime
 	 * @throws SnappydbException
 	 */
 	@Trace
-	public void fetchSession(Context context, String lastModifiedDate) throws SnappydbException {
+	public void fetchSession(Context context, String lastModifiedDate, boolean refetchWithFistPageTime) throws SnappydbException {
 
 		String newModifiedDay;
 		do {
@@ -648,61 +650,12 @@ public class DataCenter {
 
 		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE, "");
 
-		//Fetch again with modified day is first page request_time
-		String firstPageTime = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_FIRST_PAGE_MODIFIED_DATE);
-		fetchFirstPageTime(context, firstPageTime);
-
+		if (refetchWithFistPageTime) {
+			//Fetch again with modified day is first page request_time
+			String firstPageTime = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_FIRST_PAGE_MODIFIED_DATE);
+			fetchSession(context, firstPageTime, false);
+		}
 	}
-
-	/**
-	 * Like fetch session, just don't have fetch first page.
-	 *
-	 * @param context
-	 * @param lastModifiedDate
-	 * @throws SnappydbException
-	 */
-	private void fetchFirstPageTime(Context context, String lastModifiedDate) throws SnappydbException {
-
-		String newModifiedDay;
-		do {
-			int nextPage;
-			String currentPage = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE);
-			if (currentPage.isEmpty()) {
-				nextPage = 1;
-			} else {
-				nextPage = Integer.valueOf(currentPage) + 1;
-			}
-
-			List<Session> sessions = networkClient.getSessionByPage(context, nextPage, lastModifiedDate);
-			DB db = App.getDB(context);
-
-			for (Session session : sessions) {
-				String key = session.getContainerId();
-				String[] searchResult = db.findKeys(key);
-				if (session.getStep() == Step.EXPORTED.value) {
-					if (searchResult.length != 0) {
-						db.del(key);
-					}
-				} else {
-					if (searchResult.length == 0){
-						session.changeToLocalFormat();
-						addSession(session);
-					} else {
-						Session local = db.getObject(key,Session.class);
-						local.mergeSession(session);
-						db.put(key,local);
-					}
-				}
-			}
-
-			Logger.Log("Fetched first page time, page: " + nextPage);
-			newModifiedDay = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
-			Logger.Log("Current Modified day: " + newModifiedDay);
-		} while (lastModifiedDate.equals(newModifiedDay));
-
-		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE, "");
-	}
-
 	/**
 	 * Search container session from device database.
 	 * <p/>

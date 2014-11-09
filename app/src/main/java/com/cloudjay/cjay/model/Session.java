@@ -641,12 +641,12 @@ public class Session {
 	 */
 	public AuditItem getAuditItem(String itemUuid) {
 
-        if (!TextUtils.isEmpty(itemUuid)) {
-            for (AuditItem item : auditItems)
-                if (itemUuid.equals(item.getUuid())) {
-                    return item;
-                }
-        }
+		if (!TextUtils.isEmpty(itemUuid)) {
+			for (AuditItem item : auditItems)
+				if (itemUuid.equals(item.getUuid())) {
+					return item;
+				}
+		}
 
 		return null;
 	}
@@ -656,14 +656,14 @@ public class Session {
 	 */
 	public boolean removeAuditItem(String uuid) {
 
-        if (!TextUtils.isEmpty(uuid)) {
-            for (AuditItem item : auditItems) {
-                if (uuid.equals(item.getUuid())) {
-                    auditItems.remove(item);
-                    return true;
-                }
-            }
-        }
+		if (!TextUtils.isEmpty(uuid)) {
+			for (AuditItem item : auditItems) {
+				if (uuid.equals(item.getUuid())) {
+					auditItems.remove(item);
+					return true;
+				}
+			}
+		}
 
 		return false;
 	}
@@ -699,6 +699,10 @@ public class Session {
 		Logger.Log("Parse list gate images");
 		List<GateImage> diffGateImages = new ArrayList<>();
 		diffGateImages.addAll(gateImages);
+		//Set upload status for all image get from server is uploaded
+		for (GateImage gateImage : newSession.getGateImages()) {
+			gateImage.setUploadStatus(UploadStatus.COMPLETE.value);
+		}
 		diffGateImages.addAll(newSession.getGateImages());
 
 		gateImages.retainAll(newSession.getGateImages());
@@ -724,6 +728,8 @@ public class Session {
 
 			Logger.Log("Parse list audit items");
 			for (AuditItem serverItem : newSession.getAuditItems()) {
+				//Set upload status for all audit item is uploaded
+				serverItem.setUploadStatus(UploadStatus.COMPLETE.value);
 				boolean found = false;
 
 				for (AuditItem localItem : auditItems) {
@@ -806,28 +812,29 @@ public class Session {
 	 * - Set upload status of all image is uploaded
 	 * - Set name for all image
 	 * - Set upload status of all audit item is uploaded
+	 *
 	 * @param session
 	 * @return
 	 */
-	public Session changeToLocalFormat(){
+	public Session changeToLocalFormat() {
 		this.setLocalStep(this.getStep());
 
-		for (GateImage gateImage : this.getGateImages()){
+		for (GateImage gateImage : this.getGateImages()) {
 			gateImage.setName(Utils.getImageNameFromUrl(gateImage.getUrl()));
 			gateImage.setUploadStatus(UploadStatus.COMPLETE.value);
 			gateImage.setUuid(UUID.randomUUID().toString());
 		}
 
-		for (AuditItem auditItem : this.getAuditItems()){
+		for (AuditItem auditItem : this.getAuditItems()) {
 			auditItem.setUuid(UUID.randomUUID().toString());
 			auditItem.setUploadStatus(UploadStatus.COMPLETE.value);
-			for (AuditImage auditImage:auditItem.getAuditImages()){
+			for (AuditImage auditImage : auditItem.getAuditImages()) {
 				auditImage.setName(Utils.getImageNameFromUrl(auditImage.getUrl()));
 				auditImage.setUploadStatus(UploadStatus.COMPLETE.value);
 				auditImage.setUuid(UUID.randomUUID().toString());
 			}
 		}
 
-		return  this;
+		return this;
 	}
 }

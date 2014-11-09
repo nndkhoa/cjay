@@ -28,7 +28,7 @@ public class QueueIntentService extends IntentService {
 
 			if (!TextUtils.isEmpty(token) && Utils.canReachInternet()) {
 				String lastModifiedTime = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_MODIFIED_DATE);
-				DataCenter_.getInstance_(getApplicationContext()).fetchSession(getApplicationContext(), lastModifiedTime);
+				DataCenter_.getInstance_(getApplicationContext()).fetchSession(getApplicationContext(), lastModifiedTime, true);
 			} else {
 				Logger.w("There was problems. Please check credential or connectivity.");
 			}
