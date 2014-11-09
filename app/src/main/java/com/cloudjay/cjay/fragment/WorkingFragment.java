@@ -137,7 +137,6 @@ public class WorkingFragment extends Fragment {
 			refresh();
 	}
 
-	@Trace
 	public void onEvent(ContainersGotEvent event) {
 		if (event.getPrefix().equals(CJayConstant.PREFIX_WORKING))
 			updatedData(event.getSessions());

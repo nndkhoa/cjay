@@ -1519,8 +1519,8 @@ public class DataCenter {
 	 * @param containerId
 	 * @param auditItem
 	 */
-	public boolean changeUploadStatus(Context context, String containerId, AuditItem auditItem, UploadStatus status) {
-		return changeUploadStatus(context, containerId, auditItem.getUuid(), status);
+	public void changeUploadStatus(Context context, String containerId, AuditItem auditItem, UploadStatus status) throws SnappydbException {
+		changeUploadStatus(context, containerId, auditItem.getUuid(), status);
 	}
 
 	/**
@@ -1531,17 +1531,11 @@ public class DataCenter {
 	 * @param itemUuid
 	 * @param status
 	 */
-	public boolean changeUploadStatus(Context context, String containerId, String itemUuid, UploadStatus status) {
-		try {
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
-			session.changeUploadStatus(containerId, itemUuid, status);
-			db.put(containerId, session);
-			return true;
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-		return false;
+	public void changeUploadStatus(Context context, String containerId, String itemUuid, UploadStatus status) throws SnappydbException{
+		DB db = App.getDB(context);
+		Session session = db.getObject(containerId, Session.class);
+		session.changeUploadStatus(containerId, itemUuid, status);
+		db.put(containerId, session);
 	}
 
 	/**

@@ -96,7 +96,6 @@ public class UploadFragment extends Fragment {
 		refresh();
 	}
 
-	@Trace
 	public void onEvent(ContainersGotEvent event) {
 		if (event.getPrefix().equals(CJayConstant.PREFIX_UPLOADING))
 			updatedData(event.getSessions());
