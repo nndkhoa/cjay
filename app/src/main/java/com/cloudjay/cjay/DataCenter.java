@@ -530,7 +530,7 @@ public class DataCenter {
 			}
 		}
 
-		EventBus.getDefault().post(new ContainersGotEvent(sessions));
+		EventBus.getDefault().post(new ContainersGotEvent(sessions, prefix));
 	}
 
 	/**
@@ -766,6 +766,7 @@ public class DataCenter {
 
 		try {
 			DB db = App.getDB(context);
+
 			String workingKey = CJayConstant.PREFIX_WORKING + containerId;
 			db.del(workingKey);
 
@@ -1043,26 +1044,15 @@ public class DataCenter {
 	 * 1. Tìm session với containerId trong list uploading.
 	 * 2. Upload hình và gán field uploaded ngược vào list uploading
 	 *
-	 * @param context
 	 * @param uri
 	 * @param imageName
-	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	public boolean uploadImage(Context context, String uri, String imageName, String containerId, ImageType imageType) throws SnappydbException {
+	public void uploadImage(String uri, String imageName) throws SnappydbException {
 
-		try {
-			//Call network client to upload image
-			networkClient.uploadImage(uri, imageName);
+		//Call network client to upload image
+		networkClient.uploadImage(uri, imageName);
 
-			// Change image status to COMPLETE
-			changeImageUploadStatus(context, containerId, imageName, imageType, UploadStatus.COMPLETE);
-			return true;
-
-		} catch (RetrofitError e) {
-			Logger.w(e.getMessage());
-			return false;
-		}
 	}
 
 	/**

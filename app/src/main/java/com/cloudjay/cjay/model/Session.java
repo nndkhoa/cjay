@@ -586,6 +586,11 @@ public class Session {
 		}
 	}
 
+	/**
+	 * Get list of uploaded images
+	 *
+	 * @return
+	 */
 	public int getUploadedImage() {
 		int uploadedImage = 0;
 		List<AuditItem> auditItems = this.getAuditItems();
@@ -705,16 +710,17 @@ public class Session {
 		// Merge Audit Items
 		// Tìm danh sách Audit Item giống nhau, giữ danh sách local và set new id
 		// Tim danh audit item khác nhau
-
-		if (newSession.getAuditItems() != null && newSession.getAuditItems().size() != 0) {
-			List<AuditItem> diffAuditItems = new ArrayList<>();
-			diffAuditItems.addAll(auditItems);
-			diffAuditItems.addAll(newSession.getAuditItems());
-
-			auditItems.retainAll(newSession.getAuditItems());
-			diffAuditItems.removeAll(auditItems);
-			auditItems.addAll(diffAuditItems);
-		}
+		// TODO: merge audit items
+//		if (newSession.getAuditItems() != null && newSession.getAuditItems().size() != 0) {
+//
+//			List<AuditItem> diffAuditItems = new ArrayList<>();
+//			diffAuditItems.addAll(auditItems);
+//			diffAuditItems.addAll(newSession.getAuditItems());
+//
+//			auditItems.retainAll(newSession.getAuditItems());
+//			diffAuditItems.removeAll(auditItems);
+//			auditItems.addAll(diffAuditItems);
+//		}
 
 		return this;
 	}

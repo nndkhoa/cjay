@@ -10,6 +10,7 @@ import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
@@ -32,6 +33,7 @@ public class UploadImageJob extends Job {
 
 	public UploadImageJob(String uri, String imageName, String containerId, ImageType imageType) {
 		super(new Params(1).requireNetwork().persist().groupBy(containerId).setPersistent(true));
+
 		this.containerId = containerId;
 		this.uri = uri;
 		this.imageName = imageName;
@@ -54,11 +56,14 @@ public class UploadImageJob extends Job {
 
 		// Notify to fragment upload that image is being uploaded.
 		EventBus.getDefault().post(new UploadingEvent(containerId, UploadType.IMAGE));
-		Logger.Log(containerId + " | Uploading image: " + imageName);
+		Logger.Log(containerId + " | Upload img: " + Utils.subString(imageName));
 
 		// Call data center to upload image
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).uploadImage(context, uri, imageName, containerId, imageType);
+		DataCenter_.getInstance_(context).uploadImage(uri, imageName);
+
+		// Change image status to COMPLETE
+		DataCenter_.getInstance_(context).changeImageUploadStatus(context, containerId, imageName, imageType, UploadStatus.COMPLETE);
 		EventBus.getDefault().post(new UploadSucceededEvent(containerId, UploadType.IMAGE));
 	}
 

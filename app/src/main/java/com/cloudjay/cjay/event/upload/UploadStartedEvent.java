@@ -25,4 +25,7 @@ public class UploadStartedEvent {
 		this.uploadType = UploadType.values()[type];
 	}
 
+	public UploadType getUploadType() {
+		return uploadType;
+	}
 }
