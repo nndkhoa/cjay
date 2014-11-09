@@ -26,7 +26,7 @@ import java.lang.reflect.Method;
 @EActivity(R.layout.activity_detail_issue)
 public class DetailIssueActivity extends BaseActivity implements ActionBar.TabListener {
 
-    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
 
     public final static String AUDIT_ITEM_EXTRA = "com.cloudjay.wizard.auditItem";
 	public final static String SELECTED_TAB = "com.cloudjay.wizzard.selectedTab";

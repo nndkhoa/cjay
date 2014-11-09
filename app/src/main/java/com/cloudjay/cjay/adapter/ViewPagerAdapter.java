@@ -60,7 +60,7 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
         if (mType == 1) {
             switch (position) {
                 case 0:
-                    return new IssuePendingFragment_().builder().containerID(mContainerID).build();
+                    return new IssuePendingFragment_().builder().containerId(mContainerID).build();
                 case 1:
                     return new IssueRepairedFragment_().builder().containerID(mContainerID).build();
                 default:

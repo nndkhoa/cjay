@@ -31,7 +31,7 @@ public class MergeIssueActivity extends BaseActivity {
     @Bean
     DataCenter dataCenter;
 
-    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
     public final static String AUDIT_IMAGE_EXTRA = "com.cloudjay.wizard.auditImage";
     public final static String AUDIT_ITEM_REMOVE_UUID = "com.cloudjay.wizard.auditItemRemoveUUID";
 

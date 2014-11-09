@@ -92,7 +92,7 @@ public class ImportFragment extends Fragment {
 	//endregion
 
 	//region ATTRIBUTE
-	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
 
 	@Bean
 	DataCenter dataCenter;
@@ -134,7 +134,7 @@ public class ImportFragment extends Fragment {
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 		if (null == mSession) {
 
-			// Set container ID for text View containerID
+			// Set container ID for text View containerId
 			tvContainerCode.setText(containerID);
 
 		} else {
@@ -189,6 +189,7 @@ public class ImportFragment extends Fragment {
 		// Get selected operator from search operator dialog
 		Operator operator = event.getOperator();
 		operatorCode = operator.getOperatorCode();
+		Logger.Log("Choose operator " + operatorCode);
 
 		// Set operator to edit text
 		etOperator.setText(operator.getOperatorName());

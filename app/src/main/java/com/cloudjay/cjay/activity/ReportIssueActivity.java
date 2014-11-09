@@ -43,7 +43,7 @@ import com.cloudjay.cjay.util.Logger;
 public class ReportIssueActivity extends BaseActivity implements OnPageChangeListener,
         AuditorIssueReportListener, TabListener {
 
-    public static final String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+    public static final String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
     public static final String AUDIT_ITEM_EXTRA = "com.cloudjay.wizard.auditItem";
     public static final String AUDIT_IMAGE_EXTRA = "com.cloudjay.wizard.auditImage";
 
@@ -416,9 +416,9 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
                     fragment = new IssueReportComponentFragment_();
                     break;
                 case TAB_ISSUE_DIMENSION:
-                default:
+            default:
                     fragment = new IssueReportDimensionFragment_();
-                    break;
+                break;
             }
 
             fragment.setAuditItem(mAuditItem);

@@ -51,7 +51,7 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.fragment_export)
 public class ExportFragment extends Fragment {
 
-	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
 
 	@FragmentArg(CONTAINER_ID_EXTRA)
 	String containerID;

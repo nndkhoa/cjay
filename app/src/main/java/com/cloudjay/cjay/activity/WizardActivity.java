@@ -29,7 +29,7 @@ import de.greenrobot.event.EventBus;
 @EActivity(R.layout.activity_wizard)
 public class WizardActivity extends BaseActivity {
 
-	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
 	public final static String STEP_EXTRA = "com.cloudjay.wizard.step";
 
 	@Extra(CONTAINER_ID_EXTRA)

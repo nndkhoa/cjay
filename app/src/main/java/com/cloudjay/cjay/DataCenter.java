@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.image.AuditImagesGotEvent;
+import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
 import com.cloudjay.cjay.event.issue.IssueDeletedEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
 import com.cloudjay.cjay.event.issue.IssueUpdatedEvent;
@@ -534,6 +535,23 @@ public class DataCenter {
 		EventBus.getDefault().post(new ContainersGotEvent(sessions, prefix));
 	}
 
+	@Background(serial = CACHE)
+	public void getSessionInBackground(Context context, String containerId) {
+
+		try {
+			DB db = App.getDB(context);
+			String key = containerId;
+			Session session = db.getObject(key, Session.class);
+
+			List<Session> list = new ArrayList<>();
+			list.add(session);
+			EventBus.getDefault().post(new ContainersGotEvent(list, containerId));
+
+		} catch (SnappydbException e) {
+			Logger.w(e.getMessage());
+		}
+	}
+
 	/**
 	 * Change upload status of session
 	 *
@@ -604,6 +622,7 @@ public class DataCenter {
 			DB db = App.getDB(context);
 
 			for (Session session : sessions) {
+
 				String key = session.getContainerId();
 				String[] searchResult = db.findKeys(key);
 				if (session.getStep() == Step.EXPORTED.value) {
@@ -1550,6 +1569,24 @@ public class DataCenter {
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 			return null;
+		}
+	}
+
+	/**
+	 * Get list container sessions based on param `prefix`
+	 *
+	 * @param context
+	 * @param containerId
+	 * @return
+	 */
+	@Background(serial = CACHE)
+	public void getAuditItemsInBackground(Context context, String containerId) {
+		try {
+			DB db = App.getDB(context);
+			Session session = db.getObject(containerId, Session.class);
+			EventBus.getDefault().post(new AuditItemsGotEvent(session.getAuditItems()));
+		} catch (SnappydbException e) {
+			e.printStackTrace();
 		}
 	}
 

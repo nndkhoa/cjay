@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
 @EFragment(R.layout.fragment_repair)
 public class RepairFragment extends Fragment implements ActionBar.TabListener {
 
-	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
 
 	@FragmentArg(CONTAINER_ID_EXTRA)
 	public String containerID;
@@ -56,7 +56,7 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 //		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 //
 //		// Go to next fragment
-//		Fragment fragment = new ExportFragment_().builder().containerID(containerID).build();
+//		Fragment fragment = new ExportFragment_().builder().containerId(containerId).build();
 //		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 //		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 //		transaction.replace(R.id.ll_main, fragment);
@@ -155,10 +155,10 @@ class ViewPagerAdapter extends FragmentPagerAdapter {
 	Context mContext;
     String mContainerID;
 
-	public ViewPagerAdapter(Context context, FragmentManager fm, String containerID) {
+	public ViewPagerAdapter(Context context, FragmentManager fm, String containerId) {
 		super(fm);
 		mContext = context;
-        mContainerID = containerID;
+        mContainerID = containerId;
 	}
 
 	@Override
@@ -167,9 +167,9 @@ class ViewPagerAdapter extends FragmentPagerAdapter {
 
 		switch (position) {
 			case 0:
-				return new IssuePendingFragment_().builder().containerID(mContainerID).build();
+				return new IssuePendingFragment_().builder().containerId(mContainerID).build();
 			case 1:
-				return new IssueRepairedFragment_().builder().containerID(mContainerID).build();
+				return new IssueRepairedFragment_().builder().containerId(mContainerID).build();
 			default:
 				return null;
 		}
