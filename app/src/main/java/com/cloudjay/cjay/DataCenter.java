@@ -585,10 +585,13 @@ public class DataCenter {
 	 */
 	@Trace
 	public void fetchSession(Context context, String lastModifiedDate) throws SnappydbException {
+
 		String newModifiedDay;
 		do {
+
 			int nextPage;
 			String currentPage = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE);
+
 			if (currentPage.isEmpty()) {
 				nextPage = 1;
 			} else {
@@ -597,22 +600,24 @@ public class DataCenter {
 
 			List<Session> sessions = networkClient.getSessionByPage(context, nextPage, lastModifiedDate);
 			DB db = App.getDB(context);
-			for (Session session : sessions) {
 
+			for (Session session : sessions) {
 				String key = session.getContainerId();
 				session.mergeSession(session);
-
 				db.put(key, session);
 			}
+
 			Logger.Log("Fetched page: " + nextPage);
 			newModifiedDay = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
 			Logger.Log("Current Modified day: " + newModifiedDay);
+
 		} while (lastModifiedDate.equals(newModifiedDay));
+
 		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE, "");
+
 		//Fetch again with modified day is first page request_time
 		String firstPageTime = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_FIRST_PAGE_MODIFIED_DATE);
 		fetchFirstPageTime(context, firstPageTime);
-
 
 	}
 
@@ -648,6 +653,7 @@ public class DataCenter {
 			newModifiedDay = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
 			Logger.Log("Current Modified day: " + newModifiedDay);
 		} while (lastModifiedDate.equals(newModifiedDay));
+
 		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE, "");
 	}
 

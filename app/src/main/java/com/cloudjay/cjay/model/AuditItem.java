@@ -450,14 +450,18 @@ public class AuditItem {
 
 		if (obj instanceof AuditItem) {
 			AuditItem tmp = (AuditItem) obj;
-			if (id != 0
-					&& tmp.id != 0
-					&& (this.id == tmp.id || (this.uuid.equals(tmp.uuid)))) {
-				return true;
-			} else {
-				return false;
+
+			if (tmp.uuid != null && this.uuid != null) {
+				if (id != 0
+						&& tmp.id != 0
+						&& (this.id == tmp.id || (this.uuid.equals(tmp.uuid)))) {
+					return true;
+				} else {
+					return false;
+				}
 			}
 		}
+
 		return super.equals(obj);
 	}
 

@@ -691,7 +691,6 @@ public class Session {
 			this.setLocalStep(newSession.getStep());
 		}
 
-
 		// Merge Gate Images
 		// Tìm danh sách hình giống nhau, giữ danh sách local và set new id
 		// Tìm danh sách hình khác nhau
@@ -705,8 +704,8 @@ public class Session {
 		gateImages.retainAll(newSession.getGateImages());
 		diffGateImages.removeAll(gateImages);
 
-		Logger.Log("Similar count: " + gateImages.size());
-		Logger.Log("Difference count: " + diffGateImages.size());
+		Logger.Log("Similar gate img count: " + gateImages.size());
+		Logger.Log("Difference gate img count: " + diffGateImages.size());
 		// Khởi tạo các thông tin còn thiếu của list difference
 		for (GateImage image : diffGateImages) {
 			if (TextUtils.isEmpty(image.getName())) {
@@ -721,9 +720,9 @@ public class Session {
 
 		// Merge Audit Items
 		// 2 audit items bằng nhau khi giống uuid hoặc id
-		Logger.Log("Parse list audit items");
 		if (newSession.getAuditItems() != null && newSession.getAuditItems().size() != 0) {
 
+			Logger.Log("Parse list audit items");
 			for (AuditItem serverItem : newSession.getAuditItems()) {
 				boolean found = false;
 
