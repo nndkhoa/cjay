@@ -1,22 +1,18 @@
 package com.cloudjay.cjay.fragment;
 
 import android.app.ActionBar;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.activity.WizardActivity;
-import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
+import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
@@ -25,14 +21,13 @@ import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.path.android.jobqueue.JobManager;
-import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
-import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -52,7 +47,8 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.fragment_audit_repair)
 public class AuditAndRepairFragment extends Fragment implements ActionBar.TabListener {
 
-	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+	//region ATTR
+	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
 	public final static String TAB_TYPE_EXTRA = "com.cloudjay.wizard.tabtype";
 
 	@FragmentArg(CONTAINER_ID_EXTRA)
@@ -77,45 +73,24 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	private ViewPagerAdapter mPagerAdapter;
 	public int currentPosition = 0;
 
-    Session mSession;
+	Session mSession;
+	//endregion
 
 	public AuditAndRepairFragment() {
 		// Required empty public constructor
 	}
-
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
 		EventBus.getDefault().register(this);
-
-		mSession = dataCenter.getSession(getActivity(), containerID);
-		Logger.Log("current step: " + mSession.getLocalStep());
 	}
 
 	@Override
 	public void onDestroy() {
 		EventBus.getDefault().unregister(this);
 		super.onDestroy();
-	}
-
-
-	private void checkForShowButton() {
-
-        if (mSession.getLocalStep() == Step.REPAIR.value) {
-            btnCompleteAudit.setVisibility(View.GONE);
-            btnCompleteRepair.setVisibility(View.VISIBLE);
-        }
-        if (mSession.getLocalStep() == Step.AUDIT.value) {
-            if (mSession.hasRepairImages()) {
-                btnCompleteAudit.setVisibility(View.VISIBLE);
-                btnCompleteRepair.setVisibility(View.VISIBLE);
-            } else {
-                btnCompleteAudit.setVisibility(View.VISIBLE);
-                btnCompleteRepair.setVisibility(View.GONE);
-            }
-        }
 	}
 
 	@Click(R.id.btn_complete_import)
@@ -155,10 +130,10 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 		if (mSession != null) {
 
-            if(mSession.getLocalStep() == Step.AUDIT.value) {
-                Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
-                return;
-            }
+			if (mSession.getLocalStep() == Step.AUDIT.value) {
+				Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+				return;
+			}
 
 			if (!mSession.isValidToUpload(Step.REPAIR)) {
 				Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
@@ -181,7 +156,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 //
 //		// Go to next fragment
 //		android.support.v4.app.Fragment fragment =
-//				new ExportFragment_().builder().containerID(containerID).build();
+//				new ExportFragment_().builder().containerId(containerId).build();
 //
 //		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 //		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
@@ -192,13 +167,33 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	@AfterViews
 	void doAfterViews() {
 
+		dataCenter.getSessionInBackground(getActivity(), containerID);
 		configureActionBar();
 		configureViewPager();
-        if (mSession != null) {
-            checkForShowButton();
-        }
 	}
 
+	@UiThread
+	void checkForShowButton() {
+
+		if (mSession.getLocalStep() == Step.REPAIR.value) {
+			btnCompleteAudit.setVisibility(View.GONE);
+			btnCompleteRepair.setVisibility(View.VISIBLE);
+		}
+
+		if (mSession.getLocalStep() == Step.AUDIT.value) {
+			if (mSession.hasRepairImages()) {
+				btnCompleteAudit.setVisibility(View.VISIBLE);
+				btnCompleteRepair.setVisibility(View.VISIBLE);
+			} else {
+				btnCompleteAudit.setVisibility(View.VISIBLE);
+				btnCompleteRepair.setVisibility(View.GONE);
+			}
+		}
+	}
+
+	/**
+	 * Cấu hình action bar
+	 */
 	private void configureActionBar() {
 
 		// Get actionbar
@@ -226,6 +221,9 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 	}
 
+	/**
+	 * Cấu hình view pager
+	 */
 	private void configureViewPager() {
 		mPagerAdapter = new ViewPagerAdapter(getActivity(),
 				getActivity().getSupportFragmentManager(), containerID, tabType);
@@ -267,48 +265,29 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 	}
 
-	@UiThread
+	public void onEvent(ContainersGotEvent event) {
+		if (event.getSessions() != null && event.getSessions().size() > 0) {
+			mSession = event.getSessions().get(0);
+			checkForShowButton();
+		}
+	}
+
+	/**
+	 * Dùng để kiểm tra và xử lý hiển thị button giám định và sửa chữa
+	 *
+	 * @param event
+	 */
+	@Trace
 	public void onEvent(ImageCapturedEvent event) {
 
-        //requery to update button
-        mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
-
-        int imageType = event.getImageType();
-        if (imageType == ImageType.AUDIT.value) {
-            mSession.setLocalStep(Step.AUDIT.value);
-            dataCenter.addSession(mSession);
-        }
-        checkForShowButton();
-	}
-
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.base,menu);
-		menu.findItem(R.id.action_overflow).setVisible(false);
-		menu.findItem(R.id.menu_export_fragment).setVisible(true);
-		super.onCreateOptionsMenu(menu, inflater);
-	}
-
-	@OptionsItem(R.id.menu_export_fragment)
-	void exportSession() {
-		//Export session immediately
-		Session session = dataCenter.getSession(getActivity(),containerID);
-		Step step = Step.values()[session.getLocalStep()];
-		if (session.isValidToUpload(step)){
-			try {
-				dataCenter.changeSessionLocalStep(getActivity(), containerID,Step.AVAILABLE);
-				Intent intent = new Intent(getActivity(), WizardActivity_.class);
-				intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, containerID);
-				intent.putExtra(WizardActivity.STEP_EXTRA, Step.AVAILABLE.value);
-				startActivity(intent);
-				getActivity().finish();
-			} catch (SnappydbException e) {
-				e.printStackTrace();
-			}
-
-		} else {
-			Utils.showCrouton(getActivity(),"Hoàn tất bước hiện tại để xuất chỉ định");
+		// requery to update button
+		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+		int imageType = event.getImageType();
+		if (imageType == ImageType.AUDIT.value) {
+			mSession.setLocalStep(Step.AUDIT.value);
+			dataCenter.addSession(mSession);
 		}
 
+		checkForShowButton();
 	}
 }

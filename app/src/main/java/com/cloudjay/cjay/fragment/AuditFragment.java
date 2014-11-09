@@ -36,7 +36,7 @@ import java.util.List;
 @EFragment(R.layout.fragment_audit)
 public class AuditFragment extends Fragment {
 
-	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
 
 	@FragmentArg(CONTAINER_ID_EXTRA)
 	String containerID;
@@ -95,7 +95,7 @@ public class AuditFragment extends Fragment {
     void buttonCameraClicked() {
         // Open camera activity
         Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-        cameraActivityIntent.putExtra("containerID", containerID);
+        cameraActivityIntent.putExtra("containerId", containerID);
         cameraActivityIntent.putExtra("imageType", ImageType.EXPORT.value);
         cameraActivityIntent.putExtra("operatorCode", operatorCode);
         startActivity(cameraActivityIntent);

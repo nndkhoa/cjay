@@ -111,7 +111,7 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
         }
     }
 
-    public static final String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+    public static final String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
     public static final String AUDIT_ITEM_EXTRA = "com.cloudjay.wizard.auditItem";
     public static final String AUDIT_IMAGE_EXTRA = "com.cloudjay.wizard.auditImage";
 

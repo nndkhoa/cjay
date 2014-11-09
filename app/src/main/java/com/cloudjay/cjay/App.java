@@ -191,6 +191,7 @@ public class App extends Application {
 				})
 				.minConsumerCount(1)
 				.maxConsumerCount(1)
+				.loadFactor(1)
 				.build();
 
 		jobManager = new JobManager(this, configuration);

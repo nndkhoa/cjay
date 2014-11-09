@@ -44,7 +44,7 @@ public class BeforeRepairFragment extends Fragment {
     @Bean
     DataCenter dataCenter;
 
-    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
 
     public final static String AUDIT_ITEM_EXTRA = "com.cloudjay.wizard.auditItemUUID";
 

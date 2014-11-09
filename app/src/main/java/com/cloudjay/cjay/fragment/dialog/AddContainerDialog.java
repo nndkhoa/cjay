@@ -60,7 +60,7 @@ public class AddContainerDialog extends SimpleDialogFragment {
 
 				} else {
 
-					// Kiểm tra containerID theo chuẩn ISO
+					// Kiểm tra containerId theo chuẩn ISO
 					if (!Utils.isContainerIdValid(containerId)) {
 
 						getNeutralButton().setVisibility(View.VISIBLE);
@@ -107,7 +107,7 @@ public class AddContainerDialog extends SimpleDialogFragment {
 	/**
 	 * 1. Khởi tạo các thành phần trên dialog
 	 * 2. Cấu hình EditText
-	 * 3. Nếu containerID truyền vào đủ 11 kí tự, thực hiện validate theo chuẩn ISO ngay lập tức
+	 * 3. Nếu containerId truyền vào đủ 11 kí tự, thực hiện validate theo chuẩn ISO ngay lập tức
 	 */
 	@AfterViews
 	void doAfterViews() {
@@ -131,7 +131,7 @@ public class AddContainerDialog extends SimpleDialogFragment {
 		// Hide button create container wrong ISO
 		this.getNeutralButton().setVisibility(View.GONE);
 
-		// Check containerID
+		// Check containerId
 		if (containerId.length() == 11) {
 			if (!Utils.isContainerIdValid(containerId)) {
 				getNeutralButton().setVisibility(View.VISIBLE);

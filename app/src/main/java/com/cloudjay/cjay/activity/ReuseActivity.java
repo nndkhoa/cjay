@@ -44,7 +44,7 @@ import de.greenrobot.event.EventBus;
 public class ReuseActivity extends Activity {
 
 
-	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
 
 	@Extra(CONTAINER_ID_EXTRA)
 	String containerID;

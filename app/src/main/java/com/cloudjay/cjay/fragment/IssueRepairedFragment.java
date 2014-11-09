@@ -37,7 +37,7 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.fragment_issue_repaired)
 public class IssueRepairedFragment extends Fragment {
 
-    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerID";
+    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
 
     @FragmentArg(CONTAINER_ID_EXTRA)
     public String containerID;
