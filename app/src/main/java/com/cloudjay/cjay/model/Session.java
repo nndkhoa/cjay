@@ -16,7 +16,10 @@ import com.google.gson.annotations.SerializedName;
 import org.json.JSONException;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -488,7 +491,7 @@ public class Session {
 			// Tất cả các item đều được gán lỗi và có hình
 			case AUDIT:
 				for (AuditItem item : auditItems) {
-					if (item.getAudited() == false || item.getUploadStatus() == UploadStatus.NONE.value)
+					if (item.isAudited() == false || item.getUploadStatus() == UploadStatus.NONE.value)
 						return false;
 				}
 
@@ -498,7 +501,7 @@ public class Session {
 			// Loi cam sua thi field cho phep sua phai la false
 			case REPAIR:
 				for (AuditItem item : auditItems) {
-					if (item.getRepaired() == false && item.isIsAllowed() == true) {
+					if (item.isRepaired() == false && item.isAllowed() == true) {
 						return false;
 					}
 				}
@@ -586,6 +589,11 @@ public class Session {
 		}
 	}
 
+	/**
+	 * Get list of uploaded images
+	 *
+	 * @return
+	 */
 	public int getUploadedImage() {
 		int uploadedImage = 0;
 		List<AuditItem> auditItems = this.getAuditItems();
@@ -617,7 +625,7 @@ public class Session {
 		List<AuditItem> list = new ArrayList<AuditItem>();
 
 		for (AuditItem auditItem : this.getAuditItems()) {
-			if (auditItem.getRepaired()) {
+			if (auditItem.isRepaired()) {
 				list.add(auditItem);
 			}
 		}
@@ -644,7 +652,6 @@ public class Session {
 	}
 
 	/**
-	 *
 	 * @param uuid
 	 */
 	public boolean removeAuditItem(String uuid) {
@@ -662,41 +669,46 @@ public class Session {
 	}
 
 	/**
-	 * Merge
+	 * Merge new session. Use it after upload contianer to server.
 	 *
 	 * @param newSession
 	 * @return
 	 */
 	public Session mergeSession(Session newSession) {
 
+		Logger.Log(" > Merge container " + newSession.getContainerId());
+		Logger.Log("Parse basic information");
 		this.setId(newSession.getId());
 		this.setStep(newSession.getStep());
 		this.setCheckInTime(newSession.getCheckInTime());
 		this.setCheckOutTime(newSession.getCheckOutTime());
 
-		// local step is always greater or equal to step
-		Logger.Log("Local Step: " + this.getLocalStep());
-		Logger.Log("Server Step: " + newSession.getStep());
+		// local step should always greater or equal to step
+		Logger.Log("Local Step: " + Step.values()[this.getLocalStep()]);
+		Logger.Log("Server Step: " + Step.values()[newSession.getStep()]);
 
 		if (this.getLocalStep() < newSession.getStep()) {
 			this.setLocalStep(newSession.getStep());
 		}
 
+
 		// Merge Gate Images
 		// Tìm danh sách hình giống nhau, giữ danh sách local và set new id
 		// Tìm danh sách hình khác nhau
-
 		// Difference được khởi tạo là danh sách tổng hợp của client và server
 		// Difference thường là danh sách hình mới từ server
-		List<GateImage> difference = new ArrayList<>();
-		difference.addAll(gateImages);
-		difference.addAll(newSession.getGateImages());
+		Logger.Log("Parse list gate images");
+		List<GateImage> diffGateImages = new ArrayList<>();
+		diffGateImages.addAll(gateImages);
+		diffGateImages.addAll(newSession.getGateImages());
 
 		gateImages.retainAll(newSession.getGateImages());
-		difference.removeAll(gateImages);
+		diffGateImages.removeAll(gateImages);
 
+		Logger.Log("Similar count: " + gateImages.size());
+		Logger.Log("Difference count: " + diffGateImages.size());
 		// Khởi tạo các thông tin còn thiếu của list difference
-		for (GateImage image : difference) {
+		for (GateImage image : diffGateImages) {
 			if (TextUtils.isEmpty(image.getName())) {
 				image.setName(Utils.getImageNameFromUrl(image.getUrl()));
 			}
@@ -705,26 +717,47 @@ public class Session {
 				image.setUuid(UUID.randomUUID().toString());
 			}
 		}
-
-		gateImages.addAll(difference);
+		gateImages.addAll(diffGateImages);
 
 		// Merge Audit Items
-		// Tìm danh sách Audit Item giống nhau, giữ danh sách local và set new id
-		// Tim danh audit item khác nhau
-		
+		// 2 audit items bằng nhau khi giống uuid hoặc id
+		Logger.Log("Parse list audit items");
+		if (newSession.getAuditItems() != null && newSession.getAuditItems().size() != 0) {
 
-		if (newSession.getAuditItems().size() != 0) {
-			List<AuditItem> localList = this.getAuditItems();
-			for (AuditItem auditItem : this.getAuditItems()) {
-				for (AuditItem auditItemServer : newSession.getAuditItems()) {
-					if (auditItem.equals(auditItemServer)) {
-						auditItem.setUploadStatus(UploadStatus.COMPLETE);
-						auditItem.mergeAuditItem(auditItemServer);
+			for (AuditItem serverItem : newSession.getAuditItems()) {
+				boolean found = false;
+
+				for (AuditItem localItem : auditItems) {
+					if (serverItem.equals(localItem)) {
+						found = true;
+
+						Logger.Log("Found audit item");
+						SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+						try {
+							Date server = format.parse(serverItem.getModifiedAt());
+							Date local = format.parse(localItem.getModifiedAt());
+
+							// TODO: need to debug
+							if (server.after(local)) {
+								serverItem.merge(localItem);
+								updateAuditItem(serverItem);
+							}
+						} catch (ParseException e) {
+							Logger.e("Cannot parse modifiedAt");
+							// e.printStackTrace();
+						}
 					}
 				}
+
+				// Nếu không tìm thấy audit item tương ứng ở local --> audit item mới
+				// --> thêm mới audit item vào session
+				if (!found) {
+					auditItems.add(serverItem);
+					Logger.Log("Add new audit item to session");
+				}
 			}
-			this.setAuditItems(localList);
 		}
+
 		return this;
 	}
 
@@ -737,6 +770,7 @@ public class Session {
 	public boolean updateAuditItem(AuditItem auditItem) {
 
 		// find and replace with the new one
+		Logger.Log("Update audit item");
 		for (AuditItem item : auditItems) {
 			if (item.equals(auditItem)) {
 				auditItems.remove(item);

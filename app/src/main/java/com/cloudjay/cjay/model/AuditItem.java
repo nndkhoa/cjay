@@ -1,5 +1,7 @@
 package com.cloudjay.cjay.model;
 
+import android.text.TextUtils;
+
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -13,6 +15,7 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -74,7 +77,7 @@ public class AuditItem {
 
 	@SerializedName("is_allowed")
 	@Expose
-	private Boolean isAllowed;
+	private Boolean allowed;
 
 	@SerializedName("audit_images")
 	@Expose
@@ -92,15 +95,15 @@ public class AuditItem {
 
 	@SerializedName("is_audited")
 	@Expose
-	private boolean isAudited;
+	private boolean audited;
 
 	@SerializedName("is_repaired")
 	@Expose
-	private boolean isRepaired;
+	private boolean repaired;
 
 	@SerializedName("is_approved")
 	@Expose
-	private boolean isApproved;
+	private boolean approved;
 
 	private int uploadStatus;
 	//endregion
@@ -262,16 +265,16 @@ public class AuditItem {
 		return this;
 	}
 
-	public Boolean isIsAllowed() {
-		return isAllowed;
+	public Boolean isAllowed() {
+		return allowed;
 	}
 
-	public void setIsAllowed(Boolean isAllowed) {
-		this.isAllowed = isAllowed;
+	public void setAllowed(Boolean allowed) {
+		this.allowed = allowed;
 	}
 
 	public AuditItem withIsAllowed(Boolean isAllowed) {
-		this.isAllowed = isAllowed;
+		this.allowed = isAllowed;
 		return this;
 	}
 
@@ -323,28 +326,27 @@ public class AuditItem {
 	}
 
 	public void setApproved(boolean isApproved) {
-		this.isApproved = isApproved;
+		this.approved = isApproved;
 	}
 
-	public boolean getApproved() {
-		return this.isApproved;
+	public boolean isApproved() {
+		return this.approved;
 	}
 
 	public void setRepaired(boolean isRepaired) {
-		this.isRepaired = isRepaired;
+		this.repaired = isRepaired;
 	}
 
-
-	public boolean getRepaired() {
-		return this.isRepaired;
+	public boolean isRepaired() {
+		return this.repaired;
 	}
 
 	public void setAudited(boolean isAudited) {
-		this.isAudited = isAudited;
+		this.audited = isAudited;
 	}
 
-	public boolean getAudited() {
-		return this.isAudited;
+	public boolean isAudited() {
+		return this.audited;
 	}
 
 	public int getUploadStatus() {
@@ -384,7 +386,7 @@ public class AuditItem {
 		componentCodeId = 0;
 		repairCodeId = 0;
 		damageCodeId = 0;
-		isAllowed = null;
+		allowed = null;
 	}
 
 	public JsonObject getAuditItemToUpload() {
@@ -445,23 +447,21 @@ public class AuditItem {
 
 	@Override
 	public boolean equals(Object obj) {
+
 		if (obj instanceof AuditItem) {
 			AuditItem tmp = (AuditItem) obj;
-
-			if ((this.componentCodeId == tmp.componentCodeId
-					&& this.damageCodeId == tmp.damageCodeId
-					&& this.repairCodeId == tmp.repairCodeId
-					&& this.locationCode.equals(tmp.getLocationCode())) || (this.uuid.equals(tmp.uuid))) {
+			if (id != 0
+					&& tmp.id != 0
+					&& (this.id == tmp.id || (this.uuid.equals(tmp.uuid)))) {
 				return true;
 			} else {
 				return false;
 			}
 		}
-
 		return super.equals(obj);
 	}
 
-	public List<AuditImage> getListIssueImages() {
+	public List<AuditImage> getListAuditedImages() {
 		List<AuditImage> imageList = new ArrayList<AuditImage>();
 
 		for (AuditImage auditImage : this.getAuditImages()) {
@@ -483,26 +483,34 @@ public class AuditItem {
 		return imageList;
 	}
 
-	public AuditItem mergeAuditItem(AuditItem auditItemServer) {
+	// TODO: merge audit item
+	public AuditItem merge(AuditItem newItem) {
 
-		this.setId(auditItemServer.getId());
-		this.setIsAllowed(auditItemServer.isIsAllowed());
+		// Merge cac thong tin
+		this.setId(newItem.getId());
+		this.setAllowed(newItem.isAllowed());
 		this.setAudited(true);
-		/*if (!auditItemServer.isIsAllowed())
-	        this.setRepaired(true);*/
 
-		//merge audit Image
-		List<AuditImage> mergedAuditImages = this.auditImages;
-		for (AuditImage auditImage : this.auditImages) {
-			for (AuditImage auditImageServer : auditItemServer.getAuditImages()) {
-				Logger.e(auditImage.getName());
-				Logger.e(auditImageServer.getUrl());
-				if (auditImage.getName().equals(Utils.getImageNameFromUrl(auditImageServer.getUrl()))) {
-					auditImage.mergeAuditImage(auditImageServer);
-				}
+		// Merge list audit images
+		List<AuditImage> diffImages = new ArrayList<>();
+		diffImages.addAll(auditImages);
+		diffImages.addAll(newItem.getAuditImages());
+
+		auditImages.retainAll(newItem.getAuditImages());
+		diffImages.removeAll(auditImages);
+
+		// Khởi tạo các thông tin còn thiếu của list difference
+		for (AuditImage image : diffImages) {
+			if (TextUtils.isEmpty(image.getName())) {
+				image.setName(Utils.getImageNameFromUrl(image.getUrl()));
+			}
+
+			if (TextUtils.isEmpty(image.getUuid())) {
+				image.setUuid(UUID.randomUUID().toString());
 			}
 		}
-		this.setAuditImages(mergedAuditImages);
+
+		auditImages.addAll(diffImages);
 		return this;
 	}
 

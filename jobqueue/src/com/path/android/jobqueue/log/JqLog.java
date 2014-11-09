@@ -24,6 +24,11 @@ public class JqLog {
         public void e(String text, Object... args) {
             //void
         }
+
+	    @Override
+	    public void i(String text, Object... args) {
+
+	    }
     };
 
     public static void setCustomLogger(CustomLogger customLogger) {
@@ -45,4 +50,8 @@ public class JqLog {
     public static void e(String text, Object... args) {
         customLogger.e(text, args);
     }
+
+	public static void i(String text, Object... args) {
+		customLogger.i(text, args);
+	}
 }

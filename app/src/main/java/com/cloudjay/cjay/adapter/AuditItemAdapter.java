@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
+import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.view.SquareImageView;
@@ -107,8 +109,8 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			holder = (ViewHolder) view.getTag();
 		}
 		// Lỗi nào chưa giám dịnh thì hiện hinh`, lỗi nào đã giám định roi thì hiện chi tiết lỗi
-		if (auditItem.getAudited() == true) {
-			UploadStatus status = UploadStatus.values()[auditItem.getUploadStatus()];
+		if (auditItem.isAudited() == true) {
+			final UploadStatus status = UploadStatus.values()[auditItem.getUploadStatus()];
 
 			holder.llIssueImageView.setVisibility(View.GONE);
 			holder.llIssueDetails.setVisibility(View.VISIBLE);
@@ -118,6 +120,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 					holder.btnUpload.setVisibility(View.GONE);
 					holder.btnEdit.setVisibility(View.GONE);
 					holder.ivUploading.setVisibility(View.VISIBLE);
+					holder.btnRepair.setVisibility(View.VISIBLE);
 					break;
 
 				case COMPLETE:
@@ -145,11 +148,13 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			holder.tvCodeRepair.setText(auditItem.getRepairCode());
 			holder.tvCount.setText(auditItem.getQuantity() + "");
 
-			if (auditItem.isIsAllowed() == null) {
+			if (auditItem.isAllowed() == null) {
 				holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_unapproved));
+				holder.tvIssueStatus.setBackgroundColor(Color.parseColor("#FACC2E"));
 			} else {
-				if (!auditItem.isIsAllowed()) {
+				if (!auditItem.isAllowed()) {
 					holder.tvIssueStatus.setText("Cấm sửa");
+					holder.tvIssueStatus.setBackgroundColor(Color.parseColor("#DF0101"));
 				} else {
 					holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_approved));
 				}
@@ -160,12 +165,12 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				public void onClick(View view) {
 					mAuditItemUUID = auditItem.getUuid();
 					mComponentCode = auditItem.getComponentCode();
-					if (auditItem.isIsAllowed() == null) {
+					if (auditItem.isAllowed() == null) {
 						// Show repair dialog
 						showRepairDiaglog();
 
 					} else {
-						if (!auditItem.isIsAllowed()) {// Nếu lỗi này cấm sửa, hiện dialog cấm sửa
+						if (!auditItem.isAllowed()) {// Nếu lỗi này cấm sửa, hiện dialog cấm sửa
 							showPreventRepairDialog();
 						} else {
 							// Open camera activity to take repair image
@@ -180,8 +185,13 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				public void onClick(View view) {
 
 					//1. Update upload status
-					DataCenter_.getInstance_(mContext).changeUploadStatus(mContext,
-							containerId, auditItem, UploadStatus.UPLOADING);
+                    auditItem.setUploadStatus(UploadStatus.UPLOADING);
+					try {
+						DataCenter_.getInstance_(mContext).changeUploadStatus(mContext,
+								containerId, auditItem, UploadStatus.UPLOADING);
+					} catch (SnappydbException e) {
+						e.printStackTrace();
+					}
 					notifyDataSetChanged();
 
 					//2. Add container session to upload queue
@@ -195,14 +205,14 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				public void onClick(View view) {
 
 					// Validate: if this is wash type item, cannot edit
-					if (!auditItem.isIsAllowed()) {
+					if (!auditItem.isAllowed()) {
 						showPreventRepairDialog();
 					} else {
 						Logger.Log("getUuid: " + auditItem.getUuid());
 
 						Intent intent = new Intent(mContext, ReportIssueActivity_.class);
 						intent.putExtra(ReportIssueActivity_.CONTAINER_ID_EXTRA, containerId);
-						intent.putExtra(ReportIssueActivity_.AUDIT_IMAGE_EXTRA, auditItem.getAuditImages().get(0).getAuditImageUUID());
+						intent.putExtra(ReportIssueActivity_.AUDIT_IMAGE_EXTRA, auditItem.getAuditImages().get(0).getUuid());
 						intent.putExtra(ReportIssueActivity_.AUDIT_ITEM_EXTRA, auditItem.getUuid());
 
 						mContext.startActivity(intent);
@@ -227,7 +237,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			holder.btnReport.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
-					Logger.Log(auditItem.getAuditImages().get(0).getAuditImageUUID());
+					Logger.Log(auditItem.getAuditImages().get(0).getUuid());
 					Logger.Log(auditItem.getAuditImages().get(0).getName());
 					Logger.Log(auditItem.getAuditImages().get(0).getUrl());
 					Logger.Log(auditItem.getAuditImages().get(0).getType() + "");
@@ -297,7 +307,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 				Intent intent = new Intent(mContext, ReportIssueActivity_.class);
 				intent.putExtra(ReportIssueActivity_.CONTAINER_ID_EXTRA, containerId);
-				intent.putExtra(ReportIssueActivity_.AUDIT_IMAGE_EXTRA, item.getAuditImages().get(0).getAuditImageUUID());
+				intent.putExtra(ReportIssueActivity_.AUDIT_IMAGE_EXTRA, item.getAuditImages().get(0).getUuid());
 				intent.putExtra(ReportIssueActivity_.AUDIT_ITEM_EXTRA, item.getUuid());
 
 				mContext.startActivity(intent);
@@ -308,11 +318,11 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
 
-				Logger.Log("getAuditImageUUID: " + item.getAuditImages().get(0).getAuditImageUUID());
+				Logger.Log("getUuid: " + item.getAuditImages().get(0).getUuid());
 
 				Intent intent = new Intent(mContext, MergeIssueActivity_.class);
 				intent.putExtra(MergeIssueActivity_.CONTAINER_ID_EXTRA, containerId);
-				intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, item.getAuditImages().get(0).getAuditImageUUID());
+				intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, item.getAuditImages().get(0).getUuid());
 				intent.putExtra(MergeIssueActivity_.AUDIT_ITEM_REMOVE_UUID, item.getUuid());
 
 				mContext.startActivity(intent);

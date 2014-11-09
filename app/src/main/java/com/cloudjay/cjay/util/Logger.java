@@ -152,9 +152,13 @@ public final class Logger {
 		isDebuggable = enable;
 	}
 
-	public static void logJson(Object object) {
+	public static void logJson(Object object, Class c) {
+		logJson("", object, c);
+	}
+
+	public static void logJson(String msg, Object object, Class c) {
 		Gson gson = new Gson();
-		String s = gson.toJson(object);
-		d("Json: " + s);
+		String s = gson.toJson(object, c);
+		i(msg + s);
 	}
 }

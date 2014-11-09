@@ -12,6 +12,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.ViewConfiguration;
+import android.view.inputmethod.InputMethodManager;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
@@ -115,7 +116,17 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 				actionBar.selectTab(tab);
 			}
 
-		});
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                if (state == ViewPager.SCROLL_STATE_IDLE) {
+                    if (mViewPager.getCurrentItem() != 0) {
+                        // Hide the keyboard.
+                        ((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE))
+                                .hideSoftInputFromWindow(mViewPager.getWindowToken(), 0);
+                    }
+                }
+            }
+        });
 
 		// For each of the sections in the app, add a tab to the action bar.
 		for (int i = 0; i < mPagerAdapter.getCount(); i++) {

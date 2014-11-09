@@ -8,13 +8,13 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadSessionAdapter;
+import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
-import com.cloudjay.cjay.event.upload.UploadedEvent;
+import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -69,16 +69,15 @@ public class UploadFragment extends Fragment {
 	}
 
 	void refresh() {
-		List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
-				CJayConstant.PREFIX_UPLOADING);
-		updatedData(list);
+		if (mAdapter != null) {
+			dataCenter.getSessionsInBackground(getActivity().getApplicationContext(), CJayConstant.PREFIX_UPLOADING);
+		}
 	}
 
 	@UiThread
 	public void updatedData(List<Session> sessionList) {
 		mAdapter.setData(sessionList);
 	}
-
 
 	//region EVENT HANDLER
 	public void onEvent(UploadStartedEvent event) {
@@ -93,8 +92,13 @@ public class UploadFragment extends Fragment {
 		refresh();
 	}
 
-	public void onEvent(UploadedEvent event) {
+	public void onEvent(UploadSucceededEvent event) {
 		refresh();
+	}
+
+	public void onEvent(ContainersGotEvent event) {
+		if (event.getPrefix().equals(CJayConstant.PREFIX_UPLOADING))
+			updatedData(event.getSessions());
 	}
 	//endregion
 

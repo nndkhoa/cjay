@@ -17,11 +17,12 @@ import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.DetailIssueActivity;
 import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.adapter.AuditItemAdapter;
-import com.cloudjay.cjay.event.ImageCapturedEvent;
+import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.issue.IssueUpdatedEvent;
 import com.cloudjay.cjay.event.issue.IssueDeletedEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
-import com.cloudjay.cjay.event.upload.UploadedEvent;
+import com.cloudjay.cjay.event.upload.UploadStartedEvent;
+import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
@@ -160,7 +161,7 @@ public class IssuePendingFragment extends Fragment {
 	void buttonCleanClicked() {
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJob(new UploadSessionJob(mSession.getContainerId(), Step.CLEAR.value, true));
+		jobManager.addJob(new UploadSessionJob(mSession.getContainerId(), Step.HAND_CLEAN.value, true));
 
 		getActivity().finish();
 	}
@@ -182,7 +183,7 @@ public class IssuePendingFragment extends Fragment {
 	void switchToDetailIssueActivity(int position) {
 		AuditItem auditItem = auditItemAdapter.getItem(position);
 		Logger.Log("getUuid: " + auditItem.getUuid());
-		if (auditItem.getAudited()) {
+		if (auditItem.isAudited()) {
 			Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
 			detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
 			detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getUuid());
@@ -197,14 +198,14 @@ public class IssuePendingFragment extends Fragment {
 			List<AuditItem> list = new ArrayList<AuditItem>();
 			Logger.Log("AuditItems: " + mSession.getAuditItems().size());
 			for (AuditItem auditItem : mSession.getAuditItems()) {
-				if (!auditItem.getRepaired()) {
+				if (!auditItem.isRepaired()) {
 					Logger.Log("getId: " + auditItem.getId());
 					Logger.Log("getUploadStatus: " + auditItem.getUploadStatus());
 					Logger.Log("getComponentCode: " + auditItem.getComponentCode());
 					Logger.Log("getAuditImages: " + auditItem.getAuditImages().size());
-					Logger.Log("getRepaired: " + auditItem.getRepaired());
+					Logger.Log("isRepaired: " + auditItem.isRepaired());
 					Logger.Log("getUuid: " + auditItem.getUuid());
-                    Logger.Log("getIsAllow: " + auditItem.isIsAllowed());
+                    Logger.Log("getIsAllow: " + auditItem.isAllowed());
 					list.add(auditItem);
 				}
 			}
@@ -214,8 +215,8 @@ public class IssuePendingFragment extends Fragment {
 			Comparator<AuditItem> comparator = new Comparator<AuditItem>() {
 				@Override
 				public int compare(AuditItem auditItem, AuditItem auditItem2) {
-					if (!auditItem.getAudited()) {
-						if (auditItem2.getAudited()) {
+					if (!auditItem.isAudited()) {
+						if (auditItem2.isAudited()) {
 							return 1;
 						} else {
 							return -1;
@@ -287,7 +288,16 @@ public class IssuePendingFragment extends Fragment {
 	}
 
 	@UiThread
-	void onEvent(UploadedEvent event) {
+	void onEvent(UploadSucceededEvent event) {
+		Logger.Log("upload complete");
+		// Re-query container session with given containerId
+		String containerId = event.getContainerId();
+		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+		refresh();
+	}
+
+	@UiThread
+	void onEvent(UploadStartedEvent event){
 		Logger.Log("upload complete");
 		// Re-query container session with given containerId
 		String containerId = event.getContainerId();

@@ -12,12 +12,14 @@ import com.cloudjay.cjay.activity.HomeActivity;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
+import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.event.session.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
-import com.cloudjay.cjay.event.upload.UploadedEvent;
+import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.enums.UploadType;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -72,7 +74,7 @@ public class WorkingFragment extends Fragment {
 	}
 
 	@ItemLongClick(R.id.lv_working_container)
-	void showexportImmediatelyButton(int position) {
+	void workingItemLongClicked(int position) {
 
 		//Get session from position
 		Session item = mAdapter.getItem(position);
@@ -90,14 +92,15 @@ public class WorkingFragment extends Fragment {
 		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
 		lvWorking.setAdapter(mAdapter);
 		lvWorking.setEmptyView(tvEmpty);
-		refresh();
+
+		List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
+				CJayConstant.PREFIX_WORKING);
+		updatedData(list);
 	}
 
 	void refresh() {
 		if (mAdapter != null) {
-			List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
-					CJayConstant.PREFIX_WORKING);
-			updatedData(list);
+			dataCenter.getSessionsInBackground(getActivity().getApplicationContext(), CJayConstant.PREFIX_WORKING);
 		}
 	}
 
@@ -120,16 +123,24 @@ public class WorkingFragment extends Fragment {
 
 	//region EVENT HANDLER
 
-	public void onEvent(UploadStartedEvent event) {
-		refresh();
-	}
-
 	public void onEvent(WorkingSessionCreatedEvent event) {
 		refresh();
 	}
 
-	public void onEvent(UploadedEvent event) {
-		refresh();
+	public void onEvent(UploadSucceededEvent event) {
+		if (event.getUploadType() == UploadType.SESSION)
+			refresh();
 	}
+
+	public void onEvent(UploadStartedEvent event) {
+		if (event.getUploadType() == UploadType.SESSION)
+			refresh();
+	}
+
+	public void onEvent(ContainersGotEvent event) {
+		if (event.getPrefix().equals(CJayConstant.PREFIX_WORKING))
+			updatedData(event.getSessions());
+	}
+
 	//endregion
 }

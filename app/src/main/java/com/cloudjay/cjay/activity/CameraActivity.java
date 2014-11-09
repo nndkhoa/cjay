@@ -7,7 +7,6 @@ import android.view.KeyEvent;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.fragment.CameraFragment_;
-import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterExtras;
@@ -105,6 +104,11 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 
 		}
 		return (super.onKeyDown(keyCode, event));
+	}
+
+	@Override
+	public void onBackPressed() {
+		current.onBackPress();
 	}
 
 	@Override

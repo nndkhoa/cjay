@@ -190,9 +190,22 @@ public class NetworkClient {
 		}.getType();
 
 		List<Session> sessionsPage = gson.fromJson(results, listType);
+		List<Session> removeSessions = new ArrayList<Session>();
+		for (Session session : sessionsPage) {
+			if (session.getStep() == Step.EXPORTED.value) {
+				removeSessions.add(session);
+				Logger.e(session.getContainerId() + " Step: " + session.getStep());
+			}
+		}
 		sessions.addAll(sessionsPage);
+		sessions.removeAll(removeSessions);
 
 		if (!next.isJsonNull()) {
+			//Store first page modified_since to retry immediately after fetched
+			if (page == 1) {
+				String firstPageTime = jsonObject.get("request_time").getAsString();
+				PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_FIRST_PAGE_MODIFIED_DATE, firstPageTime);
+			}
 
 			//Update current page
 			String currentPage = String.valueOf(page);
@@ -301,8 +314,8 @@ public class NetworkClient {
 		Logger.Log("auditItem: " + auditItem.getAuditItemToUpload());
 
 		String auditItemUUID = auditItem.getUuid();
-		Session postAuditItemSession = provider.getRestAdapter(context).create(NetworkService.class).postAudiItem(containerSession.getId(), auditItem.getAuditItemToUpload());
-		List<AuditItem> list = postAuditItemSession.getAuditItems();
+		Session result = provider.getRestAdapter(context).create(NetworkService.class).postAudiItem(containerSession.getId(), auditItem.getAuditItemToUpload());
+		List<AuditItem> list = result.getAuditItems();
 		for (AuditItem item : list) {
 			if (item.equals(auditItem)) {
 				Logger.Log("Set here");
@@ -310,9 +323,8 @@ public class NetworkClient {
 				item.setUploadStatus(UploadStatus.COMPLETE);
 			}
 		}
-		postAuditItemSession.setAuditItems(list);
-		Logger.logJson(postAuditItemSession);
-		return postAuditItemSession;
+		result.setAuditItems(list);
+		return result;
 	}
 
 	/**
@@ -323,8 +335,11 @@ public class NetworkClient {
 	 * @return
 	 */
 	public AuditItem addAuditImage(Context context, AuditItem auditItem) {
-		AuditItem auditItemAddedImage = provider.getRestAdapter(context).create(NetworkService.class).addAuditImages(String.valueOf(auditItem.getId()), auditItem.getAuditImagesToUpLoad());
-		return auditItemAddedImage;
+
+		String uuid = auditItem.getUuid();
+		AuditItem result = provider.getRestAdapter(context).create(NetworkService.class).addAuditImages(String.valueOf(auditItem.getId()), auditItem.getAuditImagesToUpLoad());
+		result.setUuid(uuid);
+		return result;
 	}
 
 	/**

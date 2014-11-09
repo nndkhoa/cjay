@@ -62,11 +62,8 @@ public class PubnubService extends Service {
 	 * @param messageId
 	 */
 	public void pushNotification(String channel, String objectType, long objectId, String messageId) {
-
 		JobManager jobManager = App.getJobManager();
 		jobManager.addJobInBackground(new GetNotificationJob(channel, messageId, objectType, objectId));
-
-
 	}
 
 
@@ -110,7 +107,6 @@ public class PubnubService extends Service {
 
 		Message msg = handler.obtainMessage();
 		try {
-			Logger.Log("Channel: " + channel);
 			Logger.Log("Message: " + message.toString());
 
 			JsonParser jsonParser = new JsonParser();
@@ -215,7 +211,7 @@ public class PubnubService extends Service {
 			}
 		} else {
 
-			Logger.Log("Auto stop Pubnub service");
+			Logger.w("Auto stop Pubnub service");
 			stopSelf();
 
 		}

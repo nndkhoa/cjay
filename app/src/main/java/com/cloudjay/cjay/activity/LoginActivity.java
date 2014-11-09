@@ -35,7 +35,6 @@ import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
-import de.greenrobot.event.EventBus;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 import retrofit.RetrofitError;
@@ -98,7 +97,8 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
 	/**
 	 * Add account to Account Manager
-	 *  @param email
+	 *
+	 * @param email
 	 * @param password
 	 * @param token
 	 */
@@ -145,6 +145,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 			if (null != mToken) {
 
 				Logger.Log("Login successfully");
+
 				addNewAccount(email, password, mToken);
 				PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_TOKEN, mToken);
 
@@ -154,6 +155,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 				dataCenter.fetchIsoCodes(getApplicationContext());
 
 				User user = dataCenter.getCurrentUserAsync(this);
+				PreferencesUtil.putObject(this, PreferencesUtil.PREF_CURRENT_USER, user);
 				if (null != user) {
 
 					Utils.startAlarm(getApplicationContext());

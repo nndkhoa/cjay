@@ -31,6 +31,7 @@ public interface NetworkService {
 	@GET(ApiEndpoint.CURRENT_USER_API)
 	public User getCurrentUser();
 
+	//region ISO CODE
 	@GET(ApiEndpoint.LIST_REPAIR_CODES_API)
 	public List<IsoCode> getRepairCodes(@Query("modified_since") String lastModifiedDate);
 
@@ -39,15 +40,13 @@ public interface NetworkService {
 
 	@GET(ApiEndpoint.LIST_COMPONENT_CODES_API)
 	public List<IsoCode> getComponentCodes(@Query("modified_since") String lastModifiedDate);
+	//endregion
 
 	@GET(ApiEndpoint.LIST_OPERATORS_API)
 	public List<Operator> getOperators(@Query("modified_since") String lastModifiedDate);
 
 	@GET(ApiEndpoint.CONTAINER_SESSIONS_API)
 	public JsonObject getContainerSessionsByPage(@Query("page") int page, @Query("modified_since") String lastModifiedDate);
-
-	@GET(ApiEndpoint.CONTAINER_SESSIONS_API)
-	public JsonObject getContainerSessionsByModifiedTime(@Query("modified_since") String lastModifiedDate);
 
 	@GET(ApiEndpoint.CONTAINER_SESSION_ITEM_API)
 	public Session getContainerSessionById(@Path("id") long containerId);
@@ -80,6 +79,7 @@ public interface NetworkService {
 	@POST(ApiEndpoint.CJAY_TMP_STORAGE_IMAGE)
 	public Response postImageFile(@Header("Content-Type") String contentType, @Query("uploadType") String uploadType, @Query("name") String imageName, @Body() TypedFile image);
 
+	//region PUBNUB
 	//Use for PubNub
 	@GET(ApiEndpoint.PUBNUB_AUDIT_ITEM)
 	public AuditItem getAuditItemById(@Path("id") long id);
@@ -99,4 +99,5 @@ public interface NetworkService {
 	@FormUrlEncoded
 	@POST(ApiEndpoint.PUBNUB_GOT_MESSAGE)
 	public Response gotMessageFromPubNub(@Field("receiver_channel") String channel, @Field("message_id") String messageId);
+	//endregion
 }

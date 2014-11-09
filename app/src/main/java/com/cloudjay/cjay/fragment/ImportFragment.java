@@ -19,10 +19,9 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
-import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.event.EventMenuCreated;
-import com.cloudjay.cjay.event.ImageCapturedEvent;
+import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.operator.OperatorChosenEvent;
 import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
 import com.cloudjay.cjay.model.GateImage;
@@ -36,7 +35,6 @@ import com.cloudjay.cjay.util.enums.Step;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.CheckedChange;
 import org.androidannotations.annotations.Click;
@@ -108,7 +106,7 @@ public class ImportFragment extends Fragment {
 
 	long preStatus = 1;
 	Session mSession;
-    List<GateImage> list = new ArrayList<GateImage>();
+    List<GateImage> list = new ArrayList<>();
 	//endregion
 
 	public ImportFragment() {
@@ -143,7 +141,6 @@ public class ImportFragment extends Fragment {
 
 			containerID = mSession.getContainerId();
 			operatorCode = mSession.getOperatorCode();
-
 			tvContainerCode.setText(containerID);
 
             Operator operator = dataCenter.getOperator(getActivity().getApplicationContext(), operatorCode);
@@ -152,7 +149,6 @@ public class ImportFragment extends Fragment {
             }
 
             preStatus = mSession.getPreStatus();
-
 			switch ((int) preStatus) {
 				case 0:
 					rdnStatusA.setChecked(true);
@@ -186,6 +182,7 @@ public class ImportFragment extends Fragment {
 		Logger.e("EVENT BUSS MENU CREATE");
 		event.getMenu().findItem(R.id.menu_export).setVisible(false);
 	}
+
 	@UiThread
 	void onEvent(OperatorChosenEvent event) {
 
@@ -228,7 +225,6 @@ public class ImportFragment extends Fragment {
 	void refresh() {
 		if (mSession != null) {
 			list = mSession.getImportImages();
-            Logger.Log("Size: " + list.size());
 			updatedData();
 		}
 	}
@@ -293,13 +289,6 @@ public class ImportFragment extends Fragment {
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
 		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), true));
-		Logger.e(String.valueOf(mSession.getLocalStep()));
-
-        // Set local step to AVAILABLE
-        mSession.setLocalStep(Step.AVAILABLE.value);
-
-        // Update session into database
-        dataCenter.addSession(mSession);
 
 		// Navigate to HomeActivity
 		getActivity().finish();

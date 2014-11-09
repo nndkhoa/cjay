@@ -12,7 +12,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.DetailIssueActivity;
 import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.adapter.RepairedItemAdapter;
-import com.cloudjay.cjay.event.ImageCapturedEvent;
+import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
@@ -100,7 +100,7 @@ public class IssueRepairedFragment extends Fragment {
 	@ItemClick(R.id.lv_repaired_items)
 	void switchToDetailIssueActivity(int position) {
 		AuditItem auditItem = mAdapter.getItem(position);
-		if (auditItem.getAudited()) {
+		if (auditItem.isAudited()) {
 			Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
 			detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
 			detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getUuid());

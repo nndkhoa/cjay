@@ -5,15 +5,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.activity.HomeActivity_;
+import com.cloudjay.cjay.activity.WizardActivity;
+import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
-import com.cloudjay.cjay.event.ImageCapturedEvent;
+import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
@@ -22,12 +25,14 @@ import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.path.android.jobqueue.JobManager;
+import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
+import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -82,6 +87,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
 		EventBus.getDefault().register(this);
 
 		mSession = dataCenter.getSession(getActivity(), containerID);
@@ -273,5 +279,36 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
             dataCenter.addSession(mSession);
         }
         checkForShowButton();
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.base,menu);
+		menu.findItem(R.id.action_overflow).setVisible(false);
+		menu.findItem(R.id.menu_export_fragment).setVisible(true);
+		super.onCreateOptionsMenu(menu, inflater);
+	}
+
+	@OptionsItem(R.id.menu_export_fragment)
+	void exportSession() {
+		//Export session immediately
+		Session session = dataCenter.getSession(getActivity(),containerID);
+		Step step = Step.values()[session.getLocalStep()];
+		if (session.isValidToUpload(step)){
+			try {
+				dataCenter.changeSessionLocalStep(getActivity(), containerID,Step.AVAILABLE);
+				Intent intent = new Intent(getActivity(), WizardActivity_.class);
+				intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, containerID);
+				intent.putExtra(WizardActivity.STEP_EXTRA, Step.AVAILABLE.value);
+				startActivity(intent);
+				getActivity().finish();
+			} catch (SnappydbException e) {
+				e.printStackTrace();
+			}
+
+		} else {
+			Utils.showCrouton(getActivity(),"Hoàn tất bước hiện tại để xuất chỉ định");
+		}
+
 	}
 }

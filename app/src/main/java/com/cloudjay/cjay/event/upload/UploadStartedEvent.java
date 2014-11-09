@@ -4,6 +4,14 @@ import com.cloudjay.cjay.util.enums.UploadType;
 
 public class UploadStartedEvent {
 
+	public String getContainerId() {
+		return containerId;
+	}
+
+	public void setContainerId(String containerId) {
+		this.containerId = containerId;
+	}
+
 	public String containerId;
 	public UploadType uploadType;
 
@@ -17,4 +25,7 @@ public class UploadStartedEvent {
 		this.uploadType = UploadType.values()[type];
 	}
 
+	public UploadType getUploadType() {
+		return uploadType;
+	}
 }

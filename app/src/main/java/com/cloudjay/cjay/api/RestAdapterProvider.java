@@ -2,10 +2,12 @@ package com.cloudjay.cjay.api;
 
 import android.content.Context;
 
+import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 
 import retrofit.RestAdapter;
@@ -24,8 +26,8 @@ public class RestAdapterProvider {
 		if (user == null) {
 			token = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_TOKEN);
 		} else {
+			token = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_TOKEN);
 			username = user.getUsername();
-			token = user.getToken();
 		}
 
 		// Init header, pass 3 params: token, app version, username

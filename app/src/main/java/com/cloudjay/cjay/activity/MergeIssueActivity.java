@@ -89,7 +89,7 @@ public class MergeIssueActivity extends BaseActivity {
 
         List<AuditItem> list = new ArrayList<AuditItem>();
         for (AuditItem auditItem : currentSession.getAuditItems()) {
-            if (auditItem.getAudited() == true && auditItem.getId() == 0) {
+            if (auditItem.isAudited() == true && auditItem.getId() == 0) {
                 list.add(auditItem);
             }
         }

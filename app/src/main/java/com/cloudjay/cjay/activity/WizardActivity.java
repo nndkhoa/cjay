@@ -1,16 +1,12 @@
 package com.cloudjay.cjay.activity;
 
 import android.app.ActionBar;
-import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
-import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.EventMenuCreated;
 import com.cloudjay.cjay.fragment.AuditAndRepairFragment_;
@@ -21,7 +17,6 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.Step;
-import com.path.android.jobqueue.JobManager;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
@@ -88,45 +83,6 @@ public class WizardActivity extends BaseActivity {
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 		transaction.add(R.id.ll_main, fragment);
 		transaction.commit();
-
-	}
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.base, menu);
-
-		String name = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_USER_NAME);
-		String roleName = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_USER_ROLE_NAME);
-
-		menu.findItem(R.id.menu_username).setTitle(name);
-		menu.findItem(R.id.menu_role).setTitle(roleName);
-		exportMenu = menu.findItem(R.id.menu_export);
-		exportMenu.setVisible(true);
-
-		EventBus.getDefault().post(new EventMenuCreated(menu));
-
-		return true;
-	}
-
-	@OptionsItem(R.id.menu_export)
-	void exportSession()  {
-		//Export session immediately
-		Session session = dataCenter.getSession(this,exportSessionContainerId);
-		Step step = Step.values()[session.getLocalStep()];
-		if (session.isValidToUpload(step)){
-			try {
-				dataCenter.changeSessionLocalStep(this, exportSessionContainerId,Step.AVAILABLE);
-				Intent intent = new Intent(this, WizardActivity_.class);
-				intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, exportSessionContainerId);
-				intent.putExtra(WizardActivity.STEP_EXTRA, Step.AVAILABLE.value);
-				startActivity(intent);
-				this.finish();
-			} catch (SnappydbException e) {
-				e.printStackTrace();
-			}
-
-		} else {
-			Utils.showCrouton(this,"Hoàn tất bước hiện tại để xuất chỉ định");
-		}
 
 	}
 

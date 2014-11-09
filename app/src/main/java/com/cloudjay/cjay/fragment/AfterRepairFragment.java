@@ -11,7 +11,7 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.DetailIssuedImageAdapter;
-import com.cloudjay.cjay.event.ImageCapturedEvent;
+import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
@@ -125,9 +125,9 @@ public class AfterRepairFragment extends Fragment {
 			Utils.showCrouton(getActivity(), "Loi nay chua duoc giam dinh");
 			return;
 		}
-		if (auditItem.isIsAllowed() != null) {
+		if (auditItem.isAllowed() != null) {
 			// Notify user that audit item is not allow to repare
-			if (!auditItem.isIsAllowed()) {
+			if (!auditItem.isAllowed()) {
 				Utils.showCrouton(getActivity(), "Loi nay khong duoc phep sua");
 				return;
 			}

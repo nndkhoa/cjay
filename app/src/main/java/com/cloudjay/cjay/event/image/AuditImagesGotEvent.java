@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.event;
+package com.cloudjay.cjay.event.image;
 
 import com.cloudjay.cjay.model.AuditImage;
 

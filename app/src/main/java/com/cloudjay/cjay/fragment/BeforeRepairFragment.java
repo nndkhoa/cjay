@@ -11,7 +11,7 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.DetailIssuedImageAdapter;
-import com.cloudjay.cjay.event.ImageCapturedEvent;
+import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
@@ -146,7 +146,7 @@ public class BeforeRepairFragment extends Fragment {
 	@Background
     void refreshListImage() {
 		if (auditItem != null) {
-			List<AuditImage> list = auditItem.getListIssueImages();
+			List<AuditImage> list = auditItem.getListAuditedImages();
 			updatedData(list);
 		}
     }

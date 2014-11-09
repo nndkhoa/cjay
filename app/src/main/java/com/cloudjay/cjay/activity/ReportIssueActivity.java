@@ -130,8 +130,6 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
 		// Set audited is true before saving
 		mAuditItem.setAudited(true);
-		// Set is allowed to repair = true before saving
-		mAuditItem.setIsAllowed(true);
 		// save db records and refresh list
         mDataCenter.updateAuditItem(getApplicationContext(), mContainerId, mAuditItem);
 

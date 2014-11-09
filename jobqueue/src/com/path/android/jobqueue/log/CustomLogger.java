@@ -13,4 +13,5 @@ public interface CustomLogger {
     public void d(String text, Object... args);
     public void e(Throwable t, String text, Object... args);
     public void e(String text, Object... args);
+	public void i(String text, Object... args);
 }
