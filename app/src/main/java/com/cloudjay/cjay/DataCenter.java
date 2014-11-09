@@ -409,24 +409,24 @@ public class DataCenter {
 
 		// Get session from server
 		DB db = App.getDB(context);
-		Session session = networkClient.getSessionById(id);
+		Session result = networkClient.getSessionById(id);
 
-		if (session != null) {
+		if (result != null) {
 
 			// Find local session
-			String key = session.getContainerId();
-			Session localSession = getSession(context, session.getContainerId());
+			String key = result.getContainerId();
+			Session session = getSession(context, result.getContainerId());
 
-			if (localSession == null) {
-				addSession(session);
-				return session;
+			if (session == null) {
+				addSession(result);
+				return result;
 
 			} else {
 
 				// merge result from server to local session
-				localSession.mergeSession(session);
-				db.put(key, localSession);
-				return localSession;
+				session.mergeSession(result);
+				db.put(key, session);
+				return session;
 			}
 		}
 
@@ -1098,7 +1098,11 @@ public class DataCenter {
 	}
 
 	/**
-	 * Upload audit item to server
+	 * Upload audit item to server.
+	 * 1. Get audit item based on uuid
+	 * 2. Upload to server
+	 * 3. Assign uuid to response audit item
+	 * 4. Replace result with local audit item in container session
 	 *
 	 * @param context
 	 * @param containerId
@@ -1112,12 +1116,15 @@ public class DataCenter {
 		Session session = db.getObject(containerId, Session.class);
 		AuditItem auditItem = session.getAuditItem(itemUuid);
 
-		// Merge result
-		Session result = networkClient.postAuditItem(context, session, auditItem);
-		session.mergeSession(result);
+//		// Merge result
+//		Session result = networkClient.postAuditItem(context, session, auditItem);
+//		session.mergeSession(result);
+
+		AuditItem result = networkClient.addAuditImage(context, auditItem );
+		session.updateAuditItem(result);
 
 		// Update to db
-		String key = result.getContainerId();
+		String key = containerId;
 		db.put(key, session);
 	}
 
@@ -1164,14 +1171,14 @@ public class DataCenter {
 
 		// Upload complete audit session to server
 		DB db = App.getDB(context);
-		Session oldSession = db.getObject(containerId, Session.class);
-		Session result = networkClient.completeAudit(context, oldSession);
+		Session session = db.getObject(containerId, Session.class);
+		Session result = networkClient.completeAudit(context, session);
 
 		// Update container back to database
 		if (result != null) {
 			String key = result.getContainerId();
-			oldSession.mergeSession(result);
-			db.put(key, oldSession);
+			session.mergeSession(result);
+			db.put(key, session);
 		}
 	}
 
@@ -1206,21 +1213,17 @@ public class DataCenter {
 
 		// Upload audit item session to server
 		DB db = App.getDB(context);
-		Session oldSession = db.getObject(containerId, Session.class);
-		Session result = networkClient.checkOutContainerSession(context, oldSession);
+		Session session = db.getObject(containerId, Session.class);
+		Session result = networkClient.checkOutContainerSession(context, session);
 		Logger.Log("Add AuditItem to Session Id: " + result.getId());
 
 		if (result != null) {
 
 			// Update container back to database
 			String key = result.getContainerId();
-			oldSession.setUploadStatus(UploadStatus.COMPLETE);
-			oldSession.mergeSession(result);
-			db.put(key, oldSession);
-
-			// Then remove them from WORKING
-			String workingKey = CJayConstant.PREFIX_WORKING + key;
-			db.del(workingKey);
+			session.setUploadStatus(UploadStatus.COMPLETE);
+			session.mergeSession(result);
+			db.put(key, session);
 		}
 	}
 

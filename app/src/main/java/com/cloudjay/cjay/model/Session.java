@@ -16,7 +16,10 @@ import com.google.gson.annotations.SerializedName;
 import org.json.JSONException;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -661,32 +664,35 @@ public class Session {
 	}
 
 	/**
-	 * Merge
+	 * Merge new session. Use it after upload contianer to server.
 	 *
 	 * @param newSession
 	 * @return
 	 */
 	public Session mergeSession(Session newSession) {
 
+		Logger.Log(" > Merge container " + newSession.getContainerId());
+		Logger.Log("Parse basic information");
 		this.setId(newSession.getId());
 		this.setStep(newSession.getStep());
 		this.setCheckInTime(newSession.getCheckInTime());
 		this.setCheckOutTime(newSession.getCheckOutTime());
 
-		// local step is always greater or equal to step
-		Logger.Log("Local Step: " + this.getLocalStep());
-		Logger.Log("Server Step: " + newSession.getStep());
+		// local step should always greater or equal to step
+		Logger.Log("Local Step: " + Step.values()[this.getLocalStep()]);
+		Logger.Log("Server Step: " + Step.values()[newSession.getStep()]);
 
 		if (this.getLocalStep() < newSession.getStep()) {
 			this.setLocalStep(newSession.getStep());
 		}
 
+
 		// Merge Gate Images
 		// Tìm danh sách hình giống nhau, giữ danh sách local và set new id
 		// Tìm danh sách hình khác nhau
-
 		// Difference được khởi tạo là danh sách tổng hợp của client và server
 		// Difference thường là danh sách hình mới từ server
+		Logger.Log("Parse list gate images");
 		List<GateImage> diffGateImages = new ArrayList<>();
 		diffGateImages.addAll(gateImages);
 		diffGateImages.addAll(newSession.getGateImages());
@@ -694,6 +700,8 @@ public class Session {
 		gateImages.retainAll(newSession.getGateImages());
 		diffGateImages.removeAll(gateImages);
 
+		Logger.Log("Similar count: " + gateImages.size());
+		Logger.Log("Difference count: " + diffGateImages.size());
 		// Khởi tạo các thông tin còn thiếu của list difference
 		for (GateImage image : diffGateImages) {
 			if (TextUtils.isEmpty(image.getName())) {
@@ -704,23 +712,46 @@ public class Session {
 				image.setUuid(UUID.randomUUID().toString());
 			}
 		}
-
 		gateImages.addAll(diffGateImages);
 
 		// Merge Audit Items
-		// Tìm danh sách Audit Item giống nhau, giữ danh sách local và set new id
-		// Tim danh audit item khác nhau
-		// TODO: merge audit items
-//		if (newSession.getAuditItems() != null && newSession.getAuditItems().size() != 0) {
-//
-//			List<AuditItem> diffAuditItems = new ArrayList<>();
-//			diffAuditItems.addAll(auditItems);
-//			diffAuditItems.addAll(newSession.getAuditItems());
-//
-//			auditItems.retainAll(newSession.getAuditItems());
-//			diffAuditItems.removeAll(auditItems);
-//			auditItems.addAll(diffAuditItems);
-//		}
+		// 2 audit items bằng nhau khi giống uuid hoặc id
+		Logger.Log("Parse list audit items");
+		if (newSession.getAuditItems() != null && newSession.getAuditItems().size() != 0) {
+
+			for (AuditItem serverItem : newSession.getAuditItems()) {
+				boolean found = false;
+
+				for (AuditItem localItem : auditItems) {
+					if (serverItem.equals(localItem)) {
+						found = true;
+
+						Logger.Log("Found audit item");
+						SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+						try {
+							Date server = format.parse(serverItem.getModifiedAt());
+							Date local = format.parse(localItem.getModifiedAt());
+
+							// TODO: need to debug
+							if (server.after(local)) {
+								serverItem.merge(localItem);
+								updateAuditItem(serverItem);
+							}
+						} catch (ParseException e) {
+							Logger.e("Cannot parse modifiedAt");
+							// e.printStackTrace();
+						}
+					}
+				}
+
+				// Nếu không tìm thấy audit item tương ứng ở local --> audit item mới
+				// --> thêm mới audit item vào session
+				if (!found) {
+					auditItems.add(serverItem);
+					Logger.Log("Add new audit item to session");
+				}
+			}
+		}
 
 		return this;
 	}

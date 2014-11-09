@@ -327,8 +327,11 @@ public class NetworkClient {
 	 * @return
 	 */
 	public AuditItem addAuditImage(Context context, AuditItem auditItem) {
-		AuditItem auditItemAddedImage = provider.getRestAdapter(context).create(NetworkService.class).addAuditImages(String.valueOf(auditItem.getId()), auditItem.getAuditImagesToUpLoad());
-		return auditItemAddedImage;
+
+		String uuid = auditItem.getUuid();
+		AuditItem result = provider.getRestAdapter(context).create(NetworkService.class).addAuditImages(String.valueOf(auditItem.getId()), auditItem.getAuditImagesToUpLoad());
+		result.setUuid(uuid);
+		return result;
 	}
 
 	/**

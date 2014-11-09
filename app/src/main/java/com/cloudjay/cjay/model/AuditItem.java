@@ -447,21 +447,17 @@ public class AuditItem {
 
 	@Override
 	public boolean equals(Object obj) {
+
 		if (obj instanceof AuditItem) {
 			AuditItem tmp = (AuditItem) obj;
-
-			if ((this.componentCodeId == tmp.componentCodeId
-					&& this.damageCodeId == tmp.damageCodeId
-					&& this.repairCodeId == tmp.repairCodeId
-					&& this.locationCode.equals(tmp.getLocationCode())) || (this.uuid.equals(tmp.uuid))) {
-
-				this.merge(tmp);
+			if (id != 0
+					&& tmp.id != 0
+					&& (this.id == tmp.id || (this.uuid.equals(tmp.uuid)))) {
 				return true;
 			} else {
 				return false;
 			}
 		}
-
 		return super.equals(obj);
 	}
 
@@ -487,12 +483,15 @@ public class AuditItem {
 		return imageList;
 	}
 
+	// TODO: merge audit item
 	public AuditItem merge(AuditItem newItem) {
 
+		// Merge cac thong tin
 		this.setId(newItem.getId());
 		this.setAllowed(newItem.isAllowed());
 		this.setAudited(true);
 
+		// Merge list audit images
 		List<AuditImage> diffImages = new ArrayList<>();
 		diffImages.addAll(auditImages);
 		diffImages.addAll(newItem.getAuditImages());

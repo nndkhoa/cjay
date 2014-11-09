@@ -62,11 +62,8 @@ public class PubnubService extends Service {
 	 * @param messageId
 	 */
 	public void pushNotification(String channel, String objectType, long objectId, String messageId) {
-
 		JobManager jobManager = App.getJobManager();
 		jobManager.addJobInBackground(new GetNotificationJob(channel, messageId, objectType, objectId));
-
-
 	}
 
 

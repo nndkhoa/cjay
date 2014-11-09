@@ -44,6 +44,7 @@ public class GetNotificationJob extends Job {
 			pushNotification(session);
 
 		} else if (objectType.equals("AuditItem")) {
+
 			Session session = DataCenter_.getInstance_(context).getAuditItemAsyncById(context, objectId);
 			pushNotification(session);
 
