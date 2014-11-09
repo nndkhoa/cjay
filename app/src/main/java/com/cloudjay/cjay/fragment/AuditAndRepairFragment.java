@@ -166,8 +166,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 	@AfterViews
 	void doAfterViews() {
-
-		dataCenter.getSessionInBackground(getActivity(), containerID);
 		configureActionBar();
 		configureViewPager();
 	}

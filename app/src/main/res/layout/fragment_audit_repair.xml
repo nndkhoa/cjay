@@ -36,6 +36,7 @@
             android:id="@+id/btn_done"
             android:layout_weight="1"
             android:text="@string/button_repair_complete"
+            android:visibility="gone"
             android:textSize="15sp"
             android:textColor="@android:color/white"
             android:background="@drawable/btn_customize_selector"/>
