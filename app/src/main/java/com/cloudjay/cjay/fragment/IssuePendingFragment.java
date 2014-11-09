@@ -41,6 +41,7 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -171,24 +172,13 @@ public class IssuePendingFragment extends Fragment {
 
 	public void onEvent(AuditItemsGotEvent event) {
 
+		// Filter list audit items that was not repair
 		List<AuditItem> list = new ArrayList<>();
-
-		Logger.Log("AuditItems: " + event.getAuditItems().size());
-
 		for (AuditItem auditItem : event.getAuditItems()) {
 			if (!auditItem.isRepaired()) {
-				Logger.Log("getId: " + auditItem.getId());
-				Logger.Log("getUploadStatus: " + auditItem.getUploadStatus());
-				Logger.Log("getComponentCode: " + auditItem.getComponentCode());
-				Logger.Log("getAuditImages: " + auditItem.getAuditImages().size());
-				Logger.Log("isRepaired: " + auditItem.isRepaired());
-				Logger.Log("getUuid: " + auditItem.getUuid());
-				Logger.Log("getIsAllow: " + auditItem.isAllowed());
 				list.add(auditItem);
 			}
 		}
-
-		Logger.Log("Size: " + list.size());
 
 		// Sort list audit
 		Comparator<AuditItem> comparator = new Comparator<AuditItem>() {
@@ -234,6 +224,7 @@ public class IssuePendingFragment extends Fragment {
 	}
 
 	//region EVENT HANDLER
+	@Trace
 	void onEvent(ImageCapturedEvent event) {
 		Logger.Log("on ImageCapturedEvent");
 
@@ -250,7 +241,6 @@ public class IssuePendingFragment extends Fragment {
 			default:
 
 				if (!event.isOpened()) {
-
 					Logger.Log("Open AfterRepair Fragment");
 					String auditItemUUID = event.getAuditItemUUID();
 					AuditItem auditItem = dataCenter.getAuditItem(getActivity(), this.containerId, auditItemUUID);

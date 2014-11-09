@@ -36,6 +36,9 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 // slide 20
 
 @EActivity(R.layout.activity_report_issue)
@@ -52,6 +55,7 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
     private AuditorIssueReportTabPageAdaptor mViewPagerAdapter;
 
+	ActionBar actionBar;
     private String[] mLocations;
     private Session mSession;
     private AuditItem mAuditItem;
@@ -138,8 +142,29 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
     }
 
     private void configureActionBar() {
+	    // Get actionbar
+	    actionBar = getActionBar();
 
-        getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+	    // Set ActionBar Title
+	    actionBar.setTitle(R.string.fragment_repair_title);
+
+	    // Fix tab layout
+	    final Method method;
+	    try {
+		    method = actionBar.getClass()
+				    .getDeclaredMethod("setHasEmbeddedTabs", new Class[]{Boolean.TYPE});
+		    method.setAccessible(true);
+		    method.invoke(actionBar, false);
+	    } catch (NoSuchMethodException e) {
+		    e.printStackTrace();
+	    } catch (InvocationTargetException e) {
+		    e.printStackTrace();
+	    } catch (IllegalAccessException e) {
+		    e.printStackTrace();
+	    }
+
+
+	    getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         for (String location : mLocations) {
 
             Tab tab = getActionBar().newTab();

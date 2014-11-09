@@ -53,8 +53,8 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 	@AfterExtras
 	void afterExtra() {
 
-		Logger.Log("mType: " + mType);
-        Logger.Log("isOpened: " + isOpened);
+//		Logger.Log("mType: " + mType);
+//		Logger.Log("isOpened: " + isOpened);
 
 		current = CameraFragment_.builder()
 				.currentStep(currentStep)

@@ -177,13 +177,13 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	@AfterViews
 	void afterView() {
 
-		Logger.Log("isOpened: " + isOpened);
+//		Logger.Log("isOpened: " + isOpened);
 
 		// Config shot mode. Default is FALSE.
 		// Configure View visibility based on current step of session
 		Step step = Step.values()[currentStep];
 
-		Logger.Log("Current Step of session: " + step.toString());
+//		Logger.Log("Current Step of session: " + step.toString());
 		switch (step) {
 
 			case AUDIT:
