@@ -418,6 +418,8 @@ public class DataCenter {
 			Session localSession = getSession(context, session.getContainerId());
 
 			if (localSession == null) {
+				//Merge Session from server to local type
+				session.mergeSession(session);
 				addSession(session);
 				return session;
 
@@ -598,7 +600,7 @@ public class DataCenter {
 			for (Session session : sessions) {
 
 				String key = session.getContainerId();
-				session.setLocalStep(session.getStep());
+				session.mergeSession(session);
 
 				db.put(key, session);
 			}
@@ -608,7 +610,7 @@ public class DataCenter {
 		} while (lastModifiedDate.equals(newModifiedDay));
 		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE, "");
 		//Fetch again with modified day is first page request_time
-		String firstPageTime = PreferencesUtil.getPrefsValue(context,PreferencesUtil.PREF_FIRST_PAGE_MODIFIED_DATE);
+		String firstPageTime = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_FIRST_PAGE_MODIFIED_DATE);
 		fetchFirstPageTime(context, firstPageTime);
 
 
@@ -638,7 +640,7 @@ public class DataCenter {
 			for (Session session : sessions) {
 
 				String key = session.getContainerId();
-				session.setLocalStep(session.getStep());
+				session.mergeSession(session);
 
 				db.put(key, session);
 			}

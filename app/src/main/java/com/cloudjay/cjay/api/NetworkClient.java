@@ -190,13 +190,21 @@ public class NetworkClient {
 		}.getType();
 
 		List<Session> sessionsPage = gson.fromJson(results, listType);
+		List<Session> removeSessions = new ArrayList<Session>();
+		for (Session session : sessionsPage) {
+			if (session.getStep() == Step.EXPORTED.value) {
+				removeSessions.add(session);
+				Logger.e(session.getContainerId() + " Step: " + session.getStep());
+			}
+		}
 		sessions.addAll(sessionsPage);
+		sessions.removeAll(removeSessions);
 
 		if (!next.isJsonNull()) {
 			//Store first page modified_since to retry immediately after fetched
-			if (page == 1){
+			if (page == 1) {
 				String firstPageTime = jsonObject.get("request_time").getAsString();
-				PreferencesUtil.storePrefsValue(context,PreferencesUtil.PREF_FIRST_PAGE_MODIFIED_DATE, firstPageTime);
+				PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_FIRST_PAGE_MODIFIED_DATE, firstPageTime);
 			}
 
 			//Update current page
