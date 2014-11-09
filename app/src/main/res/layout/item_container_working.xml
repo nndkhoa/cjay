@@ -31,7 +31,7 @@
                 android:layout_alignParentRight="true"
                 android:text="AUDY12983750"
                 android:textStyle="bold"
-                android:textColor="@color/background_button_and_line"/>
+                android:textColor="@color/background_cjay"/>
         </RelativeLayout>
 
         <RelativeLayout

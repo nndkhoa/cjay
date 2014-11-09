@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
@@ -43,6 +44,9 @@ public class IssueReportComponentFragment extends IssueReportFragment {
 
 	@ViewById(R.id.lv_component)
 	ListView mComponentListView;
+
+    @ViewById(R.id.tv_code_fullname)
+    TextView mComponentNameTextView;
 
 	@SystemService
 	InputMethodManager inputMethodManager;
@@ -77,6 +81,7 @@ public class IssueReportComponentFragment extends IssueReportFragment {
 			public void didClearText() {
                 mComponentCode = "";
 				mComponentName = "";
+                mComponentNameTextView.setText("");
 			}
 		});
 
@@ -98,6 +103,7 @@ public class IssueReportComponentFragment extends IssueReportFragment {
 
 		ignoreSearch = true;
 		mComponentEditText.setText(mComponentName);
+        mComponentNameTextView.setText(mComponentName);
 		ignoreSearch = false;
 
         // refresh component list
@@ -121,6 +127,7 @@ public class IssueReportComponentFragment extends IssueReportFragment {
         mComponentName = item.getFullName();
         ignoreSearch = true;
         mComponentEditText.setText(mComponentName);
+        mComponentNameTextView.setText(mComponentName);
         ignoreSearch = false;
 
         // hide keyboard

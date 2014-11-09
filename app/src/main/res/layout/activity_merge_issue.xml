@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/chose_issue_has_been_audited"
-        android:textColor="@color/background_button_and_line"
+        android:textColor="@color/background_cjay"
         android:textSize="24dp"
         android:textStyle="bold"/>
     <ListView

@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:paddingBottom="3dp"
             android:text="ABCD1234567"
-            android:textColor="@color/background_button_and_line"
+            android:textColor="@color/background_cjay"
             android:textSize="24dp"
             android:textStyle="bold" />
 
@@ -29,7 +29,7 @@
             android:layout_toRightOf="@+id/tv_container_code"
             android:paddingBottom="3dp"
             android:text=" - "
-            android:textColor="@color/background_button_and_line"
+            android:textColor="@color/background_cjay"
             android:textSize="24dp"
             android:textStyle="bold" />
 
@@ -40,7 +40,7 @@
             android:layout_toRightOf="@+id/tv_divider_line"
             android:paddingBottom="3dp"
             android:text="B"
-            android:textColor="@color/background_button_and_line"
+            android:textColor="@color/background_cjay"
             android:textSize="24dp"
             android:textStyle="bold" />
 
@@ -50,7 +50,7 @@
             android:layout_height="2dp"
             android:layout_below="@+id/tv_container_code"
             android:layout_marginBottom="6dp"
-            android:background="@color/background_button_and_line" />
+            android:background="@color/background_cjay" />
 
         <TextView
             android:id="@+id/tv_import_label"
@@ -86,7 +86,7 @@
             android:id="@+id/btn_done"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/background_button_and_line"
+            android:background="@color/background_cjay"
             android:text="Xong"
             android:textColor="@android:color/white" />
 

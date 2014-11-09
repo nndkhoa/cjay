@@ -6,23 +6,16 @@
     android:paddingLeft="2dp"
     android:paddingRight="2dp" >
 
+    <include
+        layout="@layout/section_report_issue_summary1"/>
+
     <org.droidparts.widget.ClearableEditText
         android:id="@+id/repair_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="CODE sửa chữa"
-        android:inputType="textNoSuggestions"
-        android:selectAllOnFocus="true" />
+        android:hint="@string/label_code_repair"
+        style="@style/IssueReportEditText"/>
 
     <ListView
         android:id="@+id/lv_repair"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:minHeight="30dp"
-        android:paddingBottom="12dp"
-        android:paddingLeft="18dp"
-        android:paddingRight="18dp"
-        android:paddingTop="12dp"
-        style="@style/CJayListView" />
+        style="@style/IssueReportList" />
 
 </LinearLayout>

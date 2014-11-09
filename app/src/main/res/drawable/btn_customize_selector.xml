@@ -3,18 +3,18 @@
 
     <item android:state_pressed="true">
         <shape>
-            <solid android:color="#0091CC" />
+            <solid android:color="@color/background_cjay" />
 
-            <stroke android:width="1dp" android:color="#0091CC" />
+            <stroke android:width="1dp" android:color="@color/background_cjay" />
 
             <padding android:bottom="10dp" android:left="10dp" android:right="10dp" android:top="10dp" />
         </shape>
     </item>
     <item>
         <shape>
-            <gradient android:angle="270" android:endColor="#0091CC" android:startColor="#0091CC" />
+            <gradient android:angle="270" android:endColor="@color/background_cjay" android:startColor="@color/background_cjay" />
 
-            <stroke android:width="1dp" android:color="#0091CC" />
+            <stroke android:width="1dp" android:color="@color/background_cjay" />
 
             <padding android:bottom="10dp" android:left="10dp" android:right="10dp" android:top="10dp" />
         </shape>

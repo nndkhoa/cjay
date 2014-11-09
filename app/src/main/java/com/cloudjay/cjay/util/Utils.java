@@ -354,6 +354,16 @@ public class Utils {
 		return in == null || in.equals("") ? " " : in;
 	}
 
+    /**
+     * Replace a null string by an empty string
+     *
+     * @param in
+     * @return
+     */
+    public static String stripNull(String in) {
+        return in == null  ? "" : in;
+    }
+
 	/**
 	 * Count total image off session
 	 *

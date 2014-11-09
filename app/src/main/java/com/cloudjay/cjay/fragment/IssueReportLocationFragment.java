@@ -12,10 +12,12 @@ import android.view.View.OnFocusChangeListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.util.Utils;
 
 @EFragment(R.layout.fragment_report_issue_location)
 public class IssueReportLocationFragment extends IssueReportFragment implements OnFocusChangeListener, OnClickListener {
@@ -35,6 +37,7 @@ public class IssueReportLocationFragment extends IssueReportFragment implements 
 	EditText mCode2EditText;
 	@ViewById(R.id.locationCode3)
 	EditText mCode3EditText;
+
 	@ViewById(R.id.btnCode0)
 	Button mCode0Button;
 	@ViewById(R.id.btnCode1)
@@ -59,6 +62,9 @@ public class IssueReportLocationFragment extends IssueReportFragment implements 
 	Button mCode10Button;
 	@ViewById(R.id.btnCode11)
 	Button mCode11Button;
+
+    @ViewById(R.id.tv_code_fullname)
+    TextView mLocationCodeTextView;
 
 	@AfterViews
 	void AfterViews() {
@@ -108,6 +114,8 @@ public class IssueReportLocationFragment extends IssueReportFragment implements 
 				}
 			}
 		}
+
+        mLocationCodeTextView.setText(mAuditItem.getLocationCode());
 
 		mCode1EditText.requestFocus();
 	}
@@ -166,6 +174,11 @@ public class IssueReportLocationFragment extends IssueReportFragment implements 
 		if (mFocusedEditText != null && !code.equals("")) {
 			mFocusedEditText.setText(code);
 			mLocationCodes[mCurrentStep] = code;
+            mLocationCodeTextView.setText(new StringBuilder()
+                    .append(Utils.stripNull(mLocationCodes[0]))
+                    .append(Utils.stripNull(mLocationCodes[1]))
+                    .append(Utils.stripNull(mLocationCodes[2]))
+                    .append(Utils.stripNull(mLocationCodes[3])).toString());
 			goToNextInput(mCurrentStep, code);
 		}
 	}
@@ -191,8 +204,12 @@ public class IssueReportLocationFragment extends IssueReportFragment implements 
 	@Override
 	public boolean validateAndSaveData() {
 		// save location code
-		String locationCode = new StringBuilder().append(mLocationCodes[0]).append(mLocationCodes[1])
-													.append(mLocationCodes[2]).append(mLocationCodes[3]).toString();
+		String locationCode = new StringBuilder()
+                .append(Utils.stripNull(mLocationCodes[0]))
+                .append(Utils.stripNull(mLocationCodes[0]))
+                .append(Utils.stripNull(mLocationCodes[0]))
+                .append(Utils.stripNull(mLocationCodes[0])).toString();
+
 		if (locationCode.length() == 4) {
 			mCode3EditText.setError(null);
 			mCallback.onReportValueChanged(AuditorIssueReportListener.TYPE_LOCATION_CODE, locationCode);

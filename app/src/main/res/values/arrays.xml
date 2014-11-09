@@ -5,12 +5,11 @@
 		<item >@string/ffc</item>
 	</string-array>
     <string-array name="issue_report_tabs">
-        <item>PHOTO</item>
-        <item>CODE component</item>
-        <item>CODE vị trí</item>
-        <item>CODE hư hỏng</item>
-        <item>CODE sửa chữa</item>
-        <item>Kích thước</item>
-        <item>Số lượng</item>
+        <item>Hình ảnh</item>
+        <item>COMP</item>
+        <item>LOC</item>
+        <item>BR</item>
+        <item>RP</item>
+        <item>KT-SL</item>
     </string-array>
 </resources>
