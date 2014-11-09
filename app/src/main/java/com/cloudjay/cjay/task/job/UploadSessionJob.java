@@ -87,6 +87,7 @@ public class UploadSessionJob extends Job {
 					break;
 
 				case REPAIR:
+				case HAND_CLEAN:
 					dataCenter.changeSessionLocalStep(context, containerId, Step.AVAILABLE);
 					break;
 

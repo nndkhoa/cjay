@@ -85,45 +85,6 @@ public class WizardActivity extends BaseActivity {
 		transaction.commit();
 
 	}
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.base, menu);
-
-		String name = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_USER_NAME);
-		String roleName = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_USER_ROLE_NAME);
-
-		menu.findItem(R.id.menu_username).setTitle(name);
-		menu.findItem(R.id.menu_role).setTitle(roleName);
-		exportMenu = menu.findItem(R.id.menu_export);
-		exportMenu.setVisible(true);
-
-		EventBus.getDefault().post(new EventMenuCreated(menu));
-
-		return true;
-	}
-
-	@OptionsItem(R.id.menu_export)
-	void exportSession()  {
-		//Export session immediately
-		Session session = dataCenter.getSession(this,exportSessionContainerId);
-		Step step = Step.values()[session.getLocalStep()];
-		if (session.isValidToUpload(step)){
-			try {
-				dataCenter.changeSessionLocalStep(this, exportSessionContainerId,Step.AVAILABLE);
-				Intent intent = new Intent(this, WizardActivity_.class);
-				intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, exportSessionContainerId);
-				intent.putExtra(WizardActivity.STEP_EXTRA, Step.AVAILABLE.value);
-				startActivity(intent);
-				this.finish();
-			} catch (SnappydbException e) {
-				e.printStackTrace();
-			}
-
-		} else {
-			Utils.showCrouton(this,"Hoàn tất bước hiện tại để xuất chỉ định");
-		}
-
-	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {

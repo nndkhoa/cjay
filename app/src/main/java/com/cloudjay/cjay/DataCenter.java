@@ -479,7 +479,6 @@ public class DataCenter {
 		}
 
 		for (String result : keysResult) {
-
 			String newKey = result.substring(len);
 			Session session;
 			try {
@@ -571,6 +570,12 @@ public class DataCenter {
 
 	/**
 	 * Fetch all container session with last modified datetime
+	 * <p/>
+	 * 1.Get current page from preferences
+	 * 2.If current page is null =>> next page use to get session = 1
+	 * Else next page to get session = current page +1
+	 * 3. Refresh page after fetched
+	 * 5. Fetch again with modified day is first page request_time for make sure all data have update
 	 *
 	 * @param context
 	 * @param lastModifiedDate
@@ -579,9 +584,6 @@ public class DataCenter {
 	@Trace
 	public void fetchSession(Context context, String lastModifiedDate) throws SnappydbException {
 		String newModifiedDay;
-		//Get current page from preferences
-		//if current page is null =>> next page use to get session = 1
-		// else next page to get session = current page +1
 		do {
 			int nextPage;
 			String currentPage = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE);
@@ -604,7 +606,47 @@ public class DataCenter {
 			newModifiedDay = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
 			Logger.Log("Current Modified day: " + newModifiedDay);
 		} while (lastModifiedDate.equals(newModifiedDay));
+		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE, "");
+		//Fetch again with modified day is first page request_time
+		String firstPageTime = PreferencesUtil.getPrefsValue(context,PreferencesUtil.PREF_FIRST_PAGE_MODIFIED_DATE);
+		fetchFirstPageTime(context, firstPageTime);
 
+
+	}
+
+	/**
+	 * Like fetch session, just don't have fetch first page.
+	 *
+	 * @param context
+	 * @param lastModifiedDate
+	 * @throws SnappydbException
+	 */
+	private void fetchFirstPageTime(Context context, String lastModifiedDate) throws SnappydbException {
+
+		String newModifiedDay;
+		do {
+			int nextPage;
+			String currentPage = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE);
+			if (currentPage.isEmpty()) {
+				nextPage = 1;
+			} else {
+				nextPage = Integer.valueOf(currentPage) + 1;
+			}
+
+			List<Session> sessions = networkClient.getSessionByPage(context, nextPage, lastModifiedDate);
+			DB db = App.getDB(context);
+			for (Session session : sessions) {
+
+				String key = session.getContainerId();
+				session.setLocalStep(session.getStep());
+
+				db.put(key, session);
+			}
+			Logger.Log("Fetched first page time, page: " + nextPage);
+			newModifiedDay = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
+			Logger.Log("Current Modified day: " + newModifiedDay);
+		} while (lastModifiedDate.equals(newModifiedDay));
+		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE, "");
 	}
 
 	/**
