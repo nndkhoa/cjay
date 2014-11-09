@@ -490,6 +490,10 @@ public class Session {
 
 			// Tất cả các item đều được gán lỗi và có hình
 			case AUDIT:
+				if (auditItems.size() == 0) {
+					return false;
+				}
+
 				for (AuditItem item : auditItems) {
 					if (item.isAudited() == false || item.getUploadStatus() == UploadStatus.NONE.value)
 						return false;

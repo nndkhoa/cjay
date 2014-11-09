@@ -13,10 +13,8 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.session.ContainersGotEvent;
-import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
@@ -95,17 +93,17 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 	@Click(R.id.btn_complete_import)
 	void btnCompleteAuditClicked() {
+
 		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+
 		if (mSession != null) {
 			if (!mSession.isValidToUpload(Step.AUDIT)) {
-				for (AuditItem auditItem : mSession.getAuditItems()) {
-					Logger.e("UPLOAD AUDIT ITEM: " + auditItem.getUploadStatus());
-				}
 				Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
 				return;
 			}
 		} else {
-			Utils.showCrouton(getActivity(), "Sth goes wrong. Container Id " + containerID + " not found");
+			Utils.showCrouton(getActivity(), "Không tìm thấy container " + containerID);
+			return;
 		}
 
 		// PUT /api/cjay/containers/{pk}/complete-audit
