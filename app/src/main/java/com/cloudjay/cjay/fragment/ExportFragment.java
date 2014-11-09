@@ -194,8 +194,6 @@ public class ExportFragment extends Fragment {
 		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), true));
 
 		// Navigate to HomeActivity
-		Intent intent = new Intent(getActivity().getApplicationContext(), HomeActivity_.class);
-		startActivity(intent);
 		getActivity().finish();
 	}
 
