@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -14,6 +13,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.session.ContainerChangedEvent;
+import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
 import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
@@ -22,14 +22,12 @@ import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.path.android.jobqueue.JobManager;
-import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
-import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -92,63 +90,63 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 		super.onDestroy();
 	}
 
-	@Click(R.id.btn_complete_import)
-	void btnCompleteAuditClicked() {
+	public void onEvent(ContainerForUploadGotEvent event) {
+		mSession = event.getTarget();
 
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
-
-		if (mSession != null) {
-			if (!mSession.isValidToUpload(Step.AUDIT)) {
-				Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+		// Xu ly cho session da duoc Giam Dinh
+		if (mSession.getLocalStep() == Step.AUDIT.value) {
+			if (mSession != null) {
+				if (!mSession.isValidToUpload(Step.AUDIT)) {
+					Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+					return;
+				}
+			} else {
+				Utils.showCrouton(getActivity(), "Không tìm thấy container " + containerID);
 				return;
 			}
-		} else {
-			Utils.showCrouton(getActivity(), "Không tìm thấy container " + containerID);
-			return;
-		}
 
-		// PUT /api/cjay/containers/{pk}/complete-audit
-		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), true));
+			// PUT /api/cjay/containers/{pk}/complete-audit
+			JobManager jobManager = App.getJobManager();
+			jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), true));
 
-		// Hide this button
-		btnCompleteAudit.setVisibility(View.GONE);
+			// Hide this button
+			btnCompleteAudit.setVisibility(View.GONE);
 
-		// Check if this session has repair image or not
-		if (mSession.hasRepairImages()) {
-			btnCompleteRepair.setVisibility(View.VISIBLE);
-		} else {
+			// Check if this session has repair image or not
+			if (mSession.hasRepairImages()) {
+				btnCompleteRepair.setVisibility(View.VISIBLE);
+			} else {
+				// Navigate to HomeActivity
+				getActivity().finish();
+			}
+
+		} else if (mSession.getLocalStep() == Step.REPAIR.value) {
+
+			// Xu ly cho session da duoc sua chua
+
+			if (mSession != null) {
+
+				if (mSession.getLocalStep() == Step.AUDIT.value) {
+					Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+					return;
+				}
+
+				if (!mSession.isValidToUpload(Step.REPAIR)) {
+					Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+					return;
+				}
+			} else {
+				Utils.showCrouton(getActivity(), "Sth goes wrong. Container Id " + containerID + " not found");
+			}
+
+			// Add containerId to upload complete repair queue
+			// PUT /api/cjay/containers/{pk}/complete-repair
+			JobManager jobManager = App.getJobManager();
+			jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), true));
+
 			// Navigate to HomeActivity
 			getActivity().finish();
-		}
-	}
 
-	@Click(R.id.btn_done)
-	void btnCompleteRepairClicked() {
-
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
-		if (mSession != null) {
-
-			if (mSession.getLocalStep() == Step.AUDIT.value) {
-				Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
-				return;
-			}
-
-			if (!mSession.isValidToUpload(Step.REPAIR)) {
-				Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
-				return;
-			}
-		} else {
-			Utils.showCrouton(getActivity(), "Sth goes wrong. Container Id " + containerID + " not found");
-		}
-
-		// Add containerId to upload complete repair queue
-		// PUT /api/cjay/containers/{pk}/complete-repair
-		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), true));
-
-		// Navigate to HomeActivity
-		getActivity().finish();
 //	     /* Remove all tabs */
 //		actionBar.removeAllTabs();
 //		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
@@ -161,6 +159,18 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 //		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
 //		transaction.replace(R.id.ll_main, fragment);
 //		transaction.commit();
+		}
+
+	}
+
+	@Click(R.id.btn_complete_import)
+	void btnCompleteAuditClicked() {
+		dataCenter.getSessionForUpload(getActivity(), containerID);
+	}
+
+	@Click(R.id.btn_done)
+	void btnCompleteRepairClicked() {
+		dataCenter.getSessionForUpload(getActivity(), containerID);
 	}
 
 	@AfterViews
@@ -266,8 +276,8 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	}
 
 	public void onEvent(ContainersGotEvent event) {
-		if (event.getSessions() != null && event.getSessions().size() > 0) {
-			mSession = event.getSessions().get(0);
+		if (event.getTargets() != null && event.getTargets().size() > 0) {
+			mSession = event.getTargets().get(0);
 			checkForShowButton();
 		}
 	}
@@ -278,7 +288,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	 * @param event
 	 */
 	public void onEvent(ImageCapturedEvent event) {
-
 
 		// requery to update button
 		int imageType = event.getImageType();

@@ -13,6 +13,7 @@ import com.cloudjay.cjay.activity.DetailIssueActivity;
 import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.adapter.RepairedItemAdapter;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
+import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
@@ -74,9 +75,13 @@ public class IssueRepairedFragment extends Fragment {
     @AfterViews
     void setUp() {
 
-        // Get session by containerId
-	    // TODO: bug
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+	    dataCenter.getSessionInBackground(getActivity(), containerID);
+    }
+
+	@UiThread
+	public void onEvent(ContainersGotEvent event) {
+		// Get session by containerId
+		mSession = event.getTarget();
 
 		if (mSession != null) {
 
@@ -87,8 +92,7 @@ public class IssueRepairedFragment extends Fragment {
 			currentStatus = mSession.getStatus();
 			tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
 
-			mAdapter = new RepairedItemAdapter(getActivity().getApplicationContext(),
-					R.layout.item_issue_repaired);
+			mAdapter = new RepairedItemAdapter(getActivity().getApplicationContext(), R.layout.item_issue_repaired);
 			lvRepairedItem.setAdapter(mAdapter);
 
 			refresh();
@@ -97,7 +101,7 @@ public class IssueRepairedFragment extends Fragment {
 			// Set text ContainerId TextView
 			tvContainerId.setText(containerID);
 		}
-    }
+	}
 
 	@ItemClick(R.id.lv_repaired_items)
 	void repairItemClicked(int position) {
@@ -111,7 +115,6 @@ public class IssueRepairedFragment extends Fragment {
 		}
 	}
 
-	@Background
 	void refresh() {
 		if (mSession != null) {
 			repairedList = mSession.getListRepairedItem();
@@ -141,10 +144,7 @@ public class IssueRepairedFragment extends Fragment {
 	void onEvent(ImageCapturedEvent event) {
 
 		if (event.getImageType() == ImageType.REPAIRED.value) {
-			Logger.Log("on ImageCapturedEvent");
-
-			mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
-			refresh();
+			dataCenter.getSessionInBackground(getActivity(), containerID);
 		}
 	}
 

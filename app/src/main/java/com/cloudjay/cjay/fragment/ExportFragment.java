@@ -15,11 +15,11 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
-import com.cloudjay.cjay.activity.HomeActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.adapter.PhotoExpandableListAdapter;
 import com.cloudjay.cjay.event.EventMenuCreated;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
+import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
@@ -32,7 +32,6 @@ import com.cloudjay.cjay.util.enums.Step;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
@@ -51,11 +50,32 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.fragment_export)
 public class ExportFragment extends Fragment {
 
+	//region ATTR
 	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
 
 	@FragmentArg(CONTAINER_ID_EXTRA)
 	String containerID;
 
+	@Bean
+	DataCenter dataCenter;
+
+	GateImageAdapter gateImageAdapter = null;
+
+	PhotoExpandableListAdapter mListAdapter;
+	int[] mImageTypes;
+
+	List<GateImage> importImages = new ArrayList<GateImage>();
+	List<AuditImage> auditImages = new ArrayList<AuditImage>();
+	List<AuditImage> repairedImages = new ArrayList<AuditImage>();
+	List<GateImage> exportImages = new ArrayList<GateImage>();
+
+	String operatorCode;
+	long preStatus;
+	long currentStatus;
+	Session mSession;
+	//endregion
+
+	//region VIEWS
 	@ViewById(R.id.tv_container_code)
 	TextView tvContainerId;
 
@@ -79,32 +99,9 @@ public class ExportFragment extends Fragment {
 
 	@ViewById(R.id.lv_images_expandable)
 	ExpandableListView lvImagesExpandable;
-
-	@Bean
-	DataCenter dataCenter;
-
-	GateImageAdapter gateImageAdapter = null;
-
-	PhotoExpandableListAdapter mListAdapter;
-	int[] mImageTypes;
-
-	List<GateImage> importImages = new ArrayList<GateImage>();
-	List<AuditImage> auditImages = new ArrayList<AuditImage>();
-	List<AuditImage> repairedImages = new ArrayList<AuditImage>();
-	List<GateImage> exportImages = new ArrayList<GateImage>();
-
-	String operatorCode;
-	long preStatus;
-	long currentStatus;
-	Session mSession;
+	//endregion
 
 	public ExportFragment() {
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		EventBus.getDefault().register(this);
 	}
 
 	@AfterViews
@@ -126,33 +123,10 @@ public class ExportFragment extends Fragment {
 				mImageTypes, importImages, auditImages, repairedImages);
 		lvImagesExpandable.setAdapter(mListAdapter);
 
-		// Get session
-		mSession = dataCenter.getSession(getActivity(), containerID);
-
-		if (null == mSession) {
-			// Set ContainerId to TextView
-			tvContainerId.setText(containerID);
-		} else {
-			// Get operator code
-			containerID = mSession.getContainerId();
-			operatorCode = mSession.getOperatorCode();
-
-			// Set preStatus to TextView
-			preStatus = mSession.getPreStatus();
-			tvPreStatus.setText((Status.values()[(int) preStatus]).toString());
-
-			// Set currentStatus to TextView
-			currentStatus = mSession.getStatus();
-			tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
-
-			// Set ContainerId to TextView
-			tvContainerId.setText(containerID);
-
-			refresh();
-		}
-
+		dataCenter.getSessionInBackground(getActivity(), containerID);
 	}
 
+	//region VIEW INTERACTION
 	@Click(R.id.btn_take_export_picture)
 	void buttonTakeExportPictureClicked() {
 
@@ -163,16 +137,6 @@ public class ExportFragment extends Fragment {
 		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
 		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.EXPORTED.value);
 		startActivity(cameraActivityIntent);
-	}
-
-	@UiThread
-	void onEvent(ImageCapturedEvent event) {
-		Logger.Log("onEvent Image Captured");
-
-		// Re-query container session with given containerId
-		String containerId = event.getContainerId();
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
-		refresh();
 	}
 
 	@Click(R.id.btn_view_previous_step)
@@ -196,8 +160,8 @@ public class ExportFragment extends Fragment {
 		// Navigate to HomeActivity
 		getActivity().finish();
 	}
+	//endregion
 
-	@Background
 	void refresh() {
 		if (mSession != null) {
 
@@ -251,6 +215,13 @@ public class ExportFragment extends Fragment {
 		mListAdapter.notifyDataSetChanged();
 	}
 
+	//region EVENT HANDLER
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		EventBus.getDefault().register(this);
+	}
+
 	@Override
 	public void onDestroy() {
 		EventBus.getDefault().unregister(this);
@@ -261,4 +232,40 @@ public class ExportFragment extends Fragment {
 		Logger.e("EVENT BUSS MENU CREATE");
 		event.getMenu().findItem(R.id.menu_export).setVisible(false);
 	}
+
+	@UiThread
+	public void onEvent(ContainersGotEvent event) {
+
+		// Get session
+		mSession = event.getTarget();
+
+		if (null == mSession) {
+			// Set ContainerId to TextView
+			tvContainerId.setText(containerID);
+		} else {
+			// Get operator code
+			containerID = mSession.getContainerId();
+			operatorCode = mSession.getOperatorCode();
+
+			// Set preStatus to TextView
+			preStatus = mSession.getPreStatus();
+			tvPreStatus.setText((Status.values()[(int) preStatus]).toString());
+
+			// Set currentStatus to TextView
+			currentStatus = mSession.getStatus();
+			tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
+
+			// Set ContainerId to TextView
+			tvContainerId.setText(containerID);
+
+			refresh();
+		}
+	}
+
+	@UiThread
+	void onEvent(ImageCapturedEvent event) {
+		dataCenter.getSessionInBackground(getActivity(), event.getContainerId());
+	}
+	//endregion
+
 }

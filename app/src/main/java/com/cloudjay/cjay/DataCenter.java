@@ -5,11 +5,11 @@ import android.text.TextUtils;
 
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.image.AuditImagesGotEvent;
+import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
 import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
-import com.cloudjay.cjay.event.issue.IssueDeletedEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
-import com.cloudjay.cjay.event.issue.IssueUpdatedEvent;
 import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
+import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
 import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.event.session.SearchAsyncStartedEvent;
@@ -408,58 +408,62 @@ public class DataCenter {
 	 * @return
 	 * @throws SnappydbException
 	 */
-	public Session getSessionAsyncById(Context context, long id) throws SnappydbException {
+	public Session getSessionAsyncById(Context context, long id) {
 
-		// Get session from server
-		DB db = App.getDB(context);
-		Session result = networkClient.getSessionById(id);
+		try {
+			// Get session from server
+			DB db = App.getDB(context);
+			Session result = networkClient.getSessionById(id);
 
-		if (result != null) {
+			if (result != null) {
 
-			// Find local session
-			String key = result.getContainerId();
-			Session session = getSession(context, result.getContainerId());
+				// Find local session
+				String key = result.getContainerId();
+				Session session = db.get(key, Session.class);
 
-			if (session == null) {
+				if (session == null) {
 
-				//Merge Session from server to local type
-				result.changeToLocalFormat();
-				addSession(result);
-				return result;
+					//Merge Session from server to local type
+					result.changeToLocalFormat();
+					addSession(result);
+					return result;
 
-			} else {
+				} else {
 
-				// merge result from server to local session
-				session.mergeSession(result);
-				db.put(key, session);
-				return session;
+					// merge result from server to local session
+					session.mergeSession(result);
+					db.put(key, session);
+					return session;
+				}
 			}
-		}
+		} catch (SnappydbException e) {
+			Logger.w(e.getMessage());
 
+		}
 		return null;
 	}
 
-	/**
-	 * Only use when search container session from db.
-	 * Chỉ sử dụng khi biết chắc session đã ở trong db.
-	 *
-	 * @param context
-	 * @param containerId
-	 * @return
-	 */
-	public Session getSession(Context context, String containerId) {
-
-		try {
-			DB db = App.getDB(context);
-			String key = containerId;
-			Session session = db.getObject(key, Session.class);
-
-			return session;
-		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
-			return null;
-		}
-	}
+//	/**
+//	 * Only use when search container session from db.
+//	 * Chỉ sử dụng khi biết chắc session đã ở trong db.
+//	 *
+//	 * @param context
+//	 * @param containerId
+//	 * @return
+//	 */
+//	public Session getSession(Context context, String containerId) {
+//
+//		try {
+//			DB db = App.getDB(context);
+//			String key = containerId;
+//			Session session = db.getObject(key, Session.class);
+//
+//			return session;
+//		} catch (SnappydbException e) {
+//			Logger.w(e.getMessage());
+//			return null;
+//		}
+//	}
 
 	/**
 	 * Get list container sessions based on param `prefix`
@@ -497,6 +501,22 @@ public class DataCenter {
 		}
 
 		return sessions;
+	}
+
+	@Background(serial = CACHE)
+	public void getSessionForUpload(Context context, String containerId) {
+		try {
+			DB db = App.getDB(context);
+			String key = containerId;
+			Session session = db.getObject(key, Session.class);
+
+			List<Session> list = new ArrayList<>();
+			list.add(session);
+			EventBus.getDefault().post(new ContainerForUploadGotEvent(list, containerId));
+
+		} catch (SnappydbException e) {
+			Logger.w(e.getMessage());
+		}
 	}
 
 	/**
@@ -622,7 +642,7 @@ public class DataCenter {
 	 * @param refetchWithFistPageTime
 	 */
 //	@Background (serial = CACHE)
-	public void fetchSession(Context context, String lastModifiedDate, boolean refetchWithFistPageTime)  {
+	public void fetchSession(Context context, String lastModifiedDate, boolean refetchWithFistPageTime) {
 
 		String newModifiedDay;
 		do {
@@ -668,13 +688,13 @@ public class DataCenter {
 						db.del(key);
 					}
 				} else {
-					if (searchResult.length == 0){
+					if (searchResult.length == 0) {
 						session.changeToLocalFormat();
 						addSession(session);
 					} else {
-						Session local = db.getObject(key,Session.class);
+						Session local = db.getObject(key, Session.class);
 						local.mergeSession(session);
-						db.put(key,local);
+						db.put(key, local);
 					}
 				}
 			}
@@ -1198,7 +1218,7 @@ public class DataCenter {
 
 	}
 
-	public void uploadImportSession(Context context, Session session){
+	public void uploadImportSession(Context context, Session session) {
 		Session result = networkClient.uploadSession(context, session);
 		saveSession(context, result, new UploadSucceededEvent(session.getContainerId(), UploadType.SESSION));
 	}
@@ -1455,7 +1475,7 @@ public class DataCenter {
 			e.printStackTrace();
 		}
 
-		EventBus.getDefault().post(new IssueDeletedEvent(containerId));
+		EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
 	}
 
 	/**
@@ -1475,7 +1495,7 @@ public class DataCenter {
 			db.put(containerId, session);
 
 			// Notify that an audit item is updated
-			EventBus.getDefault().post(new IssueUpdatedEvent(containerId));
+			EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
 
 		} catch (SnappydbException e) {
 			e.printStackTrace();
@@ -1561,7 +1581,7 @@ public class DataCenter {
 		session.setAuditItems(list);
 		db.put(containerId, session);
 
-		EventBus.getDefault().post(new IssueDeletedEvent(containerId));
+		EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
 	}
 
 	/**

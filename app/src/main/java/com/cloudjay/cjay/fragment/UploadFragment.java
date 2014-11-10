@@ -19,7 +19,6 @@ import com.cloudjay.cjay.util.CJayConstant;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -98,7 +97,7 @@ public class UploadFragment extends Fragment {
 
 	public void onEvent(ContainersGotEvent event) {
 		if (event.getPrefix().equals(CJayConstant.PREFIX_UPLOADING))
-			updatedData(event.getSessions());
+			updatedData(event.getTargets());
 	}
 	//endregion
 

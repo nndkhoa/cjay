@@ -61,7 +61,7 @@ public class UploadSessionJob extends Job {
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
 
-        mSession = DataCenter_.getInstance_(context).getSession(context, containerId);
+//        mSession = DataCenter_.getInstance_(context).getSession(context, containerId);
 
 		// Set session upload status to UPLOADING
 		// Add session to Collection Upload

@@ -26,7 +26,6 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ItemLongClick;
-import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -139,7 +138,7 @@ public class WorkingFragment extends Fragment {
 
 	public void onEvent(ContainersGotEvent event) {
 		if (event.getPrefix().equals(CJayConstant.PREFIX_WORKING))
-			updatedData(event.getSessions());
+			updatedData(event.getTargets());
 	}
 
 	//endregion

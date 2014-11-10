@@ -15,6 +15,7 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
+import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
@@ -72,8 +73,14 @@ public class ReuseActivity extends Activity {
 
 	@AfterViews
 	void doAfterViews() {
+		dataCenter.getSessionInBackground(this, containerID);
+	}
+
+	@UiThread
+	public void onEvent(ContainersGotEvent event) {
+
 		// Get session by containerId
-		mSession = dataCenter.getSession(getApplicationContext(), containerID);
+		mSession = event.getTarget();
 
 		if (mActionMode == null) {
 			// there are some selected items, start the actionMode
@@ -116,7 +123,6 @@ public class ReuseActivity extends Activity {
 
 			}
 		});
-
 	}
 
 	@Click(R.id.btn_done)
@@ -159,7 +165,7 @@ public class ReuseActivity extends Activity {
 			List<GateImage> importImages = mSession.getImportImages();
 			List<GateImage> deletedImportImages = new ArrayList<GateImage>();
 
-            Logger.Log("import size: " + mSession.getImportImages().size());
+			Logger.Log("import size: " + mSession.getImportImages().size());
 
 			if (auditItems != null) {
 				Logger.Log("Size: " + auditItems.size());

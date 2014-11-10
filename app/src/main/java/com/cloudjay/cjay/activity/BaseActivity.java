@@ -75,26 +75,28 @@ public class BaseActivity extends FragmentActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+
 	@OptionsItem(R.id.menu_export)
 	void exportSession() {
-		//Export session immediately
-		Session session = dataCenter.getSession(this,exportSessionContainerId);
-		Step step = Step.values()[session.getLocalStep()];
-		if (session.isValidToUpload(step)){
-			try {
-				dataCenter.changeSessionLocalStep(this, exportSessionContainerId,Step.AVAILABLE);
-				Intent intent = new Intent(this, WizardActivity_.class);
-				intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, exportSessionContainerId);
-				intent.putExtra(WizardActivity.STEP_EXTRA, Step.AVAILABLE.value);
-				startActivity(intent);
-			} catch (SnappydbException e) {
-				e.printStackTrace();
-			}
 
-		} else {
-			Utils.showCrouton(this,"Hoàn tất bước hiện tại để xuất chỉ định");
-		}
-		exportMenu.setVisible(false);
+//		//Export session immediately
+//		Session session = dataCenter.getSession(this,exportSessionContainerId);
+//		Step step = Step.values()[session.getLocalStep()];
+//		if (session.isValidToUpload(step)){
+//			try {
+//				dataCenter.changeSessionLocalStep(this, exportSessionContainerId,Step.AVAILABLE);
+//				Intent intent = new Intent(this, WizardActivity_.class);
+//				intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, exportSessionContainerId);
+//				intent.putExtra(WizardActivity.STEP_EXTRA, Step.AVAILABLE.value);
+//				startActivity(intent);
+//			} catch (SnappydbException e) {
+//				e.printStackTrace();
+//			}
+//
+//		} else {
+//			Utils.showCrouton(this,"Hoàn tất bước hiện tại để xuất chỉ định");
+//		}
+//		exportMenu.setVisible(false);
 
 	}
 

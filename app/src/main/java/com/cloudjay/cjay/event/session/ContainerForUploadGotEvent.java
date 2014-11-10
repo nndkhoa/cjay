@@ -4,7 +4,7 @@ import com.cloudjay.cjay.model.Session;
 
 import java.util.List;
 
-public class ContainersGotEvent {
+public class ContainerForUploadGotEvent {
 
 	public Session getTarget() {
 		if (isSingleChange())
@@ -30,7 +30,7 @@ public class ContainersGotEvent {
 		return sessions;
 	}
 
-	public ContainersGotEvent(List<Session> list, String prefix) {
+	public ContainerForUploadGotEvent(List<Session> list, String prefix) {
 		this.sessions = list;
 		this.prefix = prefix;
 	}

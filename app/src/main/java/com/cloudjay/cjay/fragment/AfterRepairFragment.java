@@ -12,6 +12,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.DetailIssuedImageAdapter;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
+import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
@@ -94,8 +95,14 @@ public class AfterRepairFragment extends Fragment {
 
 	@AfterViews
 	void setup() {
+		dataCenter.getSessionInBackground(getActivity(), containerID);
+	}
+
+	@UiThread
+	public void onEvent(ContainersGotEvent event) {
+
 		//get container operater code form containerId
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+		mSession = event.getTarget();
 		if (null == mSession) {
 			Utils.showCrouton(getActivity(), "Không tìm thấy container trong dữ liệu");
 		} else {
