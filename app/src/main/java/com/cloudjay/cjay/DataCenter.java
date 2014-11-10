@@ -443,66 +443,6 @@ public class DataCenter {
 		return null;
 	}
 
-//	/**
-//	 * Only use when search container session from db.
-//	 * Chỉ sử dụng khi biết chắc session đã ở trong db.
-//	 *
-//	 * @param context
-//	 * @param containerId
-//	 * @return
-//	 */
-//	public Session getSession(Context context, String containerId) {
-//
-//		try {
-//			DB db = App.getDB(context);
-//			String key = containerId;
-//			Session session = db.getObject(key, Session.class);
-//
-//			return session;
-//		} catch (SnappydbException e) {
-//			Logger.w(e.getMessage());
-//			return null;
-//		}
-//	}
-
-	/**
-	 * Get list container sessions based on param `prefix`
-	 *
-	 * @param context
-	 * @param prefix
-	 * @return
-	 */
-	public List<Session> getListSessions(Context context, String prefix) {
-
-		int len = prefix.length();
-
-		DB db;
-		String[] keysResult;
-		List<Session> sessions = new ArrayList<>();
-
-		try {
-			db = App.getDB(context);
-			keysResult = db.findKeys(prefix);
-		} catch (SnappydbException e) {
-			Logger.e(e.getMessage());
-			return null;
-		}
-
-		for (String result : keysResult) {
-			String newKey = result.substring(len);
-			Session session;
-			try {
-				session = db.getObject(newKey, Session.class);
-				sessions.add(session);
-			} catch (SnappydbException e) {
-				e.printStackTrace();
-				addLog(context, newKey, prefix + " | Cannot retrieve this container");
-			}
-		}
-
-		return sessions;
-	}
-
 	@Background(serial = CACHE)
 	public void getSessionForUpload(Context context, String containerId) {
 		try {
@@ -560,6 +500,9 @@ public class DataCenter {
 
 	@Background(serial = CACHE)
 	public void getSessionInBackground(Context context, String containerId) {
+
+		StackTraceElement[] trace = new Throwable().getStackTrace();
+		Logger.Log("Open DB " + trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
 
 		try {
 			DB db = App.getDB(context);
@@ -1172,10 +1115,10 @@ public class DataCenter {
 	public void uploadAuditItem(Context context, Session session, String itemUuid) throws SnappydbException {
 
 		AuditItem auditItem = session.getAuditItem(itemUuid);
-		AuditItem result = networkClient.postAuditItem(context, session,auditItem);
-		saveSession(context,session);
+		AuditItem result = networkClient.postAuditItem(context, session, auditItem);
+		saveSession(context, session);
 		session.updateAuditItem(result);
-		saveSession(context,session);
+		saveSession(context, session);
 
 	}
 
@@ -1298,7 +1241,7 @@ public class DataCenter {
 
 		Session result = networkClient.completeAudit(context, session);
 		saveSession(context, result);
-		}
+	}
 
 	/**
 	 * Upload repaired container session
@@ -1311,7 +1254,7 @@ public class DataCenter {
 
 		Session result = networkClient.completeRepairSession(context, session);
 		saveSession(context, result);
-		}
+	}
 
 	/**
 	 * @param context
@@ -1333,10 +1276,10 @@ public class DataCenter {
 	 */
 	public void setHandCleaningSession(Context context, Session session) {
 
-			Session result = networkClient.setHandCleaningSession(context, session);
+		Session result = networkClient.setHandCleaningSession(context, session);
 		saveSession(context, result);
 
-		}
+	}
 
 	//endregion
 
