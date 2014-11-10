@@ -33,6 +33,8 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
+import com.cloudjay.cjay.util.enums.UploadStatus;
+import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
@@ -107,7 +109,7 @@ public class ImportFragment extends Fragment {
 
 	long preStatus = 1;
 	Session mSession;
-    List<GateImage> list = new ArrayList<>();
+	List<GateImage> list = new ArrayList<>();
 	//endregion
 
 	public ImportFragment() {
@@ -144,12 +146,12 @@ public class ImportFragment extends Fragment {
 			operatorCode = mSession.getOperatorCode();
 			tvContainerCode.setText(containerID);
 
-            Operator operator = dataCenter.getOperator(getActivity().getApplicationContext(), operatorCode);
-            if (operator != null) {
-                etOperator.setText(operator.getOperatorName());
-            }
+			Operator operator = dataCenter.getOperator(getActivity().getApplicationContext(), operatorCode);
+			if (operator != null) {
+				etOperator.setText(operator.getOperatorName());
+			}
 
-            preStatus = mSession.getPreStatus();
+			preStatus = mSession.getPreStatus();
 			switch ((int) preStatus) {
 				case 0:
 					rdnStatusA.setChecked(true);
@@ -179,7 +181,7 @@ public class ImportFragment extends Fragment {
 	}
 
 	//region EVENT HANDLER
-	void onEvent(EventMenuCreated event){
+	void onEvent(EventMenuCreated event) {
 		Logger.e("EVENT BUSS MENU CREATE");
 		event.getMenu().findItem(R.id.menu_export).setVisible(false);
 	}
@@ -195,14 +197,14 @@ public class ImportFragment extends Fragment {
 		// Set operator to edit text
 		etOperator.setText(operator.getOperatorName());
 
-        if (mSession != null) {
-            mSession.setOperatorId(operator.getId());
-            mSession.setOperatorCode(operator.getOperatorCode());
-            mSession.setGateImages(list);
-        }
+		if (mSession != null) {
+			mSession.setOperatorId(operator.getId());
+			mSession.setOperatorCode(operator.getOperatorCode());
+			mSession.setGateImages(list);
+		}
 
-        // Save session
-        dataCenter.addSession(mSession);
+		// Save session
+		dataCenter.addSession(mSession);
 	}
 
 	/**
@@ -244,13 +246,13 @@ public class ImportFragment extends Fragment {
 	@Click(R.id.btn_camera)
 	void buttonCameraClicked() {
 
-			// Open camera activity
-			Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-			cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
-			cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-			cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
-			cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
-			startActivity(cameraActivityIntent);
+		// Open camera activity
+		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
+		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
+		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
+		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
+		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
+		startActivity(cameraActivityIntent);
 	}
 
 	/**
@@ -264,17 +266,16 @@ public class ImportFragment extends Fragment {
 			return;
 		}
 
-		// Add current container to job queue
-		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), false));
+		//Upload import session
+		uploadImportSession(false);
 
-        // Go to audit and repair fragment
-        AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID)
-                .tabType(1).build();
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
-        transaction.replace(R.id.ll_main, fragment);
-        transaction.commit();
+		// Go to audit and repair fragment
+		AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID)
+				.tabType(1).build();
+		FragmentTransaction transaction = getFragmentManager().beginTransaction();
+		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+		transaction.replace(R.id.ll_main, fragment);
+		transaction.commit();
 	}
 
 	/**
@@ -287,15 +288,22 @@ public class ImportFragment extends Fragment {
 			Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
 			return;
 		}
-
-
-		// Add container session to upload queue
-		JobManager jobManager = App.getJobManager();
-//		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), true));
-		jobManager.addJobInBackground(new UploadImportJob(mSession, true));
+		//Upload import session
+		uploadImportSession(true);
 
 		// Navigate to HomeActivity
 		getActivity().finish();
+	}
+
+	private void uploadImportSession(boolean clearFromWorking) {
+		//Remove from working
+		if (clearFromWorking) {
+			dataCenter.removeWorkingSession(getActivity(), mSession.getContainerId());
+		}
+
+		// Add container session to upload queue
+		JobManager jobManager = App.getJobManager();
+		jobManager.addJobInBackground(new UploadImportJob(mSession));
 	}
 
 	@Touch(R.id.et_operator)
@@ -320,8 +328,8 @@ public class ImportFragment extends Fragment {
 	void preStatusAChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 0;
-            mSession.setPreStatus(preStatus);
-            dataCenter.addSession(mSession);
+			mSession.setPreStatus(preStatus);
+			dataCenter.addSession(mSession);
 			btnContinue.setVisibility(View.GONE);
 		}
 	}
@@ -330,8 +338,8 @@ public class ImportFragment extends Fragment {
 	void preStatusBChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 1;
-            mSession.setPreStatus(preStatus);
-            dataCenter.addSession(mSession);
+			mSession.setPreStatus(preStatus);
+			dataCenter.addSession(mSession);
 			btnContinue.setVisibility(View.VISIBLE);
 		}
 	}
@@ -340,8 +348,8 @@ public class ImportFragment extends Fragment {
 	void preStatusCChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 2;
-            mSession.setPreStatus(preStatus);
-            dataCenter.addSession(mSession);
+			mSession.setPreStatus(preStatus);
+			dataCenter.addSession(mSession);
 			btnContinue.setVisibility(View.VISIBLE);
 		}
 	}

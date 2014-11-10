@@ -16,6 +16,7 @@ import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.session.ContainerChangedEvent;
 import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.job.UploadImportJob;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
@@ -109,7 +110,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 		// PUT /api/cjay/containers/{pk}/complete-audit
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), true));
+		jobManager.addJobInBackground(new UploadImportJob(mSession));
 
 		// Hide this button
 		btnCompleteAudit.setVisibility(View.GONE);
@@ -145,7 +146,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 		// Add containerId to upload complete repair queue
 		// PUT /api/cjay/containers/{pk}/complete-repair
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), true));
+		jobManager.addJobInBackground(new UploadImportJob(mSession));
 
 		// Navigate to HomeActivity
 		getActivity().finish();

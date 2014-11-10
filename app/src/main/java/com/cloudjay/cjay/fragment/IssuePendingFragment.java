@@ -27,16 +27,17 @@ import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.job.UploadImportJob;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
@@ -116,7 +117,7 @@ public class IssuePendingFragment extends Fragment {
 				// Set ContainerId to TextView
 				tvContainerId.setText(containerId);
 
-				mAdapter = new AuditItemAdapter(getActivity(), R.layout.item_issue_pending, containerId, operatorCode);
+				mAdapter = new AuditItemAdapter(getActivity(), R.layout.item_issue_pending, mSession, operatorCode);
 				lvAuditItems.setAdapter(mAdapter);
 
 				refresh();
@@ -132,7 +133,7 @@ public class IssuePendingFragment extends Fragment {
 
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), Step.HAND_CLEAN.value, true));
+		jobManager.addJobInBackground(new UploadImportJob(mSession));
 
 		getActivity().finish();
 	}
@@ -215,7 +216,7 @@ public class IssuePendingFragment extends Fragment {
 
 		if (mAdapter == null) {
 			mAdapter = new AuditItemAdapter(getActivity(),
-					R.layout.item_issue_pending, containerId, operatorCode);
+					R.layout.item_issue_pending, mSession, operatorCode);
 		}
 
 		mAdapter.clear();
@@ -303,16 +304,24 @@ public class IssuePendingFragment extends Fragment {
 
 		}
 		// Re-query container session with given containerId
-		String containerId = event.getContainerId();
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+		if (event.uploadType == UploadType.SESSION) {
+			dataCenter.changeStatusWhenUpload(getActivity(), event.getSession(), UploadType.SESSION, UploadStatus.COMPLETE);
+		} else if (event.uploadType == UploadType.AUDIT_ITEM){
+			dataCenter.changeStatusWhenUpload(getActivity(),event.getSession(),UploadType.AUDIT_ITEM,UploadStatus.COMPLETE);
+		}
+		mSession = event.getSession();
 		refresh();
 	}
 
 	void onEvent(UploadStartedEvent event) {
 		Logger.Log("upload complete");
 		// Re-query container session with given containerId
-		String containerId = event.getContainerId();
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+		if (event.uploadType == UploadType.SESSION) {
+			dataCenter.changeStatusWhenUpload(getActivity(), event.getSession(), UploadType.SESSION, UploadStatus.UPLOADING);
+		} else if (event.uploadType == UploadType.AUDIT_ITEM){
+			dataCenter.changeStatusWhenUpload(getActivity(),event.getSession(),UploadType.AUDIT_ITEM,UploadStatus.UPLOADING);
+		}
+		mSession = event.getSession();
 		refresh();
 	}
 	//endregion
