@@ -66,8 +66,15 @@ public class IssueReportLocationFragment extends IssueReportFragment implements 
     @ViewById(R.id.tv_code_fullname)
     TextView mLocationCodeTextView;
 
+    @ViewById(R.id.tv_code_label)
+    TextView mCodeLabelTextView;
+
 	@AfterViews
 	void AfterViews() {
+
+        // Set text code label
+        mCodeLabelTextView.setText(R.string.label_code_location);
+
 		mCodeButtons = new Button[12];
 		mCodeButtons[0] = mCode0Button;
 		mCodeButtons[1] = mCode1Button;

@@ -47,6 +47,9 @@ public class IssueReportRepairFragment extends IssueReportFragment {
     @ViewById(R.id.tv_code_fullname)
     TextView mRepairNameTextView;
 
+    @ViewById(R.id.tv_code_label)
+    TextView mCodeLabelTextView;
+
 	@SystemService
 	InputMethodManager inputMethodManager;
 
@@ -59,6 +62,9 @@ public class IssueReportRepairFragment extends IssueReportFragment {
 
 	@AfterViews
 	void afterViews() {
+
+        // Set text code label
+        mCodeLabelTextView.setText(R.string.label_code_repair);
 
 		mRepairEditText.addTextChangedListener(new TextWatcher() {
 			@Override

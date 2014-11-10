@@ -151,7 +151,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 			if (auditItem.isAllowed() == null) {
 				holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_unapproved));
-				holder.tvIssueStatus.setBackgroundColor(Color.parseColor("#FACC2E"));
+				holder.tvIssueStatus.setBackgroundColor(Color.parseColor("#9D9614"));
 			} else {
 				if (!auditItem.isAllowed()) {
 					holder.tvIssueStatus.setText("Cấm sửa");
@@ -205,20 +205,24 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				@Override
 				public void onClick(View view) {
 
-					// Validate: if this is wash type item, cannot edit
+                    // Lỗi chưa duyệt hoặc đã duyệt thì cho phép sửa
+                    if (null == auditItem.isAllowed() || auditItem.isAllowed()) {
+                        Logger.Log("getUuid: " + auditItem.getUuid());
+
+                        Intent intent = new Intent(mContext, ReportIssueActivity_.class);
+                        intent.putExtra(ReportIssueActivity_.CONTAINER_ID_EXTRA, containerId);
+                        intent.putExtra(ReportIssueActivity_.AUDIT_IMAGE_EXTRA, auditItem.getAuditImages().get(0).getUuid());
+                        intent.putExtra(ReportIssueActivity_.AUDIT_ITEM_EXTRA, auditItem.getUuid());
+
+                        mContext.startActivity(intent);
+                        return;
+                    }
+
+					// Lỗi cấm sửa, hiện dialog thông báo cho người dùng
 					if (!auditItem.isAllowed()) {
-						showPreventRepairDialog();
-					} else {
-						Logger.Log("getUuid: " + auditItem.getUuid());
-
-						Intent intent = new Intent(mContext, ReportIssueActivity_.class);
-						intent.putExtra(ReportIssueActivity_.CONTAINER_ID_EXTRA, containerId);
-						intent.putExtra(ReportIssueActivity_.AUDIT_IMAGE_EXTRA, auditItem.getAuditImages().get(0).getUuid());
-						intent.putExtra(ReportIssueActivity_.AUDIT_ITEM_EXTRA, auditItem.getUuid());
-
-						mContext.startActivity(intent);
-					}
-
+                        showPreventRepairDialog();
+                        return;
+                    }
 				}
 			});
 
@@ -404,6 +408,17 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		});
 
 		AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+
+                // Set background and text color for confirm button
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setTextColor(mContext.getResources().getColor(android.R.color.white));
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setBackgroundResource(R.drawable.btn_green_selector);
+            }
+        });
 		dialog.show();
 	}
 
