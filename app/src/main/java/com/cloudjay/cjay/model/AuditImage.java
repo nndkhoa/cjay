@@ -8,13 +8,14 @@ import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 import javax.annotation.Generated;
 
 /* Gồm hình giám định và sửa chữa */
 @Generated("org.jsonschema2pojo")
-public class AuditImage {
+public class AuditImage implements Serializable{
 
 	@Expose
 	private long id;

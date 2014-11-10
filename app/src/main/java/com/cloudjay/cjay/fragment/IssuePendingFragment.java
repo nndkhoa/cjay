@@ -25,6 +25,7 @@ import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
 import com.cloudjay.cjay.event.issue.IssueDeletedEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
 import com.cloudjay.cjay.event.issue.IssueUpdatedEvent;
+import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
@@ -97,31 +98,35 @@ public class IssuePendingFragment extends Fragment {
 	@AfterViews
 	void setUp() {
 
-		Logger.Log("on setUp");
+		dataCenter.getSessionInBackground(getActivity(), containerId);
+	}
 
-		// Get session by containerId
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+	@UiThread
+	public void onEvent(ContainersGotEvent event) {
 
-		if (mSession != null) {
+		if (event.getSessions() != null && event.getSessions().size() > 0) {
+			mSession = event.getSessions().get(0);
+			if (mSession != null) {
 
-			// Get operator code
-			containerId = mSession.getContainerId();
-			operatorCode = mSession.getOperatorCode();
+				// Get operator code
+				containerId = mSession.getContainerId();
+				operatorCode = mSession.getOperatorCode();
 
-			// Set currentStatus to TextView
-			currentStatus = mSession.getStatus();
-			tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
+				// Set currentStatus to TextView
+				currentStatus = mSession.getStatus();
+				tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
 
-			// Set ContainerId to TextView
-			tvContainerId.setText(containerId);
+				// Set ContainerId to TextView
+				tvContainerId.setText(containerId);
 
-			mAdapter = new AuditItemAdapter(getActivity(), R.layout.item_issue_pending, containerId, operatorCode);
-			lvAuditItems.setAdapter(mAdapter);
+				mAdapter = new AuditItemAdapter(getActivity(), R.layout.item_issue_pending, containerId, operatorCode);
+				lvAuditItems.setAdapter(mAdapter);
 
-			refresh();
-		} else {
-			// Set ContainerId to TextView
-			tvContainerId.setText(containerId);
+				refresh();
+			} else {
+				// Set ContainerId to TextView
+				tvContainerId.setText(containerId);
+			}
 		}
 	}
 
@@ -158,9 +163,13 @@ public class IssuePendingFragment extends Fragment {
 	/**
 	 * Get list audit items of container
 	 */
+	@Trace
 	void refresh() {
 		if (mAdapter != null) {
+			Logger.Log("1");
 			dataCenter.getAuditItemsInBackground(getActivity(), containerId);
+		} else {
+			Logger.Log("2");
 		}
 	}
 
@@ -217,6 +226,7 @@ public class IssuePendingFragment extends Fragment {
         dialog.show();
     }
 
+	@Trace
 	public void onEvent(AuditItemsGotEvent event) {
 
 		// Filter list audit items that was not repair
@@ -273,6 +283,7 @@ public class IssuePendingFragment extends Fragment {
 
 	//region EVENT HANDLER
 	@UiThread
+	@Trace
 	void onEvent(ImageCapturedEvent event) {
 		Logger.Log("on ImageCapturedEvent");
 

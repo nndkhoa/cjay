@@ -122,13 +122,13 @@ public class AfterRepairFragment extends Fragment {
 
 		// Notify user that audit item is not uploaded yet
 		if (auditItem.getId() == 0) {
-			Utils.showCrouton(getActivity(), "Loi nay chua duoc giam dinh");
+			Utils.showCrouton(getActivity(), "Lỗi chưa được giám định");
 			return;
 		}
 		if (auditItem.isAllowed() != null) {
 			// Notify user that audit item is not allow to repare
 			if (!auditItem.isAllowed()) {
-				Utils.showCrouton(getActivity(), "Loi nay khong duoc phep sua");
+				Utils.showCrouton(getActivity(), "Lỗi không được phép sửa");
 				return;
 			}
 		}

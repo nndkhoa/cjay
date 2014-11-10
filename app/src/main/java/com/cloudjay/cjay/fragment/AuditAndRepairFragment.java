@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -16,6 +17,7 @@ import com.cloudjay.cjay.event.session.ContainerChangedEvent;
 import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
@@ -165,6 +167,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	void doAfterViews() {
 		configureActionBar();
 		configureViewPager();
+		dataCenter.getSessionInBackground(getActivity(), containerID);
 	}
 
 	@UiThread
@@ -177,9 +180,11 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 		if (mSession.getLocalStep() == Step.AUDIT.value) {
 			if (mSession.hasRepairImages()) {
+				Logger.Log("2");
 				btnCompleteAudit.setVisibility(View.VISIBLE);
 				btnCompleteRepair.setVisibility(View.VISIBLE);
 			} else {
+				Logger.Log("3");
 				btnCompleteAudit.setVisibility(View.VISIBLE);
 				btnCompleteRepair.setVisibility(View.GONE);
 			}
@@ -273,6 +278,8 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	 * @param event
 	 */
 	public void onEvent(ImageCapturedEvent event) {
+
+
 		// requery to update button
 		int imageType = event.getImageType();
 		if (imageType == ImageType.AUDIT.value) {
