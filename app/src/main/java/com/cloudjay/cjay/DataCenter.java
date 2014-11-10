@@ -586,7 +586,19 @@ public class DataCenter {
 		Session session = db.getObject(containerId, Session.class);
 		session.setLocalStep(step.value);
 		db.put(containerId, session);
+	}
 
+	@Background
+	public void changeSessionLocalStepInBackground(Context context, String containerId, Step step) {
+		DB db;
+		try {
+			db = App.getDB(context);
+			Session session = db.getObject(containerId, Session.class);
+			session.setLocalStep(step.value);
+			db.put(containerId, session);
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -602,10 +614,9 @@ public class DataCenter {
 	 * @param context
 	 * @param lastModifiedDate
 	 * @param refetchWithFistPageTime
-	 * @throws SnappydbException
 	 */
-	@Trace
-	public void fetchSession(Context context, String lastModifiedDate, boolean refetchWithFistPageTime) throws SnappydbException {
+//	@Background (serial = CACHE)
+	public void fetchSession(Context context, String lastModifiedDate, boolean refetchWithFistPageTime)  {
 
 		String newModifiedDay;
 		do {
@@ -620,8 +631,28 @@ public class DataCenter {
 			}
 
 			List<Session> sessions = networkClient.getSessionByPage(context, nextPage, lastModifiedDate);
-			DB db = App.getDB(context);
+			processListSession(sessions);
 
+			newModifiedDay = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
+			Logger.Log("Fetched page: " + nextPage);
+			Logger.Log("Current Modified day: " + newModifiedDay);
+
+		} while (lastModifiedDate.equals(newModifiedDay));
+
+		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE, "");
+
+		if (refetchWithFistPageTime) {
+			//Fetch again with modified day is first page request_time
+			String firstPageTime = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_FIRST_PAGE_MODIFIED_DATE);
+			fetchSession(context, firstPageTime, false);
+		}
+	}
+
+	@Background(serial = CACHE)
+	void processListSession(List<Session> sessions) {
+		DB db;
+		try {
+			db = App.getDB(context);
 			for (Session session : sessions) {
 
 				String key = session.getContainerId();
@@ -641,21 +672,11 @@ public class DataCenter {
 					}
 				}
 			}
-
-			Logger.Log("Fetched page: " + nextPage);
-			newModifiedDay = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
-			Logger.Log("Current Modified day: " + newModifiedDay);
-
-		} while (lastModifiedDate.equals(newModifiedDay));
-
-		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE, "");
-
-		if (refetchWithFistPageTime) {
-			//Fetch again with modified day is first page request_time
-			String firstPageTime = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_FIRST_PAGE_MODIFIED_DATE);
-			fetchSession(context, firstPageTime, false);
+		} catch (SnappydbException e) {
+			e.printStackTrace();
 		}
 	}
+
 	/**
 	 * Search container session from device database.
 	 * <p/>

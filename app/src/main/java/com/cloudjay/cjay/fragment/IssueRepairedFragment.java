@@ -16,6 +16,7 @@ import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 
 import org.androidannotations.annotations.AfterViews;
@@ -99,7 +100,7 @@ public class IssueRepairedFragment extends Fragment {
     }
 
 	@ItemClick(R.id.lv_repaired_items)
-	void switchToDetailIssueActivity(int position) {
+	void repairItemClicked(int position) {
 		AuditItem auditItem = mAdapter.getItem(position);
 		if (auditItem.isAudited()) {
 			Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
@@ -138,10 +139,13 @@ public class IssueRepairedFragment extends Fragment {
 
 	@UiThread
 	void onEvent(ImageCapturedEvent event) {
-		Logger.Log("on ImageCapturedEvent");
 
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
-		refresh();
+		if (event.getImageType() == ImageType.REPAIRED.value) {
+			Logger.Log("on ImageCapturedEvent");
+
+			mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+			refresh();
+		}
 	}
 
     @Override
