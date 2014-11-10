@@ -203,6 +203,7 @@ public class ImportFragment extends Fragment {
 
         // Save session
         dataCenter.addSession(mSession);
+        dataCenter.addWorkingSession(mSession);
 	}
 
 	/**
@@ -322,6 +323,7 @@ public class ImportFragment extends Fragment {
 			preStatus = 0;
             mSession.setPreStatus(preStatus);
             dataCenter.addSession(mSession);
+            dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.GONE);
 		}
 	}
@@ -332,6 +334,7 @@ public class ImportFragment extends Fragment {
 			preStatus = 1;
             mSession.setPreStatus(preStatus);
             dataCenter.addSession(mSession);
+            dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.VISIBLE);
 		}
 	}
@@ -342,6 +345,7 @@ public class ImportFragment extends Fragment {
 			preStatus = 2;
             mSession.setPreStatus(preStatus);
             dataCenter.addSession(mSession);
+            dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.VISIBLE);
 		}
 	}
