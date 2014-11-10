@@ -13,6 +13,7 @@ import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONException;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -22,7 +23,7 @@ import javax.annotation.Generated;
 
 /* Field uuid để phân biệt AuditItem dưới Local, trước khi upload lên server */
 @Generated("org.jsonschema2pojo")
-public class AuditItem {
+public class AuditItem implements Serializable{
 
 	//region ATTR
 	@Expose

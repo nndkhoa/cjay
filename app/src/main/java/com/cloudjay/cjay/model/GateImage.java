@@ -6,13 +6,14 @@ import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.google.gson.annotations.Expose;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 import javax.annotation.Generated;
 
 /* Gồm hình nhập và hình xuất */
 @Generated("org.jsonschema2pojo")
-public class GateImage {
+public class GateImage implements Serializable{
 
 	@Expose
 	private long id;

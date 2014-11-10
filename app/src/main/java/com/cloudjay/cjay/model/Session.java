@@ -16,6 +16,7 @@ import com.google.gson.annotations.SerializedName;
 import org.json.JSONException;
 
 import java.io.File;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ import javax.annotation.Generated;
 
 
 @Generated("org.jsonschema2pojo")
-public class Session {
+public class Session implements Serializable{
 
 	public static final String FIELD_CONTAINER_ID = "container_id";
 
@@ -129,10 +130,12 @@ public class Session {
 	}
 
 	public void setLocalStep(int localStep) {
+//		Logger.e(localStep + "");
 		this.localStep = localStep;
 	}
 
 	public Session withLocalStep(int step) {
+//		Logger.e(localStep + "1");
 		this.localStep = step;
 		return this;
 	}

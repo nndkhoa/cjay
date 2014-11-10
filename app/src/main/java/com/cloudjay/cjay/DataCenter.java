@@ -14,6 +14,7 @@ import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.event.session.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.event.session.WorkingSessionCreatedEvent;
+import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
@@ -29,6 +30,7 @@ import com.cloudjay.cjay.util.StringUtils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
+import com.cloudjay.cjay.util.enums.UploadType;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
@@ -590,6 +592,10 @@ public class DataCenter {
 
 	@Background
 	public void changeSessionLocalStepInBackground(Context context, String containerId, Step step) {
+
+		StackTraceElement[] trace = new Throwable().getStackTrace();
+		Logger.Log("Open DB " + trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
+
 		DB db;
 		try {
 			db = App.getDB(context);
@@ -968,17 +974,21 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	public void addGateImage(Context context, GateImage image, String containerId) throws SnappydbException {
+	@Background(serial = CACHE)
+	public void addGateImage(Context context, GateImage image, String containerId) {
 
-		DB db = App.getDB(context);
+		try {
+			DB db = App.getDB(context);
 
-		// Add gate image to normal container session
-		Session session = db.getObject(containerId, Session.class);
-		session.getGateImages().add(image);
+			// Add gate image to normal container session
+			Session session = db.getObject(containerId, Session.class);
+			session.getGateImages().add(image);
 
-		String key = containerId;
-		db.put(key, session);
-
+			String key = containerId;
+			db.put(key, session);
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -1186,6 +1196,36 @@ public class DataCenter {
 			Logger.logJson(error, RetrofitError.class);
 		}
 
+	}
+
+	public void uploadImportSession(Context context, Session session){
+		Session result = networkClient.uploadSession(context, session);
+		saveSession(context, result, new UploadSucceededEvent(session.getContainerId(), UploadType.SESSION));
+	}
+
+	@Background(serial = CACHE)
+	void saveSession(Context context, Session session, Object event) {
+		// doi status sang uploaded
+		DB db = null;
+		String key = session.getContainerId();
+		try {
+			db = App.getDB(context);
+
+			Session object = db.getObject(key, Session.class);
+			object.mergeSession(session);
+
+		} catch (SnappydbException e) {
+			// change session to local
+			Logger.wtf(e.getMessage());
+			try {
+
+				db.put(key, session);
+			} catch (SnappydbException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+			EventBus.getDefault().post(event);
+		}
 	}
 
 	/**
