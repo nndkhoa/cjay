@@ -1,6 +1,8 @@
 package com.cloudjay.cjay.fragment;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,6 +18,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.DetailIssueActivity;
 import com.cloudjay.cjay.activity.DetailIssueActivity_;
+import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.adapter.AuditItemAdapter;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
@@ -26,11 +29,14 @@ import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.job.UploadImportJob;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
+import com.cloudjay.cjay.util.enums.UploadStatus;
+import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
@@ -99,27 +105,20 @@ public class IssuePendingFragment extends Fragment {
 	}
 
 	//region VIEW INTERACTION
+
 	@Click(R.id.btn_clean)
 	void buttonCleanClicked() {
 
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), Step.HAND_CLEAN.value, true));
+		jobManager.addJobInBackground(new UploadImportJob(mSession));
 
 		getActivity().finish();
 	}
 
 	@Click(R.id.btn_camera)
 	void buttonCameraClicked() {
-
-		// Open camera activity
-		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerId);
-		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.AUDIT.value);
-		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.AUDIT.value);
-		cameraActivityIntent.putExtra(CameraFragment.IS_OPENED, false);
-		startActivity(cameraActivityIntent);
+        showUseGateImageDialog();
 	}
 
 	@ItemClick(R.id.lv_audit_items)
@@ -147,61 +146,119 @@ public class IssuePendingFragment extends Fragment {
 		}
 	}
 
-	@UiThread
-	void updatedData(List<AuditItem> auditItems) {
+//	<<<<<<< HEAD
+//	@UiThread
+//	void updatedData(List<AuditItem> auditItems) {
+//
+//		if (mAdapter == null) {
+//			mAdapter = new AuditItemAdapter(getActivity(),
+//					R.layout.item_issue_pending, containerId, operatorCode);
+//		}
+//
+//		mAdapter.clear();
+//		if (auditItems != null) {
+//			for (AuditItem auditItem : auditItems) {
+//				mAdapter.add(auditItem);
+//			}
+//		}
+//
+//		mAdapter.notifyDataSetChanged();
+//
+//		// If container has audit image(s), hide button Container Ve sinh - quet
+//		if (mAdapter.getCount() > 0) {
+//			btnClean.setVisibility(View.GONE);
+//		}
+//	}
+//
+//	//region EVENT HANDLER
+//	@UiThread
+//	public void onEvent(ContainersGotEvent event) {
+//
+//		if (event.getTargets() != null && event.getTargets().size() > 0) {
+//
+//			mSession = event.getTargets().get(0);
+//			if (mSession != null) {
+//
+//				// Get operator code
+//				containerId = mSession.getContainerId();
+//				operatorCode = mSession.getOperatorCode();
+//
+//				// Set currentStatus to TextView
+//				currentStatus = mSession.getStatus();
+//				tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
+//
+//				// Set ContainerId to TextView
+//				tvContainerId.setText(containerId);
+//
+//				mAdapter = new AuditItemAdapter(getActivity(), R.layout.item_issue_pending, containerId, operatorCode);
+//				lvAuditItems.setAdapter(mAdapter);
+//
+//				refresh();
+//			} else {
+//				// Set ContainerId to TextView
+//				tvContainerId.setText(containerId);
+//			}
+//		}
+//	}
+//
+//	@UiThread
+//	=======
 
-		if (mAdapter == null) {
-			mAdapter = new AuditItemAdapter(getActivity(),
-					R.layout.item_issue_pending, containerId, operatorCode);
-		}
 
-		mAdapter.clear();
-		if (auditItems != null) {
-			for (AuditItem auditItem : auditItems) {
-				mAdapter.add(auditItem);
-			}
-		}
+    /**
+     * Pick gate in image or take audit picture
+     */
+    void showUseGateImageDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.dialog_alert_title);
+        builder.setMessage(R.string.dialog_message_use_gate_in_image);
+        builder.setPositiveButton("Không", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                // Open camera to take audit picture
+                Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
+                cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerId);
+                cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.AUDIT.value);
+                cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
+                cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.AUDIT.value);
+                cameraActivityIntent.putExtra(CameraFragment.IS_OPENED, false);
+                startActivity(cameraActivityIntent);
 
-		mAdapter.notifyDataSetChanged();
+                dialogInterface.dismiss();
+            }
+        });
+        builder.setNegativeButton("Có", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                // Open ReuseActivity to chose Gate Image
+                Intent intent = new Intent(getActivity(), ReuseActivity_.class);
+                intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, containerId);
+                startActivityForResult(intent, 1);
+                dialogInterface.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
 
-		// If container has audit image(s), hide button Container Ve sinh - quet
-		if (mAdapter.getCount() > 0) {
-			btnClean.setVisibility(View.GONE);
-		}
-	}
+                // Set background and text color for use gate image
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setTextColor(getResources().getColor(android.R.color.white));
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setBackgroundResource(R.drawable.btn_green_selector);
 
-	//region EVENT HANDLER
-	@UiThread
-	public void onEvent(ContainersGotEvent event) {
+                // Set background and text color for open camera
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setTextColor(getResources().getColor(android.R.color.white));
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setBackgroundResource(R.drawable.btn_red_selector);
+            }
+        });
+        dialog.show();
+    }
 
-		if (event.getTargets() != null && event.getTargets().size() > 0) {
-
-			mSession = event.getTargets().get(0);
-			if (mSession != null) {
-
-				// Get operator code
-				containerId = mSession.getContainerId();
-				operatorCode = mSession.getOperatorCode();
-
-				// Set currentStatus to TextView
-				currentStatus = mSession.getStatus();
-				tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
-
-				// Set ContainerId to TextView
-				tvContainerId.setText(containerId);
-
-				mAdapter = new AuditItemAdapter(getActivity(), R.layout.item_issue_pending, containerId, operatorCode);
-				lvAuditItems.setAdapter(mAdapter);
-
-				refresh();
-			} else {
-				// Set ContainerId to TextView
-				tvContainerId.setText(containerId);
-			}
-		}
-	}
-
-	@UiThread
+	@Trace
 	public void onEvent(AuditItemsGotEvent event) {
 
 		// Filter list audit items that was not repair
@@ -233,6 +290,35 @@ public class IssuePendingFragment extends Fragment {
 	}
 
 	@UiThread
+	void updatedData(List<AuditItem> auditItems) {
+
+		for (AuditItem auditItem : auditItems) {
+			Logger.Log("uuid: " + auditItem.getUuid());
+		}
+
+		if (mAdapter == null) {
+			mAdapter = new AuditItemAdapter(getActivity(),
+					R.layout.item_issue_pending, mSession, operatorCode);
+		}
+
+		mAdapter.clear();
+		if (auditItems != null) {
+			for (AuditItem auditItem : auditItems) {
+				mAdapter.add(auditItem);
+			}
+		}
+
+		mAdapter.notifyDataSetChanged();
+
+		// If container has audit image(s), hide button Container Ve sinh - quet
+		if (mAdapter.getCount() > 0) {
+			btnClean.setVisibility(View.GONE);
+		}
+	}
+
+	//region EVENT HANDLER
+	@UiThread
+	@Trace
 	void onEvent(ImageCapturedEvent event) {
 		Logger.Log("on ImageCapturedEvent");
 
@@ -278,14 +364,34 @@ public class IssuePendingFragment extends Fragment {
 		dataCenter.getSessionInBackground(getActivity(), event.getContainerId());
 	}
 
-	@UiThread
+
 	void onEvent(UploadSucceededEvent event) {
-		dataCenter.getSessionInBackground(getActivity(), event.getContainerId());
+
+		if (event.uploadType == UploadType.AUDIT_ITEM) {
+
+		}
+		// Re-query container session with given containerId
+		if (event.uploadType == UploadType.SESSION) {
+			dataCenter.changeStatusWhenUpload(getActivity(), event.getSession(), UploadType.SESSION, UploadStatus.COMPLETE);
+		} else if (event.uploadType == UploadType.AUDIT_ITEM){
+			dataCenter.changeStatusWhenUpload(getActivity(),event.getSession(),UploadType.AUDIT_ITEM,UploadStatus.COMPLETE);
+		}
+		mSession = event.getSession();
+		refresh();
+
 	}
 
 	@UiThread
 	void onEvent(UploadStartedEvent event) {
-		dataCenter.getSessionInBackground(getActivity(), event.getContainerId());
+		Logger.Log("upload complete");
+		// Re-query container session with given containerId
+		if (event.uploadType == UploadType.SESSION) {
+			dataCenter.changeStatusWhenUpload(getActivity(), event.getSession(), UploadType.SESSION, UploadStatus.UPLOADING);
+		} else if (event.uploadType == UploadType.AUDIT_ITEM){
+			dataCenter.changeStatusWhenUpload(getActivity(),event.getSession(),UploadType.AUDIT_ITEM,UploadStatus.UPLOADING);
+		}
+		mSession = event.getSession();
+		refresh();
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package com.cloudjay.cjay.model;
 
 import android.text.TextUtils;
 
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -750,7 +751,8 @@ public class Session implements Serializable{
 						found = true;
 
 						Logger.Log("Found audit item");
-						SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+						SimpleDateFormat format = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+						Logger.Log(serverItem.getModifiedAt());
 						try {
 							Date server = format.parse(serverItem.getModifiedAt());
 							Date local = format.parse(localItem.getModifiedAt());

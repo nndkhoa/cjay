@@ -15,6 +15,8 @@ import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.enums.UploadStatus;
+import com.cloudjay.cjay.util.enums.UploadType;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -80,6 +82,11 @@ public class UploadFragment extends Fragment {
 
 	//region EVENT HANDLER
 	public void onEvent(UploadStartedEvent event) {
+		if (event.uploadType == UploadType.SESSION) {
+			dataCenter.changeStatusWhenUpload(getActivity(), event.getSession(), UploadType.SESSION, UploadStatus.COMPLETE);
+		} else if (event.uploadType == UploadType.AUDIT_ITEM){
+			dataCenter.changeStatusWhenUpload(getActivity(),event.getSession(),UploadType.AUDIT_ITEM,UploadStatus.COMPLETE);
+		}
 		refresh();
 	}
 
@@ -92,6 +99,11 @@ public class UploadFragment extends Fragment {
 	}
 
 	public void onEvent(UploadSucceededEvent event) {
+		if (event.uploadType == UploadType.SESSION) {
+			dataCenter.changeStatusWhenUpload(getActivity(), event.getSession(), UploadType.SESSION, UploadStatus.UPLOADING);
+		} else if (event.uploadType == UploadType.AUDIT_ITEM){
+			dataCenter.changeStatusWhenUpload(getActivity(),event.getSession(),UploadType.AUDIT_ITEM,UploadStatus.UPLOADING);
+		}
 		refresh();
 	}
 

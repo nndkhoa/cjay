@@ -76,6 +76,12 @@ public class AuditItem implements Serializable{
 	@Expose
 	private long quantity;
 
+    /**
+     * allowed status:
+     * null: chưa duyệt
+     * true: đã duyệt
+     * false: cấm sửa
+     */
 	@SerializedName("is_allowed")
 	@Expose
 	private Boolean allowed;

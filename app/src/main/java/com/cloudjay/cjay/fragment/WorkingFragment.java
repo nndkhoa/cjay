@@ -19,6 +19,7 @@ import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 
 import org.androidannotations.annotations.AfterViews;
@@ -91,10 +92,7 @@ public class WorkingFragment extends Fragment {
 		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
 		lvWorking.setAdapter(mAdapter);
 		lvWorking.setEmptyView(tvEmpty);
-
-		List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
-				CJayConstant.PREFIX_WORKING);
-		updatedData(list);
+		refresh();
 	}
 
 	void refresh() {
@@ -128,11 +126,21 @@ public class WorkingFragment extends Fragment {
 
 	public void onEvent(UploadSucceededEvent event) {
 		if (event.getUploadType() == UploadType.SESSION)
+			if (event.uploadType == UploadType.SESSION) {
+				dataCenter.changeStatusWhenUpload(getActivity(), event.getSession(), UploadType.SESSION, UploadStatus.COMPLETE);
+			} else if (event.uploadType == UploadType.AUDIT_ITEM){
+				dataCenter.changeStatusWhenUpload(getActivity(),event.getSession(),UploadType.AUDIT_ITEM,UploadStatus.COMPLETE);
+			}
 			refresh();
 	}
 
 	public void onEvent(UploadStartedEvent event) {
 		if (event.getUploadType() == UploadType.SESSION)
+			if (event.uploadType == UploadType.SESSION) {
+				dataCenter.changeStatusWhenUpload(getActivity(), event.getSession(), UploadType.SESSION, UploadStatus.UPLOADING);
+			} else if (event.uploadType == UploadType.AUDIT_ITEM){
+				dataCenter.changeStatusWhenUpload(getActivity(),event.getSession(),UploadType.AUDIT_ITEM,UploadStatus.UPLOADING);
+			}
 			refresh();
 	}
 

@@ -34,6 +34,8 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
+import com.cloudjay.cjay.util.enums.UploadStatus;
+import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
@@ -265,9 +267,8 @@ public class ImportFragment extends Fragment {
 			return;
 		}
 
-		// Add current container to job queue
-		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), false));
+		//Upload import session
+		uploadImportSession(false);
 
 		// Go to audit and repair fragment
 		AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID)
@@ -289,13 +290,23 @@ public class ImportFragment extends Fragment {
 			return;
 		}
 
-		// Add container session to upload queue
-		JobManager jobManager = App.getJobManager();
-//		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), true));
-		jobManager.addJobInBackground(new UploadImportJob(mSession, true));
+		//Upload import session
+		uploadImportSession(true);
 
 		// Navigate to HomeActivity
 		getActivity().finish();
+	}
+
+	private void uploadImportSession(boolean clearFromWorking) {
+
+		//Remove from working
+		if (clearFromWorking) {
+			dataCenter.removeWorkingSession(getActivity(), mSession.getContainerId());
+		}
+
+		// Add container session to upload queue
+		JobManager jobManager = App.getJobManager();
+		jobManager.addJobInBackground(new UploadImportJob(mSession));
 	}
 
 	@Touch(R.id.et_operator)
@@ -320,8 +331,10 @@ public class ImportFragment extends Fragment {
 	void preStatusAChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 0;
+
 			mSession.setPreStatus(preStatus);
 			dataCenter.addSession(mSession);
+            dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.GONE);
 		}
 	}
@@ -332,6 +345,7 @@ public class ImportFragment extends Fragment {
 			preStatus = 1;
 			mSession.setPreStatus(preStatus);
 			dataCenter.addSession(mSession);
+            dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.VISIBLE);
 		}
 	}
@@ -342,6 +356,7 @@ public class ImportFragment extends Fragment {
 			preStatus = 2;
 			mSession.setPreStatus(preStatus);
 			dataCenter.addSession(mSession);
+            dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.VISIBLE);
 		}
 	}

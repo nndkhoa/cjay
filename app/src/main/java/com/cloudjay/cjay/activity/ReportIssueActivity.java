@@ -31,6 +31,7 @@ import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -145,6 +146,9 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
 		// Set audited is true before saving
 		mAuditItem.setAudited(true);
+        // Set is allowed is null
+        Logger.Log("set null for allowed");
+        mAuditItem.setAllowed(null);
 		// save db records and refresh list
 		mDataCenter.updateAuditItem(getApplicationContext(), mContainerId, mAuditItem);
 
