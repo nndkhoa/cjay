@@ -1472,7 +1472,7 @@ public class DataCenter {
 
 			Logger.Log("Create new audit item");
 
-			// Add Iso Code
+			// Add Isso Code
 			String damageKey = CJayConstant.PREFIX_DAMAGE_CODE + "DB";
 			String repairKey = CJayConstant.PREFIX_REPAIR_CODE + "WW";
 			String componentKey = CJayConstant.PREFIX_COMPONENT_CODE + "FWA";
