@@ -224,6 +224,7 @@ public class IssuePendingFragment extends Fragment {
 	}
 
 	//region EVENT HANDLER
+	@UiThread
 	void onEvent(ImageCapturedEvent event) {
 		Logger.Log("on ImageCapturedEvent");
 
@@ -231,8 +232,7 @@ public class IssuePendingFragment extends Fragment {
 		switch (imageType) {
 			case AUDIT:
 				// Re-query container session with given containerId
-				String containerId = event.getContainerId();
-				mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+//				dataCenter.getSessionInBackground(getActivity(), containerId);
 				refresh();
 				break;
 

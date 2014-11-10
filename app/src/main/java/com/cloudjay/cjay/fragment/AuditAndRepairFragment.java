@@ -12,6 +12,7 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
+import com.cloudjay.cjay.event.session.ContainerChangedEvent;
 import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
@@ -19,6 +20,7 @@ import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.path.android.jobqueue.JobManager;
+import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -36,11 +38,8 @@ import de.greenrobot.event.EventBus;
 
 /**
  * Fragment giám định và sửa chữa.
- * <p/>
- * 1. Khi lần đầu vào, chỉ hiển thị nút `Hoàn tất giám định` và theo luồng xử lý thông thường
- * 2. Nếu user chụp hình sau sửa chữa thì có nghĩa user cần sửa chữa ngay sau khi giám định.
- * 2.1 Lúc này bấm nút `Hoàn tất giám định` sẽ không đóng Activity
- * 2.2
+ * 1. Default sẽ hiện button giám định.
+ * 2. Kiểm tra biến mSession để hiển thị
  */
 @EFragment(R.layout.fragment_audit_repair)
 public class AuditAndRepairFragment extends Fragment implements ActionBar.TabListener {
@@ -274,16 +273,15 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	 * @param event
 	 */
 	public void onEvent(ImageCapturedEvent event) {
-
 		// requery to update button
-		// TODO: bug
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
 		int imageType = event.getImageType();
 		if (imageType == ImageType.AUDIT.value) {
-			mSession.setLocalStep(Step.AUDIT.value);
-			dataCenter.addSession(mSession);
+			dataCenter.changeSessionLocalStepInBackground(getActivity(), containerID, Step.AUDIT);
 		}
+	}
 
+	@UiThread
+	public void onEvent(ContainerChangedEvent event) {
 		checkForShowButton();
 	}
 }

@@ -33,9 +33,6 @@ public class QueueIntentService extends IntentService {
 				Logger.w("There was problems. Please check credential or connectivity.");
 			}
 
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-
 		} catch (RetrofitError e) {
 			e.printStackTrace();
 			Utils.cancelAlarm(getApplicationContext());
