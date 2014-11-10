@@ -83,6 +83,8 @@
     <!-- Dialog Search Session Result -->
     <string name="dialog_search_container_title">Không tìm thấy Container</string>
     <string name="search_on_server">Bắt đầu tìm kiếm trên server</string>
+    <string name="dialog_alert_title">Alert</string>
+    <string name="dialog_message_use_gate_in_image">Có muốn sử dụng hình chụp ở cổng?</string>
 
     <!-- Button titles -->
     <string name="button_completed">Hoàn tất</string>

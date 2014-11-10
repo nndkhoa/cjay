@@ -1,6 +1,8 @@
 package com.cloudjay.cjay.fragment;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,6 +18,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.DetailIssueActivity;
 import com.cloudjay.cjay.activity.DetailIssueActivity_;
+import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.adapter.AuditItemAdapter;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
@@ -140,15 +143,7 @@ public class IssuePendingFragment extends Fragment {
 
 	@Click(R.id.btn_camera)
 	void buttonCameraClicked() {
-
-		// Open camera activity
-		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerId);
-		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.AUDIT.value);
-		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.AUDIT.value);
-		cameraActivityIntent.putExtra(CameraFragment.IS_OPENED, false);
-		startActivity(cameraActivityIntent);
+        showUseGateImageDialog();
 	}
 
 	@ItemClick(R.id.lv_audit_items)
@@ -178,6 +173,59 @@ public class IssuePendingFragment extends Fragment {
 			Logger.Log("2");
 		}
 	}
+
+    /**
+     * Pick gate in image or take audit picture
+     */
+    void showUseGateImageDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.dialog_alert_title);
+        builder.setMessage(R.string.dialog_message_use_gate_in_image);
+        builder.setPositiveButton("Không", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                // Open camera to take audit picture
+                Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
+                cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerId);
+                cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.AUDIT.value);
+                cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
+                cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.AUDIT.value);
+                cameraActivityIntent.putExtra(CameraFragment.IS_OPENED, false);
+                startActivity(cameraActivityIntent);
+
+                dialogInterface.dismiss();
+            }
+        });
+        builder.setNegativeButton("Có", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                // Open ReuseActivity to chose Gate Image
+                Intent intent = new Intent(getActivity(), ReuseActivity_.class);
+                intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, containerId);
+                startActivityForResult(intent, 1);
+                dialogInterface.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+
+                // Set background and text color for use gate image
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setTextColor(getResources().getColor(android.R.color.white));
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setBackgroundResource(R.drawable.btn_green_selector);
+
+                // Set background and text color for open camera
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setTextColor(getResources().getColor(android.R.color.white));
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setBackgroundResource(R.drawable.btn_red_selector);
+            }
+        });
+        dialog.show();
+    }
 
 	@Trace
 	public void onEvent(AuditItemsGotEvent event) {
@@ -213,6 +261,10 @@ public class IssuePendingFragment extends Fragment {
 	@Trace
 	@UiThread
 	void updatedData(List<AuditItem> auditItems) {
+
+		for (AuditItem auditItem : auditItems) {
+			Logger.Log("uuid: " + auditItem.getUuid());
+		}
 
 		if (mAdapter == null) {
 			mAdapter = new AuditItemAdapter(getActivity(),
@@ -292,9 +344,6 @@ public class IssuePendingFragment extends Fragment {
 	void onEvent(IssueUpdatedEvent event) {
 		Logger.Log("on IssueUpdatedEvent");
 
-		// Re-query container session with given containerId
-		String containerId = event.getContainerId();
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
 		refresh();
 	}
 

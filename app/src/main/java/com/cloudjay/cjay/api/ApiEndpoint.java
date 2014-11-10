@@ -17,7 +17,7 @@ public class ApiEndpoint {
 	public static final String CONTAINER_SESSION_COMPLETE_REPAIR_API = "/api/cjay/containers/{id}/complete-repair";
 	public static final String CONTAINER_SESSION_POST_AUDIT_ITEM_API = "/api/cjay/containers/{id}/post-audit-item";
 	public static final String CONTAINER_SESSION_COMPLETE_AUDIT_API = "/api/cjay/containers/{id}/complete-audit";
-	public static final String CONTAINER_SESSION_ADD_AUDIT_IMAGES_API = "/api/cjay/containers/{id}/add-audit-images";
+	public static final String CONTAINER_SESSION_ADD_AUDIT_IMAGES_API = "/api/cjay/audit-items/{id}/add-audit-images";
 
     public static final String CONTAINER_SESSION_HAND_CLEANING = "/api/cjay/containers/{id}/set-available";
 

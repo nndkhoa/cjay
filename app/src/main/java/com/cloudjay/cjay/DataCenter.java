@@ -818,6 +818,7 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
+	@Background(serial = CACHE)
 	public void addUploadSession(String containerId) {
 
 		try {
@@ -1151,7 +1152,7 @@ public class DataCenter {
 	public void uploadAuditItem(Context context, Session session, String itemUuid) throws SnappydbException {
 
 		AuditItem auditItem = session.getAuditItem(itemUuid);
-		AuditItem result = networkClient.addAuditImage(context, auditItem);
+		AuditItem result = networkClient.postAuditItem(context, session,auditItem);
 		saveSession(context,session);
 		session.updateAuditItem(result);
 		saveSession(context,session);
@@ -1216,6 +1217,9 @@ public class DataCenter {
 				}
 				//Remove from working
 				removeWorkingSession(context, session.getContainerId());
+
+				//Add to uploading
+				addUploadSession(session.getContainerId());
 
 				//Change upload status
 				session.setUploadStatus(uploadStatus);
@@ -1525,7 +1529,7 @@ public class DataCenter {
 
 			Logger.Log("Create new audit item");
 
-			// Add Iso Code
+			// Add Isso Code
 			String damageKey = CJayConstant.PREFIX_DAMAGE_CODE + "DB";
 			String repairKey = CJayConstant.PREFIX_REPAIR_CODE + "WW";
 			String componentKey = CJayConstant.PREFIX_COMPONENT_CODE + "FWA";
