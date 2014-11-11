@@ -1,24 +1,27 @@
-package com.cloudjay.cjay.event.upload;
+package com.cloudjay.cjay.activity;
 
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.enums.UploadType;
 
-public class UploadSucceededEvent {
+/**
+ * Created by thai on 11/11/2014.
+ */
+public class PreUploadSucceededEvent {
 	private Session session;
 	public UploadType uploadType;
 	public String containerId;
 
-	public UploadSucceededEvent(Session session, UploadType type) {
+	public PreUploadSucceededEvent(Session session, UploadType type) {
 		this.session = session;
 		this.uploadType = type;
 	}
 
-	public UploadSucceededEvent(Session session, int type) {
+	public PreUploadSucceededEvent(Session session, int type) {
 		this.session = session;
 		this.uploadType = UploadType.values()[type];
 	}
 
-	public UploadSucceededEvent(String containerId, UploadType type) {
+	public PreUploadSucceededEvent(String containerId, UploadType type) {
 		this.containerId = containerId;
 		this.uploadType = type;
 	}

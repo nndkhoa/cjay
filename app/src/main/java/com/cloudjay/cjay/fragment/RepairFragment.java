@@ -49,7 +49,7 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 
 //		// Add containerId to upload complete repair queue
 //		JobManager jobManager = App.getJobManager();
-//		jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), step.value, true));
+//		jobManager.addJobInBackground(new UploadSessionJob(session.getSession(), step.value, true));
 //
 //	     /* Remove all tabs */
 //		actionBar.removeAllTabs();
@@ -68,7 +68,7 @@ public class RepairFragment extends Fragment implements ActionBar.TabListener {
 
 //		// Add containerId to upload complete audit queue
 //		JobManager jobManager = App.getJobManager();
-//		jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), step.value, true));
+//		jobManager.addJobInBackground(new UploadSessionJob(session.getSession(), step.value, true));
 	}
 
 	@AfterViews

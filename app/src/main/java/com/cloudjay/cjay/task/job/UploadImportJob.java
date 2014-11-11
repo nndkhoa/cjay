@@ -5,6 +5,7 @@ import android.content.Context;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
+import com.cloudjay.cjay.event.upload.PreUploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
@@ -23,25 +24,23 @@ import retrofit.RetrofitError;
 
 public class UploadImportJob extends Job {
 
-    Session mSession;
+	Session mSession;
 
 	/**
 	 * Dùng để phân biệt xem có cần clear Working hay không?
 	 */
-	boolean needToClearFromWorking;
 
 	@Override
 	public int getRetryLimit() {
 		return 1;
 	}
 
-	public UploadImportJob(Session session, boolean clearFromWorking) {
+	public UploadImportJob(Session session) {
 
 		super(new Params(1).requireNetwork().persist().groupBy(session.getContainerId()).setPersistent(true));
 
-        // step is local step
+		// step is local step
 		this.mSession = session;
-		this.needToClearFromWorking = clearFromWorking;
 
 	}
 
@@ -55,8 +54,13 @@ public class UploadImportJob extends Job {
 	public void onAdded() {
 
 		// TODO: Change status to Uploading --> outside
-		// Post Event thong bao bat dau upload
-		EventBus.getDefault().post(new UploadStartedEvent(mSession.getContainerId(), UploadType.SESSION));
+
+		Context context = App.getInstance().getApplicationContext();
+		Step step = Step.values()[mSession.getLocalStep()];
+		DataCenter_.getInstance_(context).addLog(context, mSession.getContainerId(), step.name() + " | Add container vào Queue");
+
+		EventBus.getDefault().post(new PreUploadStartedEvent(mSession, UploadType.SESSION));
+		EventBus.getDefault().post(new UploadStartedEvent(mSession, UploadType.SESSION));
 	}
 
 	/**
@@ -70,12 +74,38 @@ public class UploadImportJob extends Job {
 	@Override
 	public void onRun() throws Throwable {
 
-		// Bắt đầu quá trình upload
+		EventBus.getDefault().post(new UploadingEvent(mSession.getContainerId(), UploadType.SESSION));
+
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
-		EventBus.getDefault().post(new UploadingEvent(mSession.getContainerId(), UploadType.SESSION)); // --> outside
 
-		dataCenter.uploadImportSession(context, mSession);
+		Step step = Step.values()[mSession.getLocalStep()];
+		dataCenter.addLog(context, mSession.getContainerId(), step.name() + " | Bắt đầu quá trình upload");
+
+		// Bắt đầu quá trình upload
+
+		switch (step) {
+			case AVAILABLE:
+				dataCenter.uploadExportSession(context, mSession);
+				break;
+
+			case AUDIT:
+				dataCenter.uploadAuditSession(context, mSession);
+				break;
+
+			case REPAIR:
+				dataCenter.uploadRepairSession(context, mSession);
+				break;
+
+			case IMPORT:
+				dataCenter.uploadImportSession(context, mSession);
+				break;
+
+			default:
+				dataCenter.setHandCleaningSession(context, mSession);
+				break;
+		}
+		dataCenter.addLog(context, mSession.getContainerId(), "Upload container thành công");
 	}
 
 	/**
@@ -108,14 +138,9 @@ public class UploadImportJob extends Job {
 	@Override
 	protected void onCancel() {
 
-		//Change status error
-		try {
-			Context context = App.getInstance().getApplicationContext();
-			DataCenter_.getInstance_(context).changeUploadStatus(context, mSession.getContainerId(), UploadStatus.ERROR);
-			EventBus.getDefault().post(new UploadStoppedEvent(mSession.getContainerId()));
+		Context context = App.getInstance().getApplicationContext();
+		DataCenter_.getInstance_(context).addLog(context, mSession.getContainerId(), "Upload thất bại");
 
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
+		EventBus.getDefault().post(new UploadStoppedEvent(mSession));
 	}
 }

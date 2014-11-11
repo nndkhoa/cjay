@@ -508,6 +508,20 @@ public class AuditItem implements Serializable{
 		return imageList;
 	}
 
+	/**
+	 *
+	 * @param imageUuid
+	 * @return
+	 */
+	public AuditImage getAuditImage(String imageUuid) {
+		for (AuditImage image: auditImages) {
+			if (image.getUuid().equals(imageUuid)) {
+				return image;
+			}
+		}
+		return null;
+	}
+
 	// TODO: merge audit item
 	public AuditItem merge(AuditItem newItem) {
 

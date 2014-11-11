@@ -61,7 +61,7 @@ public class UploadSessionJob extends Job {
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
 
-        mSession = DataCenter_.getInstance_(context).getSession(context, containerId);
+//        mSession = DataCenter_.getInstance_(context).getSession(context, containerId);
 
 		// Set session upload status to UPLOADING
 		// Add session to Collection Upload
@@ -101,7 +101,7 @@ public class UploadSessionJob extends Job {
 				DataCenter_.getInstance_(context).removeWorkingSession(context, containerId);
 			}
 
-			EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.SESSION));
+//			EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.SESSION));
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
@@ -118,43 +118,43 @@ public class UploadSessionJob extends Job {
 	@Override
 	public void onRun() throws Throwable {
 
-		// Bắt đầu quá trình upload
-		Context context = App.getInstance().getApplicationContext();
-		DataCenter dataCenter = DataCenter_.getInstance_(context);
-		EventBus.getDefault().post(new UploadingEvent(containerId, UploadType.SESSION));
-		Step step = Step.values()[currentStep];
-
-		Logger.Log(" >> Uploading container: " + containerId + " | " + step.name());
-		dataCenter.addLog(context, containerId, step.name() + " | Bắt đầu quá trình upload");
-
-		switch (step) {
-			case AVAILABLE:
-				dataCenter.uploadExportSession(context, containerId);
-				break;
-
-			case AUDIT:
-				dataCenter.uploadAuditSession(context, containerId);
-				break;
-
-			case REPAIR:
-				dataCenter.uploadRepairSession(context, containerId);
-				break;
-
-			case IMPORT:
-				dataCenter.uploadImportSession(context, containerId);
-				break;
-
-			default:
-				dataCenter.setHandCleaningSession(context, containerId);
-				break;
-		}
-
-		// Change upload status to COMPLETE
-		DataCenter_.getInstance_(context).changeUploadStatus(context, containerId, UploadStatus.COMPLETE);
-
-		// Upload thành công
-		DataCenter_.getInstance_(context).addLog(context, containerId, "Upload container thành công");
-		EventBus.getDefault().post(new UploadSucceededEvent(containerId, UploadType.SESSION));
+//		// Bắt đầu quá trình upload
+//		Context context = App.getInstance().getApplicationContext();
+//		DataCenter dataCenter = DataCenter_.getInstance_(context);
+//		EventBus.getDefault().post(new UploadingEvent(containerId, UploadType.SESSION));
+//		Step step = Step.values()[currentStep];
+//
+//		Logger.Log(" >> Uploading container: " + containerId + " | " + step.name());
+//		dataCenter.addLog(context, containerId, step.name() + " | Bắt đầu quá trình upload");
+//
+//		switch (step) {
+//			case AVAILABLE:
+//				dataCenter.uploadExportSession(context, containerId);
+//				break;
+//
+//			case AUDIT:
+//				dataCenter.uploadAuditSession(context, containerId);
+//				break;
+//
+//			case REPAIR:
+//				dataCenter.uploadRepairSession(context, containerId);
+//				break;
+//
+//			case IMPORT:
+//				dataCenter.uploadImportSession(context, containerId);
+//				break;
+//
+//			default:
+//				dataCenter.setHandCleaningSession(context, containerId);
+//				break;
+//		}
+//
+//		// Change upload status to COMPLETE
+//		DataCenter_.getInstance_(context).changeUploadStatus(context, containerId, UploadStatus.COMPLETE);
+//
+//		// Upload thành công
+//		DataCenter_.getInstance_(context).addLog(context, containerId, "Upload container thành công");
+////		EventBus.getDefault().post(new UploadSucceededEvent(containerId, UploadType.SESSION));
 	}
 
 	/**
@@ -186,17 +186,17 @@ public class UploadSessionJob extends Job {
 	 */
 	@Override
 	protected void onCancel() {
-
-		//Change status error
-		try {
-
-			Context context = App.getInstance().getApplicationContext();
-			DataCenter_.getInstance_(context).addLog(context, containerId, "Upload thất bại");
-			DataCenter_.getInstance_(context).changeUploadStatus(context, containerId, UploadStatus.ERROR);
-			EventBus.getDefault().post(new UploadStoppedEvent(containerId));
-
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
+//
+//		//Change status error
+//		try {
+//
+//			Context context = App.getInstance().getApplicationContext();
+//			DataCenter_.getInstance_(context).addLog(context, containerId, "Upload thất bại");
+//			DataCenter_.getInstance_(context).changeUploadStatus(context, containerId, UploadStatus.ERROR);
+//			EventBus.getDefault().post(new UploadStoppedEvent(containerId));
+//
+//		} catch (SnappydbException e) {
+//			e.printStackTrace();
+//		}
 	}
 }

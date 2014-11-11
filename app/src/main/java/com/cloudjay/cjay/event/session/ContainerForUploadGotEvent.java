@@ -4,13 +4,13 @@ import com.cloudjay.cjay.model.Session;
 
 import java.util.List;
 
-public class ContainersGotEvent {
+public class ContainerForUploadGotEvent {
 
 	public Session getTarget() {
 		if (isSingleChange())
 			return sessions.get(0);
 		else
-			throw new IllegalStateException("Can only call this when isSingleChange returns true, current size is:" + sessions.size());
+			throw new IllegalStateException("Can only call this when isSingleChange returns true");
 	}
 
 	public boolean isSingleChange() {
@@ -30,7 +30,7 @@ public class ContainersGotEvent {
 		return sessions;
 	}
 
-	public ContainersGotEvent(List<Session> list, String prefix) {
+	public ContainerForUploadGotEvent(List<Session> list, String prefix) {
 		this.sessions = list;
 		this.prefix = prefix;
 	}

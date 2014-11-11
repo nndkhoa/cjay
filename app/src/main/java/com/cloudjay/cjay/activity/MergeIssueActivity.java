@@ -5,13 +5,11 @@ import android.widget.ListView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.AuditMergeIssueAdapter;
+import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.Utils;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
@@ -28,85 +26,73 @@ import java.util.List;
 @EActivity(R.layout.activity_merge_issue)
 public class MergeIssueActivity extends BaseActivity {
 
-    @Bean
-    DataCenter dataCenter;
+	@Bean
+	DataCenter dataCenter;
 
-    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
-    public final static String AUDIT_IMAGE_EXTRA = "com.cloudjay.wizard.auditImage";
-    public final static String AUDIT_ITEM_REMOVE_UUID = "com.cloudjay.wizard.auditItemRemoveUUID";
+	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
+	public final static String AUDIT_IMAGE_EXTRA = "com.cloudjay.wizard.auditImage";
+	public final static String AUDIT_ITEM_REMOVE_UUID = "com.cloudjay.wizard.auditItemRemoveUUID";
 
-    @Extra(CONTAINER_ID_EXTRA)
-    public String containerID;
+	@Extra(CONTAINER_ID_EXTRA)
+	public String containerID;
 
-    @Extra(AUDIT_IMAGE_EXTRA)
-    String auditImageUUID;
+	@Extra(AUDIT_IMAGE_EXTRA)
+	String auditImageUUID;
 
-    @Extra(AUDIT_ITEM_REMOVE_UUID)
-    String auditItemRemoveUUID;
+	@Extra(AUDIT_ITEM_REMOVE_UUID)
+	String auditItemRemoveUUID;
 
-    @ViewById(R.id.lv_merge_issue)
-    ListView lvIssues;
+	@ViewById(R.id.lv_merge_issue)
+	ListView lvIssues;
 
-	Session currentSession;
+	AuditMergeIssueAdapter mAdapter;
 
-    AuditMergeIssueAdapter mAdapter;
+	@AfterViews
+	void setup() {
+		mAdapter = new AuditMergeIssueAdapter(this, R.layout.item_merge_issue);
+		lvIssues.setAdapter(mAdapter);
+		refresh();
+	}
 
-    @AfterViews
-    void setup() {
+	@UiThread
+	public void onEvent(AuditItemsGotEvent event) {
 
-        //get container operater code form containerId
-	    // TODO: bug
-        currentSession = dataCenter.getSession(this.getApplicationContext(), containerID);
-        if (null == currentSession) {
-            Utils.showCrouton(this, "Không tìm thấy container trong dữ liệu");
-        }
-        mAdapter = new AuditMergeIssueAdapter(this, R.layout.item_merge_issue);
-        lvIssues.setAdapter(mAdapter);
+		// Filter list audit items that was not repair
+		List<AuditItem> list = new ArrayList<>();
+		for (AuditItem auditItem : event.getAuditItems()) {
+			if (auditItem.isAudited() == true && auditItem.getId() == 0) {
+				list.add(auditItem);
+			}
+		}
+		updatedData(list);
+	}
 
-        refresh();
+	@ItemClick(R.id.lv_merge_issue)
+	void lvIssuesItemClicked(int position) {
 
-    }
+		AuditItem auditItem = mAdapter.getItem(position);
+		String uuid = auditItem.getUuid();
+		dataCenter.addAuditImageToAuditedItem(getApplicationContext(), containerID,
+				uuid, auditItemRemoveUUID, auditImageUUID);
+		refresh();
 
-    @ItemClick(R.id.lv_merge_issue)
-    void lvIssuesItemClicked(int position) {
+		this.finish();
+	}
 
-        AuditItem auditItem = mAdapter.getItem(position);
-        String uuid = auditItem.getUuid();
-		Logger.Log("auditImageUUID: " + auditImageUUID);
-		Logger.Log("auditItemRemoveUUID: " + auditItemRemoveUUID);
-		Logger.Log("uuid: " + uuid);
-        dataCenter.addAuditImageToAuditedItem(getApplicationContext(), containerID,
-		        uuid, auditItemRemoveUUID, auditImageUUID);
-        refresh();
+	void refresh() {
+		if (mAdapter != null) {
+			dataCenter.getAuditItemsInBackground(this, containerID);
+		}
+	}
 
-        this.finish();
-    }
-
-    @Background
-    void refresh() {
-
-		//get container operater code form containerId
-		currentSession = dataCenter.getSession(this.getApplicationContext(), containerID);
-
-        List<AuditItem> list = new ArrayList<AuditItem>();
-        for (AuditItem auditItem : currentSession.getAuditItems()) {
-            if (auditItem.isAudited() == true && auditItem.getId() == 0) {
-                list.add(auditItem);
-            }
-        }
-        Logger.Log("Size: " + list.size());
-        updatedData(list);
-    }
-
-    @UiThread
-    public void updatedData(List<AuditItem> auditList) {
-        mAdapter.clear();
-        if (auditList != null) {
-            for (AuditItem object : auditList) {
-                //mAdapter.insert(object, mAdapter.getCount());
-                mAdapter.add(object);
-            }
-        }
-        mAdapter.notifyDataSetChanged();
-    }
+	@UiThread
+	public void updatedData(List<AuditItem> auditItems) {
+		mAdapter.clear();
+		if (auditItems != null) {
+			for (AuditItem object : auditItems) {
+				mAdapter.add(object);
+			}
+		}
+		mAdapter.notifyDataSetChanged();
+	}
 }

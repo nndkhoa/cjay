@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -140,7 +139,7 @@ public class SearchFragment extends Fragment {
 	 * @param position
 	 */
 	@ItemClick(R.id.lv_search_container)
-	void searchListViewItemClicked(int position) {
+	void searchItemClicked(int position) {
 
 		// navigation to Wizard Activity
 		Session item = mAdapter.getItem(position);
@@ -154,7 +153,7 @@ public class SearchFragment extends Fragment {
 	}
 
 	@ItemLongClick(R.id.lv_search_container)
-	void searchListViewItemLongClicked(int position) {
+	void searchItemLongClicked(int position) {
 
 		//Get session from position
 		Session item = mAdapter.getItem(position);
@@ -194,14 +193,14 @@ public class SearchFragment extends Fragment {
                         createContainerSession(containerId);
                         openCamera(containerId);
                     } else {
-                        showAddContainerDialog(containerId);
+				showAddContainerDialog(containerId);
                     }
                 } else {
                     showAddContainerDialog(containerId);
                 }
 
                 // Close dialog
-                dialogInterface.dismiss();
+				dialogInterface.dismiss();
 			}
 		});
 
@@ -269,7 +268,7 @@ public class SearchFragment extends Fragment {
         // add working session also post an event
         dataCenter.addSession(session);
         dataCenter.addWorkingSession(session);
-    }
+	}
 
     /**
      * Open camera and go to import step
@@ -306,7 +305,7 @@ public class SearchFragment extends Fragment {
 	//region EVENT HANDLER
 
 	/**
-	 * Bắt đầu search từ Server
+	 * Thông báo bắt đầu search từ Server
 	 *
 	 * @param event
 	 */

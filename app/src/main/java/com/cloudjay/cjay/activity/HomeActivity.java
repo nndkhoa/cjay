@@ -15,16 +15,23 @@ import android.view.ViewConfiguration;
 import android.view.inputmethod.InputMethodManager;
 
 import com.cloudjay.cjay.App;
+import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.event.upload.PreUploadStartedEvent;
+import com.cloudjay.cjay.event.upload.UploadStartedEvent;
+import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.fragment.SearchFragment_;
 import com.cloudjay.cjay.fragment.UploadFragment_;
 import com.cloudjay.cjay.fragment.WorkingFragment_;
 import com.cloudjay.cjay.task.job.FetchSessionsJob;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.enums.UploadStatus;
+import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
@@ -40,6 +47,9 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 
 	@ViewById(R.id.pager)
 	ViewPager mViewPager;
+
+	@Bean
+	DataCenter dataCenter;
 
 	PagerAdapter mPagerAdapter;
 	ActionBar actionBar;
@@ -116,17 +126,17 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 				actionBar.selectTab(tab);
 			}
 
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                if (state == ViewPager.SCROLL_STATE_IDLE) {
-                    if (mViewPager.getCurrentItem() != 0) {
-                        // Hide the keyboard.
-                        ((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE))
-                                .hideSoftInputFromWindow(mViewPager.getWindowToken(), 0);
-                    }
-                }
-            }
-        });
+			@Override
+			public void onPageScrollStateChanged(int state) {
+				if (state == ViewPager.SCROLL_STATE_IDLE) {
+					if (mViewPager.getCurrentItem() != 0) {
+						// Hide the keyboard.
+						((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE))
+								.hideSoftInputFromWindow(mViewPager.getWindowToken(), 0);
+					}
+				}
+			}
+		});
 
 		// For each of the sections in the app, add a tab to the action bar.
 		for (int i = 0; i < mPagerAdapter.getCount(); i++) {
@@ -163,6 +173,22 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	public void onEvent(PreUploadStartedEvent event) {
+		if (event.uploadType == UploadType.SESSION) {
+			dataCenter.changeStatusWhenUpload(this, event.getSession(), UploadType.SESSION, UploadStatus.UPLOADING);
+		} else if (event.uploadType == UploadType.AUDIT_ITEM) {
+			dataCenter.changeStatusWhenUpload(this, event.getSession(), UploadType.AUDIT_ITEM, UploadStatus.UPLOADING);
+		}
+	}
+
+	public void onEvent(PreUploadSucceededEvent event) {
+		if (event.uploadType == UploadType.SESSION) {
+			dataCenter.changeStatusWhenUpload(this, event.getSession(), UploadType.SESSION, UploadStatus.COMPLETE);
+		} else if (event.uploadType == UploadType.AUDIT_ITEM) {
+			dataCenter.changeStatusWhenUpload(this, event.getSession(), UploadType.AUDIT_ITEM, UploadStatus.COMPLETE);
 		}
 	}
 }

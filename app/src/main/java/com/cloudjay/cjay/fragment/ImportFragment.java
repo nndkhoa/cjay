@@ -20,7 +20,7 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
-import com.cloudjay.cjay.event.EventMenuCreated;
+import com.cloudjay.cjay.event.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.operator.OperatorChosenEvent;
 import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
@@ -28,7 +28,6 @@ import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadImportJob;
-import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -60,7 +59,7 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.fragment_import)
 public class ImportFragment extends Fragment {
 
-	//region Controls and Views
+	//region VIEWS
 	@ViewById(R.id.btn_camera)
 	ImageButton btnCamera;
 
@@ -107,7 +106,7 @@ public class ImportFragment extends Fragment {
 
 	long preStatus = 1;
 	Session mSession;
-    List<GateImage> list = new ArrayList<>();
+	List<GateImage> list = new ArrayList<>();
 	//endregion
 
 	public ImportFragment() {
@@ -131,8 +130,51 @@ public class ImportFragment extends Fragment {
 		mAdapter = new GateImageAdapter(getActivity(), R.layout.item_image_gridview, false);
 		lvImages.setAdapter(mAdapter);
 
+		dataCenter.getSessionInBackground(getActivity(), containerID);
+	}
+
+	//region EVENT HANDLER
+	@UiThread
+	void onEvent(OperatorChosenEvent event) {
+
+		// Get selected operator from search operator dialog
+		Operator operator = event.getOperator();
+		operatorCode = operator.getOperatorCode();
+		Logger.Log("Choose operator " + operatorCode);
+
+		// Set operator to edit text
+		etOperator.setText(operator.getOperatorName());
+
+		if (mSession != null) {
+			mSession.setOperatorId(operator.getId());
+			mSession.setOperatorCode(operator.getOperatorCode());
+			mSession.setGateImages(list);
+		}
+
+		// Save session
+		dataCenter.addSession(mSession);
+	}
+
+	/**
+	 * Event được trigger khi chụp hình xong bấm nút Done ở camera.
+	 * Refresh container session.
+	 *
+	 * @param event
+	 */
+	void onEvent(ImageCapturedEvent event) {
+		Logger.e(event.getContainerId());
+		dataCenter.getSessionInBackground(getActivity(), event.getContainerId());
+	}
+
+	/**
+	 *
+	 * @param event
+	 */
+	@UiThread
+	public void onEvent(ContainerGotEvent event) {
+
 		// Trying to restore container status
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerID);
+		mSession = event.getSession();
 		if (null == mSession) {
 
 			// Set container ID for text View containerId
@@ -144,12 +186,12 @@ public class ImportFragment extends Fragment {
 			operatorCode = mSession.getOperatorCode();
 			tvContainerCode.setText(containerID);
 
-            Operator operator = dataCenter.getOperator(getActivity().getApplicationContext(), operatorCode);
-            if (operator != null) {
-                etOperator.setText(operator.getOperatorName());
-            }
+			Operator operator = dataCenter.getOperator(getActivity().getApplicationContext(), operatorCode);
+			if (operator != null) {
+				etOperator.setText(operator.getOperatorName());
+			}
 
-            preStatus = mSession.getPreStatus();
+			preStatus = mSession.getPreStatus();
 			switch ((int) preStatus) {
 				case 0:
 					rdnStatusA.setChecked(true);
@@ -178,51 +220,6 @@ public class ImportFragment extends Fragment {
 		super.onDestroy();
 	}
 
-	//region EVENT HANDLER
-	void onEvent(EventMenuCreated event){
-		Logger.e("EVENT BUSS MENU CREATE");
-		event.getMenu().findItem(R.id.menu_export).setVisible(false);
-	}
-
-	@UiThread
-	void onEvent(OperatorChosenEvent event) {
-
-		// Get selected operator from search operator dialog
-		Operator operator = event.getOperator();
-		operatorCode = operator.getOperatorCode();
-		Logger.Log("Choose operator " + operatorCode);
-
-		// Set operator to edit text
-		etOperator.setText(operator.getOperatorName());
-
-        if (mSession != null) {
-            mSession.setOperatorId(operator.getId());
-            mSession.setOperatorCode(operator.getOperatorCode());
-            mSession.setGateImages(list);
-        }
-
-        // Save session
-        dataCenter.addSession(mSession);
-        dataCenter.addWorkingSession(mSession);
-	}
-
-	/**
-	 * Event được trigger khi chụp hình xong bấm nút Done ở camera.
-	 * Refresh container session.
-	 *
-	 * @param event
-	 */
-	@UiThread
-	void onEvent(ImageCapturedEvent event) {
-
-		Logger.Log("onEvent Image Captured");
-
-		// Re-query container session with given containerId
-		String containerId = event.getContainerId();
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
-
-		refresh();
-	}
 	//endregion
 
 	void refresh() {
@@ -245,13 +242,13 @@ public class ImportFragment extends Fragment {
 	@Click(R.id.btn_camera)
 	void buttonCameraClicked() {
 
-			// Open camera activity
-			Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-			cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
-			cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-			cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
-			cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
-			startActivity(cameraActivityIntent);
+		// Open camera activity
+		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
+		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
+		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
+		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
+		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
+		startActivity(cameraActivityIntent);
 	}
 
 	/**
@@ -265,17 +262,16 @@ public class ImportFragment extends Fragment {
 			return;
 		}
 
-		// Add current container to job queue
-		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), false));
+		//Upload import session
+		uploadImportSession(false);
 
-        // Go to audit and repair fragment
-        AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID)
-                .tabType(1).build();
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
-        transaction.replace(R.id.ll_main, fragment);
-        transaction.commit();
+		// Go to audit and repair fragment
+		AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID)
+				.tabType(1).build();
+		FragmentTransaction transaction = getFragmentManager().beginTransaction();
+		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+		transaction.replace(R.id.ll_main, fragment);
+		transaction.commit();
 	}
 
 	/**
@@ -289,14 +285,23 @@ public class ImportFragment extends Fragment {
 			return;
 		}
 
-
-		// Add container session to upload queue
-		JobManager jobManager = App.getJobManager();
-//		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), mSession.getLocalStep(), true));
-		jobManager.addJobInBackground(new UploadImportJob(mSession, true));
+		//Upload import session
+		uploadImportSession(true);
 
 		// Navigate to HomeActivity
 		getActivity().finish();
+	}
+
+	private void uploadImportSession(boolean clearFromWorking) {
+
+		//Remove from working
+		if (clearFromWorking) {
+			dataCenter.removeWorkingSession(getActivity(), mSession.getContainerId());
+		}
+
+		// Add container session to upload queue
+		JobManager jobManager = App.getJobManager();
+		jobManager.addJobInBackground(new UploadImportJob(mSession));
 	}
 
 	@Touch(R.id.et_operator)
@@ -321,8 +326,9 @@ public class ImportFragment extends Fragment {
 	void preStatusAChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 0;
-            mSession.setPreStatus(preStatus);
-            dataCenter.addSession(mSession);
+
+			mSession.setPreStatus(preStatus);
+			dataCenter.addSession(mSession);
             dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.GONE);
 		}
@@ -332,8 +338,8 @@ public class ImportFragment extends Fragment {
 	void preStatusBChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 1;
-            mSession.setPreStatus(preStatus);
-            dataCenter.addSession(mSession);
+			mSession.setPreStatus(preStatus);
+			dataCenter.addSession(mSession);
             dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.VISIBLE);
 		}
@@ -343,8 +349,8 @@ public class ImportFragment extends Fragment {
 	void preStatusCChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 2;
-            mSession.setPreStatus(preStatus);
-            dataCenter.addSession(mSession);
+			mSession.setPreStatus(preStatus);
+			dataCenter.addSession(mSession);
             dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.VISIBLE);
 		}

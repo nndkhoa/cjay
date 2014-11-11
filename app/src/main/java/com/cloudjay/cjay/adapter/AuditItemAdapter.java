@@ -23,6 +23,7 @@ import com.cloudjay.cjay.activity.ReportIssueActivity_;
 import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -43,18 +44,18 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 	private LayoutInflater mInflater;
 	private Context mContext;
 	private int layoutResId;
-	private String containerId;
+	private Session session;
 	private AuditImage auditImage;
 	private String operatorCode;
 	private String mAuditItemUUID;
 	private String mComponentCode;
 
-	public AuditItemAdapter(Context context, int resource, String containerId, String operatorCode) {
+	public AuditItemAdapter(Context context, int resource, Session session, String operatorCode) {
 		super(context, resource);
 		this.mContext = context;
 		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		layoutResId = resource;
-		this.containerId = containerId;
+		this.session = session;
 		this.operatorCode = operatorCode;
 	}
 
@@ -185,19 +186,23 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				@Override
 				public void onClick(View view) {
 
+					Logger.Log("uuid: " + auditItem.getUuid());
+
 					//1. Update upload status
                     auditItem.setUploadStatus(UploadStatus.UPLOADING);
 					try {
 						DataCenter_.getInstance_(mContext).changeUploadStatus(mContext,
-								containerId, auditItem, UploadStatus.UPLOADING);
+								session.getContainerId(), auditItem, UploadStatus.UPLOADING);
 					} catch (SnappydbException e) {
 						e.printStackTrace();
 					}
 					notifyDataSetChanged();
 
+					Logger.Log("uuid àter: " + auditItem.getUuid());
+
 					//2. Add container session to upload queue
 					JobManager jobManager = App.getJobManager();
-					jobManager.addJob(new UploadAuditItemJob(containerId, auditItem.getUuid()));
+					jobManager.addJob(new UploadAuditItemJob(session, auditItem.getUuid()));
 				}
 			});
 
@@ -209,10 +214,10 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
                     if (null == auditItem.isAllowed() || auditItem.isAllowed()) {
                         Logger.Log("getUuid: " + auditItem.getUuid());
 
-                        Intent intent = new Intent(mContext, ReportIssueActivity_.class);
-                        intent.putExtra(ReportIssueActivity_.CONTAINER_ID_EXTRA, containerId);
-                        intent.putExtra(ReportIssueActivity_.AUDIT_IMAGE_EXTRA, auditItem.getAuditImages().get(0).getUuid());
-                        intent.putExtra(ReportIssueActivity_.AUDIT_ITEM_EXTRA, auditItem.getUuid());
+						Intent intent = new Intent(mContext, ReportIssueActivity_.class);
+						intent.putExtra(ReportIssueActivity_.CONTAINER_ID_EXTRA, session.getContainerId());
+						intent.putExtra(ReportIssueActivity_.AUDIT_IMAGE_EXTRA, auditItem.getAuditImages().get(0).getUuid());
+						intent.putExtra(ReportIssueActivity_.AUDIT_ITEM_EXTRA, auditItem.getUuid());
 
                         mContext.startActivity(intent);
                         return;
@@ -311,7 +316,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				Logger.Log("getUuid: " + item.getUuid());
 
 				Intent intent = new Intent(mContext, ReportIssueActivity_.class);
-				intent.putExtra(ReportIssueActivity_.CONTAINER_ID_EXTRA, containerId);
+				intent.putExtra(ReportIssueActivity_.CONTAINER_ID_EXTRA, session.getContainerId());
 				intent.putExtra(ReportIssueActivity_.AUDIT_IMAGE_EXTRA, item.getAuditImages().get(0).getUuid());
 				intent.putExtra(ReportIssueActivity_.AUDIT_ITEM_EXTRA, item.getUuid());
 
@@ -326,7 +331,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				Logger.Log("getUuid: " + item.getAuditImages().get(0).getUuid());
 
 				Intent intent = new Intent(mContext, MergeIssueActivity_.class);
-				intent.putExtra(MergeIssueActivity_.CONTAINER_ID_EXTRA, containerId);
+				intent.putExtra(MergeIssueActivity_.CONTAINER_ID_EXTRA, session.getContainerId());
 				intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, item.getAuditImages().get(0).getUuid());
 				intent.putExtra(MergeIssueActivity_.AUDIT_ITEM_REMOVE_UUID, item.getUuid());
 
@@ -340,7 +345,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			public void onClick(DialogInterface dialogInterface, int i) {
 				try {
 					// change status audit item to water wash
-					DataCenter_.getInstance_(mContext).setWaterWashType(mContext, item, containerId);
+					DataCenter_.getInstance_(mContext).setWaterWashType(mContext, item, session.getContainerId());
 					dialogInterface.dismiss();
 
 				} catch (SnappydbException e) {
@@ -387,7 +392,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 	void openCamera() {
 		Intent cameraActivityIntent = new Intent(mContext, CameraActivity_.class);
-		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerId);
+		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, session.getContainerId());
 		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
 		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.REPAIRED.value);
 		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);

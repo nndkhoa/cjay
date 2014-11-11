@@ -300,22 +300,15 @@ public class NetworkClient {
 	 * @param auditItem
 	 * @return
 	 */
-	public Session postAuditItem(Context context, Session containerSession, AuditItem auditItem) {
+	public AuditItem postAuditItem(Context context, Session containerSession, AuditItem auditItem) {
 
 		Logger.Log("containerSession: " + containerSession.getId());
 		Logger.Log("auditItem: " + auditItem.getAuditItemToUpload());
 
 		String auditItemUUID = auditItem.getUuid();
-		Session result = provider.getRestAdapter(context).create(NetworkService.class).postAudiItem(containerSession.getId(), auditItem.getAuditItemToUpload());
-		List<AuditItem> list = result.getAuditItems();
-		for (AuditItem item : list) {
-			if (item.equals(auditItem)) {
-				Logger.Log("Set here");
-				item.setUuid(auditItemUUID);
-				item.setUploadStatus(UploadStatus.COMPLETE);
-			}
-		}
-		result.setAuditItems(list);
+		AuditItem result = provider.getRestAdapter(context).create(NetworkService.class).postAudiItem(containerSession.getId(), auditItem.getAuditItemToUpload());
+		result.setUuid(auditItemUUID);
+
 		return result;
 	}
 
@@ -326,7 +319,7 @@ public class NetworkClient {
 	 * @param auditItem
 	 * @return
 	 */
-	public AuditItem addAuditImage(Context context, AuditItem auditItem) {
+	public AuditItem addAuditImage(Context context, Session session, AuditItem auditItem) {
 
 		String uuid = auditItem.getUuid();
 		AuditItem result = provider.getRestAdapter(context).create(NetworkService.class).addAuditImages(String.valueOf(auditItem.getId()), auditItem.getAuditImagesToUpLoad());

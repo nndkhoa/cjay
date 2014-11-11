@@ -19,6 +19,7 @@ import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.task.job.UploadImageJob;
+import com.cloudjay.cjay.task.job.UploadImportJob;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -145,7 +146,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 					;
 				}
 
-				jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), step.value, true));
+				jobManager.addJobInBackground(new UploadImportJob(session));
 
 				// In step audit check all image of item, upload all error image then upload error audit item => complete audit
 			case AUDIT:
@@ -158,10 +159,10 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 							}
 						}
 					}
-					jobManager.addJobInBackground(new UploadAuditItemJob(session.getContainerId(), item.getUuid()));
+					jobManager.addJobInBackground(new UploadAuditItemJob(session, item.getUuid()));
 				}
 
-				jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), step.value, true));
+				jobManager.addJobInBackground(new UploadImportJob(session));
 
 				// In step repaired check all image of item, upload all error image then upload error repaired item => complete repair
 			case REPAIR:
@@ -173,9 +174,9 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 							}
 						}
 					}
-					jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), step.value, true));
+					jobManager.addJobInBackground(new UploadImportJob(session));
 				}
-				jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), step.value, true));
+				jobManager.addJobInBackground(new UploadImportJob(session));
 
 				//In step export check all image, upload all error image then upload session
 			case EXPORTED:
@@ -185,7 +186,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 					}
 					;
 				}
-				jobManager.addJobInBackground(new UploadSessionJob(session.getContainerId(), step.value, true));
+				jobManager.addJobInBackground(new UploadImportJob(session));
 		}
 	}
 

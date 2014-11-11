@@ -19,6 +19,7 @@ import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 
 import org.androidannotations.annotations.AfterViews;
@@ -26,7 +27,6 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ItemLongClick;
-import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -92,10 +92,7 @@ public class WorkingFragment extends Fragment {
 		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
 		lvWorking.setAdapter(mAdapter);
 		lvWorking.setEmptyView(tvEmpty);
-
-		List<Session> list = dataCenter.getListSessions(getActivity().getApplicationContext(),
-				CJayConstant.PREFIX_WORKING);
-		updatedData(list);
+		refresh();
 	}
 
 	void refresh() {
@@ -128,18 +125,16 @@ public class WorkingFragment extends Fragment {
 	}
 
 	public void onEvent(UploadSucceededEvent event) {
-		if (event.getUploadType() == UploadType.SESSION)
 			refresh();
 	}
 
 	public void onEvent(UploadStartedEvent event) {
-		if (event.getUploadType() == UploadType.SESSION)
 			refresh();
 	}
 
 	public void onEvent(ContainersGotEvent event) {
 		if (event.getPrefix().equals(CJayConstant.PREFIX_WORKING))
-			updatedData(event.getSessions());
+			updatedData(event.getTargets());
 	}
 
 	//endregion

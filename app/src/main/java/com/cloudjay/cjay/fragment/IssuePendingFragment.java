@@ -21,25 +21,25 @@ import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.adapter.AuditItemAdapter;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
+import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
 import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
-import com.cloudjay.cjay.event.issue.IssueDeletedEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
-import com.cloudjay.cjay.event.issue.IssueUpdatedEvent;
 import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.job.UploadImportJob;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
@@ -62,11 +62,23 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.fragment_issue_pending)
 public class IssuePendingFragment extends Fragment {
 
+	//region ATTR
 	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
 
 	@FragmentArg(CONTAINER_ID_EXTRA)
 	public String containerId;
 
+	@Bean
+	DataCenter dataCenter;
+
+	String operatorCode;
+	long currentStatus;
+	AuditItemAdapter mAdapter;
+
+	Session mSession;
+	//endregion
+
+	//region VIEWS
 	@ViewById(R.id.tv_container_code)
 	TextView tvContainerId;
 
@@ -81,15 +93,7 @@ public class IssuePendingFragment extends Fragment {
 
 	@ViewById(R.id.lv_audit_items)
 	ListView lvAuditItems;
-
-	@Bean
-	DataCenter dataCenter;
-
-	String operatorCode;
-	long currentStatus;
-	AuditItemAdapter mAdapter;
-
-	Session mSession;
+	//endregion
 
 	public IssuePendingFragment() {
 		// Required empty public constructor
@@ -97,45 +101,17 @@ public class IssuePendingFragment extends Fragment {
 
 	@AfterViews
 	void setUp() {
-
 		dataCenter.getSessionInBackground(getActivity(), containerId);
 	}
 
-	@UiThread
-	public void onEvent(ContainersGotEvent event) {
-
-		if (event.getSessions() != null && event.getSessions().size() > 0) {
-			mSession = event.getSessions().get(0);
-			if (mSession != null) {
-
-				// Get operator code
-				containerId = mSession.getContainerId();
-				operatorCode = mSession.getOperatorCode();
-
-				// Set currentStatus to TextView
-				currentStatus = mSession.getStatus();
-				tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
-
-				// Set ContainerId to TextView
-				tvContainerId.setText(containerId);
-
-				mAdapter = new AuditItemAdapter(getActivity(), R.layout.item_issue_pending, containerId, operatorCode);
-				lvAuditItems.setAdapter(mAdapter);
-
-				refresh();
-			} else {
-				// Set ContainerId to TextView
-				tvContainerId.setText(containerId);
-			}
-		}
-	}
+	//region VIEW INTERACTION
 
 	@Click(R.id.btn_clean)
 	void buttonCleanClicked() {
 
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadSessionJob(mSession.getContainerId(), Step.HAND_CLEAN.value, true));
+		jobManager.addJobInBackground(new UploadImportJob(mSession));
 
 		getActivity().finish();
 	}
@@ -159,19 +135,75 @@ public class IssuePendingFragment extends Fragment {
 			startActivity(detailIssueActivity);
 		}
 	}
+	//endregion
 
 	/**
 	 * Get list audit items of container
 	 */
-	@Trace
 	void refresh() {
 		if (mAdapter != null) {
-			Logger.Log("1");
 			dataCenter.getAuditItemsInBackground(getActivity(), containerId);
-		} else {
-			Logger.Log("2");
 		}
 	}
+
+//	<<<<<<< HEAD
+//	@UiThread
+//	void updatedData(List<AuditItem> auditItems) {
+//
+//		if (mAdapter == null) {
+//			mAdapter = new AuditItemAdapter(getActivity(),
+//					R.layout.item_issue_pending, containerId, operatorCode);
+//		}
+//
+//		mAdapter.clear();
+//		if (auditItems != null) {
+//			for (AuditItem auditItem : auditItems) {
+//				mAdapter.add(auditItem);
+//			}
+//		}
+//
+//		mAdapter.notifyDataSetChanged();
+//
+//		// If container has audit image(s), hide button Container Ve sinh - quet
+//		if (mAdapter.getCount() > 0) {
+//			btnClean.setVisibility(View.GONE);
+//		}
+//	}
+//
+//	//region EVENT HANDLER
+//	@UiThread
+//	public void onEvent(ContainersGotEvent event) {
+//
+//		if (event.getTargets() != null && event.getTargets().size() > 0) {
+//
+//			mSession = event.getTargets().get(0);
+//			if (mSession != null) {
+//
+//				// Get operator code
+//				containerId = mSession.getContainerId();
+//				operatorCode = mSession.getOperatorCode();
+//
+//				// Set currentStatus to TextView
+//				currentStatus = mSession.getStatus();
+//				tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
+//
+//				// Set ContainerId to TextView
+//				tvContainerId.setText(containerId);
+//
+//				mAdapter = new AuditItemAdapter(getActivity(), R.layout.item_issue_pending, containerId, operatorCode);
+//				lvAuditItems.setAdapter(mAdapter);
+//
+//				refresh();
+//			} else {
+//				// Set ContainerId to TextView
+//				tvContainerId.setText(containerId);
+//			}
+//		}
+//	}
+//
+//	@UiThread
+//	=======
+
 
     /**
      * Pick gate in image or take audit picture
@@ -257,13 +289,16 @@ public class IssuePendingFragment extends Fragment {
 		updatedData(list);
 	}
 
-	@Trace
 	@UiThread
 	void updatedData(List<AuditItem> auditItems) {
 
+		for (AuditItem auditItem : auditItems) {
+			Logger.Log("uuid: " + auditItem.getUuid());
+		}
+
 		if (mAdapter == null) {
 			mAdapter = new AuditItemAdapter(getActivity(),
-					R.layout.item_issue_pending, containerId, operatorCode);
+					R.layout.item_issue_pending, mSession, operatorCode);
 		}
 
 		mAdapter.clear();
@@ -324,46 +359,27 @@ public class IssuePendingFragment extends Fragment {
 		refresh();
 	}
 
-	@Trace
 	@UiThread
-	void onEvent(IssueDeletedEvent event) {
-		Logger.Log("on IssueDeletedEvent");
-
-		// Re-query container session with given containerId
-		String containerId = event.getContainerId();
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
-		refresh();
+	void onEvent(AuditItemChangedEvent event) {
+		dataCenter.getSessionInBackground(getActivity(), event.getContainerId());
 	}
 
-	@UiThread
-	void onEvent(IssueUpdatedEvent event) {
-		Logger.Log("on IssueUpdatedEvent");
-
-		// Re-query container session with given containerId
-		String containerId = event.getContainerId();
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
-		refresh();
-	}
 
 	void onEvent(UploadSucceededEvent event) {
 
 		if (event.uploadType == UploadType.AUDIT_ITEM) {
 
 		}
-		// Re-query container session with given containerId
-		String containerId = event.getContainerId();
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+		mSession = event.getSession();
 		refresh();
+
 	}
 
+	@UiThread
 	void onEvent(UploadStartedEvent event) {
-		Logger.Log("upload complete");
-		// Re-query container session with given containerId
-		String containerId = event.getContainerId();
-		mSession = dataCenter.getSession(getActivity().getApplicationContext(), containerId);
+		mSession = event.getSession();
 		refresh();
 	}
-	//endregion
 
 	@Override
 	public void onDestroy() {
@@ -376,4 +392,7 @@ public class IssuePendingFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 		EventBus.getDefault().register(this);
 	}
+	//endregion
+
+
 }

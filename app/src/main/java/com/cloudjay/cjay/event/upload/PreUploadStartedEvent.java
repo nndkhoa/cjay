@@ -3,9 +3,12 @@ package com.cloudjay.cjay.event.upload;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.enums.UploadType;
 
-public class UploadStartedEvent {
+/**
+ * Created by thai on 11/11/2014.
+ */
+public class PreUploadStartedEvent {
 
-	public UploadStartedEvent(String containerId, UploadType type) {
+	public PreUploadStartedEvent(String containerId, UploadType type) {
 		this.containerId = containerId;
 		this.uploadType = type;
 	}
@@ -22,12 +25,12 @@ public class UploadStartedEvent {
 	public UploadType uploadType;
 	public String containerId;
 
-	public UploadStartedEvent(Session session, UploadType type) {
+	public PreUploadStartedEvent(Session session, UploadType type) {
 		this.session = session;
 		this.uploadType = type;
 	}
 
-	public UploadStartedEvent(Session session, int type) {
+	public PreUploadStartedEvent(Session session, int type) {
 		this.session = session;
 		this.uploadType = UploadType.values()[type];
 	}
