@@ -2,10 +2,11 @@ package com.cloudjay.cjay;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.StrictMode;
 import android.util.Log;
 
+import com.cloudjay.cjay.task.service.PubnubService_;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringUtils;
@@ -88,7 +89,7 @@ public class App extends Application {
 	private void configureAlarmManager() {
 
 		if (!Utils.isAlarmUp(getApplicationContext())) {
-			
+
 			Logger.w("Alarm Manager is not running. Starting alarm ...");
 			Utils.startAlarm(getApplicationContext());
 
@@ -96,6 +97,12 @@ public class App extends Application {
 			Logger.Log("Alarm is already running "
 					+ StringUtils.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE));
 
+			if (!Utils.isRunning(getApplicationContext(), PubnubService_.class.getName())) {
+
+				Logger.w("PubnubService is not Running");
+				Intent pubnubIntent = new Intent(getApplicationContext(), PubnubService_.class);
+				startService(pubnubIntent);
+			}
 		}
 	}
 
