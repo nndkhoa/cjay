@@ -131,6 +131,8 @@ public class ImportFragment extends Fragment {
 		lvImages.setAdapter(mAdapter);
 
 		dataCenter.getSessionInBackground(getActivity(), containerID);
+
+        refresh();
 	}
 
 	//region EVENT HANDLER
@@ -161,9 +163,11 @@ public class ImportFragment extends Fragment {
 	 *
 	 * @param event
 	 */
+    @UiThread
 	void onEvent(ImageCapturedEvent event) {
 		Logger.e(event.getContainerId());
 		dataCenter.getSessionInBackground(getActivity(), event.getContainerId());
+        refresh();
 	}
 
 	/**
