@@ -5,6 +5,7 @@ import android.content.Context;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
+import com.cloudjay.cjay.event.upload.PreUploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
@@ -53,7 +54,12 @@ public class UploadImportJob extends Job {
 	public void onAdded() {
 
 		// TODO: Change status to Uploading --> outside
-		// Post Event thong bao bat dau upload
+
+		Context context = App.getInstance().getApplicationContext();
+		Step step = Step.values()[mSession.getLocalStep()];
+		DataCenter_.getInstance_(context).addLog(context, mSession.getContainerId(), step.name() + " | Add container vào Queue");
+
+		EventBus.getDefault().post(new PreUploadStartedEvent(mSession, UploadType.SESSION));
 		EventBus.getDefault().post(new UploadStartedEvent(mSession, UploadType.SESSION));
 	}
 
@@ -70,10 +76,12 @@ public class UploadImportJob extends Job {
 
 		EventBus.getDefault().post(new UploadingEvent(mSession.getContainerId(), UploadType.SESSION));
 
-		Step step = Step.values()[mSession.getLocalStep()];
-
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
+
+		Step step = Step.values()[mSession.getLocalStep()];
+		dataCenter.addLog(context, mSession.getContainerId(), step.name() + " | Bắt đầu quá trình upload");
+
 		// Bắt đầu quá trình upload
 
 		switch (step) {
@@ -97,6 +105,7 @@ public class UploadImportJob extends Job {
 				dataCenter.setHandCleaningSession(context, mSession);
 				break;
 		}
+		dataCenter.addLog(context, mSession.getContainerId(), "Upload container thành công");
 	}
 
 	/**
@@ -128,6 +137,10 @@ public class UploadImportJob extends Job {
 	 */
 	@Override
 	protected void onCancel() {
+
+		Context context = App.getInstance().getApplicationContext();
+		DataCenter_.getInstance_(context).addLog(context, mSession.getContainerId(), "Upload thất bại");
+
 		EventBus.getDefault().post(new UploadStoppedEvent(mSession));
 	}
 }

@@ -82,11 +82,6 @@ public class UploadFragment extends Fragment {
 
 	//region EVENT HANDLER
 	public void onEvent(UploadStartedEvent event) {
-		if (event.uploadType == UploadType.SESSION) {
-			dataCenter.changeStatusWhenUpload(getActivity(), event.getSession(), UploadType.SESSION, UploadStatus.COMPLETE);
-		} else if (event.uploadType == UploadType.AUDIT_ITEM){
-			dataCenter.changeStatusWhenUpload(getActivity(),event.getSession(),UploadType.AUDIT_ITEM,UploadStatus.COMPLETE);
-		}
 		refresh();
 	}
 
@@ -99,11 +94,6 @@ public class UploadFragment extends Fragment {
 	}
 
 	public void onEvent(UploadSucceededEvent event) {
-		if (event.uploadType == UploadType.SESSION) {
-			dataCenter.changeStatusWhenUpload(getActivity(), event.getSession(), UploadType.SESSION, UploadStatus.UPLOADING);
-		} else if (event.uploadType == UploadType.AUDIT_ITEM){
-			dataCenter.changeStatusWhenUpload(getActivity(),event.getSession(),UploadType.AUDIT_ITEM,UploadStatus.UPLOADING);
-		}
 		refresh();
 	}
 
