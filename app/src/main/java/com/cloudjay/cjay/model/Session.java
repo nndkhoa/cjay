@@ -810,7 +810,7 @@ public class Session implements Serializable{
 	 * @param status
 	 * @return
 	 */
-	public boolean changeUploadStatus(String containerId, String itemUuid, UploadStatus status) {
+	public boolean changeAuditItemUploadStatus(String containerId, String itemUuid, UploadStatus status) {
 		for (AuditItem item : auditItems) {
 			if (item.getUuid().equals(itemUuid)) {
 				item.setUploadStatus(status);

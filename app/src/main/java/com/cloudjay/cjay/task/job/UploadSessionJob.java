@@ -150,7 +150,7 @@ public class UploadSessionJob extends Job {
 //		}
 //
 //		// Change upload status to COMPLETE
-//		DataCenter_.getInstance_(context).changeUploadStatus(context, containerId, UploadStatus.COMPLETE);
+//		DataCenter_.getInstance_(context).changeAuditItemUploadStatus(context, containerId, UploadStatus.COMPLETE);
 //
 //		// Upload thành công
 //		DataCenter_.getInstance_(context).addLog(context, containerId, "Upload container thành công");
@@ -192,7 +192,7 @@ public class UploadSessionJob extends Job {
 //
 //			Context context = App.getInstance().getApplicationContext();
 //			DataCenter_.getInstance_(context).addLog(context, containerId, "Upload thất bại");
-//			DataCenter_.getInstance_(context).changeUploadStatus(context, containerId, UploadStatus.ERROR);
+//			DataCenter_.getInstance_(context).changeAuditItemUploadStatus(context, containerId, UploadStatus.ERROR);
 //			EventBus.getDefault().post(new UploadStoppedEvent(containerId));
 //
 //		} catch (SnappydbException e) {

@@ -2,8 +2,6 @@ package com.cloudjay.cjay;
 
 import android.content.Context;
 import android.text.TextUtils;
-
-import com.cloudjay.cjay.activity.PreUploadSucceededEvent;
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.AuditImagesGotEvent;
@@ -1110,7 +1108,7 @@ public class DataCenter {
 		AuditItem auditItem = session.getAuditItem(itemUuid);
 		AuditItem result = networkClient.postAuditItem(context, session, auditItem);
 		session.updateAuditItem(result);
-		saveSession(context, session);
+		saveSession(context, session, UploadType.AUDIT_ITEM);
 
 	}
 
@@ -1193,11 +1191,11 @@ public class DataCenter {
 
 	public void uploadImportSession(Context context, Session session) {
 		Session result = networkClient.uploadSession(context, session);
-		saveSession(context, result);
+		saveSession(context, result, UploadType.SESSION);
 	}
 
 	@Background(serial = CACHE)
-	void saveSession(Context context, Session session) {
+	void saveSession(Context context, Session session, UploadType type) {
 		DB db = null;
 		String key = session.getContainerId();
 		Session object = null;
@@ -1207,19 +1205,24 @@ public class DataCenter {
 			object = db.getObject(key, Session.class);
 			object.mergeSession(session);
 
+			//Set upload Status conplete
+			object.setUploadStatus(UploadStatus.COMPLETE);
+
+			db.put(key, object);
+
 		} catch (SnappydbException e) {
 			// change session to local
 			Logger.wtf(e.getMessage());
 			try {
-
-				db.put(key, session);
+				object =session.changeToLocalFormat();
+				db.put(key, object);
 			} catch (SnappydbException e1) {
 				e1.printStackTrace();
 			}
 		} finally {
-			EventBus.getDefault().post(new PreUploadSucceededEvent(object, UploadType.SESSION));
 			EventBus.getDefault().post(new UploadSucceededEvent(object, UploadType.SESSION));
-			Logger.logJson(session,Session.class);
+			Logger.e("Session after saved");
+			Logger.logJson(object, Session.class);
 		}
 	}
 
@@ -1233,7 +1236,7 @@ public class DataCenter {
 	public void uploadAuditSession(Context context, Session session) throws SnappydbException {
 
 		Session result = networkClient.completeAudit(context, session);
-		saveSession(context, result);
+		saveSession(context, result, UploadType.SESSION);
 	}
 
 	/**
@@ -1246,7 +1249,7 @@ public class DataCenter {
 	public void uploadRepairSession(Context context, Session session) throws SnappydbException {
 
 		Session result = networkClient.completeRepairSession(context, session);
-		saveSession(context, result);
+		saveSession(context, result, UploadType.SESSION);
 	}
 
 	/**
@@ -1257,7 +1260,7 @@ public class DataCenter {
 	public void uploadExportSession(Context context, Session session) throws SnappydbException {
 
 		Session result = networkClient.checkOutContainerSession(context, session);
-		saveSession(context, result);
+		saveSession(context, result, UploadType.SESSION);
 	}
 
 	/**
@@ -1270,7 +1273,7 @@ public class DataCenter {
 	public void setHandCleaningSession(Context context, Session session) {
 
 		Session result = networkClient.setHandCleaningSession(context, session);
-		saveSession(context, result);
+		saveSession(context, result, UploadType.SESSION);
 
 	}
 
@@ -1561,7 +1564,7 @@ public class DataCenter {
 	public void changeUploadStatus(Context context, String containerId, String itemUuid, UploadStatus status) throws SnappydbException {
 		DB db = App.getDB(context);
 		Session session = db.getObject(containerId, Session.class);
-		session.changeUploadStatus(containerId, itemUuid, status);
+		session.changeAuditItemUploadStatus(containerId, itemUuid, status);
 		db.put(containerId, session);
 	}
 

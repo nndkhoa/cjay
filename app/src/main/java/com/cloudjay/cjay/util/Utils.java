@@ -178,7 +178,7 @@ public class Utils {
 
 			// wake up every 5 minutes to ensure service stays alive
 			alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
-					(6000 * 1000), pPubnubIntent);
+					(60 * 1000), pPubnubIntent);
 		}
 	}
 

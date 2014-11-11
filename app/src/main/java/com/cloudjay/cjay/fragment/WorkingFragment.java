@@ -125,11 +125,11 @@ public class WorkingFragment extends Fragment {
 	}
 
 	public void onEvent(UploadSucceededEvent event) {
-			refresh();
+		refresh();
 	}
 
 	public void onEvent(UploadStartedEvent event) {
-			refresh();
+		refresh();
 	}
 
 	public void onEvent(ContainersGotEvent event) {

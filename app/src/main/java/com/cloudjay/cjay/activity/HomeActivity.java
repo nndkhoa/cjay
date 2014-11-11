@@ -18,8 +18,6 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.upload.PreUploadStartedEvent;
-import com.cloudjay.cjay.event.upload.UploadStartedEvent;
-import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.fragment.SearchFragment_;
 import com.cloudjay.cjay.fragment.UploadFragment_;
 import com.cloudjay.cjay.fragment.WorkingFragment_;
@@ -181,14 +179,6 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 			dataCenter.changeStatusWhenUpload(this, event.getSession(), UploadType.SESSION, UploadStatus.UPLOADING);
 		} else if (event.uploadType == UploadType.AUDIT_ITEM) {
 			dataCenter.changeStatusWhenUpload(this, event.getSession(), UploadType.AUDIT_ITEM, UploadStatus.UPLOADING);
-		}
-	}
-
-	public void onEvent(PreUploadSucceededEvent event) {
-		if (event.uploadType == UploadType.SESSION) {
-			dataCenter.changeStatusWhenUpload(this, event.getSession(), UploadType.SESSION, UploadStatus.COMPLETE);
-		} else if (event.uploadType == UploadType.AUDIT_ITEM) {
-			dataCenter.changeStatusWhenUpload(this, event.getSession(), UploadType.AUDIT_ITEM, UploadStatus.COMPLETE);
 		}
 	}
 }

@@ -308,6 +308,7 @@ public class NetworkClient {
 		String auditItemUUID = auditItem.getUuid();
 		AuditItem result = provider.getRestAdapter(context).create(NetworkService.class).postAudiItem(containerSession.getId(), auditItem.getAuditItemToUpload());
 		result.setUuid(auditItemUUID);
+		result.setUploadStatus(UploadStatus.COMPLETE);
 
 		return result;
 	}
