@@ -11,6 +11,7 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
+import com.cloudjay.cjay.event.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.session.ContainerChangedEvent;
 import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
@@ -275,11 +276,9 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 	}
 
-	public void onEvent(ContainersGotEvent event) {
-		if (event.getTargets() != null && event.getTargets().size() > 0) {
-			mSession = event.getTargets().get(0);
+	public void onEvent(ContainerGotEvent event) {
+			mSession = event.getSession();
 			checkForShowButton();
-		}
 	}
 
 	/**

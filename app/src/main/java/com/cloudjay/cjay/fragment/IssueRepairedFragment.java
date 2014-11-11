@@ -12,16 +12,14 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.DetailIssueActivity;
 import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.adapter.RepairedItemAdapter;
+import com.cloudjay.cjay.event.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
-import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
@@ -79,9 +77,9 @@ public class IssueRepairedFragment extends Fragment {
     }
 
 	@UiThread
-	public void onEvent(ContainersGotEvent event) {
+	public void onEvent(ContainerGotEvent event) {
 		// Get session by containerId
-		mSession = event.getTarget();
+		mSession = event.getSession();
 
 		if (mSession != null) {
 

@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.event.session.ContainersGotEvent;
+import com.cloudjay.cjay.event.ContainerGotEvent;
 import com.cloudjay.cjay.fragment.IssueReportComponentFragment_;
 import com.cloudjay.cjay.fragment.IssueReportDamageFragment_;
 import com.cloudjay.cjay.fragment.IssueReportDimensionFragment_;
@@ -105,9 +105,9 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 	}
 
 	@UiThread
-	public void onEvent(ContainersGotEvent event) {
+	public void onEvent(ContainerGotEvent event) {
 
-		mSession = event.getTarget();
+		mSession = event.getSession();
 		mAuditItem = mSession.getAuditItem(mAuditItemUuid);
 		mAuditImage = mAuditItem.getAuditImage(mAuditImageUuid);
 

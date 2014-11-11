@@ -11,8 +11,8 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.DetailIssuedImageAdapter;
+import com.cloudjay.cjay.event.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
-import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
@@ -99,10 +99,10 @@ public class AfterRepairFragment extends Fragment {
 	}
 
 	@UiThread
-	public void onEvent(ContainersGotEvent event) {
+	public void onEvent(ContainerGotEvent event) {
 
 		//get container operater code form containerId
-		mSession = event.getTarget();
+		mSession = event.getSession();
 		if (null == mSession) {
 			Utils.showCrouton(getActivity(), "Không tìm thấy container trong dữ liệu");
 		} else {

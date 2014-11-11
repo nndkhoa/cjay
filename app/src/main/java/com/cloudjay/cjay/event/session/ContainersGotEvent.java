@@ -10,7 +10,7 @@ public class ContainersGotEvent {
 		if (isSingleChange())
 			return sessions.get(0);
 		else
-			throw new IllegalStateException("Can only call this when isSingleChange returns true");
+			throw new IllegalStateException("Can only call this when isSingleChange returns true, current size is:" + sessions.size());
 	}
 
 	public boolean isSingleChange() {

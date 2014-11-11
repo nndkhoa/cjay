@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.api.NetworkClient;
+import com.cloudjay.cjay.event.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.AuditImagesGotEvent;
 import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
 import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
@@ -468,6 +469,7 @@ public class DataCenter {
 	 */
 	@Background(serial = CACHE)
 	public void getSessionsInBackground(Context context, String prefix) {
+		Logger.Log("Getting list session: "+prefix);
 
 		int len = prefix.length();
 
@@ -501,6 +503,8 @@ public class DataCenter {
 	@Background(serial = CACHE)
 	public void getSessionInBackground(Context context, String containerId) {
 
+		Logger.Log("Getting container: "+containerId);
+
 		StackTraceElement[] trace = new Throwable().getStackTrace();
 		Logger.Log("Open DB " + trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
 
@@ -508,10 +512,7 @@ public class DataCenter {
 			DB db = App.getDB(context);
 			String key = containerId;
 			Session session = db.getObject(key, Session.class);
-
-			List<Session> list = new ArrayList<>();
-			list.add(session);
-			EventBus.getDefault().post(new ContainersGotEvent(list, containerId));
+			EventBus.getDefault().post(new ContainerGotEvent(session, containerId));
 
 		} catch (SnappydbException e) {
 			Logger.w(e.getMessage());

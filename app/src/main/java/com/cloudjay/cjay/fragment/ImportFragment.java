@@ -20,22 +20,18 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
-import com.cloudjay.cjay.event.EventMenuCreated;
+import com.cloudjay.cjay.event.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.operator.OperatorChosenEvent;
-import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadImportJob;
-import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
-import com.cloudjay.cjay.util.enums.UploadStatus;
-import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
@@ -165,8 +161,8 @@ public class ImportFragment extends Fragment {
 	 *
 	 * @param event
 	 */
-	@UiThread
 	void onEvent(ImageCapturedEvent event) {
+		Logger.e(event.getContainerId());
 		dataCenter.getSessionInBackground(getActivity(), event.getContainerId());
 	}
 
@@ -175,10 +171,10 @@ public class ImportFragment extends Fragment {
 	 * @param event
 	 */
 	@UiThread
-	public void onEvent(ContainersGotEvent event) {
+	public void onEvent(ContainerGotEvent event) {
 
 		// Trying to restore container status
-		mSession = event.getTarget();
+		mSession = event.getSession();
 		if (null == mSession) {
 
 			// Set container ID for text View containerId

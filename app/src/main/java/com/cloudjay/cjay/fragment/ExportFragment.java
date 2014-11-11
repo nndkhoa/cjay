@@ -17,14 +17,13 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.adapter.PhotoExpandableListAdapter;
+import com.cloudjay.cjay.event.ContainerGotEvent;
 import com.cloudjay.cjay.event.EventMenuCreated;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
-import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadImportJob;
-import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -235,10 +234,10 @@ public class ExportFragment extends Fragment {
 	}
 
 	@UiThread
-	public void onEvent(ContainersGotEvent event) {
+	public void onEvent(ContainerGotEvent event) {
 
 		// Get session
-		mSession = event.getTarget();
+		mSession = event.getSession();
 
 		if (null == mSession) {
 			// Set ContainerId to TextView

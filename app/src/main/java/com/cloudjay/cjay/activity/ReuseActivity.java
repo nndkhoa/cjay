@@ -14,8 +14,8 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
+import com.cloudjay.cjay.event.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
-import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
@@ -77,10 +77,10 @@ public class ReuseActivity extends Activity {
 	}
 
 	@UiThread
-	public void onEvent(ContainersGotEvent event) {
+	public void onEvent(ContainerGotEvent event) {
 
 		// Get session by containerId
-		mSession = event.getTarget();
+		mSession = event.getSession();
 
 		if (mActionMode == null) {
 			// there are some selected items, start the actionMode
