@@ -370,12 +370,6 @@ public class IssuePendingFragment extends Fragment {
 		if (event.uploadType == UploadType.AUDIT_ITEM) {
 
 		}
-		// Re-query container session with given containerId
-		if (event.uploadType == UploadType.SESSION) {
-			dataCenter.changeStatusWhenUpload(getActivity(), event.getSession(), UploadType.SESSION, UploadStatus.COMPLETE);
-		} else if (event.uploadType == UploadType.AUDIT_ITEM){
-			dataCenter.changeStatusWhenUpload(getActivity(),event.getSession(),UploadType.AUDIT_ITEM,UploadStatus.COMPLETE);
-		}
 		mSession = event.getSession();
 		refresh();
 
@@ -383,13 +377,6 @@ public class IssuePendingFragment extends Fragment {
 
 	@UiThread
 	void onEvent(UploadStartedEvent event) {
-		Logger.Log("upload complete");
-		// Re-query container session with given containerId
-		if (event.uploadType == UploadType.SESSION) {
-			dataCenter.changeStatusWhenUpload(getActivity(), event.getSession(), UploadType.SESSION, UploadStatus.UPLOADING);
-		} else if (event.uploadType == UploadType.AUDIT_ITEM){
-			dataCenter.changeStatusWhenUpload(getActivity(),event.getSession(),UploadType.AUDIT_ITEM,UploadStatus.UPLOADING);
-		}
 		mSession = event.getSession();
 		refresh();
 	}

@@ -125,22 +125,10 @@ public class WorkingFragment extends Fragment {
 	}
 
 	public void onEvent(UploadSucceededEvent event) {
-		if (event.getUploadType() == UploadType.SESSION)
-			if (event.uploadType == UploadType.SESSION) {
-				dataCenter.changeStatusWhenUpload(getActivity(), event.getSession(), UploadType.SESSION, UploadStatus.COMPLETE);
-			} else if (event.uploadType == UploadType.AUDIT_ITEM){
-				dataCenter.changeStatusWhenUpload(getActivity(),event.getSession(),UploadType.AUDIT_ITEM,UploadStatus.COMPLETE);
-			}
 			refresh();
 	}
 
 	public void onEvent(UploadStartedEvent event) {
-		if (event.getUploadType() == UploadType.SESSION)
-			if (event.uploadType == UploadType.SESSION) {
-				dataCenter.changeStatusWhenUpload(getActivity(), event.getSession(), UploadType.SESSION, UploadStatus.UPLOADING);
-			} else if (event.uploadType == UploadType.AUDIT_ITEM){
-				dataCenter.changeStatusWhenUpload(getActivity(),event.getSession(),UploadType.AUDIT_ITEM,UploadStatus.UPLOADING);
-			}
 			refresh();
 	}
 

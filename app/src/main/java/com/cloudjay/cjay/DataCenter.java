@@ -3,6 +3,7 @@ package com.cloudjay.cjay;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.cloudjay.cjay.activity.PreUploadSucceededEvent;
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.AuditImagesGotEvent;
@@ -1108,7 +1109,6 @@ public class DataCenter {
 
 		AuditItem auditItem = session.getAuditItem(itemUuid);
 		AuditItem result = networkClient.postAuditItem(context, session, auditItem);
-		saveSession(context, session);
 		session.updateAuditItem(result);
 		saveSession(context, session);
 
@@ -1218,7 +1218,9 @@ public class DataCenter {
 				e1.printStackTrace();
 			}
 		} finally {
+			EventBus.getDefault().post(new PreUploadSucceededEvent(object, UploadType.SESSION));
 			EventBus.getDefault().post(new UploadSucceededEvent(object, UploadType.SESSION));
+			Logger.logJson(session,Session.class);
 		}
 	}
 
