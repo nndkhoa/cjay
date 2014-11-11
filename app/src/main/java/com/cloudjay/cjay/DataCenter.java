@@ -1020,6 +1020,9 @@ public class DataCenter {
 			Session session = db.getObject(key, Session.class);
 
 			if (session != null) {
+				int uploading = 0;
+				int uploaded = 0;
+				int total = 0;
 				switch (imageType) {
 
 					case AUDIT:
@@ -1056,6 +1059,13 @@ public class DataCenter {
 							if (!TextUtils.isEmpty(gateImage.getName())) {
 								if (gateImage.getName().contains(imageName) && gateImage.getType() == imageType.value) {
 									gateImage.setUploadStatus(status);
+									total = total + 1;
+									if (status == UploadStatus.UPLOADING) {
+										uploading = uploading + 1;
+									} else if (status == UploadStatus.COMPLETE) {
+										uploaded = uploaded + 1;
+									}
+//									Logger.e("Status gate image " + gateImage.getName() + ": " + gateImage.getUploadStatus());
 									break;
 								}
 							} else {
@@ -1065,6 +1075,7 @@ public class DataCenter {
 						break;
 				}
 				db.put(key, session);
+				Logger.e(total + " " + uploaded + " " + uploading);
 				Logger.e(imageType.toString());
 				if (status == UploadStatus.UPLOADING) {
 					EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.IMAGE));
