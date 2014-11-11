@@ -155,7 +155,7 @@ public class DataCenter {
 	 *
 	 * @param keyword
 	 */
-	// TODO: add Background
+	@Background(serial = CACHE)
 	public void searchOperator(String keyword) {
 		try {
 			List<Operator> operators = new ArrayList<>();
@@ -169,28 +169,6 @@ public class DataCenter {
 			EventBus.getDefault().post(new OperatorsGotEvent(operators));
 		} catch (SnappydbException e) {
 			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Get operator from database.
-	 * Chỉ sử dụng khi biết chắc có operator ở trong database.
-	 *
-	 * @param context
-	 * @param operatorCode
-	 * @return
-	 */
-	public Operator getOperator(Context context, String operatorCode) {
-
-		try {
-			DB db = App.getDB(context);
-			String key = CJayConstant.PREFIX_OPERATOR + operatorCode;
-			Operator operator = db.getObject(key, Operator.class);
-			return operator;
-
-		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
-			return null;
 		}
 	}
 

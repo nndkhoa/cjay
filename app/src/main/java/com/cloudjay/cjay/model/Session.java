@@ -691,15 +691,15 @@ public class Session implements Serializable{
 	public Session mergeSession(Session newSession) {
 
 		Logger.Log(" > Merge container " + newSession.getContainerId());
-		Logger.Log("Parse basic information");
+//		Logger.Log("Parse basic information");
 		this.setId(newSession.getId());
 		this.setStep(newSession.getStep());
 		this.setCheckInTime(newSession.getCheckInTime());
 		this.setCheckOutTime(newSession.getCheckOutTime());
 
 		// local step should always greater or equal to step
-		Logger.Log("Local Step: " + Step.values()[this.getLocalStep()]);
-		Logger.Log("Server Step: " + Step.values()[newSession.getStep()]);
+//		Logger.Log("Local Step: " + Step.values()[this.getLocalStep()]);
+//		Logger.Log("Server Step: " + Step.values()[newSession.getStep()]);
 
 		if (this.getLocalStep() < newSession.getStep()) {
 			this.setLocalStep(newSession.getStep());
@@ -710,7 +710,7 @@ public class Session implements Serializable{
 		// Tìm danh sách hình khác nhau
 		// Difference được khởi tạo là danh sách tổng hợp của client và server
 		// Difference thường là danh sách hình mới từ server
-		Logger.Log("Parse list gate images");
+//		Logger.Log("Parse list gate images");
 		List<GateImage> diffGateImages = new ArrayList<>();
 		diffGateImages.addAll(gateImages);
 		//Set upload status for all image get from server is uploaded
@@ -722,8 +722,8 @@ public class Session implements Serializable{
 		gateImages.retainAll(newSession.getGateImages());
 		diffGateImages.removeAll(gateImages);
 
-		Logger.Log("Similar gate img count: " + gateImages.size());
-		Logger.Log("Difference gate img count: " + diffGateImages.size());
+//		Logger.Log("Similar gate img count: " + gateImages.size());
+//		Logger.Log("Difference gate img count: " + diffGateImages.size());
 		// Khởi tạo các thông tin còn thiếu của list difference
 		for (GateImage image : diffGateImages) {
 			if (TextUtils.isEmpty(image.getName())) {
@@ -750,7 +750,7 @@ public class Session implements Serializable{
 					if (serverItem.equals(localItem)) {
 						found = true;
 
-						Logger.Log("Found audit item");
+//						Logger.Log("Found audit item");
 						SimpleDateFormat format = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 						Logger.Log(serverItem.getModifiedAt());
 						try {
