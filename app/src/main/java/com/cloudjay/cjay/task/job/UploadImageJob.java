@@ -48,7 +48,7 @@ public class UploadImageJob extends Job {
 		// It will notify fragment upload to update UI
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).changeImageUploadStatus(context, containerId, imageName, imageType, UploadStatus.UPLOADING);
-		EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.IMAGE));
+
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class UploadImageJob extends Job {
 
 		// Change image status to COMPLETE
 		DataCenter_.getInstance_(context).changeImageUploadStatus(context, containerId, imageName, imageType, UploadStatus.COMPLETE);
-		EventBus.getDefault().post(new UploadSucceededEvent(containerId, UploadType.IMAGE));
+
 	}
 
 	@Override

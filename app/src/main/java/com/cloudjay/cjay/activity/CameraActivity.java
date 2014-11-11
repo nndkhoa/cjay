@@ -8,6 +8,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.fragment.CameraFragment_;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Utils;
 
 import org.androidannotations.annotations.AfterExtras;
 import org.androidannotations.annotations.EActivity;
@@ -93,17 +94,26 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
-                || keyCode == KeyEvent.KEYCODE_VOLUME_UP
-                || keyCode == KeyEvent.KEYCODE_CAMERA
-				&& current != null
-				&& !current.isSingleShotProcessing()) {
 
-			current.takeSimplePicture();
-			return (true);
+		Logger.Log(event.isLongPress() + "");
+		try {
+			if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
+					|| keyCode == KeyEvent.KEYCODE_VOLUME_UP
+					|| keyCode == KeyEvent.KEYCODE_CAMERA)
+					&& current != null
+					&& !current.isSingleShotProcessing()) {
 
+				current.takeSimplePicture();
+				return (true);
+
+			}
+			return (super.onKeyDown(keyCode, event));
+
+		} catch (Exception e) {
+			Utils.showCrouton(this, "Please take it easy");
+			e.printStackTrace();
+			return true;
 		}
-		return (super.onKeyDown(keyCode, event));
 	}
 
 	@Override

@@ -42,7 +42,7 @@ public class CJayConstant {
 
 	public static final int ALARM_QUEUE_ID = 49482;
 	public static final int ALARM_PUBNUB_ID = 43452;
-	public static final int ALARM_INTERVAL = 12*3600;
+	public static final int ALARM_INTERVAL = 12 * 3600;
 	public static final int NOTIFICATION_ID = 98234;
 	public static final int PERMANENT_NOTIFICATION_ID = 1639;
 

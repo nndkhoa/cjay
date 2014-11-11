@@ -2,6 +2,7 @@ package com.cloudjay.cjay;
 
 import android.content.Context;
 import android.text.TextUtils;
+
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.AuditImagesGotEvent;
@@ -14,6 +15,7 @@ import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.event.session.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.event.session.WorkingSessionCreatedEvent;
+import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
@@ -1051,7 +1053,7 @@ public class DataCenter {
 					case EXPORT:
 					default:
 						for (GateImage gateImage : session.getGateImages()) {
-							if (gateImage.getName() != null) {
+							if (!TextUtils.isEmpty(gateImage.getName())) {
 								if (gateImage.getName().contains(imageName) && gateImage.getType() == imageType.value) {
 									gateImage.setUploadStatus(status);
 									break;
@@ -1063,6 +1065,12 @@ public class DataCenter {
 						break;
 				}
 				db.put(key, session);
+				Logger.e(imageType.toString());
+				if (status == UploadStatus.UPLOADING) {
+					EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.IMAGE));
+				} else if (status == UploadStatus.COMPLETE) {
+					EventBus.getDefault().post(new UploadSucceededEvent(containerId, UploadType.IMAGE));
+				}
 //				return true;
 			}
 		} catch (SnappydbException e) {
@@ -1214,15 +1222,14 @@ public class DataCenter {
 			// change session to local
 			Logger.wtf(e.getMessage());
 			try {
-				object =session.changeToLocalFormat();
+				object = session.changeToLocalFormat();
 				db.put(key, object);
 			} catch (SnappydbException e1) {
 				e1.printStackTrace();
 			}
 		} finally {
+			Logger.e("UPLOADED SESSION");
 			EventBus.getDefault().post(new UploadSucceededEvent(object, UploadType.SESSION));
-			Logger.e("Session after saved");
-			Logger.logJson(object, Session.class);
 		}
 	}
 
