@@ -169,17 +169,14 @@ public class Utils {
 		// --------
 		// Configure Pubnub Service
 
-		String token = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_TOKEN);
-		if (!TextUtils.isEmpty(token)) {
+		Logger.w(" --> set repeating for pubnub");
+		Intent pubnubIntent = new Intent(context, PubnubService_.class);
+		PendingIntent pPubnubIntent = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-			Logger.Log(" --> set repeating for pubnub");
-			Intent pubnubIntent = new Intent(context, PubnubService_.class);
-			PendingIntent pPubnubIntent = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		// wake up every 5 minutes to ensure service stays alive
+		alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+				(5 * 60 * 1000), pPubnubIntent);
 
-			// wake up every 5 minutes to ensure service stays alive
-			alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
-					(60 * 1000), pPubnubIntent);
-		}
 	}
 
 	/**

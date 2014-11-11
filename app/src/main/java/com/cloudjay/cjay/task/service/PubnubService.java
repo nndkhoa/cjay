@@ -17,6 +17,7 @@ import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.task.job.GetNotificationJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
 import com.google.gson.Gson;
@@ -45,8 +46,6 @@ public class PubnubService extends Service {
 	 * Notification manager is used for display message in Notification Center
 	 */
 	NotificationManager notificationManager;
-	PowerManager.WakeLock wl = null;
-
 	private static final int DELAY_TIME = 200;
 
 	String depotChannel;
@@ -128,87 +127,94 @@ public class PubnubService extends Service {
 
 	}
 
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
 
-		Logger.w("Create pubnub service");
+		String token = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_TOKEN);
+		if (!TextUtils.isEmpty(token)) {
 
-		notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		pubnub = new Pubnub(CJayConstant.PUBLISH_KEY, CJayConstant.SUBSCRIBE_KEY);
-		if (TextUtils.isEmpty(depotChannel) || TextUtils.isEmpty(uuidChannel)) {
+			Logger.w("Create pubnub service");
 
-			// Get info from Database
-			try {
+			notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+			pubnub = new Pubnub(CJayConstant.PUBLISH_KEY, CJayConstant.SUBSCRIBE_KEY);
+			if (TextUtils.isEmpty(depotChannel) || TextUtils.isEmpty(uuidChannel)) {
 
-				User user = dataCenter.getUser(getApplicationContext());
-				depotChannel = user.getChannelDepot();
-				uuidChannel = user.getChannelUuid();
+				// Get info from Database
+				try {
 
-				Logger.Log("Depot channel: " + depotChannel);
-				Logger.Log("UUID channel: " + uuidChannel);
+					User user = dataCenter.getUser(getApplicationContext());
+					depotChannel = user.getChannelDepot();
+					uuidChannel = user.getChannelUuid();
 
-			} catch (SnappydbException e) {
-				Logger.w(e.getMessage());
+					Logger.Log("Depot channel: " + depotChannel);
+					Logger.Log("UUID channel: " + uuidChannel);
 
-			} catch (NullCredentialException e) {
+				} catch (SnappydbException e) {
+					Logger.w(e.getMessage());
 
-				// Log out instantly
-				Utils.logOut(getApplicationContext());
+				} catch (NullCredentialException e) {
+
+					// Log out instantly
+					Utils.logOut(getApplicationContext());
+				}
 			}
-		}
 
-		if (!TextUtils.isEmpty(depotChannel) && !TextUtils.isEmpty(uuidChannel) && Utils.canReachInternet()) {
+			if (!TextUtils.isEmpty(depotChannel) && !TextUtils.isEmpty(uuidChannel) && Utils.canReachInternet()) {
 
-			try {
-				Logger.Log(" > Prepare to subscribe to Pubnub channels");
-				String[] channels = new String[]{depotChannel, uuidChannel};
-				pubnub.setUUID(uuidChannel);
-				pubnub.subscribe(channels, new Callback() {
+				try {
+					Logger.Log(" > Prepare to subscribe to Pubnub channels");
+					String[] channels = new String[]{depotChannel, uuidChannel};
+					pubnub.setUUID(uuidChannel);
+					pubnub.subscribe(channels, new Callback() {
 
-					@Override
-					public void connectCallback(String channel, Object message) {
-						System.out.println("SUBSCRIBE : CONNECT on channel:" + channel
-								+ " : " + message.getClass() + " : "
-								+ message.toString());
-					}
+						@Override
+						public void connectCallback(String channel, Object message) {
+							System.out.println("SUBSCRIBE : CONNECT on channel:" + channel
+									+ " : " + message.getClass() + " : "
+									+ message.toString());
+						}
 
-					@Override
-					public void disconnectCallback(String channel, Object message) {
-						System.out.println("SUBSCRIBE : DISCONNECT on channel:" + channel
-								+ " : " + message.getClass() + " : "
-								+ message.toString());
-					}
+						@Override
+						public void disconnectCallback(String channel, Object message) {
+							System.out.println("SUBSCRIBE : DISCONNECT on channel:" + channel
+									+ " : " + message.getClass() + " : "
+									+ message.toString());
+						}
 
-					public void reconnectCallback(String channel, Object message) {
-						System.out.println("SUBSCRIBE : RECONNECT on channel:" + channel
-								+ " : " + message.getClass() + " : "
-								+ message.toString());
-					}
+						public void reconnectCallback(String channel, Object message) {
+							System.out.println("SUBSCRIBE : RECONNECT on channel:" + channel
+									+ " : " + message.getClass() + " : "
+									+ message.toString());
+						}
 
-					@Override
-					public void successCallback(String channel, Object message) {
+						@Override
+						public void successCallback(String channel, Object message) {
 //					Logger.Log("Success: " + message.toString());
-						notifyUser(uuidChannel, message);
-					}
+							notifyUser(uuidChannel, message);
+						}
 
-					@Override
-					public void errorCallback(String channel, PubnubError pubnubError) {
-						Logger.e("Error: " + pubnubError.toString());
-					}
-				});
+						@Override
+						public void errorCallback(String channel, PubnubError pubnubError) {
+							Logger.e("Error: " + pubnubError.toString());
+						}
+					});
 
-			} catch (PubnubException e) {
+				} catch (PubnubException e) {
 
-				Logger.e(e.getMessage());
-				dataCenter.addLog(getApplicationContext(), "PubNub", "Cannot subscribe channels");
+					Logger.e(e.getMessage());
+					dataCenter.addLog(getApplicationContext(), "PubNub", "Cannot subscribe channels");
 
+				}
+			} else {
+				Logger.w("Auto stop Pubnub service");
+				stopSelf();
 			}
+
 		} else {
-
-			Logger.w("Auto stop Pubnub service");
+			Logger.wtf("There was problems. Please check credential.");
 			stopSelf();
-
 		}
 	}
 }
