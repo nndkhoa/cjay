@@ -28,7 +28,7 @@ import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.service.PubnubService_;
-import com.cloudjay.cjay.task.service.QueueIntentService_;
+import com.cloudjay.cjay.task.service.SyncIntentService_;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.pubnub.api.Pubnub;
@@ -150,6 +150,8 @@ public class Utils {
 	 */
 	public static void startAlarm(Context context) {
 
+		Logger.w(" -> start Alarm Manager");
+
 		// start 30 seconds after boot completed
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.SECOND, 30);
@@ -157,7 +159,7 @@ public class Utils {
 		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
 		// Making Alarm for Queue Worker
-		Intent intent = new Intent(context, QueueIntentService_.class);
+		Intent intent = new Intent(context, SyncIntentService_.class);
 		PendingIntent pQueueIntent = PendingIntent.getService(context, CJayConstant.ALARM_QUEUE_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 		// Start every 24 hours
@@ -170,12 +172,13 @@ public class Utils {
 		String token = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_TOKEN);
 		if (!TextUtils.isEmpty(token)) {
 
+			Logger.Log(" --> set repeating for pubnub");
 			Intent pubnubIntent = new Intent(context, PubnubService_.class);
 			PendingIntent pPubnubIntent = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 			// wake up every 5 minutes to ensure service stays alive
 			alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
-					(5 * 60 * 1000), pPubnubIntent);
+					(6000 * 1000), pPubnubIntent);
 		}
 	}
 
@@ -187,11 +190,12 @@ public class Utils {
 	 */
 	public static boolean isAlarmUp(Context context) {
 
-		Intent queueIntent = new Intent(context, QueueIntentService_.class);
-		Intent pubnubIntent = new Intent(context, PubnubService_.class);
-
+		Intent queueIntent = new Intent(context, SyncIntentService_.class);
 		boolean queueUp = PendingIntent.getService(context, CJayConstant.ALARM_QUEUE_ID, queueIntent, PendingIntent.FLAG_NO_CREATE) != null;
-		boolean pubnubUp = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_NO_CREATE) != null;
+
+//		Intent pubnubIntent = new Intent(context, PubnubService_.class);
+//		boolean pubnubUp = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_NO_CREATE) != null;
+		boolean pubnubUp = isRunning(context, PubnubService_.class.getName());
 
 		if (!queueUp)
 			Logger.w("Queue Service is not running");
@@ -209,7 +213,7 @@ public class Utils {
 
 		Logger.Log("stop Alarm Manager");
 
-		Intent intent = new Intent(context, QueueIntentService_.class);
+		Intent intent = new Intent(context, SyncIntentService_.class);
 		PendingIntent sender = PendingIntent.getService(context, CJayConstant.ALARM_QUEUE_ID, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -217,6 +221,7 @@ public class Utils {
 
 		alarmManager.cancel(sender);
 		sender.cancel();
+
 	}
 
 

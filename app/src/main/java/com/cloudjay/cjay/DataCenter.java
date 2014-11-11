@@ -412,34 +412,30 @@ public class DataCenter {
 	 */
 	public Session getSessionAsyncById(Context context, long id) {
 
+		Session result = networkClient.getSessionById(id);
 		try {
 			// Get session from server
 			DB db = App.getDB(context);
-			Session result = networkClient.getSessionById(id);
-
 			if (result != null) {
 
 				// Find local session
 				String key = result.getContainerId();
 				Session session = db.get(key, Session.class);
 
-				if (session == null) {
+				// merge result from server to local session
+				session.mergeSession(result);
+				db.put(key, session);
+				return session;
 
-					//Merge Session from server to local type
-					result.changeToLocalFormat();
-					addSession(result);
-					return result;
-
-				} else {
-
-					// merge result from server to local session
-					session.mergeSession(result);
-					db.put(key, session);
-					return session;
-				}
 			}
 		} catch (SnappydbException e) {
+
 			Logger.w(e.getMessage());
+
+			//Merge Session from server to local type
+			result.changeToLocalFormat();
+			addSession(result);
+			return result;
 
 		}
 		return null;
@@ -470,7 +466,7 @@ public class DataCenter {
 	 */
 	@Background(serial = CACHE)
 	public void getSessionsInBackground(Context context, String prefix) {
-		Logger.Log("Getting list session: "+prefix);
+//		Logger.Log("Getting list session: " + prefix);
 
 		int len = prefix.length();
 
@@ -503,11 +499,6 @@ public class DataCenter {
 
 	@Background(serial = CACHE)
 	public void getSessionInBackground(Context context, String containerId) {
-
-		Logger.Log("Getting container: "+containerId);
-
-		StackTraceElement[] trace = new Throwable().getStackTrace();
-		Logger.Log("Open DB " + trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
 
 		try {
 			DB db = App.getDB(context);
@@ -1207,7 +1198,6 @@ public class DataCenter {
 
 	@Background(serial = CACHE)
 	void saveSession(Context context, Session session) {
-		// doi status sang uploaded
 		DB db = null;
 		String key = session.getContainerId();
 		Session object = null;

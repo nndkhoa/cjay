@@ -15,9 +15,9 @@ import org.androidannotations.annotations.EIntentService;
 import retrofit.RetrofitError;
 
 @EIntentService
-public class QueueIntentService extends IntentService {
-	public QueueIntentService() {
-		super("QueueIntentService");
+public class SyncIntentService extends IntentService {
+	public SyncIntentService() {
+		super("SyncIntentService");
 	}
 
 	@Override
@@ -25,15 +25,17 @@ public class QueueIntentService extends IntentService {
 
 		try {
 			String token = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_TOKEN);
-
 			if (!TextUtils.isEmpty(token) && Utils.canReachInternet()) {
+				Logger.w(" > Sync session between local and server");
+
 				String lastModifiedTime = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_MODIFIED_DATE);
 				DataCenter_.getInstance_(getApplicationContext()).fetchSession(getApplicationContext(), lastModifiedTime, true);
+
 			} else {
 				Logger.w("There was problems. Please check credential or connectivity.");
 			}
-
 		} catch (RetrofitError e) {
+
 			e.printStackTrace();
 			Utils.cancelAlarm(getApplicationContext());
 		}
