@@ -132,14 +132,9 @@ public class PubnubService extends Service {
 	public void onCreate() {
 		super.onCreate();
 
-//		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-//		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SubscribeAtBoot");
-//		if (wl != null) {
-//			wl.acquire();
-//		}
+		Logger.w("Create pubnub service");
 
 		notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
 		pubnub = new Pubnub(CJayConstant.PUBLISH_KEY, CJayConstant.SUBSCRIBE_KEY);
 		if (TextUtils.isEmpty(depotChannel) || TextUtils.isEmpty(uuidChannel)) {
 

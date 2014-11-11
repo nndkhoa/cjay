@@ -191,11 +191,9 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 		if (mSession.getLocalStep() == Step.AUDIT.value) {
 			if (mSession.hasRepairImages()) {
-				Logger.Log("2");
 				btnCompleteAudit.setVisibility(View.VISIBLE);
 				btnCompleteRepair.setVisibility(View.VISIBLE);
 			} else {
-				Logger.Log("3");
 				btnCompleteAudit.setVisibility(View.VISIBLE);
 				btnCompleteRepair.setVisibility(View.GONE);
 			}

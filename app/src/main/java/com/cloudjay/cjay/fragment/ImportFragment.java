@@ -140,7 +140,7 @@ public class ImportFragment extends Fragment {
 		// Get selected operator from search operator dialog
 		Operator operator = event.getOperator();
 		operatorCode = operator.getOperatorCode();
-		Logger.Log("Choose operator " + operatorCode);
+		Logger.Log(" > Choose operator " + operatorCode);
 
 		// Set operator to edit text
 		etOperator.setText(operator.getOperatorName());
