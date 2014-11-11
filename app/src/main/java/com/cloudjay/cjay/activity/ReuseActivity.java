@@ -2,6 +2,7 @@ package com.cloudjay.cjay.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +33,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -73,11 +75,13 @@ public class ReuseActivity extends Activity {
 
 	@AfterViews
 	void doAfterViews() {
-		dataCenter.getSessionInBackground(this, containerID);
+        dataCenter.getSessionInBackground(this, containerID);
 	}
 
 	@UiThread
 	public void onEvent(ContainerGotEvent event) {
+
+        Logger.Log("in ContainerGotEvent");
 
 		// Get session by containerId
 		mSession = event.getSession();
@@ -93,7 +97,7 @@ public class ReuseActivity extends Activity {
 			tvContainerId.setText(containerID);
 
 		} else {
-
+            Logger.Log("not null");
 			containerID = mSession.getContainerId();
 
 			// Set ContainerId to TextView
@@ -201,7 +205,19 @@ public class ReuseActivity extends Activity {
 		gateImageAdapter.notifyDataSetChanged();
 	}
 
-	private class ActionModeCallBack implements ActionMode.Callback {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
+
+    private class ActionModeCallBack implements ActionMode.Callback {
 
 		@Override
 		public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {

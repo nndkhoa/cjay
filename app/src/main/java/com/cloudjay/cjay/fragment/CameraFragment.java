@@ -120,7 +120,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 	//endregion
 
 	//region VIEW INTERACTION
-	@Click
+	@Click(R.id.btn_use_gate_image)
 	void btnUseGateImageClicked() {
 		// Open ReuseActivity
 		Intent intent = new Intent(getActivity(), ReuseActivity_.class);
