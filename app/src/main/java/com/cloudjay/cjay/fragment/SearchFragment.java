@@ -8,6 +8,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -42,6 +44,7 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ItemLongClick;
+import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
@@ -55,6 +58,7 @@ import de.keyboardsurfer.android.widget.crouton.Style;
  * Tab search container
  */
 @EFragment(R.layout.fragment_search)
+@OptionsMenu(R.menu.search)
 public class SearchFragment extends Fragment {
 
 	//region VIEW
@@ -80,6 +84,7 @@ public class SearchFragment extends Fragment {
 	@Bean
 	DataCenter dataCenter;
 	String containerID;
+	private String selectedId;
 
 	@SystemService
 	InputMethodManager inputMethodManager;
@@ -141,6 +146,8 @@ public class SearchFragment extends Fragment {
 	@ItemClick(R.id.lv_search_container)
 	void searchItemClicked(int position) {
 
+		hideMenuItems();
+
 		// navigation to Wizard Activity
 		Session item = mAdapter.getItem(position);
 		dataCenter.addWorkingSession(item);
@@ -154,12 +161,12 @@ public class SearchFragment extends Fragment {
 
 	@ItemLongClick(R.id.lv_search_container)
 	void searchItemLongClicked(int position) {
+		lvSearch.setItemChecked(position, true);
 
 		//Get session from position
 		Session item = mAdapter.getItem(position);
-		HomeActivity activity = (HomeActivity) getActivity();
-		activity.exportSessionContainerId = item.getContainerId();
-		activity.showMenuExportImmediately(true);
+		selectedId = item.getContainerId();
+		getActivity().supportInvalidateOptionsMenu();
 	}
 
 	/**
@@ -351,5 +358,21 @@ public class SearchFragment extends Fragment {
 		EventBus.getDefault().unregister(this);
 		super.onDestroy();
 	}
+
+	void hideMenuItems() {
+		selectedId = "";
+		getActivity().supportInvalidateOptionsMenu();
+	}
+
+	@Override
+	public void onPrepareOptionsMenu(Menu menu) {
+
+		boolean isDisplayed = !(TextUtils.isEmpty(selectedId));
+		MenuItem item = menu.findItem(R.id.menu_export);
+		item.setVisible(isDisplayed);
+
+		super.onPrepareOptionsMenu(menu);
+	}
+
 
 }

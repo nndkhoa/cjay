@@ -3,18 +3,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<item
-		android:id="@+id/menu_export"
-		android:icon="@android:drawable/ic_dialog_alert"
-		android:visible="false"
-		android:showAsAction="always"
-		android:title=""/>
-	<item
-		android:id="@+id/menu_export_fragment"
-		android:icon="@android:drawable/ic_dialog_alert"
-		android:visible="false"
-		android:showAsAction="always"
-		android:title=""/>
-	<item
 		android:id="@+id/action_overflow"
 		android:icon="@android:drawable/ic_menu_agenda"
 		android:orderInCategory="101"

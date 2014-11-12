@@ -3,12 +3,14 @@ package com.cloudjay.cjay.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.activity.HomeActivity;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
@@ -19,14 +21,13 @@ import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.enums.UploadStatus;
-import com.cloudjay.cjay.util.enums.UploadType;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ItemLongClick;
+import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -43,6 +44,7 @@ import de.greenrobot.event.EventBus;
  * - container uploaded
  */
 @EFragment(R.layout.fragment_working)
+@OptionsMenu(R.menu.working)
 public class WorkingFragment extends Fragment {
 
 
@@ -63,10 +65,10 @@ public class WorkingFragment extends Fragment {
 	@ItemClick(R.id.lv_working_container)
 	void workingItemClicked(int position) {
 
+		hideMenuItems();
+
 		// navigation to Wizard Activity
 		Session item = mAdapter.getItem(position);
-		Logger.Log("Clicked on container: " + item.getContainerId());
-
 		Intent intent = new Intent(getActivity(), WizardActivity_.class);
 		intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, item.getContainerId());
 		intent.putExtra(WizardActivity.STEP_EXTRA, item.getLocalStep());
@@ -76,12 +78,31 @@ public class WorkingFragment extends Fragment {
 	@ItemLongClick(R.id.lv_working_container)
 	void workingItemLongClicked(int position) {
 
+		Logger.Log("Blah blah");
+		lvWorking.setItemChecked(position, true);
+
 		//Get session from position
 		Session item = mAdapter.getItem(position);
-		HomeActivity activity = (HomeActivity) getActivity();
-		activity.exportSessionContainerId = item.getContainerId();
-		activity.showMenuExportImmediately(true);
+		selectedId = item.getContainerId();
 
+		getActivity().supportInvalidateOptionsMenu();
+	}
+
+	private String selectedId;
+
+	void hideMenuItems() {
+		selectedId = "";
+		getActivity().supportInvalidateOptionsMenu();
+	}
+
+	@Override
+	public void onPrepareOptionsMenu(Menu menu) {
+
+		boolean isDisplayed = !(TextUtils.isEmpty(selectedId));
+		MenuItem item = menu.findItem(R.id.menu_export);
+		item.setVisible(isDisplayed);
+		
+		super.onPrepareOptionsMenu(menu);
 	}
 
 	/**

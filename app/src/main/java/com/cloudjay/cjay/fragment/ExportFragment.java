@@ -18,7 +18,6 @@ import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.adapter.PhotoExpandableListAdapter;
 import com.cloudjay.cjay.event.ContainerGotEvent;
-import com.cloudjay.cjay.event.EventMenuCreated;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.GateImage;
@@ -227,11 +226,6 @@ public class ExportFragment extends Fragment {
 	public void onDestroy() {
 		EventBus.getDefault().unregister(this);
 		super.onDestroy();
-	}
-
-	public void onEvent(EventMenuCreated event) {
-		Logger.e("EVENT BUSS MENU CREATE");
-		event.getMenu().findItem(R.id.menu_export).setVisible(false);
 	}
 
 	@UiThread

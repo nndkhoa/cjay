@@ -829,8 +829,6 @@ public class DataCenter {
 			e.printStackTrace();
 		}
 	}
-
-	@Trace
 	@Background(serial = CACHE)
 	public void removeUploadedSessions(Context context) {
 

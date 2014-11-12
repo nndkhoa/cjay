@@ -75,7 +75,6 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 
 			configureActionBar();
 			configureViewPager();
-			forceShowActionBarOverflowMenu();
 
 			// Run job lấy tất cả sessions nếu chưa từng lấy lần nào
 			String lastModifiedDate = PreferencesUtil.getPrefsValue(this, PreferencesUtil.PREF_MODIFIED_DATE);
@@ -159,19 +158,6 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 
 	@Override
 	public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-	}
-
-	private void forceShowActionBarOverflowMenu() {
-		try {
-			ViewConfiguration config = ViewConfiguration.get(this);
-			Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
-			if (menuKeyField != null) {
-				menuKeyField.setAccessible(true);
-				menuKeyField.setBoolean(config, false);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	public void onEvent(PreUploadStartedEvent event) {

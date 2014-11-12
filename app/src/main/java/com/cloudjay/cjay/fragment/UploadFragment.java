@@ -114,7 +114,6 @@ public class UploadFragment extends Fragment {
 	}
 	//endregion
 
-	@Trace
 	@OptionsItem(R.id.menu_clear_uploaded)
 	void clearUploadsMenuItemSelected() {
 		dataCenter.removeUploadedSessions(getActivity().getApplicationContext());
