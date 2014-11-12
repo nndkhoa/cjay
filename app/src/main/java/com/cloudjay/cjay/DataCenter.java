@@ -754,18 +754,6 @@ public class DataCenter {
 			object = db.getObject(key, Session.class);
 			Logger.w("From save session: " + session.getModifiedAt());
 
-			// #tieubao
-			// Nếu container vừa được upload
-			if (session.getStep() == Step.AUDIT.value) {
-				for (AuditItem item : object.getAuditItems()) {
-					if (item.isUploadConfirmed()) {
-						Logger.Log("Add audit item to jobqueue: " + item.toString());
-						JobManager jobManager = App.getJobManager();
-						jobManager.addJobInBackground(new UploadAuditItemJob(session.getId(), item, session.getContainerId()));
-					}
-				}
-			}
-
 			object.mergeSession(session);
 			object.setUploadStatus(UploadStatus.COMPLETE);
 
