@@ -105,6 +105,7 @@ public class UploadImportJob extends Job {
 				dataCenter.setHandCleaningSession(context, mSession);
 				break;
 		}
+
 		dataCenter.addLog(context, mSession.getContainerId(), "Upload container thành công");
 	}
 
