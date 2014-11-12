@@ -155,6 +155,7 @@
     <string name="issue_can_not_repair">Cấm sửa</string>
     <string name="issue_code_missing_warning">Xin vui lòng nhập code</string>
 	<string name="camera_saving">Đang lưu ảnh...</string>
+	<string name="menu_clear_uploaded_title">Clear</string>
 
 
 </resources>

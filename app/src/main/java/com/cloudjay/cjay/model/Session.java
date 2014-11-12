@@ -29,7 +29,7 @@ import javax.annotation.Generated;
 
 
 @Generated("org.jsonschema2pojo")
-public class Session implements Serializable{
+public class Session implements Serializable {
 
 	public static final String FIELD_CONTAINER_ID = "container_id";
 
@@ -797,7 +797,7 @@ public class Session implements Serializable{
 				}
 			}
 		}
-		Logger.logJson(this,Session.class);
+		Logger.logJson(this, Session.class);
 
 		return this;
 	}

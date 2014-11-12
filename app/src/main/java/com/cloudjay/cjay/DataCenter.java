@@ -14,6 +14,7 @@ import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
 import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.event.session.SearchAsyncStartedEvent;
+import com.cloudjay.cjay.event.session.UploadedContainerRemoved;
 import com.cloudjay.cjay.event.session.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditImage;
@@ -814,7 +815,6 @@ public class DataCenter {
 	 * @param containerId
 	 */
 	@Background(serial = CACHE)
-	@Trace
 	public void removeWorkingSession(Context context, String containerId) {
 
 		try {
@@ -830,11 +830,34 @@ public class DataCenter {
 		}
 	}
 
+	@Trace
+	@Background(serial = CACHE)
+	public void removeUploadedSessions(Context context) {
+
+		try {
+			DB db = App.getDB(context);
+			String[] keys = db.findKeys(CJayConstant.PREFIX_UPLOADING);
+
+			for (String key : keys) {
+				String t = key.substring(CJayConstant.PREFIX_UPLOADING.length(), key.length());
+				Session object = db.getObject(t, Session.class);
+				if (object.getUploadStatus() == UploadStatus.COMPLETE.value) {
+					db.del(key);
+					Logger.Log(" > Remove container from upload collection: " + key);
+				}
+			}
+
+			EventBus.getDefault().post(new UploadedContainerRemoved());
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
+
 
 	@Background(serial = CACHE)
 	public void changeStatusWhenUpload(Context context, Session session, UploadType uploadType, UploadStatus uploadStatus) {
 
-		DB db = null;
+		DB db;
 		try {
 			db = App.getDB(context);
 			if (uploadStatus == UploadStatus.UPLOADING) {
@@ -1415,6 +1438,7 @@ public class DataCenter {
 			e.printStackTrace();
 		}
 	}
+
 	/**
 	 * Set lỗi thuộc loại vệ sinh.
 	 * 1. Get Water Wash Damage Code
