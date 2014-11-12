@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.PowerManager;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.App;
@@ -106,7 +105,7 @@ public class PubnubService extends Service {
 
 		Message msg = handler.obtainMessage();
 		try {
-			Logger.Log("Message: " + message.toString());
+//			Logger.Log("Message: " + message.toString());
 
 			JsonParser jsonParser = new JsonParser();
 			JsonObject jo = (JsonObject) jsonParser.parse(message.toString());

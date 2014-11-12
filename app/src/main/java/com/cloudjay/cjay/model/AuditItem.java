@@ -26,6 +26,18 @@ import javax.annotation.Generated;
 public class AuditItem implements Serializable{
 
 	//region ATTR
+
+	public boolean isUploadConfirmed() {
+		return uploadConfirmed;
+	}
+
+	public void setUploadConfirmed(boolean uploadConfirmed) {
+		this.uploadConfirmed = uploadConfirmed;
+	}
+
+	private boolean uploadConfirmed;
+
+
 	@Expose
 	private long id;
 
@@ -556,6 +568,11 @@ public class AuditItem implements Serializable{
 
 		auditImages.addAll(diffImages);
 		return this;
+	}
+
+	@Override
+	public String toString() {
+		return componentCode + " - " + damageCode + " - " + repairCode + " - " + locationCode;
 	}
 
 	public boolean isWashTypeItem() {

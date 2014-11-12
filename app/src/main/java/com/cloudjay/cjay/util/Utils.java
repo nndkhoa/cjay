@@ -154,7 +154,7 @@ public class Utils {
 
 		// start 30 seconds after boot completed
 		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.SECOND, 30);
+		cal.add(Calendar.SECOND, 10 * 60);
 
 		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 

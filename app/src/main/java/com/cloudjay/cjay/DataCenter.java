@@ -7,6 +7,7 @@ import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.AuditImagesGotEvent;
 import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
+import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
 import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
 import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
@@ -14,6 +15,7 @@ import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
 import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.event.session.SearchAsyncStartedEvent;
+import com.cloudjay.cjay.event.session.UploadedContainerRemoved;
 import com.cloudjay.cjay.event.session.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditImage;
@@ -50,9 +52,6 @@ import retrofit.RetrofitError;
 
 @EBean(scope = EBean.Scope.Singleton)
 public class DataCenter {
-	int uploading = 0;
-	int uploaded = 0;
-	int total = 0;
 
 	// region DECLARE
 	// Inject the rest client
@@ -413,6 +412,7 @@ public class DataCenter {
 //				}
 
 				// merge result from server to local session
+				Logger.w("From get session async");
 				session.mergeSession(result);
 				db.put(key, session);
 				return session;
@@ -423,7 +423,7 @@ public class DataCenter {
 			//Merge Session from server to local type
 
 			Logger.w(e.getMessage());
-			Logger.w("Received new container session from server");
+			Logger.w("Received new container session from server: " + result.getContainerId());
 			result.changeToLocalFormat();
 			addSession(result);
 			return result;
@@ -564,6 +564,8 @@ public class DataCenter {
 
 	@Background(serial = CACHE)
 	void processListSession(List<Session> sessions) {
+
+		Logger.w("From process list session");
 		DB db;
 		try {
 			db = App.getDB(context);
@@ -699,6 +701,7 @@ public class DataCenter {
 
 	@Background(serial = CACHE)
 	void saveSession(Context context, Session session, UploadType type) {
+
 		DB db = null;
 		String key = session.getContainerId();
 		Session object = null;
@@ -706,6 +709,8 @@ public class DataCenter {
 			db = App.getDB(context);
 
 			object = db.getObject(key, Session.class);
+			Logger.w("From save session: " + session.getModifiedAt());
+
 			object.mergeSession(session);
 			object.setUploadStatus(UploadStatus.COMPLETE);
 			db.put(key, object);
@@ -811,7 +816,6 @@ public class DataCenter {
 	 * @param containerId
 	 */
 	@Background(serial = CACHE)
-	@Trace
 	public void removeWorkingSession(Context context, String containerId) {
 
 		try {
@@ -827,11 +831,34 @@ public class DataCenter {
 		}
 	}
 
+	@Trace
+	@Background(serial = CACHE)
+	public void removeUploadedSessions(Context context) {
+
+		try {
+			DB db = App.getDB(context);
+			String[] keys = db.findKeys(CJayConstant.PREFIX_UPLOADING);
+
+			for (String key : keys) {
+				String t = key.substring(CJayConstant.PREFIX_UPLOADING.length(), key.length());
+				Session object = db.getObject(t, Session.class);
+				if (object.getUploadStatus() == UploadStatus.COMPLETE.value) {
+					db.del(key);
+					Logger.Log(" > Remove container from upload collection: " + key);
+				}
+			}
+
+			EventBus.getDefault().post(new UploadedContainerRemoved());
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
+
 
 	@Background(serial = CACHE)
 	public void changeStatusWhenUpload(Context context, Session session, UploadType uploadType, UploadStatus uploadStatus) {
 
-		DB db = null;
+		DB db;
 		try {
 			db = App.getDB(context);
 			if (uploadStatus == UploadStatus.UPLOADING) {
@@ -1396,6 +1423,23 @@ public class DataCenter {
 		}
 	}
 
+	@Background(serial = CACHE)
+	public void updateAuditItemInBackground(Context context, String containerId, AuditItem auditItem) {
+		try {
+			// find session
+			DB db = App.getDB(context);
+			Session session = db.getObject(containerId, Session.class);
+			session.updateAuditItem(auditItem);
+			db.put(containerId, session);
+
+			// Notify that an audit item is updated
+			EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
+
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Set lỗi thuộc loại vệ sinh.
 	 * 1. Get Water Wash Damage Code
@@ -1569,6 +1613,28 @@ public class DataCenter {
 			e.printStackTrace();
 		}
 	}
+
+    /**
+     * Get audit item in background and post event back
+     *
+     * @param context
+     * @param containerId
+     * @param itemUuid
+     */
+    @Background(serial = CACHE)
+    public void getAuditItemInBackground(Context context, String containerId, String itemUuid) {
+        try {
+            DB db = App.getDB(context);
+            Session session = db.getObject(containerId, Session.class);
+            if (session != null) {
+                AuditItem auditItem = session.getAuditItem(itemUuid);
+                EventBus.getDefault().post(new AuditItemGotEvent(auditItem));
+            }
+
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+    }
 
 	//endregion
 }

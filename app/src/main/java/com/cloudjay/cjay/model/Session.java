@@ -29,7 +29,7 @@ import javax.annotation.Generated;
 
 
 @Generated("org.jsonschema2pojo")
-public class Session implements Serializable{
+public class Session implements Serializable {
 
 	public static final String FIELD_CONTAINER_ID = "container_id";
 
@@ -135,12 +135,10 @@ public class Session implements Serializable{
 	}
 
 	public void setLocalStep(int localStep) {
-//		Logger.e(localStep + "");
 		this.localStep = localStep;
 	}
 
 	public Session withLocalStep(int step) {
-//		Logger.e(localStep + "1");
 		this.localStep = step;
 		return this;
 	}
@@ -799,7 +797,7 @@ public class Session implements Serializable{
 				}
 			}
 		}
-		Logger.logJson(this,Session.class);
+		Logger.logJson(this, Session.class);
 
 		return this;
 	}
@@ -856,7 +854,6 @@ public class Session implements Serializable{
 	 */
 	public Session changeToLocalFormat() {
 		this.setLocalStep(this.getStep());
-
 		for (GateImage gateImage : this.getGateImages()) {
 			gateImage.setName(Utils.getImageNameFromUrl(gateImage.getUrl()));
 			gateImage.setUploadStatus(UploadStatus.COMPLETE.value);
@@ -864,6 +861,7 @@ public class Session implements Serializable{
 		}
 
 		for (AuditItem auditItem : this.getAuditItems()) {
+			Logger.Log(auditItem.getModifiedAt());
 			auditItem.setUuid(UUID.randomUUID().toString());
 			auditItem.setUploadStatus(UploadStatus.COMPLETE.value);
 			for (AuditImage auditImage : auditItem.getAuditImages()) {
