@@ -348,8 +348,9 @@ public class IssuePendingFragment extends Fragment {
 		refresh();
 	}
 
+	@UiThread
 	void onEvent(AuditItemChangedEvent event) {
-		//dataCenter.getAuditItemsInBackground(getActivity(), event.getContainerId());
+		dataCenter.getAuditItemsInBackground(getActivity(), event.getContainerId());
 
 		refresh();
 	}
