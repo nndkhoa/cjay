@@ -92,10 +92,15 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 		outState.putBoolean(STATE_LOCK_TO_LANDSCAPE, isLockedToLandscape);
 	}
 
+	// TODO:
 	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+		return super.onKeyLongPress(keyCode, event);
+	}
 
-		Logger.Log(event.isLongPress() + "");
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+
 		try {
 			if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
 					|| keyCode == KeyEvent.KEYCODE_VOLUME_UP
@@ -104,11 +109,10 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 					&& !current.isSingleShotProcessing()) {
 
 				current.takeSimplePicture();
-				return (true);
-
+				return true;
 			}
-			return (super.onKeyDown(keyCode, event));
 
+			return (super.onKeyDown(keyCode, event));
 		} catch (Exception e) {
 			Utils.showCrouton(this, "Please take it easy");
 			e.printStackTrace();

@@ -42,7 +42,10 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.Trace;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -388,7 +391,6 @@ public class DataCenter {
 	 * @return
 	 * @throws SnappydbException
 	 */
-	@Background(serial = NETWORK)
 	public Session getSessionAsyncById(Context context, long id) {
 
 		Session result = networkClient.getSessionById(id);
@@ -401,6 +403,16 @@ public class DataCenter {
 				String key = result.getContainerId();
 				Session session = db.get(key, Session.class);
 
+//				SimpleDateFormat format = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+//				try {
+//
+//					Date server = format.parse(result.getModifiedAt());
+//					Date local = format.parse(session.getModifiedAt());
+//
+//				} catch (ParseException e) {
+//					e.printStackTrace();
+//				}
+
 				// merge result from server to local session
 				session.mergeSession(result);
 				db.put(key, session);
@@ -409,9 +421,10 @@ public class DataCenter {
 			}
 		} catch (SnappydbException e) {
 
-			Logger.w(e.getMessage());
-
 			//Merge Session from server to local type
+
+			Logger.w(e.getMessage());
+			Logger.w("Received new container session from server");
 			result.changeToLocalFormat();
 			addSession(result);
 			return result;
@@ -670,12 +683,15 @@ public class DataCenter {
 	 *
 	 * @param session
 	 */
+	@Background(serial = CACHE)
 	public void addSession(Session session) {
 		try {
 			DB db = App.getDB(context);
 
 			// Add normal session
 			String key = session.getContainerId();
+
+
 			db.put(key, session);
 
 			// Close db
@@ -683,6 +699,22 @@ public class DataCenter {
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Background(serial = CACHE)
+	public void addOperatorToSession(Context context, String containerId, Operator operator) {
+
+		try {
+			DB db = App.getDB(context);
+			String key = containerId;
+			Session object = db.getObject(containerId, Session.class);
+			object.setOperatorId(operator.getId());
+			object.setOperatorCode(operator.getOperatorCode());
+			db.put(key, object);
+		} catch (SnappydbException e) {
+			Logger.w("Container " + containerId + " not found");
+		}
+
 	}
 
 	/**
@@ -739,6 +771,7 @@ public class DataCenter {
 	 * @param containerId
 	 */
 	@Background(serial = CACHE)
+	@Trace
 	public void removeWorkingSession(Context context, String containerId) {
 
 		try {
@@ -826,8 +859,6 @@ public class DataCenter {
 				e1.printStackTrace();
 			}
 		} finally {
-
-			Logger.Log("UPLOADED SESSION");
 			EventBus.getDefault().post(new UploadSucceededEvent(object, UploadType.SESSION));
 		}
 	}
@@ -1453,7 +1484,6 @@ public class DataCenter {
 	 * @param context
 	 * @param id
 	 */
-	@Background(serial = NETWORK)
 	public Session getAuditItemAsyncById(Context context, long id) throws SnappydbException {
 
 		AuditItem auditItem = networkClient.getAuditItemById(id);

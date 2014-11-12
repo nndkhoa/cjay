@@ -10,6 +10,7 @@ import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Priority;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
@@ -32,7 +33,7 @@ public class UploadImageJob extends Job {
 	}
 
 	public UploadImageJob(String uri, String imageName, String containerId, ImageType imageType) {
-		super(new Params(1).requireNetwork().persist().groupBy(containerId).setPersistent(true));
+		super(new Params(Priority.HIGH).requireNetwork().persist().groupBy(containerId).setPersistent(true));
 
 		this.containerId = containerId;
 		this.uri = uri;

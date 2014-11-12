@@ -12,6 +12,7 @@ import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Priority;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
@@ -29,7 +30,6 @@ public class UploadImportJob extends Job {
 	/**
 	 * Dùng để phân biệt xem có cần clear Working hay không?
 	 */
-
 	@Override
 	public int getRetryLimit() {
 		return 1;
@@ -37,7 +37,7 @@ public class UploadImportJob extends Job {
 
 	public UploadImportJob(Session session) {
 
-		super(new Params(1).requireNetwork().persist().groupBy(session.getContainerId()).setPersistent(true));
+		super(new Params(Priority.LOW).requireNetwork().persist().groupBy(session.getContainerId()).setPersistent(true));
 
 		// step is local step
 		this.mSession = session;
