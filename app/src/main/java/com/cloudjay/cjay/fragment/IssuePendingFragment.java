@@ -348,13 +348,16 @@ public class IssuePendingFragment extends Fragment {
 		refresh();
 	}
 
-	@UiThread
 	void onEvent(AuditItemChangedEvent event) {
-		dataCenter.getAuditItemsInBackground(getActivity(), event.getContainerId());
+		//dataCenter.getAuditItemsInBackground(getActivity(), event.getContainerId());
+
+		refresh();
 	}
 
-
+	@UiThread
 	void onEvent(UploadSucceededEvent event) {
+
+		Logger.Log("on UploadSucceededEvent");
 
 		if (event.uploadType == UploadType.AUDIT_ITEM) {
 
