@@ -51,6 +51,9 @@ import retrofit.RetrofitError;
 
 @EBean(scope = EBean.Scope.Singleton)
 public class DataCenter {
+	int uploading = 0;
+	int uploaded = 0;
+	int total = 0;
 
 	// region DECLARE
 	// Inject the rest client
@@ -577,7 +580,7 @@ public class DataCenter {
 	 * @param lastModifiedDate
 	 * @param refetchWithFistPageTime
 	 */
-//	@Background (serial = CACHE)
+	@Background(serial = CACHE)
 	public void fetchSession(Context context, String lastModifiedDate, boolean refetchWithFistPageTime) {
 
 		String newModifiedDay;
@@ -1018,11 +1021,9 @@ public class DataCenter {
 			// Change status image in db
 			String key = containerId;
 			Session session = db.getObject(key, Session.class);
+			Logger.logJson(session,Session.class);
 
 			if (session != null) {
-				int uploading = 0;
-				int uploaded = 0;
-				int total = 0;
 				switch (imageType) {
 
 					case AUDIT:
@@ -1059,13 +1060,6 @@ public class DataCenter {
 							if (!TextUtils.isEmpty(gateImage.getName())) {
 								if (gateImage.getName().contains(imageName) && gateImage.getType() == imageType.value) {
 									gateImage.setUploadStatus(status);
-									total = total + 1;
-									if (status == UploadStatus.UPLOADING) {
-										uploading = uploading + 1;
-									} else if (status == UploadStatus.COMPLETE) {
-										uploaded = uploaded + 1;
-									}
-//									Logger.e("Status gate image " + gateImage.getName() + ": " + gateImage.getUploadStatus());
 									break;
 								}
 							} else {
@@ -1075,8 +1069,7 @@ public class DataCenter {
 						break;
 				}
 				db.put(key, session);
-				Logger.e(total + " " + uploaded + " " + uploading);
-				Logger.e(imageType.toString());
+				Logger.logJson(session,Session.class);
 				if (status == UploadStatus.UPLOADING) {
 					EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.IMAGE));
 				} else if (status == UploadStatus.COMPLETE) {
@@ -1240,6 +1233,7 @@ public class DataCenter {
 			}
 		} finally {
 			Logger.e("UPLOADED SESSION");
+			Logger.logJson(object, Session.class);
 			EventBus.getDefault().post(new UploadSucceededEvent(object, UploadType.SESSION));
 		}
 	}

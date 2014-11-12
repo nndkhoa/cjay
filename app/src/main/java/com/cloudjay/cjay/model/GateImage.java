@@ -2,6 +2,7 @@ package com.cloudjay.cjay.model;
 
 import android.text.TextUtils;
 
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.google.gson.annotations.Expose;
@@ -36,10 +37,16 @@ public class GateImage implements Serializable{
 	}
 
 	public void setUploadStatus(int status) {
+		if (status == 1){
+			Logger.e("CHANGE TO UPLOADING");
+		}
 		this.uploadStatus = status;
 	}
 
 	public void setUploadStatus(UploadStatus status) {
+		if (status == UploadStatus.UPLOADING){
+			Logger.e("CHANGE TO UPLOADING");
+		}
 		this.uploadStatus = status.value;
 	}
 

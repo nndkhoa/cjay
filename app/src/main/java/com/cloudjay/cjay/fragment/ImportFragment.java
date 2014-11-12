@@ -163,18 +163,15 @@ public class ImportFragment extends Fragment {
 	 *
 	 * @param event
 	 */
-    @UiThread
 	void onEvent(ImageCapturedEvent event) {
 		Logger.e(event.getContainerId());
 		dataCenter.getSessionInBackground(getActivity(), event.getContainerId());
-        refresh();
 	}
 
 	/**
 	 *
 	 * @param event
 	 */
-	@UiThread
 	public void onEvent(ContainerGotEvent event) {
 
 		// Trying to restore container status
