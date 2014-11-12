@@ -13,6 +13,7 @@ import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
 import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
 import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
+import com.cloudjay.cjay.event.session.ContainerChangedEvent;
 import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
@@ -546,6 +547,8 @@ public class DataCenter {
 			Session session = db.getObject(containerId, Session.class);
 			session.setLocalStep(step.value);
 			db.put(containerId, session);
+
+            EventBus.getDefault().post(new ContainerGotEvent(session, containerId));
 
 		} catch (SnappydbException e) {
 			e.printStackTrace();

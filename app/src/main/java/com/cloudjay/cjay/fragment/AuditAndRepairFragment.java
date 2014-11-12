@@ -13,12 +13,9 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
-import com.cloudjay.cjay.event.session.ContainerChangedEvent;
 import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
-import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadImportJob;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
@@ -280,10 +277,5 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 		if (imageType == ImageType.AUDIT.value) {
 			dataCenter.changeSessionLocalStepInBackground(getActivity(), containerID, Step.AUDIT);
 		}
-	}
-
-	@UiThread
-	public void onEvent(ContainerChangedEvent event) {
-		checkForShowButton();
 	}
 }
