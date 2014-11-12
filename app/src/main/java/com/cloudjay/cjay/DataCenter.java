@@ -1231,6 +1231,7 @@ public class DataCenter {
 	public void uploadAuditItem(Context context, Session session, String itemUuid) throws SnappydbException {
 
 		AuditItem auditItem = session.getAuditItem(itemUuid);
+		Logger.logJson("item to upload: ", auditItem, AuditItem.class);
 		AuditItem result = networkClient.postAuditItem(context, session, auditItem);
 		session.updateAuditItem(result);
 		saveSession(context, session, UploadType.AUDIT_ITEM);
