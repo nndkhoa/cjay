@@ -844,12 +844,12 @@ public class DataCenter {
 					case AUDIT:
 						session.setLocalStep(Step.REPAIR.value);
 						break;
-					case REPAIR:
-						session.setLocalStep(Step.AVAILABLE.value);
-						break;
 					case AVAILABLE:
-					default:
 						session.setLocalStep(Step.EXPORTED.value);
+						break;
+					case REPAIR:
+					default:
+						session.setLocalStep(Step.AVAILABLE.value);
 						break;
 				}
 

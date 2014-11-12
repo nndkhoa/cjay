@@ -12,6 +12,7 @@ import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Priority;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
@@ -32,7 +33,7 @@ public class UploadAuditItemJob extends Job {
 	}
 
 	public UploadAuditItemJob(Session session, String auditItemUUID) {
-		super(new Params(1).requireNetwork().persist().groupBy(session.getContainerId()).setPersistent(true));
+		super(new Params(Priority.MID).requireNetwork().persist().groupBy(session.getContainerId()).setPersistent(true));
 		this.session = session;
 		this.auditItemUuid = auditItemUUID;
 	}
