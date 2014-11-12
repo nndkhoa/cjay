@@ -178,7 +178,7 @@ public class DataCenter {
 	 * @param context
 	 * @param id
 	 */
-	// TODO: add Background
+	@Background(serial = NETWORK)
 	public void getOperatorAsyncById(Context context, long id) {
 
 		Operator operator = networkClient.getOperatorById(id);
@@ -319,7 +319,7 @@ public class DataCenter {
 	 * @param context
 	 * @param id
 	 */
-	// TODO: add background
+	@Background(serial = NETWORK)
 	public void getDamageCodeAsyncById(Context context, long id) {
 		IsoCode isoCode = networkClient.getDamageCodeById(id);
 		addIsoCode(context, isoCode, IsoCode.Type.DAMAGE);
@@ -331,7 +331,7 @@ public class DataCenter {
 	 * @param context
 	 * @param id
 	 */
-	// TODO: add background
+	@Background(serial = NETWORK)
 	public void getRepairCodeAsyncById(Context context, long id) {
 		IsoCode isoCode = networkClient.getRepairCodeById(id);
 		addIsoCode(context, isoCode, IsoCode.Type.REPAIR);
@@ -343,7 +343,7 @@ public class DataCenter {
 	 * @param context
 	 * @param id
 	 */
-	// TODO: add background
+	@Background(serial = NETWORK)
 	public void getComponentCodeAsyncById(Context context, long id) {
 		IsoCode isoCode = networkClient.getComponentCodeById(id);
 		addIsoCode(context, isoCode, IsoCode.Type.COMPONENT);
@@ -388,6 +388,7 @@ public class DataCenter {
 	 * @return
 	 * @throws SnappydbException
 	 */
+	@Background(serial = NETWORK)
 	public Session getSessionAsyncById(Context context, long id) {
 
 		Session result = networkClient.getSessionById(id);
@@ -489,42 +490,7 @@ public class DataCenter {
 		}
 	}
 
-	/**
-	 * Change upload status of session
-	 *
-	 * @param context
-	 * @param containerId
-	 * @param status
-	 * @throws SnappydbException
-	 */
-	public void changeUploadStatus(Context context, String containerId, UploadStatus status) throws SnappydbException {
-		DB db = App.getDB(context);
-		String key = containerId;
-		Session session = db.getObject(key, Session.class);
-		session.setUploadStatus(status);
-		Logger.Log(session.getContainerId() + " -> Upload Status: " + status.name());
-		db.put(containerId, session);
-	}
-
-	/**
-	 * Change local step of given session
-	 *
-	 * @param context
-	 * @param containerId
-	 * @param step
-	 * @throws SnappydbException
-	 */
-	public void changeSessionLocalStep(Context context, String containerId, Step step) throws SnappydbException {
-
-		Logger.Log("set local step: " + step.value);
-
-		DB db = App.getDB(context);
-		Session session = db.getObject(containerId, Session.class);
-		session.setLocalStep(step.value);
-		db.put(containerId, session);
-	}
-
-	@Background
+	@Background(serial = CACHE)
 	public void changeSessionLocalStepInBackground(Context context, String containerId, Step step) {
 
 		StackTraceElement[] trace = new Throwable().getStackTrace();
@@ -555,7 +521,6 @@ public class DataCenter {
 	 * @param lastModifiedDate
 	 * @param refetchWithFistPageTime
 	 */
-//	@Background (serial = CACHE)
 	public void fetchSession(Context context, String lastModifiedDate, boolean refetchWithFistPageTime) {
 
 		String newModifiedDay;
@@ -867,10 +832,6 @@ public class DataCenter {
 		}
 	}
 
-	public void uploadImportSession(Context context, Session session) {
-		Session result = networkClient.uploadSession(context, session);
-		saveSession(context, result, UploadType.SESSION);
-	}
 
 	//endregion
 
@@ -1179,6 +1140,18 @@ public class DataCenter {
 	}
 
 	/**
+	 * Upload import container session
+	 *
+	 * @param context
+	 * @param session
+	 * @throws SnappydbException
+	 */
+	public void uploadImportSession(Context context, Session session) {
+		Session result = networkClient.uploadSession(context, session);
+		saveSession(context, result, UploadType.SESSION);
+	}
+
+	/**
 	 * Upload audited container session
 	 *
 	 * @param context
@@ -1313,7 +1286,6 @@ public class DataCenter {
 		try {
 			DB db = App.getDB(context);
 			db.put(CJayConstant.PREFIX_LOG + log.getContainerId() + log.getTime(), log);
-
 
 		} catch (SnappydbException e) {
 			Logger.w(e.getMessage());
@@ -1481,6 +1453,7 @@ public class DataCenter {
 	 * @param context
 	 * @param id
 	 */
+	@Background(serial = NETWORK)
 	public Session getAuditItemAsyncById(Context context, long id) throws SnappydbException {
 
 		AuditItem auditItem = networkClient.getAuditItemById(id);
