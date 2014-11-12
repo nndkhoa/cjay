@@ -705,7 +705,6 @@ public class Session implements Serializable {
 	 * @return
 	 */
 	public Session mergeSession(Session newSession) {
-		Logger.logJson("Before Merge: ",newSession, Session.class);
 
 		Logger.Log(" > Merge container " + newSession.getContainerId());
 //		Logger.Log("Parse basic information");
@@ -766,7 +765,6 @@ public class Session implements Serializable {
 				for (AuditItem localItem : auditItems) {
 					if (serverItem.equals(localItem)) {
 						found = true;
-                        Logger.logJson("EQUAL AUDIT ITEM: ",serverItem,AuditItem.class);
 
 						SimpleDateFormat format = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 

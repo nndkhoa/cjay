@@ -312,8 +312,6 @@ public class NetworkClient {
 		result.setUploadStatus(UploadStatus.COMPLETE);
 		result.setAudited(true);
 
-        Logger.logJson("RESULT: " , result, AuditItem.class);
-
 		return result;
 	}
 

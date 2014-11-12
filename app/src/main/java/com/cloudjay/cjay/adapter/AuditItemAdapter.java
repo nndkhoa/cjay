@@ -189,6 +189,8 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				@Override
 				public void onClick(View view) {
 
+					Logger.Log("componentCodeId: " + auditItem.getComponentCodeId());
+
 					//1. Update upload status
 					auditItem.setUploadStatus(UploadStatus.UPLOADING);
 					try {

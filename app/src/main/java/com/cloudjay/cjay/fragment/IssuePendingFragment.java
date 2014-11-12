@@ -283,6 +283,10 @@ public class IssuePendingFragment extends Fragment {
     @UiThread
     void updatedData(List<AuditItem> auditItems) {
 
+	    for (AuditItem item : auditItems) {
+		    Logger.Log("Component Code Id: " + item.getComponentCodeId());
+	    }
+
         if (mAdapter == null) {
             mAdapter = new AuditItemAdapter(getActivity(),
                     R.layout.item_issue_pending, mSession, operatorCode);
@@ -343,12 +347,12 @@ public class IssuePendingFragment extends Fragment {
         refresh();
     }
 
-    @UiThread
     void onEvent(AuditItemChangedEvent event) {
         dataCenter.getAuditItemsInBackground(getActivity(), event.getContainerId());
     }
 
 
+	@UiThread
     void onEvent(UploadSucceededEvent event) {
 
         Logger.Log("UploadSucceededEvent");
