@@ -106,7 +106,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 			// PUT /api/cjay/containers/{pk}/complete-audit
 			JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadImportJob(mSession));
+			jobManager.addJobInBackground(new UploadImportJob(mSession));
 
 			// Hide this button
 			btnCompleteAudit.setVisibility(View.GONE);
@@ -140,7 +140,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			// Add containerId to upload complete repair queue
 			// PUT /api/cjay/containers/{pk}/complete-repair
 			JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadImportJob(mSession));
+			jobManager.addJobInBackground(new UploadImportJob(mSession));
 
 			// Navigate to HomeActivity
 			getActivity().finish();
@@ -272,8 +272,8 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	}
 
 	public void onEvent(ContainerGotEvent event) {
-			mSession = event.getSession();
-			checkForShowButton();
+		mSession = event.getSession();
+		checkForShowButton();
 	}
 
 	/**

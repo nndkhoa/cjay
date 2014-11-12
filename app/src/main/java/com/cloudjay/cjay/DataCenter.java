@@ -812,8 +812,6 @@ public class DataCenter {
 						session.setLocalStep(Step.EXPORTED.value);
 						break;
 				}
-				//Remove from working
-				removeWorkingSession(context, session.getContainerId());
 
 				//Add to uploading
 				addUploadSession(session.getContainerId());
