@@ -802,7 +802,6 @@ public class Session implements Serializable {
 				}
 			}
 		}
-		Logger.logJson(this, Session.class);
 
 		return this;
 	}
