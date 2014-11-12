@@ -37,7 +37,7 @@ public class UploadImportJob extends Job {
 
 	public UploadImportJob(Session session) {
 
-		super(new Params(Priority.LOW).requireNetwork().persist().groupBy(session.getContainerId()).setPersistent(true));
+		super(new Params(Priority.MID).requireNetwork().persist().groupBy(session.getContainerId()).setPersistent(true));
 
 		// step is local step
 		this.mSession = session;
@@ -125,7 +125,6 @@ public class UploadImportJob extends Job {
 			//if it is a 4xx error, stop
 			RetrofitError retrofitError = (RetrofitError) throwable;
 			Logger.Log("Retrofit response: " + retrofitError.getSuccessType().toString());
-
 			return retrofitError.getResponse().getStatus() < 400 || retrofitError.getResponse().getStatus() > 499;
 		}
 

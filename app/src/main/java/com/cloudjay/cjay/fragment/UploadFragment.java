@@ -1,5 +1,6 @@
 package com.cloudjay.cjay.fragment;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.widget.ListView;
@@ -9,6 +10,7 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.UploadSessionAdapter;
 import com.cloudjay.cjay.event.session.ContainersGotEvent;
+import com.cloudjay.cjay.event.session.UploadedContainerRemoved;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
@@ -22,6 +24,9 @@ import com.cloudjay.cjay.util.enums.UploadType;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -31,6 +36,7 @@ import de.greenrobot.event.EventBus;
 
 
 @EFragment(R.layout.fragment_upload)
+@OptionsMenu(R.menu.upload)
 public class UploadFragment extends Fragment {
 
 	@ViewById(R.id.lv_uploading_container)
@@ -102,6 +108,15 @@ public class UploadFragment extends Fragment {
 		if (event.getPrefix().equals(CJayConstant.PREFIX_UPLOADING))
 			updatedData(event.getTargets());
 	}
+
+	public void onEvent(UploadedContainerRemoved event) {
+		refresh();
+	}
 	//endregion
 
+	@Trace
+	@OptionsItem(R.id.menu_clear_uploaded)
+	void clearUploadsMenuItemSelected() {
+		dataCenter.removeUploadedSessions(getActivity().getApplicationContext());
+	}
 }
