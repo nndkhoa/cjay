@@ -698,6 +698,9 @@ public class DataCenter {
 
 				for (Session session : sessions) {
 					String key = session.getContainerId();
+
+                    session.changeToLocalFormat();
+
 					db.put(key, session);
 				}
 			}

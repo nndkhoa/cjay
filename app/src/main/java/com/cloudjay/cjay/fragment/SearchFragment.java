@@ -148,17 +148,26 @@ public class SearchFragment extends Fragment {
 	@ItemClick(R.id.lv_search_container)
 	void searchItemClicked(int position) {
 
-		hideMenuItems();
-
 		// navigation to Wizard Activity
 		Session item = mAdapter.getItem(position);
+
+        if (item.getLocalStep() == Step.EXPORTED.value) {
+            Toast.makeText(getActivity().getApplicationContext(),
+                    getActivity().getResources().getText(R.string.warning_exported_container),
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+
 		dataCenter.addWorkingSession(item);
+        hideMenuItems();
 
 		// Open Wizard Activity
 		Intent intent = new Intent(getActivity(), WizardActivity_.class);
 		intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, item.getContainerId());
 		intent.putExtra(WizardActivity.STEP_EXTRA, item.getLocalStep());
 		startActivity(intent);
+
+
 	}
 
 	@ItemLongClick(R.id.lv_search_container)

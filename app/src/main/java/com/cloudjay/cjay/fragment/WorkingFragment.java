@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
@@ -20,6 +21,7 @@ import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.enums.Step;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -65,10 +67,18 @@ public class WorkingFragment extends Fragment {
 	@ItemClick(R.id.lv_working_container)
 	void workingItemClicked(int position) {
 
-		hideMenuItems();
-
 		// navigation to Wizard Activity
 		Session item = mAdapter.getItem(position);
+
+        if (item.getLocalStep() == Step.EXPORTED.value) {
+            Toast.makeText(getActivity().getApplicationContext(),
+                    getActivity().getResources().getText(R.string.warning_exported_container),
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        hideMenuItems();
+
 		Intent intent = new Intent(getActivity(), WizardActivity_.class);
 		intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, item.getContainerId());
 		intent.putExtra(WizardActivity.STEP_EXTRA, item.getLocalStep());

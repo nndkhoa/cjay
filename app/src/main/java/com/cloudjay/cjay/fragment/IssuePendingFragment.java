@@ -284,6 +284,7 @@ public class IssuePendingFragment extends Fragment {
 	@OptionsItem(R.id.menu_export)
 	void exportMenuItemClicked() {
 		dataCenter.changeLocalStepAndForceExport(getActivity(), containerId);
+        getActivity().finish();
 	}
 
 	@UiThread
