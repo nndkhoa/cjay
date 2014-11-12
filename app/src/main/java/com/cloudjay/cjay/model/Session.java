@@ -707,6 +707,7 @@ public class Session implements Serializable{
 	 * @return
 	 */
 	public Session mergeSession(Session newSession) {
+		Logger.logJson(newSession, Session.class);
 
 		Logger.Log(" > Merge container " + newSession.getContainerId());
 //		Logger.Log("Parse basic information");
@@ -800,6 +801,7 @@ public class Session implements Serializable{
 				}
 			}
 		}
+		Logger.logJson(this,Session.class);
 
 		return this;
 	}

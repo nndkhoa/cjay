@@ -33,7 +33,7 @@ public class UploadImageJob extends Job {
 	}
 
 	public UploadImageJob(String uri, String imageName, String containerId, ImageType imageType) {
-		super(new Params(Priority.HIGH).requireNetwork().persist().groupBy(containerId).setPersistent(true));
+		super(new Params(Priority.MID).requireNetwork().persist().groupBy(containerId).setPersistent(true));
 
 		this.containerId = containerId;
 		this.uri = uri;
