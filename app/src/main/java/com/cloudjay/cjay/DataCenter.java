@@ -789,6 +789,89 @@ public class DataCenter {
 		}
 	}
 
+
+	@Background(serial = CACHE)
+	public void changeStatusWhenUpload(Context context, Session session, UploadType uploadType, UploadStatus uploadStatus) {
+
+		DB db = null;
+		try {
+			db = App.getDB(context);
+			if (uploadStatus == UploadStatus.UPLOADING) {
+				//Change local step
+				Step step = Step.values()[session.getLocalStep()];
+				switch (step) {
+					case IMPORT:
+						session.setLocalStep(Step.AUDIT.value);
+						break;
+					case AUDIT:
+						session.setLocalStep(Step.REPAIR.value);
+						break;
+					case REPAIR:
+						session.setLocalStep(Step.AVAILABLE.value);
+						break;
+					case AVAILABLE:
+					default:
+						session.setLocalStep(Step.EXPORTED.value);
+						break;
+				}
+				//Remove from working
+				removeWorkingSession(context, session.getContainerId());
+
+				//Add to uploading
+				addUploadSession(session.getContainerId());
+
+				//Change upload status
+				session.setUploadStatus(uploadStatus);
+			} else if (uploadStatus == UploadStatus.COMPLETE) {
+				session.setUploadStatus(uploadStatus.value);
+			}
+
+			//Update new session to db
+			db.put(session.getContainerId(), session);
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+
+
+	}
+
+	@Background(serial = CACHE)
+	void saveSession(Context context, Session session, UploadType type) {
+		DB db = null;
+		String key = session.getContainerId();
+		Session object = null;
+		try {
+			db = App.getDB(context);
+
+			object = db.getObject(key, Session.class);
+			object.mergeSession(session);
+
+			//Set upload Status conplete
+			object.setUploadStatus(UploadStatus.COMPLETE);
+			db.put(key, object);
+
+		} catch (SnappydbException e) {
+
+			// change session to local
+			Logger.wtf(e.getMessage());
+			try {
+				object = session.changeToLocalFormat();
+				db.put(key, object);
+			} catch (SnappydbException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+
+			Logger.Log("UPLOADED SESSION");
+			EventBus.getDefault().post(new UploadSucceededEvent(object, UploadType.SESSION));
+		}
+	}
+
+	public void uploadImportSession(Context context, Session session) {
+		Session result = networkClient.uploadSession(context, session);
+		saveSession(context, result, UploadType.SESSION);
+	}
+
 	//endregion
 
 	//region IMAGE
@@ -989,7 +1072,6 @@ public class DataCenter {
 	 */
 	@Background(serial = CACHE)
 	public void changeImageUploadStatus(Context context, String containerId, String imageName, ImageType imageType, UploadStatus status) {
-
 		try {
 			DB db = App.getDB(context);
 
@@ -998,9 +1080,6 @@ public class DataCenter {
 			Session session = db.getObject(key, Session.class);
 
 			if (session != null) {
-				int uploading = 0;
-				int uploaded = 0;
-				int total = 0;
 				switch (imageType) {
 
 					case AUDIT:
@@ -1037,13 +1116,6 @@ public class DataCenter {
 							if (!TextUtils.isEmpty(gateImage.getName())) {
 								if (gateImage.getName().contains(imageName) && gateImage.getType() == imageType.value) {
 									gateImage.setUploadStatus(status);
-									total = total + 1;
-									if (status == UploadStatus.UPLOADING) {
-										uploading = uploading + 1;
-									} else if (status == UploadStatus.COMPLETE) {
-										uploaded = uploaded + 1;
-									}
-//									Logger.e("Status gate image " + gateImage.getName() + ": " + gateImage.getUploadStatus());
 									break;
 								}
 							} else {
@@ -1052,21 +1124,18 @@ public class DataCenter {
 						}
 						break;
 				}
+
 				db.put(key, session);
-				Logger.e(total + " " + uploaded + " " + uploading);
-				Logger.e(imageType.toString());
+
 				if (status == UploadStatus.UPLOADING) {
 					EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.IMAGE));
 				} else if (status == UploadStatus.COMPLETE) {
 					EventBus.getDefault().post(new UploadSucceededEvent(containerId, UploadType.IMAGE));
 				}
-//				return true;
 			}
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
-
-//		return false;
 	}
 
 	//endregion
@@ -1107,119 +1176,6 @@ public class DataCenter {
 		session.updateAuditItem(result);
 		saveSession(context, session, UploadType.AUDIT_ITEM);
 
-	}
-
-	/**
-	 * -1. Change local step to import
-	 * 0. Check for make sure all gate image have uploaded
-	 * 1. Upload container session
-	 * 2. Change status uploaded of session to COMPLETE
-	 * 3. Remove this container from TAB WORKING
-	 *
-	 * @param context
-	 * @param containerId
-	 * @throws SnappydbException
-	 */
-	public void uploadImportSession(Context context, String containerId) throws SnappydbException {
-		try {
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
-
-			// Upload container session to server
-			Session result = networkClient.uploadSession(context, session);
-
-			if (result != null) {
-
-				// Update container back to database
-				String key = result.getContainerId();
-				session.mergeSession(result);
-				db.put(key, session);
-			}
-		} catch (RetrofitError error) {
-			Logger.logJson(error, RetrofitError.class);
-		}
-
-	}
-
-	@Background(serial = CACHE)
-	public void changeStatusWhenUpload(Context context, Session session, UploadType uploadType, UploadStatus uploadStatus) {
-
-		DB db = null;
-		try {
-			db = App.getDB(context);
-			if (uploadStatus == UploadStatus.UPLOADING) {
-				//Change local step
-				Step step = Step.values()[session.getLocalStep()];
-				switch (step) {
-					case IMPORT:
-						session.setLocalStep(Step.AUDIT.value);
-						break;
-					case AUDIT:
-						session.setLocalStep(Step.REPAIR.value);
-						break;
-					case REPAIR:
-						session.setLocalStep(Step.AVAILABLE.value);
-						break;
-					case AVAILABLE:
-					default:
-						session.setLocalStep(Step.EXPORTED.value);
-						break;
-				}
-				//Remove from working
-				removeWorkingSession(context, session.getContainerId());
-
-				//Add to uploading
-				addUploadSession(session.getContainerId());
-
-				//Change upload status
-				session.setUploadStatus(uploadStatus);
-			} else if (uploadStatus == UploadStatus.COMPLETE) {
-				session.setUploadStatus(uploadStatus.value);
-			}
-
-			//Update new session to db
-			db.put(session.getContainerId(), session);
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-
-
-	}
-
-	public void uploadImportSession(Context context, Session session) {
-		Session result = networkClient.uploadSession(context, session);
-		saveSession(context, result, UploadType.SESSION);
-	}
-
-	@Background(serial = CACHE)
-	void saveSession(Context context, Session session, UploadType type) {
-		DB db = null;
-		String key = session.getContainerId();
-		Session object = null;
-		try {
-			db = App.getDB(context);
-
-			object = db.getObject(key, Session.class);
-			object.mergeSession(session);
-
-			//Set upload Status conplete
-			object.setUploadStatus(UploadStatus.COMPLETE);
-
-			db.put(key, object);
-
-		} catch (SnappydbException e) {
-			// change session to local
-			Logger.wtf(e.getMessage());
-			try {
-				object = session.changeToLocalFormat();
-				db.put(key, object);
-			} catch (SnappydbException e1) {
-				e1.printStackTrace();
-			}
-		} finally {
-			Logger.e("UPLOADED SESSION");
-			EventBus.getDefault().post(new UploadSucceededEvent(object, UploadType.SESSION));
-		}
 	}
 
 	/**

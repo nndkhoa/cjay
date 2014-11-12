@@ -20,7 +20,6 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.task.job.UploadImageJob;
 import com.cloudjay.cjay.task.job.UploadImportJob;
-import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
