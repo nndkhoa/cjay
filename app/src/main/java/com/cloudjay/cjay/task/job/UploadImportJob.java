@@ -125,7 +125,6 @@ public class UploadImportJob extends Job {
 			//if it is a 4xx error, stop
 			RetrofitError retrofitError = (RetrofitError) throwable;
 			Logger.Log("Retrofit response: " + retrofitError.getSuccessType().toString());
-
 			return retrofitError.getResponse().getStatus() < 400 || retrofitError.getResponse().getStatus() > 499;
 		}
 

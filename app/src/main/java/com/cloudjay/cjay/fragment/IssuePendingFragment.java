@@ -153,6 +153,8 @@ public class IssuePendingFragment extends Fragment {
         mSession = event.getSession();
 
         if (mSession != null) {
+
+
             // Get operator code
             containerId = mSession.getContainerId();
             operatorCode = mSession.getOperatorCode();
@@ -167,6 +169,8 @@ public class IssuePendingFragment extends Fragment {
             mAdapter = new AuditItemAdapter(getActivity(), R.layout.item_issue_pending,
                     mSession, operatorCode);
             lvAuditItems.setAdapter(mAdapter);
+
+	        // TODO: update session for Adapter
 
             refresh();
         } else {

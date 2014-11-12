@@ -50,9 +50,6 @@ import retrofit.RetrofitError;
 
 @EBean(scope = EBean.Scope.Singleton)
 public class DataCenter {
-	int uploading = 0;
-	int uploaded = 0;
-	int total = 0;
 
 	// region DECLARE
 	// Inject the rest client
@@ -413,6 +410,7 @@ public class DataCenter {
 //				}
 
 				// merge result from server to local session
+				Logger.w("From get session async");
 				session.mergeSession(result);
 				db.put(key, session);
 				return session;
@@ -423,7 +421,7 @@ public class DataCenter {
 			//Merge Session from server to local type
 
 			Logger.w(e.getMessage());
-			Logger.w("Received new container session from server");
+			Logger.w("Received new container session from server: " + result.getContainerId());
 			result.changeToLocalFormat();
 			addSession(result);
 			return result;
@@ -564,6 +562,8 @@ public class DataCenter {
 
 	@Background(serial = CACHE)
 	void processListSession(List<Session> sessions) {
+
+		Logger.w("From process list session");
 		DB db;
 		try {
 			db = App.getDB(context);
@@ -699,6 +699,7 @@ public class DataCenter {
 
 	@Background(serial = CACHE)
 	void saveSession(Context context, Session session, UploadType type) {
+
 		DB db = null;
 		String key = session.getContainerId();
 		Session object = null;
@@ -706,6 +707,8 @@ public class DataCenter {
 			db = App.getDB(context);
 
 			object = db.getObject(key, Session.class);
+			Logger.w("From save session: " + session.getModifiedAt());
+
 			object.mergeSession(session);
 			object.setUploadStatus(UploadStatus.COMPLETE);
 			db.put(key, object);
@@ -1396,6 +1399,22 @@ public class DataCenter {
 		}
 	}
 
+	@Background(serial = CACHE)
+	public void updateAuditItemInBackground(Context context, String containerId, AuditItem auditItem) {
+		try {
+			// find session
+			DB db = App.getDB(context);
+			Session session = db.getObject(containerId, Session.class);
+			session.updateAuditItem(auditItem);
+			db.put(containerId, session);
+
+			// Notify that an audit item is updated
+			EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
+
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
 	/**
 	 * Set lỗi thuộc loại vệ sinh.
 	 * 1. Get Water Wash Damage Code

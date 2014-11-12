@@ -27,7 +27,6 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
-import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.view.SquareImageView;
@@ -49,6 +48,10 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 	private String operatorCode;
 	private String mAuditItemUUID;
 	private String mComponentCode;
+
+	public void setSession(Session session) {
+		this.session = session;
+	}
 
 	public AuditItemAdapter(Context context, int resource, Session session, String operatorCode) {
 		super(context, resource);
@@ -187,7 +190,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				public void onClick(View view) {
 
 					//1. Update upload status
-                    auditItem.setUploadStatus(UploadStatus.UPLOADING);
+					auditItem.setUploadStatus(UploadStatus.UPLOADING);
 					try {
 						DataCenter_.getInstance_(mContext).changeUploadStatus(mContext,
 								session.getContainerId(), auditItem, UploadStatus.UPLOADING);
@@ -196,9 +199,18 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 					}
 					notifyDataSetChanged();
 
-					//2. Add container session to upload queue
-					JobManager jobManager = App.getJobManager();
-					jobManager.addJob(new UploadAuditItemJob(session, auditItem.getUuid()));
+					// Cần kiểm tra xem import đã xong hay chưa
+					// Nếu chưa thì add field
+					if (session.getId() == 0) {
+
+						Logger.Log("Set upload confirmed for audit item: " + auditItem.toString());
+						auditItem.setUploadConfirmed(true);
+						DataCenter_.getInstance_(mContext).updateAuditItemInBackground(mContext, session.getContainerId(), auditItem);
+					} else {
+						//2. Add container session to upload queue
+						JobManager jobManager = App.getJobManager();
+						jobManager.addJobInBackground(new UploadAuditItemJob(session, auditItem.getUuid()));
+					}
 				}
 			});
 
@@ -206,24 +218,24 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				@Override
 				public void onClick(View view) {
 
-                    // Lỗi chưa duyệt hoặc đã duyệt thì cho phép sửa
-                    if (null == auditItem.isAllowed() || auditItem.isAllowed()) {
-                        Logger.Log("getUuid: " + auditItem.getUuid());
+					// Lỗi chưa duyệt hoặc đã duyệt thì cho phép sửa
+					if (null == auditItem.isAllowed() || auditItem.isAllowed()) {
+						Logger.Log("getUuid: " + auditItem.getUuid());
 
 						Intent intent = new Intent(mContext, ReportIssueActivity_.class);
 						intent.putExtra(ReportIssueActivity_.CONTAINER_ID_EXTRA, session.getContainerId());
 						intent.putExtra(ReportIssueActivity_.AUDIT_IMAGE_EXTRA, auditItem.getAuditImages().get(0).getUuid());
 						intent.putExtra(ReportIssueActivity_.AUDIT_ITEM_EXTRA, auditItem.getUuid());
 
-                        mContext.startActivity(intent);
-                        return;
-                    }
+						mContext.startActivity(intent);
+						return;
+					}
 
 					// Lỗi cấm sửa, hiện dialog thông báo cho người dùng
 					if (!auditItem.isAllowed()) {
-                        showPreventRepairDialog();
-                        return;
-                    }
+						showPreventRepairDialog();
+						return;
+					}
 				}
 			});
 
@@ -409,17 +421,17 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		});
 
 		AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialogInterface) {
+		dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+			@Override
+			public void onShow(DialogInterface dialogInterface) {
 
-                // Set background and text color for confirm button
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
-                        .setTextColor(mContext.getResources().getColor(android.R.color.white));
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
-                        .setBackgroundResource(R.drawable.btn_green_selector);
-            }
-        });
+				// Set background and text color for confirm button
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+						.setTextColor(mContext.getResources().getColor(android.R.color.white));
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+						.setBackgroundResource(R.drawable.btn_green_selector);
+			}
+		});
 		dialog.show();
 	}
 
