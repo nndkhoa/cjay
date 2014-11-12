@@ -37,7 +37,7 @@ public class UploadImportJob extends Job {
 
 	public UploadImportJob(Session session) {
 
-		super(new Params(Priority.LOW).requireNetwork().persist().groupBy(session.getContainerId()).setPersistent(true));
+		super(new Params(Priority.MID).requireNetwork().persist().groupBy(session.getContainerId()).setPersistent(true));
 
 		// step is local step
 		this.mSession = session;
