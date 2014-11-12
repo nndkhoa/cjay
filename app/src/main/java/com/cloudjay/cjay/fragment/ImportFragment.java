@@ -132,7 +132,7 @@ public class ImportFragment extends Fragment {
 
 		dataCenter.getSessionInBackground(getActivity(), containerID);
 
-        refresh();
+		refresh();
 	}
 
 	//region EVENT HANDLER
@@ -152,9 +152,8 @@ public class ImportFragment extends Fragment {
 			mSession.setOperatorCode(operator.getOperatorCode());
 			mSession.setGateImages(list);
 		}
-
 		// Save session
-		dataCenter.addSession(mSession);
+		dataCenter.updateImportSession(mSession);
 	}
 
 	/**
@@ -164,49 +163,17 @@ public class ImportFragment extends Fragment {
 	 * @param event
 	 */
 	void onEvent(ImageCapturedEvent event) {
-		Logger.e(event.getContainerId());
-		dataCenter.getSessionInBackground(getActivity(), event.getContainerId());
+		refresh();
 	}
 
 	/**
-	 *
 	 * @param event
 	 */
 	public void onEvent(ContainerGotEvent event) {
 
 		// Trying to restore container status
 		mSession = event.getSession();
-		if (null == mSession) {
-
-			// Set container ID for text View containerId
-			tvContainerCode.setText(containerID);
-
-		} else {
-
-			containerID = mSession.getContainerId();
-			operatorCode = mSession.getOperatorCode();
-			tvContainerCode.setText(containerID);
-
-			Operator operator = dataCenter.getOperator(getActivity().getApplicationContext(), operatorCode);
-			if (operator != null) {
-				etOperator.setText(operator.getOperatorName());
-			}
-
-			preStatus = mSession.getPreStatus();
-			switch ((int) preStatus) {
-				case 0:
-					rdnStatusA.setChecked(true);
-					break;
-				case 1:
-					rdnStatusB.setChecked(true);
-					break;
-				case 2:
-					rdnStatusC.setChecked(true);
-					break;
-			}
-
-			refresh();
-		}
+		updatedData();
 	}
 
 	@Override
@@ -224,15 +191,44 @@ public class ImportFragment extends Fragment {
 	//endregion
 
 	void refresh() {
-		if (mSession != null) {
-			list = mSession.getImportImages();
-			updatedData();
-		}
+		dataCenter.getSessionInBackground(getActivity(), containerID);
+
 	}
 
 	@UiThread
 	public void updatedData() {
-		mAdapter.setData(list);
+
+		if (null == mSession) {
+
+			// Set container ID for text View containerId
+			tvContainerCode.setText(containerID);
+
+		} else {
+			list = mSession.getImportImages();
+			mAdapter.setData(list);
+			containerID = mSession.getContainerId();
+			operatorCode = mSession.getOperatorCode();
+			tvContainerCode.setText(containerID);
+
+			etOperator.setText(operatorCode);
+//			Operator operator = dataCenter.getOperator(getActivity().getApplicationContext(), operatorCode);
+//			if (operator != null) {
+//				etOperator.setText(operator.getOperatorName());
+//			}
+
+			preStatus = mSession.getPreStatus();
+			switch ((int) preStatus) {
+				case 0:
+					rdnStatusA.setChecked(true);
+					break;
+				case 1:
+					rdnStatusB.setChecked(true);
+					break;
+				case 2:
+					rdnStatusC.setChecked(true);
+					break;
+			}
+		}
 	}
 
 	//region VIEW INTERACTION
@@ -329,8 +325,8 @@ public class ImportFragment extends Fragment {
 			preStatus = 0;
 
 			mSession.setPreStatus(preStatus);
-			dataCenter.addSession(mSession);
-            dataCenter.addWorkingSession(mSession);
+			dataCenter.updateImportSession(mSession);
+			dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.GONE);
 		}
 	}
@@ -340,8 +336,8 @@ public class ImportFragment extends Fragment {
 		if (isChecked == true) {
 			preStatus = 1;
 			mSession.setPreStatus(preStatus);
-			dataCenter.addSession(mSession);
-            dataCenter.addWorkingSession(mSession);
+			dataCenter.updateImportSession(mSession);
+			dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.VISIBLE);
 		}
 	}
@@ -351,8 +347,8 @@ public class ImportFragment extends Fragment {
 		if (isChecked == true) {
 			preStatus = 2;
 			mSession.setPreStatus(preStatus);
-			dataCenter.addSession(mSession);
-            dataCenter.addWorkingSession(mSession);
+			dataCenter.updateImportSession(mSession);
+			dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.VISIBLE);
 		}
 	}

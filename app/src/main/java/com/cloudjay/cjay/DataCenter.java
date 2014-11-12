@@ -158,7 +158,7 @@ public class DataCenter {
 	 *
 	 * @param keyword
 	 */
-	// TODO: add Background
+	@Background(serial = CACHE)
 	public void searchOperator(String keyword) {
 		try {
 			List<Operator> operators = new ArrayList<>();
@@ -172,28 +172,6 @@ public class DataCenter {
 			EventBus.getDefault().post(new OperatorsGotEvent(operators));
 		} catch (SnappydbException e) {
 			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Get operator from database.
-	 * Chỉ sử dụng khi biết chắc có operator ở trong database.
-	 *
-	 * @param context
-	 * @param operatorCode
-	 * @return
-	 */
-	public Operator getOperator(Context context, String operatorCode) {
-
-		try {
-			DB db = App.getDB(context);
-			String key = CJayConstant.PREFIX_OPERATOR + operatorCode;
-			Operator operator = db.getObject(key, Operator.class);
-			return operator;
-
-		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
-			return null;
 		}
 	}
 
@@ -745,12 +723,43 @@ public class DataCenter {
 		}
 	}
 
+	@Background(serial = CACHE)
+	public void updateImportSession(Session session) {
+		DB db = null;
+		try {
+			db = App.getDB(context);
+
+			Session oldSession = db.getObject(session.getContainerId(), Session.class);
+
+
+			oldSession.setOperatorId(session.getOperatorId());
+			oldSession.setOperatorCode(session.getOperatorCode());
+			oldSession.setPreStatus(session.getPreStatus());
+
+			// Add normal session
+			String key = session.getContainerId();
+			db.put(key, oldSession);
+
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+			String key = session.getContainerId();
+			try {
+				db.put(key, session);
+			} catch (SnappydbException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+			getSessionInBackground(context,session.getContainerId());
+		}
+	}
+
 	/**
 	 * Add container session vào list working session in database
 	 *
 	 * @param session
 	 */
 	@Trace
+	@Background(serial = CACHE)
 	public void addWorkingSession(Session session) {
 
 		try {
@@ -1021,7 +1030,6 @@ public class DataCenter {
 			// Change status image in db
 			String key = containerId;
 			Session session = db.getObject(key, Session.class);
-			Logger.logJson(session,Session.class);
 
 			if (session != null) {
 				switch (imageType) {
@@ -1069,10 +1077,7 @@ public class DataCenter {
 						break;
 				}
 				db.put(key, session);
-				Logger.logJson(session,Session.class);
-				if (status == UploadStatus.UPLOADING) {
-					EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.IMAGE));
-				} else if (status == UploadStatus.COMPLETE) {
+				if (status == UploadStatus.COMPLETE) {
 					EventBus.getDefault().post(new UploadSucceededEvent(containerId, UploadType.IMAGE));
 				}
 //				return true;
