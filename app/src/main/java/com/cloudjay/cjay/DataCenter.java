@@ -15,7 +15,6 @@ import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.event.session.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.event.session.WorkingSessionCreatedEvent;
-import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
@@ -42,10 +41,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.Trace;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,6 +50,9 @@ import retrofit.RetrofitError;
 
 @EBean(scope = EBean.Scope.Singleton)
 public class DataCenter {
+	int uploading = 0;
+	int uploaded = 0;
+	int total = 0;
 
 	// region DECLARE
 	// Inject the rest client
@@ -702,19 +701,62 @@ public class DataCenter {
 	}
 
 	@Background(serial = CACHE)
-	public void addOperatorToSession(Context context, String containerId, Operator operator) {
-
+	void saveSession(Context context, Session session, UploadType type) {
+		DB db = null;
+		String key = session.getContainerId();
+		Session object = null;
 		try {
-			DB db = App.getDB(context);
-			String key = containerId;
-			Session object = db.getObject(containerId, Session.class);
-			object.setOperatorId(operator.getId());
-			object.setOperatorCode(operator.getOperatorCode());
-			db.put(key, object);
-		} catch (SnappydbException e) {
-			Logger.w("Container " + containerId + " not found");
-		}
+			db = App.getDB(context);
 
+			object = db.getObject(key, Session.class);
+			object.mergeSession(session);
+			object.setUploadStatus(UploadStatus.COMPLETE);
+			db.put(key, object);
+
+		} catch (SnappydbException e) {
+
+			// change session to local
+			Logger.wtf(e.getMessage());
+			try {
+				object = session.changeToLocalFormat();
+				db.put(key, object);
+			} catch (SnappydbException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+			EventBus.getDefault().post(new UploadSucceededEvent(object, UploadType.SESSION));
+		}
+	}
+
+
+	@Background(serial = CACHE)
+	public void updateImportSession(Session session) {
+		DB db = null;
+		try {
+			db = App.getDB(context);
+
+			Session oldSession = db.getObject(session.getContainerId(), Session.class);
+
+
+			oldSession.setOperatorId(session.getOperatorId());
+			oldSession.setOperatorCode(session.getOperatorCode());
+			oldSession.setPreStatus(session.getPreStatus());
+
+			// Add normal session
+			String key = session.getContainerId();
+			db.put(key, oldSession);
+
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+			String key = session.getContainerId();
+			try {
+				db.put(key, session);
+			} catch (SnappydbException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+			getSessionInBackground(context, session.getContainerId());
+		}
 	}
 
 	/**
@@ -723,6 +765,7 @@ public class DataCenter {
 	 * @param session
 	 */
 	@Trace
+	@Background(serial = CACHE)
 	public void addWorkingSession(Session session) {
 
 		try {
@@ -832,37 +875,6 @@ public class DataCenter {
 
 
 	}
-
-	@Background(serial = CACHE)
-	void saveSession(Context context, Session session, UploadType type) {
-		DB db = null;
-		String key = session.getContainerId();
-		Session object = null;
-		try {
-			db = App.getDB(context);
-
-			object = db.getObject(key, Session.class);
-			object.mergeSession(session);
-
-			//Set upload Status conplete
-			object.setUploadStatus(UploadStatus.COMPLETE);
-			db.put(key, object);
-
-		} catch (SnappydbException e) {
-
-			// change session to local
-			Logger.wtf(e.getMessage());
-			try {
-				object = session.changeToLocalFormat();
-				db.put(key, object);
-			} catch (SnappydbException e1) {
-				e1.printStackTrace();
-			}
-		} finally {
-			EventBus.getDefault().post(new UploadSucceededEvent(object, UploadType.SESSION));
-		}
-	}
-
 
 	//endregion
 
@@ -1118,10 +1130,7 @@ public class DataCenter {
 				}
 
 				db.put(key, session);
-
-				if (status == UploadStatus.UPLOADING) {
-					EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.IMAGE));
-				} else if (status == UploadStatus.COMPLETE) {
+				if (status == UploadStatus.COMPLETE) {
 					EventBus.getDefault().post(new UploadSucceededEvent(containerId, UploadType.IMAGE));
 				}
 			}

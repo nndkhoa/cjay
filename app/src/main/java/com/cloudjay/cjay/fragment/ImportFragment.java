@@ -132,7 +132,7 @@ public class ImportFragment extends Fragment {
 
 		dataCenter.getSessionInBackground(getActivity(), containerID);
 
-        refresh();
+		refresh();
 	}
 
 	//region EVENT HANDLER
@@ -147,9 +147,14 @@ public class ImportFragment extends Fragment {
 		// Set operator to edit text
 		mSession.setOperatorId(operator.getId());
 		mSession.setOperatorCode(operatorCode);
+		if (mSession != null) {
+			mSession.setOperatorId(operator.getId());
+			mSession.setOperatorCode(operator.getOperatorCode());
+			mSession.setGateImages(list);
+		}
 
-		etOperator.setText(operator.getOperatorName());
-		dataCenter.addOperatorToSession(getActivity().getApplicationContext(), containerID, operator);
+		// Save session
+		dataCenter.updateImportSession(mSession);
 	}
 
 	/**
@@ -158,29 +163,50 @@ public class ImportFragment extends Fragment {
 	 *
 	 * @param event
 	 */
-    @UiThread
 	void onEvent(ImageCapturedEvent event) {
-		Logger.e(event.getContainerId());
-		dataCenter.getSessionInBackground(getActivity(), event.getContainerId());
-        refresh();
+		refresh();
 	}
 
 	/**
-	 *
 	 * @param event
 	 */
-	@UiThread
 	public void onEvent(ContainerGotEvent event) {
 
 		// Trying to restore container status
 		mSession = event.getSession();
+		updatedData();
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		EventBus.getDefault().register(this);
+	}
+
+	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
+
+	//endregion
+
+	void refresh() {
+		dataCenter.getSessionInBackground(getActivity(), containerID);
+
+	}
+
+	@UiThread
+	public void updatedData() {
+
 		if (null == mSession) {
 
 			// Set container ID for text View containerId
 			tvContainerCode.setText(containerID);
 
 		} else {
-
+			list = mSession.getImportImages();
+			mAdapter.setData(list);
 			containerID = mSession.getContainerId();
 			operatorCode = mSession.getOperatorCode();
 			tvContainerCode.setText(containerID);
@@ -203,35 +229,7 @@ public class ImportFragment extends Fragment {
 					rdnStatusC.setChecked(true);
 					break;
 			}
-
-			refresh();
 		}
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		EventBus.getDefault().register(this);
-	}
-
-	@Override
-	public void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
-	}
-
-	//endregion
-
-	void refresh() {
-		if (mSession != null) {
-			list = mSession.getImportImages();
-			updatedData();
-		}
-	}
-
-	@UiThread
-	public void updatedData() {
-		mAdapter.setData(list);
 	}
 
 	//region VIEW INTERACTION
@@ -328,8 +326,8 @@ public class ImportFragment extends Fragment {
 			preStatus = 0;
 
 			mSession.setPreStatus(preStatus);
-			dataCenter.addSession(mSession);
-            dataCenter.addWorkingSession(mSession);
+			dataCenter.updateImportSession(mSession);
+			dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.GONE);
 		}
 	}
@@ -339,8 +337,8 @@ public class ImportFragment extends Fragment {
 		if (isChecked == true) {
 			preStatus = 1;
 			mSession.setPreStatus(preStatus);
-			dataCenter.addSession(mSession);
-            dataCenter.addWorkingSession(mSession);
+			dataCenter.updateImportSession(mSession);
+			dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.VISIBLE);
 		}
 	}
@@ -350,8 +348,8 @@ public class ImportFragment extends Fragment {
 		if (isChecked == true) {
 			preStatus = 2;
 			mSession.setPreStatus(preStatus);
-			dataCenter.addSession(mSession);
-            dataCenter.addWorkingSession(mSession);
+			dataCenter.updateImportSession(mSession);
+			dataCenter.addWorkingSession(mSession);
 			btnContinue.setVisibility(View.VISIBLE);
 		}
 	}

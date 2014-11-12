@@ -43,6 +43,7 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -148,11 +149,11 @@ public class IssuePendingFragment extends Fragment {
     }
 
     @UiThread
+    @Trace
     public void onEvent(ContainerGotEvent event) {
         mSession = event.getSession();
 
         if (mSession != null) {
-            Logger.Log("session != null");
             // Get operator code
             containerId = mSession.getContainerId();
             operatorCode = mSession.getOperatorCode();
@@ -274,10 +275,6 @@ public class IssuePendingFragment extends Fragment {
     @UiThread
     void updatedData(List<AuditItem> auditItems) {
 
-        for (AuditItem auditItem : auditItems) {
-            Logger.Log("uuid: " + auditItem.getUuid());
-        }
-
         if (mAdapter == null) {
             mAdapter = new AuditItemAdapter(getActivity(),
                     R.layout.item_issue_pending, mSession, operatorCode);
@@ -300,8 +297,8 @@ public class IssuePendingFragment extends Fragment {
 
     //region EVENT HANDLER
     @UiThread
+    @Trace
     void onEvent(ImageCapturedEvent event) {
-        Logger.Log("on ImageCapturedEvent");
 
         ImageType imageType = ImageType.values()[event.getImageType()];
         switch (imageType) {
