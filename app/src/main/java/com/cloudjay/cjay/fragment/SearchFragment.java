@@ -91,6 +91,8 @@ public class SearchFragment extends Fragment {
 
 	private SessionAdapter mAdapter;
 
+    public boolean isSearchResultDialogOpening = false;
+
 	public SearchFragment() {
 	}
 
@@ -228,6 +230,12 @@ public class SearchFragment extends Fragment {
 						.setBackgroundResource(R.drawable.btn_green_selector);
 			}
 		});
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                isSearchResultDialogOpening = false;
+            }
+        });
 		dialog.show();
 	}
 
@@ -347,7 +355,10 @@ public class SearchFragment extends Fragment {
 				mAdapter.notifyDataSetChanged();
 
 			} else {
-				showSearchResultDialog(containerID);
+                if (!isSearchResultDialogOpening) {
+                    isSearchResultDialogOpening = true;
+                    showSearchResultDialog(containerID);
+                }
 			}
 		}
 	}

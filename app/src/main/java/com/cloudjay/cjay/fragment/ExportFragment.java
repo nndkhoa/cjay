@@ -151,7 +151,7 @@ public class ExportFragment extends Fragment {
 			Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
 			return;
 		}
-		dataCenter.removeWorkingSession(getActivity(),containerID);
+		dataCenter.removeWorkingSession(getActivity(), containerID);
 
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();

@@ -705,7 +705,7 @@ public class Session implements Serializable {
 	 * @return
 	 */
 	public Session mergeSession(Session newSession) {
-		Logger.logJson(newSession, Session.class);
+		Logger.logJson("Before Merge: ",newSession, Session.class);
 
 		Logger.Log(" > Merge container " + newSession.getContainerId());
 //		Logger.Log("Parse basic information");
@@ -766,26 +766,33 @@ public class Session implements Serializable {
 				for (AuditItem localItem : auditItems) {
 					if (serverItem.equals(localItem)) {
 						found = true;
+                        Logger.logJson("EQUAL AUDIT ITEM: ",serverItem,AuditItem.class);
 
 						SimpleDateFormat format = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 
 						if (TextUtils.isEmpty(serverItem.getModifiedAt())) {
 							Logger.w("Audit item id: " + serverItem.getId());
-						}
+						} else {
 
-						try {
-							Date server = format.parse(serverItem.getModifiedAt());
-							Date local = format.parse(localItem.getModifiedAt());
+                            try {
+                                Date server = format.parse(serverItem.getModifiedAt());
 
-							// TODO: need to debug
-							if (server.after(local)) {
-								serverItem.merge(localItem);
-								updateAuditItem(serverItem);
-							}
-						} catch (ParseException e) {
-							Logger.e("Cannot parse modifiedAt");
-							// e.printStackTrace();
-						}
+                                if (!TextUtils.isEmpty(localItem.getModifiedAt())) {
+                                    Date local = format.parse(localItem.getModifiedAt());
+
+                                    // TODO: need to debug
+                                    if (server.after(local)) {
+                                        localItem.merge(serverItem);
+                                    }
+                                } else {
+                                    localItem.merge(serverItem);
+                                }
+
+                            } catch (ParseException e) {
+                                Logger.e("Cannot parse modifiedAt");
+                                // e.printStackTrace();
+                            }
+                        }
 					}
 				}
 
@@ -833,10 +840,12 @@ public class Session implements Serializable {
 	 */
 	public boolean changeAuditItemUploadStatus(String containerId, String itemUuid, UploadStatus status) {
 		for (AuditItem item : auditItems) {
-			if (item.getUuid().equals(itemUuid)) {
-				item.setUploadStatus(status);
-				return true;
-			}
+            if (item.getUuid() != null) {
+                if (item.getUuid().equals(itemUuid)) {
+                    item.setUploadStatus(status);
+                    return true;
+                }
+            }
 		}
 		return false;
 	}

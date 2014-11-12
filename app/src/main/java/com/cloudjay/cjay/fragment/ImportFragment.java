@@ -145,6 +145,8 @@ public class ImportFragment extends Fragment {
 		Logger.Log(" > Choose operator " + operatorCode);
 
 		// Set operator to edit text
+        etOperator.setText(operator.getOperatorCode());
+
 		mSession.setOperatorId(operator.getId());
 		mSession.setOperatorCode(operatorCode);
 		if (mSession != null) {

@@ -108,6 +108,11 @@ public class IssuePendingFragment extends Fragment {
 	@Click(R.id.btn_clean)
 	void buttonCleanClicked() {
 
+		//Remove from working
+		dataCenter.removeWorkingSession(getActivity(), containerId);
+		//Change step to Clean
+		mSession.setLocalStep(Step.HAND_CLEAN.value);
+
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
 		jobManager.addJobInBackground(new UploadImportJob(mSession));

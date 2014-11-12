@@ -9,6 +9,7 @@ import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.image.AuditImagesGotEvent;
 import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
+import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
 import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
 import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
@@ -746,6 +747,9 @@ public class DataCenter {
 
 			object.mergeSession(session);
 			object.setUploadStatus(UploadStatus.COMPLETE);
+
+            Logger.logJson("session from server: ", session, Session.class);
+
 			db.put(key, object);
 
 		} catch (SnappydbException e) {
@@ -903,12 +907,12 @@ public class DataCenter {
 					case AUDIT:
 						session.setLocalStep(Step.REPAIR.value);
 						break;
-					case REPAIR:
-						session.setLocalStep(Step.AVAILABLE.value);
-						break;
 					case AVAILABLE:
-					default:
 						session.setLocalStep(Step.EXPORTED.value);
+						break;
+					case REPAIR:
+					default:
+						session.setLocalStep(Step.AVAILABLE.value);
 						break;
 				}
 
@@ -1645,6 +1649,28 @@ public class DataCenter {
 			e.printStackTrace();
 		}
 	}
+
+    /**
+     * Get audit item in background and post event back
+     *
+     * @param context
+     * @param containerId
+     * @param itemUuid
+     */
+    @Background(serial = CACHE)
+    public void getAuditItemInBackground(Context context, String containerId, String itemUuid) {
+        try {
+            DB db = App.getDB(context);
+            Session session = db.getObject(containerId, Session.class);
+            if (session != null) {
+                AuditItem auditItem = session.getAuditItem(itemUuid);
+                EventBus.getDefault().post(new AuditItemGotEvent(auditItem));
+            }
+
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+    }
 
 	//endregion
 }
