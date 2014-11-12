@@ -59,7 +59,7 @@ public class BeforeRepairFragment extends Fragment {
 	TextView tvCompCode;
 
 	@ViewById(R.id.tv_code_location_repaired)
-	TextView tvLocaitonCode;
+	TextView tvLocationCode;
 
 	@ViewById(R.id.tv_code_damaged_repaired)
 	TextView tvDamageCode;
@@ -96,12 +96,31 @@ public class BeforeRepairFragment extends Fragment {
 	@UiThread
 	public void onEvent(AuditItemsGotEvent event) {
 
+//		auditItem = dataCenter.getAuditItem(getActivity().getApplicationContext(), containerID, auditItemUUID);
+//		if (auditItem != null) {
+//
+//			// parse Data to view
+//			tvCompCode.setText(auditItem.getComponentCode());
+//			tvLocationCode.setText(auditItem.getLocationCode());
+//			tvDamageCode.setText(auditItem.getDamageCode());
+//			tvRepairCode.setText(auditItem.getRepairCode());
+//
+//			tvSize.setText("Dài " + auditItem.getHeight() + ",\t" + "Rộng " + auditItem.getLength());
+//			textViewBtnCamera.setText(R.string.button_add_new_audit_image);
+//			tvNumber.setText(auditItem.getQuantity() + "");
+//
+//			imageAdapter = new DetailIssuedImageAdapter(
+//					getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.AUDIT);
+//			lvImage.setAdapter(imageAdapter);
+//
+//			refreshListImage();
+//		}
 	}
 
 	@UiThread
 	public void onEvent(ContainerGotEvent event) {
 
-		// get container operater code form containerId
+		// get container operator code form containerId
 		mSession = event.getSession();
 		if (null == mSession) {
 			Utils.showCrouton(getActivity(), "Không tìm thấy container trong dữ liệu");
@@ -110,26 +129,6 @@ public class BeforeRepairFragment extends Fragment {
 		}
 
 		dataCenter.getAuditItemsInBackground(getActivity(), containerID);
-
-		auditItem = dataCenter.getAuditItem(getActivity().getApplicationContext(), containerID, auditItemUUID);
-		if (auditItem != null) {
-
-			// parse Data to view
-			tvCompCode.setText(auditItem.getComponentCode());
-			tvLocaitonCode.setText(auditItem.getLocationCode());
-			tvDamageCode.setText(auditItem.getDamageCode());
-			tvRepairCode.setText(auditItem.getRepairCode());
-
-			tvSize.setText("Dài " + auditItem.getHeight() + ",\t" + "Rộng " + auditItem.getLength());
-			textViewBtnCamera.setText(R.string.button_add_new_audit_image);
-			tvNumber.setText(auditItem.getQuantity() + "");
-
-			imageAdapter = new DetailIssuedImageAdapter(
-					getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.AUDIT);
-			lvImage.setAdapter(imageAdapter);
-
-			refreshListImage();
-		}
 	}
 
 	@AfterViews
@@ -139,7 +138,7 @@ public class BeforeRepairFragment extends Fragment {
 
 	@Click(R.id.btn_camera_repaired)
 	void openCameraActivity() {
-		//get container operater code form containerId
+		//get container operator code form containerId
 		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
 		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
 		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);

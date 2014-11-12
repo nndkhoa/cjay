@@ -186,8 +186,6 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				@Override
 				public void onClick(View view) {
 
-					Logger.Log("uuid: " + auditItem.getUuid());
-
 					//1. Update upload status
                     auditItem.setUploadStatus(UploadStatus.UPLOADING);
 					try {
@@ -197,8 +195,6 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 						e.printStackTrace();
 					}
 					notifyDataSetChanged();
-
-					Logger.Log("uuid àter: " + auditItem.getUuid());
 
 					//2. Add container session to upload queue
 					JobManager jobManager = App.getJobManager();
