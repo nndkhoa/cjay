@@ -20,7 +20,7 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
-import com.cloudjay.cjay.event.ContainerGotEvent;
+import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.operator.OperatorChosenEvent;
 import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;

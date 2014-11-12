@@ -23,7 +23,6 @@ import android.widget.Toast;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
-import com.cloudjay.cjay.activity.HomeActivity;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
@@ -44,6 +43,7 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ItemLongClick;
+import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.UiThread;
@@ -169,6 +169,11 @@ public class SearchFragment extends Fragment {
 		getActivity().supportInvalidateOptionsMenu();
 	}
 
+	@OptionsItem(R.id.menu_export)
+	void exportMenuItemClicked() {
+		dataCenter.changeLocalStepAndForceExport(getActivity(), selectedId);
+	}
+
 	/**
 	 * Hiển thị kết quả không tìm thấy container
 	 *
@@ -192,21 +197,21 @@ public class SearchFragment extends Fragment {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
 
-                // Kiểm tra nhập đủ 11 ký tự hay chưa
-                if (editText.length() == 11) {
-                    // Kiểm tra containerId theo chuẩn ISO
-                    if (Utils.isContainerIdValid(containerId)) {
-                        // Nếu đúng chuẩn ISO, tạo mới container và mở Camera
-                        createContainerSession(containerId);
-                        openCamera(containerId);
-                    } else {
-				showAddContainerDialog(containerId);
-                    }
-                } else {
-                    showAddContainerDialog(containerId);
-                }
+				// Kiểm tra nhập đủ 11 ký tự hay chưa
+				if (editText.length() == 11) {
+					// Kiểm tra containerId theo chuẩn ISO
+					if (Utils.isContainerIdValid(containerId)) {
+						// Nếu đúng chuẩn ISO, tạo mới container và mở Camera
+						createContainerSession(containerId);
+						openCamera(containerId);
+					} else {
+						showAddContainerDialog(containerId);
+					}
+				} else {
+					showAddContainerDialog(containerId);
+				}
 
-                // Close dialog
+				// Close dialog
 				dialogInterface.dismiss();
 			}
 		});
@@ -255,47 +260,48 @@ public class SearchFragment extends Fragment {
 
 	}
 
-    /**
-     * Create container session when containerId is valid ISO
-     * @param containerId
-     */
-    public void createContainerSession(String containerId) {
-        // Add new session to database
-        String currentTime = StringUtils.getCurrentTimestamp(CJayConstant.
-                CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+	/**
+	 * Create container session when containerId is valid ISO
+	 *
+	 * @param containerId
+	 */
+	public void createContainerSession(String containerId) {
+		// Add new session to database
+		String currentTime = StringUtils.getCurrentTimestamp(CJayConstant.
+				CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 
-        // Create container session
-        Session session = new Session().withContainerId(containerId)
-                .withLocalStep(Step.IMPORT.value)
-                .withStep(Step.IMPORT.value)
-                .withCheckInTime(currentTime)
-                .withPreStatus(1);
+		// Create container session
+		Session session = new Session().withContainerId(containerId)
+				.withLocalStep(Step.IMPORT.value)
+				.withStep(Step.IMPORT.value)
+				.withCheckInTime(currentTime)
+				.withPreStatus(1);
 
-        // Save normal session and working session.
-        // add working session also post an event
-        dataCenter.addSession(session);
-        dataCenter.addWorkingSession(session);
+		// Save normal session and working session.
+		// add working session also post an event
+		dataCenter.addSession(session);
+		dataCenter.addWorkingSession(session);
 	}
 
-    /**
-     * Open camera and go to import step
-     */
-    public void openCamera(String containerId) {
+	/**
+	 * Open camera and go to import step
+	 */
+	public void openCamera(String containerId) {
 
-        Logger.Log("containerId: " + containerId);
+		Logger.Log("containerId: " + containerId);
 
-        Intent intent = new Intent(getActivity(), WizardActivity_.class);
-        intent.putExtra(WizardActivity_.CONTAINER_ID_EXTRA, containerId);
-        startActivity(intent);
+		Intent intent = new Intent(getActivity(), WizardActivity_.class);
+		intent.putExtra(WizardActivity_.CONTAINER_ID_EXTRA, containerId);
+		startActivity(intent);
 
-        // Open camera activity
-        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-        cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerId);
-        cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, "");
-        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
-        cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
-        startActivity(cameraActivityIntent);
-    }
+		// Open camera activity
+		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
+		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerId);
+		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, "");
+		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
+		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
+		startActivity(cameraActivityIntent);
+	}
 
 	@UiThread
 	void showProgress(final boolean show) {

@@ -124,7 +124,7 @@
     <!-- Main flow fragment titles -->
     <string name="fragment_import_title">Nhập</string>
     <string name="fragment_audit_title">Giám định</string>
-    <string name="fragment_repair_title">Giám định và sửa chữa</string>
+    <string name="fragment_repair_title">Giám định</string>
     <string name="fragment_export_title">Xuất</string>
 
     <!-- Text Error -->

@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
-import com.cloudjay.cjay.event.ContainerGotEvent;
+import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
@@ -33,7 +33,6 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
-import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 

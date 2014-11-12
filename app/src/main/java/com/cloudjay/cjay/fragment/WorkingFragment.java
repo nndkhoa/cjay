@@ -20,13 +20,13 @@ import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ItemLongClick;
+import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
@@ -78,7 +78,6 @@ public class WorkingFragment extends Fragment {
 	@ItemLongClick(R.id.lv_working_container)
 	void workingItemLongClicked(int position) {
 
-		Logger.Log("Blah blah");
 		lvWorking.setItemChecked(position, true);
 
 		//Get session from position
@@ -88,22 +87,12 @@ public class WorkingFragment extends Fragment {
 		getActivity().supportInvalidateOptionsMenu();
 	}
 
+	@OptionsItem(R.id.menu_export)
+	void exportMenuItemClicked() {
+		dataCenter.changeLocalStepAndForceExport(getActivity(), selectedId);
+	}
+
 	private String selectedId;
-
-	void hideMenuItems() {
-		selectedId = "";
-		getActivity().supportInvalidateOptionsMenu();
-	}
-
-	@Override
-	public void onPrepareOptionsMenu(Menu menu) {
-
-		boolean isDisplayed = !(TextUtils.isEmpty(selectedId));
-		MenuItem item = menu.findItem(R.id.menu_export);
-		item.setVisible(isDisplayed);
-		
-		super.onPrepareOptionsMenu(menu);
-	}
 
 	/**
 	 * Initial loader and set adapter for list view
@@ -137,6 +126,20 @@ public class WorkingFragment extends Fragment {
 	public void onDestroy() {
 		EventBus.getDefault().unregister(this);
 		super.onDestroy();
+	}
+
+	void hideMenuItems() {
+		selectedId = "";
+		getActivity().supportInvalidateOptionsMenu();
+	}
+
+	@Override
+	public void onPrepareOptionsMenu(Menu menu) {
+		boolean isDisplayed = !(TextUtils.isEmpty(selectedId));
+		MenuItem item = menu.findItem(R.id.menu_export);
+		item.setVisible(isDisplayed);
+
+		super.onPrepareOptionsMenu(menu);
 	}
 
 	//region EVENT HANDLER

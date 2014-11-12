@@ -63,24 +63,6 @@ public class BaseActivity extends FragmentActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	@OptionsItem(R.id.menu_export)
-	void exportSession() {
-
-//		try {
-//
-//			dataCenter.changeSessionLocalStep(this, forceExportContainerId, Step.AVAILABLE);
-//
-//			Intent intent = new Intent(this, WizardActivity_.class);
-//			intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, forceExportContainerId);
-//			intent.putExtra(WizardActivity.STEP_EXTRA, Step.AVAILABLE.value);
-//			startActivity(intent);
-//
-//		} catch (SnappydbException e) {
-//			e.printStackTrace();
-//		}
-
-	}
-
 	@OptionsItem(R.id.menu_logout)
 	void logoutItemClicked() {
 		showLogoutPrompt();

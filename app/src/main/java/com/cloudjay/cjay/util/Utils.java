@@ -190,9 +190,9 @@ public class Utils {
 		Intent queueIntent = new Intent(context, SyncIntentService_.class);
 		boolean queueUp = PendingIntent.getService(context, CJayConstant.ALARM_QUEUE_ID, queueIntent, PendingIntent.FLAG_NO_CREATE) != null;
 
-//		Intent pubnubIntent = new Intent(context, PubnubService_.class);
-//		boolean pubnubUp = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_NO_CREATE) != null;
-		boolean pubnubUp = isRunning(context, PubnubService_.class.getName());
+		Intent pubnubIntent = new Intent(context, PubnubService_.class);
+		boolean pubnubUp = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_NO_CREATE) != null;
+//		boolean pubnubUp = isRunning(context, PubnubService_.class.getName());
 
 		if (!queueUp)
 			Logger.w("Queue Service is not running");

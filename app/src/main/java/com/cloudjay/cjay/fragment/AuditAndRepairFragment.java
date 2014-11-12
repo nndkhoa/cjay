@@ -11,7 +11,7 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
-import com.cloudjay.cjay.event.ContainerGotEvent;
+import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.session.ContainerChangedEvent;
 import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
