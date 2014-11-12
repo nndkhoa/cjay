@@ -15,7 +15,6 @@ import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.event.session.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.event.session.WorkingSessionCreatedEvent;
-import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
@@ -403,6 +402,16 @@ public class DataCenter {
 				String key = result.getContainerId();
 				Session session = db.get(key, Session.class);
 
+//				SimpleDateFormat format = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+//				try {
+//
+//					Date server = format.parse(result.getModifiedAt());
+//					Date local = format.parse(session.getModifiedAt());
+//
+//				} catch (ParseException e) {
+//					e.printStackTrace();
+//				}
+
 				// merge result from server to local session
 				session.mergeSession(result);
 				db.put(key, session);
@@ -411,9 +420,10 @@ public class DataCenter {
 			}
 		} catch (SnappydbException e) {
 
-			Logger.w(e.getMessage());
-
 			//Merge Session from server to local type
+
+			Logger.w(e.getMessage());
+			Logger.w("Received new container session from server");
 			result.changeToLocalFormat();
 			addSession(result);
 			return result;
@@ -672,12 +682,15 @@ public class DataCenter {
 	 *
 	 * @param session
 	 */
+	@Background(serial = CACHE)
 	public void addSession(Session session) {
 		try {
 			DB db = App.getDB(context);
 
 			// Add normal session
 			String key = session.getContainerId();
+
+
 			db.put(key, session);
 
 			// Close db
@@ -686,6 +699,35 @@ public class DataCenter {
 			e.printStackTrace();
 		}
 	}
+
+	@Background(serial = CACHE)
+	void saveSession(Context context, Session session, UploadType type) {
+		DB db = null;
+		String key = session.getContainerId();
+		Session object = null;
+		try {
+			db = App.getDB(context);
+
+			object = db.getObject(key, Session.class);
+			object.mergeSession(session);
+			object.setUploadStatus(UploadStatus.COMPLETE);
+			db.put(key, object);
+
+		} catch (SnappydbException e) {
+
+			// change session to local
+			Logger.wtf(e.getMessage());
+			try {
+				object = session.changeToLocalFormat();
+				db.put(key, object);
+			} catch (SnappydbException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+			EventBus.getDefault().post(new UploadSucceededEvent(object, UploadType.SESSION));
+		}
+	}
+
 
 	@Background(serial = CACHE)
 	public void updateImportSession(Session session) {
@@ -772,6 +814,7 @@ public class DataCenter {
 	 * @param containerId
 	 */
 	@Background(serial = CACHE)
+	@Trace
 	public void removeWorkingSession(Context context, String containerId) {
 
 		try {
@@ -830,7 +873,6 @@ public class DataCenter {
 
 
 	}
-
 
 	//endregion
 
@@ -1145,38 +1187,6 @@ public class DataCenter {
 	public void uploadImportSession(Context context, Session session) {
 		Session result = networkClient.uploadSession(context, session);
 		saveSession(context, result, UploadType.SESSION);
-	}
-
-	@Background(serial = CACHE)
-	void saveSession(Context context, Session session, UploadType type) {
-		DB db = null;
-		String key = session.getContainerId();
-		Session object = null;
-		try {
-			db = App.getDB(context);
-
-			object = db.getObject(key, Session.class);
-			object.mergeSession(session);
-
-			//Set upload Status conplete
-			object.setUploadStatus(UploadStatus.COMPLETE);
-
-			db.put(key, object);
-
-		} catch (SnappydbException e) {
-			// change session to local
-			Logger.wtf(e.getMessage());
-			try {
-				object = session.changeToLocalFormat();
-				db.put(key, object);
-			} catch (SnappydbException e1) {
-				e1.printStackTrace();
-			}
-		} finally {
-			Logger.e("UPLOADED SESSION");
-			Logger.logJson(object, Session.class);
-			EventBus.getDefault().post(new UploadSucceededEvent(object, UploadType.SESSION));
-		}
 	}
 
 	/**

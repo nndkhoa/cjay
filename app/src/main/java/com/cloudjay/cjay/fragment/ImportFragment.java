@@ -145,13 +145,14 @@ public class ImportFragment extends Fragment {
 		Logger.Log(" > Choose operator " + operatorCode);
 
 		// Set operator to edit text
-		etOperator.setText(operator.getOperatorName());
-
+		mSession.setOperatorId(operator.getId());
+		mSession.setOperatorCode(operatorCode);
 		if (mSession != null) {
 			mSession.setOperatorId(operator.getId());
 			mSession.setOperatorCode(operator.getOperatorCode());
 			mSession.setGateImages(list);
 		}
+
 		// Save session
 		dataCenter.updateImportSession(mSession);
 	}

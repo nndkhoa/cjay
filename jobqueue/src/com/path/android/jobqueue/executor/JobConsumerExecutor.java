@@ -218,7 +218,7 @@ public class JobConsumerExecutor {
 
 								if (nextJob.getRunCount() <= nextJob.getBaseJob().getRetryLimit()) {
 
-									JqLog.i("--> Ready to remove job #" + nextJob.getId() + " / Group: " + nextJob.getGroupId());
+									JqLog.d("--> Ready to remove job #" + nextJob.getId() + " / Group: " + nextJob.getGroupId());
 									contract.removeJob(nextJob);
 
 								} else {

@@ -302,13 +302,15 @@ public class NetworkClient {
 	 */
 	public AuditItem postAuditItem(Context context, Session containerSession, AuditItem auditItem) {
 
-		Logger.Log("containerSession: " + containerSession.getId());
-		Logger.Log("auditItem: " + auditItem.getAuditItemToUpload());
+//		Logger.Log("containerSession: " + containerSession.getId());
+//		Logger.Log("auditItem: " + auditItem.getAuditItemToUpload());
 
 		String auditItemUUID = auditItem.getUuid();
 		AuditItem result = provider.getRestAdapter(context).create(NetworkService.class).postAudiItem(containerSession.getId(), auditItem.getAuditItemToUpload());
+
 		result.setUuid(auditItemUUID);
 		result.setUploadStatus(UploadStatus.COMPLETE);
+		result.setAudited(true);
 
 		return result;
 	}

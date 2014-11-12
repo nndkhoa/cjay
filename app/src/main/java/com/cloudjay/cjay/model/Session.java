@@ -64,6 +64,10 @@ public class Session implements Serializable{
 	@Expose
 	private long preStatus;
 
+	@SerializedName("modified_at")
+	@Expose
+	private String modifiedAt;
+
 	@Expose
 	private long status;
 
@@ -210,6 +214,20 @@ public class Session implements Serializable{
 		this.operatorId = operatorId;
 		return this;
 	}
+
+	public String getModifiedAt() {
+		return modifiedAt;
+	}
+
+	public void setModifiedAt(String modifiedAt) {
+		this.modifiedAt = modifiedAt;
+	}
+
+	public Session withModifiedAt(String modifiedAt) {
+		this.modifiedAt = modifiedAt;
+		return this;
+	}
+
 
 	public String getDepotCode() {
 		return depotCode;
@@ -740,7 +758,7 @@ public class Session implements Serializable{
 		// 2 audit items bằng nhau khi giống uuid hoặc id
 		if (newSession.getAuditItems() != null && newSession.getAuditItems().size() != 0) {
 
-			Logger.Log("Parse list audit items");
+//			Logger.Log("Parse list audit items");
 			for (AuditItem serverItem : newSession.getAuditItems()) {
 				//Set upload status for all audit item is uploaded
 				serverItem.setUploadStatus(UploadStatus.COMPLETE.value);
@@ -752,7 +770,12 @@ public class Session implements Serializable{
 
 //						Logger.Log("Found audit item");
 						SimpleDateFormat format = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-						Logger.Log(serverItem.getModifiedAt());
+//						Logger.Log(serverItem.getModifiedAt());
+
+						if (TextUtils.isEmpty(serverItem.getModifiedAt())) {
+							Logger.w("Audit item id: " + serverItem.getId());
+						}
+
 						try {
 							Date server = format.parse(serverItem.getModifiedAt());
 							Date local = format.parse(localItem.getModifiedAt());

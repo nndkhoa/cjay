@@ -23,6 +23,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
+import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.ViewById;
 
 import eu.inmite.android.lib.dialogs.SimpleDialogFragment;
@@ -96,13 +97,24 @@ public class AddContainerDialog extends SimpleDialogFragment {
 			@Override
 			public void onClick(View view) {
 
-                createContainerSession();
-                openCamera();
+				String containerId = etContainerID.getText().toString();
+				if (Utils.simpleValid(containerId)) {
+					createContainerSession();
+					openCamera();
+				} else {
+					etContainerID.setError(getString(R.string.dialog_container_id_invalid_length));
+				}
+
 			}
 		});
 
 		return builder;
 	}
+
+//	@Touch(R.id.et_container_id)
+//	void setupInput() {
+//		Utils.setupEditText(etContainerID);
+//	}
 
 	/**
 	 * 1. Khởi tạo các thành phần trên dialog

@@ -36,6 +36,7 @@ public class GetNotificationJob extends Job {
 	@Override
 	public void onRun() throws Throwable {
 
+		Logger.Log("Receive notification from server");
 		Context context = App.getInstance().getApplicationContext();
 
 		// Get data from notification
