@@ -769,9 +769,7 @@ public class Session implements Serializable{
 					if (serverItem.equals(localItem)) {
 						found = true;
 
-//						Logger.Log("Found audit item");
 						SimpleDateFormat format = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-//						Logger.Log(serverItem.getModifiedAt());
 
 						if (TextUtils.isEmpty(serverItem.getModifiedAt())) {
 							Logger.w("Audit item id: " + serverItem.getId());

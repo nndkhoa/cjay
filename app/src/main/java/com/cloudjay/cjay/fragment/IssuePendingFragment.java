@@ -149,7 +149,6 @@ public class IssuePendingFragment extends Fragment {
     }
 
     @UiThread
-    @Trace
     public void onEvent(ContainerGotEvent event) {
         mSession = event.getSession();
 
@@ -297,7 +296,6 @@ public class IssuePendingFragment extends Fragment {
 
     //region EVENT HANDLER
     @UiThread
-    @Trace
     void onEvent(ImageCapturedEvent event) {
 
         ImageType imageType = ImageType.values()[event.getImageType()];

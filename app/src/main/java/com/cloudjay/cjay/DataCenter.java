@@ -505,9 +505,6 @@ public class DataCenter {
 	@Background(serial = CACHE)
 	public void changeSessionLocalStepInBackground(Context context, String containerId, Step step) {
 
-		StackTraceElement[] trace = new Throwable().getStackTrace();
-		Logger.Log("Open DB " + trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
-
 		DB db;
 		try {
 			db = App.getDB(context);

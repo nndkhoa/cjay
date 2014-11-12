@@ -81,8 +81,6 @@ public class ReuseActivity extends Activity {
 	@UiThread
 	public void onEvent(ContainerGotEvent event) {
 
-        Logger.Log("in ContainerGotEvent");
-
 		// Get session by containerId
 		mSession = event.getSession();
 
@@ -97,7 +95,6 @@ public class ReuseActivity extends Activity {
 			tvContainerId.setText(containerID);
 
 		} else {
-            Logger.Log("not null");
 			containerID = mSession.getContainerId();
 
 			// Set ContainerId to TextView
@@ -169,10 +166,7 @@ public class ReuseActivity extends Activity {
 			List<GateImage> importImages = mSession.getImportImages();
 			List<GateImage> deletedImportImages = new ArrayList<GateImage>();
 
-			Logger.Log("import size: " + mSession.getImportImages().size());
-
 			if (auditItems != null) {
-				Logger.Log("Size: " + auditItems.size());
 				for (GateImage gateImage : importImages) {
 					for (AuditItem auditItem : auditItems) {
 
