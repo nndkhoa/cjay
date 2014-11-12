@@ -1224,20 +1224,37 @@ public class DataCenter {
 	 * 4. Replace result with local audit item in container session
 	 *
 	 * @param context
-	 * @param session
-	 * @param itemUuid
+	 * @param containerId
+	 * @param sessionId
 	 * @throws SnappydbException
 	 */
-	public void uploadAuditItem(Context context, Session session, String itemUuid) throws SnappydbException {
+	public void uploadAuditItem(Context context, String containerId, long sessionId, AuditItem auditItem) throws SnappydbException {
 
-		AuditItem auditItem = session.getAuditItem(itemUuid);
-		AuditItem result = networkClient.postAuditItem(context, session, auditItem);
-		session.updateAuditItem(result);
-		saveSession(context, session, UploadType.AUDIT_ITEM);
+		AuditItem result = networkClient.postAuditItem(context, sessionId, auditItem);
+		saveUploadAuditItemSession(context, result, UploadType.AUDIT_ITEM, containerId);
 
 	}
 
-	/**
+    @Background(serial = CACHE)
+    public void saveUploadAuditItemSession(Context context, AuditItem result, UploadType type, String containerId) {
+        DB db = null;
+        String key = containerId;
+        Session object = null;
+        try {
+            db = App.getDB(context);
+
+            object = db.getObject(key, Session.class);
+            object.updateAuditItem(result);
+            saveSession(context,object,type);
+
+        } catch (SnappydbException e) {
+            Logger.wtf(e.getMessage());
+        } finally {
+            EventBus.getDefault().post(new UploadSucceededEvent(object, UploadType.SESSION));
+        }
+    }
+
+    /**
 	 * Upload import container session
 	 *
 	 * @param context
