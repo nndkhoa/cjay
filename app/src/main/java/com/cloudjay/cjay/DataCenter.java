@@ -1,10 +1,12 @@
 package com.cloudjay.cjay;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.TextUtils;
 
+import com.cloudjay.cjay.activity.WizardActivity;
+import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.api.NetworkClient;
-import com.cloudjay.cjay.event.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.AuditImagesGotEvent;
 import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
 import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
@@ -12,6 +14,7 @@ import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
 import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
 import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
+import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.event.session.SearchAsyncStartedEvent;
@@ -503,14 +506,45 @@ public class DataCenter {
 	}
 
 	@Background(serial = CACHE)
+	public void changeLocalStepAndForceExport(Context context, String containerId) {
+
+		DB db;
+		try {
+
+			db = App.getDB(context);
+			Session session = db.getObject(containerId, Session.class);
+			session.setLocalStep(Step.AVAILABLE.value);
+			db.put(containerId, session);
+
+			Intent intent = new Intent(context, WizardActivity_.class);
+			intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, containerId);
+			intent.putExtra(WizardActivity.STEP_EXTRA, Step.AVAILABLE.value);
+			context.startActivity(intent);
+
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * Change container session local step in background
+	 *
+	 * @param context
+	 * @param containerId
+	 * @param step
+	 */
+	@Background(serial = CACHE)
 	public void changeSessionLocalStepInBackground(Context context, String containerId, Step step) {
 
 		DB db;
 		try {
+
 			db = App.getDB(context);
 			Session session = db.getObject(containerId, Session.class);
 			session.setLocalStep(step.value);
 			db.put(containerId, session);
+
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
@@ -834,7 +868,6 @@ public class DataCenter {
 		}
 	}
 
-	@Trace
 	@Background(serial = CACHE)
 	public void removeUploadedSessions(Context context) {
 

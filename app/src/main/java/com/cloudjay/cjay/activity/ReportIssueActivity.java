@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.event.ContainerGotEvent;
+import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.fragment.IssueReportComponentFragment_;
 import com.cloudjay.cjay.fragment.IssueReportDamageFragment_;
 import com.cloudjay.cjay.fragment.IssueReportDimensionFragment_;

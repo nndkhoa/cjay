@@ -14,17 +14,16 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.UserLoggedOutEvent;
 import com.cloudjay.cjay.event.session.ContainersFetchedEvent;
-import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
-import com.cloudjay.cjay.util.enums.Step;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
 
 import java.lang.reflect.Method;
@@ -36,36 +35,24 @@ import de.keyboardsurfer.android.widget.crouton.Style;
  * Activity chung. Các Activity khác sẽ kế thừa BaseActivity để sử dụng menu items và các hàm chung.
  */
 @EActivity
+@OptionsMenu(R.menu.base)
 public class BaseActivity extends FragmentActivity {
 
 	public DataCenter getDataCenter() {
 		return dataCenter;
 	}
-	public String exportSessionContainerId;
 
-	MenuItem exportMenu;
-
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		String name = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_USER_NAME);
+		String roleName = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_USER_ROLE_NAME);
+		menu.findItem(R.id.menu_username).setTitle(name);
+		menu.findItem(R.id.menu_role).setTitle(roleName);
+		return super.onPrepareOptionsMenu(menu);
+	}
 
 	@Bean
 	DataCenter dataCenter;
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.base, menu);
-
-		String name = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_USER_NAME);
-		String roleName = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_USER_ROLE_NAME);
-
-		menu.findItem(R.id.menu_username).setTitle(name);
-		menu.findItem(R.id.menu_role).setTitle(roleName);
-
-		exportMenu = menu.findItem(R.id.menu_export);
-
-		return true;
-	}
-	public void showMenuExportImmediately(boolean show){
-		exportMenu.setVisible(show);
-	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -74,30 +61,6 @@ public class BaseActivity extends FragmentActivity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-
-	@OptionsItem(R.id.menu_export)
-	void exportSession() {
-
-//		//Export session immediately
-//		Session session = dataCenter.getSession(this,exportSessionContainerId);
-//		Step step = Step.values()[session.getLocalStep()];
-//		if (session.isValidToUpload(step)){
-//			try {
-//				dataCenter.changeSessionLocalStep(this, exportSessionContainerId,Step.AVAILABLE);
-//				Intent intent = new Intent(this, WizardActivity_.class);
-//				intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, exportSessionContainerId);
-//				intent.putExtra(WizardActivity.STEP_EXTRA, Step.AVAILABLE.value);
-//				startActivity(intent);
-//			} catch (SnappydbException e) {
-//				e.printStackTrace();
-//			}
-//
-//		} else {
-//			Utils.showCrouton(this,"Hoàn tất bước hiện tại để xuất chỉ định");
-//		}
-//		exportMenu.setVisible(false);
-
 	}
 
 	@OptionsItem(R.id.menu_logout)
@@ -163,22 +126,22 @@ public class BaseActivity extends FragmentActivity {
 		finish();
 	}
 
-	@Override
-	public boolean onMenuOpened(int featureId, Menu menu) {
-		if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
-			if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
-				try {
-					Method m = menu.getClass().getDeclaredMethod(
-							"setOptionalIconsVisible", Boolean.TYPE);
-					m.setAccessible(true);
-					m.invoke(menu, true);
-				} catch (NoSuchMethodException e) {
-					Logger.Log(e.getMessage());
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-		}
-		return super.onMenuOpened(featureId, menu);
-	}
+//	@Override
+//	public boolean onMenuOpened(int featureId, Menu menu) {
+//		if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
+//			if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
+//				try {
+//					Method m = menu.getClass().getDeclaredMethod(
+//							"setOptionalIconsVisible", Boolean.TYPE);
+//					m.setAccessible(true);
+//					m.invoke(menu, true);
+//				} catch (NoSuchMethodException e) {
+//					Logger.Log(e.getMessage());
+//				} catch (Exception e) {
+//					throw new RuntimeException(e);
+//				}
+//			}
+//		}
+//		return super.onMenuOpened(featureId, menu);
+//	}
 }

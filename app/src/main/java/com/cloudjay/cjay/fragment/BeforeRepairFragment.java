@@ -11,7 +11,7 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.DetailIssuedImageAdapter;
-import com.cloudjay.cjay.event.ContainerGotEvent;
+import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
