@@ -296,17 +296,14 @@ public class NetworkClient {
 	 * put audit item to server
 	 *
 	 * @param context
-	 * @param containerSession
+	 * @param sessionId
 	 * @param auditItem
 	 * @return
 	 */
-	public AuditItem postAuditItem(Context context, Session containerSession, AuditItem auditItem) {
-
-		Logger.Log("containerSession: " + containerSession.getId());
-		Logger.Log("auditItem: " + auditItem.getAuditItemToUpload());
+	public AuditItem postAuditItem(Context context, long sessionId, AuditItem auditItem) {
 
 		String auditItemUUID = auditItem.getUuid();
-		AuditItem result = provider.getRestAdapter(context).create(NetworkService.class).postAudiItem(containerSession.getId(), auditItem.getAuditItemToUpload());
+		AuditItem result = provider.getRestAdapter(context).create(NetworkService.class).postAudiItem(sessionId, auditItem.getAuditItemToUpload());
 
 		result.setUuid(auditItemUUID);
 		result.setUploadStatus(UploadStatus.COMPLETE);
