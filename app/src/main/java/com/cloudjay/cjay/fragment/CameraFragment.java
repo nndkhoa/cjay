@@ -29,7 +29,6 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringUtils;
-import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.commonsware.cwac.camera.PictureTransaction;
@@ -176,6 +175,9 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
     @AfterViews
     void afterView() {
+
+        // Enable button Camera
+        btnTakePicture.setEnabled(true);
 
 //		Logger.Log("isOpened: " + isOpened);
 

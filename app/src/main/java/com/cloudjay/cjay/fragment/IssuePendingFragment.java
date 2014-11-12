@@ -175,8 +175,6 @@ public class IssuePendingFragment extends Fragment {
 					mSession, operatorCode);
 			lvAuditItems.setAdapter(mAdapter);
 
-			// TODO: update session for Adapter
-
 			refresh();
 		} else {
 			// Set ContainerId to TextView
@@ -289,6 +287,10 @@ public class IssuePendingFragment extends Fragment {
 
 	@UiThread
 	void updatedData(List<AuditItem> auditItems) {
+
+        for (AuditItem item : auditItems) {
+            Logger.Log("audited: " + item.isAudited());
+        }
 
 		if (mAdapter == null) {
 			mAdapter = new AuditItemAdapter(getActivity(),
