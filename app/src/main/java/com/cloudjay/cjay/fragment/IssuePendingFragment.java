@@ -310,7 +310,8 @@ public class IssuePendingFragment extends Fragment {
                 if (!event.isOpened()) {
                     Logger.Log("Open AfterRepair Fragment");
                     String auditItemUUID = event.getAuditItemUUID();
-                    AuditItem auditItem = dataCenter.getAuditItem(getActivity(), this.containerId, auditItemUUID);
+                    AuditItem auditItem = dataCenter.getAuditItem(getActivity().getApplicationContext(),
+                            this.containerId, auditItemUUID);
                     Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
                     detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, this.containerId);
                     detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getUuid());

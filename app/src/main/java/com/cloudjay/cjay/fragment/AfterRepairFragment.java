@@ -13,6 +13,7 @@ import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.DetailIssuedImageAdapter;
 import com.cloudjay.cjay.event.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
+import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
@@ -108,15 +109,9 @@ public class AfterRepairFragment extends Fragment {
 		} else {
 			operatorCode = mSession.getOperatorCode();
 		}
-		auditItem = dataCenter.getAuditItem(getActivity(), containerID, auditItemUUID);
-		// parse Data to view
-		tvCompCode.setText(auditItem.getComponentCode());
-		tvLocaitonCode.setText(auditItem.getLocationCode());
-		tvDamageCode.setText(auditItem.getDamageCode());
-		tvRepairCode.setText(auditItem.getRepairCode());
-		tvSize.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
-		tvNumber.setText(auditItem.getQuantity() + "");
-		textViewBtnCamera.setText(R.string.button_add_new_repair_image);
+
+        // Get audit item in background and post an event
+        dataCenter.getAuditItemInBackground(getActivity(), containerID, auditItemUUID);
 
 		imageAdapter = new DetailIssuedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.REPAIRED);
 		lvImage.setAdapter(imageAdapter);
@@ -176,10 +171,28 @@ public class AfterRepairFragment extends Fragment {
 		Logger.Log("on ImageCapturedEvent");
 
 		// Requery audit item by uuid to update listview
-		auditItem = dataCenter.getAuditItem(getActivity().getApplicationContext(),
+		dataCenter.getAuditItemInBackground(getActivity().getApplicationContext(),
 				containerID, auditItemUUID);
 		refreshListImage();
 	}
+
+    @UiThread
+    void onEvent(AuditItemGotEvent event) {
+        auditItem = event.getAuditItem();
+
+        if (auditItem != null) {
+            // parse Data to view
+            tvCompCode.setText(auditItem.getComponentCode());
+            tvLocaitonCode.setText(auditItem.getLocationCode());
+            tvDamageCode.setText(auditItem.getDamageCode());
+            tvRepairCode.setText(auditItem.getRepairCode());
+            tvSize.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
+            tvNumber.setText(auditItem.getQuantity() + "");
+            textViewBtnCamera.setText(R.string.button_add_new_repair_image);
+
+            refreshListImage();
+        }
+    }
 
 	@Override
 	public void onDestroy() {

@@ -7,6 +7,7 @@ import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.AuditImagesGotEvent;
 import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
+import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
 import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
 import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
@@ -1569,6 +1570,28 @@ public class DataCenter {
 			e.printStackTrace();
 		}
 	}
+
+    /**
+     * Get audit item in background and post event back
+     *
+     * @param context
+     * @param containerId
+     * @param itemUuid
+     */
+    @Background(serial = CACHE)
+    public void getAuditItemInBackground(Context context, String containerId, String itemUuid) {
+        try {
+            DB db = App.getDB(context);
+            Session session = db.getObject(containerId, Session.class);
+            if (session != null) {
+                AuditItem auditItem = session.getAuditItem(itemUuid);
+                EventBus.getDefault().post(new AuditItemGotEvent(auditItem));
+            }
+
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+    }
 
 	//endregion
 }

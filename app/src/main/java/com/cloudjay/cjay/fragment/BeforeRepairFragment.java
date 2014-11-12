@@ -13,7 +13,7 @@ import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.DetailIssuedImageAdapter;
 import com.cloudjay.cjay.event.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
-import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
+import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
@@ -94,27 +94,24 @@ public class BeforeRepairFragment extends Fragment {
 	}
 
 	@UiThread
-	public void onEvent(AuditItemsGotEvent event) {
+	public void onEvent(AuditItemGotEvent event) {
 
-//		auditItem = dataCenter.getAuditItem(getActivity().getApplicationContext(), containerID, auditItemUUID);
-//		if (auditItem != null) {
-//
-//			// parse Data to view
-//			tvCompCode.setText(auditItem.getComponentCode());
-//			tvLocationCode.setText(auditItem.getLocationCode());
-//			tvDamageCode.setText(auditItem.getDamageCode());
-//			tvRepairCode.setText(auditItem.getRepairCode());
-//
-//			tvSize.setText("Dài " + auditItem.getHeight() + ",\t" + "Rộng " + auditItem.getLength());
-//			textViewBtnCamera.setText(R.string.button_add_new_audit_image);
-//			tvNumber.setText(auditItem.getQuantity() + "");
-//
-//			imageAdapter = new DetailIssuedImageAdapter(
-//					getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.AUDIT);
-//			lvImage.setAdapter(imageAdapter);
-//
-//			refreshListImage();
-//		}
+        auditItem = event.getAuditItem();
+
+		if (auditItem != null) {
+
+			// parse Data to view
+			tvCompCode.setText(auditItem.getComponentCode());
+			tvLocationCode.setText(auditItem.getLocationCode());
+			tvDamageCode.setText(auditItem.getDamageCode());
+			tvRepairCode.setText(auditItem.getRepairCode());
+
+			tvSize.setText("Dài " + auditItem.getHeight() + ",\t" + "Rộng " + auditItem.getLength());
+			textViewBtnCamera.setText(R.string.button_add_new_audit_image);
+			tvNumber.setText(auditItem.getQuantity() + "");
+
+			refreshListImage();
+		}
 	}
 
 	@UiThread
@@ -128,12 +125,16 @@ public class BeforeRepairFragment extends Fragment {
 			operatorCode = mSession.getOperatorCode();
 		}
 
-		dataCenter.getAuditItemsInBackground(getActivity(), containerID);
+		dataCenter.getAuditItemInBackground(getActivity(), containerID, auditItemUUID);
 	}
 
 	@AfterViews
 	void setup() {
 		dataCenter.getSessionInBackground(getActivity(), containerID);
+
+        imageAdapter = new DetailIssuedImageAdapter(
+                getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.AUDIT);
+        lvImage.setAdapter(imageAdapter);
 	}
 
 	@Click(R.id.btn_camera_repaired)
@@ -174,8 +175,10 @@ public class BeforeRepairFragment extends Fragment {
 		Logger.Log("on ImageCapturedEvent");
 
 		// Requery audit item by uuid to update listview
-		auditItem = dataCenter.getAuditItem(getActivity().getApplicationContext(),
-				containerID, auditItemUUID);
+		dataCenter.getAuditItemInBackground(getActivity().getApplicationContext(),
+
+                containerID, auditItemUUID);
+
 		refreshListImage();
 	}
 

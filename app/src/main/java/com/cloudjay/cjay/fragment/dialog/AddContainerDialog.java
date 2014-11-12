@@ -14,15 +14,18 @@ import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringUtils;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 
+import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
+import org.androidannotations.annotations.TextChange;
 import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.ViewById;
 
@@ -145,6 +148,7 @@ public class AddContainerDialog extends SimpleDialogFragment {
 
 		// Check containerId
 		if (containerId.length() == 11) {
+
 			if (!Utils.isContainerIdValid(containerId)) {
 				getNeutralButton().setVisibility(View.VISIBLE);
 				etContainerID.setError(getString(R.string.dialog_container_id_invalid_iso));
