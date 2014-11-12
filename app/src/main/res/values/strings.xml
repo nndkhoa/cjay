@@ -157,5 +157,7 @@
 	<string name="camera_saving">Đang lưu ảnh...</string>
 	<string name="menu_clear_uploaded_title">Clear</string>
 
+    <!-- Warning -->
+    <string name="warning_exported_container">Container này đã được xuất</string>
 
 </resources>
