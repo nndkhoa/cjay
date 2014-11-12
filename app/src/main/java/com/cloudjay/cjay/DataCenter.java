@@ -713,6 +713,9 @@ public class DataCenter {
 
 			object.mergeSession(session);
 			object.setUploadStatus(UploadStatus.COMPLETE);
+
+            Logger.logJson("session from server: ", session, Session.class);
+
 			db.put(key, object);
 
 		} catch (SnappydbException e) {

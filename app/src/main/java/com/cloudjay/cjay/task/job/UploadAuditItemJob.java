@@ -52,8 +52,6 @@ public class UploadAuditItemJob extends Job {
 		EventBus.getDefault().post(new UploadingEvent(session, UploadType.AUDIT_ITEM));
 
 		dataCenter.uploadAuditItem(context, session, auditItemUuid);
-
-		EventBus.getDefault().post(new UploadSucceededEvent(session, UploadType.AUDIT_ITEM));
 	}
 
 	@Override

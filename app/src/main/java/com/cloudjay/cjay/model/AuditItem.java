@@ -566,6 +566,9 @@ public class AuditItem implements Serializable{
 			}
 		}
 
+        this.setModifiedAt(newItem.getModifiedAt());
+        this.setUploadStatus(newItem.getUploadStatus());
+
 		auditImages.addAll(diffImages);
 		return this;
 	}

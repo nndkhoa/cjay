@@ -351,6 +351,8 @@ public class IssuePendingFragment extends Fragment {
 
     void onEvent(UploadSucceededEvent event) {
 
+        Logger.Log("UploadSucceededEvent");
+
         if (event.uploadType == UploadType.AUDIT_ITEM) {
 
         }
