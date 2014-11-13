@@ -21,9 +21,9 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
+import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
-import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.task.job.UploadImageJob;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -59,6 +59,8 @@ import de.greenrobot.event.EventBus;
  */
 @EFragment
 public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
+
+    private AuditImage auditImage;
 
     public interface Contract {
         boolean isSingleShotMode();
@@ -172,6 +174,13 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
         xact.needBitmap(true);
         xact.flashMode(Camera.Parameters.FLASH_MODE_AUTO);
 
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 
     @AfterViews
@@ -272,6 +281,27 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
         }
     }
 
+    @UiThread
+    public void onEvent(AuditItemGotEvent event) {
+
+        AuditItem auditItem = event.getAuditItem();
+
+        // Create temporary audit item
+        if (null == auditItem) {
+            Logger.Log("Create new Audit Item: " + auditImage.getType());
+            dataCenter.addAuditImage(getActivity().getApplicationContext(), auditImage, containerId);
+
+        } else {
+
+            auditItem.getAuditImages().add(auditImage);
+            if (mType == ImageType.REPAIRED.value) {
+                auditItem.setRepaired(true);
+            }
+
+            dataCenter.updateAuditItemInBackground(getActivity().getApplicationContext(), containerId, auditItem);
+        }
+    }
+
 
     /**
      * CameraHost is the interface use to configure behavior of camera ~ setting.
@@ -361,29 +391,14 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
                 default:
 
                     Logger.Log("mType: " + mType);
-                    AuditImage auditImage = new AuditImage()
+                    auditImage = new AuditImage()
                             .withId(0)
                             .withType(mType)
                             .withUrl("file://" + uri)
                             .withName(imageName)
                             .withUUID(uuid);
 
-                    AuditItem auditItem = dataCenter.getAuditItem(getActivity(), containerId, auditItemUUID);
-
-                    // Create temporary audit item
-                    if (null == auditItem) {
-                        Logger.Log("Create new Audit Item: " + auditImage.getType());
-                        dataCenter.addAuditImage(getActivity().getApplicationContext(), auditImage, containerId);
-
-                    } else {
-
-                        auditItem.getAuditImages().add(auditImage);
-                        if (mType == ImageType.REPAIRED.value) {
-                            auditItem.setRepaired(true);
-                        }
-
-                        dataCenter.updateAuditItemInBackground(getActivity().getApplicationContext(), containerId, auditItem);
-                    }
+                    dataCenter.getAuditItemInBackground(getActivity(), containerId, auditItemUUID);
 
                     break;
             }

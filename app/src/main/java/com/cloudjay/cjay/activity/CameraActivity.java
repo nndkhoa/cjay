@@ -112,17 +112,16 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 				return true;
 			}
 
+            if (keyCode == KeyEvent.KEYCODE_BACK && current != null) {
+                current.onBackPress();
+            }
+
 			return (super.onKeyDown(keyCode, event));
 		} catch (Exception e) {
 			Utils.showCrouton(this, "Please take it easy");
 			e.printStackTrace();
 			return true;
 		}
-	}
-
-	@Override
-	public void onBackPressed() {
-		current.onBackPress();
 	}
 
 	@Override
