@@ -288,10 +288,6 @@ public class IssuePendingFragment extends Fragment {
 	@UiThread
 	void updatedData(List<AuditItem> auditItems) {
 
-        for (AuditItem item : auditItems) {
-            Logger.Log("audited: " + item.isAudited());
-        }
-
 		if (mAdapter == null) {
 			mAdapter = new AuditItemAdapter(getActivity(),
 					R.layout.item_issue_pending, mSession, operatorCode);

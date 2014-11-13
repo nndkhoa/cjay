@@ -8,6 +8,8 @@ import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.image.AuditImagesGotEvent;
+import com.cloudjay.cjay.event.isocode.IsoCodeGotEvent;
+import com.cloudjay.cjay.event.isocode.IsoCodesGotEvent;
 import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
 import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
 import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
@@ -301,7 +303,8 @@ public class DataCenter {
 	 * @param prefix
 	 * @return
 	 */
-	public List<IsoCode> getListIsoCodes(Context context, String prefix) {
+    @Background(serial = CACHE)
+	public void getListIsoCodes(Context context, String prefix) {
 		try {
 			DB db = App.getDB(context);
 			String[] keyResults = db.findKeys(prefix);
@@ -312,11 +315,10 @@ public class DataCenter {
 				isoCodes.add(isoCode);
 			}
 
-			return isoCodes;
+            EventBus.getDefault().post(new IsoCodesGotEvent(isoCodes, prefix));
 
 		} catch (SnappydbException e) {
 			Logger.e(e.getMessage());
-			return null;
 		}
 	}
 
@@ -362,7 +364,8 @@ public class DataCenter {
 	 * @param code
 	 * @return
 	 */
-	public IsoCode getIsoCode(Context context, String prefix, String code) {
+    @Background(serial = CACHE)
+	public void getIsoCode(Context context, String prefix, String code) {
 		try {
 			DB db = App.getDB(context);
 			String[] keyResults = db.findKeys(prefix + code);
@@ -373,13 +376,10 @@ public class DataCenter {
 				Logger.Log("getCode: " + isoCode.getCode());
 				Logger.Log("getId: " + isoCode.getId());
 
-				return isoCode;
-			} else {
-				return null;
+				EventBus.getDefault().post(new IsoCodeGotEvent(isoCode, prefix));
 			}
 		} catch (SnappydbException e) {
 			Logger.e(e.getMessage());
-			return null;
 		}
 	}
 
