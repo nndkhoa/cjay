@@ -34,6 +34,37 @@ public class Session implements Serializable {
 	public static final String FIELD_CONTAINER_ID = "container_id";
 
 	//region ATTR
+
+	public boolean isUploadAuditConfirmed() {
+		return uploadAuditConfirmed;
+	}
+
+	public void setUploadAuditConfirmed(boolean uploadConfirmed) {
+		this.uploadAuditConfirmed = uploadConfirmed;
+	}
+
+	private boolean uploadAuditConfirmed;
+
+	public boolean isUploadRepairConfirmed() {
+		return uploadRepairConfirmed;
+	}
+
+	public void setUploadRepairConfirmed(boolean uploadRepairConfirmed) {
+		this.uploadRepairConfirmed = uploadRepairConfirmed;
+	}
+
+	private boolean uploadRepairConfirmed;
+
+	public boolean isUploadExportConfirmed() {
+		return uploadExportConfirmed;
+	}
+
+	public void setUploadExportConfirmed(boolean uploadExportConfirmed) {
+		this.uploadExportConfirmed = uploadExportConfirmed;
+	}
+
+	private boolean uploadExportConfirmed;
+
 	@Expose
 	private long id;
 
@@ -867,7 +898,7 @@ public class Session implements Serializable {
 		}
 
 		for (AuditItem auditItem : this.getAuditItems()) {
-			Logger.Log(auditItem.getModifiedAt());
+			//Logger.Log(auditItem.getModifiedAt());
 			auditItem.setUuid(UUID.randomUUID().toString());
 			auditItem.setUploadStatus(UploadStatus.COMPLETE.value);
 			for (AuditImage auditImage : auditItem.getAuditImages()) {
