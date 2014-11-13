@@ -16,7 +16,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.ReuseActivity_;
@@ -25,7 +24,6 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.GateImage;
-import com.cloudjay.cjay.task.job.UploadImageJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -34,7 +32,6 @@ import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.commonsware.cwac.camera.PictureTransaction;
 import com.commonsware.cwac.camera.SimpleCameraHost;
-import com.path.android.jobqueue.JobManager;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
@@ -391,7 +388,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
             // Add image to job queue
 	        //TODO add cjobject to queue @Han
 	        try {
-		        dataCenter.addQueue(containerId, new CJayObject());
+		        dataCenter.addCJayObj(containerId, new CJayObject());
 	        } catch (SnappydbException e) {
 		        e.printStackTrace();
 	        }

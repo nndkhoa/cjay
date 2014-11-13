@@ -25,7 +25,6 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
@@ -34,7 +33,6 @@ import com.cloudjay.cjay.view.SquareImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.imageaware.ImageAware;
 import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
-import com.path.android.jobqueue.JobManager;
 import com.snappydb.SnappydbException;
 
 import java.util.List;
@@ -213,7 +211,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 						//2. Add container session to upload queue
 						//TODO add cjobject to queue @Han
 						try {
-							DataCenter_.getInstance_(App.getInstance().getApplicationContext()).addQueue(session.getContainerId(), new CJayObject());
+							DataCenter_.getInstance_(App.getInstance().getApplicationContext()).addCJayObj(session.getContainerId(), new CJayObject());
 						} catch (SnappydbException e) {
 							e.printStackTrace();
 						}

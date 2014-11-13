@@ -51,6 +51,6 @@ public class CJayConstant {
 	// Pubnub
 	public static final String PUBLISH_KEY = "pub-c-d4a2608d-f440-4ebf-a09a-dd8a570428cd";
 	public static final String SUBSCRIBE_KEY = "sub-c-fe158864-9fcf-11e3-a937-02ee2ddab7fe";
-	public static final String QUEUE_PRIORITY = "QUEUE_PRIORITY:";
-	public static final String SESSION_PRIORITY = "SESSION_PRIORITY";
+	public static final String PREFIX_CONTAINER_PRIORITY = "PREFIX_CONTAINER_PRIORITY:";
+	public static final String PREFIX_CJAY_PRIORITY = "PREFIX_CJAY_PRIORITY";
 }

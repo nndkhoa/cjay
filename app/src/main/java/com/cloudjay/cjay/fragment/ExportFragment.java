@@ -11,7 +11,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
@@ -23,13 +22,11 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.job.UploadImportJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
-import com.path.android.jobqueue.JobManager;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
@@ -158,7 +155,7 @@ public class ExportFragment extends Fragment {
 		// Add container session to upload queue
 		//TODO add cjobject to queue @Han
 		try {
-			dataCenter.addQueue(containerID, new CJayObject());
+			dataCenter.addCJayObj(containerID, new CJayObject());
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}

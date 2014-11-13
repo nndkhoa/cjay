@@ -33,7 +33,6 @@ import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Objects;
 
 import de.greenrobot.event.EventBus;
 
@@ -146,7 +145,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			// PUT /api/cjay/containers/{pk}/complete-repair
 			//TODO add cjobject to queue @Han
 			try {
-				dataCenter.addQueue(containerID, new CJayObject());
+				dataCenter.addCJayObj(containerID, new CJayObject());
 			} catch (SnappydbException e) {
 				e.printStackTrace();
 			}
