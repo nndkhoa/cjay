@@ -11,6 +11,7 @@ import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Priority;
 import com.cloudjay.cjay.util.enums.Step;
@@ -57,7 +58,7 @@ public class UploadImportJob extends Job {
 
 		Context context = App.getInstance().getApplicationContext();
 		Step step = Step.values()[mSession.getLocalStep()];
-		DataCenter_.getInstance_(context).addLog(context, mSession.getContainerId(), step.name() + " | Add container vào Queue");
+		DataCenter_.getInstance_(context).addLog(context, mSession.getContainerId(), step.name() + " | Add container vào Queue", CJayConstant.PREFIX_LOG);
 
 		EventBus.getDefault().post(new PreUploadStartedEvent(mSession, UploadType.SESSION));
 		EventBus.getDefault().post(new UploadStartedEvent(mSession, UploadType.SESSION));
@@ -80,7 +81,7 @@ public class UploadImportJob extends Job {
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
 
 		Step step = Step.values()[mSession.getLocalStep()];
-		dataCenter.addLog(context, mSession.getContainerId(), step.name() + " | Bắt đầu quá trình upload");
+		dataCenter.addLog(context, mSession.getContainerId(), step.name() + " | Bắt đầu quá trình upload",CJayConstant.PREFIX_LOG);
 
 		// Bắt đầu quá trình upload
 
@@ -106,7 +107,7 @@ public class UploadImportJob extends Job {
 				break;
 		}
 
-		dataCenter.addLog(context, mSession.getContainerId(), "Upload container thành công");
+		dataCenter.addLog(context, mSession.getContainerId(), "Upload container thành công",CJayConstant.PREFIX_LOG);
 	}
 
 	/**
@@ -120,7 +121,7 @@ public class UploadImportJob extends Job {
 
 		if (throwable instanceof RetrofitError) {
 			Context context = App.getInstance().getApplicationContext();
-			DataCenter_.getInstance_(context).addLog(context, mSession.getContainerId(), "Upload bị gián đoạn");
+			DataCenter_.getInstance_(context).addLog(context, mSession.getContainerId(), "Upload bị gián đoạn",CJayConstant.PREFIX_LOG);
 
 			//if it is a 4xx error, stop
 			RetrofitError retrofitError = (RetrofitError) throwable;
@@ -139,7 +140,7 @@ public class UploadImportJob extends Job {
 	protected void onCancel() {
 
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).addLog(context, mSession.getContainerId(), "Upload thất bại");
+		DataCenter_.getInstance_(context).addLog(context, mSession.getContainerId(), "Upload thất bại",CJayConstant.PREFIX_LOG);
 
 		EventBus.getDefault().post(new UploadStoppedEvent(mSession));
 	}

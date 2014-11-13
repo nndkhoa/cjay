@@ -303,7 +303,7 @@ public class DataCenter {
 	 * @param prefix
 	 * @return
 	 */
-    @Background(serial = CACHE)
+	@Background(serial = CACHE)
 	public void getListIsoCodes(Context context, String prefix) {
 		try {
 			DB db = App.getDB(context);
@@ -315,7 +315,7 @@ public class DataCenter {
 				isoCodes.add(isoCode);
 			}
 
-            EventBus.getDefault().post(new IsoCodesGotEvent(isoCodes, prefix));
+			EventBus.getDefault().post(new IsoCodesGotEvent(isoCodes, prefix));
 
 		} catch (SnappydbException e) {
 			Logger.e(e.getMessage());
@@ -364,7 +364,7 @@ public class DataCenter {
 	 * @param code
 	 * @return
 	 */
-    @Background(serial = CACHE)
+	@Background(serial = CACHE)
 	public void getIsoCode(Context context, String prefix, String code) {
 		try {
 			DB db = App.getDB(context);
@@ -487,7 +487,7 @@ public class DataCenter {
 				sessions.add(session);
 			} catch (SnappydbException e) {
 				e.printStackTrace();
-				addLog(context, newKey, prefix + " | Cannot retrieve this container");
+				addLog(context, newKey, prefix + " | Cannot retrieve this container",CJayConstant.PREFIX_LOG);
 			}
 		}
 
@@ -1400,7 +1400,7 @@ public class DataCenter {
 	public List<LogItem> searchLog(Context context, String searchKey) {
 		try {
 			DB db = App.getDB(context);
-			String[] keysResult = db.findKeys(CJayConstant.PREFIX_LOG + searchKey);
+			String[] keysResult = db.findKeys(searchKey);
 			List<LogItem> logUploads = new ArrayList<>();
 
 			for (String result : keysResult) {
@@ -1430,7 +1430,7 @@ public class DataCenter {
 	 * @param title
 	 * @param message
 	 */
-	public void addLog(Context context, String title, String message) {
+	public void addLog(Context context, String title, String message, String typeLog) {
 		String currentTime = StringUtils.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 
 		LogItem log = new LogItem();
@@ -1438,13 +1438,17 @@ public class DataCenter {
 		log.setMessage(message);
 		log.setTime(currentTime);
 
-		addLog(context, log);
+		addLog(context, log, typeLog);
 	}
 
-	public void addLog(Context context, LogItem log) {
+	public void addLog(Context context, LogItem log, String typeLog) {
 		try {
 			DB db = App.getDB(context);
-			db.put(CJayConstant.PREFIX_LOG + log.getContainerId() + log.getTime(), log);
+			if (typeLog.equals(CJayConstant.PREFIX_LOG)) {
+				db.put(CJayConstant.PREFIX_LOG + log.getContainerId() + log.getTime(), log);
+			} else if (typeLog.equals(CJayConstant.PREFIX_NOTIFI_LOG)) {
+				db.put(CJayConstant.PREFIX_NOTIFI_LOG + log.getContainerId() + log.getTime(), log);
+			}
 
 		} catch (SnappydbException e) {
 			Logger.w(e.getMessage());
@@ -1775,8 +1779,9 @@ public class DataCenter {
 	 * 1. Search for next session priority,
 	 * - if exit => return Object
 	 * - if isn't exit => search for next queue priority
-	 *      - if exit => return first object (object with session priority = 1 )
-	 *      - if isn't exit => return null
+	 * - if exit => return first object (object with session priority = 1 )
+	 * - if isn't exit => return null
+	 *
 	 * @param containerId
 	 * @param oldObject
 	 * @return
@@ -1798,7 +1803,7 @@ public class DataCenter {
 			String[] queuePriority = db.findKeys(keyQueryNextQueue);
 			if (queuePriority.length != 0) {
 				String nextContainer = db.get(keyQueryNextQueue);
-				CJayObject nextJob = db.getObject(CJayConstant.SESSION_PRIORITY+":"+1,CJayObject.class);
+				CJayObject nextJob = db.getObject(CJayConstant.SESSION_PRIORITY + ":" + 1, CJayObject.class);
 				return nextJob;
 			} else {
 				return null;
@@ -1811,6 +1816,7 @@ public class DataCenter {
 	 * 1. Remove object in db with key is current object session priority
 	 * 2 Find for next session priority
 	 * => if didn't find , remove queue priority with key is current object queue priority
+	 *
 	 * @param containerId
 	 * @param object
 	 * @throws SnappydbException
@@ -1821,14 +1827,14 @@ public class DataCenter {
 		int sessionPriority = object.getSessionPriority();
 		int queuePriority = object.getQueuePriority();
 
-		String keytoDelete = CJayConstant.SESSION_PRIORITY+containerId+":"+sessionPriority;
+		String keytoDelete = CJayConstant.SESSION_PRIORITY + containerId + ":" + sessionPriority;
 		db.del(keytoDelete);
 
-		int nextSessionPririty = object.getSessionPriority()+1;
-		String keySearchNextSessionPriority = CJayConstant.SESSION_PRIORITY+containerId+":"+nextSessionPririty;
+		int nextSessionPririty = object.getSessionPriority() + 1;
+		String keySearchNextSessionPriority = CJayConstant.SESSION_PRIORITY + containerId + ":" + nextSessionPririty;
 		String[] nextSessionPrioritys = db.findKeys(keySearchNextSessionPriority);
-		if (nextSessionPrioritys.length == 0 ){
-			String keyDeleteQueuePriority = CJayConstant.QUEUE_PRIORITY+queuePriority;
+		if (nextSessionPrioritys.length == 0) {
+			String keyDeleteQueuePriority = CJayConstant.QUEUE_PRIORITY + queuePriority;
 			db.del(keyDeleteQueuePriority);
 		}
 

@@ -51,7 +51,7 @@ public class UploadAuditItemJob extends Job {
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
 
-		dataCenter.addLog(context, containerId, "Bắt đầu upload audit item: " + auditItem.getUuid());
+		dataCenter.addLog(context, containerId, "Bắt đầu upload audit item: " + auditItem.getUuid(),CJayConstant.PREFIX_LOG);
 		EventBus.getDefault().post(new UploadingEvent(containerId, UploadType.AUDIT_ITEM));
 
 		dataCenter.uploadAuditItem(context, containerId, sessionId, auditItem);
@@ -61,7 +61,7 @@ public class UploadAuditItemJob extends Job {
 	protected void onCancel() {
 
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).addLog(context, containerId, "Upload lỗi thất bại");
+		DataCenter_.getInstance_(context).addLog(context, containerId, "Upload lỗi thất bại",CJayConstant.PREFIX_LOG);
 
 		EventBus.getDefault().post(new UploadStoppedEvent(containerId));
 
@@ -72,7 +72,7 @@ public class UploadAuditItemJob extends Job {
 
 		if (throwable instanceof RetrofitError) {
 			Context context = App.getInstance().getApplicationContext();
-			DataCenter_.getInstance_(context).addLog(context, containerId, "Upload lỗibị gián đoạn");
+			DataCenter_.getInstance_(context).addLog(context, containerId, "Upload lỗibị gián đoạn",CJayConstant.PREFIX_LOG);
 
 			//if it is a 4xx error, stop
 			RetrofitError retrofitError = (RetrofitError) throwable;

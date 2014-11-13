@@ -14,6 +14,7 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.UserLoggedOutEvent;
 import com.cloudjay.cjay.event.session.ContainersFetchedEvent;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
@@ -71,6 +72,7 @@ public class BaseActivity extends FragmentActivity {
 	@OptionsItem(R.id.menu_upload_log)
 	void uploadLogMenuItemClicked() {
 		Intent intent = new Intent(getApplicationContext(), LogActivity_.class);
+		intent.putExtra(LogActivity.LOG_TYPE_EXTRA, CJayConstant.PREFIX_LOG);
 		startActivity(intent);
 	}
 

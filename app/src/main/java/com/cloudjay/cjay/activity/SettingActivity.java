@@ -8,7 +8,9 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
+import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.EActivity;
@@ -48,7 +50,10 @@ public class SettingActivity extends PreferenceActivity {
 
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                //TODO: open Notification log
+	            // Open Wizard Activity
+	            Intent intent = new Intent(App.getInstance().getApplicationContext(), LogActivity_.class);
+	            intent.putExtra(LogActivity.LOG_TYPE_EXTRA, CJayConstant.PREFIX_NOTIFI_LOG);
+	            startActivity(intent);
                 return false;
             }
         });
