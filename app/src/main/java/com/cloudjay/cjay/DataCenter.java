@@ -13,6 +13,7 @@ import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
 import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
 import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
+import com.cloudjay.cjay.event.session.ContainerChangedEvent;
 import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
@@ -547,6 +548,8 @@ public class DataCenter {
 			session.setLocalStep(step.value);
 			db.put(containerId, session);
 
+            EventBus.getDefault().post(new ContainerGotEvent(session, containerId));
+
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
@@ -959,6 +962,7 @@ public class DataCenter {
 	 * @param auditItemRemove
 	 * @param auditImageUUID
 	 */
+    @Background(serial = CACHE)
 	public void addAuditImageToAuditedItem(Context context,
 	                                       String containerId,
 	                                       String auditItemUUID,
@@ -997,30 +1001,6 @@ public class DataCenter {
 		}
 
 		EventBus.getDefault().post(new IssueMergedEvent(containerId, auditItemRemove));
-	}
-
-	public void getAuditImages(Context context, String containerId) {
-		Session session = null;
-
-		try {
-			DB db = App.getDB(context);
-			session = db.getObject(containerId, Session.class);
-
-		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
-		}
-
-		// Audit and Repaired Images
-		List<AuditImage> auditImages = new ArrayList<>();
-
-		// Get list audit images of each audit item and add to audit images list
-		for (AuditItem auditItem : session.getAuditItems()) {
-			List<AuditImage> childAuditImageList = auditItem.getAuditImages();
-			if (childAuditImageList != null) {
-				auditImages.addAll(childAuditImageList);
-			}
-		}
-		EventBus.getDefault().post(new AuditImagesGotEvent(auditImages));
 	}
 
 	/**
@@ -1092,46 +1072,53 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	public void addAuditImage(Context context, AuditImage auditImage, String containerId) throws SnappydbException {
+    @Background(serial = CACHE)
+	public void addAuditImage(Context context, AuditImage auditImage, String containerId) {
 
-		DB db = App.getDB(context);
-		Session session = db.getObject(containerId, Session.class);
+        try {
+            DB db = App.getDB(context);
+            Session session = db.getObject(containerId, Session.class);
 
-		// Generate random one UUID to save auditItem
-		String uuid = UUID.randomUUID().toString();
+            // Generate random one UUID to save auditItem
+            String uuid = UUID.randomUUID().toString();
 
-		// Create new audit item to save
-		AuditItem auditItem = new AuditItem();
-		auditItem.setId(0);
-		auditItem.setUuid(uuid);
-		auditItem.setAudited(false);
-		auditItem.setRepaired(false);
-		auditItem.setAllowed(null);
-		auditItem.setUploadStatus(UploadStatus.NONE);
+            // Create new audit item to save
+            AuditItem auditItem = new AuditItem();
+            auditItem.setId(0);
+            auditItem.setUuid(uuid);
+            auditItem.setAudited(false);
+            auditItem.setRepaired(false);
+            auditItem.setAllowed(null);
+            auditItem.setUploadStatus(UploadStatus.NONE);
 
-		// Get list session's audit items
-		List<AuditItem> auditItems = session.getAuditItems();
-		if (auditItems == null) {
-			auditItems = new ArrayList<>();
-		}
+            // Get list session's audit items
+            List<AuditItem> auditItems = session.getAuditItems();
+            if (auditItems == null) {
+                auditItems = new ArrayList<>();
+            }
 
-		List<AuditImage> auditImages = auditItem.getAuditImages();
-		if (auditImages == null) {
-			auditImages = new ArrayList<>();
-		}
-		// Add audit image to list audit images
-		auditImages.add(auditImage);
-		auditItem.setAuditImages(auditImages);
+            List<AuditImage> auditImages = auditItem.getAuditImages();
+            if (auditImages == null) {
+                auditImages = new ArrayList<>();
+            }
+            // Add audit image to list audit images
+            auditImages.add(auditImage);
+            auditItem.setAuditImages(auditImages);
 
-		// Add audit item to List session's audit items
-		auditItems.add(auditItem);
+            // Add audit item to List session's audit items
+            auditItems.add(auditItem);
 
-		// Add audit item to Session
-		session.setAuditItems(auditItems);
+            // Add audit item to Session
+            session.setAuditItems(auditItems);
 
-		db.put(containerId, session);
+            db.put(containerId, session);
 
-		Logger.Log("Insert audit image successfully");
+            Logger.Log("Insert audit image successfully");
+
+            EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
 	}
 
 	/**
@@ -1492,6 +1479,7 @@ public class DataCenter {
 	 * @param containerId
 	 * @param auditItemUUID
 	 */
+    @Background(serial = CACHE)
 	public void removeAuditItem(Context context, String containerId, String auditItemUUID) {
 		try {
 			// find session
@@ -1509,30 +1497,6 @@ public class DataCenter {
 		}
 
 		EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
-	}
-
-	/**
-	 * Update given audit item
-	 *
-	 * @param context
-	 * @param containerId
-	 * @param auditItem
-	 */
-	public void updateAuditItem(Context context, String containerId, AuditItem auditItem) {
-		try {
-
-			// find session
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
-			session.updateAuditItem(auditItem);
-			db.put(containerId, session);
-
-			// Notify that an audit item is updated
-			EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
-
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Background(serial = CACHE)
@@ -1567,71 +1531,76 @@ public class DataCenter {
 	 * @param auditItem
 	 * @throws SnappydbException
 	 */
-	public void setWaterWashType(Context context, final AuditItem auditItem, String containerId) throws SnappydbException {
+    @Background(serial = CACHE)
+	public void setWaterWashType(Context context, final AuditItem auditItem, String containerId) {
 
-		Logger.Log("Selected audit item: " + auditItem.getUuid());
+        try {
+            Logger.Log("Selected audit item: " + auditItem.getUuid());
 
-		// Find session
-		DB db = App.getDB(context);
-		Session session = db.getObject(containerId, Session.class);
+            // Find session
+            DB db = App.getDB(context);
+            Session session = db.getObject(containerId, Session.class);
 
-		// --> Nếu nhiều image cùng được chọn là lỗi vệ sinh, thì gộp tất cả vào một lỗi
-		boolean isExisted = false;
+            // --> Nếu nhiều image cùng được chọn là lỗi vệ sinh, thì gộp tất cả vào một lỗi
+            boolean isExisted = false;
 
-		List<AuditItem> list = session.getAuditItems();
-		for (int i = 0; i < list.size(); i++) {
+            List<AuditItem> list = session.getAuditItems();
+            for (int i = 0; i < list.size(); i++) {
 
-			// neu da ton tai loi ve sinh va chua duoc upload thi them hinh vao loi ve sinh
-			if (list.get(i).isWashTypeItem() && list.get(i).getId() == 0) {
-				list.get(i).getAuditImages().add(auditItem.getAuditImages().get(0));
-				isExisted = true;
-				Logger.Log("Images size: " + list.get(i).getAuditImages().size());
-				Logger.Log("existed");
-				break;
-			}
-		}
+                // neu da ton tai loi ve sinh va chua duoc upload thi them hinh vao loi ve sinh
+                if (list.get(i).isWashTypeItem() && list.get(i).getId() == 0) {
+                    list.get(i).getAuditImages().add(auditItem.getAuditImages().get(0));
+                    isExisted = true;
+                    Logger.Log("Images size: " + list.get(i).getAuditImages().size());
+                    Logger.Log("existed");
+                    break;
+                }
+            }
 
-		// Remove temporary audit item
-		for (int i = 0; i < list.size(); i++) {
-			AuditItem tmp = list.get(i);
-			if (tmp.equals(auditItem)) {
-				list.remove(i);
-			}
-		}
+            // Remove temporary audit item
+            for (int i = 0; i < list.size(); i++) {
+                AuditItem tmp = list.get(i);
+                if (tmp.equals(auditItem)) {
+                    list.remove(i);
+                }
+            }
 
-		if (!isExisted) {
+            if (!isExisted) {
 
-			Logger.Log("Create new audit item");
+                Logger.Log("Create new audit item");
 
-			// Add Isso Code
-			String damageKey = CJayConstant.PREFIX_DAMAGE_CODE + "DB";
-			String repairKey = CJayConstant.PREFIX_REPAIR_CODE + "WW";
-			String componentKey = CJayConstant.PREFIX_COMPONENT_CODE + "FWA";
+                // Add Isso Code
+                String damageKey = CJayConstant.PREFIX_DAMAGE_CODE + "DB";
+                String repairKey = CJayConstant.PREFIX_REPAIR_CODE + "WW";
+                String componentKey = CJayConstant.PREFIX_COMPONENT_CODE + "FWA";
 
-			IsoCode damageCode = db.getObject(damageKey, IsoCode.class);
-			IsoCode repairCode = db.getObject(repairKey, IsoCode.class);
-			IsoCode componentCode = db.getObject(componentKey, IsoCode.class);
+                IsoCode damageCode = db.getObject(damageKey, IsoCode.class);
+                IsoCode repairCode = db.getObject(repairKey, IsoCode.class);
+                IsoCode componentCode = db.getObject(componentKey, IsoCode.class);
 
-			auditItem.setDamageCodeId(damageCode.getId());
-			auditItem.setDamageCode(damageCode.getCode());
+                auditItem.setDamageCodeId(damageCode.getId());
+                auditItem.setDamageCode(damageCode.getCode());
 
-			auditItem.setRepairCodeId(repairCode.getId());
-			auditItem.setRepairCode(repairCode.getCode());
+                auditItem.setRepairCodeId(repairCode.getId());
+                auditItem.setRepairCode(repairCode.getCode());
 
-			auditItem.setComponentCodeId(componentCode.getId());
-			auditItem.setComponentCode(componentCode.getCode());
+                auditItem.setComponentCodeId(componentCode.getId());
+                auditItem.setComponentCode(componentCode.getCode());
 
-			auditItem.setLocationCode("BXXX");
-			auditItem.setAudited(true);
-			auditItem.setAllowed(true);
+                auditItem.setLocationCode("BXXX");
+                auditItem.setAudited(true);
+                auditItem.setAllowed(true);
 
-			list.add(auditItem);
-		}
+                list.add(auditItem);
+            }
 
-		session.setAuditItems(list);
-		db.put(containerId, session);
+            session.setAuditItems(list);
+            db.put(containerId, session);
 
-		EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
+            EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
 	}
 
 	/**

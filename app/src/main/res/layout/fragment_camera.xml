@@ -73,7 +73,8 @@
 			android:layout_height="match_parent"
 			android:layout_weight="1"
 			android:background="@drawable/camera_option_background_selector"
-			android:src="@drawable/ic_capture"/>
+			android:src="@drawable/ic_capture"
+            android:clickable="false"/>
 
 		<RelativeLayout
 			android:id="@+id/rl_camera_done"

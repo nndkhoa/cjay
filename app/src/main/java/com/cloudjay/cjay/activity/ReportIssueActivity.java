@@ -150,7 +150,7 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
         Logger.Log("set null for allowed");
         mAuditItem.setAllowed(null);
 		// save db records and refresh list
-		mDataCenter.updateAuditItem(getApplicationContext(), mContainerId, mAuditItem);
+		mDataCenter.updateAuditItemInBackground(getApplicationContext(), mContainerId, mAuditItem);
 
 		// go back
 		onBackPressed();

@@ -29,7 +29,6 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringUtils;
-import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.commonsware.cwac.camera.PictureTransaction;
@@ -60,460 +59,460 @@ import de.greenrobot.event.EventBus;
 @EFragment
 public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
-	public interface Contract {
-		boolean isSingleShotMode();
+    public interface Contract {
+        boolean isSingleShotMode();
 
-		void setSingleShotMode(boolean mode);
-	}
+        void setSingleShotMode(boolean mode);
+    }
 
-	//region ATTR
+    //region ATTR
 
-	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
-	public final static String OPERATOR_CODE_EXTRA = "com.cloudjay.wizard.operatorCode";
-	public final static String IMAGE_TYPE_EXTRA = "com.cloudjay.wizard.imageType";
-	public final static String CURRENT_STEP_EXTRA = "com.cloudjay.wizard.currentStep";
-	// These Extra bundles is use to open Detail Issue Activity only
-	public final static String AUDIT_ITEM_UUID_EXTRA = "com.cloudjay.wizard.auditItemUUID";
-	public final static String IS_OPENED = "com.cloudjay.wizard.isOpened";
+    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
+    public final static String OPERATOR_CODE_EXTRA = "com.cloudjay.wizard.operatorCode";
+    public final static String IMAGE_TYPE_EXTRA = "com.cloudjay.wizard.imageType";
+    public final static String CURRENT_STEP_EXTRA = "com.cloudjay.wizard.currentStep";
+    // These Extra bundles is use to open Detail Issue Activity only
+    public final static String AUDIT_ITEM_UUID_EXTRA = "com.cloudjay.wizard.auditItemUUID";
+    public final static String IS_OPENED = "com.cloudjay.wizard.isOpened";
 
-	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
-	private boolean singleShotProcessing = false;
+    private static final int PICTURE_SIZE_MAX_WIDTH = 640;
+    private boolean singleShotProcessing = false;
 
-	@FragmentArg(IMAGE_TYPE_EXTRA)
-	int mType = 0;
+    @FragmentArg(IMAGE_TYPE_EXTRA)
+    int mType = 0;
 
-	@FragmentArg(CONTAINER_ID_EXTRA)
-	String containerId;
+    @FragmentArg(CONTAINER_ID_EXTRA)
+    String containerId;
 
-	@FragmentArg(OPERATOR_CODE_EXTRA)
-	String operatorCode;
+    @FragmentArg(OPERATOR_CODE_EXTRA)
+    String operatorCode;
 
-	@FragmentArg(CURRENT_STEP_EXTRA)
-	int currentStep;
+    @FragmentArg(CURRENT_STEP_EXTRA)
+    int currentStep;
 
-	@FragmentArg(AUDIT_ITEM_UUID_EXTRA)
-	String auditItemUUID;
+    @FragmentArg(AUDIT_ITEM_UUID_EXTRA)
+    String auditItemUUID;
 
-	@FragmentArg(IS_OPENED)
-	boolean isOpened;
+    @FragmentArg(IS_OPENED)
+    boolean isOpened;
 
-	@Bean
-	DataCenter dataCenter;
+    @Bean
+    DataCenter dataCenter;
 
-	//endregion
+    //endregion
 
-	//region VIEW
-	@ViewById(R.id.tv_camera_done)
-	TextView tvSavingImage;
+    //region VIEW
+    @ViewById(R.id.tv_camera_done)
+    TextView tvSavingImage;
 
-	@ViewById(R.id.btn_capture)
-	ImageButton btnTakePicture;
+    @ViewById(R.id.btn_capture)
+    ImageButton btnTakePicture;
 
-	@ViewById(R.id.btn_capture_mode)
-	ToggleButton btnCameraMode;
+    @ViewById(R.id.btn_capture_mode)
+    ToggleButton btnCameraMode;
 
-	@ViewById(R.id.btn_camera_done)
-	Button btnDone;
+    @ViewById(R.id.btn_camera_done)
+    Button btnDone;
 
-	@ViewById(R.id.btn_use_gate_image)
-	Button btnUseGateImage;
-	//endregion
+    @ViewById(R.id.btn_use_gate_image)
+    Button btnUseGateImage;
+    //endregion
 
-	//region VIEW INTERACTION
-	@Click(R.id.btn_use_gate_image)
-	void btnUseGateImageClicked() {
-		// Open ReuseActivity
-		Intent intent = new Intent(getActivity(), ReuseActivity_.class);
-		intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, containerId);
-		startActivityForResult(intent, 1);
-	}
+    //region VIEW INTERACTION
+    @Click(R.id.btn_use_gate_image)
+    void btnUseGateImageClicked() {
+        // Open ReuseActivity
+        Intent intent = new Intent(getActivity(), ReuseActivity_.class);
+        intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, containerId);
+        startActivityForResult(intent, 1);
+    }
 
-	@Click(R.id.btn_camera_done)
-	void btnDoneClicked() {
-		EventBus.getDefault().post(new ImageCapturedEvent(containerId, mType, auditItemUUID, isOpened));
-		getActivity().finish();
-	}
+    @Click(R.id.btn_camera_done)
+    void btnDoneClicked() {
+        EventBus.getDefault().post(new ImageCapturedEvent(containerId, mType, auditItemUUID, isOpened));
+        getActivity().finish();
+    }
 
-	@Click(R.id.btn_capture)
-	void btnTakePictureClicked() {
+    @Click(R.id.btn_capture)
+    void btnTakePictureClicked() {
 
-		takeSimplePicture();
+        takeSimplePicture();
 
-		//btnTakePicture.setEnabled(false);
-		//btnDone.setEnabled(false);
-		//autoFocus();
-	}
+        //btnTakePicture.setEnabled(false);
+        //btnDone.setEnabled(false);
+        //autoFocus();
+    }
 
-	@Click(R.id.btn_capture_mode)
-	void btnCameraModeClicked() {
-		if (btnCameraMode.isChecked() == true) {
-			getContract().setSingleShotMode(false);
-			Logger.Log("Single shot mode: " + getContract().isSingleShotMode());
-			Toast.makeText(getActivity(), "Kích hoạt chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
-		} else {
-			getContract().setSingleShotMode(true);
-			Logger.Log("Single shot mode: " + getContract().isSingleShotMode());
-			Toast.makeText(getActivity(), "Đã dừng chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
-		}
-	}
-	//endregion
+    @Click(R.id.btn_capture_mode)
+    void btnCameraModeClicked() {
+        if (btnCameraMode.isChecked() == true) {
+            getContract().setSingleShotMode(false);
+            Logger.Log("Single shot mode: " + getContract().isSingleShotMode());
+            Toast.makeText(getActivity(), "Kích hoạt chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
+        } else {
+            getContract().setSingleShotMode(true);
+            Logger.Log("Single shot mode: " + getContract().isSingleShotMode());
+            Toast.makeText(getActivity(), "Đã dừng chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
+        }
+    }
+    //endregion
 
 
-	PictureTransaction xact;
+    PictureTransaction xact;
 
-	@Override
-	public void onCreate(Bundle state) {
-		super.onCreate(state);
-		SimpleCameraHost.Builder builder = new SimpleCameraHost.Builder(new CameraHost(getActivity()));
-		setHost(builder.useFullBleedPreview(true).build());
+    @Override
+    public void onCreate(Bundle state) {
+        super.onCreate(state);
+        SimpleCameraHost.Builder builder = new SimpleCameraHost.Builder(new CameraHost(getActivity()));
+        setHost(builder.useFullBleedPreview(true).build());
 
-		// You can move it to CameraHost#takeSimplePicture to tag Object
-		xact = new PictureTransaction(getHost());
-		xact.needBitmap(true);
-		xact.flashMode(Camera.Parameters.FLASH_MODE_AUTO);
+        // You can move it to CameraHost#takeSimplePicture to tag Object
+        xact = new PictureTransaction(getHost());
+        xact.needBitmap(true);
+        xact.flashMode(Camera.Parameters.FLASH_MODE_AUTO);
 
-	}
+    }
 
-	@AfterViews
-	void afterView() {
+    @AfterViews
+    void afterView() {
+
+        // Enable button Camera
+        btnTakePicture.setEnabled(true);
 
 //		Logger.Log("isOpened: " + isOpened);
 
-		// Config shot mode. Default is FALSE.
-		// Configure View visibility based on current step of session
-		Step step = Step.values()[currentStep];
+        // Config shot mode. Default is FALSE.
+        // Configure View visibility based on current step of session
+        Step step = Step.values()[currentStep];
 
 //		Logger.Log("Current Step of session: " + step.toString());
-		switch (step) {
+        switch (step) {
 
-			case AUDIT:
-				btnUseGateImage.setVisibility(View.VISIBLE);
-				btnCameraMode.setVisibility(View.VISIBLE);
-				break;
+            case AUDIT:
+                btnUseGateImage.setVisibility(View.VISIBLE);
+                btnCameraMode.setVisibility(View.VISIBLE);
+                break;
 
-			default:
-				getContract().setSingleShotMode(false);
-				btnUseGateImage.setVisibility(View.GONE);
-				btnCameraMode.setVisibility(View.GONE);
-				break;
-		}
+            default:
+                getContract().setSingleShotMode(false);
+                btnUseGateImage.setVisibility(View.GONE);
+                btnCameraMode.setVisibility(View.GONE);
+                break;
+        }
 
-	}
+    }
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View cameraView = super.onCreateView(inflater, container, savedInstanceState);
-		View results = inflater.inflate(R.layout.fragment_camera, container, false);
-		((ViewGroup) results.findViewById(R.id.camera)).addView(cameraView);
-		return (results);
-	}
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View cameraView = super.onCreateView(inflater, container, savedInstanceState);
+        View results = inflater.inflate(R.layout.fragment_camera, container, false);
+        ((ViewGroup) results.findViewById(R.id.camera)).addView(cameraView);
+        return (results);
+    }
 
-	@Override
-	public void onPause() {
-		super.onPause();
-		getActivity().invalidateOptionsMenu();
-	}
+    @Override
+    public void onPause() {
+        super.onPause();
+        getActivity().invalidateOptionsMenu();
+    }
 
-	public boolean isSingleShotProcessing() {
-		return (singleShotProcessing);
-	}
+    public boolean isSingleShotProcessing() {
+        return (singleShotProcessing);
+    }
 
-	Contract getContract() {
-		return ((Contract) getActivity());
-	}
+    Contract getContract() {
+        return ((Contract) getActivity());
+    }
 
-	/**
-	 * Take a picture, need to call auto focus before taking picture
-	 */
-	@UiThread
-	public void takeSimplePicture() {
-		showProgressSavingImage(true);
-		if (getContract().isSingleShotMode() == true) {
-			Logger.Log("getContract().isSingleShotMode()");
-			singleShotProcessing = true;
-		}
+    /**
+     * Take a picture, need to call auto focus before taking picture
+     */
+    @UiThread
+    public void takeSimplePicture() {
+        showProgressSavingImage(true);
+        if (getContract().isSingleShotMode() == true) {
+            Logger.Log("getContract().isSingleShotMode()");
+            singleShotProcessing = true;
+        }
 
-		// xact.tag()
-		// Call it with PictureTransaction to take picture with configuration in CameraHost
-		// Process image in Subclass of `CameraHost#saveImage`
-		takePicture(xact);
-	}
+        // xact.tag()
+        // Call it with PictureTransaction to take picture with configuration in CameraHost
+        // Process image in Subclass of `CameraHost#saveImage`
+        takePicture(xact);
+    }
 
-	private void showProgressSavingImage(boolean show) {
-		btnTakePicture.setEnabled(show ? false : true);
-		btnDone.setEnabled(show ? false : true);
-		btnDone.setVisibility(show ? View.GONE : View.VISIBLE);
-		tvSavingImage.setVisibility(show ? View.VISIBLE : View.GONE);
-	}
+    private void showProgressSavingImage(boolean show) {
+        btnTakePicture.setEnabled(show ? false : true);
+        btnDone.setEnabled(show ? false : true);
+        btnDone.setVisibility(show ? View.GONE : View.VISIBLE);
+        tvSavingImage.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
 
-	/**
-	 * User for override back button on Camera Activity
-	 *
-	 * @return
-	 */
-	public void onBackPress() {
-		if (btnDone.getVisibility() == View.GONE) {
-			Toast.makeText(getActivity(), "Vui lòng thử lại khi đã lưu hình xong", Toast.LENGTH_SHORT).show();
-		} else {
-			EventBus.getDefault().post(new ImageCapturedEvent(containerId, mType, auditItemUUID, isOpened));
-			getActivity().finish();
-		}
-	}
+    /**
+     * User for override back button on Camera Activity
+     *
+     * @return
+     */
+    public void onBackPress() {
+        if (btnDone.getVisibility() == View.GONE) {
+            Toast.makeText(getActivity(), "Vui lòng thử lại khi đã lưu hình xong", Toast.LENGTH_SHORT).show();
+        } else {
+            EventBus.getDefault().post(new ImageCapturedEvent(containerId, mType, auditItemUUID, isOpened));
+            getActivity().finish();
+        }
+    }
 
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-		if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
-			getActivity().finish();
-		}
-	}
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            getActivity().finish();
+        }
+    }
 
 
-	/**
-	 * CameraHost is the interface use to configure behavior of camera ~ setting.
-	 */
-	class CameraHost extends SimpleCameraHost {
+    /**
+     * CameraHost is the interface use to configure behavior of camera ~ setting.
+     */
+    class CameraHost extends SimpleCameraHost {
 
-		public CameraHost(Context _ctxt) {
-			super(_ctxt);
-		}
+        public CameraHost(Context _ctxt) {
+            super(_ctxt);
+        }
 
-		/**
-		 * MAIN: > Process taken picture:
-		 * 1. Create directory
-		 * 2. Save Bitmap to File
-		 * 3. Add image to Queue
-		 * 4. Enable button done, take picture
-		 *
-		 * @param xact
-		 * @param capturedBitmap
-		 */
-		@Override
-		public void saveImage(PictureTransaction xact, Bitmap capturedBitmap) {
-			try {
-				if (useSingleShotMode()) {
-					singleShotProcessing = false;
-				}
+        /**
+         * MAIN: > Process taken picture:
+         * 1. Create directory
+         * 2. Save Bitmap to File
+         * 3. Add image to Queue
+         * 4. Enable button done, take picture
+         *
+         * @param xact
+         * @param capturedBitmap
+         */
+        @Override
+        public void saveImage(PictureTransaction xact, Bitmap capturedBitmap) {
+            try {
+                if (useSingleShotMode()) {
+                    singleShotProcessing = false;
+                }
 
-				//Random UUID
-				String uuid = UUID.randomUUID().toString();
+                //Random UUID
+                String uuid = UUID.randomUUID().toString();
 
-				// Save bitmap
-				File photo = getFile(uuid);
-				saveBitmapToFile(capturedBitmap, photo);
+                // Save bitmap
+                File photo = getFile(uuid);
+                saveBitmapToFile(capturedBitmap, photo);
 
-				// Add taken picture to job queue
-				addImageToUploadQueue(photo.getAbsolutePath(), photo.getName(), uuid);
-				getActivity().runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						showProgressSavingImage(false);
-					}
-				});
+                // Add taken picture to job queue
+                addImageToUploadQueue(photo.getAbsolutePath(), photo.getName(), uuid);
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        showProgressSavingImage(false);
+                    }
+                });
 
-			} catch (Exception e) {
-				getActivity().runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						Toast.makeText(getActivity(), "Không thể lưu hình, vui lòng thử lại", Toast.LENGTH_SHORT).show();
-						showProgressSavingImage(false);
-					}
-				});
-			}
-		}
+            } catch (Exception e) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getActivity(), "Không thể lưu hình, vui lòng thử lại", Toast.LENGTH_SHORT).show();
+                        showProgressSavingImage(false);
+                    }
+                });
+            }
+        }
 
-		@Override
-		public boolean useSingleShotMode() {
-			return (getContract().isSingleShotMode());
-		}
+        @Override
+        public boolean useSingleShotMode() {
+            return (getContract().isSingleShotMode());
+        }
 
-		/**
-		 * Add new image to database based on `mType`.
-		 * Add image at `uri` to job queue.
-		 *
-		 * @param uri
-		 * @param imageName
-		 * @throws SnappydbException
-		 */
-		protected void addImageToUploadQueue(String uri, String imageName, String uuid) {
-			try {
+        /**
+         * Add new image to database based on `mType`.
+         * Add image at `uri` to job queue.
+         *
+         * @param uri
+         * @param imageName
+         * @throws SnappydbException
+         */
+        protected void addImageToUploadQueue(String uri, String imageName, String uuid) {
 
-				// Create image based on mType and add this image to database
-				ImageType type = ImageType.values()[mType];
-				switch (type) {
-					case IMPORT:
-					case EXPORT:
-						GateImage gateImage = new GateImage()
-								.withId(0)
-								.withType(mType)
-								.withName(imageName)
-								.withUrl("file://" + uri)
-								.withUuid(uuid);
+            // Create image based on mType and add this image to database
+            ImageType type = ImageType.values()[mType];
+            switch (type) {
+                case IMPORT:
+                case EXPORT:
+                    GateImage gateImage = new GateImage()
+                            .withId(0)
+                            .withType(mType)
+                            .withName(imageName)
+                            .withUrl("file://" + uri)
+                            .withUuid(uuid);
 
-						dataCenter.addGateImage(getActivity().getApplicationContext(), gateImage, containerId);
-						break;
+                    dataCenter.addGateImage(getActivity().getApplicationContext(), gateImage, containerId);
+                    break;
 
-					case AUDIT:
-					case REPAIRED:
-					default:
+                case AUDIT:
+                case REPAIRED:
+                default:
 
-						Logger.Log("mType: " + mType);
-						AuditImage auditImage = new AuditImage()
-								.withId(0)
-								.withType(mType)
-								.withUrl("file://" + uri)
-								.withName(imageName)
-								.withUUID(uuid);
+                    Logger.Log("mType: " + mType);
+                    AuditImage auditImage = new AuditImage()
+                            .withId(0)
+                            .withType(mType)
+                            .withUrl("file://" + uri)
+                            .withName(imageName)
+                            .withUUID(uuid);
 
-						AuditItem auditItem = dataCenter.getAuditItem(getActivity(), containerId, auditItemUUID);
+                    AuditItem auditItem = dataCenter.getAuditItem(getActivity(), containerId, auditItemUUID);
 
-						// Create temporary audit item
-						if (null == auditItem) {
-							Logger.Log("Create new Audit Item: " + auditImage.getType());
-							dataCenter.addAuditImage(getActivity().getApplicationContext(), auditImage, containerId);
+                    // Create temporary audit item
+                    if (null == auditItem) {
+                        Logger.Log("Create new Audit Item: " + auditImage.getType());
+                        dataCenter.addAuditImage(getActivity().getApplicationContext(), auditImage, containerId);
 
-						} else {
+                    } else {
 
-							auditItem.getAuditImages().add(auditImage);
-							if (mType == ImageType.REPAIRED.value) {
-								auditItem.setRepaired(true);
-							}
+                        auditItem.getAuditImages().add(auditImage);
+                        if (mType == ImageType.REPAIRED.value) {
+                            auditItem.setRepaired(true);
+                        }
 
-							dataCenter.updateAuditItem(getActivity().getApplicationContext(), containerId, auditItem);
-						}
+                        dataCenter.updateAuditItemInBackground(getActivity().getApplicationContext(), containerId, auditItem);
+                    }
 
-						break;
-				}
+                    break;
+            }
 
-				// Add image to job queue
-				JobManager jobManager = App.getJobManager();
-				jobManager.addJobInBackground(new UploadImageJob(uri, imageName, containerId, type));
+            // Add image to job queue
+            JobManager jobManager = App.getJobManager();
+            jobManager.addJobInBackground(new UploadImageJob(uri, imageName, containerId, type));
 
-			} catch (SnappydbException e) {
-				Utils.showCrouton(getActivity(), e.getMessage());
-			}
-		}
 
-		/**
-		 * Save bitmap to file
-		 *
-		 * @param bitmap
-		 * @param filename
-		 */
-		protected void saveBitmapToFile(Bitmap bitmap, File filename) {
-			try {
-				FileOutputStream out = new FileOutputStream(filename);
-				bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
-				out.flush();
-				out.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+        }
 
-		/**
-		 * Get image type string based on input image type
-		 *
-		 * @param imgType
-		 * @return
-		 */
-		protected String getImageTypeString(int imgType) {
-			ImageType type = ImageType.values()[imgType];
-			switch (type) {
-				case IMPORT:
-					return "gate-in";
+        /**
+         * Save bitmap to file
+         *
+         * @param bitmap
+         * @param filename
+         */
+        protected void saveBitmapToFile(Bitmap bitmap, File filename) {
+            try {
+                FileOutputStream out = new FileOutputStream(filename);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+                out.flush();
+                out.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
-				case EXPORT:
-					return "gate-out";
+        /**
+         * Get image type string based on input image type
+         *
+         * @param imgType
+         * @return
+         */
+        protected String getImageTypeString(int imgType) {
+            ImageType type = ImageType.values()[imgType];
+            switch (type) {
+                case IMPORT:
+                    return "gate-in";
 
-				case AUDIT:
-					return "auditor";
+                case EXPORT:
+                    return "gate-out";
 
-				case REPAIRED:
-				default:
-					return "repair";
-			}
-		}
+                case AUDIT:
+                    return "auditor";
 
-		/**
-		 * Create directory for saving image
-		 *
-		 * @return
-		 */
-		protected File getFile(String uuid) {
+                case REPAIRED:
+                default:
+                    return "repair";
+            }
+        }
 
-			// Save Bitmap to Files
-			String imageType = getImageTypeString(mType);
+        /**
+         * Create directory for saving image
+         *
+         * @return
+         */
+        protected File getFile(String uuid) {
 
-			// create today String
-			String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
-			String depotCode = PreferencesUtil.getPrefsValue(getActivity(), PreferencesUtil.PREF_USER_DEPOT);
+            // Save Bitmap to Files
+            String imageType = getImageTypeString(mType);
 
-			// create directory to save images
-			File newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/" + today + "/" + imageType
-					+ "/" + containerId);
+            // create today String
+            String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
+            String depotCode = PreferencesUtil.getPrefsValue(getActivity(), PreferencesUtil.PREF_USER_DEPOT);
 
-			if (!newDirectory.exists()) {
-				newDirectory.mkdirs();
-			}
+            // create directory to save images
+            File newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/" + today + "/" + imageType
+                    + "/" + containerId);
 
-			// create image file name
-			String fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-" + operatorCode + "-"
-					+ uuid + ".jpg";
+            if (!newDirectory.exists()) {
+                newDirectory.mkdirs();
+            }
 
-			File photo = new File(newDirectory, fileName);
+            // create image file name
+            String fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-" + operatorCode + "-"
+                    + uuid + ".jpg";
 
-			return photo;
-		}
+            File photo = new File(newDirectory, fileName);
 
-		@Override
-		public void onCameraFail(com.commonsware.cwac.camera.CameraHost.FailureReason reason) {
-			super.onCameraFail(reason);
-			Toast.makeText(getActivity(), "Sorry, but you cannot use the camera now!", Toast.LENGTH_LONG).show();
-		}
+            return photo;
+        }
 
-		@Override
-		@TargetApi(16)
-		public void onAutoFocus(boolean success, Camera camera) {
-			Logger.Log("onAutoFocus");
-			super.onAutoFocus(success, camera);
+        @Override
+        public void onCameraFail(com.commonsware.cwac.camera.CameraHost.FailureReason reason) {
+            super.onCameraFail(reason);
+            Toast.makeText(getActivity(), "Sorry, but you cannot use the camera now!", Toast.LENGTH_LONG).show();
+        }
 
-			//takeSimplePicture();
+        @Override
+        @TargetApi(16)
+        public void onAutoFocus(boolean success, Camera camera) {
+            Logger.Log("onAutoFocus");
+            super.onAutoFocus(success, camera);
 
-		}
+            //takeSimplePicture();
 
-		/**
-		 * Calculate best size for saved image
-		 *
-		 * @param sizes
-		 * @return
-		 */
-		protected Camera.Size determineBestSize(List<Camera.Size> sizes) {
-			Camera.Size bestSize = null;
+        }
 
-			for (Camera.Size currentSize : sizes) {
-				boolean isDesiredRatio = currentSize.width / 4 == currentSize.height / 3;
-				boolean isBetterSize = bestSize == null || currentSize.width > bestSize.width;
-				boolean isInBounds = currentSize.width <= PICTURE_SIZE_MAX_WIDTH;
-				if (isDesiredRatio && isInBounds && isBetterSize) {
-					bestSize = currentSize;
-				}
-			}
-			return bestSize;
-		}
+        /**
+         * Calculate best size for saved image
+         *
+         * @param sizes
+         * @return
+         */
+        protected Camera.Size determineBestSize(List<Camera.Size> sizes) {
+            Camera.Size bestSize = null;
 
-		@Override
-		public Camera.Size getPreviewSize(int displayOrientation, int width, int height, Camera.Parameters parameters) {
-			List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
-			return determineBestSize(sizes);
-		}
+            for (Camera.Size currentSize : sizes) {
+                boolean isDesiredRatio = currentSize.width / 4 == currentSize.height / 3;
+                boolean isBetterSize = bestSize == null || currentSize.width > bestSize.width;
+                boolean isInBounds = currentSize.width <= PICTURE_SIZE_MAX_WIDTH;
+                if (isDesiredRatio && isInBounds && isBetterSize) {
+                    bestSize = currentSize;
+                }
+            }
+            return bestSize;
+        }
 
-		@Override
-		public Camera.Size getPictureSize(PictureTransaction xact, Camera.Parameters parameters) {
-			List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
-			return determineBestSize(sizes);
-		}
-	}
+        @Override
+        public Camera.Size getPreviewSize(int displayOrientation, int width, int height, Camera.Parameters parameters) {
+            List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
+            return determineBestSize(sizes);
+        }
+
+        @Override
+        public Camera.Size getPictureSize(PictureTransaction xact, Camera.Parameters parameters) {
+            List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
+            return determineBestSize(sizes);
+        }
+    }
 
 }
