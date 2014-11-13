@@ -901,10 +901,16 @@ public class Session implements Serializable {
 			//Logger.Log(auditItem.getModifiedAt());
 			auditItem.setUuid(UUID.randomUUID().toString());
 			auditItem.setUploadStatus(UploadStatus.COMPLETE.value);
+            auditItem.setAudited(true);
 			for (AuditImage auditImage : auditItem.getAuditImages()) {
 				auditImage.setName(Utils.getImageNameFromUrl(auditImage.getUrl()));
 				auditImage.setUploadStatus(UploadStatus.COMPLETE.value);
 				auditImage.setUuid(UUID.randomUUID().toString());
+
+                if (auditImage.getType() == ImageType.REPAIRED.value) {
+                    auditItem.setRepaired(true);
+                    break;
+                }
 			}
 		}
 

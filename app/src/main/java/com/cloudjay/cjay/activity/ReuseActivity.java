@@ -133,22 +133,18 @@ public class ReuseActivity extends Activity {
 	private void donePickImage() {
 		List<GateImage> gateImages = gateImageAdapter.getCheckedCJayImageUrls();
 		for (int i = 0; i < gateImages.size(); i++) {
-			try {
-				// Getting the last part of the referrer url
-				String name = gateImages.get(i).getName();
-				Logger.Log("name: " + name);
-				// Create new audit image object
-				AuditImage auditImage = new AuditImage()
-						.withId(0)
-						.withType(ImageType.AUDIT)
-						.withUrl(gateImages.get(i).getUrl())
-						.withName(name)
-						.withUUID(UUID.randomUUID().toString());
+            // Getting the last part of the referrer url
+            String name = gateImages.get(i).getName();
+            Logger.Log("name: " + name);
+            // Create new audit image object
+            AuditImage auditImage = new AuditImage()
+                    .withId(0)
+                    .withType(ImageType.AUDIT)
+                    .withUrl(gateImages.get(i).getUrl())
+                    .withName(name)
+                    .withUUID(UUID.randomUUID().toString());
 
-				dataCenter.addAuditImage(getApplicationContext(), auditImage, containerID);
-			} catch (SnappydbException e) {
-				e.printStackTrace();
-			}
+            dataCenter.addAuditImage(getApplicationContext(), auditImage, containerID);
 		}
 
 		Intent resultIntent = new Intent();

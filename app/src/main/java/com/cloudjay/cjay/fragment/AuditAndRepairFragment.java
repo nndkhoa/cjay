@@ -13,7 +13,6 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
-import com.cloudjay.cjay.event.session.ContainerChangedEvent;
 import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadImportJob;
@@ -89,8 +88,11 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 		super.onDestroy();
 	}
 
+    @UiThread
 	public void onEvent(ContainerForUploadGotEvent event) {
 		mSession = event.getTarget();
+
+        Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
 
 		// Xu ly cho session da duoc Giam Dinh
 		if (mSession.getLocalStep() == Step.AUDIT.value) {
@@ -144,19 +146,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 			// Navigate to HomeActivity
 			getActivity().finish();
-
-//	     /* Remove all tabs */
-//		actionBar.removeAllTabs();
-//		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-//
-//		// Go to next fragment
-//		android.support.v4.app.Fragment fragment =
-//				new ExportFragment_().builder().containerId(containerId).build();
-//
-//		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-//		transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
-//		transaction.replace(R.id.ll_main, fragment);
-//		transaction.commit();
 		}
 
 	}
@@ -164,13 +153,11 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	@Click(R.id.btn_complete_import)
 	void btnCompleteAuditClicked() {
 		dataCenter.getSessionForUpload(getActivity(), containerID);
-		getActivity().finish();
 	}
 
 	@Click(R.id.btn_done)
 	void btnCompleteRepairClicked() {
 		dataCenter.getSessionForUpload(getActivity(), containerID);
-		getActivity().finish();
 	}
 
 	@AfterViews
@@ -290,10 +277,5 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 		if (imageType == ImageType.AUDIT.value) {
 			dataCenter.changeSessionLocalStepInBackground(getActivity(), containerID, Step.AUDIT);
 		}
-	}
-
-	@UiThread
-	public void onEvent(ContainerChangedEvent event) {
-		checkForShowButton();
 	}
 }

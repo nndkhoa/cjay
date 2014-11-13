@@ -353,14 +353,9 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
-				try {
-					// change status audit item to water wash
-					DataCenter_.getInstance_(mContext).setWaterWashType(mContext, item, session.getContainerId());
-					dialogInterface.dismiss();
-
-				} catch (SnappydbException e) {
-					e.printStackTrace();
-				}
+                // change status audit item to water wash
+                DataCenter_.getInstance_(mContext).setWaterWashType(mContext, item, session.getContainerId());
+                dialogInterface.dismiss();
 			}
 		});
 
