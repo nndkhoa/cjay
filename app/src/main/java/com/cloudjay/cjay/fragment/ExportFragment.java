@@ -20,6 +20,7 @@ import com.cloudjay.cjay.adapter.PhotoExpandableListAdapter;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
+import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadImportJob;
@@ -29,6 +30,7 @@ import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
 import com.path.android.jobqueue.JobManager;
+import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -154,8 +156,12 @@ public class ExportFragment extends Fragment {
 		dataCenter.removeWorkingSession(getActivity(), containerID);
 
 		// Add container session to upload queue
-		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadImportJob(mSession));
+		//TODO add cjobject to queue @Han
+		try {
+			dataCenter.addQueue(containerID, new CJayObject());
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
 
 		// Navigate to HomeActivity
 		getActivity().finish();

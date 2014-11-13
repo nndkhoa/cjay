@@ -23,6 +23,7 @@ import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.task.job.UploadImageJob;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -388,8 +389,12 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
             }
 
             // Add image to job queue
-            JobManager jobManager = App.getJobManager();
-            jobManager.addJobInBackground(new UploadImageJob(uri, imageName, containerId, type));
+	        //TODO add cjobject to queue @Han
+	        try {
+		        dataCenter.addQueue(containerId, new CJayObject());
+	        } catch (SnappydbException e) {
+		        e.printStackTrace();
+	        }
 
 
         }

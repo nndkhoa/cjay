@@ -7,13 +7,11 @@ import android.text.TextUtils;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.api.NetworkClient;
-import com.cloudjay.cjay.event.image.AuditImagesGotEvent;
 import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
 import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
 import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
 import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
-import com.cloudjay.cjay.event.session.ContainerChangedEvent;
 import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
@@ -24,6 +22,7 @@ import com.cloudjay.cjay.event.session.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.LogItem;
@@ -50,6 +49,7 @@ import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.Trace;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -548,7 +548,7 @@ public class DataCenter {
 			session.setLocalStep(step.value);
 			db.put(containerId, session);
 
-            EventBus.getDefault().post(new ContainerGotEvent(session, containerId));
+			EventBus.getDefault().post(new ContainerGotEvent(session, containerId));
 
 		} catch (SnappydbException e) {
 			e.printStackTrace();
@@ -702,7 +702,7 @@ public class DataCenter {
 				for (Session session : sessions) {
 					String key = session.getContainerId();
 
-                    session.changeToLocalFormat();
+					session.changeToLocalFormat();
 
 					db.put(key, session);
 				}
@@ -960,7 +960,7 @@ public class DataCenter {
 	 * @param auditItemRemove
 	 * @param auditImageUUID
 	 */
-    @Background(serial = CACHE)
+	@Background(serial = CACHE)
 	public void addAuditImageToAuditedItem(Context context,
 	                                       String containerId,
 	                                       String auditItemUUID,
@@ -1070,53 +1070,53 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-    @Background(serial = CACHE)
+	@Background(serial = CACHE)
 	public void addAuditImage(Context context, AuditImage auditImage, String containerId) {
 
-        try {
-            DB db = App.getDB(context);
-            Session session = db.getObject(containerId, Session.class);
+		try {
+			DB db = App.getDB(context);
+			Session session = db.getObject(containerId, Session.class);
 
-            // Generate random one UUID to save auditItem
-            String uuid = UUID.randomUUID().toString();
+			// Generate random one UUID to save auditItem
+			String uuid = UUID.randomUUID().toString();
 
-            // Create new audit item to save
-            AuditItem auditItem = new AuditItem();
-            auditItem.setId(0);
-            auditItem.setUuid(uuid);
-            auditItem.setAudited(false);
-            auditItem.setRepaired(false);
-            auditItem.setAllowed(null);
-            auditItem.setUploadStatus(UploadStatus.NONE);
+			// Create new audit item to save
+			AuditItem auditItem = new AuditItem();
+			auditItem.setId(0);
+			auditItem.setUuid(uuid);
+			auditItem.setAudited(false);
+			auditItem.setRepaired(false);
+			auditItem.setAllowed(null);
+			auditItem.setUploadStatus(UploadStatus.NONE);
 
-            // Get list session's audit items
-            List<AuditItem> auditItems = session.getAuditItems();
-            if (auditItems == null) {
-                auditItems = new ArrayList<>();
-            }
+			// Get list session's audit items
+			List<AuditItem> auditItems = session.getAuditItems();
+			if (auditItems == null) {
+				auditItems = new ArrayList<>();
+			}
 
-            List<AuditImage> auditImages = auditItem.getAuditImages();
-            if (auditImages == null) {
-                auditImages = new ArrayList<>();
-            }
-            // Add audit image to list audit images
-            auditImages.add(auditImage);
-            auditItem.setAuditImages(auditImages);
+			List<AuditImage> auditImages = auditItem.getAuditImages();
+			if (auditImages == null) {
+				auditImages = new ArrayList<>();
+			}
+			// Add audit image to list audit images
+			auditImages.add(auditImage);
+			auditItem.setAuditImages(auditImages);
 
-            // Add audit item to List session's audit items
-            auditItems.add(auditItem);
+			// Add audit item to List session's audit items
+			auditItems.add(auditItem);
 
-            // Add audit item to Session
-            session.setAuditItems(auditItems);
+			// Add audit item to Session
+			session.setAuditItems(auditItems);
 
-            db.put(containerId, session);
+			db.put(containerId, session);
 
-            Logger.Log("Insert audit image successfully");
+			Logger.Log("Insert audit image successfully");
 
-            EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
+			EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -1477,7 +1477,7 @@ public class DataCenter {
 	 * @param containerId
 	 * @param auditItemUUID
 	 */
-    @Background(serial = CACHE)
+	@Background(serial = CACHE)
 	public void removeAuditItem(Context context, String containerId, String auditItemUUID) {
 		try {
 			// find session
@@ -1529,76 +1529,76 @@ public class DataCenter {
 	 * @param auditItem
 	 * @throws SnappydbException
 	 */
-    @Background(serial = CACHE)
+	@Background(serial = CACHE)
 	public void setWaterWashType(Context context, final AuditItem auditItem, String containerId) {
 
-        try {
-            Logger.Log("Selected audit item: " + auditItem.getUuid());
+		try {
+			Logger.Log("Selected audit item: " + auditItem.getUuid());
 
-            // Find session
-            DB db = App.getDB(context);
-            Session session = db.getObject(containerId, Session.class);
+			// Find session
+			DB db = App.getDB(context);
+			Session session = db.getObject(containerId, Session.class);
 
-            // --> Nếu nhiều image cùng được chọn là lỗi vệ sinh, thì gộp tất cả vào một lỗi
-            boolean isExisted = false;
+			// --> Nếu nhiều image cùng được chọn là lỗi vệ sinh, thì gộp tất cả vào một lỗi
+			boolean isExisted = false;
 
-            List<AuditItem> list = session.getAuditItems();
-            for (int i = 0; i < list.size(); i++) {
+			List<AuditItem> list = session.getAuditItems();
+			for (int i = 0; i < list.size(); i++) {
 
-                // neu da ton tai loi ve sinh va chua duoc upload thi them hinh vao loi ve sinh
-                if (list.get(i).isWashTypeItem() && list.get(i).getId() == 0) {
-                    list.get(i).getAuditImages().add(auditItem.getAuditImages().get(0));
-                    isExisted = true;
-                    Logger.Log("Images size: " + list.get(i).getAuditImages().size());
-                    Logger.Log("existed");
-                    break;
-                }
-            }
+				// neu da ton tai loi ve sinh va chua duoc upload thi them hinh vao loi ve sinh
+				if (list.get(i).isWashTypeItem() && list.get(i).getId() == 0) {
+					list.get(i).getAuditImages().add(auditItem.getAuditImages().get(0));
+					isExisted = true;
+					Logger.Log("Images size: " + list.get(i).getAuditImages().size());
+					Logger.Log("existed");
+					break;
+				}
+			}
 
-            // Remove temporary audit item
-            for (int i = 0; i < list.size(); i++) {
-                AuditItem tmp = list.get(i);
-                if (tmp.equals(auditItem)) {
-                    list.remove(i);
-                }
-            }
+			// Remove temporary audit item
+			for (int i = 0; i < list.size(); i++) {
+				AuditItem tmp = list.get(i);
+				if (tmp.equals(auditItem)) {
+					list.remove(i);
+				}
+			}
 
-            if (!isExisted) {
+			if (!isExisted) {
 
-                Logger.Log("Create new audit item");
+				Logger.Log("Create new audit item");
 
-                // Add Isso Code
-                String damageKey = CJayConstant.PREFIX_DAMAGE_CODE + "DB";
-                String repairKey = CJayConstant.PREFIX_REPAIR_CODE + "WW";
-                String componentKey = CJayConstant.PREFIX_COMPONENT_CODE + "FWA";
+				// Add Isso Code
+				String damageKey = CJayConstant.PREFIX_DAMAGE_CODE + "DB";
+				String repairKey = CJayConstant.PREFIX_REPAIR_CODE + "WW";
+				String componentKey = CJayConstant.PREFIX_COMPONENT_CODE + "FWA";
 
-                IsoCode damageCode = db.getObject(damageKey, IsoCode.class);
-                IsoCode repairCode = db.getObject(repairKey, IsoCode.class);
-                IsoCode componentCode = db.getObject(componentKey, IsoCode.class);
+				IsoCode damageCode = db.getObject(damageKey, IsoCode.class);
+				IsoCode repairCode = db.getObject(repairKey, IsoCode.class);
+				IsoCode componentCode = db.getObject(componentKey, IsoCode.class);
 
-                auditItem.setDamageCodeId(damageCode.getId());
-                auditItem.setDamageCode(damageCode.getCode());
+				auditItem.setDamageCodeId(damageCode.getId());
+				auditItem.setDamageCode(damageCode.getCode());
 
-                auditItem.setRepairCodeId(repairCode.getId());
-                auditItem.setRepairCode(repairCode.getCode());
+				auditItem.setRepairCodeId(repairCode.getId());
+				auditItem.setRepairCode(repairCode.getCode());
 
-                auditItem.setComponentCodeId(componentCode.getId());
-                auditItem.setComponentCode(componentCode.getCode());
+				auditItem.setComponentCodeId(componentCode.getId());
+				auditItem.setComponentCode(componentCode.getCode());
 
-                auditItem.setLocationCode("BXXX");
-                auditItem.setAudited(true);
-                auditItem.setAllowed(true);
+				auditItem.setLocationCode("BXXX");
+				auditItem.setAudited(true);
+				auditItem.setAllowed(true);
 
-                list.add(auditItem);
-            }
+				list.add(auditItem);
+			}
 
-            session.setAuditItems(list);
-            db.put(containerId, session);
+			session.setAuditItems(list);
+			db.put(containerId, session);
 
-            EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
+			EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -1716,4 +1716,148 @@ public class DataCenter {
 	}
 
 	//endregion
+
+	/**
+	 * Add Queue to line
+	 * <p/>
+	 * 1. Find Session queue
+	 * - if found, get max session priority => add new session queue with priority = current max priority +1
+	 * - if can't find, get max queue priority => add new container priority then add new session queue
+	 *
+	 * @param containerId
+	 * @param object
+	 * @throws SnappydbException
+	 */
+	public void addQueue(String containerId, CJayObject object) throws SnappydbException {
+		DB db = App.getDB(context);
+		//Find if this container is in line
+		//If found => get max priority number and add object with key have priority is
+		// current max priority + 1
+		// If can't find, => search for Queue Priority of this all container,
+		String keytoFind = CJayConstant.SESSION_PRIORITY + containerId + ":";
+		String[] sessionPriority = db.findKeys(keytoFind);
+		//Progress if found
+		if (sessionPriority.length != 0) {
+			int maxPriority = getPriority(sessionPriority, keytoFind, true);
+			int priorityToAdd = maxPriority + 1;
+
+			CJayObject beforeObject = db.getObject(keytoFind + maxPriority, CJayObject.class);
+
+			object.setSessionPriority(priorityToAdd);
+			object.setQueuePriority(beforeObject.getQueuePriority());
+
+			db.put(keytoFind + priorityToAdd, object);
+		} else {
+			//Search for current max queue priority
+			String[] queuePriority = db.findKeys(CJayConstant.QUEUE_PRIORITY);
+			if (queuePriority.length != 0) {
+				int maxPriority = getPriority(queuePriority, CJayConstant.QUEUE_PRIORITY, true);
+				int priorityToAdd = maxPriority + 1;
+
+				object.setQueuePriority(priorityToAdd);
+				object.setSessionPriority(1);
+
+				db.put(keytoFind + "1", object);
+				db.put(CJayConstant.QUEUE_PRIORITY + priorityToAdd, containerId);
+			} else {
+
+				object.setQueuePriority(1);
+				object.setSessionPriority(1);
+
+				db.put(keytoFind + "1", object);
+				db.put(CJayConstant.QUEUE_PRIORITY + 1, containerId);
+			}
+		}
+	}
+
+	/**
+	 * Get next Queue by old CjayObject
+	 * 1. Search for next session priority,
+	 * - if exit => return Object
+	 * - if isn't exit => search for next queue priority
+	 *      - if exit => return first object (object with session priority = 1 )
+	 *      - if isn't exit => return null
+	 * @param containerId
+	 * @param oldObject
+	 * @return
+	 * @throws SnappydbException
+	 */
+	public CJayObject getNextQueue(String containerId, CJayObject oldObject) throws SnappydbException {
+		DB db = App.getDB(context);
+
+		int nextSessionPriority = oldObject.getSessionPriority() + 1;
+		int nexQueuePriority = oldObject.getQueuePriority() + 1;
+
+		String keytoFind = CJayConstant.SESSION_PRIORITY + containerId + ":" + nextSessionPriority;
+		String[] sessionPriority = db.findKeys(keytoFind);
+		if (sessionPriority.length != 0) {
+			CJayObject nextJob = db.getObject(keytoFind, CJayObject.class);
+			return nextJob;
+		} else {
+			String keyQueryNextQueue = CJayConstant.QUEUE_PRIORITY + nexQueuePriority;
+			String[] queuePriority = db.findKeys(keyQueryNextQueue);
+			if (queuePriority.length != 0) {
+				String nextContainer = db.get(keyQueryNextQueue);
+				CJayObject nextJob = db.getObject(CJayConstant.SESSION_PRIORITY+":"+1,CJayObject.class);
+				return nextJob;
+			} else {
+				return null;
+			}
+		}
+	}
+
+	/**
+	 * Remove done CjObject after done job
+	 * 1. Remove object in db with key is current object session priority
+	 * 2 Find for next session priority
+	 * => if didn't find , remove queue priority with key is current object queue priority
+	 * @param containerId
+	 * @param object
+	 * @throws SnappydbException
+	 */
+	public void removeDoneJQueue(String containerId, CJayObject object) throws SnappydbException {
+		DB db = App.getDB(context);
+
+		int sessionPriority = object.getSessionPriority();
+		int queuePriority = object.getQueuePriority();
+
+		String keytoDelete = CJayConstant.SESSION_PRIORITY+containerId+":"+sessionPriority;
+		db.del(keytoDelete);
+
+		int nextSessionPririty = object.getSessionPriority()+1;
+		String keySearchNextSessionPriority = CJayConstant.SESSION_PRIORITY+containerId+":"+nextSessionPririty;
+		String[] nextSessionPrioritys = db.findKeys(keySearchNextSessionPriority);
+		if (nextSessionPrioritys.length == 0 ){
+			String keyDeleteQueuePriority = CJayConstant.QUEUE_PRIORITY+queuePriority;
+			db.del(keyDeleteQueuePriority);
+		}
+
+
+	}
+
+	/**
+	 * Get current priority base on String[] reuslt search and key to search
+	 * False for min priority
+	 * True for max priority
+	 *
+	 * @param priorityString
+	 * @param keyToGetInt
+	 * @return
+	 */
+	private int getPriority(String[] priorityString, String keyToGetInt, boolean max) {
+		ArrayList<Integer> priorityList = new ArrayList<Integer>();
+		for (String key : priorityString) {
+			int lenghtString = (keyToGetInt).length();
+			String priority = key.substring(lenghtString);
+			int priorityNumer = Integer.valueOf(priority);
+			priorityList.add(priorityNumer);
+		}
+		int maxPriority = Collections.max(priorityList);
+		int minPriority = Collections.min(priorityList);
+		if (max) {
+			return maxPriority;
+		} else {
+			return maxPriority;
+		}
+	}
 }

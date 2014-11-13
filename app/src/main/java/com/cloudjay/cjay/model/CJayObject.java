@@ -7,6 +7,26 @@ public class CJayObject implements Serializable {
 	Class cls;
 	Object object;
 
+	public int getQueuePriority() {
+		return queuePriority;
+	}
+
+	public void setQueuePriority(int queuePriority) {
+		this.queuePriority = queuePriority;
+	}
+
+	int queuePriority;
+
+	public int getSessionPriority() {
+		return sessionPriority;
+	}
+
+	public void setSessionPriority(int sessionPriority) {
+		this.sessionPriority = sessionPriority;
+	}
+
+	int sessionPriority;
+
 	public CJayObject() {
 	}
 
@@ -14,9 +34,11 @@ public class CJayObject implements Serializable {
 		this.object = obj;
 	}
 
-	public CJayObject(Object obj, Class cls) {
+	public CJayObject(Object obj, Class cls, int queuePriority, int sessionPriority) {
 		this.object = obj;
 		this.cls = cls;
+		this.queuePriority = queuePriority;
+		this.sessionPriority = sessionPriority;
 	}
 
 	public GateImage getGateImage() {
