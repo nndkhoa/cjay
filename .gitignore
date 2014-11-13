@@ -28,3 +28,4 @@ app/src/main/assets/crashlytics-build.properties
 #
 /keystore
 /release
+version.properties
