@@ -49,7 +49,7 @@ public class CJayObject implements Serializable {
 		if (cls == Session.class || object instanceof Session) {
 			return (Session) object;
 		} else {
-			throw new IllegalStateException("This object is not a AuditItem");
+			throw new IllegalStateException("This object is not a Session");
 		}
 	}
 
