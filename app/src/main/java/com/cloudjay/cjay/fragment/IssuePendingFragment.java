@@ -116,8 +116,12 @@ public class IssuePendingFragment extends Fragment {
 		mSession.setLocalStep(Step.HAND_CLEAN.value);
 
 		// Add container session to upload queue
-		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadImportJob(mSession));
+		//TODO add cjobject to queue @Han
+		try {
+			dataCenter.addQueue(containerId, new CJayObject());
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
 		getActivity().finish();
 	}
 
@@ -283,7 +287,7 @@ public class IssuePendingFragment extends Fragment {
 	@OptionsItem(R.id.menu_export)
 	void exportMenuItemClicked() {
 		dataCenter.changeLocalStepAndForceExport(getActivity(), containerId);
-        getActivity().finish();
+		getActivity().finish();
 	}
 
 	@UiThread

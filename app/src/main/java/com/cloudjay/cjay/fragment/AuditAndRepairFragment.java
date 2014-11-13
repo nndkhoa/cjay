@@ -144,8 +144,12 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 			// Add containerId to upload complete repair queue
 			// PUT /api/cjay/containers/{pk}/complete-repair
-			JobManager jobManager = App.getJobManager();
-			jobManager.addJobInBackground(new UploadImportJob(mSession));
+			//TODO add cjobject to queue @Han
+			try {
+				dataCenter.addQueue(containerID, new CJayObject());
+			} catch (SnappydbException e) {
+				e.printStackTrace();
+			}
 
 			// Navigate to HomeActivity
 			getActivity().finish();

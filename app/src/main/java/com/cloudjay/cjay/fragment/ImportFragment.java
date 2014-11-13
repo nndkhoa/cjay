@@ -24,6 +24,7 @@ import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.operator.OperatorChosenEvent;
 import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
+import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
@@ -33,6 +34,7 @@ import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.path.android.jobqueue.JobManager;
+import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -145,7 +147,7 @@ public class ImportFragment extends Fragment {
 		Logger.Log(" > Choose operator " + operatorCode);
 
 		// Set operator to edit text
-        etOperator.setText(operator.getOperatorCode());
+		etOperator.setText(operator.getOperatorCode());
 
 		mSession.setOperatorId(operator.getId());
 		mSession.setOperatorCode(operatorCode);
@@ -300,8 +302,12 @@ public class ImportFragment extends Fragment {
 		}
 
 		// Add container session to upload queue
-		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadImportJob(mSession));
+		//TODO add cjobject to queue @Han
+		try {
+			dataCenter.addQueue(containerID, new CJayObject());
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Touch(R.id.et_operator)

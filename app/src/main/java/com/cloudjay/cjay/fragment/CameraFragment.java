@@ -389,8 +389,12 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
             }
 
             // Add image to job queue
-	        JobManager jobManager = App.getJobManager();
-	        jobManager.addJobInBackground(new UploadImageJob(uri, imageName, containerId, type));
+	        //TODO add cjobject to queue @Han
+	        try {
+		        dataCenter.addQueue(containerId, new CJayObject());
+	        } catch (SnappydbException e) {
+		        e.printStackTrace();
+	        }
 
 
         }
