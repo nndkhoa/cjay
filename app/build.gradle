@@ -36,15 +36,15 @@ android {
     compileSdkVersion 19
     buildToolsVersion '19.1.0'
 
-    // Generate version build from file
-    def Properties versionProps = new Properties()
-    def versionPropsFile = file('version.properties')
-    if (versionPropsFile.exists())
-        versionProps.load(new FileInputStream(versionPropsFile))
-
-    versionBuild = (versionProps['VERSION_CODE'] ?: "0").toInteger() + 1
-    versionProps['VERSION_CODE'] = versionBuild.toString()
-    versionProps.store(versionPropsFile.newWriter(), null)
+//    // Generate version build from file
+//    def Properties versionProps = new Properties()
+//    def versionPropsFile = file('version.properties')
+//    if (versionPropsFile.exists())
+//        versionProps.load(new FileInputStream(versionPropsFile))
+//
+//    versionBuild = (versionProps['VERSION_CODE'] ?: "0").toInteger() + 1
+//    versionProps['VERSION_CODE'] = versionBuild.toString()
+//    versionProps.store(versionPropsFile.newWriter(), null)
 
     defaultConfig {
 
@@ -52,7 +52,8 @@ android {
         minSdkVersion 16
         targetSdkVersion 16
 
-        versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
+//        versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
+        versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100
         versionName "${versionMajor}.${versionMinor}.${versionPatch}${versionTag}"
 
         buildConfigField "String", "GIT_SHA", "\"${gitSha}\""
