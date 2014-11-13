@@ -109,8 +109,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 				PARAM_AUTH_TOKEN_TYPE);
 
 		if (accountType == null) {
-			// accountType = AccountGeneral.ACCOUNT_TYPE;
-			accountType = getApplicationContext().getPackageName();
+			accountType = AccountGeneral.ACCOUNT_TYPE;
 			Logger.Log("Account type: " + accountType);
 		}
 
