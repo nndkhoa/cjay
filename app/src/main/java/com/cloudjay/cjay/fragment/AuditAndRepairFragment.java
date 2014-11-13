@@ -14,12 +14,14 @@ import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
+import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadImportJob;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.path.android.jobqueue.JobManager;
+import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -31,6 +33,7 @@ import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 import de.greenrobot.event.EventBus;
 
@@ -107,8 +110,12 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			}
 
 			// PUT /api/cjay/containers/{pk}/complete-audit
-			JobManager jobManager = App.getJobManager();
-			jobManager.addJobInBackground(new UploadImportJob(mSession));
+			//TODO add cjobject to queue @Han
+			try {
+				dataCenter.addQueue(containerID, new CJayObject());
+			} catch (SnappydbException e) {
+				e.printStackTrace();
+			}
 
 			// Hide this button
 			btnCompleteAudit.setVisibility(View.GONE);
@@ -141,8 +148,12 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 			// Add containerId to upload complete repair queue
 			// PUT /api/cjay/containers/{pk}/complete-repair
-			JobManager jobManager = App.getJobManager();
-			jobManager.addJobInBackground(new UploadImportJob(mSession));
+			//TODO add cjobject to queue @Han
+			try {
+				dataCenter.addQueue(containerID, new CJayObject());
+			} catch (SnappydbException e) {
+				e.printStackTrace();
+			}
 
 			// Navigate to HomeActivity
 			getActivity().finish();
