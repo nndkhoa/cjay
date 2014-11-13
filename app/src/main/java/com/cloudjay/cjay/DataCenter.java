@@ -1815,7 +1815,7 @@ public class DataCenter {
 	 * @param object
 	 * @throws SnappydbException
 	 */
-	public void removeDoneJQueue(String containerId, CJayObject object) throws SnappydbException {
+	public void removeDoneQueue(String containerId, CJayObject object) throws SnappydbException {
 		DB db = App.getDB(context);
 
 		int sessionPriority = object.getSessionPriority();
@@ -1857,7 +1857,7 @@ public class DataCenter {
 		if (max) {
 			return maxPriority;
 		} else {
-			return maxPriority;
+			return minPriority;
 		}
 	}
 }
