@@ -5,11 +5,13 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.SystemService;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.droidparts.widget.ClearableEditText;
 import org.droidparts.widget.ClearableEditText.Listener;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -20,6 +22,8 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.IsoCodeAdapter;
+import com.cloudjay.cjay.event.isocode.IsoCodeGotEvent;
+import com.cloudjay.cjay.event.isocode.IsoCodesGotEvent;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.IsoCode;
@@ -27,6 +31,8 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 
 import java.util.List;
+
+import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.fragment_report_issue_component)
 public class IssueReportComponentFragment extends IssueReportFragment {
@@ -57,6 +63,7 @@ public class IssueReportComponentFragment extends IssueReportFragment {
 	private int mItemLayout = R.layout.item_code;
 
 	IsoCodeAdapter mAdapter;
+    List<IsoCode> componentCodes;
 
 	@AfterViews
 	void afterViews() {
@@ -85,37 +92,9 @@ public class IssueReportComponentFragment extends IssueReportFragment {
 			}
 		});
 
-		// initialize with issue
-        IsoCode componentCode = null;
-		if (mAuditItem != null && mAuditItem.getComponentCode() != null) {
-            componentCode = mDataCenter.getIsoCode(getActivity().getApplicationContext(),
-                    CJayConstant.PREFIX_COMPONENT_CODE,
-                    mAuditItem.getComponentCode());
-
-        }
-        if (componentCode != null) {
-            mComponentCode = componentCode.getCode();
-            mComponentName = componentCode.getFullName();
-		} else {
-            mComponentCode = "";
-			mComponentName = "";
-		}
-
-		ignoreSearch = true;
-		mComponentEditText.setText(mComponentName);
-        mComponentNameTextView.setText(mComponentName);
-		ignoreSearch = false;
-
         // refresh component list
-        List<IsoCode> componentCodes = mDataCenter.getListIsoCodes(getActivity().getApplicationContext(),
+        mDataCenter.getListIsoCodes(getActivity().getApplicationContext(),
                 CJayConstant.PREFIX_COMPONENT_CODE);
-        mAdapter = new IsoCodeAdapter(getActivity().getApplicationContext(), mItemLayout, componentCodes);
-
-        mComponentListView.setAdapter(mAdapter);
-        mComponentListView.setTextFilterEnabled(true);
-        mComponentListView.setScrollingCacheEnabled(false);
-
-        mAdapter.notifyDataSetChanged();
 	}
 
 	@ItemClick(R.id.lv_component)
@@ -183,4 +162,66 @@ public class IssueReportComponentFragment extends IssueReportFragment {
 			return false;
 		}
 	}
+
+    @UiThread
+    public void onEvent(IsoCodeGotEvent event) {
+        Logger.Log("event componentCode");
+        IsoCode componentCode = event.getIsoCode();
+        if (event.getPrefix().equals(CJayConstant.PREFIX_COMPONENT_CODE)) {
+            if (componentCode != null) {
+                mComponentCode = componentCode.getCode();
+                mComponentName = componentCode.getFullName();
+            } else {
+                mComponentCode = "";
+                mComponentName = "";
+            }
+
+            ignoreSearch = true;
+            mComponentEditText.setText(mComponentName);
+            mComponentNameTextView.setText(mComponentName);
+            ignoreSearch = false;
+        }
+    }
+
+    void updateData(List<IsoCode> isoCodes) {
+        if (isoCodes != null) {
+            mAdapter = new IsoCodeAdapter(getActivity().getApplicationContext(),
+                    mItemLayout, componentCodes);
+
+            mComponentListView.setAdapter(mAdapter);
+            mComponentListView.setTextFilterEnabled(true);
+            mComponentListView.setScrollingCacheEnabled(false);
+
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @UiThread
+    public void onEvent(IsoCodesGotEvent event) {
+
+        String prefix = event.getPrefix();
+
+        if (prefix.equals(CJayConstant.PREFIX_COMPONENT_CODE)) {
+            componentCodes = event.getListIsoCodes();
+            updateData(componentCodes);
+
+            // initialize with issue
+            if (mAuditItem != null && mAuditItem.getComponentCode() != null) {
+                mDataCenter.getIsoCode(getActivity().getApplicationContext(),
+                        CJayConstant.PREFIX_COMPONENT_CODE, mAuditItem.getComponentCode());
+            }
+        }
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
 }

@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
 import android.app.FragmentTransaction;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.event.isocode.IsoCodeGotEvent;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.fragment.IssueReportComponentFragment_;
 import com.cloudjay.cjay.fragment.IssueReportDamageFragment_;
@@ -44,6 +46,8 @@ import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import de.greenrobot.event.EventBus;
 
 // slide 20
 
@@ -125,6 +129,32 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 		getActionBar().selectTab(getActionBar().getTabAt(TAB_ISSUE_COMPONENT));
 	}
 
+    @UiThread
+    public void onEvent(IsoCodeGotEvent event) {
+
+        Logger.Log("IsoCodeGotEvent");
+        IsoCode isoCode = event.getIsoCode();
+
+        if (isoCode == null) {
+            return;
+        }
+        if (event.getPrefix().equals(CJayConstant.PREFIX_COMPONENT_CODE)) {
+            Logger.Log(isoCode.getId() + "");
+            mAuditItem.setComponentCodeId(isoCode.getId());
+            mAuditItem.setComponentCode(isoCode.getCode());
+        } else if (event.getPrefix().equals(CJayConstant.PREFIX_DAMAGE_CODE)) {
+            Logger.Log(isoCode.getId() + "");
+            mAuditItem.setDamageCodeId(isoCode.getId());
+            mAuditItem.setDamageCode(isoCode.getCode());
+        } else if (event.getPrefix().equals(CJayConstant.PREFIX_REPAIR_CODE)) {
+            Logger.Log(isoCode.getId() + "");
+            mAuditItem.setRepairCodeId(isoCode.getId());
+            mAuditItem.setRepairCode(isoCode.getCode());
+
+            // save db records and refresh list
+            mDataCenter.updateAuditItemInBackground(getApplicationContext(), mContainerId, mAuditItem);
+        }
+    }
 
 	@OptionsItem(R.id.menu_check)
 	void checkMenuItemClicked() {
@@ -149,8 +179,6 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
         // Set is allowed is null
         Logger.Log("set null for allowed");
         mAuditItem.setAllowed(null);
-		// save db records and refresh list
-		mDataCenter.updateAuditItemInBackground(getApplicationContext(), mContainerId, mAuditItem);
 
 		// go back
 		onBackPressed();
@@ -251,41 +279,26 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
 				break;
 			case TYPE_DAMAGE_CODE:
-				IsoCode damageCode = null;
 				if (!TextUtils.isEmpty(val)) {
-					damageCode = mDataCenter.getIsoCode(getApplicationContext(),
-							CJayConstant.PREFIX_DAMAGE_CODE,
-							val);
-				}
-				if (damageCode != null) {
-					mAuditItem.setDamageCodeId(damageCode.getId());
-					mAuditItem.setDamageCode(damageCode.getCode());
+					mDataCenter.getIsoCode(getApplicationContext(),
+                            CJayConstant.PREFIX_DAMAGE_CODE,
+                            val);
 				}
 
 				break;
 			case TYPE_REPAIR_CODE:
-				IsoCode repairCode = null;
 				if (!TextUtils.isEmpty(val)) {
-					repairCode = mDataCenter.getIsoCode(getApplicationContext(),
-							CJayConstant.PREFIX_REPAIR_CODE,
-							val);
-				}
-				if (repairCode != null) {
-					mAuditItem.setRepairCodeId(repairCode.getId());
-					mAuditItem.setRepairCode(repairCode.getCode());
+					mDataCenter.getIsoCode(getApplicationContext(),
+                            CJayConstant.PREFIX_REPAIR_CODE,
+                            val);
 				}
 
 				break;
 			case TYPE_COMPONENT_CODE:
-				IsoCode componentCode = null;
 				if (!TextUtils.isEmpty(val)) {
-					componentCode = mDataCenter.getIsoCode(getApplicationContext(),
-							CJayConstant.PREFIX_COMPONENT_CODE,
-							val);
-				}
-				if (componentCode != null) {
-					mAuditItem.setComponentCodeId(componentCode.getId());
-					mAuditItem.setComponentCode(componentCode.getCode());
+					mDataCenter.getIsoCode(getApplicationContext(),
+                            CJayConstant.PREFIX_COMPONENT_CODE,
+                            val);
 				}
 
 				break;

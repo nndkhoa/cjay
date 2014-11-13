@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.IsoCode;
+import com.cloudjay.cjay.util.Logger;
 
 import org.w3c.dom.Text;
 
@@ -120,6 +121,8 @@ public class IsoCodeAdapter extends ArrayAdapter<IsoCode> implements Filterable 
                 add(data.get(i));
             }
         }
+
+        notifyDataSetChanged();
     }
 
     @Override
