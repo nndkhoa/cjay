@@ -93,6 +93,11 @@
 			android:name=".activity.BaseActivity_"
 			android:screenOrientation="portrait"></activity>
 
+        <activity
+            android:name=".activity.SettingActivity_"
+            android:label="@string/title_activity_settings"
+            android:screenOrientation="portrait"></activity>
+
 		<service android:name=".task.service.PubnubService_"/>
 		<service android:name=".task.service.SyncIntentService_"/>
 

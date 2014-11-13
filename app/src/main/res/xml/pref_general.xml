@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/pref_key_auto_check_update_checkbox"
+        android:summary="@string/pref_description_auto_check_update"
+        android:title="@string/pref_title_auto_check_update" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/pref_key_enable_logger_checkbox"
+        android:summary="@string/pref_description_enable_logger"
+        android:title="@string/pref_title_enable_logger" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/pref_key_enable_temporary_fragment_checkbox"
+        android:summary="@string/pref_description_rainy_mode"
+        android:title="@string/pref_title_rainy_mode" />
+
+    <Preference
+        android:key="notification_log"
+        android:summary="@string/pref_description_notification_log"
+        android:title="@string/pref_title_notification_log" >
+    </Preference>
+
+</PreferenceScreen>

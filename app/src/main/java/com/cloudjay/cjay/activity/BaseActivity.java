@@ -74,6 +74,12 @@ public class BaseActivity extends FragmentActivity {
 		startActivity(intent);
 	}
 
+    @OptionsItem(R.id.menu_setting)
+    void settingItemClicked() {
+        Intent intent = new Intent(getApplicationContext(), SettingActivity_.class);
+        startActivity(intent);
+    }
+
 	protected void showLogoutPrompt() {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
