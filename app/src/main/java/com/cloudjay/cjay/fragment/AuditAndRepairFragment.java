@@ -9,14 +9,18 @@ import android.widget.Button;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
+import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.task.job.UploadImportJob;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
@@ -110,6 +114,25 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			}
 
 			// PUT /api/cjay/containers/{pk}/complete-audit
+            if (mSession.getId() == 0) {
+
+                for (AuditItem auditItem : mSession.getAuditItems()) {
+                    if (auditItem.getId() == 0 && auditItem.isAudited()) {
+                        Logger.Log("Set upload confirmed for audit item: " + auditItem.toString());
+                        auditItem.setUploadConfirmed(true);
+                        DataCenter_.getInstance_(getActivity()).updateAuditItemInBackground(getActivity(),
+                                mSession.getContainerId(), auditItem);
+                    }
+                }
+            } else {
+                for (AuditItem auditItem : mSession.getAuditItems()) {
+                    // Add container session to upload queue
+                    JobManager jobManager = App.getJobManager();
+                    jobManager.addJobInBackground(new UploadAuditItemJob(mSession.getId(), auditItem,
+                            mSession.getContainerId()));
+                }
+            }
+
 			JobManager jobManager = App.getJobManager();
 			jobManager.addJobInBackground(new UploadImportJob(mSession));
 

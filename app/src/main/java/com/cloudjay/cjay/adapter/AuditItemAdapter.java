@@ -158,10 +158,11 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				holder.tvIssueStatus.setBackgroundColor(Color.parseColor("#9D9614"));
 			} else {
 				if (!auditItem.isAllowed()) {
-					holder.tvIssueStatus.setText("Cấm sửa");
+					holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_can_not_repair));
 					holder.tvIssueStatus.setBackgroundColor(Color.parseColor("#DF0101"));
 				} else {
 					holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_approved));
+                    holder.tvIssueStatus.setBackgroundColor(Color.parseColor("#008CC9"));
 				}
 			}
 

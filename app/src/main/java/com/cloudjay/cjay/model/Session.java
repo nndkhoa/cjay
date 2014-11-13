@@ -547,7 +547,7 @@ public class Session implements Serializable {
 				}
 
 				for (AuditItem item : auditItems) {
-					if (item.isAudited() == false || item.getUploadStatus() == UploadStatus.NONE.value)
+					if (item.isAudited() == false)
 						return false;
 				}
 
