@@ -171,7 +171,6 @@ public class IssueReportRepairFragment extends IssueReportFragment {
 
     @UiThread
     public void onEvent(IsoCodeGotEvent event) {
-        Logger.Log("event repairCode");
         IsoCode repairCode = event.getIsoCode();
 
         if (event.getPrefix().equals(CJayConstant.PREFIX_REPAIR_CODE)) {

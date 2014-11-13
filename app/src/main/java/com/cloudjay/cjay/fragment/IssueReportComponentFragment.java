@@ -165,7 +165,6 @@ public class IssueReportComponentFragment extends IssueReportFragment {
 
     @UiThread
     public void onEvent(IsoCodeGotEvent event) {
-        Logger.Log("event componentCode");
         IsoCode componentCode = event.getIsoCode();
         if (event.getPrefix().equals(CJayConstant.PREFIX_COMPONENT_CODE)) {
             if (componentCode != null) {

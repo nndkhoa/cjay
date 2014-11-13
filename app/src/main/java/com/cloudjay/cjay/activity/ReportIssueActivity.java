@@ -131,8 +131,6 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
     @UiThread
     public void onEvent(IsoCodeGotEvent event) {
-
-        Logger.Log("IsoCodeGotEvent");
         IsoCode isoCode = event.getIsoCode();
 
         if (isoCode == null) {
