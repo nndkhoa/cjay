@@ -1,7 +1,7 @@
 package com.cloudjay.cjay.activity;
 
-import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
@@ -30,11 +30,7 @@ public class SettingActivity extends PreferenceActivity {
         PREF_KEY_AUTO_CHECK_UPDATE = getString(R.string.pref_key_auto_check_update_checkbox);
         PREF_KEY_RAINY_MODE = getString(R.string.pref_key_enable_temporary_fragment_checkbox);
         PREF_KEY_ENABLE_LOGGER = getString(R.string.pref_key_enable_logger_checkbox);
-    }
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
         setupSimplePreferencesScreen();
     }
 
@@ -46,8 +42,7 @@ public class SettingActivity extends PreferenceActivity {
         bindPreferenceSummaryToValue(findPreference(PREF_KEY_RAINY_MODE));
         bindPreferenceSummaryToValue(findPreference(PREF_KEY_ENABLE_LOGGER));
 
-        Preference findPreference = findPreference("secret_log");
-
+        Preference findPreference = findPreference("notification_log");
 
         findPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 
@@ -63,12 +58,10 @@ public class SettingActivity extends PreferenceActivity {
 
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
-
             String key = preference.getKey();
             if (key.equals(PREF_KEY_ENABLE_LOGGER)) {
                 Logger.getInstance().setDebuggable((Boolean) value);
             }
-
             return true;
         }
     };
@@ -91,5 +84,10 @@ public class SettingActivity extends PreferenceActivity {
 
         // Trigger the listener immediately with the preference's current value.
         sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, newValue);
+    }
+
+    @Override
+    public SharedPreferences getSharedPreferences(String name, int mode) {
+        return super.getSharedPreferences(name, mode);
     }
 }

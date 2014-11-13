@@ -17,7 +17,7 @@
     <string name="pref_description_enable_logger">Cho phép hệ thống Log hoạt động</string>
     <string name="pref_title_rainy_mode">Enable Rainy Mode</string>
     <string name="pref_description_rainy_mode">Chế độ làm việc dưới trời mưa</string>
-    <string name="pref_title_notification_log">Open notification log</string>
+    <string name="pref_title_notification_log">Open Notification Log</string>
     <string name="pref_description_notification_log">Xem Notification log</string>
 
     <!--  -->

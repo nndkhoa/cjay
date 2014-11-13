@@ -175,7 +175,6 @@ public class IssueReportDamageFragment extends IssueReportFragment {
 
     @UiThread
     public void onEvent(IsoCodeGotEvent event) {
-        Logger.Log("event damageCode");
         IsoCode damageCode = event.getIsoCode();
 
         if (event.getPrefix().equals(CJayConstant.PREFIX_DAMAGE_CODE)) {
