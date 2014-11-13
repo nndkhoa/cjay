@@ -110,12 +110,8 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			}
 
 			// PUT /api/cjay/containers/{pk}/complete-audit
-			//TODO add cjobject to queue @Han
-			try {
-				dataCenter.addQueue(containerID, new CJayObject());
-			} catch (SnappydbException e) {
-				e.printStackTrace();
-			}
+			JobManager jobManager = App.getJobManager();
+			jobManager.addJobInBackground(new UploadImportJob(mSession));
 
 			// Hide this button
 			btnCompleteAudit.setVisibility(View.GONE);
@@ -148,12 +144,8 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 			// Add containerId to upload complete repair queue
 			// PUT /api/cjay/containers/{pk}/complete-repair
-			//TODO add cjobject to queue @Han
-			try {
-				dataCenter.addQueue(containerID, new CJayObject());
-			} catch (SnappydbException e) {
-				e.printStackTrace();
-			}
+			JobManager jobManager = App.getJobManager();
+			jobManager.addJobInBackground(new UploadImportJob(mSession));
 
 			// Navigate to HomeActivity
 			getActivity().finish();

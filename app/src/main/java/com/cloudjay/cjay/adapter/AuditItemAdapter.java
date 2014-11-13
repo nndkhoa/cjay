@@ -23,7 +23,6 @@ import com.cloudjay.cjay.activity.ReportIssueActivity_;
 import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
-import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.util.Logger;
@@ -211,12 +210,8 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 						DataCenter_.getInstance_(mContext).updateAuditItemInBackground(mContext, session.getContainerId(), auditItem);
 					} else {
 						//2. Add container session to upload queue
-						//TODO add cjobject to queue @Han
-						try {
-							DataCenter_.getInstance_(App.getInstance().getApplicationContext()).addQueue(session.getContainerId(), new CJayObject());
-						} catch (SnappydbException e) {
-							e.printStackTrace();
-						}
+						JobManager jobManager = App.getJobManager();
+						jobManager.addJobInBackground(new UploadAuditItemJob(session.getId(), auditItem,session.getContainerId()));
 					}
 				}
 			});
@@ -358,9 +353,9 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
-				// change status audit item to water wash
-				DataCenter_.getInstance_(mContext).setWaterWashType(mContext, item, session.getContainerId());
-				dialogInterface.dismiss();
+                // change status audit item to water wash
+                DataCenter_.getInstance_(mContext).setWaterWashType(mContext, item, session.getContainerId());
+                dialogInterface.dismiss();
 			}
 		});
 

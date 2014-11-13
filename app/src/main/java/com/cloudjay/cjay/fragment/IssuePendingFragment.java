@@ -116,13 +116,8 @@ public class IssuePendingFragment extends Fragment {
 		mSession.setLocalStep(Step.HAND_CLEAN.value);
 
 		// Add container session to upload queue
-		//TODO add cjobject to queue @Han
-		try {
-			dataCenter.addQueue(containerId, new CJayObject());
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-
+		JobManager jobManager = App.getJobManager();
+		jobManager.addJobInBackground(new UploadImportJob(mSession));
 		getActivity().finish();
 	}
 
