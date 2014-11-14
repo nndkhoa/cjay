@@ -6,26 +6,28 @@ public class CJayObject implements Serializable {
 
 	Class cls;
 	Object object;
+	long sessionId;
+	String containerId;
 
-	public int getContainerPriority() {
-		return containerPriority;
+	public int getQueuePriority() {
+		return queuePriority;
 	}
 
-	public void setContainerPriority(int containerPriority) {
-		this.containerPriority = containerPriority;
+	public void setQueuePriority(int queuePriority) {
+		this.queuePriority = queuePriority;
 	}
 
-	int containerPriority;
+	int queuePriority;
 
-	public int getcJayPriority() {
-		return cJayPriority;
+	public int getSessionPriority() {
+		return sessionPriority;
 	}
 
-	public void setcJayPriority(int cJayPriority) {
-		this.cJayPriority = cJayPriority;
+	public void setSessionPriority(int sessionPriority) {
+		this.sessionPriority = sessionPriority;
 	}
 
-	int cJayPriority;
+	int sessionPriority;
 
 	public CJayObject() {
 	}
@@ -37,8 +39,24 @@ public class CJayObject implements Serializable {
 	public CJayObject(Object obj, Class cls, int queuePriority, int sessionPriority) {
 		this.object = obj;
 		this.cls = cls;
-		this.containerPriority = queuePriority;
-		this.cJayPriority = sessionPriority;
+		this.queuePriority = queuePriority;
+		this.sessionPriority = sessionPriority;
+	}
+
+	public CJayObject(Object obj, Class cls, int queuePriority, int sessionPriority, long id) {
+		this.object = obj;
+		this.cls = cls;
+		this.queuePriority = queuePriority;
+		this.sessionPriority = sessionPriority;
+		this.sessionId = id;
+	}
+
+	public CJayObject(Object obj, Class cls, int queuePriority, int sessionPriority, String containerId) {
+		this.object = obj;
+		this.cls = cls;
+		this.queuePriority = queuePriority;
+		this.sessionPriority = sessionPriority;
+		this.containerId = containerId;
 	}
 
 	public GateImage getGateImage() {
@@ -48,7 +66,22 @@ public class CJayObject implements Serializable {
 		} else {
 			throw new IllegalStateException("This object is not a GateImage");
 		}
+	}
 
+	public long getSessionId() {
+		if (cls == AuditItem.class || object instanceof AuditItem) {
+			return sessionId;
+		} else {
+			throw new IllegalStateException("This object is not a AuditItem");
+		}
+	}
+
+	public String getContainerId() {
+		if (cls == GateImage.class || object instanceof GateImage) {
+			return containerId;
+		} else {
+			throw new IllegalStateException("This object is not a GateImage");
+		}
 	}
 
 	public AuditImage getAuditImage() {
