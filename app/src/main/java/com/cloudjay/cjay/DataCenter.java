@@ -1720,6 +1720,7 @@ public class DataCenter {
 	//endregion
 
 	//region CJAY OBJECT
+
 	/**
 	 * Add Queue to line
 	 * <p/>
@@ -1977,27 +1978,32 @@ public class DataCenter {
 		DB db = App.getDB(context);
 		CJayObject object = null;
 		// Find key
-		boolean isExsitContainerLine =  isExistLine(" ",CJayConstant.PREFIX_CONTAINER_PRIORITY);
-		if (isExsitContainerLine){
+		boolean isExsitContainerLine = isExistLine(" ", CJayConstant.PREFIX_CONTAINER_PRIORITY);
+		if (isExsitContainerLine) {
 			String[] containersOnLine = db.findKeys(CJayConstant.PREFIX_CONTAINER_PRIORITY);
-			int minPriority = getPriority(containersOnLine,CJayConstant.PREFIX_CONTAINER_PRIORITY,false);
-			String firstContainerIdOnLine = db.get(CJayConstant.PREFIX_CONTAINER_PRIORITY+minPriority);
-			String keyOfFirstObject = CJayConstant.PREFIX_CJAY_PRIORITY+firstContainerIdOnLine+":"+1;
+			int minPriority = getPriority(containersOnLine, CJayConstant.PREFIX_CONTAINER_PRIORITY, false);
+			String firstContainerIdOnLine = db.get(CJayConstant.PREFIX_CONTAINER_PRIORITY + minPriority);
+			String keyOfFirstObject = CJayConstant.PREFIX_CJAY_PRIORITY + firstContainerIdOnLine + ":" + 1;
 			object = db.getObject(keyOfFirstObject, CJayObject.class);
 		}
 
 		// Add Job in background
 		JobManager jobManager = App.getJobManager();
 
-		if (object != null){
-		Class cls = object.getCls();
-			if (cls == Session.class){
+		if (object != null) {
+			Class cls = object.getCls();
+			if (cls == Session.class) {
 				jobManager.addJobInBackground(new UploadImportJob(object.getSession()));
-			} else if (cls == AuditItem.class){
-				jobManager.addJobInBackground(new UploadAuditItemJob();
-			} else if (cls == GateImage.class){
-				GateImage  gateImage = object.getGateImage();
-				jobManager.addJobInBackground(new UploadImageJob(gateImage.getUri(), gateImage.getName(),gateImage.));
+			} else if (cls == AuditItem.class) {
+				jobManager.addJobInBackground(new UploadAuditItemJob(object.getSessionId(), object.getAuditItem(), object.getContainerId()));
+			} else if (cls == GateImage.class) {
+				GateImage gateImage = object.getGateImage();
+				ImageType type = ImageType.values()[((int) gateImage.getType())];
+				jobManager.addJobInBackground(new UploadImageJob(gateImage.getUri(), gateImage.getName(), object.getContainerId(), type));
+			} else if (cls == AuditImage.class) {
+				AuditImage auditImage = object.getAuditImage();
+				ImageType type = ImageType.values()[((int) auditImage.getType())];
+				jobManager.addJobInBackground(new UploadImageJob(auditImage.getUri(), auditImage.getName(), object.getContainerId(), type));
 			}
 		}
 

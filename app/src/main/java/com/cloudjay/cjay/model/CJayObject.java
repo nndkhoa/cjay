@@ -13,25 +13,25 @@ public class CJayObject implements Serializable {
 	long sessionId;
 	String containerId;
 
-	public int getQueuePriority() {
-		return queuePriority;
+	public int getContainerPriority() {
+		return containerPriority;
 	}
 
-	public void setQueuePriority(int queuePriority) {
-		this.queuePriority = queuePriority;
+	public void setContainerPriority(int containerPriority) {
+		this.containerPriority = containerPriority;
 	}
 
-	int queuePriority;
+	int containerPriority;
 
-	public int getSessionPriority() {
-		return sessionPriority;
+	public int getcJayPriority() {
+		return cJayPriority;
 	}
 
-	public void setSessionPriority(int sessionPriority) {
-		this.sessionPriority = sessionPriority;
+	public void setcJayPriority(int cJayPriority) {
+		this.cJayPriority = cJayPriority;
 	}
 
-	int sessionPriority;
+	int cJayPriority;
 
 	public CJayObject() {
 	}
@@ -43,23 +43,23 @@ public class CJayObject implements Serializable {
 	public CJayObject(Object obj, Class cls, int queuePriority, int sessionPriority) {
 		this.object = obj;
 		this.cls = cls;
-		this.queuePriority = queuePriority;
-		this.sessionPriority = sessionPriority;
+		this.containerPriority = queuePriority;
+		this.cJayPriority = sessionPriority;
 	}
 
 	public CJayObject(Object obj, Class cls, int queuePriority, int sessionPriority, long id) {
 		this.object = obj;
 		this.cls = cls;
-		this.queuePriority = queuePriority;
-		this.sessionPriority = sessionPriority;
+		this.containerPriority = queuePriority;
+		this.cJayPriority = sessionPriority;
 		this.sessionId = id;
 	}
 
 	public CJayObject(Object obj, Class cls, int queuePriority, int sessionPriority, String containerId) {
 		this.object = obj;
 		this.cls = cls;
-		this.queuePriority = queuePriority;
-		this.sessionPriority = sessionPriority;
+		this.containerPriority = queuePriority;
+		this.cJayPriority = sessionPriority;
 		this.containerId = containerId;
 	}
 
