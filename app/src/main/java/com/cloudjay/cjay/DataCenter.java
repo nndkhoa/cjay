@@ -1717,6 +1717,7 @@ public class DataCenter {
 
 	//endregion
 
+	//region CJAY OBJECT
 	/**
 	 * Add Queue to line
 	 * <p/>
@@ -1728,19 +1729,19 @@ public class DataCenter {
 	 * @param object
 	 * @throws SnappydbException
 	 */
-	public void addCJayObj(String containerId, CJayObject object) throws SnappydbException {
+	public void addCJayObject(String containerId, CJayObject object) throws SnappydbException {
 
 		boolean isExistContainerLine = isExistLine(containerId, CJayConstant.PREFIX_CJAY_PRIORITY);
 		boolean isExistQueueLine = isExistLine(containerId, CJayConstant.PREFIX_CONTAINER_PRIORITY);
 
 		if (isExistContainerLine) {
-			addCJayObjToContainterLine(containerId, object, true);
+			addCJayObjToContainerLine(containerId, object, true);
 		} else {
 			if (isExistQueueLine) {
-				addCJayObjToContainterLine(containerId, object, false);
+				addCJayObjToContainerLine(containerId, object, false);
 				addContainerToQueueLine(containerId, object, true);
 			} else {
-				addCJayObjToContainterLine(containerId, object, false);
+				addCJayObjToContainerLine(containerId, object, false);
 				addContainerToQueueLine(containerId, object, false);
 			}
 		}
@@ -1755,6 +1756,7 @@ public class DataCenter {
 	 * @throws SnappydbException
 	 */
 	private boolean isExistLine(String containerId, String TypeOfLine) throws SnappydbException {
+
 		DB db = App.getDB(context);
 		if (TypeOfLine.equals(CJayConstant.PREFIX_CJAY_PRIORITY)) {
 			String keytoFind = CJayConstant.PREFIX_CJAY_PRIORITY + containerId + ":";
@@ -1809,7 +1811,7 @@ public class DataCenter {
 	 * @param toExistLine
 	 * @throws SnappydbException
 	 */
-	private void addCJayObjToContainterLine(String containerId, CJayObject object, boolean toExistLine) throws SnappydbException {
+	private void addCJayObjToContainerLine(String containerId, CJayObject object, boolean toExistLine) throws SnappydbException {
 
 
 		DB db = App.getDB(context);
@@ -1849,7 +1851,7 @@ public class DataCenter {
 	 * @return
 	 * @throws SnappydbException
 	 */
-	public CJayObject getNextCJay(String containerId, CJayObject oldObject) throws SnappydbException {
+	public CJayObject getNextCJayObject(String containerId, CJayObject oldObject) throws SnappydbException {
 		DB db = App.getDB(context);
 
 		int nextCJayPriority = oldObject.getcJayPriority() + 1;
@@ -1857,16 +1859,16 @@ public class DataCenter {
 
 		String keyFindNextCJay = CJayConstant.PREFIX_CJAY_PRIORITY + containerId + ":" + nextCJayPriority;
 
-		boolean isExistNextCJay = isExistNext(containerId,oldObject,CJayConstant.PREFIX_CJAY_PRIORITY);
-		boolean isExistNextContainer = isExistNext(containerId,oldObject,CJayConstant.PREFIX_CONTAINER_PRIORITY);
+		boolean isExistNextCJay = isExistNext(containerId, oldObject, CJayConstant.PREFIX_CJAY_PRIORITY);
+		boolean isExistNextContainer = isExistNext(containerId, oldObject, CJayConstant.PREFIX_CONTAINER_PRIORITY);
 
 		if (isExistNextCJay) {
 			CJayObject nextJob = db.getObject(keyFindNextCJay, CJayObject.class);
 			return nextJob;
 		} else {
 			if (isExistNextContainer) {
-				String nextContainerId = db.get(CJayConstant.PREFIX_CONTAINER_PRIORITY +nextContainerPriority);
-				String keyFindNextCJayOfNextContainer = CJayConstant.PREFIX_CJAY_PRIORITY + nextContainerId+":" + 1;
+				String nextContainerId = db.get(CJayConstant.PREFIX_CONTAINER_PRIORITY + nextContainerPriority);
+				String keyFindNextCJayOfNextContainer = CJayConstant.PREFIX_CJAY_PRIORITY + nextContainerId + ":" + 1;
 				CJayObject nextJob = db.getObject(keyFindNextCJayOfNextContainer, CJayObject.class);
 				return nextJob;
 			} else {
@@ -1877,13 +1879,15 @@ public class DataCenter {
 
 	/**
 	 * Check if exist next item of line
+	 *
 	 * @param containerId
 	 * @param oldObject
 	 * @param typOfLine
 	 * @return
 	 * @throws SnappydbException
 	 */
-	private boolean isExistNext(String containerId, CJayObject oldObject , String typOfLine) throws SnappydbException {
+	private boolean isExistNext(String containerId, CJayObject oldObject, String typOfLine) throws SnappydbException {
+
 		int nextCJayPriority = oldObject.getcJayPriority() + 1;
 		int nextContainerPriority = oldObject.getContainerPriority() + 1;
 
@@ -1928,18 +1932,16 @@ public class DataCenter {
 		String keytoDelete = CJayConstant.PREFIX_CJAY_PRIORITY + containerId + ":" + sessionPriority;
 		db.del(keytoDelete);
 
-		boolean isExitNextCjay = isExistNext(containerId,object,CJayConstant.PREFIX_CJAY_PRIORITY);
+		boolean isExitNextCjay = isExistNext(containerId, object, CJayConstant.PREFIX_CJAY_PRIORITY);
 
 		if (isExitNextCjay) {
 			String keyDeleteQueuePriority = CJayConstant.PREFIX_CONTAINER_PRIORITY + containerPriority;
 			db.del(keyDeleteQueuePriority);
 		}
-
-
 	}
 
 	/**
-	 * Get current priority base on String[] reuslt search and key to search
+	 * Get current priority base on String[] result search and key to search
 	 * False for min priority
 	 * True for max priority
 	 *
@@ -1948,6 +1950,7 @@ public class DataCenter {
 	 * @return
 	 */
 	private int getPriority(String[] priorityString, String keyToGetInt, boolean max) {
+
 		ArrayList<Integer> priorityList = new ArrayList<Integer>();
 		for (String key : priorityString) {
 			int lenghtString = (keyToGetInt).length();
@@ -1955,12 +1958,24 @@ public class DataCenter {
 			int priorityNumer = Integer.valueOf(priority);
 			priorityList.add(priorityNumer);
 		}
+
 		int maxPriority = Collections.max(priorityList);
 		int minPriority = Collections.min(priorityList);
+
 		if (max) {
 			return maxPriority;
 		} else {
 			return minPriority;
 		}
+	}
+	//endregion
+
+	@Background(serial = CACHE)
+	public void startJobQueue(Context context) {
+
+		// Find key
+
+		// Add Job in background
+
 	}
 }

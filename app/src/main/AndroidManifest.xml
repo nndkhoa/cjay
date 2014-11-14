@@ -96,6 +96,7 @@
 
 		<service android:name=".task.service.PubnubService_"/>
 		<service android:name=".task.service.SyncIntentService_"/>
+		<service android:name=".task.service.UploadIntentService_"/>
 
 		<receiver android:name=".task.receiver.AutoStartReceiver_">
 			<intent-filter>
