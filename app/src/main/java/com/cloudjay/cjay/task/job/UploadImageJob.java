@@ -76,7 +76,7 @@ public class UploadImageJob extends Job {
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).changeImageUploadStatus(context, containerId, imageName, imageType, UploadStatus.ERROR);
 		EventBus.getDefault().post(new UploadStoppedEvent(containerId));
-		DataCenter_.getInstance_(context).addLog(context, containerId, "Không thể tải lên hình: " + imageName);
+		DataCenter_.getInstance_(context).addLog(context, containerId, "Không thể tải lên hình: " + imageName,CJayConstant.PREFIX_LOG);
 
 	}
 

@@ -13,12 +13,14 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.LogAdapter;
 import com.cloudjay.cjay.model.LogItem;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
@@ -27,6 +29,11 @@ import java.util.List;
 
 @EActivity(R.layout.activity_log)
 public class LogActivity extends Activity {
+
+	public final static String LOG_TYPE_EXTRA = "com.cloudjay.wizard.Log";
+
+	@Extra(LOG_TYPE_EXTRA)
+	String LogType;
 
 	@ViewById(R.id.lv_log)
 	ListView lvLog;
@@ -72,13 +79,13 @@ public class LogActivity extends Activity {
 	}
 
 	private void searchLog(String key) {
-		List<LogItem> list = dataCenter.searchLog(this.getApplicationContext(), key);
+		List<LogItem> list = dataCenter.searchLog(this.getApplicationContext(), LogType + key);
 		updatedData(list);
 	}
 
 	void refresh() {
 		List<LogItem> list = dataCenter.getListLogItems(this.getApplicationContext(),
-				CJayConstant.PREFIX_LOG);
+				LogType);
 		updatedData(list);
 	}
 

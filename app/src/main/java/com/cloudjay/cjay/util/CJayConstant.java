@@ -25,6 +25,7 @@ public class CJayConstant {
 	public static final String PREFIX_REPAIR_CODE = "REPAIR";
 	public static final String PREFIX_COMPONENT_CODE = "COMPONENT";
 	public static final String PREFIX_LOG = "LOG";
+	public static final String PREFIX_NOTIFI_LOG = "NOTIFI_LOG";
 
 	// `/sdcard/DCMI/CJay/`
 	public static final File APP_DIRECTORY_FILE = new File(
@@ -53,4 +54,5 @@ public class CJayConstant {
 	public static final String SUBSCRIBE_KEY = "sub-c-fe158864-9fcf-11e3-a937-02ee2ddab7fe";
 	public static final String QUEUE_PRIORITY = "QUEUE_PRIORITY:";
 	public static final String SESSION_PRIORITY = "SESSION_PRIORITY";
+
 }
