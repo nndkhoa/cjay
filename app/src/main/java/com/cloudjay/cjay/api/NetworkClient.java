@@ -319,12 +319,21 @@ public class NetworkClient {
 	 * @param auditItem
 	 * @return
 	 */
-	public AuditItem addAuditImage(Context context, Session session, AuditItem auditItem) {
+	public AuditItem addAuditImage(Context context, AuditItem auditItem) {
+
 
 		String uuid = auditItem.getUuid();
-		AuditItem result = provider.getRestAdapter(context).create(NetworkService.class).addAuditImages(String.valueOf(auditItem.getId()), auditItem.getAuditImagesToUpLoad());
-		result.setUuid(uuid);
-		return result;
+        JsonObject addedAuditImagesToUpload = auditItem.getAddedAuditImagesToUpload();
+
+        Logger.Log("auditItemId: " + auditItem.getId());
+        Logger.Log("audit_images: " + addedAuditImagesToUpload.toString());
+
+        if (!addedAuditImagesToUpload.isJsonNull()) {
+            AuditItem result = provider.getRestAdapter(context).create(NetworkService.class).addAuditImages(String.valueOf(auditItem.getId()), addedAuditImagesToUpload);
+            result.setUuid(uuid);
+            return result;
+        }
+        return null;
 	}
 
 	/**

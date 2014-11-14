@@ -9,6 +9,7 @@ import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
+import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -16,6 +17,8 @@ import com.cloudjay.cjay.util.Priority;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
+
+import java.util.List;
 
 import de.greenrobot.event.EventBus;
 import retrofit.RetrofitError;
@@ -25,17 +28,20 @@ public class UploadAuditItemJob extends Job {
 	long sessionId;
 	AuditItem auditItem;
     String containerId;
+    boolean addMoreImages;
 
 	@Override
 	public int getRetryLimit() {
 		return CJayConstant.RETRY_THRESHOLD;
 	}
 
-	public UploadAuditItemJob(long sessionId, AuditItem auditItem, String containerId) {
+	public UploadAuditItemJob(long sessionId, AuditItem auditItem, String containerId,
+                              boolean addMoreImages) {
 		super(new Params(Priority.MID).requireNetwork().persist().groupBy(containerId).setPersistent(true));
 		this.sessionId = sessionId;
 		this.auditItem = auditItem;
         this.containerId = containerId;
+        this.addMoreImages = addMoreImages;
 	}
 
 	@Override
@@ -54,7 +60,11 @@ public class UploadAuditItemJob extends Job {
 		dataCenter.addLog(context, containerId, "Bắt đầu upload audit item: " + auditItem.getUuid(),CJayConstant.PREFIX_LOG);
 		EventBus.getDefault().post(new UploadingEvent(containerId, UploadType.AUDIT_ITEM));
 
-		dataCenter.uploadAuditItem(context, containerId, sessionId, auditItem);
+        if (!this.addMoreImages) {
+            dataCenter.uploadAuditItem(context, containerId, sessionId, auditItem);
+        } else {
+            dataCenter.uploadAddedAuditImage(context, containerId, auditItem);
+        }
 	}
 
 	@Override

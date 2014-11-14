@@ -7,6 +7,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
@@ -17,10 +18,12 @@ import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
+import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
@@ -31,6 +34,7 @@ import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -99,6 +103,13 @@ public class BeforeRepairFragment extends Fragment {
         auditItem = event.getAuditItem();
 
 		if (auditItem != null) {
+            //TODO: remove comand when server has been tested
+//            if (auditItem.getId() != 0) {
+//                // Add image to job queue
+//                JobManager jobManager = App.getJobManager();
+//                jobManager.addJobInBackground(new UploadAuditItemJob(auditItem.getSession(),
+//                        auditItem, containerID, true));
+//            }
 
 			// parse Data to view
 			tvCompCode.setText(auditItem.getComponentCode());
@@ -176,7 +187,6 @@ public class BeforeRepairFragment extends Fragment {
 
 		// Requery audit item by uuid to update listview
 		dataCenter.getAuditItemInBackground(getActivity().getApplicationContext(),
-
                 containerID, auditItemUUID);
 
 		refreshListImage();

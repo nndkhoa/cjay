@@ -129,7 +129,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
                     // Add container session to upload queue
                     JobManager jobManager = App.getJobManager();
                     jobManager.addJobInBackground(new UploadAuditItemJob(mSession.getId(), auditItem,
-                            mSession.getContainerId()));
+                            mSession.getContainerId(), false));
                 }
             }
 
