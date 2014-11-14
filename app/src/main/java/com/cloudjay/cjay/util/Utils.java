@@ -488,7 +488,12 @@ public class Utils {
 		editText.setFilters(new InputFilter[]{isLetterAndDigitFilter, validCharacterFilter});
 
 		// Set keyboard type
-		editText.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+		if (editText.getText().toString().length() > 4) {
+			editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+		} else {
+			editText.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+		}
+
 		editText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -496,6 +501,7 @@ public class Utils {
 
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
 				Matcher matcher = pattern.matcher(s);
 				if (s.length() < 4) {
 					if (editText.getInputType() != InputType.TYPE_CLASS_TEXT) {
