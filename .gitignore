@@ -17,14 +17,11 @@ proguard/
 *.ipr
 *.iws
 .idea/
-
-#
 /.apt_generated
 realm_version_check.timestamp
 app/src/main/res/values/com_crashlytics_export_strings.xml
 /jobqueue/build
 app/src/main/assets/crashlytics-build.properties
-
-#
 /keystore
 /release
+app/version.properties

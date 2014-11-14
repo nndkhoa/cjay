@@ -4,6 +4,10 @@ import java.io.Serializable;
 
 public class CJayObject implements Serializable {
 
+	public Class getCls() {
+		return cls;
+	}
+
 	Class cls;
 	Object object;
 

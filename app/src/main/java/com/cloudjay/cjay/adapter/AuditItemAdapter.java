@@ -211,7 +211,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 						//2. Add container session to upload queue
 						//TODO add cjobject to queue @Han
 						try {
-							DataCenter_.getInstance_(App.getInstance().getApplicationContext()).addCJayObj(session.getContainerId(), new CJayObject());
+							DataCenter_.getInstance_(App.getInstance().getApplicationContext()).addCJayObject(session.getContainerId(), new CJayObject());
 						} catch (SnappydbException e) {
 							e.printStackTrace();
 						}

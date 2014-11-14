@@ -115,7 +115,7 @@ public class IssuePendingFragment extends Fragment {
 		// Add container session to upload queue
 		//TODO add cjobject to queue @Han
 		try {
-			dataCenter.addCJayObj(containerId, new CJayObject());
+			dataCenter.addCJayObject(containerId, new CJayObject());
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}

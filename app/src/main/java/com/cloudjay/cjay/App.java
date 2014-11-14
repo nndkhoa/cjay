@@ -1,12 +1,14 @@
 package com.cloudjay.cjay;
 
 import android.app.Application;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.cloudjay.cjay.task.service.PubnubService_;
+import com.cloudjay.cjay.task.service.SyncIntentService_;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringUtils;
@@ -203,6 +205,7 @@ public class App extends Application {
 
 		jobManager = new JobManager(this, configuration);
 	}
+
 
 	private static JobManager jobManager;
 

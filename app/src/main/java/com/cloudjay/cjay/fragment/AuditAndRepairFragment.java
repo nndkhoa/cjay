@@ -145,7 +145,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			// PUT /api/cjay/containers/{pk}/complete-repair
 			//TODO add cjobject to queue @Han
 			try {
-				dataCenter.addCJayObj(containerID, new CJayObject());
+				dataCenter.addCJayObject(containerID, new CJayObject());
 			} catch (SnappydbException e) {
 				e.printStackTrace();
 			}

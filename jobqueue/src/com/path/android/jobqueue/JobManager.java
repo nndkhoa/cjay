@@ -34,6 +34,11 @@ public class JobManager implements NetworkEventProvider.Listener {
 	
 	@SuppressWarnings("FieldCanBeLocal")//used for testing
 	private final long sessionId;
+
+	public boolean isRunning() {
+		return running;
+	}
+
 	private boolean running;
 
 	private final Context appContext;
@@ -74,6 +79,7 @@ public class JobManager implements NetworkEventProvider.Listener {
 	 * @param config
 	 */
 	public JobManager(Context context, Configuration config) {
+
 		if (config.getCustomLogger() != null) {
 			JqLog.setCustomLogger(config.getCustomLogger());
 		}
@@ -95,6 +101,7 @@ public class JobManager implements NetworkEventProvider.Listener {
 		jobConsumerExecutor = new JobConsumerExecutor(config, consumerContract);
 		timedExecutor = Executors.newSingleThreadScheduledExecutor();
 		start();
+
 	}
 
 

@@ -26,6 +26,9 @@ public class CJayConstant {
 	public static final String PREFIX_COMPONENT_CODE = "COMPONENT";
 	public static final String PREFIX_LOG = "LOG";
 
+	public static final String PREFIX_CONTAINER_PRIORITY = "PREFIX_CONTAINER_PRIORITY:";
+	public static final String PREFIX_CJAY_PRIORITY = "PREFIX_CJAY_PRIORITY";
+
 	// `/sdcard/DCMI/CJay/`
 	public static final File APP_DIRECTORY_FILE = new File(
 			Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
@@ -40,8 +43,11 @@ public class CJayConstant {
 	public static final String LOG_TO_FILE_FORMAT = "[%s]	-	%s\n";
 
 
-	public static final int ALARM_QUEUE_ID = 49482;
-	public static final int ALARM_PUBNUB_ID = 43452;
+	public static final int ALARM_SYNC_SERVICE_ID = 49482;
+	public static final int ALARM_PUBNUB_SERVICE_ID = 43452;
+	public static final int ALARM_UPLOAD_SERVICE_ID = 62368;
+
+
 	public static final int ALARM_INTERVAL = 12 * 3600;
 	public static final int NOTIFICATION_ID = 98234;
 	public static final int PERMANENT_NOTIFICATION_ID = 1639;
@@ -51,6 +57,4 @@ public class CJayConstant {
 	// Pubnub
 	public static final String PUBLISH_KEY = "pub-c-d4a2608d-f440-4ebf-a09a-dd8a570428cd";
 	public static final String SUBSCRIBE_KEY = "sub-c-fe158864-9fcf-11e3-a937-02ee2ddab7fe";
-	public static final String PREFIX_CONTAINER_PRIORITY = "PREFIX_CONTAINER_PRIORITY:";
-	public static final String PREFIX_CJAY_PRIORITY = "PREFIX_CJAY_PRIORITY";
 }
