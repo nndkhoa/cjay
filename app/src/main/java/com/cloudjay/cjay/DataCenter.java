@@ -1232,6 +1232,22 @@ public class DataCenter {
 
 	}
 
+    /**
+     * Upload audit images of uploaded audit item to server
+     * 1. Get audit item based on uuid
+     * 2. Get id of audit item and list images to upload
+     * 3. Upload to server
+     * 4. Assign uuid to response audit item
+     * 5. Replace result with local audit item in container session
+     * @param context
+     * @param containerId
+     * @param auditItem
+     */
+    public void uploadAddedAuditImage(Context context, String containerId, AuditItem auditItem) {
+        AuditItem result = networkClient.addAuditImage(context, auditItem);
+        saveUploadAuditItemSession(context, result, UploadType.AUDIT_ITEM, containerId);
+    }
+
 	@Background(serial = CACHE)
 	public void saveUploadAuditItemSession(Context context, AuditItem result, UploadType type, String containerId) {
 		DB db = null;
@@ -1282,7 +1298,7 @@ public class DataCenter {
 					if (item.isUploadConfirmed()) {
 						Logger.Log("Add audit item to jobqueue: " + item.toString());
 						JobManager jobManager = App.getJobManager();
-						jobManager.addJobInBackground(new UploadAuditItemJob(session.getId(), item, session.getContainerId()));
+						jobManager.addJobInBackground(new UploadAuditItemJob(session.getId(), item, session.getContainerId(), false));
 					}
 				}
 			}

@@ -70,7 +70,7 @@ public interface NetworkService {
 	public AuditItem postAudiItem(@Path("id") long containerPk, @Body JsonObject audit_item);
 
 	@PUT(ApiEndpoint.CONTAINER_SESSION_ADD_AUDIT_IMAGES_API)
-	public AuditItem addAuditImages(@Path("id") String auditId, @Body JsonArray auditImages);
+	public AuditItem addAuditImages(@Path("id") String auditId, @Body JsonObject audit_images);
 
 	@PUT(ApiEndpoint.CONTAINER_SESSION_HAND_CLEANING)
 	public Session setHandCleaningSession(@Path("id") long containerPk);

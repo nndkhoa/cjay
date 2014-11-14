@@ -22,9 +22,12 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
+import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
+import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.task.job.UploadImageJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -47,6 +50,7 @@ import org.androidannotations.annotations.ViewById;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -132,6 +136,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
     @Click(R.id.btn_camera_done)
     void btnDoneClicked() {
+        // Post an event
         EventBus.getDefault().post(new ImageCapturedEvent(containerId, mType, auditItemUUID, isOpened));
         getActivity().finish();
     }
@@ -302,7 +307,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
         }
     }
 
-
     /**
      * CameraHost is the interface use to configure behavior of camera ~ setting.
      */
@@ -406,8 +410,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
             // Add image to job queue
 	        JobManager jobManager = App.getJobManager();
 	        jobManager.addJobInBackground(new UploadImageJob(uri, imageName, containerId, type));
-
-
         }
 
         /**
