@@ -34,7 +34,6 @@ import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -99,17 +98,23 @@ public class BeforeRepairFragment extends Fragment {
 
 	@UiThread
 	public void onEvent(AuditItemGotEvent event) {
+        Logger.Log("AuditItemGotEvent");
 
         auditItem = event.getAuditItem();
 
 		if (auditItem != null) {
-            //TODO: remove comand when server has been tested
-//            if (auditItem.getId() != 0) {
-//                // Add image to job queue
-//                JobManager jobManager = App.getJobManager();
-//                jobManager.addJobInBackground(new UploadAuditItemJob(auditItem.getSession(),
-//                        auditItem, containerID, true));
-//            }
+            if (auditItem.getId() != 0) {
+                for (AuditImage image : auditItem.getAuditImages()) {
+                    if (image.getId() == 0 && image.getType() == ImageType.AUDIT.value) {
+                        Logger.Log("has image to upload");
+                        // Add image to job queue
+                        JobManager jobManager = App.getJobManager();
+                        jobManager.addJobInBackground(new UploadAuditItemJob(auditItem.getSession(),
+                                auditItem, containerID, true));
+                        break;
+                    }
+                }
+            }
 
 			// parse Data to view
 			tvCompCode.setText(auditItem.getComponentCode());
@@ -127,25 +132,27 @@ public class BeforeRepairFragment extends Fragment {
 
 	@UiThread
 	public void onEvent(ContainerGotEvent event) {
-
 		// get container operator code form containerId
 		mSession = event.getSession();
 		if (null == mSession) {
 			Utils.showCrouton(getActivity(), "Không tìm thấy container trong dữ liệu");
 		} else {
+            Logger.Log("getSession");
 			operatorCode = mSession.getOperatorCode();
+            dataCenter.getAuditItemInBackground(getActivity(), containerID, auditItemUUID, false);
 		}
-
-		dataCenter.getAuditItemInBackground(getActivity(), containerID, auditItemUUID);
 	}
 
 	@AfterViews
 	void setup() {
-		dataCenter.getSessionInBackground(getActivity(), containerID);
+        if (null == mSession) {
+            Logger.Log("get Session");
+            dataCenter.getSessionInBackground(getActivity(), containerID);
 
-        imageAdapter = new DetailIssuedImageAdapter(
-                getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.AUDIT);
-        lvImage.setAdapter(imageAdapter);
+            imageAdapter = new DetailIssuedImageAdapter(
+                    getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.AUDIT);
+            lvImage.setAdapter(imageAdapter);
+        }
 	}
 
 	@Click(R.id.btn_camera_repaired)
@@ -183,13 +190,15 @@ public class BeforeRepairFragment extends Fragment {
 
 	@UiThread
 	void onEvent(ImageCapturedEvent event) {
-		Logger.Log("on ImageCapturedEvent");
+        Logger.Log("on ImageCapturedEvenImageimagecaCt");
+		if (event.getImageType() == ImageType.AUDIT.value) {
 
-		// Requery audit item by uuid to update listview
-		dataCenter.getAuditItemInBackground(getActivity().getApplicationContext(),
-                containerID, auditItemUUID);
+            // Requery audit item by uuid to update listview
+            dataCenter.getAuditItemInBackground(getActivity().getApplicationContext(),
+                    containerID, auditItemUUID, false);
 
-		refreshListImage();
+            refreshListImage();
+        }
 	}
 
 	@Override

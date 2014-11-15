@@ -496,7 +496,7 @@ public class DataCenter {
 
 	@Background(serial = CACHE)
 	public void getSessionInBackground(Context context, String containerId) {
-
+        Logger.Log("getSessionInBackground");
 		try {
 			DB db = App.getDB(context);
 			String key = containerId;
@@ -1519,6 +1519,7 @@ public class DataCenter {
 
 	@Background(serial = CACHE)
 	public void updateAuditItemInBackground(Context context, String containerId, AuditItem auditItem) {
+        Logger.Log("updateAuditItemInBackground");
 		try {
 			// find session
 			DB db = App.getDB(context);
@@ -1721,13 +1722,15 @@ public class DataCenter {
 	 * @param itemUuid
 	 */
 	@Background(serial = CACHE)
-	public void getAuditItemInBackground(Context context, String containerId, String itemUuid) {
+	public void getAuditItemInBackground(Context context, String containerId, String itemUuid,
+                                         boolean cameraMode) {
+        Logger.Log("getAuditItemInBackground");
 		try {
 			DB db = App.getDB(context);
 			Session session = db.getObject(containerId, Session.class);
 			if (session != null) {
 				AuditItem auditItem = session.getAuditItem(itemUuid);
-				EventBus.getDefault().post(new AuditItemGotEvent(auditItem));
+				EventBus.getDefault().post(new AuditItemGotEvent(auditItem, cameraMode));
 			}
 
 		} catch (SnappydbException e) {

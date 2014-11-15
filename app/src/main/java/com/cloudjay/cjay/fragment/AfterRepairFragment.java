@@ -96,8 +96,10 @@ public class AfterRepairFragment extends Fragment {
 
 	@AfterViews
 	void setup() {
-		dataCenter.getSessionInBackground(getActivity(), containerID);
-	}
+        if (null == mSession) {
+            dataCenter.getSessionInBackground(getActivity(), containerID);
+        }
+    }
 
 	@UiThread
 	public void onEvent(ContainerGotEvent event) {
@@ -111,7 +113,7 @@ public class AfterRepairFragment extends Fragment {
 		}
 
         // Get audit item in background and post an event
-        dataCenter.getAuditItemInBackground(getActivity(), containerID, auditItemUUID);
+        dataCenter.getAuditItemInBackground(getActivity(), containerID, auditItemUUID, false);
 
 		imageAdapter = new DetailIssuedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.REPAIRED);
 		lvImage.setAdapter(imageAdapter);
@@ -168,12 +170,13 @@ public class AfterRepairFragment extends Fragment {
 
 	@UiThread
 	void onEvent(ImageCapturedEvent event) {
-		Logger.Log("on ImageCapturedEvent");
-
-		// Requery audit item by uuid to update listview
-		dataCenter.getAuditItemInBackground(getActivity().getApplicationContext(),
-				containerID, auditItemUUID);
-		refreshListImage();
+        if (event.getImageType() == ImageType.REPAIRED.value) {
+            Logger.Log("on ImageCapturedEvent");
+            // Requery audit item by uuid to update listview
+            dataCenter.getAuditItemInBackground(getActivity().getApplicationContext(),
+                    containerID, auditItemUUID, false);
+            refreshListImage();
+        }
 	}
 
     @UiThread

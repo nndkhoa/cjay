@@ -13,6 +13,7 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Priority;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
@@ -61,8 +62,10 @@ public class UploadAuditItemJob extends Job {
 		EventBus.getDefault().post(new UploadingEvent(containerId, UploadType.AUDIT_ITEM));
 
         if (!this.addMoreImages) {
+            Logger.Log("uploadAddedAuditImage");
             dataCenter.uploadAuditItem(context, containerId, sessionId, auditItem);
         } else {
+            Logger.Log("uploadAddedAuditImage");
             dataCenter.uploadAddedAuditImage(context, containerId, auditItem);
         }
 	}
