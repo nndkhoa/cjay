@@ -325,9 +325,6 @@ public class NetworkClient {
 		String uuid = auditItem.getUuid();
         JsonObject addedAuditImagesToUpload = auditItem.getAddedAuditImagesToUpload();
 
-        Logger.Log("auditItemId: " + auditItem.getId());
-        Logger.Log("audit_images: " + addedAuditImagesToUpload.toString());
-
         if (!addedAuditImagesToUpload.isJsonNull()) {
             AuditItem result = provider.getRestAdapter(context).create(NetworkService.class).addAuditImages(String.valueOf(auditItem.getId()), addedAuditImagesToUpload);
             result.setUuid(uuid);

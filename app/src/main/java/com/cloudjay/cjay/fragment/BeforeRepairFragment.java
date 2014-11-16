@@ -15,6 +15,7 @@ import com.cloudjay.cjay.adapter.DetailIssuedImageAdapter;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
+import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
@@ -88,7 +89,8 @@ public class BeforeRepairFragment extends Fragment {
 	DetailIssuedImageAdapter imageAdapter;
 	String operatorCode;
 	Session mSession;
-	AuditItem auditItem;
+
+    boolean hasImageToUpload = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -96,110 +98,105 @@ public class BeforeRepairFragment extends Fragment {
 		EventBus.getDefault().register(this);
 	}
 
-	@UiThread
-	public void onEvent(AuditItemGotEvent event) {
-        Logger.Log("AuditItemGotEvent");
+	@AfterViews
+    void setUp() {
+        if (null == mSession) {
+            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
+                    containerID);
+        }
 
-        auditItem = event.getAuditItem();
+        if (null == imageAdapter) {
+            imageAdapter = new DetailIssuedImageAdapter(
+                    getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.AUDIT);
+        }
+        lvImage.setAdapter(imageAdapter);
+    }
 
-		if (auditItem != null) {
+    @Click(R.id.btn_camera_repaired)
+    void openCameraActivity() {
+        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
+        cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
+        cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
+        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.AUDIT.value);
+        cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.AUDIT.value);
+        cameraActivityIntent.putExtra(CameraFragment.AUDIT_ITEM_UUID_EXTRA, auditItemUUID);
+        startActivity(cameraActivityIntent);
+    }
+
+    @UiThread
+    void onEvent(ContainerGotEvent event) {
+        mSession = event.getSession();
+        if (null == mSession) {
+            Utils.showCrouton(getActivity(), "Không tìm thấy container trong dữ liệu");
+        } else {
+            operatorCode = mSession.getOperatorCode();
+            refreshData();
+            refreshListImage();
+            if (hasImageToUpload) {
+                addImageToJobqueue();
+            }
+        }
+    }
+
+    @UiThread
+    void onEvent(ImageCapturedEvent event) {
+        Logger.Log("on ImageCapturedEvent");
+        if (event.getImageType() == ImageType.AUDIT.value) {
+            // Requery session to update data
+            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
+                    containerID);
+        }
+    }
+
+    void refreshListImage() {
+        if (mSession != null) {
+            List<AuditImage> list = mSession.getAuditItem(auditItemUUID).getListAuditedImages();
+            updatedData(list);
+        }
+    }
+
+    void refreshData() {
+        if (mSession != null) {
+            AuditItem auditItem = mSession.getAuditItem(auditItemUUID);
             if (auditItem.getId() != 0) {
-                for (AuditImage image : auditItem.getAuditImages()) {
-                    if (image.getId() == 0 && image.getType() == ImageType.AUDIT.value) {
-                        Logger.Log("has image to upload");
-                        // Add image to job queue
-                        JobManager jobManager = App.getJobManager();
-                        jobManager.addJobInBackground(new UploadAuditItemJob(auditItem.getSession(),
-                                auditItem, containerID, true));
+                for (AuditImage image : auditItem.getListAuditedImages()) {
+                    if (image.getId() == 0) {
+                        hasImageToUpload = true;
                         break;
                     }
                 }
             }
 
-			// parse Data to view
-			tvCompCode.setText(auditItem.getComponentCode());
-			tvLocationCode.setText(auditItem.getLocationCode());
-			tvDamageCode.setText(auditItem.getDamageCode());
-			tvRepairCode.setText(auditItem.getRepairCode());
+            // parse Data to view
+            tvCompCode.setText(auditItem.getComponentCode());
+            tvLocationCode.setText(auditItem.getLocationCode());
+            tvDamageCode.setText(auditItem.getDamageCode());
+            tvRepairCode.setText(auditItem.getRepairCode());
 
-			tvSize.setText("Dài " + auditItem.getHeight() + ",\t" + "Rộng " + auditItem.getLength());
-			textViewBtnCamera.setText(R.string.button_add_new_audit_image);
-			tvNumber.setText(auditItem.getQuantity() + "");
-
-			refreshListImage();
-		}
-	}
-
-	@UiThread
-	public void onEvent(ContainerGotEvent event) {
-		// get container operator code form containerId
-		mSession = event.getSession();
-		if (null == mSession) {
-			Utils.showCrouton(getActivity(), "Không tìm thấy container trong dữ liệu");
-		} else {
-            Logger.Log("getSession");
-			operatorCode = mSession.getOperatorCode();
-            dataCenter.getAuditItemInBackground(getActivity(), containerID, auditItemUUID, false);
-		}
-	}
-
-	@AfterViews
-	void setup() {
-        if (null == mSession) {
-            Logger.Log("get Session");
-            dataCenter.getSessionInBackground(getActivity(), containerID);
-
-            imageAdapter = new DetailIssuedImageAdapter(
-                    getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.AUDIT);
-            lvImage.setAdapter(imageAdapter);
+            tvSize.setText("Dài " + auditItem.getHeight() + ",\t" + "Rộng " + auditItem.getLength());
+            textViewBtnCamera.setText(R.string.button_add_new_audit_image);
+            tvNumber.setText(auditItem.getQuantity() + "");
         }
-	}
+    }
 
-	@Click(R.id.btn_camera_repaired)
-	void openCameraActivity() {
-		//get container operator code form containerId
-		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
-		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.AUDIT.value);
-		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.AUDIT.value);
-		cameraActivityIntent.putExtra(CameraFragment.AUDIT_ITEM_UUID_EXTRA, auditItemUUID);
-		startActivity(cameraActivityIntent);
-	}
+    @UiThread
+    public void updatedData(List<AuditImage> imageList) {
 
-	@Background
-	void refreshListImage() {
-		if (auditItem != null) {
-			List<AuditImage> list = auditItem.getListAuditedImages();
-			updatedData(list);
-		}
-	}
-
-	@UiThread
-	public void updatedData(List<AuditImage> imageList) {
-
-		imageAdapter.clear();
-		if (imageList != null) {
-			for (AuditImage object : imageList) {
-				imageAdapter.add(object);
-			}
-		}
-
-		imageAdapter.notifyDataSetChanged();
-	}
-
-	@UiThread
-	void onEvent(ImageCapturedEvent event) {
-        Logger.Log("on ImageCapturedEvenImageimagecaCt");
-		if (event.getImageType() == ImageType.AUDIT.value) {
-
-            // Requery audit item by uuid to update listview
-            dataCenter.getAuditItemInBackground(getActivity().getApplicationContext(),
-                    containerID, auditItemUUID, false);
-
-            refreshListImage();
+        imageAdapter.clear();
+        if (imageList != null) {
+            for (AuditImage object : imageList) {
+                imageAdapter.add(object);
+            }
         }
-	}
+
+        imageAdapter.notifyDataSetChanged();
+    }
+
+    void addImageToJobqueue() {
+        JobManager jobManager = App.getJobManager();
+        jobManager.addJobInBackground(new UploadAuditItemJob(mSession.getId(),
+                mSession.getAuditItem(auditItemUUID), containerID, true));
+    }
 
 	@Override
 	public void onDestroy() {

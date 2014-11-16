@@ -59,7 +59,7 @@ public class AfterRepairFragment extends Fragment {
 	TextView tvCompCode;
 
 	@ViewById(R.id.tv_code_location_repaired)
-	TextView tvLocaitonCode;
+	TextView tvLocationCode;
 
 	@ViewById(R.id.tv_code_damaged_repaired)
 	TextView tvDamageCode;
@@ -94,107 +94,102 @@ public class AfterRepairFragment extends Fragment {
 		EventBus.getDefault().register(this);
 	}
 
-	@AfterViews
-	void setup() {
+    @AfterViews
+    void setUp() {
         if (null == mSession) {
-            dataCenter.getSessionInBackground(getActivity(), containerID);
+            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
+                    containerID);
+        }
+
+        if (null == imageAdapter) {
+            imageAdapter = new DetailIssuedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.REPAIRED);
+        }
+
+        lvImage.setAdapter(imageAdapter);
+    }
+
+    @Click(R.id.btn_camera_repaired)
+    void openCameraActivity() {
+
+        // Notify user that audit item is not uploaded yet
+        if (auditItem.getId() == 0) {
+            Utils.showCrouton(getActivity(), "Lỗi chưa được giám định");
+            return;
+        }
+        if (auditItem.isAllowed() != null) {
+            // Notify user that audit item is not allow to repare
+            if (!auditItem.isAllowed()) {
+                Utils.showCrouton(getActivity(), "Lỗi không được phép sửa");
+                return;
+            }
+        }
+
+        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
+        cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
+        cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
+        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.REPAIRED.value);
+        cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);
+        cameraActivityIntent.putExtra(CameraFragment.AUDIT_ITEM_UUID_EXTRA, auditItemUUID);
+        cameraActivityIntent.putExtra(CameraFragment.IS_OPENED, true);
+        startActivity(cameraActivityIntent);
+    }
+
+    @UiThread
+    void onEvent(ImageCapturedEvent event) {
+        Logger.Log("on ImageCapturedEvent");
+        if (event.getImageType() == ImageType.REPAIRED.value) {
+            // Requery session to update data
+            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
+                    containerID);
         }
     }
 
-	@UiThread
-	public void onEvent(ContainerGotEvent event) {
-
-		//get container operater code form containerId
-		mSession = event.getSession();
-		if (null == mSession) {
-			Utils.showCrouton(getActivity(), "Không tìm thấy container trong dữ liệu");
-		} else {
-			operatorCode = mSession.getOperatorCode();
-		}
-
-        // Get audit item in background and post an event
-        dataCenter.getAuditItemInBackground(getActivity(), containerID, auditItemUUID, false);
-
-		imageAdapter = new DetailIssuedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.REPAIRED);
-		lvImage.setAdapter(imageAdapter);
-
-		refreshListImage();
-	}
-
-	@Click(R.id.btn_camera_repaired)
-	void openCameraActivity() {
-
-		// Notify user that audit item is not uploaded yet
-		if (auditItem.getId() == 0) {
-			Utils.showCrouton(getActivity(), "Lỗi chưa được giám định");
-			return;
-		}
-		if (auditItem.isAllowed() != null) {
-			// Notify user that audit item is not allow to repare
-			if (!auditItem.isAllowed()) {
-				Utils.showCrouton(getActivity(), "Lỗi không được phép sửa");
-				return;
-			}
-		}
-
-		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
-		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.REPAIRED.value);
-		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);
-		cameraActivityIntent.putExtra(CameraFragment.AUDIT_ITEM_UUID_EXTRA, auditItemUUID);
-		cameraActivityIntent.putExtra(CameraFragment.IS_OPENED, true);
-		startActivity(cameraActivityIntent);
-	}
-
-	@Background
-	void refreshListImage() {
-		if (auditItem != null) {
-			List<AuditImage> list = auditItem.getListRepairedImages();
-			updatedData(list);
-		}
-	}
-
-	@UiThread
-	void updatedData(List<AuditImage> imageList) {
-
-		imageAdapter.clear();
-		if (imageList != null) {
-			for (AuditImage object : imageList) {
-				imageAdapter.add(object);
-			}
-		}
-
-		imageAdapter.notifyDataSetChanged();
-	}
-
-	@UiThread
-	void onEvent(ImageCapturedEvent event) {
-        if (event.getImageType() == ImageType.REPAIRED.value) {
-            Logger.Log("on ImageCapturedEvent");
-            // Requery audit item by uuid to update listview
-            dataCenter.getAuditItemInBackground(getActivity().getApplicationContext(),
-                    containerID, auditItemUUID, false);
+    @UiThread
+    public void onEvent(ContainerGotEvent event) {
+        mSession = event.getSession();
+        if (null == mSession) {
+            Utils.showCrouton(getActivity(), "Không tìm thấy container trong dữ liệu");
+        } else {
+            operatorCode = mSession.getOperatorCode();
+            refreshData();
             refreshListImage();
         }
-	}
+    }
 
-    @UiThread
-    void onEvent(AuditItemGotEvent event) {
-        auditItem = event.getAuditItem();
-
+    void refreshListImage() {
         if (auditItem != null) {
+            List<AuditImage> list = auditItem.getListRepairedImages();
+            updatedData(list);
+        }
+    }
+
+    void refreshData() {
+        if (mSession != null) {
+            auditItem = mSession.getAuditItem(auditItemUUID);
+
             // parse Data to view
             tvCompCode.setText(auditItem.getComponentCode());
-            tvLocaitonCode.setText(auditItem.getLocationCode());
+            tvLocationCode.setText(auditItem.getLocationCode());
             tvDamageCode.setText(auditItem.getDamageCode());
             tvRepairCode.setText(auditItem.getRepairCode());
-            tvSize.setText("Dài " + auditItem.getHeight() + "," + " Rộng " + auditItem.getLength());
-            tvNumber.setText(auditItem.getQuantity() + "");
-            textViewBtnCamera.setText(R.string.button_add_new_repair_image);
 
-            refreshListImage();
+            tvSize.setText("Dài " + auditItem.getHeight() + ",\t" + "Rộng " + auditItem.getLength());
+            textViewBtnCamera.setText(R.string.button_add_new_audit_image);
+            tvNumber.setText(auditItem.getQuantity() + "");
         }
+    }
+
+    @UiThread
+    void updatedData(List<AuditImage> imageList) {
+
+        imageAdapter.clear();
+        if (imageList != null) {
+            for (AuditImage object : imageList) {
+                imageAdapter.add(object);
+            }
+        }
+
+        imageAdapter.notifyDataSetChanged();
     }
 
 	@Override

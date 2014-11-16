@@ -447,8 +447,13 @@ public class AuditItem implements Serializable{
 
         JsonObject auditImagesPut = new JsonObject();
         JsonArray auditImages = new JsonArray();
-        for (AuditImage auditImage : this.auditImages) {
-            if (auditImage.getId() == 0 && auditImage.getType() == ImageType.AUDIT.getValue()) {
+        Logger.e("size: " + String.valueOf(this.getListAuditedImages().size()));
+        for (AuditImage auditImage : this.getListAuditedImages()) {
+
+            Logger.Log("getId: " + auditImage.getId());
+            Logger.Log("getName: " + auditImage.getName());
+
+            if (auditImage.getId() == 0) {
                 String auditImageName = auditImage.getName();
                 JsonObject jsonObject = new JsonObject();
                 jsonObject.addProperty("name", auditImageName);
