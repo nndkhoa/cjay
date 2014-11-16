@@ -65,10 +65,10 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	@ViewById(R.id.pager)
 	ViewPager pager;
 
-	@ViewById(R.id.btn_done)
+	@ViewById(R.id.btn_complete_repair)
 	Button btnCompleteRepair;
 
-	@ViewById(R.id.btn_complete_import)
+	@ViewById(R.id.btn_complete_audit)
 	Button btnCompleteAudit;
 
 	ActionBar actionBar;
@@ -126,10 +126,14 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
                 }
             } else {
                 for (AuditItem auditItem : mSession.getAuditItems()) {
-                    // Add container session to upload queue
-                    JobManager jobManager = App.getJobManager();
-                    jobManager.addJobInBackground(new UploadAuditItemJob(mSession.getId(), auditItem,
-                            mSession.getContainerId(), false));
+
+                    if (auditItem.getId() == 0) {
+                        // If audit item has not been uploaded yet
+                        // Add container session to upload queue
+                        JobManager jobManager = App.getJobManager();
+                        jobManager.addJobInBackground(new UploadAuditItemJob(mSession.getId(), auditItem,
+                                mSession.getContainerId(), false));
+                    }
                 }
             }
 
@@ -176,12 +180,12 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 	}
 
-	@Click(R.id.btn_complete_import)
+	@Click(R.id.btn_complete_audit)
 	void btnCompleteAuditClicked() {
 		dataCenter.getSessionForUpload(getActivity(), containerID);
 	}
 
-	@Click(R.id.btn_done)
+	@Click(R.id.btn_complete_repair)
 	void btnCompleteRepairClicked() {
 		dataCenter.getSessionForUpload(getActivity(), containerID);
 	}
