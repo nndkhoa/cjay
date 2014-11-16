@@ -1722,15 +1722,14 @@ public class DataCenter {
 	 * @param itemUuid
 	 */
 	@Background(serial = CACHE)
-	public void getAuditItemInBackground(Context context, String containerId, String itemUuid,
-                                         boolean cameraMode) {
+	public void getAuditItemInBackground(Context context, String containerId, String itemUuid) {
         Logger.Log("getAuditItemInBackground");
 		try {
 			DB db = App.getDB(context);
 			Session session = db.getObject(containerId, Session.class);
 			if (session != null) {
 				AuditItem auditItem = session.getAuditItem(itemUuid);
-				EventBus.getDefault().post(new AuditItemGotEvent(auditItem, cameraMode));
+				EventBus.getDefault().post(new AuditItemGotEvent(auditItem));
 			}
 
 		} catch (SnappydbException e) {

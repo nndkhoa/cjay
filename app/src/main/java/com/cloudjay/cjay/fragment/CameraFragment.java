@@ -290,7 +290,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
     public void onEvent(AuditItemGotEvent event) {
 
         AuditItem auditItem = event.getAuditItem();
-        boolean isCameraMode = event.isCameraMode();
 
         // Create temporary audit item
         if (null == auditItem) {
@@ -304,9 +303,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
                 auditItem.setRepaired(true);
             }
 
-            if (isCameraMode == true) {
-                dataCenter.updateAuditItemInBackground(getActivity().getApplicationContext(), containerId, auditItem);
-            }
+            dataCenter.updateAuditItemInBackground(getActivity().getApplicationContext(), containerId, auditItem);
         }
     }
 
@@ -405,7 +402,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
                             .withName(imageName)
                             .withUUID(uuid);
 
-                    dataCenter.getAuditItemInBackground(getActivity(), containerId, auditItemUUID, true);
+                    dataCenter.getAuditItemInBackground(getActivity(), containerId, auditItemUUID);
 
                     break;
             }

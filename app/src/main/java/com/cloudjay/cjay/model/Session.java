@@ -810,9 +810,12 @@ public class Session implements Serializable {
                                     Date local = format.parse(localItem.getModifiedAt());
 
                                     // TODO: need to debug
-                                    if (server.after(local)) {
+                                    if (server.after(local) || server.equals(local)) {
                                         localItem.merge(serverItem);
                                     }
+
+
+
                                 } else {
                                     localItem.merge(serverItem);
                                 }
