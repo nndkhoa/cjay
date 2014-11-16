@@ -96,6 +96,9 @@ public class AfterRepairFragment extends Fragment {
 
     @AfterViews
     void setUp() {
+
+
+
         if (null == mSession) {
             dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
                     containerID);
@@ -174,7 +177,7 @@ public class AfterRepairFragment extends Fragment {
             tvRepairCode.setText(auditItem.getRepairCode());
 
             tvSize.setText("Dài " + auditItem.getHeight() + ",\t" + "Rộng " + auditItem.getLength());
-            textViewBtnCamera.setText(R.string.button_add_new_audit_image);
+            textViewBtnCamera.setText(R.string.button_add_new_repair_image);
             tvNumber.setText(auditItem.getQuantity() + "");
         }
     }
