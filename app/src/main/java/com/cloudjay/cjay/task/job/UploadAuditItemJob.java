@@ -10,6 +10,7 @@ import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Priority;
@@ -25,17 +26,19 @@ public class UploadAuditItemJob extends Job {
 	long sessionId;
 	AuditItem auditItem;
     String containerId;
+	CJayObject object;
 
 	@Override
 	public int getRetryLimit() {
 		return CJayConstant.RETRY_THRESHOLD;
 	}
 
-	public UploadAuditItemJob(long sessionId, AuditItem auditItem, String containerId) {
+	public UploadAuditItemJob(long sessionId, AuditItem auditItem, String containerId,CJayObject object) {
 		super(new Params(Priority.MID).requireNetwork().persist().groupBy(containerId).setPersistent(true));
 		this.sessionId = sessionId;
 		this.auditItem = auditItem;
         this.containerId = containerId;
+		this.object = object;
 	}
 
 	@Override
@@ -54,7 +57,7 @@ public class UploadAuditItemJob extends Job {
 		dataCenter.addLog(context, containerId, "Bắt đầu upload audit item: " + auditItem.getUuid());
 		EventBus.getDefault().post(new UploadingEvent(containerId, UploadType.AUDIT_ITEM));
 
-		dataCenter.uploadAuditItem(context, containerId, sessionId, auditItem);
+		dataCenter.uploadAuditItem(context, containerId, sessionId, auditItem, object);
 	}
 
 	@Override

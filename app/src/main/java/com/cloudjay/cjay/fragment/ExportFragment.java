@@ -153,9 +153,9 @@ public class ExportFragment extends Fragment {
 		dataCenter.removeWorkingSession(getActivity(), containerID);
 
 		// Add container session to upload queue
-		//TODO add cjobject to queue @Han
 		try {
-			dataCenter.addCJayObject(containerID, new CJayObject());
+			CJayObject object = new CJayObject(mSession,Session.class,mSession.getContainerId());
+			dataCenter.addCJayObject(containerID, object);
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}

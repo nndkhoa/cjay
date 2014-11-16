@@ -24,6 +24,7 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.GateImage;
+import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -351,6 +352,14 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
                             .withUuid(uuid);
 
                     dataCenter.addGateImage(getActivity().getApplicationContext(), gateImage, containerId);
+
+	                // Add image to job queue
+	                try {
+		                CJayObject object = new CJayObject(gateImage, GateImage.class, containerId);
+		                dataCenter.addCJayObject(containerId, object);
+	                } catch (SnappydbException e) {
+		                e.printStackTrace();
+	                }
                     break;
 
                 case AUDIT:
@@ -380,18 +389,19 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
                         }
 
                         dataCenter.updateAuditItemInBackground(getActivity().getApplicationContext(), containerId, auditItem);
+	                    // Add image to job queue
+	                    try {
+		                    CJayObject object = new CJayObject(auditImage, AuditImage.class, containerId);
+		                    dataCenter.addCJayObject(containerId, object);
+	                    } catch (SnappydbException e) {
+		                    e.printStackTrace();
+	                    }
                     }
 
                     break;
             }
 
-            // Add image to job queue
-	        //TODO add cjobject to queue @Han
-	        try {
-		        dataCenter.addCJayObject(containerId, new CJayObject());
-	        } catch (SnappydbException e) {
-		        e.printStackTrace();
-	        }
+
 
 
         }

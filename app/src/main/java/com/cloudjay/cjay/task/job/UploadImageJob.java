@@ -8,6 +8,7 @@ import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
+import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Priority;
@@ -26,19 +27,21 @@ public class UploadImageJob extends Job {
 	String uri;
 	String imageName;
 	ImageType imageType;
+	CJayObject object;
 
 	@Override
 	public int getRetryLimit() {
 		return CJayConstant.RETRY_THRESHOLD;
 	}
 
-	public UploadImageJob(String uri, String imageName, String containerId, ImageType imageType) {
+	public UploadImageJob(String uri, String imageName, String containerId, ImageType imageType,CJayObject object) {
 		super(new Params(Priority.MID).requireNetwork().persist().groupBy(containerId).setPersistent(true));
 
 		this.containerId = containerId;
 		this.uri = uri;
 		this.imageName = imageName;
 		this.imageType = imageType;
+		this.object = object;
 	}
 
 	@Override
@@ -48,7 +51,7 @@ public class UploadImageJob extends Job {
 		// in case container session upload status is > UPLOADING.
 		// It will notify fragment upload to update UI
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).changeImageUploadStatus(context, containerId, imageName, imageType, UploadStatus.UPLOADING);
+		DataCenter_.getInstance_(context).changeImageUploadStatus(context, containerId, imageName, imageType, UploadStatus.UPLOADING, object);
 
 	}
 
@@ -64,7 +67,7 @@ public class UploadImageJob extends Job {
 		DataCenter_.getInstance_(context).uploadImage(uri, imageName);
 
 		// Change image status to COMPLETE
-		DataCenter_.getInstance_(context).changeImageUploadStatus(context, containerId, imageName, imageType, UploadStatus.COMPLETE);
+		DataCenter_.getInstance_(context).changeImageUploadStatus(context, containerId, imageName, imageType, UploadStatus.COMPLETE,object);
 
 	}
 
@@ -74,7 +77,7 @@ public class UploadImageJob extends Job {
 		// Job has exceeded retry attempts or shouldReRunOnThrowable() has returned false.
 		// Set image upload Status is ERROR and notify to Upload Fragment
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).changeImageUploadStatus(context, containerId, imageName, imageType, UploadStatus.ERROR);
+		DataCenter_.getInstance_(context).changeImageUploadStatus(context, containerId, imageName, imageType, UploadStatus.ERROR, object);
 		EventBus.getDefault().post(new UploadStoppedEvent(containerId));
 		DataCenter_.getInstance_(context).addLog(context, containerId, "Không thể tải lên hình: " + imageName);
 

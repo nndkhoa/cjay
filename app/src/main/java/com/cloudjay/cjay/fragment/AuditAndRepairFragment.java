@@ -90,11 +90,11 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 		super.onDestroy();
 	}
 
-    @UiThread
+	@UiThread
 	public void onEvent(ContainerForUploadGotEvent event) {
 		mSession = event.getTarget();
 
-        Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+		Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
 
 		// Xu ly cho session da duoc Giam Dinh
 		if (mSession.getLocalStep() == Step.AUDIT.value) {
@@ -109,8 +109,12 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			}
 
 			// PUT /api/cjay/containers/{pk}/complete-audit
-			JobManager jobManager = App.getJobManager();
-			jobManager.addJobInBackground(new UploadImportJob(mSession));
+			try {
+				CJayObject object = new CJayObject(mSession, Session.class, mSession.getContainerId());
+				dataCenter.addCJayObject(containerID, object);
+			} catch (SnappydbException e) {
+				e.printStackTrace();
+			}
 
 			// Hide this button
 			btnCompleteAudit.setVisibility(View.GONE);
@@ -143,9 +147,9 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 			// Add containerId to upload complete repair queue
 			// PUT /api/cjay/containers/{pk}/complete-repair
-			//TODO add cjobject to queue @Han
 			try {
-				dataCenter.addCJayObject(containerID, new CJayObject());
+				CJayObject object = new CJayObject(mSession, Session.class, mSession.getContainerId());
+				dataCenter.addCJayObject(containerID, object);
 			} catch (SnappydbException e) {
 				e.printStackTrace();
 			}

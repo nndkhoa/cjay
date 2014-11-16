@@ -10,6 +10,7 @@ import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
+import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Priority;
@@ -26,6 +27,7 @@ import retrofit.RetrofitError;
 public class UploadImportJob extends Job {
 
 	Session mSession;
+	CJayObject object;
 
 	/**
 	 * Dùng để phân biệt xem có cần clear Working hay không?
@@ -35,12 +37,13 @@ public class UploadImportJob extends Job {
 		return 1;
 	}
 
-	public UploadImportJob(Session session) {
+	public UploadImportJob(Session session, CJayObject object) {
 
 		super(new Params(Priority.MID).requireNetwork().persist().groupBy(session.getContainerId()).setPersistent(true));
 
 		// step is local step
 		this.mSession = session;
+		this.object = object;
 
 	}
 
@@ -86,23 +89,23 @@ public class UploadImportJob extends Job {
 
 		switch (step) {
 			case AVAILABLE:
-				dataCenter.uploadExportSession(context, mSession);
+				dataCenter.uploadExportSession(context, mSession, object);
 				break;
 
 			case AUDIT:
-				dataCenter.uploadAuditSession(context, mSession);
+				dataCenter.uploadAuditSession(context, mSession, object);
 				break;
 
 			case REPAIR:
-				dataCenter.uploadRepairSession(context, mSession);
+				dataCenter.uploadRepairSession(context, mSession, object);
 				break;
 
 			case IMPORT:
-				dataCenter.uploadImportSession(context, mSession);
+				dataCenter.uploadImportSession(context, mSession, object);
 				break;
 
 			default:
-				dataCenter.setHandCleaningSession(context, mSession);
+				dataCenter.setHandCleaningSession(context, mSession, object);
 				break;
 		}
 

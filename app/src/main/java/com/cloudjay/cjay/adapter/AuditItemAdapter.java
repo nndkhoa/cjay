@@ -208,10 +208,9 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 						auditItem.setUploadConfirmed(true);
 						DataCenter_.getInstance_(mContext).updateAuditItemInBackground(mContext, session.getContainerId(), auditItem);
 					} else {
-						//2. Add container session to upload queue
-						//TODO add cjobject to queue @Han
 						try {
-							DataCenter_.getInstance_(App.getInstance().getApplicationContext()).addCJayObject(session.getContainerId(), new CJayObject());
+							CJayObject object = new CJayObject(auditItem,AuditItem.class,session.getContainerId());
+							DataCenter_.getInstance_(App.getInstance().getApplicationContext()).addCJayObject(session.getContainerId(), object);
 						} catch (SnappydbException e) {
 							e.printStackTrace();
 						}

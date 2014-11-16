@@ -36,7 +36,7 @@ public class UploadIntentService extends IntentService {
 			if (!TextUtils.isEmpty(token) && Utils.canReachInternet()) {
 
 				JobManager manager = App.getJobManager();
-				if (manager.isRunning()) {
+				if (manager.count() != 0) {
 					Logger.Log("There is already job in the queue");
 				} else {
 					dataCenter.startJobQueue(getApplicationContext());

@@ -63,6 +63,18 @@ public class CJayObject implements Serializable {
 		this.containerId = containerId;
 	}
 
+	public CJayObject(Object obj, Class cls, String containerId) {
+		this.object = obj;
+		this.cls = cls;
+		this.containerId = containerId;
+	}
+
+	public CJayObject(Object obj, Class cls, long id) {
+		this.object = obj;
+		this.cls = cls;
+		this.sessionId = id;
+	}
+
 	public GateImage getGateImage() {
 
 		if (cls == GateImage.class || object instanceof GateImage) {
