@@ -751,7 +751,7 @@ public class DataCenter {
 	 * @param type
 	 */
 	@Background(serial = CACHE)
-	void saveSession(Context context, Session session, UploadType type,CJayObject cJayObject) {
+	void saveSession(Context context, Session session, UploadType type, CJayObject cJayObject) {
 
 		DB db = null;
 		String key = session.getContainerId();
@@ -779,7 +779,8 @@ public class DataCenter {
 			}
 		} finally {
 			try {
-				removeDoneQueue(cJayObject.getContainerId(),cJayObject);
+				removeDoneQueue(cJayObject.getContainerId(), cJayObject);
+				getNextCJayObject(cJayObject.getContainerId(),cJayObject);
 			} catch (SnappydbException e) {
 				e.printStackTrace();
 			}
@@ -1193,7 +1194,8 @@ public class DataCenter {
 
 				db.put(key, session);
 				if (status == UploadStatus.COMPLETE) {
-					removeDoneQueue(containerId,object);
+					removeDoneQueue(containerId, object);
+					getNextCJayObject(containerId,object);
 					EventBus.getDefault().post(new UploadSucceededEvent(containerId, UploadType.IMAGE));
 				}
 			}
@@ -1250,7 +1252,7 @@ public class DataCenter {
 
 			object = db.getObject(key, Session.class);
 			object.updateAuditItem(result);
-			saveSession(context, object, type,cJobject);
+			saveSession(context, object, type, cJobject);
 
 		} catch (SnappydbException e) {
 			Logger.wtf(e.getMessage());
@@ -1290,7 +1292,7 @@ public class DataCenter {
 					if (item.isUploadConfirmed()) {
 						Logger.Log("Add audit item to jobqueue: " + item.toString());
 						JobManager jobManager = App.getJobManager();
-						jobManager.addJobInBackground(new UploadAuditItemJob(session.getId(), item, session.getContainerId(),cJayObject));
+						jobManager.addJobInBackground(new UploadAuditItemJob(session.getId(), item, session.getContainerId(), cJayObject));
 					}
 				}
 			}
@@ -1328,7 +1330,7 @@ public class DataCenter {
 	public void uploadAuditSession(Context context, Session session, CJayObject object) throws SnappydbException {
 
 		Session result = networkClient.completeAudit(context, session);
-		saveSession(context, result, UploadType.SESSION,object);
+		saveSession(context, result, UploadType.SESSION, object);
 	}
 
 	/**
@@ -1341,7 +1343,7 @@ public class DataCenter {
 	public void uploadRepairSession(Context context, Session session, CJayObject object) throws SnappydbException {
 
 		Session result = networkClient.completeRepairSession(context, session);
-		saveSession(context, result, UploadType.SESSION,object);
+		saveSession(context, result, UploadType.SESSION, object);
 	}
 
 	/**
@@ -1352,7 +1354,7 @@ public class DataCenter {
 	public void uploadExportSession(Context context, Session session, CJayObject object) throws SnappydbException {
 
 		Session result = networkClient.checkOutContainerSession(context, session);
-		saveSession(context, result, UploadType.SESSION,object);
+		saveSession(context, result, UploadType.SESSION, object);
 	}
 
 	/**
@@ -1365,7 +1367,7 @@ public class DataCenter {
 	public void setHandCleaningSession(Context context, Session session, CJayObject object) {
 
 		Session result = networkClient.setHandCleaningSession(context, session);
-		saveSession(context, result, UploadType.SESSION,object);
+		saveSession(context, result, UploadType.SESSION, object);
 
 	}
 
@@ -1835,7 +1837,7 @@ public class DataCenter {
 			object.setcJayPriority(priorityToAdd);
 			object.setContainerPriority(beforeObject.getContainerPriority());
 
-			Logger.e(keytoFind+priorityToAdd);
+			Logger.e(keytoFind + priorityToAdd);
 
 			db.put(keytoFind + priorityToAdd, object);
 		} else {
@@ -1860,7 +1862,7 @@ public class DataCenter {
 	 * @return
 	 * @throws SnappydbException
 	 */
-	public CJayObject getNextCJayObject(String containerId, CJayObject oldObject) throws SnappydbException {
+	public void getNextCJayObject(String containerId, CJayObject oldObject) throws SnappydbException {
 		DB db = App.getDB(context);
 
 		int nextCJayPriority = oldObject.getcJayPriority() + 1;
@@ -1873,15 +1875,15 @@ public class DataCenter {
 
 		if (isExistNextCJay) {
 			CJayObject nextJob = db.getObject(keyFindNextCJay, CJayObject.class);
-			return nextJob;
+			addCJayToJob(nextJob);
 		} else {
 			if (isExistNextContainer) {
 				String nextContainerId = db.get(CJayConstant.PREFIX_CONTAINER_PRIORITY + nextContainerPriority);
 				String keyFindNextCJayOfNextContainer = CJayConstant.PREFIX_CJAY_PRIORITY + nextContainerId + ":" + 1;
 				CJayObject nextJob = db.getObject(keyFindNextCJayOfNextContainer, CJayObject.class);
-				return nextJob;
+				addCJayToJob(nextJob);
 			} else {
-				return null;
+				Logger.Log("Không tìm thấy CJay Object tiếp theo");
 			}
 		}
 	}
@@ -1991,31 +1993,44 @@ public class DataCenter {
 				String[] containersOnLine = db.findKeys(CJayConstant.PREFIX_CONTAINER_PRIORITY);
 				int minPriority = getPriority(containersOnLine, CJayConstant.PREFIX_CONTAINER_PRIORITY, false);
 				String firstContainerIdOnLine = db.get(CJayConstant.PREFIX_CONTAINER_PRIORITY + minPriority);
-				String keyOfFirstObject = CJayConstant.PREFIX_CJAY_PRIORITY + firstContainerIdOnLine + ":" + 1;
+
+				String keySearchCjayOnLine = CJayConstant.PREFIX_CJAY_PRIORITY+firstContainerIdOnLine+":";
+				String[] cJaysOnLine = db.findKeys(keySearchCjayOnLine);
+
+				int minCJayPriority = getPriority(cJaysOnLine,keySearchCjayOnLine,false);
+				String keyOfFirstObject = CJayConstant.PREFIX_CJAY_PRIORITY + firstContainerIdOnLine + ":" + minCJayPriority;
 				Logger.e(keyOfFirstObject);
 				object = db.getObject(keyOfFirstObject, CJayObject.class);
 			}
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
+
+
+		if (object != null) {
+			addCJayToJob(object);
+		}
+
+	}
+
+	public void addCJayToJob(CJayObject object) {
+
 		// Add Job in background
 		JobManager jobManager = App.getJobManager();
 
-		if (object != null) {
-			Class cls = object.getCls();
-			if (cls == Session.class) {
-				jobManager.addJobInBackground(new UploadImportJob(object.getSession(), object));
-			} else if (cls == AuditItem.class) {
-				jobManager.addJobInBackground(new UploadAuditItemJob(object.getSessionId(), object.getAuditItem(), object.getContainerId(), object));
-			} else if (cls == GateImage.class) {
-				GateImage gateImage = object.getGateImage();
-				ImageType type = ImageType.values()[((int) gateImage.getType())];
-				jobManager.addJobInBackground(new UploadImageJob(gateImage.getUri(), gateImage.getName(), object.getContainerId(), type, object));
-			} else if (cls == AuditImage.class) {
-				AuditImage auditImage = object.getAuditImage();
-				ImageType type = ImageType.values()[((int) auditImage.getType())];
-				jobManager.addJobInBackground(new UploadImageJob(auditImage.getUri(), auditImage.getName(), object.getContainerId(), type, object));
-			}
+		Class cls = object.getCls();
+		if (cls == Session.class) {
+			jobManager.addJobInBackground(new UploadImportJob(object.getSession(), object));
+		} else if (cls == AuditItem.class) {
+			jobManager.addJobInBackground(new UploadAuditItemJob(object.getSessionId(), object.getAuditItem(), object.getContainerId(), object));
+		} else if (cls == GateImage.class) {
+			GateImage gateImage = object.getGateImage();
+			ImageType type = ImageType.values()[((int) gateImage.getType())];
+			jobManager.addJobInBackground(new UploadImageJob(gateImage.getUri(), gateImage.getName(), object.getContainerId(), type, object));
+		} else if (cls == AuditImage.class) {
+			AuditImage auditImage = object.getAuditImage();
+			ImageType type = ImageType.values()[((int) auditImage.getType())];
+			jobManager.addJobInBackground(new UploadImageJob(auditImage.getUri(), auditImage.getName(), object.getContainerId(), type, object));
 		}
 
 	}
