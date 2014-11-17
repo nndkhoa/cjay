@@ -1,6 +1,8 @@
 package com.cloudjay.cjay.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -29,6 +31,7 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
+import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
 import com.snappydb.SnappydbException;
 
@@ -69,6 +72,12 @@ public class ReuseActivity extends Activity {
 	@ViewById(R.id.tv_current_status)
 	TextView tvCurrentStatus;
 
+	@ViewById(R.id.btn_input_rainy_mode)
+	Button btnInputRainy;
+
+	@ViewById(R.id.btn_done_rainy_mode)
+	Button btnDoneRainy;
+
 	@Bean
 	DataCenter dataCenter;
 
@@ -80,7 +89,7 @@ public class ReuseActivity extends Activity {
 	long currentStatus;
 	Session mSession;
 
-    boolean rainyMode;
+	boolean rainyMode;
 
 	@AfterViews
 	void doAfterViews() {
@@ -166,6 +175,76 @@ public class ReuseActivity extends Activity {
 	@Click(R.id.btn_done)
 	void buttonDoneClicked() {
         donePickImage();
+	}
+
+	@Click(R.id.btn_input_rainy_mode)
+	void buttonInputRainyClicked() {
+		openWizadActivityRainy();
+	}
+
+	@Click(R.id.btn_done_rainy_mode)
+	void buttonDoneRainyClicked() {
+		showRainyDiaglog();
+	}
+
+	private void showRainyDiaglog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Alert");
+		builder.setMessage("Vãn còn hình thiếu thông tin, tiếp tục?");
+
+		builder.setPositiveButton("Quay lại", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				dialogInterface.dismiss();
+			}
+		});
+
+		builder.setNegativeButton("Có", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				closeActivity();
+				dialogInterface.dismiss();
+			}
+		});
+
+		AlertDialog dialog = builder.create();
+		dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+			@Override
+			public void onShow(DialogInterface dialogInterface) {
+
+				// Set background and text color for BUTTON_NEGATIVE
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+						.setTextColor(getResources().getColor(android.R.color.white));
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+						.setBackgroundResource(R.drawable.btn_green_selector);
+
+				// Set background and text color for BUTTON_POSITIVE
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+						.setTextColor(getResources().getColor(android.R.color.white));
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+						.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+			}
+		});
+		dialog.show();
+
+	}
+
+	private void closeActivity() {
+		this.finish();
+	}
+
+	private void openWizadActivityRainy() {
+		List<GateImage> gateImages = gateImageAdapter.getCheckedCJayImageUrls();
+		for (int i = 0; i < gateImages.size(); i++) {
+			// Getting the last part of the referrer url
+			dataCenter.addGateImage(getApplicationContext(), gateImages.get(i), containerID);
+		}
+
+		// Open Wizard Activity
+		Intent intent = new Intent(this, WizardActivity_.class);
+		intent.putExtra(WizardActivity.STEP_EXTRA, Step.IMPORT.value);
+		startActivity(intent);
+		this.finish();
 	}
 
 	private void donePickImage() {
@@ -254,19 +333,27 @@ public class ReuseActivity extends Activity {
         mAdapter.notifyDataSetChanged();
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EventBus.getDefault().register(this);
-    }
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		EventBus.getDefault().register(this);
+	}
 
-    @Override
-    protected void onDestroy() {
-        EventBus.getDefault().unregister(this);
-        super.onDestroy();
-    }
+	@Override
+	protected void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
 
-    private class ActionModeCallBack implements ActionMode.Callback {
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		if (rainyMode) {
+			openWizadActivityRainy();
+		}
+	}
+
+	private class ActionModeCallBack implements ActionMode.Callback {
 
 		@Override
 		public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
