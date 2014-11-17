@@ -22,7 +22,9 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
@@ -37,6 +39,7 @@ import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -87,6 +90,22 @@ public class ReuseActivity extends Activity {
             // Hide container id textview
             tvContainerId.setVisibility(View.INVISIBLE);
             tvCurrentStatus.setVisibility(View.INVISIBLE);
+
+            gateImageAdapter = new GateImageAdapter(this, R.layout.item_image_gridview, true);
+            gvReuseImages.setAdapter(gateImageAdapter);
+
+            String depotCode = PreferencesUtil.getPrefsValue(getApplicationContext(),
+                    PreferencesUtil.PREF_USER_DEPOT);
+
+            // Get rainy mode directory
+            String path = CJayConstant.APP_DIRECTORY_FILE + "/" + depotCode + "/rainy_mode";
+            File f = new File(path);
+            File files[] = f.listFiles();
+            Logger.Log("size: " + files.length);
+
+            for (int i = 0; i < files.length; i++) {
+                Logger.Log("");
+            }
         }
 	}
 

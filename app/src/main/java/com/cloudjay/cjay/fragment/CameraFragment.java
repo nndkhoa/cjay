@@ -138,7 +138,6 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
     void btnDoneClicked() {
 
         if (rainyMode) {
-            // Open resue activity
             // Open ReuseActivity
             Intent intent = new Intent(getActivity(), ReuseActivity_.class);
             intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, "");
@@ -512,7 +511,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
             } else {
 
                 // create directory to save images
-                newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/" + today + "/rainy_mode" );
+                newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/rainy_mode" );
 
                 if (!newDirectory.exists()) {
                     newDirectory.mkdirs();
