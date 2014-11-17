@@ -26,6 +26,7 @@ public class CJayConstant {
 	public static final String PREFIX_COMPONENT_CODE = "COMPONENT";
 	public static final String PREFIX_LOG = "LOG";
 	public static final String PREFIX_NOTIFI_LOG = "NOTIFI_LOG";
+    public static final String PREFIX_RAINY_MODE_IMAGE = "RAINY_MODE_IMAGE";
 
 	// `/sdcard/DCMI/CJay/`
 	public static final File APP_DIRECTORY_FILE = new File(
