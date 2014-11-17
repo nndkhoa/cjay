@@ -317,6 +317,14 @@ public class ReuseActivity extends Activity {
 		super.onDestroy();
 	}
 
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		if (rainyMode) {
+			openWizadActivityRainy();
+		}
+	}
+
 	private class ActionModeCallBack implements ActionMode.Callback {
 
 		@Override

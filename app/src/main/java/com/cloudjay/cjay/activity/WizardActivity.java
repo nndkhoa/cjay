@@ -84,4 +84,5 @@ public class WizardActivity extends BaseActivity {
 
 		return super.onOptionsItemSelected(item);
 	}
+
 }

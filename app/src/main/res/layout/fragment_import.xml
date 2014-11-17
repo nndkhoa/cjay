@@ -50,23 +50,40 @@
 			android:paddingBottom="6dp"
 			android:paddingLeft="9dp"/>
 
-		<ImageButton
+		<LinearLayout
+			android:id="@+id/ll_btn_camera_pick_more"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:id="@+id/btn_camera"
-			android:text="Camera button"
 			android:layout_below="@+id/et_operator"
-			android:background="@drawable/btn_customize_selector"
-			android:src="@android:drawable/ic_menu_camera"
-			android:minHeight="20dp"
-			android:layout_marginBottom="6dp"/>
+			android:orientation="vertical">
+
+			<Button
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:id="@+id/btn_pick_more"
+				android:layout_below="@+id/et_operator"
+				android:text="@string/button_audit_now"
+				android:textColor="@android:color/white"
+				android:background="@drawable/btn_customize_selector"/>
+
+			<ImageButton
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:id="@+id/btn_camera"
+				android:text="Camera button"
+				android:background="@drawable/btn_customize_selector"
+				android:src="@android:drawable/ic_menu_camera"
+				android:minHeight="20dp"
+				android:layout_marginBottom="6dp"/>
+		</LinearLayout>
+
 
 		<ListView
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:id="@+id/lv_image"
 			android:layout_above="@+id/rdn_group_status"
-			android:layout_below="@+id/btn_camera"
+			android:layout_below="@+id/ll_btn_camera_pick_more"
 			android:paddingBottom="6dp"
 			tools:listitem="@layout/item_image_gridview">
 		</ListView>

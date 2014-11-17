@@ -19,6 +19,9 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
+import com.cloudjay.cjay.activity.ReuseActivity_;
+import com.cloudjay.cjay.activity.WizardActivity;
+import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
@@ -62,6 +65,9 @@ public class ImportFragment extends Fragment {
 	//region VIEWS
 	@ViewById(R.id.btn_camera)
 	ImageButton btnCamera;
+
+	@ViewById(R.id.btn_pick_more)
+	Button btnPickMore;
 
 	@ViewById(R.id.btn_done)
 	Button btnContinue;
@@ -145,7 +151,7 @@ public class ImportFragment extends Fragment {
 		Logger.Log(" > Choose operator " + operatorCode);
 
 		// Set operator to edit text
-        etOperator.setText(operator.getOperatorCode());
+		etOperator.setText(operator.getOperatorCode());
 
 		mSession.setOperatorId(operator.getId());
 		mSession.setOperatorCode(operatorCode);
@@ -289,6 +295,14 @@ public class ImportFragment extends Fragment {
 		uploadImportSession(true);
 
 		// Navigate to HomeActivity
+		getActivity().finish();
+	}
+
+	@Click(R.id.btn_pick_more)
+	void buttonPickMoreClicked() {
+		// Open Reuse Activity
+		Intent intent = new Intent(getActivity(), ReuseActivity_.class);
+		startActivity(intent);
 		getActivity().finish();
 	}
 
