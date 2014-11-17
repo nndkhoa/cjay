@@ -2,6 +2,7 @@ package com.cloudjay.cjay.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -91,7 +92,7 @@ public class ImportFragment extends Fragment {
 	RadioButton rdnStatusC;
 
 	@ViewById(R.id.tv_container_id)
-	TextView tvContainerCode;
+	EditText etContainerCode;
 
 	@ViewById(R.id.lv_image)
 	ListView lvImages;
@@ -113,6 +114,8 @@ public class ImportFragment extends Fragment {
 	long preStatus = 1;
 	Session mSession;
 	List<GateImage> list = new ArrayList<>();
+
+	boolean rainyMode;
 	//endregion
 
 	public ImportFragment() {
@@ -126,19 +129,35 @@ public class ImportFragment extends Fragment {
 	@AfterViews
 	void doAfterViews() {
 
+		rainyMode = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext())
+				.getBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox),
+						false);
+
 		// Set ActionBar Title
 		getActivity().getActionBar().setTitle(R.string.fragment_import_title);
 
 		etOperator.setFocusable(false);
 		etOperator.setCursorVisible(false);
+		etContainerCode.setKeyListener(null);
 		etOperator.clearFocus();
 
 		mAdapter = new GateImageAdapter(getActivity(), R.layout.item_image_gridview, false);
 		lvImages.setAdapter(mAdapter);
 
+
+		if (rainyMode) {
+			configViewForRainyMode();
+		}
+
 		dataCenter.getSessionInBackground(getActivity(), containerID);
 
 		refresh();
+	}
+
+	private void configViewForRainyMode() {
+		btnCamera.setVisibility(View.GONE);
+		btnContinue.setVisibility(View.GONE);
+		Utils.setupEditText(etContainerCode);
 	}
 
 	//region EVENT HANDLER
@@ -210,14 +229,14 @@ public class ImportFragment extends Fragment {
 		if (null == mSession) {
 
 			// Set container ID for text View containerId
-			tvContainerCode.setText(containerID);
+			etContainerCode.setText(containerID);
 
 		} else {
 			list = mSession.getImportImages();
 			mAdapter.setData(list);
 			containerID = mSession.getContainerId();
 			operatorCode = mSession.getOperatorCode();
-			tvContainerCode.setText(containerID);
+			etContainerCode.setText(containerID);
 
 			etOperator.setText(operatorCode);
 //			Operator operator = dataCenter.getOperator(getActivity().getApplicationContext(), operatorCode);
@@ -285,22 +304,29 @@ public class ImportFragment extends Fragment {
 	 */
 	@Click(R.id.btn_complete_import)
 	void buttonCompletedClicked() {
-
 		if (mSession.isValidToUpload(Step.IMPORT) == false) {
 			Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
 			return;
 		}
+		//TODO add condition if all image selected => use normal action (else phase) @Nam
+		if (rainyMode) {
+			openReuseActivity();
+		} else {
+			//Upload import session
+			uploadImportSession(true);
 
-		//Upload import session
-		uploadImportSession(true);
-
-		// Navigate to HomeActivity
-		getActivity().finish();
+			// Navigate to HomeActivity
+			getActivity().finish();
+		}
 	}
 
 	@Click(R.id.btn_pick_more)
 	void buttonPickMoreClicked() {
 		// Open Reuse Activity
+		openReuseActivity();
+	}
+
+	private void openReuseActivity() {
 		Intent intent = new Intent(getActivity(), ReuseActivity_.class);
 		startActivity(intent);
 		getActivity().finish();

@@ -29,7 +29,6 @@
 			android:layout_height="wrap_content"
 			android:id="@+id/tv_container_id"
 			android:hint="Nhập Container Id"
-			android:editable="false"
 			android:layout_below="@+id/tv_input_container"
 			android:background="@android:drawable/editbox_dropdown_light_frame"
 			android:paddingTop="6dp"
