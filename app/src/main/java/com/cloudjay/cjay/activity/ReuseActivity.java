@@ -178,13 +178,13 @@ public class ReuseActivity extends Activity {
 
 	@Click(R.id.btn_done_rainy_mode)
 	void buttonDoneRainyClicked() {
-//		showRainyDiaglog();
+		showRainyDiaglog();
 	}
 
 	private void showRainyDiaglog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Alert");
-		builder.setMessage("Container còn thiếu thông tin");
+		builder.setMessage("Vãn còn hình thiếu thông tin, tiếp tục?");
 
 		builder.setPositiveButton("Quay lại", new DialogInterface.OnClickListener() {
 			@Override
@@ -196,6 +196,7 @@ public class ReuseActivity extends Activity {
 		builder.setNegativeButton("Có", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
+				closeActivity();
 				dialogInterface.dismiss();
 			}
 		});
@@ -220,6 +221,10 @@ public class ReuseActivity extends Activity {
 		});
 		dialog.show();
 
+	}
+
+	private void closeActivity() {
+		this.finish();
 	}
 
 	private void openWizadActivityRainy() {

@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -17,8 +19,10 @@ import com.cloudjay.cjay.model.Operator;
 import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.BeforeTextChange;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.TextChange;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -68,6 +72,7 @@ public class SearchOperatorDialog extends DialogFragment {
 
 		// Notify change
 		operatorAdapter.swapOperators(operators);
+
 	}
 
 	@AfterViews
@@ -91,6 +96,14 @@ public class SearchOperatorDialog extends DialogFragment {
 		String keyword = text.toString();
 		dataCenter.searchOperator(keyword);
 	}
+
+	@TextChange(R.id.et_operator_name)
+	void upperCase(){
+		etOperatorName.setInputType(InputType.TYPE_CLASS_TEXT
+				| InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+	}
+
+
 
 	public void setParent(Fragment parent) {
 		mParent = parent;

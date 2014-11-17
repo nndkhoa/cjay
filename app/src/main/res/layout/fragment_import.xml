@@ -46,6 +46,7 @@
 			android:layout_below="@+id/tv_container_id"
 			android:layout_marginBottom="6dp"
 			android:background="@android:drawable/editbox_dropdown_light_frame"
+			android:capitalize="sentences"
 			android:paddingTop="6dp"
 			android:paddingBottom="6dp"
 			android:paddingLeft="9dp"/>
