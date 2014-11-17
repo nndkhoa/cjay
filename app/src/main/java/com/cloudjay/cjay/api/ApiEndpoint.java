@@ -3,7 +3,14 @@ package com.cloudjay.cjay.api;
 
 public class ApiEndpoint {
 
-	public static final String ROOT_API = "https://beta-dot-cloudjay-web.appspot.com";
+	public static String ROOT_API = "https://cloudjay-web.appspot.com";
+
+	public static void initBetaApi(boolean isBeta) {
+		if(isBeta){
+			ROOT_API = "https://beta-dot-cloudjay-web.appspot.com";
+		}
+	}
+
 	public static final String TOKEN_API = "/api/auth";
 	public static final String CURRENT_USER_API = "/api/cjay/me";
 	public static final String LIST_OPERATORS_API = "/api/cjay/operators";

@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.cloudjay.cjay.api.ApiEndpoint;
 import com.cloudjay.cjay.task.service.PubnubService_;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -31,6 +32,8 @@ public class App extends Application {
 
 	private static App instance;
 	private static DB snappyDB = null;
+
+	private static boolean defaultBetaApiVal = true;
 
 	public App() {
 		instance = this;
@@ -66,6 +69,8 @@ public class App extends Application {
 		super.onCreate();
 		Crashlytics.start(this);
 
+		ApiEndpoint.initBetaApi(defaultBetaApiVal);
+
 		try {
 			closeDB();
 		} catch (SnappydbException e) {
@@ -76,7 +81,7 @@ public class App extends Application {
 		configureImageLoader();
 		configureJobManager();
 		configureAlarmManager();
-        configureSettings();
+		configureSettings();
 
 //		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
 //		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().build());
@@ -207,39 +212,39 @@ public class App extends Application {
 		jobManager = new JobManager(this, configuration);
 	}
 
-    /**
-     *  Cấu hình cho Setting
-     */
-    private void configureSettings() {
-        boolean defaultDebug = true;
-        boolean defaultAutoUpdate = true;
-        boolean defaultRainyMode = false;
+	/**
+	 * Cấu hình cho Setting
+	 */
+	private void configureSettings() {
+		boolean defaultDebug = true;
+		boolean defaultAutoUpdate = true;
+		boolean defaultRainyMode = false;
 
-        // Configure Logger
-        boolean debuggable = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-                .getBoolean(getString(R.string.pref_key_enable_logger_checkbox),
-                        defaultDebug);
-        Logger.getInstance().setDebuggable(debuggable);
+		// Configure Logger
+		boolean debuggable = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+				.getBoolean(getString(R.string.pref_key_enable_logger_checkbox),
+						defaultDebug);
+		Logger.getInstance().setDebuggable(debuggable);
 
-        // Configure AutoUpdate
-        boolean autoUpdate = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-                .getBoolean(getString(R.string.pref_key_enable_logger_checkbox),
-                        defaultAutoUpdate);
+		// Configure AutoUpdate
+		boolean autoUpdate = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+				.getBoolean(getString(R.string.pref_key_enable_logger_checkbox),
+						defaultAutoUpdate);
 
-        // Configure rainy mode
-        boolean rainyMode = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-                .getBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox),
-                        defaultRainyMode);
+		// Configure rainy mode
+		boolean rainyMode = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+				.getBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox),
+						defaultRainyMode);
 
-        SharedPreferences.Editor editor =
-                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
-        editor.putBoolean(getString(R.string.pref_key_enable_logger_checkbox), debuggable);
-        editor.putBoolean(getString(R.string.pref_key_auto_check_update_checkbox), autoUpdate);
-        editor.putBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox), rainyMode);
-        editor.commit();
+		SharedPreferences.Editor editor =
+				PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+		editor.putBoolean(getString(R.string.pref_key_enable_logger_checkbox), debuggable);
+		editor.putBoolean(getString(R.string.pref_key_auto_check_update_checkbox), autoUpdate);
+		editor.putBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox), rainyMode);
+		editor.commit();
 
 
-    }
+	}
 
 	private static JobManager jobManager;
 
