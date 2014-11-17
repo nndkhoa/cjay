@@ -24,11 +24,12 @@
 			android:id="@+id/tv_input_container"
 			android:layout_marginBottom="6dp"/>
 
-		<TextView
+		<EditText
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:id="@+id/tv_container_id"
-			android:text="ABCD1234567 - B"
+			android:hint="Nhập Container Id"
+			android:editable="false"
 			android:layout_below="@+id/tv_input_container"
 			android:background="@android:drawable/editbox_dropdown_light_frame"
 			android:paddingTop="6dp"
@@ -67,7 +68,7 @@
 			android:layout_above="@+id/rdn_group_status"
 			android:layout_below="@+id/btn_camera"
 			android:paddingBottom="6dp"
-            tools:listitem="@layout/item_image_gridview">
+			tools:listitem="@layout/item_image_gridview">
 		</ListView>
 
 		<RadioGroup
@@ -99,7 +100,7 @@
 				android:id="@+id/rdn_status_b"
 				android:text="B"
 				android:textSize="40dp"
-                android:checked="true"
+				android:checked="true"
 				android:button="@null"
 				android:background="@drawable/radio_button_selector"
 				android:textColor="@drawable/radion_button_text_color_selector"

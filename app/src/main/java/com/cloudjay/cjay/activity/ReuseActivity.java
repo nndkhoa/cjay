@@ -1,6 +1,8 @@
 package com.cloudjay.cjay.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -83,37 +85,37 @@ public class ReuseActivity extends Activity {
 	long currentStatus;
 	Session mSession;
 
-    boolean rainyMode;
+	boolean rainyMode;
 
 	@AfterViews
 	void doAfterViews() {
 
-        rainyMode = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-                .getBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox),
-                        false);
-        if (!rainyMode) {
-            dataCenter.getSessionInBackground(this, containerID);
-        } else {
-            // Hide container id textview
-            tvContainerId.setVisibility(View.INVISIBLE);
-            tvCurrentStatus.setVisibility(View.INVISIBLE);
+		rainyMode = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+				.getBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox),
+						false);
+		if (!rainyMode) {
+			dataCenter.getSessionInBackground(this, containerID);
+		} else {
+			// Hide container id textview
+			tvContainerId.setVisibility(View.INVISIBLE);
+			tvCurrentStatus.setVisibility(View.INVISIBLE);
 
-            gateImageAdapter = new GateImageAdapter(this, R.layout.item_image_gridview, true);
-            gvReuseImages.setAdapter(gateImageAdapter);
+			gateImageAdapter = new GateImageAdapter(this, R.layout.item_image_gridview, true);
+			gvReuseImages.setAdapter(gateImageAdapter);
 
-            String depotCode = PreferencesUtil.getPrefsValue(getApplicationContext(),
-                    PreferencesUtil.PREF_USER_DEPOT);
+			String depotCode = PreferencesUtil.getPrefsValue(getApplicationContext(),
+					PreferencesUtil.PREF_USER_DEPOT);
 
-            // Get rainy mode directory
-            String path = CJayConstant.APP_DIRECTORY_FILE + "/" + depotCode + "/rainy_mode";
-            File f = new File(path);
-            File files[] = f.listFiles();
-            Logger.Log("size: " + files.length);
+			// Get rainy mode directory
+			String path = CJayConstant.APP_DIRECTORY_FILE + "/" + depotCode + "/rainy_mode";
+			File f = new File(path);
+			File files[] = f.listFiles();
+			Logger.Log("size: " + files.length);
 
-            for (int i = 0; i < files.length; i++) {
-                Logger.Log("");
-            }
-        }
+			for (int i = 0; i < files.length; i++) {
+				Logger.Log("");
+			}
+		}
 	}
 
 	@UiThread
@@ -170,7 +172,57 @@ public class ReuseActivity extends Activity {
 	}
 
 	@Click(R.id.btn_input_rainy_mode)
-	void buttonDoneRainyClicked(){
+	void buttonInputRainyClicked() {
+		openWizadActivityRainy();
+	}
+
+	@Click(R.id.btn_done_rainy_mode)
+	void buttonDoneRainyClicked() {
+//		showRainyDiaglog();
+	}
+
+	private void showRainyDiaglog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Alert");
+		builder.setMessage("Container còn thiếu thông tin");
+
+		builder.setPositiveButton("Quay lại", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				dialogInterface.dismiss();
+			}
+		});
+
+		builder.setNegativeButton("Có", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				dialogInterface.dismiss();
+			}
+		});
+
+		AlertDialog dialog = builder.create();
+		dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+			@Override
+			public void onShow(DialogInterface dialogInterface) {
+
+				// Set background and text color for BUTTON_NEGATIVE
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+						.setTextColor(getResources().getColor(android.R.color.white));
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+						.setBackgroundResource(R.drawable.btn_green_selector);
+
+				// Set background and text color for BUTTON_POSITIVE
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+						.setTextColor(getResources().getColor(android.R.color.white));
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+						.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+			}
+		});
+		dialog.show();
+
+	}
+
+	private void openWizadActivityRainy() {
 		List<GateImage> gateImages = gateImageAdapter.getCheckedCJayImageUrls();
 		for (int i = 0; i < gateImages.size(); i++) {
 			// Getting the last part of the referrer url
@@ -179,29 +231,26 @@ public class ReuseActivity extends Activity {
 
 		// Open Wizard Activity
 		Intent intent = new Intent(this, WizardActivity_.class);
-		intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, containerID);
 		intent.putExtra(WizardActivity.STEP_EXTRA, Step.IMPORT.value);
 		startActivity(intent);
-
-		EventBus.getDefault().post(new ImageCapturedEvent(containerID, ImageType.AUDIT, null));
 		this.finish();
 	}
 
 	private void donePickImage() {
 		List<GateImage> gateImages = gateImageAdapter.getCheckedCJayImageUrls();
 		for (int i = 0; i < gateImages.size(); i++) {
-            // Getting the last part of the referrer url
-            String name = gateImages.get(i).getName();
-            Logger.Log("name: " + name);
-            // Create new audit image object
-            AuditImage auditImage = new AuditImage()
-                    .withId(0)
-                    .withType(ImageType.AUDIT)
-                    .withUrl(gateImages.get(i).getUrl())
-                    .withName(name)
-                    .withUUID(UUID.randomUUID().toString());
+			// Getting the last part of the referrer url
+			String name = gateImages.get(i).getName();
+			Logger.Log("name: " + name);
+			// Create new audit image object
+			AuditImage auditImage = new AuditImage()
+					.withId(0)
+					.withType(ImageType.AUDIT)
+					.withUrl(gateImages.get(i).getUrl())
+					.withName(name)
+					.withUUID(UUID.randomUUID().toString());
 
-            dataCenter.addAuditImage(getApplicationContext(), auditImage, containerID);
+			dataCenter.addAuditImage(getApplicationContext(), auditImage, containerID);
 		}
 
 		Intent resultIntent = new Intent();
@@ -251,24 +300,24 @@ public class ReuseActivity extends Activity {
 		gateImageAdapter.notifyDataSetChanged();
 	}
 
-    @UiThread
-    void onEvent(ImageCapturedEvent event) {
-        Logger.Log("ImageCapturedEvent");
-    }
+	@UiThread
+	void onEvent(ImageCapturedEvent event) {
+		Logger.Log("ImageCapturedEvent");
+	}
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EventBus.getDefault().register(this);
-    }
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		EventBus.getDefault().register(this);
+	}
 
-    @Override
-    protected void onDestroy() {
-        EventBus.getDefault().unregister(this);
-        super.onDestroy();
-    }
+	@Override
+	protected void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
 
-    private class ActionModeCallBack implements ActionMode.Callback {
+	private class ActionModeCallBack implements ActionMode.Callback {
 
 		@Override
 		public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
