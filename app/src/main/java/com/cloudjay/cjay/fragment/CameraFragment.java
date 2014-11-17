@@ -395,6 +395,11 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
         protected void addImageToUploadQueue(String uri, String imageName, String uuid) {
 
             if (rainyMode) {
+
+                uri = "file://" + uri;
+                // Save image url to snappy db
+                dataCenter.saveRainyImage(getActivity().getApplicationContext(),
+                        uuid, uri);
                 return;
             }
 

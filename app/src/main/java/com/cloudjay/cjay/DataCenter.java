@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.api.NetworkClient;
+import com.cloudjay.cjay.event.image.RainyImagesGotEvent;
 import com.cloudjay.cjay.event.isocode.IsoCodeGotEvent;
 import com.cloudjay.cjay.event.isocode.IsoCodesGotEvent;
 import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
@@ -1193,6 +1194,38 @@ public class DataCenter {
 			e.printStackTrace();
 		}
 	}
+
+    @Background(serial = CACHE)
+    public void saveRainyImage(Context context, String uuid, String rainyImageUrl) {
+        try {
+            DB db = App.getDB(context);
+            db.put(CJayConstant.PREFIX_RAINY_MODE_IMAGE + uuid, rainyImageUrl);
+
+            Logger.Log("save rainy image successfully");
+
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Background(serial = CACHE)
+    public void getRainyImages(Context context) {
+        try {
+            DB db = App.getDB(context);
+
+            String[] keys = db.findKeys(CJayConstant.PREFIX_RAINY_MODE_IMAGE);
+            ArrayList<String> imageUrls = new ArrayList<>();
+
+            for (int i = 0; i < keys.length; i++) {
+                imageUrls.add(db.get(keys[i]));
+            }
+
+            EventBus.getDefault().post(new RainyImagesGotEvent(imageUrls));
+
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+    }
 
 	//endregion
 

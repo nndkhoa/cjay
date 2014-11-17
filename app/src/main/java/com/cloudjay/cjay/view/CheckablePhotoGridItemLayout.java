@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.view;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,7 +9,9 @@ import android.widget.ImageView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
+import com.cloudjay.cjay.adapter.RainyModeImageAdapter;
 import com.cloudjay.cjay.model.GateImage;
+import com.cloudjay.cjay.util.Logger;
 
 /**
  * Created by nambv on 17/10/2014.
@@ -21,8 +24,17 @@ public class CheckablePhotoGridItemLayout extends CheckableFrameLayout {
     private GateImageAdapter mParentAdapter;
     private GateImage mCJayImage;
 
+    private RainyModeImageAdapter mRainyModeAdapter;
+    private String mRainyImage;
+
+    private boolean rainyMode;
+
     public CheckablePhotoGridItemLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        rainyMode = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext())
+                .getBoolean(context.getString(R.string.pref_key_enable_temporary_fragment_checkbox),
+                        false);
 
         LayoutInflater.from(context).inflate(R.layout.item_gridview_photo_multi_select,
                 this);
@@ -49,10 +61,20 @@ public class CheckablePhotoGridItemLayout extends CheckableFrameLayout {
     public void toggle() {
         super.toggle();
 
-        if (isChecked()) {
-            mParentAdapter.addCheckedCJayImageUrl(mCJayImage);
+        Logger.Log("rainyMode: " + rainyMode);
+
+        if (!rainyMode) {
+            if (isChecked()) {
+                mParentAdapter.addCheckedCJayImageUrl(mCJayImage);
+            } else {
+                mParentAdapter.removeCheckedCJayImageUrl(mCJayImage);
+            }
         } else {
-            mParentAdapter.removeCheckedCJayImageUrl(mCJayImage);
+            if (isChecked()) {
+                mRainyModeAdapter.addCheckedImageUrl(mRainyImage);
+            } else {
+                mRainyModeAdapter.removeCheckedImageUrl(mRainyImage);
+            }
         }
     }
 
@@ -78,5 +100,13 @@ public class CheckablePhotoGridItemLayout extends CheckableFrameLayout {
 
     public GateImageAdapter getParentAdapter() {
         return mParentAdapter;
+    }
+
+    public void setRainyImage(String rainyImage) {
+        mRainyImage = rainyImage;
+    }
+
+    public void setRainyModeAdapter(RainyModeImageAdapter adapter) {
+        mRainyModeAdapter = adapter;
     }
 }

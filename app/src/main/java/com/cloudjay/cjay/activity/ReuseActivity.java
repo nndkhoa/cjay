@@ -16,6 +16,8 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
+import com.cloudjay.cjay.adapter.RainyModeImageAdapter;
+import com.cloudjay.cjay.event.image.RainyImagesGotEvent;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditImage;
@@ -70,7 +72,9 @@ public class ReuseActivity extends Activity {
 	@Bean
 	DataCenter dataCenter;
 
-	GateImageAdapter gateImageAdapter = null;
+    GateImageAdapter gateImageAdapter = null;
+    // use when rainy mode is true
+	RainyModeImageAdapter mAdapter = null;
 	private ActionMode mActionMode;
 
 	long currentStatus;
@@ -87,26 +91,43 @@ public class ReuseActivity extends Activity {
         if (!rainyMode) {
             dataCenter.getSessionInBackground(this, containerID);
         } else {
+
+            if (mActionMode == null) {
+                // there are some selected items, start the actionMode
+                mActionMode = startActionMode(new ActionModeCallBack());
+            }
+
             // Hide container id textview
             tvContainerId.setVisibility(View.INVISIBLE);
             tvCurrentStatus.setVisibility(View.INVISIBLE);
 
-            gateImageAdapter = new GateImageAdapter(this, R.layout.item_image_gridview, true);
-            gvReuseImages.setAdapter(gateImageAdapter);
+            mAdapter = new RainyModeImageAdapter(this, R.layout.item_image_gridview, true);
+            gvReuseImages.setAdapter(mAdapter);
 
-            String depotCode = PreferencesUtil.getPrefsValue(getApplicationContext(),
-                    PreferencesUtil.PREF_USER_DEPOT);
-
-            // Get rainy mode directory
-            String path = CJayConstant.APP_DIRECTORY_FILE + "/" + depotCode + "/rainy_mode";
-            File f = new File(path);
-            File files[] = f.listFiles();
-            Logger.Log("size: " + files.length);
-
-            for (int i = 0; i < files.length; i++) {
-                Logger.Log("");
-            }
+            // get rainy image
+            dataCenter.getRainyImages(getApplicationContext());
         }
+
+        // Set item click event on grid view
+        gvReuseImages.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                Logger.Log("item clicked");
+
+                CheckablePhotoGridItemLayout layout = (CheckablePhotoGridItemLayout)
+                        view.findViewById(R.id.photo_layout);
+                layout.toggle();
+
+                if (!rainyMode) {
+                    if (mActionMode != null)
+                        mActionMode.setTitle(String.valueOf(gateImageAdapter.getCheckedCJayImageUrlsCount()) + " selected");
+                } else {
+                    if (mActionMode != null)
+                        mActionMode.setTitle(String.valueOf(mAdapter.getCheckedImageUrlsCount()) + " selected");
+                }
+            }
+        });
 	}
 
 	@UiThread
@@ -140,50 +161,38 @@ public class ReuseActivity extends Activity {
 
 			refresh();
 		}
-
-		// Set item click event on grid view
-		gvReuseImages.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-				CheckablePhotoGridItemLayout layout = (CheckablePhotoGridItemLayout)
-						view.findViewById(R.id.photo_layout);
-				layout.toggle();
-
-
-				if (mActionMode != null)
-					mActionMode.setTitle(String.valueOf(gateImageAdapter.getCheckedCJayImageUrlsCount()) + " selected");
-
-			}
-		});
 	}
 
 	@Click(R.id.btn_done)
 	void buttonDoneClicked() {
-		donePickImage();
+        donePickImage();
 	}
 
 	private void donePickImage() {
-		List<GateImage> gateImages = gateImageAdapter.getCheckedCJayImageUrls();
-		for (int i = 0; i < gateImages.size(); i++) {
-            // Getting the last part of the referrer url
-            String name = gateImages.get(i).getName();
-            Logger.Log("name: " + name);
-            // Create new audit image object
-            AuditImage auditImage = new AuditImage()
-                    .withId(0)
-                    .withType(ImageType.AUDIT)
-                    .withUrl(gateImages.get(i).getUrl())
-                    .withName(name)
-                    .withUUID(UUID.randomUUID().toString());
 
-            dataCenter.addAuditImage(getApplicationContext(), auditImage, containerID);
-		}
+        if (!rainyMode) {
+            List<GateImage> gateImages = gateImageAdapter.getCheckedCJayImageUrls();
+            for (int i = 0; i < gateImages.size(); i++) {
+                // Getting the last part of the referrer url
+                String name = gateImages.get(i).getName();
+                Logger.Log("name: " + name);
+                // Create new audit image object
+                AuditImage auditImage = new AuditImage()
+                        .withId(0)
+                        .withType(ImageType.AUDIT)
+                        .withUrl(gateImages.get(i).getUrl())
+                        .withName(name)
+                        .withUUID(UUID.randomUUID().toString());
 
-		Intent resultIntent = new Intent();
-		setResult(Activity.RESULT_OK, resultIntent);
+                dataCenter.addAuditImage(getApplicationContext(), auditImage, containerID);
+            }
 
-		EventBus.getDefault().post(new ImageCapturedEvent(containerID, ImageType.AUDIT, null));
-		this.finish();
+            Intent resultIntent = new Intent();
+            setResult(Activity.RESULT_OK, resultIntent);
+
+            EventBus.getDefault().post(new ImageCapturedEvent(containerID, ImageType.AUDIT, null));
+            this.finish();
+        }
 	}
 
 	@Background
@@ -227,8 +236,22 @@ public class ReuseActivity extends Activity {
 	}
 
     @UiThread
-    void onEvent(ImageCapturedEvent event) {
-        Logger.Log("ImageCapturedEvent");
+    void onEvent(RainyImagesGotEvent event) {
+        ArrayList<String> imageUrls = event.getImageUrls();
+
+        if (imageUrls != null) {
+            refreshInRainyMode(imageUrls);
+        }
+    }
+
+    void refreshInRainyMode(ArrayList<String> imageUrls) {
+        mAdapter.clear();
+        if (imageUrls != null) {
+            for (String object : imageUrls) {
+                mAdapter.add(object);
+            }
+        }
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -260,35 +283,68 @@ public class ReuseActivity extends Activity {
 		@Override
 		public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
 
-			ArrayList<GateImage> selected = new ArrayList<GateImage>();
-			switch (menuItem.getItemId()) {
-				case R.id.item_select_all:
-					if (gateImageAdapter.getCheckedCJayImageUrlsCount() < gateImageAdapter.getCount()) {
-						// Do select all
-						Logger.Log("Do select all");
-						for (int i = 0; i < gateImageAdapter.getCount(); i++) {
-							selected.add(gateImageAdapter.getItem(i));
-						}
+            if (!rainyMode) {
 
-						gateImageAdapter.setCheckedCJayImageUrls(selected);
-						gateImageAdapter.notifyDataSetChanged();
+                ArrayList<GateImage> selected = new ArrayList<>();
+                switch (menuItem.getItemId()) {
+                    case R.id.item_select_all:
+                        if (gateImageAdapter.getCheckedCJayImageUrlsCount() < gateImageAdapter.getCount()) {
+                            // Do select all
+                            Logger.Log("Do select all");
+                            for (int i = 0; i < gateImageAdapter.getCount(); i++) {
+                                selected.add(gateImageAdapter.getItem(i));
+                            }
 
-						Logger.Log("selected: " + selected.size());
-						actionMode.setTitle(String.valueOf(selected.size()) + " selected");
+                            gateImageAdapter.setCheckedCJayImageUrls(selected);
+                            gateImageAdapter.notifyDataSetChanged();
 
-					}
-					break;
-				case R.id.item_unselect_all:
-					// Do unselect all
-					Logger.Log("Do unselect all");
-					selected.clear();
-					gateImageAdapter.removeAllCheckedCJayImageUrl();
-					gateImageAdapter.notifyDataSetChanged();
+                            Logger.Log("selected: " + selected.size());
+                            actionMode.setTitle(String.valueOf(selected.size()) + " selected");
 
-					mActionMode.setTitle(String.valueOf(gateImageAdapter.getCheckedCJayImageUrlsCount()) + " selected");
+                        }
+                        break;
+                    case R.id.item_unselect_all:
+                        // Do unselect all
+                        Logger.Log("Do unselect all");
+                        selected.clear();
+                        gateImageAdapter.removeAllCheckedCJayImageUrl();
+                        gateImageAdapter.notifyDataSetChanged();
 
-					break;
-			}
+                        mActionMode.setTitle(String.valueOf(gateImageAdapter.getCheckedCJayImageUrlsCount()) + " selected");
+
+                        break;
+                }
+            } else {
+                ArrayList<String> selected = new ArrayList<>();
+                switch (menuItem.getItemId()) {
+                    case R.id.item_select_all:
+                        if (mAdapter.getCheckedImageUrlsCount() < mAdapter.getCount()) {
+                            // Do select all
+                            Logger.Log("Do select all");
+                            for (int i = 0; i < mAdapter.getCount(); i++) {
+                                selected.add(mAdapter.getItem(i));
+                            }
+
+                            mAdapter.setCheckedImageUrls(selected);
+                            mAdapter.notifyDataSetChanged();
+
+                            Logger.Log("selected: " + selected.size());
+                            actionMode.setTitle(String.valueOf(selected.size()) + " selected");
+
+                        }
+                        break;
+                    case R.id.item_unselect_all:
+                        // Do unselect all
+                        Logger.Log("Do unselect all");
+                        selected.clear();
+                        mAdapter.removeAllCheckedImageUrl();
+                        mAdapter.notifyDataSetChanged();
+
+                        mActionMode.setTitle(String.valueOf(mAdapter.getCheckedImageUrlsCount()) + " selected");
+
+                        break;
+                }
+            }
 
 			return false;
 		}
