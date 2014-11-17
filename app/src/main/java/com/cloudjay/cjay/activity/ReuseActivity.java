@@ -114,7 +114,7 @@ public class ReuseActivity extends Activity {
         } else {
 
             buttonLinearLayout.setVisibility(View.GONE);
-            rainyModeButtonLinearLayout.setVisibility(View.VISIBLE);
+            rainyModeButtonLinearLayout.setVisibility(View.GONE);
 
             if (mActionMode == null) {
                 // there are some selected items, start the actionMode
@@ -147,6 +147,12 @@ public class ReuseActivity extends Activity {
                 } else {
                     if (mActionMode != null)
                         mActionMode.setTitle(String.valueOf(mAdapter.getCheckedImageUrlsCount()) + " selected");
+
+                    if (mAdapter.getCheckedImageUrlsCount() > 0) {
+                        rainyModeButtonLinearLayout.setVisibility(View.VISIBLE);
+                    } else {
+                        rainyModeButtonLinearLayout.setVisibility(View.GONE);
+                    }
                 }
             }
         });
@@ -395,7 +401,6 @@ public class ReuseActivity extends Activity {
 
                             Logger.Log("selected: " + selected.size());
                             actionMode.setTitle(String.valueOf(selected.size()) + " selected");
-
                         }
                         break;
                     case R.id.item_unselect_all:
@@ -425,7 +430,7 @@ public class ReuseActivity extends Activity {
 
                             Logger.Log("selected: " + selected.size());
                             actionMode.setTitle(String.valueOf(selected.size()) + " selected");
-
+                            rainyModeButtonLinearLayout.setVisibility(View.VISIBLE);
                         }
                         break;
                     case R.id.item_unselect_all:
@@ -436,6 +441,7 @@ public class ReuseActivity extends Activity {
                         mAdapter.notifyDataSetChanged();
 
                         mActionMode.setTitle(String.valueOf(mAdapter.getCheckedImageUrlsCount()) + " selected");
+                        rainyModeButtonLinearLayout.setVisibility(View.GONE);
 
                         break;
                 }
