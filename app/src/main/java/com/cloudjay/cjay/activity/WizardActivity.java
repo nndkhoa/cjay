@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.activity;
 
 import android.app.ActionBar;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.MenuItem;
@@ -9,6 +10,8 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.fragment.AuditAndRepairFragment_;
 import com.cloudjay.cjay.fragment.ExportFragment_;
 import com.cloudjay.cjay.fragment.ImportFragment_;
+import com.cloudjay.cjay.model.GateImage;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.Step;
 
@@ -16,11 +19,15 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @EActivity(R.layout.activity_wizard)
 public class WizardActivity extends BaseActivity {
 
 	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
 	public final static String STEP_EXTRA = "com.cloudjay.wizard.step";
+    public final static String IMAGE_URLS = "com.cloudjay.wizard.imageurls";
 
 	@Extra(CONTAINER_ID_EXTRA)
 	String containerID;
@@ -30,6 +37,9 @@ public class WizardActivity extends BaseActivity {
 	 */
 	@Extra(STEP_EXTRA)
 	int step = 4;
+
+    @Extra(IMAGE_URLS)
+    ArrayList<String> imageUrls;
 
 	ActionBar actionBar;
 
@@ -64,7 +74,19 @@ public class WizardActivity extends BaseActivity {
 			// Load fragment Import
 			case IMPORT:
 			default:
-				fragment = ImportFragment_.builder().containerID(containerID).build();
+                Intent intent = getIntent();
+                if (intent.getAction() != null) {
+                    if (intent.getAction().equals(CJayConstant.ACTION_SEND_GATE_IMAGES)) {
+                        fragment = ImportFragment_.builder()
+                                .containerID(containerID)
+                                .imageUrls(imageUrls)
+                                .build();
+                    } else {
+                        fragment = ImportFragment_.builder().containerID(containerID).build();
+                    }
+                } else {
+                    fragment = ImportFragment_.builder().containerID(containerID).build();
+                }
 				break;
 		}
 

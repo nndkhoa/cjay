@@ -511,7 +511,9 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
                 }
 
                 // create image file name
-                fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-" + operatorCode + "-"
+//                fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-" + operatorCode + "-"
+//                        + uuid + ".jpg";
+                fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-"
                         + uuid + ".jpg";
             } else {
 
@@ -523,7 +525,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
                 }
 
                 // create image file name
-                fileName = today + "-" + uuid + ".jpg";
+                fileName = depotCode + "-" + today + "-" + "imageType" + "-" + "containerId" + "-"
+                        + uuid + ".jpg";
             }
 
             File photo = new File(newDirectory, fileName);

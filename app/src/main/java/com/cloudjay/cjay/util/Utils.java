@@ -538,6 +538,16 @@ public class Utils {
 		return name;
 	}
 
+    public static String getUuidFromImageName(String imageName) {
+        if (TextUtils.isEmpty(imageName)) {
+            return "";
+        }
+
+        String uuid = imageName.substring(imageName.lastIndexOf("-") + 1, imageName.length());
+        uuid = uuid.substring(0, uuid.length() - 4);
+        return uuid;
+    }
+
 	public static String subString(String s) {
 		return s.substring(s.length() - 53, s.length() - 32);
 	}

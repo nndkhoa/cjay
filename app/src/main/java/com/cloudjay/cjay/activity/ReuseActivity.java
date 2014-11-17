@@ -30,6 +30,7 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
@@ -135,8 +136,6 @@ public class ReuseActivity extends Activity {
         gvReuseImages.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                Logger.Log("item clicked");
 
                 CheckablePhotoGridItemLayout layout = (CheckablePhotoGridItemLayout)
                         view.findViewById(R.id.photo_layout);
@@ -248,44 +247,39 @@ public class ReuseActivity extends Activity {
 	}
 
 	private void openWizadActivityRainy() {
-		List<GateImage> gateImages = gateImageAdapter.getCheckedCJayImageUrls();
-		for (int i = 0; i < gateImages.size(); i++) {
-			// Getting the last part of the referrer url
-			dataCenter.addGateImage(getApplicationContext(), gateImages.get(i), containerID);
-		}
+        ArrayList<String> imageUrls  = mAdapter.getCheckedImageUrls();
 
 		// Open Wizard Activity
 		Intent intent = new Intent(this, WizardActivity_.class);
 		intent.putExtra(WizardActivity.STEP_EXTRA, Step.IMPORT.value);
+        intent.putExtra(WizardActivity.IMAGE_URLS, imageUrls);
+        intent.setAction(CJayConstant.ACTION_SEND_GATE_IMAGES);
 		startActivity(intent);
 		this.finish();
 	}
 
 	private void donePickImage() {
+        List<GateImage> gateImages = gateImageAdapter.getCheckedCJayImageUrls();
+        for (int i = 0; i < gateImages.size(); i++) {
+            // Getting the last part of the referrer url
+            String name = gateImages.get(i).getName();
+            Logger.Log("name: " + name);
+            // Create new audit image object
+            AuditImage auditImage = new AuditImage()
+                    .withId(0)
+                    .withType(ImageType.AUDIT)
+                    .withUrl(gateImages.get(i).getUrl())
+                    .withName(name)
+                    .withUUID(UUID.randomUUID().toString());
 
-        if (!rainyMode) {
-            List<GateImage> gateImages = gateImageAdapter.getCheckedCJayImageUrls();
-            for (int i = 0; i < gateImages.size(); i++) {
-                // Getting the last part of the referrer url
-                String name = gateImages.get(i).getName();
-                Logger.Log("name: " + name);
-                // Create new audit image object
-                AuditImage auditImage = new AuditImage()
-                        .withId(0)
-                        .withType(ImageType.AUDIT)
-                        .withUrl(gateImages.get(i).getUrl())
-                        .withName(name)
-                        .withUUID(UUID.randomUUID().toString());
-
-                dataCenter.addAuditImage(getApplicationContext(), auditImage, containerID);
-            }
-
-            Intent resultIntent = new Intent();
-            setResult(Activity.RESULT_OK, resultIntent);
-
-            EventBus.getDefault().post(new ImageCapturedEvent(containerID, ImageType.AUDIT, null));
-            this.finish();
+            dataCenter.addAuditImage(getApplicationContext(), auditImage, containerID);
         }
+
+        Intent resultIntent = new Intent();
+        setResult(Activity.RESULT_OK, resultIntent);
+
+        EventBus.getDefault().post(new ImageCapturedEvent(containerID, ImageType.AUDIT, null));
+        this.finish();
 	}
 
 	@Background

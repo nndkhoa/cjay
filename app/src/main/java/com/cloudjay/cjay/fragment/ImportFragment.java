@@ -100,12 +100,16 @@ public class ImportFragment extends Fragment {
 
 	//region ATTRIBUTE
 	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
+    public final static String IMAGE_URLS_EXTRA = "com.cloudjay.wizard.imageurls";
 
 	@Bean
 	DataCenter dataCenter;
 
 	@FragmentArg(CONTAINER_ID_EXTRA)
 	String containerID;
+
+    @FragmentArg(IMAGE_URLS_EXTRA)
+    ArrayList<String> imageUrls;
 
 	String operatorCode;
 
@@ -147,17 +151,45 @@ public class ImportFragment extends Fragment {
 
 		if (rainyMode) {
 			configViewForRainyMode();
-		}
+		} else {
 
-		dataCenter.getSessionInBackground(getActivity(), containerID);
+            btnCamera.setVisibility(View.VISIBLE);
+            btnPickMore.setVisibility(View.GONE);
 
-		refresh();
+            dataCenter.getSessionInBackground(getActivity(), containerID);
+            refresh();
+        }
+
 	}
 
+    /**
+     * configure view for rainy mode
+     */
 	private void configViewForRainyMode() {
+        btnPickMore.setVisibility(View.VISIBLE);
 		btnCamera.setVisibility(View.GONE);
 		btnContinue.setVisibility(View.GONE);
+
 		Utils.setupEditText(etContainerCode);
+
+        if (imageUrls != null) {
+            for (int i = 0; i < imageUrls.size(); i++) {
+
+                String imageName = Utils.getImageNameFromUrl(imageUrls.get(i));
+                String uuid = Utils.getUuidFromImageName(imageName);
+
+                GateImage gateImage = new GateImage()
+                        .withId(0)
+                        .withType(ImageType.IMPORT.value)
+                        .withName(imageName)
+                        .withUrl(imageUrls.get(i))
+                        .withUuid(uuid);
+
+                list.add(gateImage);
+            }
+        }
+
+        mAdapter.setData(list);
 	}
 
 	//region EVENT HANDLER
@@ -310,14 +342,17 @@ public class ImportFragment extends Fragment {
 		}
 		//TODO add condition if all image selected => use normal action (else phase) @Nam
 		if (rainyMode) {
-			openReuseActivity();
-		} else {
-			//Upload import session
-			uploadImportSession(true);
+            //TODO: add image to upload queue @Thai
 
-			// Navigate to HomeActivity
-			getActivity().finish();
+            // open reuse activity
+			openReuseActivity();
 		}
+
+        //Upload import session
+        uploadImportSession(true);
+
+        // Navigate to HomeActivity
+        getActivity().finish();
 	}
 
 	@Click(R.id.btn_pick_more)
