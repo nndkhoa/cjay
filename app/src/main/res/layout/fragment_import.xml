@@ -63,7 +63,7 @@
 				android:layout_height="wrap_content"
 				android:id="@+id/btn_pick_more"
 				android:layout_below="@+id/et_operator"
-				android:text="@string/button_audit_now"
+				android:text="Chọn thêm hình"
 				android:textColor="@android:color/white"
 				android:background="@drawable/btn_customize_selector"/>
 
