@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.inputmethod.InputMethodManager;
@@ -21,6 +22,7 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.upload.PreUploadStartedEvent;
+import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.fragment.SearchFragment;
 import com.cloudjay.cjay.fragment.SearchFragment_;
 import com.cloudjay.cjay.fragment.UploadFragment_;
@@ -29,6 +31,8 @@ import com.cloudjay.cjay.task.job.FetchSessionsJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.enums.ImageType;
+import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.JobManager;
@@ -226,6 +230,29 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener,
         } catch (PackageManager.NameNotFoundException ignored) {
         }
         return null;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        boolean rainyMode = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+                .getBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox),
+                        false);
+
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+            if (rainyMode) {
+                // Go direct to camera
+                Intent cameraActivityIntent = new Intent(getApplicationContext(), CameraActivity_.class);
+                cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, "");
+                cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, "");
+                cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, -1);
+                cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, -1);
+                startActivity(cameraActivityIntent);
+            }
+            return true;
+        } else {
+            return super.onKeyDown(keyCode, event);
+        }
     }
 }
 

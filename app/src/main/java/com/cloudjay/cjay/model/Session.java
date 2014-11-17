@@ -563,7 +563,15 @@ public class Session implements Serializable {
 
 				for (AuditItem item : auditItems) {
 					if (item.isRepaired() == false) {
-						return false;
+                        if (item.isAllowed() == null) {
+                            return false;
+                        } else {
+                            if (item.isAllowed()) {
+                                return false;
+                            } else {
+                                continue;
+                            }
+                        }
 					}
 				}
 

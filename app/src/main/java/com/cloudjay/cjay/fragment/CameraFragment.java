@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,12 +23,9 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
-import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
-import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.task.job.UploadImageJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -106,6 +104,8 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
     @Bean
     DataCenter dataCenter;
 
+    boolean rainyMode;
+
     //endregion
 
     //region VIEW
@@ -136,6 +136,15 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
     @Click(R.id.btn_camera_done)
     void btnDoneClicked() {
+
+        if (rainyMode) {
+            // Open resue activity
+            // Open ReuseActivity
+            Intent intent = new Intent(getActivity(), ReuseActivity_.class);
+            intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, "");
+            startActivityForResult(intent, 1);
+        }
+
         // Post an event
         EventBus.getDefault().post(new ImageCapturedEvent(containerId, mType, auditItemUUID, isOpened));
         getActivity().finish();
@@ -198,21 +207,32 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
         // Config shot mode. Default is FALSE.
         // Configure View visibility based on current step of session
-        Step step = Step.values()[currentStep];
 
 //		Logger.Log("Current Step of session: " + step.toString());
-        switch (step) {
 
-            case AUDIT:
-                btnUseGateImage.setVisibility(View.VISIBLE);
-                btnCameraMode.setVisibility(View.VISIBLE);
-                break;
+        rainyMode = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext())
+                .getBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox),
+                        false);
 
-            default:
-                getContract().setSingleShotMode(false);
-                btnUseGateImage.setVisibility(View.GONE);
-                btnCameraMode.setVisibility(View.GONE);
-                break;
+        if (rainyMode) {
+            btnUseGateImage.setVisibility(View.GONE);
+        } else {
+
+            Step step = Step.values()[currentStep];
+
+            switch (step) {
+
+                case AUDIT:
+                    btnUseGateImage.setVisibility(View.VISIBLE);
+                    btnCameraMode.setVisibility(View.VISIBLE);
+                    break;
+
+                default:
+                    getContract().setSingleShotMode(false);
+                    btnUseGateImage.setVisibility(View.GONE);
+                    btnCameraMode.setVisibility(View.GONE);
+                    break;
+            }
         }
 
     }
@@ -375,6 +395,10 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
          */
         protected void addImageToUploadQueue(String uri, String imageName, String uuid) {
 
+            if (rainyMode) {
+                return;
+            }
+
             // Create image based on mType and add this image to database
             ImageType type = ImageType.values()[mType];
             switch (type) {
@@ -460,24 +484,43 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
          */
         protected File getFile(String uuid) {
 
-            // Save Bitmap to Files
-            String imageType = getImageTypeString(mType);
+            String fileName;
+            File newDirectory = null;
 
             // create today String
             String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
+
+            // get depot code
             String depotCode = PreferencesUtil.getPrefsValue(getActivity(), PreferencesUtil.PREF_USER_DEPOT);
 
-            // create directory to save images
-            File newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/" + today + "/" + imageType
-                    + "/" + containerId);
+            if (!rainyMode) {
 
-            if (!newDirectory.exists()) {
-                newDirectory.mkdirs();
+                // Save Bitmap to Files
+                String imageType = getImageTypeString(mType);
+
+                // create directory to save images
+                newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/" + today + "/" + imageType
+                        + "/" + containerId);
+
+                if (!newDirectory.exists()) {
+                    newDirectory.mkdirs();
+                }
+
+                // create image file name
+                fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-" + operatorCode + "-"
+                        + uuid + ".jpg";
+            } else {
+
+                // create directory to save images
+                newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/" + today + "/rainy_mode" );
+
+                if (!newDirectory.exists()) {
+                    newDirectory.mkdirs();
+                }
+
+                // create image file name
+                fileName = today + "-" + uuid + ".jpg";
             }
-
-            // create image file name
-            String fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-" + operatorCode + "-"
-                    + uuid + ".jpg";
 
             File photo = new File(newDirectory, fileName);
 

@@ -2,6 +2,7 @@ package com.cloudjay.cjay.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 
 import com.cloudjay.cjay.R;
@@ -99,7 +100,7 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 	}
 
 	@Override
-	public boolean onKeyUp(int keyCode, KeyEvent event) {
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
 
 		try {
 			if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
@@ -110,13 +111,13 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 
 				current.takeSimplePicture();
 				return true;
-			}
-
-            if (keyCode == KeyEvent.KEYCODE_BACK && current != null) {
-                current.onBackPress();
+			} else if (keyCode == KeyEvent.KEYCODE_BACK && current != null) {
+//                current.onBackPress();
+                this.finish();
+                return true;
+            } else {
+                return super.onKeyDown(keyCode, event);
             }
-
-			return (super.onKeyDown(keyCode, event));
 		} catch (Exception e) {
 			Utils.showCrouton(this, "Please take it easy");
 			e.printStackTrace();

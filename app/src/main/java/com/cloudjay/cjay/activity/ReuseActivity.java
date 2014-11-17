@@ -3,6 +3,7 @@ package com.cloudjay.cjay.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -72,9 +73,21 @@ public class ReuseActivity extends Activity {
 	long currentStatus;
 	Session mSession;
 
+    boolean rainyMode;
+
 	@AfterViews
 	void doAfterViews() {
-        dataCenter.getSessionInBackground(this, containerID);
+
+        rainyMode = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+                .getBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox),
+                        false);
+        if (!rainyMode) {
+            dataCenter.getSessionInBackground(this, containerID);
+        } else {
+            // Hide container id textview
+            tvContainerId.setVisibility(View.INVISIBLE);
+            tvCurrentStatus.setVisibility(View.INVISIBLE);
+        }
 	}
 
 	@UiThread
@@ -193,6 +206,11 @@ public class ReuseActivity extends Activity {
 		}
 		gateImageAdapter.notifyDataSetChanged();
 	}
+
+    @UiThread
+    void onEvent(ImageCapturedEvent event) {
+        Logger.Log("ImageCapturedEvent");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
