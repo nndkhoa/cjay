@@ -25,6 +25,7 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
+import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
 import com.snappydb.SnappydbException;
 
@@ -63,6 +64,12 @@ public class ReuseActivity extends Activity {
 
 	@ViewById(R.id.tv_current_status)
 	TextView tvCurrentStatus;
+
+	@ViewById(R.id.btn_input_rainy_mode)
+	Button btnInputRainy;
+
+	@ViewById(R.id.btn_done_rainy_mode)
+	Button btnDoneRainy;
 
 	@Bean
 	DataCenter dataCenter;
@@ -141,6 +148,24 @@ public class ReuseActivity extends Activity {
 	@Click(R.id.btn_done)
 	void buttonDoneClicked() {
 		donePickImage();
+	}
+
+	@Click(R.id.btn_input_rainy_mode)
+	void buttonDoneRainyClicked(){
+		List<GateImage> gateImages = gateImageAdapter.getCheckedCJayImageUrls();
+		for (int i = 0; i < gateImages.size(); i++) {
+			// Getting the last part of the referrer url
+			dataCenter.addGateImage(getApplicationContext(), gateImages.get(i), containerID);
+		}
+
+		// Open Wizard Activity
+		Intent intent = new Intent(this, WizardActivity_.class);
+		intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, containerID);
+		intent.putExtra(WizardActivity.STEP_EXTRA, Step.IMPORT.value);
+		startActivity(intent);
+
+		EventBus.getDefault().post(new ImageCapturedEvent(containerID, ImageType.AUDIT, null));
+		this.finish();
 	}
 
 	private void donePickImage() {
