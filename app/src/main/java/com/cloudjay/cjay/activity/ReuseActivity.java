@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
@@ -78,6 +79,12 @@ public class ReuseActivity extends Activity {
 	@ViewById(R.id.btn_done_rainy_mode)
 	Button btnDoneRainy;
 
+    @ViewById(R.id.ll_bottom_rainy_mode)
+    LinearLayout rainyModeButtonLinearLayout;
+
+    @ViewById(R.id.ll_bottom)
+    LinearLayout buttonLinearLayout;
+
 	@Bean
 	DataCenter dataCenter;
 
@@ -98,8 +105,15 @@ public class ReuseActivity extends Activity {
                 .getBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox),
                         false);
         if (!rainyMode) {
+
+            buttonLinearLayout.setVisibility(View.VISIBLE);
+            rainyModeButtonLinearLayout.setVisibility(View.GONE);
+
             dataCenter.getSessionInBackground(this, containerID);
         } else {
+
+            buttonLinearLayout.setVisibility(View.GONE);
+            rainyModeButtonLinearLayout.setVisibility(View.VISIBLE);
 
             if (mActionMode == null) {
                 // there are some selected items, start the actionMode
