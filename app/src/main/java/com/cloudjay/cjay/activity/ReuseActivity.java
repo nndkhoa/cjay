@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.ActionMode;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +24,7 @@ import com.cloudjay.cjay.adapter.RainyModeImageAdapter;
 import com.cloudjay.cjay.event.image.RainyImagesGotEvent;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.image.ImageCapturedEvent;
+import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
@@ -58,9 +60,13 @@ public class ReuseActivity extends Activity {
 
 
 	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
+    public final static String GATE_IMAGES_EXTRA = "com.cloudjay.wizard.gate_images";
 
 	@Extra(CONTAINER_ID_EXTRA)
 	String containerID;
+
+    @Extra(GATE_IMAGES_EXTRA)
+    ArrayList<String> gateImages;
 
 	@ViewById(R.id.btn_done)
 	Button btnDone;
@@ -344,6 +350,11 @@ public class ReuseActivity extends Activity {
                 mAdapter.add(object);
             }
         }
+
+        if (gateImages != null) {
+            mAdapter.setCheckedImageUrls(gateImages);
+        }
+
         mAdapter.notifyDataSetChanged();
     }
 
@@ -359,15 +370,34 @@ public class ReuseActivity extends Activity {
 		super.onDestroy();
 	}
 
-	@Override
-	public void onBackPressed() {
-		super.onBackPressed();
-		if (rainyMode) {
-			openWizadActivityRainy();
-		}
-	}
+//	@Override
+//	public void onBackPressed() {
+//		super.onBackPressed();
+//		if (rainyMode) {
+//			openWizadActivityRainy();
+//		}
+//	}
 
-	private class ActionModeCallBack implements ActionMode.Callback {
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+            if (rainyMode) {
+                // Go direct to camera
+                Intent cameraActivityIntent = new Intent(getApplicationContext(), CameraActivity_.class);
+                cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, "");
+                cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, "");
+                cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, -1);
+                cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, -1);
+                startActivity(cameraActivityIntent);
+            }
+            return true;
+        } else {
+            return super.onKeyDown(keyCode, event);
+        }
+    }
+
+    private class ActionModeCallBack implements ActionMode.Callback {
 
 		@Override
 		public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
@@ -452,9 +482,10 @@ public class ReuseActivity extends Activity {
 
 		@Override
 		public void onDestroyActionMode(ActionMode actionMode) {
-			donePickImage();
+            if (!rainyMode) {
+                donePickImage();
+            }
 		}
-
 	}
 
 }

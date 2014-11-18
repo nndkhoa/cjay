@@ -160,5 +160,6 @@
 
     <!-- Warning -->
     <string name="warning_exported_container">Container này đã được xuất</string>
+    <string name="warning_container_invalid">Container chưa được báo cáo đầy đủ</string>
 
 </resources>

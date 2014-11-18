@@ -117,7 +117,7 @@ public class WorkingFragment extends Fragment {
 
 	void refresh() {
 		if (mAdapter != null) {
-			dataCenter.getSessionsInBackground(getActivity().getApplicationContext(), CJayConstant.PREFIX_WORKING);
+			dataCenter.getListSessionsInBackground(getActivity().getApplicationContext(), CJayConstant.PREFIX_WORKING);
 		}
 	}
 
