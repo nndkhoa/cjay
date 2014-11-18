@@ -58,4 +58,5 @@ public class CJayConstant {
 
     // Action Intent
     public static final String ACTION_SEND_GATE_IMAGES = "action_send_gate_images";
+    public static final String ACTION_PICK_MORE = "action_pick_more";
 }

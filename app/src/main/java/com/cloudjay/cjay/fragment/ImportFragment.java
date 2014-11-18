@@ -20,6 +20,7 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
+import com.cloudjay.cjay.activity.ReuseActivity;
 import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
@@ -32,6 +33,7 @@ import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadImportJob;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -112,6 +114,7 @@ public class ImportFragment extends Fragment {
     ArrayList<String> imageUrls;
 
 	String operatorCode;
+    long operatorId;
 
 	GateImageAdapter mAdapter = null;
 
@@ -199,21 +202,23 @@ public class ImportFragment extends Fragment {
 		// Get selected operator from search operator dialog
 		Operator operator = event.getOperator();
 		operatorCode = operator.getOperatorCode();
+        operatorId = operator.getId();
 		Logger.Log(" > Choose operator " + operatorCode);
 
 		// Set operator to edit text
 		etOperator.setText(operator.getOperatorCode());
 
-		mSession.setOperatorId(operator.getId());
-		mSession.setOperatorCode(operatorCode);
-		if (mSession != null) {
-			mSession.setOperatorId(operator.getId());
-			mSession.setOperatorCode(operator.getOperatorCode());
-			mSession.setGateImages(list);
-		}
+        if (!rainyMode) {
 
-		// Save session
-		dataCenter.updateImportSession(mSession);
+            if (mSession != null) {
+                mSession.setOperatorId(operatorId);
+                mSession.setOperatorCode(operator.getOperatorCode());
+                mSession.setGateImages(list);
+            }
+
+            // Save session
+            dataCenter.updateImportSession(mSession);
+        }
 	}
 
 	/**
@@ -336,17 +341,36 @@ public class ImportFragment extends Fragment {
 	 */
 	@Click(R.id.btn_complete_import)
 	void buttonCompletedClicked() {
-		if (mSession.isValidToUpload(Step.IMPORT) == false) {
-			Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
-			return;
-		}
+
 		//TODO add condition if all image selected => use normal action (else phase) @Nam
 		if (rainyMode) {
-            //TODO: add image to upload queue @Thai
 
-            // open reuse activity
-			openReuseActivity();
+            if (isValidToAddSession()) {
+
+                mSession = new Session()
+                        .withContainerId(etContainerCode.getText().toString())
+                        .withOperatorCode(etOperator.getText().toString())
+                        .withPreStatus(preStatus)
+                        .withGateImages(list);
+
+                dataCenter.addSession(mSession);
+
+                //TODO: add image to upload queue @Thai
+
+                // open reuse activity
+                openReuseActivity();
+            }
+            else {
+                Utils.showCrouton(getActivity(), getResources().getString(
+                        R.string.warning_container_invalid));
+                return;
+            }
 		}
+
+        if (mSession.isValidToUpload(Step.IMPORT) == false) {
+            Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+            return;
+        }
 
         //Upload import session
         uploadImportSession(true);
@@ -362,9 +386,15 @@ public class ImportFragment extends Fragment {
 	}
 
 	private void openReuseActivity() {
+        ArrayList<String> gateImages = new ArrayList<>();
+
+        for (int i = 0; i < list.size(); i++) {
+            gateImages.add(list.get(i).getUrl());
+        }
 		Intent intent = new Intent(getActivity(), ReuseActivity_.class);
+        intent.setAction(CJayConstant.ACTION_PICK_MORE);
+        intent.putExtra(ReuseActivity.GATE_IMAGES_EXTRA, gateImages);
 		startActivity(intent);
-		getActivity().finish();
 	}
 
 	private void uploadImportSession(boolean clearFromWorking) {
@@ -402,10 +432,14 @@ public class ImportFragment extends Fragment {
 		if (isChecked == true) {
 			preStatus = 0;
 
-			mSession.setPreStatus(preStatus);
-			dataCenter.updateImportSession(mSession);
-			dataCenter.addWorkingSession(mSession);
-			btnContinue.setVisibility(View.GONE);
+            if (!rainyMode) {
+                mSession.setPreStatus(preStatus);
+                dataCenter.updateImportSession(mSession);
+                dataCenter.addWorkingSession(mSession);
+
+                btnContinue.setVisibility(View.GONE);
+            }
+
 		}
 	}
 
@@ -413,10 +447,14 @@ public class ImportFragment extends Fragment {
 	void preStatusBChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 1;
-			mSession.setPreStatus(preStatus);
-			dataCenter.updateImportSession(mSession);
-			dataCenter.addWorkingSession(mSession);
-			btnContinue.setVisibility(View.VISIBLE);
+
+            if (!rainyMode) {
+                mSession.setPreStatus(preStatus);
+                dataCenter.updateImportSession(mSession);
+                dataCenter.addWorkingSession(mSession);
+
+                btnContinue.setVisibility(View.VISIBLE);
+            }
 		}
 	}
 
@@ -424,11 +462,34 @@ public class ImportFragment extends Fragment {
 	void preStatusCChecked(boolean isChecked) {
 		if (isChecked == true) {
 			preStatus = 2;
-			mSession.setPreStatus(preStatus);
-			dataCenter.updateImportSession(mSession);
-			dataCenter.addWorkingSession(mSession);
-			btnContinue.setVisibility(View.VISIBLE);
+
+            if (!rainyMode) {
+                mSession.setPreStatus(preStatus);
+                dataCenter.updateImportSession(mSession);
+                dataCenter.addWorkingSession(mSession);
+
+                btnContinue.setVisibility(View.VISIBLE);
+            }
 		}
 	}
 	//endregion
+
+    boolean isValidToAddSession() {
+
+        containerID = etContainerCode.getText().toString();
+
+        if (containerID.length() < 11) {
+            return false;
+        }
+
+        if (operatorCode.equals("") || operatorId == 0) {
+            return false;
+        }
+
+        if (null == list || list.size() == 0) {
+            return false;
+        }
+
+        return true;
+    }
 }

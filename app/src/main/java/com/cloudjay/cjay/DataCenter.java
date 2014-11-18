@@ -463,7 +463,7 @@ public class DataCenter {
 	 * @return
 	 */
 	@Background(serial = CACHE)
-	public void getSessionsInBackground(Context context, String prefix) {
+	public void getListSessionsInBackground(Context context, String prefix) {
 //		Logger.Log("Getting list session: " + prefix);
 
 		int len = prefix.length();
