@@ -354,7 +354,7 @@ public class SearchFragment extends Fragment {
 		if (event.isFailed()) {
 
 			llSearchResult.setVisibility(View.GONE);
-			Utils.showCrouton(getActivity(), "Đang xảy ra sự cố \nXin thử lại sau", Style.ALERT);
+			Utils.showCrouton(getActivity(), "Xảy ra sự cố với kết nối mạng \nXin thử lại sau", Style.ALERT);
 
 		} else {
 			List<Session> result = event.getSessions();

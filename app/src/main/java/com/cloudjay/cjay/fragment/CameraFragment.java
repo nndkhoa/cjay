@@ -190,7 +190,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
         EventBus.getDefault().register(this);
     }
 
-    @Override
+	@Override
     public void onDestroy() {
         EventBus.getDefault().unregister(this);
         super.onDestroy();
