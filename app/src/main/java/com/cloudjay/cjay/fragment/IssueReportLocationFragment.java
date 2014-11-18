@@ -213,9 +213,9 @@ public class IssueReportLocationFragment extends IssueReportFragment implements 
 		// save location code
 		String locationCode = new StringBuilder()
                 .append(Utils.stripNull(mLocationCodes[0]))
-                .append(Utils.stripNull(mLocationCodes[0]))
-                .append(Utils.stripNull(mLocationCodes[0]))
-                .append(Utils.stripNull(mLocationCodes[0])).toString();
+                .append(Utils.stripNull(mLocationCodes[1]))
+                .append(Utils.stripNull(mLocationCodes[2]))
+                .append(Utils.stripNull(mLocationCodes[3])).toString();
 
 		if (locationCode.length() == 4) {
 			mCode3EditText.setError(null);
