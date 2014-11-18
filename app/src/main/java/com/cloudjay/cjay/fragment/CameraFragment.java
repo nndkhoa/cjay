@@ -145,7 +145,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
         }
 
         // Post an event
-        EventBus.getDefault().post(new ImageCapturedEvent(containerId, mType, auditItemUUID, isOpened));
+        //EventBus.getDefault().post(new ImageCapturedEvent(containerId, mType, auditItemUUID, isOpened));
         getActivity().finish();
     }
 
@@ -291,7 +291,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
         if (btnDone.getVisibility() == View.GONE) {
             Toast.makeText(getActivity(), "Vui lòng thử lại khi đã lưu hình xong", Toast.LENGTH_SHORT).show();
         } else {
-            EventBus.getDefault().post(new ImageCapturedEvent(containerId, mType, auditItemUUID, isOpened));
+//          EventBus.getDefault().post(new ImageCapturedEvent(containerId, mType, auditItemUUID, isOpened));
             getActivity().finish();
         }
     }

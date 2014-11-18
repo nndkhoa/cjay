@@ -300,12 +300,18 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	 *
 	 * @param event
 	 */
-	public void onEvent(ImageCapturedEvent event) {
+//	public void onEvent(ImageCapturedEvent event) {
+//
+//		// requery to update button
+//		int imageType = event.getImageType();
+//		if (imageType == ImageType.AUDIT.value) {
+//			dataCenter.changeSessionLocalStepInBackground(getActivity(), containerID, Step.AUDIT);
+//		}
+//	}
 
-		// requery to update button
-		int imageType = event.getImageType();
-		if (imageType == ImageType.AUDIT.value) {
-			dataCenter.changeSessionLocalStepInBackground(getActivity(), containerID, Step.AUDIT);
-		}
-	}
+    @Override
+    public void onResume() {
+        super.onResume();
+        dataCenter.changeSessionLocalStepInBackground(getActivity(), containerID, Step.AUDIT);
+    }
 }

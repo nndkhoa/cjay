@@ -228,11 +228,19 @@ public class ImportFragment extends Fragment {
 	 *
 	 * @param event
 	 */
-	void onEvent(ImageCapturedEvent event) {
-		refresh();
-	}
+//  @UiThread
+//	void onEvent(ImageCapturedEvent event) {
+//		refresh();
+//	}
 
-	/**
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refresh();
+    }
+
+    /**
 	 * @param event
 	 */
 	public void onEvent(ContainerGotEvent event) {

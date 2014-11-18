@@ -137,14 +137,21 @@ public class AfterRepairFragment extends Fragment {
         startActivity(cameraActivityIntent);
     }
 
-    @UiThread
-    void onEvent(ImageCapturedEvent event) {
-        Logger.Log("on ImageCapturedEvent");
-        if (event.getImageType() == ImageType.REPAIRED.value) {
-            // Requery session to update data
-            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
+//    @UiThread
+//    void onEvent(ImageCapturedEvent event) {
+//        Logger.Log("on ImageCapturedEvent");
+//        if (event.getImageType() == ImageType.REPAIRED.value) {
+//            // Requery session to update data
+//            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
+//                    containerID);
+//        }
+//    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
                     containerID);
-        }
     }
 
     @UiThread

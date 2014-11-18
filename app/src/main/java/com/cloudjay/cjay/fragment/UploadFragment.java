@@ -83,30 +83,30 @@ public class UploadFragment extends Fragment {
 	}
 
 	//region EVENT HANDLER
-	public void onEvent(UploadStartedEvent event) {
-		refresh();
-	}
-
-	public void onEvent(UploadStoppedEvent event) {
-		refresh();
-	}
-
-	public void onEvent(UploadingEvent event) {
-		refresh();
-	}
-
-	public void onEvent(UploadSucceededEvent event) {
-		refresh();
-	}
+//	public void onEvent(UploadStartedEvent event) {
+//		refresh();
+//	}
+//
+//	public void onEvent(UploadStoppedEvent event) {
+//		refresh();
+//	}
+//
+//	public void onEvent(UploadingEvent event) {
+//		refresh();
+//	}
+//
+//	public void onEvent(UploadSucceededEvent event) {
+//		refresh();
+//	}
 
 	public void onEvent(ContainersGotEvent event) {
 		if (event.getPrefix().equals(CJayConstant.PREFIX_UPLOADING))
 			updatedData(event.getTargets());
 	}
 
-	public void onEvent(UploadedContainerRemoved event) {
-		refresh();
-	}
+//	public void onEvent(UploadedContainerRemoved event) {
+//		refresh();
+//	}
 	//endregion
 
 	@OptionsItem(R.id.menu_clear_uploaded)

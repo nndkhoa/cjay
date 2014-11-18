@@ -259,10 +259,18 @@ public class ExportFragment extends Fragment {
 		}
 	}
 
-	@UiThread
-	void onEvent(ImageCapturedEvent event) {
-		dataCenter.getSessionInBackground(getActivity(), event.getContainerId());
-	}
-	//endregion
+//	@UiThread
+//	void onEvent(ImageCapturedEvent event) {
+//		dataCenter.getSessionInBackground(getActivity(), event.getContainerId());
+//	}
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        dataCenter.getSessionInBackground(getActivity(), containerID);
+    }
+
+
+    //endregion
 
 }

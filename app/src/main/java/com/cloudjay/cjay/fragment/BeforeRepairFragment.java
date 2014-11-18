@@ -138,14 +138,21 @@ public class BeforeRepairFragment extends Fragment {
         }
     }
 
-    @UiThread
-    void onEvent(ImageCapturedEvent event) {
-        Logger.Log("on ImageCapturedEvent");
-        if (event.getImageType() == ImageType.AUDIT.value) {
-            // Requery session to update data
-            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
+//    @UiThread
+//    void onEvent(ImageCapturedEvent event) {
+//        Logger.Log("on ImageCapturedEvent");
+//        if (event.getImageType() == ImageType.AUDIT.value) {
+//            // Requery session to update data
+//            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
+//                    containerID);
+//        }
+//    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
                     containerID);
-        }
     }
 
     void refreshListImage() {
