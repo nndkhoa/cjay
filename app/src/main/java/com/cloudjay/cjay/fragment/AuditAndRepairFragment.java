@@ -33,7 +33,6 @@ import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Objects;
 
 import de.greenrobot.event.EventBus;
 
@@ -196,6 +195,8 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	@UiThread
 	void checkForShowButton() {
 
+        Logger.Log("localStep: " + mSession.getLocalStep());
+
 		if (mSession.getLocalStep() == Step.REPAIR.value) {
 			btnCompleteAudit.setVisibility(View.GONE);
 			btnCompleteRepair.setVisibility(View.VISIBLE);
@@ -308,6 +309,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
     @Override
     public void onResume() {
         super.onResume();
-        dataCenter.changeSessionLocalStepInBackground(getActivity(), containerID, Step.AUDIT);
+//      dataCenter.changeSessionLocalStepInBackground(getActivity(), containerID, Step.AUDIT);
     }
 }
