@@ -1,6 +1,8 @@
 package com.cloudjay.cjay.activity;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
@@ -22,9 +24,9 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 	public final static String OPERATOR_CODE_EXTRA = "com.cloudjay.wizard.operatorCode";
 	public final static String IMAGE_TYPE_EXTRA = "com.cloudjay.wizard.imageType";
 	public final static String CURRENT_STEP_EXTRA = "com.cloudjay.wizard.currentStep";
-    // This Extra bundle is use to open Detail Issue Activity only
-    public final static String AUDIT_ITEM_UUID_EXTRA = "com.cloudjay.wizard.auditItemUUID";
-    public final static String IS_OPENED = "com.cloudjay.wizard.isOpened";
+	// This Extra bundle is use to open Detail Issue Activity only
+	public final static String AUDIT_ITEM_UUID_EXTRA = "com.cloudjay.wizard.auditItemUUID";
+	public final static String IS_OPENED = "com.cloudjay.wizard.isOpened";
 
 	@Extra(IMAGE_TYPE_EXTRA)
 	int mType;
@@ -38,11 +40,11 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 	@Extra(CURRENT_STEP_EXTRA)
 	int currentStep;
 
-    @Extra(AUDIT_ITEM_UUID_EXTRA)
-    String auditItemUUID;
+	@Extra(AUDIT_ITEM_UUID_EXTRA)
+	String auditItemUUID;
 
-    @Extra(IS_OPENED)
-    boolean isOpened;
+	@Extra(IS_OPENED)
+	boolean isOpened;
 
 	private static final String STATE_SINGLE_SHOT = "single_shot";
 	private static final String STATE_LOCK_TO_LANDSCAPE = "lock_to_landscape";
@@ -63,8 +65,8 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 				.containerId(containerId)
 				.operatorCode(operatorCode)
 				.mType(mType)
-                .auditItemUUID(auditItemUUID)
-                .isOpened(isOpened)
+				.auditItemUUID(auditItemUUID)
+				.isOpened(isOpened)
 				.build();
 
 		getFragmentManager().beginTransaction()
@@ -113,11 +115,11 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 				return true;
 			} else if (keyCode == KeyEvent.KEYCODE_BACK && current != null) {
 //                current.onBackPress();
-                this.finish();
-                return true;
-            } else {
-                return super.onKeyDown(keyCode, event);
-            }
+				this.finish();
+				return true;
+			} else {
+				return super.onKeyDown(keyCode, event);
+			}
 		} catch (Exception e) {
 			Utils.showCrouton(this, "Please take it easy");
 			e.printStackTrace();
@@ -133,5 +135,11 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 	@Override
 	public void setSingleShotMode(boolean mode) {
 		singleShot = mode;
+	}
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 	}
 }

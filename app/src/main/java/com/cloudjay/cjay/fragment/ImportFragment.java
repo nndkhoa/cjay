@@ -32,6 +32,7 @@ import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.job.UploadImageJob;
 import com.cloudjay.cjay.task.job.UploadImportJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -102,7 +103,7 @@ public class ImportFragment extends Fragment {
 
 	//region ATTRIBUTE
 	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
-    public final static String IMAGE_URLS_EXTRA = "com.cloudjay.wizard.imageurls";
+	public final static String IMAGE_URLS_EXTRA = "com.cloudjay.wizard.imageurls";
 
 	@Bean
 	DataCenter dataCenter;
@@ -110,11 +111,11 @@ public class ImportFragment extends Fragment {
 	@FragmentArg(CONTAINER_ID_EXTRA)
 	String containerID;
 
-    @FragmentArg(IMAGE_URLS_EXTRA)
-    ArrayList<String> imageUrls;
+	@FragmentArg(IMAGE_URLS_EXTRA)
+	ArrayList<String> imageUrls;
 
 	String operatorCode;
-    long operatorId;
+	long operatorId;
 
 	GateImageAdapter mAdapter = null;
 
@@ -156,43 +157,43 @@ public class ImportFragment extends Fragment {
 			configViewForRainyMode();
 		} else {
 
-            btnCamera.setVisibility(View.VISIBLE);
-            btnPickMore.setVisibility(View.GONE);
+			btnCamera.setVisibility(View.VISIBLE);
+			btnPickMore.setVisibility(View.GONE);
 
-            dataCenter.getSessionInBackground(getActivity(), containerID);
-            refresh();
-        }
+			dataCenter.getSessionInBackground(getActivity(), containerID);
+			refresh();
+		}
 
 	}
 
-    /**
-     * configure view for rainy mode
-     */
+	/**
+	 * configure view for rainy mode
+	 */
 	private void configViewForRainyMode() {
-        btnPickMore.setVisibility(View.VISIBLE);
+		btnPickMore.setVisibility(View.VISIBLE);
 		btnCamera.setVisibility(View.GONE);
 		btnContinue.setVisibility(View.GONE);
 
 		Utils.setupEditText(etContainerCode);
 
-        if (imageUrls != null) {
-            for (int i = 0; i < imageUrls.size(); i++) {
+		if (imageUrls != null) {
+			for (int i = 0; i < imageUrls.size(); i++) {
 
-                String imageName = Utils.getImageNameFromUrl(imageUrls.get(i));
-                String uuid = Utils.getUuidFromImageName(imageName);
+				String imageName = Utils.getImageNameFromUrl(imageUrls.get(i));
+				String uuid = Utils.getUuidFromImageName(imageName);
 
-                GateImage gateImage = new GateImage()
-                        .withId(0)
-                        .withType(ImageType.IMPORT.value)
-                        .withName(imageName)
-                        .withUrl(imageUrls.get(i))
-                        .withUuid(uuid);
+				GateImage gateImage = new GateImage()
+						.withId(0)
+						.withType(ImageType.IMPORT.value)
+						.withName(imageName)
+						.withUrl(imageUrls.get(i))
+						.withUuid(uuid);
 
-                list.add(gateImage);
-            }
-        }
+				list.add(gateImage);
+			}
+		}
 
-        mAdapter.setData(list);
+		mAdapter.setData(list);
 	}
 
 	//region EVENT HANDLER
@@ -202,23 +203,23 @@ public class ImportFragment extends Fragment {
 		// Get selected operator from search operator dialog
 		Operator operator = event.getOperator();
 		operatorCode = operator.getOperatorCode();
-        operatorId = operator.getId();
+		operatorId = operator.getId();
 		Logger.Log(" > Choose operator " + operatorCode);
 
 		// Set operator to edit text
 		etOperator.setText(operator.getOperatorCode());
 
-        if (!rainyMode) {
+		if (!rainyMode) {
 
-            if (mSession != null) {
-                mSession.setOperatorId(operatorId);
-                mSession.setOperatorCode(operator.getOperatorCode());
-                mSession.setGateImages(list);
-            }
+			if (mSession != null) {
+				mSession.setOperatorId(operatorId);
+				mSession.setOperatorCode(operator.getOperatorCode());
+				mSession.setGateImages(list);
+			}
 
-            // Save session
-            dataCenter.updateImportSession(mSession);
-        }
+			// Save session
+			dataCenter.updateImportSession(mSession);
+		}
 	}
 
 	/**
@@ -345,38 +346,47 @@ public class ImportFragment extends Fragment {
 		//TODO add condition if all image selected => use normal action (else phase) @Nam
 		if (rainyMode) {
 
-            if (isValidToAddSession()) {
+			if (isValidToAddSession()) {
 
-                mSession = new Session()
-                        .withContainerId(etContainerCode.getText().toString())
-                        .withOperatorCode(etOperator.getText().toString())
-                        .withPreStatus(preStatus)
-                        .withGateImages(list);
+				mSession = new Session()
+						.withContainerId(etContainerCode.getText().toString())
+						.withOperatorCode(etOperator.getText().toString())
+						.withPreStatus(preStatus)
+						.withGateImages(list);
 
-                dataCenter.addSession(mSession);
+				dataCenter.addSession(mSession);
 
-                //TODO: add image to upload queue @Thai
+				// Add image to job queue
+				for (GateImage gateImage : mSession.getGateImages()) {
+					String uri = Utils.parseUrltoUri(gateImage.getUrl());
+					String imageName = gateImage.getName();
+					String containerId = mSession.getContainerId();
 
-                // open reuse activity
-                openReuseActivity();
-            }
-            else {
-                Utils.showCrouton(getActivity(), getResources().getString(
-                        R.string.warning_container_invalid));
-                return;
-            }
+					JobManager jobManager = App.getJobManager();
+					jobManager.addJobInBackground(new UploadImageJob(uri, imageName, containerId, ImageType.IMPORT));
+				}
+				//Upload session
+				uploadImportSession(false);
+
+				// open reuse activity
+				openReuseActivity();
+			} else {
+				Utils.showCrouton(getActivity(), getResources().getString(
+						R.string.warning_container_invalid));
+				return;
+			}
 		}
 
-        if (mSession.isValidToUpload(Step.IMPORT) == false) {
-            Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
-            return;
-        }
+		if (mSession.isValidToUpload(Step.IMPORT) == false) {
+			Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+			return;
+		}
 
-        //Upload import session
-        uploadImportSession(true);
+		//Upload import session
+		uploadImportSession(true);
 
-        // Navigate to HomeActivity
-        getActivity().finish();
+		// Navigate to HomeActivity
+		getActivity().finish();
 	}
 
 	@Click(R.id.btn_pick_more)
@@ -386,14 +396,14 @@ public class ImportFragment extends Fragment {
 	}
 
 	private void openReuseActivity() {
-        ArrayList<String> gateImages = new ArrayList<>();
+		ArrayList<String> gateImages = new ArrayList<>();
 
-        for (int i = 0; i < list.size(); i++) {
-            gateImages.add(list.get(i).getUrl());
-        }
+		for (int i = 0; i < list.size(); i++) {
+			gateImages.add(list.get(i).getUrl());
+		}
 		Intent intent = new Intent(getActivity(), ReuseActivity_.class);
-        intent.setAction(CJayConstant.ACTION_PICK_MORE);
-        intent.putExtra(ReuseActivity.GATE_IMAGES_EXTRA, gateImages);
+		intent.setAction(CJayConstant.ACTION_PICK_MORE);
+		intent.putExtra(ReuseActivity.GATE_IMAGES_EXTRA, gateImages);
 		startActivity(intent);
 	}
 
@@ -432,13 +442,13 @@ public class ImportFragment extends Fragment {
 		if (isChecked == true) {
 			preStatus = 0;
 
-            if (!rainyMode) {
-                mSession.setPreStatus(preStatus);
-                dataCenter.updateImportSession(mSession);
-                dataCenter.addWorkingSession(mSession);
+			if (!rainyMode) {
+				mSession.setPreStatus(preStatus);
+				dataCenter.updateImportSession(mSession);
+				dataCenter.addWorkingSession(mSession);
 
-                btnContinue.setVisibility(View.GONE);
-            }
+				btnContinue.setVisibility(View.GONE);
+			}
 
 		}
 	}
@@ -448,13 +458,13 @@ public class ImportFragment extends Fragment {
 		if (isChecked == true) {
 			preStatus = 1;
 
-            if (!rainyMode) {
-                mSession.setPreStatus(preStatus);
-                dataCenter.updateImportSession(mSession);
-                dataCenter.addWorkingSession(mSession);
+			if (!rainyMode) {
+				mSession.setPreStatus(preStatus);
+				dataCenter.updateImportSession(mSession);
+				dataCenter.addWorkingSession(mSession);
 
-                btnContinue.setVisibility(View.VISIBLE);
-            }
+				btnContinue.setVisibility(View.VISIBLE);
+			}
 		}
 	}
 
@@ -463,33 +473,33 @@ public class ImportFragment extends Fragment {
 		if (isChecked == true) {
 			preStatus = 2;
 
-            if (!rainyMode) {
-                mSession.setPreStatus(preStatus);
-                dataCenter.updateImportSession(mSession);
-                dataCenter.addWorkingSession(mSession);
+			if (!rainyMode) {
+				mSession.setPreStatus(preStatus);
+				dataCenter.updateImportSession(mSession);
+				dataCenter.addWorkingSession(mSession);
 
-                btnContinue.setVisibility(View.VISIBLE);
-            }
+				btnContinue.setVisibility(View.VISIBLE);
+			}
 		}
 	}
 	//endregion
 
-    boolean isValidToAddSession() {
+	boolean isValidToAddSession() {
 
-        containerID = etContainerCode.getText().toString();
+		containerID = etContainerCode.getText().toString();
 
-        if (containerID.length() < 11) {
-            return false;
-        }
+		if (containerID.length() < 11) {
+			return false;
+		}
 
-        if (operatorCode.equals("") || operatorId == 0) {
-            return false;
-        }
+		if (operatorCode.equals("") || operatorId == 0) {
+			return false;
+		}
 
-        if (null == list || list.size() == 0) {
-            return false;
-        }
+		if (null == list || list.size() == 0) {
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 }
