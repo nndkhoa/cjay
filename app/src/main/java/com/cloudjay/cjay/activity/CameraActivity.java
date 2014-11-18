@@ -3,6 +3,7 @@ package com.cloudjay.cjay.activity;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
@@ -68,6 +69,7 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 				.auditItemUUID(auditItemUUID)
 				.isOpened(isOpened)
 				.build();
+
 
 		getFragmentManager().beginTransaction()
 				.replace(R.id.container, current).commit();
@@ -137,9 +139,4 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 		singleShot = mode;
 	}
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-	}
 }
