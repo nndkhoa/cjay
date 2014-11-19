@@ -44,7 +44,6 @@ import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -56,9 +55,13 @@ public class ReuseActivity extends Activity {
 
 
 	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
+    public final static String CHECKED_IMAGES = "com.cloudjay.wizard.checked_images";
 
 	@Extra(CONTAINER_ID_EXTRA)
 	String containerID;
+
+    @Extra(CHECKED_IMAGES)
+    ArrayList<String> checkedImages;
 
 	@ViewById(R.id.btn_done)
 	Button btnDone;
@@ -112,7 +115,6 @@ public class ReuseActivity extends Activity {
         } else {
 
             buttonLinearLayout.setVisibility(View.GONE);
-            rainyModeButtonLinearLayout.setVisibility(View.GONE);
 
             if (mActionMode == null) {
                 // there are some selected items, start the actionMode
@@ -130,8 +132,13 @@ public class ReuseActivity extends Activity {
             dataCenter.getRainyImages(getApplicationContext());
 
             Intent intent = getIntent();
-            if (null == intent.getAction() || intent.getAction().equals("")) {
-                btnDoneRainy.setVisibility(View.VISIBLE);
+            if (null == intent.getAction()) {
+                rainyModeButtonLinearLayout.setVisibility(View.VISIBLE);
+            } else {
+                if (intent.getAction().equals(CJayConstant.ACTION_PICK_MORE)) {
+                    rainyModeButtonLinearLayout.setVisibility(View.GONE);
+                    mAdapter.setCheckedImageUrls(checkedImages);
+                }
             }
         }
 

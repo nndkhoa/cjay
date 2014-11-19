@@ -28,6 +28,7 @@ import com.cloudjay.cjay.event.image.RainyImagesDeletedEvent;
 import com.cloudjay.cjay.event.image.RainyImagesGotEvent;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.operator.OperatorChosenEvent;
+import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
@@ -353,17 +354,10 @@ public class ImportFragment extends Fragment {
 	@Click(R.id.btn_complete_import)
 	void buttonCompletedClicked() {
 
+        containerID = etContainerCode.getText().toString();
+
 		if (rainyMode) {
-			if (isValidToAddSession()) {
-                if (!Utils.isContainerIdValid(etContainerCode.getText().toString())) {
-                    showInvalidIsoContainerDialog();
-                } else {
-                    saveSessionRainyMode();
-                }
-			} else {
-				Utils.showCrouton(getActivity(), getResources().getString(
-						R.string.warning_container_invalid));
-			}
+            performSearch(containerID);
             return;
 		}
 
@@ -388,6 +382,7 @@ public class ImportFragment extends Fragment {
 	private void openReuseActivity() {
 		Intent intent = new Intent(getActivity(), ReuseActivity_.class);
 		intent.setAction(CJayConstant.ACTION_PICK_MORE);
+        intent.putExtra(ReuseActivity.CHECKED_IMAGES, imageUrls);
 		startActivity(intent);
 	}
 
@@ -594,5 +589,28 @@ public class ImportFragment extends Fragment {
             }
         });
         dialog.show();
+    }
+
+    private void performSearch(String containerId) {
+        dataCenter.search(getActivity(), containerId);
+    }
+
+    @UiThread
+    public void onEvent(ContainerSearchedEvent event) {
+        List<Session> result = event.getSessions();
+        if (result.size() == 0) {
+            if (isValidToAddSession()) {
+                if (!Utils.isContainerIdValid(containerID)) {
+                    showInvalidIsoContainerDialog();
+                } else {
+                    saveSessionRainyMode();
+                }
+            } else {
+                Utils.showCrouton(getActivity(), getResources().getString(
+                        R.string.warning_container_invalid));
+            }
+        } else {
+            Utils.showCrouton(getActivity(), "Container này đã tồn tại");
+        }
     }
 }
