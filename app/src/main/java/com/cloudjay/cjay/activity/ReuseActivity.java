@@ -102,7 +102,6 @@ public class ReuseActivity extends Activity {
 
 	@AfterViews
 	void doAfterViews() {
-
         rainyMode = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
                 .getBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox),
                         false);
@@ -136,7 +135,9 @@ public class ReuseActivity extends Activity {
                 rainyModeButtonLinearLayout.setVisibility(View.VISIBLE);
             } else {
                 if (intent.getAction().equals(CJayConstant.ACTION_PICK_MORE)) {
-                    rainyModeButtonLinearLayout.setVisibility(View.GONE);
+                    rainyModeButtonLinearLayout.setVisibility(View.VISIBLE);
+                    btnDoneRainy.setVisibility(View.GONE);
+
                     mAdapter.setCheckedImageUrls(checkedImages);
                 }
             }
@@ -208,7 +209,18 @@ public class ReuseActivity extends Activity {
 
 	@Click(R.id.btn_input_rainy_mode)
 	void buttonInputRainyClicked() {
-		openWizadActivityRainy();
+        Intent intent = getIntent();
+        if (null == intent.getAction()) {
+            openWizadActivityRainy();
+        } else {
+            if (intent.getAction().equals(CJayConstant.ACTION_PICK_MORE)) {
+
+                Logger.Log("size: " + mAdapter.getCheckedImageUrls().size());
+
+                EventBus.getDefault().post(new RainyImagesGotEvent(mAdapter.getCheckedImageUrls()));
+                this.finish();
+            }
+        }
 	}
 
 	@Click(R.id.btn_done_rainy_mode)
@@ -372,14 +384,6 @@ public class ReuseActivity extends Activity {
 		EventBus.getDefault().unregister(this);
 		super.onDestroy();
 	}
-
-//	@Override
-//	public void onBackPressed() {
-//		super.onBackPressed();
-//		if (rainyMode) {
-//			openWizadActivityRainy();
-//		}
-//	}
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {

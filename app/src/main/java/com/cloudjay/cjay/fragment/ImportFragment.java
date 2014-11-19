@@ -140,6 +140,8 @@ public class ImportFragment extends Fragment {
 	@AfterViews
 	void doAfterViews() {
 
+        Logger.Log("doAfterViews");
+
 		rainyMode = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext())
 				.getBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox),
 						false);
@@ -178,26 +180,7 @@ public class ImportFragment extends Fragment {
 
 		Utils.setupEditText(etContainerCode);
 
-		if (imageUrls != null) {
-			for (int i = 0; i < imageUrls.size(); i++) {
-
-				String imageName = Utils.getImageNameFromUrl(imageUrls.get(i));
-				String uuid = Utils.getUuidFromImageName(imageName);
-
-                Logger.Log("uuid: " + uuid);
-
-				GateImage gateImage = new GateImage()
-						.withId(0)
-						.withType(ImageType.IMPORT.value)
-						.withName(imageName)
-						.withUrl(imageUrls.get(i))
-						.withUuid(uuid);
-
-				list.add(gateImage);
-			}
-		}
-
-		mAdapter.setData(list);
+        updateList();
 	}
 
 	//region EVENT HANDLER
@@ -547,12 +530,47 @@ public class ImportFragment extends Fragment {
         // open reuse activity
         Intent intent = new Intent(getActivity(), ReuseActivity_.class);
         startActivity(intent);
+        getActivity().finish();
+    }
+
+    @UiThread
+    void onEvent (RainyImagesGotEvent event) {
+        imageUrls = event.getImageUrls();
+        updateList();
+    }
+
+    void updateList() {
+
+        list.clear();
+        mAdapter.clear();
+
+        if (imageUrls != null) {
+
+            for (int i = 0; i < imageUrls.size(); i++) {
+
+                String imageName = Utils.getImageNameFromUrl(imageUrls.get(i));
+                String uuid = Utils.getUuidFromImageName(imageName);
+
+                Logger.Log("uuid: " + uuid);
+
+                GateImage gateImage = new GateImage()
+                        .withId(0)
+                        .withType(ImageType.IMPORT.value)
+                        .withName(imageName)
+                        .withUrl(imageUrls.get(i))
+                        .withUuid(uuid);
+
+                list.add(gateImage);
+            }
+        }
+
+        mAdapter.setData(list);
     }
 
     private void showInvalidIsoContainerDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Alert");
-        builder.setMessage("Container ID này sai chuẩn ISO. Tiếp tục?");
+        builder.setMessage(getResources().getString(R.string.dialog_container_id_invalid_iso));
 
         builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
             @Override
@@ -610,7 +628,8 @@ public class ImportFragment extends Fragment {
                         R.string.warning_container_invalid));
             }
         } else {
-            Utils.showCrouton(getActivity(), "Container này đã tồn tại");
+            Utils.showCrouton(getActivity(), getResources().getString(
+                    R.string.error_container_is_already_existed));
         }
     }
 }
