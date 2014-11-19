@@ -149,6 +149,8 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
             mAuditItem.setRepairCodeId(isoCode.getId());
             mAuditItem.setRepairCode(isoCode.getCode());
 
+            Logger.logJson("mAuditItem", mAuditItem, AuditItem.class);
+
             // save db records and refresh list
             mDataCenter.updateAuditItemInBackground(getApplicationContext(), mContainerId, mAuditItem);
         }

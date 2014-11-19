@@ -112,7 +112,6 @@ public class WorkingFragment extends Fragment {
 		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
 		lvWorking.setAdapter(mAdapter);
 		lvWorking.setEmptyView(tvEmpty);
-		refresh();
 	}
 
 	void refresh() {
@@ -158,18 +157,16 @@ public class WorkingFragment extends Fragment {
 		refresh();
 	}
 
-	public void onEvent(UploadSucceededEvent event) {
-		refresh();
-	}
-
-	public void onEvent(UploadStartedEvent event) {
-		refresh();
-	}
-
 	public void onEvent(ContainersGotEvent event) {
 		if (event.getPrefix().equals(CJayConstant.PREFIX_WORKING))
 			updatedData(event.getTargets());
 	}
 
-	//endregion
+    @Override
+    public void onResume() {
+        super.onResume();
+        refresh();
+    }
+
+    //endregion
 }

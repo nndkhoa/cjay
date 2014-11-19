@@ -13,10 +13,8 @@ import com.cloudjay.cjay.activity.DetailIssueActivity;
 import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.adapter.RepairedItemAdapter;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
-import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 
 import org.androidannotations.annotations.AfterViews;
@@ -138,13 +136,20 @@ public class IssueRepairedFragment extends Fragment {
 		mAdapter.notifyDataSetChanged();
 	}
 
-	@UiThread
-	void onEvent(ImageCapturedEvent event) {
+//	@UiThread
+//	void onEvent(ImageCapturedEvent event) {
+//
+//		if (event.getImageType() == ImageType.REPAIRED.value) {
+//			dataCenter.getSessionInBackground(getActivity(), containerID);
+//		}
+//	}
 
-		if (event.getImageType() == ImageType.REPAIRED.value) {
-			dataCenter.getSessionInBackground(getActivity(), containerID);
-		}
-	}
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        dataCenter.getSessionInBackground(getActivity(), containerID);
+    }
 
     @Override
     public void onDestroy() {
