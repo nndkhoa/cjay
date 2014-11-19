@@ -1,5 +1,7 @@
 package com.cloudjay.cjay.fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -343,44 +345,22 @@ public class ImportFragment extends Fragment {
 	@Click(R.id.btn_complete_import)
 	void buttonCompletedClicked() {
 
-		//TODO add condition if all image selected => use normal action (else phase) @Nam
 		if (rainyMode) {
 
 			if (isValidToAddSession()) {
-
-                if (Utils.isContainerIdValid(containerID)) {
-                    Utils.showCrouton(getActivity(),
-                            R.string.dialog_container_id_invalid_iso);
-                    return;
+                Logger.Log("data is valid");
+                if (Utils.isContainerIdValid(etContainerCode.getText().toString())) {
+                    Logger.Log("container iso is invalid");
+                    showInvalidIsoContainerDialog();
+                } else {
+                    Logger.Log("container iso is valid");
+                    saveSessionRainyMode();
                 }
-
-				mSession = new Session()
-						.withContainerId(etContainerCode.getText().toString())
-						.withOperatorCode(etOperator.getText().toString())
-						.withPreStatus(preStatus)
-						.withGateImages(list);
-
-				dataCenter.addSession(mSession);
-
-				// Add image to job queue
-				for (GateImage gateImage : mSession.getGateImages()) {
-					String uri = Utils.parseUrltoUri(gateImage.getUrl());
-					String imageName = gateImage.getName();
-					String containerId = mSession.getContainerId();
-
-					JobManager jobManager = App.getJobManager();
-					jobManager.addJobInBackground(new UploadImageJob(uri, imageName, containerId, ImageType.IMPORT));
-				}
-				//Upload session
-				uploadImportSession(false);
-
-				// open reuse activity
-				openReuseActivity();
 			} else {
 				Utils.showCrouton(getActivity(), getResources().getString(
 						R.string.warning_container_invalid));
-				return;
 			}
+            return;
 		}
 
 		if (mSession.isValidToUpload(Step.IMPORT) == false) {
@@ -498,7 +478,7 @@ public class ImportFragment extends Fragment {
 			return false;
 		}
 
-		if (operatorCode.equals("") || operatorId == 0) {
+		if (etContainerCode.getText().toString().equals("")) {
 			return false;
 		}
 
@@ -508,4 +488,94 @@ public class ImportFragment extends Fragment {
 
 		return true;
 	}
+
+    private void saveSessionRainyMode() {
+
+        for (GateImage gateImage : list) {
+            String uri = gateImage.getUrl();
+            String oldImageName = gateImage.getName();
+
+            // update image name
+            String newImageName = oldImageName.replace("containerId", etContainerCode.getText().toString());
+            newImageName = newImageName.replace("imageType", "gate-in");
+
+            // TODO: rename file in storage
+
+
+            //update uri
+            String newUri = uri.replace(oldImageName, newImageName);
+
+            // set name and uri in gate image
+            gateImage.setName(newImageName);
+            gateImage.setUrl(newUri);
+        }
+
+        mSession = new Session()
+                .withContainerId(etContainerCode.getText().toString())
+                .withOperatorCode(etOperator.getText().toString())
+                .withPreStatus(preStatus)
+                .withGateImages(list);
+
+        dataCenter.addSession(mSession);
+
+        // Add image to job queue
+        for (GateImage gateImage : list) {
+            String uri = Utils.parseUrltoUri(gateImage.getUrl());
+            String imageName = gateImage.getName();
+            String containerId = mSession.getContainerId();
+
+            Logger.Log("imageName: " + imageName);
+            Logger.Log("uri: " + uri);
+
+            JobManager jobManager = App.getJobManager();
+            jobManager.addJobInBackground(new UploadImageJob(uri, imageName, containerId, ImageType.IMPORT));
+        }
+        //Upload session
+        uploadImportSession(false);
+
+        // open reuse activity
+        openReuseActivity();
+    }
+
+    private void showInvalidIsoContainerDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Alert");
+        builder.setMessage("Container ID này sai chuẩn ISO. Tiếp tục?");
+
+        builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
+        builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                // Open camera activity to take repair image
+                saveSessionRainyMode();
+                dialogInterface.dismiss();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+
+                // Set background and text color for BUTTON_NEGATIVE
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setTextColor(getActivity().getResources().getColor(android.R.color.white));
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setBackgroundResource(R.drawable.btn_green_selector);
+
+                // Set background and text color for BUTTON_POSITIVE
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setTextColor(getActivity().getResources().getColor(android.R.color.white));
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setBackgroundColor(getActivity().getResources().getColor(android.R.color.darker_gray));
+            }
+        });
+        dialog.show();
+    }
 }
