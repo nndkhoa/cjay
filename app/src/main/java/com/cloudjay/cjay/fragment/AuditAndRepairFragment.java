@@ -195,8 +195,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	@UiThread
 	void checkForShowButton() {
 
-        Logger.Log("localStep: " + mSession.getLocalStep());
-
 		if (mSession.getLocalStep() == Step.REPAIR.value) {
 			btnCompleteAudit.setVisibility(View.GONE);
 			btnCompleteRepair.setVisibility(View.VISIBLE);

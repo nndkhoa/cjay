@@ -497,6 +497,10 @@ public class DataCenter {
 
 	@Background(serial = CACHE)
 	public void getSessionInBackground(Context context, String containerId) {
+
+		StackTraceElement[] trace = new Throwable().getStackTrace();
+		Logger.Log("Open DB " + trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
+
         Logger.Log("getSessionInBackground");
 		try {
 			DB db = App.getDB(context);
