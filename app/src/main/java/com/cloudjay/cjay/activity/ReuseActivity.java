@@ -225,7 +225,11 @@ public class ReuseActivity extends Activity {
 
 	@Click(R.id.btn_done_rainy_mode)
 	void buttonDoneRainyClicked() {
-		showRainyDiaglog();
+        if (mAdapter.getCount() != 0) {
+            showRainyDiaglog();
+        } else {
+            closeActivity();
+        }
 	}
 
 	private void showRainyDiaglog() {
