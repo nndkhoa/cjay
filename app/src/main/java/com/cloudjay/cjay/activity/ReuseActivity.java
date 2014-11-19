@@ -60,13 +60,9 @@ public class ReuseActivity extends Activity {
 
 
 	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
-    public final static String GATE_IMAGES_EXTRA = "com.cloudjay.wizard.gate_images";
 
 	@Extra(CONTAINER_ID_EXTRA)
 	String containerID;
-
-    @Extra(GATE_IMAGES_EXTRA)
-    ArrayList<String> gateImages;
 
 	@ViewById(R.id.btn_done)
 	Button btnDone;
@@ -347,12 +343,11 @@ public class ReuseActivity extends Activity {
         mAdapter.clear();
         if (imageUrls != null) {
             for (String object : imageUrls) {
-                mAdapter.add(object);
-            }
-        }
 
-        if (gateImages != null) {
-            mAdapter.setCheckedImageUrls(gateImages);
+                if (object.contains("containerId") && object.contains("imageType")) {
+                    mAdapter.add(object);
+                }
+            }
         }
 
         mAdapter.notifyDataSetChanged();

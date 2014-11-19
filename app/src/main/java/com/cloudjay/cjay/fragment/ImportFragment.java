@@ -213,14 +213,13 @@ public class ImportFragment extends Fragment {
 		// Set operator to edit text
 		etOperator.setText(operator.getOperatorCode());
 
-		if (!rainyMode) {
+        if (mSession != null) {
+            mSession.setOperatorId(operatorId);
+            mSession.setOperatorCode(operator.getOperatorCode());
+            mSession.setGateImages(list);
+        }
 
-			if (mSession != null) {
-				mSession.setOperatorId(operatorId);
-				mSession.setOperatorCode(operator.getOperatorCode());
-				mSession.setGateImages(list);
-			}
-
+        if (!rainyMode) {
 			// Save session
 			dataCenter.updateImportSession(mSession);
 		}
@@ -348,14 +347,10 @@ public class ImportFragment extends Fragment {
 	void buttonCompletedClicked() {
 
 		if (rainyMode) {
-
 			if (isValidToAddSession()) {
-                Logger.Log("data is valid");
-                if (Utils.isContainerIdValid(etContainerCode.getText().toString())) {
-                    Logger.Log("container iso is invalid");
+                if (!Utils.isContainerIdValid(etContainerCode.getText().toString())) {
                     showInvalidIsoContainerDialog();
                 } else {
-                    Logger.Log("container iso is valid");
                     saveSessionRainyMode();
                 }
 			} else {
@@ -391,7 +386,6 @@ public class ImportFragment extends Fragment {
 		}
 		Intent intent = new Intent(getActivity(), ReuseActivity_.class);
 		intent.setAction(CJayConstant.ACTION_PICK_MORE);
-		intent.putExtra(ReuseActivity.GATE_IMAGES_EXTRA, gateImages);
 		startActivity(intent);
 	}
 
@@ -504,7 +498,6 @@ public class ImportFragment extends Fragment {
             String newImageName = imageName.replace("containerId", etContainerCode.getText().toString());
             newImageName = newImageName.replace("imageType", "gate-in");
 
-            // TODO: rename file in storage
             // Get image file from storage
             File directory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/rainy_mode" );
             File file = new File(directory, imageName);
@@ -526,8 +519,10 @@ public class ImportFragment extends Fragment {
         mSession = new Session()
                 .withContainerId(etContainerCode.getText().toString())
                 .withOperatorCode(etOperator.getText().toString())
+                .withOperatorId(operatorId)
                 .withPreStatus(preStatus)
-                .withGateImages(list);
+                .withGateImages(list)
+                .withLocalStep(Step.IMPORT.value);
 
         dataCenter.addSession(mSession);
 
