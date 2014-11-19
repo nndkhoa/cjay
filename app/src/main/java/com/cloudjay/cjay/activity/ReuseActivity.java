@@ -128,6 +128,11 @@ public class ReuseActivity extends Activity {
 
             // get rainy image
             dataCenter.getRainyImages(getApplicationContext());
+
+            Intent intent = getIntent();
+            if (null == intent.getAction() || intent.getAction().equals("")) {
+                btnDoneRainy.setVisibility(View.VISIBLE);
+            }
         }
 
         // Set item click event on grid view

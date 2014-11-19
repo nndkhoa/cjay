@@ -24,6 +24,8 @@ import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.ReuseActivity;
 import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
+import com.cloudjay.cjay.event.image.RainyImagesDeletedEvent;
+import com.cloudjay.cjay.event.image.RainyImagesGotEvent;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.operator.OperatorChosenEvent;
 import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
@@ -160,7 +162,6 @@ public class ImportFragment extends Fragment {
 			btnCamera.setVisibility(View.VISIBLE);
 			btnPickMore.setVisibility(View.GONE);
 
-			dataCenter.getSessionInBackground(getActivity(), containerID);
 			refresh();
 		}
 
@@ -181,6 +182,8 @@ public class ImportFragment extends Fragment {
 
 				String imageName = Utils.getImageNameFromUrl(imageUrls.get(i));
 				String uuid = Utils.getUuidFromImageName(imageName);
+
+                Logger.Log("uuid: " + uuid);
 
 				GateImage gateImage = new GateImage()
 						.withId(0)
@@ -383,11 +386,6 @@ public class ImportFragment extends Fragment {
 	}
 
 	private void openReuseActivity() {
-		ArrayList<String> gateImages = new ArrayList<>();
-
-		for (int i = 0; i < list.size(); i++) {
-			gateImages.add(list.get(i).getUrl());
-		}
 		Intent intent = new Intent(getActivity(), ReuseActivity_.class);
 		intent.setAction(CJayConstant.ACTION_PICK_MORE);
 		startActivity(intent);
@@ -545,8 +543,15 @@ public class ImportFragment extends Fragment {
         //Upload session
         uploadImportSession(false);
 
+        // Delete selected image
+        dataCenter.deleteRainyImage(getActivity().getApplicationContext(), imageUrls);
+    }
+
+    @UiThread
+    void onEvent(RainyImagesDeletedEvent event) {
         // open reuse activity
-        openReuseActivity();
+        Intent intent = new Intent(getActivity(), ReuseActivity_.class);
+        startActivity(intent);
     }
 
     private void showInvalidIsoContainerDialog() {

@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.api.NetworkClient;
+import com.cloudjay.cjay.event.image.RainyImagesDeletedEvent;
 import com.cloudjay.cjay.event.image.RainyImagesGotEvent;
 import com.cloudjay.cjay.event.isocode.IsoCodeGotEvent;
 import com.cloudjay.cjay.event.isocode.IsoCodesGotEvent;
@@ -37,6 +38,7 @@ import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringUtils;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
@@ -1221,6 +1223,27 @@ public class DataCenter {
             }
 
             EventBus.getDefault().post(new RainyImagesGotEvent(imageUrls));
+
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Background(serial  = CACHE, delay = 30)
+    public void deleteRainyImage(Context context, ArrayList<String> imageUrls) {
+        try {
+            DB db = App.getDB(context);
+
+            for (String imageUrl : imageUrls) {
+                String uuid = Utils.getUuidFromImageName(Utils.getImageNameFromUrl(imageUrl));
+                Logger.Log("uuid: " + uuid);
+                if (db.exists(CJayConstant.PREFIX_RAINY_MODE_IMAGE + uuid)) {
+                    Logger.Log("del: " + CJayConstant.PREFIX_RAINY_MODE_IMAGE + uuid);
+                    db.del(CJayConstant.PREFIX_RAINY_MODE_IMAGE + uuid);
+                }
+            }
+
+            EventBus.getDefault().post(new RainyImagesDeletedEvent());
 
         } catch (SnappydbException e) {
             e.printStackTrace();

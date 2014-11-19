@@ -543,7 +543,11 @@ public class Utils {
             return "";
         }
 
-        String uuid = imageName.substring(imageName.lastIndexOf("-") + 1, imageName.length());
+        int index = 0;
+        for(int i = 0; i < 6; i++)
+            index = imageName.indexOf("-", index+1);
+
+        String uuid = imageName.substring(index + 1, imageName.length());
         uuid = uuid.substring(0, uuid.length() - 4);
         return uuid;
     }
