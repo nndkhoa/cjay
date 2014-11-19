@@ -165,7 +165,7 @@ public class DataCenter {
 	 *
 	 * @param keyword
 	 */
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void searchOperator(String keyword) {
 		try {
 			List<Operator> operators = new ArrayList<>();
@@ -304,7 +304,7 @@ public class DataCenter {
 	 * @param prefix
 	 * @return
 	 */
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void getListIsoCodes(Context context, String prefix) {
 		try {
 			DB db = App.getDB(context);
@@ -365,7 +365,7 @@ public class DataCenter {
 	 * @param code
 	 * @return
 	 */
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void getIsoCode(Context context, String prefix, String code) {
 		try {
 			DB db = App.getDB(context);
@@ -439,7 +439,7 @@ public class DataCenter {
 		return null;
 	}
 
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void getSessionForUpload(Context context, String containerId) {
 		try {
 			DB db = App.getDB(context);
@@ -462,7 +462,7 @@ public class DataCenter {
 	 * @param prefix
 	 * @return
 	 */
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void getListSessionsInBackground(Context context, String prefix) {
 //		Logger.Log("Getting list session: " + prefix);
 
@@ -495,7 +495,7 @@ public class DataCenter {
 		EventBus.getDefault().post(new ContainersGotEvent(sessions, prefix));
 	}
 
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void getSessionInBackground(Context context, String containerId) {
         Logger.Log("getSessionInBackground");
 		try {
@@ -509,7 +509,7 @@ public class DataCenter {
 		}
 	}
 
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void changeLocalStepAndForceExport(Context context, String containerId) {
 
 		DB db;
@@ -538,7 +538,7 @@ public class DataCenter {
 	 * @param containerId
 	 * @param step
 	 */
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void changeSessionLocalStepInBackground(Context context, String containerId, Step step) {
 
 		DB db;
@@ -602,7 +602,7 @@ public class DataCenter {
 		}
 	}
 
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	void processListSession(List<Session> sessions) {
 
 		Logger.w("From process list session");
@@ -645,7 +645,7 @@ public class DataCenter {
 	 * @param context
 	 * @param keyword
 	 */
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void search(Context context, String keyword) {
 
 		String[] keysResult;
@@ -724,7 +724,7 @@ public class DataCenter {
 	 *
 	 * @param session
 	 */
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void addSession(Session session) {
 		try {
 			DB db = App.getDB(context);
@@ -749,7 +749,7 @@ public class DataCenter {
 	 * @param session
 	 * @param type
 	 */
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 50)
 	void saveSession(Context context, Session session, UploadType type) {
 
 		DB db = null;
@@ -782,7 +782,7 @@ public class DataCenter {
 	}
 
 
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void updateImportSession(Session session) {
 		DB db = null;
 		try {
@@ -818,7 +818,7 @@ public class DataCenter {
 	 * @param session
 	 */
 	@Trace
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void addWorkingSession(Session session) {
 
 		try {
@@ -845,7 +845,7 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	@Background(serial = CACHE)
+	
 	public void addUploadSession(String containerId) {
 
 		try {
@@ -866,7 +866,7 @@ public class DataCenter {
 	 * @param context
 	 * @param containerId
 	 */
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void removeWorkingSession(Context context, String containerId) {
 
 		try {
@@ -882,7 +882,7 @@ public class DataCenter {
 		}
 	}
 
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void removeUploadedSessions(Context context) {
 
 		try {
@@ -905,7 +905,7 @@ public class DataCenter {
 	}
 
 
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void changeStatusWhenUpload(Context context, Session session, UploadType uploadType, UploadStatus uploadStatus) {
 
 		DB db;
@@ -961,7 +961,7 @@ public class DataCenter {
 	 * @param auditItemRemove
 	 * @param auditImageUUID
 	 */
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void addAuditImageToAuditedItem(Context context,
 	                                       String containerId,
 	                                       String auditItemUUID,
@@ -1046,7 +1046,7 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void addGateImage(Context context, GateImage image, String containerId) {
 
 		try {
@@ -1071,7 +1071,7 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void addAuditImage(Context context, AuditImage auditImage, String containerId) {
 
 		try {
@@ -1130,7 +1130,7 @@ public class DataCenter {
 	 * @param status
 	 * @throws SnappydbException
 	 */
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void changeImageUploadStatus(Context context, String containerId, String imageName, ImageType imageType, UploadStatus status) {
 		try {
 			DB db = App.getDB(context);
@@ -1195,7 +1195,7 @@ public class DataCenter {
 		}
 	}
 
-    @Background(serial = CACHE)
+    @Background(serial  = CACHE, delay = 30)
     public void saveRainyImage(Context context, String uuid, String rainyImageUrl) {
         try {
             DB db = App.getDB(context);
@@ -1208,7 +1208,7 @@ public class DataCenter {
         }
     }
 
-    @Background(serial = CACHE)
+    @Background(serial  = CACHE, delay = 30)
     public void getRainyImages(Context context) {
         try {
             DB db = App.getDB(context);
@@ -1281,7 +1281,7 @@ public class DataCenter {
         saveUploadAuditItemSession(context, result, UploadType.AUDIT_ITEM, containerId);
     }
 
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void saveUploadAuditItemSession(Context context, AuditItem result, UploadType type, String containerId) {
 		DB db = null;
 		String key = containerId;
@@ -1312,7 +1312,7 @@ public class DataCenter {
 		saveSessionAfterImport(context, result, UploadType.SESSION);
 	}
 
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void saveSessionAfterImport(Context context, Session session, UploadType type) {
 
 		DB db = null;
@@ -1530,7 +1530,7 @@ public class DataCenter {
 	 * @param containerId
 	 * @param auditItemUUID
 	 */
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void removeAuditItem(Context context, String containerId, String auditItemUUID) {
 		try {
 			// find session
@@ -1550,7 +1550,7 @@ public class DataCenter {
 		EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
 	}
 
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void updateAuditItemInBackground(Context context, String containerId, AuditItem auditItem) {
         Logger.Log("updateAuditItemInBackground");
 		try {
@@ -1583,7 +1583,7 @@ public class DataCenter {
 	 * @param auditItem
 	 * @throws SnappydbException
 	 */
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void setWaterWashType(Context context, final AuditItem auditItem, String containerId) {
 
 		try {
@@ -1736,7 +1736,7 @@ public class DataCenter {
 	 * @param containerId
 	 * @return
 	 */
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void getAuditItemsInBackground(Context context, String containerId) {
 		try {
 			DB db = App.getDB(context);
@@ -1754,7 +1754,7 @@ public class DataCenter {
 	 * @param containerId
 	 * @param itemUuid
 	 */
-	@Background(serial = CACHE)
+	@Background(serial  = CACHE, delay = 30)
 	public void getAuditItemInBackground(Context context, String containerId, String itemUuid) {
         Logger.Log("getAuditItemInBackground");
 		try {

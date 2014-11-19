@@ -20,7 +20,6 @@ import com.cloudjay.cjay.activity.DetailIssueActivity;
 import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.adapter.AuditItemAdapter;
-import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
 import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
@@ -28,7 +27,6 @@ import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
-import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadImportJob;
 import com.cloudjay.cjay.util.Logger;
@@ -37,7 +35,6 @@ import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.JobManager;
-import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -310,32 +307,14 @@ public class IssuePendingFragment extends Fragment {
 	}
 
 	//region EVENT HANDLER
-	@UiThread
-	void onEvent(ImageCapturedEvent event) {
 
-		ImageType imageType = ImageType.values()[event.getImageType()];
-		switch (imageType) {
-			case AUDIT:
-				refresh();
-				break;
+    @Override
+    public void onResume() {
+        super.onResume();
+        refresh();
+    }
 
-			case REPAIRED:
-			default:
-
-				if (!event.isOpened()) {
-					Logger.Log("Open AfterRepair Fragment");
-					String auditItemUUID = event.getAuditItemUUID();
-					Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
-					detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, this.containerId);
-					detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItemUUID);
-					detailIssueActivity.putExtra(DetailIssueActivity.SELECTED_TAB, 1);
-					startActivity(detailIssueActivity);
-					break;
-				}
-		}
-	}
-
-	@UiThread
+    @UiThread
 	void onEvent(IssueMergedEvent event) {
 		Logger.Log("on IssueMergedEvent");
 
@@ -349,8 +328,6 @@ public class IssuePendingFragment extends Fragment {
 
 	@UiThread
 	void onEvent(AuditItemChangedEvent event) {
-		dataCenter.getAuditItemsInBackground(getActivity(), event.getContainerId());
-
 		refresh();
 	}
 

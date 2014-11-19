@@ -18,6 +18,8 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
+import com.cloudjay.cjay.activity.DetailIssueActivity;
+import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.activity.MergeIssueActivity_;
 import com.cloudjay.cjay.activity.ReportIssueActivity_;
 import com.cloudjay.cjay.fragment.CameraFragment;
@@ -180,6 +182,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 							showPreventRepairDialog();
 						} else {
 							// Open camera activity to take repair image
+                            openDetailIssueActivity();
 							openCamera();
 						}
 					}
@@ -288,6 +291,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			public void onClick(DialogInterface dialogInterface, int i) {
 				// Open camera activity to take repair image
 				Logger.Log("mComponentCode: " + mComponentCode);
+                openDetailIssueActivity();
 				openCamera();
 				dialogInterface.dismiss();
 			}
@@ -312,8 +316,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			}
 		});
 		dialog.show();
-
-	}
+    }
 
 	void showApproveDiaglog(final AuditItem item) {
 
@@ -406,6 +409,14 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		cameraActivityIntent.putExtra(CameraFragment.AUDIT_ITEM_UUID_EXTRA, mAuditItemUUID);
 		mContext.startActivity(cameraActivityIntent);
 	}
+
+    void openDetailIssueActivity() {
+        Intent detailIssueActivity = new Intent(mContext, DetailIssueActivity_.class);
+        detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, session.getContainerId());
+        detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, mAuditItemUUID);
+        detailIssueActivity.putExtra(DetailIssueActivity.SELECTED_TAB, 1);
+        mContext.startActivity(detailIssueActivity);
+    }
 
 	void showPreventRepairDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);

@@ -57,7 +57,8 @@ public class UploadImageJob extends Job {
 
 		// Notify to fragment upload that image is being uploaded.
 		EventBus.getDefault().post(new UploadingEvent(containerId, UploadType.IMAGE));
-		Logger.Log("Upload img: " + Utils.subString(imageName));
+		// Logger.Log("Upload img: " + Utils.subString(imageName));
+        Logger.Log("Upload img: " + imageName);
 
 		// Call data center to upload image
 		Context context = App.getInstance().getApplicationContext();
@@ -86,7 +87,7 @@ public class UploadImageJob extends Job {
 		//if it is a 4xx error, stop
 		if (throwable instanceof RetrofitError) {
 			RetrofitError retrofitError = (RetrofitError) throwable;
-			Logger.Log("Retrofit response: " + retrofitError.getSuccessType().toString());
+			Logger.Log("Retrofit response: " + retrofitError.getBody().toString());
 
 			return retrofitError.getResponse().getStatus() < 400 || retrofitError.getResponse().getStatus() > 499;
 		}

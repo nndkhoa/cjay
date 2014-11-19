@@ -90,7 +90,7 @@ public class NetworkClient {
 
 		// Begin to post image
 		Response response = restAdapter.create(NetworkService.class).postImageFile("image/jpeg", "media", imageName, typedFile);
-		imageFile.exists();
+//		imageFile.exists()
 		return response;
 	}
 	//endregion

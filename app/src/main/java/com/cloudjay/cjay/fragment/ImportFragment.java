@@ -16,7 +16,6 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
@@ -24,11 +23,8 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.ReuseActivity;
 import com.cloudjay.cjay.activity.ReuseActivity_;
-import com.cloudjay.cjay.activity.WizardActivity;
-import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
-import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.operator.OperatorChosenEvent;
 import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
 import com.cloudjay.cjay.model.GateImage;
@@ -231,11 +227,19 @@ public class ImportFragment extends Fragment {
 	 *
 	 * @param event
 	 */
-	void onEvent(ImageCapturedEvent event) {
-		refresh();
-	}
+//  @UiThread
+//	void onEvent(ImageCapturedEvent event) {
+//		refresh();
+//	}
 
-	/**
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refresh();
+    }
+
+    /**
 	 * @param event
 	 */
 	public void onEvent(ContainerGotEvent event) {

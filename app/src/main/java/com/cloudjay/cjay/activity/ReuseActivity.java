@@ -23,7 +23,6 @@ import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.adapter.RainyModeImageAdapter;
 import com.cloudjay.cjay.event.image.RainyImagesGotEvent;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
-import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
@@ -31,13 +30,10 @@ import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.PreferencesUtil;
-import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
-import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
@@ -286,7 +282,7 @@ public class ReuseActivity extends Activity {
         Intent resultIntent = new Intent();
         setResult(Activity.RESULT_OK, resultIntent);
 
-        EventBus.getDefault().post(new ImageCapturedEvent(containerID, ImageType.AUDIT, null));
+//      EventBus.getDefault().post(new ImageCapturedEvent(containerID, ImageType.AUDIT, null));
         this.finish();
 	}
 

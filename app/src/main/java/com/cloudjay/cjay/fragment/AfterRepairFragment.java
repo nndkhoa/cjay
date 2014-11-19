@@ -12,18 +12,14 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.DetailIssuedImageAdapter;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
-import com.cloudjay.cjay.event.image.ImageCapturedEvent;
-import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
@@ -137,14 +133,21 @@ public class AfterRepairFragment extends Fragment {
         startActivity(cameraActivityIntent);
     }
 
-    @UiThread
-    void onEvent(ImageCapturedEvent event) {
-        Logger.Log("on ImageCapturedEvent");
-        if (event.getImageType() == ImageType.REPAIRED.value) {
-            // Requery session to update data
-            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
+//    @UiThread
+//    void onEvent(ImageCapturedEvent event) {
+//        Logger.Log("on ImageCapturedEvent");
+//        if (event.getImageType() == ImageType.REPAIRED.value) {
+//            // Requery session to update data
+//            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
+//                    containerID);
+//        }
+//    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
                     containerID);
-        }
     }
 
     @UiThread
