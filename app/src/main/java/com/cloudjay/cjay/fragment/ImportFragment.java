@@ -348,6 +348,12 @@ public class ImportFragment extends Fragment {
 
 			if (isValidToAddSession()) {
 
+                if (Utils.isContainerIdValid(containerID)) {
+                    Utils.showCrouton(getActivity(),
+                            R.string.dialog_container_id_invalid_iso);
+                    return;
+                }
+
 				mSession = new Session()
 						.withContainerId(etContainerCode.getText().toString())
 						.withOperatorCode(etOperator.getText().toString())
