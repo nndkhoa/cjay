@@ -30,7 +30,7 @@ public class ApiEndpoint {
     public static final String CONTAINER_SESSION_HAND_CLEANING = "/api/cjay/containers/{id}/set-available";
 
 	public static final String CJAY_TMP_STORAGE = "https://www.googleapis.com";
-	public static final String CJAY_TMP_STORAGE_IMAGE = "/upload/storage/v1beta2/b/cjaytmp/o";
+	public static final String CJAY_TMP_STORAGE_IMAGE = "/upload/storage/v1/b/cjaytmp/o";
 
 	public static final String PUBNUB_AUDIT_ITEM = "/api/cjay/audit-items/{id}";
 	public static final String PUBNUB_DAMAGE_CODE = "/api/cjay/damage-codes/{id}";

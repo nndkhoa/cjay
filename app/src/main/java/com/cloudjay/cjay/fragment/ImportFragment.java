@@ -38,6 +38,7 @@ import com.cloudjay.cjay.task.job.UploadImageJob;
 import com.cloudjay.cjay.task.job.UploadImportJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
@@ -53,6 +54,7 @@ import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -491,19 +493,30 @@ public class ImportFragment extends Fragment {
 
     private void saveSessionRainyMode() {
 
+        // get depot code
+        String depotCode = PreferencesUtil.getPrefsValue(getActivity(), PreferencesUtil.PREF_USER_DEPOT);
+
         for (GateImage gateImage : list) {
             String uri = gateImage.getUrl();
-            String oldImageName = gateImage.getName();
+            String imageName = gateImage.getName();
 
             // update image name
-            String newImageName = oldImageName.replace("containerId", etContainerCode.getText().toString());
+            String newImageName = imageName.replace("containerId", etContainerCode.getText().toString());
             newImageName = newImageName.replace("imageType", "gate-in");
 
             // TODO: rename file in storage
+            // Get image file from storage
+            File directory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/rainy_mode" );
+            File file = new File(directory, imageName);
 
+            // Create new image file
+            File newFile = new File(directory, newImageName);
+
+            // Rename image
+            file.renameTo(newFile);
 
             //update uri
-            String newUri = uri.replace(oldImageName, newImageName);
+            String newUri = uri.replace(imageName, newImageName);
 
             // set name and uri in gate image
             gateImage.setName(newImageName);
