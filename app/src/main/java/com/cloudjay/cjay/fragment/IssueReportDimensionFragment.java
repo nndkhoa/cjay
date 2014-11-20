@@ -1,9 +1,5 @@
 package com.cloudjay.cjay.fragment;
 
-import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.ViewById;
-
 import android.app.Activity;
 import android.content.Context;
 import android.text.Editable;
@@ -17,6 +13,10 @@ import android.widget.TextView;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.AuditItem;
+
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_report_issue_dimension)
 public class IssueReportDimensionFragment extends IssueReportFragment {

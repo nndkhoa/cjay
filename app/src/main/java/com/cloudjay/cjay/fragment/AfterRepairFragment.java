@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.activity.CameraActivity_;
+import com.cloudjay.cjay.activity.NewCameraActivity_;
 import com.cloudjay.cjay.adapter.DetailIssuedImageAdapter;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
@@ -123,13 +123,13 @@ public class AfterRepairFragment extends Fragment {
             }
         }
 
-        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-        cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerID);
-        cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.REPAIRED.value);
-        cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);
-        cameraActivityIntent.putExtra(CameraFragment.AUDIT_ITEM_UUID_EXTRA, auditItemUUID);
-        cameraActivityIntent.putExtra(CameraFragment.IS_OPENED, true);
+        Intent cameraActivityIntent = new Intent(getActivity(), NewCameraActivity_.class);
+        cameraActivityIntent.putExtra(NewCameraActivity_.CONTAINER_ID_EXTRA, containerID);
+        cameraActivityIntent.putExtra(NewCameraActivity_.OPERATOR_CODE_EXTRA, operatorCode);
+        cameraActivityIntent.putExtra(NewCameraActivity_.IMAGE_TYPE_EXTRA, ImageType.REPAIRED.value);
+        cameraActivityIntent.putExtra(NewCameraActivity_.CURRENT_STEP_EXTRA, Step.REPAIR.value);
+        cameraActivityIntent.putExtra(NewCameraActivity_.AUDIT_ITEM_UUID_EXTRA, auditItemUUID);
+        cameraActivityIntent.putExtra(NewCameraActivity_.IS_OPENED, true);
         startActivity(cameraActivityIntent);
     }
 

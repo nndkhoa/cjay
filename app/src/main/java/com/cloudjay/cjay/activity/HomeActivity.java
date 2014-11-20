@@ -19,7 +19,6 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.upload.PreUploadStartedEvent;
-import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.fragment.SearchFragment_;
 import com.cloudjay.cjay.fragment.UploadFragment_;
 import com.cloudjay.cjay.fragment.WorkingFragment_;
@@ -192,11 +191,11 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
             if (rainyMode) {
                 // Go direct to camera
-                Intent cameraActivityIntent = new Intent(getApplicationContext(), CameraActivity_.class);
-                cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, "");
-                cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, "");
-                cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
-                cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
+                Intent cameraActivityIntent = new Intent(getApplicationContext(), NewCameraActivity_.class);
+                cameraActivityIntent.putExtra(NewCameraActivity_.CONTAINER_ID_EXTRA, "");
+                cameraActivityIntent.putExtra(NewCameraActivity_.OPERATOR_CODE_EXTRA, "");
+                cameraActivityIntent.putExtra(NewCameraActivity_.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
+                cameraActivityIntent.putExtra(NewCameraActivity_.CURRENT_STEP_EXTRA, Step.IMPORT.value);
                 startActivity(cameraActivityIntent);
             }
             return true;
