@@ -16,6 +16,8 @@ public class ContainerSearchedEvent {
 		return sessions;
 	}
 
+    public boolean searchInImportFragment;
+
 	public Session getTarget() {
 		if (isSingleChange()) {
 			return sessions.get(0);
@@ -47,4 +49,13 @@ public class ContainerSearchedEvent {
 	public boolean isSingleChange() {
 		return sessions.size() == 1;
 	}
+
+    public boolean isSearchInImportFragment() {
+        return this.searchInImportFragment;
+    }
+
+    public ContainerSearchedEvent(List<Session> sessions, boolean searchInImportFragment) {
+        this.sessions = sessions;
+        this.searchInImportFragment = searchInImportFragment;
+    }
 }

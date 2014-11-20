@@ -94,13 +94,13 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	public void onEvent(ContainerForUploadGotEvent event) {
 		mSession = event.getTarget();
 
-        Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+        Utils.showCrouton(getActivity(), getResources().getString(R.string.warning_container_invalid));
 
 		// Xu ly cho session da duoc Giam Dinh
 		if (mSession.getLocalStep() == Step.AUDIT.value) {
 			if (mSession != null) {
 				if (!mSession.isValidToUpload(Step.AUDIT)) {
-					Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+					Utils.showCrouton(getActivity(), getResources().getString(R.string.warning_container_invalid));
 					return;
 				}
 			} else {
@@ -152,12 +152,12 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			if (mSession != null) {
 
 				if (mSession.getLocalStep() == Step.AUDIT.value) {
-					Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+					Utils.showCrouton(getActivity(), getResources().getString(R.string.warning_container_invalid));
 					return;
 				}
 
 				if (!mSession.isValidToUpload(Step.REPAIR)) {
-					Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+					Utils.showCrouton(getActivity(), getResources().getString(R.string.warning_container_invalid));
 					return;
 				}
 			} else {
@@ -267,7 +267,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			);
 		}
 	}
-
 	@Override
 	public void onTabSelected(ActionBar.Tab tab, android.app.FragmentTransaction fragmentTransaction) {
 		int position = tab.getPosition();
@@ -293,7 +292,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	/**
 	 * Dùng để kiểm tra và xử lý hiển thị button giám định và sửa chữa
 	 *
-	 * @param event
+	 *
 	 */
 //	public void onEvent(ImageCapturedEvent event) {
 //

@@ -135,16 +135,14 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
     @Click(R.id.btn_camera_done)
     void btnDoneClicked() {
-
         if (rainyMode) {
-            // Open ReuseActivity
-            Intent intent = new Intent(getActivity(), ReuseActivity_.class);
-            intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, "");
-            startActivityForResult(intent, 1);
+            if (currentStep == Step.IMPORT.value) {
+                // Open ReuseActivity
+                Intent intent = new Intent(getActivity(), ReuseActivity_.class);
+                intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, "");
+                startActivityForResult(intent, 1);
+            }
         }
-
-        // Post an event
-        //EventBus.getDefault().post(new ImageCapturedEvent(containerId, mType, auditItemUUID, isOpened));
         getActivity().finish();
     }
 
@@ -208,21 +206,17 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
             btnUseGateImage.setVisibility(View.GONE);
 
         } else {
-            Step step = Step.values()[currentStep];
-
-            switch (step) {
-
-                case AUDIT:
-                    btnUseGateImage.setVisibility(View.VISIBLE);
-                    btnCameraMode.setVisibility(View.VISIBLE);
-                    break;
-
-                default:
-                    getContract().setSingleShotMode(false);
-                    btnUseGateImage.setVisibility(View.GONE);
-                    btnCameraMode.setVisibility(View.GONE);
-                    break;
-            }
+        Step step = Step.values()[currentStep];
+        switch (step) {
+            case AUDIT:
+                btnUseGateImage.setVisibility(View.VISIBLE);
+                btnCameraMode.setVisibility(View.VISIBLE);
+                break;
+            default:
+                getContract().setSingleShotMode(false);
+                btnUseGateImage.setVisibility(View.GONE);
+                btnCameraMode.setVisibility(View.GONE);
+                break;
         }
 
     }
@@ -385,19 +379,16 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
          */
         protected void addImageToUploadQueue(String uri, String imageName, String uuid) {
 
-            if (rainyMode) {
-
-                uri = "file://" + uri;
-                // Save image url to snappy db
-                dataCenter.saveRainyImage(getActivity().getApplicationContext(),
-                        uuid, uri);
-                return;
-            }
-
             // Create image based on mType and add this image to database
             ImageType type = ImageType.values()[mType];
             switch (type) {
                 case IMPORT:
+                    if (rainyMode) {
+                        uri = "file://" + uri;
+                        dataCenter.saveRainyImage(getActivity().getApplicationContext(),
+                                uuid, uri);
+                        return;
+                    }
                 case EXPORT:
                     GateImage gateImage = new GateImage()
                             .withId(0)

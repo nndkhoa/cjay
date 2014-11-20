@@ -245,8 +245,8 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener,
                 Intent cameraActivityIntent = new Intent(getApplicationContext(), CameraActivity_.class);
                 cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, "");
                 cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, "");
-                cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, -1);
-                cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, -1);
+                cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
+                cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
                 startActivity(cameraActivityIntent);
             }
             return true;
