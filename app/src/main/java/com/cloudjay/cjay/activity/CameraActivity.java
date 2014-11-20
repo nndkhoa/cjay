@@ -366,17 +366,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
     @Override
     public void onBackPressed() {
-
-//        // Open GridView
-//        if (mSourceTag.equals(GateImportListFragment.LOG_TAG)) {
-//            CJayApplication.openPhotoGridView(	this, mContainerSessionUUID, containerId, CJayImage.TYPE_IMPORT,
-//                    GateImportListFragment.LOG_TAG);
-//        } else if (mSourceTag.equals(GateExportListFragment.LOG_TAG)) {
-//            CJayApplication.openPhotoGridView(	this, mContainerSessionUUID, containerId, CJayImage.TYPE_EXPORT,
-//                    CJayImage.TYPE_REPAIRED, GateExportListFragment.LOG_TAG);
-//        }
-//
-//        super.onBackPressed();
+		doneButtonClicked();
     }
 
     @Override
@@ -813,9 +803,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
             }
 
             // create image file name
-//                fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-" + operatorCode + "-"
-//                        + uuid + ".jpg";
-            fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-"
+	        fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-"
                     + uuid + ".jpg";
         } else {
 

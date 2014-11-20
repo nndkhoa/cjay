@@ -8,7 +8,6 @@ import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
-import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.EIntentService;
 

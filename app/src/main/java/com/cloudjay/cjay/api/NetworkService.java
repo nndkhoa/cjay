@@ -5,7 +5,6 @@ import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.util.List;

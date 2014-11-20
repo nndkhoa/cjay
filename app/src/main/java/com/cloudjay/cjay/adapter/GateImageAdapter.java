@@ -9,7 +9,6 @@ import android.widget.ImageView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.GateImage;
-import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.view.CheckablePhotoGridItemLayout;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.imageaware.ImageAware;

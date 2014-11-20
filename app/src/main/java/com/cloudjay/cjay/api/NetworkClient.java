@@ -2,7 +2,6 @@ package com.cloudjay.cjay.api;
 
 
 import android.content.Context;
-import android.text.TextUtils;
 
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.IsoCode;
@@ -11,7 +10,6 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
-import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

@@ -5,11 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.AuditImage;
-import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.view.CheckableImageView;
 import com.cloudjay.cjay.view.SquareImageView;
