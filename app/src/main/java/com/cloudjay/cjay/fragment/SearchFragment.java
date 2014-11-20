@@ -22,7 +22,7 @@ import android.widget.Toast;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.activity.NewCameraActivity_;
+import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
@@ -312,11 +312,11 @@ public class SearchFragment extends Fragment {
 		startActivity(intent);
 
 		// Open camera activity
-		Intent cameraActivityIntent = new Intent(getActivity(), NewCameraActivity_.class);
-		cameraActivityIntent.putExtra(NewCameraActivity_.CONTAINER_ID_EXTRA, containerId);
-		cameraActivityIntent.putExtra(NewCameraActivity_.OPERATOR_CODE_EXTRA, "");
-		cameraActivityIntent.putExtra(NewCameraActivity_.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
-		cameraActivityIntent.putExtra(NewCameraActivity_.CURRENT_STEP_EXTRA, Step.IMPORT.value);
+		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
+		cameraActivityIntent.putExtra(CameraActivity_.CONTAINER_ID_EXTRA, containerId);
+		cameraActivityIntent.putExtra(CameraActivity_.OPERATOR_CODE_EXTRA, "");
+		cameraActivityIntent.putExtra(CameraActivity_.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
+		cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.IMPORT.value);
 		startActivity(cameraActivityIntent);
 	}
 

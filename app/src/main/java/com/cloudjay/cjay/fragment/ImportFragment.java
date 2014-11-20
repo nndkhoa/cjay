@@ -20,7 +20,7 @@ import android.widget.RadioGroup;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.activity.NewCameraActivity_;
+import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.ReuseActivity;
 import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
@@ -140,8 +140,6 @@ public class ImportFragment extends Fragment {
 	@AfterViews
 	void doAfterViews() {
 
-        Logger.Log("doAfterViews");
-
 		rainyMode = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext())
 				.getBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox),
 						false);
@@ -191,7 +189,6 @@ public class ImportFragment extends Fragment {
 		Operator operator = event.getOperator();
 		operatorCode = operator.getOperatorCode();
 		operatorId = operator.getId();
-		Logger.Log(" > Choose operator " + operatorCode);
 
 		// Set operator to edit text
 		etOperator.setText(operator.getOperatorCode());
@@ -300,11 +297,11 @@ public class ImportFragment extends Fragment {
 	void buttonCameraClicked() {
 
 		// Open camera activity
-		Intent cameraActivityIntent = new Intent(getActivity(), NewCameraActivity_.class);
-		cameraActivityIntent.putExtra(NewCameraActivity_.CONTAINER_ID_EXTRA, containerID);
-		cameraActivityIntent.putExtra(NewCameraActivity_.OPERATOR_CODE_EXTRA, operatorCode);
-		cameraActivityIntent.putExtra(NewCameraActivity_.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
-		cameraActivityIntent.putExtra(NewCameraActivity_.CURRENT_STEP_EXTRA, Step.IMPORT.value);
+		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
+		cameraActivityIntent.putExtra(CameraActivity_.CONTAINER_ID_EXTRA, containerID);
+		cameraActivityIntent.putExtra(CameraActivity_.OPERATOR_CODE_EXTRA, operatorCode);
+		cameraActivityIntent.putExtra(CameraActivity_.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
+		cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.IMPORT.value);
 		startActivity(cameraActivityIntent);
 	}
 
@@ -512,9 +509,6 @@ public class ImportFragment extends Fragment {
             String imageName = gateImage.getName();
             String containerId = mSession.getContainerId();
 
-            Logger.Log("imageName: " + imageName);
-            Logger.Log("uri: " + uri);
-
             JobManager jobManager = App.getJobManager();
             jobManager.addJobInBackground(new UploadImageJob(uri, imageName, containerId, ImageType.IMPORT));
         }
@@ -550,8 +544,6 @@ public class ImportFragment extends Fragment {
 
                 String imageName = Utils.getImageNameFromUrl(imageUrls.get(i));
                 String uuid = Utils.getUuidFromImageName(imageName);
-
-                Logger.Log("uuid: " + uuid);
 
                 GateImage gateImage = new GateImage()
                         .withId(0)

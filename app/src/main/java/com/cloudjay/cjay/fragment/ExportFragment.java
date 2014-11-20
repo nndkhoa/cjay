@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.activity.NewCameraActivity_;
+import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.adapter.PhotoExpandableListAdapter;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
@@ -129,11 +129,11 @@ public class ExportFragment extends Fragment {
 	void buttonTakeExportPictureClicked() {
 
 		// Open camera activity
-		Intent cameraActivityIntent = new Intent(getActivity(), NewCameraActivity_.class);
-		cameraActivityIntent.putExtra(NewCameraActivity_.CONTAINER_ID_EXTRA, containerID);
-		cameraActivityIntent.putExtra(NewCameraActivity_.IMAGE_TYPE_EXTRA, ImageType.EXPORT.value);
-		cameraActivityIntent.putExtra(NewCameraActivity_.OPERATOR_CODE_EXTRA, operatorCode);
-		cameraActivityIntent.putExtra(NewCameraActivity_.CURRENT_STEP_EXTRA, Step.EXPORTED.value);
+		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
+		cameraActivityIntent.putExtra(CameraActivity_.CONTAINER_ID_EXTRA, containerID);
+		cameraActivityIntent.putExtra(CameraActivity_.IMAGE_TYPE_EXTRA, ImageType.EXPORT.value);
+		cameraActivityIntent.putExtra(CameraActivity_.OPERATOR_CODE_EXTRA, operatorCode);
+		cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.EXPORTED.value);
 		startActivity(cameraActivityIntent);
 	}
 
@@ -171,11 +171,6 @@ public class ExportFragment extends Fragment {
 			// Get audit and repaired images by containerId
 			auditImages = mSession.getIssueImages();
 			repairedImages = mSession.getRepairedImages();
-
-//			Logger.Log("importImages: " + importImages.size());
-//			Logger.Log("exportImages: " + exportImages.size());
-//			Logger.Log("auditImages: " + auditImages.size());
-//			Logger.Log("repairedImages: " + repairedImages.size());
 
 			updatedGridView();
 			updateExpandableListView();
@@ -255,11 +250,6 @@ public class ExportFragment extends Fragment {
 			refresh();
 		}
 	}
-
-//	@UiThread
-//	void onEvent(ImageCapturedEvent event) {
-//		dataCenter.getSessionInBackground(getActivity(), event.getContainerId());
-//	}
 
     @Override
     public void onResume() {

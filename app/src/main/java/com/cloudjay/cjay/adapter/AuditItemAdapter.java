@@ -20,7 +20,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.DetailIssueActivity;
 import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.activity.MergeIssueActivity_;
-import com.cloudjay.cjay.activity.NewCameraActivity_;
+import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.ReportIssueActivity_;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
@@ -400,12 +400,12 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 	}
 
 	void openCamera() {
-		Intent cameraActivityIntent = new Intent(mContext, NewCameraActivity_.class);
-		cameraActivityIntent.putExtra(NewCameraActivity_.CONTAINER_ID_EXTRA, session.getContainerId());
-		cameraActivityIntent.putExtra(NewCameraActivity_.OPERATOR_CODE_EXTRA, operatorCode);
-		cameraActivityIntent.putExtra(NewCameraActivity_.IMAGE_TYPE_EXTRA, ImageType.REPAIRED.value);
-		cameraActivityIntent.putExtra(NewCameraActivity_.CURRENT_STEP_EXTRA, Step.REPAIR.value);
-		cameraActivityIntent.putExtra(NewCameraActivity_.AUDIT_ITEM_UUID_EXTRA, mAuditItemUUID);
+		Intent cameraActivityIntent = new Intent(mContext, CameraActivity_.class);
+		cameraActivityIntent.putExtra(CameraActivity_.CONTAINER_ID_EXTRA, session.getContainerId());
+		cameraActivityIntent.putExtra(CameraActivity_.OPERATOR_CODE_EXTRA, operatorCode);
+		cameraActivityIntent.putExtra(CameraActivity_.IMAGE_TYPE_EXTRA, ImageType.REPAIRED.value);
+		cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.REPAIR.value);
+		cameraActivityIntent.putExtra(CameraActivity_.AUDIT_ITEM_UUID_EXTRA, mAuditItemUUID);
 		mContext.startActivity(cameraActivityIntent);
 	}
 

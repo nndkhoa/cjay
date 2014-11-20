@@ -53,17 +53,33 @@
         android:background="@color/camera_background_transparent"
         android:orientation="vertical" >
 
-        <ImageView
-            android:id="@+id/left_padding"
+        <RelativeLayout
+            android:id="@+id/rl_use_gate_image"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="@color/camera_background_transparent" />
+            android:layout_weight="1" >
+
+            <Button
+                android:id="@+id/btn_use_gate_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:background="@drawable/btn_blue"
+                android:minHeight="40dp"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="2"
+                android:text="@string/btn_use_gate_in_image_title"
+                android:textColor="@android:color/white"/>
+        </RelativeLayout>
 
         <ImageButton
             android:id="@+id/btn_capture"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:background="@drawable/camera_option_background_selector"
@@ -89,6 +105,22 @@
                 android:paddingRight="12dp"
                 android:shadowDx="1"
                 android:text="@string/camera_done" />
+
+            <TextView
+                android:gravity="center"
+                android:id="@+id/tv_camera_done"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:minHeight="40dp"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:shadowDx="1"
+                android:textColor="#FFF"
+                android:visibility="gone"
+                android:text="@string/camera_saving"/>
         </RelativeLayout>
     </LinearLayout>
 

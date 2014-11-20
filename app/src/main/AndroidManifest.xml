@@ -92,14 +92,9 @@
             android:screenOrientation="portrait" />
         <activity
             android:name="com.cloudjay.cjay.activity.CameraActivity_"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_camera"
-            android:screenOrientation="nosensor"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" />
-        <activity
-            android:name="com.cloudjay.cjay.activity.NewCameraActivity_"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_new_camera"
+            android:screenOrientation="sensorLandscape"
             android:theme="@android:style/Theme.NoTitleBar"/>
         <activity
             android:name="com.cloudjay.cjay.activity.MergeIssueActivity_"
@@ -139,7 +134,7 @@
         </receiver>
 
         <activity
-            android:name="com.cloudjay.cjay.activity.NewCameraActivity"
+            android:name=".activity.CameraActivity"
             android:label="@string/title_activity_new_camera" >
         </activity>
     </application>

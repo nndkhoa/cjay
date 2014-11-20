@@ -27,7 +27,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
@@ -63,8 +62,8 @@ import java.util.UUID;
 
 import de.greenrobot.event.EventBus;
 
-@EActivity(R.layout.activity_new_camera)
-public class NewCameraActivity extends Activity implements AutoFocusCallback {
+@EActivity(R.layout.activity_camera)
+public class CameraActivity extends Activity implements AutoFocusCallback {
 
     public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
     public final static String OPERATOR_CODE_EXTRA = "com.cloudjay.wizard.operatorCode";
@@ -100,9 +99,6 @@ public class NewCameraActivity extends Activity implements AutoFocusCallback {
 
     @ViewById(R.id.btn_toggle_flash)
     ImageButton btnToggleFlash;
-
-    @ViewById(R.id.btn_capture_mode)
-    ToggleButton btnCaptureMode;
 
     @ViewById(R.id.camera_preview)
     SurfaceView mPreview;
@@ -172,6 +168,9 @@ public class NewCameraActivity extends Activity implements AutoFocusCallback {
 
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
+
+            showProgressSavingImage(true);
+
             try {
 
                 savePhoto(data);
@@ -211,19 +210,6 @@ public class NewCameraActivity extends Activity implements AutoFocusCallback {
     @Click(R.id.btn_capture)
     void buttonCaptureClicked() {
         takePicture();
-    }
-
-    @Click(R.id.btn_capture_mode)
-    void buttonCaptureModeToggleClicked() {
-
-        if (btnCaptureMode.isChecked()) {
-            Toast.makeText(this, "Kích hoạt chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
-            PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, true);
-        } else {
-            Toast.makeText(this, "Đã dừng chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
-            PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false);
-        }
-
     }
 
     @Click(R.id.btn_use_gate_image)
@@ -311,12 +297,10 @@ public class NewCameraActivity extends Activity implements AutoFocusCallback {
         switch (step) {
             case AUDIT:
                 btnUseGateImage.setVisibility(View.VISIBLE);
-                btnCaptureMode.setVisibility(View.VISIBLE);
                 break;
             default:
                 //getContract().setSingleShotMode(false);
                 btnUseGateImage.setVisibility(View.GONE);
-                btnCaptureMode.setVisibility(View.GONE);
                 break;
         }
 
@@ -404,7 +388,7 @@ public class NewCameraActivity extends Activity implements AutoFocusCallback {
         // setCameraDisplayOrientation(this, cameraMode, camera);
         // onResume();
 
-        setContentView(R.layout.activity_new_camera);
+        setContentView(R.layout.activity_camera);
         openCamera();
     }
 
@@ -445,7 +429,7 @@ public class NewCameraActivity extends Activity implements AutoFocusCallback {
         super.onResume();
 
         openCamera();
-        setContentView(R.layout.activity_new_camera);
+        setContentView(R.layout.activity_camera);
 
     }
 
@@ -504,9 +488,9 @@ public class NewCameraActivity extends Activity implements AutoFocusCallback {
 
     void saveBitmapToFile(Bitmap bitmap, File filename) {
 
-        // Logger.Log("===== On SaveBitmap =====");
-        // Logger.Log("Width/Height: " + Integer.toString(bitmap.getWidth()) + "/" +
-        // Integer.toString(bitmap.getHeight()));
+        Logger.Log("===== On SaveBitmap =====");
+        Logger.Log("Width/Height: " + Integer.toString(bitmap.getWidth()) + "/" +
+        Integer.toString(bitmap.getHeight()));
 
         try {
 
@@ -525,8 +509,6 @@ public class NewCameraActivity extends Activity implements AutoFocusCallback {
 
     @Background
     void savePhoto(byte[] data) {
-
-        synchronized (this) {
 
             try {
 
@@ -558,61 +540,6 @@ public class NewCameraActivity extends Activity implements AutoFocusCallback {
                     }
                 });
             }
-
-//            // Convert rotated byte[] to Bitmap
-//            Bitmap capturedBitmap = saveToBitmap(data);
-//
-//            // Save Bitmap to Files
-//            String uuid = UUID.randomUUID().toString();
-//
-//            String imageType;
-//            switch (mType) {
-//                case CJayImage.TYPE_IMPORT:
-//                    imageType = "gate-in";
-//                    break;
-//
-//                case CJayImage.TYPE_EXPORT:
-//                    imageType = "gate-out";
-//                    break;
-//
-//                case CJayImage.TYPE_AUDIT:
-//                    imageType = "auditor";
-//                    break;
-//
-//                case CJayImage.TYPE_REPAIRED:
-//                default:
-//                    imageType = "repair";
-//                    break;
-//            }
-//
-//            // file name example:
-//            // [depot-code]-2013-12-19-[gate-in|gate-out|report]-[containerId]-[UUID].jpg
-//            String today = StringHelper.getCurrentTimestamp("yyyy-MM-dd");
-//            String fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-" + operatorCode + "-"
-//                    + uuid + ".jpg";
-//
-//            File newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/" + today + "/" + imageType
-//                    + "/" + containerId);
-//
-//            if (!newDirectory.exists()) {
-//                newDirectory.mkdirs();
-//            }
-//
-//            // Save Bitmap to JPEG
-//            File photo = new File(newDirectory, fileName);
-//            saveBitmapToFile(capturedBitmap, photo);
-//
-//            // Upload image --> add image to queue
-//            uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
-//            DataCenter.getDatabaseHelper(this).addUsageLog(this, containerId + " | Captured " + fileName);
-//
-//            if (capturedBitmap != null) {
-//                capturedBitmap.recycle();
-//                capturedBitmap = null;
-//                System.gc();
-//            }
-        }
-
     }
 
     /**
@@ -763,17 +690,6 @@ public class NewCameraActivity extends Activity implements AutoFocusCallback {
             Logger.Log("Camera does not open");
         }
     }
-
-//    @UiThread
-//    public void showIssueReportDialog(String cjayImageUuid) {
-//
-//        if (mSourceTag.equals("AuditorContainerActivity")) {
-//            CJayApplication.openReportDialog(this, cjayImageUuid, mContainerSessionUUID);
-//        } else if (mSourceTag.equals("RepairIssuePendingListFragment")) {
-//            CJayApplication.openReportDialog(this, cjayImageUuid, mContainerSessionUUID);
-//        }
-//
-//    }
 
     public static void setCameraDisplayOrientation(Activity activity, int cameraId, android.hardware.Camera camera) {
 

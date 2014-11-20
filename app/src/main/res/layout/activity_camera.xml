@@ -23,18 +23,6 @@
         android:background="@color/camera_background_transparent"
         android:orientation="horizontal" >
 
-        <ToggleButton
-            android:id="@+id/btn_capture_mode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:background="@drawable/btn_toggle_blue"
-            android:shadowColor="@android:color/black"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="2"
-            android:layout_marginLeft="18dp"/>
-
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
