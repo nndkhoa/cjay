@@ -1,15 +1,5 @@
 package com.cloudjay.cjay.fragment;
 
-import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Bean;
-import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.ItemClick;
-import org.androidannotations.annotations.SystemService;
-import org.androidannotations.annotations.UiThread;
-import org.androidannotations.annotations.ViewById;
-import org.droidparts.widget.ClearableEditText;
-import org.droidparts.widget.ClearableEditText.Listener;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -29,6 +19,16 @@ import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.SystemService;
+import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.ViewById;
+import org.droidparts.widget.ClearableEditText;
+import org.droidparts.widget.ClearableEditText.Listener;
 
 import java.util.List;
 

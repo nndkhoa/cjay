@@ -7,7 +7,6 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.AuditMergeIssueAdapter;
 import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
 import com.cloudjay.cjay.model.AuditItem;
-import com.cloudjay.cjay.model.Session;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;

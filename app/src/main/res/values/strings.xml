@@ -69,13 +69,14 @@
     <string name="fragment_search_btn_search">Tìm kiếm</string>
     <string name="dialog_container_id_required">Chưa nhập container ID</string>
     <string name="dialog_container_id_invalid">Container ID không đúng quy định</string>
-	<string name="dialog_container_id_invalid_length">Container ID đủ 11 ký tự</string>
+    <string name="dialog_container_id_invalid_length">Container ID đủ 11 ký tự</string>
     <string name="dialog_container_id_invalid_iso">Container ID không đúng chuẩn ISO</string>
 
     <!-- Camera Button -->
     <string name="camera_done">Xong</string>
     <string name="require_select_operator_first">Vui lòng chọn hãng tàu trước khi chụp</string>
     <string name="btn_use_gate_in_image_title">GATE</string>
+    <string name="alert_camera_preview">Ứng dụng không xử lý kịp. Hãy chụp chậm lại.</string>
 
     <!-- Dialog Search Operator -->
     <string name="dialog_container_owner">Hãng tàu</string>
@@ -119,7 +120,7 @@
     <string name="menu_refresh">Refresh</string>
     <string name="menu_role_title">Role</string>
     <string name="menu_upload_log_title">Log</string>
-	<string name="logout_prompt_title">Dữ liệu sẽ mất sau khi đăng xuất. Bạn có chắc chưa?</string>
+    <string name="logout_prompt_title">Dữ liệu sẽ mất sau khi đăng xuất. Bạn có chắc chưa?</string>
     <string name="menu_setting_title">Setting</string>
 
     <!-- Main flow fragment titles -->
@@ -147,7 +148,7 @@
     <string name="image_type_description_export">Hình Xuất</string>
     <string name="image_type_description_report">Hình Giám Định</string>
     <string name="image_type_description_repaired">Hình Sửa Chữa</string>
-	<string name="no_working_item">No available items</string>
+    <string name="no_working_item">No available items</string>
     <string name="chose_issue_has_been_audited">Chọn lỗi đã giám định</string>
 
     <!-- Issue status -->
@@ -155,13 +156,14 @@
     <string name="issue_approved">Đã duyệt</string>
     <string name="issue_can_not_repair">Cấm sửa</string>
     <string name="issue_code_missing_warning">Xin vui lòng nhập code</string>
-	<string name="camera_saving">Đang lưu ảnh...</string>
-	<string name="menu_clear_uploaded_title">Clear</string>
+    <string name="camera_saving">Đang lưu ảnh...</string>
+    <string name="menu_clear_uploaded_title">Clear</string>
 
     <!-- Warning -->
     <string name="warning_exported_container">Container này đã được xuất</string>
     <string name="warning_container_invalid">Container chưa được báo cáo đầy đủ</string>
     <string name="error_container_is_already_existed">Container này đã tồn tại</string>
     <string name="warning_rainy_mode_dialog">Vãn còn hình thiếu thông tin, tiếp tục?</string>
+    <string name="title_activity_new_camera">NewCameraActivity</string>
 
 </resources>

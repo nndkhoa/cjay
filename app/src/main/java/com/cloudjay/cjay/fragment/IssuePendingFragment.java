@@ -15,9 +15,9 @@ import android.widget.TextView;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.DetailIssueActivity;
 import com.cloudjay.cjay.activity.DetailIssueActivity_;
+import com.cloudjay.cjay.activity.NewCameraActivity_;
 import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.adapter.AuditItemAdapter;
 import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
@@ -227,12 +227,12 @@ public class IssuePendingFragment extends Fragment {
 	 * Open camera to take audit picture
 	 */
 	void openCamera() {
-		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerId);
-		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.AUDIT.value);
-		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.AUDIT.value);
-		cameraActivityIntent.putExtra(CameraFragment.IS_OPENED, false);
+		Intent cameraActivityIntent = new Intent(getActivity(), NewCameraActivity_.class);
+		cameraActivityIntent.putExtra(NewCameraActivity_.CONTAINER_ID_EXTRA, containerId);
+		cameraActivityIntent.putExtra(NewCameraActivity_.IMAGE_TYPE_EXTRA, ImageType.AUDIT.value);
+		cameraActivityIntent.putExtra(NewCameraActivity_.OPERATOR_CODE_EXTRA, operatorCode);
+		cameraActivityIntent.putExtra(NewCameraActivity_.CURRENT_STEP_EXTRA, Step.AUDIT.value);
+		cameraActivityIntent.putExtra(NewCameraActivity_.IS_OPENED, false);
 		startActivity(cameraActivityIntent);
 	}
 

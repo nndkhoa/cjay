@@ -10,7 +10,6 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.fragment.AuditAndRepairFragment_;
 import com.cloudjay.cjay.fragment.ExportFragment_;
 import com.cloudjay.cjay.fragment.ImportFragment_;
-import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.Step;
@@ -20,7 +19,6 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @EActivity(R.layout.activity_wizard)
 public class WizardActivity extends BaseActivity {

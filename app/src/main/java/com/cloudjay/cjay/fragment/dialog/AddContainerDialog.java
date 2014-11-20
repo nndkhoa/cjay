@@ -8,25 +8,20 @@ import android.widget.EditText;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.activity.CameraActivity_;
+import com.cloudjay.cjay.activity.NewCameraActivity_;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
-import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringUtils;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 
-import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
-import org.androidannotations.annotations.TextChange;
-import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.ViewById;
 
 import eu.inmite.android.lib.dialogs.SimpleDialogFragment;
@@ -175,11 +170,11 @@ public class AddContainerDialog extends SimpleDialogFragment {
         startActivity(intent);
 
         // Open camera activity
-        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-        cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerId);
-        cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, "");
-        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
-        cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
+        Intent cameraActivityIntent = new Intent(getActivity(), NewCameraActivity_.class);
+        cameraActivityIntent.putExtra(NewCameraActivity_.CONTAINER_ID_EXTRA, containerId);
+        cameraActivityIntent.putExtra(NewCameraActivity_.OPERATOR_CODE_EXTRA, "");
+        cameraActivityIntent.putExtra(NewCameraActivity_.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
+        cameraActivityIntent.putExtra(NewCameraActivity_.CURRENT_STEP_EXTRA, Step.IMPORT.value);
         startActivity(cameraActivityIntent);
         dismiss();
     }
