@@ -33,9 +33,6 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.dialog_select_operator)
 public class SearchOperatorDialog extends DialogFragment {
 
-	private String mOperatorName;
-	private Fragment mParent;
-
 	List<Operator> operators;
 	OperatorAdapter operatorAdapter;
 
@@ -78,6 +75,8 @@ public class SearchOperatorDialog extends DialogFragment {
 	@AfterViews
 	void doAfterViews() {
 
+		
+
 		// Set title for search operator dialog
 		getDialog().setTitle(getResources().getString(R.string.dialog_operator_title));
 
@@ -103,9 +102,6 @@ public class SearchOperatorDialog extends DialogFragment {
 				| InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
 	}
 
-
-
 	public void setParent(Fragment parent) {
-		mParent = parent;
 	}
 }

@@ -5,7 +5,6 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,8 +13,6 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.KeyEvent;
-import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.inputmethod.InputMethodManager;
 
 import com.cloudjay.cjay.App;
@@ -23,12 +20,10 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.upload.PreUploadStartedEvent;
 import com.cloudjay.cjay.fragment.CameraFragment;
-import com.cloudjay.cjay.fragment.SearchFragment;
 import com.cloudjay.cjay.fragment.SearchFragment_;
 import com.cloudjay.cjay.fragment.UploadFragment_;
 import com.cloudjay.cjay.fragment.WorkingFragment_;
 import com.cloudjay.cjay.task.job.FetchSessionsJob;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -36,21 +31,18 @@ import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.JobManager;
-import com.rampo.updatechecker.UpdateChecker;
-import com.rampo.updatechecker.UpdateCheckerResult;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Locale;
 
 @EActivity(R.layout.activity_home)
-public class HomeActivity extends BaseActivity implements ActionBar.TabListener, UpdateCheckerResult {
+public class HomeActivity extends BaseActivity implements ActionBar.TabListener {
 
 	public int currentPosition = 0;
 
@@ -76,12 +68,13 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener,
         SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
         boolean isUpdateEnabled = preferences.getBoolean("auto_check_update_checkbox", false);
-        if (isUpdateEnabled) {
-            Logger.Log("Check for update");
-            UpdateChecker checker = new UpdateChecker(this, this);
-            checker.setSuccessfulChecksRequired(2);
-            checker.start();
-        }
+
+//        if (isUpdateEnabled) {
+//            Logger.Log("Check for update");
+//            UpdateChecker checker = new UpdateChecker(this, this);
+//            checker.setSuccessfulChecksRequired(2);
+//            checker.start();
+//        }
 
 		// Check if user was logged in
 		String token = PreferencesUtil.getPrefsValue(this, PreferencesUtil.PREF_TOKEN);
@@ -189,50 +182,7 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener,
 		}
 	}
 
-    @Override
-    public void foundUpdateAndShowIt(String versionDownloadable) {
-        Logger.Log("Update available\n" + "Version downloadable: " + versionDownloadable + "\nVersion installed: " + getVersionInstalled());
-    }
-
-    @Override
-    public void foundUpdateAndDontShowIt(String versionDownloadable) {
-        Logger.Log("Already Shown\n" + "Version downloadable: " + versionDownloadable + "\nVersion installed: " + getVersionInstalled());
-    }
-
-    @Override
-    public void returnUpToDate(String versionDownloadable) {
-        Logger.Log("Updated\n" + "Version downloadable: " + versionDownloadable + "\nVersion installed: " + getVersionInstalled());
-    }
-
-    @Override
-    public void returnMultipleApksPublished() {
-
-    }
-
-    @Override
-    public void returnNetworkError() {
-
-    }
-
-    @Override
-    public void returnAppUnpublished() {
-        Logger.Log("App unpublished");
-    }
-
-    @Override
-    public void returnStoreError() {
-
-    }
-
-    public String getVersionInstalled() {
-        try {
-            return getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException ignored) {
-        }
-        return null;
-    }
-
-    @Override
+	@Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
         boolean rainyMode = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
