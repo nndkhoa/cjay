@@ -101,9 +101,6 @@ public class NewCameraActivity extends Activity implements AutoFocusCallback {
     @ViewById(R.id.btn_toggle_flash)
     ImageButton btnToggleFlash;
 
-    @ViewById(R.id.btn_capture_mode)
-    ToggleButton btnCaptureMode;
-
     @ViewById(R.id.camera_preview)
     SurfaceView mPreview;
 
@@ -213,19 +210,6 @@ public class NewCameraActivity extends Activity implements AutoFocusCallback {
         takePicture();
     }
 
-    @Click(R.id.btn_capture_mode)
-    void buttonCaptureModeToggleClicked() {
-
-        if (btnCaptureMode.isChecked()) {
-            Toast.makeText(this, "Kích hoạt chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
-            PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, true);
-        } else {
-            Toast.makeText(this, "Đã dừng chế độ chụp liên tục", Toast.LENGTH_SHORT).show();
-            PreferencesUtil.storePrefsValue(this, PreferencesUtil.PREF_CAMERA_MODE_CONTINUOUS, false);
-        }
-
-    }
-
     @Click(R.id.btn_use_gate_image)
     void btnUseGateImageClicked() {
         // Open ReuseActivity
@@ -311,12 +295,10 @@ public class NewCameraActivity extends Activity implements AutoFocusCallback {
         switch (step) {
             case AUDIT:
                 btnUseGateImage.setVisibility(View.VISIBLE);
-                btnCaptureMode.setVisibility(View.VISIBLE);
                 break;
             default:
                 //getContract().setSingleShotMode(false);
                 btnUseGateImage.setVisibility(View.GONE);
-                btnCaptureMode.setVisibility(View.GONE);
                 break;
         }
 
