@@ -172,10 +172,10 @@ public class ExportFragment extends Fragment {
 			auditImages = mSession.getIssueImages();
 			repairedImages = mSession.getRepairedImages();
 
-			Logger.Log("importImages: " + importImages.size());
-			Logger.Log("exportImages: " + exportImages.size());
-			Logger.Log("auditImages: " + auditImages.size());
-			Logger.Log("repairedImages: " + repairedImages.size());
+//			Logger.Log("importImages: " + importImages.size());
+//			Logger.Log("exportImages: " + exportImages.size());
+//			Logger.Log("auditImages: " + auditImages.size());
+//			Logger.Log("repairedImages: " + repairedImages.size());
 
 			updatedGridView();
 			updateExpandableListView();

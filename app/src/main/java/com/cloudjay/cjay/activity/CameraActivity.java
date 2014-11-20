@@ -25,6 +25,7 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 	public final static String OPERATOR_CODE_EXTRA = "com.cloudjay.wizard.operatorCode";
 	public final static String IMAGE_TYPE_EXTRA = "com.cloudjay.wizard.imageType";
 	public final static String CURRENT_STEP_EXTRA = "com.cloudjay.wizard.currentStep";
+
 	// This Extra bundle is use to open Detail Issue Activity only
 	public final static String AUDIT_ITEM_UUID_EXTRA = "com.cloudjay.wizard.auditItemUUID";
 	public final static String IS_OPENED = "com.cloudjay.wizard.isOpened";
@@ -51,16 +52,11 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 	private static final String STATE_LOCK_TO_LANDSCAPE = "lock_to_landscape";
 
 	private boolean singleShot = false;
-
-	private boolean isLockedToLandscape = true;
+	private boolean isLockedToLandscape = false;
 	private CameraFragment current = null;
 
 	@AfterExtras
 	void afterExtra() {
-
-//		Logger.Log("mType: " + mType);
-//		Logger.Log("isOpened: " + isOpened);
-
 		current = CameraFragment_.builder()
 				.currentStep(currentStep)
 				.containerId(containerId)

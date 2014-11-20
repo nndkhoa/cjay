@@ -172,12 +172,12 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
     }
     //endregion
 
-
     PictureTransaction xact;
 
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
+
         SimpleCameraHost.Builder builder = new SimpleCameraHost.Builder(new CameraHost(getActivity()));
         setHost(builder.useFullBleedPreview(true).build());
 
@@ -200,22 +200,14 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
 
         // Enable button Camera
         btnTakePicture.setEnabled(true);
-
-//		Logger.Log("isOpened: " + isOpened);
-
-        // Config shot mode. Default is FALSE.
-        // Configure View visibility based on current step of session
-
-//		Logger.Log("Current Step of session: " + step.toString());
-
         rainyMode = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext())
                 .getBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox),
                         false);
 
         if (rainyMode) {
             btnUseGateImage.setVisibility(View.GONE);
-        } else {
 
+        } else {
             Step step = Step.values()[currentStep];
 
             switch (step) {
@@ -542,9 +534,7 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
         @Override
         @TargetApi(16)
         public void onAutoFocus(boolean success, Camera camera) {
-            Logger.Log("onAutoFocus");
             super.onAutoFocus(success, camera);
-
             //takeSimplePicture();
 
         }
