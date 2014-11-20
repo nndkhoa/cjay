@@ -72,8 +72,14 @@ public class ReuseActivity extends Activity {
 	@ViewById(R.id.tv_container_code)
 	TextView tvContainerId;
 
+    @ViewById(R.id.tv_divider_line)
+    TextView tvDividerLine;
+
 	@ViewById(R.id.tv_current_status)
 	TextView tvCurrentStatus;
+
+    @ViewById(R.id.v_line)
+    View vLine;
 
 	@ViewById(R.id.btn_input_rainy_mode)
 	Button btnInputRainy;
@@ -112,6 +118,11 @@ public class ReuseActivity extends Activity {
 
             dataCenter.getSessionInBackground(this, containerID);
         } else {
+
+            tvContainerId.setVisibility(View.GONE);
+            tvDividerLine.setVisibility(View.GONE);
+            tvCurrentStatus.setVisibility(View.GONE);
+            vLine.setVisibility(View.GONE);
 
             buttonLinearLayout.setVisibility(View.GONE);
 
@@ -235,7 +246,7 @@ public class ReuseActivity extends Activity {
 	private void showRainyDiaglog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Alert");
-		builder.setMessage("Vãn còn hình thiếu thông tin, tiếp tục?");
+		builder.setMessage(getResources().getString(R.string.warning_rainy_mode_dialog));
 
 		builder.setPositiveButton("Quay lại", new DialogInterface.OnClickListener() {
 			@Override
@@ -398,8 +409,8 @@ public class ReuseActivity extends Activity {
                 Intent cameraActivityIntent = new Intent(getApplicationContext(), CameraActivity_.class);
                 cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, "");
                 cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, "");
-                cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, -1);
-                cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, -1);
+                cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
+                cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
                 startActivity(cameraActivityIntent);
             }
             return true;

@@ -212,7 +212,7 @@ public class ImportFragment extends Fragment {
 	 * Event được trigger khi chụp hình xong bấm nút Done ở camera.
 	 * Refresh container session.
 	 *
-	 * @param event
+	 * @param
 	 */
 //  @UiThread
 //	void onEvent(ImageCapturedEvent event) {
@@ -315,7 +315,7 @@ public class ImportFragment extends Fragment {
 	void buttonContinueClicked() {
 
 		if (mSession.isValidToUpload(Step.IMPORT) == false) {
-			Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+			Utils.showCrouton(getActivity(), getResources().getString(R.string.warning_container_invalid));
 			return;
 		}
 
@@ -345,7 +345,7 @@ public class ImportFragment extends Fragment {
 		}
 
 		if (mSession.isValidToUpload(Step.IMPORT) == false) {
-			Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+			Utils.showCrouton(getActivity(), getResources().getString(R.string.warning_container_invalid));
 			return;
 		}
 
@@ -597,7 +597,7 @@ public class ImportFragment extends Fragment {
                 ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
                         .setTextColor(getActivity().getResources().getColor(android.R.color.white));
                 ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
-                        .setBackgroundResource(R.drawable.btn_green_selector);
+                        .setBackgroundResource(R.drawable.btn_red_selector);
 
                 // Set background and text color for BUTTON_POSITIVE
                 ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
