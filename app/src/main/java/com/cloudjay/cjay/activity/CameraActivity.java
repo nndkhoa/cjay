@@ -135,4 +135,9 @@ public class CameraActivity extends Activity implements CameraFragment.Contract 
 		singleShot = mode;
 	}
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+    }
 }
