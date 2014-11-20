@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.InputType;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -19,6 +20,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.TextChange;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -28,9 +30,6 @@ import de.greenrobot.event.EventBus;
 
 @EFragment(R.layout.dialog_select_operator)
 public class SearchOperatorDialog extends DialogFragment {
-
-	private String mOperatorName;
-	private Fragment mParent;
 
 	List<Operator> operators;
 	OperatorAdapter operatorAdapter;
@@ -68,10 +67,13 @@ public class SearchOperatorDialog extends DialogFragment {
 
 		// Notify change
 		operatorAdapter.swapOperators(operators);
+
 	}
 
 	@AfterViews
 	void doAfterViews() {
+
+		
 
 		// Set title for search operator dialog
 		getDialog().setTitle(getResources().getString(R.string.dialog_operator_title));
@@ -92,7 +94,12 @@ public class SearchOperatorDialog extends DialogFragment {
 		dataCenter.searchOperator(keyword);
 	}
 
+	@TextChange(R.id.et_operator_name)
+	void upperCase(){
+		etOperatorName.setInputType(InputType.TYPE_CLASS_TEXT
+				| InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+	}
+
 	public void setParent(Fragment parent) {
-		mParent = parent;
 	}
 }

@@ -273,7 +273,7 @@ public class SearchFragment extends Fragment {
 
 		// Start search in background
 		containerID = keyword;
-		dataCenter.search(getActivity(), keyword);
+		dataCenter.search(getActivity(), keyword, false);
 
 	}
 
@@ -313,10 +313,10 @@ public class SearchFragment extends Fragment {
 
 		// Open camera activity
 		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerId);
-		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, "");
-		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
-		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
+		cameraActivityIntent.putExtra(CameraActivity_.CONTAINER_ID_EXTRA, containerId);
+		cameraActivityIntent.putExtra(CameraActivity_.OPERATOR_CODE_EXTRA, "");
+		cameraActivityIntent.putExtra(CameraActivity_.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
+		cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.IMPORT.value);
 		startActivity(cameraActivityIntent);
 	}
 
@@ -350,26 +350,30 @@ public class SearchFragment extends Fragment {
 	@UiThread
 	public void onEvent(ContainerSearchedEvent event) {
 
-		showProgress(false);
-		if (event.isFailed()) {
+        boolean searchInImportFragment = event.isSearchInImportFragment();
 
-			llSearchResult.setVisibility(View.GONE);
-			Utils.showCrouton(getActivity(), "Đang xảy ra sự cố \nXin thử lại sau", Style.ALERT);
+        if (!searchInImportFragment) {
+            showProgress(false);
+            if (event.isFailed()) {
 
-		} else {
-			List<Session> result = event.getSessions();
-			mAdapter.clear();
-			if (result.size() != 0) {
-				mAdapter.setData(result);
-				mAdapter.notifyDataSetChanged();
+                llSearchResult.setVisibility(View.GONE);
+                Utils.showCrouton(getActivity(), "Xảy ra sự cố với kết nối mạng \nXin thử lại sau", Style.ALERT);
 
-			} else {
-                if (!isSearchResultDialogOpening) {
-                    isSearchResultDialogOpening = true;
-                    showSearchResultDialog(containerID);
+            } else {
+                List<Session> result = event.getSessions();
+                mAdapter.clear();
+                if (result.size() != 0) {
+                    mAdapter.setData(result);
+                    mAdapter.notifyDataSetChanged();
+
+                } else {
+                    if (!isSearchResultDialogOpening) {
+                        isSearchResultDialogOpening = true;
+                        showSearchResultDialog(containerID);
+                    }
                 }
-			}
-		}
+            }
+        }
 	}
 	//endregion
 

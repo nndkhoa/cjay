@@ -17,8 +17,6 @@ import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.SessionAdapter;
 import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.event.session.WorkingSessionCreatedEvent;
-import com.cloudjay.cjay.event.upload.UploadStartedEvent;
-import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.enums.Step;
@@ -112,12 +110,11 @@ public class WorkingFragment extends Fragment {
 		mAdapter = new SessionAdapter(getActivity(), R.layout.item_container_working);
 		lvWorking.setAdapter(mAdapter);
 		lvWorking.setEmptyView(tvEmpty);
-		refresh();
 	}
 
 	void refresh() {
 		if (mAdapter != null) {
-			dataCenter.getSessionsInBackground(getActivity().getApplicationContext(), CJayConstant.PREFIX_WORKING);
+			dataCenter.getListSessionsInBackground(getActivity().getApplicationContext(), CJayConstant.PREFIX_WORKING);
 		}
 	}
 
@@ -158,18 +155,16 @@ public class WorkingFragment extends Fragment {
 		refresh();
 	}
 
-	public void onEvent(UploadSucceededEvent event) {
-		refresh();
-	}
-
-	public void onEvent(UploadStartedEvent event) {
-		refresh();
-	}
-
 	public void onEvent(ContainersGotEvent event) {
 		if (event.getPrefix().equals(CJayConstant.PREFIX_WORKING))
 			updatedData(event.getTargets());
 	}
 
-	//endregion
+    @Override
+    public void onResume() {
+        super.onResume();
+        refresh();
+    }
+
+    //endregion
 }

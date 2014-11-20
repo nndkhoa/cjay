@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/dialog_container_owner"
-        android:inputType="textNoSuggestions" />
+        android:inputType="textNoSuggestions|textCapSentences" />
 
     <ListView
         android:id="@+id/lv_operators_list"

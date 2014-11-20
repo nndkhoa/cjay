@@ -30,6 +30,9 @@ public class GetNotificationJob extends Job {
 
 	@Override
 	public void onAdded() {
+		//Add LOG
+		Context context = App.getInstance().getApplicationContext();
+		DataCenter_.getInstance_(context).addLog(context, objectType, objectId + " |R " + messageId, CJayConstant.PREFIX_NOTIFI_LOG);
 
 	}
 
@@ -86,7 +89,8 @@ public class GetNotificationJob extends Job {
 	protected void onCancel() {
 		//Add LOG
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).addLog(context, objectType, objectId + " | " + messageId);
+		DataCenter_.getInstance_(context).addLog(context, objectType, objectId + " |C " + messageId, CJayConstant.PREFIX_NOTIFI_LOG);
+
 	}
 
 	@Override

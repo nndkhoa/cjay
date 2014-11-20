@@ -2,12 +2,10 @@ package com.cloudjay.cjay.api;
 
 import android.content.Context;
 
-import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 
-import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 
 import retrofit.RestAdapter;

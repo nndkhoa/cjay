@@ -4,26 +4,29 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
-import android.view.ViewConfiguration;
+import android.view.KeyEvent;
 import android.view.inputmethod.InputMethodManager;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.upload.PreUploadStartedEvent;
-import com.cloudjay.cjay.fragment.SearchFragment;
 import com.cloudjay.cjay.fragment.SearchFragment_;
 import com.cloudjay.cjay.fragment.UploadFragment_;
 import com.cloudjay.cjay.fragment.WorkingFragment_;
 import com.cloudjay.cjay.task.job.FetchSessionsJob;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.enums.ImageType;
+import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.JobManager;
@@ -33,7 +36,6 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Locale;
@@ -61,6 +63,17 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 	 */
 	@AfterViews
 	void setup() {
+        // Check for update
+        SharedPreferences preferences = PreferenceManager
+                .getDefaultSharedPreferences(getApplicationContext());
+        boolean isUpdateEnabled = preferences.getBoolean("auto_check_update_checkbox", false);
+
+//        if (isUpdateEnabled) {
+//            Logger.Log("Check for update");
+//            UpdateChecker checker = new UpdateChecker(this, this);
+//            checker.setSuccessfulChecksRequired(2);
+//            checker.start();
+//        }
 
 		// Check if user was logged in
 		String token = PreferencesUtil.getPrefsValue(this, PreferencesUtil.PREF_TOKEN);
@@ -167,6 +180,29 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 			dataCenter.changeStatusWhenUpload(this, event.getSession(), UploadType.AUDIT_ITEM, UploadStatus.UPLOADING);
 		}
 	}
+
+	@Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        boolean rainyMode = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+                .getBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox),
+                        false);
+
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+            if (rainyMode) {
+                // Go direct to camera
+                Intent cameraActivityIntent = new Intent(getApplicationContext(), CameraActivity_.class);
+                cameraActivityIntent.putExtra(CameraActivity_.CONTAINER_ID_EXTRA, "");
+                cameraActivityIntent.putExtra(CameraActivity_.OPERATOR_CODE_EXTRA, "");
+                cameraActivityIntent.putExtra(CameraActivity_.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
+                cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.IMPORT.value);
+                startActivity(cameraActivityIntent);
+            }
+            return true;
+        } else {
+            return super.onKeyDown(keyCode, event);
+        }
+    }
 }
 
 class ViewPagerAdapter extends FragmentPagerAdapter {

@@ -18,9 +18,10 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
+import com.cloudjay.cjay.activity.DetailIssueActivity;
+import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.activity.MergeIssueActivity_;
 import com.cloudjay.cjay.activity.ReportIssueActivity_;
-import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.CJayObject;
@@ -157,10 +158,11 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				holder.tvIssueStatus.setBackgroundColor(Color.parseColor("#9D9614"));
 			} else {
 				if (!auditItem.isAllowed()) {
-					holder.tvIssueStatus.setText("Cấm sửa");
+					holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_can_not_repair));
 					holder.tvIssueStatus.setBackgroundColor(Color.parseColor("#DF0101"));
 				} else {
 					holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_approved));
+                    holder.tvIssueStatus.setBackgroundColor(Color.parseColor("#008CC9"));
 				}
 			}
 
@@ -178,6 +180,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 							showPreventRepairDialog();
 						} else {
 							// Open camera activity to take repair image
+                            openDetailIssueActivity();
 							openCamera();
 						}
 					}
@@ -288,6 +291,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			public void onClick(DialogInterface dialogInterface, int i) {
 				// Open camera activity to take repair image
 				Logger.Log("mComponentCode: " + mComponentCode);
+                openDetailIssueActivity();
 				openCamera();
 				dialogInterface.dismiss();
 			}
@@ -312,8 +316,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			}
 		});
 		dialog.show();
-
-	}
+    }
 
 	void showApproveDiaglog(final AuditItem item) {
 
@@ -399,13 +402,21 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 	void openCamera() {
 		Intent cameraActivityIntent = new Intent(mContext, CameraActivity_.class);
-		cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, session.getContainerId());
-		cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, operatorCode);
-		cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.REPAIRED.value);
-		cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.REPAIR.value);
-		cameraActivityIntent.putExtra(CameraFragment.AUDIT_ITEM_UUID_EXTRA, mAuditItemUUID);
+		cameraActivityIntent.putExtra(CameraActivity_.CONTAINER_ID_EXTRA, session.getContainerId());
+		cameraActivityIntent.putExtra(CameraActivity_.OPERATOR_CODE_EXTRA, operatorCode);
+		cameraActivityIntent.putExtra(CameraActivity_.IMAGE_TYPE_EXTRA, ImageType.REPAIRED.value);
+		cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.REPAIR.value);
+		cameraActivityIntent.putExtra(CameraActivity_.AUDIT_ITEM_UUID_EXTRA, mAuditItemUUID);
 		mContext.startActivity(cameraActivityIntent);
 	}
+
+    void openDetailIssueActivity() {
+        Intent detailIssueActivity = new Intent(mContext, DetailIssueActivity_.class);
+        detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, session.getContainerId());
+        detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, mAuditItemUUID);
+        detailIssueActivity.putExtra(DetailIssueActivity.SELECTED_TAB, 1);
+        mContext.startActivity(detailIssueActivity);
+    }
 
 	void showPreventRepairDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);

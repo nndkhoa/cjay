@@ -1,9 +1,5 @@
 package com.cloudjay.cjay.fragment;
 
-import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.ViewById;
-
 import android.app.Activity;
 import android.text.InputType;
 import android.view.View;
@@ -18,6 +14,10 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.util.Utils;
+
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ViewById;
 
 @EFragment(R.layout.fragment_report_issue_location)
 public class IssueReportLocationFragment extends IssueReportFragment implements OnFocusChangeListener, OnClickListener {
@@ -213,9 +213,9 @@ public class IssueReportLocationFragment extends IssueReportFragment implements 
 		// save location code
 		String locationCode = new StringBuilder()
                 .append(Utils.stripNull(mLocationCodes[0]))
-                .append(Utils.stripNull(mLocationCodes[0]))
-                .append(Utils.stripNull(mLocationCodes[0]))
-                .append(Utils.stripNull(mLocationCodes[0])).toString();
+                .append(Utils.stripNull(mLocationCodes[1]))
+                .append(Utils.stripNull(mLocationCodes[2]))
+                .append(Utils.stripNull(mLocationCodes[3])).toString();
 
 		if (locationCode.length() == 4) {
 			mCode3EditText.setError(null);

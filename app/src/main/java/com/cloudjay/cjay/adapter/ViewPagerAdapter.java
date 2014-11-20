@@ -1,7 +1,6 @@
 package com.cloudjay.cjay.adapter;
 
 import android.content.Context;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
@@ -9,7 +8,6 @@ import com.cloudjay.cjay.fragment.AfterRepairFragment_;
 import com.cloudjay.cjay.fragment.BeforeRepairFragment_;
 import com.cloudjay.cjay.fragment.IssuePendingFragment_;
 import com.cloudjay.cjay.fragment.IssueRepairedFragment_;
-import com.cloudjay.cjay.model.AuditItem;
 
 /**
  * A {@link android.support.v4.app.FragmentPagerAdapter} that returns a fragment corresponding to

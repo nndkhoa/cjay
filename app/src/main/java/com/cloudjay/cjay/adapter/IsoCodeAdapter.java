@@ -12,9 +12,6 @@ import android.widget.TextView;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.IsoCode;
-import com.cloudjay.cjay.util.Logger;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;

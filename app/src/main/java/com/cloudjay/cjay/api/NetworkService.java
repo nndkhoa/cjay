@@ -5,7 +5,6 @@ import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.util.List;
@@ -70,7 +69,7 @@ public interface NetworkService {
 	public AuditItem postAudiItem(@Path("id") long containerPk, @Body JsonObject audit_item);
 
 	@PUT(ApiEndpoint.CONTAINER_SESSION_ADD_AUDIT_IMAGES_API)
-	public AuditItem addAuditImages(@Path("id") String auditId, @Body JsonArray auditImages);
+	public AuditItem addAuditImages(@Path("id") String auditId, @Body JsonObject audit_images);
 
 	@PUT(ApiEndpoint.CONTAINER_SESSION_HAND_CLEANING)
 	public Session setHandCleaningSession(@Path("id") long containerPk);

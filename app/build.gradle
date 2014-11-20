@@ -20,7 +20,7 @@ apply plugin: 'crashlytics'
 // Manifest version information!
 def versionMajor = 2
 def versionMinor = 0
-def versionPatch = 0
+def versionPatch = 2
 def versionBuild = 0
 def versionTag = '-alpha' // bump for dogfood builds, public betas, etc.
 
@@ -53,7 +53,7 @@ android {
         targetSdkVersion 16
 
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
-        versionName "${versionMajor}.${versionMinor}.${versionPatch}${versionTag}"
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}${versionTag}-b${versionBuild}"
 
         buildConfigField "String", "GIT_SHA", "\"${gitSha}\""
         buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
@@ -137,6 +137,8 @@ dependencies {
     compile 'com.snappydb:snappydb-lib:0.5.0'
     compile 'com.esotericsoftware.kryo:kryo:2.24.0'
     compile 'org.droidparts:droidparts:2.6.2'
+
+    compile 'com.github.rampo.updatechecker:library:2.1.4'
 
     compile project(":jobqueue")
 }

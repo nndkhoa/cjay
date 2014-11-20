@@ -178,10 +178,14 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 				showError(etEmail, R.string.error_incorrect_password);
 			}
 		} catch (RetrofitError error) {
-
 			showProgress(false);
-			setError(getString(R.string.error_invalid_password));
-			showCrouton(error.getMessage());
+			String message = "";
+			if (error.getResponse().getStatus() == 400){
+				message = "Sai thông tin đăng nhập";
+			} else {
+				message = "Không thể kết nối với server";
+			}
+			showCrouton(message);
 		} catch (Exception e) {
 			e.printStackTrace();
 			showCrouton(e.getMessage());

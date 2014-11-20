@@ -9,16 +9,18 @@ import android.widget.Button;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
-import com.cloudjay.cjay.event.session.ContainerGotEvent;
-import com.cloudjay.cjay.event.image.ImageCapturedEvent;
 import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
+import com.cloudjay.cjay.event.session.ContainerGotEvent;
+import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.task.job.UploadImportJob;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
-import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.path.android.jobqueue.JobManager;
 import com.snappydb.SnappydbException;
@@ -60,10 +62,10 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	@ViewById(R.id.pager)
 	ViewPager pager;
 
-	@ViewById(R.id.btn_done)
+	@ViewById(R.id.btn_complete_repair)
 	Button btnCompleteRepair;
 
-	@ViewById(R.id.btn_complete_import)
+	@ViewById(R.id.btn_complete_audit)
 	Button btnCompleteAudit;
 
 	ActionBar actionBar;
@@ -92,15 +94,15 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 	@UiThread
 	public void onEvent(ContainerForUploadGotEvent event) {
-		mSession = event.getTarget();
 
-		Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+		mSession = event.getTarget();
+        Utils.showCrouton(getActivity(), getResources().getString(R.string.warning_container_invalid));
 
 		// Xu ly cho session da duoc Giam Dinh
 		if (mSession.getLocalStep() == Step.AUDIT.value) {
 			if (mSession != null) {
 				if (!mSession.isValidToUpload(Step.AUDIT)) {
-					Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+					Utils.showCrouton(getActivity(), getResources().getString(R.string.warning_container_invalid));
 					return;
 				}
 			} else {
@@ -115,6 +117,32 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			} catch (SnappydbException e) {
 				e.printStackTrace();
 			}
+
+//            if (mSession.getId() == 0) {
+//
+//                for (AuditItem auditItem : mSession.getAuditItems()) {
+//                    if (auditItem.getId() == 0 && auditItem.isAudited()) {
+//                        Logger.Log("Set upload confirmed for audit item: " + auditItem.toString());
+//                        auditItem.setUploadConfirmed(true);
+//                        DataCenter_.getInstance_(getActivity()).updateAuditItemInBackground(getActivity(),
+//                                mSession.getContainerId(), auditItem);
+//                    }
+//                }
+//            } else {
+//                for (AuditItem auditItem : mSession.getAuditItems()) {
+//
+//                    if (auditItem.getId() == 0) {
+//                        // If audit item has not been uploaded yet
+//                        // Add container session to upload queue
+//                        JobManager jobManager = App.getJobManager();
+//                        jobManager.addJobInBackground(new UploadAuditItemJob(mSession.getId(), auditItem,
+//                                mSession.getContainerId(), false));
+//                    }
+//                }
+//            }
+//
+//			JobManager jobManager = App.getJobManager();
+//			jobManager.addJobInBackground(new UploadImportJob(mSession));
 
 			// Hide this button
 			btnCompleteAudit.setVisibility(View.GONE);
@@ -133,12 +161,12 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			if (mSession != null) {
 
 				if (mSession.getLocalStep() == Step.AUDIT.value) {
-					Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+					Utils.showCrouton(getActivity(), getResources().getString(R.string.warning_container_invalid));
 					return;
 				}
 
 				if (!mSession.isValidToUpload(Step.REPAIR)) {
-					Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+					Utils.showCrouton(getActivity(), getResources().getString(R.string.warning_container_invalid));
 					return;
 				}
 			} else {
@@ -160,12 +188,12 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 	}
 
-	@Click(R.id.btn_complete_import)
+	@Click(R.id.btn_complete_audit)
 	void btnCompleteAuditClicked() {
 		dataCenter.getSessionForUpload(getActivity(), containerID);
 	}
 
-	@Click(R.id.btn_done)
+	@Click(R.id.btn_complete_repair)
 	void btnCompleteRepairClicked() {
 		dataCenter.getSessionForUpload(getActivity(), containerID);
 	}
@@ -252,7 +280,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			);
 		}
 	}
-
 	@Override
 	public void onTabSelected(ActionBar.Tab tab, android.app.FragmentTransaction fragmentTransaction) {
 		int position = tab.getPosition();
@@ -278,14 +305,20 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	/**
 	 * Dùng để kiểm tra và xử lý hiển thị button giám định và sửa chữa
 	 *
-	 * @param event
+	 *
 	 */
-	public void onEvent(ImageCapturedEvent event) {
+//	public void onEvent(ImageCapturedEvent event) {
+//
+//		// requery to update button
+//		int imageType = event.getImageType();
+//		if (imageType == ImageType.AUDIT.value) {
+//			dataCenter.changeSessionLocalStepInBackground(getActivity(), containerID, Step.AUDIT);
+//		}
+//	}
 
-		// requery to update button
-		int imageType = event.getImageType();
-		if (imageType == ImageType.AUDIT.value) {
-			dataCenter.changeSessionLocalStepInBackground(getActivity(), containerID, Step.AUDIT);
-		}
-	}
+    @Override
+    public void onResume() {
+        super.onResume();
+//      dataCenter.changeSessionLocalStepInBackground(getActivity(), containerID, Step.AUDIT);
+    }
 }

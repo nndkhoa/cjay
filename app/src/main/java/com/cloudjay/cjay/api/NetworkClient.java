@@ -2,7 +2,6 @@ package com.cloudjay.cjay.api;
 
 
 import android.content.Context;
-import android.text.TextUtils;
 
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.IsoCode;
@@ -11,7 +10,6 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
-import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -84,13 +82,13 @@ public class NetworkClient {
 	public Response uploadImage(String uri, String imageName) {
 
 		// Init explicit rest adapter for upload to Google Cloud Storage
-		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.CJAY_TMP_STORAGE).build();
+		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.CJAY_TMP_STORAGE).setLogLevel(RestAdapter.LogLevel.HEADERS).build();
 		File imageFile = new File(uri);
 		TypedFile typedFile = new TypedFile("image/jpeg", imageFile);
 
 		// Begin to post image
 		Response response = restAdapter.create(NetworkService.class).postImageFile("image/jpeg", "media", imageName, typedFile);
-		imageFile.exists();
+//		imageFile.exists()
 		return response;
 	}
 	//endregion
@@ -319,12 +317,18 @@ public class NetworkClient {
 	 * @param auditItem
 	 * @return
 	 */
-	public AuditItem addAuditImage(Context context, Session session, AuditItem auditItem) {
+	public AuditItem addAuditImage(Context context, AuditItem auditItem) {
+
 
 		String uuid = auditItem.getUuid();
-		AuditItem result = provider.getRestAdapter(context).create(NetworkService.class).addAuditImages(String.valueOf(auditItem.getId()), auditItem.getAuditImagesToUpLoad());
-		result.setUuid(uuid);
-		return result;
+        JsonObject addedAuditImagesToUpload = auditItem.getAddedAuditImagesToUpload();
+
+        if (!addedAuditImagesToUpload.isJsonNull()) {
+            AuditItem result = provider.getRestAdapter(context).create(NetworkService.class).addAuditImages(String.valueOf(auditItem.getId()), addedAuditImagesToUpload);
+            result.setUuid(uuid);
+            return result;
+        }
+        return null;
 	}
 
 	/**

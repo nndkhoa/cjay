@@ -1,95 +1,124 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white"
-    tools:context="com.cloudjay.cjay.activity.ReuseActivity">
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/white"
+                tools:context="com.cloudjay.cjay.activity.ReuseActivity">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/ll_bottom"
-        android:orientation="vertical"
-        android:padding="9dp">
+	<RelativeLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_above="@+id/ll_bottom"
+		android:orientation="vertical"
+		android:padding="9dp">
 
-        <TextView
-            android:id="@+id/tv_container_code"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="3dp"
-            android:text="ABCD1234567"
-            android:textColor="@color/background_cjay"
-            android:textSize="24dp"
-            android:textStyle="bold" />
+		<TextView
+			android:id="@+id/tv_container_code"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:paddingBottom="3dp"
+			android:text="ABCD1234567"
+			android:textColor="@color/background_cjay"
+			android:textSize="24dp"
+			android:textStyle="bold"/>
 
-        <TextView
-            android:id="@+id/tv_divider_line"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/tv_container_code"
-            android:paddingBottom="3dp"
-            android:text=" - "
-            android:textColor="@color/background_cjay"
-            android:textSize="24dp"
-            android:textStyle="bold" />
+		<TextView
+			android:id="@+id/tv_divider_line"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_toRightOf="@+id/tv_container_code"
+			android:paddingBottom="3dp"
+			android:text=" - "
+			android:textColor="@color/background_cjay"
+			android:textSize="24dp"
+			android:textStyle="bold"/>
 
-        <TextView
-            android:id="@+id/tv_current_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/tv_divider_line"
-            android:paddingBottom="3dp"
-            android:text="B"
-            android:textColor="@color/background_cjay"
-            android:textSize="24dp"
-            android:textStyle="bold" />
+		<TextView
+			android:id="@+id/tv_current_status"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_toRightOf="@+id/tv_divider_line"
+			android:paddingBottom="3dp"
+			android:text="B"
+			android:textColor="@color/background_cjay"
+			android:textSize="24dp"
+			android:textStyle="bold"/>
 
-        <View
-            android:id="@+id/v_line"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_below="@+id/tv_container_code"
-            android:layout_marginBottom="6dp"
-            android:background="@color/background_cjay" />
+		<View
+			android:id="@+id/v_line"
+			android:layout_width="match_parent"
+			android:layout_height="2dp"
+			android:layout_below="@+id/tv_container_code"
+			android:layout_marginBottom="6dp"
+			android:background="@color/background_cjay"/>
 
-        <TextView
-            android:id="@+id/tv_import_label"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/v_line"
-            android:paddingBottom="3dp"
-            android:text="Hình nhập"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+		<TextView
+			android:id="@+id/tv_import_label"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/v_line"
+			android:paddingBottom="3dp"
+			android:text="Hình nhập"
+			android:textSize="18sp"
+			android:textStyle="bold"/>
 
-        <GridView
-            android:id="@+id/gv_reuse_images"
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            android:verticalSpacing="1dp"
-            android:horizontalSpacing="1dp"
-            android:stretchMode="columnWidth"
-            android:numColumns="2"
-            tools:listitem="@layout/item_gridview_photo_multi_select"
-            android:layout_below="@+id/tv_import_label"/>
+		<GridView
+			android:id="@+id/gv_reuse_images"
+			android:layout_height="match_parent"
+			android:layout_width="match_parent"
+			android:verticalSpacing="1dp"
+			android:horizontalSpacing="1dp"
+			android:stretchMode="columnWidth"
+			android:numColumns="2"
+			tools:listitem="@layout/item_gridview_photo_multi_select"
+			android:layout_below="@+id/tv_import_label"/>
 
-    </RelativeLayout>
+	</RelativeLayout>
 
-    <LinearLayout
-        android:id="@+id/ll_bottom"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal">
+	<LinearLayout
+		android:id="@+id/ll_bottom"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:orientation="horizontal"
+		android:visibility="gone">
 
-        <Button
-            android:id="@+id/btn_done"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/background_cjay"
-            android:text="Xong"
-            android:textColor="@android:color/white" />
+		<Button
+			android:id="@+id/btn_done"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="@color/background_cjay"
+			android:text="Chọn"
+			android:textColor="@android:color/white"/>
 
-    </LinearLayout>
+	</LinearLayout>
+	<LinearLayout
+		android:id="@+id/ll_bottom_rainy_mode"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:orientation="horizontal"
+		android:weightSum="2">
+		<Button
+			android:id="@+id/btn_input_rainy_mode"
+			android:layout_width="0dp"
+			android:layout_weight="1"
+			android:layout_height="match_parent"
+			android:background="@drawable/btn_green_selector"
+			android:text="Nhập thông tin"
+			android:textSize="13sp"
+			android:textColor="@android:color/white"/>
+
+		<Button
+			android:id="@+id/btn_done_rainy_mode"
+			android:layout_width="0dp"
+			android:layout_weight="1"
+			android:layout_height="match_parent"
+			android:background="@color/background_cjay"
+			android:textSize="13sp"
+			android:text="Hoàn tất nhập Container"
+			android:textColor="@android:color/white"/>
+
+	</LinearLayout>
 
 </RelativeLayout>

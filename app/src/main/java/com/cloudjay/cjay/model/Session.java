@@ -547,7 +547,7 @@ public class Session implements Serializable {
 				}
 
 				for (AuditItem item : auditItems) {
-					if (item.isAudited() == false || item.getUploadStatus() == UploadStatus.NONE.value)
+					if (item.isAudited() == false)
 						return false;
 				}
 
@@ -562,8 +562,16 @@ public class Session implements Serializable {
 				}
 
 				for (AuditItem item : auditItems) {
-					if (item.isRepaired() == false && item.isAllowed() == true) {
-						return false;
+					if (item.isRepaired() == false) {
+                        if (item.isAllowed() == null) {
+                            return false;
+                        } else {
+                            if (item.isAllowed()) {
+                                return false;
+                            } else {
+                                continue;
+                            }
+                        }
 					}
 				}
 
@@ -813,6 +821,7 @@ public class Session implements Serializable {
                                     if (server.after(local)) {
                                         localItem.merge(serverItem);
                                     }
+
                                 } else {
                                     localItem.merge(serverItem);
                                 }

@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
 import android.app.FragmentTransaction;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -46,8 +45,6 @@ import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-import de.greenrobot.event.EventBus;
 
 // slide 20
 
@@ -131,8 +128,6 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
     @UiThread
     public void onEvent(IsoCodeGotEvent event) {
-
-        Logger.Log("IsoCodeGotEvent");
         IsoCode isoCode = event.getIsoCode();
 
         if (isoCode == null) {
@@ -150,6 +145,8 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
             Logger.Log(isoCode.getId() + "");
             mAuditItem.setRepairCodeId(isoCode.getId());
             mAuditItem.setRepairCode(isoCode.getCode());
+
+            Logger.logJson("mAuditItem", mAuditItem, AuditItem.class);
 
             // save db records and refresh list
             mDataCenter.updateAuditItemInBackground(getApplicationContext(), mContainerId, mAuditItem);

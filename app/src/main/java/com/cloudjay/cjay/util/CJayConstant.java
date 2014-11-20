@@ -25,6 +25,8 @@ public class CJayConstant {
 	public static final String PREFIX_REPAIR_CODE = "REPAIR";
 	public static final String PREFIX_COMPONENT_CODE = "COMPONENT";
 	public static final String PREFIX_LOG = "LOG";
+	public static final String PREFIX_NOTIFI_LOG = "NOTIFI_LOG";
+    public static final String PREFIX_RAINY_MODE_IMAGE = "RAINY_MODE_IMAGE";
 
 	public static final String PREFIX_CONTAINER_PRIORITY = "PREFIX_CONTAINER_PRIORITY:";
 	public static final String PREFIX_CJAY_PRIORITY = "PREFIX_CJAY_PRIORITY";
@@ -57,4 +59,10 @@ public class CJayConstant {
 	// Pubnub
 	public static final String PUBLISH_KEY = "pub-c-d4a2608d-f440-4ebf-a09a-dd8a570428cd";
 	public static final String SUBSCRIBE_KEY = "sub-c-fe158864-9fcf-11e3-a937-02ee2ddab7fe";
+	public static final String QUEUE_PRIORITY = "QUEUE_PRIORITY:";
+	public static final String SESSION_PRIORITY = "SESSION_PRIORITY";
+
+    // Action Intent
+    public static final String ACTION_SEND_GATE_IMAGES = "action_send_gate_images";
+    public static final String ACTION_PICK_MORE = "action_pick_more";
 }

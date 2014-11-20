@@ -2,19 +2,14 @@ package com.cloudjay.cjay.activity;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
-import android.support.v4.app.FragmentTabHost;
-import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.model.AuditItem;
-import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
-import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.InvocationTargetException;

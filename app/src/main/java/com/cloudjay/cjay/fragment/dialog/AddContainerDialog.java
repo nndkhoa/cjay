@@ -11,22 +11,17 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
-import com.cloudjay.cjay.fragment.CameraFragment;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringUtils;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 
-import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
-import org.androidannotations.annotations.TextChange;
-import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.ViewById;
 
 import eu.inmite.android.lib.dialogs.SimpleDialogFragment;
@@ -96,7 +91,7 @@ public class AddContainerDialog extends SimpleDialogFragment {
 			}
 		});
 
-		builder.setNeutralButton("Taọ sai ISO", new View.OnClickListener() {
+		builder.setNeutralButton("Tạo sai ISO", new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 
@@ -114,11 +109,6 @@ public class AddContainerDialog extends SimpleDialogFragment {
 		return builder;
 	}
 
-//	@Touch(R.id.et_container_id)
-//	void setupInput() {
-//		Utils.setupEditText(etContainerID);
-//	}
-
 	/**
 	 * 1. Khởi tạo các thành phần trên dialog
 	 * 2. Cấu hình EditText
@@ -129,9 +119,6 @@ public class AddContainerDialog extends SimpleDialogFragment {
 
 		// Set search keyword into edit text
 		etContainerID.setText(containerId);
-
-		// Setup keyboard
-		Utils.setupEditText(etContainerID);
 
 		// Set background and text color for Negative button
 		this.getNegativeButton().setBackgroundResource(R.drawable.btn_green_selector);
@@ -154,6 +141,8 @@ public class AddContainerDialog extends SimpleDialogFragment {
 				etContainerID.setError(getString(R.string.dialog_container_id_invalid_iso));
 			}
 		}
+
+		Utils.setupEditText(etContainerID);
 	}
 
     void createContainerSession() {
@@ -182,10 +171,10 @@ public class AddContainerDialog extends SimpleDialogFragment {
 
         // Open camera activity
         Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-        cameraActivityIntent.putExtra(CameraFragment.CONTAINER_ID_EXTRA, containerId);
-        cameraActivityIntent.putExtra(CameraFragment.OPERATOR_CODE_EXTRA, "");
-        cameraActivityIntent.putExtra(CameraFragment.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
-        cameraActivityIntent.putExtra(CameraFragment.CURRENT_STEP_EXTRA, Step.IMPORT.value);
+        cameraActivityIntent.putExtra(CameraActivity_.CONTAINER_ID_EXTRA, containerId);
+        cameraActivityIntent.putExtra(CameraActivity_.OPERATOR_CODE_EXTRA, "");
+        cameraActivityIntent.putExtra(CameraActivity_.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
+        cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.IMPORT.value);
         startActivity(cameraActivityIntent);
         dismiss();
     }

@@ -537,7 +537,12 @@ public class Utils {
 		editText.setFilters(new InputFilter[]{isLetterAndDigitFilter, validCharacterFilter});
 
 		// Set keyboard type
-		editText.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+		if (editText.getText().toString().length() > 4) {
+			editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+		} else {
+			editText.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+		}
+
 		editText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -545,6 +550,7 @@ public class Utils {
 
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
 				Matcher matcher = pattern.matcher(s);
 				if (s.length() < 4) {
 					if (editText.getInputType() != InputType.TYPE_CLASS_TEXT) {
@@ -580,6 +586,20 @@ public class Utils {
 		String name = url.substring(url.lastIndexOf("/") + 1, url.length());
 		return name;
 	}
+
+    public static String getUuidFromImageName(String imageName) {
+        if (TextUtils.isEmpty(imageName)) {
+            return "";
+        }
+
+        int index = 0;
+        for(int i = 0; i < 6; i++)
+            index = imageName.indexOf("-", index+1);
+
+        String uuid = imageName.substring(index + 1, imageName.length());
+        uuid = uuid.substring(0, uuid.length() - 4);
+        return uuid;
+    }
 
 	public static String subString(String s) {
 		return s.substring(s.length() - 53, s.length() - 32);

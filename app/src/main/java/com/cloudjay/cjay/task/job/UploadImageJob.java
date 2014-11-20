@@ -4,15 +4,12 @@ import android.content.Context;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
-import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
-import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Priority;
-import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
@@ -60,7 +57,8 @@ public class UploadImageJob extends Job {
 
 		// Notify to fragment upload that image is being uploaded.
 		EventBus.getDefault().post(new UploadingEvent(containerId, UploadType.IMAGE));
-		Logger.Log("Upload img: " + Utils.subString(imageName));
+		// Logger.Log("Upload img: " + Utils.subString(imageName));
+        Logger.Log("Upload img: " + imageName);
 
 		// Call data center to upload image
 		Context context = App.getInstance().getApplicationContext();
@@ -79,7 +77,7 @@ public class UploadImageJob extends Job {
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).changeImageUploadStatus(context, containerId, imageName, imageType, UploadStatus.ERROR, object);
 		EventBus.getDefault().post(new UploadStoppedEvent(containerId));
-		DataCenter_.getInstance_(context).addLog(context, containerId, "Không thể tải lên hình: " + imageName);
+		DataCenter_.getInstance_(context).addLog(context, containerId, "Không thể tải lên hình: " + imageName,CJayConstant.PREFIX_LOG);
 
 	}
 
@@ -89,7 +87,7 @@ public class UploadImageJob extends Job {
 		//if it is a 4xx error, stop
 		if (throwable instanceof RetrofitError) {
 			RetrofitError retrofitError = (RetrofitError) throwable;
-			Logger.Log("Retrofit response: " + retrofitError.getSuccessType().toString());
+			Logger.Log("Retrofit response: " + retrofitError.getBody().toString());
 
 			return retrofitError.getResponse().getStatus() < 400 || retrofitError.getResponse().getStatus() > 499;
 		}

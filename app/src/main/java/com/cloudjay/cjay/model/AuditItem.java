@@ -443,6 +443,27 @@ public class AuditItem implements Serializable{
 		return audit_image;
 	}
 
+    public JsonObject getAddedAuditImagesToUpload() {
+
+        JsonObject auditImagesPut = new JsonObject();
+        JsonArray auditImages = new JsonArray();
+        Logger.e("size: " + String.valueOf(this.getListAuditedImages().size()));
+        for (AuditImage auditImage : this.getListAuditedImages()) {
+
+            Logger.Log("getId: " + auditImage.getId());
+            Logger.Log("getName: " + auditImage.getName());
+
+            if (auditImage.getId() == 0) {
+                String auditImageName = auditImage.getName();
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("name", auditImageName);
+                auditImages.add(jsonObject);
+            }
+        }
+        auditImagesPut.add("audit_images", auditImages);
+        return auditImagesPut;
+    }
+
 	/**
 	 * Get repaired image name for post complete repair
 	 * Return JSONArray of repaired image list look like [{name: '....'}, {name: '....'}, ...] for upload
