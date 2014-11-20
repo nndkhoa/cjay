@@ -27,7 +27,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
@@ -63,8 +62,8 @@ import java.util.UUID;
 
 import de.greenrobot.event.EventBus;
 
-@EActivity(R.layout.activity_new_camera)
-public class NewCameraActivity extends Activity implements AutoFocusCallback {
+@EActivity(R.layout.activity_camera)
+public class CameraActivity extends Activity implements AutoFocusCallback {
 
     public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
     public final static String OPERATOR_CODE_EXTRA = "com.cloudjay.wizard.operatorCode";
@@ -169,6 +168,9 @@ public class NewCameraActivity extends Activity implements AutoFocusCallback {
 
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
+
+            showProgressSavingImage(true);
+
             try {
 
                 savePhoto(data);
@@ -386,7 +388,7 @@ public class NewCameraActivity extends Activity implements AutoFocusCallback {
         // setCameraDisplayOrientation(this, cameraMode, camera);
         // onResume();
 
-        setContentView(R.layout.activity_new_camera);
+        setContentView(R.layout.activity_camera);
         openCamera();
     }
 
@@ -427,7 +429,7 @@ public class NewCameraActivity extends Activity implements AutoFocusCallback {
         super.onResume();
 
         openCamera();
-        setContentView(R.layout.activity_new_camera);
+        setContentView(R.layout.activity_camera);
 
     }
 

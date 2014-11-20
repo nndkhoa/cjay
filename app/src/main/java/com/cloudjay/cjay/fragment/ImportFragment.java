@@ -20,7 +20,7 @@ import android.widget.RadioGroup;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.activity.NewCameraActivity_;
+import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.ReuseActivity;
 import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
@@ -300,11 +300,11 @@ public class ImportFragment extends Fragment {
 	void buttonCameraClicked() {
 
 		// Open camera activity
-		Intent cameraActivityIntent = new Intent(getActivity(), NewCameraActivity_.class);
-		cameraActivityIntent.putExtra(NewCameraActivity_.CONTAINER_ID_EXTRA, containerID);
-		cameraActivityIntent.putExtra(NewCameraActivity_.OPERATOR_CODE_EXTRA, operatorCode);
-		cameraActivityIntent.putExtra(NewCameraActivity_.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
-		cameraActivityIntent.putExtra(NewCameraActivity_.CURRENT_STEP_EXTRA, Step.IMPORT.value);
+		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
+		cameraActivityIntent.putExtra(CameraActivity_.CONTAINER_ID_EXTRA, containerID);
+		cameraActivityIntent.putExtra(CameraActivity_.OPERATOR_CODE_EXTRA, operatorCode);
+		cameraActivityIntent.putExtra(CameraActivity_.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
+		cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.IMPORT.value);
 		startActivity(cameraActivityIntent);
 	}
 

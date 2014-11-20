@@ -164,6 +164,6 @@
     <string name="warning_container_invalid">Container chưa được báo cáo đầy đủ</string>
     <string name="error_container_is_already_existed">Container này đã tồn tại</string>
     <string name="warning_rainy_mode_dialog">Vãn còn hình thiếu thông tin, tiếp tục?</string>
-    <string name="title_activity_new_camera">NewCameraActivity</string>
+    <string name="title_activity_new_camera">CameraActivity</string>
 
 </resources>
