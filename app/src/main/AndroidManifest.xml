@@ -73,7 +73,7 @@
 		<activity
 			android:name=".activity.CameraActivity_"
 			android:label="@string/title_activity_camera"
-			android:screenOrientation="portrait"
+            android:screenOrientation="nosensor"
 			android:configChanges="keyboardHidden|orientation|screenSize"
 			android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen"></activity>
 
@@ -141,6 +141,4 @@
 	<uses-feature
 		android:name="android.hardware.camera.autofocus"
 		android:required="false"/>
-	<uses-feature android:name="android.hardware.screen.portrait" />
-
 </manifest>
