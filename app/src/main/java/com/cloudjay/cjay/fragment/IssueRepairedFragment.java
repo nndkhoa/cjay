@@ -136,15 +136,6 @@ public class IssueRepairedFragment extends Fragment {
 		mAdapter.notifyDataSetChanged();
 	}
 
-//	@UiThread
-//	void onEvent(ImageCapturedEvent event) {
-//
-//		if (event.getImageType() == ImageType.REPAIRED.value) {
-//			dataCenter.getSessionInBackground(getActivity(), containerID);
-//		}
-//	}
-
-
     @Override
     public void onResume() {
         super.onResume();

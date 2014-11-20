@@ -129,9 +129,7 @@ public class IssuePendingFragment extends Fragment {
 
 	@ItemClick(R.id.lv_audit_items)
 	void auditItemClicked(int position) {
-
 		AuditItem auditItem = mAdapter.getItem(position);
-		Logger.Log("getUuid: " + auditItem.getUuid());
 
 		if (auditItem.isAudited()) {
 			Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
@@ -316,7 +314,6 @@ public class IssuePendingFragment extends Fragment {
 
     @UiThread
 	void onEvent(IssueMergedEvent event) {
-		Logger.Log("on IssueMergedEvent");
 
 		// Delete merged audit item containerId
 		String containerId = event.getContainerId();
@@ -333,9 +330,6 @@ public class IssuePendingFragment extends Fragment {
 
 	@UiThread
 	void onEvent(UploadSucceededEvent event) {
-
-		Logger.Log("on UploadSucceededEvent");
-
 		if (event.uploadType == UploadType.AUDIT_ITEM) {
 
 		}

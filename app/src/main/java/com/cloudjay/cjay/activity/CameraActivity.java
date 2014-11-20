@@ -488,9 +488,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
     void saveBitmapToFile(Bitmap bitmap, File filename) {
 
-        // Logger.Log("===== On SaveBitmap =====");
-        // Logger.Log("Width/Height: " + Integer.toString(bitmap.getWidth()) + "/" +
-        // Integer.toString(bitmap.getHeight()));
+        Logger.Log("===== On SaveBitmap =====");
+        Logger.Log("Width/Height: " + Integer.toString(bitmap.getWidth()) + "/" +
+        Integer.toString(bitmap.getHeight()));
 
         try {
 
@@ -509,8 +509,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
     @Background
     void savePhoto(byte[] data) {
-
-        synchronized (this) {
 
             try {
 
@@ -542,61 +540,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
                     }
                 });
             }
-
-//            // Convert rotated byte[] to Bitmap
-//            Bitmap capturedBitmap = saveToBitmap(data);
-//
-//            // Save Bitmap to Files
-//            String uuid = UUID.randomUUID().toString();
-//
-//            String imageType;
-//            switch (mType) {
-//                case CJayImage.TYPE_IMPORT:
-//                    imageType = "gate-in";
-//                    break;
-//
-//                case CJayImage.TYPE_EXPORT:
-//                    imageType = "gate-out";
-//                    break;
-//
-//                case CJayImage.TYPE_AUDIT:
-//                    imageType = "auditor";
-//                    break;
-//
-//                case CJayImage.TYPE_REPAIRED:
-//                default:
-//                    imageType = "repair";
-//                    break;
-//            }
-//
-//            // file name example:
-//            // [depot-code]-2013-12-19-[gate-in|gate-out|report]-[containerId]-[UUID].jpg
-//            String today = StringHelper.getCurrentTimestamp("yyyy-MM-dd");
-//            String fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-" + operatorCode + "-"
-//                    + uuid + ".jpg";
-//
-//            File newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/" + today + "/" + imageType
-//                    + "/" + containerId);
-//
-//            if (!newDirectory.exists()) {
-//                newDirectory.mkdirs();
-//            }
-//
-//            // Save Bitmap to JPEG
-//            File photo = new File(newDirectory, fileName);
-//            saveBitmapToFile(capturedBitmap, photo);
-//
-//            // Upload image --> add image to queue
-//            uploadImage(uuid, "file://" + photo.getAbsolutePath(), fileName);
-//            DataCenter.getDatabaseHelper(this).addUsageLog(this, containerId + " | Captured " + fileName);
-//
-//            if (capturedBitmap != null) {
-//                capturedBitmap.recycle();
-//                capturedBitmap = null;
-//                System.gc();
-//            }
-        }
-
     }
 
     /**
@@ -747,17 +690,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
             Logger.Log("Camera does not open");
         }
     }
-
-//    @UiThread
-//    public void showIssueReportDialog(String cjayImageUuid) {
-//
-//        if (mSourceTag.equals("AuditorContainerActivity")) {
-//            CJayApplication.openReportDialog(this, cjayImageUuid, mContainerSessionUUID);
-//        } else if (mSourceTag.equals("RepairIssuePendingListFragment")) {
-//            CJayApplication.openReportDialog(this, cjayImageUuid, mContainerSessionUUID);
-//        }
-//
-//    }
 
     public static void setCameraDisplayOrientation(Activity activity, int cameraId, android.hardware.Camera camera) {
 

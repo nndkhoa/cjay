@@ -84,7 +84,7 @@ public class NetworkClient {
 	public Response uploadImage(String uri, String imageName) {
 
 		// Init explicit rest adapter for upload to Google Cloud Storage
-		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.CJAY_TMP_STORAGE).build();
+		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.CJAY_TMP_STORAGE).setLogLevel(RestAdapter.LogLevel.HEADERS).build();
 		File imageFile = new File(uri);
 		TypedFile typedFile = new TypedFile("image/jpeg", imageFile);
 

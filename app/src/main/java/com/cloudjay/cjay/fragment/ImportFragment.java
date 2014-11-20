@@ -140,8 +140,6 @@ public class ImportFragment extends Fragment {
 	@AfterViews
 	void doAfterViews() {
 
-        Logger.Log("doAfterViews");
-
 		rainyMode = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext())
 				.getBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox),
 						false);
@@ -191,7 +189,6 @@ public class ImportFragment extends Fragment {
 		Operator operator = event.getOperator();
 		operatorCode = operator.getOperatorCode();
 		operatorId = operator.getId();
-		Logger.Log(" > Choose operator " + operatorCode);
 
 		// Set operator to edit text
 		etOperator.setText(operator.getOperatorCode());
@@ -512,9 +509,6 @@ public class ImportFragment extends Fragment {
             String imageName = gateImage.getName();
             String containerId = mSession.getContainerId();
 
-            Logger.Log("imageName: " + imageName);
-            Logger.Log("uri: " + uri);
-
             JobManager jobManager = App.getJobManager();
             jobManager.addJobInBackground(new UploadImageJob(uri, imageName, containerId, ImageType.IMPORT));
         }
@@ -550,8 +544,6 @@ public class ImportFragment extends Fragment {
 
                 String imageName = Utils.getImageNameFromUrl(imageUrls.get(i));
                 String uuid = Utils.getUuidFromImageName(imageName);
-
-                Logger.Log("uuid: " + uuid);
 
                 GateImage gateImage = new GateImage()
                         .withId(0)
