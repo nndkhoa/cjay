@@ -610,27 +610,32 @@ public class ImportFragment extends Fragment {
     }
 
     private void performSearch(String containerId) {
-        dataCenter.search(getActivity(), containerId);
+        dataCenter.search(getActivity(), containerId, true);
     }
 
     @UiThread
     public void onEvent(ContainerSearchedEvent event) {
-        if (rainyMode) {
-            List<Session> result = event.getSessions();
-            if (result.size() == 0) {
-                if (isValidToAddSession()) {
-                    if (!Utils.isContainerIdValid(containerID)) {
-                        showInvalidIsoContainerDialog();
+
+        boolean searchInImportFragment = event.isSearchInImportFragment();
+
+        if (searchInImportFragment) {
+            if (rainyMode) {
+                List<Session> result = event.getSessions();
+                if (result.size() == 0) {
+                    if (isValidToAddSession()) {
+                        if (!Utils.isContainerIdValid(containerID)) {
+                            showInvalidIsoContainerDialog();
+                        } else {
+                            saveSessionRainyMode();
+                        }
                     } else {
-                        saveSessionRainyMode();
+                        Utils.showCrouton(getActivity(), getResources().getString(
+                                R.string.warning_container_invalid));
                     }
                 } else {
                     Utils.showCrouton(getActivity(), getResources().getString(
-                            R.string.warning_container_invalid));
+                            R.string.error_container_is_already_existed));
                 }
-            } else {
-                Utils.showCrouton(getActivity(), getResources().getString(
-                        R.string.error_container_is_already_existed));
             }
         }
     }

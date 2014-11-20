@@ -648,7 +648,7 @@ public class DataCenter {
 	 * @param keyword
 	 */
 	@Background(serial  = CACHE, delay = 30)
-	public void search(Context context, String keyword) {
+	public void search(Context context, String keyword, boolean searchInImportFragment) {
 
 		String[] keysResult;
 		try {
@@ -667,13 +667,13 @@ public class DataCenter {
 			// Check if local search has results
 			if (sessions.size() != 0) {
 
-				EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
+				EventBus.getDefault().post(new ContainerSearchedEvent(sessions, searchInImportFragment));
 			} else {
 
 				// If there was not result in local, send search request to server
 				//  --> alert to user about that no results was found in local
 				EventBus.getDefault().post(new SearchAsyncStartedEvent(context.getResources().getString(R.string.search_on_server)));
-				searchAsync(context, keyword);
+				searchAsync(context, keyword, searchInImportFragment);
 			}
 		} catch (SnappydbException e) {
 			Logger.e(e.getMessage());
@@ -692,7 +692,7 @@ public class DataCenter {
 	 * @param keyword
 	 */
 	@Background(serial = NETWORK)
-	public void searchAsync(Context context, String keyword) {
+	public void searchAsync(Context context, String keyword, boolean searchInImportFragment) {
 
 		try {
 
@@ -711,7 +711,7 @@ public class DataCenter {
 				}
 			}
 
-			EventBus.getDefault().post(new ContainerSearchedEvent(sessions));
+			EventBus.getDefault().post(new ContainerSearchedEvent(sessions, searchInImportFragment));
 		} catch (SnappydbException e) {
 
 			Logger.w(e.getMessage());
