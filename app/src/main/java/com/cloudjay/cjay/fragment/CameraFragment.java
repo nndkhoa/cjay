@@ -205,30 +205,21 @@ public class CameraFragment extends com.commonsware.cwac.camera.CameraFragment {
         // Configure View visibility based on current step of session
 
 //		Logger.Log("Current Step of session: " + step.toString());
-
         rainyMode = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext())
                 .getBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox),
                         false);
 
-        if (rainyMode) {
-            btnUseGateImage.setVisibility(View.GONE);
-        } else {
-
-            Step step = Step.values()[currentStep];
-
-            switch (step) {
-
-                case AUDIT:
-                    btnUseGateImage.setVisibility(View.VISIBLE);
-                    btnCameraMode.setVisibility(View.VISIBLE);
-                    break;
-
-                default:
-                    getContract().setSingleShotMode(false);
-                    btnUseGateImage.setVisibility(View.GONE);
-                    btnCameraMode.setVisibility(View.GONE);
-                    break;
-            }
+        Step step = Step.values()[currentStep];
+        switch (step) {
+            case AUDIT:
+                btnUseGateImage.setVisibility(View.VISIBLE);
+                btnCameraMode.setVisibility(View.VISIBLE);
+                break;
+            default:
+                getContract().setSingleShotMode(false);
+                btnUseGateImage.setVisibility(View.GONE);
+                btnCameraMode.setVisibility(View.GONE);
+                break;
         }
 
     }
