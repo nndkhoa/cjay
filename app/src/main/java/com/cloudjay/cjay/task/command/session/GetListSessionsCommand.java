@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.task.command;
+package com.cloudjay.cjay.task.command.session;
 
 
 import android.content.Context;
@@ -6,6 +6,7 @@ import android.content.Context;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.Command;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.snappydb.DB;

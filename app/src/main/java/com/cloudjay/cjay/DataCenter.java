@@ -783,7 +783,7 @@ public class DataCenter {
 	 * @param type
 	 */
 	@Background(serial  = CACHE, delay = 50)
-	void saveSession(Context context, Session session, UploadType type) {
+	public void saveSession(Context context, Session session, UploadType type) {
 
 		DB db = null;
 		String key = session.getContainerId();
