@@ -12,8 +12,11 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
+import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
 import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
+import com.cloudjay.cjay.event.upload.UploadStartedEvent;
+import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
@@ -21,6 +24,7 @@ import com.cloudjay.cjay.task.job.UploadImportJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.Step;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
@@ -69,6 +73,8 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	ActionBar actionBar;
 	private ViewPagerAdapter mPagerAdapter;
 	public int currentPosition = 0;
+
+    private boolean mIsUploading = false;
 
 	Session mSession;
 	//endregion
@@ -122,7 +128,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
             } else {
                 for (AuditItem auditItem : mSession.getAuditItems()) {
 
-                    if (auditItem.getId() == 0) {
+                    if (auditItem.getId() == 0 || auditItem.getUploadStatus() == UploadStatus.NONE.value) {
                         // If audit item has not been uploaded yet
                         // Add container session to upload queue
                         JobManager jobManager = App.getJobManager();
@@ -175,9 +181,30 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 	}
 
+    @UiThread
+    void onEvent(AuditItemChangedEvent event) {
+        // Requery to update show button behavior
+        dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
+                containerID);
+    }
+
+    @UiThread
+    void onEvent(UploadStartedEvent event) {
+        mIsUploading = true;
+    }
+
+    @UiThread
+    void onEvent(UploadSucceededEvent event) {
+        mIsUploading = false;
+    }
+
 	@Click(R.id.btn_complete_audit)
 	void btnCompleteAuditClicked() {
-		dataCenter.getSessionForUpload(getActivity(), containerID);
+        if (!mIsUploading) {
+            dataCenter.getSessionForUpload(getActivity(), containerID);
+        } else {
+            Utils.showCrouton(getActivity(), "Vui lòng chờ quá trình tải lên hoàn tất");
+        }
 	}
 
 	@Click(R.id.btn_complete_repair)
@@ -196,8 +223,20 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	void checkForShowButton() {
 
 		if (mSession.getLocalStep() == Step.REPAIR.value) {
-			btnCompleteAudit.setVisibility(View.GONE);
-			btnCompleteRepair.setVisibility(View.VISIBLE);
+
+            for (AuditItem auditItem : mSession.getAuditItems()) {
+                if (auditItem.getId() == 0) {
+                    Logger.w("change to audit step");
+                    dataCenter.changeSessionLocalStepInBackground(getActivity(), containerID, Step.AUDIT);
+
+                    btnCompleteAudit.setVisibility(View.VISIBLE);
+                    btnCompleteRepair.setVisibility(View.VISIBLE);
+                    return;
+                }
+            }
+
+            btnCompleteAudit.setVisibility(View.GONE);
+            btnCompleteRepair.setVisibility(View.VISIBLE);
 		}
 
 		if (mSession.getLocalStep() == Step.AUDIT.value) {

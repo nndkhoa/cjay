@@ -5,6 +5,8 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.InputType;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -20,6 +22,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.TextChange;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
@@ -42,6 +45,9 @@ public class SearchOperatorDialog extends DialogFragment {
 
 	@Bean
 	DataCenter dataCenter;
+
+    @SystemService
+    InputMethodManager inputMethodManager;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -72,15 +78,15 @@ public class SearchOperatorDialog extends DialogFragment {
 
 	@AfterViews
 	void doAfterViews() {
-
-		
-
 		// Set title for search operator dialog
 		getDialog().setTitle(getResources().getString(R.string.dialog_operator_title));
 
-		// Begin to get operators from cache
+//		// Begin to get operators from cache
 		dataCenter.searchOperator("");
-	}
+
+        // show keyboard
+        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+    }
 
 	@ItemClick(R.id.lv_operators_list)
 	void listViewOperatorsItemClicked(Operator selectedOperator) {

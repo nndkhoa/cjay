@@ -1684,6 +1684,7 @@ public class DataCenter {
 				auditItem.setLocationCode("BXXX");
 				auditItem.setAudited(true);
 				auditItem.setAllowed(true);
+                auditItem.setQuantity(1);
 
 				list.add(auditItem);
 			}

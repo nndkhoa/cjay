@@ -14,6 +14,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import org.androidannotations.annotations.Trace;
 import org.json.JSONException;
 
 import java.io.File;
@@ -802,6 +803,8 @@ public class Session implements Serializable {
 				boolean found = false;
 
 				for (AuditItem localItem : auditItems) {
+
+
 					if (serverItem.equals(localItem)) {
 						found = true;
 
@@ -899,6 +902,9 @@ public class Session implements Serializable {
 	 * @return
 	 */
 	public Session changeToLocalFormat() {
+
+        Logger.w("inside changeToLocalFormat");
+
 		this.setLocalStep(this.getStep());
 		for (GateImage gateImage : this.getGateImages()) {
 			gateImage.setName(Utils.getImageNameFromUrl(gateImage.getUrl()));

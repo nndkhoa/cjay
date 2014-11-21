@@ -29,6 +29,7 @@ import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadImportJob;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
@@ -339,7 +340,7 @@ public class IssuePendingFragment extends Fragment {
 
 	@UiThread
 	void onEvent(UploadStartedEvent event) {
-		mSession = event.getSession();
+        mSession = event.getSession();
 		refresh();
 	}
 
