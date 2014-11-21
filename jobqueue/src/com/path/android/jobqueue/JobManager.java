@@ -609,6 +609,8 @@ public class JobManager implements NetworkEventProvider.Listener {
 	protected void addJobInBackground(final int priority, final long delay, final BaseJob baseJob,
 	    /*nullable*/final AsyncAddCallback callback) {
 		final long callTime = System.nanoTime();
+
+		// TODO: #tieubao we can change behaviour of this executor
 		timedExecutor.execute(new Runnable() {
 			@Override
 			public void run() {

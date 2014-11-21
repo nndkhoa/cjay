@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * works deeply coupled with {@link JobManager}
  */
 public class JobConsumerExecutor {
+
 	private int maxConsumerSize;
 	private int minConsumerSize;
 	private int loadFactor;

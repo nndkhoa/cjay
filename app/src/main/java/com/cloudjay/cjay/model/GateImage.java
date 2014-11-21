@@ -37,16 +37,12 @@ public class GateImage implements Serializable{
 	}
 
 	public void setUploadStatus(int status) {
-		if (status == 1){
-			Logger.e("CHANGE TO UPLOADING");
-		}
+
 		this.uploadStatus = status;
 	}
 
 	public void setUploadStatus(UploadStatus status) {
-		if (status == UploadStatus.UPLOADING){
-			Logger.e("CHANGE TO UPLOADING");
-		}
+		Logger.Log("Change image " + uuid + "status to " + status.name());
 		this.uploadStatus = status.value;
 	}
 

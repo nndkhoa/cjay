@@ -96,7 +96,7 @@
 			android:name="com.cloudjay.cjay.activity.CameraActivity_"
 			android:configChanges="orientation|screenSize"
 			android:label="@string/title_activity_new_camera"
-			android:screenOrientation="sensorLandscape"
+			android:screenOrientation="reverseLandscape"
 			android:theme="@android:style/Theme.NoTitleBar"/>
 		<activity
 			android:name="com.cloudjay.cjay.activity.MergeIssueActivity_"
