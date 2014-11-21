@@ -233,5 +233,4 @@ public class IssueReportDamageFragment extends IssueReportFragment {
         EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
-
 }

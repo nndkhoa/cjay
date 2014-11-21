@@ -174,14 +174,16 @@ public class AfterRepairFragment extends Fragment {
             auditItem = mSession.getAuditItem(auditItemUUID);
 
             // parse Data to view
-            tvCompCode.setText(auditItem.getComponentCode());
-            tvLocationCode.setText(auditItem.getLocationCode());
-            tvDamageCode.setText(auditItem.getDamageCode());
-            tvRepairCode.setText(auditItem.getRepairCode());
+            if (auditItem != null) {
+                tvCompCode.setText(auditItem.getComponentCode());
+                tvLocationCode.setText(auditItem.getLocationCode());
+                tvDamageCode.setText(auditItem.getDamageCode());
+                tvRepairCode.setText(auditItem.getRepairCode());
 
-            tvSize.setText("Dài " + auditItem.getHeight() + ",\t" + "Rộng " + auditItem.getLength());
-            textViewBtnCamera.setText(R.string.button_add_new_repair_image);
-            tvNumber.setText(auditItem.getQuantity() + "");
+                tvSize.setText("Dài " + auditItem.getHeight() + ",\t" + "Rộng " + auditItem.getLength());
+                textViewBtnCamera.setText(R.string.button_add_new_repair_image);
+                tvNumber.setText(auditItem.getQuantity() + "");
+            }
         }
     }
 
