@@ -182,13 +182,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	}
 
     @UiThread
-    void onEvent(AuditItemChangedEvent event) {
-        // Requery to update show button behavior
-        dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
-                containerID);
-    }
-
-    @UiThread
     void onEvent(UploadStartedEvent event) {
         mIsUploading = true;
     }

@@ -93,12 +93,10 @@ public class AfterRepairFragment extends Fragment {
     @AfterViews
     void setUp() {
 
-
-
-        if (null == mSession) {
-            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
-                    containerID);
-        }
+//        if (null == mSession) {
+//            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
+//                    containerID);
+//        }
 
         if (null == imageAdapter) {
             imageAdapter = new DetailIssuedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.REPAIRED);
