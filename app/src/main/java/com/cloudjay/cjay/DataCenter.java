@@ -45,6 +45,7 @@ import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
+import com.path.android.jobqueue.BackgroundExecutor;
 import com.path.android.jobqueue.JobManager;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
@@ -171,8 +172,8 @@ public class DataCenter {
 	 */
 //	@Background(serial  = CACHE, delay = 50)
 	public void searchOperator(String keyword) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+		test = test + 1;
+		Logger.e("Test number: " + test);
 		try {
 			List<Operator> operators = new ArrayList<>();
 			DB db = App.getDB(context);
@@ -310,25 +311,30 @@ public class DataCenter {
 	 * @param prefix
 	 * @return
 	 */
-	@Background(serial  = CACHE)
-	public void getListIsoCodes(Context context, String prefix) {
-		test = test +1;
-		Logger.e("Test number: "+test);
-		try {
-			DB db = App.getDB(context);
-			String[] keyResults = db.findKeys(prefix);
-			List<IsoCode> isoCodes = new ArrayList<>();
+	public void getListIsoCodes(final Context context, final String prefix) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
+		BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "CACHE") {
+			@Override
+			public void execute() {
+				try {
+					DB db = App.getDB(context);
+					String[] keyResults = db.findKeys(prefix);
+					List<IsoCode> isoCodes = new ArrayList<>();
 
-			for (String result : keyResults) {
-				IsoCode isoCode = db.getObject(result, IsoCode.class);
-				isoCodes.add(isoCode);
+					for (String result : keyResults) {
+						IsoCode isoCode = db.getObject(result, IsoCode.class);
+						isoCodes.add(isoCode);
+					}
+
+					EventBus.getDefault().post(new IsoCodesGotEvent(isoCodes, prefix));
+
+				} catch (SnappydbException e) {
+					Logger.e(e.getMessage());
+				}
 			}
+		});
 
-			EventBus.getDefault().post(new IsoCodesGotEvent(isoCodes, prefix));
-
-		} catch (SnappydbException e) {
-			Logger.e(e.getMessage());
-		}
 	}
 
 	/**
@@ -373,55 +379,60 @@ public class DataCenter {
 	 * @param code
 	 * @return
 	 */
-	@Background(serial  = CACHE)
-	public void getIsoCode(Context context, String prefix, String code) {
-		test = test +1;
-		Logger.e("Test number: "+test);
-		try {
-			DB db = App.getDB(context);
-			String[] keyResults = db.findKeys(prefix + code);
+	public void getIsoCode(final Context context, final String prefix, final String code) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
+		BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "CACHE") {
+			@Override
+			public void execute() {
+				try {
+					DB db = App.getDB(context);
+					String[] keyResults = db.findKeys(prefix + code);
 
-			if (keyResults.length > 0) {
-				IsoCode isoCode = db.getObject(keyResults[0], IsoCode.class);
-				EventBus.getDefault().post(new IsoCodeGotEvent(isoCode, prefix));
+					if (keyResults.length > 0) {
+						IsoCode isoCode = db.getObject(keyResults[0], IsoCode.class);
+						EventBus.getDefault().post(new IsoCodeGotEvent(isoCode, prefix));
+					}
+				} catch (SnappydbException e) {
+					Logger.e(e.getMessage());
+				}
 			}
+		});
+
+	}
+
+	//    @Background(serial  = CACHE, delay = 50)
+	public void getIsoCodesToUpdate(Context context, String strComponentCode,
+	                                String strDamageCode, String strRepairCode) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
+		try {
+
+			IsoCode componentCode = null;
+			IsoCode damageCode = null;
+			IsoCode repairCode = null;
+
+			DB db = App.getDB(context);
+			String[] keyComponent = db.findKeys(CJayConstant.PREFIX_COMPONENT_CODE + strComponentCode);
+			String[] keyDamage = db.findKeys(CJayConstant.PREFIX_DAMAGE_CODE + strDamageCode);
+			String[] keyRepair = db.findKeys(CJayConstant.PREFIX_REPAIR_CODE + strRepairCode);
+
+			if (keyComponent.length > 0) {
+				componentCode = db.getObject(keyComponent[0], IsoCode.class);
+			}
+			if (keyDamage.length > 0) {
+				damageCode = db.getObject(keyDamage[0], IsoCode.class);
+			}
+			if (keyRepair.length > 0) {
+				repairCode = db.getObject(keyRepair[0], IsoCode.class);
+			}
+
+			EventBus.getDefault().post(new IsoCodesGotToUpdateEvent(componentCode, damageCode, repairCode));
+
 		} catch (SnappydbException e) {
 			Logger.e(e.getMessage());
 		}
 	}
-
-//    @Background(serial  = CACHE, delay = 50)
-    public void getIsoCodesToUpdate(Context context, String strComponentCode,
-                                    String strDamageCode, String strRepairCode) {
-	    test = test +1;
-	    Logger.e("Test number: "+test);
-        try {
-
-            IsoCode componentCode = null;
-            IsoCode damageCode = null;
-            IsoCode repairCode = null;
-
-            DB db = App.getDB(context);
-            String[] keyComponent = db.findKeys(CJayConstant.PREFIX_COMPONENT_CODE + strComponentCode);
-            String[] keyDamage = db.findKeys(CJayConstant.PREFIX_DAMAGE_CODE + strDamageCode);
-            String[] keyRepair = db.findKeys(CJayConstant.PREFIX_REPAIR_CODE + strRepairCode);
-
-            if (keyComponent.length > 0) {
-                componentCode = db.getObject(keyComponent[0], IsoCode.class);
-            }
-            if (keyDamage.length > 0) {
-                damageCode = db.getObject(keyDamage[0], IsoCode.class);
-            }
-            if (keyRepair.length > 0) {
-                repairCode = db.getObject(keyRepair[0], IsoCode.class);
-            }
-
-            EventBus.getDefault().post(new IsoCodesGotToUpdateEvent(componentCode, damageCode, repairCode));
-
-        } catch (SnappydbException e) {
-            Logger.e(e.getMessage());
-        }
-    }
 
 	//endregion
 
@@ -436,8 +447,8 @@ public class DataCenter {
 	 * @throws SnappydbException
 	 */
 	public Session getSessionAsyncById(Context context, long id) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+		test = test + 1;
+		Logger.e("Test number: " + test);
 
 		Session result = networkClient.getSessionById(id);
 		try {
@@ -469,22 +480,27 @@ public class DataCenter {
 		return null;
 	}
 
-	@Background(serial  = CACHE)
-	public void getSessionForUpload(Context context, String containerId) {
-		test = test +1;
-		Logger.e("Test number: "+test);
-		try {
-			DB db = App.getDB(context);
-			String key = containerId;
-			Session session = db.getObject(key, Session.class);
 
-			List<Session> list = new ArrayList<>();
-			list.add(session);
-			EventBus.getDefault().post(new ContainerForUploadGotEvent(list, containerId));
+	public void getSessionForUpload(final Context context, final String containerId) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
+		BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "CACHE") {
+			@Override
+			public void execute() {
+				try {
+					DB db = App.getDB(context);
+					String key = containerId;
+					Session session = db.getObject(key, Session.class);
 
-		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
-		}
+					List<Session> list = new ArrayList<>();
+					list.add(session);
+					EventBus.getDefault().post(new ContainerForUploadGotEvent(list, containerId));
+
+				} catch (SnappydbException e) {
+					Logger.w(e.getMessage());
+				}
+			}
+		});
 	}
 
 	/**
@@ -492,87 +508,96 @@ public class DataCenter {
 	 *
 	 * @param context
 	 * @param prefix
-	 * @return
-//	 */
-	@Background(serial  = CACHE)
-	public void getListSessionsInBackground(Context context, String prefix) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+	 * @return //
+	 */
+	public void getListSessionsInBackground(final Context context, final String prefix) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
 //		Logger.Log("Getting list session: " + prefix);
+		BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "CACHE") {
+			@Override
+			public void execute() {
 
-		int len = prefix.length();
+				int len = prefix.length();
 
-		DB db = null;
-		String[] keysResult = new String[0];
-		List<Session> sessions = new ArrayList<>();
+				DB db = null;
+				String[] keysResult = new String[0];
+				List<Session> sessions = new ArrayList<>();
 
-		try {
-			db = App.getDB(context);
-			keysResult = db.findKeys(prefix);
-		} catch (SnappydbException e) {
-			Logger.e(e.getMessage());
-		}
+				try {
+					db = App.getDB(context);
+					keysResult = db.findKeys(prefix);
+				} catch (SnappydbException e) {
+					Logger.e(e.getMessage());
+				}
 
-		for (String result : keysResult) {
+				for (String result : keysResult) {
 
-			String newKey = result.substring(len);
-			Session session;
-			try {
-				session = db.getObject(newKey, Session.class);
-				sessions.add(session);
-			} catch (SnappydbException e) {
-				e.printStackTrace();
-				addLog(context, newKey, prefix + " | Cannot retrieve this container",CJayConstant.PREFIX_LOG);
+					String newKey = result.substring(len);
+					Session session;
+					try {
+						session = db.getObject(newKey, Session.class);
+						sessions.add(session);
+					} catch (SnappydbException e) {
+						e.printStackTrace();
+						addLog(context, newKey, prefix + " | Cannot retrieve this container", CJayConstant.PREFIX_LOG);
+					}
+				}
+
+				EventBus.getDefault().post(new ContainersGotEvent(sessions, prefix));
 			}
-		}
-
-		EventBus.getDefault().post(new ContainersGotEvent(sessions, prefix));
+		});
 	}
 
 	@Trace
-	@Background(serial  = CACHE)
-	public void getSessionInBackground(Context context, String containerId) {
-		test = test +1;
-		Logger.e("Test number: "+test);
-		try {
-			DB db = App.getDB(context);
-			String key = containerId;
-			Session session = db.getObject(key, Session.class);
-			EventBus.getDefault().post(new ContainerGotEvent(session, containerId));
+	public void getSessionInBackground(final Context context, final String containerId) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
+		BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "CACHE") {
+			@Override
+			public void execute() {
+				try {
+					DB db = App.getDB(context);
+					String key = containerId;
+					Session session = db.getObject(key, Session.class);
+					EventBus.getDefault().post(new ContainerGotEvent(session, containerId));
 
-		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
-		}
+				} catch (SnappydbException e) {
+					Logger.w(e.getMessage());
+				}
+			}
+		});
 	}
 
 	/**
-	 *
-	 *
-	 *
 	 * @param context
 	 * @param containerId
 	 */
-	@Background(serial  = CACHE)
-	public void changeLocalStepAndForceExport(Context context, String containerId) {
-		test = test +1;
-		Logger.e("Test number: "+test);
 
-		DB db;
-		try {
+	public void changeLocalStepAndForceExport(final Context context, final String containerId) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
+		BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "CACHE") {
+			@Override
+			public void execute() {
+				DB db;
+				try {
 
-			db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
-			session.setLocalStep(Step.AVAILABLE.value);
-			db.put(containerId, session);
+					db = App.getDB(context);
+					Session session = db.getObject(containerId, Session.class);
+					session.setLocalStep(Step.AVAILABLE.value);
+					db.put(containerId, session);
 
-			Intent intent = new Intent(context, WizardActivity_.class);
-			intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, containerId);
-			intent.putExtra(WizardActivity.STEP_EXTRA, Step.AVAILABLE.value);
-			context.startActivity(intent);
+					Intent intent = new Intent(context, WizardActivity_.class);
+					intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, containerId);
+					intent.putExtra(WizardActivity.STEP_EXTRA, Step.AVAILABLE.value);
+					context.startActivity(intent);
 
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
+				} catch (SnappydbException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 
 	}
 
@@ -585,8 +610,8 @@ public class DataCenter {
 	 */
 //	@Background(serial  = CACHE, delay = 50)
 	public void changeSessionLocalStepInBackground(Context context, String containerId, Step step) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+		test = test + 1;
+		Logger.e("Test number: " + test);
 
 		DB db;
 		try {
@@ -649,10 +674,10 @@ public class DataCenter {
 		}
 	}
 
-//	@Background(serial  = CACHE, delay = 50)
+	//	@Background(serial  = CACHE, delay = 50)
 	void processListSession(List<Session> sessions) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+		test = test + 1;
+		Logger.e("Test number: " + test);
 		DB db;
 		try {
 			db = App.getDB(context);
@@ -694,8 +719,8 @@ public class DataCenter {
 	 */
 //	@Background(serial  = CACHE, delay = 30)
 	public void search(Context context, String keyword, boolean searchInImportFragment) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+		test = test + 1;
+		Logger.e("Test number: " + test);
 
 		String[] keysResult;
 		try {
@@ -740,8 +765,8 @@ public class DataCenter {
 	 */
 	@Background(serial = NETWORK)
 	public void searchAsync(Context context, String keyword, boolean searchInImportFragment) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+		test = test + 1;
+		Logger.e("Test number: " + test);
 
 
 		try {
@@ -778,8 +803,8 @@ public class DataCenter {
 	 */
 //	@Background(serial  = CACHE, delay = 50)
 	public void addSession(Session session) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+		test = test + 1;
+		Logger.e("Test number: " + test);
 		try {
 			DB db = App.getDB(context);
 
@@ -805,8 +830,8 @@ public class DataCenter {
 	 */
 //	@Background(serial  = CACHE, delay = 50)
 	void saveSession(Context context, Session session, UploadType type) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+		test = test + 1;
+		Logger.e("Test number: " + test);
 
 		DB db = null;
 		String key = session.getContainerId();
@@ -838,10 +863,10 @@ public class DataCenter {
 	}
 
 
-//	@Background(serial  = CACHE, delay = 50)
+	//	@Background(serial  = CACHE, delay = 50)
 	public void updateImportSession(Session session) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+		test = test + 1;
+		Logger.e("Test number: " + test);
 		DB db = null;
 		try {
 			db = App.getDB(context);
@@ -876,27 +901,31 @@ public class DataCenter {
 	 * @param session
 	 */
 	@Trace
-	@Background(serial  = CACHE)
-	public void addWorkingSession(Session session) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+	public void addWorkingSession(final Session session) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
+		BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "CACHE") {
+			@Override
+			public void execute() {
 
-		try {
-			DB db = App.getDB(context);
+				try {
+					DB db = App.getDB(context);
 
-			String key = CJayConstant.PREFIX_WORKING + session.getContainerId();
-			db.put(key, session);
+					String key = CJayConstant.PREFIX_WORKING + session.getContainerId();
+					db.put(key, session);
 
-			// Log
-			Step step = Step.values()[session.getLocalStep()];
-			Logger.Log("Add container " + session.getContainerId() + " | " + step.name() + " to Working collection");
+					// Log
+					Step step = Step.values()[session.getLocalStep()];
+					Logger.Log("Add container " + session.getContainerId() + " | " + step.name() + " to Working collection");
 
-			// Notify to Working Fragment
-			EventBus.getDefault().post(new WorkingSessionCreatedEvent(session));
+					// Notify to Working Fragment
+					EventBus.getDefault().post(new WorkingSessionCreatedEvent(session));
 
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
+				} catch (SnappydbException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	/**
@@ -905,113 +934,129 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	@Background(serial  = CACHE)
-	public void addUploadSession(String containerId) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+	public void addUploadSession(final String containerId) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
+		BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "CACHE") {
+			@Override
+			public void execute() {
 
-		try {
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
-			String key = CJayConstant.PREFIX_UPLOADING + containerId;
-			db.put(key, session);
+				try {
+					DB db = App.getDB(context);
+					Session session = db.getObject(containerId, Session.class);
+					String key = CJayConstant.PREFIX_UPLOADING + containerId;
+					db.put(key, session);
 
-			Step step = Step.values()[session.getLocalStep()];
-			Logger.Log("Add container " + session.getContainerId() + " | " + step.name() + " to Upload collection");
+					Step step = Step.values()[session.getLocalStep()];
+					Logger.Log("Add container " + session.getContainerId() + " | " + step.name() + " to Upload collection");
 
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
+				} catch (SnappydbException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	/**
 	 * @param context
 	 * @param containerId
 	 */
-	@Background(serial  = CACHE)
-	public void removeWorkingSession(Context context, String containerId) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+	public void removeWorkingSession(final Context context, final String containerId) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
+		BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "CACHE") {
+			@Override
+			public void execute() {
+				try {
+					DB db = App.getDB(context);
 
-		try {
-			DB db = App.getDB(context);
+					String workingKey = CJayConstant.PREFIX_WORKING + containerId;
+					db.del(workingKey);
 
-			String workingKey = CJayConstant.PREFIX_WORKING + containerId;
-			db.del(workingKey);
+					Logger.Log("REMOVE container " + containerId + " from Working collection");
 
-			Logger.Log("REMOVE container " + containerId + " from Working collection");
-
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Background(serial  = CACHE)
-	public void removeUploadedSessions(Context context) {
-		test = test +1;
-		Logger.e("Test number: "+test);
-
-		try {
-			DB db = App.getDB(context);
-			String[] keys = db.findKeys(CJayConstant.PREFIX_UPLOADING);
-
-			for (String key : keys) {
-				String t = key.substring(CJayConstant.PREFIX_UPLOADING.length(), key.length());
-				Session object = db.getObject(t, Session.class);
-				if (object.getUploadStatus() == UploadStatus.COMPLETE.value) {
-					db.del(key);
-					Logger.Log(" > Remove container from upload collection: " + key);
+				} catch (SnappydbException e) {
+					e.printStackTrace();
 				}
 			}
+		});
+	}
 
-			EventBus.getDefault().post(new UploadedContainerRemoved());
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
+	public void removeUploadedSessions(final Context context) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
+		BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "CACHE") {
+			@Override
+			public void execute() {
+
+				try {
+					DB db = App.getDB(context);
+					String[] keys = db.findKeys(CJayConstant.PREFIX_UPLOADING);
+
+					for (String key : keys) {
+						String t = key.substring(CJayConstant.PREFIX_UPLOADING.length(), key.length());
+						Session object = db.getObject(t, Session.class);
+						if (object.getUploadStatus() == UploadStatus.COMPLETE.value) {
+							db.del(key);
+							Logger.Log(" > Remove container from upload collection: " + key);
+						}
+					}
+
+					EventBus.getDefault().post(new UploadedContainerRemoved());
+				} catch (SnappydbException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 
-	@Background(serial  = CACHE)
-	public void changeStatusWhenUpload(Context context, Session session, UploadType uploadType, UploadStatus uploadStatus) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+	public void changeStatusWhenUpload(final Context context, final Session session, UploadType uploadType, final UploadStatus uploadStatus) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
 
-		DB db;
-		try {
-			db = App.getDB(context);
-			if (uploadStatus == UploadStatus.UPLOADING) {
-				//Change local step
-				Step step = Step.values()[session.getLocalStep()];
-				switch (step) {
-					case IMPORT:
-						session.setLocalStep(Step.AUDIT.value);
-						break;
-					case AUDIT:
-						session.setLocalStep(Step.REPAIR.value);
-						break;
-					case AVAILABLE:
-						session.setLocalStep(Step.EXPORTED.value);
-						break;
-					case REPAIR:
-					default:
-						session.setLocalStep(Step.AVAILABLE.value);
-						break;
+		BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "CACHE") {
+			@Override
+			public void execute() {
+
+				DB db;
+				try {
+					db = App.getDB(context);
+					if (uploadStatus == UploadStatus.UPLOADING) {
+						//Change local step
+						Step step = Step.values()[session.getLocalStep()];
+						switch (step) {
+							case IMPORT:
+								session.setLocalStep(Step.AUDIT.value);
+								break;
+							case AUDIT:
+								session.setLocalStep(Step.REPAIR.value);
+								break;
+							case AVAILABLE:
+								session.setLocalStep(Step.EXPORTED.value);
+								break;
+							case REPAIR:
+							default:
+								session.setLocalStep(Step.AVAILABLE.value);
+								break;
+						}
+
+						//Add to uploading
+						addUploadSession(session.getContainerId());
+
+						//Change upload status
+						session.setUploadStatus(uploadStatus);
+					} else if (uploadStatus == UploadStatus.COMPLETE) {
+						session.setUploadStatus(uploadStatus.value);
+					}
+
+					//Update new session to db
+					db.put(session.getContainerId(), session);
+				} catch (SnappydbException e) {
+					e.printStackTrace();
 				}
-
-				//Add to uploading
-				addUploadSession(session.getContainerId());
-
-				//Change upload status
-				session.setUploadStatus(uploadStatus);
-			} else if (uploadStatus == UploadStatus.COMPLETE) {
-				session.setUploadStatus(uploadStatus.value);
 			}
-
-			//Update new session to db
-			db.put(session.getContainerId(), session);
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
+		});
 
 
 	}
@@ -1029,47 +1074,52 @@ public class DataCenter {
 	 * @param auditItemRemove
 	 * @param auditImageUUID
 	 */
-	@Background(serial  = CACHE)
-	public void addAuditImageToAuditedItem(Context context,
-	                                       String containerId,
-	                                       String auditItemUUID,
-	                                       String auditItemRemove,
-	                                       String auditImageUUID) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+	public void addAuditImageToAuditedItem(final Context context,
+	                                       final String containerId,
+	                                       final String auditItemUUID,
+	                                       final String auditItemRemove,
+	                                       final String auditImageUUID) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
 
-		try {
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
+		BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "CACHE") {
+			@Override
+			public void execute() {
 
-			// Get audit image of audit item will be merged
-			AuditImage auditImage = getAuditImageByUUId(context, containerId,
-					auditItemRemove, auditImageUUID);
+				try {
+					DB db = App.getDB(context);
+					Session session = db.getObject(containerId, Session.class);
 
-			// Remove audit item will be merged
-			AuditItem removeItem = getAuditItem(context, containerId, auditItemRemove);
-			if (removeItem != null) {
-				Logger.Log("Begin to remove");
-				session.getAuditItems().remove(removeItem);
+					// Get audit image of audit item will be merged
+					AuditImage auditImage = getAuditImageByUUId(context, containerId,
+							auditItemRemove, auditImageUUID);
+
+					// Remove audit item will be merged
+					AuditItem removeItem = getAuditItem(context, containerId, auditItemRemove);
+					if (removeItem != null) {
+						Logger.Log("Begin to remove");
+						session.getAuditItems().remove(removeItem);
+					}
+
+					AuditItem itemMerged = getAuditItem(context, containerId, auditItemUUID);
+					if (itemMerged != null) {
+						AuditItem tmp = itemMerged;
+						tmp.getAuditImages().add(auditImage);
+
+						session.getAuditItems().add(tmp);
+						session.getAuditItems().remove(itemMerged);
+					}
+
+					db.put(containerId, session);
+					Logger.Log("add AuditImage To AuditedIssue successfully");
+
+				} catch (SnappydbException e) {
+					Logger.w(e.getMessage());
+				}
+
+				EventBus.getDefault().post(new IssueMergedEvent(containerId, auditItemRemove));
 			}
-
-			AuditItem itemMerged = getAuditItem(context, containerId, auditItemUUID);
-			if (itemMerged != null) {
-				AuditItem tmp = itemMerged;
-				tmp.getAuditImages().add(auditImage);
-
-				session.getAuditItems().add(tmp);
-				session.getAuditItems().remove(itemMerged);
-			}
-
-			db.put(containerId, session);
-			Logger.Log("add AuditImage To AuditedIssue successfully");
-
-		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
-		}
-
-		EventBus.getDefault().post(new IssueMergedEvent(containerId, auditItemRemove));
+		});
 	}
 
 	/**
@@ -1082,8 +1132,8 @@ public class DataCenter {
 	 * @return
 	 */
 	public AuditImage getAuditImageByUUId(Context context, String containerId, String auditItemUUID, String auditImageUUID) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+		test = test + 1;
+		Logger.e("Test number: " + test);
 
 		try {
 			DB db = App.getDB(context);
@@ -1118,23 +1168,26 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	@Background(serial  = CACHE)
-	public void addGateImage(Context context, GateImage image, String containerId) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+	public void addGateImage(final Context context, final GateImage image, final String containerId) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
+		BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "CACHE") {
+			@Override
+			public void execute() {
+				try {
+					DB db = App.getDB(context);
 
-		try {
-			DB db = App.getDB(context);
+					// Add gate image to normal container session
+					Session session = db.getObject(containerId, Session.class);
+					session.getGateImages().add(image);
 
-			// Add gate image to normal container session
-			Session session = db.getObject(containerId, Session.class);
-			session.getGateImages().add(image);
-
-			String key = containerId;
-			db.put(key, session);
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
+					String key = containerId;
+					db.put(key, session);
+				} catch (SnappydbException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	/**
@@ -1145,55 +1198,59 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	@Background(serial  = CACHE)
-	public void addAuditImage(Context context, AuditImage auditImage, String containerId) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+	public void addAuditImage(final Context context, final AuditImage auditImage, final String containerId) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
+		BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "CACHE") {
+			@Override
+			public void execute() {
 
-		try {
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
+				try {
+					DB db = App.getDB(context);
+					Session session = db.getObject(containerId, Session.class);
 
-			// Generate random one UUID to save auditItem
-			String uuid = UUID.randomUUID().toString();
+					// Generate random one UUID to save auditItem
+					String uuid = UUID.randomUUID().toString();
 
-			// Create new audit item to save
-			AuditItem auditItem = new AuditItem();
-			auditItem.setId(0);
-			auditItem.setUuid(uuid);
-			auditItem.setAudited(false);
-			auditItem.setRepaired(false);
-			auditItem.setAllowed(null);
-			auditItem.setUploadStatus(UploadStatus.NONE);
+					// Create new audit item to save
+					AuditItem auditItem = new AuditItem();
+					auditItem.setId(0);
+					auditItem.setUuid(uuid);
+					auditItem.setAudited(false);
+					auditItem.setRepaired(false);
+					auditItem.setAllowed(null);
+					auditItem.setUploadStatus(UploadStatus.NONE);
 
-			// Get list session's audit items
-			List<AuditItem> auditItems = session.getAuditItems();
-			if (auditItems == null) {
-				auditItems = new ArrayList<>();
+					// Get list session's audit items
+					List<AuditItem> auditItems = session.getAuditItems();
+					if (auditItems == null) {
+						auditItems = new ArrayList<>();
+					}
+
+					List<AuditImage> auditImages = auditItem.getAuditImages();
+					if (auditImages == null) {
+						auditImages = new ArrayList<>();
+					}
+					// Add audit image to list audit images
+					auditImages.add(auditImage);
+					auditItem.setAuditImages(auditImages);
+
+					// Add audit item to List session's audit items
+					auditItems.add(auditItem);
+
+					// Add audit item to Session
+					session.setAuditItems(auditItems);
+
+					db.put(containerId, session);
+
+					Logger.Log("Insert audit image successfully");
+
+					EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
+				} catch (SnappydbException e) {
+					e.printStackTrace();
+				}
 			}
-
-			List<AuditImage> auditImages = auditItem.getAuditImages();
-			if (auditImages == null) {
-				auditImages = new ArrayList<>();
-			}
-			// Add audit image to list audit images
-			auditImages.add(auditImage);
-			auditItem.setAuditImages(auditImages);
-
-			// Add audit item to List session's audit items
-			auditItems.add(auditItem);
-
-			// Add audit item to Session
-			session.setAuditItems(auditItems);
-
-			db.put(containerId, session);
-
-			Logger.Log("Insert audit image successfully");
-
-			EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
+		});
 	}
 
 	/**
@@ -1208,8 +1265,8 @@ public class DataCenter {
 	 */
 //	@Background(serial  = CACHE, delay = 50)
 	public void changeImageUploadStatus(Context context, String containerId, String imageName, ImageType imageType, UploadStatus status) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+		test = test + 1;
+		Logger.e("Test number: " + test);
 		try {
 			DB db = App.getDB(context);
 
@@ -1273,61 +1330,58 @@ public class DataCenter {
 		}
 	}
 
-    @Background(serial  = CACHE)
-    public void saveRainyImage(Context context, String uuid, String rainyImageUrl) {
-	    test = test +1;
-	    Logger.e("Test number: "+test);
-        try {
-            DB db = App.getDB(context);
-            db.put(CJayConstant.PREFIX_RAINY_MODE_IMAGE + uuid, rainyImageUrl);
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
-    }
+	public void saveRainyImage(Context context, String uuid, String rainyImageUrl) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
+		try {
+			DB db = App.getDB(context);
+			db.put(CJayConstant.PREFIX_RAINY_MODE_IMAGE + uuid, rainyImageUrl);
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
 
-   @Background(serial  = CACHE)
-    public void getRainyImages(Context context) {
-	    test = test +1;
-	    Logger.e("Test number: "+test);
-        try {
-            DB db = App.getDB(context);
+	public void getRainyImages(Context context) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
+		try {
+			DB db = App.getDB(context);
 
-            String[] keys = db.findKeys(CJayConstant.PREFIX_RAINY_MODE_IMAGE);
-            ArrayList<String> imageUrls = new ArrayList<>();
+			String[] keys = db.findKeys(CJayConstant.PREFIX_RAINY_MODE_IMAGE);
+			ArrayList<String> imageUrls = new ArrayList<>();
 
-            for (int i = 0; i < keys.length; i++) {
-                imageUrls.add(db.get(keys[i]));
-            }
+			for (int i = 0; i < keys.length; i++) {
+				imageUrls.add(db.get(keys[i]));
+			}
 
-            EventBus.getDefault().post(new RainyImagesGotEvent(imageUrls));
+			EventBus.getDefault().post(new RainyImagesGotEvent(imageUrls));
 
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
-    }
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
 
-    @Background(serial  = CACHE)
-    public void deleteRainyImage(Context context, ArrayList<String> imageUrls) {
-	    test = test +1;
-	    Logger.e("Test number: "+test);
-        try {
-            DB db = App.getDB(context);
+	public void deleteRainyImage(Context context, ArrayList<String> imageUrls) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
+		try {
+			DB db = App.getDB(context);
 
-            for (String imageUrl : imageUrls) {
-                String uuid = Utils.getUuidFromImageName(Utils.getImageNameFromUrl(imageUrl));
-                Logger.Log("uuid: " + uuid);
-                if (db.exists(CJayConstant.PREFIX_RAINY_MODE_IMAGE + uuid)) {
-                    Logger.Log("del: " + CJayConstant.PREFIX_RAINY_MODE_IMAGE + uuid);
-                    db.del(CJayConstant.PREFIX_RAINY_MODE_IMAGE + uuid);
-                }
-            }
+			for (String imageUrl : imageUrls) {
+				String uuid = Utils.getUuidFromImageName(Utils.getImageNameFromUrl(imageUrl));
+				Logger.Log("uuid: " + uuid);
+				if (db.exists(CJayConstant.PREFIX_RAINY_MODE_IMAGE + uuid)) {
+					Logger.Log("del: " + CJayConstant.PREFIX_RAINY_MODE_IMAGE + uuid);
+					db.del(CJayConstant.PREFIX_RAINY_MODE_IMAGE + uuid);
+				}
+			}
 
-            EventBus.getDefault().post(new RainyImagesDeletedEvent());
+			EventBus.getDefault().post(new RainyImagesDeletedEvent());
 
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
-    }
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
 
 	//endregion
 
@@ -1367,26 +1421,27 @@ public class DataCenter {
 
 	}
 
-    /**
-     * Upload audit images of uploaded audit item to server
-     * 1. Get audit item based on uuid
-     * 2. Get id of audit item and list images to upload
-     * 3. Upload to server
-     * 4. Assign uuid to response audit item
-     * 5. Replace result with local audit item in container session
-     * @param context
-     * @param containerId
-     * @param auditItem
-     */
-    public void uploadAddedAuditImage(Context context, String containerId, AuditItem auditItem) {
-        AuditItem result = networkClient.addAuditImage(context, auditItem);
-        saveUploadAuditItemSession(context, result, UploadType.AUDIT_ITEM, containerId);
-    }
+	/**
+	 * Upload audit images of uploaded audit item to server
+	 * 1. Get audit item based on uuid
+	 * 2. Get id of audit item and list images to upload
+	 * 3. Upload to server
+	 * 4. Assign uuid to response audit item
+	 * 5. Replace result with local audit item in container session
+	 *
+	 * @param context
+	 * @param containerId
+	 * @param auditItem
+	 */
+	public void uploadAddedAuditImage(Context context, String containerId, AuditItem auditItem) {
+		AuditItem result = networkClient.addAuditImage(context, auditItem);
+		saveUploadAuditItemSession(context, result, UploadType.AUDIT_ITEM, containerId);
+	}
 
-//	@Background(serial  = CACHE, delay = 50)
+	//	@Background(serial  = CACHE, delay = 50)
 	public void saveUploadAuditItemSession(Context context, AuditItem result, UploadType type, String containerId) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+		test = test + 1;
+		Logger.e("Test number: " + test);
 		DB db = null;
 		String key = containerId;
 		Session object = null;
@@ -1416,11 +1471,11 @@ public class DataCenter {
 		saveSessionAfterImport(context, result, UploadType.SESSION);
 	}
 
-//	@Background(serial  = CACHE, delay = 50)
+	//	@Background(serial  = CACHE, delay = 50)
 	public void saveSessionAfterImport(Context context, Session session, UploadType type) {
 
-		test = test +1;
-		Logger.e("Test number: "+test);
+		test = test + 1;
+		Logger.e("Test number: " + test);
 		DB db = null;
 		String key = session.getContainerId();
 		Session object = null;
@@ -1528,8 +1583,8 @@ public class DataCenter {
 	 * @return
 	 */
 	public List<LogItem> getListLogItems(Context context, String logUploadKey) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+		test = test + 1;
+		Logger.e("Test number: " + test);
 		try {
 			DB db = App.getDB(context);
 			String[] keysResult = db.findKeys(logUploadKey);
@@ -1555,8 +1610,8 @@ public class DataCenter {
 	 * @return
 	 */
 	public List<LogItem> searchLog(Context context, String searchKey) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+		test = test + 1;
+		Logger.e("Test number: " + test);
 		try {
 			DB db = App.getDB(context);
 			String[] keysResult = db.findKeys(searchKey);
@@ -1590,8 +1645,8 @@ public class DataCenter {
 	 * @param message
 	 */
 	public void addLog(Context context, String title, String message, String typeLog) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+		test = test + 1;
+		Logger.e("Test number: " + test);
 		String currentTime = StringUtils.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 
 		LogItem log = new LogItem();
@@ -1603,8 +1658,8 @@ public class DataCenter {
 	}
 
 	public void addLog(Context context, LogItem log, String typeLog) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+		test = test + 1;
+		Logger.e("Test number: " + test);
 		try {
 			DB db = App.getDB(context);
 			if (typeLog.equals(CJayConstant.PREFIX_LOG)) {
@@ -1644,46 +1699,55 @@ public class DataCenter {
 	 * @param containerId
 	 * @param auditItemUUID
 	 */
-	@Background(serial  = CACHE)
-	public void removeAuditItem(Context context, String containerId, String auditItemUUID) {
-		test = test +1;
-		Logger.e("Test number: "+test);
-		try {
-			// find session
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
+	public void removeAuditItem(final Context context, final String containerId, final String auditItemUUID) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
 
-			// Remove audit item from session
-			if (session != null) {
-				session.removeAuditItem(auditItemUUID);
-				db.put(containerId, session);
+		BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "CACHE") {
+			@Override
+			public void execute() {
+				try {
+					// find session
+					DB db = App.getDB(context);
+					Session session = db.getObject(containerId, Session.class);
+
+					// Remove audit item from session
+					if (session != null) {
+						session.removeAuditItem(auditItemUUID);
+						db.put(containerId, session);
+					}
+
+				} catch (SnappydbException e) {
+					e.printStackTrace();
+				}
+
+				EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
 			}
-
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-
-		EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
+		});
 	}
 
-	@Background(serial  = CACHE)
-	public void updateAuditItemInBackground(Context context, String containerId, AuditItem auditItem) {
-		test = test +1;
-		Logger.e("Test number: "+test);
-        Logger.Log("updateAuditItemInBackground");
-		try {
-			// find session
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
-			session.updateAuditItem(auditItem);
-			db.put(containerId, session);
+	public void updateAuditItemInBackground(final Context context, final String containerId, final AuditItem auditItem) {
+		BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "CACHE") {
+			@Override
+			public void execute() {
+				test = test + 1;
+				Logger.e("Test number: " + test);
+				Logger.Log("updateAuditItemInBackground");
+				try {
+					// find session
+					DB db = App.getDB(context);
+					Session session = db.getObject(containerId, Session.class);
+					session.updateAuditItem(auditItem);
+					db.put(containerId, session);
 
-			// Notify that an audit item is updated
-			EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
+					// Notify that an audit item is updated
+					EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
 
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
+				} catch (SnappydbException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	/**
@@ -1701,78 +1765,82 @@ public class DataCenter {
 	 * @param auditItem
 	 * @throws SnappydbException
 	 */
-	@Background(serial  = CACHE)
-	public void setWaterWashType(Context context, final AuditItem auditItem, String containerId) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+	public void setWaterWashType(final Context context, final AuditItem auditItem, final String containerId) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
+		BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "CACHE") {
+			@Override
+			public void execute() {
 
-		try {
-			Logger.Log("Selected audit item: " + auditItem.getUuid());
+				try {
+					Logger.Log("Selected audit item: " + auditItem.getUuid());
 
-			// Find session
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
+					// Find session
+					DB db = App.getDB(context);
+					Session session = db.getObject(containerId, Session.class);
 
-			// --> Nếu nhiều image cùng được chọn là lỗi vệ sinh, thì gộp tất cả vào một lỗi
-			boolean isExisted = false;
+					// --> Nếu nhiều image cùng được chọn là lỗi vệ sinh, thì gộp tất cả vào một lỗi
+					boolean isExisted = false;
 
-			List<AuditItem> list = session.getAuditItems();
-			for (int i = 0; i < list.size(); i++) {
+					List<AuditItem> list = session.getAuditItems();
+					for (int i = 0; i < list.size(); i++) {
 
-				// neu da ton tai loi ve sinh va chua duoc upload thi them hinh vao loi ve sinh
-				if (list.get(i).isWashTypeItem() && list.get(i).getId() == 0) {
-					list.get(i).getAuditImages().add(auditItem.getAuditImages().get(0));
-					isExisted = true;
-					Logger.Log("Images size: " + list.get(i).getAuditImages().size());
-					Logger.Log("existed");
-					break;
+						// neu da ton tai loi ve sinh va chua duoc upload thi them hinh vao loi ve sinh
+						if (list.get(i).isWashTypeItem() && list.get(i).getId() == 0) {
+							list.get(i).getAuditImages().add(auditItem.getAuditImages().get(0));
+							isExisted = true;
+							Logger.Log("Images size: " + list.get(i).getAuditImages().size());
+							Logger.Log("existed");
+							break;
+						}
+					}
+
+					// Remove temporary audit item
+					for (int i = 0; i < list.size(); i++) {
+						AuditItem tmp = list.get(i);
+						if (tmp.equals(auditItem)) {
+							list.remove(i);
+						}
+					}
+
+					if (!isExisted) {
+
+						Logger.Log("Create new audit item");
+
+						// Add Isso Code
+						String damageKey = CJayConstant.PREFIX_DAMAGE_CODE + "DB";
+						String repairKey = CJayConstant.PREFIX_REPAIR_CODE + "WW";
+						String componentKey = CJayConstant.PREFIX_COMPONENT_CODE + "FWA";
+
+						IsoCode damageCode = db.getObject(damageKey, IsoCode.class);
+						IsoCode repairCode = db.getObject(repairKey, IsoCode.class);
+						IsoCode componentCode = db.getObject(componentKey, IsoCode.class);
+
+						auditItem.setDamageCodeId(damageCode.getId());
+						auditItem.setDamageCode(damageCode.getCode());
+
+						auditItem.setRepairCodeId(repairCode.getId());
+						auditItem.setRepairCode(repairCode.getCode());
+
+						auditItem.setComponentCodeId(componentCode.getId());
+						auditItem.setComponentCode(componentCode.getCode());
+
+						auditItem.setLocationCode("BXXX");
+						auditItem.setAudited(true);
+						auditItem.setAllowed(true);
+
+						list.add(auditItem);
+					}
+
+					session.setAuditItems(list);
+					db.put(containerId, session);
+
+					EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
+				} catch (SnappydbException e) {
+					e.printStackTrace();
 				}
 			}
-
-			// Remove temporary audit item
-			for (int i = 0; i < list.size(); i++) {
-				AuditItem tmp = list.get(i);
-				if (tmp.equals(auditItem)) {
-					list.remove(i);
-				}
-			}
-
-			if (!isExisted) {
-
-				Logger.Log("Create new audit item");
-
-				// Add Isso Code
-				String damageKey = CJayConstant.PREFIX_DAMAGE_CODE + "DB";
-				String repairKey = CJayConstant.PREFIX_REPAIR_CODE + "WW";
-				String componentKey = CJayConstant.PREFIX_COMPONENT_CODE + "FWA";
-
-				IsoCode damageCode = db.getObject(damageKey, IsoCode.class);
-				IsoCode repairCode = db.getObject(repairKey, IsoCode.class);
-				IsoCode componentCode = db.getObject(componentKey, IsoCode.class);
-
-				auditItem.setDamageCodeId(damageCode.getId());
-				auditItem.setDamageCode(damageCode.getCode());
-
-				auditItem.setRepairCodeId(repairCode.getId());
-				auditItem.setRepairCode(repairCode.getCode());
-
-				auditItem.setComponentCodeId(componentCode.getId());
-				auditItem.setComponentCode(componentCode.getCode());
-
-				auditItem.setLocationCode("BXXX");
-				auditItem.setAudited(true);
-				auditItem.setAllowed(true);
-
-				list.add(auditItem);
-			}
-
-			session.setAuditItems(list);
-			db.put(containerId, session);
-
-			EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
+		});
 	}
 
 	/**
@@ -1818,8 +1886,8 @@ public class DataCenter {
 	 * @param status
 	 */
 	public void changeUploadStatus(Context context, String containerId, String itemUuid, UploadStatus status) throws SnappydbException {
-		test = test +1;
-		Logger.e("Test number: "+test);
+		test = test + 1;
+		Logger.e("Test number: " + test);
 		DB db = App.getDB(context);
 		Session session = db.getObject(containerId, Session.class);
 		session.changeAuditItemUploadStatus(containerId, itemUuid, status);
@@ -1835,8 +1903,8 @@ public class DataCenter {
 	 * @return
 	 */
 	public AuditItem getAuditItem(Context context, String containerId, String itemUuid) {
-		test = test +1;
-		Logger.e("Test number: "+test);
+		test = test + 1;
+		Logger.e("Test number: " + test);
 
 		try {
 			DB db = App.getDB(context);
@@ -1860,17 +1928,21 @@ public class DataCenter {
 	 * @param containerId
 	 * @return
 	 */
-	@Background(serial  = CACHE)
-	public void getAuditItemsInBackground(Context context, String containerId) {
-		test = test +1;
-		Logger.e("Test number: "+test);
-		try {
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
-			EventBus.getDefault().post(new AuditItemsGotEvent(session.getAuditItems()));
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
+	public void getAuditItemsInBackground(final Context context, final String containerId) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
+		BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "CACHE") {
+			@Override
+			public void execute() {
+				try {
+					DB db = App.getDB(context);
+					Session session = db.getObject(containerId, Session.class);
+					EventBus.getDefault().post(new AuditItemsGotEvent(session.getAuditItems()));
+				} catch (SnappydbException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	/**
@@ -1880,22 +1952,26 @@ public class DataCenter {
 	 * @param containerId
 	 * @param itemUuid
 	 */
-	@Background(serial  = CACHE)
-	public void getAuditItemInBackground(Context context, String containerId, String itemUuid) {
-		test = test +1;
-		Logger.e("Test number: "+test);
-        Logger.Log("getAuditItemInBackground");
-		try {
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
-			if (session != null) {
-				AuditItem auditItem = session.getAuditItem(itemUuid);
-				EventBus.getDefault().post(new AuditItemGotEvent(auditItem));
-			}
+	public void getAuditItemInBackground(final Context context, final String containerId, final String itemUuid) {
+		test = test + 1;
+		Logger.e("Test number: " + test);
+		Logger.Log("getAuditItemInBackground");
+		BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "CACHE") {
+			@Override
+			public void execute() {
+				try {
+					DB db = App.getDB(context);
+					Session session = db.getObject(containerId, Session.class);
+					if (session != null) {
+						AuditItem auditItem = session.getAuditItem(itemUuid);
+						EventBus.getDefault().post(new AuditItemGotEvent(auditItem));
+					}
 
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
+				} catch (SnappydbException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	//endregion
