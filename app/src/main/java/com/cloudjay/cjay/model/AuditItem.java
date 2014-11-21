@@ -493,7 +493,7 @@ public class AuditItem implements Serializable{
 
 			// local compare
 			if (this.id == 0 && tmp.id == 0) {
-				if (uuid.equals(tmp.uuid)) {
+                if (uuid.equals(tmp.uuid)) {
 					return true;
 				} else {
 					return false;

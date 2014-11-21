@@ -93,12 +93,10 @@ public class AfterRepairFragment extends Fragment {
     @AfterViews
     void setUp() {
 
-
-
-        if (null == mSession) {
-            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
-                    containerID);
-        }
+//        if (null == mSession) {
+//            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
+//                    containerID);
+//        }
 
         if (null == imageAdapter) {
             imageAdapter = new DetailIssuedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.REPAIRED);
@@ -174,14 +172,16 @@ public class AfterRepairFragment extends Fragment {
             auditItem = mSession.getAuditItem(auditItemUUID);
 
             // parse Data to view
-            tvCompCode.setText(auditItem.getComponentCode());
-            tvLocationCode.setText(auditItem.getLocationCode());
-            tvDamageCode.setText(auditItem.getDamageCode());
-            tvRepairCode.setText(auditItem.getRepairCode());
+            if (auditItem != null) {
+                tvCompCode.setText(auditItem.getComponentCode());
+                tvLocationCode.setText(auditItem.getLocationCode());
+                tvDamageCode.setText(auditItem.getDamageCode());
+                tvRepairCode.setText(auditItem.getRepairCode());
 
-            tvSize.setText("Dài " + auditItem.getHeight() + ",\t" + "Rộng " + auditItem.getLength());
-            textViewBtnCamera.setText(R.string.button_add_new_repair_image);
-            tvNumber.setText(auditItem.getQuantity() + "");
+                tvSize.setText("Dài " + auditItem.getHeight() + ",\t" + "Rộng " + auditItem.getLength());
+                textViewBtnCamera.setText(R.string.button_add_new_repair_image);
+                tvNumber.setText(auditItem.getQuantity() + "");
+            }
         }
     }
 

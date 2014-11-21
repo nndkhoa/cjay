@@ -11,6 +11,7 @@ import com.cloudjay.cjay.event.image.RainyImagesDeletedEvent;
 import com.cloudjay.cjay.event.image.RainyImagesGotEvent;
 import com.cloudjay.cjay.event.isocode.IsoCodeGotEvent;
 import com.cloudjay.cjay.event.isocode.IsoCodesGotEvent;
+import com.cloudjay.cjay.event.isocode.IsoCodesGotToUpdateEvent;
 import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
 import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
 import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
@@ -376,16 +377,43 @@ public class DataCenter {
 
 			if (keyResults.length > 0) {
 				IsoCode isoCode = db.getObject(keyResults[0], IsoCode.class);
-
-				Logger.Log("getCode: " + isoCode.getCode());
-				Logger.Log("getId: " + isoCode.getId());
-
 				EventBus.getDefault().post(new IsoCodeGotEvent(isoCode, prefix));
 			}
 		} catch (SnappydbException e) {
 			Logger.e(e.getMessage());
 		}
 	}
+
+    @Background(serial  = CACHE, delay = 50)
+    public void getIsoCodesToUpdate(Context context, String strComponentCode,
+                                    String strDamageCode, String strRepairCode) {
+        try {
+
+            IsoCode componentCode = null;
+            IsoCode damageCode = null;
+            IsoCode repairCode = null;
+
+            DB db = App.getDB(context);
+            String[] keyComponent = db.findKeys(CJayConstant.PREFIX_COMPONENT_CODE + strComponentCode);
+            String[] keyDamage = db.findKeys(CJayConstant.PREFIX_DAMAGE_CODE + strDamageCode);
+            String[] keyRepair = db.findKeys(CJayConstant.PREFIX_REPAIR_CODE + strRepairCode);
+
+            if (keyComponent.length > 0) {
+                componentCode = db.getObject(keyComponent[0], IsoCode.class);
+            }
+            if (keyDamage.length > 0) {
+                damageCode = db.getObject(keyDamage[0], IsoCode.class);
+            }
+            if (keyRepair.length > 0) {
+                repairCode = db.getObject(keyRepair[0], IsoCode.class);
+            }
+
+            EventBus.getDefault().post(new IsoCodesGotToUpdateEvent(componentCode, damageCode, repairCode));
+
+        } catch (SnappydbException e) {
+            Logger.e(e.getMessage());
+        }
+    }
 
 	//endregion
 
@@ -1659,6 +1687,7 @@ public class DataCenter {
 				auditItem.setLocationCode("BXXX");
 				auditItem.setAudited(true);
 				auditItem.setAllowed(true);
+                auditItem.setQuantity(1);
 
 				list.add(auditItem);
 			}

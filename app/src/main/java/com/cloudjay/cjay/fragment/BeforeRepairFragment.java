@@ -17,6 +17,7 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
@@ -95,10 +96,10 @@ public class BeforeRepairFragment extends Fragment {
 
 	@AfterViews
     void setUp() {
-        if (null == mSession) {
-            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
-                    containerID);
-        }
+//        if (null == mSession) {
+//            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
+//                    containerID);
+//        }
 
         if (null == imageAdapter) {
             imageAdapter = new DetailIssuedImageAdapter(
@@ -120,6 +121,7 @@ public class BeforeRepairFragment extends Fragment {
 
     @UiThread
     void onEvent(ContainerGotEvent event) {
+        Logger.Log("ContainerGotEvent");
         mSession = event.getSession();
         if (null == mSession) {
             Utils.showCrouton(getActivity(), "Không tìm thấy container trong dữ liệu");
@@ -129,19 +131,10 @@ public class BeforeRepairFragment extends Fragment {
             refreshListImage();
             if (hasImageToUpload) {
                 addImageToJobqueue();
+                hasImageToUpload =  false;
             }
         }
     }
-
-//    @UiThread
-//    void onEvent(ImageCapturedEvent event) {
-//        Logger.Log("on ImageCapturedEvent");
-//        if (event.getImageType() == ImageType.AUDIT.value) {
-//            // Requery session to update data
-//            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
-//                    containerID);
-//        }
-//    }
 
     @Override
     public void onResume() {
