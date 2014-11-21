@@ -9,15 +9,11 @@ import com.cloudjay.cjay.util.Logger;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
-/**
- * Created by nambv on 2014/11/22.
- */
-public class RemoveWorkingSession extends Command {
-
+public class RemoveWorkingSessionCommand extends Command {
     Context context;
     String containerId;
 
-    public RemoveWorkingSession(Context context, String containerId) {
+    public RemoveWorkingSessionCommand(Context context, String containerId) {
         this.context = context;
         this.containerId = containerId;
     }

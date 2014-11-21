@@ -13,16 +13,12 @@ import com.snappydb.SnappydbException;
 
 import de.greenrobot.event.EventBus;
 
-/**
- * Created by nambv on 2014/11/22.
- */
-public class UpdateAuditItemInBackgroundCommand extends Command {
-
+public class UpdateAuditItemCommand extends Command {
     Context context;
     String containerId;
     AuditItem auditItem;
 
-    public UpdateAuditItemInBackgroundCommand(Context context, String containerId, AuditItem auditItem) {
+    public UpdateAuditItemCommand(Context context, String containerId, AuditItem auditItem) {
         this.containerId = containerId;
         this.context = context;
         this.auditItem = auditItem;

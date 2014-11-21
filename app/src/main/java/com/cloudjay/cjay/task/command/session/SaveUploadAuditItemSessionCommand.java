@@ -18,11 +18,7 @@ import org.androidannotations.annotations.Bean;
 
 import de.greenrobot.event.EventBus;
 
-/**
- * Created by nambv on 2014/11/22.
- */
-public class SaveUploadAuditItemSession extends Command {
-
+public class SaveUploadAuditItemSessionCommand extends Command {
     DataCenter dataCenter;
 
     private String containerId;
@@ -30,7 +26,7 @@ public class SaveUploadAuditItemSession extends Command {
     private UploadType type;
     private AuditItem result;
 
-    public SaveUploadAuditItemSession(Context context, AuditItem result, UploadType type, String containerId) {
+    public SaveUploadAuditItemSessionCommand(Context context, AuditItem result, UploadType type, String containerId) {
         this.context = context;
         this.containerId = containerId;
         this.type = type;
