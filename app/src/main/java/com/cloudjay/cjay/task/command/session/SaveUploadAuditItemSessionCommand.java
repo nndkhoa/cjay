@@ -20,7 +20,7 @@ import de.greenrobot.event.EventBus;
 /**
  * Created by nambv on 2014/11/22.
  */
-public class SaveUploadAuditItemSession implements Command {
+public class SaveUploadAuditItemSessionCommand implements Command {
 
     @Bean
     DataCenter dataCenter;
@@ -30,7 +30,7 @@ public class SaveUploadAuditItemSession implements Command {
     private UploadType type;
     private AuditItem result;
 
-    public SaveUploadAuditItemSession(Context context, AuditItem result, UploadType type, String containerId) {
+    public SaveUploadAuditItemSessionCommand(Context context, AuditItem result, UploadType type, String containerId) {
         this.context = context;
         this.containerId = containerId;
         this.type = type;

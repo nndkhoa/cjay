@@ -3,7 +3,7 @@ package com.cloudjay.cjay.task.command.issue;
 import android.content.Context;
 
 import com.cloudjay.cjay.App;
-import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
+import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.Command;
@@ -16,30 +16,28 @@ import de.greenrobot.event.EventBus;
 /**
  * Created by nambv on 2014/11/22.
  */
-public class UpdateAuditItemInBackgroundCommand implements Command {
+public class GetAuditItemCommand implements Command {
 
     Context context;
     String containerId;
-    AuditItem auditItem;
+    String itemUuid;
 
-    public UpdateAuditItemInBackgroundCommand(Context context, String containerId, AuditItem auditItem) {
-        this.containerId = containerId;
+    public GetAuditItemCommand(Context context, String containerId, String itemUuid) {
         this.context = context;
-        this.auditItem = auditItem;
+        this.containerId = containerId;
+        this.itemUuid = itemUuid;
     }
 
     @Override
     public void run() {
-        Logger.Log("updateAuditItemInBackground");
+        Logger.Log("getAuditItemInBackground");
         try {
-            // find session
             DB db = App.getDB(context);
             Session session = db.getObject(containerId, Session.class);
-            session.updateAuditItem(auditItem);
-            db.put(containerId, session);
-
-            // Notify that an audit item is updated
-            EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
+            if (session != null) {
+                AuditItem auditItem = session.getAuditItem(itemUuid);
+                EventBus.getDefault().post(new AuditItemGotEvent(auditItem));
+            }
 
         } catch (SnappydbException e) {
             e.printStackTrace();
