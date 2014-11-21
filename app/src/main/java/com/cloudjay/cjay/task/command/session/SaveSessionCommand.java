@@ -17,7 +17,7 @@ import de.greenrobot.event.EventBus;
 /**
  * Created by nambv on 2014/11/22.
  */
-public class SaveSessionCommand implements Command {
+public class SaveSessionCommand extends Command {
     Context context;
     Session session;
     UploadType uploadType;

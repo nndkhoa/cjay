@@ -16,7 +16,7 @@ import de.greenrobot.event.EventBus;
 /**
  * Created by nambv on 2014/11/22.
  */
-public class GetAuditItemInBackgroundCommand implements Command {
+public class GetAuditItemInBackgroundCommand extends Command {
 
     Context context;
     String containerId;
@@ -26,6 +26,7 @@ public class GetAuditItemInBackgroundCommand implements Command {
         this.context = context;
         this.containerId = containerId;
         this.itemUuid = itemUuid;
+
     }
 
     @Override

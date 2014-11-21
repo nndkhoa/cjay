@@ -21,7 +21,7 @@ import de.greenrobot.event.EventBus;
 /**
  * Created by nambv on 2014/11/22.
  */
-public class SaveSessionAfterImport implements Command {
+public class SaveSessionAfterImport extends Command {
 
     Context context;
     Session session;

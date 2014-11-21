@@ -139,6 +139,7 @@ dependencies {
     compile 'org.droidparts:droidparts:2.6.2'
 
     compile 'com.github.rampo.updatechecker:library:2.1.4'
+    compile 'com.squareup:tape:1.2.3'
 
     compile project(":jobqueue")
 }

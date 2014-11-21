@@ -15,7 +15,7 @@ import de.greenrobot.event.EventBus;
 /**
  * Created by nambv on 2014/11/22.
  */
-public class GetSessionCommand implements Command {
+public class GetSessionCommand extends Command {
 
     Context context;
     String containerId;

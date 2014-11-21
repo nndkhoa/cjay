@@ -12,7 +12,7 @@ import com.snappydb.SnappydbException;
 /**
  * Created by nambv on 2014/11/22.
  */
-public class RemoveWorkingSession implements Command {
+public class RemoveWorkingSession extends Command {
 
     Context context;
     String containerId;

@@ -36,6 +36,7 @@ import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.task.command.Command;
+import com.cloudjay.cjay.task.command.CommandQueue;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.task.service.QueryService;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -68,10 +69,11 @@ import retrofit.RetrofitError;
 @EBean(scope = EBean.Scope.Singleton)
 public class DataCenter {
 
-    QueryService service;
+	@Bean
+    CommandQueue queue;
 
     public void add(Command command) {
-        service.add(command);
+	    queue.add(command);
     }
 
 	// region DECLARE

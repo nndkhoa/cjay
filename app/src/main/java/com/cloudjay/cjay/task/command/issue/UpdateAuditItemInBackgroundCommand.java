@@ -16,7 +16,7 @@ import de.greenrobot.event.EventBus;
 /**
  * Created by nambv on 2014/11/22.
  */
-public class UpdateAuditItemInBackgroundCommand implements Command {
+public class UpdateAuditItemInBackgroundCommand extends Command {
 
     Context context;
     String containerId;

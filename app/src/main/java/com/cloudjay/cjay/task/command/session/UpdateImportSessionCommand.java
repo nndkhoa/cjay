@@ -8,7 +8,7 @@ import com.cloudjay.cjay.task.command.Command;
 /**
  * Created by nambv on 2014/11/22.
  */
-public class UpdateImportSessionCommand implements Command {
+public class UpdateImportSessionCommand extends Command {
 
     Context context;
     Session session;

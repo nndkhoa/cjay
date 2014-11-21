@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
@@ -20,9 +21,8 @@ import de.greenrobot.event.EventBus;
 /**
  * Created by nambv on 2014/11/22.
  */
-public class SaveUploadAuditItemSession implements Command {
+public class SaveUploadAuditItemSession extends Command {
 
-    @Bean
     DataCenter dataCenter;
 
     private String containerId;
@@ -35,6 +35,7 @@ public class SaveUploadAuditItemSession implements Command {
         this.containerId = containerId;
         this.type = type;
         this.result = result;
+	    this.dataCenter = DataCenter_.getInstance_(context);
     }
 
     @Override

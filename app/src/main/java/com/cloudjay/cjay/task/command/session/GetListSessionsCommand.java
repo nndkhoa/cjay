@@ -17,7 +17,7 @@ import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
-public class GetListSessionsCommand implements Command {
+public class GetListSessionsCommand extends Command {
 
     String prefix;
     Context context;
