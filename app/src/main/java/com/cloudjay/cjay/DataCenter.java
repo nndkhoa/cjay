@@ -74,6 +74,7 @@ public class DataCenter {
 
 	public static final String NETWORK = "NETWORK";
 	public static final String CACHE = "CACHE";
+	int test = 0;
 
 	public DataCenter(Context context) {
 		this.context = context;
@@ -168,8 +169,10 @@ public class DataCenter {
 	 *
 	 * @param keyword
 	 */
-	@Background(serial  = CACHE, delay = 50)
+//	@Background(serial  = CACHE, delay = 50)
 	public void searchOperator(String keyword) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 		try {
 			List<Operator> operators = new ArrayList<>();
 			DB db = App.getDB(context);
@@ -191,7 +194,7 @@ public class DataCenter {
 	 * @param context
 	 * @param id
 	 */
-	@Background(serial = NETWORK)
+//	@Background(serial = NETWORK)
 	public void getOperatorAsyncById(Context context, long id) {
 
 		Operator operator = networkClient.getOperatorById(id);
@@ -307,8 +310,10 @@ public class DataCenter {
 	 * @param prefix
 	 * @return
 	 */
-	@Background(serial  = CACHE, delay = 50)
+	@Background(serial  = CACHE)
 	public void getListIsoCodes(Context context, String prefix) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 		try {
 			DB db = App.getDB(context);
 			String[] keyResults = db.findKeys(prefix);
@@ -332,7 +337,7 @@ public class DataCenter {
 	 * @param context
 	 * @param id
 	 */
-	@Background(serial = NETWORK)
+//	@Background(serial = NETWORK)
 	public void getDamageCodeAsyncById(Context context, long id) {
 		IsoCode isoCode = networkClient.getDamageCodeById(id);
 		addIsoCode(context, isoCode, IsoCode.Type.DAMAGE);
@@ -344,7 +349,7 @@ public class DataCenter {
 	 * @param context
 	 * @param id
 	 */
-	@Background(serial = NETWORK)
+//	@Background(serial = NETWORK)
 	public void getRepairCodeAsyncById(Context context, long id) {
 		IsoCode isoCode = networkClient.getRepairCodeById(id);
 		addIsoCode(context, isoCode, IsoCode.Type.REPAIR);
@@ -356,7 +361,7 @@ public class DataCenter {
 	 * @param context
 	 * @param id
 	 */
-	@Background(serial = NETWORK)
+//	@Background(serial = NETWORK)
 	public void getComponentCodeAsyncById(Context context, long id) {
 		IsoCode isoCode = networkClient.getComponentCodeById(id);
 		addIsoCode(context, isoCode, IsoCode.Type.COMPONENT);
@@ -368,8 +373,10 @@ public class DataCenter {
 	 * @param code
 	 * @return
 	 */
-	@Background(serial  = CACHE, delay = 50)
+	@Background(serial  = CACHE)
 	public void getIsoCode(Context context, String prefix, String code) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 		try {
 			DB db = App.getDB(context);
 			String[] keyResults = db.findKeys(prefix + code);
@@ -383,9 +390,11 @@ public class DataCenter {
 		}
 	}
 
-    @Background(serial  = CACHE, delay = 50)
+//    @Background(serial  = CACHE, delay = 50)
     public void getIsoCodesToUpdate(Context context, String strComponentCode,
                                     String strDamageCode, String strRepairCode) {
+	    test = test +1;
+	    Logger.e("Test number: "+test);
         try {
 
             IsoCode componentCode = null;
@@ -427,6 +436,8 @@ public class DataCenter {
 	 * @throws SnappydbException
 	 */
 	public Session getSessionAsyncById(Context context, long id) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 
 		Session result = networkClient.getSessionById(id);
 		try {
@@ -458,8 +469,10 @@ public class DataCenter {
 		return null;
 	}
 
-	@Background(serial  = CACHE, delay = 50)
+	@Background(serial  = CACHE)
 	public void getSessionForUpload(Context context, String containerId) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 		try {
 			DB db = App.getDB(context);
 			String key = containerId;
@@ -480,9 +493,11 @@ public class DataCenter {
 	 * @param context
 	 * @param prefix
 	 * @return
-	 */
-	@Background(serial  = CACHE, delay = 50)
+//	 */
+	@Background(serial  = CACHE)
 	public void getListSessionsInBackground(Context context, String prefix) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 //		Logger.Log("Getting list session: " + prefix);
 
 		int len = prefix.length();
@@ -515,8 +530,10 @@ public class DataCenter {
 	}
 
 	@Trace
-	@Background(serial  = CACHE, delay = 50)
+	@Background(serial  = CACHE)
 	public void getSessionInBackground(Context context, String containerId) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 		try {
 			DB db = App.getDB(context);
 			String key = containerId;
@@ -535,8 +552,10 @@ public class DataCenter {
 	 * @param context
 	 * @param containerId
 	 */
-	@Background(serial  = CACHE, delay = 50)
+	@Background(serial  = CACHE)
 	public void changeLocalStepAndForceExport(Context context, String containerId) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 
 		DB db;
 		try {
@@ -564,8 +583,10 @@ public class DataCenter {
 	 * @param containerId
 	 * @param step
 	 */
-	@Background(serial  = CACHE, delay = 50)
+//	@Background(serial  = CACHE, delay = 50)
 	public void changeSessionLocalStepInBackground(Context context, String containerId, Step step) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 
 		DB db;
 		try {
@@ -628,8 +649,10 @@ public class DataCenter {
 		}
 	}
 
-	@Background(serial  = CACHE, delay = 50)
+//	@Background(serial  = CACHE, delay = 50)
 	void processListSession(List<Session> sessions) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 		DB db;
 		try {
 			db = App.getDB(context);
@@ -669,8 +692,10 @@ public class DataCenter {
 	 * @param context
 	 * @param keyword
 	 */
-	@Background(serial  = CACHE, delay = 30)
+//	@Background(serial  = CACHE, delay = 30)
 	public void search(Context context, String keyword, boolean searchInImportFragment) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 
 		String[] keysResult;
 		try {
@@ -715,6 +740,9 @@ public class DataCenter {
 	 */
 	@Background(serial = NETWORK)
 	public void searchAsync(Context context, String keyword, boolean searchInImportFragment) {
+		test = test +1;
+		Logger.e("Test number: "+test);
+
 
 		try {
 
@@ -748,8 +776,10 @@ public class DataCenter {
 	 *
 	 * @param session
 	 */
-	@Background(serial  = CACHE, delay = 50)
+//	@Background(serial  = CACHE, delay = 50)
 	public void addSession(Session session) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 		try {
 			DB db = App.getDB(context);
 
@@ -773,8 +803,10 @@ public class DataCenter {
 	 * @param session
 	 * @param type
 	 */
-	@Background(serial  = CACHE, delay = 50)
+//	@Background(serial  = CACHE, delay = 50)
 	void saveSession(Context context, Session session, UploadType type) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 
 		DB db = null;
 		String key = session.getContainerId();
@@ -806,8 +838,10 @@ public class DataCenter {
 	}
 
 
-	@Background(serial  = CACHE, delay = 50)
+//	@Background(serial  = CACHE, delay = 50)
 	public void updateImportSession(Session session) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 		DB db = null;
 		try {
 			db = App.getDB(context);
@@ -842,8 +876,10 @@ public class DataCenter {
 	 * @param session
 	 */
 	@Trace
-	@Background(serial  = CACHE, delay = 50)
+	@Background(serial  = CACHE)
 	public void addWorkingSession(Session session) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 
 		try {
 			DB db = App.getDB(context);
@@ -869,8 +905,10 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	
+	@Background(serial  = CACHE)
 	public void addUploadSession(String containerId) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 
 		try {
 			DB db = App.getDB(context);
@@ -890,8 +928,10 @@ public class DataCenter {
 	 * @param context
 	 * @param containerId
 	 */
-	@Background(serial  = CACHE, delay = 50)
+	@Background(serial  = CACHE)
 	public void removeWorkingSession(Context context, String containerId) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 
 		try {
 			DB db = App.getDB(context);
@@ -906,8 +946,10 @@ public class DataCenter {
 		}
 	}
 
-	@Background(serial  = CACHE, delay = 50)
+	@Background(serial  = CACHE)
 	public void removeUploadedSessions(Context context) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 
 		try {
 			DB db = App.getDB(context);
@@ -929,8 +971,10 @@ public class DataCenter {
 	}
 
 
-	@Background(serial  = CACHE, delay = 50)
+	@Background(serial  = CACHE)
 	public void changeStatusWhenUpload(Context context, Session session, UploadType uploadType, UploadStatus uploadStatus) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 
 		DB db;
 		try {
@@ -985,12 +1029,14 @@ public class DataCenter {
 	 * @param auditItemRemove
 	 * @param auditImageUUID
 	 */
-	@Background(serial  = CACHE, delay = 50)
+	@Background(serial  = CACHE)
 	public void addAuditImageToAuditedItem(Context context,
 	                                       String containerId,
 	                                       String auditItemUUID,
 	                                       String auditItemRemove,
 	                                       String auditImageUUID) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 
 		try {
 			DB db = App.getDB(context);
@@ -1036,6 +1082,8 @@ public class DataCenter {
 	 * @return
 	 */
 	public AuditImage getAuditImageByUUId(Context context, String containerId, String auditItemUUID, String auditImageUUID) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 
 		try {
 			DB db = App.getDB(context);
@@ -1070,8 +1118,10 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	@Background(serial  = CACHE, delay = 50)
+	@Background(serial  = CACHE)
 	public void addGateImage(Context context, GateImage image, String containerId) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 
 		try {
 			DB db = App.getDB(context);
@@ -1095,8 +1145,10 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	@Background(serial  = CACHE, delay = 50)
+	@Background(serial  = CACHE)
 	public void addAuditImage(Context context, AuditImage auditImage, String containerId) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 
 		try {
 			DB db = App.getDB(context);
@@ -1154,8 +1206,10 @@ public class DataCenter {
 	 * @param status
 	 * @throws SnappydbException
 	 */
-	@Background(serial  = CACHE, delay = 50)
+//	@Background(serial  = CACHE, delay = 50)
 	public void changeImageUploadStatus(Context context, String containerId, String imageName, ImageType imageType, UploadStatus status) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 		try {
 			DB db = App.getDB(context);
 
@@ -1219,8 +1273,10 @@ public class DataCenter {
 		}
 	}
 
-    @Background(serial  = CACHE, delay = 50)
+    @Background(serial  = CACHE)
     public void saveRainyImage(Context context, String uuid, String rainyImageUrl) {
+	    test = test +1;
+	    Logger.e("Test number: "+test);
         try {
             DB db = App.getDB(context);
             db.put(CJayConstant.PREFIX_RAINY_MODE_IMAGE + uuid, rainyImageUrl);
@@ -1229,8 +1285,10 @@ public class DataCenter {
         }
     }
 
-    @Background(serial  = CACHE, delay = 50)
+   @Background(serial  = CACHE)
     public void getRainyImages(Context context) {
+	    test = test +1;
+	    Logger.e("Test number: "+test);
         try {
             DB db = App.getDB(context);
 
@@ -1248,8 +1306,10 @@ public class DataCenter {
         }
     }
 
-    @Background(serial  = CACHE, delay = 50)
+    @Background(serial  = CACHE)
     public void deleteRainyImage(Context context, ArrayList<String> imageUrls) {
+	    test = test +1;
+	    Logger.e("Test number: "+test);
         try {
             DB db = App.getDB(context);
 
@@ -1323,8 +1383,10 @@ public class DataCenter {
         saveUploadAuditItemSession(context, result, UploadType.AUDIT_ITEM, containerId);
     }
 
-	@Background(serial  = CACHE, delay = 50)
+//	@Background(serial  = CACHE, delay = 50)
 	public void saveUploadAuditItemSession(Context context, AuditItem result, UploadType type, String containerId) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 		DB db = null;
 		String key = containerId;
 		Session object = null;
@@ -1354,9 +1416,11 @@ public class DataCenter {
 		saveSessionAfterImport(context, result, UploadType.SESSION);
 	}
 
-	@Background(serial  = CACHE, delay = 50)
+//	@Background(serial  = CACHE, delay = 50)
 	public void saveSessionAfterImport(Context context, Session session, UploadType type) {
 
+		test = test +1;
+		Logger.e("Test number: "+test);
 		DB db = null;
 		String key = session.getContainerId();
 		Session object = null;
@@ -1464,6 +1528,8 @@ public class DataCenter {
 	 * @return
 	 */
 	public List<LogItem> getListLogItems(Context context, String logUploadKey) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 		try {
 			DB db = App.getDB(context);
 			String[] keysResult = db.findKeys(logUploadKey);
@@ -1489,6 +1555,8 @@ public class DataCenter {
 	 * @return
 	 */
 	public List<LogItem> searchLog(Context context, String searchKey) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 		try {
 			DB db = App.getDB(context);
 			String[] keysResult = db.findKeys(searchKey);
@@ -1522,6 +1590,8 @@ public class DataCenter {
 	 * @param message
 	 */
 	public void addLog(Context context, String title, String message, String typeLog) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 		String currentTime = StringUtils.getCurrentTimestamp(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 
 		LogItem log = new LogItem();
@@ -1533,6 +1603,8 @@ public class DataCenter {
 	}
 
 	public void addLog(Context context, LogItem log, String typeLog) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 		try {
 			DB db = App.getDB(context);
 			if (typeLog.equals(CJayConstant.PREFIX_LOG)) {
@@ -1572,8 +1644,10 @@ public class DataCenter {
 	 * @param containerId
 	 * @param auditItemUUID
 	 */
-	@Background(serial  = CACHE, delay = 50)
+	@Background(serial  = CACHE)
 	public void removeAuditItem(Context context, String containerId, String auditItemUUID) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 		try {
 			// find session
 			DB db = App.getDB(context);
@@ -1592,8 +1666,10 @@ public class DataCenter {
 		EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
 	}
 
-	@Background(serial  = CACHE, delay = 50)
+	@Background(serial  = CACHE)
 	public void updateAuditItemInBackground(Context context, String containerId, AuditItem auditItem) {
+		test = test +1;
+		Logger.e("Test number: "+test);
         Logger.Log("updateAuditItemInBackground");
 		try {
 			// find session
@@ -1625,8 +1701,10 @@ public class DataCenter {
 	 * @param auditItem
 	 * @throws SnappydbException
 	 */
-	@Background(serial  = CACHE, delay = 50)
+	@Background(serial  = CACHE)
 	public void setWaterWashType(Context context, final AuditItem auditItem, String containerId) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 
 		try {
 			Logger.Log("Selected audit item: " + auditItem.getUuid());
@@ -1740,6 +1818,8 @@ public class DataCenter {
 	 * @param status
 	 */
 	public void changeUploadStatus(Context context, String containerId, String itemUuid, UploadStatus status) throws SnappydbException {
+		test = test +1;
+		Logger.e("Test number: "+test);
 		DB db = App.getDB(context);
 		Session session = db.getObject(containerId, Session.class);
 		session.changeAuditItemUploadStatus(containerId, itemUuid, status);
@@ -1755,6 +1835,8 @@ public class DataCenter {
 	 * @return
 	 */
 	public AuditItem getAuditItem(Context context, String containerId, String itemUuid) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 
 		try {
 			DB db = App.getDB(context);
@@ -1778,8 +1860,10 @@ public class DataCenter {
 	 * @param containerId
 	 * @return
 	 */
-	@Background(serial  = CACHE, delay = 50)
+	@Background(serial  = CACHE)
 	public void getAuditItemsInBackground(Context context, String containerId) {
+		test = test +1;
+		Logger.e("Test number: "+test);
 		try {
 			DB db = App.getDB(context);
 			Session session = db.getObject(containerId, Session.class);
@@ -1796,8 +1880,10 @@ public class DataCenter {
 	 * @param containerId
 	 * @param itemUuid
 	 */
-	@Background(serial  = CACHE, delay = 50)
+	@Background(serial  = CACHE)
 	public void getAuditItemInBackground(Context context, String containerId, String itemUuid) {
+		test = test +1;
+		Logger.e("Test number: "+test);
         Logger.Log("getAuditItemInBackground");
 		try {
 			DB db = App.getDB(context);

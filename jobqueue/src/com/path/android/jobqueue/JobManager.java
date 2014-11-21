@@ -609,9 +609,9 @@ public class JobManager implements NetworkEventProvider.Listener {
 	protected void addJobInBackground(final int priority, final long delay, final BaseJob baseJob,
 	    /*nullable*/final AsyncAddCallback callback) {
 		final long callTime = System.nanoTime();
-		timedExecutor.execute(new Runnable() {
+		BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "CACHE") {
 			@Override
-			public void run() {
+			public void execute() {
 				try {
 					final long runDelay = (System.nanoTime() - callTime) / NS_PER_MS;
 					long id = addJob(priority, Math.max(0, delay - runDelay), baseJob);
@@ -623,6 +623,20 @@ public class JobManager implements NetworkEventProvider.Listener {
 				}
 			}
 		});
+//		timedExecutor.execute(new Runnable() {
+//			@Override
+//			public void run() {
+//				try {
+//					final long runDelay = (System.nanoTime() - callTime) / NS_PER_MS;
+//					long id = addJob(priority, Math.max(0, delay - runDelay), baseJob);
+//					if (callback != null) {
+//						callback.onAdded(id);
+//					}
+//				} catch (Throwable t) {
+//					JqLog.e(t, "addJobInBackground received an exception. job class: %s", baseJob.getClass().getSimpleName());
+//				}
+//			}
+//		});
 	}
 
 
