@@ -2,6 +2,7 @@ package com.cloudjay.cjay;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.DhcpInfo;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.activity.WizardActivity;
@@ -34,7 +35,9 @@ import com.cloudjay.cjay.model.LogItem;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
+import com.cloudjay.cjay.task.command.Command;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
+import com.cloudjay.cjay.task.service.QueryService;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -64,6 +67,12 @@ import retrofit.RetrofitError;
 
 @EBean(scope = EBean.Scope.Singleton)
 public class DataCenter {
+
+    QueryService service;
+
+    public void add(Command command) {
+        service.add(command);
+    }
 
 	// region DECLARE
 	// Inject the rest client
