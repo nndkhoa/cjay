@@ -21,6 +21,7 @@ import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.job.UploadImportJob;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -120,7 +121,7 @@ public class ExportFragment extends Fragment {
 				mImageTypes, importImages, auditImages, repairedImages);
 		lvImagesExpandable.setAdapter(mListAdapter);
 
-		dataCenter.getSessionInBackground(getActivity(), containerID);
+		dataCenter.add(new GetSessionCommand(getActivity(), containerID));
 	}
 
 	//region VIEW INTERACTION
@@ -253,7 +254,7 @@ public class ExportFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        dataCenter.getSessionInBackground(getActivity(), containerID);
+	    dataCenter.add(new GetSessionCommand(getActivity(), containerID));
     }
 
 

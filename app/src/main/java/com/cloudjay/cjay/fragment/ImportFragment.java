@@ -33,6 +33,10 @@ import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
+import com.cloudjay.cjay.task.command.session.update.AddSessionCommand;
+import com.cloudjay.cjay.task.command.session.update.AddWorkingSessionCommand;
+import com.cloudjay.cjay.task.command.session.get.SearchCommand;
 import com.cloudjay.cjay.task.job.UploadImageJob;
 import com.cloudjay.cjay.task.job.UploadImportJob;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -247,16 +251,13 @@ public class ImportFragment extends Fragment {
 	//endregion
 
 	void refresh() {
-		dataCenter.getSessionInBackground(getActivity(), containerID);
-
+		dataCenter.add(new GetSessionCommand(getActivity(), containerID));
 	}
 
 	@UiThread
 	public void updatedData() {
 
 		if (null == mSession) {
-
-			// Set container ID for text View containerId
 			etContainerCode.setText(containerID);
 
 		} else {
@@ -265,12 +266,7 @@ public class ImportFragment extends Fragment {
 			containerID = mSession.getContainerId();
 			operatorCode = mSession.getOperatorCode();
 			etContainerCode.setText(containerID);
-
 			etOperator.setText(operatorCode);
-//			Operator operator = dataCenter.getOperator(getActivity().getApplicationContext(), operatorCode);
-//			if (operator != null) {
-//				etOperator.setText(operator.getOperatorName());
-//			}
 
 			preStatus = mSession.getPreStatus();
 			switch ((int) preStatus) {
@@ -403,7 +399,7 @@ public class ImportFragment extends Fragment {
 			if (!rainyMode) {
 				mSession.setPreStatus(preStatus);
 				dataCenter.updateImportSession(mSession);
-				dataCenter.addWorkingSession(mSession);
+				dataCenter.add(new AddWorkingSessionCommand(getActivity(), mSession));
 
 				btnContinue.setVisibility(View.GONE);
 			}
@@ -419,7 +415,7 @@ public class ImportFragment extends Fragment {
 			if (!rainyMode) {
 				mSession.setPreStatus(preStatus);
 				dataCenter.updateImportSession(mSession);
-				dataCenter.addWorkingSession(mSession);
+				dataCenter.add(new AddWorkingSessionCommand(getActivity(), mSession));
 
 				btnContinue.setVisibility(View.VISIBLE);
 			}
@@ -434,7 +430,7 @@ public class ImportFragment extends Fragment {
 			if (!rainyMode) {
 				mSession.setPreStatus(preStatus);
 				dataCenter.updateImportSession(mSession);
-				dataCenter.addWorkingSession(mSession);
+				dataCenter.add(new AddWorkingSessionCommand(getActivity(), mSession));
 
 				btnContinue.setVisibility(View.VISIBLE);
 			}
@@ -500,7 +496,7 @@ public class ImportFragment extends Fragment {
                 .withGateImages(list)
                 .withLocalStep(Step.IMPORT.value);
 
-        dataCenter.addSession(mSession);
+	    dataCenter.add(new AddSessionCommand(getActivity(), mSession));
 
         // Add image to job queue
         for (GateImage gateImage : list) {
@@ -601,7 +597,8 @@ public class ImportFragment extends Fragment {
     }
 
     private void performSearch(String containerId) {
-        dataCenter.search(getActivity(), containerId, true);
+//        dataCenter.search(getActivity(), containerId, true);
+	    dataCenter.add(new SearchCommand(getActivity(), containerId, true));
     }
 
     @UiThread

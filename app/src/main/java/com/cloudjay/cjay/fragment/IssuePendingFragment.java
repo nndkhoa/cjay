@@ -28,6 +28,7 @@ import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.job.UploadImportJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -99,7 +100,7 @@ public class IssuePendingFragment extends Fragment {
 
 	@AfterViews
 	void setUp() {
-		dataCenter.getSessionInBackground(getActivity(), containerId);
+		dataCenter.add(new GetSessionCommand(getActivity(), containerId));
 	}
 
 	//region VIEW INTERACTION

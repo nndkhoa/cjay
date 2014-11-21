@@ -19,6 +19,9 @@ import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
+import com.cloudjay.cjay.task.command.session.get.GetSessionForUploadCommand;
+import com.cloudjay.cjay.task.command.session.update.ChangeSessionLocalStepCommand;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.task.job.UploadImportJob;
 import com.cloudjay.cjay.util.Logger;
@@ -194,7 +197,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	@Click(R.id.btn_complete_audit)
 	void btnCompleteAuditClicked() {
         if (!mIsUploading) {
-            dataCenter.getSessionForUpload(getActivity(), containerID);
+	        dataCenter.add(new GetSessionForUploadCommand(getActivity(), containerID));
         } else {
             Utils.showCrouton(getActivity(), "Vui lòng chờ quá trình tải lên hoàn tất");
         }
@@ -202,14 +205,14 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 	@Click(R.id.btn_complete_repair)
 	void btnCompleteRepairClicked() {
-		dataCenter.getSessionForUpload(getActivity(), containerID);
+		dataCenter.add(new GetSessionForUploadCommand(getActivity(), containerID));
 	}
 
 	@AfterViews
 	void doAfterViews() {
 		configureActionBar();
 		configureViewPager();
-		dataCenter.getSessionInBackground(getActivity(), containerID);
+		dataCenter.add(new GetSessionCommand(getActivity(), containerID));
 	}
 
 	@UiThread
@@ -219,9 +222,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
             for (AuditItem auditItem : mSession.getAuditItems()) {
                 if (auditItem.getId() == 0) {
-                    Logger.w("change to audit step");
-                    dataCenter.changeSessionLocalStepInBackground(getActivity(), containerID, Step.AUDIT);
-
+                    dataCenter.add(new ChangeSessionLocalStepCommand(getActivity(), containerID, Step.AUDIT));
                     btnCompleteAudit.setVisibility(View.VISIBLE);
                     btnCompleteRepair.setVisibility(View.VISIBLE);
                     return;

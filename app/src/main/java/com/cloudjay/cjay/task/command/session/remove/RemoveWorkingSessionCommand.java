@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.task.command.session;
+package com.cloudjay.cjay.task.command.session.remove;
 
 import android.content.Context;
 

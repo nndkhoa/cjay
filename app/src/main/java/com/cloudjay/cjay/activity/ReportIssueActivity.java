@@ -29,6 +29,7 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
@@ -97,7 +98,7 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
     @AfterViews
     void afterViews() {
-        dataCenter.getSessionInBackground(this, mContainerId);
+	    dataCenter.add(new GetSessionCommand(this, mContainerId));
     }
 
     @UiThread

@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.task.command.session;
+package com.cloudjay.cjay.task.command.session.update;
 
 import android.content.Context;
 

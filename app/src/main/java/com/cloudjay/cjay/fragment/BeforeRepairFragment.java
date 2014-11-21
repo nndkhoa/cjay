@@ -16,6 +16,7 @@ import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
@@ -139,8 +140,7 @@ public class BeforeRepairFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
-                    containerID);
+	    dataCenter.add(new GetSessionCommand(getActivity(), containerID));
     }
 
     void refreshListImage() {

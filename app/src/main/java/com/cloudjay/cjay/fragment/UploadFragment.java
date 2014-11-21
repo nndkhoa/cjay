@@ -15,6 +15,7 @@ import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.session.get.GetListSessionsCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 
 import org.androidannotations.annotations.AfterViews;
@@ -73,7 +74,7 @@ public class UploadFragment extends Fragment {
 
 	void refresh() {
 		if (mAdapter != null) {
-			dataCenter.getListSessionsInBackground(getActivity().getApplicationContext(), CJayConstant.PREFIX_UPLOADING);
+			dataCenter.add(new GetListSessionsCommand(getActivity(), CJayConstant.PREFIX_UPLOADING));
 		}
 	}
 

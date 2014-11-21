@@ -15,6 +15,7 @@ import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
@@ -131,21 +132,10 @@ public class AfterRepairFragment extends Fragment {
         startActivity(cameraActivityIntent);
     }
 
-//    @UiThread
-//    void onEvent(ImageCapturedEvent event) {
-//        Logger.Log("on ImageCapturedEvent");
-//        if (event.getImageType() == ImageType.REPAIRED.value) {
-//            // Requery session to update data
-//            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
-//                    containerID);
-//        }
-//    }
-
     @Override
     public void onResume() {
         super.onResume();
-        dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
-                    containerID);
+	    dataCenter.add(new GetSessionCommand(getActivity(), containerID));
     }
 
     @UiThread

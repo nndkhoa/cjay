@@ -27,6 +27,7 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -114,8 +115,7 @@ public class ReuseActivity extends Activity {
 
             buttonLinearLayout.setVisibility(View.VISIBLE);
             rainyModeButtonLinearLayout.setVisibility(View.GONE);
-
-            dataCenter.getSessionInBackground(this, containerID);
+	        dataCenter.add(new GetSessionCommand(this, containerID));
         } else {
 
             tvContainerId.setVisibility(View.GONE);

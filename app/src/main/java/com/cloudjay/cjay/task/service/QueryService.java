@@ -36,11 +36,11 @@ public class QueryService extends Service implements Command.Callback {
 			task.execute(this);
 
 		} else {
-			Logger.Log("Service stopping!");
+
+			Logger.d("Service stopping!");
 			stopSelf(); // No more tasks are present. Stop.
 		}
 	}
-
 
 	@Override
 	public void onCreate() {
