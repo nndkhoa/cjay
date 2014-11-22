@@ -22,7 +22,8 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
-import com.cloudjay.cjay.task.job.UploadImportJob;
+import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
+import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
@@ -150,11 +151,12 @@ public class ExportFragment extends Fragment {
 			Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
 			return;
 		}
-		dataCenter.removeWorkingSession(getActivity(), containerID);
+
+		dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
 
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadImportJob(mSession));
+		jobManager.addJobInBackground(new UploadSessionJob(mSession));
 
 		// Navigate to HomeActivity
 		getActivity().finish();

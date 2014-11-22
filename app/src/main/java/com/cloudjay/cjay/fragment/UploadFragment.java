@@ -16,6 +16,7 @@ import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.session.get.GetListSessionsCommand;
+import com.cloudjay.cjay.task.command.session.remove.RemoveUploadedSessionsCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 
 import org.androidannotations.annotations.AfterViews;
@@ -112,6 +113,6 @@ public class UploadFragment extends Fragment {
 
 	@OptionsItem(R.id.menu_clear_uploaded)
 	void clearUploadsMenuItemSelected() {
-		dataCenter.removeUploadedSessions(getActivity().getApplicationContext());
+		dataCenter.add(new RemoveUploadedSessionsCommand(getActivity()));
 	}
 }

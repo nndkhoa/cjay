@@ -17,11 +17,7 @@ import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
 import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
 import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
-import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
-import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
-import com.cloudjay.cjay.event.session.ContainersGotEvent;
-import com.cloudjay.cjay.event.session.UploadedContainerRemoved;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
@@ -53,7 +49,6 @@ import com.snappydb.SnappydbException;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
-import org.androidannotations.annotations.Trace;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -183,6 +178,84 @@ public class DataCenter {
 			return session;
 		}
 	}
+
+	public boolean removeSession(Context context, String containerId, String prefix) {
+		try {
+			DB db = App.getDB(context);
+			String key = prefix + containerId;
+			db.del(key);
+			return true;
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public void addSession(Context context, Session session) {
+
+		DB db = null;
+		String key = session.getContainerId();
+		Session object = null;
+
+		// Check if this container is existed in DB
+		try {
+			db = App.getDB(context);
+			object = db.getObject(key, Session.class);
+
+			Logger.Log("Container " + session.getContainerId() + " is existed in db");
+			object.mergeSession(session);
+			object.setUploadStatus(UploadStatus.COMPLETE);
+			db.put(key, object);
+
+		} catch (SnappydbException e) {
+
+			// This container is not exist in db, so we add it to db
+			try {
+				// Only localize container if it is from server
+				if (session.getId() != 0)
+					object = session.changeToLocalFormat();
+
+				db.put(key, object);
+			} catch (SnappydbException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+			EventBus.getDefault().post(new UploadSucceededEvent(object, UploadType.SESSION));
+		}
+	}
+
+	public void addSession(Context context, Session session, String prefix) {
+		try {
+			DB db = App.getDB(context);
+			String key = prefix + session.getContainerId();
+			db.put(key, session);
+
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * Use it to add existed container from Collection Normal to another collection. e.g. UPLOAD, WORKING
+	 * @param context
+	 * @param containerId
+	 * @param prefix
+	 */
+	public void addSession(Context context, String containerId, String prefix) {
+		try {
+
+			DB db = App.getDB(context);
+			Session session = db.getObject(containerId, Session.class);
+			String key = prefix + containerId;
+			db.put(key, session);
+
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
+
+
 
 	//region USER
 
@@ -796,49 +869,6 @@ public class DataCenter {
 			e.printStackTrace();
 		}
 	}
-
-	/**
-	 * @param context
-	 * @param containerId
-	 */
-	@Background(serial = CACHE, delay = 50)
-	public void removeWorkingSession(Context context, String containerId) {
-
-		try {
-			DB db = App.getDB(context);
-
-			String workingKey = CJayConstant.PREFIX_WORKING + containerId;
-			db.del(workingKey);
-
-			Logger.Log("REMOVE container " + containerId + " from Working collection");
-
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Background(serial = CACHE, delay = 50)
-	public void removeUploadedSessions(Context context) {
-
-		try {
-			DB db = App.getDB(context);
-			String[] keys = db.findKeys(CJayConstant.PREFIX_UPLOADING);
-
-			for (String key : keys) {
-				String t = key.substring(CJayConstant.PREFIX_UPLOADING.length(), key.length());
-				Session object = db.getObject(t, Session.class);
-				if (object.getUploadStatus() == UploadStatus.COMPLETE.value) {
-					db.del(key);
-					Logger.Log(" > Remove container from upload collection: " + key);
-				}
-			}
-
-			EventBus.getDefault().post(new UploadedContainerRemoved());
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-	}
-
 
 	@Background(serial = CACHE, delay = 50)
 	public void changeStatusWhenUpload(Context context, Session session, UploadType uploadType, UploadStatus uploadStatus) {

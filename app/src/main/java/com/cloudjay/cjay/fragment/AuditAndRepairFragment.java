@@ -12,7 +12,6 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
-import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
 import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
@@ -23,7 +22,7 @@ import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionForUploadCommand;
 import com.cloudjay.cjay.task.command.session.update.ChangeSessionLocalStepCommand;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
-import com.cloudjay.cjay.task.job.UploadImportJob;
+import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.Step;
@@ -142,7 +141,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
             }
 
 			JobManager jobManager = App.getJobManager();
-			jobManager.addJobInBackground(new UploadImportJob(mSession));
+			jobManager.addJobInBackground(new UploadSessionJob(mSession));
 
 			// Hide this button
 			btnCompleteAudit.setVisibility(View.GONE);
@@ -176,7 +175,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			// Add containerId to upload complete repair queue
 			// PUT /api/cjay/containers/{pk}/complete-repair
 			JobManager jobManager = App.getJobManager();
-			jobManager.addJobInBackground(new UploadImportJob(mSession));
+			jobManager.addJobInBackground(new UploadSessionJob(mSession));
 
 			// Navigate to HomeActivity
 			getActivity().finish();

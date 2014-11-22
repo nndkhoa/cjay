@@ -3,6 +3,8 @@ package com.cloudjay.cjay.task.command.session.remove;
 import android.content.Context;
 
 import com.cloudjay.cjay.App;
+import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.task.command.Command;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -20,16 +22,7 @@ public class RemoveWorkingSessionCommand extends Command {
 
     @Override
     public void run() {
-        try {
-            DB db = App.getDB(context);
-
-            String workingKey = CJayConstant.PREFIX_WORKING + containerId;
-            db.del(workingKey);
-
-            Logger.Log("REMOVE container " + containerId + " from Working collection");
-
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
+	    DataCenter dataCenter = DataCenter_.getInstance_(context);
+	    dataCenter.removeSession(context, containerId, CJayConstant.PREFIX_WORKING);
     }
 }

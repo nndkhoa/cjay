@@ -29,8 +29,8 @@ import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
-import com.cloudjay.cjay.task.job.UploadImportJob;
-import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
+import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
@@ -109,13 +109,14 @@ public class IssuePendingFragment extends Fragment {
 	void buttonCleanClicked() {
 
 		//Remove from working
-		dataCenter.removeWorkingSession(getActivity(), containerId);
+		dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerId));
+
 		//Change step to Clean
 		mSession.setLocalStep(Step.HAND_CLEAN.value);
 
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadImportJob(mSession));
+		jobManager.addJobInBackground(new UploadSessionJob(mSession));
 		getActivity().finish();
 	}
 

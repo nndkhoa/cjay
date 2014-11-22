@@ -21,7 +21,7 @@ import com.path.android.jobqueue.Params;
 import de.greenrobot.event.EventBus;
 import retrofit.RetrofitError;
 
-public class UploadImportJob extends Job {
+public class UploadSessionJob extends Job {
 
 	Session mSession;
 
@@ -33,7 +33,7 @@ public class UploadImportJob extends Job {
 		return 1;
 	}
 
-	public UploadImportJob(Session session) {
+	public UploadSessionJob(Session session) {
 
 		super(new Params(Priority.MID).requireNetwork().persist().groupBy(session.getContainerId()).setPersistent(true));
 

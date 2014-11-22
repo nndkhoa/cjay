@@ -34,11 +34,12 @@ import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
+import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.AddSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.AddWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.get.SearchCommand;
 import com.cloudjay.cjay.task.job.UploadImageJob;
-import com.cloudjay.cjay.task.job.UploadImportJob;
+import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
@@ -365,12 +366,12 @@ public class ImportFragment extends Fragment {
 
 		//Remove from working
 		if (clearFromWorking) {
-			dataCenter.removeWorkingSession(getActivity(), mSession.getContainerId());
+			dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
 		}
 
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadImportJob(mSession));
+		jobManager.addJobInBackground(new UploadSessionJob(mSession));
 	}
 
 	@Touch(R.id.et_operator)

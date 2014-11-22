@@ -903,20 +903,26 @@ public class Session implements Serializable {
 	 */
 	public Session changeToLocalFormat() {
 
-        Logger.w("inside changeToLocalFormat");
-
 		this.setLocalStep(this.getStep());
 		for (GateImage gateImage : this.getGateImages()) {
+
+			if (TextUtils.isEmpty(gateImage.getUuid())) {
+				gateImage.setUuid(UUID.randomUUID().toString());
+			}
+
 			gateImage.setName(Utils.getImageNameFromUrl(gateImage.getUrl()));
 			gateImage.setUploadStatus(UploadStatus.COMPLETE.value);
-			gateImage.setUuid(UUID.randomUUID().toString());
 		}
 
 		for (AuditItem auditItem : this.getAuditItems()) {
-			//Logger.Log(auditItem.getModifiedAt());
-			auditItem.setUuid(UUID.randomUUID().toString());
+
+			if (TextUtils.isEmpty(auditItem.getUuid())) {
+				auditItem.setUuid(UUID.randomUUID().toString());
+			}
+
 			auditItem.setUploadStatus(UploadStatus.COMPLETE.value);
             auditItem.setAudited(true);
+
 			for (AuditImage auditImage : auditItem.getAuditImages()) {
 				auditImage.setName(Utils.getImageNameFromUrl(auditImage.getUrl()));
 				auditImage.setUploadStatus(UploadStatus.COMPLETE.value);
@@ -927,6 +933,7 @@ public class Session implements Serializable {
                     break;
                 }
 			}
+
 		}
 
 		return this;
