@@ -319,7 +319,6 @@ public class NetworkClient {
 	 */
 	public AuditItem addAuditImage(Context context, AuditItem auditItem) {
 
-
 		String uuid = auditItem.getUuid();
         JsonObject addedAuditImagesToUpload = auditItem.getAddedAuditImagesToUpload();
 

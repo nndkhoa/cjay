@@ -18,20 +18,16 @@ import org.androidannotations.annotations.Bean;
 
 import de.greenrobot.event.EventBus;
 
-public class SaveUploadAuditItemSessionCommand extends Command {
-    DataCenter dataCenter;
+public class UpdateAuditItemCommand extends Command {
 
     private String containerId;
     private Context context;
-    private UploadType type;
-    private AuditItem result;
+	private AuditItem result;
 
-    public SaveUploadAuditItemSessionCommand(Context context, AuditItem result, UploadType type, String containerId) {
+    public UpdateAuditItemCommand(Context context, AuditItem result, String containerId) {
         this.context = context;
         this.containerId = containerId;
-        this.type = type;
-        this.result = result;
-	    this.dataCenter = DataCenter_.getInstance_(context);
+	    this.result = result;
     }
 
     @Override
@@ -40,16 +36,16 @@ public class SaveUploadAuditItemSessionCommand extends Command {
         String key = containerId;
         Session object = null;
         try {
-            db = App.getDB(context);
 
+            db = App.getDB(context);
             object = db.getObject(key, Session.class);
             object.updateAuditItem(result);
-//            dataCenter.saveSession(context, object, type);
+	        db.put(key, object);
 
         } catch (SnappydbException e) {
             Logger.wtf(e.getMessage());
         } finally {
-            EventBus.getDefault().post(new UploadSucceededEvent(object, UploadType.SESSION));
+            EventBus.getDefault().post(new UploadSucceededEvent(object, UploadType.AUDIT_ITEM));
         }
     }
 }
