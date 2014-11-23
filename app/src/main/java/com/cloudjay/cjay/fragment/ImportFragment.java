@@ -34,6 +34,7 @@ import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.image.DeleteRainyImageCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.AddUploadingSessionCommand;
@@ -510,7 +511,8 @@ public class ImportFragment extends Fragment {
         uploadImportSession(false);
 
         // Delete selected image
-        dataCenter.deleteRainyImage(getActivity().getApplicationContext(), imageUrls);
+        dataCenter.add(new DeleteRainyImageCommand(
+                getActivity().getApplicationContext(), imageUrls));
     }
 
     @UiThread

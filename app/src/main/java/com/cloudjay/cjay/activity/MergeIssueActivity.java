@@ -7,6 +7,8 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.AuditMergeIssueAdapter;
 import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
 import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.task.command.image.AddAuditImageCommand;
+import com.cloudjay.cjay.util.enums.AddAuditImageType;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -71,8 +73,9 @@ public class MergeIssueActivity extends BaseActivity {
 
 		AuditItem auditItem = mAdapter.getItem(position);
 		String uuid = auditItem.getUuid();
-		dataCenter.addAuditImageToAuditedItem(getApplicationContext(), containerID,
-				uuid, auditItemRemoveUUID, auditImageUUID);
+		dataCenter.add(new AddAuditImageCommand(getApplicationContext(), containerID,
+                uuid, auditItemRemoveUUID, auditImageUUID,
+                AddAuditImageType.ADD_AUDIT_IMAGE_TO_EXISTED_ISSUE.value));
 		refresh();
 
 		this.finish();
