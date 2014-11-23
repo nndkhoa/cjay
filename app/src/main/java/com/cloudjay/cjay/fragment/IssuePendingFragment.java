@@ -342,9 +342,9 @@ public class IssuePendingFragment extends Fragment {
 		if (event.uploadType == UploadType.AUDIT_ITEM) {
 
 		}
+
 		mSession = event.getSession();
 		refresh();
-
 	}
 
 	@UiThread

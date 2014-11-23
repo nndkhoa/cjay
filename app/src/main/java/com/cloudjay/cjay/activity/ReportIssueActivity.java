@@ -29,6 +29,7 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.util.Logger;
 
@@ -138,9 +139,8 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
             mAuditItem.setRepairCodeId(repairCode.getId());
             mAuditItem.setRepairCode(repairCode.getCode());
 
-            Logger.Log("update");
             // save db records and refresh list
-            dataCenter.updateAuditItemInBackground(getApplicationContext(), mContainerId, mAuditItem);
+	        dataCenter.add(new UpdateAuditItemCommand(this, mContainerId, mAuditItem));
         }
     }
 

@@ -9,7 +9,6 @@ import android.widget.Button;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
-import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
@@ -18,6 +17,7 @@ import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionForUploadCommand;
 import com.cloudjay.cjay.task.command.session.update.ChangeSessionLocalStepCommand;
@@ -122,8 +122,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
                     if (auditItem.getId() == 0 && auditItem.isAudited()) {
                         Logger.Log("Set upload confirmed for audit item: " + auditItem.toString());
                         auditItem.setUploadConfirmed(true);
-                        DataCenter_.getInstance_(getActivity()).updateAuditItemInBackground(getActivity(),
-                                mSession.getContainerId(), auditItem);
+	                    dataCenter.add(new UpdateAuditItemCommand(getActivity(), mSession.getContainerId(), auditItem));
                     }
                 }
             } else {

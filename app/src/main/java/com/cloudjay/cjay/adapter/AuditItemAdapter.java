@@ -25,6 +25,7 @@ import com.cloudjay.cjay.activity.ReportIssueActivity_;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -207,10 +208,9 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 					// Cần kiểm tra xem import đã xong hay chưa
 					// Nếu chưa thì add field
 					if (session.getId() == 0) {
-
 						Logger.Log("Set upload confirmed for audit item: " + auditItem.toString());
 						auditItem.setUploadConfirmed(true);
-						DataCenter_.getInstance_(mContext).updateAuditItemInBackground(mContext, session.getContainerId(), auditItem);
+						DataCenter_.getInstance_(mContext).add(new UpdateAuditItemCommand(mContext, session.getContainerId(), auditItem));
 					} else {
 						//2. Add container session to upload queue
 						JobManager jobManager = App.getJobManager();

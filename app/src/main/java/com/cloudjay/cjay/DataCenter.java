@@ -706,7 +706,7 @@ public class DataCenter {
 	}
 
 	@Background(serial = CACHE, delay = 50)
-	void processListSession(Context context, List<Session> sessions) {
+	public void processListSession(Context context, List<Session> sessions) {
 		DB db;
 		try {
 			db = App.getDB(context);
@@ -963,10 +963,6 @@ public class DataCenter {
 		}
 	}
 
-	public void addOrUpdateAuditImage() {
-
-	}
-
 	/**
 	 * Change upload status of given image
 	 *
@@ -1032,10 +1028,6 @@ public class DataCenter {
 				}
 
 				db.put(key, session);
-
-//				if (status == UploadStatus.COMPLETE) {
-//					EventBus.getDefault().post(new UploadSucceededEvent(containerId, UploadType.IMAGE));
-//				}
 			}
 		} catch (SnappydbException e) {
 			e.printStackTrace();
@@ -1310,27 +1302,10 @@ public class DataCenter {
 			session.updateAuditItem(auditItem);
 			db.put(containerId, session);
 			return true;
+
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 			return false;
-		}
-	}
-
-	@Background(serial = CACHE, delay = 50)
-	public void updateAuditItemInBackground(Context context, String containerId, AuditItem auditItem) {
-		Logger.Log("updateAuditItemInBackground");
-		try {
-			// find session
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
-			session.updateAuditItem(auditItem);
-			db.put(containerId, session);
-
-			// Notify that an audit item is updated
-			EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
-
-		} catch (SnappydbException e) {
-			e.printStackTrace();
 		}
 	}
 
