@@ -23,6 +23,8 @@ import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
+import com.cloudjay.cjay.task.command.session.update.AddUploadingSessionCommand;
+import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -152,7 +154,12 @@ public class ExportFragment extends Fragment {
 			return;
 		}
 
+		// Add to Uploading
+		dataCenter.add(new AddUploadingSessionCommand(getActivity(), mSession));
 		dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
+
+		mSession.prepareForUploading();
+		dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
 
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();

@@ -75,9 +75,9 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 		}
 
 		//Set data to view
-        if (session.getGateImages().get(0).getUrl() != null) {
-            ImageLoader.getInstance().displayImage(session.getGateImages().get(0).getUrl(), viewHolder.ivContainer);
-        }
+		if (session.getGateImages().get(0).getUrl() != null) {
+			ImageLoader.getInstance().displayImage(session.getGateImages().get(0).getUrl(), viewHolder.ivContainer);
+		}
 		viewHolder.tvContainerId.setText(session.getContainerId());
 		viewHolder.tvTotalPhotoUpload.setText(String.valueOf(Utils.countTotalImage(session)));
 		viewHolder.tvCurrentPhotoUpload.setText(String.valueOf(Utils.countUploadedImage(session)));
@@ -120,7 +120,9 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 						viewHolder.btnUploadStatus.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View view) {
-								uploadCurrentStep(session);
+
+								// TODO: #tieubao command this line, need to double check this method
+								// uploadCurrentStep(session);
 							}
 						});
 					}
@@ -148,8 +150,9 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 				}
 
 				jobManager.addJobInBackground(new UploadSessionJob(session));
+				break;
 
-				// In step audit check all image of item, upload all error image then upload error audit item => complete audit
+			// In step audit check all image of item, upload all error image then upload error audit item => complete audit
 			case AUDIT:
 
 				for (AuditItem item : session.getAuditItems()) {
@@ -160,13 +163,14 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 							}
 						}
 					}
-					jobManager.addJobInBackground(new UploadAuditItemJob(session.getId(), item,session.getContainerId(),
-                            false));
+					jobManager.addJobInBackground(new UploadAuditItemJob(session.getId(), item, session.getContainerId(),
+							false));
 				}
 
 				jobManager.addJobInBackground(new UploadSessionJob(session));
+				break;
 
-				// In step repaired check all image of item, upload all error image then upload error repaired item => complete repair
+			// In step repaired check all image of item, upload all error image then upload error repaired item => complete repair
 			case REPAIR:
 				for (AuditItem item : session.getAuditItems()) {
 					if (item.getUploadStatus() == UploadStatus.ERROR.value) {
@@ -179,9 +183,12 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 					jobManager.addJobInBackground(new UploadSessionJob(session));
 				}
 				jobManager.addJobInBackground(new UploadSessionJob(session));
+				break;
 
-				//In step export check all image, upload all error image then upload session
 			case EXPORTED:
+			default:
+				//In step export check all image, upload all error image then upload session
+
 				for (GateImage image : session.getGateImages()) {
 					if (image.getType() == ImageType.EXPORT.value && image.getUploadStatus() != UploadStatus.ERROR.value) {
 						jobManager.addJobInBackground(new UploadImageJob(image.getUrl(), image.getName(), session.getContainerId(), ImageType.EXPORT));
@@ -189,6 +196,7 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 					;
 				}
 				jobManager.addJobInBackground(new UploadSessionJob(session));
+				break;
 		}
 	}
 

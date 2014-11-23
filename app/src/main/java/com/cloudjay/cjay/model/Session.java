@@ -938,4 +938,34 @@ public class Session implements Serializable {
 
 		return this;
 	}
+
+	public Session prepareForUploading () {
+
+		Step step = Step.values()[localStep];
+
+		// Change local step
+		switch (step) {
+			case IMPORT:
+				setLocalStep(Step.AUDIT.value);
+				break;
+
+			case AUDIT:
+				setLocalStep(Step.REPAIR.value);
+				break;
+
+			case AVAILABLE:
+				setLocalStep(Step.EXPORTED.value);
+				break;
+
+			case REPAIR:
+			default:
+				setLocalStep(Step.AVAILABLE.value);
+				break;
+		}
+
+		//Change upload status
+		setUploadStatus(UploadStatus.UPLOADING);
+
+		return this;
+	}
 }

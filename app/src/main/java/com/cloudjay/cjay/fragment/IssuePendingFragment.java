@@ -30,6 +30,7 @@ import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
+import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
@@ -113,6 +114,8 @@ public class IssuePendingFragment extends Fragment {
 
 		//Change step to Clean
 		mSession.setLocalStep(Step.HAND_CLEAN.value);
+		mSession.prepareForUploading();
+		dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
 
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();

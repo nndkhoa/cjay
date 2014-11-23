@@ -21,6 +21,7 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionForUploadCommand;
 import com.cloudjay.cjay.task.command.session.update.ChangeSessionLocalStepCommand;
+import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
@@ -140,6 +141,9 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
                 }
             }
 
+			mSession.prepareForUploading();
+			dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
+
 			JobManager jobManager = App.getJobManager();
 			jobManager.addJobInBackground(new UploadSessionJob(mSession));
 
@@ -171,6 +175,9 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			} else {
 				Utils.showCrouton(getActivity(), "Sth goes wrong. Container Id " + containerID + " not found");
 			}
+
+			mSession.prepareForUploading();
+			dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
 
 			// Add containerId to upload complete repair queue
 			// PUT /api/cjay/containers/{pk}/complete-repair

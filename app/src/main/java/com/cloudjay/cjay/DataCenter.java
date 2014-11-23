@@ -271,40 +271,10 @@ public class DataCenter {
 		}
 	}
 
-	public void prepareForUploading(Context context, Session session, Step step) {
-
-		addLog(context, session.getContainerId(), step.name() + " | Add container vào Queue", CJayConstant.PREFIX_LOG);
-
-		// Change local step
-		switch (step) {
-			case IMPORT:
-				session.setLocalStep(Step.AUDIT.value);
-				break;
-
-			case AUDIT:
-				session.setLocalStep(Step.REPAIR.value);
-				break;
-
-			case AVAILABLE:
-				session.setLocalStep(Step.EXPORTED.value);
-				break;
-
-			case REPAIR:
-			default:
-				session.setLocalStep(Step.AVAILABLE.value);
-				break;
-		}
-
-		//Change upload status
-		session.setUploadStatus(UploadStatus.UPLOADING);
-		DataCenter_.getInstance_(context).add(new AddUploadingSessionCommand(context, session));
-		EventBus.getDefault().post(new UploadStartedEvent(session, UploadType.SESSION));
-	}
-
 	public Session uploadSession(Context context, Session session, Step uploadStep) throws SnappydbException {
-
 		Logger.Log("Begin to upload container: " + session.getContainerId() + " | Step: " + uploadStep.name());
 		addLog(context, session.getContainerId(), uploadStep.name() + " | Bắt đầu quá trình upload", CJayConstant.PREFIX_LOG);
+		EventBus.getDefault().post(new UploadStartedEvent(session, UploadType.SESSION));
 		switch (uploadStep) {
 			case IMPORT:
 				return networkClient.uploadSession(context, session);
