@@ -4,15 +4,15 @@ import com.cloudjay.cjay.model.Operator;
 
 public class OperatorChosenEvent {
 
-    private Operator operator;
+	private Operator operator;
 
-    public OperatorChosenEvent(Operator operator) {
-        this.operator = operator;
-    }
+	public OperatorChosenEvent(Operator operator) {
+		this.operator = operator;
+	}
 
-    public Operator getOperator() {
-        return operator;
-    }
+	public Operator getOperator() {
+		return operator;
+	}
 
 
 }

@@ -5,11 +5,12 @@ import android.content.Context;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
-import com.cloudjay.cjay.event.upload.PreUploadStartedEvent;
-import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
-import com.cloudjay.cjay.event.upload.UploadingEvent;
+import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.Command;
+import com.cloudjay.cjay.task.command.session.update.PrepareForUploadingCommand;
+import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Priority;
@@ -21,7 +22,7 @@ import com.path.android.jobqueue.Params;
 import de.greenrobot.event.EventBus;
 import retrofit.RetrofitError;
 
-public class UploadSessionJob extends Job {
+public class UploadSessionJob extends Job implements Command.Callback {
 
 	Session mSession;
 
@@ -39,26 +40,29 @@ public class UploadSessionJob extends Job {
 
 		// step is local step
 		this.mSession = session;
+	}
+
+	@Override
+	public boolean safeRun(int currentRunCount) {
+		return super.safeRun(currentRunCount);
 
 	}
 
 	/**
 	 * 1. Thêm container session vào list upload
 	 * 2. Notify cho Upload Fragment để cập nhật UI
-	 * 3. Tự động thay đổi local currentStep đến level kế tiếp
+	 * 3. Tự động thay đổi local currentStep đến stage kế tiếp
 	 * 4. Remove from Working tab if needed
 	 */
 	@Override
 	public void onAdded() {
 
-		// TODO: Change status to Uploading --> outside
-
-		Context context = App.getInstance().getApplicationContext();
 		Step step = Step.values()[mSession.getLocalStep()];
-		DataCenter_.getInstance_(context).addLog(context, mSession.getContainerId(), step.name() + " | Add container vào Queue", CJayConstant.PREFIX_LOG);
+		Context context = App.getInstance().getApplicationContext();
+		DataCenter dataCenter = DataCenter_.getInstance_(context);
 
-		EventBus.getDefault().post(new PreUploadStartedEvent(mSession, UploadType.SESSION));
-		EventBus.getDefault().post(new UploadStartedEvent(mSession, UploadType.SESSION));
+		// Change local step and post Upload Started Event also
+		dataCenter.add(new PrepareForUploadingCommand(context, mSession));
 	}
 
 	/**
@@ -71,40 +75,19 @@ public class UploadSessionJob extends Job {
 
 	@Override
 	public void onRun() throws Throwable {
-
-		EventBus.getDefault().post(new UploadingEvent(mSession.getContainerId(), UploadType.SESSION));
+		EventBus.getDefault().register(this);
 
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
 
-		Step step = Step.values()[mSession.getLocalStep()];
-		dataCenter.addLog(context, mSession.getContainerId(), step.name() + " | Bắt đầu quá trình upload",CJayConstant.PREFIX_LOG);
-
 		// Bắt đầu quá trình upload
+		Step step = Step.values()[mSession.getLocalStep()];
+		Session response = dataCenter.uploadSession(context, mSession, step);
+		dataCenter.add(new SaveSessionCommand(context, response, UploadType.SESSION));
 
-		switch (step) {
-			case AVAILABLE:
-				dataCenter.uploadExportSession(context, mSession);
-				break;
-
-			case AUDIT:
-				dataCenter.uploadAuditSession(context, mSession);
-				break;
-
-			case REPAIR:
-				dataCenter.uploadRepairSession(context, mSession);
-				break;
-
-			case IMPORT:
-				dataCenter.uploadImportSession(context, mSession);
-				break;
-
-			default:
-				dataCenter.setHandCleaningSession(context, mSession);
-				break;
-		}
-
-		dataCenter.addLog(context, mSession.getContainerId(), "Upload container thành công",CJayConstant.PREFIX_LOG);
+		// Notify to upload fragment
+		dataCenter.addLog(context, response.getContainerId(), "Upload container thành công", CJayConstant.PREFIX_LOG);
+		EventBus.getDefault().post(new UploadSucceededEvent(response, UploadType.SESSION));
 	}
 
 	/**
@@ -118,7 +101,7 @@ public class UploadSessionJob extends Job {
 
 		if (throwable instanceof RetrofitError) {
 			Context context = App.getInstance().getApplicationContext();
-			DataCenter_.getInstance_(context).addLog(context, mSession.getContainerId(), "Upload bị gián đoạn",CJayConstant.PREFIX_LOG);
+			DataCenter_.getInstance_(context).addLog(context, mSession.getContainerId(), "Upload bị gián đoạn", CJayConstant.PREFIX_LOG);
 
 			//if it is a 4xx error, stop
 			RetrofitError retrofitError = (RetrofitError) throwable;
@@ -137,8 +120,17 @@ public class UploadSessionJob extends Job {
 	protected void onCancel() {
 
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).addLog(context, mSession.getContainerId(), "Upload thất bại",CJayConstant.PREFIX_LOG);
-
+		DataCenter_.getInstance_(context).addLog(context, mSession.getContainerId(), "Upload thất bại", CJayConstant.PREFIX_LOG);
 		EventBus.getDefault().post(new UploadStoppedEvent(mSession));
+	}
+
+	@Override
+	public void onSuccess(String url) {
+
+	}
+
+	@Override
+	public void onFailure(Throwable e) {
+
 	}
 }

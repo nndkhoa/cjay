@@ -1,5 +1,6 @@
 package com.cloudjay.cjay.task.command;
 
+import com.snappydb.SnappydbException;
 import com.squareup.tape.Task;
 
 import org.androidannotations.annotations.EBean;
@@ -15,7 +16,7 @@ public abstract class Command implements Task<Command.Callback> {
 		void onFailure(Throwable e);
 	}
 
-	protected abstract void run();
+	protected abstract void run() throws SnappydbException;
 
 	@Override
 	public void execute(Callback callback) {
@@ -25,6 +26,5 @@ public abstract class Command implements Task<Command.Callback> {
 		} catch (Throwable e) {
 			callback.onFailure(e);
 		}
-
 	}
 }

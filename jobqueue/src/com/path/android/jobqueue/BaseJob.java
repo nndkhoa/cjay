@@ -98,7 +98,7 @@ abstract public class BaseJob implements Serializable {
      * @param currentRunCount
      * @return
      */
-    public final boolean safeRun(int currentRunCount) {
+    public boolean safeRun(int currentRunCount) {
         this.currentRunCount = currentRunCount;
         if (JqLog.isDebugEnabled()) {
             JqLog.d("running job %s", this.getClass().getSimpleName());

@@ -10,15 +10,15 @@ public class WorkingSessionCreatedEvent {
 
 	Session session;
 
+	public WorkingSessionCreatedEvent(Session current) {
+		this.session = current;
+	}
+
 	public Session getSession() {
 		return session;
 	}
 
 	public void setSession(Session session) {
 		this.session = session;
-	}
-
-	public WorkingSessionCreatedEvent(Session current) {
-		this.session = current;
 	}
 }

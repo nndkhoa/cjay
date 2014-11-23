@@ -8,34 +8,8 @@ import java.util.List;
 
 public class ContainerSearchedEvent {
 
-	public List<Session> getSessions() {
-		return sessions;
-	}
-
-	public List<Session> getTargets() {
-		return sessions;
-	}
-
-    public boolean searchInImportFragment;
-
-	public Session getTarget() {
-		if (isSingleChange()) {
-			return sessions.get(0);
-		} else {
-			throw new IllegalStateException("Can only call this when isSingleChange returns true");
-		}
-	}
-
+	public boolean searchInImportFragment;
 	private List<Session> sessions;
-
-	public boolean isFailed() {
-		return failed;
-	}
-
-	public void setFailed(boolean failed) {
-		this.failed = failed;
-	}
-
 	private boolean failed = false;
 
 	public ContainerSearchedEvent(List<Session> sessions) {
@@ -46,16 +20,40 @@ public class ContainerSearchedEvent {
 		this.failed = failed;
 	}
 
+	public ContainerSearchedEvent(List<Session> sessions, boolean searchInImportFragment) {
+		this.sessions = sessions;
+		this.searchInImportFragment = searchInImportFragment;
+	}
+
+	public List<Session> getSessions() {
+		return sessions;
+	}
+
+	public List<Session> getTargets() {
+		return sessions;
+	}
+
+	public Session getTarget() {
+		if (isSingleChange()) {
+			return sessions.get(0);
+		} else {
+			throw new IllegalStateException("Can only call this when isSingleChange returns true");
+		}
+	}
+
+	public boolean isFailed() {
+		return failed;
+	}
+
+	public void setFailed(boolean failed) {
+		this.failed = failed;
+	}
+
 	public boolean isSingleChange() {
 		return sessions.size() == 1;
 	}
 
-    public boolean isSearchInImportFragment() {
-        return this.searchInImportFragment;
-    }
-
-    public ContainerSearchedEvent(List<Session> sessions, boolean searchInImportFragment) {
-        this.sessions = sessions;
-        this.searchInImportFragment = searchInImportFragment;
-    }
+	public boolean isSearchInImportFragment() {
+		return this.searchInImportFragment;
+	}
 }

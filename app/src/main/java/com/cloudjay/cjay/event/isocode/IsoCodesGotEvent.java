@@ -9,20 +9,20 @@ import java.util.List;
  */
 public class IsoCodesGotEvent {
 
-    private List<IsoCode> isoCodes;
-    private String prefix;
+	private List<IsoCode> isoCodes;
+	private String prefix;
 
-    public IsoCodesGotEvent(List<IsoCode> isoCodes, String prefix) {
-        this.isoCodes = isoCodes;
-        this.prefix = prefix;
-    }
+	public IsoCodesGotEvent(List<IsoCode> isoCodes, String prefix) {
+		this.isoCodes = isoCodes;
+		this.prefix = prefix;
+	}
 
-    public List<IsoCode> getListIsoCodes() {
-        return this.isoCodes;
-    }
+	public List<IsoCode> getListIsoCodes() {
+		return this.isoCodes;
+	}
 
-    public String getPrefix() {
-        return this.prefix;
-    }
+	public String getPrefix() {
+		return this.prefix;
+	}
 
 }

@@ -4,9 +4,9 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.enums.UploadType;
 
 public class UploadSucceededEvent {
-	private Session session;
 	public UploadType uploadType;
 	public String containerId;
+	private Session session;
 
 	public UploadSucceededEvent(Session session, UploadType type) {
 		this.session = session;

@@ -44,7 +44,7 @@ public class SaveUploadAuditItemSessionCommand extends Command {
 
             object = db.getObject(key, Session.class);
             object.updateAuditItem(result);
-            dataCenter.saveSession(context, object, type);
+//            dataCenter.saveSession(context, object, type);
 
         } catch (SnappydbException e) {
             Logger.wtf(e.getMessage());
