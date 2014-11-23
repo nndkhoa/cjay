@@ -37,6 +37,7 @@ import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.task.command.image.AddGateImageCommand;
 import com.cloudjay.cjay.task.command.image.AddOrUpdateAuditImageCommand;
+import com.cloudjay.cjay.task.command.image.AddRainyImageCommand;
 import com.cloudjay.cjay.task.job.UploadImageJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -739,7 +740,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
             case IMPORT:
                 if (rainyMode) {
                     uri = "file://" + uri;
-                    dataCenter.saveRainyImage(getApplicationContext(), uuid, uri);
+                    dataCenter.add(new AddRainyImageCommand(getApplicationContext(),
+                            uuid, uri));
                     return;
                 }
             case EXPORT:

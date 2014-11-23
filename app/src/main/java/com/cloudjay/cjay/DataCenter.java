@@ -868,7 +868,6 @@ public class DataCenter {
 	 * @param auditItemRemove
 	 * @param auditImageUUID
 	 */
-	@Background(serial = CACHE, delay = 50)
 	public void addAuditImageToAuditedItem(Context context,
 	                                       String containerId,
 	                                       String auditItemUUID,
@@ -1101,7 +1100,6 @@ public class DataCenter {
 		}
 	}
 
-	@Background(serial = CACHE, delay = 50)
 	public void saveRainyImage(Context context, String uuid, String rainyImageUrl) {
 		try {
 			DB db = App.getDB(context);
@@ -1111,8 +1109,7 @@ public class DataCenter {
 		}
 	}
 
-	@Background(serial = CACHE, delay = 50)
-	public void getRainyImages(Context context) {
+	public ArrayList<String> getRainyImages(Context context) {
 		try {
 			DB db = App.getDB(context);
 
@@ -1122,15 +1119,13 @@ public class DataCenter {
 			for (int i = 0; i < keys.length; i++) {
 				imageUrls.add(db.get(keys[i]));
 			}
-
-			EventBus.getDefault().post(new RainyImagesGotEvent(imageUrls));
-
+            return imageUrls;
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
+        return null;
 	}
 
-	@Background(serial = CACHE, delay = 50)
 	public void deleteRainyImage(Context context, ArrayList<String> imageUrls) {
 		try {
 			DB db = App.getDB(context);
@@ -1143,9 +1138,6 @@ public class DataCenter {
 					db.del(CJayConstant.PREFIX_RAINY_MODE_IMAGE + uuid);
 				}
 			}
-
-			EventBus.getDefault().post(new RainyImagesDeletedEvent());
-
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}

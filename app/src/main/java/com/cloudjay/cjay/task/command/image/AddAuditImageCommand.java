@@ -13,16 +13,44 @@ public class AddAuditImageCommand extends Command {
 	Context context;
 	AuditImage image;
 	String containerId;
+    int type;
 
-	public AddAuditImageCommand(Context context, AuditImage image, String containerId) {
+    String auditItenUUID;
+    String auditImageUUID;
+    String auditItemRemove;
+
+    public AddAuditImageCommand(Context context, AuditImage image, String containerId, int type) {
 		this.containerId = containerId;
 		this.context = context;
 		this.image = image;
+        this.type = type;
 	}
+
+    public AddAuditImageCommand(Context context,
+                                String containerId,
+                                String auditItemUUID,
+                                String auditItemRemove,
+                                String auditImageUUID,
+                                int type) {
+        this.context = context;
+        this.containerId = containerId;
+        this.auditItenUUID = auditItemUUID;
+        this.auditItemRemove = auditItemRemove;
+        this.auditImageUUID = auditImageUUID;
+        this.type = type;
+    }
 
 	@Override
 	protected void run() {
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
-		dataCenter.addAuditImage(context, image, containerId);
+        switch (type) {
+            case 0:
+                dataCenter.addAuditImage(context, image, containerId);
+                break;
+            default:
+                dataCenter.addAuditImageToAuditedItem(context, containerId, auditItenUUID,
+                        auditItemRemove, auditImageUUID);
+        }
+
 	}
 }

@@ -28,9 +28,11 @@ import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.image.AddAuditImageCommand;
+import com.cloudjay.cjay.task.command.image.GetRainyImagesCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.enums.AddAuditImageType;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
@@ -140,7 +142,7 @@ public class ReuseActivity extends Activity {
             gvReuseImages.setAdapter(mAdapter);
 
             // get rainy image
-            dataCenter.getRainyImages(getApplicationContext());
+            dataCenter.add(new GetRainyImagesCommand(getApplicationContext()));
 
             Intent intent = getIntent();
             if (null == intent.getAction()) {
@@ -315,7 +317,8 @@ public class ReuseActivity extends Activity {
                     .withName(name)
                     .withUUID(UUID.randomUUID().toString());
 
-	        dataCenter.add(new AddAuditImageCommand(this, auditImage, containerID));
+	        dataCenter.add(new AddAuditImageCommand(this, auditImage, containerID,
+                    AddAuditImageType.ADD_AUDIT_IMAGE_TO_NEW_ISSUE.value));
         }
 
         Intent resultIntent = new Intent();

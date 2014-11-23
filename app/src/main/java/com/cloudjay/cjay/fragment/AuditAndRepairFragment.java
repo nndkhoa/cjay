@@ -102,8 +102,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 	public void onEvent(ContainerForUploadGotEvent event) {
 		mSession = event.getTarget();
 
-        Utils.showCrouton(getActivity(), getResources().getString(R.string.warning_container_invalid));
-
 		// Xu ly cho session da duoc Giam Dinh
 		if (mSession.getLocalStep() == Step.AUDIT.value) {
 			if (mSession != null) {
@@ -195,11 +193,12 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 	@Click(R.id.btn_complete_audit)
 	void btnCompleteAuditClicked() {
-        if (!mIsUploading) {
-	        dataCenter.add(new GetSessionForUploadCommand(getActivity(), containerID));
-        } else {
-            Utils.showCrouton(getActivity(), "Vui lòng chờ quá trình tải lên hoàn tất");
-        }
+//        if (!mIsUploading) {
+//	        dataCenter.add(new GetSessionForUploadCommand(getActivity(), containerID));
+//        } else {
+//            Utils.showCrouton(getActivity(), "Vui lòng chờ quá trình tải lên hoàn tất");
+//        }
+        dataCenter.add(new GetSessionForUploadCommand(getActivity(), containerID));
 	}
 
 	@Click(R.id.btn_complete_repair)
