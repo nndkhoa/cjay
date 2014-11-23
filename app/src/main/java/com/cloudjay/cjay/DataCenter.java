@@ -197,7 +197,7 @@ public class DataCenter {
 	 * @param context
 	 * @param session
 	 */
-	public void addOrUpdateSession(Context context, Session session) {
+	public boolean addOrUpdateSession(Context context, Session session) {
 
 		DB db = null;
 		String key = session.getContainerId();
@@ -220,14 +220,17 @@ public class DataCenter {
 				// Only localize container if it is from server
 				if (session.getId() != 0) {
                     object = session.changeToLocalFormat();
-                    db.put(key, session);
+                    db.put(key, object);
                 } else {
                     db.put(key, session);
                 }
 			} catch (SnappydbException e1) {
-				e1.printStackTrace();
+				Logger.w(e1.getMessage());
+				return false;
 			}
 		}
+
+		return true;
 	}
 
 	/**
@@ -1035,7 +1038,6 @@ public class DataCenter {
 	 * @param status
 	 * @throws SnappydbException
 	 */
-	@Background(serial = CACHE, delay = 50)
 	public void changeImageUploadStatus(Context context, String containerId, String imageName, ImageType imageType, UploadStatus status) {
 		try {
 			DB db = App.getDB(context);
@@ -1091,9 +1093,10 @@ public class DataCenter {
 				}
 
 				db.put(key, session);
-				if (status == UploadStatus.COMPLETE) {
-					EventBus.getDefault().post(new UploadSucceededEvent(containerId, UploadType.IMAGE));
-				}
+
+//				if (status == UploadStatus.COMPLETE) {
+//					EventBus.getDefault().post(new UploadSucceededEvent(containerId, UploadType.IMAGE));
+//				}
 			}
 		} catch (SnappydbException e) {
 			e.printStackTrace();
@@ -1156,10 +1159,8 @@ public class DataCenter {
 	 * @throws SnappydbException
 	 */
 	public void uploadImage(String uri, String imageName) throws SnappydbException {
-
 		//Call network client to upload image
 		networkClient.uploadImage(uri, imageName);
-
 	}
 
 	/**

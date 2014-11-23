@@ -30,9 +30,10 @@ import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.session.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.fragment.dialog.AddContainerDialog;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.command.session.update.AddSessionCommand;
+
 import com.cloudjay.cjay.task.command.session.update.AddWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.get.SearchCommand;
+import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringUtils;
@@ -381,7 +382,7 @@ public class SearchFragment extends Fragment {
 
 		// Save normal session and working session.
 		// add working session also post an event
-		dataCenter.add(new AddSessionCommand(getActivity(), session));
+		dataCenter.add(new SaveSessionCommand(getActivity(), session));
 		dataCenter.add(new AddWorkingSessionCommand(getActivity(), session));
 	}
 
