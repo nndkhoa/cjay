@@ -38,6 +38,7 @@ import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand
 import com.cloudjay.cjay.task.command.session.update.AddSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.AddWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.get.SearchCommand;
+import com.cloudjay.cjay.task.command.session.update.UpdateImportSessionCommand;
 import com.cloudjay.cjay.task.job.UploadImageJob;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -203,23 +204,11 @@ public class ImportFragment extends Fragment {
             mSession.setGateImages(list);
         }
 
+		// Save session
         if (!rainyMode) {
-			// Save session
-			dataCenter.updateImportSession(mSession);
+	        dataCenter.add(new UpdateImportSessionCommand(getActivity(), mSession));
 		}
 	}
-
-	/**
-	 * Event được trigger khi chụp hình xong bấm nút Done ở camera.
-	 * Refresh container session.
-	 *
-	 * @param
-	 */
-//  @UiThread
-//	void onEvent(ImageCapturedEvent event) {
-//		refresh();
-//	}
-
 
     @Override
     public void onResume() {
@@ -399,7 +388,7 @@ public class ImportFragment extends Fragment {
 
 			if (!rainyMode) {
 				mSession.setPreStatus(preStatus);
-				dataCenter.updateImportSession(mSession);
+				dataCenter.add(new UpdateImportSessionCommand(getActivity(), mSession));
 				dataCenter.add(new AddWorkingSessionCommand(getActivity(), mSession));
 
 				btnContinue.setVisibility(View.GONE);
@@ -415,7 +404,7 @@ public class ImportFragment extends Fragment {
 
 			if (!rainyMode) {
 				mSession.setPreStatus(preStatus);
-				dataCenter.updateImportSession(mSession);
+				dataCenter.add(new UpdateImportSessionCommand(getActivity(), mSession));
 				dataCenter.add(new AddWorkingSessionCommand(getActivity(), mSession));
 
 				btnContinue.setVisibility(View.VISIBLE);
@@ -430,7 +419,7 @@ public class ImportFragment extends Fragment {
 
 			if (!rainyMode) {
 				mSession.setPreStatus(preStatus);
-				dataCenter.updateImportSession(mSession);
+				dataCenter.add(new UpdateImportSessionCommand(getActivity(), mSession));
 				dataCenter.add(new AddWorkingSessionCommand(getActivity(), mSession));
 
 				btnContinue.setVisibility(View.VISIBLE);

@@ -31,7 +31,6 @@ public class ChangeSessionLocalStepCommand extends Command {
     public void run() {
         DB db;
         try {
-
             db = App.getDB(context);
             Session session = db.getObject(containerId, Session.class);
             session.setLocalStep(step.value);

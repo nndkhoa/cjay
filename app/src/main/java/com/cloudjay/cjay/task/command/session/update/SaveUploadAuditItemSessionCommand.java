@@ -36,7 +36,7 @@ public class SaveUploadAuditItemSessionCommand extends Command {
 
     @Override
     public void run() {
-        DB db = null;
+        DB db;
         String key = containerId;
         Session object = null;
         try {

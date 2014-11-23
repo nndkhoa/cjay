@@ -22,7 +22,7 @@ import com.path.android.jobqueue.Params;
 import de.greenrobot.event.EventBus;
 import retrofit.RetrofitError;
 
-public class UploadSessionJob extends Job implements Command.Callback {
+public class UploadSessionJob extends Job {
 
 	Session mSession;
 
@@ -35,17 +35,8 @@ public class UploadSessionJob extends Job implements Command.Callback {
 	}
 
 	public UploadSessionJob(Session session) {
-
 		super(new Params(Priority.MID).requireNetwork().persist().groupBy(session.getContainerId()).setPersistent(true));
-
-		// step is local step
 		this.mSession = session;
-	}
-
-	@Override
-	public boolean safeRun(int currentRunCount) {
-		return super.safeRun(currentRunCount);
-
 	}
 
 	/**
@@ -57,7 +48,6 @@ public class UploadSessionJob extends Job implements Command.Callback {
 	@Override
 	public void onAdded() {
 
-		Step step = Step.values()[mSession.getLocalStep()];
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
 
@@ -122,15 +112,5 @@ public class UploadSessionJob extends Job implements Command.Callback {
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter_.getInstance_(context).addLog(context, mSession.getContainerId(), "Upload thất bại", CJayConstant.PREFIX_LOG);
 		EventBus.getDefault().post(new UploadStoppedEvent(mSession));
-	}
-
-	@Override
-	public void onSuccess(String url) {
-
-	}
-
-	@Override
-	public void onFailure(Throwable e) {
-
 	}
 }

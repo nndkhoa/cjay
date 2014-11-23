@@ -27,7 +27,7 @@ public class AddLogCommand extends Command {
 	protected void run() {
 
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
-		dataCenter.addSession(context, session);
+		dataCenter.addOrUpdateSession(context, session);
 
 		try {
 			DB db = App.getDB(context);

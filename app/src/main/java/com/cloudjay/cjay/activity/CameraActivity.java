@@ -35,6 +35,8 @@ import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
+import com.cloudjay.cjay.task.command.image.AddGateImageCommand;
+import com.cloudjay.cjay.task.command.image.AddOrUpdateAuditImageCommand;
 import com.cloudjay.cjay.task.job.UploadImageJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -748,7 +750,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
                         .withUrl("file://" + uri)
                         .withUuid(uuid);
 
-                dataCenter.addGateImage(getApplicationContext(), gateImage, containerId);
+	            dataCenter.add(new AddGateImageCommand(this, gateImage, containerId));
                 break;
 
             case AUDIT:
@@ -763,8 +765,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
                         .withName(imageName)
                         .withUUID(uuid);
 
-                dataCenter.getAuditItemInBackground(getApplicationContext(), containerId, auditItemUUID);
-
+				dataCenter.add(new AddOrUpdateAuditImageCommand(this, auditImage, containerId, auditItemUUID));
                 break;
         }
 
@@ -852,27 +853,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
             case REPAIRED:
             default:
                 return "repair";
-        }
-    }
-
-    @UiThread
-    public void onEvent(AuditItemGotEvent event) {
-
-        AuditItem auditItem = event.getAuditItem();
-
-        // Create temporary audit item
-        if (null == auditItem) {
-            Logger.Log("Create new Audit Item: " + auditImage.getType());
-            dataCenter.addAuditImage(getApplicationContext(), auditImage, containerId);
-
-        } else {
-
-            auditItem.getAuditImages().add(auditImage);
-            if (mType == ImageType.REPAIRED.value) {
-                auditItem.setRepaired(true);
-            }
-
-            dataCenter.updateAuditItemInBackground(getApplicationContext(), containerId, auditItem);
         }
     }
 

@@ -3,6 +3,8 @@ package com.cloudjay.cjay.task.command.issue;
 import android.content.Context;
 
 import com.cloudjay.cjay.App;
+import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
@@ -26,19 +28,12 @@ public class UpdateAuditItemCommand extends Command {
 
     @Override
     public void run() {
-        Logger.Log("updateAuditItemInBackground");
-        try {
-            // find session
-            DB db = App.getDB(context);
-            Session session = db.getObject(containerId, Session.class);
-            session.updateAuditItem(auditItem);
-            db.put(containerId, session);
+	    DataCenter dataCenter = DataCenter_.getInstance_(context);
+	    boolean success = dataCenter.updateAuditItem(context, containerId, auditItem);
 
-            // Notify that an audit item is updated
-            EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
-
-        } catch (SnappydbException e) {
-            e.printStackTrace();
-        }
+	    // Notify that an audit item is updated
+	    if (success) {
+		    EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
+	    }
     }
 }

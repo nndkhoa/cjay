@@ -17,6 +17,7 @@ import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
 import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
 import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
+import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
@@ -31,9 +32,7 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.task.command.Command;
 import com.cloudjay.cjay.task.command.CommandQueue;
-import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.AddUploadingSessionCommand;
-import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -44,7 +43,6 @@ import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
-import com.path.android.jobqueue.JobManager;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
@@ -193,7 +191,13 @@ public class DataCenter {
 		}
 	}
 
-	public void addSession(Context context, Session session) {
+	/**
+	 * Use it to add container session that received from server
+	 *
+	 * @param context
+	 * @param session
+	 */
+	public void addOrUpdateSession(Context context, Session session) {
 
 		DB db = null;
 		String key = session.getContainerId();
@@ -242,7 +246,6 @@ public class DataCenter {
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
@@ -317,6 +320,7 @@ public class DataCenter {
 				return networkClient.setHandCleaningSession(context, session);
 		}
 	}
+
 	//region USER
 
 	/**
@@ -391,13 +395,11 @@ public class DataCenter {
 	 * @throws SnappydbException
 	 */
 	public void fetchOperators(Context context) throws SnappydbException {
-
 		DB db = App.getDB(context);
 		List<Operator> operators = networkClient.getOperators(context, null);
 		for (Operator operator : operators) {
 			db.put(CJayConstant.PREFIX_OPERATOR + operator.getOperatorCode(), operator);
 		}
-
 	}
 
 	/**
@@ -405,21 +407,19 @@ public class DataCenter {
 	 *
 	 * @param keyword
 	 */
-	@Background(serial = CACHE, delay = 50)
-	public void searchOperator(String keyword) {
+	public List<Operator> searchOperator(Context context, String keyword) {
+		List<Operator> operators = new ArrayList<>();
 		try {
-			List<Operator> operators = new ArrayList<>();
 			DB db = App.getDB(context);
 			String[] keysResult = db.findKeys(CJayConstant.PREFIX_OPERATOR + keyword);
 			for (String result : keysResult) {
 				Operator operator = db.getObject(result, Operator.class);
 				operators.add(operator);
 			}
-
-			EventBus.getDefault().post(new OperatorsGotEvent(operators));
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
+		return operators;
 	}
 
 	/**
@@ -688,7 +688,7 @@ public class DataCenter {
 			Logger.w(e.getMessage());
 			Logger.w("Received new container session from server: " + result.getContainerId());
 			result.changeToLocalFormat();
-//			addSession(result);
+//			addOrUpdateSession(result);
 			return result;
 
 		}
@@ -739,7 +739,6 @@ public class DataCenter {
 
 		String newModifiedDay;
 		do {
-
 			int nextPage;
 			String currentPage = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE);
 
@@ -750,11 +749,8 @@ public class DataCenter {
 			}
 
 			List<Session> sessions = networkClient.getSessionByPage(context, nextPage, lastModifiedDate);
-			processListSession(sessions);
-
+			processListSession(context, sessions);
 			newModifiedDay = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
-//			Logger.Log("Fetched page: " + nextPage);
-//			Logger.Log("Current Modified day: " + newModifiedDay);
 
 		} while (lastModifiedDate.equals(newModifiedDay));
 
@@ -768,7 +764,7 @@ public class DataCenter {
 	}
 
 	@Background(serial = CACHE, delay = 50)
-	void processListSession(List<Session> sessions) {
+	void processListSession(Context context, List<Session> sessions) {
 		DB db;
 		try {
 			db = App.getDB(context);
@@ -783,7 +779,7 @@ public class DataCenter {
 				} else {
 					if (searchResult.length == 0) {
 						session.changeToLocalFormat();
-//						addSession(session);
+						addOrUpdateSession(context, session);
 					} else {
 						Session local = db.getObject(key, Session.class);
 						local.mergeSession(session);
@@ -811,7 +807,6 @@ public class DataCenter {
 	public void searchAsync(Context context, String keyword, boolean searchInImportFragment) {
 
 		try {
-
 			Logger.Log("Begin to search container from server");
 			List<Session> sessions = networkClient.searchSessions(context, keyword);
 
@@ -820,72 +815,43 @@ public class DataCenter {
 
 				for (Session session : sessions) {
 					String key = session.getContainerId();
-
 					session.changeToLocalFormat();
-
 					db.put(key, session);
 				}
 			}
 
 			EventBus.getDefault().post(new ContainerSearchedEvent(sessions, searchInImportFragment));
 		} catch (SnappydbException e) {
-
 			Logger.w(e.getMessage());
-
 		} catch (RetrofitError error) {
 			EventBus.getDefault().post(new ContainerSearchedEvent(true));
 		}
 	}
 
-	@Background(serial = CACHE, delay = 50)
-	public void updateImportSession(Session session) {
+	public void updateImportSession(Context context, Session session) {
 		DB db = null;
+		String key = session.getContainerId();
 		try {
+
 			db = App.getDB(context);
-
 			Session oldSession = db.getObject(session.getContainerId(), Session.class);
-
 			oldSession.setOperatorId(session.getOperatorId());
 			oldSession.setOperatorCode(session.getOperatorCode());
 			oldSession.setPreStatus(session.getPreStatus());
-
-			// Add normal session
-			String key = session.getContainerId();
 			db.put(key, oldSession);
 
 		} catch (SnappydbException e) {
-			e.printStackTrace();
-			String key = session.getContainerId();
+			Logger.w(e.getMessage());
 			try {
 				db.put(key, session);
 			} catch (SnappydbException e1) {
 				e1.printStackTrace();
 			}
 		} finally {
-			this.add(new GetSessionCommand(context, session.getContainerId()));
-		}
-	}
 
-	/**
-	 * Add container session vào list uploading session in database
-	 *
-	 * @param containerId
-	 * @throws SnappydbException
-	 */
-
-	public void addUploadSession(String containerId) {
-
-		try {
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
-			String key = CJayConstant.PREFIX_UPLOADING + containerId;
-			db.put(key, session);
-
-			Step step = Step.values()[session.getLocalStep()];
-			Logger.Log("Add container " + session.getContainerId() + " | " + step.name() + " to Upload collection");
-
-		} catch (SnappydbException e) {
-			e.printStackTrace();
+			// Notify to Import Fragment
+			getSession(context, key);
+			EventBus.getDefault().post(new ContainerGotEvent(session, key));
 		}
 	}
 
@@ -987,13 +953,9 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	@Background(serial = CACHE, delay = 50)
 	public void addGateImage(Context context, GateImage image, String containerId) {
-
 		try {
 			DB db = App.getDB(context);
-
-			// Add gate image to normal container session
 			Session session = db.getObject(containerId, Session.class);
 			session.getGateImages().add(image);
 
@@ -1012,7 +974,6 @@ public class DataCenter {
 	 * @param containerId
 	 * @throws SnappydbException
 	 */
-	@Background(serial = CACHE, delay = 50)
 	public void addAuditImage(Context context, AuditImage auditImage, String containerId) {
 
 		try {
@@ -1059,6 +1020,10 @@ public class DataCenter {
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void addOrUpdateAuditImage() {
+
 	}
 
 	/**
@@ -1397,6 +1362,20 @@ public class DataCenter {
 		}
 
 		EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
+	}
+
+	public boolean updateAuditItem(Context context, String containerId, AuditItem auditItem) {
+		try {
+			// find session
+			DB db = App.getDB(context);
+			Session session = db.getObject(containerId, Session.class);
+			session.updateAuditItem(auditItem);
+			db.put(containerId, session);
+			return true;
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	@Background(serial = CACHE, delay = 50)

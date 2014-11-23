@@ -16,6 +16,7 @@ import com.cloudjay.cjay.adapter.OperatorAdapter;
 import com.cloudjay.cjay.event.operator.OperatorChosenEvent;
 import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
 import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.task.command.operator.SearchOperatorCommand;
 
 import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
@@ -82,7 +83,7 @@ public class SearchOperatorDialog extends DialogFragment {
 		getDialog().setTitle(getResources().getString(R.string.dialog_operator_title));
 
 //		// Begin to get operators from cache
-		dataCenter.searchOperator("");
+		dataCenter.add(new SearchOperatorCommand(getActivity(), ""));
 
         // show keyboard
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
@@ -97,7 +98,7 @@ public class SearchOperatorDialog extends DialogFragment {
 	@AfterTextChange(R.id.et_operator_name)
 	void search(Editable text) {
 		String keyword = text.toString();
-		dataCenter.searchOperator(keyword);
+		dataCenter.add(new SearchOperatorCommand(getActivity(), keyword));
 	}
 
 	@TextChange(R.id.et_operator_name)

@@ -2,12 +2,11 @@ package com.cloudjay.cjay.task.command.session.update;
 
 import android.content.Context;
 
+import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.Command;
 
-/**
- * Created by nambv on 2014/11/22.
- */
 public class UpdateImportSessionCommand extends Command {
 
     Context context;
@@ -20,6 +19,7 @@ public class UpdateImportSessionCommand extends Command {
 
     @Override
     public void run() {
-
+	    DataCenter dataCenter = DataCenter_.getInstance_(context);
+	    dataCenter.updateImportSession(context, session);
     }
 }
