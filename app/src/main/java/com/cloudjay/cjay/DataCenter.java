@@ -517,8 +517,7 @@ public class DataCenter {
 	 * @param prefix
 	 * @return
 	 */
-	@Background(serial = CACHE, delay = 50)
-	public void getListIsoCodes(Context context, String prefix) {
+	public List<IsoCode> getListIsoCodes(Context context, String prefix) {
 		try {
 			DB db = App.getDB(context);
 			String[] keyResults = db.findKeys(prefix);
@@ -529,11 +528,11 @@ public class DataCenter {
 				isoCodes.add(isoCode);
 			}
 
-			EventBus.getDefault().post(new IsoCodesGotEvent(isoCodes, prefix));
-
+            return isoCodes;
 		} catch (SnappydbException e) {
 			Logger.e(e.getMessage());
 		}
+        return null;
 	}
 
 	/**
@@ -578,19 +577,19 @@ public class DataCenter {
 	 * @param code
 	 * @return
 	 */
-	@Background(serial = CACHE, delay = 50)
-	public void getIsoCode(Context context, String prefix, String code) {
+	public IsoCode getIsoCode(Context context, String prefix, String code) {
 		try {
 			DB db = App.getDB(context);
 			String[] keyResults = db.findKeys(prefix + code);
-
+            IsoCode isoCode = null;
 			if (keyResults.length > 0) {
-				IsoCode isoCode = db.getObject(keyResults[0], IsoCode.class);
-				EventBus.getDefault().post(new IsoCodeGotEvent(isoCode, prefix));
+				isoCode = db.getObject(keyResults[0], IsoCode.class);
 			}
+            return isoCode;
 		} catch (SnappydbException e) {
 			Logger.e(e.getMessage());
 		}
+        return null;
 	}
 
 	@Background(serial = CACHE, delay = 50)

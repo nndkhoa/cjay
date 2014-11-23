@@ -17,6 +17,8 @@ import com.cloudjay.cjay.event.isocode.IsoCodesGotEvent;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.IsoCode;
+import com.cloudjay.cjay.task.command.isocode.GetIsoCodeCommand;
+import com.cloudjay.cjay.task.command.isocode.GetListIsoCodesCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 
@@ -101,8 +103,8 @@ public class IssueReportDamageFragment extends IssueReportFragment {
 		});
 
         // refresh damage list
-        mDataCenter.getListIsoCodes(getActivity().getApplicationContext(),
-                CJayConstant.PREFIX_DAMAGE_CODE);
+        mDataCenter.add(new GetListIsoCodesCommand(getActivity().getApplicationContext(),
+                CJayConstant.PREFIX_DAMAGE_CODE));
 	}
 
     @ItemClick(R.id.lv_damage)
@@ -216,8 +218,8 @@ public class IssueReportDamageFragment extends IssueReportFragment {
 
             // initialize with issue
             if (mAuditItem != null && mAuditItem.getComponentCode() != null) {
-                mDataCenter.getIsoCode(getActivity().getApplicationContext(),
-                        CJayConstant.PREFIX_DAMAGE_CODE, mAuditItem.getDamageCode());
+                mDataCenter.add(new GetIsoCodeCommand(getActivity().getApplicationContext(),
+                        CJayConstant.PREFIX_DAMAGE_CODE, mAuditItem.getDamageCode()));
             }
         }
     }
