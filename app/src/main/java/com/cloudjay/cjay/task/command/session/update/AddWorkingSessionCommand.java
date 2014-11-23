@@ -32,7 +32,7 @@ public class AddWorkingSessionCommand extends Command {
 	@Override
 	protected void run() {
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
-		dataCenter.addSession(context, session, CJayConstant.PREFIX_UPLOADING);
+		dataCenter.addSession(context, session, CJayConstant.PREFIX_WORKING);
 		EventBus.getDefault().post(new WorkingSessionCreatedEvent(session));
 	}
 }
