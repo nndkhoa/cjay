@@ -35,9 +35,9 @@ import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
-import com.cloudjay.cjay.task.command.session.update.AddSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.AddWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.get.SearchCommand;
+import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.UpdateImportSessionCommand;
 import com.cloudjay.cjay.task.job.UploadImageJob;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
@@ -486,7 +486,7 @@ public class ImportFragment extends Fragment {
                 .withGateImages(list)
                 .withLocalStep(Step.IMPORT.value);
 
-	    dataCenter.add(new AddSessionCommand(getActivity(), mSession));
+	    dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
 
         // Add image to job queue
         for (GateImage gateImage : list) {

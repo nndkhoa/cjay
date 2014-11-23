@@ -48,11 +48,6 @@ public class UploadSessionJob extends Job {
 	@Override
 	public void onAdded() {
 
-		Context context = App.getInstance().getApplicationContext();
-		DataCenter dataCenter = DataCenter_.getInstance_(context);
-
-		// Change local step and post Upload Started Event also
-		dataCenter.add(new PrepareForUploadingCommand(context, mSession));
 	}
 
 	/**
@@ -65,17 +60,21 @@ public class UploadSessionJob extends Job {
 
 	@Override
 	public void onRun() throws Throwable {
+
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
+
+		// Change local step and post Upload Started Event also
+		dataCenter.add(new PrepareForUploadingCommand(context, mSession));
 
 		// Bắt đầu quá trình upload
 		Step step = Step.values()[mSession.getLocalStep()];
 		Session response = dataCenter.uploadSession(context, mSession, step);
-		dataCenter.add(new SaveSessionCommand(context, response, UploadType.SESSION));
 
-		// Notify to upload fragment
 		dataCenter.addLog(context, response.getContainerId(), "Upload container thành công", CJayConstant.PREFIX_LOG);
-		EventBus.getDefault().post(new UploadSucceededEvent(response, UploadType.SESSION));
+
+		// Save session and also notify success to Upload Fragment
+		dataCenter.add(new SaveSessionCommand(context, response, UploadType.SESSION));
 	}
 
 	/**

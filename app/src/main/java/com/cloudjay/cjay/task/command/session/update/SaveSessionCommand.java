@@ -2,57 +2,41 @@ package com.cloudjay.cjay.task.command.session.update;
 
 import android.content.Context;
 
-import com.cloudjay.cjay.App;
+import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.Command;
-import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
-import com.snappydb.DB;
-import com.snappydb.SnappydbException;
 
 import de.greenrobot.event.EventBus;
 
+/**
+ * Will be called after upload successfully
+ */
 public class SaveSessionCommand extends Command {
-    Context context;
-    Session session;
-    UploadType uploadType;
+	Context context;
+	Session session;
+	UploadType uploadType = null;
 
-    public SaveSessionCommand(Context context, Session session, UploadType uploadType) {
-        this.context = context;
-        this.session = session;
-        this.uploadType = uploadType;
-    }
+	public SaveSessionCommand(Context context, Session session, UploadType uploadType) {
+		this.context = context;
+		this.session = session;
+		this.uploadType = uploadType;
+	}
 
-    @Override
-    public void run() {
-        DB db = null;
-        String key = session.getContainerId();
-        Session object = null;
-        try {
-            db = App.getDB(context);
+	public SaveSessionCommand(Context context, Session session) {
+		this.context = context;
+		this.session = session;
+		this.uploadType = null;
+	}
 
-            object = db.getObject(key, Session.class);
-            Logger.w("From save session: " + session.getModifiedAt());
+	@Override
+	public void run() {
+		DataCenter dataCenter = DataCenter_.getInstance_(context);
+		boolean success = dataCenter.addOrUpdateSession(context, session);
 
-            object.mergeSession(session);
-            object.setUploadStatus(UploadStatus.COMPLETE);
-
-            db.put(key, object);
-
-        } catch (SnappydbException e) {
-
-            // change session to local
-            Logger.wtf(e.getMessage());
-            try {
-                object = session.changeToLocalFormat();
-                db.put(key, object);
-            } catch (SnappydbException e1) {
-                e1.printStackTrace();
-            }
-        } finally {
-            EventBus.getDefault().post(new UploadSucceededEvent(object, UploadType.SESSION));
-        }
-    }
+		if (uploadType != null && success)
+			EventBus.getDefault().post(new UploadSucceededEvent(session, UploadType.SESSION));
+	}
 }

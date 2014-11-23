@@ -42,9 +42,7 @@ public class UploadAuditItemJob extends Job {
 
 	@Override
 	public void onAdded() {
-
 		EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.AUDIT_ITEM));
-
 	}
 
 	@Override
