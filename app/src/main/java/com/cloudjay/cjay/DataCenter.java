@@ -272,10 +272,12 @@ public class DataCenter {
 	}
 
 	public Session uploadSession(Context context, Session session, Step uploadStep) throws SnappydbException {
+
 		Logger.Log("Begin to upload container: " + session.getContainerId() + " | Step: " + uploadStep.name());
 		addLog(context, session.getContainerId(), uploadStep.name() + " | Bắt đầu quá trình upload", CJayConstant.PREFIX_LOG);
 		EventBus.getDefault().post(new UploadStartedEvent(session, UploadType.SESSION));
 		switch (uploadStep) {
+
 			case IMPORT:
 				return networkClient.uploadSession(context, session);
 

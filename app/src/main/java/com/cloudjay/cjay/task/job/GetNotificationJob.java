@@ -76,7 +76,7 @@ public class GetNotificationJob extends Job {
         Context context = App.getInstance().getApplicationContext();
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification notification = null;
+        Notification notification;
         if (type == 1) {
             notification = new Notification.Builder(context).setContentTitle("Đã cập nhật thông tin")
                     .setContentText(" → Container " + session.getContainerId())

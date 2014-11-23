@@ -35,6 +35,7 @@ import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.JobManager;
 
@@ -113,13 +114,16 @@ public class IssuePendingFragment extends Fragment {
 		dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerId));
 
 		//Change step to Clean
+		mSession.setUploadStatus(UploadStatus.UPLOADING);
 		mSession.setLocalStep(Step.HAND_CLEAN.value);
-		mSession.prepareForUploading();
-		dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
 
 		// Add container session to upload queue
 		JobManager jobManager = App.getJobManager();
 		jobManager.addJobInBackground(new UploadSessionJob(mSession));
+
+//		mSession.prepareForUploading();
+//		dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
+
 		getActivity().finish();
 	}
 

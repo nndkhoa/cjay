@@ -139,11 +139,11 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
                 }
             }
 
-			mSession.prepareForUploading();
-			dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
-
 			JobManager jobManager = App.getJobManager();
 			jobManager.addJobInBackground(new UploadSessionJob(mSession));
+
+			mSession.prepareForUploading();
+			dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
 
 			// Hide this button
 			btnCompleteAudit.setVisibility(View.GONE);

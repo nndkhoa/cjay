@@ -60,12 +60,18 @@ public class UploadSessionJob extends Job {
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
 
-		// Change local step and post Upload Started Event also
-//		dataCenter.add(new PrepareForUploadingCommand(context, mSession));
+		// Tính toán lại giá trị của biến x, là giá trị trước khi đưa vào Queue.
+		// Cần refactor lại code sau khi release.
+		int x = mSession.getLocalStep();
+		if (mSession.getLocalStep() <= 3 && mSession.getLocalStep() >= 1) {
+			x = mSession.getLocalStep() - 1;
+		} else if (mSession.getLocalStep() == 0) {
+			x = 4;
+		}
 
 		// Bắt đầu quá trình upload
-		Step step = Step.values()[mSession.getLocalStep()];
-		Session response = dataCenter.uploadSession(context, mSession, step);
+		Step uploadStep = Step.values()[x];
+		Session response = dataCenter.uploadSession(context, mSession, uploadStep);
 
 		// Save session and also notify success to Upload Fragment
 		dataCenter.add(new AddLogCommand(context, response.getContainerId(), "Upload container thành công", CJayConstant.PREFIX_LOG));

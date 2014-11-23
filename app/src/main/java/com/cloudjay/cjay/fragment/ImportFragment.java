@@ -512,7 +512,7 @@ public class ImportFragment extends Fragment {
 
         // Delete selected image
         dataCenter.add(new DeleteRainyImageCommand(
-                getActivity().getApplicationContext(), imageUrls));
+		        getActivity().getApplicationContext(), imageUrls));
     }
 
     @UiThread

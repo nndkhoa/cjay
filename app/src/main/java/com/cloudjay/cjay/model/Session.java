@@ -945,19 +945,19 @@ public class Session implements Serializable {
 
 		// Change local step
 		switch (step) {
-			case IMPORT:
+			case IMPORT: // 4 -> 0
 				setLocalStep(Step.AUDIT.value);
 				break;
 
-			case AUDIT:
+			case AUDIT: // 0 -> 1
 				setLocalStep(Step.REPAIR.value);
 				break;
 
-			case AVAILABLE:
+			case AVAILABLE: // 2 -> 3
 				setLocalStep(Step.EXPORTED.value);
 				break;
 
-			case REPAIR:
+			case REPAIR: // 1 -> 2
 			default:
 				setLocalStep(Step.AVAILABLE.value);
 				break;
