@@ -201,7 +201,7 @@ public class DataCenter {
 
 		DB db = null;
 		String key = session.getContainerId();
-		Session object = null;
+		Session object;
 
 		// Check if this container is existed in DB
 		try {
@@ -218,15 +218,15 @@ public class DataCenter {
 			// This container is not exist in db, so we add it to db
 			try {
 				// Only localize container if it is from server
-				if (session.getId() != 0)
-					object = session.changeToLocalFormat();
-
-				db.put(key, object);
+				if (session.getId() != 0) {
+                    object = session.changeToLocalFormat();
+                    db.put(key, session);
+                } else {
+                    db.put(key, session);
+                }
 			} catch (SnappydbException e1) {
 				e1.printStackTrace();
 			}
-		} finally {
-			EventBus.getDefault().post(new UploadSucceededEvent(object, UploadType.SESSION));
 		}
 	}
 

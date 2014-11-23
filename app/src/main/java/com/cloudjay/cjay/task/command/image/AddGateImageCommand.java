@@ -28,5 +28,7 @@ public class AddGateImageCommand extends Command {
 	protected void run() {
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
 		dataCenter.addGateImage(context, image, containerId);
+
+        //
 	}
 }

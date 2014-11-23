@@ -65,8 +65,6 @@ public class UploadSessionJob extends Job {
 
 	@Override
 	public void onRun() throws Throwable {
-		EventBus.getDefault().register(this);
-
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
 

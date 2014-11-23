@@ -115,7 +115,7 @@ public class WorkingFragment extends Fragment {
 
 	void refresh() {
 		if (mAdapter != null) {
-			dataCenter.add(new GetListSessionsCommand(getActivity(), CJayConstant.PREFIX_UPLOADING));
+			dataCenter.add(new GetListSessionsCommand(getActivity(), CJayConstant.PREFIX_WORKING));
 		}
 	}
 
