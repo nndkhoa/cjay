@@ -51,6 +51,7 @@ import org.androidannotations.annotations.ItemLongClick;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.SystemService;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -139,6 +140,7 @@ public class SearchFragment extends Fragment {
 	 * User tiến hành tìm kiếm container session
 	 */
 	@Click(R.id.btn_search)
+	@Trace
 	void buttonSearchClicked() {
 		if (!TextUtils.isEmpty(editText.getText())) {
 			performSearch();
@@ -352,7 +354,8 @@ public class SearchFragment extends Fragment {
 	/**
 	 * Begin to search in background
 	 */
-	private void performSearch() {
+	@Trace
+	void performSearch() {
 
 		showProgress(true);
 
@@ -361,6 +364,8 @@ public class SearchFragment extends Fragment {
 
 		// Start search in background
 		containerID = keyword;
+
+		Logger.Log("Begin to call search command.");
 		dataCenter.add(new SearchCommand(getActivity(), keyword, false));
 	}
 

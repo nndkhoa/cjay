@@ -192,7 +192,7 @@ public class PubnubService extends Service {
 					Logger.Log("UUID channel: " + uuidChannel);
 
 				} catch (SnappydbException e) {
-					Logger.w(e.getMessage());
+					e.printStackTrace();
 
 				} catch (NullCredentialException e) {
 

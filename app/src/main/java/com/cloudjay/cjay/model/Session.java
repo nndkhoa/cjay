@@ -774,6 +774,7 @@ public class Session implements Serializable {
         // Difference thường là danh sách hình mới từ server
         List<GateImage> diffGateImages = new ArrayList<>();
         diffGateImages.addAll(gateImages);
+
         //Set upload status for all image get from server is uploaded
         for (GateImage gateImage : newSession.getGateImages()) {
             gateImage.setUploadStatus(UploadStatus.COMPLETE.value);
@@ -806,7 +807,6 @@ public class Session implements Serializable {
 
                 for (AuditItem localItem : auditItems) {
 
-
                     if (serverItem.equals(localItem)) {
                         found = true;
 
@@ -814,6 +814,7 @@ public class Session implements Serializable {
 
                         if (TextUtils.isEmpty(serverItem.getModifiedAt())) {
                             Logger.w("Audit item id: " + serverItem.getId());
+	                        throw new RuntimeException("Cannot find audit item # modified_at attr");
                         } else {
 
                             try {
@@ -841,7 +842,21 @@ public class Session implements Serializable {
 
                 // Nếu không tìm thấy audit item tương ứng ở local --> audit item mới
                 // --> thêm mới audit item vào session
+	            // TODO: should localize server session before merge session
                 if (!found) {
+	                serverItem.setAudited(true);
+	                serverItem.setUuid(UUID.randomUUID().toString());
+	                serverItem.setUploadStatus(UploadStatus.COMPLETE);
+	                for (AuditImage image : serverItem.getAuditImages()) {
+		                image.setName(Utils.getImageNameFromUrl(image.getUrl()));
+		                image.setUuid(Utils.getUuidFromImageName(Utils.getImageNameFromUrl(image.getName())));
+		                image.setUploadStatus(UploadStatus.COMPLETE);
+
+		                if (image.getType() == ImageType.REPAIRED.value) {
+			                serverItem.setRepaired(true);
+		                }
+	                }
+
                     auditItems.add(serverItem);
                     Logger.Log("Add new audit item to session");
                 }
@@ -902,7 +917,7 @@ public class Session implements Serializable {
      * @param session
      * @return
      */
-    public Session changeToLocalFormat() {
+    public Session localize() {
 
         this.setLocalStep(this.getStep());
         for (GateImage gateImage : this.getGateImages()) {

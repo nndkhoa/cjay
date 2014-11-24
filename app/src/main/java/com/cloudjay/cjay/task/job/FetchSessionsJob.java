@@ -5,6 +5,7 @@ import android.content.Context;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.session.ContainersFetchedEvent;
+import com.cloudjay.cjay.task.command.session.FetchSessionsCommand;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 
@@ -35,9 +36,10 @@ public class FetchSessionsJob extends Job {
 		Context context = App.getInstance().getApplicationContext();
 
 		DataCenter_.getInstance_(context).fetchSession(context, modifiedDate, true);
+//		DataCenter_.getInstance_(context).add(new FetchSessionsCommand(context, modifiedDate, true));
 
 		// Notify UI that all data was fetched
-		EventBus.getDefault().post(new ContainersFetchedEvent());
+
 	}
 
 	@Override

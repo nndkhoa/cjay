@@ -151,12 +151,17 @@ public class BaseActivity extends FragmentActivity {
 
     @UiThread
     public void onEvent(PubnubSubscriptionChangedEvent event) {
-        boolean isSubscribed = event.isSubscribed();
-        if (!isSubscribed) {
-            menuPubnubStatus.setIcon(getResources().getDrawable(R.drawable.ic_red));
-        } else {
-            menuPubnubStatus.setIcon(getResources().getDrawable(R.drawable.ic_green));
-        }
+	    try {
+		    boolean isSubscribed = event.isSubscribed();
+		    if (!isSubscribed) {
+			    menuPubnubStatus.setIcon(getResources().getDrawable(R.drawable.ic_red));
+		    } else {
+			    menuPubnubStatus.setIcon(getResources().getDrawable(R.drawable.ic_green));
+		    }
+	    } catch (Exception e) {
+		    e.printStackTrace();
+	    }
+
     }
 
 //	@Override

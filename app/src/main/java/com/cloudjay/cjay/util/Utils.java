@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.cloudjay.cjay.App;
+import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.HomeActivity_;
 import com.cloudjay.cjay.model.AuditImage;
@@ -37,9 +38,13 @@ import com.snappydb.SnappydbException;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.net.ssl.SSLContext;
 
 import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
@@ -123,7 +128,7 @@ public class Utils {
 			DB db = App.getDB(context);
 			db.destroy();
 		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
@@ -155,9 +160,14 @@ public class Utils {
 
 		Logger.w(" -> start Alarm Manager");
 
+		Date date = new Date();   // given date
+		Calendar calendar = GregorianCalendar.getInstance(); // creates a new calendar instance
+		calendar.setTime(date);   // assigns calendar to given date
+		int i = calendar.get(Calendar.HOUR); // gets hour in 12h format
+
 		// start 30 seconds after boot completed
 		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.SECOND, 10);
+		cal.add(Calendar.SECOND, (12 - i) * 3600);
 
 		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 

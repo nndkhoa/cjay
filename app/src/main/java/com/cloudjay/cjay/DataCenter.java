@@ -2,6 +2,7 @@ package com.cloudjay.cjay;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.StrictMode;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.activity.WizardActivity;
@@ -98,11 +99,11 @@ public class DataCenter {
 	 * @throws SnappydbException
 	 * @throws NullCredentialException
 	 */
+	// TODO: add to command
 	public User getUser(Context context) throws SnappydbException, NullCredentialException {
 
 		DB db = App.getDB(context);
 		User user = db.getObject(CJayConstant.PREFIX_USER, User.class);
-
 
 		if (null == user) {
 			return getCurrentUserAsync(context);
@@ -289,7 +290,7 @@ public class DataCenter {
 			db.put(key, isoCode);
 
 		} catch (SnappydbException e) {
-			Logger.e(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
@@ -313,7 +314,7 @@ public class DataCenter {
 
 			return isoCodes;
 		} catch (SnappydbException e) {
-			Logger.e(e.getMessage());
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -370,7 +371,7 @@ public class DataCenter {
 			}
 			return isoCode;
 		} catch (SnappydbException e) {
-			Logger.e(e.getMessage());
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -413,7 +414,7 @@ public class DataCenter {
 
             return true;
         } catch (SnappydbException e) {
-            Logger.e(e.getMessage());
+            e.printStackTrace();
         }
 
         return false;
@@ -471,10 +472,10 @@ public class DataCenter {
 	 *
 	 * @param context
 	 * @param lastModifiedDate
-	 * @param refetchWithFistPageTime
+	 * @param refetchWithFirstPageTime
 	 */
 	@Trace
-	public void fetchSession(Context context, String lastModifiedDate, boolean refetchWithFistPageTime) {
+	public void fetchSession(Context context, String lastModifiedDate, boolean refetchWithFirstPageTime) {
 
 		String newModifiedDay;
 		do {
@@ -490,6 +491,9 @@ public class DataCenter {
 			Logger.Log("At page: " + nextPage);
 
 			List<Session> sessions = networkClient.getSessionByPage(context, nextPage, lastModifiedDate);
+
+//			processListSession(context, sessions);
+
 			add(new AddListSessionsCommand(context, sessions));
 			newModifiedDay = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
 
@@ -497,7 +501,7 @@ public class DataCenter {
 
 		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE, "");
 
-		if (refetchWithFistPageTime) {
+		if (refetchWithFirstPageTime) {
 
 			//Fetch again with modified day is first page request_time
 			String firstPageTime = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_FIRST_PAGE_MODIFIED_DATE);
@@ -521,7 +525,7 @@ public class DataCenter {
 					}
 				} else {
 					if (searchResult.length == 0) {
-						session.changeToLocalFormat();
+						session.localize();
 						addOrUpdateSession(context, session);
 					} else {
 						Session local = db.getObject(key, Session.class);
@@ -558,14 +562,14 @@ public class DataCenter {
 
 				for (Session session : sessions) {
 					String key = session.getContainerId();
-					session.changeToLocalFormat();
+					session.localize();
 					db.put(key, session);
 				}
 			}
 
 			EventBus.getDefault().post(new ContainerSearchedEvent(sessions, searchInImportFragment));
 		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
+			e.printStackTrace();
 		} catch (RetrofitError error) {
 			EventBus.getDefault().post(new ContainerSearchedEvent(true));
 		}
@@ -579,7 +583,7 @@ public class DataCenter {
 			String key = containerId;
 			session = db.getObject(key, Session.class);
 		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
+			e.printStackTrace();
 		} finally {
 			return session;
 		}
@@ -596,7 +600,7 @@ public class DataCenter {
 			db = App.getDB(context);
 			keysResult = db.findKeys(prefix);
 		} catch (SnappydbException e) {
-			Logger.e(e.getMessage());
+			e.printStackTrace();
 		}
 
 		for (String result : keysResult) {
@@ -626,7 +630,7 @@ public class DataCenter {
 			db = App.getDB(context);
 			keysResult = db.findKeys(prefix + keyword);
 		} catch (SnappydbException e) {
-			Logger.e(e.getMessage());
+			e.printStackTrace();
 		}
 
 		for (String result : keysResult) {
@@ -662,7 +666,7 @@ public class DataCenter {
 			session = db.getObject(key, Session.class);
 
 		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
+			e.printStackTrace();
 		} finally {
 			return session;
 		}
@@ -707,7 +711,7 @@ public class DataCenter {
 			try {
 				// Only localize container if it is from server
 				if (session.getId() != 0) {
-					object = session.changeToLocalFormat();
+					object = session.localize();
 					db.put(key, object);
 				} else {
 					db.put(key, session);
@@ -805,7 +809,7 @@ public class DataCenter {
 			Logger.Log("add AuditImage To AuditedIssue successfully");
 
 		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
+			e.printStackTrace();
 		}
 
 		EventBus.getDefault().post(new IssueMergedEvent(containerId, auditItemRemove));
@@ -1142,7 +1146,7 @@ public class DataCenter {
 
 			return logUploads;
 		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -1168,7 +1172,7 @@ public class DataCenter {
 
 			return logUploads;
 		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -1206,7 +1210,7 @@ public class DataCenter {
 			db.put(key, log);
 
 		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 	//endregion
@@ -1371,6 +1375,7 @@ public class DataCenter {
 	public void getAuditItemAsyncById(Context context, long id) throws SnappydbException {
 
 		AuditItem auditItem = networkClient.getAuditItemById(id);
+
 		if (auditItem != null) {
 			long sessionId = auditItem.getSession();
 			getSessionAsyncById(context, sessionId, 1);
