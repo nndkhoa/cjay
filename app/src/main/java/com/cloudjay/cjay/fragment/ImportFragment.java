@@ -29,7 +29,6 @@ import com.cloudjay.cjay.event.image.RainyImagesGotEvent;
 import com.cloudjay.cjay.event.operator.OperatorChosenEvent;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
-import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
@@ -41,7 +40,6 @@ import com.cloudjay.cjay.task.command.session.update.AddUploadingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.AddWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.get.SearchCommand;
 import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
-import com.cloudjay.cjay.task.command.session.update.UpdateImportSessionCommand;
 import com.cloudjay.cjay.task.job.UploadImageJob;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -49,7 +47,6 @@ import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
-import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
@@ -210,7 +207,7 @@ public class ImportFragment extends Fragment {
 
 		// Save session
         if (!rainyMode) {
-	        dataCenter.add(new UpdateImportSessionCommand(getActivity(), mSession));
+	        dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
 		}
 	}
 
@@ -398,7 +395,7 @@ public class ImportFragment extends Fragment {
 
 			if (!rainyMode) {
 				mSession.setPreStatus(preStatus);
-				dataCenter.add(new UpdateImportSessionCommand(getActivity(), mSession));
+				dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
 				dataCenter.add(new AddWorkingSessionCommand(getActivity(), mSession));
 
 				btnContinue.setVisibility(View.GONE);
@@ -414,7 +411,7 @@ public class ImportFragment extends Fragment {
 
 			if (!rainyMode) {
 				mSession.setPreStatus(preStatus);
-				dataCenter.add(new UpdateImportSessionCommand(getActivity(), mSession));
+				dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
 				dataCenter.add(new AddWorkingSessionCommand(getActivity(), mSession));
 
 				btnContinue.setVisibility(View.VISIBLE);
@@ -429,7 +426,7 @@ public class ImportFragment extends Fragment {
 
 			if (!rainyMode) {
 				mSession.setPreStatus(preStatus);
-				dataCenter.add(new UpdateImportSessionCommand(getActivity(), mSession));
+				dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
 				dataCenter.add(new AddWorkingSessionCommand(getActivity(), mSession));
 
 				btnContinue.setVisibility(View.VISIBLE);

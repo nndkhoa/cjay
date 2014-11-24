@@ -226,33 +226,6 @@ public class DataCenter {
 		return true;
 	}
 
-	public void updateImportSession(Context context, Session session) {
-		DB db = null;
-		String key = session.getContainerId();
-		try {
-
-			db = App.getDB(context);
-			Session oldSession = db.getObject(session.getContainerId(), Session.class);
-			oldSession.setOperatorId(session.getOperatorId());
-			oldSession.setOperatorCode(session.getOperatorCode());
-			oldSession.setPreStatus(session.getPreStatus());
-			db.put(key, oldSession);
-
-		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
-			try {
-				db.put(key, session);
-			} catch (SnappydbException e1) {
-				e1.printStackTrace();
-			}
-		} finally {
-
-			// Notify to Import Fragment
-			getSession(context, key);
-			EventBus.getDefault().post(new ContainerGotEvent(session, key));
-		}
-	}
-
 	/**
 	 * Use it to add existed container from Collection Normal to another collection. e.g. UPLOAD, WORKING
 	 *
