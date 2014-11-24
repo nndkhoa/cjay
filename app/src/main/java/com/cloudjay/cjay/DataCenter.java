@@ -40,6 +40,7 @@ import com.snappydb.SnappydbException;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
+import org.androidannotations.annotations.Trace;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -472,6 +473,7 @@ public class DataCenter {
 	 * @param lastModifiedDate
 	 * @param refetchWithFistPageTime
 	 */
+	@Trace
 	public void fetchSession(Context context, String lastModifiedDate, boolean refetchWithFistPageTime) {
 
 		String newModifiedDay;
@@ -503,6 +505,7 @@ public class DataCenter {
 	}
 
 	public void processListSession(Context context, List<Session> sessions) {
+
 		DB db;
 		try {
 			db = App.getDB(context);
@@ -693,7 +696,7 @@ public class DataCenter {
 			object = db.getObject(key, Session.class);
 			object.mergeSession(session);
 			object.setUploadStatus(UploadStatus.COMPLETE);
-            Logger.e("Local step: "+object.getLocalStep());
+            Logger.e("Local step: " + object.getLocalStep());
 			db.put(key, object);
 
 		} catch (SnappydbException e) {

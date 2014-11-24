@@ -747,7 +747,7 @@ public class Session implements Serializable {
      */
     public Session mergeSession(Session newSession) {
 
-
+	    Logger.Log(" > Merge session: " + newSession.getContainerId());
 
         this.setId(newSession.getId());
         this.setStep(newSession.getStep());
@@ -759,16 +759,12 @@ public class Session implements Serializable {
 
         //Merge local step from client
         if (-1 != newSession.getLocalStep()) {
-            Logger.e("Local step before merge: " + this.getLocalStep());
-            Logger.e("Local step before merge: " + newSession.getLocalStep());
             this.setLocalStep(newSession.getLocalStep());
-            Logger.e("Local step merged: " + this.getLocalStep());
         }
 
         //Merge local step from server should always greater or equal to step
         if (this.getLocalStep() < newSession.getStep() && -1 == newSession.getLocalStep()) {
             this.setLocalStep(newSession.getStep());
-            Logger.e("Local step merged: " + this.getLocalStep());
         }
 
         // Merge Gate Images
