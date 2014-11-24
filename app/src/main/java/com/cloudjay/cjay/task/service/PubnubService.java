@@ -15,6 +15,7 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.NotificationItemReceivedEvent;
+import com.cloudjay.cjay.event.pubnub.PubnubSubscriptionChangedEvent;
 import com.cloudjay.cjay.model.NotificationItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
@@ -108,7 +109,7 @@ public class PubnubService extends Service {
 	 * @param channel
 	 * @param message
 	 */
-	private void notifyUser(String channel, Object message) {
+	public void notifyUser(String channel, Object message) {
 
 		Message msg = handler.obtainMessage();
 		try {
@@ -209,22 +210,34 @@ public class PubnubService extends Service {
 
 						@Override
 						public void connectCallback(String channel, Object message) {
+                            // store pref subscribe mode in shared preferences
+                            PreferencesUtil.storePrefsValue(getApplicationContext(),
+                                    PreferencesUtil.PREF_SUBSCRIBE_PUBNUB, true);
 							System.out.println("SUBSCRIBE : CONNECT on channel:" + channel
 									+ " : " + message.getClass() + " : "
 									+ message.toString());
+                            EventBus.getDefault().post(new PubnubSubscriptionChangedEvent(true));
 						}
 
 						@Override
 						public void disconnectCallback(String channel, Object message) {
-							System.out.println("SUBSCRIBE : DISCONNECT on channel:" + channel
+                            // store pref subscribe mode in shared preferences
+                            PreferencesUtil.storePrefsValue(getApplicationContext(),
+                                    PreferencesUtil.PREF_SUBSCRIBE_PUBNUB, false);
+                            System.out.println("SUBSCRIBE : DISCONNECT on channel:" + channel
 									+ " : " + message.getClass() + " : "
 									+ message.toString());
+                            EventBus.getDefault().post(new PubnubSubscriptionChangedEvent(false));
 						}
 
 						public void reconnectCallback(String channel, Object message) {
-							System.out.println("SUBSCRIBE : RECONNECT on channel:" + channel
+                            // store pref subscribe mode in shared preferences
+                            PreferencesUtil.storePrefsValue(getApplicationContext(),
+                                    PreferencesUtil.PREF_SUBSCRIBE_PUBNUB, true);
+                            System.out.println("SUBSCRIBE : RECONNECT on channel:" + channel
 									+ " : " + message.getClass() + " : "
 									+ message.toString());
+                            EventBus.getDefault().post(new PubnubSubscriptionChangedEvent(true));
 						}
 
 						@Override
