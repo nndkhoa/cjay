@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.isocode.IsoCodesGotToUpdateEvent;
+import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.fragment.IssueReportComponentFragment_;
 import com.cloudjay.cjay.fragment.IssueReportDamageFragment_;
@@ -123,27 +124,6 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
         getActionBar().selectTab(getActionBar().getTabAt(TAB_ISSUE_COMPONENT));
     }
 
-    @UiThread
-    void onEvent(IsoCodesGotToUpdateEvent event) {
-        IsoCode componentCode = event.getComponentCode();
-        IsoCode damageCode = event.getDamageCode();
-        IsoCode repairCode = event.getRepairCode();
-
-        if (componentCode != null && damageCode != null && repairCode != null) {
-            mAuditItem.setComponentCodeId(componentCode.getId());
-            mAuditItem.setComponentCode(componentCode.getCode());
-
-            mAuditItem.setDamageCodeId(damageCode.getId());
-            mAuditItem.setDamageCode(damageCode.getCode());
-
-            mAuditItem.setRepairCodeId(repairCode.getId());
-            mAuditItem.setRepairCode(repairCode.getCode());
-
-            // save db records and refresh list
-	        dataCenter.add(new UpdateAuditItemCommand(this, mContainerId, mAuditItem));
-        }
-    }
-
     @OptionsItem(R.id.menu_check)
     void checkMenuItemClicked() {
 
@@ -167,7 +147,9 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
         // Set is allowed is null
         Logger.Log("set null for allowed");
         mAuditItem.setAllowed(null);
-        dataCenter.getIsoCodesToUpdate(getApplicationContext(), codeComponent, codeDamage, codeRepair);
+
+        dataCenter.add(new UpdateAuditItemCommand(getApplicationContext(), mContainerId, mAuditItem,
+                codeComponent, codeDamage, codeRepair));
         // go back
         onBackPressed();
     }

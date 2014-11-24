@@ -561,37 +561,48 @@ public class DataCenter {
 		return null;
 	}
 
-	@Background(serial = CACHE, delay = 50)
-	public void getIsoCodesToUpdate(Context context, String strComponentCode,
-	                                String strDamageCode, String strRepairCode) {
-		try {
+    public boolean updateAuditItem(Context context, String containerId, AuditItem auditItem,
+                                String strComponentCode, String strDamageCode,
+                                String strRepairCode) {
+        try {
 
-			IsoCode componentCode = null;
-			IsoCode damageCode = null;
-			IsoCode repairCode = null;
+            IsoCode componentCode = null;
+            IsoCode damageCode = null;
+            IsoCode repairCode = null;
 
-			DB db = App.getDB(context);
-			String[] keyComponent = db.findKeys(CJayConstant.PREFIX_COMPONENT_CODE + strComponentCode);
-			String[] keyDamage = db.findKeys(CJayConstant.PREFIX_DAMAGE_CODE + strDamageCode);
-			String[] keyRepair = db.findKeys(CJayConstant.PREFIX_REPAIR_CODE + strRepairCode);
+            DB db = App.getDB(context);
+            String[] keyComponent = db.findKeys(CJayConstant.PREFIX_COMPONENT_CODE + strComponentCode);
+            String[] keyDamage = db.findKeys(CJayConstant.PREFIX_DAMAGE_CODE + strDamageCode);
+            String[] keyRepair = db.findKeys(CJayConstant.PREFIX_REPAIR_CODE + strRepairCode);
 
-			if (keyComponent.length > 0) {
-				componentCode = db.getObject(keyComponent[0], IsoCode.class);
-			}
-			if (keyDamage.length > 0) {
-				damageCode = db.getObject(keyDamage[0], IsoCode.class);
-			}
-			if (keyRepair.length > 0) {
-				repairCode = db.getObject(keyRepair[0], IsoCode.class);
-			}
+            if (keyComponent.length > 0) {
+                componentCode = db.getObject(keyComponent[0], IsoCode.class);
+            }
+            if (keyDamage.length > 0) {
+                damageCode = db.getObject(keyDamage[0], IsoCode.class);
+            }
+            if (keyRepair.length > 0) {
+                repairCode = db.getObject(keyRepair[0], IsoCode.class);
+            }
 
-			EventBus.getDefault().post(new IsoCodesGotToUpdateEvent(componentCode, damageCode, repairCode));
+            auditItem.setComponentCodeId(componentCode.getId());
+            auditItem.setComponentCode(componentCode.getCode());
 
-		} catch (SnappydbException e) {
-			Logger.e(e.getMessage());
-		}
-	}
+            auditItem.setDamageCodeId(damageCode.getId());
+            auditItem.setDamageCode(damageCode.getCode());
 
+            auditItem.setRepairCodeId(repairCode.getId());
+            auditItem.setRepairCode(repairCode.getCode());
+
+            updateAuditItem(context, containerId, auditItem);
+
+            return true;
+        } catch (SnappydbException e) {
+            Logger.e(e.getMessage());
+        }
+
+        return false;
+    }
 	//endregion
 
 	//region SESSION
