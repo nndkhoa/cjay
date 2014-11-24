@@ -138,11 +138,11 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
                 }
             }
 
+            mSession.prepareForUploading();
+            dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
+
 			JobManager jobManager = App.getJobManager();
 			jobManager.addJobInBackground(new UploadSessionJob(mSession));
-
-			mSession.prepareForUploading();
-			dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
 
 			// Hide this button
 			btnCompleteAudit.setVisibility(View.GONE);
@@ -204,11 +204,13 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 //        } else {
 //            Utils.showCrouton(getActivity(), "Vui lòng chờ quá trình tải lên hoàn tất");
 //        }
+
         dataCenter.add(new GetSessionForUploadCommand(getActivity(), containerID));
 	}
 
 	@Click(R.id.btn_complete_repair)
 	void btnCompleteRepairClicked() {
+
 		dataCenter.add(new GetSessionForUploadCommand(getActivity(), containerID));
 	}
 

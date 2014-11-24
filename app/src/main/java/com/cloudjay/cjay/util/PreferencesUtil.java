@@ -66,4 +66,9 @@ public class PreferencesUtil {
 		// Commit Changed Data
 		editor.commit();
 	}
+
+	public static void removePrefsValue(Context context, String key) {
+		SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
+		prefs.edit().remove(key).commit();
+	}
 }

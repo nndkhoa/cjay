@@ -9,6 +9,7 @@ import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.Command;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.UploadType;
 
 import de.greenrobot.event.EventBus;
