@@ -24,6 +24,7 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.task.command.Command;
 import com.cloudjay.cjay.task.command.CommandQueue;
+import com.cloudjay.cjay.task.command.session.update.AddListSessionsCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -687,7 +688,7 @@ public class DataCenter {
 			}
 
 			List<Session> sessions = networkClient.getSessionByPage(context, nextPage, lastModifiedDate);
-			processListSession(context, sessions);
+			add(new AddListSessionsCommand(context, sessions));
 			newModifiedDay = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_MODIFIED_DATE);
 
 		} while (lastModifiedDate.equals(newModifiedDay));
@@ -695,13 +696,14 @@ public class DataCenter {
 		PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_MODIFIED_PAGE, "");
 
 		if (refetchWithFistPageTime) {
+
 			//Fetch again with modified day is first page request_time
 			String firstPageTime = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_FIRST_PAGE_MODIFIED_DATE);
 			fetchSession(context, firstPageTime, false);
+
 		}
 	}
 
-	@Background(serial = CACHE, delay = 50)
 	public void processListSession(Context context, List<Session> sessions) {
 		DB db;
 		try {

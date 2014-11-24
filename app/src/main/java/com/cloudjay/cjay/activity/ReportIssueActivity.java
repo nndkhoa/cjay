@@ -125,6 +125,7 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
     @UiThread
     void onEvent(IsoCodesGotToUpdateEvent event) {
+
         IsoCode componentCode = event.getComponentCode();
         IsoCode damageCode = event.getDamageCode();
         IsoCode repairCode = event.getRepairCode();
