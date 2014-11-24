@@ -77,193 +77,6 @@ public class DataCenter {
 	}
 	//endregion
 
-	public Session getSession(Context context, String containerId) {
-		Session session = null;
-		try {
-			DB db = App.getDB(context);
-			String key = containerId;
-			session = db.getObject(key, Session.class);
-		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
-		} finally {
-			return session;
-		}
-	}
-
-	public List<Session> getListSessions(Context context, String prefix) {
-
-		int len = prefix.length();
-		DB db = null;
-		String[] keysResult = new String[0];
-		List<Session> sessions = new ArrayList<>();
-
-		try {
-			db = App.getDB(context);
-			keysResult = db.findKeys(prefix);
-		} catch (SnappydbException e) {
-			Logger.e(e.getMessage());
-		}
-
-		for (String result : keysResult) {
-			String newKey = result.substring(len);
-			Session session;
-
-			try {
-				session = db.getObject(newKey, Session.class);
-				sessions.add(session);
-			} catch (SnappydbException e) {
-				e.printStackTrace();
-				addLog(context, newKey, prefix + " | Cannot retrieve this container", CJayConstant.PREFIX_LOG);
-			}
-		}
-
-		return sessions;
-	}
-
-	public List<Session> getListSessions(Context context, String keyword, String prefix) {
-
-		int len = prefix.length();
-		DB db = null;
-		String[] keysResult = new String[0];
-		List<Session> sessions = new ArrayList<>();
-
-		try {
-			db = App.getDB(context);
-			keysResult = db.findKeys(prefix + keyword);
-		} catch (SnappydbException e) {
-			Logger.e(e.getMessage());
-		}
-
-		for (String result : keysResult) {
-			String newKey = result.substring(len);
-			Session session;
-
-			try {
-				session = db.getObject(newKey, Session.class);
-				sessions.add(session);
-			} catch (SnappydbException e) {
-				e.printStackTrace();
-				addLog(context, newKey, prefix + " | Cannot retrieve this container", CJayConstant.PREFIX_LOG);
-			}
-		}
-
-		return sessions;
-	}
-
-	/**
-	 * Get session with key without prefix
-	 *
-	 * @param context
-	 * @param containerId
-	 * @param prefix
-	 * @return
-	 */
-	public Session getSession(Context context, String containerId, String prefix) {
-		Session session = null;
-		try {
-
-			DB db = App.getDB(context);
-			String key = containerId.substring(prefix.length());
-			session = db.getObject(key, Session.class);
-
-		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
-		} finally {
-			return session;
-		}
-	}
-
-	public boolean removeSession(Context context, String containerId, String prefix) {
-		try {
-			DB db = App.getDB(context);
-			String key = prefix + containerId;
-			db.del(key);
-			return true;
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	/**
-	 * Use it to add container session that received from server
-	 *
-	 * @param context
-	 * @param session
-	 */
-	public boolean addOrUpdateSession(Context context, Session session) {
-
-		DB db = null;
-		String key = session.getContainerId();
-		Session object;
-
-		// Check if this container is existed in DB
-		try {
-			db = App.getDB(context);
-			object = db.getObject(key, Session.class);
-
-			Logger.Log("Container " + session.getContainerId() + " is existed in db");
-			object.mergeSession(session);
-			object.setUploadStatus(UploadStatus.COMPLETE);
-			db.put(key, object);
-
-		} catch (SnappydbException e) {
-
-			// This container is not exist in db, so we add it to db
-			try {
-				// Only localize container if it is from server
-				if (session.getId() != 0) {
-					object = session.changeToLocalFormat();
-					db.put(key, object);
-				} else {
-					db.put(key, session);
-				}
-			} catch (SnappydbException e1) {
-				Logger.w(e1.getMessage());
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Use it to add existed container from Collection Normal to another collection. e.g. UPLOAD, WORKING
-	 *
-	 * @param context
-	 * @param session
-	 * @param prefix
-	 */
-	public void addSession(Context context, Session session, String prefix) {
-		try {
-			DB db = App.getDB(context);
-			String key = prefix + session.getContainerId();
-			db.put(key, session);
-
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Use it to add existed container from Collection Normal to another collection. e.g. UPLOAD, WORKING
-	 *
-	 * @param context
-	 * @param containerId
-	 * @param prefix
-	 */
-	public void addSession(Context context, String containerId, String prefix) {
-		try {
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
-			String key = prefix + containerId;
-			db.put(key, session);
-
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-	}
-
 	//region USER
 
 	/**
@@ -562,37 +375,48 @@ public class DataCenter {
 		return null;
 	}
 
-	@Background(serial = CACHE, delay = 50)
-	public void getIsoCodesToUpdate(Context context, String strComponentCode,
-	                                String strDamageCode, String strRepairCode) {
-		try {
+    public boolean updateAuditItem(Context context, String containerId, AuditItem auditItem,
+                                String strComponentCode, String strDamageCode,
+                                String strRepairCode) {
+        try {
 
-			IsoCode componentCode = null;
-			IsoCode damageCode = null;
-			IsoCode repairCode = null;
+            IsoCode componentCode = null;
+            IsoCode damageCode = null;
+            IsoCode repairCode = null;
 
-			DB db = App.getDB(context);
-			String[] keyComponent = db.findKeys(CJayConstant.PREFIX_COMPONENT_CODE + strComponentCode);
-			String[] keyDamage = db.findKeys(CJayConstant.PREFIX_DAMAGE_CODE + strDamageCode);
-			String[] keyRepair = db.findKeys(CJayConstant.PREFIX_REPAIR_CODE + strRepairCode);
+            DB db = App.getDB(context);
+            String[] keyComponent = db.findKeys(CJayConstant.PREFIX_COMPONENT_CODE + strComponentCode);
+            String[] keyDamage = db.findKeys(CJayConstant.PREFIX_DAMAGE_CODE + strDamageCode);
+            String[] keyRepair = db.findKeys(CJayConstant.PREFIX_REPAIR_CODE + strRepairCode);
 
-			if (keyComponent.length > 0) {
-				componentCode = db.getObject(keyComponent[0], IsoCode.class);
-			}
-			if (keyDamage.length > 0) {
-				damageCode = db.getObject(keyDamage[0], IsoCode.class);
-			}
-			if (keyRepair.length > 0) {
-				repairCode = db.getObject(keyRepair[0], IsoCode.class);
-			}
+            if (keyComponent.length > 0) {
+                componentCode = db.getObject(keyComponent[0], IsoCode.class);
+            }
+            if (keyDamage.length > 0) {
+                damageCode = db.getObject(keyDamage[0], IsoCode.class);
+            }
+            if (keyRepair.length > 0) {
+                repairCode = db.getObject(keyRepair[0], IsoCode.class);
+            }
 
-			EventBus.getDefault().post(new IsoCodesGotToUpdateEvent(componentCode, damageCode, repairCode));
+            auditItem.setComponentCodeId(componentCode.getId());
+            auditItem.setComponentCode(componentCode.getCode());
 
-		} catch (SnappydbException e) {
-			Logger.e(e.getMessage());
-		}
-	}
+            auditItem.setDamageCodeId(damageCode.getId());
+            auditItem.setDamageCode(damageCode.getCode());
 
+            auditItem.setRepairCodeId(repairCode.getId());
+            auditItem.setRepairCode(repairCode.getCode());
+
+            updateAuditItem(context, containerId, auditItem);
+
+            return true;
+        } catch (SnappydbException e) {
+            Logger.e(e.getMessage());
+        }
+
+        return false;
+    }
 	//endregion
 
 	//region SESSION
@@ -765,6 +589,194 @@ public class DataCenter {
 			Logger.w(e.getMessage());
 		} catch (RetrofitError error) {
 			EventBus.getDefault().post(new ContainerSearchedEvent(true));
+		}
+	}
+
+
+	public Session getSession(Context context, String containerId) {
+		Session session = null;
+		try {
+			DB db = App.getDB(context);
+			String key = containerId;
+			session = db.getObject(key, Session.class);
+		} catch (SnappydbException e) {
+			Logger.w(e.getMessage());
+		} finally {
+			return session;
+		}
+	}
+
+	public List<Session> getListSessions(Context context, String prefix) {
+
+		int len = prefix.length();
+		DB db = null;
+		String[] keysResult = new String[0];
+		List<Session> sessions = new ArrayList<>();
+
+		try {
+			db = App.getDB(context);
+			keysResult = db.findKeys(prefix);
+		} catch (SnappydbException e) {
+			Logger.e(e.getMessage());
+		}
+
+		for (String result : keysResult) {
+			String newKey = result.substring(len);
+			Session session;
+
+			try {
+				session = db.getObject(newKey, Session.class);
+				sessions.add(session);
+			} catch (SnappydbException e) {
+				e.printStackTrace();
+				addLog(context, newKey, prefix + " | Cannot retrieve this container", CJayConstant.PREFIX_LOG);
+			}
+		}
+
+		return sessions;
+	}
+
+	public List<Session> getListSessions(Context context, String keyword, String prefix) {
+
+		int len = prefix.length();
+		DB db = null;
+		String[] keysResult = new String[0];
+		List<Session> sessions = new ArrayList<>();
+
+		try {
+			db = App.getDB(context);
+			keysResult = db.findKeys(prefix + keyword);
+		} catch (SnappydbException e) {
+			Logger.e(e.getMessage());
+		}
+
+		for (String result : keysResult) {
+			String newKey = result.substring(len);
+			Session session;
+
+			try {
+				session = db.getObject(newKey, Session.class);
+				sessions.add(session);
+			} catch (SnappydbException e) {
+				e.printStackTrace();
+				addLog(context, newKey, prefix + " | Cannot retrieve this container", CJayConstant.PREFIX_LOG);
+			}
+		}
+
+		return sessions;
+	}
+
+	/**
+	 * Get session with key without prefix
+	 *
+	 * @param context
+	 * @param containerId
+	 * @param prefix
+	 * @return
+	 */
+	public Session getSession(Context context, String containerId, String prefix) {
+		Session session = null;
+		try {
+
+			DB db = App.getDB(context);
+			String key = containerId.substring(prefix.length());
+			session = db.getObject(key, Session.class);
+
+		} catch (SnappydbException e) {
+			Logger.w(e.getMessage());
+		} finally {
+			return session;
+		}
+	}
+
+	public boolean removeSession(Context context, String containerId, String prefix) {
+		try {
+			DB db = App.getDB(context);
+			String key = prefix + containerId;
+			db.del(key);
+			return true;
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	/**
+	 * Use it to add container session that received from server
+	 *
+	 * @param context
+	 * @param session
+	 */
+	public boolean addOrUpdateSession(Context context, Session session) {
+
+		DB db = null;
+		String key = session.getContainerId();
+		Session object;
+
+		// Check if this container is existed in DB
+		try {
+			db = App.getDB(context);
+			object = db.getObject(key, Session.class);
+
+			Logger.Log("Container " + session.getContainerId() + " is existed in db");
+			object.mergeSession(session);
+			object.setUploadStatus(UploadStatus.COMPLETE);
+			db.put(key, object);
+
+		} catch (SnappydbException e) {
+
+			// This container is not exist in db, so we add it to db
+			try {
+				// Only localize container if it is from server
+				if (session.getId() != 0) {
+					object = session.changeToLocalFormat();
+					db.put(key, object);
+				} else {
+					db.put(key, session);
+				}
+			} catch (SnappydbException e1) {
+				Logger.w(e1.getMessage());
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Use it to add existed container from Collection Normal to another collection. e.g. UPLOAD, WORKING
+	 *
+	 * @param context
+	 * @param session
+	 * @param prefix
+	 */
+	public void addSession(Context context, Session session, String prefix) {
+		try {
+			DB db = App.getDB(context);
+			String key = prefix + session.getContainerId();
+			db.put(key, session);
+
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Use it to add existed container from Collection Normal to another collection. e.g. UPLOAD, WORKING
+	 *
+	 * @param context
+	 * @param containerId
+	 * @param prefix
+	 */
+	public void addSession(Context context, String containerId, String prefix) {
+		try {
+			DB db = App.getDB(context);
+			Session session = db.getObject(containerId, Session.class);
+			String key = prefix + containerId;
+			db.put(key, session);
+
+		} catch (SnappydbException e) {
+			e.printStackTrace();
 		}
 	}
 
