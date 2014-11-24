@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
+import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.Command;
@@ -35,6 +36,7 @@ public class SaveSessionCommand extends Command {
 	public void run() {
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
 		boolean success = dataCenter.addOrUpdateSession(context, session);
+		EventBus.getDefault().post(new ContainerGotEvent(session, session.getContainerId()));
 
 		if (uploadType != null && success)
 			EventBus.getDefault().post(new UploadSucceededEvent(session, UploadType.SESSION));

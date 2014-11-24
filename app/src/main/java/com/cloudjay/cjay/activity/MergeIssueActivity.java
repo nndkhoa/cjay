@@ -8,6 +8,7 @@ import com.cloudjay.cjay.adapter.AuditMergeIssueAdapter;
 import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.task.command.image.AddAuditImageCommand;
+import com.cloudjay.cjay.task.command.issue.GetListAuditItemsCommand;
 import com.cloudjay.cjay.util.enums.AddAuditImageType;
 
 import org.androidannotations.annotations.AfterViews;
@@ -83,7 +84,7 @@ public class MergeIssueActivity extends BaseActivity {
 
 	void refresh() {
 		if (mAdapter != null) {
-			dataCenter.getAuditItemsInBackground(this, containerID);
+			dataCenter.add(new GetListAuditItemsCommand(this, containerID));
 		}
 	}
 

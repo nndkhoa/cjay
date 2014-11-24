@@ -25,6 +25,7 @@ import com.cloudjay.cjay.activity.ReportIssueActivity_;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.issue.SetWaterWashAuditItemCommand;
 import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.util.Logger;
@@ -164,7 +165,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 					holder.tvIssueStatus.setBackgroundColor(Color.parseColor("#DF0101"));
 				} else {
 					holder.tvIssueStatus.setText(mContext.getResources().getString(R.string.issue_approved));
-                    holder.tvIssueStatus.setBackgroundColor(Color.parseColor("#008CC9"));
+					holder.tvIssueStatus.setBackgroundColor(Color.parseColor("#008CC9"));
 				}
 			}
 
@@ -182,7 +183,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 							showPreventRepairDialog();
 						} else {
 							// Open camera activity to take repair image
-                            openDetailIssueActivity();
+							openDetailIssueActivity();
 							openCamera();
 						}
 					}
@@ -192,9 +193,6 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			holder.btnUpload.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
-
-					Logger.Log("componentCodeId: " + auditItem.getComponentCodeId());
-
 					//1. Update upload status
 					auditItem.setUploadStatus(UploadStatus.UPLOADING);
 					try {
@@ -208,14 +206,14 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 					// Cần kiểm tra xem import đã xong hay chưa
 					// Nếu chưa thì add field
 					if (session.getId() == 0) {
-						Logger.Log("Set upload confirmed for audit item: " + auditItem.toString());
 						auditItem.setUploadConfirmed(true);
 						DataCenter_.getInstance_(mContext).add(new UpdateAuditItemCommand(mContext, session.getContainerId(), auditItem));
+
 					} else {
 						//2. Add container session to upload queue
 						JobManager jobManager = App.getJobManager();
-						jobManager.addJobInBackground(new UploadAuditItemJob(session.getId(), auditItem,session.getContainerId()
-                        , false));
+						jobManager.addJobInBackground(new UploadAuditItemJob(session.getId(), auditItem, session.getContainerId()
+								, false));
 					}
 				}
 			});
@@ -290,7 +288,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			public void onClick(DialogInterface dialogInterface, int i) {
 				// Open camera activity to take repair image
 				Logger.Log("mComponentCode: " + mComponentCode);
-                openDetailIssueActivity();
+				openDetailIssueActivity();
 				openCamera();
 				dialogInterface.dismiss();
 			}
@@ -315,7 +313,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			}
 		});
 		dialog.show();
-    }
+	}
 
 	void showApproveDiaglog(final AuditItem item) {
 
@@ -326,8 +324,6 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		builder.setPositiveButton("Chưa", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
-
-				Logger.Log("getUuid: " + item.getUuid());
 
 				Intent intent = new Intent(mContext, ReportIssueActivity_.class);
 				intent.putExtra(ReportIssueActivity_.CONTAINER_ID_EXTRA, session.getContainerId());
@@ -342,8 +338,6 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
 
-				Logger.Log("getUuid: " + item.getAuditImages().get(0).getUuid());
-
 				Intent intent = new Intent(mContext, MergeIssueActivity_.class);
 				intent.putExtra(MergeIssueActivity_.CONTAINER_ID_EXTRA, session.getContainerId());
 				intent.putExtra(MergeIssueActivity_.AUDIT_IMAGE_EXTRA, item.getAuditImages().get(0).getUuid());
@@ -357,9 +351,9 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
-                // change status audit item to water wash
-                DataCenter_.getInstance_(mContext).setWaterWashType(mContext, item, session.getContainerId());
-                dialogInterface.dismiss();
+				// change status audit item to water wash
+				DataCenter_.getInstance_(mContext).add(new SetWaterWashAuditItemCommand(mContext, item, session.getContainerId()));
+				dialogInterface.dismiss();
 			}
 		});
 
@@ -409,13 +403,13 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		mContext.startActivity(cameraActivityIntent);
 	}
 
-    void openDetailIssueActivity() {
-        Intent detailIssueActivity = new Intent(mContext, DetailIssueActivity_.class);
-        detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, session.getContainerId());
-        detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, mAuditItemUUID);
-        detailIssueActivity.putExtra(DetailIssueActivity.SELECTED_TAB, 1);
-        mContext.startActivity(detailIssueActivity);
-    }
+	void openDetailIssueActivity() {
+		Intent detailIssueActivity = new Intent(mContext, DetailIssueActivity_.class);
+		detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, session.getContainerId());
+		detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, mAuditItemUUID);
+		detailIssueActivity.putExtra(DetailIssueActivity.SELECTED_TAB, 1);
+		mContext.startActivity(detailIssueActivity);
+	}
 
 	void showPreventRepairDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);

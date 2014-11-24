@@ -7,11 +7,13 @@ import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.Command;
 
+/**
+ *
+ */
 public class UpdateImportSessionCommand extends Command {
 
     Context context;
     Session session;
-
     public UpdateImportSessionCommand(Context context, Session session) {
         this.context = context;
         this.session = session;

@@ -28,9 +28,10 @@ import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.issue.GetListAuditItemsCommand;
+import com.cloudjay.cjay.task.command.issue.RemoveAuditItemCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
-import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
@@ -155,7 +156,7 @@ public class IssuePendingFragment extends Fragment {
 	 */
 	void refresh() {
 		if (mAdapter != null) {
-			dataCenter.getAuditItemsInBackground(getActivity(), containerId);
+			dataCenter.add(new GetListAuditItemsCommand(getActivity(), containerId));
 		}
 	}
 
@@ -287,7 +288,7 @@ public class IssuePendingFragment extends Fragment {
 	@OptionsItem(R.id.menu_export)
 	void exportMenuItemClicked() {
 		dataCenter.changeLocalStepAndForceExport(getActivity(), containerId);
-        getActivity().finish();
+		getActivity().finish();
 	}
 
 	@UiThread
@@ -315,21 +316,19 @@ public class IssuePendingFragment extends Fragment {
 
 	//region EVENT HANDLER
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        refresh();
-    }
+	@Override
+	public void onResume() {
+		super.onResume();
+		refresh();
+	}
 
-    @UiThread
+	@UiThread
 	void onEvent(IssueMergedEvent event) {
 
 		// Delete merged audit item containerId
 		String containerId = event.getContainerId();
-		String auditItemRemoveUUID = event.getAuditItemRemoveUUID();
-		dataCenter.removeAuditItem(getActivity().getApplicationContext(),
-				containerId, auditItemRemoveUUID);
-		refresh();
+		String itemUuid = event.getItemUuid();
+		dataCenter.add(new RemoveAuditItemCommand(getActivity(), containerId, itemUuid));
 	}
 
 	@UiThread
@@ -349,7 +348,7 @@ public class IssuePendingFragment extends Fragment {
 
 	@UiThread
 	void onEvent(UploadStartedEvent event) {
-        mSession = event.getSession();
+		mSession = event.getSession();
 		refresh();
 	}
 

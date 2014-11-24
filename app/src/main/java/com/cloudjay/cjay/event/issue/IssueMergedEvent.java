@@ -2,18 +2,18 @@ package com.cloudjay.cjay.event.issue;
 
 public class IssueMergedEvent {
 	private String containerId;
-	private String auditItemRemoveUUID;
+	private String itemUuid;
 
-	public IssueMergedEvent(String containerId, String auditItemRemoveUUID) {
+	public IssueMergedEvent(String containerId, String itemUuid) {
 		this.containerId = containerId;
-		this.auditItemRemoveUUID = auditItemRemoveUUID;
+		this.itemUuid = itemUuid;
 	}
 
 	public String getContainerId() {
 		return containerId;
 	}
 
-	public String getAuditItemRemoveUUID() {
-		return auditItemRemoveUUID;
+	public String getItemUuid() {
+		return itemUuid;
 	}
 }

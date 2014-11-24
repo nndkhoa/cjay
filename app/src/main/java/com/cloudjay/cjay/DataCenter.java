@@ -9,13 +9,10 @@ import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.isocode.IsoCodesGotToUpdateEvent;
 import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
-import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
-import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
-import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.CJayObject;
@@ -55,14 +52,16 @@ import retrofit.RetrofitError;
 @EBean(scope = EBean.Scope.Singleton)
 public class DataCenter {
 
-	@Bean
-	CommandQueue queue;
-
 	public void add(Command command) {
 		queue.add(command);
 	}
 
 	// region DECLARE
+
+	// Inject the command queue
+	@Bean
+	CommandQueue queue;
+
 	// Inject the rest client
 	@Bean
 	NetworkClient networkClient;
@@ -225,6 +224,33 @@ public class DataCenter {
 		}
 
 		return true;
+	}
+
+	public void updateImportSession(Context context, Session session) {
+		DB db = null;
+		String key = session.getContainerId();
+		try {
+
+			db = App.getDB(context);
+			Session oldSession = db.getObject(session.getContainerId(), Session.class);
+			oldSession.setOperatorId(session.getOperatorId());
+			oldSession.setOperatorCode(session.getOperatorCode());
+			oldSession.setPreStatus(session.getPreStatus());
+			db.put(key, oldSession);
+
+		} catch (SnappydbException e) {
+			Logger.w(e.getMessage());
+			try {
+				db.put(key, session);
+			} catch (SnappydbException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+
+			// Notify to Import Fragment
+			getSession(context, key);
+			EventBus.getDefault().post(new ContainerGotEvent(session, key));
+		}
 	}
 
 	/**
@@ -770,33 +796,6 @@ public class DataCenter {
 		}
 	}
 
-	public void updateImportSession(Context context, Session session) {
-		DB db = null;
-		String key = session.getContainerId();
-		try {
-
-			db = App.getDB(context);
-			Session oldSession = db.getObject(session.getContainerId(), Session.class);
-			oldSession.setOperatorId(session.getOperatorId());
-			oldSession.setOperatorCode(session.getOperatorCode());
-			oldSession.setPreStatus(session.getPreStatus());
-			db.put(key, oldSession);
-
-		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
-			try {
-				db.put(key, session);
-			} catch (SnappydbException e1) {
-				e1.printStackTrace();
-			}
-		} finally {
-
-			// Notify to Import Fragment
-			getSession(context, key);
-			EventBus.getDefault().post(new ContainerGotEvent(session, key));
-		}
-	}
-
 	//endregion
 
 	//region IMAGE
@@ -1115,7 +1114,8 @@ public class DataCenter {
 	 * 3. Upload to server
 	 * 4. Assign uuid to response audit item
 	 * 5. Replace result with local audit item in container session
-	 *  @param context
+	 *
+	 * @param context
 	 * @param auditItem
 	 */
 	public AuditItem uploadAddedAuditImage(Context context, AuditItem auditItem) {
@@ -1274,8 +1274,7 @@ public class DataCenter {
 	 * @param containerId
 	 * @param auditItemUUID
 	 */
-	@Background(serial = CACHE, delay = 50)
-	public void removeAuditItem(Context context, String containerId, String auditItemUUID) {
+	public boolean removeAuditItem(Context context, String containerId, String auditItemUUID) {
 		try {
 			// find session
 			DB db = App.getDB(context);
@@ -1285,13 +1284,12 @@ public class DataCenter {
 			if (session != null) {
 				session.removeAuditItem(auditItemUUID);
 				db.put(containerId, session);
+				return true;
 			}
-
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
-
-		EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
+		return false;
 	}
 
 	public boolean updateAuditItem(Context context, String containerId, AuditItem auditItem) {
@@ -1324,8 +1322,7 @@ public class DataCenter {
 	 * @param auditItem
 	 * @throws SnappydbException
 	 */
-	@Background(serial = CACHE, delay = 50)
-	public void setWaterWashType(Context context, final AuditItem auditItem, String containerId) {
+	public boolean setWaterWashType(Context context, final AuditItem auditItem, String containerId) {
 
 		try {
 			Logger.Log("Selected audit item: " + auditItem.getUuid());
@@ -1391,10 +1388,12 @@ public class DataCenter {
 			session.setAuditItems(list);
 			db.put(containerId, session);
 
-			EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
+			return true;
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
+
+		return false;
 	}
 
 	/**
@@ -1471,46 +1470,6 @@ public class DataCenter {
 		}
 	}
 
-	/**
-	 * Get list container sessions based on param `prefix`
-	 *
-	 * @param context
-	 * @param containerId
-	 * @return
-	 */
-	@Background(serial = CACHE, delay = 50)
-	public void getAuditItemsInBackground(Context context, String containerId) {
-		try {
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
-			EventBus.getDefault().post(new AuditItemsGotEvent(session.getAuditItems()));
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Get audit item in background and post event back
-	 *
-	 * @param context
-	 * @param containerId
-	 * @param itemUuid
-	 */
-	@Background(serial = CACHE, delay = 50)
-	public void getAuditItemInBackground(Context context, String containerId, String itemUuid) {
-		Logger.Log("getAuditItemInBackground");
-		try {
-			DB db = App.getDB(context);
-			Session session = db.getObject(containerId, Session.class);
-			if (session != null) {
-				AuditItem auditItem = session.getAuditItem(itemUuid);
-				EventBus.getDefault().post(new AuditItemGotEvent(auditItem));
-			}
-
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-	}
 
 	//endregion
 
