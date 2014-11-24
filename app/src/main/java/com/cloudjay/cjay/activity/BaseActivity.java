@@ -12,12 +12,20 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.UserLoggedOutEvent;
+import com.cloudjay.cjay.event.pubnub.PubnubSubscriptionChangedEvent;
 import com.cloudjay.cjay.event.session.ContainersFetchedEvent;
+import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.task.job.FetchSessionsJob;
+import com.cloudjay.cjay.task.service.PubnubService;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
+import com.cloudjay.cjay.util.exception.NullCredentialException;
 import com.path.android.jobqueue.JobManager;
+import com.pubnub.api.Callback;
+import com.pubnub.api.Pubnub;
+import com.pubnub.api.PubnubException;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
@@ -25,6 +33,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.OptionsMenuItem;
 import org.androidannotations.annotations.UiThread;
 
 import de.greenrobot.event.EventBus;
@@ -40,6 +49,9 @@ public class BaseActivity extends FragmentActivity {
 	public DataCenter getDataCenter() {
 		return dataCenter;
 	}
+
+    @OptionsMenuItem(R.id.menu_subcribe_pubnub)
+    MenuItem menuPubnubSubscribe;
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
@@ -81,8 +93,25 @@ public class BaseActivity extends FragmentActivity {
     }
 
 	@OptionsItem(R.id.menu_subcribe_pubnub)
-	void subcriblePubnubItemClicked() {
-		//TODO: subcribe pubnub here @hanngo
+	void subscriblePubnubItemClicked() {
+
+        boolean isSubscribed = PreferencesUtil.getPrefsValue(getApplicationContext(),
+                PreferencesUtil.PREF_SUBSCRIBE_PUBNUB, false);
+//        if (!isSubscribed) {
+//            User user = dataCenter.getUser(getApplicationContext());
+//            String depotChannel = user.getChannelDepot();
+//            String uuidChannel = user.getChannelUuid();
+//
+//            String[] channels = new String[]{depotChannel, uuidChannel};
+//            pubnub.subscribe(channels, new Callback() {
+//                @Override
+//                public void successCallback(String uuidChannel, Object message) {
+//                    PubnubService.notifyUser(uuidChannel, message);
+//                }
+//            });
+//        } else {
+//            Logger.Log("pubnub is already subscribed");
+//        }
 	}
 
 	@OptionsItem(R.id.menu_refresh)
@@ -151,6 +180,16 @@ public class BaseActivity extends FragmentActivity {
 	public void onEvent(UserLoggedOutEvent event) {
 		finish();
 	}
+
+    @UiThread
+    public void onEvent(PubnubSubscriptionChangedEvent event) {
+        boolean isSubscribed = event.isSubscribed();
+        if (!isSubscribed) {
+            menuPubnubSubscribe.setIcon(getResources().getDrawable(R.drawable.ic_red));
+        } else {
+            menuPubnubSubscribe.setIcon(getResources().getDrawable(R.drawable.ic_green));
+        }
+    }
 
 //	@Override
 //	public boolean onMenuOpened(int featureId, Menu menu) {
