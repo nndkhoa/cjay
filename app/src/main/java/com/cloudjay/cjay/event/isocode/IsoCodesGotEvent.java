@@ -4,9 +4,6 @@ import com.cloudjay.cjay.model.IsoCode;
 
 import java.util.List;
 
-/**
- * Created by nambv on 2014/11/13.
- */
 public class IsoCodesGotEvent {
 
 	private List<IsoCode> isoCodes;

@@ -2,9 +2,6 @@ package com.cloudjay.cjay.event.isocode;
 
 import com.cloudjay.cjay.model.IsoCode;
 
-/**
- * Created by nambv on 2014/11/13.
- */
 public class IsoCodeGotEvent {
 
 	private IsoCode isoCode;

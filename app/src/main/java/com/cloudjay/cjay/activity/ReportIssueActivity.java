@@ -15,8 +15,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.event.isocode.IsoCodesGotToUpdateEvent;
-import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.fragment.IssueReportComponentFragment_;
 import com.cloudjay.cjay.fragment.IssueReportDamageFragment_;
@@ -28,7 +26,6 @@ import com.cloudjay.cjay.fragment.IssueReportRepairFragment_;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
-import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
@@ -149,7 +146,7 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
         mAuditItem.setAllowed(null);
 
         dataCenter.add(new UpdateAuditItemCommand(getApplicationContext(), mContainerId, mAuditItem,
-                codeComponent, codeDamage, codeRepair));
+		        codeComponent, codeDamage, codeRepair));
         // go back
         onBackPressed();
     }

@@ -165,25 +165,6 @@ public class IssueReportComponentFragment extends IssueReportFragment {
 		}
 	}
 
-    @UiThread
-    public void onEvent(IsoCodeGotEvent event) {
-        IsoCode componentCode = event.getIsoCode();
-        if (event.getPrefix().equals(CJayConstant.PREFIX_COMPONENT_CODE)) {
-            if (componentCode != null) {
-                mComponentCode = componentCode.getCode();
-                mComponentName = componentCode.getFullName();
-            } else {
-                mComponentCode = "";
-                mComponentName = "";
-            }
-
-            ignoreSearch = true;
-            mComponentEditText.setText(mComponentName);
-            mComponentNameTextView.setText(mComponentName);
-            ignoreSearch = false;
-        }
-    }
-
     void updateData(List<IsoCode> isoCodes) {
         if (isoCodes != null) {
             mAdapter = new IsoCodeAdapter(getActivity().getApplicationContext(),
@@ -197,12 +178,32 @@ public class IssueReportComponentFragment extends IssueReportFragment {
         }
     }
 
+	@UiThread
+	public void onEvent(IsoCodeGotEvent event) {
+		IsoCode componentCode = event.getIsoCode();
+		if (event.getPrefix().equals(CJayConstant.PREFIX_COMPONENT_CODE)) {
+			if (componentCode != null) {
+				mComponentCode = componentCode.getCode();
+				mComponentName = componentCode.getFullName();
+			} else {
+				mComponentCode = "";
+				mComponentName = "";
+			}
+
+			ignoreSearch = true;
+			mComponentEditText.setText(mComponentName);
+			mComponentNameTextView.setText(mComponentName);
+			ignoreSearch = false;
+		}
+	}
+
     @UiThread
     public void onEvent(IsoCodesGotEvent event) {
 
         String prefix = event.getPrefix();
 
         if (prefix.equals(CJayConstant.PREFIX_COMPONENT_CODE)) {
+
             componentCodes = event.getListIsoCodes();
             updateData(componentCodes);
 

@@ -1,7 +1,9 @@
 package com.cloudjay.cjay.task.service;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,7 +13,10 @@ import android.text.TextUtils;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.event.NotificationItemReceivedEvent;
 import com.cloudjay.cjay.model.NotificationItem;
+import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.task.job.GetNotificationJob;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -31,6 +36,8 @@ import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EService;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Pubnub service is used to handle notification from Server by using Pubnub API
@@ -126,10 +133,42 @@ public class PubnubService extends Service {
 
 	}
 
+	public void pushNotification(Session session, int type) {
+		Context context = App.getInstance().getApplicationContext();
+
+		NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		Notification notification;
+		if (type == 1) {
+			notification = new Notification.Builder(context).setContentTitle("Đã cập nhật thông tin")
+					.setContentText(" → Container " + session.getContainerId())
+					.setSmallIcon(R.drawable.ic_app_small)
+					.setAutoCancel(true)
+					.build();
+		} else {
+
+			notification = new Notification.Builder(context).setContentTitle("Đã cập nhật thông tin")
+					.setContentText(" → Container " + session.getContainerId())
+					.setSmallIcon(R.drawable.ic_app_small)
+					.setAutoCancel(true)
+					.setDefaults(Notification.DEFAULT_SOUND).build();
+		}
+		notificationManager.notify(CJayConstant.NOTIFICATION_ID, notification);
+	}
+
+	public void onEvent(NotificationItemReceivedEvent event) {
+		pushNotification(event.getSession(), event.getType());
+	}
+
+	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		EventBus.getDefault().register(this);
 
 		String token = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_TOKEN);
 		if (!TextUtils.isEmpty(token)) {

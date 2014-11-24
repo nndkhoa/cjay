@@ -44,13 +44,12 @@ public class GetNotificationJob extends Job {
 
         // Get data from notification
         if (objectType.equals("Container")) {
-            Session session = DataCenter_.getInstance_(context).getSessionAsyncById(context, objectId);
-            pushNotification(session, 0);
+            DataCenter_.getInstance_(context).getSessionAsyncById(context, objectId);
+//            pushNotification(session, 0);
 
         } else if (objectType.equals("AuditItem")) {
-
-            Session session = DataCenter_.getInstance_(context).getAuditItemAsyncById(context, objectId);
-            pushNotification(session, 1);
+            DataCenter_.getInstance_(context).getAuditItemAsyncById(context, objectId);
+//            pushNotification(session, 1);
 
         } else if (objectType.equals("Damage")) {
             DataCenter_.getInstance_(context).getDamageCodeAsyncById(context, objectId);
@@ -72,27 +71,6 @@ public class GetNotificationJob extends Job {
         DataCenter_.getInstance_(context).gotMessage(context, channel, messageId);
     }
 
-    public void pushNotification(Session session, int type) {
-        Context context = App.getInstance().getApplicationContext();
-
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification notification;
-        if (type == 1) {
-            notification = new Notification.Builder(context).setContentTitle("Đã cập nhật thông tin")
-                    .setContentText(" → Container " + session.getContainerId())
-                    .setSmallIcon(R.drawable.ic_app_small)
-                    .setAutoCancel(true)
-                    .build();
-        } else {
-
-            notification = new Notification.Builder(context).setContentTitle("Đã cập nhật thông tin")
-                    .setContentText(" → Container " + session.getContainerId())
-                    .setSmallIcon(R.drawable.ic_app_small)
-                    .setAutoCancel(true)
-                    .setDefaults(Notification.DEFAULT_SOUND).build();
-        }
-        notificationManager.notify(CJayConstant.NOTIFICATION_ID, notification);
-    }
 
     @Override
     protected void onCancel() {

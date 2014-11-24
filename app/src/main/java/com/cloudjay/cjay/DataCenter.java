@@ -7,10 +7,8 @@ import android.text.TextUtils;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.api.NetworkClient;
-import com.cloudjay.cjay.event.isocode.IsoCodesGotToUpdateEvent;
 import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
-import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.model.AuditImage;
@@ -25,6 +23,7 @@ import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.task.command.Command;
 import com.cloudjay.cjay.task.command.CommandQueue;
 import com.cloudjay.cjay.task.command.session.update.AddListSessionsCommand;
+import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -401,6 +400,7 @@ public class DataCenter {
 
             auditItem.setComponentCodeId(componentCode.getId());
             auditItem.setComponentCode(componentCode.getCode());
+	        auditItem.setComponentName(componentCode.getFullName());
 
             auditItem.setDamageCodeId(damageCode.getId());
             auditItem.setDamageCode(damageCode.getCode());
@@ -429,36 +429,10 @@ public class DataCenter {
 	 * @return
 	 * @throws SnappydbException
 	 */
-	public Session getSessionAsyncById(Context context, long id) {
-
+	@Background(serial = NETWORK)
+	public void getSessionAsyncById(Context context, long id) {
 		Session result = networkClient.getSessionById(id);
-		try {
-			// Get session from server
-			DB db = App.getDB(context);
-			if (result != null) {
-
-				// Find local session
-				String key = result.getContainerId();
-				Session session = db.get(key, Session.class);
-
-				// merge result from server to local session
-				session.mergeSession(result);
-				db.put(key, session);
-				return session;
-
-			}
-		} catch (SnappydbException e) {
-
-			//Merge Session from server to local type
-
-			Logger.w(e.getMessage());
-			Logger.w("Received new container session from server: " + result.getContainerId());
-			result.changeToLocalFormat();
-//			addOrUpdateSession(result);
-			return result;
-
-		}
-		return null;
+		add(new SaveSessionCommand(context, result));
 	}
 
 	/**
@@ -1390,17 +1364,13 @@ public class DataCenter {
 	 * @param context
 	 * @param id
 	 */
-	public Session getAuditItemAsyncById(Context context, long id) throws SnappydbException {
+	public void getAuditItemAsyncById(Context context, long id) throws SnappydbException {
 
 		AuditItem auditItem = networkClient.getAuditItemById(id);
 		if (auditItem != null) {
-
 			long sessionId = auditItem.getSession();
-			Session session = getSessionAsyncById(context, sessionId);
-			return session;
+			getSessionAsyncById(context, sessionId);
 		}
-
-		return null;
 	}
 
 	/**

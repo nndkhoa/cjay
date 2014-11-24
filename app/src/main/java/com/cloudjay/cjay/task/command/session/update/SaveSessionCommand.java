@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
+import com.cloudjay.cjay.event.NotificationItemReceivedEvent;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.Session;
@@ -19,6 +20,7 @@ public class SaveSessionCommand extends Command {
 	Context context;
 	Session session;
 	UploadType uploadType = null;
+	Integer popUpNotification;
 
 	public SaveSessionCommand(Context context, Session session, UploadType uploadType) {
 		this.context = context;
@@ -32,6 +34,12 @@ public class SaveSessionCommand extends Command {
 		this.uploadType = null;
 	}
 
+	public SaveSessionCommand(Context context, Session session, Integer notification) {
+		this.context = context;
+		this.session = session;
+		this.popUpNotification = notification;
+	}
+
 	@Override
 	public void run() {
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
@@ -40,5 +48,9 @@ public class SaveSessionCommand extends Command {
 
 		if (uploadType != null && success)
 			EventBus.getDefault().post(new UploadSucceededEvent(session, UploadType.SESSION));
+
+		if (popUpNotification != null) {
+			EventBus.getDefault().post(new NotificationItemReceivedEvent(session, popUpNotification));
+		}
 	}
 }
