@@ -174,7 +174,7 @@ public class Utils {
 		PendingIntent pPubnubIntent = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 		// wake up every 5 minutes to ensure service stays alive
-		alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
 				(30 * 60 * 1000), pPubnubIntent);
 
 	}
