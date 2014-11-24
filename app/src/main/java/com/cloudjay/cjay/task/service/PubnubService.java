@@ -14,6 +14,7 @@ import android.text.TextUtils;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.activity.LoginActivity_;
 import com.cloudjay.cjay.event.NotificationItemReceivedEvent;
 import com.cloudjay.cjay.event.pubnub.PubnubSubscriptionChangedEvent;
 import com.cloudjay.cjay.model.NotificationItem;
@@ -176,8 +177,6 @@ public class PubnubService extends Service {
 		String token = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_TOKEN);
 		if (!TextUtils.isEmpty(token)) {
 
-			Logger.w("Create pubnub service");
-
 			notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 			pubnub = new Pubnub(CJayConstant.PUBLISH_KEY, CJayConstant.SUBSCRIBE_KEY);
 			if (TextUtils.isEmpty(depotChannel) || TextUtils.isEmpty(uuidChannel)) {
@@ -197,8 +196,13 @@ public class PubnubService extends Service {
 
 				} catch (NullCredentialException e) {
 
-					// Log out instantly
+					// Log out instantly and stop Pubnub Service also
 					Utils.logOut(getApplicationContext());
+
+//					// Open Login Activity w/ message
+//					Intent loginIntent = new Intent(getApplicationContext(), LoginActivity_.class);
+//					loginIntent.putExtra("EXIT", true);
+//					startActivity(loginIntent);
 				}
 			}
 
@@ -212,39 +216,46 @@ public class PubnubService extends Service {
 
 						@Override
 						public void connectCallback(String channel, Object message) {
-                            // store pref subscribe mode in shared preferences
-                            PreferencesUtil.storePrefsValue(getApplicationContext(),
-                                    PreferencesUtil.PREF_SUBSCRIBE_PUBNUB, true);
+							// store pref subscribe mode in shared preferences
+							PreferencesUtil.storePrefsValue(getApplicationContext(),
+									PreferencesUtil.PREF_SUBSCRIBE_PUBNUB, true);
+
+							EventBus.getDefault().post(new PubnubSubscriptionChangedEvent(true));
+
 							System.out.println("SUBSCRIBE : CONNECT on channel:" + channel
 									+ " : " + message.getClass() + " : "
 									+ message.toString());
-                            EventBus.getDefault().post(new PubnubSubscriptionChangedEvent(true));
+
 						}
 
 						@Override
 						public void disconnectCallback(String channel, Object message) {
-                            // store pref subscribe mode in shared preferences
-                            PreferencesUtil.storePrefsValue(getApplicationContext(),
-                                    PreferencesUtil.PREF_SUBSCRIBE_PUBNUB, false);
-                            System.out.println("SUBSCRIBE : DISCONNECT on channel:" + channel
+							// store pref subscribe mode in shared preferences
+							PreferencesUtil.storePrefsValue(getApplicationContext(),
+									PreferencesUtil.PREF_SUBSCRIBE_PUBNUB, false);
+
+							EventBus.getDefault().post(new PubnubSubscriptionChangedEvent(false));
+
+							System.out.println("SUBSCRIBE : DISCONNECT on channel:" + channel
 									+ " : " + message.getClass() + " : "
 									+ message.toString());
-                            EventBus.getDefault().post(new PubnubSubscriptionChangedEvent(false));
+
 						}
 
+						@Override
 						public void reconnectCallback(String channel, Object message) {
-                            // store pref subscribe mode in shared preferences
-                            PreferencesUtil.storePrefsValue(getApplicationContext(),
-                                    PreferencesUtil.PREF_SUBSCRIBE_PUBNUB, true);
-                            System.out.println("SUBSCRIBE : RECONNECT on channel:" + channel
+
+							// store pref subscribe mode in shared preferences
+							PreferencesUtil.storePrefsValue(getApplicationContext(),
+									PreferencesUtil.PREF_SUBSCRIBE_PUBNUB, true);
+							System.out.println("SUBSCRIBE : RECONNECT on channel:" + channel
 									+ " : " + message.getClass() + " : "
 									+ message.toString());
-                            EventBus.getDefault().post(new PubnubSubscriptionChangedEvent(true));
+							EventBus.getDefault().post(new PubnubSubscriptionChangedEvent(true));
 						}
 
 						@Override
 						public void successCallback(String channel, Object message) {
-//					Logger.Log("Success: " + message.toString());
 							notifyUser(uuidChannel, message);
 						}
 
@@ -257,7 +268,7 @@ public class PubnubService extends Service {
 				} catch (PubnubException e) {
 
 					Logger.e(e.getMessage());
-					dataCenter.addLog(getApplicationContext(), "PubNub", "Cannot subscribe channels",CJayConstant.PREFIX_NOTIFI_LOG);
+					dataCenter.addLog(getApplicationContext(), "PubNub", "Cannot subscribe channels", CJayConstant.PREFIX_NOTIFI_LOG);
 
 				}
 			} else {

@@ -45,6 +45,8 @@ public class SaveSessionCommand extends Command {
 	public void run() {
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
 		boolean success = dataCenter.addOrUpdateSession(context, session);
+
+
 		EventBus.getDefault().post(new ContainerGotEvent(session, session.getContainerId()));
 
 		if (uploadType != null && success)

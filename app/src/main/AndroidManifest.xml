@@ -78,6 +78,7 @@
 		<activity
 			android:name="com.cloudjay.cjay.activity.LoginActivity_"
 			android:label="@string/title_activity_login"
+			android:launchMode="singleTop"
 			android:screenOrientation="portrait"
 			android:theme="@android:style/Theme.Holo.Light.NoActionBar"/>
 		<activity

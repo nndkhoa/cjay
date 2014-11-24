@@ -24,6 +24,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -106,6 +107,8 @@ public class UploadFragment extends Fragment {
 			updatedData(event.getTargets());
 	}
 
+	@UiThread
+	@Trace
 	public void onEvent(UploadedContainerRemoved event) {
 		refresh();
 	}

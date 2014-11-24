@@ -3,6 +3,7 @@ package com.cloudjay.cjay.task.command.session.remove;
 import android.content.Context;
 
 import com.cloudjay.cjay.App;
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.session.UploadedContainerRemoved;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.Command;
@@ -14,9 +15,6 @@ import com.snappydb.SnappydbException;
 
 import de.greenrobot.event.EventBus;
 
-/**
- * Created by nambv on 2014/11/22.
- */
 public class RemoveUploadedSessionsCommand extends Command {
 
     Context context;
@@ -28,12 +26,15 @@ public class RemoveUploadedSessionsCommand extends Command {
     @Override
     public void run() {
         try {
+
             DB db = App.getDB(context);
             String[] keys = db.findKeys(CJayConstant.PREFIX_UPLOADING);
 
             for (String key : keys) {
+
                 String t = key.substring(CJayConstant.PREFIX_UPLOADING.length(), key.length());
                 Session object = db.getObject(t, Session.class);
+
                 if (object.getUploadStatus() == UploadStatus.COMPLETE.value) {
                     db.del(key);
                     Logger.Log(" > Remove container from upload collection: " + key);

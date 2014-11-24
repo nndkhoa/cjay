@@ -44,12 +44,10 @@ public class GetNotificationJob extends Job {
 
         // Get data from notification
         if (objectType.equals("Container")) {
-            DataCenter_.getInstance_(context).getSessionAsyncById(context, objectId);
-//            pushNotification(session, 0);
+            DataCenter_.getInstance_(context).getSessionAsyncById(context, objectId, 0);
 
         } else if (objectType.equals("AuditItem")) {
             DataCenter_.getInstance_(context).getAuditItemAsyncById(context, objectId);
-//            pushNotification(session, 1);
 
         } else if (objectType.equals("Damage")) {
             DataCenter_.getInstance_(context).getDamageCodeAsyncById(context, objectId);

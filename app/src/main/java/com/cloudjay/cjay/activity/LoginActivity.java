@@ -49,6 +49,10 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		accountManager = AccountManager.get(this);
+
+//		if (getIntent().getBooleanExtra("EXIT", false)) {
+//			Utils.showCrouton(this, "Xảy ra sự cố với ứng dụng. Vui lòng đăng nhập lại", Style.INFO);
+//		}
 	}
 
 	public static final String PARAM_AUTH_TOKEN_TYPE = "auth.token";
@@ -180,7 +184,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		} catch (RetrofitError error) {
 			showProgress(false);
 			String message = "";
-			if (error.getResponse().getStatus() == 400){
+			if (error.getResponse().getStatus() == 400) {
 				message = "Sai thông tin đăng nhập";
 			} else {
 				message = "Không thể kết nối với server";

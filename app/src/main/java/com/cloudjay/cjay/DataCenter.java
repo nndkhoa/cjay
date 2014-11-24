@@ -431,9 +431,9 @@ public class DataCenter {
 	 * @throws SnappydbException
 	 */
 	@Background(serial = NETWORK)
-	public void getSessionAsyncById(Context context, long id) {
+	public void getSessionAsyncById(Context context, long id, int type) {
 		Session result = networkClient.getSessionById(id);
-		add(new SaveSessionCommand(context, result));
+		add(new SaveSessionCommand(context, result, type));
 	}
 
 	/**
@@ -486,6 +486,8 @@ public class DataCenter {
 			} else {
 				nextPage = Integer.valueOf(currentPage) + 1;
 			}
+
+			Logger.Log("At page: " + nextPage);
 
 			List<Session> sessions = networkClient.getSessionByPage(context, nextPage, lastModifiedDate);
 			add(new AddListSessionsCommand(context, sessions));
@@ -1371,7 +1373,7 @@ public class DataCenter {
 		AuditItem auditItem = networkClient.getAuditItemById(id);
 		if (auditItem != null) {
 			long sessionId = auditItem.getSession();
-			getSessionAsyncById(context, sessionId);
+			getSessionAsyncById(context, sessionId, 1);
 		}
 	}
 

@@ -109,6 +109,9 @@ public class Utils {
 		Pubnub pubnub = new Pubnub(CJayConstant.PUBLISH_KEY, CJayConstant.SUBSCRIBE_KEY);
 		pubnub.unsubscribeAllChannels();
 
+		Intent intent = new Intent(context, PubnubService_.class);
+		context.stopService(intent);
+
 		// Clear preference and Database
 		Logger.Log("Clear all preferences");
 		PreferencesUtil.clearPrefs(context);
@@ -154,7 +157,7 @@ public class Utils {
 
 		// start 30 seconds after boot completed
 		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.SECOND, 10 * 60);
+		cal.add(Calendar.SECOND, 10);
 
 		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
