@@ -36,6 +36,7 @@ import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EService;
+import org.androidannotations.annotations.Trace;
 
 import de.greenrobot.event.EventBus;
 
@@ -155,7 +156,8 @@ public class PubnubService extends Service {
 		notificationManager.notify(CJayConstant.NOTIFICATION_ID, notification);
 	}
 
-	public void onEvent(NotificationItemReceivedEvent event) {
+	@Trace
+	public void onEventMainThread(NotificationItemReceivedEvent event) {
 		pushNotification(event.getSession(), event.getType());
 	}
 
