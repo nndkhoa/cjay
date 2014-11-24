@@ -13,9 +13,11 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.UserLoggedOutEvent;
 import com.cloudjay.cjay.event.session.ContainersFetchedEvent;
+import com.cloudjay.cjay.task.job.FetchSessionsJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
+import com.path.android.jobqueue.JobManager;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
@@ -77,6 +79,26 @@ public class BaseActivity extends FragmentActivity {
         Intent intent = new Intent(getApplicationContext(), SettingActivity_.class);
         startActivity(intent);
     }
+
+	@OptionsItem(R.id.menu_subcribe_pubnub)
+	void subcriblePubnubItemClicked() {
+		//TODO: subcribe pubnub here @hanngo
+	}
+
+	@OptionsItem(R.id.menu_refresh)
+	void refreshItemClicked() {
+		// 1. clear preferences
+		PreferencesUtil.removePrefsValue(getApplicationContext(), PreferencesUtil.PREF_MODIFIED_PAGE);
+		PreferencesUtil.removePrefsValue(getApplicationContext(), PreferencesUtil.PREF_MODIFIED_DATE);
+		PreferencesUtil.removePrefsValue(getApplicationContext(), PreferencesUtil.PREF_FIRST_PAGE_MODIFIED_DATE);
+
+		// 2. fetch page sessions again
+		String lastModifiedDate = PreferencesUtil.getPrefsValue(this, PreferencesUtil.PREF_MODIFIED_DATE);
+		if (lastModifiedDate.isEmpty()) {
+			JobManager jobManager = App.getJobManager();
+			jobManager.addJobInBackground(new FetchSessionsJob(lastModifiedDate));
+		}
+	}
 
 	protected void showLogoutPrompt() {
 
