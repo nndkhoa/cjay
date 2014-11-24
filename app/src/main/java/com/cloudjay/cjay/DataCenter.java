@@ -717,10 +717,9 @@ public class DataCenter {
 		try {
 			db = App.getDB(context);
 			object = db.getObject(key, Session.class);
-
-			Logger.Log("Container " + session.getContainerId() + " is existed in db");
 			object.mergeSession(session);
 			object.setUploadStatus(UploadStatus.COMPLETE);
+            Logger.e("Local step: "+object.getLocalStep());
 			db.put(key, object);
 
 		} catch (SnappydbException e) {
