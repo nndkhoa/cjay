@@ -33,6 +33,7 @@ import com.cloudjay.cjay.model.Session;
 
 import com.cloudjay.cjay.task.command.session.update.AddWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.get.SearchCommand;
+import com.cloudjay.cjay.task.command.session.update.ForceExportCommand;
 import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -187,7 +188,7 @@ public class SearchFragment extends Fragment {
 
 	@OptionsItem(R.id.menu_export)
 	void exportMenuItemClicked() {
-		dataCenter.changeLocalStepAndForceExport(getActivity(), selectedId);
+		dataCenter.add(new ForceExportCommand(getActivity(), selectedId));
 	}
 	//endregion
 

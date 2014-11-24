@@ -32,6 +32,7 @@ import com.cloudjay.cjay.task.command.issue.GetListAuditItemsCommand;
 import com.cloudjay.cjay.task.command.issue.RemoveAuditItemCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
+import com.cloudjay.cjay.task.command.session.update.ForceExportCommand;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
@@ -287,7 +288,7 @@ public class IssuePendingFragment extends Fragment {
 
 	@OptionsItem(R.id.menu_export)
 	void exportMenuItemClicked() {
-		dataCenter.changeLocalStepAndForceExport(getActivity(), containerId);
+		dataCenter.add(new ForceExportCommand(getActivity(), containerId));
 		getActivity().finish();
 	}
 

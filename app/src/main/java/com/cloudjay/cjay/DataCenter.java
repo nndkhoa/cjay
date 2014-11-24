@@ -640,13 +640,10 @@ public class DataCenter {
 	 * @param context
 	 * @param containerId
 	 */
-	@Background(serial = CACHE, delay = 50)
-	public void changeLocalStepAndForceExport(Context context, String containerId) {
-
-		DB db;
+	public void forceExport(Context context, String containerId) {
 		try {
 
-			db = App.getDB(context);
+			DB db = App.getDB(context);
 			Session session = db.getObject(containerId, Session.class);
 			session.setLocalStep(Step.AVAILABLE.value);
 			db.put(containerId, session);
@@ -1442,7 +1439,6 @@ public class DataCenter {
 			return null;
 		}
 	}
-
 
 	//endregion
 

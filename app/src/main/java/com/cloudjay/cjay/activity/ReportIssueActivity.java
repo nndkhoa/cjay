@@ -167,9 +167,7 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
         // Set is allowed is null
         Logger.Log("set null for allowed");
         mAuditItem.setAllowed(null);
-
         dataCenter.getIsoCodesToUpdate(getApplicationContext(), codeComponent, codeDamage, codeRepair);
-
         // go back
         onBackPressed();
     }
