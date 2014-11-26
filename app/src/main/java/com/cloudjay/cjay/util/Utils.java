@@ -29,6 +29,8 @@ import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.service.PubnubService_;
+import com.cloudjay.cjay.task.service.QueryService;
+import com.cloudjay.cjay.task.service.QueryService_;
 import com.cloudjay.cjay.task.service.SyncIntentService_;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
@@ -114,8 +116,9 @@ public class Utils {
 		Pubnub pubnub = new Pubnub(CJayConstant.PUBLISH_KEY, CJayConstant.SUBSCRIBE_KEY);
 		pubnub.unsubscribeAllChannels();
 
-		Intent intent = new Intent(context, PubnubService_.class);
-		context.stopService(intent);
+		context.stopService(new Intent(context, PubnubService_.class));
+		context.stopService(new Intent(context, QueryService_.class));
+		context.stopService(new Intent(context, SyncIntentService_.class));
 
 		// Clear preference and Database
 		Logger.Log("Clear all preferences");
@@ -205,7 +208,7 @@ public class Utils {
 
 		Intent pubnubIntent = new Intent(context, PubnubService_.class);
 		boolean pubnubUp = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_NO_CREATE) != null;
-//		boolean pubnubUp = isRunning(context, PubnubService_.class.getName());
+//		boolean pubnubUp = isProcessing(context, PubnubService_.class.getName());
 
 		if (!queueUp)
 			Logger.w("Queue Service is not running");

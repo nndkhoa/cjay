@@ -120,6 +120,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
                 for (AuditItem auditItem : mSession.getAuditItems()) {
                     if (auditItem.getId() == 0 && auditItem.isAudited()) {
+
                         Logger.Log("Set upload confirmed for audit item: " + auditItem.toString());
                         auditItem.setUploadConfirmed(true);
 	                    dataCenter.add(new UpdateAuditItemCommand(getActivity(), mSession.getContainerId(), auditItem));

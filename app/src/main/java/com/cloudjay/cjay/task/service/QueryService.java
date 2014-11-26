@@ -7,7 +7,6 @@ import android.os.IBinder;
 import com.cloudjay.cjay.task.command.Command;
 import com.cloudjay.cjay.task.command.CommandQueue;
 import com.cloudjay.cjay.util.Logger;
-import com.google.gson.GsonBuilder;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EService;
@@ -18,7 +17,10 @@ public class QueryService extends Service implements Command.Callback {
 	@Bean
 	CommandQueue queue;
 
-	private boolean running;
+	public boolean isProcessing() {
+		return processing;
+	}
+	private boolean processing;
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -27,12 +29,13 @@ public class QueryService extends Service implements Command.Callback {
 	}
 
 	private void executeNext() {
-		if (running) return; // Only one task at a time.
+
+		if (processing) return; // Only one task at a time.
 
 		Command task = queue.peek();
 		if (task != null) {
 
-			running = true;
+			processing = true;
 			task.execute(this);
 
 		} else {
@@ -45,6 +48,7 @@ public class QueryService extends Service implements Command.Callback {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		Logger.v("Start query service");
 	}
 
 	@Override
@@ -54,13 +58,13 @@ public class QueryService extends Service implements Command.Callback {
 
 	@Override
 	public void onSuccess(String url) {
-		running = false;
+		processing = false;
 		queue.remove();
 		executeNext();
 	}
 
 	@Override
 	public void onFailure(Throwable e) {
-
+		e.printStackTrace();
 	}
 }

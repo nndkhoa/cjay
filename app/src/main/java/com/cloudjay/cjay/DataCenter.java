@@ -35,6 +35,7 @@ import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
+import com.esotericsoftware.kryo.KryoException;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
@@ -583,6 +584,8 @@ public class DataCenter {
 			String key = containerId;
 			session = db.getObject(key, Session.class);
 		} catch (SnappydbException e) {
+			e.printStackTrace();
+		} catch (KryoException e) {
 			e.printStackTrace();
 		} finally {
 			return session;

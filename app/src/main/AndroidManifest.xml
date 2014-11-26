@@ -121,7 +121,7 @@
 
 		<service android:name="com.cloudjay.cjay.task.service.PubnubService_"/>
 		<service android:name="com.cloudjay.cjay.task.service.SyncIntentService_"/>
-		<service android:name="com.cloudjay.cjay.task.service.QueryService_"/>
+		<service android:enabled="true" android:name="com.cloudjay.cjay.task.service.QueryService_"/>
 
 		<receiver android:name="com.cloudjay.cjay.task.receiver.AutoStartReceiver_">
 			<intent-filter>
