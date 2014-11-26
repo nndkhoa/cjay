@@ -14,6 +14,8 @@ public class ConnectionChangeReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		Utils.keepNotificationAlive(context);
-		Utils.startAlarm(context);
+
+		if (!Utils.isAlarmUp(context))
+			Utils.startAlarm(context);
 	}
 }

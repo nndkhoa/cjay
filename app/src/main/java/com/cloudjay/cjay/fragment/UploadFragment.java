@@ -15,6 +15,8 @@ import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.session.get.GetListSessionsCommand;
+import com.cloudjay.cjay.task.command.session.remove.RemoveUploadedSessionsCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 
 import org.androidannotations.annotations.AfterViews;
@@ -22,6 +24,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -73,7 +76,7 @@ public class UploadFragment extends Fragment {
 
 	void refresh() {
 		if (mAdapter != null) {
-			dataCenter.getListSessionsInBackground(getActivity().getApplicationContext(), CJayConstant.PREFIX_UPLOADING);
+			dataCenter.add(new GetListSessionsCommand(getActivity(), CJayConstant.PREFIX_UPLOADING));
 		}
 	}
 
@@ -104,6 +107,8 @@ public class UploadFragment extends Fragment {
 			updatedData(event.getTargets());
 	}
 
+	@UiThread
+	@Trace
 	public void onEvent(UploadedContainerRemoved event) {
 		refresh();
 	}
@@ -111,6 +116,6 @@ public class UploadFragment extends Fragment {
 
 	@OptionsItem(R.id.menu_clear_uploaded)
 	void clearUploadsMenuItemSelected() {
-		dataCenter.removeUploadedSessions(getActivity().getApplicationContext());
+		dataCenter.add(new RemoveUploadedSessionsCommand(getActivity()));
 	}
 }

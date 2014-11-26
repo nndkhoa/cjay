@@ -18,7 +18,9 @@ import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
@@ -98,10 +100,11 @@ public class BeforeRepairFragment extends Fragment {
 
 	@AfterViews
     void setUp() {
-        if (null == mSession) {
-            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
-                    containerID);
-        }
+
+//        if (null == mSession) {
+//            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
+//                    containerID);
+//        }
 
         if (null == imageAdapter) {
             imageAdapter = new DetailIssuedImageAdapter(
@@ -123,6 +126,7 @@ public class BeforeRepairFragment extends Fragment {
 
     @UiThread
     void onEvent(ContainerGotEvent event) {
+        Logger.Log("ContainerGotEvent");
         mSession = event.getSession();
         if (null == mSession) {
             Utils.showCrouton(getActivity(), "Không tìm thấy container trong dữ liệu");
@@ -130,28 +134,14 @@ public class BeforeRepairFragment extends Fragment {
             operatorCode = mSession.getOperatorCode();
             refreshData();
             refreshListImage();
-
-            if (hasImageToUpload) {
-                addImageToJobqueue();
-            }
         }
     }
 
-//    @UiThread
-//    void onEvent(ImageCapturedEvent event) {
-//        Logger.Log("on ImageCapturedEvent");
-//        if (event.getImageType() == ImageType.AUDIT.value) {
-//            // Requery session to update data
-//            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
-//                    containerID);
-//        }
-//    }
 
     @Override
     public void onResume() {
         super.onResume();
-        dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
-                    containerID);
+	    dataCenter.add(new GetSessionCommand(getActivity(), containerID));
     }
 
     void refreshListImage() {
@@ -198,18 +188,6 @@ public class BeforeRepairFragment extends Fragment {
         imageAdapter.notifyDataSetChanged();
     }
 
-    void addImageToJobqueue() {
-	    // TODO: @nam & @thai need to recheck this block
-//        JobManager jobManager = App.getJobManager();
-//        jobManager.addJobInBackground(new UploadAuditItemJob(mSession.getId(),
-//                mSession.getAuditItem(auditItemUUID), containerID, true));
-	    try {
-		    CJayObject object = new CJayObject(mSession, Session.class, mSession.getContainerId());
-		    dataCenter.addCJayObject(containerID, object);
-	    } catch (SnappydbException e) {
-		    e.printStackTrace();
-	    }
-    }
 
 	@Override
 	public void onDestroy() {

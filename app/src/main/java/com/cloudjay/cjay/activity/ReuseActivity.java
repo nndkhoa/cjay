@@ -27,8 +27,12 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.image.AddAuditImageCommand;
+import com.cloudjay.cjay.task.command.image.GetRainyImagesCommand;
+import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.enums.AddAuditImageType;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
@@ -114,8 +118,7 @@ public class ReuseActivity extends Activity {
 
             buttonLinearLayout.setVisibility(View.VISIBLE);
             rainyModeButtonLinearLayout.setVisibility(View.GONE);
-
-            dataCenter.getSessionInBackground(this, containerID);
+	        dataCenter.add(new GetSessionCommand(this, containerID));
         } else {
 
             tvContainerId.setVisibility(View.GONE);
@@ -138,7 +141,7 @@ public class ReuseActivity extends Activity {
             gvReuseImages.setAdapter(mAdapter);
 
             // get rainy image
-            dataCenter.getRainyImages(getApplicationContext());
+            dataCenter.add(new GetRainyImagesCommand(getApplicationContext()));
 
             Intent intent = getIntent();
             if (null == intent.getAction()) {
@@ -233,6 +236,7 @@ public class ReuseActivity extends Activity {
         }
 	}
 
+
 	@Click(R.id.btn_done_rainy_mode)
 	void buttonDoneRainyClicked() {
         if (mAdapter.getCount() != 0) {
@@ -303,9 +307,8 @@ public class ReuseActivity extends Activity {
 	private void donePickImage() {
         List<GateImage> gateImages = gateImageAdapter.getCheckedCJayImageUrls();
         for (int i = 0; i < gateImages.size(); i++) {
-            // Getting the last part of the referrer url
             String name = gateImages.get(i).getName();
-            Logger.Log("name: " + name);
+
             // Create new audit image object
             AuditImage auditImage = new AuditImage()
                     .withId(0)
@@ -314,14 +317,13 @@ public class ReuseActivity extends Activity {
                     .withName(name)
                     .withUUID(UUID.randomUUID().toString());
 
-            dataCenter.addAuditImage(getApplicationContext(), auditImage, containerID);
+	        dataCenter.add(new AddAuditImageCommand(this, auditImage, containerID,
+                    AddAuditImageType.ADD_AUDIT_IMAGE_TO_NEW_ISSUE.value));
         }
 
         Intent resultIntent = new Intent();
         setResult(Activity.RESULT_OK, resultIntent);
-
-//      EventBus.getDefault().post(new ImageCapturedEvent(containerID, ImageType.AUDIT, null));
-        this.finish();
+        finish();
 	}
 
 	@Background
@@ -347,14 +349,12 @@ public class ReuseActivity extends Activity {
 			}
 
 			importImages.removeAll(deletedImportImages);
-
 			updatedData(importImages);
 		}
 	}
 
 	@UiThread
 	public void updatedData(List<GateImage> importImages) {
-		Logger.Log("Size: " + importImages.size());
 		gateImageAdapter.clear();
 		if (importImages != null) {
 			for (GateImage object : importImages) {
@@ -377,7 +377,6 @@ public class ReuseActivity extends Activity {
         mAdapter.clear();
         if (imageUrls != null) {
             for (String object : imageUrls) {
-
                 if (object.contains("containerId") && object.contains("imageType")) {
                     mAdapter.add(object);
                 }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.DataCenter_;
+import com.cloudjay.cjay.task.command.session.FetchSessionsCommand;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
@@ -28,7 +29,7 @@ public class SyncIntentService extends IntentService {
 				Logger.w(" > Sync session between local and server");
 
 				String lastModifiedTime = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_MODIFIED_DATE);
-				DataCenter_.getInstance_(getApplicationContext()).fetchSession(getApplicationContext(), lastModifiedTime, true);
+				DataCenter_.getInstance_(this).add(new FetchSessionsCommand(getApplicationContext(), lastModifiedTime, true));
 
 			} else {
 				Logger.w("There was problems. Please check credential or connectivity.");

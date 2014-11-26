@@ -17,6 +17,8 @@ public class PreferencesUtil {
 	public static final String PREF_FIRST_PAGE_MODIFIED_DATE = "com.cloudjay.cjay.pref_first_page_modified_date";
     public static final String PREF_CAMERA_MODE_CONTINUOUS = "pref_camera_mode_continuous";
 
+    public static final String PREF_SUBSCRIBE_PUBNUB = "com.cloudjay.cjay.pref_subscribe_pubnub";
+
 	public static void clearPrefs(Context context) {
 		SharedPreferences settings = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
 		settings.edit().clear().commit();
@@ -65,5 +67,10 @@ public class PreferencesUtil {
 
 		// Commit Changed Data
 		editor.commit();
+	}
+
+	public static void removePrefsValue(Context context, String key) {
+		SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
+		prefs.edit().remove(key).commit();
 	}
 }

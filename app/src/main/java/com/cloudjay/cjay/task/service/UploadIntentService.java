@@ -6,6 +6,7 @@ import android.text.TextUtils;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.task.command.cjayobject.StartJobQueueCommand;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
@@ -39,7 +40,7 @@ public class UploadIntentService extends IntentService {
 				if (manager.count() != 0) {
 					Logger.Log("There is already job in the queue");
 				} else {
-					dataCenter.startJobQueue(getApplicationContext());
+					dataCenter.add(new StartJobQueueCommand(getApplicationContext()));
 				}
 
 			} else {

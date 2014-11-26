@@ -34,8 +34,16 @@ import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.cjayobject.AddCjayObjectCommand;
+import com.cloudjay.cjay.task.command.image.DeleteRainyImageCommand;
+import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
+import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
+import com.cloudjay.cjay.task.command.session.update.AddUploadingSessionCommand;
+import com.cloudjay.cjay.task.command.session.update.AddWorkingSessionCommand;
+import com.cloudjay.cjay.task.command.session.get.SearchCommand;
+import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.task.job.UploadImageJob;
-import com.cloudjay.cjay.task.job.UploadImportJob;
+import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
@@ -179,7 +187,7 @@ public class ImportFragment extends Fragment {
 
 		Utils.setupEditText(etContainerCode);
 
-        updateList();
+		updateList();
 	}
 
 	//region EVENT HANDLER
@@ -194,37 +202,25 @@ public class ImportFragment extends Fragment {
 		// Set operator to edit text
 		etOperator.setText(operator.getOperatorCode());
 
-        if (mSession != null) {
-            mSession.setOperatorId(operatorId);
-            mSession.setOperatorCode(operator.getOperatorCode());
-            mSession.setGateImages(list);
-        }
+		if (mSession != null) {
+			mSession.setOperatorId(operatorId);
+			mSession.setOperatorCode(operator.getOperatorCode());
+			mSession.setGateImages(list);
+		}
 
-        if (!rainyMode) {
-			// Save session
-			dataCenter.updateImportSession(mSession);
+		// Save session
+		if (!rainyMode) {
+			dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
 		}
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+		refresh();
+	}
+
 	/**
-	 * Event được trigger khi chụp hình xong bấm nút Done ở camera.
-	 * Refresh container session.
-	 *
-	 * @param
-	 */
-//  @UiThread
-//	void onEvent(ImageCapturedEvent event) {
-//		refresh();
-//	}
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        refresh();
-    }
-
-    /**
 	 * @param event
 	 */
 	public void onEvent(ContainerGotEvent event) {
@@ -249,16 +245,13 @@ public class ImportFragment extends Fragment {
 	//endregion
 
 	void refresh() {
-		dataCenter.getSessionInBackground(getActivity(), containerID);
-
+		dataCenter.add(new GetSessionCommand(getActivity(), containerID));
 	}
 
 	@UiThread
 	public void updatedData() {
 
 		if (null == mSession) {
-
-			// Set container ID for text View containerId
 			etContainerCode.setText(containerID);
 
 		} else {
@@ -267,12 +260,7 @@ public class ImportFragment extends Fragment {
 			containerID = mSession.getContainerId();
 			operatorCode = mSession.getOperatorCode();
 			etContainerCode.setText(containerID);
-
 			etOperator.setText(operatorCode);
-//			Operator operator = dataCenter.getOperator(getActivity().getApplicationContext(), operatorCode);
-//			if (operator != null) {
-//				etOperator.setText(operator.getOperatorName());
-//			}
 
 			preStatus = mSession.getPreStatus();
 			switch ((int) preStatus) {
@@ -335,11 +323,11 @@ public class ImportFragment extends Fragment {
 	@Click(R.id.btn_complete_import)
 	void buttonCompletedClicked() {
 
-        containerID = etContainerCode.getText().toString();
+		containerID = etContainerCode.getText().toString();
 
 		if (rainyMode) {
-            performSearch(containerID);
-            return;
+			performSearch(containerID);
+			return;
 		}
 
 		if (mSession.isValidToUpload(Step.IMPORT) == false) {
@@ -363,24 +351,26 @@ public class ImportFragment extends Fragment {
 	private void openReuseActivity() {
 		Intent intent = new Intent(getActivity(), ReuseActivity_.class);
 		intent.setAction(CJayConstant.ACTION_PICK_MORE);
-        intent.putExtra(ReuseActivity.CHECKED_IMAGES, imageUrls);
+		intent.putExtra(ReuseActivity.CHECKED_IMAGES, imageUrls);
 		startActivity(intent);
 	}
 
 	private void uploadImportSession(boolean clearFromWorking) {
 
+		// Add to Uploading
+		dataCenter.add(new AddUploadingSessionCommand(getActivity(), mSession));
+
 		//Remove from working
 		if (clearFromWorking) {
-			dataCenter.removeWorkingSession(getActivity(), mSession.getContainerId());
+			dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
 		}
 
+		mSession.prepareForUploading();
+		dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
+
 		// Add container session to upload queue
-		try {
-			CJayObject object = new CJayObject(mSession,Session.class,mSession.getContainerId());
-			dataCenter.addCJayObject(containerID, object);
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
+		CJayObject object = new CJayObject(mSession, Session.class, mSession.getContainerId());
+		dataCenter.add(new AddCjayObjectCommand(getActivity().getApplicationContext(), object));
 	}
 
 	@Touch(R.id.et_operator)
@@ -408,8 +398,8 @@ public class ImportFragment extends Fragment {
 
 			if (!rainyMode) {
 				mSession.setPreStatus(preStatus);
-				dataCenter.updateImportSession(mSession);
-				dataCenter.addWorkingSession(mSession);
+				dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
+				dataCenter.add(new AddWorkingSessionCommand(getActivity(), mSession));
 
 				btnContinue.setVisibility(View.GONE);
 			}
@@ -424,8 +414,8 @@ public class ImportFragment extends Fragment {
 
 			if (!rainyMode) {
 				mSession.setPreStatus(preStatus);
-				dataCenter.updateImportSession(mSession);
-				dataCenter.addWorkingSession(mSession);
+				dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
+				dataCenter.add(new AddWorkingSessionCommand(getActivity(), mSession));
 
 				btnContinue.setVisibility(View.VISIBLE);
 			}
@@ -439,8 +429,8 @@ public class ImportFragment extends Fragment {
 
 			if (!rainyMode) {
 				mSession.setPreStatus(preStatus);
-				dataCenter.updateImportSession(mSession);
-				dataCenter.addWorkingSession(mSession);
+				dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
+				dataCenter.add(new AddWorkingSessionCommand(getActivity(), mSession));
 
 				btnContinue.setVisibility(View.VISIBLE);
 			}
@@ -467,181 +457,174 @@ public class ImportFragment extends Fragment {
 		return true;
 	}
 
-    private void saveSessionRainyMode() {
+	private void saveSessionRainyMode() {
 
-        // get depot code
-        String depotCode = PreferencesUtil.getPrefsValue(getActivity(), PreferencesUtil.PREF_USER_DEPOT);
+		// get depot code
+		String depotCode = PreferencesUtil.getPrefsValue(getActivity(), PreferencesUtil.PREF_USER_DEPOT);
 
-        for (GateImage gateImage : list) {
-            String uri = gateImage.getUrl();
-            String imageName = gateImage.getName();
+		for (GateImage gateImage : list) {
+			String uri = gateImage.getUrl();
+			String imageName = gateImage.getName();
 
-            // update image name
-            String newImageName = imageName.replace("containerId", etContainerCode.getText().toString());
-            newImageName = newImageName.replace("imageType", "gate-in");
+			// update image name
+			String newImageName = imageName.replace("containerId", etContainerCode.getText().toString());
+			newImageName = newImageName.replace("imageType", "gate-in");
 
-            // Get image file from storage
-            File directory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/rainy_mode" );
-            File file = new File(directory, imageName);
+			// Get image file from storage
+			File directory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/rainy_mode");
+			File file = new File(directory, imageName);
 
-            // Create new image file
-            File newFile = new File(directory, newImageName);
+			// Create new image file
+			File newFile = new File(directory, newImageName);
 
-            // Rename image
-            file.renameTo(newFile);
+			// Rename image
+			file.renameTo(newFile);
 
-            //update uri
-            String newUri = uri.replace(imageName, newImageName);
+			//update uri
+			String newUri = uri.replace(imageName, newImageName);
 
-            // set name and uri in gate image
-            gateImage.setName(newImageName);
-            gateImage.setUrl(newUri);
-        }
+			// set name and uri in gate image
+			gateImage.setName(newImageName);
+			gateImage.setUrl(newUri);
+		}
 
-        mSession = new Session()
-                .withContainerId(etContainerCode.getText().toString())
-                .withOperatorCode(etOperator.getText().toString())
-                .withOperatorId(operatorId)
-                .withPreStatus(preStatus)
-                .withGateImages(list)
-                .withLocalStep(Step.IMPORT.value);
+		mSession = new Session()
+				.withContainerId(etContainerCode.getText().toString())
+				.withOperatorCode(etOperator.getText().toString())
+				.withOperatorId(operatorId)
+				.withPreStatus(preStatus)
+				.withGateImages(list)
+				.withLocalStep(Step.IMPORT.value);
 
-        dataCenter.addSession(mSession);
+		dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
+		// Add image to job queue
+		for (GateImage gateImage : list) {
+			String uri = Utils.parseUrltoUri(gateImage.getUrl());
+			String imageName = gateImage.getName();
+			String containerId = mSession.getContainerId();
 
-        // Add image to job queue
-        for (GateImage gateImage : list) {
-            String uri = Utils.parseUrltoUri(gateImage.getUrl());
-            String imageName = gateImage.getName();
-            String containerId = mSession.getContainerId();
+			CJayObject object = new CJayObject(gateImage, GateImage.class, containerId);
+			dataCenter.add(new AddCjayObjectCommand(getActivity().getApplicationContext(), object));
+		}
+		//Upload session
+		uploadImportSession(false);
 
-	        // TODO: @nam & @thai need to recheck this block
-//            JobManager jobManager = App.getJobManager();
-//            jobManager.addJobInBackground(new UploadImageJob(uri, imageName, containerId, ImageType.IMPORT));
+		// Delete selected image
+		dataCenter.add(new DeleteRainyImageCommand(
+				getActivity().getApplicationContext(), imageUrls));
+	}
 
-	        try {
-		        CJayObject object = new CJayObject(gateImage, GateImage.class, containerId);
-		        dataCenter.addCJayObject(containerId, object);
-	        } catch (SnappydbException e) {
-		        e.printStackTrace();
-	        }
-        }
-        //Upload session
-        uploadImportSession(false);
+	@UiThread
+	void onEvent(RainyImagesDeletedEvent event) {
+		// open reuse activity
+		Intent intent = new Intent(getActivity(), ReuseActivity_.class);
+		startActivity(intent);
+		getActivity().finish();
+	}
 
-        // Delete selected image
-        dataCenter.deleteRainyImage(getActivity().getApplicationContext(), imageUrls);
-    }
+	@UiThread
+	void onEvent(RainyImagesGotEvent event) {
+		imageUrls = event.getImageUrls();
+		updateList();
+	}
 
-    @UiThread
-    void onEvent(RainyImagesDeletedEvent event) {
-        // open reuse activity
-        Intent intent = new Intent(getActivity(), ReuseActivity_.class);
-        startActivity(intent);
-        getActivity().finish();
-    }
+	void updateList() {
 
-    @UiThread
-    void onEvent (RainyImagesGotEvent event) {
-        imageUrls = event.getImageUrls();
-        updateList();
-    }
+		list.clear();
+		mAdapter.clear();
 
-    void updateList() {
+		if (imageUrls != null) {
 
-        list.clear();
-        mAdapter.clear();
+			for (int i = 0; i < imageUrls.size(); i++) {
 
-        if (imageUrls != null) {
+				String imageName = Utils.getImageNameFromUrl(imageUrls.get(i));
+				String uuid = Utils.getUuidFromImageName(imageName);
 
-            for (int i = 0; i < imageUrls.size(); i++) {
+				GateImage gateImage = new GateImage()
+						.withId(0)
+						.withType(ImageType.IMPORT.value)
+						.withName(imageName)
+						.withUrl(imageUrls.get(i))
+						.withUuid(uuid);
 
-                String imageName = Utils.getImageNameFromUrl(imageUrls.get(i));
-                String uuid = Utils.getUuidFromImageName(imageName);
+				list.add(gateImage);
+			}
+		}
 
-                GateImage gateImage = new GateImage()
-                        .withId(0)
-                        .withType(ImageType.IMPORT.value)
-                        .withName(imageName)
-                        .withUrl(imageUrls.get(i))
-                        .withUuid(uuid);
+		mAdapter.setData(list);
+	}
 
-                list.add(gateImage);
-            }
-        }
+	private void showInvalidIsoContainerDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setTitle("Alert");
+		builder.setMessage(getResources().getString(R.string.dialog_container_id_invalid_iso));
 
-        mAdapter.setData(list);
-    }
+		builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				dialogInterface.dismiss();
+			}
+		});
 
-    private void showInvalidIsoContainerDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Alert");
-        builder.setMessage(getResources().getString(R.string.dialog_container_id_invalid_iso));
+		builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				// Open camera activity to take repair image
+				saveSessionRainyMode();
+				dialogInterface.dismiss();
+			}
+		});
 
-        builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        });
+		AlertDialog dialog = builder.create();
+		dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+			@Override
+			public void onShow(DialogInterface dialogInterface) {
 
-        builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                // Open camera activity to take repair image
-                saveSessionRainyMode();
-                dialogInterface.dismiss();
-            }
-        });
+				// Set background and text color for BUTTON_NEGATIVE
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+						.setTextColor(getActivity().getResources().getColor(android.R.color.white));
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+						.setBackgroundResource(R.drawable.btn_red_selector);
 
-        AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialogInterface) {
+				// Set background and text color for BUTTON_POSITIVE
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+						.setTextColor(getActivity().getResources().getColor(android.R.color.white));
+				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+						.setBackgroundColor(getActivity().getResources().getColor(android.R.color.darker_gray));
+			}
+		});
+		dialog.show();
+	}
 
-                // Set background and text color for BUTTON_NEGATIVE
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
-                        .setTextColor(getActivity().getResources().getColor(android.R.color.white));
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
-                        .setBackgroundResource(R.drawable.btn_red_selector);
+	private void performSearch(String containerId) {
+//        dataCenter.search(getActivity(), containerId, true);
+		dataCenter.add(new SearchCommand(getActivity(), containerId, true));
+	}
 
-                // Set background and text color for BUTTON_POSITIVE
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
-                        .setTextColor(getActivity().getResources().getColor(android.R.color.white));
-                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
-                        .setBackgroundColor(getActivity().getResources().getColor(android.R.color.darker_gray));
-            }
-        });
-        dialog.show();
-    }
+	@UiThread
+	public void onEvent(ContainerSearchedEvent event) {
 
-    private void performSearch(String containerId) {
-        dataCenter.search(getActivity(), containerId, true);
-    }
+		boolean searchInImportFragment = event.isSearchInImportFragment();
 
-    @UiThread
-    public void onEvent(ContainerSearchedEvent event) {
-
-        boolean searchInImportFragment = event.isSearchInImportFragment();
-
-        if (searchInImportFragment) {
-            if (rainyMode) {
-                List<Session> result = event.getSessions();
-                if (result.size() == 0) {
-                    if (isValidToAddSession()) {
-                        if (!Utils.isContainerIdValid(containerID)) {
-                            showInvalidIsoContainerDialog();
-                        } else {
-                            saveSessionRainyMode();
-                        }
-                    } else {
-                        Utils.showCrouton(getActivity(), getResources().getString(
-                                R.string.warning_container_invalid));
-                    }
-                } else {
-                    Utils.showCrouton(getActivity(), getResources().getString(
-                            R.string.error_container_is_already_existed));
-                }
-            }
-        }
-    }
+		if (searchInImportFragment) {
+			if (rainyMode) {
+				List<Session> result = event.getSessions();
+				if (result.size() == 0) {
+					if (isValidToAddSession()) {
+						if (!Utils.isContainerIdValid(containerID)) {
+							showInvalidIsoContainerDialog();
+						} else {
+							saveSessionRainyMode();
+						}
+					} else {
+						Utils.showCrouton(getActivity(), getResources().getString(
+								R.string.warning_container_invalid));
+					}
+				} else {
+					Utils.showCrouton(getActivity(), getResources().getString(
+							R.string.error_container_is_already_existed));
+				}
+			}
+		}
+	}
 }

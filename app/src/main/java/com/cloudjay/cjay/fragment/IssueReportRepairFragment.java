@@ -17,6 +17,8 @@ import com.cloudjay.cjay.event.isocode.IsoCodesGotEvent;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.IsoCode;
+import com.cloudjay.cjay.task.command.isocode.GetIsoCodeCommand;
+import com.cloudjay.cjay.task.command.isocode.GetListIsoCodesCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 
@@ -98,8 +100,8 @@ public class IssueReportRepairFragment extends IssueReportFragment {
 		});
 
         // refresh repair list
-        mDataCenter.getListIsoCodes(getActivity().getApplicationContext(),
-                CJayConstant.PREFIX_REPAIR_CODE);
+        mDataCenter.add(new GetListIsoCodesCommand(getActivity().getApplicationContext(),
+                CJayConstant.PREFIX_REPAIR_CODE));
 	}
 
 	@Override
@@ -211,8 +213,8 @@ public class IssueReportRepairFragment extends IssueReportFragment {
 
             // initialize with issue
             if (mAuditItem != null && mAuditItem.getComponentCode() != null) {
-                mDataCenter.getIsoCode(getActivity().getApplicationContext(),
-                        CJayConstant.PREFIX_REPAIR_CODE, mAuditItem.getRepairCode());
+                mDataCenter.add(new GetIsoCodeCommand(getActivity().getApplicationContext(),
+                        CJayConstant.PREFIX_REPAIR_CODE, mAuditItem.getRepairCode()));
             }
         }
     }

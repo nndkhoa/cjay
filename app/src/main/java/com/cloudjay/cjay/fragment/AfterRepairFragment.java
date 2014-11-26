@@ -15,6 +15,7 @@ import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
@@ -93,12 +94,10 @@ public class AfterRepairFragment extends Fragment {
     @AfterViews
     void setUp() {
 
-
-
-        if (null == mSession) {
-            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
-                    containerID);
-        }
+//        if (null == mSession) {
+//            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
+//                    containerID);
+//        }
 
         if (null == imageAdapter) {
             imageAdapter = new DetailIssuedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.REPAIRED);
@@ -133,21 +132,10 @@ public class AfterRepairFragment extends Fragment {
         startActivity(cameraActivityIntent);
     }
 
-//    @UiThread
-//    void onEvent(ImageCapturedEvent event) {
-//        Logger.Log("on ImageCapturedEvent");
-//        if (event.getImageType() == ImageType.REPAIRED.value) {
-//            // Requery session to update data
-//            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
-//                    containerID);
-//        }
-//    }
-
     @Override
     public void onResume() {
         super.onResume();
-        dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
-                    containerID);
+	    dataCenter.add(new GetSessionCommand(getActivity(), containerID));
     }
 
     @UiThread
@@ -174,14 +162,16 @@ public class AfterRepairFragment extends Fragment {
             auditItem = mSession.getAuditItem(auditItemUUID);
 
             // parse Data to view
-            tvCompCode.setText(auditItem.getComponentCode());
-            tvLocationCode.setText(auditItem.getLocationCode());
-            tvDamageCode.setText(auditItem.getDamageCode());
-            tvRepairCode.setText(auditItem.getRepairCode());
+            if (auditItem != null) {
+                tvCompCode.setText(auditItem.getComponentCode());
+                tvLocationCode.setText(auditItem.getLocationCode());
+                tvDamageCode.setText(auditItem.getDamageCode());
+                tvRepairCode.setText(auditItem.getRepairCode());
 
-            tvSize.setText("Dài " + auditItem.getHeight() + ",\t" + "Rộng " + auditItem.getLength());
-            textViewBtnCamera.setText(R.string.button_add_new_repair_image);
-            tvNumber.setText(auditItem.getQuantity() + "");
+                tvSize.setText("Dài " + auditItem.getHeight() + ",\t" + "Rộng " + auditItem.getLength());
+                textViewBtnCamera.setText(R.string.button_add_new_repair_image);
+                tvNumber.setText(auditItem.getQuantity() + "");
+            }
         }
     }
 

@@ -7,13 +7,13 @@ import java.util.ArrayList;
  */
 public class RainyImagesGotEvent {
 
-    public ArrayList<String> imageUrls;
+	public ArrayList<String> imageUrls;
 
-    public RainyImagesGotEvent(ArrayList<String> imageUrls) {
-        this.imageUrls = imageUrls;
-    }
+	public RainyImagesGotEvent(ArrayList<String> imageUrls) {
+		this.imageUrls = imageUrls;
+	}
 
-    public ArrayList<String> getImageUrls() {
-        return this.imageUrls;
-    }
+	public ArrayList<String> getImageUrls() {
+		return this.imageUrls;
+	}
 }

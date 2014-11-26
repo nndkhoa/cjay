@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 
 import org.androidannotations.annotations.AfterViews;

@@ -28,14 +28,20 @@ import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.util.Logger;
-import com.cloudjay.cjay.task.job.UploadImportJob;
+import com.cloudjay.cjay.task.command.cjayobject.AddCjayObjectCommand;
+import com.cloudjay.cjay.task.command.issue.GetListAuditItemsCommand;
+import com.cloudjay.cjay.task.command.issue.RemoveAuditItemCommand;
+import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
+import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
+import com.cloudjay.cjay.task.command.session.update.ForceExportCommand;
+import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
-import com.snappydb.SnappydbException;
 import com.path.android.jobqueue.JobManager;
+import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -100,7 +106,7 @@ public class IssuePendingFragment extends Fragment {
 
 	@AfterViews
 	void setUp() {
-		dataCenter.getSessionInBackground(getActivity(), containerId);
+		dataCenter.add(new GetSessionCommand(getActivity(), containerId));
 	}
 
 	//region VIEW INTERACTION
@@ -109,17 +115,15 @@ public class IssuePendingFragment extends Fragment {
 	void buttonCleanClicked() {
 
 		//Remove from working
-		dataCenter.removeWorkingSession(getActivity(), containerId);
+		dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerId));
+
 		//Change step to Clean
+		mSession.setUploadStatus(UploadStatus.UPLOADING);
 		mSession.setLocalStep(Step.HAND_CLEAN.value);
 
 		// Add container session to upload queue
-		try {
-			CJayObject object = new CJayObject(mSession, Session.class, mSession.getContainerId());
-			dataCenter.addCJayObject(containerId, object);
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
+		CJayObject object = new CJayObject(mSession, Session.class, mSession.getContainerId());
+		dataCenter.add(new AddCjayObjectCommand(getActivity(), object));
 		getActivity().finish();
 	}
 
@@ -151,7 +155,7 @@ public class IssuePendingFragment extends Fragment {
 	 */
 	void refresh() {
 		if (mAdapter != null) {
-			dataCenter.getAuditItemsInBackground(getActivity(), containerId);
+			dataCenter.add(new GetListAuditItemsCommand(getActivity(), containerId));
 		}
 	}
 
@@ -282,7 +286,7 @@ public class IssuePendingFragment extends Fragment {
 
 	@OptionsItem(R.id.menu_export)
 	void exportMenuItemClicked() {
-		dataCenter.changeLocalStepAndForceExport(getActivity(), containerId);
+		dataCenter.add(new ForceExportCommand(getActivity(), containerId));
 		getActivity().finish();
 	}
 
@@ -311,21 +315,19 @@ public class IssuePendingFragment extends Fragment {
 
 	//region EVENT HANDLER
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        refresh();
-    }
+	@Override
+	public void onResume() {
+		super.onResume();
+		refresh();
+	}
 
-    @UiThread
+	@UiThread
 	void onEvent(IssueMergedEvent event) {
 
 		// Delete merged audit item containerId
 		String containerId = event.getContainerId();
-		String auditItemRemoveUUID = event.getAuditItemRemoveUUID();
-		dataCenter.removeAuditItem(getActivity().getApplicationContext(),
-				containerId, auditItemRemoveUUID);
-		refresh();
+		String itemUuid = event.getItemUuid();
+		dataCenter.add(new RemoveAuditItemCommand(getActivity(), containerId, itemUuid));
 	}
 
 	@UiThread
@@ -338,9 +340,9 @@ public class IssuePendingFragment extends Fragment {
 		if (event.uploadType == UploadType.AUDIT_ITEM) {
 
 		}
+
 		mSession = event.getSession();
 		refresh();
-
 	}
 
 	@UiThread

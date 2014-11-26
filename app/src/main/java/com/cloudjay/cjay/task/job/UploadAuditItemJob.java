@@ -10,7 +10,9 @@ import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.CJayObject;
-import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.cjayobject.GetNextJobCommand;
+import com.cloudjay.cjay.task.command.cjayobject.RemoveCjayObjectCommand;
+import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Priority;
@@ -45,9 +47,7 @@ public class UploadAuditItemJob extends Job {
 
 	@Override
 	public void onAdded() {
-
 		EventBus.getDefault().post(new UploadStartedEvent(containerId, UploadType.AUDIT_ITEM));
-
 	}
 
 	@Override
@@ -56,24 +56,26 @@ public class UploadAuditItemJob extends Job {
 		Context context = App.getInstance().getApplicationContext();
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
 
-		dataCenter.addLog(context, containerId, "Bắt đầu upload audit item: " + auditItem.getUuid(),CJayConstant.PREFIX_LOG);
+		dataCenter.addLog(context, containerId, "Bắt đầu upload audit item: " + auditItem.getUuid(), CJayConstant.PREFIX_LOG);
 		EventBus.getDefault().post(new UploadingEvent(containerId, UploadType.AUDIT_ITEM));
 
-        if (!this.addMoreImages) {
-            Logger.Log("uploadAddedAuditImage");
-			dataCenter.uploadAuditItem(context, containerId, sessionId, auditItem, object);
-        } else {
-            Logger.Log("uploadAddedAuditImage");
-            dataCenter.uploadAddedAuditImage(context, containerId, auditItem);
-        }
+		AuditItem item;
+		if (!this.addMoreImages) {
+			item = dataCenter.uploadAuditItem(context, sessionId, auditItem);
+		} else {
+			item = dataCenter.uploadAddedAuditImage(context, auditItem);
+		}
+
+		dataCenter.add(new UpdateAuditItemCommand(context, containerId, item));
+		dataCenter.add(new RemoveCjayObjectCommand(context, object));
+		dataCenter.add(new GetNextJobCommand(context, object));
 	}
 
 	@Override
 	protected void onCancel() {
 
 		Context context = App.getInstance().getApplicationContext();
-		DataCenter_.getInstance_(context).addLog(context, containerId, "Upload lỗi thất bại",CJayConstant.PREFIX_LOG);
-
+		DataCenter_.getInstance_(context).addLog(context, containerId, "Upload lỗi thất bại", CJayConstant.PREFIX_LOG);
 		EventBus.getDefault().post(new UploadStoppedEvent(containerId));
 
 	}
@@ -83,7 +85,7 @@ public class UploadAuditItemJob extends Job {
 
 		if (throwable instanceof RetrofitError) {
 			Context context = App.getInstance().getApplicationContext();
-			DataCenter_.getInstance_(context).addLog(context, containerId, "Upload lỗibị gián đoạn",CJayConstant.PREFIX_LOG);
+			DataCenter_.getInstance_(context).addLog(context, containerId, "Upload bị gián đoạn", CJayConstant.PREFIX_LOG);
 
 			//if it is a 4xx error, stop
 			RetrofitError retrofitError = (RetrofitError) throwable;

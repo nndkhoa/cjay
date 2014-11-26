@@ -17,6 +17,8 @@ import com.cloudjay.cjay.event.isocode.IsoCodesGotEvent;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.IsoCode;
+import com.cloudjay.cjay.task.command.isocode.GetIsoCodeCommand;
+import com.cloudjay.cjay.task.command.isocode.GetListIsoCodesCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 
@@ -93,8 +95,8 @@ public class IssueReportComponentFragment extends IssueReportFragment {
 		});
 
         // refresh component list
-        mDataCenter.getListIsoCodes(getActivity().getApplicationContext(),
-                CJayConstant.PREFIX_COMPONENT_CODE);
+        mDataCenter.add(new GetListIsoCodesCommand(getActivity().getApplicationContext(),
+                CJayConstant.PREFIX_COMPONENT_CODE));
 	}
 
 	@ItemClick(R.id.lv_component)
@@ -163,25 +165,6 @@ public class IssueReportComponentFragment extends IssueReportFragment {
 		}
 	}
 
-    @UiThread
-    public void onEvent(IsoCodeGotEvent event) {
-        IsoCode componentCode = event.getIsoCode();
-        if (event.getPrefix().equals(CJayConstant.PREFIX_COMPONENT_CODE)) {
-            if (componentCode != null) {
-                mComponentCode = componentCode.getCode();
-                mComponentName = componentCode.getFullName();
-            } else {
-                mComponentCode = "";
-                mComponentName = "";
-            }
-
-            ignoreSearch = true;
-            mComponentEditText.setText(mComponentName);
-            mComponentNameTextView.setText(mComponentName);
-            ignoreSearch = false;
-        }
-    }
-
     void updateData(List<IsoCode> isoCodes) {
         if (isoCodes != null) {
             mAdapter = new IsoCodeAdapter(getActivity().getApplicationContext(),
@@ -195,19 +178,39 @@ public class IssueReportComponentFragment extends IssueReportFragment {
         }
     }
 
+	@UiThread
+	public void onEvent(IsoCodeGotEvent event) {
+		IsoCode componentCode = event.getIsoCode();
+		if (event.getPrefix().equals(CJayConstant.PREFIX_COMPONENT_CODE)) {
+			if (componentCode != null) {
+				mComponentCode = componentCode.getCode();
+				mComponentName = componentCode.getFullName();
+			} else {
+				mComponentCode = "";
+				mComponentName = "";
+			}
+
+			ignoreSearch = true;
+			mComponentEditText.setText(mComponentName);
+			mComponentNameTextView.setText(mComponentName);
+			ignoreSearch = false;
+		}
+	}
+
     @UiThread
     public void onEvent(IsoCodesGotEvent event) {
 
         String prefix = event.getPrefix();
 
         if (prefix.equals(CJayConstant.PREFIX_COMPONENT_CODE)) {
+
             componentCodes = event.getListIsoCodes();
             updateData(componentCodes);
 
             // initialize with issue
             if (mAuditItem != null && mAuditItem.getComponentCode() != null) {
-                mDataCenter.getIsoCode(getActivity().getApplicationContext(),
-                        CJayConstant.PREFIX_COMPONENT_CODE, mAuditItem.getComponentCode());
+                mDataCenter.add(new GetIsoCodeCommand(getActivity().getApplicationContext(),
+                        CJayConstant.PREFIX_COMPONENT_CODE, mAuditItem.getComponentCode()));
             }
         }
     }

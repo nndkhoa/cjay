@@ -36,6 +36,12 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.GateImage;
+import com.cloudjay.cjay.model.GateImage;
+import com.cloudjay.cjay.task.command.cjayobject.AddCjayObjectCommand;
+import com.cloudjay.cjay.task.command.image.AddGateImageCommand;
+import com.cloudjay.cjay.task.command.image.AddOrUpdateAuditImageCommand;
+import com.cloudjay.cjay.task.command.image.AddRainyImageCommand;
+
 import com.cloudjay.cjay.task.job.UploadImageJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -67,843 +73,796 @@ import de.greenrobot.event.EventBus;
 @EActivity(R.layout.activity_camera)
 public class CameraActivity extends Activity implements AutoFocusCallback {
 
-    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
-    public final static String OPERATOR_CODE_EXTRA = "com.cloudjay.wizard.operatorCode";
-    public final static String IMAGE_TYPE_EXTRA = "com.cloudjay.wizard.imageType";
-    public final static String CURRENT_STEP_EXTRA = "com.cloudjay.wizard.currentStep";
-    // This Extra bundle is use to open Detail Issue Activity only
-    public final static String AUDIT_ITEM_UUID_EXTRA = "com.cloudjay.wizard.auditItemUUID";
-    public final static String IS_OPENED = "com.cloudjay.wizard.isOpened";
+	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
+	public final static String OPERATOR_CODE_EXTRA = "com.cloudjay.wizard.operatorCode";
+	public final static String IMAGE_TYPE_EXTRA = "com.cloudjay.wizard.imageType";
+	public final static String CURRENT_STEP_EXTRA = "com.cloudjay.wizard.currentStep";
+	// This Extra bundle is use to open Detail Issue Activity only
+	public final static String AUDIT_ITEM_UUID_EXTRA = "com.cloudjay.wizard.auditItemUUID";
+	public final static String IS_OPENED = "com.cloudjay.wizard.isOpened";
 
-    @Extra(IMAGE_TYPE_EXTRA)
-    int mType;
+	@Extra(IMAGE_TYPE_EXTRA)
+	int mType;
 
-    @Extra(CONTAINER_ID_EXTRA)
-    String containerId;
+	@Extra(CONTAINER_ID_EXTRA)
+	String containerId;
 
-    @Extra(OPERATOR_CODE_EXTRA)
-    String operatorCode;
+	@Extra(OPERATOR_CODE_EXTRA)
+	String operatorCode;
 
-    @Extra(CURRENT_STEP_EXTRA)
-    int currentStep;
+	@Extra(CURRENT_STEP_EXTRA)
+	int currentStep;
 
-    @Extra(AUDIT_ITEM_UUID_EXTRA)
-    String auditItemUUID;
+	@Extra(AUDIT_ITEM_UUID_EXTRA)
+	String auditItemUUID;
 
-    @Extra(IS_OPENED)
-    boolean isOpened;
+	@Extra(IS_OPENED)
+	boolean isOpened;
 
-    @ViewById(R.id.btn_camera_done)
-    Button btnDone;
+	@ViewById(R.id.btn_camera_done)
+	Button btnDone;
 
-    @ViewById(R.id.btn_capture)
-    ImageButton btnCapture;
+	@ViewById(R.id.btn_capture)
+	ImageButton btnCapture;
 
-    @ViewById(R.id.btn_toggle_flash)
-    ImageButton btnToggleFlash;
+	@ViewById(R.id.btn_toggle_flash)
+	ImageButton btnToggleFlash;
 
-    @ViewById(R.id.camera_preview)
-    SurfaceView mPreview;
+	@ViewById(R.id.camera_preview)
+	SurfaceView mPreview;
 
-    @ViewById(R.id.btn_use_gate_image)
-    Button btnUseGateImage;
+	@ViewById(R.id.btn_use_gate_image)
+	Button btnUseGateImage;
 
-    @ViewById(R.id.tv_camera_done)
-    TextView tvSavingImage;
+	@ViewById(R.id.tv_camera_done)
+	TextView tvSavingImage;
 
-    @SystemService
-    AudioManager mAudioManager;
+	@SystemService
+	AudioManager mAudioManager;
 
-    @Bean
-    DataCenter dataCenter;
+	@Bean
+	DataCenter dataCenter;
 
-    boolean rainyMode;
-    private AuditImage auditImage;
+	boolean rainyMode;
+	private AuditImage auditImage;
 
-    MediaPlayer mShootMediaPlayer = null;
-    Camera mCamera = null;
-    String mFlashMode = Camera.Parameters.FLASH_MODE_OFF;
+	MediaPlayer mShootMediaPlayer = null;
+	Camera mCamera = null;
+	String mFlashMode = Camera.Parameters.FLASH_MODE_OFF;
 
-    private static final int PICTURE_SIZE_MAX_WIDTH = 640;
-    private static final int PREVIEW_SIZE_MAX_WIDTH = 1280;
-    private SurfaceHolder mPreviewHolder = null;
-    private boolean mInPreview = false;
-    private boolean mCameraConfigured = false;
-    int mCameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
+	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
+	private static final int PREVIEW_SIZE_MAX_WIDTH = 1280;
+	private SurfaceHolder mPreviewHolder = null;
+	private boolean mInPreview = false;
+	private boolean mCameraConfigured = false;
+	int mCameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
 
-    SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
+	SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
 
-        @Override
-        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+		@Override
+		public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 
-            try {
-                Logger.Log("onSurfaceChanged");
+			try {
+				Logger.Log("onSurfaceChanged");
 
-                initPreview(width, height);
-                startPreview();
+				initPreview(width, height);
+				startPreview();
 
-                Logger.Log("endSurfaceChanged");
+				Logger.Log("endSurfaceChanged");
 
-            } catch (Exception e) {
+			} catch (Exception e) {
 
-                e.printStackTrace();
-                Toast.makeText(getApplicationContext(), R.string.alert_camera_preview, Toast.LENGTH_LONG).show();
-            }
-        }
+				e.printStackTrace();
+				Toast.makeText(getApplicationContext(), R.string.alert_camera_preview, Toast.LENGTH_LONG).show();
+			}
+		}
 
-        @Override
-        public void surfaceCreated(SurfaceHolder holder) {
-            // no-op -- wait until surfaceChanged()
-            Logger.Log("onSurfaceCreated");
-            mInPreview = true;
-        }
+		@Override
+		public void surfaceCreated(SurfaceHolder holder) {
+			// no-op -- wait until surfaceChanged()
+			Logger.Log("onSurfaceCreated");
+			mInPreview = true;
+		}
 
-        @Override
-        public void surfaceDestroyed(SurfaceHolder holder) {
-            // no-op
-            Logger.Log("onSurfaceDestroyed");
+		@Override
+		public void surfaceDestroyed(SurfaceHolder holder) {
+			// no-op
+			Logger.Log("onSurfaceDestroyed");
 
-        }
-    };
+		}
+	};
 
-    Camera.PictureCallback photoCallback = new Camera.PictureCallback() {
+	Camera.PictureCallback photoCallback = new Camera.PictureCallback() {
 
-        @Override
-        public void onPictureTaken(byte[] data, Camera camera) {
+		@Override
+		public void onPictureTaken(byte[] data, Camera camera) {
 
-            showProgressSavingImage(true);
+			showProgressSavingImage(true);
 
-            try {
+			try {
 
-                savePhoto(data);
-                camera.startPreview();
+				savePhoto(data);
+				camera.startPreview();
 
-                mInPreview = true;
-            } catch (Exception e) {
+				mInPreview = true;
+			} catch (Exception e) {
 
-                e.printStackTrace();
-                releaseCamera();
+				e.printStackTrace();
+				releaseCamera();
 
-            }
-        }
-    };
+			}
+		}
+	};
 
-    Camera.ShutterCallback shutterCallback = new Camera.ShutterCallback() {
+	Camera.ShutterCallback shutterCallback = new Camera.ShutterCallback() {
 
-        @Override
-        public void onShutter() {
-            int volume = mAudioManager.getStreamVolume(AudioManager.STREAM_NOTIFICATION);
+		@Override
+		public void onShutter() {
+			int volume = mAudioManager.getStreamVolume(AudioManager.STREAM_NOTIFICATION);
 
-            if (volume != 0) {
-                if (mShootMediaPlayer == null) {
-                    mShootMediaPlayer = MediaPlayer.create(	getApplicationContext(),
-                            Uri.parse("file:///system/media/audio/ui/camera_click.ogg"));
-                }
+			if (volume != 0) {
+				if (mShootMediaPlayer == null) {
+					mShootMediaPlayer = MediaPlayer.create(getApplicationContext(),
+							Uri.parse("file:///system/media/audio/ui/camera_click.ogg"));
+				}
 
-                if (mShootMediaPlayer != null) {
-                    mShootMediaPlayer.start();
-                }
-            }
+				if (mShootMediaPlayer != null) {
+					mShootMediaPlayer.start();
+				}
+			}
 
-            // Logger.Log( "onShutter");
-        }
-    };
+			// Logger.Log( "onShutter");
+		}
+	};
 
-    @Click(R.id.btn_capture)
-    void buttonCaptureClicked() {
-        takePicture();
-    }
+	@Click(R.id.btn_capture)
+	void buttonCaptureClicked() {
+		takePicture();
+	}
 
-    @Click(R.id.btn_use_gate_image)
-    void btnUseGateImageClicked() {
-        // Open ReuseActivity
-        Intent intent = new Intent(getApplicationContext(), ReuseActivity_.class);
-        intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, containerId);
-        startActivityForResult(intent, 1);
-    }
+	@Click(R.id.btn_use_gate_image)
+	void btnUseGateImageClicked() {
+		// Open ReuseActivity
+		Intent intent = new Intent(getApplicationContext(), ReuseActivity_.class);
+		intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, containerId);
+		startActivityForResult(intent, 1);
+	}
 
-    @Click({ R.id.btn_camera_done, R.id.rl_camera_done })
-    void doneButtonClicked() {
-        if (rainyMode) {
-            if (currentStep == Step.IMPORT.value) {
-                // Open ReuseActivity
-                Intent intent = new Intent(getApplicationContext(), ReuseActivity_.class);
-                intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, "");
-                startActivityForResult(intent, 1);
-            }
-        }
-        finish();
-    }
+	@Click({R.id.btn_camera_done, R.id.rl_camera_done})
+	void doneButtonClicked() {
+		if (rainyMode) {
+			if (currentStep == Step.IMPORT.value) {
+				// Open ReuseActivity
+				Intent intent = new Intent(getApplicationContext(), ReuseActivity_.class);
+				intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, "");
+				startActivityForResult(intent, 1);
+			}
+		}
+		finish();
+	}
 
-    private Camera.Size determineBestPictureSize(Camera.Parameters parameters) {
-        List<Size> sizes = parameters.getSupportedPictureSizes();
+	private Camera.Size determineBestPictureSize(Camera.Parameters parameters) {
+		List<Size> sizes = parameters.getSupportedPictureSizes();
 
-        return determineBestSize(sizes, PICTURE_SIZE_MAX_WIDTH);
-    }
+		return determineBestSize(sizes, PICTURE_SIZE_MAX_WIDTH);
+	}
 
-    private Size determineBestPreviewSize(Camera.Parameters parameters) {
-        List<Size> sizes = parameters.getSupportedPreviewSizes();
+	private Size determineBestPreviewSize(Camera.Parameters parameters) {
+		List<Size> sizes = parameters.getSupportedPreviewSizes();
 
-        return determineBestSize(sizes, PREVIEW_SIZE_MAX_WIDTH);
-    }
+		return determineBestSize(sizes, PREVIEW_SIZE_MAX_WIDTH);
+	}
 
-    protected Size determineBestSize(List<Camera.Size> sizes, int widthThreshold) {
-        Size bestSize = null;
+	protected Size determineBestSize(List<Camera.Size> sizes, int widthThreshold) {
+		Size bestSize = null;
 
-        for (Size currentSize : sizes) {
-            boolean isDesiredRatio = currentSize.width / 4 == currentSize.height / 3;
-            boolean isBetterSize = bestSize == null || currentSize.width > bestSize.width;
-            boolean isInBounds = currentSize.width <= PICTURE_SIZE_MAX_WIDTH;
+		for (Size currentSize : sizes) {
+			boolean isDesiredRatio = currentSize.width / 4 == currentSize.height / 3;
+			boolean isBetterSize = bestSize == null || currentSize.width > bestSize.width;
+			boolean isInBounds = currentSize.width <= PICTURE_SIZE_MAX_WIDTH;
 
-            if (isDesiredRatio && isInBounds && isBetterSize) {
-                bestSize = currentSize;
-            }
-        }
+			if (isDesiredRatio && isInBounds && isBetterSize) {
+				bestSize = currentSize;
+			}
+		}
 
-        return bestSize;
-    }
+		return bestSize;
+	}
 
-    @AfterViews
-    void afterViews() {
+	@AfterViews
+	void afterViews() {
 
-        // init container sessions
-        // loadData();
+		// init container sessions
+		// loadData();
 
-        Logger.Log("----> initCamera(), addSurfaceCallback");
+		Logger.Log("----> initCamera(), addSurfaceCallback");
+		// WARNING: this block should be run before onResume()
+		// Setup Surface Holder
+		mPreviewHolder = mPreview.getHolder();
+		mPreviewHolder.addCallback(surfaceCallback);
+		mPreviewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
-        // WARNING: this block should be run before onResume()
-        // Setup Surface Holder
-        mPreviewHolder = mPreview.getHolder();
-        mPreviewHolder.addCallback(surfaceCallback);
-        mPreviewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+		// Restore camera state from database or somewhere else
+		// mFlashMode = Camera.Parameters.FLASH_MODE_OFF;
+		// mCameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
+		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        // Restore camera state from database or somewhere else
-        // mFlashMode = Camera.Parameters.FLASH_MODE_OFF;
-        // mCameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
-
-        // Enable button Camera
-        btnCapture.setEnabled(true);
+		// Enable button Camera
+		btnCapture.setEnabled(true);
 
 //		Logger.Log("isOpened: " + isOpened);
 
-        // Config shot mode. Default is FALSE.
-        // Configure View visibility based on current step of session
+		// Config shot mode. Default is FALSE.
+		// Configure View visibility based on current step of session
 
 //		Logger.Log("Current Step of session: " + step.toString());
-        rainyMode = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-                .getBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox),
-                        false);
+		rainyMode = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+				.getBoolean(getString(R.string.pref_key_enable_temporary_fragment_checkbox),
+						false);
 
-        Step step = Step.values()[currentStep];
-        switch (step) {
-            case AUDIT:
-                btnUseGateImage.setVisibility(View.VISIBLE);
-                break;
-            default:
-                //getContract().setSingleShotMode(false);
-                btnUseGateImage.setVisibility(View.GONE);
-                break;
-        }
+		Step step = Step.values()[currentStep];
+		switch (step) {
+			case AUDIT:
+				btnUseGateImage.setVisibility(View.VISIBLE);
+				break;
+			default:
+				//getContract().setSingleShotMode(false);
+				btnUseGateImage.setVisibility(View.GONE);
+				break;
+		}
 
-    }
+	}
 
-    void initPreview(int width, int height) {
-        Logger.Log("initPreview()");
+	void initPreview(int width, int height) {
+		Logger.Log("initPreview()");
 
-        if (mCamera != null && mPreviewHolder.getSurface() != null) {
-            try {
-                Logger.Log("setPreviewDisplay");
-                mCamera.setPreviewDisplay(mPreviewHolder);
-                // camera.setPreviewCallback(null);
-                // camera.setOneShotPreviewCallback(null);
+		if (mCamera != null && mPreviewHolder.getSurface() != null) {
+			try {
+				Logger.Log("setPreviewDisplay");
+				mCamera.setPreviewDisplay(mPreviewHolder);
+				// camera.setPreviewCallback(null);
+				// camera.setOneShotPreviewCallback(null);
 
-            } catch (Throwable t) {
-                Logger.e("Exception in setPreviewDisplay()");
-                Toast.makeText(this, t.getMessage(), Toast.LENGTH_LONG).show();
-            }
+			} catch (Throwable t) {
+				Logger.e("Exception in setPreviewDisplay()");
+				Toast.makeText(this, t.getMessage(), Toast.LENGTH_LONG).show();
+			}
 
-            if (!mCameraConfigured) {
+			if (!mCameraConfigured) {
 
-                Logger.Log("config Camera");
+				Logger.Log("config Camera");
 
-                Camera.Parameters parameters = mCamera.getParameters();
-                Camera.Size size = determineBestPreviewSize(parameters);
-                Camera.Size pictureSize = determineBestPictureSize(parameters);
+				Camera.Parameters parameters = mCamera.getParameters();
+				Camera.Size size = determineBestPreviewSize(parameters);
+				Camera.Size pictureSize = determineBestPictureSize(parameters);
 
-                // Logger.Log("PreviewSize: " + Integer.toString(size.width) + "/" + Integer.toString(size.height));
-                // Logger.Log("PictureSize: " + Integer.toString(pictureSize.width) + "/"
-                // + Integer.toString(pictureSize.height));
+				// Logger.Log("PreviewSize: " + Integer.toString(size.width) + "/" + Integer.toString(size.height));
+				// Logger.Log("PictureSize: " + Integer.toString(pictureSize.width) + "/"
+				// + Integer.toString(pictureSize.height));
 
-                try {
-                    if (size != null && pictureSize != null) {
-                        parameters.setPreviewSize(size.width, size.height);
+				try {
+					if (size != null && pictureSize != null) {
+						parameters.setPreviewSize(size.width, size.height);
 
-                        parameters.setPictureSize(pictureSize.width, pictureSize.height);
+						parameters.setPictureSize(pictureSize.width, pictureSize.height);
 
-                        parameters.setPictureFormat(ImageFormat.JPEG);
-                        parameters.setFlashMode(mFlashMode);
-                        parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+						parameters.setPictureFormat(ImageFormat.JPEG);
+						parameters.setFlashMode(mFlashMode);
+						parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
 
-                        mCamera.setParameters(parameters);
-                        mCameraConfigured = true;
-                    }
-                } catch (Resources.NotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
+						mCamera.setParameters(parameters);
+						mCameraConfigured = true;
+					}
+				} catch (Resources.NotFoundException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 
-    @Override
-    public void onAutoFocus(boolean arg0, Camera arg1) {
+	@Override
+	public void onAutoFocus(boolean arg0, Camera arg1) {
 
-        try {
-            Logger.Log("Auto focused, now take picture");
-            mCamera.takePicture(shutterCallback, null, photoCallback);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+		try {
+			Logger.Log("Auto focused, now take picture");
+			mCamera.takePicture(shutterCallback, null, photoCallback);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-    @Override
-    public void onBackPressed() {
+	@Override
+	public void onBackPressed() {
 		doneButtonClicked();
-    }
+	}
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
 
-        // cameraConfigured = false;
-        super.onConfigurationChanged(newConfig);
+		// cameraConfigured = false;
+		super.onConfigurationChanged(newConfig);
 
-        // setCameraDisplayOrientation(this, cameraMode, camera);
-        // onResume();
+		// setCameraDisplayOrientation(this, cameraMode, camera);
+		// onResume();
 
-        setContentView(R.layout.activity_camera);
-        openCamera();
-    }
+		setContentView(R.layout.activity_camera);
+		openCamera();
+	}
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
 
-        try {
-            if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
-                    || keyCode == KeyEvent.KEYCODE_VOLUME_UP
-                    || keyCode == KeyEvent.KEYCODE_CAMERA)) {
+		try {
+			if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
+					|| keyCode == KeyEvent.KEYCODE_VOLUME_UP
+					|| keyCode == KeyEvent.KEYCODE_CAMERA)) {
 
-                takePicture();
-                return true;
-            } else {
-                return super.onKeyDown(keyCode, event);
-            }
-        } catch (Exception e) {
-            Utils.showCrouton(this, "Please take it easy");
-            e.printStackTrace();
-            return true;
-        }
-    }
+				takePicture();
+				return true;
+			} else {
+				return super.onKeyDown(keyCode, event);
+			}
+		} catch (Exception e) {
+			Utils.showCrouton(this, "Please take it easy");
+			e.printStackTrace();
+			return true;
+		}
+	}
 
-    @Override
-    protected void onPause() {
-        releaseCamera();
-        super.onPause();
-    }
+	@Override
+	protected void onPause() {
+		releaseCamera();
+		super.onPause();
+	}
 
-    // region Override Activity
-    @Override
-    protected void onResume() {
+	// region Override Activity
+	@Override
+	protected void onResume() {
 
-        // Logger.w("Session: " + mContainerSessionUUID);
-        // Logger.w("Issue: " + mIssueUUID);
-        // Logger.w("Image Type: " + mType);
-        // Logger.Log("----> onResume()");
-        super.onResume();
+		// Logger.w("Session: " + mContainerSessionUUID);
+		// Logger.w("Issue: " + mIssueUUID);
+		// Logger.w("Image Type: " + mType);
+		// Logger.Log("----> onResume()");
+		super.onResume();
 
-        openCamera();
-        setContentView(R.layout.activity_camera);
+		openCamera();
+		setContentView(R.layout.activity_camera);
 
-    }
+	}
 
-    void openCamera() {
+	void openCamera() {
 
-        if (mCamera != null) {
-            mCamera.release();
-        }
+		if (mCamera != null) {
+			mCamera.release();
+		}
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            Camera.CameraInfo info = new Camera.CameraInfo();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+			Camera.CameraInfo info = new Camera.CameraInfo();
 
-            for (int i = 0; i < Camera.getNumberOfCameras(); i++) {
+			for (int i = 0; i < Camera.getNumberOfCameras(); i++) {
 
-                Camera.getCameraInfo(i, info);
-                if (info.facing == mCameraMode) {
-                    Logger.Log("inside onResume: camera != null");
-
-                    mCamera = Camera.open(i);
-                    setCameraDisplayOrientation(this, mCameraMode, mCamera);
-                }
-            }
-        }
-
-        if (mCamera == null) {
-            Logger.Log("inside onResume: camera == null");
-            mCamera = Camera.open(mCameraMode);
-        }
-
-        startPreview();
-    }
+				Camera.getCameraInfo(i, info);
+				if (info.facing == mCameraMode) {
+					Logger.Log("inside onResume: camera != null");
+
+					mCamera = Camera.open(i);
+					setCameraDisplayOrientation(this, mCameraMode, mCamera);
+				}
+			}
+		}
+
+		if (mCamera == null) {
+			Logger.Log("inside onResume: camera == null");
+			mCamera = Camera.open(mCameraMode);
+		}
+
+		startPreview();
+	}
 
-    void releaseCamera() {
+	void releaseCamera() {
 
-        if (mCamera != null) {
+		if (mCamera != null) {
 
-            Logger.Log("Release camera ... ");
+			Logger.Log("Release camera ... ");
 
-            if (mInPreview) {
-                Logger.Log("Stop Preview ... ");
-                mCamera.stopPreview();
-                // preview.getHolder().removeCallback(null);
-            }
+			if (mInPreview) {
+				Logger.Log("Stop Preview ... ");
+				mCamera.stopPreview();
+				// preview.getHolder().removeCallback(null);
+			}
 
-            // camera.setPreviewCallback(null);
-            mCamera.release();
-            mCamera = null;
+			// camera.setPreviewCallback(null);
+			mCamera.release();
+			mCamera = null;
 
-            // WARNING: lots of bugs may appear
-            mInPreview = false;
-            mCameraConfigured = false;
+			// WARNING: lots of bugs may appear
+			mInPreview = false;
+			mCameraConfigured = false;
 
-            Logger.Log("Release camera complete");
-        }
-    }
+			Logger.Log("Release camera complete");
+		}
+	}
 
-    void saveBitmapToFile(Bitmap bitmap, File filename) {
+	void saveBitmapToFile(Bitmap bitmap, File filename) {
 
-        Logger.Log("===== On SaveBitmap =====");
-        Logger.Log("Width/Height: " + Integer.toString(bitmap.getWidth()) + "/" +
-        Integer.toString(bitmap.getHeight()));
+		Logger.Log("===== On SaveBitmap =====");
+		Logger.Log("Width/Height: " + Integer.toString(bitmap.getWidth()) + "/" +
+				Integer.toString(bitmap.getHeight()));
 
-        try {
+		try {
 
-            // Logger.Log("Path: " + filename.getAbsolutePath());
+			// Logger.Log("Path: " + filename.getAbsolutePath());
 
-            FileOutputStream out = new FileOutputStream(filename);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            out.flush();
-            out.close();
+			FileOutputStream out = new FileOutputStream(filename);
+			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+			out.flush();
+			out.close();
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-    }
+	}
 
-    @Background
-    void savePhoto(byte[] data) {
+	@Background
+	void savePhoto(byte[] data) {
 
-            try {
+		try {
 
-                // Convert rotated byte[] to Bitmap
-                Bitmap capturedBitmap = saveToBitmap(data);
+			// Convert rotated byte[] to Bitmap
+			Bitmap capturedBitmap = saveToBitmap(data);
 
-                //Random UUID
-                String uuid = UUID.randomUUID().toString();
+			//Random UUID
+			String uuid = UUID.randomUUID().toString();
 
-                // Save bitmap
-                File photo = getFile(uuid);
-                saveBitmapToFile(capturedBitmap, photo);
+			// Save bitmap
+			File photo = getFile(uuid);
+			saveBitmapToFile(capturedBitmap, photo);
 
-                // Add taken picture to job queue
-                addImageToUploadQueue(photo.getAbsolutePath(), photo.getName(), uuid);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        showProgressSavingImage(false);
-                    }
-                });
+			// Add taken picture to job queue
+			addImageToUploadQueue(photo.getAbsolutePath(), photo.getName(), uuid);
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					showProgressSavingImage(false);
+				}
+			});
 
-            } catch (Exception e) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(), "Không thể lưu hình, vui lòng thử lại", Toast.LENGTH_SHORT).show();
-                        showProgressSavingImage(false);
-                    }
-                });
-            }
-    }
+		} catch (Exception e) {
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					Toast.makeText(getApplicationContext(), "Không thể lưu hình, vui lòng thử lại", Toast.LENGTH_SHORT).show();
+					showProgressSavingImage(false);
+				}
+			});
+		}
+	}
 
-    /**
-     * save byte array to Bitmap
-     *
-     * @param data
-     * @return
-     */
-    Bitmap saveToBitmap(byte[] data) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
+	/**
+	 * save byte array to Bitmap
+	 *
+	 * @param data
+	 * @return
+	 */
+	Bitmap saveToBitmap(byte[] data) {
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
 
-        if (data != null) {
-            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+		if (data != null) {
+			if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 
-                Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data != null ? data.length : 0);
+				Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data != null ? data.length : 0);
 
-                android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
-                android.hardware.Camera.getCameraInfo(mCameraMode, info);
+				android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
+				android.hardware.Camera.getCameraInfo(mCameraMode, info);
 
-                int rotation = getWindowManager().getDefaultDisplay().getRotation();
+				int rotation = getWindowManager().getDefaultDisplay().getRotation();
 
-                Matrix mtx = new Matrix();
+				Matrix mtx = new Matrix();
 
-                if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT && rotation == Surface.ROTATION_0) {
-                    mtx.postRotate(270);
-                } else {
-                    mtx.postRotate(90);
-                }
+				if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT && rotation == Surface.ROTATION_0) {
+					mtx.postRotate(270);
+				} else {
+					mtx.postRotate(90);
+				}
 
-                Bitmap rotatedBitmap = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), mtx, true);
+				Bitmap rotatedBitmap = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), mtx, true);
 
-                if (bm != null) {
-                    bm.recycle();
-                    bm = null;
-                    System.gc();
-                }
+				if (bm != null) {
+					bm.recycle();
+					bm = null;
+					System.gc();
+				}
 
-                return rotatedBitmap;
+				return rotatedBitmap;
 
-            } else {
+			} else {
 
-                int rotation = getWindowManager().getDefaultDisplay().getRotation();
+				int rotation = getWindowManager().getDefaultDisplay().getRotation();
 
-                if (rotation == Surface.ROTATION_270) {
+				if (rotation == Surface.ROTATION_270) {
 
-                    Matrix mtx = new Matrix();
-                    mtx.postRotate(180);
+					Matrix mtx = new Matrix();
+					mtx.postRotate(180);
 
-                    // Flip Bitmap
-                    Logger.Log("Flip image");
-                    Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data != null ? data.length : 0);
-                    bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), mtx, true);
-                    return bm;
+					// Flip Bitmap
+					Logger.Log("Flip image");
+					Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data != null ? data.length : 0);
+					bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), mtx, true);
+					return bm;
 
-                } else {
-                    // LANDSCAPE MODE --> No need to reverse width and height
-                    Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data != null ? data.length : 0);
-                    return bm;
-                }
-            }
-        }
-        return null;
-    }
+				} else {
+					// LANDSCAPE MODE --> No need to reverse width and height
+					Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data != null ? data.length : 0);
+					return bm;
+				}
+			}
+		}
+		return null;
+	}
 
-    void startPreview() {
-        Logger.Log("----> startPreview");
+	void startPreview() {
+		Logger.Log("----> startPreview");
 
-        if (mCameraConfigured && mCamera != null) {
+		if (mCameraConfigured && mCamera != null) {
 
-            Logger.Log("cameraConfigured and camera != null");
-            mCamera.startPreview();
-            mInPreview = true;
-        }
-    }
+			Logger.Log("cameraConfigured and camera != null");
+			mCamera.startPreview();
+			mInPreview = true;
+		}
+	}
 
-    @Background
-    void takePicture() {
+	@Background
+	void takePicture() {
 
-        if (mInPreview) {
+		if (mInPreview) {
 
-            try {
-                // Logger.Log( "Prepare to take picture");
-                Camera.Parameters cameraParameters = mCamera.getParameters();
+			try {
+				// Logger.Log( "Prepare to take picture");
+				Camera.Parameters cameraParameters = mCamera.getParameters();
 
-                List<String> supportedFocusMode = cameraParameters.getSupportedFocusModes();
+				List<String> supportedFocusMode = cameraParameters.getSupportedFocusModes();
 
-                // Submit focus area to camera
-                if (supportedFocusMode.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+				// Submit focus area to camera
+				if (supportedFocusMode.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
 
-                    cameraParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-                    mCamera.setParameters(cameraParameters);
-                    mCamera.autoFocus(this);
+					cameraParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+					mCamera.setParameters(cameraParameters);
+					mCamera.autoFocus(this);
 
-                } else {
+				} else {
 
-                    Logger.Log("No auto focus mode supported, now just take picture");
-                    mCamera.takePicture(shutterCallback, null, photoCallback);
+					Logger.Log("No auto focus mode supported, now just take picture");
+					mCamera.takePicture(shutterCallback, null, photoCallback);
 
-                }
+				}
 
-                mInPreview = false;
+				mInPreview = false;
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
-    /**
-     * Default:
-     *
-     * OFF --> AUTO --> ON --> OFF
-     */
-    @Click(R.id.btn_toggle_flash)
-    void toggleFlashButtonClicked() {
+	/**
+	 * Default:
+	 * <p/>
+	 * OFF --> AUTO --> ON --> OFF
+	 */
+	@Click(R.id.btn_toggle_flash)
+	void toggleFlashButtonClicked() {
 
-        // Logger.Log( "toggleFlashButtonClicked()");
+		// Logger.Log( "toggleFlashButtonClicked()");
+
+		if (mInPreview && mCamera != null) {
+			Parameters params = mCamera.getParameters();
+			mFlashMode = params.getFlashMode();
 
-        if (mInPreview && mCamera != null) {
-            Parameters params = mCamera.getParameters();
-            mFlashMode = params.getFlashMode();
+			if (mFlashMode.equalsIgnoreCase(Parameters.FLASH_MODE_OFF)) {
 
-            if (mFlashMode.equalsIgnoreCase(Parameters.FLASH_MODE_OFF)) {
+				btnToggleFlash.setImageResource(R.drawable.ic_flash_auto);
+				params.setFlashMode(Parameters.FLASH_MODE_AUTO);
 
-                btnToggleFlash.setImageResource(R.drawable.ic_flash_auto);
-                params.setFlashMode(Parameters.FLASH_MODE_AUTO);
+			} else if (mFlashMode.equalsIgnoreCase(Parameters.FLASH_MODE_AUTO)) {
 
-            } else if (mFlashMode.equalsIgnoreCase(Parameters.FLASH_MODE_AUTO)) {
+				btnToggleFlash.setImageResource(R.drawable.ic_flash_on);
+				params.setFlashMode(Parameters.FLASH_MODE_ON);
 
-                btnToggleFlash.setImageResource(R.drawable.ic_flash_on);
-                params.setFlashMode(Parameters.FLASH_MODE_ON);
+			} else if (mFlashMode.equalsIgnoreCase(Parameters.FLASH_MODE_ON)) {
 
-            } else if (mFlashMode.equalsIgnoreCase(Parameters.FLASH_MODE_ON)) {
+				btnToggleFlash.setImageResource(R.drawable.ic_flash_off);
+				params.setFlashMode(Parameters.FLASH_MODE_OFF);
 
-                btnToggleFlash.setImageResource(R.drawable.ic_flash_off);
-                params.setFlashMode(Parameters.FLASH_MODE_OFF);
+			} else {
 
-            } else {
+			}
 
-            }
+			// Update camera and camera setting
+			mCamera.setParameters(params);
+			mFlashMode = params.getFlashMode();
+
+		} else {
+			Logger.Log("Camera does not open");
+		}
+	}
+
+	public static void setCameraDisplayOrientation(Activity activity, int cameraId, android.hardware.Camera camera) {
+
+		if (camera != null) {
+
+			android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
+			android.hardware.Camera.getCameraInfo(cameraId, info);
+
+			int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+
+			int degrees = 0;
+			switch (rotation) {
+				case Surface.ROTATION_0:
+					degrees = 0;
+					break;
+				case Surface.ROTATION_90:
+					degrees = 90;
+					break;
+				case Surface.ROTATION_180:
+					degrees = 180;
+					break;
+				case Surface.ROTATION_270:
+					degrees = 270;
+					break;
+			}
+
+			Logger.Log("Rotate degree: " + degrees);
 
-            // Update camera and camera setting
-            mCamera.setParameters(params);
-            mFlashMode = params.getFlashMode();
+			int result;
+			if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+				result = (info.orientation + degrees) % 360;
+				result = (360 - result) % 360; // compensate the mirror
+
+			} else { // back-facing
+				result = (info.orientation - degrees + 360) % 360;
+			}
+
+			camera.setDisplayOrientation(result);
+		}
+	}
+
+	/**
+	 * Add new image to database based on `mType`.
+	 * Add image at `uri` to job queue.
+	 *
+	 * @param uri
+	 * @param imageName
+	 * @throws com.snappydb.SnappydbException
+	 */
+	protected void addImageToUploadQueue(String uri, String imageName, String uuid) {
 
-        } else {
-            Logger.Log("Camera does not open");
-        }
-    }
-
-    public static void setCameraDisplayOrientation(Activity activity, int cameraId, android.hardware.Camera camera) {
-
-        if (camera != null) {
-
-            android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
-            android.hardware.Camera.getCameraInfo(cameraId, info);
-
-            int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-
-            int degrees = 0;
-            switch (rotation) {
-                case Surface.ROTATION_0:
-                    degrees = 0;
-                    break;
-                case Surface.ROTATION_90:
-                    degrees = 90;
-                    break;
-                case Surface.ROTATION_180:
-                    degrees = 180;
-                    break;
-                case Surface.ROTATION_270:
-                    degrees = 270;
-                    break;
-            }
-
-            Logger.Log("Rotate degree: " + degrees);
-
-            int result;
-            if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-                result = (info.orientation + degrees) % 360;
-                result = (360 - result) % 360; // compensate the mirror
-
-            } else { // back-facing
-                result = (info.orientation - degrees + 360) % 360;
-            }
-
-            camera.setDisplayOrientation(result);
-        }
-    }
-
-    /**
-     * Add new image to database based on `mType`.
-     * Add image at `uri` to job queue.
-     *
-     * @param uri
-     * @param imageName
-     * @throws com.snappydb.SnappydbException
-     */
-    protected void addImageToUploadQueue(String uri, String imageName, String uuid) {
-
-        // Create image based on mType and add this image to database
-        ImageType type = ImageType.values()[mType];
-        switch (type) {
-            case IMPORT:
-
-                if (rainyMode) {
-                    uri = "file://" + uri;
-                    dataCenter.saveRainyImage(getApplicationContext(), uuid, uri);
-                    return;
-                }
-
-            case EXPORT:
-                GateImage gateImage = new GateImage()
-                        .withId(0)
-                        .withType(mType)
-                        .withName(imageName)
-                        .withUrl("file://" + uri)
-                        .withUuid(uuid);
-
-                dataCenter.addGateImage(getApplicationContext(), gateImage, containerId);
-
-	            // Add image to job queue
-	            try {
-		            CJayObject object = new CJayObject(gateImage, GateImage.class, containerId);
-		            dataCenter.addCJayObject(containerId, object);
-	            } catch (SnappydbException e) {
-		            e.printStackTrace();
-	            }
-                break;
-
-            case AUDIT:
-            case REPAIRED:
-            default:
-
-                Logger.Log("mType: " + mType);
-                auditImage = new AuditImage()
-                        .withId(0)
-                        .withType(mType)
-                        .withUrl("file://" + uri)
-                        .withName(imageName)
-                        .withUUID(uuid);
-
-                dataCenter.getAuditItemInBackground(getApplicationContext(), containerId, auditItemUUID);
-
-                break;
-        }
-//        // Add image to job queue
-//        JobManager jobManager = App.getJobManager();
-//        jobManager.addJobInBackground(new UploadImageJob(uri, imageName, containerId, type));
-    }
-
-    /**
-     * Create directory for saving image
-     *
-     * @return
-     */
-    protected File getFile(String uuid) {
-
-        String fileName;
-        File newDirectory = null;
-
-        // create today String
-        String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
-
-        // get depot code
-        String depotCode = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_USER_DEPOT);
-
-        if (!rainyMode) {
-
-            // Save Bitmap to Files
-            String imageType = getImageTypeString(mType);
-
-            // create directory to save images
-            newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/" + today + "/" + imageType
-                    + "/" + containerId);
-
-            if (!newDirectory.exists()) {
-                newDirectory.mkdirs();
-            }
-
-            // create image file name
-	        fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-"
-                    + uuid + ".jpg";
-        } else {
-
-            // create directory to save images
-            newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/rainy_mode" );
-
-            if (!newDirectory.exists()) {
-                newDirectory.mkdirs();
-            }
-
-            // create image file name
-            fileName = depotCode + "-" + today + "-" + "imageType" + "-" + "containerId" + "-"
-                    + uuid + ".jpg";
-        }
-
-        File photo = new File(newDirectory, fileName);
-
-        return photo;
-    }
-
-    private void showProgressSavingImage(boolean show) {
-        btnCapture.setEnabled(show ? false : true);
-        btnDone.setEnabled(show ? false : true);
-        btnDone.setVisibility(show ? View.GONE : View.VISIBLE);
-        tvSavingImage.setVisibility(show ? View.VISIBLE : View.GONE);
-    }
-
-    /**
-     * Get image type string based on input image type
-     *
-     * @param imgType
-     * @return
-     */
-    protected String getImageTypeString(int imgType) {
-        ImageType type = ImageType.values()[imgType];
-        switch (type) {
-            case IMPORT:
-                return "gate-in";
-
-            case EXPORT:
-                return "gate-out";
-
-            case AUDIT:
-                return "auditor";
-
-            case REPAIRED:
-            default:
-                return "repair";
-        }
-    }
-
-    @UiThread
-    public void onEvent(AuditItemGotEvent event) {
-
-        AuditItem auditItem = event.getAuditItem();
-
-        // Create temporary audit item
-        if (null == auditItem) {
-            Logger.Log("Create new Audit Item: " + auditImage.getType());
-            dataCenter.addAuditImage(getApplicationContext(), auditImage, containerId);
-
-        } else {
-
-            auditItem.getAuditImages().add(auditImage);
-            if (mType == ImageType.REPAIRED.value) {
-                auditItem.setRepaired(true);
-            }
-
-            dataCenter.updateAuditItemInBackground(getApplicationContext(), containerId, auditItem);
-
-	        // Add image to job queue
-	        try {
-		        CJayObject object = new CJayObject(auditImage, AuditImage.class, containerId);
-		        dataCenter.addCJayObject(containerId, object);
-	        } catch (SnappydbException e) {
-		        e.printStackTrace();
-	        }
-        }
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    protected void onDestroy() {
-        EventBus.getDefault().unregister(this);
-        super.onDestroy();
-    }
+		// Create image based on mType and add this image to database
+		ImageType type = ImageType.values()[mType];
+		switch (type) {
+			case IMPORT:
+				if (rainyMode) {
+					uri = "file://" + uri;
+					dataCenter.add(new AddRainyImageCommand(getApplicationContext(),
+							uuid, uri));
+					return;
+				}
+			case EXPORT:
+				GateImage gateImage = new GateImage()
+						.withId(0)
+						.withType(mType)
+						.withName(imageName)
+						.withUrl("file://" + uri)
+						.withUuid(uuid);
+
+				dataCenter.add(new AddGateImageCommand(this, gateImage, containerId));
+
+				// Add image to job queue
+				CJayObject object = new CJayObject(gateImage, GateImage.class, containerId);
+				dataCenter.add(new AddCjayObjectCommand(this, object));
+
+				break;
+
+			case AUDIT:
+			case REPAIRED:
+			default:
+
+				Logger.Log("mType: " + mType);
+				auditImage = new AuditImage()
+						.withId(0)
+						.withType(mType)
+						.withUrl("file://" + uri)
+						.withName(imageName)
+						.withUUID(uuid);
+
+				dataCenter.add(new AddOrUpdateAuditImageCommand(this, auditImage, containerId, auditItemUUID));
+				// Add image to job queue
+				CJayObject objectAudit = new CJayObject(auditImage, AuditImage.class, containerId);
+				dataCenter.add(new AddCjayObjectCommand(this, objectAudit));
+				break;
+		}
+	}
+
+	/**
+	 * Create directory for saving image
+	 *
+	 * @return
+	 */
+	protected File getFile(String uuid) {
+
+		String fileName;
+		File newDirectory = null;
+
+		// create today String
+		String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
+
+		// get depot code
+		String depotCode = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_USER_DEPOT);
+
+		if (!rainyMode) {
+
+			// Save Bitmap to Files
+			String imageType = getImageTypeString(mType);
+
+			// create directory to save images
+			newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/" + today + "/" + imageType
+					+ "/" + containerId);
+
+			if (!newDirectory.exists()) {
+				newDirectory.mkdirs();
+			}
+
+			// create image file name
+			fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-"
+					+ uuid + ".jpg";
+		} else {
+
+			// create directory to save images
+			newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/rainy_mode");
+
+			if (!newDirectory.exists()) {
+				newDirectory.mkdirs();
+			}
+
+			// create image file name
+			fileName = depotCode + "-" + today + "-" + "imageType" + "-" + "containerId" + "-"
+					+ uuid + ".jpg";
+		}
+
+		File photo = new File(newDirectory, fileName);
+
+		return photo;
+	}
+
+	private void showProgressSavingImage(boolean show) {
+		btnCapture.setEnabled(show ? false : true);
+		btnDone.setEnabled(show ? false : true);
+		btnDone.setVisibility(show ? View.GONE : View.VISIBLE);
+		tvSavingImage.setVisibility(show ? View.VISIBLE : View.GONE);
+	}
+
+	/**
+	 * Get image type string based on input image type
+	 *
+	 * @param imgType
+	 * @return
+	 */
+	protected String getImageTypeString(int imgType) {
+		ImageType type = ImageType.values()[imgType];
+		switch (type) {
+			case IMPORT:
+				return "gate-in";
+
+			case EXPORT:
+				return "gate-out";
+
+			case AUDIT:
+				return "auditor";
+
+			case REPAIRED:
+			default:
+				return "repair";
+		}
+	}
 }

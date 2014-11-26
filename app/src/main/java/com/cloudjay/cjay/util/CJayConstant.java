@@ -31,6 +31,7 @@ public class CJayConstant {
 	public static final String PREFIX_CONTAINER_PRIORITY = "PREFIX_CONTAINER_PRIORITY:";
 	public static final String PREFIX_CJAY_PRIORITY = "PREFIX_CJAY_PRIORITY";
 
+
 	// `/sdcard/DCMI/CJay/`
 	public static final File APP_DIRECTORY_FILE = new File(
 			Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),

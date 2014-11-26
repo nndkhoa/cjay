@@ -30,6 +30,11 @@ import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.session.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.fragment.dialog.AddContainerDialog;
 import com.cloudjay.cjay.model.Session;
+
+import com.cloudjay.cjay.task.command.session.update.AddWorkingSessionCommand;
+import com.cloudjay.cjay.task.command.session.get.SearchCommand;
+import com.cloudjay.cjay.task.command.session.update.ForceExportCommand;
+import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringUtils;
@@ -46,6 +51,7 @@ import org.androidannotations.annotations.ItemLongClick;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.SystemService;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -81,20 +87,21 @@ public class SearchFragment extends Fragment {
 	TextView tvEmptyView;
 	//endregion
 
+	//region ATTR
 	@Bean
 	DataCenter dataCenter;
 	String containerID;
-	private String selectedId;
+	String selectedId;
 
 	@SystemService
 	InputMethodManager inputMethodManager;
 
 	private SessionAdapter mAdapter;
-
     public boolean isSearchResultDialogOpening = false;
 
 	public SearchFragment() {
 	}
+	//endregion
 
 	/**
 	 * 1. Setup search EditText
@@ -128,10 +135,12 @@ public class SearchFragment extends Fragment {
 		});
 	}
 
+	//region VIEW INTERACTION
 	/**
 	 * User tiến hành tìm kiếm container session
 	 */
 	@Click(R.id.btn_search)
+	@Trace
 	void buttonSearchClicked() {
 		if (!TextUtils.isEmpty(editText.getText())) {
 			performSearch();
@@ -158,7 +167,7 @@ public class SearchFragment extends Fragment {
             return;
         }
 
-		dataCenter.addWorkingSession(item);
+		dataCenter.add(new AddWorkingSessionCommand(getActivity(), item));
         hideMenuItems();
 
 		// Open Wizard Activity
@@ -166,7 +175,6 @@ public class SearchFragment extends Fragment {
 		intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, item.getContainerId());
 		intent.putExtra(WizardActivity.STEP_EXTRA, item.getLocalStep());
 		startActivity(intent);
-
 
 	}
 
@@ -182,9 +190,11 @@ public class SearchFragment extends Fragment {
 
 	@OptionsItem(R.id.menu_export)
 	void exportMenuItemClicked() {
-		dataCenter.changeLocalStepAndForceExport(getActivity(), selectedId);
+		dataCenter.add(new ForceExportCommand(getActivity(), selectedId));
 	}
+	//endregion
 
+	//region DIALOG
 	/**
 	 * Hiển thị kết quả không tìm thấy container
 	 *
@@ -260,76 +270,12 @@ public class SearchFragment extends Fragment {
 				.builder().containerId(containerId).build();
 		addContainerDialog_.show(fragmentManager, "fragment_addcontainer");
 	}
-
-	/**
-	 * Begin to search in background
-	 */
-	private void performSearch() {
-
-		showProgress(true);
-
-		inputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-		String keyword = editText.getText().toString();
-
-		// Start search in background
-		containerID = keyword;
-		dataCenter.search(getActivity(), keyword, false);
-
-	}
-
-	/**
-	 * Create container session when containerId is valid ISO
-	 *
-	 * @param containerId
-	 */
-	public void createContainerSession(String containerId) {
-		// Add new session to database
-		String currentTime = StringUtils.getCurrentTimestamp(CJayConstant.
-				CJAY_DATETIME_FORMAT_NO_TIMEZONE);
-
-		// Create container session
-		Session session = new Session().withContainerId(containerId)
-				.withLocalStep(Step.IMPORT.value)
-				.withStep(Step.IMPORT.value)
-				.withCheckInTime(currentTime)
-				.withPreStatus(1);
-
-		// Save normal session and working session.
-		// add working session also post an event
-		dataCenter.addSession(session);
-		dataCenter.addWorkingSession(session);
-	}
-
-	/**
-	 * Open camera and go to import step
-	 */
-	public void openCamera(String containerId) {
-
-		Logger.Log("containerId: " + containerId);
-
-		Intent intent = new Intent(getActivity(), WizardActivity_.class);
-		intent.putExtra(WizardActivity_.CONTAINER_ID_EXTRA, containerId);
-		startActivity(intent);
-
-		// Open camera activity
-		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-		cameraActivityIntent.putExtra(CameraActivity_.CONTAINER_ID_EXTRA, containerId);
-		cameraActivityIntent.putExtra(CameraActivity_.OPERATOR_CODE_EXTRA, "");
-		cameraActivityIntent.putExtra(CameraActivity_.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
-		cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.IMPORT.value);
-		startActivity(cameraActivityIntent);
-	}
+	//endregion
 
 	@UiThread
 	void showProgress(final boolean show) {
 		llSearchProgress.setVisibility(show ? View.VISIBLE : View.GONE);
 		llSearchResult.setVisibility(show ? View.GONE : View.VISIBLE);
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		llSearchResult.setVisibility(View.GONE);
 	}
 
 	//region EVENT HANDLER
@@ -378,6 +324,12 @@ public class SearchFragment extends Fragment {
 	//endregion
 
 	@Override
+	public void onResume() {
+		super.onResume();
+		llSearchResult.setVisibility(View.GONE);
+	}
+
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		EventBus.getDefault().register(this);
@@ -387,11 +339,6 @@ public class SearchFragment extends Fragment {
 	public void onDestroy() {
 		EventBus.getDefault().unregister(this);
 		super.onDestroy();
-	}
-
-	void hideMenuItems() {
-		selectedId = "";
-		getActivity().supportInvalidateOptionsMenu();
 	}
 
 	@Override
@@ -404,5 +351,69 @@ public class SearchFragment extends Fragment {
 		super.onPrepareOptionsMenu(menu);
 	}
 
+	/**
+	 * Begin to search in background
+	 */
+	@Trace
+	void performSearch() {
+
+		showProgress(true);
+
+		inputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+		String keyword = editText.getText().toString();
+
+		// Start search in background
+		containerID = keyword;
+
+		Logger.Log("Begin to call search command.");
+		dataCenter.add(new SearchCommand(getActivity(), keyword, false));
+	}
+
+	/**
+	 * Create container session when containerId is valid ISO
+	 *
+	 * @param containerId
+	 */
+	public void createContainerSession(String containerId) {
+		// Add new session to database
+		String currentTime = StringUtils.getCurrentTimestamp(CJayConstant.
+				CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+
+		// Create container session
+		Session session = new Session().withContainerId(containerId)
+				.withLocalStep(Step.IMPORT.value)
+				.withStep(Step.IMPORT.value)
+				.withCheckInTime(currentTime)
+				.withPreStatus(1);
+
+		// Save normal session and working session.
+		// add working session also post an event
+		dataCenter.add(new SaveSessionCommand(getActivity(), session));
+		dataCenter.add(new AddWorkingSessionCommand(getActivity(), session));
+	}
+
+	/**
+	 * Open camera and go to import step
+	 */
+	public void openCamera(String containerId) {
+
+		Logger.Log("containerId: " + containerId);
+
+		Intent intent = new Intent(getActivity(), WizardActivity_.class);
+		intent.putExtra(WizardActivity_.CONTAINER_ID_EXTRA, containerId);
+		startActivity(intent);
+
+		// Open camera activity
+		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
+		cameraActivityIntent.putExtra(CameraActivity_.CONTAINER_ID_EXTRA, containerId);
+		cameraActivityIntent.putExtra(CameraActivity_.OPERATOR_CODE_EXTRA, "");
+		cameraActivityIntent.putExtra(CameraActivity_.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
+		cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.IMPORT.value);
+		startActivity(cameraActivityIntent);
+	}
+	void hideMenuItems() {
+		selectedId = "";
+		getActivity().supportInvalidateOptionsMenu();
+	}
 
 }

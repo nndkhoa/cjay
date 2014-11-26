@@ -5,6 +5,8 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.InputType;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -14,12 +16,14 @@ import com.cloudjay.cjay.adapter.OperatorAdapter;
 import com.cloudjay.cjay.event.operator.OperatorChosenEvent;
 import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
 import com.cloudjay.cjay.model.Operator;
+import com.cloudjay.cjay.task.command.operator.SearchOperatorCommand;
 
 import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.TextChange;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
@@ -42,6 +46,9 @@ public class SearchOperatorDialog extends DialogFragment {
 
 	@Bean
 	DataCenter dataCenter;
+
+    @SystemService
+    InputMethodManager inputMethodManager;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -72,15 +79,15 @@ public class SearchOperatorDialog extends DialogFragment {
 
 	@AfterViews
 	void doAfterViews() {
-
-		
-
 		// Set title for search operator dialog
 		getDialog().setTitle(getResources().getString(R.string.dialog_operator_title));
 
-		// Begin to get operators from cache
-		dataCenter.searchOperator("");
-	}
+//		// Begin to get operators from cache
+		dataCenter.add(new SearchOperatorCommand(getActivity(), ""));
+
+        // show keyboard
+        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+    }
 
 	@ItemClick(R.id.lv_operators_list)
 	void listViewOperatorsItemClicked(Operator selectedOperator) {
@@ -91,7 +98,7 @@ public class SearchOperatorDialog extends DialogFragment {
 	@AfterTextChange(R.id.et_operator_name)
 	void search(Editable text) {
 		String keyword = text.toString();
-		dataCenter.searchOperator(keyword);
+		dataCenter.add(new SearchOperatorCommand(getActivity(), keyword));
 	}
 
 	@TextChange(R.id.et_operator_name)

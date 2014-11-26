@@ -18,17 +18,15 @@ import android.view.inputmethod.InputMethodManager;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.event.upload.PreUploadStartedEvent;
 import com.cloudjay.cjay.fragment.SearchFragment_;
 import com.cloudjay.cjay.fragment.UploadFragment_;
 import com.cloudjay.cjay.fragment.WorkingFragment_;
 import com.cloudjay.cjay.task.job.FetchSessionsJob;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
-import com.cloudjay.cjay.util.enums.UploadStatus;
-import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
@@ -92,6 +90,7 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 			// Run job lấy tất cả sessions nếu chưa từng lấy lần nào
 			String lastModifiedDate = PreferencesUtil.getPrefsValue(this, PreferencesUtil.PREF_MODIFIED_DATE);
 			if (lastModifiedDate.isEmpty()) {
+				Logger.Log("Begin to fetch session.");
 				JobManager jobManager = App.getJobManager();
 				jobManager.addJobInBackground(new FetchSessionsJob(lastModifiedDate));
 			}
@@ -171,14 +170,6 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 
 	@Override
 	public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-	}
-
-	public void onEvent(PreUploadStartedEvent event) {
-		if (event.uploadType == UploadType.SESSION) {
-			dataCenter.changeStatusWhenUpload(this, event.getSession(), UploadType.SESSION, UploadStatus.UPLOADING);
-		} else if (event.uploadType == UploadType.AUDIT_ITEM) {
-			dataCenter.changeStatusWhenUpload(this, event.getSession(), UploadType.AUDIT_ITEM, UploadStatus.UPLOADING);
-		}
 	}
 
 	@Override

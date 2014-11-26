@@ -21,8 +21,12 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.job.UploadImportJob;
-import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.task.command.cjayobject.AddCjayObjectCommand;
+import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
+import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
+import com.cloudjay.cjay.task.command.session.update.AddUploadingSessionCommand;
+import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
+import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
@@ -122,7 +126,7 @@ public class ExportFragment extends Fragment {
 				mImageTypes, importImages, auditImages, repairedImages);
 		lvImagesExpandable.setAdapter(mListAdapter);
 
-		dataCenter.getSessionInBackground(getActivity(), containerID);
+		dataCenter.add(new GetSessionCommand(getActivity(), containerID));
 	}
 
 	//region VIEW INTERACTION
@@ -151,15 +155,17 @@ public class ExportFragment extends Fragment {
 			Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
 			return;
 		}
-		dataCenter.removeWorkingSession(getActivity(), containerID);
+
+		// Add to Uploading
+		dataCenter.add(new AddUploadingSessionCommand(getActivity(), mSession));
+		dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
+
+		mSession.prepareForUploading();
+		dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
 
 		// Add container session to upload queue
-		try {
-			CJayObject object = new CJayObject(mSession,Session.class,mSession.getContainerId());
-			dataCenter.addCJayObject(containerID, object);
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
+		CJayObject object = new CJayObject(mSession, Session.class, mSession.getContainerId());
+		dataCenter.add(new AddCjayObjectCommand(getActivity(), object));
 
 		// Navigate to HomeActivity
 		getActivity().finish();
@@ -256,13 +262,13 @@ public class ExportFragment extends Fragment {
 		}
 	}
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        dataCenter.getSessionInBackground(getActivity(), containerID);
-    }
+	@Override
+	public void onResume() {
+		super.onResume();
+		dataCenter.add(new GetSessionCommand(getActivity(), containerID));
+	}
 
 
-    //endregion
+	//endregion
 
 }

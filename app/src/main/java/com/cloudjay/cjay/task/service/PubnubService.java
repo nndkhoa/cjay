@@ -1,7 +1,9 @@
 package com.cloudjay.cjay.task.service;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,7 +13,12 @@ import android.text.TextUtils;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.R;
+import com.cloudjay.cjay.activity.LoginActivity_;
+import com.cloudjay.cjay.event.NotificationItemReceivedEvent;
+import com.cloudjay.cjay.event.pubnub.PubnubSubscriptionChangedEvent;
 import com.cloudjay.cjay.model.NotificationItem;
+import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.task.job.GetNotificationJob;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -31,6 +38,9 @@ import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EService;
+import org.androidannotations.annotations.Trace;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Pubnub service is used to handle notification from Server by using Pubnub API
@@ -101,7 +111,7 @@ public class PubnubService extends Service {
 	 * @param channel
 	 * @param message
 	 */
-	private void notifyUser(String channel, Object message) {
+	public void notifyUser(String channel, Object message) {
 
 		Message msg = handler.obtainMessage();
 		try {
@@ -126,15 +136,46 @@ public class PubnubService extends Service {
 
 	}
 
+	public void pushNotification(Session session, int type) {
+		Context context = App.getInstance().getApplicationContext();
+
+		NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		Notification notification;
+		if (type == 1) {
+			notification = new Notification.Builder(context).setContentTitle("Đã cập nhật thông tin")
+					.setContentText(" → Container " + session.getContainerId())
+					.setSmallIcon(R.drawable.ic_app_small)
+					.setAutoCancel(true)
+					.build();
+		} else {
+
+			notification = new Notification.Builder(context).setContentTitle("Đã cập nhật thông tin")
+					.setContentText(" → Container " + session.getContainerId())
+					.setSmallIcon(R.drawable.ic_app_small)
+					.setAutoCancel(true)
+					.setDefaults(Notification.DEFAULT_SOUND).build();
+		}
+		notificationManager.notify(CJayConstant.NOTIFICATION_ID, notification);
+	}
+
+	@Trace
+	public void onEventMainThread(NotificationItemReceivedEvent event) {
+		pushNotification(event.getSession(), event.getType());
+	}
+
+	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		EventBus.getDefault().register(this);
 
 		String token = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_TOKEN);
 		if (!TextUtils.isEmpty(token)) {
-
-			Logger.w("Create pubnub service");
 
 			notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 			pubnub = new Pubnub(CJayConstant.PUBLISH_KEY, CJayConstant.SUBSCRIBE_KEY);
@@ -151,12 +192,17 @@ public class PubnubService extends Service {
 					Logger.Log("UUID channel: " + uuidChannel);
 
 				} catch (SnappydbException e) {
-					Logger.w(e.getMessage());
+					e.printStackTrace();
 
 				} catch (NullCredentialException e) {
 
-					// Log out instantly
+					// Log out instantly and stop Pubnub Service also
 					Utils.logOut(getApplicationContext());
+
+//					// Open Login Activity w/ message
+//					Intent loginIntent = new Intent(getApplicationContext(), LoginActivity_.class);
+//					loginIntent.putExtra("EXIT", true);
+//					startActivity(loginIntent);
 				}
 			}
 
@@ -170,27 +216,46 @@ public class PubnubService extends Service {
 
 						@Override
 						public void connectCallback(String channel, Object message) {
+							// store pref subscribe mode in shared preferences
+							PreferencesUtil.storePrefsValue(getApplicationContext(),
+									PreferencesUtil.PREF_SUBSCRIBE_PUBNUB, true);
+
+							EventBus.getDefault().post(new PubnubSubscriptionChangedEvent(true));
+
 							System.out.println("SUBSCRIBE : CONNECT on channel:" + channel
 									+ " : " + message.getClass() + " : "
 									+ message.toString());
+
 						}
 
 						@Override
 						public void disconnectCallback(String channel, Object message) {
+							// store pref subscribe mode in shared preferences
+							PreferencesUtil.storePrefsValue(getApplicationContext(),
+									PreferencesUtil.PREF_SUBSCRIBE_PUBNUB, false);
+
+							EventBus.getDefault().post(new PubnubSubscriptionChangedEvent(false));
+
 							System.out.println("SUBSCRIBE : DISCONNECT on channel:" + channel
 									+ " : " + message.getClass() + " : "
 									+ message.toString());
+
 						}
 
+						@Override
 						public void reconnectCallback(String channel, Object message) {
+
+							// store pref subscribe mode in shared preferences
+							PreferencesUtil.storePrefsValue(getApplicationContext(),
+									PreferencesUtil.PREF_SUBSCRIBE_PUBNUB, true);
 							System.out.println("SUBSCRIBE : RECONNECT on channel:" + channel
 									+ " : " + message.getClass() + " : "
 									+ message.toString());
+							EventBus.getDefault().post(new PubnubSubscriptionChangedEvent(true));
 						}
 
 						@Override
 						public void successCallback(String channel, Object message) {
-//					Logger.Log("Success: " + message.toString());
 							notifyUser(uuidChannel, message);
 						}
 
@@ -203,8 +268,7 @@ public class PubnubService extends Service {
 				} catch (PubnubException e) {
 
 					Logger.e(e.getMessage());
-					dataCenter.addLog(getApplicationContext(), "PubNub", "Cannot subscribe channels",CJayConstant.PREFIX_NOTIFI_LOG);
-
+					dataCenter.addLog(getApplicationContext(), "PubNub", "Cannot subscribe channels", CJayConstant.PREFIX_NOTIFI_LOG);
 				}
 			} else {
 				Logger.w("Auto stop Pubnub service");

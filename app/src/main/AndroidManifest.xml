@@ -78,6 +78,7 @@
 		<activity
 			android:name="com.cloudjay.cjay.activity.LoginActivity_"
 			android:label="@string/title_activity_login"
+			android:launchMode="singleTop"
 			android:screenOrientation="portrait"
 			android:theme="@android:style/Theme.Holo.Light.NoActionBar"/>
 		<activity
@@ -102,7 +103,6 @@
 			android:name="com.cloudjay.cjay.activity.MergeIssueActivity_"
 			android:label="@string/fragment_repair_title"
 			android:screenOrientation="portrait"/>
-
 		<activity
 			android:name="com.cloudjay.cjay.activity.DetailIssueActivity_"
 			android:label="@string/fragment_repair_title"
@@ -121,7 +121,10 @@
 
 		<service android:name="com.cloudjay.cjay.task.service.PubnubService_"/>
 		<service android:name="com.cloudjay.cjay.task.service.SyncIntentService_"/>
+
 		<service android:name=".task.service.UploadIntentService_"/>
+
+		<service android:name="com.cloudjay.cjay.task.service.QueryService_"/>
 
 		<receiver android:name="com.cloudjay.cjay.task.receiver.AutoStartReceiver_">
 			<intent-filter>

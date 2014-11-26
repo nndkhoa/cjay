@@ -15,6 +15,7 @@ import com.cloudjay.cjay.adapter.RepairedItemAdapter;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.util.enums.Status;
 
 import org.androidannotations.annotations.AfterViews;
@@ -70,8 +71,7 @@ public class IssueRepairedFragment extends Fragment {
 
     @AfterViews
     void setUp() {
-
-	    dataCenter.getSessionInBackground(getActivity(), containerID);
+	    dataCenter.add(new GetSessionCommand(getActivity(), containerID));
     }
 
 	@UiThread
@@ -139,7 +139,7 @@ public class IssueRepairedFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        dataCenter.getSessionInBackground(getActivity(), containerID);
+	    dataCenter.add(new GetSessionCommand(getActivity(), containerID));
     }
 
     @Override

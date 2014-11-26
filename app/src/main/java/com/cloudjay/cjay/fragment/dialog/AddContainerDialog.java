@@ -12,6 +12,8 @@ import com.cloudjay.cjay.activity.CameraActivity_;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.session.update.AddWorkingSessionCommand;
+import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.StringUtils;
 import com.cloudjay.cjay.util.Utils;
@@ -159,8 +161,8 @@ public class AddContainerDialog extends SimpleDialogFragment {
 
         // Save normal session and working session.
         // add working session also post an event
-        dataCenter.addSession(mSession);
-        dataCenter.addWorkingSession(mSession);
+	    dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
+	    dataCenter.add(new AddWorkingSessionCommand(getActivity(), mSession));
     }
 
     void openCamera() {
