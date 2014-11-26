@@ -30,7 +30,7 @@ public class ChangeImageUploadStatusCommand extends Command {
 	@Override
 	protected void run() {
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
-		dataCenter.changeImageUploadStatus(context, containerId, imageName, imageType, uploadStatus, object);
+		dataCenter.changeImageUploadStatus(context, containerId, imageName, imageType, uploadStatus);
 		if (uploadStatus == UploadStatus.COMPLETE) {
 			EventBus.getDefault().post(new UploadSucceededEvent(containerId, UploadType.IMAGE));
 		}

@@ -24,6 +24,7 @@ public abstract class Command implements Task<Command.Callback> {
 			run();
 			callback.onSuccess("");
 		} catch (Throwable e) {
+			e.printStackTrace();
 			callback.onFailure(e);
 		}
 	}

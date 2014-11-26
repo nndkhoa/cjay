@@ -95,7 +95,14 @@ public class CJayObject implements Serializable {
 	public String getContainerId() {
 		if (cls == GateImage.class || object instanceof GateImage) {
 			return containerId;
-		} else {
+		} else if (cls == Session.class || object instanceof Session){
+			return ((Session) object).getContainerId();
+		} else if (cls == AuditImage.class || object instanceof AuditImage){
+			return containerId;
+		} else if (cls == AuditItem.class || object instanceof AuditItem){
+			return containerId;
+		}
+		else {
 			throw new IllegalStateException("This object is not a GateImage");
 		}
 	}

@@ -756,11 +756,11 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 						.withUrl("file://" + uri)
 						.withUuid(uuid);
 
-				dataCenter.add(new AddGateImageCommand(this, gateImage, containerId));
+				dataCenter.add(new AddGateImageCommand(getApplicationContext(), gateImage, containerId));
 
 				// Add image to job queue
 				CJayObject object = new CJayObject(gateImage, GateImage.class, containerId);
-				dataCenter.add(new AddCjayObjectCommand(this, object));
+				dataCenter.add(new AddCjayObjectCommand(getApplicationContext(), object));
 
 				break;
 
@@ -776,10 +776,10 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 						.withName(imageName)
 						.withUUID(uuid);
 
-				dataCenter.add(new AddOrUpdateAuditImageCommand(this, auditImage, containerId, auditItemUUID));
+				dataCenter.add(new AddOrUpdateAuditImageCommand(getApplicationContext(), auditImage, containerId, auditItemUUID));
 				// Add image to job queue
 				CJayObject objectAudit = new CJayObject(auditImage, AuditImage.class, containerId);
-				dataCenter.add(new AddCjayObjectCommand(this, objectAudit));
+				dataCenter.add(new AddCjayObjectCommand(getApplicationContext(), objectAudit));
 				break;
 		}
 	}

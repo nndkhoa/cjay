@@ -6,6 +6,7 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.task.command.Command;
+import com.cloudjay.cjay.util.Logger;
 import com.snappydb.SnappydbException;
 
 /**
@@ -22,6 +23,7 @@ public class RemoveCjayObjectCommand extends Command {
 
 	@Override
 	protected void run() throws SnappydbException {
+		Logger.e("RUNNING REMOVE");
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
 		dataCenter.removeDoneQueue(object.getContainerId(),object);
 	}

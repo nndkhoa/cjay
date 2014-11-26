@@ -65,7 +65,6 @@ public class UploadImageJob extends Job {
 		dataCenter.add(new ChangeImageUploadStatusCommand(context, containerId, imageName, imageType, UploadStatus.COMPLETE,object));
 		dataCenter.add(new RemoveCjayObjectCommand(context, object));
 		dataCenter.add(new GetNextJobCommand(context, object));
-		EventBus.getDefault().post(new UploadSucceededEvent(containerId, UploadType.IMAGE));
 
 	}
 

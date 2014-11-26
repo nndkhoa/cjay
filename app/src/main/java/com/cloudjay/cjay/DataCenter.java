@@ -1115,7 +1115,7 @@ public class DataCenter {
 		} catch (SnappydbException e) {
 			e.printStackTrace();
 		}
-		return  imageUrls;
+		return imageUrls;
 	}
 
 	public void deleteRainyImage(Context context, ArrayList<String> imageUrls) {
@@ -1535,6 +1535,7 @@ public class DataCenter {
 	//region CJAY OBJECT
 
 	/**
+	 * ADD CJAY TO COMMAND
 	 * Add Queue to line
 	 * <p/>
 	 * 1. Find Session queue
@@ -1545,21 +1546,27 @@ public class DataCenter {
 	 * @param object
 	 * @throws SnappydbException
 	 */
-	public void addCJayObject(String containerId, CJayObject object) throws SnappydbException {
+	public void addCJayObject(String containerId, CJayObject object) {
 
-		boolean isExistContainerLine = isExistLine(containerId, CJayConstant.PREFIX_CJAY_PRIORITY);
-		boolean isExistQueueLine = isExistLine(containerId, CJayConstant.PREFIX_CONTAINER_PRIORITY);
+		try {
+			Logger.e("ADDING CJAY");
+			boolean isExistContainerLine = isExistLine(containerId, CJayConstant.PREFIX_CJAY_PRIORITY);
+			boolean isExistQueueLine = isExistLine(containerId, CJayConstant.PREFIX_CONTAINER_PRIORITY);
 
-		if (isExistContainerLine) {
-			addCJayObjToContainerLine(containerId, object, true);
-		} else {
-			if (isExistQueueLine) {
-				addCJayObjToContainerLine(containerId, object, false);
-				addContainerToQueueLine(containerId, object, true);
+
+			if (isExistContainerLine) {
+				addCJayObjToContainerLine(containerId, object, true);
 			} else {
-				addContainerToQueueLine(containerId, object, false);
-				addCJayObjToContainerLine(containerId, object, false);
+				if (isExistQueueLine) {
+					addCJayObjToContainerLine(containerId, object, false);
+					addContainerToQueueLine(containerId, object, true);
+				} else {
+					addContainerToQueueLine(containerId, object, false);
+					addCJayObjToContainerLine(containerId, object, false);
+				}
 			}
+		} catch (SnappydbException e) {
+			Logger.e(e.getMessage());
 		}
 	}
 
@@ -1649,7 +1656,7 @@ public class DataCenter {
 
 			object.setcJayPriority(1);
 			object.setContainerPriority(1);
-
+			Logger.e("Add first cjay of cotainer");
 			db.put(keytoFind + 1, object);
 		}
 	}
@@ -1745,15 +1752,15 @@ public class DataCenter {
 		int cJayPriority = object.getcJayPriority();
 		int containerPriority = object.getContainerPriority();
 
-		String keytoDelete = CJayConstant.SESSION_PRIORITY + containerId + ":" + cJayPriority;
+		String keytoDelete = CJayConstant.PREFIX_CJAY_PRIORITY + containerId + ":" + cJayPriority;
 		db.del(keytoDelete);
 
 		int nextSessionPririty = object.getcJayPriority() + 1;
-		String keySearchNextSessionPriority = CJayConstant.SESSION_PRIORITY + containerId + ":" + nextSessionPririty;
+		String keySearchNextSessionPriority = CJayConstant.PREFIX_CJAY_PRIORITY + containerId + ":" + nextSessionPririty;
 		String[] nextSessionPrioritys = db.findKeys(keySearchNextSessionPriority);
 
 		if (nextSessionPrioritys.length == 0) {
-			String keyDeleteQueuePriority = CJayConstant.QUEUE_PRIORITY + containerPriority;
+			String keyDeleteQueuePriority = CJayConstant.PREFIX_CONTAINER_PRIORITY + containerPriority;
 			db.del(keyDeleteQueuePriority);
 		}
 	}
