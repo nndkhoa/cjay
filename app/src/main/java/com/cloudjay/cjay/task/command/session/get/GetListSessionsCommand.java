@@ -34,9 +34,7 @@ public class GetListSessionsCommand extends Command {
 	    DataCenter dataCenter = DataCenter_.getInstance_(context);
 	    List<Session> sessions = dataCenter.getListSessions(context, prefix);
 
-	    if (sessions.size() > 0) {
-		    EventBus.getDefault().post(new ContainersGotEvent(sessions, prefix));
-	    }
+        EventBus.getDefault().post(new ContainersGotEvent(sessions, prefix));
     }
 
 }

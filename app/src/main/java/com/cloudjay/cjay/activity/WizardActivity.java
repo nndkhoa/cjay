@@ -26,6 +26,7 @@ public class WizardActivity extends BaseActivity {
 	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
 	public final static String STEP_EXTRA = "com.cloudjay.wizard.step";
     public final static String IMAGE_URLS = "com.cloudjay.wizard.imageurls";
+    public final static String OPEN_FROM_REUSE_ACTIVITY = "com.cloudjay.wizard.openfromreuseactivity";
 
 	@Extra(CONTAINER_ID_EXTRA)
 	String containerID;
@@ -38,6 +39,12 @@ public class WizardActivity extends BaseActivity {
 
     @Extra(IMAGE_URLS)
     ArrayList<String> imageUrls;
+
+    /**
+     * Use to config import fragment in rainy mode only
+     */
+    @Extra(OPEN_FROM_REUSE_ACTIVITY)
+    boolean isOpenedFromReuseActivity;
 
 	ActionBar actionBar;
 
@@ -78,6 +85,7 @@ public class WizardActivity extends BaseActivity {
                         fragment = ImportFragment_.builder()
                                 .containerID(containerID)
                                 .imageUrls(imageUrls)
+                                .isOpenedFromReuseActivity(isOpenedFromReuseActivity)
                                 .build();
                     } else {
                         fragment = ImportFragment_.builder().containerID(containerID).build();

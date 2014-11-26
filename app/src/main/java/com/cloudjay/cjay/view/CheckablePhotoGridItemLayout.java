@@ -61,15 +61,15 @@ public class CheckablePhotoGridItemLayout extends CheckableFrameLayout {
     public void toggle() {
         super.toggle();
 
-        Logger.Log("rainyMode: " + rainyMode);
-
-        if (!rainyMode) {
+        if (mParentAdapter != null) {
             if (isChecked()) {
                 mParentAdapter.addCheckedCJayImageUrl(mCJayImage);
             } else {
                 mParentAdapter.removeCheckedCJayImageUrl(mCJayImage);
             }
-        } else {
+        }
+
+        if (mRainyModeAdapter != null) {
             if (isChecked()) {
                 mRainyModeAdapter.addCheckedImageUrl(mRainyImage);
             } else {

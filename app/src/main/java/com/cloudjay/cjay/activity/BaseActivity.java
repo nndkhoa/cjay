@@ -15,13 +15,10 @@ import com.cloudjay.cjay.event.UserLoggedOutEvent;
 import com.cloudjay.cjay.event.pubnub.PubnubSubscriptionChangedEvent;
 import com.cloudjay.cjay.event.session.ContainersFetchedEvent;
 import com.cloudjay.cjay.task.job.FetchSessionsJob;
-import com.cloudjay.cjay.task.service.PubnubService_;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 import com.path.android.jobqueue.JobManager;
-import com.snappydb.DB;
-import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;

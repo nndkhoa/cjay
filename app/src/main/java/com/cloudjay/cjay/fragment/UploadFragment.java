@@ -18,6 +18,7 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.session.get.GetListSessionsCommand;
 import com.cloudjay.cjay.task.command.session.remove.RemoveUploadedSessionsCommand;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -110,7 +111,7 @@ public class UploadFragment extends Fragment {
 	@UiThread
 	@Trace
 	public void onEvent(UploadedContainerRemoved event) {
-		refresh();
+        refresh();
 	}
 	//endregion
 

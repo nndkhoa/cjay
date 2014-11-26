@@ -974,6 +974,7 @@ public class Session implements Serializable {
                 break;
 
             case REPAIR: // 1 -> 2
+            case HAND_CLEAN: // 5 -> 2
             default:
                 this.setLocalStep(Step.AVAILABLE.value);
                 break;
