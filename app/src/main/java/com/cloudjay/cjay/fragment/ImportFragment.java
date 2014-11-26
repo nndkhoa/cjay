@@ -21,6 +21,8 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
+import com.cloudjay.cjay.activity.RainyModeActivity;
+import com.cloudjay.cjay.activity.RainyModeActivity_;
 import com.cloudjay.cjay.activity.ReuseActivity;
 import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
@@ -43,6 +45,7 @@ import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.task.job.UploadImageJob;
 import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -113,6 +116,7 @@ public class ImportFragment extends Fragment {
 	//region ATTRIBUTE
 	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
 	public final static String IMAGE_URLS_EXTRA = "com.cloudjay.wizard.imageurls";
+    public final static String OPEN_FROM_REUSE_ACTIVITY = "com.cloudjay.wizard.openfromreuseactivity";
 
 	@Bean
 	DataCenter dataCenter;
@@ -122,6 +126,9 @@ public class ImportFragment extends Fragment {
 
 	@FragmentArg(IMAGE_URLS_EXTRA)
 	ArrayList<String> imageUrls;
+
+    @FragmentArg(OPEN_FROM_REUSE_ACTIVITY)
+    boolean isOpenedFromReuseActivity;
 
 	String operatorCode;
 	long operatorId;
@@ -162,7 +169,7 @@ public class ImportFragment extends Fragment {
 		lvImages.setAdapter(mAdapter);
 
 
-		if (rainyMode) {
+		if (rainyMode && isOpenedFromReuseActivity) {
 			configViewForRainyMode();
 		} else {
 
@@ -204,11 +211,14 @@ public class ImportFragment extends Fragment {
             mSession.setOperatorCode(operator.getOperatorCode());
             mSession.setGateImages(list);
         }
-
 		// Save session
-        if (!rainyMode) {
-	        dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
-		}
+        if (rainyMode) {
+            if (!isOpenedFromReuseActivity) {
+                dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
+            }
+		} else {
+            dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
+        }
 	}
 
     @Override
@@ -322,7 +332,7 @@ public class ImportFragment extends Fragment {
 
         containerID = etContainerCode.getText().toString();
 
-		if (rainyMode) {
+		if (rainyMode && isOpenedFromReuseActivity) {
             performSearch(containerID);
             return;
 		}
@@ -346,9 +356,9 @@ public class ImportFragment extends Fragment {
 	}
 
 	private void openReuseActivity() {
-		Intent intent = new Intent(getActivity(), ReuseActivity_.class);
+		Intent intent = new Intent(getActivity(), RainyModeActivity_.class);
 		intent.setAction(CJayConstant.ACTION_PICK_MORE);
-        intent.putExtra(ReuseActivity.CHECKED_IMAGES, imageUrls);
+        intent.putExtra(RainyModeActivity.CHECKED_IMAGES, imageUrls);
 		startActivity(intent);
 	}
 
@@ -393,13 +403,13 @@ public class ImportFragment extends Fragment {
 		if (isChecked == true) {
 			preStatus = 0;
 
-			if (!rainyMode) {
-				mSession.setPreStatus(preStatus);
-				dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
-				dataCenter.add(new AddWorkingSessionCommand(getActivity(), mSession));
-
-				btnContinue.setVisibility(View.GONE);
-			}
+            if (rainyMode) {
+                if (!isOpenedFromReuseActivity) {
+                    setPreStatusValue();
+                }
+            } else {
+                setPreStatusValue();
+            }
 
 		}
 	}
@@ -409,13 +419,13 @@ public class ImportFragment extends Fragment {
 		if (isChecked == true) {
 			preStatus = 1;
 
-			if (!rainyMode) {
-				mSession.setPreStatus(preStatus);
-				dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
-				dataCenter.add(new AddWorkingSessionCommand(getActivity(), mSession));
-
-				btnContinue.setVisibility(View.VISIBLE);
-			}
+            if (rainyMode) {
+                if (!isOpenedFromReuseActivity) {
+                    setPreStatusValue();
+                }
+            } else {
+                setPreStatusValue();
+            }
 		}
 	}
 
@@ -424,16 +434,24 @@ public class ImportFragment extends Fragment {
 		if (isChecked == true) {
 			preStatus = 2;
 
-			if (!rainyMode) {
-				mSession.setPreStatus(preStatus);
-				dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
-				dataCenter.add(new AddWorkingSessionCommand(getActivity(), mSession));
-
-				btnContinue.setVisibility(View.VISIBLE);
-			}
+			if (rainyMode) {
+                if (!isOpenedFromReuseActivity) {
+                    setPreStatusValue();
+                }
+			} else {
+                setPreStatusValue();
+            }
 		}
 	}
 	//endregion
+
+    void setPreStatusValue() {
+        mSession.setPreStatus(preStatus);
+        dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
+        dataCenter.add(new AddWorkingSessionCommand(getActivity(), mSession));
+
+        btnContinue.setVisibility(View.VISIBLE);
+    }
 
 	boolean isValidToAddSession() {
 
@@ -514,8 +532,8 @@ public class ImportFragment extends Fragment {
 
     @UiThread
     void onEvent(RainyImagesDeletedEvent event) {
-        // open reuse activity
-        Intent intent = new Intent(getActivity(), ReuseActivity_.class);
+        // open rainy mode activity
+        Intent intent = new Intent(getActivity(), RainyModeActivity_.class);
         startActivity(intent);
         getActivity().finish();
     }
@@ -605,7 +623,7 @@ public class ImportFragment extends Fragment {
         boolean searchInImportFragment = event.isSearchInImportFragment();
 
         if (searchInImportFragment) {
-            if (rainyMode) {
+            if (rainyMode && isOpenedFromReuseActivity) {
                 List<Session> result = event.getSessions();
                 if (result.size() == 0) {
                     if (isValidToAddSession()) {

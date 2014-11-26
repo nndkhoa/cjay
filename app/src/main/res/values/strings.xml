@@ -165,5 +165,6 @@
     <string name="error_container_is_already_existed">Container này đã tồn tại</string>
     <string name="warning_rainy_mode_dialog">Vãn còn hình thiếu thông tin, tiếp tục?</string>
     <string name="title_activity_new_camera">CameraActivity</string>
+    <string name="title_activity_rainy_mode">RainyMode</string>
 
 </resources>

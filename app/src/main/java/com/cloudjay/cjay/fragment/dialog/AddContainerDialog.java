@@ -1,14 +1,18 @@
 package com.cloudjay.cjay.fragment.dialog;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
+import com.cloudjay.cjay.activity.SettingActivity;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.model.Session;
@@ -118,7 +122,6 @@ public class AddContainerDialog extends SimpleDialogFragment {
 	 */
 	@AfterViews
 	void doAfterViews() {
-
 		// Set search keyword into edit text
 		etContainerID.setText(containerId);
 
@@ -166,7 +169,6 @@ public class AddContainerDialog extends SimpleDialogFragment {
     }
 
     void openCamera() {
-
         Intent intent = new Intent(getActivity(), WizardActivity_.class);
         intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, containerId);
         startActivity(intent);

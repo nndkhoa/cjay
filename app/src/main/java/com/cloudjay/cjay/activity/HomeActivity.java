@@ -187,6 +187,7 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
                 cameraActivityIntent.putExtra(CameraActivity_.OPERATOR_CODE_EXTRA, "");
                 cameraActivityIntent.putExtra(CameraActivity_.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
                 cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.IMPORT.value);
+                cameraActivityIntent.putExtra(CameraActivity_.OPEN_RAINY_MODE_ACTIVITY, true);
                 startActivity(cameraActivityIntent);
             }
             return true;

@@ -16,7 +16,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.Surface;
@@ -31,9 +30,7 @@ import android.widget.Toast;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
-import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.task.command.image.AddGateImageCommand;
 import com.cloudjay.cjay.task.command.image.AddOrUpdateAuditImageCommand;
@@ -55,15 +52,12 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.SystemService;
-import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
 import java.util.UUID;
-
-import de.greenrobot.event.EventBus;
 
 @EActivity(R.layout.activity_camera)
 public class CameraActivity extends Activity implements AutoFocusCallback {
@@ -75,6 +69,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
     // This Extra bundle is use to open Detail Issue Activity only
     public final static String AUDIT_ITEM_UUID_EXTRA = "com.cloudjay.wizard.auditItemUUID";
     public final static String IS_OPENED = "com.cloudjay.wizard.isOpened";
+    public final static String OPEN_RAINY_MODE_ACTIVITY = "com.cloudjay.wizard.openRainyModeActivity";
 
     @Extra(IMAGE_TYPE_EXTRA)
     int mType;
@@ -93,6 +88,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
     @Extra(IS_OPENED)
     boolean isOpened;
+
+    @Extra(OPEN_RAINY_MODE_ACTIVITY)
+    boolean openRainyModeActivity;
 
     @ViewById(R.id.btn_camera_done)
     Button btnDone;
@@ -225,11 +223,10 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
     @Click({ R.id.btn_camera_done, R.id.rl_camera_done })
     void doneButtonClicked() {
-        if (rainyMode) {
+        if (rainyMode && openRainyModeActivity) {
             if (currentStep == Step.IMPORT.value) {
                 // Open ReuseActivity
-                Intent intent = new Intent(getApplicationContext(), ReuseActivity_.class);
-                intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, "");
+                Intent intent = new Intent(getApplicationContext(), RainyModeActivity_.class);
                 startActivityForResult(intent, 1);
             }
         }
@@ -738,7 +735,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
         ImageType type = ImageType.values()[mType];
         switch (type) {
             case IMPORT:
-                if (rainyMode) {
+                if (rainyMode && openRainyModeActivity) {
                     uri = "file://" + uri;
                     dataCenter.add(new AddRainyImageCommand(getApplicationContext(),
                             uuid, uri));
@@ -792,8 +789,19 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
         // get depot code
         String depotCode = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_USER_DEPOT);
 
-        if (!rainyMode) {
+        if (rainyMode && openRainyModeActivity) {
 
+            // create directory to save images
+            newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/rainy_mode" );
+
+            if (!newDirectory.exists()) {
+                newDirectory.mkdirs();
+            }
+
+            // create image file name
+            fileName = depotCode + "-" + today + "-" + "imageType" + "-" + "containerId" + "-"
+                    + uuid + ".jpg";
+        } else {
             // Save Bitmap to Files
             String imageType = getImageTypeString(mType);
 
@@ -806,19 +814,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
             }
 
             // create image file name
-	        fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-"
-                    + uuid + ".jpg";
-        } else {
-
-            // create directory to save images
-            newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/rainy_mode" );
-
-            if (!newDirectory.exists()) {
-                newDirectory.mkdirs();
-            }
-
-            // create image file name
-            fileName = depotCode + "-" + today + "-" + "imageType" + "-" + "containerId" + "-"
+            fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-"
                     + uuid + ".jpg";
         }
 

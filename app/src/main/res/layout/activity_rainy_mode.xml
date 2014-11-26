@@ -1,0 +1,66 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/white"
+                tools:context="com.cloudjay.cjay.activity.RainyModeActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/ll_bottom"
+        android:orientation="vertical"
+        android:padding="9dp">
+
+        <TextView
+            android:id="@+id/tv_import_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/v_line"
+            android:paddingBottom="3dp"
+            android:text="Hình chụp"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+        <GridView
+            android:id="@+id/gv_reuse_images"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/tv_import_label"
+            android:horizontalSpacing="1dp"
+            android:numColumns="2"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="1dp"
+            tools:listitem="@layout/item_gridview_photo_multi_select"/>
+
+    </RelativeLayout>
+    <LinearLayout
+        android:id="@+id/ll_bottom_rainy_mode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/btn_input_rainy_mode"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/btn_green_selector"
+            android:text="Nhập thông tin"
+            android:textColor="@android:color/white"
+            android:textSize="13sp"/>
+
+        <Button
+            android:id="@+id/btn_done_rainy_mode"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/background_cjay"
+            android:text="Hoàn tất nhập Container"
+            android:textColor="@android:color/white"
+            android:textSize="13sp"/>
+    </LinearLayout>
+</RelativeLayout>
+

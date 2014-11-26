@@ -21,9 +21,9 @@ import org.androidannotations.annotations.EActivity;
 @EActivity
 public class SettingActivity extends PreferenceActivity {
 
-    static String PREF_KEY_AUTO_CHECK_UPDATE;
-    static String PREF_KEY_RAINY_MODE;
-    static String PREF_KEY_ENABLE_LOGGER;
+    public static String PREF_KEY_AUTO_CHECK_UPDATE;
+    public static String PREF_KEY_RAINY_MODE;
+    public static String PREF_KEY_ENABLE_LOGGER;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
