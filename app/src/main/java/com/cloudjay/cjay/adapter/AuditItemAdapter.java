@@ -204,16 +204,14 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 					}
 					notifyDataSetChanged();
 
-					// Cần kiểm tra xem import đã xong hay chưa
-					// Nếu chưa thì add field
 					if (session.getId() == 0) {
 						auditItem.setUploadConfirmed(true);
 						DataCenter_.getInstance_(mContext).add(new UpdateAuditItemCommand(mContext, session.getContainerId(), auditItem));
 
-					} else {
-						CJayObject object = new CJayObject(auditItem, AuditItem.class, session.getContainerId());
-						DataCenter_.getInstance_(mContext).add(new AddCjayObjectCommand(mContext, object));
 					}
+					auditItem.setSession(session.getId());
+					CJayObject object = new CJayObject(auditItem, AuditItem.class, session.getContainerId());
+					DataCenter_.getInstance_(mContext).add(new AddCjayObjectCommand(mContext.getApplicationContext(), object));
 				}
 			});
 

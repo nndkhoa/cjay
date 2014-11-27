@@ -75,6 +75,13 @@ public class CJayObject implements Serializable {
 		this.sessionId = id;
 	}
 
+	public CJayObject(Object obj, Class cls, String containerId, long id) {
+		this.object = obj;
+		this.cls = cls;
+		this.sessionId = id;
+		this.containerId = containerId;
+	}
+
 	public GateImage getGateImage() {
 
 		if (cls == GateImage.class || object instanceof GateImage) {
@@ -85,24 +92,19 @@ public class CJayObject implements Serializable {
 	}
 
 	public long getSessionId() {
-		if (cls == AuditItem.class || object instanceof AuditItem) {
-			return sessionId;
-		} else {
-			throw new IllegalStateException("This object is not a AuditItem");
-		}
+		return sessionId;
 	}
 
 	public String getContainerId() {
 		if (cls == GateImage.class || object instanceof GateImage) {
 			return containerId;
-		} else if (cls == Session.class || object instanceof Session){
+		} else if (cls == Session.class || object instanceof Session) {
 			return ((Session) object).getContainerId();
-		} else if (cls == AuditImage.class || object instanceof AuditImage){
+		} else if (cls == AuditImage.class || object instanceof AuditImage) {
 			return containerId;
-		} else if (cls == AuditItem.class || object instanceof AuditItem){
+		} else if (cls == AuditItem.class || object instanceof AuditItem) {
 			return containerId;
-		}
-		else {
+		} else {
 			throw new IllegalStateException("This object is not a GateImage");
 		}
 	}
@@ -131,4 +133,22 @@ public class CJayObject implements Serializable {
 		}
 	}
 
+	public CJayObject mergeCjayObject(CJayObject cJayObject) {
+		this.sessionId = cJayObject.getSessionId();
+
+		if (cls == GateImage.class || object instanceof GateImage) {
+			return cJayObject;
+		} else if (cls == Session.class || object instanceof Session) {
+			this.sessionId = cJayObject.getSession().getId();
+			return this;
+		} else if (cls == AuditImage.class || object instanceof AuditImage) {
+			return cJayObject;
+		} else if (cls == AuditItem.class || object instanceof AuditItem) {
+			this.object = cJayObject.getAuditItem();
+			return this;
+		} else {
+			throw new IllegalStateException("This object is not a GateImage");
+		}
+
+	}
 }

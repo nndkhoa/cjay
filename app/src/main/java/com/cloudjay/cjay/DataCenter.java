@@ -2,7 +2,6 @@ package com.cloudjay.cjay;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.StrictMode;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.activity.WizardActivity;
@@ -10,8 +9,6 @@ import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.event.image.RainyImagesDeletedEvent;
 import com.cloudjay.cjay.event.image.RainyImagesGotEvent;
-import com.cloudjay.cjay.event.isocode.IsoCodeGotEvent;
-import com.cloudjay.cjay.event.isocode.IsoCodesGotEvent;
 
 import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
@@ -19,7 +16,6 @@ import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.event.session.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
-import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.CJayObject;
@@ -31,6 +27,7 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.task.command.Command;
 import com.cloudjay.cjay.task.command.CommandQueue;
+import com.cloudjay.cjay.task.command.cjayobject.UpdateDataAndUploadCommand;
 import com.cloudjay.cjay.task.command.session.update.AddListSessionsCommand;
 import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
@@ -399,6 +396,7 @@ public class DataCenter {
 			IsoCode repairCode = null;
 
 			DB db = App.getDB(context);
+			Session session =  db.getObject(containerId,Session.class);
 			String[] keyComponent = db.findKeys(CJayConstant.PREFIX_COMPONENT_CODE + strComponentCode);
 			String[] keyDamage = db.findKeys(CJayConstant.PREFIX_DAMAGE_CODE + strDamageCode);
 			String[] keyRepair = db.findKeys(CJayConstant.PREFIX_REPAIR_CODE + strRepairCode);
@@ -413,6 +411,7 @@ public class DataCenter {
 				repairCode = db.getObject(keyRepair[0], IsoCode.class);
 			}
 
+			auditItem.setSession(session.getId());
 			auditItem.setComponentCodeId(componentCode.getId());
 			auditItem.setComponentCode(componentCode.getCode());
 			auditItem.setComponentName(componentCode.getFullName());
@@ -986,6 +985,8 @@ public class DataCenter {
 			auditItem.setAllowed(null);
 			auditItem.setUploadStatus(UploadStatus.NONE);
 
+			auditItem.setModifiedAt(StringUtils.getMinDate());
+
 			// Get list session's audit items
 			List<AuditItem> auditItems = session.getAuditItems();
 			if (auditItems == null) {
@@ -1445,6 +1446,7 @@ public class DataCenter {
 				auditItem.setAudited(true);
 				auditItem.setAllowed(true);
 				auditItem.setQuantity(1);
+				auditItem.setModifiedAt(StringUtils.getMinDate());
 
 				list.add(auditItem);
 			}
@@ -1549,7 +1551,6 @@ public class DataCenter {
 	public void addCJayObject(String containerId, CJayObject object) {
 
 		try {
-			Logger.e("ADDING CJAY");
 			boolean isExistContainerLine = isExistLine(containerId, CJayConstant.PREFIX_CJAY_PRIORITY);
 			boolean isExistQueueLine = isExistLine(containerId, CJayConstant.PREFIX_CONTAINER_PRIORITY);
 
@@ -1649,14 +1650,11 @@ public class DataCenter {
 			object.setcJayPriority(priorityToAdd);
 			object.setContainerPriority(beforeObject.getContainerPriority());
 
-			Logger.e(keytoFind + priorityToAdd);
-
 			db.put(keytoFind + priorityToAdd, object);
 		} else {
 
 			object.setcJayPriority(1);
 			object.setContainerPriority(1);
-			Logger.e("Add first cjay of cotainer");
 			db.put(keytoFind + 1, object);
 		}
 	}
@@ -1687,13 +1685,13 @@ public class DataCenter {
 
 		if (isExistNextCJay) {
 			CJayObject nextJob = db.getObject(keyFindNextCJay, CJayObject.class);
-			addCJayToJob(nextJob);
+			updateDataAndUpload(nextJob);
 		} else {
 			if (isExistNextContainer) {
 				String nextContainerId = db.get(CJayConstant.PREFIX_CONTAINER_PRIORITY + nextContainerPriority);
 				String keyFindNextCJayOfNextContainer = CJayConstant.PREFIX_CJAY_PRIORITY + nextContainerId + ":" + 1;
 				CJayObject nextJob = db.getObject(keyFindNextCJayOfNextContainer, CJayObject.class);
-				addCJayToJob(nextJob);
+				updateDataAndUpload(nextJob);
 			} else {
 				Logger.Log("Không tìm thấy CJay Object tiếp theo");
 			}
@@ -1821,16 +1819,49 @@ public class DataCenter {
 
 
 		if (object != null) {
-			addCJayToJob(object);
+			updateDataAndUpload(object);
 		}
 
+	}
+
+	/**
+	 * Update data of cjay object then add to upload job
+	 * @param object
+	 */
+	public void updateDataAndUpload(CJayObject object){
+		add(new UpdateDataAndUploadCommand(object));
+	}
+
+	/**
+	 * Update data of cjay object by current data in db
+	 * @param object
+	 * @return
+	 * @throws SnappydbException
+	 */
+	public CJayObject updateCjayOject(CJayObject object) throws SnappydbException {
+
+		if (object.getCls() == Session.class) {
+			Session session = getSession(context, object.getContainerId());
+			CJayObject newObject = new CJayObject(session, Session.class, session.getContainerId());
+			object = object.mergeCjayObject(newObject);
+			Logger.e("CURRENT LOCAL STEP: "+session.getLocalStep());
+			return object;
+
+		} else if (object.getCls() == AuditItem.class) {
+			Session session = getSession(context, object.getContainerId());
+			AuditItem auditItem = getAuditItem(context, object.getContainerId(), object.getAuditItem().getUuid());
+			CJayObject newObject = new CJayObject(auditItem, AuditItem.class, object.getContainerId(), session.getId());
+			object.mergeCjayObject(newObject);
+			return object;
+		} else {
+			return object;
+		}
 	}
 
 	public void addCJayToJob(CJayObject object) {
 
 		// Add Job in background
 		JobManager jobManager = App.getJobManager();
-		Logger.e("Start JOB QUEUE");
 
 		Class cls = object.getCls();
 		if (cls == Session.class) {

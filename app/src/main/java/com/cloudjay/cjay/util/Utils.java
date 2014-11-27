@@ -38,6 +38,7 @@ import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
