@@ -66,5 +66,8 @@ public class QueryService extends Service implements Command.Callback {
 	@Override
 	public void onFailure(Throwable e) {
 		e.printStackTrace();
+        processing = false;
+        queue.remove();
+        executeNext();
 	}
 }

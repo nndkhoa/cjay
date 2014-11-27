@@ -44,8 +44,11 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.Trace;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -1350,7 +1353,7 @@ public class DataCenter {
 				auditItem.setAllowed(true);
 				auditItem.setQuantity(1);
 
-				list.add(auditItem);
+                list.add(auditItem);
 			}
 
 			session.setAuditItems(list);
