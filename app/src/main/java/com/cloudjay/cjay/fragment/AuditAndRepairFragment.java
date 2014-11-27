@@ -143,10 +143,10 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			}
 
 			mSession.prepareForUploading();
-			dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
+			dataCenter.add(new SaveSessionCommand(getActivity().getApplicationContext(), mSession));
 
 			CJayObject object = new CJayObject(mSession, Session.class, mSession.getContainerId());
-			dataCenter.add(new AddCjayObjectCommand(getActivity(), object));
+			dataCenter.add(new AddCjayObjectCommand(getActivity().getApplicationContext(), object));
 
 			// Hide this button
 			btnCompleteAudit.setVisibility(View.GONE);

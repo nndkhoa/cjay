@@ -74,8 +74,11 @@ public class UploadSessionJob extends Job {
 			x = 4;
 		}
 
+		mSession.setId(object.getSessionId());
+
 		// Bắt đầu quá trình upload
 		Step uploadStep = Step.values()[x];
+		Logger.e("MODIFIDE LOCAL STEP: "+x);
 		Session response = dataCenter.uploadSession(context, mSession, uploadStep);
 
 		dataCenter.addLog(context, mSession.getContainerId(), "Upload container thành công", CJayConstant.PREFIX_LOG);
