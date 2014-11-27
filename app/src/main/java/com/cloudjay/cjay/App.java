@@ -45,15 +45,14 @@ public class App extends Application {
 		return instance;
 	}
 
-	public static DB getDB(Context context) throws SnappydbException {
 
 //		StackTraceElement[] trace = new Throwable().getStackTrace();
 //		Logger.Log("Open DB " + trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
 
+	public static DB getDB(Context context) throws SnappydbException {
 		if (snappyDB == null || snappyDB.isOpen() == false) {
 			snappyDB = DBFactory.open(context, CJayConstant.DB_NAME);
 		}
-
 		return snappyDB;
 	}
 

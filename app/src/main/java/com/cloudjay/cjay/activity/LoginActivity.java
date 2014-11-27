@@ -183,7 +183,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 			}
 		} catch (RetrofitError error) {
 			showProgress(false);
-			String message = "";
+			String message;
 			if (error.getResponse().getStatus() == 400) {
 				message = "Sai thông tin đăng nhập";
 			} else {
