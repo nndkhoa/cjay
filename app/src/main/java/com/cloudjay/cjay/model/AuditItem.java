@@ -567,8 +567,11 @@ public class AuditItem implements Serializable{
 		List<AuditImage> diffImages = new ArrayList<>();
 		diffImages.addAll(auditImages);
 
-		//Set upload status for all audit image get from server is uploaded
+		//Set upload status and image name for all audit image get from server is uploaded
 		for (AuditImage auditImage : newItem.getAuditImages()) {
+            if (!TextUtils.isEmpty(auditImage.getUrl())) {
+                auditImage.setName(Utils.getImageNameFromUrl(auditImage.getUrl()));
+            }
 			auditImage.setUploadStatus(UploadStatus.COMPLETE.value);
 		}
 		diffImages.addAll(newItem.getAuditImages());
