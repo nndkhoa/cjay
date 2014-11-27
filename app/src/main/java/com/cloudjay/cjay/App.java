@@ -33,7 +33,7 @@ public class App extends Application {
 	private static App instance;
 	private static DB snappyDB = null;
 
-	private static boolean defaultBetaApiVal = true;
+	private static boolean defaultBetaApiVal = false;
 
 	public App() {
 		instance = this;
