@@ -402,7 +402,7 @@ public class DataCenter {
 			IsoCode repairCode = null;
 
 			DB db = App.getDB(context);
-			Session session =  db.getObject(containerId,Session.class);
+			Session session = db.getObject(containerId, Session.class);
 			String[] keyComponent = db.findKeys(CJayConstant.PREFIX_COMPONENT_CODE + strComponentCode);
 			String[] keyDamage = db.findKeys(CJayConstant.PREFIX_DAMAGE_CODE + strDamageCode);
 			String[] keyRepair = db.findKeys(CJayConstant.PREFIX_REPAIR_CODE + strRepairCode);
@@ -1455,7 +1455,7 @@ public class DataCenter {
 				auditItem.setQuantity(1);
 				auditItem.setModifiedAt(StringUtils.getMinDate());
 
-                list.add(auditItem);
+				list.add(auditItem);
 			}
 
 			session.setAuditItems(list);
@@ -1480,12 +1480,16 @@ public class DataCenter {
 	 * @param id
 	 */
 	public void getAuditItemAsyncById(Context context, long id) throws SnappydbException {
+		try {
 
-		AuditItem auditItem = networkClient.getAuditItemById(id);
+			AuditItem auditItem = networkClient.getAuditItemById(id);
 
-		if (auditItem != null) {
-			long sessionId = auditItem.getSession();
-			getSessionAsyncById(context, sessionId, 1);
+			if (auditItem != null) {
+				long sessionId = auditItem.getSession();
+				getSessionAsyncById(context, sessionId, 1);
+			}
+		} catch (RetrofitError error) {
+			error.printStackTrace();
 		}
 	}
 
@@ -1833,14 +1837,16 @@ public class DataCenter {
 
 	/**
 	 * Update data of cjay object then add to upload job
+	 *
 	 * @param object
 	 */
-	public void updateDataAndUpload(CJayObject object){
+	public void updateDataAndUpload(CJayObject object) {
 		add(new UpdateDataAndUploadCommand(object));
 	}
 
 	/**
 	 * Update data of cjay object by current data in db
+	 *
 	 * @param object
 	 * @return
 	 * @throws SnappydbException
@@ -1851,7 +1857,7 @@ public class DataCenter {
 			Session session = getSession(context, object.getContainerId());
 			CJayObject newObject = new CJayObject(session, Session.class, session.getContainerId());
 			object = object.mergeCjayObject(newObject);
-			Logger.e("CURRENT LOCAL STEP: "+session.getLocalStep());
+			Logger.e("CURRENT LOCAL STEP: " + session.getLocalStep());
 			return object;
 
 		} else if (object.getCls() == AuditItem.class) {

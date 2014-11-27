@@ -25,7 +25,7 @@ public class RestAdapterProvider {
 			token = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_TOKEN);
 		} else {
 			token = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_TOKEN);
-			username = user.getUsername();
+			username = user.getFullName();
 		}
 
 		// Init header, pass 3 params: token, app version, username
