@@ -23,6 +23,7 @@ import com.cloudjay.cjay.task.command.cjayobject.AddCjayObjectCommand;
 import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionForUploadCommand;
+import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.ChangeSessionLocalStepCommand;
 import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.task.job.UploadAuditItemJob;
@@ -148,6 +149,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			CJayObject object = new CJayObject(mSession, Session.class, mSession.getContainerId());
 			dataCenter.add(new AddCjayObjectCommand(getActivity().getApplicationContext(), object));
 
+
 			// Hide this button
 			btnCompleteAudit.setVisibility(View.GONE);
 
@@ -155,6 +157,10 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			if (mSession.hasRepairImages()) {
 				btnCompleteRepair.setVisibility(View.VISIBLE);
 			} else {
+
+                // Remove from working session
+                dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
+
 				// Navigate to HomeActivity
 				getActivity().finish();
 			}
@@ -176,6 +182,9 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			} else {
 				Utils.showCrouton(getActivity(), "Sth goes wrong. Container Id " + containerID + " not found");
 			}
+
+            // Remove from working session
+            dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
 
 			mSession.prepareForUploading();
 			dataCenter.add(new SaveSessionCommand(getActivity(), mSession));

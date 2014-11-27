@@ -209,7 +209,7 @@ public class PubnubService extends Service {
 			if (!TextUtils.isEmpty(depotChannel) && !TextUtils.isEmpty(uuidChannel) && Utils.canReachInternet()) {
 
 				try {
-					Logger.Log(" > Prepare to subscribe to Pubnub channels");
+					Logger.w(" > Prepare to subscribe to Pubnub channels");
 					String[] channels = new String[]{depotChannel, uuidChannel};
 					pubnub.setUUID(uuidChannel);
 					pubnub.subscribe(channels, new Callback() {

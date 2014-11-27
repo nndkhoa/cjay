@@ -271,8 +271,6 @@ public class NetworkClient {
 		GsonBuilder builder = new GsonBuilder();
 		Gson gson = builder.create();
 
-		Logger.Log("containerSession: " + gson.toJson(containerSession));
-
 		Session completeAuditSession = provider.getRestAdapter(context).create(NetworkService.class).completeAudit(containerSession.getId());
 		return completeAuditSession;
 	}

@@ -29,6 +29,8 @@ import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.service.PubnubService_;
+import com.cloudjay.cjay.task.service.QueryService;
+import com.cloudjay.cjay.task.service.QueryService_;
 import com.cloudjay.cjay.task.service.SyncIntentService_;
 import com.cloudjay.cjay.task.service.UploadIntentService_;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -116,8 +118,9 @@ public class Utils {
 		Pubnub pubnub = new Pubnub(CJayConstant.PUBLISH_KEY, CJayConstant.SUBSCRIBE_KEY);
 		pubnub.unsubscribeAllChannels();
 
-		Intent intent = new Intent(context, PubnubService_.class);
-		context.stopService(intent);
+		context.stopService(new Intent(context, PubnubService_.class));
+		context.stopService(new Intent(context, QueryService_.class));
+		context.stopService(new Intent(context, SyncIntentService_.class));
 
 		// Clear preference and Database
 		Logger.Log("Clear all preferences");
@@ -187,10 +190,12 @@ public class Utils {
 		Intent pubnubIntent = new Intent(context, PubnubService_.class);
 		PendingIntent pPubnubIntent = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_SERVICE_ID, pubnubIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-		// wake up every 5 minutes to ensure service stays alive
+		// wake up every 30 minutes to ensure service stays alive
 		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
 				(30 * 60 * 1000), pPubnubIntent);
 
+
+		// TODO: #tieubao
 		// --------
 		// Configure Upload Service
 		Logger.w(" --> set repeating for upload service");
@@ -200,6 +205,8 @@ public class Utils {
 		// wake up every 5 minutes to ensure service stays alive
 		alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
 				(1 * 60 * 1000), pUploadIntent);
+
+        context.startService(new Intent(context, PubnubService_.class));
 	}
 
 	/**
@@ -214,7 +221,9 @@ public class Utils {
 		boolean queueUp = PendingIntent.getService(context, CJayConstant.ALARM_SYNC_SERVICE_ID, queueIntent, PendingIntent.FLAG_NO_CREATE) != null;
 
 		Intent pubnubIntent = new Intent(context, PubnubService_.class);
+
 		boolean pubnubUp = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_SERVICE_ID, pubnubIntent, PendingIntent.FLAG_NO_CREATE) != null;
+		boolean isSubscribed = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_SUBSCRIBE_PUBNUB, false);
 
 		Intent uploadIntent = new Intent(context, UploadIntentService_.class);
 		boolean uploadUp = PendingIntent.getService(context, CJayConstant.ALARM_UPLOAD_SERVICE_ID, uploadIntent, PendingIntent.FLAG_NO_CREATE) != null;
@@ -228,7 +237,7 @@ public class Utils {
 		if (!pubnubUp)
 			Logger.w("Pubnub Service is not running");
 
-		if (queueUp && pubnubUp && uploadUp)
+		if (queueUp && pubnubUp && isSubscribed)
 			return true;
 		else
 			return false;

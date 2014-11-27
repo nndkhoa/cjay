@@ -159,10 +159,9 @@ public class AuditImage implements Serializable {
 
 			if (!TextUtils.isEmpty(name) && tmp.getUrl().contains(name)) {
 				id = tmp.getId();
-
 				return true;
 			} else if (!TextUtils.isEmpty(tmp.getName()) && url.contains(tmp.getName())) {
-
+                name = tmp.getName();
 				return true;
 			}
 			return false;

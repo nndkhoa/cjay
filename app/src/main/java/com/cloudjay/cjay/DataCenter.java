@@ -44,6 +44,7 @@ import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
 import com.path.android.jobqueue.JobManager;
+import com.esotericsoftware.kryo.KryoException;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
@@ -52,8 +53,11 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.Trace;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -69,6 +73,8 @@ public class DataCenter {
 	}
 
 	// region DECLARE
+
+	// TODO: Inject new cjay object queue
 
 	// Inject the command queue
 	@Bean
@@ -513,7 +519,6 @@ public class DataCenter {
 	 * @param lastModifiedDate
 	 * @param refetchWithFirstPageTime
 	 */
-	@Trace
 	public void fetchSession(Context context, String lastModifiedDate, boolean refetchWithFirstPageTime) {
 
 		String newModifiedDay;
@@ -670,6 +675,8 @@ public class DataCenter {
 			String key = containerId;
 			session = db.getObject(key, Session.class);
 		} catch (SnappydbException e) {
+			e.printStackTrace();
+		} catch (KryoException e) {
 			e.printStackTrace();
 		} finally {
 			return session;
@@ -1448,7 +1455,7 @@ public class DataCenter {
 				auditItem.setQuantity(1);
 				auditItem.setModifiedAt(StringUtils.getMinDate());
 
-				list.add(auditItem);
+                list.add(auditItem);
 			}
 
 			session.setAuditItems(list);

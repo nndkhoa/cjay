@@ -22,7 +22,6 @@ import com.cloudjay.cjay.fragment.SearchFragment_;
 import com.cloudjay.cjay.fragment.UploadFragment_;
 import com.cloudjay.cjay.fragment.WorkingFragment_;
 import com.cloudjay.cjay.task.job.FetchSessionsJob;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -90,7 +89,6 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 			// Run job lấy tất cả sessions nếu chưa từng lấy lần nào
 			String lastModifiedDate = PreferencesUtil.getPrefsValue(this, PreferencesUtil.PREF_MODIFIED_DATE);
 			if (lastModifiedDate.isEmpty()) {
-				Logger.Log("Begin to fetch session.");
 				JobManager jobManager = App.getJobManager();
 				jobManager.addJobInBackground(new FetchSessionsJob(lastModifiedDate));
 			}
@@ -187,6 +185,7 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
                 cameraActivityIntent.putExtra(CameraActivity_.OPERATOR_CODE_EXTRA, "");
                 cameraActivityIntent.putExtra(CameraActivity_.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
                 cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.IMPORT.value);
+                cameraActivityIntent.putExtra(CameraActivity_.OPEN_RAINY_MODE_ACTIVITY, true);
                 startActivity(cameraActivityIntent);
             }
             return true;
