@@ -167,4 +167,6 @@
     <string name="title_activity_new_camera">CameraActivity</string>
     <string name="title_activity_rainy_mode">RainyMode</string>
 
+    <string name="info_notification_is_working">Notification đang hoạt động</string>
+
 </resources>

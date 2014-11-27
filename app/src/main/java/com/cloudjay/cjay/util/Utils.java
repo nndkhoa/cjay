@@ -189,9 +189,11 @@ public class Utils {
 		Intent pubnubIntent = new Intent(context, PubnubService_.class);
 		PendingIntent pPubnubIntent = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-		// wake up every 5 minutes to ensure service stays alive
+		// wake up every 30 minutes to ensure service stays alive
 		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
 				(30 * 60 * 1000), pPubnubIntent);
+
+        context.startService(new Intent(context, PubnubService_.class));
 
 	}
 
@@ -210,13 +212,15 @@ public class Utils {
 		boolean pubnubUp = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_NO_CREATE) != null;
 //		boolean pubnubUp = isProcessing(context, PubnubService_.class.getName());
 
+        boolean isSubscribed = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_SUBSCRIBE_PUBNUB, false);
+
 		if (!queueUp)
 			Logger.w("Queue Service is not running");
 
 		if (!pubnubUp)
 			Logger.w("Pubnub Service is not running");
 
-		if (queueUp && pubnubUp)
+		if (queueUp && pubnubUp && isSubscribed)
 			return true;
 		else
 			return false;

@@ -16,6 +16,7 @@ import com.cloudjay.cjay.event.pubnub.PubnubSubscriptionChangedEvent;
 import com.cloudjay.cjay.event.session.ContainersFetchedEvent;
 import com.cloudjay.cjay.task.job.FetchSessionsJob;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 import com.path.android.jobqueue.JobManager;
@@ -25,6 +26,7 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.OptionsMenuItem;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 
 import de.greenrobot.event.EventBus;
@@ -85,6 +87,15 @@ public class BaseActivity extends FragmentActivity {
 
 	@OptionsItem(R.id.menu_subcribe_pubnub)
 	void subscribePubnubItemClicked() {
+        boolean connected = Utils.canReachInternet();
+        boolean alarmUp = Utils.isAlarmUp(this);
+        if (connected && !alarmUp) {
+            Utils.startAlarm(this);
+        } else if (!connected) {
+            Utils.showCrouton(this, getResources().getString(R.string.error_try_again), Style.ALERT);
+        } else if (alarmUp) {
+            Utils.showCrouton(this, getResources().getString(R.string.info_notification_is_working), Style.INFO);
+        }
 	}
 
 	@OptionsItem(R.id.menu_refresh)
@@ -147,6 +158,7 @@ public class BaseActivity extends FragmentActivity {
 	}
 
     @UiThread
+    @Trace
     public void onEvent(PubnubSubscriptionChangedEvent event) {
 	    try {
 		    boolean isSubscribed = event.isSubscribed();

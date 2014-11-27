@@ -475,7 +475,6 @@ public class DataCenter {
 	 * @param lastModifiedDate
 	 * @param refetchWithFirstPageTime
 	 */
-	@Trace
 	public void fetchSession(Context context, String lastModifiedDate, boolean refetchWithFirstPageTime) {
 
 		String newModifiedDay;
