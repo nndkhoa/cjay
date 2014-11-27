@@ -6,7 +6,7 @@ public class ApiEndpoint {
 	public static String ROOT_API = "https://cloudjay-web.appspot.com";
 
 	public static void initBetaApi(boolean isBeta) {
-		if(isBeta){
+		if (isBeta) {
 			ROOT_API = "https://beta-dot-cloudjay-web.appspot.com";
 		}
 	}
@@ -27,7 +27,7 @@ public class ApiEndpoint {
 
 	public static final String CONTAINER_SESSION_ADD_AUDIT_IMAGES_API = "/api/cjay/audit-items/{id}/add-audit-images";
 
-    public static final String CONTAINER_SESSION_HAND_CLEANING = "/api/cjay/containers/{id}/set-available";
+	public static final String CONTAINER_SESSION_HAND_CLEANING = "/api/cjay/containers/{id}/set-available";
 
 	public static final String CJAY_TMP_STORAGE = "https://www.googleapis.com";
 	public static final String CJAY_TMP_STORAGE_IMAGE = "/upload/storage/v1/b/cjaytmp/o";
