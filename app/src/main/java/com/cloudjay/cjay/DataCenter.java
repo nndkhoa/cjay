@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
+import com.cloudjay.cjay.activity.HomeActivity;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.api.NetworkClient;
@@ -519,7 +520,7 @@ public class DataCenter {
 	 * @param lastModifiedDate
 	 * @param refetchWithFirstPageTime
 	 */
-	public void fetchSession(Context context, String lastModifiedDate, boolean refetchWithFirstPageTime) {
+	public void fetchSession(Context context, String lastModifiedDate, boolean refetchWithFirstPageTime) throws RetrofitError{
 
 		String newModifiedDay;
 		do {
@@ -535,7 +536,6 @@ public class DataCenter {
 			Logger.Log("At page: " + nextPage);
 
 			List<Session> sessions = networkClient.getSessionByPage(context, nextPage, lastModifiedDate);
-
 //			processListSession(context, sessions);
 
 			add(new AddListSessionsCommand(context, sessions));
