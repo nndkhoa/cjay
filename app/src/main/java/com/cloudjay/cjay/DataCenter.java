@@ -1378,13 +1378,16 @@ public class DataCenter {
 	 * @param id
 	 */
 	public void getAuditItemAsyncById(Context context, long id) throws SnappydbException {
+        try {
+            AuditItem auditItem = networkClient.getAuditItemById(id);
 
-		AuditItem auditItem = networkClient.getAuditItemById(id);
-
-		if (auditItem != null) {
-			long sessionId = auditItem.getSession();
-			getSessionAsyncById(context, sessionId, 1);
-		}
+            if (auditItem != null) {
+                long sessionId = auditItem.getSession();
+                getSessionAsyncById(context, sessionId, 1);
+            }
+        } catch (RetrofitError e) {
+            e.printStackTrace();
+        }
 	}
 
 	/**
