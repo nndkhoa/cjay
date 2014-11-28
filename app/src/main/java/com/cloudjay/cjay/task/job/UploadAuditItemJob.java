@@ -11,7 +11,9 @@ import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Priority;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
@@ -56,10 +58,11 @@ public class UploadAuditItemJob extends Job {
 		if (!this.addMoreImages) {
 			item = dataCenter.uploadAuditItem(context, sessionId, auditItem);
 		} else {
-			item = dataCenter.uploadAddedAuditImage(context, auditItem);
+            item = dataCenter.uploadAddedAuditImage(context, auditItem);
 		}
-
-		dataCenter.add(new UpdateAuditItemCommand(context, containerId, item));
+        auditItem.merge(item);
+        auditItem.setUploadStatus(UploadStatus.COMPLETE.value);
+		dataCenter.add(new UpdateAuditItemCommand(context, containerId, auditItem));
 	}
 
 	@Override

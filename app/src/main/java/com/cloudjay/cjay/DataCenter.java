@@ -1265,6 +1265,9 @@ public class DataCenter {
 
 	public boolean updateAuditItem(Context context, String containerId, AuditItem auditItem) {
 		try {
+
+            Logger.Log("upload status: " + auditItem.getUploadStatus());
+
 			// find session
 			DB db = App.getDB(context);
 			Session session = db.getObject(containerId, Session.class);

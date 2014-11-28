@@ -154,6 +154,7 @@ public class BeforeRepairFragment extends Fragment {
     void refreshData() {
         if (mSession != null) {
             AuditItem auditItem = mSession.getAuditItem(auditItemUUID);
+            Logger.Log("is audited: " + auditItem.isAudited());
             if (auditItem.getId() != 0) {
                 for (AuditImage image : auditItem.getListAuditedImages()) {
                     if (image.getId() == 0) {
