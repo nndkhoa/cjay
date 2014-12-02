@@ -49,6 +49,6 @@ public class FetchSessionsJob extends Job {
 
 	@Override
 	protected boolean shouldReRunOnThrowable(Throwable throwable) {
-		return false;
+		return true;
 	}
 }
