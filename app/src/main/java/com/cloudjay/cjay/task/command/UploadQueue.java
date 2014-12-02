@@ -6,8 +6,6 @@ import android.support.annotation.NonNull;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.task.command.cjayobject.AddCJayObjectCommand;
-import com.cloudjay.cjay.task.command.cjayobject.GetNextJobCommand;
-import com.cloudjay.cjay.task.command.cjayobject.RemoveCjayObjectCommand;
 
 import org.androidannotations.annotations.EBean;
 
