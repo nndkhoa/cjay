@@ -27,20 +27,16 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.AuditImage;
-import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.GateImage;
-import com.cloudjay.cjay.model.GateImage;
-import com.cloudjay.cjay.task.command.cjayobject.AddCjayObjectCommand;
+import com.cloudjay.cjay.task.command.cjayobject.AddCJayObjectCommand;
 import com.cloudjay.cjay.task.command.image.AddGateImageCommand;
 import com.cloudjay.cjay.task.command.image.AddOrUpdateAuditImageCommand;
 import com.cloudjay.cjay.task.command.image.AddRainyImageCommand;
 
-import com.cloudjay.cjay.task.job.UploadImageJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -48,8 +44,6 @@ import com.cloudjay.cjay.util.StringUtils;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
-import com.path.android.jobqueue.JobManager;
-import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
@@ -64,8 +58,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
 import java.util.UUID;
-
-import de.greenrobot.event.EventBus;
 
 @EActivity(R.layout.activity_camera)
 public class CameraActivity extends Activity implements AutoFocusCallback {
@@ -760,7 +752,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 				// Add image to job queue
 				CJayObject object = new CJayObject(gateImage, GateImage.class, containerId);
-				dataCenter.add(new AddCjayObjectCommand(getApplicationContext(), object));
+				dataCenter.add(new AddCJayObjectCommand(getApplicationContext(), object));
 
 				break;
 
@@ -779,7 +771,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 				dataCenter.add(new AddOrUpdateAuditImageCommand(getApplicationContext(), auditImage, containerId, auditItemUUID));
 				// Add image to job queue
 				CJayObject objectAudit = new CJayObject(auditImage, AuditImage.class, containerId);
-				dataCenter.add(new AddCjayObjectCommand(getApplicationContext(), objectAudit));
+				dataCenter.add(new AddCJayObjectCommand(getApplicationContext(), objectAudit));
 				break;
 		}
 	}

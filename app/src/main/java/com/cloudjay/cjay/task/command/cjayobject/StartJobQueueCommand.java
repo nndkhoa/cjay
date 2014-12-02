@@ -7,9 +7,6 @@ import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.task.command.Command;
 import com.snappydb.SnappydbException;
 
-/**
- * Created by thai on 26/11/2014.
- */
 public class StartJobQueueCommand extends Command {
 	Context context;
 

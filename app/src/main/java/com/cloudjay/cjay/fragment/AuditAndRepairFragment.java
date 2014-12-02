@@ -7,9 +7,7 @@ import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.widget.Button;
 
-import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
-import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
@@ -19,20 +17,17 @@ import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.command.cjayobject.AddCjayObjectCommand;
+import com.cloudjay.cjay.task.command.cjayobject.AddCJayObjectCommand;
 import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionForUploadCommand;
 import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.ChangeSessionLocalStepCommand;
 import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
-import com.cloudjay.cjay.task.job.UploadAuditItemJob;
-import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
-import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -138,7 +133,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 						// If audit item has not been uploaded yet
 						// Add container session to upload queue
 						CJayObject object = new CJayObject(auditItem,AuditItem.class,mSession.getId());
-						dataCenter.add(new AddCjayObjectCommand(getActivity(),object));
+						dataCenter.add(new AddCJayObjectCommand(getActivity(),object));
 					}
 				}
 			}
@@ -147,7 +142,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			dataCenter.add(new SaveSessionCommand(getActivity().getApplicationContext(), mSession));
 
 			CJayObject object = new CJayObject(mSession, Session.class, mSession.getContainerId());
-			dataCenter.add(new AddCjayObjectCommand(getActivity().getApplicationContext(), object));
+			dataCenter.add(new AddCJayObjectCommand(getActivity().getApplicationContext(), object));
 
 
 			// Hide this button
@@ -192,7 +187,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			// Add containerId to upload complete repair queue
 			// PUT /api/cjay/containers/{pk}/complete-repair
 			CJayObject object = new CJayObject(mSession, Session.class, mSession.getContainerId());
-			dataCenter.add(new AddCjayObjectCommand(getActivity(), object));
+			dataCenter.add(new AddCJayObjectCommand(getActivity(), object));
 
 			// Navigate to HomeActivity
 			getActivity().finish();

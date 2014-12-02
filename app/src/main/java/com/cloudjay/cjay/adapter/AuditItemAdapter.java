@@ -14,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
@@ -26,10 +25,9 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.command.cjayobject.AddCjayObjectCommand;
+import com.cloudjay.cjay.task.command.cjayobject.AddCJayObjectCommand;
 import com.cloudjay.cjay.task.command.issue.SetWaterWashAuditItemCommand;
 import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
-import com.cloudjay.cjay.task.job.UploadAuditItemJob;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
@@ -211,7 +209,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 					}
 					auditItem.setSession(session.getId());
 					CJayObject object = new CJayObject(auditItem, AuditItem.class, session.getContainerId());
-					DataCenter_.getInstance_(mContext).add(new AddCjayObjectCommand(mContext.getApplicationContext(), object));
+					DataCenter_.getInstance_(mContext).add(new AddCJayObjectCommand(mContext.getApplicationContext(), object));
 				}
 			});
 

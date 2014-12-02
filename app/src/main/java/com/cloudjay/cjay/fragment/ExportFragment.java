@@ -21,18 +21,15 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.command.cjayobject.AddCjayObjectCommand;
+import com.cloudjay.cjay.task.command.cjayobject.AddCJayObjectCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.AddUploadingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
-import com.cloudjay.cjay.task.job.UploadSessionJob;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
-import com.path.android.jobqueue.JobManager;
-import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -165,7 +162,7 @@ public class ExportFragment extends Fragment {
 
 		// Add container session to upload queue
 		CJayObject object = new CJayObject(mSession, Session.class, mSession.getContainerId());
-		dataCenter.add(new AddCjayObjectCommand(getActivity(), object));
+		dataCenter.add(new AddCJayObjectCommand(getActivity(), object));
 
 		// Navigate to HomeActivity
 		getActivity().finish();

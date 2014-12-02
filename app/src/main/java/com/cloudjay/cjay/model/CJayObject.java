@@ -133,7 +133,7 @@ public class CJayObject implements Serializable {
 		}
 	}
 
-	public CJayObject mergeCjayObject(CJayObject cJayObject) {
+	public CJayObject mergeCJayObject(CJayObject cJayObject) {
 		this.sessionId = cJayObject.getSessionId();
 
 		if (cls == GateImage.class || object instanceof GateImage) {
@@ -149,6 +149,5 @@ public class CJayObject implements Serializable {
 		} else {
 			throw new IllegalStateException("This object is not a GateImage");
 		}
-
 	}
 }

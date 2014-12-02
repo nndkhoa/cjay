@@ -121,6 +121,7 @@ public class Utils {
 		context.stopService(new Intent(context, PubnubService_.class));
 		context.stopService(new Intent(context, QueryService_.class));
 		context.stopService(new Intent(context, SyncIntentService_.class));
+		context.stopService(new Intent(context, UploadIntentService_.class));
 
 		// Clear preference and Database
 		Logger.Log("Clear all preferences");
@@ -221,7 +222,6 @@ public class Utils {
 		boolean queueUp = PendingIntent.getService(context, CJayConstant.ALARM_SYNC_SERVICE_ID, queueIntent, PendingIntent.FLAG_NO_CREATE) != null;
 
 		Intent pubnubIntent = new Intent(context, PubnubService_.class);
-
 		boolean pubnubUp = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_SERVICE_ID, pubnubIntent, PendingIntent.FLAG_NO_CREATE) != null;
 		boolean isSubscribed = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_SUBSCRIBE_PUBNUB, false);
 

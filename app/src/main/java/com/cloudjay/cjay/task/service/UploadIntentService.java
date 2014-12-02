@@ -6,6 +6,7 @@ import android.text.TextUtils;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.task.command.UploadQueue;
 import com.cloudjay.cjay.task.command.cjayobject.StartJobQueueCommand;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -23,13 +24,23 @@ public class UploadIntentService extends IntentService {
 	@Bean
 	DataCenter dataCenter;
 
+	@Bean
+	UploadQueue queue;
+
 	public UploadIntentService() {
 		super("UploadIntentService");
 	}
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
+		executeNext();
+	}
 
+	private boolean processing;
+
+	private void executeNext() {
+
+		if (processing) return; // Only one task at a time.
 		try {
 
 			// Check if user is logged in or not

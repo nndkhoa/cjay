@@ -8,9 +8,6 @@ import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.task.command.Command;
 import com.snappydb.SnappydbException;
 
-/**
- * Created by thai on 26/11/2014.
- */
 public class GetNextJobCommand extends Command {
 	CJayObject object;
 	Context context;
