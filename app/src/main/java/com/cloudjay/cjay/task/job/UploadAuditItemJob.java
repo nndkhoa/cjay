@@ -11,10 +11,9 @@ import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.task.command.cjayobject.GetNextJobCommand;
-import com.cloudjay.cjay.task.command.cjayobject.RemoveCjayObjectCommand;
+import com.cloudjay.cjay.task.command.cjayobject.RemoveCJayObjectCommand;
 import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
 import com.cloudjay.cjay.util.CJayConstant;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Priority;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
@@ -67,7 +66,7 @@ public class UploadAuditItemJob extends Job {
 		}
 
 		dataCenter.add(new UpdateAuditItemCommand(context, containerId, item));
-		dataCenter.add(new RemoveCjayObjectCommand(context, object));
+		dataCenter.add(new RemoveCJayObjectCommand(context, object));
 		dataCenter.add(new GetNextJobCommand(context, object));
 	}
 

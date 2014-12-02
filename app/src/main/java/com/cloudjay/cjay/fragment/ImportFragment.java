@@ -36,10 +36,10 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.cjayobject.AddCJayObjectCommand;
 import com.cloudjay.cjay.task.command.image.DeleteRainyImageCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
+import com.cloudjay.cjay.task.command.session.get.SearchCommand;
 import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.AddUploadingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.AddWorkingSessionCommand;
-import com.cloudjay.cjay.task.command.session.get.SearchCommand;
 import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -372,8 +372,7 @@ public class ImportFragment extends Fragment {
 
 		// Add container session to upload queue
 		CJayObject object = new CJayObject(mSession, Session.class, mSession.getContainerId());
-//		dataCenter.add(new AddCJayObjectCommand(getActivity(), object));
-		dataCenter.addUpload(object);
+		dataCenter.addUploadItem(object);
 	}
 
 	@Touch(R.id.et_operator)
@@ -508,25 +507,24 @@ public class ImportFragment extends Fragment {
 				.withLocalStep(Step.IMPORT.value);
 
 		dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
+
 		// Add image to job queue
 		for (GateImage gateImage : list) {
-			String uri = Utils.parseUrltoUri(gateImage.getUrl());
-			String imageName = gateImage.getName();
 			String containerId = mSession.getContainerId();
-
 			CJayObject object = new CJayObject(gateImage, GateImage.class, containerId);
 			dataCenter.add(new AddCJayObjectCommand(getActivity().getApplicationContext(), object));
 		}
+
 		//Upload session
 		uploadImportSession(false);
 
 		// Delete selected image
-		dataCenter.add(new DeleteRainyImageCommand(
-				getActivity().getApplicationContext(), imageUrls));
+		dataCenter.add(new DeleteRainyImageCommand(getActivity().getApplicationContext(), imageUrls));
 	}
 
 	@UiThread
 	void onEvent(RainyImagesDeletedEvent event) {
+
 		// open rainy mode activity
 		Intent intent = new Intent(getActivity(), RainyModeActivity_.class);
 		startActivity(intent);

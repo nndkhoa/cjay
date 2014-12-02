@@ -22,6 +22,12 @@ public class UploadQueue implements Queue<CJayObject> {
 		this.context = context;
 	}
 
+	/**
+	 * Add new command and also start Upload intent service
+	 *
+	 * @param cJayObject
+	 * @return
+	 */
 	@Override
 	public boolean add(CJayObject cJayObject) {
 		DataCenter_.getInstance_(context).add(new AddCJayObjectCommand(context, cJayObject));
@@ -30,11 +36,9 @@ public class UploadQueue implements Queue<CJayObject> {
 
 	@Override
 	public boolean addAll(Collection<? extends CJayObject> cJayObjects) {
-
 		for (CJayObject object : cJayObjects) {
 			DataCenter_.getInstance_(context).add(new AddCJayObjectCommand(context, object));
 		}
-
 		return false;
 	}
 
@@ -129,7 +133,6 @@ public class UploadQueue implements Queue<CJayObject> {
 
 	@Override
 	public CJayObject peek() {
-
 //		DataCenter_.getInstance_(context).add(new GetNextJobCommand());
 		return null;
 	}

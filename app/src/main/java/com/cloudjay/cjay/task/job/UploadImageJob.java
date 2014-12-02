@@ -6,10 +6,9 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
-import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.task.command.cjayobject.GetNextJobCommand;
-import com.cloudjay.cjay.task.command.cjayobject.RemoveCjayObjectCommand;
+import com.cloudjay.cjay.task.command.cjayobject.RemoveCJayObjectCommand;
 import com.cloudjay.cjay.task.command.image.ChangeImageUploadStatusCommand;
 import com.cloudjay.cjay.task.command.log.AddLogCommand;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -17,7 +16,6 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Priority;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
-import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 
@@ -63,7 +61,7 @@ public class UploadImageJob extends Job {
 
 		// Change image status to COMPLETE
 		dataCenter.add(new ChangeImageUploadStatusCommand(context, containerId, imageName, imageType, UploadStatus.COMPLETE,object));
-		dataCenter.add(new RemoveCjayObjectCommand(context, object));
+		dataCenter.add(new RemoveCJayObjectCommand(context, object));
 		dataCenter.add(new GetNextJobCommand(context, object));
 
 	}

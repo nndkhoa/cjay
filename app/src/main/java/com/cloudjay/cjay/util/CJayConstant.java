@@ -28,8 +28,15 @@ public class CJayConstant {
 	public static final String PREFIX_NOTIFI_LOG = "NOTIFI_LOG";
     public static final String PREFIX_RAINY_MODE_IMAGE = "RAINY_MODE_IMAGE";
 
-	public static final String PREFIX_CONTAINER_PRIORITY = "PREFIX_CONTAINER_PRIORITY:";
-	public static final String PREFIX_CJAY_PRIORITY = "PREFIX_CJAY_PRIORITY";
+	/**
+	 * Quy định thứ tự của các container khác nhau.
+	 */
+	public static final String PREFIX_CONTAINER_ORDER = "PREFIX_CONTAINER_ORDER:";
+
+	/**
+	 * Quy định thứ tự của các CJayObject cần upload trong CÙNG một container.
+	 */
+	public static final String PREFIX_CJAY_OBJECT_ORDER = "PREFIX_CJAY_OBJECT_ORDER";
 
 
 	// `/sdcard/DCMI/CJay/`

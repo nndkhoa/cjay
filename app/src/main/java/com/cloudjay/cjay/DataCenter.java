@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
-import com.cloudjay.cjay.activity.HomeActivity;
 import com.cloudjay.cjay.activity.WizardActivity;
 import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.api.NetworkClient;
@@ -69,7 +68,7 @@ public class DataCenter {
 		queue.add(command);
 	}
 
-	public void addUpload(CJayObject object) {
+	public void addUploadItem(CJayObject object) {
 		uploadQueue.add(object);
 	}
 
@@ -521,7 +520,7 @@ public class DataCenter {
 	 * @param lastModifiedDate
 	 * @param refetchWithFirstPageTime
 	 */
-	public void fetchSession(Context context, String lastModifiedDate, boolean refetchWithFirstPageTime) throws RetrofitError{
+	public void fetchSession(Context context, String lastModifiedDate, boolean refetchWithFirstPageTime) throws RetrofitError {
 
 		String newModifiedDay;
 		do {
@@ -1563,8 +1562,8 @@ public class DataCenter {
 	public void addCJayObject(String containerId, CJayObject object) {
 
 		try {
-			boolean isExistContainerLine = isExistLine(containerId, CJayConstant.PREFIX_CJAY_PRIORITY);
-			boolean isExistQueueLine = isExistLine(containerId, CJayConstant.PREFIX_CONTAINER_PRIORITY);
+			boolean isExistContainerLine = isExistLine(containerId, CJayConstant.PREFIX_CJAY_OBJECT_ORDER);
+			boolean isExistQueueLine = isExistLine(containerId, CJayConstant.PREFIX_CONTAINER_ORDER);
 
 			if (isExistContainerLine) {
 				addCJayObjToContainerLine(containerId, object, true);
@@ -1586,23 +1585,24 @@ public class DataCenter {
 	 * Check if exist line of container or queue
 	 *
 	 * @param containerId
-	 * @param TypeOfLine
+	 * @param type
 	 * @return
 	 * @throws SnappydbException
 	 */
-	private boolean isExistLine(String containerId, String TypeOfLine) throws SnappydbException {
+	private boolean isExistLine(String containerId, String type) throws SnappydbException {
 
 		DB db = App.getDB(context);
-		if (TypeOfLine.equals(CJayConstant.PREFIX_CJAY_PRIORITY)) {
-			String keytoFind = CJayConstant.PREFIX_CJAY_PRIORITY + containerId + ":";
+		if (type.equals(CJayConstant.PREFIX_CJAY_OBJECT_ORDER)) {
+
+			String keytoFind = CJayConstant.PREFIX_CJAY_OBJECT_ORDER + containerId + ":";
 			String[] sessionPriority = db.findKeys(keytoFind);
 			if (sessionPriority.length != 0) {
 				return true;
 			} else {
 				return false;
 			}
-		} else if (TypeOfLine.equals(CJayConstant.PREFIX_CONTAINER_PRIORITY)) {
-			String[] queuePriority = db.findKeys(CJayConstant.PREFIX_CONTAINER_PRIORITY);
+		} else if (type.equals(CJayConstant.PREFIX_CONTAINER_ORDER)) {
+			String[] queuePriority = db.findKeys(CJayConstant.PREFIX_CONTAINER_ORDER);
 			if (queuePriority.length != 0) {
 				return true;
 			} else {
@@ -1624,14 +1624,14 @@ public class DataCenter {
 
 		DB db = App.getDB(context);
 
-		String[] queuePriority = db.findKeys(CJayConstant.PREFIX_CONTAINER_PRIORITY);
+		String[] queuePriority = db.findKeys(CJayConstant.PREFIX_CONTAINER_ORDER);
 
 		if (toExistLine) {
-			int maxPriority = getPriority(queuePriority, CJayConstant.PREFIX_CONTAINER_PRIORITY, true);
+			int maxPriority = getPriority(queuePriority, CJayConstant.PREFIX_CONTAINER_ORDER, true);
 			int priorityToAdd = maxPriority + 1;
-			db.put(CJayConstant.PREFIX_CONTAINER_PRIORITY + priorityToAdd, containerId);
+			db.put(CJayConstant.PREFIX_CONTAINER_ORDER + priorityToAdd, containerId);
 		} else {
-			db.put(CJayConstant.PREFIX_CONTAINER_PRIORITY + 1, containerId);
+			db.put(CJayConstant.PREFIX_CONTAINER_ORDER + 1, containerId);
 		}
 
 	}
@@ -1647,7 +1647,7 @@ public class DataCenter {
 	private void addCJayObjToContainerLine(String containerId, CJayObject object, boolean toExistLine) throws SnappydbException {
 
 		DB db = App.getDB(context);
-		String key = CJayConstant.PREFIX_CJAY_PRIORITY + containerId + ":";
+		String key = CJayConstant.PREFIX_CJAY_OBJECT_ORDER + containerId + ":";
 		String[] sessionPriority = db.findKeys(key);
 
 		if (toExistLine) {
@@ -1681,23 +1681,26 @@ public class DataCenter {
 	 * @throws SnappydbException
 	 */
 	public void getNextCJayObject(String containerId, CJayObject oldObject) throws SnappydbException {
+
 		DB db = App.getDB(context);
 
 		int nextCJayPriority = oldObject.getcJayPriority() + 1;
 		int nextContainerPriority = oldObject.getContainerPriority() + 1;
 
-		String keyFindNextCJay = CJayConstant.PREFIX_CJAY_PRIORITY + containerId + ":" + nextCJayPriority;
+		String keyFindNextCJay = CJayConstant.PREFIX_CJAY_OBJECT_ORDER + containerId + ":" + nextCJayPriority;
 
-		boolean isExistNextCJay = isExistNext(containerId, oldObject, CJayConstant.PREFIX_CJAY_PRIORITY);
-		boolean isExistNextContainer = isExistNext(containerId, oldObject, CJayConstant.PREFIX_CONTAINER_PRIORITY);
+		boolean isExistNextCJay = isExistNext(containerId, oldObject, CJayConstant.PREFIX_CJAY_OBJECT_ORDER);
+		boolean isExistNextContainer = isExistNext(containerId, oldObject, CJayConstant.PREFIX_CONTAINER_ORDER);
 
 		if (isExistNextCJay) {
-			CJayObject nextJob = db.getObject(keyFindNextCJay, CJayObject.class);
-			update(nextJob);
+
+			CJayObject nextItem = db.getObject(keyFindNextCJay, CJayObject.class);
+			update(nextItem);
+
 		} else {
 			if (isExistNextContainer) {
-				String nextContainerId = db.get(CJayConstant.PREFIX_CONTAINER_PRIORITY + nextContainerPriority);
-				String keyFindNextCJayOfNextContainer = CJayConstant.PREFIX_CJAY_PRIORITY + nextContainerId + ":" + 1;
+				String nextContainerId = db.get(CJayConstant.PREFIX_CONTAINER_ORDER + nextContainerPriority);
+				String keyFindNextCJayOfNextContainer = CJayConstant.PREFIX_CJAY_OBJECT_ORDER + nextContainerId + ":" + 1;
 				CJayObject nextJob = db.getObject(keyFindNextCJayOfNextContainer, CJayObject.class);
 				update(nextJob);
 			} else {
@@ -1721,16 +1724,16 @@ public class DataCenter {
 		int nextContainerPriority = oldObject.getContainerPriority() + 1;
 
 		DB db = App.getDB(context);
-		if (typOfLine.equals(CJayConstant.PREFIX_CJAY_PRIORITY)) {
-			String keytoFind = CJayConstant.PREFIX_CJAY_PRIORITY + containerId + ":" + nextCJayPriority;
+		if (typOfLine.equals(CJayConstant.PREFIX_CJAY_OBJECT_ORDER)) {
+			String keytoFind = CJayConstant.PREFIX_CJAY_OBJECT_ORDER + containerId + ":" + nextCJayPriority;
 			String[] sessionPriority = db.findKeys(keytoFind);
 			if (sessionPriority.length != 0) {
 				return true;
 			} else {
 				return false;
 			}
-		} else if (typOfLine.equals(CJayConstant.PREFIX_CONTAINER_PRIORITY)) {
-			String keyQueryNextQueue = CJayConstant.PREFIX_CONTAINER_PRIORITY + nextContainerPriority;
+		} else if (typOfLine.equals(CJayConstant.PREFIX_CONTAINER_ORDER)) {
+			String keyQueryNextQueue = CJayConstant.PREFIX_CONTAINER_ORDER + nextContainerPriority;
 			String[] queuePriority = db.findKeys(keyQueryNextQueue);
 			if (queuePriority.length != 0) {
 				return true;
@@ -1745,28 +1748,28 @@ public class DataCenter {
 	/**
 	 * Remove done CjObject after done job
 	 * 1. Remove object in db with key is current object session priority
-	 * 2 Find for next session priority
+	 * 2. Find for next session priority
 	 * => if didn't find , remove queue priority with key is current object queue priority
 	 *
 	 * @param containerId
 	 * @param object
 	 * @throws SnappydbException
 	 */
-	public void removeDoneQueue(String containerId, CJayObject object) throws SnappydbException {
+	public void remove(String containerId, CJayObject object) throws SnappydbException {
 		DB db = App.getDB(context);
 
 		int cJayPriority = object.getcJayPriority();
 		int containerPriority = object.getContainerPriority();
 
-		String keytoDelete = CJayConstant.PREFIX_CJAY_PRIORITY + containerId + ":" + cJayPriority;
-		db.del(keytoDelete);
+		String keyToDelete = CJayConstant.PREFIX_CJAY_OBJECT_ORDER + containerId + ":" + cJayPriority;
+		db.del(keyToDelete);
 
-		int nextSessionPririty = object.getcJayPriority() + 1;
-		String keySearchNextSessionPriority = CJayConstant.PREFIX_CJAY_PRIORITY + containerId + ":" + nextSessionPririty;
-		String[] nextSessionPrioritys = db.findKeys(keySearchNextSessionPriority);
+		int nextSessionPriority = object.getcJayPriority() + 1;
+		String keySearchNextSessionPriority = CJayConstant.PREFIX_CJAY_OBJECT_ORDER + containerId + ":" + nextSessionPriority;
+		String[] nextSessionPriorities = db.findKeys(keySearchNextSessionPriority);
 
-		if (nextSessionPrioritys.length == 0) {
-			String keyDeleteQueuePriority = CJayConstant.PREFIX_CONTAINER_PRIORITY + containerPriority;
+		if (nextSessionPriorities.length == 0) {
+			String keyDeleteQueuePriority = CJayConstant.PREFIX_CONTAINER_ORDER + containerPriority;
 			db.del(keyDeleteQueuePriority);
 		}
 	}
@@ -1782,12 +1785,12 @@ public class DataCenter {
 	 */
 	private int getPriority(String[] priorityString, String keyToGetInt, boolean max) {
 
-		ArrayList<Integer> priorityList = new ArrayList<Integer>();
+		ArrayList<Integer> priorityList = new ArrayList<>();
 		for (String key : priorityString) {
-			int lenghtString = (keyToGetInt).length();
-			String priority = key.substring(lenghtString);
-			int priorityNumer = Integer.valueOf(priority);
-			priorityList.add(priorityNumer);
+			int strLen = (keyToGetInt).length();
+			String priority = key.substring(strLen);
+			int priorityNumber = Integer.valueOf(priority);
+			priorityList.add(priorityNumber);
 		}
 
 		int maxPriority = Collections.max(priorityList);
@@ -1801,38 +1804,6 @@ public class DataCenter {
 	}
 	//endregion
 
-	public CJayObject getNextItem(Context context) {
-
-		DB db;
-		CJayObject object = null;
-
-		try {
-
-			db = App.getDB(context);
-
-			// Find key
-			boolean isExistContainerLine = isExistLine(" ", CJayConstant.PREFIX_CONTAINER_PRIORITY);
-
-			if (isExistContainerLine) {
-				String[] containersOnLine = db.findKeys(CJayConstant.PREFIX_CONTAINER_PRIORITY);
-				int minPriority = getPriority(containersOnLine, CJayConstant.PREFIX_CONTAINER_PRIORITY, false);
-				String firstContainerIdOnLine = db.get(CJayConstant.PREFIX_CONTAINER_PRIORITY + minPriority);
-
-				String keySearchCJayOnLine = CJayConstant.PREFIX_CJAY_PRIORITY + firstContainerIdOnLine + ":";
-				String[] cJaysOnLine = db.findKeys(keySearchCJayOnLine);
-
-				int minCJayPriority = getPriority(cJaysOnLine, keySearchCJayOnLine, false);
-				String keyOfFirstObject = CJayConstant.PREFIX_CJAY_PRIORITY + firstContainerIdOnLine + ":" + minCJayPriority;
-				object = db.getObject(keyOfFirstObject, CJayObject.class);
-			}
-
-		} catch (SnappydbException e) {
-			e.printStackTrace();
-		}
-
-		return object;
-	}
-
 	/**
 	 * 1. Find next upload item/cjay object
 	 * 2. Update object data
@@ -1843,10 +1814,13 @@ public class DataCenter {
 	 */
 	public void startJobQueue(Context context) throws SnappydbException {
 
+		// Find next upload item
 		JobManager jobManager = App.getJobManager();
 		CJayObject object = getNextItem(context);
 
 		if (object != null) {
+
+			// update object before upload
 			object = update(object);
 
 			// Add Job in background
@@ -1874,6 +1848,43 @@ public class DataCenter {
 	}
 
 	/**
+	 * Find next item in upload queue
+	 *
+	 * @param context
+	 * @return
+	 */
+	public CJayObject getNextItem(Context context) {
+
+		DB db;
+		CJayObject object = null;
+		try {
+			db = App.getDB(context);
+
+			// Find key
+			boolean isExistContainerLine = isExistLine(" ", CJayConstant.PREFIX_CONTAINER_ORDER);
+
+			if (isExistContainerLine) {
+
+				String[] containersOnLine = db.findKeys(CJayConstant.PREFIX_CONTAINER_ORDER);
+				int minPriority = getPriority(containersOnLine, CJayConstant.PREFIX_CONTAINER_ORDER, false);
+				String firstContainerIdOnLine = db.get(CJayConstant.PREFIX_CONTAINER_ORDER + minPriority);
+
+				String keySearchCJayOnLine = CJayConstant.PREFIX_CJAY_OBJECT_ORDER + firstContainerIdOnLine + ":";
+				String[] cJaysOnLine = db.findKeys(keySearchCJayOnLine);
+
+				int minCJayPriority = getPriority(cJaysOnLine, keySearchCJayOnLine, false);
+				String keyOfFirstObject = CJayConstant.PREFIX_CJAY_OBJECT_ORDER + firstContainerIdOnLine + ":" + minCJayPriority;
+				object = db.getObject(keyOfFirstObject, CJayObject.class);
+			}
+
+		} catch (SnappydbException e) {
+			e.printStackTrace();
+		}
+
+		return object;
+	}
+
+	/**
 	 * Update data of cjay object then add to upload job
 	 *
 	 * @param object
@@ -1881,12 +1892,14 @@ public class DataCenter {
 	public CJayObject update(CJayObject object) throws SnappydbException {
 
 		if (object.getCls() == Session.class) {
+
 			Session session = getSession(context, object.getContainerId());
 			CJayObject newObject = new CJayObject(session, Session.class, session.getContainerId());
 			object = object.mergeCJayObject(newObject);
 			return object;
 
 		} else if (object.getCls() == AuditItem.class) {
+
 			Session session = getSession(context, object.getContainerId());
 			AuditItem auditItem = getAuditItem(context, object.getContainerId(), object.getAuditItem().getUuid());
 			CJayObject newObject = new CJayObject(auditItem, AuditItem.class, object.getContainerId(), session.getId());

@@ -158,7 +158,7 @@ public class Utils {
 	}
 
 	/**
-	 * Init alarm manager to start QueueIntentService
+	 * Initial alarm manager to trigger app services
 	 *
 	 * @param context
 	 */
@@ -194,6 +194,7 @@ public class Utils {
 		// wake up every 30 minutes to ensure service stays alive
 		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
 				(30 * 60 * 1000), pPubnubIntent);
+		context.startService(new Intent(context, PubnubService_.class));
 
 
 		// TODO: #tieubao
@@ -201,13 +202,11 @@ public class Utils {
 		// Configure Upload Service
 		Logger.w(" --> set repeating for upload service");
 		Intent uploadIntent = new Intent(context, UploadIntentService_.class);
-		PendingIntent pUploadIntent = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_SERVICE_ID, uploadIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pUploadIntent = PendingIntent.getService(context, CJayConstant.ALARM_UPLOAD_SERVICE_ID, uploadIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 		// wake up every 5 minutes to ensure service stays alive
-		alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
-				(1 * 60 * 1000), pUploadIntent);
-
-        context.startService(new Intent(context, PubnubService_.class));
+		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+				(30 * 60 * 1000), pUploadIntent);
 	}
 
 	/**

@@ -22,6 +22,7 @@ public class AddCJayObjectCommand extends Command {
 
 	@Override
 	protected void run() throws SnappydbException {
+
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
 		dataCenter.addCJayObject(object.getContainerId(), object);
 		context.startService(new Intent(context, UploadIntentService_.class));

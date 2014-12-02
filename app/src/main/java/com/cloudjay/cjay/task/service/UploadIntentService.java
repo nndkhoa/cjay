@@ -18,6 +18,11 @@ import org.androidannotations.annotations.EIntentService;
 
 import retrofit.RetrofitError;
 
+/**
+ * This intent service should be called in 2 cases:
+ * - First time start app / reboot device, alarm manager will trigger automatically
+ * - When user want to upload new item
+ */
 @EIntentService
 public class UploadIntentService extends IntentService {
 
@@ -36,7 +41,10 @@ public class UploadIntentService extends IntentService {
 		executeNext();
 	}
 
-	private boolean processing;
+	/**
+	 * Biến processing sẽ có giá trị false khi không còn task nào để thực hiện
+	 */
+	public static boolean processing;
 
 	private void executeNext() {
 
@@ -55,12 +63,16 @@ public class UploadIntentService extends IntentService {
 				}
 
 			} else {
+
 				Logger.w("There was problems. Please check credential or connectivity.");
+				Logger.w("Upload service will be stopped.");
+				processing = false;
+				stopSelf();
 			}
 
 		} catch (RetrofitError e) {
 			e.printStackTrace();
-			Utils.cancelAlarm(getApplicationContext());
+//			Utils.cancelAlarm(getApplicationContext());
 		}
 	}
 }
