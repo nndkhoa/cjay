@@ -54,6 +54,7 @@ import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
+import org.droidparts.widget.ClearableEditText;
 
 import java.util.List;
 
@@ -72,7 +73,7 @@ public class SearchFragment extends Fragment {
 	ImageButton btnSearch;
 
 	@ViewById(R.id.et_search)
-	EditText editText;
+    ClearableEditText editText;
 
 	@ViewById(R.id.lv_search_container)
 	ListView lvSearch;
@@ -327,6 +328,7 @@ public class SearchFragment extends Fragment {
 	public void onResume() {
 		super.onResume();
 		llSearchResult.setVisibility(View.GONE);
+        editText.setText("");
 	}
 
 	@Override
