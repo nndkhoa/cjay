@@ -6,7 +6,7 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
-import com.cloudjay.cjay.model.CJayObject;
+import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.task.command.cjayobject.GetNextJobCommand;
 import com.cloudjay.cjay.task.command.cjayobject.RemoveCJayObjectCommand;
 import com.cloudjay.cjay.task.command.image.ChangeImageUploadStatusCommand;
@@ -28,14 +28,14 @@ public class UploadImageJob extends Job {
 	String uri;
 	String imageName;
 	ImageType imageType;
-	CJayObject object;
+	UploadObject object;
 
 	@Override
 	public int getRetryLimit() {
 		return CJayConstant.RETRY_THRESHOLD;
 	}
 
-	public UploadImageJob(String uri, String imageName, String containerId, ImageType imageType,CJayObject object) {
+	public UploadImageJob(String uri, String imageName, String containerId, ImageType imageType,UploadObject object) {
 		super(new Params(Priority.MID).requireNetwork().persist().groupBy(containerId).setPersistent(true));
 
 		this.containerId = containerId;

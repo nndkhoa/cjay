@@ -17,12 +17,12 @@ import com.cloudjay.cjay.event.session.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
-import com.cloudjay.cjay.model.CJayObject;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.LogItem;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.task.command.Command;
 import com.cloudjay.cjay.task.command.CommandQueue;
@@ -68,7 +68,7 @@ public class DataCenter {
 		queue.add(command);
 	}
 
-	public void addUploadItem(CJayObject object) {
+	public void addUploadItem(UploadObject object) {
 		uploadQueue.add(object);
 	}
 
@@ -1548,32 +1548,35 @@ public class DataCenter {
 	//region CJAY OBJECT
 
 	/**
-	 * ADD CJAY TO COMMAND
-	 * Add Queue to line
+	 * 1. Add container to the end of Container Upload Queue (PREFIX_CONTAINER_ORDER) if it have not existed yet
+	 * 2. Add upload object to the end (enqueue) of this container upload queue (PREFIX_UPLOAD_OBJECT_ORDER)
 	 * <p/>
-	 * 1. Find Session queue
-	 * - if found, get max session priority => add new session queue with priority = current max priority +1
-	 * - if can't find, get max queue priority => add new container priority then add new session queue
+	 * Note: Upload Queue > Container Queue
 	 *
 	 * @param containerId
 	 * @param object
 	 * @throws SnappydbException
 	 */
-	public void addCJayObject(String containerId, CJayObject object) {
-
+	public void enqueue(Context context, String containerId, UploadObject object) {
 		try {
-			boolean isExistContainerLine = isExistLine(containerId, CJayConstant.PREFIX_CJAY_OBJECT_ORDER);
-			boolean isExistQueueLine = isExistLine(containerId, CJayConstant.PREFIX_CONTAINER_ORDER);
 
-			if (isExistContainerLine) {
-				addCJayObjToContainerLine(containerId, object, true);
+			// if there is an item in container queue, it means upload queue also contains this container
+			// so do not need to double check
+			boolean hasItemInContainerQueue = hasItem(containerId, CJayConstant.PREFIX_UPLOAD_OBJECT_ORDER);
+			if (hasItemInContainerQueue) {
+
+				enqueueUploadObject(containerId, object, true);
+
 			} else {
-				if (isExistQueueLine) {
-					addCJayObjToContainerLine(containerId, object, false);
-					addContainerToQueueLine(containerId, true);
+				boolean hasItemInUploadQueue = hasItem(containerId, CJayConstant.PREFIX_CONTAINER_ORDER);
+				if (hasItemInUploadQueue) {
+
+					enqueueUploadObject(containerId, object, false);
+					enqueueContainer(containerId, true);
 				} else {
-					addContainerToQueueLine(containerId, false);
-					addCJayObjToContainerLine(containerId, object, false);
+
+					enqueueContainer(containerId, false);
+					enqueueUploadObject(containerId, object, false);
 				}
 			}
 		} catch (SnappydbException e) {
@@ -1582,87 +1585,49 @@ public class DataCenter {
 	}
 
 	/**
-	 * Check if exist line of container or queue
-	 *
-	 * @param containerId
-	 * @param type
-	 * @return
-	 * @throws SnappydbException
-	 */
-	private boolean isExistLine(String containerId, String type) throws SnappydbException {
-
-		DB db = App.getDB(context);
-		if (type.equals(CJayConstant.PREFIX_CJAY_OBJECT_ORDER)) {
-
-			String keytoFind = CJayConstant.PREFIX_CJAY_OBJECT_ORDER + containerId + ":";
-			String[] sessionPriority = db.findKeys(keytoFind);
-			if (sessionPriority.length != 0) {
-				return true;
-			} else {
-				return false;
-			}
-		} else if (type.equals(CJayConstant.PREFIX_CONTAINER_ORDER)) {
-			String[] queuePriority = db.findKeys(CJayConstant.PREFIX_CONTAINER_ORDER);
-			if (queuePriority.length != 0) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Add containerid to queue line
+	 * Add containerId to the end of Upload Queue
 	 *
 	 * @param containerId
 	 * @param toExistLine
 	 * @throws SnappydbException
 	 */
-	private void addContainerToQueueLine(String containerId, boolean toExistLine) throws SnappydbException {
+	private void enqueueContainer(String containerId, boolean toExistLine) throws SnappydbException {
 
 		DB db = App.getDB(context);
-
-		String[] queuePriority = db.findKeys(CJayConstant.PREFIX_CONTAINER_ORDER);
+		int lastIndex = 0;
+		String[] keys = db.findKeys(CJayConstant.PREFIX_CONTAINER_ORDER);
 
 		if (toExistLine) {
-			int maxPriority = getPriority(queuePriority, CJayConstant.PREFIX_CONTAINER_ORDER, true);
-			int priorityToAdd = maxPriority + 1;
-			db.put(CJayConstant.PREFIX_CONTAINER_ORDER + priorityToAdd, containerId);
-		} else {
-			db.put(CJayConstant.PREFIX_CONTAINER_ORDER + 1, containerId);
+			lastIndex = getLastIndex(keys, CJayConstant.PREFIX_CONTAINER_ORDER);
 		}
 
+		db.put(CJayConstant.PREFIX_CONTAINER_ORDER + lastIndex + 1, containerId);
 	}
 
 	/**
-	 * Add Cjay Obj to wait line of container queue
+	 * Add upload object to the end of Container Queue
 	 *
 	 * @param containerId
 	 * @param object
 	 * @param toExistLine
 	 * @throws SnappydbException
 	 */
-	private void addCJayObjToContainerLine(String containerId, CJayObject object, boolean toExistLine) throws SnappydbException {
+	private void enqueueUploadObject(String containerId, UploadObject object, boolean toExistLine) throws SnappydbException {
 
 		DB db = App.getDB(context);
-		String key = CJayConstant.PREFIX_CJAY_OBJECT_ORDER + containerId + ":";
-		String[] sessionPriority = db.findKeys(key);
+		String key = CJayConstant.PREFIX_UPLOAD_OBJECT_ORDER + containerId + ":";
+		String[] results = db.findKeys(key);
 
 		if (toExistLine) {
-			int maxPriority = getPriority(sessionPriority, key, true);
-			int priorityToAdd = maxPriority + 1;
-			CJayObject beforeObject = db.getObject(key + maxPriority, CJayObject.class);
-
-			object.setcJayPriority(priorityToAdd);
-			object.setContainerPriority(beforeObject.getContainerPriority());
-
-			db.put(key + priorityToAdd, object);
+			int lastIndex = getLastIndex(results, key);
+			UploadObject beforeObject = db.getObject(key + lastIndex, UploadObject.class);
+			object.setUploadQueueOrder(beforeObject.getUploadQueueOrder());
+			object.setContainerQueueOrder(lastIndex + 1);
+			db.put(key + lastIndex + 1, object);
 		} else {
 
-			object.setcJayPriority(1);
-			object.setContainerPriority(1);
+			object.setContainerQueueOrder(1);
+			object.setUploadQueueOrder(1);
 			db.put(key + 1, object);
 		}
 	}
@@ -1680,32 +1645,107 @@ public class DataCenter {
 	 * @return
 	 * @throws SnappydbException
 	 */
-	public void getNextCJayObject(String containerId, CJayObject oldObject) throws SnappydbException {
+	public void getNextCJayObject(String containerId, UploadObject oldObject) throws SnappydbException {
 
 		DB db = App.getDB(context);
 
-		int nextCJayPriority = oldObject.getcJayPriority() + 1;
-		int nextContainerPriority = oldObject.getContainerPriority() + 1;
+		int nextCJayPriority = oldObject.getContainerQueueOrder() + 1;
+		int nextContainerPriority = oldObject.getUploadQueueOrder() + 1;
 
-		String keyFindNextCJay = CJayConstant.PREFIX_CJAY_OBJECT_ORDER + containerId + ":" + nextCJayPriority;
+		String keyFindNextCJay = CJayConstant.PREFIX_UPLOAD_OBJECT_ORDER + containerId + ":" + nextCJayPriority;
 
-		boolean isExistNextCJay = isExistNext(containerId, oldObject, CJayConstant.PREFIX_CJAY_OBJECT_ORDER);
-		boolean isExistNextContainer = isExistNext(containerId, oldObject, CJayConstant.PREFIX_CONTAINER_ORDER);
+		boolean isExistNextCJay = hasNext(containerId, oldObject, CJayConstant.PREFIX_UPLOAD_OBJECT_ORDER);
+		boolean isExistNextContainer = hasNext(containerId, oldObject, CJayConstant.PREFIX_CONTAINER_ORDER);
 
 		if (isExistNextCJay) {
 
-			CJayObject nextItem = db.getObject(keyFindNextCJay, CJayObject.class);
+			UploadObject nextItem = db.getObject(keyFindNextCJay, UploadObject.class);
 			update(nextItem);
 
 		} else {
 			if (isExistNextContainer) {
 				String nextContainerId = db.get(CJayConstant.PREFIX_CONTAINER_ORDER + nextContainerPriority);
-				String keyFindNextCJayOfNextContainer = CJayConstant.PREFIX_CJAY_OBJECT_ORDER + nextContainerId + ":" + 1;
-				CJayObject nextJob = db.getObject(keyFindNextCJayOfNextContainer, CJayObject.class);
+				String keyFindNextCJayOfNextContainer = CJayConstant.PREFIX_UPLOAD_OBJECT_ORDER + nextContainerId + ":" + 1;
+				UploadObject nextJob = db.getObject(keyFindNextCJayOfNextContainer, UploadObject.class);
 				update(nextJob);
 			} else {
 				Logger.Log("Không tìm thấy CJay Object tiếp theo");
 			}
+		}
+	}
+
+	/**
+	 * Remove done CjObject after done job
+	 * 1. Remove object in db with key is current object session priority
+	 * 2. Find for next session priority
+	 * => if didn't find , remove queue priority with key is current object queue priority
+	 *
+	 * @param containerId
+	 * @param object
+	 * @throws SnappydbException
+	 */
+	public void remove(String containerId, UploadObject object) throws SnappydbException {
+		DB db = App.getDB(context);
+
+		int cJayPriority = object.getContainerQueueOrder();
+		int containerPriority = object.getUploadQueueOrder();
+
+		String keyToDelete = CJayConstant.PREFIX_UPLOAD_OBJECT_ORDER + containerId + ":" + cJayPriority;
+		db.del(keyToDelete);
+
+		int nextSessionPriority = object.getContainerQueueOrder() + 1;
+		String keySearchNextSessionPriority = CJayConstant.PREFIX_UPLOAD_OBJECT_ORDER + containerId + ":" + nextSessionPriority;
+		String[] nextSessionPriorities = db.findKeys(keySearchNextSessionPriority);
+
+		if (nextSessionPriorities.length == 0) {
+			String keyDeleteQueuePriority = CJayConstant.PREFIX_CONTAINER_ORDER + containerPriority;
+			db.del(keyDeleteQueuePriority);
+		}
+	}
+
+	private int getLastIndex(String[] keysList, String prefix) {
+		ArrayList<Integer> tmp = new ArrayList<>();
+		for (String key : keysList) {
+			String order = key.substring(prefix.length());
+			tmp.add(Integer.valueOf(order));
+		}
+		return Collections.max(tmp);
+	}
+
+	private int getFirstIndex(String[] keysList, String prefix) {
+		ArrayList<Integer> tmp = new ArrayList<>();
+		for (String key : keysList) {
+			String order = key.substring(prefix.length());
+			tmp.add(Integer.valueOf(order));
+		}
+		return Collections.min(tmp);
+	}
+
+	/**
+	 * Check if exist line of container or queue
+	 *
+	 * @param containerId
+	 * @param type
+	 * @return
+	 * @throws SnappydbException
+	 */
+	private boolean hasItem(String containerId, String type) throws SnappydbException {
+
+		DB db = App.getDB(context);
+		switch (type) {
+
+			case CJayConstant.PREFIX_UPLOAD_OBJECT_ORDER:
+				String key = CJayConstant.PREFIX_UPLOAD_OBJECT_ORDER + containerId + ":";
+				String[] results = db.findKeys(key);
+				return results.length != 0;
+
+			case CJayConstant.PREFIX_CONTAINER_ORDER:
+				key = CJayConstant.PREFIX_CONTAINER_ORDER;
+				results = db.findKeys(key);
+				return results.length != 0;
+
+			default:
+				return false;
 		}
 	}
 
@@ -1718,14 +1758,14 @@ public class DataCenter {
 	 * @return
 	 * @throws SnappydbException
 	 */
-	private boolean isExistNext(String containerId, CJayObject oldObject, String typOfLine) throws SnappydbException {
+	private boolean hasNext(String containerId, UploadObject oldObject, String typOfLine) throws SnappydbException {
 
-		int nextCJayPriority = oldObject.getcJayPriority() + 1;
-		int nextContainerPriority = oldObject.getContainerPriority() + 1;
+		int nextCJayPriority = oldObject.getContainerQueueOrder() + 1;
+		int nextContainerPriority = oldObject.getUploadQueueOrder() + 1;
 
 		DB db = App.getDB(context);
-		if (typOfLine.equals(CJayConstant.PREFIX_CJAY_OBJECT_ORDER)) {
-			String keytoFind = CJayConstant.PREFIX_CJAY_OBJECT_ORDER + containerId + ":" + nextCJayPriority;
+		if (typOfLine.equals(CJayConstant.PREFIX_UPLOAD_OBJECT_ORDER)) {
+			String keytoFind = CJayConstant.PREFIX_UPLOAD_OBJECT_ORDER + containerId + ":" + nextCJayPriority;
 			String[] sessionPriority = db.findKeys(keytoFind);
 			if (sessionPriority.length != 0) {
 				return true;
@@ -1745,63 +1785,6 @@ public class DataCenter {
 		}
 	}
 
-	/**
-	 * Remove done CjObject after done job
-	 * 1. Remove object in db with key is current object session priority
-	 * 2. Find for next session priority
-	 * => if didn't find , remove queue priority with key is current object queue priority
-	 *
-	 * @param containerId
-	 * @param object
-	 * @throws SnappydbException
-	 */
-	public void remove(String containerId, CJayObject object) throws SnappydbException {
-		DB db = App.getDB(context);
-
-		int cJayPriority = object.getcJayPriority();
-		int containerPriority = object.getContainerPriority();
-
-		String keyToDelete = CJayConstant.PREFIX_CJAY_OBJECT_ORDER + containerId + ":" + cJayPriority;
-		db.del(keyToDelete);
-
-		int nextSessionPriority = object.getcJayPriority() + 1;
-		String keySearchNextSessionPriority = CJayConstant.PREFIX_CJAY_OBJECT_ORDER + containerId + ":" + nextSessionPriority;
-		String[] nextSessionPriorities = db.findKeys(keySearchNextSessionPriority);
-
-		if (nextSessionPriorities.length == 0) {
-			String keyDeleteQueuePriority = CJayConstant.PREFIX_CONTAINER_ORDER + containerPriority;
-			db.del(keyDeleteQueuePriority);
-		}
-	}
-
-	/**
-	 * Get current priority base on String[] result search and key to search
-	 * False for min priority
-	 * True for max priority
-	 *
-	 * @param priorityString
-	 * @param keyToGetInt
-	 * @return
-	 */
-	private int getPriority(String[] priorityString, String keyToGetInt, boolean max) {
-
-		ArrayList<Integer> priorityList = new ArrayList<>();
-		for (String key : priorityString) {
-			int strLen = (keyToGetInt).length();
-			String priority = key.substring(strLen);
-			int priorityNumber = Integer.valueOf(priority);
-			priorityList.add(priorityNumber);
-		}
-
-		int maxPriority = Collections.max(priorityList);
-		int minPriority = Collections.min(priorityList);
-
-		if (max) {
-			return maxPriority;
-		} else {
-			return minPriority;
-		}
-	}
 	//endregion
 
 	/**
@@ -1816,7 +1799,7 @@ public class DataCenter {
 
 		// Find next upload item
 		JobManager jobManager = App.getJobManager();
-		CJayObject object = getNextItem(context);
+		UploadObject object = getNextItem(context);
 
 		if (object != null) {
 
@@ -1848,33 +1831,33 @@ public class DataCenter {
 	}
 
 	/**
-	 * Find next item in upload queue
+	 * READ: Find next item in upload queue
 	 *
 	 * @param context
 	 * @return
 	 */
-	public CJayObject getNextItem(Context context) {
+	public UploadObject getNextItem(Context context) {
 
 		DB db;
-		CJayObject object = null;
+		UploadObject object = null;
 		try {
 			db = App.getDB(context);
 
 			// Find key
-			boolean isExistContainerLine = isExistLine(" ", CJayConstant.PREFIX_CONTAINER_ORDER);
+			boolean isExistContainerLine = hasItem(" ", CJayConstant.PREFIX_CONTAINER_ORDER);
 
 			if (isExistContainerLine) {
 
 				String[] containersOnLine = db.findKeys(CJayConstant.PREFIX_CONTAINER_ORDER);
-				int minPriority = getPriority(containersOnLine, CJayConstant.PREFIX_CONTAINER_ORDER, false);
+				int minPriority = getFirstIndex(containersOnLine, CJayConstant.PREFIX_CONTAINER_ORDER);
 				String firstContainerIdOnLine = db.get(CJayConstant.PREFIX_CONTAINER_ORDER + minPriority);
 
-				String keySearchCJayOnLine = CJayConstant.PREFIX_CJAY_OBJECT_ORDER + firstContainerIdOnLine + ":";
+				String keySearchCJayOnLine = CJayConstant.PREFIX_UPLOAD_OBJECT_ORDER + firstContainerIdOnLine + ":";
 				String[] cJaysOnLine = db.findKeys(keySearchCJayOnLine);
 
-				int minCJayPriority = getPriority(cJaysOnLine, keySearchCJayOnLine, false);
-				String keyOfFirstObject = CJayConstant.PREFIX_CJAY_OBJECT_ORDER + firstContainerIdOnLine + ":" + minCJayPriority;
-				object = db.getObject(keyOfFirstObject, CJayObject.class);
+				int minCJayPriority = getFirstIndex(cJaysOnLine, keySearchCJayOnLine);
+				String keyOfFirstObject = CJayConstant.PREFIX_UPLOAD_OBJECT_ORDER + firstContainerIdOnLine + ":" + minCJayPriority;
+				object = db.getObject(keyOfFirstObject, UploadObject.class);
 			}
 
 		} catch (SnappydbException e) {
@@ -1889,12 +1872,12 @@ public class DataCenter {
 	 *
 	 * @param object
 	 */
-	public CJayObject update(CJayObject object) throws SnappydbException {
+	public UploadObject update(UploadObject object) throws SnappydbException {
 
 		if (object.getCls() == Session.class) {
 
 			Session session = getSession(context, object.getContainerId());
-			CJayObject newObject = new CJayObject(session, Session.class, session.getContainerId());
+			UploadObject newObject = new UploadObject(session, Session.class, session.getContainerId());
 			object = object.mergeCJayObject(newObject);
 			return object;
 
@@ -1902,7 +1885,7 @@ public class DataCenter {
 
 			Session session = getSession(context, object.getContainerId());
 			AuditItem auditItem = getAuditItem(context, object.getContainerId(), object.getAuditItem().getUuid());
-			CJayObject newObject = new CJayObject(auditItem, AuditItem.class, object.getContainerId(), session.getId());
+			UploadObject newObject = new UploadObject(auditItem, AuditItem.class, object.getContainerId(), session.getId());
 			object.mergeCJayObject(newObject);
 			return object;
 

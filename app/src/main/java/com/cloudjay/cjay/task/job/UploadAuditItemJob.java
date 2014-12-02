@@ -9,7 +9,7 @@ import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.AuditItem;
-import com.cloudjay.cjay.model.CJayObject;
+import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.task.command.cjayobject.GetNextJobCommand;
 import com.cloudjay.cjay.task.command.cjayobject.RemoveCJayObjectCommand;
 import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
@@ -28,14 +28,14 @@ public class UploadAuditItemJob extends Job {
 	AuditItem auditItem;
     String containerId;
     boolean addMoreImages;
-	CJayObject object;
+	UploadObject object;
 
 	@Override
 	public int getRetryLimit() {
 		return CJayConstant.RETRY_THRESHOLD;
 	}
 
-	public UploadAuditItemJob(long sessionId, AuditItem auditItem, String containerId,CJayObject object, boolean addMoreImages) {
+	public UploadAuditItemJob(long sessionId, AuditItem auditItem, String containerId,UploadObject object, boolean addMoreImages) {
 		super(new Params(Priority.MID).requireNetwork().persist().groupBy(containerId).setPersistent(true));
 		this.sessionId = sessionId;
 		this.auditItem = auditItem;

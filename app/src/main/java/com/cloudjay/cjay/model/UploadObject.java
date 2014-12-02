@@ -2,7 +2,7 @@ package com.cloudjay.cjay.model;
 
 import java.io.Serializable;
 
-public class CJayObject implements Serializable {
+public class UploadObject implements Serializable {
 
 	public Class getCls() {
 		return cls;
@@ -13,69 +13,69 @@ public class CJayObject implements Serializable {
 	long sessionId;
 	String containerId;
 
-	public int getContainerPriority() {
-		return containerPriority;
+	public int getUploadQueueOrder() {
+		return uploadQueueOrder;
 	}
 
-	public void setContainerPriority(int containerPriority) {
-		this.containerPriority = containerPriority;
+	public void setUploadQueueOrder(int uploadQueueOrder) {
+		this.uploadQueueOrder = uploadQueueOrder;
 	}
 
-	int containerPriority;
+	int uploadQueueOrder;
 
-	public int getcJayPriority() {
-		return cJayPriority;
+	public int getContainerQueueOrder() {
+		return containerQueueOrder;
 	}
 
-	public void setcJayPriority(int cJayPriority) {
-		this.cJayPriority = cJayPriority;
+	public void setContainerQueueOrder(int containerQueueOrder) {
+		this.containerQueueOrder = containerQueueOrder;
 	}
 
-	int cJayPriority;
+	int containerQueueOrder;
 
-	public CJayObject() {
+	public UploadObject() {
 	}
 
-	public CJayObject(Object obj) {
+	public UploadObject(Object obj) {
 		this.object = obj;
 	}
 
-	public CJayObject(Object obj, Class cls, int queuePriority, int sessionPriority) {
-		this.object = obj;
-		this.cls = cls;
-		this.containerPriority = queuePriority;
-		this.cJayPriority = sessionPriority;
-	}
-
-	public CJayObject(Object obj, Class cls, int queuePriority, int sessionPriority, long id) {
+	public UploadObject(Object obj, Class cls, int uploadQueueOrder, int containerQueueOrder) {
 		this.object = obj;
 		this.cls = cls;
-		this.containerPriority = queuePriority;
-		this.cJayPriority = sessionPriority;
+		this.uploadQueueOrder = uploadQueueOrder;
+		this.containerQueueOrder = containerQueueOrder;
+	}
+
+	public UploadObject(Object obj, Class cls, int uploadQueueOrder, int containerQueueOrder, long id) {
+		this.object = obj;
+		this.cls = cls;
+		this.uploadQueueOrder = uploadQueueOrder;
+		this.containerQueueOrder = containerQueueOrder;
 		this.sessionId = id;
 	}
 
-	public CJayObject(Object obj, Class cls, int queuePriority, int sessionPriority, String containerId) {
+	public UploadObject(Object obj, Class cls, int uploadQueueOrder, int containerQueueOrder, String containerId) {
 		this.object = obj;
 		this.cls = cls;
-		this.containerPriority = queuePriority;
-		this.cJayPriority = sessionPriority;
+		this.uploadQueueOrder = uploadQueueOrder;
+		this.containerQueueOrder = containerQueueOrder;
 		this.containerId = containerId;
 	}
 
-	public CJayObject(Object obj, Class cls, String containerId) {
+	public UploadObject(Object obj, Class cls, String containerId) {
 		this.object = obj;
 		this.cls = cls;
 		this.containerId = containerId;
 	}
 
-	public CJayObject(Object obj, Class cls, long id) {
+	public UploadObject(Object obj, Class cls, long id) {
 		this.object = obj;
 		this.cls = cls;
 		this.sessionId = id;
 	}
 
-	public CJayObject(Object obj, Class cls, String containerId, long id) {
+	public UploadObject(Object obj, Class cls, String containerId, long id) {
 		this.object = obj;
 		this.cls = cls;
 		this.sessionId = id;
@@ -133,7 +133,7 @@ public class CJayObject implements Serializable {
 		}
 	}
 
-	public CJayObject mergeCJayObject(CJayObject cJayObject) {
+	public UploadObject mergeCJayObject(UploadObject cJayObject) {
 		this.sessionId = cJayObject.getSessionId();
 
 		if (cls == GateImage.class || object instanceof GateImage) {

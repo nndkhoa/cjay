@@ -6,7 +6,7 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
-import com.cloudjay.cjay.model.CJayObject;
+import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.cjayobject.GetNextJobCommand;
 import com.cloudjay.cjay.task.command.cjayobject.RemoveCJayObjectCommand;
@@ -26,7 +26,7 @@ import retrofit.RetrofitError;
 public class UploadSessionJob extends Job {
 
 	Session mSession;
-	CJayObject object;
+	UploadObject object;
 
 	/**
 	 * Dùng để phân biệt xem có cần clear Working hay không?
@@ -36,7 +36,7 @@ public class UploadSessionJob extends Job {
 		return 1;
 	}
 
-	public UploadSessionJob(Session session, CJayObject object) {
+	public UploadSessionJob(Session session, UploadObject object) {
 		super(new Params(Priority.MID).requireNetwork().persist().groupBy(session.getContainerId()).setPersistent(true));
 		this.mSession = session;
 		this.object = object;

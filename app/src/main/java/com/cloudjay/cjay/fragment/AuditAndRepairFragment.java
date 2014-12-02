@@ -15,7 +15,7 @@ import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
-import com.cloudjay.cjay.model.CJayObject;
+import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.cjayobject.AddCJayObjectCommand;
 import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
@@ -132,8 +132,8 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 					if (auditItem.getId() == 0 || auditItem.getUploadStatus() == UploadStatus.NONE.value) {
 						// If audit item has not been uploaded yet
 						// Add container session to upload queue
-						CJayObject object = new CJayObject(auditItem,AuditItem.class,mSession.getId());
-						dataCenter.add(new AddCJayObjectCommand(getActivity(),object));
+						UploadObject object = new UploadObject(auditItem,AuditItem.class,mSession.getId());
+						dataCenter.add(new AddCJayObjectCommand(getActivity(), object));
 					}
 				}
 			}
@@ -141,7 +141,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			mSession.prepareForUploading();
 			dataCenter.add(new SaveSessionCommand(getActivity().getApplicationContext(), mSession));
 
-			CJayObject object = new CJayObject(mSession, Session.class, mSession.getContainerId());
+			UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
 			dataCenter.add(new AddCJayObjectCommand(getActivity().getApplicationContext(), object));
 
 
@@ -186,7 +186,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 			// Add containerId to upload complete repair queue
 			// PUT /api/cjay/containers/{pk}/complete-repair
-			CJayObject object = new CJayObject(mSession, Session.class, mSession.getContainerId());
+			UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
 			dataCenter.add(new AddCJayObjectCommand(getActivity(), object));
 
 			// Navigate to HomeActivity

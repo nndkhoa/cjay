@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.cloudjay.cjay.DataCenter_;
-import com.cloudjay.cjay.model.CJayObject;
+import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.task.command.cjayobject.AddCJayObjectCommand;
 
 import org.androidannotations.annotations.EBean;
@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.Queue;
 
 @EBean(scope = EBean.Scope.Singleton)
-public class UploadQueue implements Queue<CJayObject> {
+public class UploadQueue implements Queue<UploadObject> {
 
 	Context context;
 
@@ -29,14 +29,14 @@ public class UploadQueue implements Queue<CJayObject> {
 	 * @return
 	 */
 	@Override
-	public boolean add(CJayObject cJayObject) {
+	public boolean add(UploadObject cJayObject) {
 		DataCenter_.getInstance_(context).add(new AddCJayObjectCommand(context, cJayObject));
 		return false;
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends CJayObject> cJayObjects) {
-		for (CJayObject object : cJayObjects) {
+	public boolean addAll(Collection<? extends UploadObject> cJayObjects) {
+		for (UploadObject object : cJayObjects) {
 			DataCenter_.getInstance_(context).add(new AddCJayObjectCommand(context, object));
 		}
 		return false;
@@ -74,7 +74,7 @@ public class UploadQueue implements Queue<CJayObject> {
 
 	@NonNull
 	@Override
-	public Iterator<CJayObject> iterator() {
+	public Iterator<UploadObject> iterator() {
 		return null;
 	}
 
@@ -111,28 +111,28 @@ public class UploadQueue implements Queue<CJayObject> {
 	}
 
 	@Override
-	public boolean offer(CJayObject cJayObject) {
+	public boolean offer(UploadObject cJayObject) {
 		return false;
 	}
 
 	@Override
-	public CJayObject remove() {
+	public UploadObject remove() {
 
 		return null;
 	}
 
 	@Override
-	public CJayObject poll() {
+	public UploadObject poll() {
 		return null;
 	}
 
 	@Override
-	public CJayObject element() {
+	public UploadObject element() {
 		return null;
 	}
 
 	@Override
-	public CJayObject peek() {
+	public UploadObject peek() {
 //		DataCenter_.getInstance_(context).add(new GetNextJobCommand());
 		return null;
 	}

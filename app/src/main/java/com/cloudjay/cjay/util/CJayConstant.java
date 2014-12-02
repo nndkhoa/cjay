@@ -25,7 +25,7 @@ public class CJayConstant {
 	public static final String PREFIX_REPAIR_CODE = "REPAIR";
 	public static final String PREFIX_COMPONENT_CODE = "COMPONENT";
 	public static final String PREFIX_LOG = "LOG";
-	public static final String PREFIX_NOTIFI_LOG = "NOTIFI_LOG";
+	public static final String PREFIX_NOTIFICATION_LOG = "NOTIFICATION_LOG";
     public static final String PREFIX_RAINY_MODE_IMAGE = "RAINY_MODE_IMAGE";
 
 	/**
@@ -36,7 +36,7 @@ public class CJayConstant {
 	/**
 	 * Quy định thứ tự của các CJayObject cần upload trong CÙNG một container.
 	 */
-	public static final String PREFIX_CJAY_OBJECT_ORDER = "PREFIX_CJAY_OBJECT_ORDER";
+	public static final String PREFIX_UPLOAD_OBJECT_ORDER = "PREFIX_UPLOAD_OBJECT_ORDER";
 
 
 	// `/sdcard/DCMI/CJay/`

@@ -23,7 +23,7 @@ import com.cloudjay.cjay.activity.MergeIssueActivity_;
 import com.cloudjay.cjay.activity.ReportIssueActivity_;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
-import com.cloudjay.cjay.model.CJayObject;
+import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.cjayobject.AddCJayObjectCommand;
 import com.cloudjay.cjay.task.command.issue.SetWaterWashAuditItemCommand;
@@ -208,7 +208,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 					}
 					auditItem.setSession(session.getId());
-					CJayObject object = new CJayObject(auditItem, AuditItem.class, session.getContainerId());
+					UploadObject object = new UploadObject(auditItem, AuditItem.class, session.getContainerId());
 					DataCenter_.getInstance_(mContext).add(new AddCJayObjectCommand(mContext.getApplicationContext(), object));
 				}
 			});

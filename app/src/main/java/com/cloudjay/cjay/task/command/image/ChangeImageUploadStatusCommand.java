@@ -5,7 +5,7 @@ import android.content.Context;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
-import com.cloudjay.cjay.model.CJayObject;
+import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.task.command.Command;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
@@ -25,7 +25,7 @@ public class ChangeImageUploadStatusCommand extends Command {
 	String imageName;
 	ImageType imageType;
 	UploadStatus uploadStatus;
-	CJayObject object;
+	UploadObject object;
 
 	@Override
 	protected void run() {
@@ -36,7 +36,7 @@ public class ChangeImageUploadStatusCommand extends Command {
 		}
 	}
 
-	public ChangeImageUploadStatusCommand(Context context, String containerId, String imageName, ImageType imageType, UploadStatus status, CJayObject object) {
+	public ChangeImageUploadStatusCommand(Context context, String containerId, String imageName, ImageType imageType, UploadStatus status, UploadObject object) {
 		this.context = context;
 		this.containerId = containerId;
 		this.imageName = imageName;

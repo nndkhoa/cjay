@@ -1,13 +1,9 @@
 package com.cloudjay.cjay.task.job;
 
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.Context;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
-import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
@@ -33,7 +29,7 @@ public class GetNotificationJob extends Job {
     public void onAdded() {
         //Add LOG
         Context context = App.getInstance().getApplicationContext();
-        DataCenter_.getInstance_(context).addLog(context, objectType, objectId + " |R " + messageId, CJayConstant.PREFIX_NOTIFI_LOG);
+        DataCenter_.getInstance_(context).addLog(context, objectType, objectId + " |R " + messageId, CJayConstant.PREFIX_NOTIFICATION_LOG);
 
     }
 
@@ -75,7 +71,7 @@ public class GetNotificationJob extends Job {
     protected void onCancel() {
         //Add LOG
         Context context = App.getInstance().getApplicationContext();
-        DataCenter_.getInstance_(context).addLog(context, objectType, objectId + " |C " + messageId, CJayConstant.PREFIX_NOTIFI_LOG);
+        DataCenter_.getInstance_(context).addLog(context, objectType, objectId + " |C " + messageId, CJayConstant.PREFIX_NOTIFICATION_LOG);
 
     }
 

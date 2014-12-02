@@ -14,7 +14,6 @@ import android.text.TextUtils;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.activity.LoginActivity_;
 import com.cloudjay.cjay.event.NotificationItemReceivedEvent;
 import com.cloudjay.cjay.event.pubnub.PubnubSubscriptionChangedEvent;
 import com.cloudjay.cjay.model.NotificationItem;
@@ -268,7 +267,7 @@ public class PubnubService extends Service {
 				} catch (PubnubException e) {
 
 					Logger.e(e.getMessage());
-					dataCenter.addLog(getApplicationContext(), "PubNub", "Cannot subscribe channels", CJayConstant.PREFIX_NOTIFI_LOG);
+					dataCenter.addLog(getApplicationContext(), "PubNub", "Cannot subscribe channels", CJayConstant.PREFIX_NOTIFICATION_LOG);
 				}
 			} else {
 				Logger.w("Auto stop Pubnub service");

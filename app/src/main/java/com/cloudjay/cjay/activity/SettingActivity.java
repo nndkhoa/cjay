@@ -52,7 +52,7 @@ public class SettingActivity extends PreferenceActivity {
             public boolean onPreferenceClick(Preference preference) {
 	            // Open Wizard Activity
 	            Intent intent = new Intent(App.getInstance().getApplicationContext(), LogActivity_.class);
-	            intent.putExtra(LogActivity.LOG_TYPE_EXTRA, CJayConstant.PREFIX_NOTIFI_LOG);
+	            intent.putExtra(LogActivity.LOG_TYPE_EXTRA, CJayConstant.PREFIX_NOTIFICATION_LOG);
 	            startActivity(intent);
                 return false;
             }

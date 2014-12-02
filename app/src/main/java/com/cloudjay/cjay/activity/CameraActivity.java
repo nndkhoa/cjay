@@ -30,7 +30,7 @@ import android.widget.Toast;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.AuditImage;
-import com.cloudjay.cjay.model.CJayObject;
+import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.task.command.cjayobject.AddCJayObjectCommand;
 import com.cloudjay.cjay.task.command.image.AddGateImageCommand;
@@ -751,7 +751,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 				dataCenter.add(new AddGateImageCommand(getApplicationContext(), gateImage, containerId));
 
 				// Add image to job queue
-				CJayObject object = new CJayObject(gateImage, GateImage.class, containerId);
+				UploadObject object = new UploadObject(gateImage, GateImage.class, containerId);
 				dataCenter.add(new AddCJayObjectCommand(getApplicationContext(), object));
 
 				break;
@@ -770,7 +770,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 				dataCenter.add(new AddOrUpdateAuditImageCommand(getApplicationContext(), auditImage, containerId, auditItemUUID));
 				// Add image to job queue
-				CJayObject objectAudit = new CJayObject(auditImage, AuditImage.class, containerId);
+				UploadObject objectAudit = new UploadObject(auditImage, AuditImage.class, containerId);
 				dataCenter.add(new AddCJayObjectCommand(getApplicationContext(), objectAudit));
 				break;
 		}

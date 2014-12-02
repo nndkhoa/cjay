@@ -18,7 +18,7 @@ import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.adapter.PhotoExpandableListAdapter;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
-import com.cloudjay.cjay.model.CJayObject;
+import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.cjayobject.AddCJayObjectCommand;
@@ -161,7 +161,7 @@ public class ExportFragment extends Fragment {
 		dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
 
 		// Add container session to upload queue
-		CJayObject object = new CJayObject(mSession, Session.class, mSession.getContainerId());
+		UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
 		dataCenter.add(new AddCJayObjectCommand(getActivity(), object));
 
 		// Navigate to HomeActivity

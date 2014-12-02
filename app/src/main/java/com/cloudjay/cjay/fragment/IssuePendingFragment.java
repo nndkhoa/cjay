@@ -26,7 +26,7 @@ import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
-import com.cloudjay.cjay.model.CJayObject;
+import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.cjayobject.AddCJayObjectCommand;
 import com.cloudjay.cjay.task.command.issue.GetListAuditItemsCommand;
@@ -119,7 +119,7 @@ public class IssuePendingFragment extends Fragment {
 		mSession.setLocalStep(Step.HAND_CLEAN.value);
 
 		// Add container session to upload queue
-		CJayObject object = new CJayObject(mSession, Session.class, mSession.getContainerId());
+		UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
 		dataCenter.add(new AddCJayObjectCommand(getActivity(), object));
 		getActivity().finish();
 	}

@@ -29,7 +29,7 @@ import com.cloudjay.cjay.event.operator.OperatorChosenEvent;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
 import com.cloudjay.cjay.fragment.dialog.SearchOperatorDialog_;
-import com.cloudjay.cjay.model.CJayObject;
+import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
@@ -371,7 +371,7 @@ public class ImportFragment extends Fragment {
 		dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
 
 		// Add container session to upload queue
-		CJayObject object = new CJayObject(mSession, Session.class, mSession.getContainerId());
+		UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
 		dataCenter.addUploadItem(object);
 	}
 
@@ -511,7 +511,7 @@ public class ImportFragment extends Fragment {
 		// Add image to job queue
 		for (GateImage gateImage : list) {
 			String containerId = mSession.getContainerId();
-			CJayObject object = new CJayObject(gateImage, GateImage.class, containerId);
+			UploadObject object = new UploadObject(gateImage, GateImage.class, containerId);
 			dataCenter.add(new AddCJayObjectCommand(getActivity().getApplicationContext(), object));
 		}
 
