@@ -53,12 +53,6 @@ public class IssueReportDamageFragment extends IssueReportFragment {
 	@ViewById(R.id.lv_damage)
 	ListView mDamageListView;
 
-    @ViewById(R.id.tv_code_fullname)
-    TextView mDamageNameTextView;
-
-    @ViewById(R.id.tv_code_label)
-    TextView mCodeLabelTextView;
-
 	@SystemService
 	InputMethodManager inputMethodManager;
 
@@ -72,10 +66,6 @@ public class IssueReportDamageFragment extends IssueReportFragment {
 
 	@AfterViews
 	void afterViews() {
-
-        // Set text code label
-        mCodeLabelTextView.setText(R.string.label_code_damage);
-
 		mDamageEditText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable arg0) {
@@ -98,7 +88,6 @@ public class IssueReportDamageFragment extends IssueReportFragment {
 			public void didClearText() {
 				mDamageCode = "";
 				mDamageName = "";
-                mDamageNameTextView.setText("");
 			}
 		});
 
@@ -116,7 +105,6 @@ public class IssueReportDamageFragment extends IssueReportFragment {
         mDamageName = item.getFullName();
         ignoreSearch = true;
         mDamageEditText.setText(mDamageName);
-        mDamageNameTextView.setText(mDamageName);
         ignoreSearch = false;
 
         // hide keyboard
@@ -190,7 +178,6 @@ public class IssueReportDamageFragment extends IssueReportFragment {
 
             ignoreSearch = true;
             mDamageEditText.setText(mDamageName);
-            mDamageNameTextView.setText(mDamageName);
             ignoreSearch = false;
         }
     }
