@@ -7,11 +7,11 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
+import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.UploadObject;
-import com.cloudjay.cjay.task.command.cjayobject.GetNextJobCommand;
-import com.cloudjay.cjay.task.command.cjayobject.RemoveCJayObjectCommand;
+import com.cloudjay.cjay.task.command.cjayobject.RemoveUploadObjectCommand;
 import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Priority;
@@ -66,8 +66,7 @@ public class UploadAuditItemJob extends Job {
 		}
 
 		dataCenter.add(new UpdateAuditItemCommand(context, containerId, item));
-		dataCenter.add(new RemoveCJayObjectCommand(context, object));
-		dataCenter.add(new GetNextJobCommand(context, object));
+		EventBus.getDefault().post(new UploadSucceededEvent(containerId, UploadType.AUDIT_ITEM));
 	}
 
 	@Override

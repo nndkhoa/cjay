@@ -33,7 +33,7 @@ import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.command.cjayobject.AddCJayObjectCommand;
+import com.cloudjay.cjay.task.command.cjayobject.AddUploadObjectCommand;
 import com.cloudjay.cjay.task.command.image.DeleteRainyImageCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.get.SearchCommand;
@@ -512,7 +512,7 @@ public class ImportFragment extends Fragment {
 		for (GateImage gateImage : list) {
 			String containerId = mSession.getContainerId();
 			UploadObject object = new UploadObject(gateImage, GateImage.class, containerId);
-			dataCenter.add(new AddCJayObjectCommand(getActivity().getApplicationContext(), object));
+			dataCenter.add(new AddUploadObjectCommand(getActivity().getApplicationContext(), object));
 		}
 
 		//Upload session

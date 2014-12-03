@@ -19,9 +19,6 @@ public class QueryService extends IntentService implements Command.Callback {
 	@Bean
 	CommandQueue queue;
 
-	public boolean isProcessing() {
-		return processing;
-	}
 	private boolean processing;
 
 	public QueryService() {

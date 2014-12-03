@@ -38,6 +38,15 @@ public class CJayConstant {
 	 */
 	public static final String PREFIX_UPLOAD_OBJECT_ORDER = "PREFIX_UPLOAD_OBJECT_ORDER";
 
+	/**
+	 *
+	 * Upload queue prefix in snappy db.
+	 *
+	 * UPLOAD:<index>:<containerId> --> UploadObject
+	 *
+	 */
+	public static final String PREFIX_UPLOAD_QUEUE = "UPLOAD:";
+
 
 	// `/sdcard/DCMI/CJay/`
 	public static final File APP_DIRECTORY_FILE = new File(

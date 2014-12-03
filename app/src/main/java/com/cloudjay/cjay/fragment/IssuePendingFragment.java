@@ -28,7 +28,7 @@ import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.command.cjayobject.AddCJayObjectCommand;
+import com.cloudjay.cjay.task.command.cjayobject.AddUploadObjectCommand;
 import com.cloudjay.cjay.task.command.issue.GetListAuditItemsCommand;
 import com.cloudjay.cjay.task.command.issue.RemoveAuditItemCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
@@ -120,7 +120,7 @@ public class IssuePendingFragment extends Fragment {
 
 		// Add container session to upload queue
 		UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
-		dataCenter.add(new AddCJayObjectCommand(getActivity(), object));
+		dataCenter.add(new AddUploadObjectCommand(getActivity(), object));
 		getActivity().finish();
 	}
 

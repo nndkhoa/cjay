@@ -32,7 +32,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.model.GateImage;
-import com.cloudjay.cjay.task.command.cjayobject.AddCJayObjectCommand;
+import com.cloudjay.cjay.task.command.cjayobject.AddUploadObjectCommand;
 import com.cloudjay.cjay.task.command.image.AddGateImageCommand;
 import com.cloudjay.cjay.task.command.image.AddOrUpdateAuditImageCommand;
 import com.cloudjay.cjay.task.command.image.AddRainyImageCommand;
@@ -455,10 +455,10 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		if (mCamera != null) {
 
-			Logger.Log("Release camera ... ");
+			Logger.d("Release camera ... ");
 
 			if (mInPreview) {
-				Logger.Log("Stop Preview ... ");
+				Logger.d("Stop Preview ... ");
 				mCamera.stopPreview();
 				// preview.getHolder().removeCallback(null);
 			}
@@ -471,14 +471,14 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			mInPreview = false;
 			mCameraConfigured = false;
 
-			Logger.Log("Release camera complete");
+			Logger.d("Release camera complete");
 		}
 	}
 
 	void saveBitmapToFile(Bitmap bitmap, File filename) {
 
-		Logger.Log("===== On SaveBitmap =====");
-		Logger.Log("Width/Height: " + Integer.toString(bitmap.getWidth()) + "/" +
+		Logger.d("===== On SaveBitmap =====");
+		Logger.d("Width/Height: " + Integer.toString(bitmap.getWidth()) + "/" +
 				Integer.toString(bitmap.getHeight()));
 
 		try {
@@ -752,7 +752,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 				// Add image to job queue
 				UploadObject object = new UploadObject(gateImage, GateImage.class, containerId);
-				dataCenter.add(new AddCJayObjectCommand(getApplicationContext(), object));
+				dataCenter.add(new AddUploadObjectCommand(getApplicationContext(), object));
 
 				break;
 
@@ -771,7 +771,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 				dataCenter.add(new AddOrUpdateAuditImageCommand(getApplicationContext(), auditImage, containerId, auditItemUUID));
 				// Add image to job queue
 				UploadObject objectAudit = new UploadObject(auditImage, AuditImage.class, containerId);
-				dataCenter.add(new AddCJayObjectCommand(getApplicationContext(), objectAudit));
+				dataCenter.add(new AddUploadObjectCommand(getApplicationContext(), objectAudit));
 				break;
 		}
 	}

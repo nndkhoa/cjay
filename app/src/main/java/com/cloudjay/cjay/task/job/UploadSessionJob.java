@@ -8,8 +8,7 @@ import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.command.cjayobject.GetNextJobCommand;
-import com.cloudjay.cjay.task.command.cjayobject.RemoveCJayObjectCommand;
+import com.cloudjay.cjay.task.command.cjayobject.RemoveUploadObjectCommand;
 import com.cloudjay.cjay.task.command.log.AddLogCommand;
 import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -77,19 +76,15 @@ public class UploadSessionJob extends Job {
 		mSession.setId(object.getSessionId());
 
 		// Bắt đầu quá trình upload
+		// Network operation. It may throw an network exception that will be handle by `shouldReRunOnThrowable`
 		Step uploadStep = Step.values()[x];
 		Session response = dataCenter.uploadSession(context, mSession, uploadStep);
-
-		dataCenter.addLog(context, mSession.getContainerId(), "Upload container thành công", CJayConstant.PREFIX_LOG);
-
-		// Save session and also notify success to Upload Fragment
 		dataCenter.add(new AddLogCommand(context, response.getContainerId(), "Upload container thành công", CJayConstant.PREFIX_LOG));
-		dataCenter.add(new SaveSessionCommand(context, response, UploadType.SESSION));
-		dataCenter.add(new RemoveCJayObjectCommand(context, object));
 
-		// TODO: #tieubao, I think we should post an event to Upload Service
-		// Get next item
-		dataCenter.add(new GetNextJobCommand(context, object));
+		// Save session and also notify success to Upload Fragment by posting UploadSucceededEvent in SaveSessionCommand
+		dataCenter.add(new SaveSessionCommand(context, response, UploadType.SESSION));
+
+		// UploadService will receive event and take care of the rest.
 	}
 
 	/**

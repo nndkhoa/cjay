@@ -5,7 +5,8 @@ import android.support.annotation.NonNull;
 
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.model.UploadObject;
-import com.cloudjay.cjay.task.command.cjayobject.AddCJayObjectCommand;
+import com.cloudjay.cjay.task.command.cjayobject.AddUploadObjectCommand;
+import com.cloudjay.cjay.task.command.cjayobject.RemoveUploadObjectCommand;
 
 import org.androidannotations.annotations.EBean;
 
@@ -30,14 +31,14 @@ public class UploadQueue implements Queue<UploadObject> {
 	 */
 	@Override
 	public boolean add(UploadObject cJayObject) {
-		DataCenter_.getInstance_(context).add(new AddCJayObjectCommand(context, cJayObject));
+		DataCenter_.getInstance_(context).add(new AddUploadObjectCommand(context, cJayObject));
 		return false;
 	}
 
 	@Override
 	public boolean addAll(Collection<? extends UploadObject> cJayObjects) {
 		for (UploadObject object : cJayObjects) {
-			DataCenter_.getInstance_(context).add(new AddCJayObjectCommand(context, object));
+			DataCenter_.getInstance_(context).add(new AddUploadObjectCommand(context, object));
 		}
 		return false;
 	}
@@ -117,7 +118,7 @@ public class UploadQueue implements Queue<UploadObject> {
 
 	@Override
 	public UploadObject remove() {
-
+		DataCenter_.getInstance_(context).add(new RemoveUploadObjectCommand(context));
 		return null;
 	}
 

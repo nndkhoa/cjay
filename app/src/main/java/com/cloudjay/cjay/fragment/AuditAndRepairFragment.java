@@ -17,7 +17,7 @@ import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.command.cjayobject.AddCJayObjectCommand;
+import com.cloudjay.cjay.task.command.cjayobject.AddUploadObjectCommand;
 import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionForUploadCommand;
@@ -133,7 +133,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 						// If audit item has not been uploaded yet
 						// Add container session to upload queue
 						UploadObject object = new UploadObject(auditItem,AuditItem.class,mSession.getId());
-						dataCenter.add(new AddCJayObjectCommand(getActivity(), object));
+						dataCenter.add(new AddUploadObjectCommand(getActivity(), object));
 					}
 				}
 			}
@@ -142,7 +142,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			dataCenter.add(new SaveSessionCommand(getActivity().getApplicationContext(), mSession));
 
 			UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
-			dataCenter.add(new AddCJayObjectCommand(getActivity().getApplicationContext(), object));
+			dataCenter.add(new AddUploadObjectCommand(getActivity().getApplicationContext(), object));
 
 
 			// Hide this button
@@ -187,7 +187,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			// Add containerId to upload complete repair queue
 			// PUT /api/cjay/containers/{pk}/complete-repair
 			UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
-			dataCenter.add(new AddCJayObjectCommand(getActivity(), object));
+			dataCenter.add(new AddUploadObjectCommand(getActivity(), object));
 
 			// Navigate to HomeActivity
 			getActivity().finish();

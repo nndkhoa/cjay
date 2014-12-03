@@ -7,8 +7,6 @@ import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.model.UploadObject;
-import com.cloudjay.cjay.task.command.cjayobject.GetNextJobCommand;
-import com.cloudjay.cjay.task.command.cjayobject.RemoveCJayObjectCommand;
 import com.cloudjay.cjay.task.command.image.ChangeImageUploadStatusCommand;
 import com.cloudjay.cjay.task.command.log.AddLogCommand;
 import com.cloudjay.cjay.util.CJayConstant;
@@ -35,7 +33,7 @@ public class UploadImageJob extends Job {
 		return CJayConstant.RETRY_THRESHOLD;
 	}
 
-	public UploadImageJob(String uri, String imageName, String containerId, ImageType imageType,UploadObject object) {
+	public UploadImageJob(String uri, String imageName, String containerId, ImageType imageType, UploadObject object) {
 		super(new Params(Priority.MID).requireNetwork().persist().groupBy(containerId).setPersistent(true));
 
 		this.containerId = containerId;
@@ -59,11 +57,8 @@ public class UploadImageJob extends Job {
 		// Call data center to upload image
 		Response response = dataCenter.uploadImage(uri, imageName);
 
-		// Change image status to COMPLETE
-		dataCenter.add(new ChangeImageUploadStatusCommand(context, containerId, imageName, imageType, UploadStatus.COMPLETE,object));
-		dataCenter.add(new RemoveCJayObjectCommand(context, object));
-		dataCenter.add(new GetNextJobCommand(context, object));
-
+		// Change image status to COMPLETE and also notify success to Upload Fragment by posting UploadSucceededEvent in ChangeImageUploadStatusCommand
+		dataCenter.add(new ChangeImageUploadStatusCommand(context, containerId, imageName, imageType, UploadStatus.COMPLETE, object));
 	}
 
 	@Override
@@ -75,7 +70,7 @@ public class UploadImageJob extends Job {
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
 
 		dataCenter.add(new AddLogCommand(context, containerId, "Không thể tải lên hình: " + imageName, CJayConstant.PREFIX_LOG));
-		dataCenter.add(new ChangeImageUploadStatusCommand(context, containerId, imageName, imageType, UploadStatus.ERROR,object));
+		dataCenter.add(new ChangeImageUploadStatusCommand(context, containerId, imageName, imageType, UploadStatus.ERROR, object));
 		EventBus.getDefault().post(new UploadStoppedEvent(containerId));
 	}
 

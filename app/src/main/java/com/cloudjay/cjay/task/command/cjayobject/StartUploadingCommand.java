@@ -4,22 +4,19 @@ import android.content.Context;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
-import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.task.command.Command;
 import com.snappydb.SnappydbException;
 
-public class RemoveCJayObjectCommand extends Command {
-	Context context;
-	UploadObject object;
+public class StartUploadingCommand extends Command {
 
-	public RemoveCJayObjectCommand(Context context, UploadObject object) {
-		this.context= context;
-		this.object= object;
+	Context context;
+	public StartUploadingCommand(Context context) {
+		this.context = context;
 	}
 
 	@Override
 	protected void run() throws SnappydbException {
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
-		dataCenter.remove(object.getContainerId(), object);
+		dataCenter.startJobQueue(context);
 	}
 }

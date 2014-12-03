@@ -1,21 +1,27 @@
 package com.cloudjay.cjay.task.service;
 
-import android.app.IntentService;
+import android.app.Service;
 import android.content.Intent;
+import android.os.IBinder;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.event.upload.UploadObjectRemovedEvent;
+import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
+import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.task.command.UploadQueue;
-import com.cloudjay.cjay.task.command.cjayobject.StartJobQueueCommand;
+import com.cloudjay.cjay.task.command.cjayobject.StartUploadingCommand;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.Bean;
-import org.androidannotations.annotations.EIntentService;
+import org.androidannotations.annotations.EService;
+import org.androidannotations.annotations.Trace;
 
+import de.greenrobot.event.EventBus;
 import retrofit.RetrofitError;
 
 /**
@@ -23,8 +29,8 @@ import retrofit.RetrofitError;
  * - First time start app / reboot device, alarm manager will trigger automatically
  * - When user want to upload new item
  */
-@EIntentService
-public class UploadIntentService extends IntentService {
+@EService
+public class UploadIntentService extends Service {
 
 	@Bean
 	DataCenter dataCenter;
@@ -32,23 +38,55 @@ public class UploadIntentService extends IntentService {
 	@Bean
 	UploadQueue queue;
 
-	public UploadIntentService() {
-		super("UploadIntentService");
-	}
-
-	@Override
-	protected void onHandleIntent(Intent intent) {
-		executeNext();
-	}
-
 	/**
 	 * Biến processing sẽ có giá trị false khi không còn task nào để thực hiện
 	 */
 	public static boolean processing;
 
-	private void executeNext() {
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		EventBus.getDefault().register(this);
+	}
+
+	@Override
+	public void onDestroy() {
+		EventBus.getDefault().unregister(this);
+		super.onDestroy();
+	}
+
+	@Trace
+	public void onEvent(UploadSucceededEvent event) {
+		processing = false;
+		queue.remove();
+	}
+
+	@Trace
+	public void onEvent(UploadStoppedEvent event) {
+		Logger.w("Upload failed, container " + event.session.getContainerId());
+		processing = false;
+		executeNext();
+	}
+
+	public void onEvent(UploadObjectRemovedEvent event) {
+		executeNext();
+	}
+
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		executeNext();
+		return super.onStartCommand(intent, flags, startId);
+	}
+
+	@Override
+	public IBinder onBind(Intent intent) {
+		return null;
+	}
+
+	void executeNext() {
 
 		if (processing) return; // Only one task at a time.
+
 		try {
 
 			// Check if user is logged in or not
@@ -59,7 +97,7 @@ public class UploadIntentService extends IntentService {
 				if (manager.count() != 0) {
 					Logger.Log("There is already job in the queue");
 				} else {
-					dataCenter.add(new StartJobQueueCommand(getApplicationContext()));
+					dataCenter.add(new StartUploadingCommand(getApplicationContext()));
 				}
 
 			} else {
