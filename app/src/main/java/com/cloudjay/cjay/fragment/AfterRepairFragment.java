@@ -84,6 +84,7 @@ public class AfterRepairFragment extends Fragment {
 	String operatorCode;
 	AuditItem auditItem;
 	Session mSession;
+    boolean updateData = true;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -93,16 +94,9 @@ public class AfterRepairFragment extends Fragment {
 
     @AfterViews
     void setUp() {
-
-//        if (null == mSession) {
-//            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
-//                    containerID);
-//        }
-
         if (null == imageAdapter) {
             imageAdapter = new DetailIssuedImageAdapter(getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.REPAIRED);
         }
-
         lvImage.setAdapter(imageAdapter);
     }
 
@@ -130,12 +124,18 @@ public class AfterRepairFragment extends Fragment {
         cameraActivityIntent.putExtra(CameraActivity_.AUDIT_ITEM_UUID_EXTRA, auditItemUUID);
         cameraActivityIntent.putExtra(CameraActivity_.IS_OPENED, true);
         startActivity(cameraActivityIntent);
+
+        // Set update data = true to refresh data after taken picture
+        updateData = true;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-	    dataCenter.add(new GetSessionCommand(getActivity(), containerID));
+        if (updateData) {
+            updateData = false;
+            dataCenter.add(new GetSessionCommand(getActivity(), containerID));
+        }
     }
 
     @UiThread

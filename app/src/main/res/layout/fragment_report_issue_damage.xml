@@ -6,13 +6,20 @@
     android:paddingLeft="2dp"
     android:paddingRight="2dp" >
 
-    <include
-        layout="@layout/section_report_issue_summary1"/>
+    <TextView
+        android:id="@+id/tv_code_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/label_code_damage"
+        android:layout_marginLeft="5dp"
+        android:padding="10dp"/>
 
     <org.droidparts.widget.ClearableEditText
         android:id="@+id/damage_name"
         android:hint="@string/label_code_damage"
-        style="@style/IssueReportEditText"/>
+        style="@style/IssueReportEditText"
+        android:textColor="@color/background_cjay"
+        android:textStyle="bold"/>
 
     <ListView
         android:id="@+id/lv_damage"

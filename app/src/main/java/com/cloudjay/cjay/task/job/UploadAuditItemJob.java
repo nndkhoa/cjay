@@ -11,10 +11,10 @@ import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.event.upload.UploadingEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.UploadObject;
-import com.cloudjay.cjay.task.command.cjayobject.RemoveUploadObjectCommand;
 import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Priority;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
@@ -26,8 +26,8 @@ public class UploadAuditItemJob extends Job {
 
 	long sessionId;
 	AuditItem auditItem;
-    String containerId;
-    boolean addMoreImages;
+	String containerId;
+	boolean addMoreImages;
 	UploadObject object;
 
 	@Override
@@ -35,12 +35,12 @@ public class UploadAuditItemJob extends Job {
 		return CJayConstant.RETRY_THRESHOLD;
 	}
 
-	public UploadAuditItemJob(long sessionId, AuditItem auditItem, String containerId,UploadObject object, boolean addMoreImages) {
+	public UploadAuditItemJob(long sessionId, AuditItem auditItem, String containerId, UploadObject object, boolean addMoreImages) {
 		super(new Params(Priority.MID).requireNetwork().persist().groupBy(containerId).setPersistent(true));
 		this.sessionId = sessionId;
 		this.auditItem = auditItem;
-        this.containerId = containerId;
-        this.addMoreImages = addMoreImages;
+		this.containerId = containerId;
+		this.addMoreImages = addMoreImages;
 		this.object = object;
 	}
 
@@ -64,8 +64,10 @@ public class UploadAuditItemJob extends Job {
 		} else {
 			item = dataCenter.uploadAddedAuditImage(context, auditItem);
 		}
+		auditItem.merge(item);
+		auditItem.setUploadStatus(UploadStatus.COMPLETE.value);
+		dataCenter.add(new UpdateAuditItemCommand(context, containerId, auditItem));
 
-		dataCenter.add(new UpdateAuditItemCommand(context, containerId, item));
 		EventBus.getDefault().post(new UploadSucceededEvent(containerId, UploadType.AUDIT_ITEM));
 	}
 

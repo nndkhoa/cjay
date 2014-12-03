@@ -562,6 +562,7 @@ public class AuditItem implements Serializable{
 		this.setId(newItem.getId());
 		this.setAllowed(newItem.isAllowed());
 		this.setAudited(true);
+        this.setUploadStatus(UploadStatus.COMPLETE.value);
 
 		// Merge list audit images
 		List<AuditImage> diffImages = new ArrayList<>();

@@ -1367,6 +1367,9 @@ public class DataCenter {
 
 	public boolean updateAuditItem(Context context, String containerId, AuditItem auditItem) {
 		try {
+
+            Logger.Log("upload status: " + auditItem.getUploadStatus());
+
 			// find session
 			DB db = App.getDB(context);
 			Session session = db.getObject(containerId, Session.class);
@@ -1481,17 +1484,18 @@ public class DataCenter {
 	 * @param id
 	 */
 	public void getAuditItemAsyncById(Context context, long id) throws SnappydbException {
-		try {
 
-			AuditItem auditItem = networkClient.getAuditItemById(id);
+        try {
+            AuditItem auditItem = networkClient.getAuditItemById(id);
 
-			if (auditItem != null) {
-				long sessionId = auditItem.getSession();
-				getSessionAsyncById(context, sessionId, 1);
-			}
-		} catch (RetrofitError error) {
-			error.printStackTrace();
-		}
+            if (auditItem != null) {
+                long sessionId = auditItem.getSession();
+                getSessionAsyncById(context, sessionId, 1);
+            }
+        } catch (RetrofitError e) {
+            e.printStackTrace();
+        }
+
 	}
 
 	/**

@@ -52,12 +52,6 @@ public class IssueReportRepairFragment extends IssueReportFragment {
 	@ViewById(R.id.lv_repair)
 	ListView mRepairListView;
 
-    @ViewById(R.id.tv_code_fullname)
-    TextView mRepairNameTextView;
-
-    @ViewById(R.id.tv_code_label)
-    TextView mCodeLabelTextView;
-
 	@SystemService
 	InputMethodManager inputMethodManager;
 
@@ -71,9 +65,6 @@ public class IssueReportRepairFragment extends IssueReportFragment {
 
 	@AfterViews
 	void afterViews() {
-
-        // Set text code label
-        mCodeLabelTextView.setText(R.string.label_code_repair);
 
 		mRepairEditText.addTextChangedListener(new TextWatcher() {
 			@Override
@@ -95,7 +86,6 @@ public class IssueReportRepairFragment extends IssueReportFragment {
 			public void didClearText() {
 				mRepairCode = "";
 				mRepairName = "";
-                mRepairNameTextView.setText("");
 			}
 		});
 
@@ -129,7 +119,6 @@ public class IssueReportRepairFragment extends IssueReportFragment {
         mRepairName = item.getFullName();
         ignoreSearch = true;
         mRepairEditText.setText(mRepairName);
-        mRepairNameTextView.setText(mRepairName);
         ignoreSearch = false;
 
         // hide keyboard
@@ -186,7 +175,6 @@ public class IssueReportRepairFragment extends IssueReportFragment {
 
             ignoreSearch = true;
             mRepairEditText.setText(mRepairName);
-            mRepairNameTextView.setText(mRepairName);
             ignoreSearch = false;
         }
     }

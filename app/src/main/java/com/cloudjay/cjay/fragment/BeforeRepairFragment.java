@@ -85,6 +85,7 @@ public class BeforeRepairFragment extends Fragment {
 	Session mSession;
 
     boolean hasImageToUpload = false;
+    boolean updateData = true;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -94,12 +95,6 @@ public class BeforeRepairFragment extends Fragment {
 
 	@AfterViews
     void setUp() {
-
-//        if (null == mSession) {
-//            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
-//                    containerID);
-//        }
-
         if (null == imageAdapter) {
             imageAdapter = new DetailIssuedImageAdapter(
                     getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.AUDIT);
@@ -116,11 +111,13 @@ public class BeforeRepairFragment extends Fragment {
         cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.AUDIT.value);
         cameraActivityIntent.putExtra(CameraActivity_.AUDIT_ITEM_UUID_EXTRA, auditItemUUID);
         startActivity(cameraActivityIntent);
+
+        // Set update data = true to refresh data after taken picture
+        updateData = true;
     }
 
     @UiThread
     void onEvent(ContainerGotEvent event) {
-        Logger.Log("ContainerGotEvent");
         mSession = event.getSession();
         if (null == mSession) {
             Utils.showCrouton(getActivity(), "Không tìm thấy container trong dữ liệu");
@@ -135,7 +132,10 @@ public class BeforeRepairFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-	    dataCenter.add(new GetSessionCommand(getActivity(), containerID));
+        if (updateData) {
+            updateData = false;
+            dataCenter.add(new GetSessionCommand(getActivity(), containerID));
+        }
     }
 
     void refreshListImage() {
@@ -148,6 +148,7 @@ public class BeforeRepairFragment extends Fragment {
     void refreshData() {
         if (mSession != null) {
             AuditItem auditItem = mSession.getAuditItem(auditItemUUID);
+            Logger.Log("is audited: " + auditItem.isAudited());
             if (auditItem.getId() != 0) {
                 for (AuditImage image : auditItem.getListAuditedImages()) {
                     if (image.getId() == 0) {

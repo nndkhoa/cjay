@@ -34,6 +34,7 @@ import com.cloudjay.cjay.task.command.issue.RemoveAuditItemCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.ForceExportCommand;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
@@ -329,6 +330,7 @@ public class IssuePendingFragment extends Fragment {
 
 	@UiThread
 	void onEvent(AuditItemChangedEvent event) {
+        Logger.Log("change event");
 		refresh();
 	}
 
