@@ -1,7 +1,6 @@
 package com.cloudjay.cjay;
 
 import android.app.Application;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,7 +10,6 @@ import android.util.Log;
 
 import com.cloudjay.cjay.api.ApiEndpoint;
 import com.cloudjay.cjay.task.service.PubnubService_;
-import com.cloudjay.cjay.task.service.SyncIntentService_;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringUtils;

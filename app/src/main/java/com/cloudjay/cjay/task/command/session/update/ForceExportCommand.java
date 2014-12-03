@@ -4,13 +4,7 @@ import android.content.Context;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
-import com.cloudjay.cjay.event.session.ContainerGotEvent;
-import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
-import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.Command;
-import com.cloudjay.cjay.util.enums.UploadType;
-
-import de.greenrobot.event.EventBus;
 
 public class ForceExportCommand extends Command {
 	Context context;

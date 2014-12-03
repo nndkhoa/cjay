@@ -2,7 +2,8 @@ package com.path.android.jobqueue.nonPersistentQueue;
 
 import com.path.android.jobqueue.JobHolder;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
 
 /**
  * This is a {@link MergedQueue} class that can handle queue updates based on time.

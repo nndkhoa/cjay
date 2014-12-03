@@ -4,12 +4,8 @@ import android.content.Context;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
-import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
-import com.cloudjay.cjay.event.session.ContainerSearchedEvent;
-import com.cloudjay.cjay.event.session.SearchAsyncStartedEvent;
 import com.cloudjay.cjay.model.Operator;
-import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.Command;
 
 import java.util.List;

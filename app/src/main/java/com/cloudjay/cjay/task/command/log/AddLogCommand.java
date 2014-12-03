@@ -2,14 +2,9 @@ package com.cloudjay.cjay.task.command.log;
 
 import android.content.Context;
 
-import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
-import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.Command;
-import com.cloudjay.cjay.util.CJayConstant;
-import com.snappydb.DB;
-import com.snappydb.SnappydbException;
 
 /**
  * Add container to database

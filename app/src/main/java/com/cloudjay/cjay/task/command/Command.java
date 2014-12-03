@@ -3,8 +3,6 @@ package com.cloudjay.cjay.task.command;
 import com.snappydb.SnappydbException;
 import com.squareup.tape.Task;
 
-import org.androidannotations.annotations.EBean;
-
 /**
  * Implement Callback để khi chạy xong sẽ phải gọi onSuccess để getNextItem()
  */

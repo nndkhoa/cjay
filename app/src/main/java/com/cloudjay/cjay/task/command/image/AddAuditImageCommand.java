@@ -5,7 +5,6 @@ import android.content.Context;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.model.AuditImage;
-import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.task.command.Command;
 
 public class AddAuditImageCommand extends Command {

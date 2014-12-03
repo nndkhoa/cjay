@@ -2,17 +2,11 @@ package com.cloudjay.cjay.task.command.session.update;
 
 import android.content.Context;
 
-import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
-import com.cloudjay.cjay.event.session.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.Command;
 import com.cloudjay.cjay.util.CJayConstant;
-import com.snappydb.DB;
-import com.snappydb.SnappydbException;
-
-import de.greenrobot.event.EventBus;
 
 /**
  * Add container to collection WORKING database

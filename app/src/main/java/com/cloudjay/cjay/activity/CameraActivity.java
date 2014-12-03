@@ -30,13 +30,12 @@ import android.widget.Toast;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.AuditImage;
-import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.model.GateImage;
+import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.task.command.cjayobject.AddUploadObjectCommand;
 import com.cloudjay.cjay.task.command.image.AddGateImageCommand;
 import com.cloudjay.cjay.task.command.image.AddOrUpdateAuditImageCommand;
 import com.cloudjay.cjay.task.command.image.AddRainyImageCommand;
-
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;

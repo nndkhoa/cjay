@@ -4,12 +4,8 @@ import android.content.Context;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
-import com.cloudjay.cjay.event.session.ContainersFetchedEvent;
-import com.cloudjay.cjay.task.command.session.FetchSessionsCommand;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
-
-import de.greenrobot.event.EventBus;
 
 public class FetchSessionsJob extends Job {
 

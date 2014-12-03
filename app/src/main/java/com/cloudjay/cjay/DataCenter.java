@@ -52,7 +52,6 @@ import com.snappydb.SnappydbException;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
-import org.androidannotations.annotations.Trace;
 
 import java.util.ArrayList;
 import java.util.List;

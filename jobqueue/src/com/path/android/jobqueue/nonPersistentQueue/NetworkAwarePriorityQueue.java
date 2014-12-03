@@ -4,7 +4,6 @@ import com.path.android.jobqueue.JobHolder;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Queue;
 
 /**
  * A {@link MergedQueue} class that can separate jobs based on their network requirement

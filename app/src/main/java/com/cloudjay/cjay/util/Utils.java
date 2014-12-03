@@ -21,7 +21,6 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.cloudjay.cjay.App;
-import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.HomeActivity_;
 import com.cloudjay.cjay.model.AuditImage;
@@ -29,7 +28,6 @@ import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.service.PubnubService_;
-import com.cloudjay.cjay.task.service.QueryService;
 import com.cloudjay.cjay.task.service.QueryService_;
 import com.cloudjay.cjay.task.service.SyncIntentService_;
 import com.cloudjay.cjay.task.service.UploadIntentService_;
@@ -40,15 +38,12 @@ import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.net.ssl.SSLContext;
 
 import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;

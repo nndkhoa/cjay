@@ -11,7 +11,6 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.adapter.RainyModeImageAdapter;
 import com.cloudjay.cjay.model.GateImage;
-import com.cloudjay.cjay.util.Logger;
 
 /**
  * Created by nambv on 17/10/2014.

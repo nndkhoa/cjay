@@ -1,7 +1,6 @@
 package com.cloudjay.cjay.task.service;
 
 import android.app.IntentService;
-import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
@@ -11,7 +10,6 @@ import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EIntentService;
-import org.androidannotations.annotations.EService;
 
 @EIntentService
 public class QueryService extends IntentService implements Command.Callback {
