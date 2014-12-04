@@ -34,8 +34,8 @@ public class SyncIntentService extends IntentService {
 			} else {
 				Logger.w("There was problems. Please check credential or connectivity.");
 			}
-		} catch (RetrofitError e) {
 
+		} catch (RetrofitError e) {
 			e.printStackTrace();
 			Utils.cancelAlarm(getApplicationContext());
 		}

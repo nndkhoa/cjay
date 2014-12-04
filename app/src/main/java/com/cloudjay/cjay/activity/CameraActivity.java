@@ -144,13 +144,13 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			try {
 
-				Logger.Log("onSurfaceChanged");
+				Logger.d("onSurfaceChanged");
 
 				configurationZoom();
 				initPreview(width, height);
 				startPreview();
 
-				Logger.Log("endSurfaceChanged");
+				Logger.d("endSurfaceChanged");
 
 			} catch (Exception e) {
 
@@ -162,14 +162,14 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		@Override
 		public void surfaceCreated(SurfaceHolder holder) {
 			// no-op -- wait until surfaceChanged()
-			Logger.Log("onSurfaceCreated");
+			Logger.d("onSurfaceCreated");
 			mInPreview = true;
 		}
 
 		@Override
 		public void surfaceDestroyed(SurfaceHolder holder) {
 			// no-op
-			Logger.Log("onSurfaceDestroyed");
+			Logger.d("onSurfaceDestroyed");
 
 		}
 	};
@@ -339,7 +339,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		// init container sessions
 		// loadData();
 
-		Logger.Log("----> initCamera(), addSurfaceCallback");
+		Logger.d("----> initCamera(), addSurfaceCallback");
 		// WARNING: this block should be run before onResume()
 		// Setup Surface Holder
 		mPreviewHolder = mPreview.getHolder();
@@ -378,11 +378,13 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	}
 
 	void initPreview(int width, int height) {
-		Logger.Log("initPreview()");
+		Logger.d("initPreview()");
 
 		if (mCamera != null && mPreviewHolder.getSurface() != null) {
 			try {
-				Logger.Log("setPreviewDisplay");
+				configurationZoom();
+				Logger.d("setPreviewDisplay");
+
 				mCamera.setPreviewDisplay(mPreviewHolder);
 				// camera.setPreviewCallback(null);
 				// camera.setOneShotPreviewCallback(null);
@@ -394,7 +396,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			if (!mCameraConfigured) {
 
-				Logger.Log("config Camera");
+				Logger.d("config Camera");
 
 				Camera.Parameters parameters = mCamera.getParameters();
 				Camera.Size size = determineBestPreviewSize(parameters);
@@ -428,7 +430,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	public void onAutoFocus(boolean arg0, Camera arg1) {
 
 		try {
-			Logger.Log("Auto focused, now take picture");
+			Logger.d("Auto focused, now take picture");
 			mCamera.takePicture(shutterCallback, null, photoCallback);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -507,7 +509,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 				Camera.getCameraInfo(i, info);
 				if (info.facing == mCameraMode) {
-					Logger.Log("inside onResume: camera != null");
+					Logger.d("inside onResume: camera != null");
 
 					mCamera = Camera.open(i);
 					setCameraDisplayOrientation(this, mCameraMode, mCamera);
@@ -516,7 +518,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		}
 
 		if (mCamera == null) {
-			Logger.Log("inside onResume: camera == null");
+			Logger.d("inside onResume: camera == null");
 			mCamera = Camera.open(mCameraMode);
 		}
 
@@ -667,11 +669,11 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	}
 
 	void startPreview() {
-		Logger.Log("----> startPreview");
+		Logger.d("----> startPreview");
 
 		if (mCameraConfigured && mCamera != null) {
 
-			Logger.Log("cameraConfigured and camera != null");
+			Logger.d("cameraConfigured and camera != null");
 			mCamera.startPreview();
 			mInPreview = true;
 		}

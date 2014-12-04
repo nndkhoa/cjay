@@ -55,20 +55,29 @@ public class UploadIntentService extends Service {
 		super.onDestroy();
 	}
 
-	@Trace
+	/**
+	 * Receive upload succeeded event then run Remove upload item command.
+	 *
+	 * @param event
+	 */
 	public void onEvent(UploadSucceededEvent event) {
 		processing = false;
 		queue.remove();
+	}
+
+	/**
+	 * Triggered after upload item was removed, then it continues on execution.
+	 *
+	 * @param event
+	 */
+	public void onEvent(UploadObjectRemovedEvent event) {
+		executeNext();
 	}
 
 	@Trace
 	public void onEvent(UploadStoppedEvent event) {
 		Logger.w("Upload failed, container " + event.session.getContainerId());
 		processing = false;
-		executeNext();
-	}
-
-	public void onEvent(UploadObjectRemovedEvent event) {
 		executeNext();
 	}
 
@@ -87,30 +96,22 @@ public class UploadIntentService extends Service {
 
 		if (processing) return; // Only one task at a time.
 
-		try {
+		// Check if user is logged in or not
+		String token = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_TOKEN);
+		if (!TextUtils.isEmpty(token) && Utils.canReachInternet()) {
 
-			// Check if user is logged in or not
-			String token = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_TOKEN);
-			if (!TextUtils.isEmpty(token) && Utils.canReachInternet()) {
-
-				JobManager manager = App.getJobManager();
-				if (manager.count() != 0) {
-					Logger.Log("There is already job in the queue");
-				} else {
-					dataCenter.add(new StartUploadingCommand(getApplicationContext()));
-				}
-
+			JobManager manager = App.getJobManager();
+			if (manager.count() != 0) {
+				Logger.Log("There is already job in the queue");
 			} else {
-
-				Logger.w("There was problems. Please check credential or connectivity.");
-				Logger.w("Upload service will be stopped.");
-				processing = false;
-				stopSelf();
+				dataCenter.add(new StartUploadingCommand(getApplicationContext()));
 			}
 
-		} catch (RetrofitError e) {
-			e.printStackTrace();
-//			Utils.cancelAlarm(getApplicationContext());
+		} else {
+			Logger.w("There was problems. Please check credential or connectivity.");
+			Logger.w("Upload service will be stopped.");
+			processing = false;
+			stopSelf();
 		}
 	}
 }

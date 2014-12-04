@@ -450,10 +450,17 @@ public class DataCenter {
 	 * @return
 	 * @throws SnappydbException
 	 */
-	@Background(serial = NETWORK)
+//	@Background(serial = NETWORK)
 	public void getSessionAsyncById(Context context, long id, int type) {
+
 		Session result = networkClient.getSessionById(id);
 		add(new SaveSessionCommand(context, result, type));
+
+//		try {
+//
+//		} catch (RetrofitError e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	/**
@@ -796,7 +803,7 @@ public class DataCenter {
 			object = db.getObject(key, Session.class);
 			object.mergeSession(session);
 			object.setUploadStatus(UploadStatus.COMPLETE);
-			Logger.e("Local step: " + object.getLocalStep());
+			Logger.Log("Local step: " + object.getLocalStep());
 			db.put(key, object);
 
 		} catch (SnappydbException e) {
@@ -1494,7 +1501,6 @@ public class DataCenter {
         } catch (RetrofitError e) {
             e.printStackTrace();
         }
-
 	}
 
 	/**
@@ -1559,7 +1565,7 @@ public class DataCenter {
 			// Reset index if there is no item left in the queue
 			int leftCount = db.countKeys(CJayConstant.PREFIX_UPLOAD_QUEUE);
 			if (leftCount == 0) {
-				Logger.Log("Reset index to 0");
+				Logger.w("Reset index to 0");
 				PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_UPLOAD_QUEUE_INDEX, 0);
 			}
 
@@ -1567,6 +1573,7 @@ public class DataCenter {
 			int currentIndex = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_UPLOAD_QUEUE_INDEX, 0);
 			String key = CJayConstant.PREFIX_UPLOAD_QUEUE + currentIndex + ":" + containerId;
 			db.put(key, object);
+
 		} catch (SnappydbException e) {
 			Logger.e(e.getMessage());
 		}
@@ -1577,7 +1584,7 @@ public class DataCenter {
 		KeyIterator it = db.findKeysIterator(CJayConstant.PREFIX_UPLOAD_QUEUE);
 		String[] keys = it.next(1);
 		it.close();
-		if (null != keys && keys.length > 0) {
+		if (null != keys && keys.length > 0 && keys[0].contains(CJayConstant.PREFIX_UPLOAD_QUEUE)) {
 			Logger.Log("Delete item: " + keys[0]);
 			db.del(keys[0]);
 		}
@@ -1635,7 +1642,7 @@ public class DataCenter {
 	 * @param context
 	 * @throws SnappydbException
 	 */
-	public void startJobQueue(Context context) throws SnappydbException {
+	public void startUploading(Context context) throws SnappydbException {
 
 		// Find next upload item
 		JobManager jobManager = App.getJobManager();
@@ -1668,7 +1675,7 @@ public class DataCenter {
 			}
 
 		} else {
-			Logger.wtf("No more item. Stop service.");
+			Logger.Log("No more item. Stop upload service.");
 			context.stopService(new Intent(context, UploadIntentService_.class));
 		}
 	}

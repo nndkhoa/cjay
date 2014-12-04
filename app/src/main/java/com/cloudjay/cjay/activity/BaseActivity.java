@@ -99,6 +99,7 @@ public class BaseActivity extends FragmentActivity {
 
 	@OptionsItem(R.id.menu_refresh)
 	void refreshItemClicked() {
+
 		// 1. clear preferences
 		PreferencesUtil.removePrefsValue(getApplicationContext(), PreferencesUtil.PREF_MODIFIED_PAGE);
 		PreferencesUtil.removePrefsValue(getApplicationContext(), PreferencesUtil.PREF_MODIFIED_DATE);
@@ -156,7 +157,6 @@ public class BaseActivity extends FragmentActivity {
 	}
 
     @UiThread
-    @Trace
     public void onEvent(PubnubSubscriptionChangedEvent event) {
 	    try {
 		    boolean isSubscribed = event.isSubscribed();
@@ -170,23 +170,4 @@ public class BaseActivity extends FragmentActivity {
 	    }
 
     }
-
-//	@Override
-//	public boolean onMenuOpened(int featureId, Menu menu) {
-//		if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
-//			if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
-//				try {
-//					Method m = menu.getClass().getDeclaredMethod(
-//							"setOptionalIconsVisible", Boolean.TYPE);
-//					m.setAccessible(true);
-//					m.invoke(menu, true);
-//				} catch (NoSuchMethodException e) {
-//					Logger.Log(e.getMessage());
-//				} catch (Exception e) {
-//					throw new RuntimeException(e);
-//				}
-//			}
-//		}
-//		return super.onMenuOpened(featureId, menu);
-//	}
 }

@@ -13,54 +13,11 @@ public class UploadObject implements Serializable {
 	long sessionId;
 	String containerId;
 
-	public int getUploadQueueOrder() {
-		return uploadQueueOrder;
-	}
-
-	public void setUploadQueueOrder(int uploadQueueOrder) {
-		this.uploadQueueOrder = uploadQueueOrder;
-	}
-
-	int uploadQueueOrder;
-
-	public int getContainerQueueOrder() {
-		return containerQueueOrder;
-	}
-
-	public void setContainerQueueOrder(int containerQueueOrder) {
-		this.containerQueueOrder = containerQueueOrder;
-	}
-
-	int containerQueueOrder;
-
 	public UploadObject() {
 	}
 
 	public UploadObject(Object obj) {
 		this.object = obj;
-	}
-
-	public UploadObject(Object obj, Class cls, int uploadQueueOrder, int containerQueueOrder) {
-		this.object = obj;
-		this.cls = cls;
-		this.uploadQueueOrder = uploadQueueOrder;
-		this.containerQueueOrder = containerQueueOrder;
-	}
-
-	public UploadObject(Object obj, Class cls, int uploadQueueOrder, int containerQueueOrder, long id) {
-		this.object = obj;
-		this.cls = cls;
-		this.uploadQueueOrder = uploadQueueOrder;
-		this.containerQueueOrder = containerQueueOrder;
-		this.sessionId = id;
-	}
-
-	public UploadObject(Object obj, Class cls, int uploadQueueOrder, int containerQueueOrder, String containerId) {
-		this.object = obj;
-		this.cls = cls;
-		this.uploadQueueOrder = uploadQueueOrder;
-		this.containerQueueOrder = containerQueueOrder;
-		this.containerId = containerId;
 	}
 
 	public UploadObject(Object obj, Class cls, String containerId) {

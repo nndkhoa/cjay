@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.cloudjay.cjay.task.service.QueryService_;
+import com.cloudjay.cjay.util.Logger;
 import com.squareup.tape.InMemoryObjectQueue;
 import com.squareup.tape.TaskQueue;
 
@@ -30,6 +31,11 @@ public class CommandQueue extends TaskQueue<Command> {
 
 	@Override
 	public void remove() {
-		super.remove();
+		try {
+			super.remove();
+		} catch (Exception e) {
+			Logger.w(e.getMessage());
+		}
+
 	}
 }

@@ -172,17 +172,17 @@ public class Utils {
 
 		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-		// Making Alarm for Queue Worker
+		// Making Alarm for Sync Worker
 		Intent intent = new Intent(context, SyncIntentService_.class);
-		PendingIntent pQueueIntent = PendingIntent.getService(context, CJayConstant.ALARM_SYNC_SERVICE_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pSyncIntent = PendingIntent.getService(context, CJayConstant.ALARM_SYNC_SERVICE_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 		// Start every 24 hours
 		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
-				CJayConstant.ALARM_INTERVAL * 1000, pQueueIntent);
+				CJayConstant.ALARM_INTERVAL * 1000, pSyncIntent);
 
 		// --------
 		// Configure Pubnub Service
-		Logger.w(" --> set repeating for pubnub");
+		Logger.w(" --> set repeating for pubnub service");
 		Intent pubnubIntent = new Intent(context, PubnubService_.class);
 		PendingIntent pPubnubIntent = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_SERVICE_ID, pubnubIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -212,8 +212,8 @@ public class Utils {
 	 */
 	public static boolean isAlarmUp(Context context) {
 
-		Intent queueIntent = new Intent(context, SyncIntentService_.class);
-		boolean queueUp = PendingIntent.getService(context, CJayConstant.ALARM_SYNC_SERVICE_ID, queueIntent, PendingIntent.FLAG_NO_CREATE) != null;
+		Intent syncIntent = new Intent(context, SyncIntentService_.class);
+		boolean syncUp = PendingIntent.getService(context, CJayConstant.ALARM_SYNC_SERVICE_ID, syncIntent, PendingIntent.FLAG_NO_CREATE) != null;
 
 		Intent pubnubIntent = new Intent(context, PubnubService_.class);
 		boolean pubnubUp = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_SERVICE_ID, pubnubIntent, PendingIntent.FLAG_NO_CREATE) != null;
@@ -225,13 +225,13 @@ public class Utils {
 		if (!uploadUp)
 			Logger.w("Upload Service is not running");
 
-		if (!queueUp)
+		if (!syncUp)
 			Logger.w("Queue Service is not running");
 
 		if (!pubnubUp)
 			Logger.w("Pubnub Service is not running");
 
-		if (queueUp && pubnubUp && isSubscribed)
+		if (syncUp && pubnubUp && isSubscribed && uploadUp)
 			return true;
 		else
 			return false;

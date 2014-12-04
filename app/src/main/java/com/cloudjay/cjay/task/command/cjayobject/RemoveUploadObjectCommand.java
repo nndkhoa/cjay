@@ -14,16 +14,9 @@ import de.greenrobot.event.EventBus;
 public class RemoveUploadObjectCommand extends Command {
 
 	Context context;
-	UploadObject object;
 
 	public RemoveUploadObjectCommand(Context context) {
 		this.context = context;
-		this.object = null;
-	}
-
-	public RemoveUploadObjectCommand(Context context, UploadObject object) {
-		this.context= context;
-		this.object= object;
 	}
 
 	@Override

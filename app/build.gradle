@@ -87,7 +87,7 @@ android {
         }
 
         debug {
-//            applicationIdSuffix '.dev'
+            applicationIdSuffix '.dev'
             versionNameSuffix '-dev'
         }
     }

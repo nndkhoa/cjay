@@ -26,9 +26,6 @@ public class UploadSessionJob extends Job {
 	Session mSession;
 	UploadObject object;
 
-	/**
-	 * Dùng để phân biệt xem có cần clear Working hay không?
-	 */
 	@Override
 	public int getRetryLimit() {
 		return 1;
@@ -40,23 +37,10 @@ public class UploadSessionJob extends Job {
 		this.object = object;
 	}
 
-	/**
-	 * 1. Thêm container session vào list upload
-	 * 2. Notify cho Upload Fragment để cập nhật UI
-	 * 3. Tự động thay đổi local currentStep đến stage kế tiếp
-	 * 4. Remove from Working tab if needed
-	 */
 	@Override
 	public void onAdded() {
 	}
 
-	/**
-	 * 1. Notify qua BUS quá trình upload đang diễn ra
-	 * 2. Gọi hàm upload container json lên server
-	 * 3. Nếu upload thành công (không bị throw exception) thì gán
-	 *
-	 * @throws Throwable
-	 */
 	@Override
 	public void onRun() throws Throwable {
 
@@ -86,12 +70,6 @@ public class UploadSessionJob extends Job {
 		// UploadService will receive event and take care of the rest.
 	}
 
-	/**
-	 * Retry to upload
-	 *
-	 * @param throwable
-	 * @return
-	 */
 	@Override
 	protected boolean shouldReRunOnThrowable(Throwable throwable) {
 
@@ -110,9 +88,6 @@ public class UploadSessionJob extends Job {
 		return true;
 	}
 
-	/**
-	 * Quá trình upload thất bại. Gán status ERROR container
-	 */
 	@Override
 	protected void onCancel() {
 		Context context = App.getInstance().getApplicationContext();

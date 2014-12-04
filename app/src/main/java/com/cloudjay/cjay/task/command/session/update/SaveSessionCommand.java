@@ -50,7 +50,6 @@ public class SaveSessionCommand extends Command {
 
 		if (uploadType != null && success)
 			EventBus.getDefault().post(new UploadSucceededEvent(session, UploadType.SESSION));
-		Logger.e("Session saved");
 
 		if (popUpNotification != null) {
 			EventBus.getDefault().post(new NotificationItemReceivedEvent(session, popUpNotification));

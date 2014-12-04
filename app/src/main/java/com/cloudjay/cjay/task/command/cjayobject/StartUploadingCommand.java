@@ -14,9 +14,10 @@ public class StartUploadingCommand extends Command {
 		this.context = context;
 	}
 
+
 	@Override
 	protected void run() throws SnappydbException {
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
-		dataCenter.startJobQueue(context);
+		dataCenter.startUploading(context);
 	}
 }
