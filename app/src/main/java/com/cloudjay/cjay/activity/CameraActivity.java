@@ -180,14 +180,14 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		if (p.isZoomSupported() && p.isSmoothZoomSupported()) {
 			//most phones
 			maxZoomLevel = p.getMaxZoom();
-
+			final int changeValue = (maxZoomLevel / 5);
 			zoomControls.setIsZoomInEnabled(true);
 			zoomControls.setIsZoomOutEnabled(true);
 
 			zoomControls.setOnZoomInClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					if (currentZoomLevel < maxZoomLevel) {
-						currentZoomLevel++;
+						currentZoomLevel = currentZoomLevel + changeValue;
 						mCamera.startSmoothZoom(currentZoomLevel);
 
 					}
@@ -197,22 +197,22 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			zoomControls.setOnZoomOutClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					if (currentZoomLevel > 0) {
-						currentZoomLevel--;
+						currentZoomLevel = currentZoomLevel - changeValue;
 						mCamera.startSmoothZoom(currentZoomLevel);
 					}
 				}
 			});
-		} else if (p.isZoomSupported() && !p.isSmoothZoomSupported()){
+		} else if (p.isZoomSupported() && !p.isSmoothZoomSupported()) {
 			//stupid HTC phones
 			maxZoomLevel = p.getMaxZoom();
-
+			final int changeValue = (maxZoomLevel / 5);
 			zoomControls.setIsZoomInEnabled(true);
 			zoomControls.setIsZoomOutEnabled(true);
 
 			zoomControls.setOnZoomInClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					if (currentZoomLevel < maxZoomLevel) {
-						currentZoomLevel++;
+						currentZoomLevel = currentZoomLevel + changeValue;
 						p.setZoom(currentZoomLevel);
 						mCamera.setParameters(p);
 
@@ -223,13 +223,13 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			zoomControls.setOnZoomOutClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					if (currentZoomLevel > 0) {
-						currentZoomLevel--;
+						currentZoomLevel = currentZoomLevel -changeValue;
 						p.setZoom(currentZoomLevel);
 						mCamera.setParameters(p);
 					}
 				}
 			});
-		}else{
+		} else {
 			//no zoom on phone
 			zoomControls.setVisibility(View.GONE);
 		}
@@ -243,7 +243,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		public void onPictureTaken(byte[] data, Camera camera) {
 
 			showProgressSavingImage(true);
-
 			try {
 
 				savePhoto(data);
