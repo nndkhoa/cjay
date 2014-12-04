@@ -157,7 +157,6 @@ public class PubnubService extends Service {
 		notificationManager.notify(CJayConstant.NOTIFICATION_ID, notification);
 	}
 
-	@Trace
 	public void onEventMainThread(NotificationItemReceivedEvent event) {
 		pushNotification(event.getSession(), event.getType());
 	}
