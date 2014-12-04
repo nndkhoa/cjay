@@ -26,6 +26,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ZoomControls;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
@@ -103,6 +104,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	@ViewById(R.id.camera_preview)
 	SurfaceView mPreview;
 
+	@ViewById(R.id.camera_zoom_control)
+	ZoomControls zoomControls;
+
 	@ViewById(R.id.btn_use_gate_image)
 	Button btnUseGateImage;
 
@@ -120,6 +124,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	MediaPlayer mShootMediaPlayer = null;
 	Camera mCamera = null;
+	Camera.Parameters p;
 	String mFlashMode = Camera.Parameters.FLASH_MODE_OFF;
 
 	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
@@ -129,14 +134,19 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	private boolean mCameraConfigured = false;
 	int mCameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
 
+	int maxZoomLevel;
+	int currentZoomLevel;
+
 	SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
 
 		@Override
 		public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 
 			try {
+
 				Logger.Log("onSurfaceChanged");
 
+				configurationZoom();
 				initPreview(width, height);
 				startPreview();
 
@@ -163,6 +173,69 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		}
 	};
+
+	private void configurationZoom() {
+		//Config zoom
+		p = mCamera.getParameters();
+		if (p.isZoomSupported() && p.isSmoothZoomSupported()) {
+			//most phones
+			maxZoomLevel = p.getMaxZoom();
+
+			zoomControls.setIsZoomInEnabled(true);
+			zoomControls.setIsZoomOutEnabled(true);
+
+			zoomControls.setOnZoomInClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					if (currentZoomLevel < maxZoomLevel) {
+						currentZoomLevel++;
+						mCamera.startSmoothZoom(currentZoomLevel);
+
+					}
+				}
+			});
+
+			zoomControls.setOnZoomOutClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					if (currentZoomLevel > 0) {
+						currentZoomLevel--;
+						mCamera.startSmoothZoom(currentZoomLevel);
+					}
+				}
+			});
+		} else if (p.isZoomSupported() && !p.isSmoothZoomSupported()){
+			//stupid HTC phones
+			maxZoomLevel = p.getMaxZoom();
+
+			zoomControls.setIsZoomInEnabled(true);
+			zoomControls.setIsZoomOutEnabled(true);
+
+			zoomControls.setOnZoomInClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					if (currentZoomLevel < maxZoomLevel) {
+						currentZoomLevel++;
+						p.setZoom(currentZoomLevel);
+						mCamera.setParameters(p);
+
+					}
+				}
+			});
+
+			zoomControls.setOnZoomOutClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					if (currentZoomLevel > 0) {
+						currentZoomLevel--;
+						p.setZoom(currentZoomLevel);
+						mCamera.setParameters(p);
+					}
+				}
+			});
+		}else{
+			//no zoom on phone
+			zoomControls.setVisibility(View.GONE);
+		}
+
+		mCamera.setParameters(p);
+	}
 
 	Camera.PictureCallback photoCallback = new Camera.PictureCallback() {
 
@@ -794,7 +867,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		if (rainyMode && openRainyModeActivity) {
 
 			// create directory to save images
-			newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/rainy_mode" );
+			newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/rainy_mode");
 
 			if (!newDirectory.exists()) {
 				newDirectory.mkdirs();
