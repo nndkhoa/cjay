@@ -11,7 +11,6 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.adapter.RainyModeImageAdapter;
 import com.cloudjay.cjay.model.GateImage;
-import com.cloudjay.cjay.util.Logger;
 
 /**
  * Created by nambv on 17/10/2014.
@@ -61,15 +60,15 @@ public class CheckablePhotoGridItemLayout extends CheckableFrameLayout {
     public void toggle() {
         super.toggle();
 
-        Logger.Log("rainyMode: " + rainyMode);
-
-        if (!rainyMode) {
+        if (mParentAdapter != null) {
             if (isChecked()) {
                 mParentAdapter.addCheckedCJayImageUrl(mCJayImage);
             } else {
                 mParentAdapter.removeCheckedCJayImageUrl(mCJayImage);
             }
-        } else {
+        }
+
+        if (mRainyModeAdapter != null) {
             if (isChecked()) {
                 mRainyModeAdapter.addCheckedImageUrl(mRainyImage);
             } else {

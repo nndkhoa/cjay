@@ -1,22 +1,19 @@
 package com.cloudjay.cjay.event.issue;
 
-/**
- * Created by nambv on 29/10/2014.
- */
 public class IssueMergedEvent {
-    private String containerId;
-    private String auditItemRemoveUUID;
+	private String containerId;
+	private String itemUuid;
 
-    public IssueMergedEvent(String containerId, String auditItemRemoveUUID) {
-        this.containerId = containerId;
-        this.auditItemRemoveUUID = auditItemRemoveUUID;
-    }
+	public IssueMergedEvent(String containerId, String itemUuid) {
+		this.containerId = containerId;
+		this.itemUuid = itemUuid;
+	}
 
-    public String getContainerId() {
-        return containerId;
-    }
+	public String getContainerId() {
+		return containerId;
+	}
 
-    public String getAuditItemRemoveUUID() {
-        return auditItemRemoveUUID;
-    }
+	public String getItemUuid() {
+		return itemUuid;
+	}
 }

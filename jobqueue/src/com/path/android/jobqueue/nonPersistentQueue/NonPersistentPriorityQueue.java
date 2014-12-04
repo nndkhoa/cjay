@@ -4,7 +4,9 @@ import com.path.android.jobqueue.JobHolder;
 import com.path.android.jobqueue.JobManager;
 import com.path.android.jobqueue.JobQueue;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 
 public class NonPersistentPriorityQueue implements JobQueue {
     private long nonPersistentJobIdGenerator = Integer.MIN_VALUE;

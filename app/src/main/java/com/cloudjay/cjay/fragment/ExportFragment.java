@@ -11,7 +11,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
@@ -21,12 +20,16 @@ import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.job.UploadImportJob;
+import com.cloudjay.cjay.model.UploadObject;
+import com.cloudjay.cjay.task.command.cjayobject.AddUploadObjectCommand;
+import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
+import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
+import com.cloudjay.cjay.task.command.session.update.AddUploadingSessionCommand;
+import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
-import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -120,7 +123,7 @@ public class ExportFragment extends Fragment {
 				mImageTypes, importImages, auditImages, repairedImages);
 		lvImagesExpandable.setAdapter(mListAdapter);
 
-		dataCenter.getSessionInBackground(getActivity(), containerID);
+		dataCenter.add(new GetSessionCommand(getActivity(), containerID));
 	}
 
 	//region VIEW INTERACTION
@@ -149,11 +152,17 @@ public class ExportFragment extends Fragment {
 			Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
 			return;
 		}
-		dataCenter.removeWorkingSession(getActivity(), containerID);
+
+		// Add to Uploading
+		dataCenter.add(new AddUploadingSessionCommand(getActivity(), mSession));
+		dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
+
+		mSession.prepareForUploading();
+		dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
 
 		// Add container session to upload queue
-		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadImportJob(mSession));
+		UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
+		dataCenter.add(new AddUploadObjectCommand(getActivity(), object));
 
 		// Navigate to HomeActivity
 		getActivity().finish();
@@ -250,13 +259,13 @@ public class ExportFragment extends Fragment {
 		}
 	}
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        dataCenter.getSessionInBackground(getActivity(), containerID);
-    }
+	@Override
+	public void onResume() {
+		super.onResume();
+		dataCenter.add(new GetSessionCommand(getActivity(), containerID));
+	}
 
 
-    //endregion
+	//endregion
 
 }

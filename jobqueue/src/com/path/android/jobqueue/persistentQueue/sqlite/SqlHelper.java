@@ -2,6 +2,7 @@ package com.path.android.jobqueue.persistentQueue.sqlite;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+
 import com.path.android.jobqueue.log.JqLog;
 
 /**

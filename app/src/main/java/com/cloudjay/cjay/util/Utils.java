@@ -28,7 +28,9 @@ import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.service.PubnubService_;
+import com.cloudjay.cjay.task.service.QueryService_;
 import com.cloudjay.cjay.task.service.SyncIntentService_;
+import com.cloudjay.cjay.task.service.UploadIntentService_;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.pubnub.api.Pubnub;
@@ -37,6 +39,8 @@ import com.snappydb.SnappydbException;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -109,6 +113,11 @@ public class Utils {
 		Pubnub pubnub = new Pubnub(CJayConstant.PUBLISH_KEY, CJayConstant.SUBSCRIBE_KEY);
 		pubnub.unsubscribeAllChannels();
 
+		context.stopService(new Intent(context, PubnubService_.class));
+		context.stopService(new Intent(context, QueryService_.class));
+		context.stopService(new Intent(context, SyncIntentService_.class));
+		context.stopService(new Intent(context, UploadIntentService_.class));
+
 		// Clear preference and Database
 		Logger.Log("Clear all preferences");
 		PreferencesUtil.clearPrefs(context);
@@ -120,7 +129,7 @@ public class Utils {
 			DB db = App.getDB(context);
 			db.destroy();
 		} catch (SnappydbException e) {
-			Logger.w(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
@@ -144,7 +153,7 @@ public class Utils {
 	}
 
 	/**
-	 * Init alarm manager to start QueueIntentService
+	 * Initial alarm manager to trigger app services
 	 *
 	 * @param context
 	 */
@@ -152,31 +161,47 @@ public class Utils {
 
 		Logger.w(" -> start Alarm Manager");
 
+		Date date = new Date();   // given date
+		Calendar calendar = GregorianCalendar.getInstance(); // creates a new calendar instance
+		calendar.setTime(date);   // assigns calendar to given date
+		int i = calendar.get(Calendar.HOUR); // gets hour in 12h format
+
 		// start 30 seconds after boot completed
 		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.SECOND, 10 * 60);
+		cal.add(Calendar.SECOND, (12 - i) * 3600);
 
 		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-		// Making Alarm for Queue Worker
+		// Making Alarm for Sync Worker
 		Intent intent = new Intent(context, SyncIntentService_.class);
-		PendingIntent pQueueIntent = PendingIntent.getService(context, CJayConstant.ALARM_QUEUE_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pSyncIntent = PendingIntent.getService(context, CJayConstant.ALARM_SYNC_SERVICE_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 		// Start every 24 hours
-		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
-				CJayConstant.ALARM_INTERVAL * 1000, pQueueIntent);
+		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+				CJayConstant.ALARM_INTERVAL * 1000, pSyncIntent);
 
 		// --------
 		// Configure Pubnub Service
-
-		Logger.w(" --> set repeating for pubnub");
+		Logger.w(" --> set repeating for pubnub service");
 		Intent pubnubIntent = new Intent(context, PubnubService_.class);
-		PendingIntent pPubnubIntent = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pPubnubIntent = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_SERVICE_ID, pubnubIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+		// wake up every 30 minutes to ensure service stays alive
+		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+				(30 * 60 * 1000), pPubnubIntent);
+		context.startService(new Intent(context, PubnubService_.class));
+
+
+		// TODO: #tieubao
+		// --------
+		// Configure Upload Service
+		Logger.w(" --> set repeating for upload service");
+		Intent uploadIntent = new Intent(context, UploadIntentService_.class);
+		PendingIntent pUploadIntent = PendingIntent.getService(context, CJayConstant.ALARM_UPLOAD_SERVICE_ID, uploadIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 		// wake up every 5 minutes to ensure service stays alive
-		alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
-				(30 * 60 * 1000), pPubnubIntent);
-
+		alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+				(30 * 60 * 1000), pUploadIntent);
 	}
 
 	/**
@@ -187,40 +212,81 @@ public class Utils {
 	 */
 	public static boolean isAlarmUp(Context context) {
 
-		Intent queueIntent = new Intent(context, SyncIntentService_.class);
-		boolean queueUp = PendingIntent.getService(context, CJayConstant.ALARM_QUEUE_ID, queueIntent, PendingIntent.FLAG_NO_CREATE) != null;
+		Intent syncIntent = new Intent(context, SyncIntentService_.class);
+		boolean syncUp = PendingIntent.getService(context, CJayConstant.ALARM_SYNC_SERVICE_ID, syncIntent, PendingIntent.FLAG_NO_CREATE) != null;
 
 		Intent pubnubIntent = new Intent(context, PubnubService_.class);
-		boolean pubnubUp = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_ID, pubnubIntent, PendingIntent.FLAG_NO_CREATE) != null;
-//		boolean pubnubUp = isRunning(context, PubnubService_.class.getName());
+		boolean pubnubUp = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_SERVICE_ID, pubnubIntent, PendingIntent.FLAG_NO_CREATE) != null;
+		boolean isSubscribed = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_SUBSCRIBE_PUBNUB, false);
 
-		if (!queueUp)
+		Intent uploadIntent = new Intent(context, UploadIntentService_.class);
+		boolean uploadUp = PendingIntent.getService(context, CJayConstant.ALARM_UPLOAD_SERVICE_ID, uploadIntent, PendingIntent.FLAG_NO_CREATE) != null;
+
+		if (!uploadUp)
+			Logger.w("Upload Service is not running");
+
+		if (!syncUp)
 			Logger.w("Queue Service is not running");
 
 		if (!pubnubUp)
 			Logger.w("Pubnub Service is not running");
 
-		if (queueUp && pubnubUp)
+		if (syncUp && pubnubUp && isSubscribed && uploadUp)
 			return true;
 		else
 			return false;
 	}
 
+	/**
+	 * Unregister Sync Intent Service from Alarm Manager
+	 *
+	 * @param context
+	 */
 	public static void cancelAlarm(Context context) {
-
 		Logger.Log("stop Alarm Manager");
 
 		Intent intent = new Intent(context, SyncIntentService_.class);
-		PendingIntent sender = PendingIntent.getService(context, CJayConstant.ALARM_QUEUE_ID, intent,
+		PendingIntent sender = PendingIntent.getService(context, CJayConstant.ALARM_SYNC_SERVICE_ID, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 
 		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-
 		alarmManager.cancel(sender);
 		sender.cancel();
-
 	}
 
+	/**
+	 * Check if list intent service is running or not
+	 *
+	 * @param context
+	 * @param intent
+	 * @return
+	 */
+	public static boolean isAlarmUp(Context context, Intent... intent) {
+
+		if (intent != null) {
+			for (Intent i : intent) {
+				if (PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_SERVICE_ID, i, PendingIntent.FLAG_NO_CREATE) == null) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Cancel alarm for given pending intent
+	 *
+	 * @param context
+	 * @param intent
+	 */
+	public static void cancelAlarm(Context context, PendingIntent intent) {
+
+		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+		alarmManager.cancel(intent);
+		intent.cancel();
+
+	}
 
 	/**
 	 * Get app version name
@@ -356,15 +422,15 @@ public class Utils {
 		return in == null || in.equals("") ? " " : in;
 	}
 
-    /**
-     * Replace a null string by an empty string
-     *
-     * @param in
-     * @return
-     */
-    public static String stripNull(String in) {
-        return in == null  ? "" : in;
-    }
+	/**
+	 * Replace a null string by an empty string
+	 *
+	 * @param in
+	 * @return
+	 */
+	public static String stripNull(String in) {
+		return in == null ? "" : in;
+	}
 
 	/**
 	 * Count total image off session

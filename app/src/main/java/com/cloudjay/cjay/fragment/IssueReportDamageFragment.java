@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
@@ -17,6 +16,8 @@ import com.cloudjay.cjay.event.isocode.IsoCodesGotEvent;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.IsoCode;
+import com.cloudjay.cjay.task.command.isocode.GetIsoCodeCommand;
+import com.cloudjay.cjay.task.command.isocode.GetListIsoCodesCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 
@@ -51,12 +52,6 @@ public class IssueReportDamageFragment extends IssueReportFragment {
 	@ViewById(R.id.lv_damage)
 	ListView mDamageListView;
 
-    @ViewById(R.id.tv_code_fullname)
-    TextView mDamageNameTextView;
-
-    @ViewById(R.id.tv_code_label)
-    TextView mCodeLabelTextView;
-
 	@SystemService
 	InputMethodManager inputMethodManager;
 
@@ -70,10 +65,6 @@ public class IssueReportDamageFragment extends IssueReportFragment {
 
 	@AfterViews
 	void afterViews() {
-
-        // Set text code label
-        mCodeLabelTextView.setText(R.string.label_code_damage);
-
 		mDamageEditText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable arg0) {
@@ -96,13 +87,12 @@ public class IssueReportDamageFragment extends IssueReportFragment {
 			public void didClearText() {
 				mDamageCode = "";
 				mDamageName = "";
-                mDamageNameTextView.setText("");
 			}
 		});
 
         // refresh damage list
-        mDataCenter.getListIsoCodes(getActivity().getApplicationContext(),
-                CJayConstant.PREFIX_DAMAGE_CODE);
+        mDataCenter.add(new GetListIsoCodesCommand(getActivity().getApplicationContext(),
+                CJayConstant.PREFIX_DAMAGE_CODE));
 	}
 
     @ItemClick(R.id.lv_damage)
@@ -114,7 +104,6 @@ public class IssueReportDamageFragment extends IssueReportFragment {
         mDamageName = item.getFullName();
         ignoreSearch = true;
         mDamageEditText.setText(mDamageName);
-        mDamageNameTextView.setText(mDamageName);
         ignoreSearch = false;
 
         // hide keyboard
@@ -156,8 +145,6 @@ public class IssueReportDamageFragment extends IssueReportFragment {
 
 	@Override
 	public void showKeyboard() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -188,7 +175,6 @@ public class IssueReportDamageFragment extends IssueReportFragment {
 
             ignoreSearch = true;
             mDamageEditText.setText(mDamageName);
-            mDamageNameTextView.setText(mDamageName);
             ignoreSearch = false;
         }
     }
@@ -216,8 +202,8 @@ public class IssueReportDamageFragment extends IssueReportFragment {
 
             // initialize with issue
             if (mAuditItem != null && mAuditItem.getComponentCode() != null) {
-                mDataCenter.getIsoCode(getActivity().getApplicationContext(),
-                        CJayConstant.PREFIX_DAMAGE_CODE, mAuditItem.getDamageCode());
+                mDataCenter.add(new GetIsoCodeCommand(getActivity().getApplicationContext(),
+                        CJayConstant.PREFIX_DAMAGE_CODE, mAuditItem.getDamageCode()));
             }
         }
     }

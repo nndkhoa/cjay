@@ -4,11 +4,8 @@ import android.content.Context;
 
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter_;
-import com.cloudjay.cjay.event.session.ContainersFetchedEvent;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
-
-import de.greenrobot.event.EventBus;
 
 public class FetchSessionsJob extends Job {
 
@@ -33,10 +30,12 @@ public class FetchSessionsJob extends Job {
 	@Override
 	public void onRun() throws Throwable {
 		Context context = App.getInstance().getApplicationContext();
+
 		DataCenter_.getInstance_(context).fetchSession(context, modifiedDate, true);
+//		DataCenter_.getInstance_(context).add(new FetchSessionsCommand(context, modifiedDate, true));
 
 		// Notify UI that all data was fetched
-		EventBus.getDefault().post(new ContainersFetchedEvent());
+
 	}
 
 	@Override
@@ -46,6 +45,6 @@ public class FetchSessionsJob extends Job {
 
 	@Override
 	protected boolean shouldReRunOnThrowable(Throwable throwable) {
-		return false;
+		return true;
 	}
 }

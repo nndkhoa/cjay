@@ -18,6 +18,8 @@ import com.cloudjay.cjay.adapter.SessionAdapter;
 import com.cloudjay.cjay.event.session.ContainersGotEvent;
 import com.cloudjay.cjay.event.session.WorkingSessionCreatedEvent;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.session.get.GetListSessionsCommand;
+import com.cloudjay.cjay.task.command.session.update.ForceExportCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.enums.Step;
 
@@ -97,7 +99,7 @@ public class WorkingFragment extends Fragment {
 
 	@OptionsItem(R.id.menu_export)
 	void exportMenuItemClicked() {
-		dataCenter.changeLocalStepAndForceExport(getActivity(), selectedId);
+		dataCenter.add(new ForceExportCommand(getActivity(), selectedId));
 	}
 
 	private String selectedId;
@@ -114,7 +116,7 @@ public class WorkingFragment extends Fragment {
 
 	void refresh() {
 		if (mAdapter != null) {
-			dataCenter.getListSessionsInBackground(getActivity().getApplicationContext(), CJayConstant.PREFIX_WORKING);
+			dataCenter.add(new GetListSessionsCommand(getActivity(), CJayConstant.PREFIX_WORKING));
 		}
 	}
 

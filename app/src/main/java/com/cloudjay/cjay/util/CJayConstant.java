@@ -25,8 +25,28 @@ public class CJayConstant {
 	public static final String PREFIX_REPAIR_CODE = "REPAIR";
 	public static final String PREFIX_COMPONENT_CODE = "COMPONENT";
 	public static final String PREFIX_LOG = "LOG";
-	public static final String PREFIX_NOTIFI_LOG = "NOTIFI_LOG";
+	public static final String PREFIX_NOTIFICATION_LOG = "NOTIFICATION_LOG";
     public static final String PREFIX_RAINY_MODE_IMAGE = "RAINY_MODE_IMAGE";
+
+	/**
+	 * Quy định thứ tự của các container khác nhau.
+	 */
+	public static final String PREFIX_CONTAINER_ORDER = "PREFIX_CONTAINER_ORDER:";
+
+	/**
+	 * Quy định thứ tự của các CJayObject cần upload trong CÙNG một container.
+	 */
+	public static final String PREFIX_UPLOAD_OBJECT_ORDER = "PREFIX_UPLOAD_OBJECT_ORDER";
+
+	/**
+	 *
+	 * Upload queue prefix in snappy db.
+	 *
+	 * UPLOAD:<index>:<containerId> --> UploadObject
+	 *
+	 */
+	public static final String PREFIX_UPLOAD_QUEUE = "UPLOAD:";
+
 
 	// `/sdcard/DCMI/CJay/`
 	public static final File APP_DIRECTORY_FILE = new File(
@@ -42,8 +62,11 @@ public class CJayConstant {
 	public static final String LOG_TO_FILE_FORMAT = "[%s]	-	%s\n";
 
 
-	public static final int ALARM_QUEUE_ID = 49482;
-	public static final int ALARM_PUBNUB_ID = 43452;
+	public static final int ALARM_SYNC_SERVICE_ID = 49482;
+	public static final int ALARM_PUBNUB_SERVICE_ID = 43452;
+	public static final int ALARM_UPLOAD_SERVICE_ID = 62368;
+
+
 	public static final int ALARM_INTERVAL = 12 * 3600;
 	public static final int NOTIFICATION_ID = 98234;
 	public static final int PERMANENT_NOTIFICATION_ID = 1639;
@@ -53,8 +76,6 @@ public class CJayConstant {
 	// Pubnub
 	public static final String PUBLISH_KEY = "pub-c-d4a2608d-f440-4ebf-a09a-dd8a570428cd";
 	public static final String SUBSCRIBE_KEY = "sub-c-fe158864-9fcf-11e3-a937-02ee2ddab7fe";
-	public static final String QUEUE_PRIORITY = "QUEUE_PRIORITY:";
-	public static final String SESSION_PRIORITY = "SESSION_PRIORITY";
 
     // Action Intent
     public static final String ACTION_SEND_GATE_IMAGES = "action_send_gate_images";

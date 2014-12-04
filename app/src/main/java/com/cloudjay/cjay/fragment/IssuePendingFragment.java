@@ -12,7 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
@@ -28,13 +27,19 @@ import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.job.UploadImportJob;
+import com.cloudjay.cjay.model.UploadObject;
+import com.cloudjay.cjay.task.command.cjayobject.AddUploadObjectCommand;
+import com.cloudjay.cjay.task.command.issue.GetListAuditItemsCommand;
+import com.cloudjay.cjay.task.command.issue.RemoveAuditItemCommand;
+import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
+import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
+import com.cloudjay.cjay.task.command.session.update.ForceExportCommand;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
-import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -99,7 +104,7 @@ public class IssuePendingFragment extends Fragment {
 
 	@AfterViews
 	void setUp() {
-		dataCenter.getSessionInBackground(getActivity(), containerId);
+		dataCenter.add(new GetSessionCommand(getActivity(), containerId));
 	}
 
 	//region VIEW INTERACTION
@@ -108,13 +113,15 @@ public class IssuePendingFragment extends Fragment {
 	void buttonCleanClicked() {
 
 		//Remove from working
-		dataCenter.removeWorkingSession(getActivity(), containerId);
+		dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerId));
+
 		//Change step to Clean
+		mSession.setUploadStatus(UploadStatus.UPLOADING);
 		mSession.setLocalStep(Step.HAND_CLEAN.value);
 
 		// Add container session to upload queue
-		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadImportJob(mSession));
+		UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
+		dataCenter.add(new AddUploadObjectCommand(getActivity(), object));
 		getActivity().finish();
 	}
 
@@ -146,7 +153,7 @@ public class IssuePendingFragment extends Fragment {
 	 */
 	void refresh() {
 		if (mAdapter != null) {
-			dataCenter.getAuditItemsInBackground(getActivity(), containerId);
+			dataCenter.add(new GetListAuditItemsCommand(getActivity(), containerId));
 		}
 	}
 
@@ -277,8 +284,8 @@ public class IssuePendingFragment extends Fragment {
 
 	@OptionsItem(R.id.menu_export)
 	void exportMenuItemClicked() {
-		dataCenter.changeLocalStepAndForceExport(getActivity(), containerId);
-        getActivity().finish();
+		dataCenter.add(new ForceExportCommand(getActivity(), containerId));
+		getActivity().finish();
 	}
 
 	@UiThread
@@ -306,25 +313,24 @@ public class IssuePendingFragment extends Fragment {
 
 	//region EVENT HANDLER
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        refresh();
-    }
-
-    @UiThread
-	void onEvent(IssueMergedEvent event) {
-
-		// Delete merged audit item containerId
-		String containerId = event.getContainerId();
-		String auditItemRemoveUUID = event.getAuditItemRemoveUUID();
-		dataCenter.removeAuditItem(getActivity().getApplicationContext(),
-				containerId, auditItemRemoveUUID);
+	@Override
+	public void onResume() {
+		super.onResume();
 		refresh();
 	}
 
 	@UiThread
+	void onEvent(IssueMergedEvent event) {
+
+		// Delete merged audit item containerId
+		String containerId = event.getContainerId();
+		String itemUuid = event.getItemUuid();
+		dataCenter.add(new RemoveAuditItemCommand(getActivity(), containerId, itemUuid));
+	}
+
+	@UiThread
 	void onEvent(AuditItemChangedEvent event) {
+        Logger.Log("change event");
 		refresh();
 	}
 
@@ -333,14 +339,14 @@ public class IssuePendingFragment extends Fragment {
 		if (event.uploadType == UploadType.AUDIT_ITEM) {
 
 		}
+
 		mSession = event.getSession();
 		refresh();
-
 	}
 
 	@UiThread
 	void onEvent(UploadStartedEvent event) {
-        mSession = event.getSession();
+		mSession = event.getSession();
 		refresh();
 	}
 

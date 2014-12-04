@@ -16,7 +16,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.Surface;
@@ -27,15 +26,17 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ZoomControls;
 
-import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.event.issue.AuditItemGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
-import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
-import com.cloudjay.cjay.task.job.UploadImageJob;
+import com.cloudjay.cjay.model.UploadObject;
+import com.cloudjay.cjay.task.command.cjayobject.AddUploadObjectCommand;
+import com.cloudjay.cjay.task.command.image.AddGateImageCommand;
+import com.cloudjay.cjay.task.command.image.AddOrUpdateAuditImageCommand;
+import com.cloudjay.cjay.task.command.image.AddRainyImageCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
@@ -43,7 +44,6 @@ import com.cloudjay.cjay.util.StringUtils;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
-import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
@@ -52,15 +52,12 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.SystemService;
-import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
 import java.util.UUID;
-
-import de.greenrobot.event.EventBus;
 
 @EActivity(R.layout.activity_camera)
 public class CameraActivity extends Activity implements AutoFocusCallback {
@@ -72,6 +69,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	// This Extra bundle is use to open Detail Issue Activity only
 	public final static String AUDIT_ITEM_UUID_EXTRA = "com.cloudjay.wizard.auditItemUUID";
 	public final static String IS_OPENED = "com.cloudjay.wizard.isOpened";
+	public final static String OPEN_RAINY_MODE_ACTIVITY = "com.cloudjay.wizard.openRainyModeActivity";
 
 	@Extra(IMAGE_TYPE_EXTRA)
 	int mType;
@@ -91,6 +89,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	@Extra(IS_OPENED)
 	boolean isOpened;
 
+	@Extra(OPEN_RAINY_MODE_ACTIVITY)
+	boolean openRainyModeActivity;
+
 	@ViewById(R.id.btn_camera_done)
 	Button btnDone;
 
@@ -102,6 +103,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@ViewById(R.id.camera_preview)
 	SurfaceView mPreview;
+
+	@ViewById(R.id.camera_zoom_control)
+	ZoomControls zoomControls;
 
 	@ViewById(R.id.btn_use_gate_image)
 	Button btnUseGateImage;
@@ -120,6 +124,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	MediaPlayer mShootMediaPlayer = null;
 	Camera mCamera = null;
+	Camera.Parameters p;
 	String mFlashMode = Camera.Parameters.FLASH_MODE_OFF;
 
 	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
@@ -129,14 +134,19 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	private boolean mCameraConfigured = false;
 	int mCameraMode = Camera.CameraInfo.CAMERA_FACING_BACK;
 
+	int maxZoomLevel;
+	int currentZoomLevel;
+
 	SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
 
 		@Override
 		public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 
 			try {
+
 				Logger.d("onSurfaceChanged");
 
+				configurationZoom();
 				initPreview(width, height);
 				startPreview();
 
@@ -164,13 +174,75 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		}
 	};
 
+	private void configurationZoom() {
+		//Config zoom
+		p = mCamera.getParameters();
+		if (p.isZoomSupported() && p.isSmoothZoomSupported()) {
+			//most phones
+			maxZoomLevel = p.getMaxZoom();
+			final int changeValue = (maxZoomLevel / 5);
+			zoomControls.setIsZoomInEnabled(true);
+			zoomControls.setIsZoomOutEnabled(true);
+
+			zoomControls.setOnZoomInClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					if (currentZoomLevel < maxZoomLevel) {
+						currentZoomLevel = currentZoomLevel + changeValue;
+						mCamera.startSmoothZoom(currentZoomLevel);
+
+					}
+				}
+			});
+
+			zoomControls.setOnZoomOutClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					if (currentZoomLevel > 0) {
+						currentZoomLevel = currentZoomLevel - changeValue;
+						mCamera.startSmoothZoom(currentZoomLevel);
+					}
+				}
+			});
+		} else if (p.isZoomSupported() && !p.isSmoothZoomSupported()) {
+			//stupid HTC phones
+			maxZoomLevel = p.getMaxZoom();
+			final int changeValue = (maxZoomLevel / 5);
+			zoomControls.setIsZoomInEnabled(true);
+			zoomControls.setIsZoomOutEnabled(true);
+
+			zoomControls.setOnZoomInClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					if (currentZoomLevel < maxZoomLevel) {
+						currentZoomLevel = currentZoomLevel + changeValue;
+						p.setZoom(currentZoomLevel);
+						mCamera.setParameters(p);
+
+					}
+				}
+			});
+
+			zoomControls.setOnZoomOutClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					if (currentZoomLevel > 0) {
+						currentZoomLevel = currentZoomLevel -changeValue;
+						p.setZoom(currentZoomLevel);
+						mCamera.setParameters(p);
+					}
+				}
+			});
+		} else {
+			//no zoom on phone
+			zoomControls.setVisibility(View.GONE);
+		}
+
+		mCamera.setParameters(p);
+	}
+
 	Camera.PictureCallback photoCallback = new Camera.PictureCallback() {
 
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
 
 			showProgressSavingImage(true);
-
 			try {
 
 				savePhoto(data);
@@ -222,11 +294,10 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 	@Click({R.id.btn_camera_done, R.id.rl_camera_done})
 	void doneButtonClicked() {
-		if (rainyMode) {
+		if (rainyMode && openRainyModeActivity) {
 			if (currentStep == Step.IMPORT.value) {
 				// Open ReuseActivity
-				Intent intent = new Intent(getApplicationContext(), ReuseActivity_.class);
-				intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, "");
+				Intent intent = new Intent(getApplicationContext(), RainyModeActivity_.class);
 				startActivityForResult(intent, 1);
 			}
 		}
@@ -268,7 +339,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		// loadData();
 
 		Logger.d("----> initCamera(), addSurfaceCallback");
-
 		// WARNING: this block should be run before onResume()
 		// Setup Surface Holder
 		mPreviewHolder = mPreview.getHolder();
@@ -311,7 +381,9 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 		if (mCamera != null && mPreviewHolder.getSurface() != null) {
 			try {
+				configurationZoom();
 				Logger.d("setPreviewDisplay");
+
 				mCamera.setPreviewDisplay(mPreviewHolder);
 				// camera.setPreviewCallback(null);
 				// camera.setOneShotPreviewCallback(null);
@@ -323,7 +395,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			if (!mCameraConfigured) {
 
-				Logger.d("configure Camera");
+				Logger.d("config Camera");
 
 				Camera.Parameters parameters = mCamera.getParameters();
 				Camera.Size size = determineBestPreviewSize(parameters);
@@ -479,7 +551,8 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	void saveBitmapToFile(Bitmap bitmap, File filename) {
 
 		Logger.d("===== On SaveBitmap =====");
-		Logger.d("Width/Height: " + Integer.toString(bitmap.getWidth()) + "/" + Integer.toString(bitmap.getHeight()));
+		Logger.d("Width/Height: " + Integer.toString(bitmap.getWidth()) + "/" +
+				Integer.toString(bitmap.getHeight()));
 
 		try {
 
@@ -579,7 +652,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 					mtx.postRotate(180);
 
 					// Flip Bitmap
-					Logger.d("Flip image");
+					Logger.Log("Flip image");
 					Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data != null ? data.length : 0);
 					bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), mtx, true);
 					return bm;
@@ -625,7 +698,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 				} else {
 
-					Logger.w("No auto focus mode supported, now just take picture");
+					Logger.Log("No auto focus mode supported, now just take picture");
 					mCamera.takePicture(shutterCallback, null, photoCallback);
 
 				}
@@ -676,7 +749,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			mFlashMode = params.getFlashMode();
 
 		} else {
-			Logger.e("Camera does not open");
+			Logger.Log("Camera does not open");
 		}
 	}
 
@@ -705,7 +778,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 					break;
 			}
 
-			Logger.d("Rotate degree: " + degrees);
+			Logger.Log("Rotate degree: " + degrees);
 
 			int result;
 			if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
@@ -734,9 +807,10 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		ImageType type = ImageType.values()[mType];
 		switch (type) {
 			case IMPORT:
-				if (rainyMode) {
+				if (rainyMode && openRainyModeActivity) {
 					uri = "file://" + uri;
-					dataCenter.saveRainyImage(getApplicationContext(), uuid, uri);
+					dataCenter.add(new AddRainyImageCommand(getApplicationContext(),
+							uuid, uri));
 					return;
 				}
 			case EXPORT:
@@ -747,7 +821,12 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 						.withUrl("file://" + uri)
 						.withUuid(uuid);
 
-				dataCenter.addGateImage(getApplicationContext(), gateImage, containerId);
+				dataCenter.add(new AddGateImageCommand(getApplicationContext(), gateImage, containerId));
+
+				// Add image to job queue
+				UploadObject object = new UploadObject(gateImage, GateImage.class, containerId);
+				dataCenter.add(new AddUploadObjectCommand(getApplicationContext(), object));
+
 				break;
 
 			case AUDIT:
@@ -762,14 +841,12 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 						.withName(imageName)
 						.withUUID(uuid);
 
-				dataCenter.getAuditItemInBackground(getApplicationContext(), containerId, auditItemUUID);
-
+				dataCenter.add(new AddOrUpdateAuditImageCommand(getApplicationContext(), auditImage, containerId, auditItemUUID));
+				// Add image to job queue
+				UploadObject objectAudit = new UploadObject(auditImage, AuditImage.class, containerId);
+				dataCenter.add(new AddUploadObjectCommand(getApplicationContext(), objectAudit));
 				break;
 		}
-
-		// Add image to job queue
-		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new UploadImageJob(uri, imageName, containerId, type));
 	}
 
 	/**
@@ -788,8 +865,19 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		// get depot code
 		String depotCode = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_USER_DEPOT);
 
-		if (!rainyMode) {
+		if (rainyMode && openRainyModeActivity) {
 
+			// create directory to save images
+			newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/rainy_mode");
+
+			if (!newDirectory.exists()) {
+				newDirectory.mkdirs();
+			}
+
+			// create image file name
+			fileName = depotCode + "-" + today + "-" + "imageType" + "-" + "containerId" + "-"
+					+ uuid + ".jpg";
+		} else {
 			// Save Bitmap to Files
 			String imageType = getImageTypeString(mType);
 
@@ -803,18 +891,6 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 
 			// create image file name
 			fileName = depotCode + "-" + today + "-" + imageType + "-" + containerId + "-"
-					+ uuid + ".jpg";
-		} else {
-
-			// create directory to save images
-			newDirectory = new File(CJayConstant.APP_DIRECTORY_FILE, depotCode + "/rainy_mode");
-
-			if (!newDirectory.exists()) {
-				newDirectory.mkdirs();
-			}
-
-			// create image file name
-			fileName = depotCode + "-" + today + "-" + "imageType" + "-" + "containerId" + "-"
 					+ uuid + ".jpg";
 		}
 
@@ -852,38 +928,5 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 			default:
 				return "repair";
 		}
-	}
-
-	@UiThread
-	public void onEvent(AuditItemGotEvent event) {
-
-		AuditItem auditItem = event.getAuditItem();
-
-		// Create temporary audit item
-		if (null == auditItem) {
-			Logger.Log("Create new Audit Item: " + auditImage.getType());
-			dataCenter.addAuditImage(getApplicationContext(), auditImage, containerId);
-
-		} else {
-
-			auditItem.getAuditImages().add(auditImage);
-			if (mType == ImageType.REPAIRED.value) {
-				auditItem.setRepaired(true);
-			}
-
-			dataCenter.updateAuditItemInBackground(getApplicationContext(), containerId, auditItem);
-		}
-	}
-
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		EventBus.getDefault().register(this);
-	}
-
-	@Override
-	protected void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
 	}
 }

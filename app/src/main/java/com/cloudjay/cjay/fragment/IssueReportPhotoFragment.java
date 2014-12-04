@@ -5,7 +5,6 @@ import android.widget.ImageView;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
-import com.cloudjay.cjay.util.Logger;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.androidannotations.annotations.AfterViews;

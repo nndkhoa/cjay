@@ -15,7 +15,7 @@ import javax.annotation.Generated;
 
 /* Gồm hình giám định và sửa chữa */
 @Generated("org.jsonschema2pojo")
-public class AuditImage implements Serializable{
+public class AuditImage implements Serializable {
 
 	@Expose
 	private long id;
@@ -103,6 +103,10 @@ public class AuditImage implements Serializable{
 		this.url = url;
 	}
 
+	public String getUri() {
+		return Utils.parseUrltoUri(this.getUrl());
+	}
+
 	public AuditImage withUrl(String url) {
 		this.url = url;
 		return this;
@@ -155,10 +159,9 @@ public class AuditImage implements Serializable{
 
 			if (!TextUtils.isEmpty(name) && tmp.getUrl().contains(name)) {
 				id = tmp.getId();
-
 				return true;
 			} else if (!TextUtils.isEmpty(tmp.getName()) && url.contains(tmp.getName())) {
-
+                name = tmp.getName();
 				return true;
 			}
 			return false;

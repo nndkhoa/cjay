@@ -20,7 +20,7 @@ apply plugin: 'crashlytics'
 // Manifest version information!
 def versionMajor = 2
 def versionMinor = 0
-def versionPatch = 2
+def versionPatch = 4
 def versionBuild = 0
 def versionTag = '-alpha' // bump for dogfood builds, public betas, etc.
 
@@ -139,6 +139,7 @@ dependencies {
     compile 'org.droidparts:droidparts:2.6.2'
 
     compile 'com.github.rampo.updatechecker:library:2.1.4'
+    compile 'com.squareup:tape:1.2.3'
 
     compile project(":jobqueue")
 }

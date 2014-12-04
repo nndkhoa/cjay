@@ -11,21 +11,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.aerilys.helpers.android.NetworkHelper;
-import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.model.AuditImage;
-import com.cloudjay.cjay.model.AuditItem;
-import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.job.UploadAuditItemJob;
-import com.cloudjay.cjay.task.job.UploadImageJob;
-import com.cloudjay.cjay.task.job.UploadImportJob;
 import com.cloudjay.cjay.util.Utils;
-import com.cloudjay.cjay.util.enums.ImageType;
-import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.path.android.jobqueue.JobManager;
 
 import java.util.List;
 
@@ -75,7 +65,9 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 		}
 
 		//Set data to view
-		ImageLoader.getInstance().displayImage(session.getGateImages().get(0).getUrl(), viewHolder.ivContainer);
+		if (session.getGateImages().get(0).getUrl() != null) {
+			ImageLoader.getInstance().displayImage(session.getGateImages().get(0).getUrl(), viewHolder.ivContainer);
+		}
 		viewHolder.tvContainerId.setText(session.getContainerId());
 		viewHolder.tvTotalPhotoUpload.setText(String.valueOf(Utils.countTotalImage(session)));
 		viewHolder.tvCurrentPhotoUpload.setText(String.valueOf(Utils.countUploadedImage(session)));
@@ -118,7 +110,9 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 						viewHolder.btnUploadStatus.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View view) {
-								uploadCurrentStep(session);
+
+								// TODO: #tieubao command this line, need to double check this method
+								// uploadCurrentStep(session);
 							}
 						});
 					}
@@ -129,67 +123,73 @@ public class UploadSessionAdapter extends ArrayAdapter<Session> {
 		return convertView;
 	}
 
-	private void uploadCurrentStep(Session session) {
-		JobManager jobManager = App.getJobManager();
-		Step step = Step.values()[session.getLocalStep()];
 
-		//Retry upload base on step
-		switch (step) {
-
-			//In step import check all image, upload all error image then upload session
-			case IMPORT:
-				for (GateImage image : session.getGateImages()) {
-					if (image.getType() == ImageType.IMPORT.value && image.getUploadStatus() != UploadStatus.ERROR.value) {
-						jobManager.addJobInBackground(new UploadImageJob(image.getUrl(), image.getName(), session.getContainerId(), ImageType.IMPORT));
-					}
-					;
-				}
-
-				jobManager.addJobInBackground(new UploadImportJob(session));
-
-				// In step audit check all image of item, upload all error image then upload error audit item => complete audit
-			case AUDIT:
-
-				for (AuditItem item : session.getAuditItems()) {
-					if (item.getUploadStatus() == UploadStatus.ERROR.value) {
-						for (AuditImage auditImage : item.getAuditImages()) {
-							if (auditImage.getUploadStatus() != UploadStatus.ERROR.value && auditImage.getType() == ImageType.AUDIT.value) {
-								jobManager.addJobInBackground(new UploadImageJob(auditImage.getUrl(), auditImage.getName(), session.getContainerId(), ImageType.AUDIT));
-							}
-						}
-					}
-					jobManager.addJobInBackground(new UploadAuditItemJob(session.getId(), item,session.getContainerId(),
-                            false));
-				}
-
-				jobManager.addJobInBackground(new UploadImportJob(session));
-
-				// In step repaired check all image of item, upload all error image then upload error repaired item => complete repair
-			case REPAIR:
-				for (AuditItem item : session.getAuditItems()) {
-					if (item.getUploadStatus() == UploadStatus.ERROR.value) {
-						for (AuditImage auditImage : item.getAuditImages()) {
-							if (auditImage.getUploadStatus() != UploadStatus.ERROR.value && auditImage.getType() == ImageType.REPAIRED.value) {
-								jobManager.addJobInBackground(new UploadImageJob(auditImage.getUrl(), auditImage.getName(), session.getContainerId(), ImageType.REPAIRED));
-							}
-						}
-					}
-					jobManager.addJobInBackground(new UploadImportJob(session));
-				}
-				jobManager.addJobInBackground(new UploadImportJob(session));
-
-				//In step export check all image, upload all error image then upload session
-			case EXPORTED:
-				for (GateImage image : session.getGateImages()) {
-					if (image.getType() == ImageType.EXPORT.value && image.getUploadStatus() != UploadStatus.ERROR.value) {
-						jobManager.addJobInBackground(new UploadImageJob(image.getUrl(), image.getName(), session.getContainerId(), ImageType.EXPORT));
-					}
-					;
-				}
-				jobManager.addJobInBackground(new UploadImportJob(session));
-		}
-	}
-
+//	private void uploadCurrentStep(Session session) {
+//		JobManager jobManager = App.getJobManager();
+//		Step step = Step.values()[session.getLocalStep()];
+//
+//		//Retry upload base on step
+//		switch (step) {
+//
+//			//In step import check all image, upload all error image then upload session
+//			case IMPORT:
+//				for (GateImage image : session.getGateImages()) {
+//					if (image.getType() == ImageType.IMPORT.value && image.getUploadStatus() != UploadStatus.ERROR.value) {
+//						jobManager.addJobInBackground(new UploadImageJob(image.getUrl(), image.getName(), session.getContainerId(), ImageType.IMPORT));
+//					}
+//					;
+//				}
+//
+//				jobManager.addJobInBackground(new UploadSessionJob(session));
+//				break;
+//
+//			// In step audit check all image of item, upload all error image then upload error audit item => complete audit
+//			case AUDIT:
+//
+//				for (AuditItem item : session.getAuditItems()) {
+//					if (item.getUploadStatus() == UploadStatus.ERROR.value) {
+//						for (AuditImage auditImage : item.getAuditImages()) {
+//							if (auditImage.getUploadStatus() != UploadStatus.ERROR.value && auditImage.getType() == ImageType.AUDIT.value) {
+//								jobManager.addJobInBackground(new UploadImageJob(auditImage.getUrl(), auditImage.getName(), session.getContainerId(), ImageType.AUDIT));
+//							}
+//						}
+//					}
+//					jobManager.addJobInBackground(new UploadAuditItemJob(session.getId(), item, session.getContainerId(),
+//							false));
+//				}
+//
+//				jobManager.addJobInBackground(new UploadSessionJob(session));
+//				break;
+//
+//			// In step repaired check all image of item, upload all error image then upload error repaired item => complete repair
+//			case REPAIR:
+//				for (AuditItem item : session.getAuditItems()) {
+//					if (item.getUploadStatus() == UploadStatus.ERROR.value) {
+//						for (AuditImage auditImage : item.getAuditImages()) {
+//							if (auditImage.getUploadStatus() != UploadStatus.ERROR.value && auditImage.getType() == ImageType.REPAIRED.value) {
+//								jobManager.addJobInBackground(new UploadImageJob(auditImage.getUrl(), auditImage.getName(), session.getContainerId(), ImageType.REPAIRED));
+//							}
+//						}
+//					}
+//					jobManager.addJobInBackground(new UploadSessionJob(session));
+//				}
+//				jobManager.addJobInBackground(new UploadSessionJob(session));
+//				break;
+//
+//			case EXPORTED:
+//			default:
+//				//In step export check all image, upload all error image then upload session
+//
+//				for (GateImage image : session.getGateImages()) {
+//					if (image.getType() == ImageType.EXPORT.value && image.getUploadStatus() != UploadStatus.ERROR.value) {
+//						jobManager.addJobInBackground(new UploadImageJob(image.getUrl(), image.getName(), session.getContainerId(), ImageType.EXPORT));
+//					}
+//					;
+//				}
+//				jobManager.addJobInBackground(new UploadSessionJob(session));
+//				break;
+//		}
+//	}
 	public void setData(List<Session> data) {
 		clear();
 		if (data != null) {

@@ -6,6 +6,15 @@ import java.util.List;
 
 public class ContainersGotEvent {
 
+	private List<Session> sessions;
+	private String prefix;
+
+
+	public ContainersGotEvent(List<Session> list, String prefix) {
+		this.sessions = list;
+		this.prefix = prefix;
+	}
+
 	public Session getTarget() {
 		if (isSingleChange())
 			return sessions.get(0);
@@ -17,22 +26,12 @@ public class ContainersGotEvent {
 		return sessions.size() == 1;
 	}
 
-
-	private List<Session> sessions;
-
 	public String getPrefix() {
 		return prefix;
 	}
 
-	private String prefix;
-
 	public List<Session> getTargets() {
 		return sessions;
-	}
-
-	public ContainersGotEvent(List<Session> list, String prefix) {
-		this.sessions = list;
-		this.prefix = prefix;
 	}
 
 }

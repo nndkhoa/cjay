@@ -8,12 +8,12 @@ public class AuditItemsGotEvent {
 
 	private List<AuditItem> auditItems;
 
-	public List<AuditItem> getAuditItems() {
-		return auditItems;
-	}
-
 	public AuditItemsGotEvent(List<AuditItem> list) {
 		this.auditItems = list;
+	}
+
+	public List<AuditItem> getAuditItems() {
+		return auditItems;
 	}
 
 }

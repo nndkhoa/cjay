@@ -214,9 +214,7 @@ public class JobConsumerExecutor {
 								 * Job không còn giá trị sử dụng ở thời gian điểm hiện tại, cần kiểm tra
 								 * xem có cần add vào sau hay không?
 								 */
-
 								JqLog.d("RunCount: " + nextJob.getRunCount());
-
 								if (nextJob.getRunCount() <= nextJob.getBaseJob().getRetryLimit()) {
 
 									JqLog.d("--> Ready to remove job #" + nextJob.getId() + " / Group: " + nextJob.getGroupId());
@@ -224,6 +222,7 @@ public class JobConsumerExecutor {
 
 								} else {
 
+									// TODO: #tieubao
 									JqLog.i("--> Re-add group " + nextJob.getGroupId());
 									contract.reAddGroup(nextJob);
 								}

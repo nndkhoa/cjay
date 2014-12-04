@@ -7,7 +7,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
@@ -16,12 +15,11 @@ import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.job.UploadAuditItemJob;
+import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
-import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -87,6 +85,7 @@ public class BeforeRepairFragment extends Fragment {
 	Session mSession;
 
     boolean hasImageToUpload = false;
+    boolean updateData = true;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -96,11 +95,6 @@ public class BeforeRepairFragment extends Fragment {
 
 	@AfterViews
     void setUp() {
-//        if (null == mSession) {
-//            dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
-//                    containerID);
-//        }
-
         if (null == imageAdapter) {
             imageAdapter = new DetailIssuedImageAdapter(
                     getActivity(), R.layout.item_gridview_photo_multi_select, ImageType.AUDIT);
@@ -117,11 +111,13 @@ public class BeforeRepairFragment extends Fragment {
         cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.AUDIT.value);
         cameraActivityIntent.putExtra(CameraActivity_.AUDIT_ITEM_UUID_EXTRA, auditItemUUID);
         startActivity(cameraActivityIntent);
+
+        // Set update data = true to refresh data after taken picture
+        updateData = true;
     }
 
     @UiThread
     void onEvent(ContainerGotEvent event) {
-        Logger.Log("ContainerGotEvent");
         mSession = event.getSession();
         if (null == mSession) {
             Utils.showCrouton(getActivity(), "Không tìm thấy container trong dữ liệu");
@@ -129,18 +125,17 @@ public class BeforeRepairFragment extends Fragment {
             operatorCode = mSession.getOperatorCode();
             refreshData();
             refreshListImage();
-            if (hasImageToUpload) {
-                addImageToJobqueue();
-                hasImageToUpload =  false;
-            }
         }
     }
+
 
     @Override
     public void onResume() {
         super.onResume();
-        dataCenter.getSessionInBackground(getActivity().getApplicationContext(),
-                    containerID);
+        if (updateData) {
+            updateData = false;
+            dataCenter.add(new GetSessionCommand(getActivity(), containerID));
+        }
     }
 
     void refreshListImage() {
@@ -153,6 +148,7 @@ public class BeforeRepairFragment extends Fragment {
     void refreshData() {
         if (mSession != null) {
             AuditItem auditItem = mSession.getAuditItem(auditItemUUID);
+            Logger.Log("is audited: " + auditItem.isAudited());
             if (auditItem.getId() != 0) {
                 for (AuditImage image : auditItem.getListAuditedImages()) {
                     if (image.getId() == 0) {
@@ -187,11 +183,6 @@ public class BeforeRepairFragment extends Fragment {
         imageAdapter.notifyDataSetChanged();
     }
 
-    void addImageToJobqueue() {
-        JobManager jobManager = App.getJobManager();
-        jobManager.addJobInBackground(new UploadAuditItemJob(mSession.getId(),
-                mSession.getAuditItem(auditItemUUID), containerID, true));
-    }
 
 	@Override
 	public void onDestroy() {

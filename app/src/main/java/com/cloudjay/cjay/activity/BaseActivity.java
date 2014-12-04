@@ -12,17 +12,20 @@ import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.UserLoggedOutEvent;
+import com.cloudjay.cjay.event.pubnub.PubnubSubscriptionChangedEvent;
 import com.cloudjay.cjay.event.session.ContainersFetchedEvent;
+import com.cloudjay.cjay.task.job.FetchSessionsJob;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
-import com.snappydb.DB;
-import com.snappydb.SnappydbException;
+import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.OptionsMenuItem;
+import org.androidannotations.annotations.Trace;
 import org.androidannotations.annotations.UiThread;
 
 import de.greenrobot.event.EventBus;
@@ -38,6 +41,9 @@ public class BaseActivity extends FragmentActivity {
 	public DataCenter getDataCenter() {
 		return dataCenter;
 	}
+
+    @OptionsMenuItem(R.id.menu_subcribe_pubnub)
+    MenuItem menuPubnubStatus;
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
@@ -78,6 +84,34 @@ public class BaseActivity extends FragmentActivity {
         startActivity(intent);
     }
 
+	@OptionsItem(R.id.menu_subcribe_pubnub)
+	void subscribePubnubItemClicked() {
+        boolean connected = Utils.canReachInternet();
+        boolean alarmUp = Utils.isAlarmUp(this);
+        if (connected && !alarmUp) {
+            Utils.startAlarm(this);
+        } else if (!connected) {
+            Utils.showCrouton(this, getResources().getString(R.string.error_try_again), Style.ALERT);
+        } else if (alarmUp) {
+            Utils.showCrouton(this, getResources().getString(R.string.info_notification_is_working), Style.INFO);
+        }
+	}
+
+	@OptionsItem(R.id.menu_refresh)
+	void refreshItemClicked() {
+
+		// 1. clear preferences
+		PreferencesUtil.removePrefsValue(getApplicationContext(), PreferencesUtil.PREF_MODIFIED_PAGE);
+		PreferencesUtil.removePrefsValue(getApplicationContext(), PreferencesUtil.PREF_MODIFIED_DATE);
+		PreferencesUtil.removePrefsValue(getApplicationContext(), PreferencesUtil.PREF_FIRST_PAGE_MODIFIED_DATE);
+
+		// 2. fetch page sessions again
+		String lastModifiedDate = PreferencesUtil.getPrefsValue(this, PreferencesUtil.PREF_MODIFIED_DATE);
+		if (lastModifiedDate.isEmpty()) {
+			JobManager jobManager = App.getJobManager();
+			jobManager.addJobInBackground(new FetchSessionsJob(lastModifiedDate));
+		}
+	}
 	protected void showLogoutPrompt() {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -86,22 +120,14 @@ public class BaseActivity extends FragmentActivity {
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				try {
 
-					dialog.dismiss();
+				dialog.dismiss();
+				Utils.logOut(getApplicationContext());
 
-					// Clear preference and Database
-					PreferencesUtil.clearPrefs(getApplicationContext());
-					getApplicationContext().deleteDatabase("db_default_job_manager.db");
-					DB db = App.getDB(getApplicationContext());
-					db.destroy();
-
-					// Open Login Activity
-					startActivity(new Intent(getApplicationContext(), LoginActivity_.class));
-					EventBus.getDefault().post(new UserLoggedOutEvent());
-				} catch (SnappydbException e) {
-					e.printStackTrace();
-				}
+				// Open Login Activity
+				Intent loginIntent =new Intent(getApplicationContext(), LoginActivity_.class);
+				startActivity(loginIntent);
+				EventBus.getDefault().post(new UserLoggedOutEvent());
 			}
 		});
 
@@ -130,22 +156,18 @@ public class BaseActivity extends FragmentActivity {
 		finish();
 	}
 
-//	@Override
-//	public boolean onMenuOpened(int featureId, Menu menu) {
-//		if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
-//			if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
-//				try {
-//					Method m = menu.getClass().getDeclaredMethod(
-//							"setOptionalIconsVisible", Boolean.TYPE);
-//					m.setAccessible(true);
-//					m.invoke(menu, true);
-//				} catch (NoSuchMethodException e) {
-//					Logger.Log(e.getMessage());
-//				} catch (Exception e) {
-//					throw new RuntimeException(e);
-//				}
-//			}
-//		}
-//		return super.onMenuOpened(featureId, menu);
-//	}
+    @UiThread
+    public void onEvent(PubnubSubscriptionChangedEvent event) {
+	    try {
+		    boolean isSubscribed = event.isSubscribed();
+		    if (!isSubscribed) {
+			    menuPubnubStatus.setIcon(getResources().getDrawable(R.drawable.ic_red));
+		    } else {
+			    menuPubnubStatus.setIcon(getResources().getDrawable(R.drawable.ic_green));
+		    }
+	    } catch (Exception e) {
+		    e.printStackTrace();
+	    }
+
+    }
 }

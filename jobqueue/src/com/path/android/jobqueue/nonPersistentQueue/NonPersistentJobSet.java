@@ -1,6 +1,5 @@
 package com.path.android.jobqueue.nonPersistentQueue;
 
-import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.JobHolder;
 import com.path.android.jobqueue.log.JqLog;
 

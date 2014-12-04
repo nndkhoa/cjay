@@ -2,6 +2,7 @@ package com.path.android.jobqueue.config;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
+
 import com.path.android.jobqueue.JobManager;
 import com.path.android.jobqueue.JobQueue;
 import com.path.android.jobqueue.QueueFactory;

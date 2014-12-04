@@ -15,7 +15,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.event.isocode.IsoCodesGotToUpdateEvent;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
 import com.cloudjay.cjay.fragment.IssueReportComponentFragment_;
 import com.cloudjay.cjay.fragment.IssueReportDamageFragment_;
@@ -27,8 +26,9 @@ import com.cloudjay.cjay.fragment.IssueReportRepairFragment_;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
-import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
+import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
@@ -97,7 +97,7 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
     @AfterViews
     void afterViews() {
-        dataCenter.getSessionInBackground(this, mContainerId);
+	    dataCenter.add(new GetSessionCommand(this, mContainerId));
     }
 
     @UiThread
@@ -119,28 +119,6 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
         // go to the 2nd tab
         getActionBar().selectTab(getActionBar().getTabAt(TAB_ISSUE_COMPONENT));
-    }
-
-    @UiThread
-    void onEvent(IsoCodesGotToUpdateEvent event) {
-        IsoCode componentCode = event.getComponentCode();
-        IsoCode damageCode = event.getDamageCode();
-        IsoCode repairCode = event.getRepairCode();
-
-        if (componentCode != null && damageCode != null && repairCode != null) {
-            mAuditItem.setComponentCodeId(componentCode.getId());
-            mAuditItem.setComponentCode(componentCode.getCode());
-
-            mAuditItem.setDamageCodeId(damageCode.getId());
-            mAuditItem.setDamageCode(damageCode.getCode());
-
-            mAuditItem.setRepairCodeId(repairCode.getId());
-            mAuditItem.setRepairCode(repairCode.getCode());
-
-            Logger.Log("update");
-            // save db records and refresh list
-            dataCenter.updateAuditItemInBackground(getApplicationContext(), mContainerId, mAuditItem);
-        }
     }
 
     @OptionsItem(R.id.menu_check)
@@ -167,8 +145,8 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
         Logger.Log("set null for allowed");
         mAuditItem.setAllowed(null);
 
-        dataCenter.getIsoCodesToUpdate(getApplicationContext(), codeComponent, codeDamage, codeRepair);
-
+        dataCenter.add(new UpdateAuditItemCommand(getApplicationContext(), mContainerId, mAuditItem,
+		        codeComponent, codeDamage, codeRepair));
         // go back
         onBackPressed();
     }
@@ -204,6 +182,7 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
             tab.setTabListener(this);
             getActionBar().addTab(tab);
         }
+
     }
 
     private void configureViewPager() {

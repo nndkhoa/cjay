@@ -21,9 +21,9 @@ import org.androidannotations.annotations.EActivity;
 @EActivity
 public class SettingActivity extends PreferenceActivity {
 
-    static String PREF_KEY_AUTO_CHECK_UPDATE;
-    static String PREF_KEY_RAINY_MODE;
-    static String PREF_KEY_ENABLE_LOGGER;
+    public static String PREF_KEY_AUTO_CHECK_UPDATE;
+    public static String PREF_KEY_RAINY_MODE;
+    public static String PREF_KEY_ENABLE_LOGGER;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +52,7 @@ public class SettingActivity extends PreferenceActivity {
             public boolean onPreferenceClick(Preference preference) {
 	            // Open Wizard Activity
 	            Intent intent = new Intent(App.getInstance().getApplicationContext(), LogActivity_.class);
-	            intent.putExtra(LogActivity.LOG_TYPE_EXTRA, CJayConstant.PREFIX_NOTIFI_LOG);
+	            intent.putExtra(LogActivity.LOG_TYPE_EXTRA, CJayConstant.PREFIX_NOTIFICATION_LOG);
 	            startActivity(intent);
                 return false;
             }

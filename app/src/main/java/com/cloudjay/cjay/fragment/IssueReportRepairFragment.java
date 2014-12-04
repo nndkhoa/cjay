@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
@@ -17,6 +16,8 @@ import com.cloudjay.cjay.event.isocode.IsoCodesGotEvent;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.IsoCode;
+import com.cloudjay.cjay.task.command.isocode.GetIsoCodeCommand;
+import com.cloudjay.cjay.task.command.isocode.GetListIsoCodesCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 
@@ -50,12 +51,6 @@ public class IssueReportRepairFragment extends IssueReportFragment {
 	@ViewById(R.id.lv_repair)
 	ListView mRepairListView;
 
-    @ViewById(R.id.tv_code_fullname)
-    TextView mRepairNameTextView;
-
-    @ViewById(R.id.tv_code_label)
-    TextView mCodeLabelTextView;
-
 	@SystemService
 	InputMethodManager inputMethodManager;
 
@@ -69,9 +64,6 @@ public class IssueReportRepairFragment extends IssueReportFragment {
 
 	@AfterViews
 	void afterViews() {
-
-        // Set text code label
-        mCodeLabelTextView.setText(R.string.label_code_repair);
 
 		mRepairEditText.addTextChangedListener(new TextWatcher() {
 			@Override
@@ -93,13 +85,12 @@ public class IssueReportRepairFragment extends IssueReportFragment {
 			public void didClearText() {
 				mRepairCode = "";
 				mRepairName = "";
-                mRepairNameTextView.setText("");
 			}
 		});
 
         // refresh repair list
-        mDataCenter.getListIsoCodes(getActivity().getApplicationContext(),
-                CJayConstant.PREFIX_REPAIR_CODE);
+        mDataCenter.add(new GetListIsoCodesCommand(getActivity().getApplicationContext(),
+                CJayConstant.PREFIX_REPAIR_CODE));
 	}
 
 	@Override
@@ -127,7 +118,6 @@ public class IssueReportRepairFragment extends IssueReportFragment {
         mRepairName = item.getFullName();
         ignoreSearch = true;
         mRepairEditText.setText(mRepairName);
-        mRepairNameTextView.setText(mRepairName);
         ignoreSearch = false;
 
         // hide keyboard
@@ -184,7 +174,6 @@ public class IssueReportRepairFragment extends IssueReportFragment {
 
             ignoreSearch = true;
             mRepairEditText.setText(mRepairName);
-            mRepairNameTextView.setText(mRepairName);
             ignoreSearch = false;
         }
     }
@@ -211,8 +200,8 @@ public class IssueReportRepairFragment extends IssueReportFragment {
 
             // initialize with issue
             if (mAuditItem != null && mAuditItem.getComponentCode() != null) {
-                mDataCenter.getIsoCode(getActivity().getApplicationContext(),
-                        CJayConstant.PREFIX_REPAIR_CODE, mAuditItem.getRepairCode());
+                mDataCenter.add(new GetIsoCodeCommand(getActivity().getApplicationContext(),
+                        CJayConstant.PREFIX_REPAIR_CODE, mAuditItem.getRepairCode()));
             }
         }
     }

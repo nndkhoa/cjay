@@ -80,8 +80,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_alignParentBottom="true"
-		android:orientation="horizontal"
-		android:visibility="gone">
+		android:orientation="horizontal">
 
 		<Button
 			android:id="@+id/btn_done"
@@ -92,33 +91,4 @@
 			android:textColor="@android:color/white"/>
 
 	</LinearLayout>
-	<LinearLayout
-		android:id="@+id/ll_bottom_rainy_mode"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_alignParentBottom="true"
-		android:orientation="horizontal"
-		android:weightSum="2">
-		<Button
-			android:id="@+id/btn_input_rainy_mode"
-			android:layout_width="0dp"
-			android:layout_weight="1"
-			android:layout_height="match_parent"
-			android:background="@drawable/btn_green_selector"
-			android:text="Nhập thông tin"
-			android:textSize="13sp"
-			android:textColor="@android:color/white"/>
-
-		<Button
-			android:id="@+id/btn_done_rainy_mode"
-			android:layout_width="0dp"
-			android:layout_weight="1"
-			android:layout_height="match_parent"
-			android:background="@color/background_cjay"
-			android:textSize="13sp"
-			android:text="Hoàn tất nhập Container"
-			android:textColor="@android:color/white"/>
-
-	</LinearLayout>
-
 </RelativeLayout>

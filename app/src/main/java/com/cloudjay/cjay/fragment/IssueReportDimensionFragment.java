@@ -13,7 +13,6 @@ import android.widget.TextView;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.AuditItem;
-import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
@@ -67,7 +66,12 @@ public class IssueReportDimensionFragment extends IssueReportFragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                mLengthTextView.setText(editable.toString());
+                if (mLengthEditText.length() == 0) {
+                    mLengthEditText.setText("0");
+                    mLengthTextView.setText("0");
+                } else {
+                    mLengthTextView.setText(editable.toString());
+                }
             }
         });
 
@@ -82,7 +86,12 @@ public class IssueReportDimensionFragment extends IssueReportFragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                mHeightTextView.setText(editable.toString());
+                if (mHeightEditText.length() == 0) {
+                    mHeightEditText.setText("0");
+                    mHeightTextView.setText("0");
+                } else {
+                    mHeightTextView.setText(editable.toString());
+                }
             }
         });
 
@@ -97,7 +106,12 @@ public class IssueReportDimensionFragment extends IssueReportFragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                mQuantityTextView.setText(editable.toString());
+                if (mQuantityEditText.length() == 0) {
+                    mQuantityEditText.setText("0");
+                    mQuantityTextView.setText("0");
+                } else {
+                    mQuantityTextView.setText(editable.toString());
+                }
             }
         });
 

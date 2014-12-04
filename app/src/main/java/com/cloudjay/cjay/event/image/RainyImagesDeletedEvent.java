@@ -5,6 +5,6 @@ package com.cloudjay.cjay.event.image;
  */
 public class RainyImagesDeletedEvent {
 
-    public RainyImagesDeletedEvent() {
-    }
+	public RainyImagesDeletedEvent() {
+	}
 }

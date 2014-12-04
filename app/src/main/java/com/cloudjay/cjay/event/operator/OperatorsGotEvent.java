@@ -9,14 +9,14 @@ import java.util.List;
  */
 public class OperatorsGotEvent {
 
-	public List<Operator> getOperators() {
-		return operators;
-	}
-
 	private List<Operator> operators;
 
 	public OperatorsGotEvent(List<Operator> operators) {
 		this.operators = operators;
+	}
+
+	public List<Operator> getOperators() {
+		return operators;
 	}
 
 }

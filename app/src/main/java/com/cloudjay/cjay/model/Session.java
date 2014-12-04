@@ -14,7 +14,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import org.androidannotations.annotations.Trace;
 import org.json.JSONException;
 
 import java.io.File;
@@ -143,6 +142,7 @@ public class Session implements Serializable {
 	//endregion
 
 	public Session() {
+		localStep = -1;
 		gateImages = new ArrayList<GateImage>();
 		auditItems = new ArrayList<AuditItem>();
 	}
@@ -564,15 +564,15 @@ public class Session implements Serializable {
 
 				for (AuditItem item : auditItems) {
 					if (item.isRepaired() == false) {
-                        if (item.isAllowed() == null) {
-                            return false;
-                        } else {
-                            if (item.isAllowed()) {
-                                return false;
-                            } else {
-                                continue;
-                            }
-                        }
+						if (item.isAllowed() == null) {
+							return false;
+						} else {
+							if (item.isAllowed()) {
+								return false;
+							} else {
+								continue;
+							}
+						}
 					}
 				}
 
@@ -680,7 +680,6 @@ public class Session implements Serializable {
 
 			}
 		}
-
 		List<GateImage> gateImages = this.getGateImages();
 		for (GateImage gateImage : gateImages) {
 			if (gateImage.getUploadStatus() == UploadStatus.COMPLETE.value) {
@@ -746,18 +745,25 @@ public class Session implements Serializable {
 	 */
 	public Session mergeSession(Session newSession) {
 
-		Logger.Log(" > Merge container " + newSession.getContainerId());
-//		Logger.Log("Parse basic information");
-		this.setId(newSession.getId());
+		Logger.Log(" > Merge session: " + newSession.getContainerId());
+
+		if (newSession.getId() != 0) {
+			this.setId(newSession.getId());
+		}
 		this.setStep(newSession.getStep());
 		this.setCheckInTime(newSession.getCheckInTime());
 		this.setCheckOutTime(newSession.getCheckOutTime());
+		this.setOperatorId(newSession.getOperatorId());
+		this.setOperatorCode(newSession.getOperatorCode());
+		this.setPreStatus(newSession.getPreStatus());
 
-		// local step should always greater or equal to step
-//		Logger.Log("Local Step: " + Step.values()[this.getLocalStep()]);
-//		Logger.Log("Server Step: " + Step.values()[newSession.getStep()]);
+		//Merge local step from client
+		if (-1 != newSession.getLocalStep()) {
+			this.setLocalStep(newSession.getLocalStep());
+		}
 
-		if (this.getLocalStep() < newSession.getStep()) {
+		//Merge local step from server should always greater or equal to step
+		if (this.getLocalStep() < newSession.getStep() && -1 == newSession.getLocalStep()) {
 			this.setLocalStep(newSession.getStep());
 		}
 
@@ -766,9 +772,9 @@ public class Session implements Serializable {
 		// Tìm danh sách hình khác nhau
 		// Difference được khởi tạo là danh sách tổng hợp của client và server
 		// Difference thường là danh sách hình mới từ server
-//		Logger.Log("Parse list gate images");
 		List<GateImage> diffGateImages = new ArrayList<>();
 		diffGateImages.addAll(gateImages);
+
 		//Set upload status for all image get from server is uploaded
 		for (GateImage gateImage : newSession.getGateImages()) {
 			gateImage.setUploadStatus(UploadStatus.COMPLETE.value);
@@ -778,8 +784,6 @@ public class Session implements Serializable {
 		gateImages.retainAll(newSession.getGateImages());
 		diffGateImages.removeAll(gateImages);
 
-//		Logger.Log("Similar gate img count: " + gateImages.size());
-//		Logger.Log("Difference gate img count: " + diffGateImages.size());
 		// Khởi tạo các thông tin còn thiếu của list difference
 		for (GateImage image : diffGateImages) {
 			if (TextUtils.isEmpty(image.getName())) {
@@ -792,27 +796,27 @@ public class Session implements Serializable {
 		}
 		gateImages.addAll(diffGateImages);
 
-		// Merge Audit Items
-		// 2 audit items bằng nhau khi giống uuid hoặc id
+		// Merge audit items. 2 audit items bằng nhau khi giống uuid hoặc id
 		if (newSession.getAuditItems() != null && newSession.getAuditItems().size() != 0) {
 
 //			Logger.Log("Parse list audit items");
-			for (AuditItem serverItem : newSession.getAuditItems()) {
-				//Set upload status for all audit item is uploaded
-				serverItem.setUploadStatus(UploadStatus.COMPLETE.value);
-				boolean found = false;
 
-				for (AuditItem localItem : auditItems) {
+            for (AuditItem serverItem : newSession.getAuditItems()) {
+                //Set upload status for all audit item is uploaded
+                serverItem.setUploadStatus(UploadStatus.COMPLETE.value);
+                boolean found = false;
 
+                for (AuditItem localItem : auditItems) {
 
-					if (serverItem.equals(localItem)) {
-						found = true;
+                    if (serverItem.equals(localItem)) {
+                        found = true;
 
-						SimpleDateFormat format = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+                        SimpleDateFormat format = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 
-						if (TextUtils.isEmpty(serverItem.getModifiedAt())) {
-							Logger.w("Audit item id: " + serverItem.getId());
-						} else {
+                        if (TextUtils.isEmpty(serverItem.getModifiedAt())) {
+                            Logger.w("Audit item id: " + serverItem.getId());
+	                        throw new RuntimeException("Cannot find audit item # modified_at attr");
+                        } else {
 
                             try {
                                 Date server = format.parse(serverItem.getModifiedAt());
@@ -834,101 +838,152 @@ public class Session implements Serializable {
                                 // e.printStackTrace();
                             }
                         }
-					}
-				}
+                    }
+                }
 
-				// Nếu không tìm thấy audit item tương ứng ở local --> audit item mới
-				// --> thêm mới audit item vào session
-				if (!found) {
-					auditItems.add(serverItem);
-					Logger.Log("Add new audit item to session");
-				}
-			}
-		}
+                // Nếu không tìm thấy audit item tương ứng ở local --> audit item mới
+                // --> thêm mới audit item vào session
+	            // TODO: should localize server session before merge session
+                if (!found) {
+	                serverItem.setAudited(true);
+	                serverItem.setUuid(UUID.randomUUID().toString());
+	                serverItem.setUploadStatus(UploadStatus.COMPLETE);
+	                for (AuditImage image : serverItem.getAuditImages()) {
+		                image.setName(Utils.getImageNameFromUrl(image.getUrl()));
+		                image.setUuid(Utils.getUuidFromImageName(Utils.getImageNameFromUrl(image.getName())));
+		                image.setUploadStatus(UploadStatus.COMPLETE);
 
-		return this;
-	}
+		                if (image.getType() == ImageType.REPAIRED.value) {
+			                serverItem.setRepaired(true);
+		                }
+	                }
 
-	/**
-	 * Find and update audit item information
-	 *
-	 * @param auditItem
-	 * @return
-	 */
-	public boolean updateAuditItem(AuditItem auditItem) {
+                    auditItems.add(serverItem);
+                    Logger.Log("Add new audit item to session");
+                }
+            }
+        }
 
-		// find and replace with the new one
-		Logger.Log("Update audit item");
-		for (AuditItem item : auditItems) {
-			if (item.equals(auditItem)) {
-				auditItems.remove(item);
-				auditItems.add(auditItem);
-				return true;
-			}
-		}
+        return this;
+    }
 
-		return false;
-	}
+    /**
+     * Find and update audit item information
+     *
+     * @param auditItem
+     * @return
+     */
+    public boolean updateAuditItem(AuditItem auditItem) {
 
-	/**
-	 * Change audit item upload status
-	 *
-	 * @param containerId
-	 * @param itemUuid
-	 * @param status
-	 * @return
-	 */
-	public boolean changeAuditItemUploadStatus(String containerId, String itemUuid, UploadStatus status) {
-		for (AuditItem item : auditItems) {
+        // find and replace with the new one
+        for (AuditItem item : auditItems) {
+            if (item.equals(auditItem)) {
+                auditItems.remove(item);
+                auditItems.add(auditItem);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Change audit item upload status
+     *
+     * @param containerId
+     * @param itemUuid
+     * @param status
+     * @return
+     */
+    public boolean changeAuditItemUploadStatus(String containerId, String itemUuid, UploadStatus status) {
+        for (AuditItem item : auditItems) {
             if (item.getUuid() != null) {
                 if (item.getUuid().equals(itemUuid)) {
                     item.setUploadStatus(status);
                     return true;
                 }
             }
-		}
-		return false;
-	}
+        }
+        return false;
+    }
 
-	/**
-	 * Add some field to make new session return from server look like local session
-	 * - Set localstep = step
-	 * - Gen UUID for each audit item, image
-	 * - Set upload status of all image is uploaded
-	 * - Set name for all image
-	 * - Set upload status of all audit item is uploaded
-	 *
-	 * @param session
-	 * @return
-	 */
-	public Session changeToLocalFormat() {
+    /**
+     * Add some field to make new session return from server look like local session
+     * - Set localstep = step
+     * - Gen UUID for each audit item, image
+     * - Set upload status of all image is uploaded
+     * - Set name for all image
+     * - Set upload status of all audit item is uploaded
+     *
+     * @param session
+     * @return
+     */
+    public Session localize() {
 
-        Logger.w("inside changeToLocalFormat");
+        this.setLocalStep(this.getStep());
+        for (GateImage gateImage : this.getGateImages()) {
 
-		this.setLocalStep(this.getStep());
-		for (GateImage gateImage : this.getGateImages()) {
-			gateImage.setName(Utils.getImageNameFromUrl(gateImage.getUrl()));
-			gateImage.setUploadStatus(UploadStatus.COMPLETE.value);
-			gateImage.setUuid(UUID.randomUUID().toString());
-		}
+            if (TextUtils.isEmpty(gateImage.getUuid())) {
+                gateImage.setUuid(UUID.randomUUID().toString());
+            }
 
-		for (AuditItem auditItem : this.getAuditItems()) {
-			//Logger.Log(auditItem.getModifiedAt());
-			auditItem.setUuid(UUID.randomUUID().toString());
-			auditItem.setUploadStatus(UploadStatus.COMPLETE.value);
+            gateImage.setName(Utils.getImageNameFromUrl(gateImage.getUrl()));
+            gateImage.setUploadStatus(UploadStatus.COMPLETE.value);
+        }
+
+        for (AuditItem auditItem : this.getAuditItems()) {
+
+            if (TextUtils.isEmpty(auditItem.getUuid())) {
+                auditItem.setUuid(UUID.randomUUID().toString());
+            }
+
+            auditItem.setUploadStatus(UploadStatus.COMPLETE.value);
             auditItem.setAudited(true);
-			for (AuditImage auditImage : auditItem.getAuditImages()) {
-				auditImage.setName(Utils.getImageNameFromUrl(auditImage.getUrl()));
-				auditImage.setUploadStatus(UploadStatus.COMPLETE.value);
-				auditImage.setUuid(UUID.randomUUID().toString());
+
+            for (AuditImage auditImage : auditItem.getAuditImages()) {
+                auditImage.setName(Utils.getImageNameFromUrl(auditImage.getUrl()));
+                auditImage.setUploadStatus(UploadStatus.COMPLETE.value);
+                auditImage.setUuid(UUID.randomUUID().toString());
 
                 if (auditImage.getType() == ImageType.REPAIRED.value) {
                     auditItem.setRepaired(true);
                     break;
                 }
-			}
-		}
+            }
 
-		return this;
-	}
+        }
+
+        return this;
+    }
+
+    public Session prepareForUploading() {
+
+        Step step = Step.values()[localStep];
+
+        // Change local step
+        switch (step) {
+            case IMPORT: // 4 -> 0
+                this.setLocalStep(Step.AUDIT.value);
+                break;
+
+            case AUDIT: // 0 -> 1
+                this.setLocalStep(Step.REPAIR.value);
+                break;
+
+            case AVAILABLE: // 2 -> 3
+                this.setLocalStep(Step.EXPORTED.value);
+                break;
+
+            case REPAIR: // 1 -> 2
+            case HAND_CLEAN: // 5 -> 2
+            default:
+                this.setLocalStep(Step.AVAILABLE.value);
+                break;
+        }
+
+        //Change upload status
+        setUploadStatus(UploadStatus.UPLOADING);
+
+        return this;
+    }
 }

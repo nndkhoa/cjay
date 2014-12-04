@@ -14,7 +14,7 @@ import javax.annotation.Generated;
 
 /* Gồm hình nhập và hình xuất */
 @Generated("org.jsonschema2pojo")
-public class GateImage implements Serializable{
+public class GateImage implements Serializable {
 
 	@Expose
 	private long id;
@@ -37,12 +37,16 @@ public class GateImage implements Serializable{
 	}
 
 	public void setUploadStatus(int status) {
-
+		if (status == 1) {
+			Logger.e("CHANGE TO UPLOADING");
+		}
 		this.uploadStatus = status;
 	}
 
 	public void setUploadStatus(UploadStatus status) {
-		Logger.Log("Change image " + uuid + "status to " + status.name());
+		if (status == UploadStatus.UPLOADING) {
+			Logger.e("CHANGE TO UPLOADING");
+		}
 		this.uploadStatus = status.value;
 	}
 
@@ -88,6 +92,10 @@ public class GateImage implements Serializable{
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public String getUri() {
+		return Utils.parseUrltoUri(this.getUrl());
 	}
 
 	public GateImage withUrl(String url) {

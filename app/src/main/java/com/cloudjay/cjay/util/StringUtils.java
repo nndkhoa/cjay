@@ -80,4 +80,11 @@ public class StringUtils {
 		return sb.toString();
 	}
 
+	public static String getMinDate() {
+		Date minDate = new Date(Long.MIN_VALUE);
+		SimpleDateFormat dateFormat = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
+		String strDate = dateFormat.format(minDate);
+		return strDate;
+	}
+
 }

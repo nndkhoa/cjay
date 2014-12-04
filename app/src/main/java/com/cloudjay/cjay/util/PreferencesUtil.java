@@ -16,6 +16,10 @@ public class PreferencesUtil {
 	public static final String PREF_MODIFIED_PAGE = "com.cloudjay.cjay.pref_modified_page";
 	public static final String PREF_FIRST_PAGE_MODIFIED_DATE = "com.cloudjay.cjay.pref_first_page_modified_date";
     public static final String PREF_CAMERA_MODE_CONTINUOUS = "pref_camera_mode_continuous";
+	public static final String PREF_UPLOAD_QUEUE_INDEX = "com.cloudjay.cjay.pref_upload_queue_index";
+
+
+    public static final String PREF_SUBSCRIBE_PUBNUB = "com.cloudjay.cjay.pref_subscribe_pubnub";
 
 	public static void clearPrefs(Context context) {
 		SharedPreferences settings = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
@@ -31,6 +35,12 @@ public class PreferencesUtil {
 	public static <T> T getObject(Context context, String key, Class<T> a) {
 		ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(context, PreferencesUtil.PREFS, 0);
 		return complexPreferences.getObject(key, a);
+	}
+
+	public static int getPrefsValue(Context context, String key, int defVal) {
+		SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
+		int value = prefs.getInt(key, defVal);
+		return value;
 	}
 
 	public static String getPrefsValue(Context context, String key) {
@@ -65,5 +75,21 @@ public class PreferencesUtil {
 
 		// Commit Changed Data
 		editor.commit();
+	}
+
+	public static void storePrefsValue(Context context, String key, int val) {
+		SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
+		SharedPreferences.Editor editor = prefs.edit();
+
+		// Clear Prefs User Data
+		editor.putInt(key, val);
+
+		// Commit Changed Data
+		editor.commit();
+	}
+
+	public static void removePrefsValue(Context context, String key) {
+		SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
+		prefs.edit().remove(key).commit();
 	}
 }

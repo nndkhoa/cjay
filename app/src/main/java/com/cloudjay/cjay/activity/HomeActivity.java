@@ -18,7 +18,6 @@ import android.view.inputmethod.InputMethodManager;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.event.upload.PreUploadStartedEvent;
 import com.cloudjay.cjay.fragment.SearchFragment_;
 import com.cloudjay.cjay.fragment.UploadFragment_;
 import com.cloudjay.cjay.fragment.WorkingFragment_;
@@ -27,8 +26,6 @@ import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
-import com.cloudjay.cjay.util.enums.UploadStatus;
-import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.AfterViews;
@@ -173,14 +170,6 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 	public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
 	}
 
-	public void onEvent(PreUploadStartedEvent event) {
-		if (event.uploadType == UploadType.SESSION) {
-			dataCenter.changeStatusWhenUpload(this, event.getSession(), UploadType.SESSION, UploadStatus.UPLOADING);
-		} else if (event.uploadType == UploadType.AUDIT_ITEM) {
-			dataCenter.changeStatusWhenUpload(this, event.getSession(), UploadType.AUDIT_ITEM, UploadStatus.UPLOADING);
-		}
-	}
-
 	@Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
@@ -196,6 +185,7 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
                 cameraActivityIntent.putExtra(CameraActivity_.OPERATOR_CODE_EXTRA, "");
                 cameraActivityIntent.putExtra(CameraActivity_.IMAGE_TYPE_EXTRA, ImageType.IMPORT.value);
                 cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.IMPORT.value);
+                cameraActivityIntent.putExtra(CameraActivity_.OPEN_RAINY_MODE_ACTIVITY, true);
                 startActivity(cameraActivityIntent);
             }
             return true;
