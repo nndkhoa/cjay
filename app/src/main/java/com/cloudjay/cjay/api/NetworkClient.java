@@ -266,10 +266,17 @@ public class NetworkClient {
 	 * @param containerSession
 	 * @return
 	 */
-	public Session completeAudit(Context context, Session containerSession) {
+	public Session completeAudit(Context context, Session containerSession) throws RetrofitError{
 
-		Session completeAuditSession = provider.getRestAdapter(context).create(NetworkService.class).completeAudit(containerSession.getId());
-		return completeAuditSession;
+		try {
+			Session completeAuditSession = provider.getRestAdapter(context).create(NetworkService.class).completeAudit(containerSession.getId());
+			return completeAuditSession;
+		} catch (RetrofitError error) {
+			Logger.Log("Throw Error");
+			throw error;
+		}
+
+
 	}
 
 	/**
@@ -280,7 +287,6 @@ public class NetworkClient {
 	 * @return
 	 */
 	public Session completeRepairSession(Context context, Session containerSession) {
-		Logger.e(containerSession.getRepairedAuditItemToUpLoad().toString());
 		Session completeRepairSession = provider.getRestAdapter(context).create(NetworkService.class).completeRepair(containerSession.getId(), containerSession.getRepairedAuditItemToUpLoad());
 		return completeRepairSession;
 	}

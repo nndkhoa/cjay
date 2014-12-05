@@ -473,7 +473,6 @@ public class AuditItem implements Serializable{
 	 */
 	public JsonArray getRepairedImageToUpLoad() {
 		JsonArray repaired_image = new JsonArray();
-		Logger.e(String.valueOf(auditImages.size()));
 		for (AuditImage repairedtImage : this.auditImages) {
 			if (repairedtImage.getType() == ImageType.REPAIRED.getValue()) {
 				String repairedImageName = repairedtImage.getName();

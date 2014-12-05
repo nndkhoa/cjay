@@ -20,7 +20,7 @@ apply plugin: 'crashlytics'
 // Manifest version information!
 def versionMajor = 2
 def versionMinor = 0
-def versionPatch = 4
+def versionPatch = 5
 def versionBuild = 0
 def versionTag = '-alpha' // bump for dogfood builds, public betas, etc.
 
@@ -88,7 +88,7 @@ android {
 
         debug {
             applicationIdSuffix '.dev'
-            versionNameSuffix '-dev'
+            versionNameSuffix '-dev' + '-' + System.getenv('HOME').split('/').last()
         }
     }
     lintOptions {

@@ -18,6 +18,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 /**
  * a JobManager that supports;
@@ -119,6 +120,8 @@ public class JobManager implements NetworkEventProvider.Listener {
 		if (running) {
 			return;
 		}
+
+		JqLog.i("Start Jq");
 		running = true;
 		notifyJobConsumer();
 	}
