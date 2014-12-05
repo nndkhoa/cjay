@@ -254,11 +254,18 @@ public class IssuePendingFragment extends Fragment {
 	public void onEvent(AuditItemsGotEvent event) {
 
 		// Filter list audit items that was not repair
+		boolean isAudited = false;
 		List<AuditItem> list = new ArrayList<>();
+		List<AuditItem> listRepair = new ArrayList<>();
 		for (AuditItem auditItem : event.getAuditItems()) {
 			if (!auditItem.isRepaired()) {
 				list.add(auditItem);
+			} else {
+				listRepair.add(auditItem);
 			}
+		}
+		if (listRepair.size() != 0){
+			isAudited = true;
 		}
 
 		// Sort list audit
@@ -278,7 +285,7 @@ public class IssuePendingFragment extends Fragment {
 		};
 
 		Collections.sort(list, comparator);
-		updatedData(list);
+		updatedData(list, isAudited);
 	}
 
 
@@ -289,7 +296,7 @@ public class IssuePendingFragment extends Fragment {
 	}
 
 	@UiThread
-	void updatedData(List<AuditItem> auditItems) {
+	void updatedData(List<AuditItem> auditItems, boolean isAudited) {
 
 		if (mAdapter == null) {
 			mAdapter = new AuditItemAdapter(getActivity(),
@@ -306,7 +313,7 @@ public class IssuePendingFragment extends Fragment {
 		mAdapter.notifyDataSetChanged();
 
 		// If container has audit image(s), hide button Container Ve sinh - quet
-		if (mAdapter.getCount() > 0) {
+		if (mAdapter.getCount() > 0 || isAudited) {
 			btnClean.setVisibility(View.GONE);
 		}
 	}
@@ -330,7 +337,7 @@ public class IssuePendingFragment extends Fragment {
 
 	@UiThread
 	void onEvent(AuditItemChangedEvent event) {
-        Logger.Log("change event");
+		Logger.Log("change event");
 		refresh();
 	}
 
