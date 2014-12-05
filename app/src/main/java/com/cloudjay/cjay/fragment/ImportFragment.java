@@ -268,12 +268,15 @@ public class ImportFragment extends Fragment {
 			switch ((int) preStatus) {
 				case 0:
 					rdnStatusA.setChecked(true);
+					btnContinue.setVisibility(View.GONE);
 					break;
 				case 1:
 					rdnStatusB.setChecked(true);
+					btnContinue.setVisibility(View.VISIBLE);
 					break;
 				case 2:
 					rdnStatusC.setChecked(true);
+					btnContinue.setVisibility(View.VISIBLE);
 					break;
 			}
 		}
