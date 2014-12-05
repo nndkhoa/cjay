@@ -68,10 +68,13 @@ public class RepairedItemAdapter extends ArrayAdapter<AuditItem> {
 
 		if (auditItem.isRepaired() == true) {
 			//Set detail textviews
+            int height = (int) auditItem.getHeight();
+            int length = (int) auditItem.getLength();
+
 			holder.tvCodeComponent.setText(auditItem.getComponentCode());
 			holder.tvCodeIssue.setText(auditItem.getDamageCode());
 			holder.tvCodeLocation.setText(auditItem.getLocationCode());
-			holder.tvDimension.setText("Dài " + auditItem.getLength() + "," + " Rộng " + auditItem.getHeight());
+			holder.tvDimension.setText("Dài " + String.valueOf(length) + "," + " Rộng " + String.valueOf(height));
 			holder.tvCodeRepair.setText(auditItem.getRepairCode());
 			holder.tvCount.setText(auditItem.getQuantity() + "");
 

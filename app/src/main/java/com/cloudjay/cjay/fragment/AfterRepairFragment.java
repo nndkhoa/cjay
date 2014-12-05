@@ -163,12 +163,16 @@ public class AfterRepairFragment extends Fragment {
 
             // parse Data to view
             if (auditItem != null) {
+
+                int height = (int) auditItem.getHeight();
+                int length = (int) auditItem.getLength();
+
                 tvCompCode.setText(auditItem.getComponentCode());
                 tvLocationCode.setText(auditItem.getLocationCode());
                 tvDamageCode.setText(auditItem.getDamageCode());
                 tvRepairCode.setText(auditItem.getRepairCode());
 
-                tvSize.setText("Dài " + auditItem.getHeight() + ",\t" + "Rộng " + auditItem.getLength());
+                tvSize.setText("Dài " + String.valueOf(length) + ",\t" + "Rộng " + String.valueOf(height));
                 textViewBtnCamera.setText(R.string.button_add_new_repair_image);
                 tvNumber.setText(auditItem.getQuantity() + "");
             }
