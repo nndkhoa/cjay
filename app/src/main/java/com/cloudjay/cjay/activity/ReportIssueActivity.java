@@ -64,12 +64,11 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
     ActionBar actionBar;
     private String[] mLocations;
-    private Session mSession;
     private AuditImage mAuditImage;
     private AuditItem mAuditItem;
 
     @Extra(CONTAINER_ID_EXTRA)
-    String mContainerId = "";
+    String mContainerId;
 
     @Extra(AUDIT_ITEM_EXTRA)
     String strAuditItem;
@@ -106,10 +105,6 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
     @AfterViews
     void afterViews() {
-
-        // Get container
-        dataCenter.add(new GetSessionCommand(this, mContainerId));
-
         if (mAuditItem != null)
             mAuditImage = mAuditItem.getAuditImage(mAuditImageUuid);
 
@@ -123,14 +118,6 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
         // go to the 2nd tab
         getActionBar().selectTab(getActionBar().getTabAt(TAB_ISSUE_COMPONENT));
-    }
-
-    @UiThread
-    public void onEvent(ContainerGotEvent event) {
-        mSession = event.getSession();
-
-        // Set Activity Title
-        setTitle(mSession.getContainerId());
     }
 
     @OptionsItem(R.id.menu_check)
@@ -168,7 +155,7 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
         actionBar = getActionBar();
 
         // Set ActionBar Title
-        actionBar.setTitle(R.string.fragment_repair_title);
+        actionBar.setTitle(mContainerId);
 
         // Fix tab layout
         final Method method;
