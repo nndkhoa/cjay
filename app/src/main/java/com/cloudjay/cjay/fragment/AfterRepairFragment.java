@@ -175,6 +175,8 @@ public class AfterRepairFragment extends Fragment {
                 tvSize.setText("Dài " + String.valueOf(length) + ",\t" + "Rộng " + String.valueOf(height));
                 textViewBtnCamera.setText(R.string.button_add_new_repair_image);
                 tvNumber.setText(auditItem.getQuantity() + "");
+            } else {
+                Utils.showCrouton(getActivity(), "Có lỗi, vui lòng thử lại sau");
             }
         }
     }
