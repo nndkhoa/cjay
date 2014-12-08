@@ -78,7 +78,8 @@ public class UploadIntentService extends Service {
 	public void onEvent(UploadStoppedEvent event) {
 		Logger.w("Upload failed, container " + event.session.getContainerId());
 		processing = false;
-		executeNext();
+		queue.remove();
+//		executeNext();
 	}
 
 	@Override
@@ -102,7 +103,14 @@ public class UploadIntentService extends Service {
 
 			JobManager manager = App.getJobManager();
 			if (manager.count() != 0) {
-				Logger.Log("There is already job in the queue");
+				if (processing == false) {
+
+					// Zombies appear
+					manager.clear();
+					dataCenter.add(new StartUploadingCommand(getApplicationContext()));
+				} else {
+					Logger.Log("There is already job in the queue");
+				}
 			} else {
 				dataCenter.add(new StartUploadingCommand(getApplicationContext()));
 			}

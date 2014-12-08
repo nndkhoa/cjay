@@ -1210,10 +1210,11 @@ public class DataCenter {
 	 * @return
 	 * @throws SnappydbException
 	 */
-	public Session uploadSession(Context context, Session session, Step uploadStep) throws SnappydbException {
+	public Session uploadSession(Context context, Session session, Step uploadStep) throws SnappydbException, RetrofitError {
 
 		Logger.Log("Begin to upload container: " + session.getContainerId() + " | Step: " + uploadStep.name());
 		addLog(context, session.getContainerId(), uploadStep.name() + " | Bắt đầu quá trình upload", CJayConstant.PREFIX_LOG);
+
 		EventBus.getDefault().post(new UploadStartedEvent(session, UploadType.SESSION));
 		switch (uploadStep) {
 

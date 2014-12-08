@@ -123,7 +123,7 @@ public class ExportFragment extends Fragment {
 				mImageTypes, importImages, auditImages, repairedImages);
 		lvImagesExpandable.setAdapter(mListAdapter);
 
-		dataCenter.add(new GetSessionCommand(getActivity(), containerID));
+//		dataCenter.add(new GetSessionCommand(getActivity(), containerID));
 	}
 
 	//region VIEW INTERACTION
