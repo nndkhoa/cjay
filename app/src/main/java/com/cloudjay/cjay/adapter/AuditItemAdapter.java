@@ -33,6 +33,7 @@ import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.view.SquareImageView;
+import com.google.gson.Gson;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.imageaware.ImageAware;
 import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
@@ -227,7 +228,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 						Intent intent = new Intent(mContext, ReportIssueActivity_.class);
 						intent.putExtra(ReportIssueActivity_.CONTAINER_ID_EXTRA, session.getContainerId());
 						intent.putExtra(ReportIssueActivity_.AUDIT_IMAGE_EXTRA, auditItem.getAuditImages().get(0).getUuid());
-						intent.putExtra(ReportIssueActivity_.AUDIT_ITEM_EXTRA, auditItem.getUuid());
+						intent.putExtra(ReportIssueActivity_.AUDIT_ITEM_EXTRA, new Gson().toJson(auditItem));
 
 						mContext.startActivity(intent);
 						return;
@@ -257,10 +258,6 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			holder.btnReport.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
-//					Logger.Log(auditItem.getAuditImages().get(0).getUuid());
-//					Logger.Log(auditItem.getAuditImages().get(0).getName());
-//					Logger.Log(auditItem.getAuditImages().get(0).getUrl());
-//					Logger.Log(auditItem.getAuditImages().get(0).getType() + "");
 					showApproveDiaglog(auditItem);
 				}
 			});
@@ -327,7 +324,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				Intent intent = new Intent(mContext, ReportIssueActivity_.class);
 				intent.putExtra(ReportIssueActivity_.CONTAINER_ID_EXTRA, session.getContainerId());
 				intent.putExtra(ReportIssueActivity_.AUDIT_IMAGE_EXTRA, item.getAuditImages().get(0).getUuid());
-				intent.putExtra(ReportIssueActivity_.AUDIT_ITEM_EXTRA, item.getUuid());
+                intent.putExtra(ReportIssueActivity_.AUDIT_ITEM_EXTRA, new Gson().toJson(item));
 
 				mContext.startActivity(intent);
 			}
