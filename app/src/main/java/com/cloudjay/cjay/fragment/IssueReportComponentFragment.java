@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -114,7 +115,9 @@ public class IssueReportComponentFragment extends IssueReportFragment {
 
 	@Override
 	public void hideKeyboard() {
-
+        // hide keyboard
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(mComponentEditText.getWindowToken(), 0);
 	}
 
 	@Override
@@ -144,6 +147,10 @@ public class IssueReportComponentFragment extends IssueReportFragment {
 
 	@Override
 	public void showKeyboard() {
+        // show keyboard
+        mComponentEditText.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(mComponentEditText, 0);
 	}
 
 	@Override

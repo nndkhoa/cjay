@@ -293,6 +293,9 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
         // show keyboard for specific tabs
         switch (position) {
+            case TAB_ISSUE_COMPONENT:
+            case TAB_ISSUE_DAMAGE:
+            case TAB_ISSUE_REPAIR:
             case TAB_ISSUE_DIMENSION:
             case TAB_ISSUE_QUANTITY:
                 IssueReportFragment fragment = (IssueReportFragment) mViewPagerAdapter.getRegisteredFragment(position);
