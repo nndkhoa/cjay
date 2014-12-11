@@ -431,7 +431,6 @@ public class AuditItem implements Serializable{
 	 */
 	public JsonArray getAuditImagesToUpLoad() {
 		JsonArray audit_image = new JsonArray();
-		Logger.e(String.valueOf(auditImages.size()));
 		for (AuditImage auditImage : this.auditImages) {
 			if (auditImage.getType() == ImageType.AUDIT.getValue()) {
 				String auditImageName = auditImage.getName();

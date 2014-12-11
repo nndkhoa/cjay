@@ -32,94 +32,101 @@ import retrofit.RetrofitError;
 @EService
 public class UploadIntentService extends Service {
 
-	@Bean
-	DataCenter dataCenter;
+    @Bean
+    DataCenter dataCenter;
 
-	@Bean
-	UploadQueue queue;
+    @Bean
+    UploadQueue queue;
 
-	/**
-	 * Biến processing sẽ có giá trị false khi không còn task nào để thực hiện
-	 */
-	public static boolean processing;
+    /**
+     * Biến processing sẽ có giá trị false khi không còn task nào để thực hiện
+     */
+    public static boolean processing;
 
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		EventBus.getDefault().register(this);
-	}
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        EventBus.getDefault().register(this);
+    }
 
-	@Override
-	public void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
-	}
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
 
-	/**
-	 * Receive upload succeeded event then run Remove upload item command.
-	 *
-	 * @param event
-	 */
-	public void onEvent(UploadSucceededEvent event) {
-		processing = false;
-		queue.remove();
-	}
+    /**
+     * Receive upload succeeded event then run Remove upload item command.
+     *
+     * @param event
+     */
+    public void onEvent(UploadSucceededEvent event) {
+        processing = false;
+        queue.remove();
+    }
 
-	/**
-	 * Triggered after upload item was removed, then it continues on execution.
-	 *
-	 * @param event
-	 */
-	public void onEvent(UploadObjectRemovedEvent event) {
-		executeNext();
-	}
+    /**
+     * Triggered after upload item was removed, then it continues on execution.
+     *
+     * @param event
+     */
+    public void onEvent(UploadObjectRemovedEvent event) {
+        Logger.Log("on UploadObjectRemovedEvent");
+        executeNext();
+    }
 
-	@Trace
-	public void onEvent(UploadStoppedEvent event) {
-		Logger.w("Upload failed, container " + event.session.getContainerId());
-		processing = false;
-		queue.remove();
+    @Trace
+    public void onEvent(UploadStoppedEvent event) {
+        Logger.w("Upload failed, container " + event.session.getContainerId());
+        processing = false;
+        queue.remove();
 //		executeNext();
-	}
+    }
 
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		executeNext();
-		return super.onStartCommand(intent, flags, startId);
-	}
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        executeNext();
+        return START_STICKY;
+    }
 
-	@Override
-	public IBinder onBind(Intent intent) {
-		return null;
-	}
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
 
-	void executeNext() {
+    void executeNext() {
 
-		if (processing) return; // Only one task at a time.
+        StackTraceElement[] trace = new Throwable().getStackTrace();
+        Logger.Log("Open DB " + trace[1].getFileName() + "#" + trace[1].getMethodName() + "() | Line: " + trace[1].getLineNumber());
+//
+//        Logger.Log("on executeNext");
 
-		// Check if user is logged in or not
-		String token = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_TOKEN);
-		if (!TextUtils.isEmpty(token) && Utils.canReachInternet()) {
+        if (processing) return; // Only one task at a time.
 
-			JobManager manager = App.getJobManager();
-			if (manager.count() != 0) {
-				if (processing == false) {
+        // Check if user is logged in or not
+        String token = PreferencesUtil.getPrefsValue(getApplicationContext(), PreferencesUtil.PREF_TOKEN);
+        if (!TextUtils.isEmpty(token) && Utils.canReachInternet()) {
 
-					// Zombies appear
-					manager.clear();
-					dataCenter.add(new StartUploadingCommand(getApplicationContext()));
-				} else {
-					Logger.Log("There is already job in the queue");
-				}
-			} else {
-				dataCenter.add(new StartUploadingCommand(getApplicationContext()));
-			}
+            JobManager manager = App.getJobManager();
+            if (manager.count() != 0) {
+                if (processing == false) {
 
-		} else {
-			Logger.w("There was problems. Please check credential or connectivity.");
-			Logger.w("Upload service will be stopped.");
-			processing = false;
-			stopSelf();
-		}
-	}
+                    // Zombies appear
+                    manager.clear();
+                    dataCenter.add(new StartUploadingCommand(getApplicationContext()));
+                } else {
+                    Logger.Log("There is already job in the queue");
+                }
+
+            } else {
+                dataCenter.add(new StartUploadingCommand(getApplicationContext()));
+            }
+
+        } else {
+            Logger.w("There was problems. Please check credential or connectivity.");
+            Logger.w("Upload service will be stopped.");
+            processing = false;
+            stopSelf();
+        }
+    }
 }

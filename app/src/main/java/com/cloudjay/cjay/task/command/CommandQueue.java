@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.cloudjay.cjay.task.service.QueryService_;
+import com.cloudjay.cjay.task.service.UploadIntentService_;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Utils;
 import com.squareup.tape.InMemoryObjectQueue;
 import com.squareup.tape.TaskQueue;
 
@@ -20,7 +22,9 @@ public class CommandQueue extends TaskQueue<Command> {
 	}
 
 	private void startService() {
-		context.startService(new Intent(context, QueryService_.class));
+        if (!Utils.isRunning(context, QueryService_.class.getName())) {
+            context.startService(new Intent(context, QueryService_.class));
+        }
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.cloudjay.cjay.DataCenter;
+import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
 import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
@@ -28,6 +29,7 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
+import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -132,8 +134,16 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 					if (auditItem.getId() == 0 || auditItem.getUploadStatus() == UploadStatus.NONE.value) {
 						// If audit item has not been uploaded yet
 						// Add container session to upload queue
-						UploadObject object = new UploadObject(auditItem,AuditItem.class,mSession.getId());
-						dataCenter.add(new AddUploadObjectCommand(getActivity(), object));
+                        Logger.Log("upload audit item with container id: " + mSession.getId());
+//                        try {
+//                            dataCenter.changeUploadStatus(getActivity().getApplicationContext(),
+//                                    mSession.getContainerId(), auditItem, UploadStatus.UPLOADING);
+//                        } catch (SnappydbException e) {
+//                            e.printStackTrace();
+//                        }
+                        auditItem.setSession(mSession.getId());
+						UploadObject object = new UploadObject(auditItem, AuditItem.class, containerID, mSession.getId());
+						dataCenter.add(new AddUploadObjectCommand(getActivity().getApplicationContext(), object));
 					}
 				}
 			}
