@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
+import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.fragment.IssueReportComponentFragment_;
 import com.cloudjay.cjay.fragment.IssueReportDamageFragment_;
 import com.cloudjay.cjay.fragment.IssueReportDimensionFragment_;
@@ -30,7 +31,10 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Utils;
+import com.google.gson.Gson;
 
+import org.androidannotations.annotations.AfterExtras;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
@@ -60,15 +64,14 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
     ActionBar actionBar;
     private String[] mLocations;
-    private Session mSession;
-    private AuditItem mAuditItem;
     private AuditImage mAuditImage;
+    private AuditItem mAuditItem;
 
     @Extra(CONTAINER_ID_EXTRA)
-    String mContainerId = "";
+    String mContainerId;
 
     @Extra(AUDIT_ITEM_EXTRA)
-    String mAuditItemUuid = "";
+    String strAuditItem;
 
     @Extra(AUDIT_IMAGE_EXTRA)
     String mAuditImageUuid = "";
@@ -95,20 +98,16 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
     String codeDamage = "";
     String codeRepair = "";
 
-    @AfterViews
-    void afterViews() {
-	    dataCenter.add(new GetSessionCommand(this, mContainerId));
+    @AfterExtras
+    void doExtra() {
+        mAuditItem = new Gson().fromJson(strAuditItem, AuditItem.class);
     }
 
-    @UiThread
-    public void onEvent(ContainerGotEvent event) {
+    @AfterViews
+    void afterViews() {
+        if (mAuditItem != null)
+            mAuditImage = mAuditItem.getAuditImage(mAuditImageUuid);
 
-        mSession = event.getSession();
-        mAuditItem = mSession.getAuditItem(mAuditItemUuid);
-        mAuditImage = mAuditItem.getAuditImage(mAuditImageUuid);
-
-        // Set Activity Title
-        setTitle(mSession.getContainerId());
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
         mLocations = getResources().getStringArray(R.array.issue_report_tabs);
@@ -156,7 +155,7 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
         actionBar = getActionBar();
 
         // Set ActionBar Title
-        actionBar.setTitle(R.string.fragment_repair_title);
+        actionBar.setTitle(mContainerId);
 
         // Fix tab layout
         final Method method;
@@ -227,6 +226,12 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
     @Override
     public void onReportValueChanged(int type, String val) {
+
+        if (null == mAuditItem) {
+            Utils.showCrouton(this, "Có lỗi, vui lòng thử lại sau");
+            return;
+        }
+
         // save value
         switch (type) {
             case TYPE_LOCATION_CODE:
@@ -293,6 +298,9 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
 
         // show keyboard for specific tabs
         switch (position) {
+            case TAB_ISSUE_COMPONENT:
+            case TAB_ISSUE_DAMAGE:
+            case TAB_ISSUE_REPAIR:
             case TAB_ISSUE_DIMENSION:
             case TAB_ISSUE_QUANTITY:
                 IssueReportFragment fragment = (IssueReportFragment) mViewPagerAdapter.getRegisteredFragment(position);

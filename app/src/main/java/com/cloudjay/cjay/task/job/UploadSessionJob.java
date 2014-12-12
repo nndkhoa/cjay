@@ -73,6 +73,7 @@ public class UploadSessionJob extends Job {
 	@Override
 	protected boolean shouldReRunOnThrowable(Throwable throwable) {
 
+		Logger.w("XXX");
 		if (throwable instanceof RetrofitError) {
 
 			Context context = App.getInstance().getApplicationContext();

@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.AuditItem;
+import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
@@ -70,7 +71,10 @@ public class IssueReportDimensionFragment extends IssueReportFragment {
                     mLengthEditText.setText("0");
                     mLengthTextView.setText("0");
                 } else {
-                    mLengthTextView.setText(editable.toString());
+                    double dLength = Double.parseDouble(editable.toString());
+                    int length = (int) dLength;
+                    String strLength = String.valueOf(length);
+                    mLengthTextView.setText(strLength);
                 }
             }
         });
@@ -90,7 +94,10 @@ public class IssueReportDimensionFragment extends IssueReportFragment {
                     mHeightEditText.setText("0");
                     mHeightTextView.setText("0");
                 } else {
-                    mHeightTextView.setText(editable.toString());
+                    double dHeight = Double.parseDouble(editable.toString());
+                    int height = (int) dHeight;
+                    String strHeight = String.valueOf(height);
+                    mHeightTextView.setText(strHeight);
                 }
             }
         });

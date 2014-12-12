@@ -44,6 +44,7 @@ import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
 import com.esotericsoftware.kryo.KryoException;
+import com.google.gson.Gson;
 import com.path.android.jobqueue.JobManager;
 import com.snappydb.DB;
 import com.snappydb.KeyIterator;
@@ -1210,10 +1211,11 @@ public class DataCenter {
 	 * @return
 	 * @throws SnappydbException
 	 */
-	public Session uploadSession(Context context, Session session, Step uploadStep) throws SnappydbException {
+	public Session uploadSession(Context context, Session session, Step uploadStep) throws SnappydbException, RetrofitError {
 
 		Logger.Log("Begin to upload container: " + session.getContainerId() + " | Step: " + uploadStep.name());
 		addLog(context, session.getContainerId(), uploadStep.name() + " | Bắt đầu quá trình upload", CJayConstant.PREFIX_LOG);
+
 		EventBus.getDefault().post(new UploadStartedEvent(session, UploadType.SESSION));
 		switch (uploadStep) {
 
@@ -1562,6 +1564,8 @@ public class DataCenter {
 		try {
 			DB db = App.getDB(context);
 
+            Logger.Log("class in enqueue: " + object.getCls());
+
 			// Reset index if there is no item left in the queue
 			int leftCount = db.countKeys(CJayConstant.PREFIX_UPLOAD_QUEUE);
 			if (leftCount == 0) {
@@ -1569,9 +1573,18 @@ public class DataCenter {
 				PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_UPLOAD_QUEUE_INDEX, 0);
 			}
 
+            Logger.Log("leftCount: " + leftCount);
+
 			// Enqueue
 			int currentIndex = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_UPLOAD_QUEUE_INDEX, 0);
+
+            if (leftCount > 0) {
+                currentIndex = currentIndex + 1;
+                PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_UPLOAD_QUEUE_INDEX, currentIndex);
+            }
+
 			String key = CJayConstant.PREFIX_UPLOAD_QUEUE + currentIndex + ":" + containerId;
+            Logger.Log("key in enqueue: " + key);
 			db.put(key, object);
 
 		} catch (SnappydbException e) {
@@ -1601,6 +1614,9 @@ public class DataCenter {
 
 			if (null != keys && keys.length > 0 && keys[0].contains(CJayConstant.PREFIX_UPLOAD_QUEUE)) {
 				object = db.getObject(keys[0], UploadObject.class);
+
+                Logger.Log("keys length: " + keys.length);
+                Logger.Log("class in getNextItem: " + object.getCls());
 			}
 
 		} catch (SnappydbException e) {
@@ -1644,6 +1660,8 @@ public class DataCenter {
 	 */
 	public void startUploading(Context context) throws SnappydbException {
 
+        Logger.Log("on startUploading");
+
 		// Find next upload item
 		JobManager jobManager = App.getJobManager();
 		UploadObject object = getNextItem(context);
@@ -1656,9 +1674,11 @@ public class DataCenter {
 			// Add Job in background
 			Class cls = object.getCls();
 			if (cls == Session.class) {
+                Logger.Log("addJobInBackground Session");
 				jobManager.addJobInBackground(new UploadSessionJob(object.getSession(), object));
 
 			} else if (cls == AuditItem.class) {
+                Logger.Log("addJobInBackground audit item");
 				jobManager.addJobInBackground(new UploadAuditItemJob(object.getSessionId(), object.getAuditItem(), object.getContainerId(), object, false));
 
 			} else if (cls == GateImage.class) {
