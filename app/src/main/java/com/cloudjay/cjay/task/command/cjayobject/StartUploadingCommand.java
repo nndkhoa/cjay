@@ -10,6 +10,7 @@ import com.snappydb.SnappydbException;
 public class StartUploadingCommand extends Command {
 
 	Context context;
+
 	public StartUploadingCommand(Context context) {
 		this.context = context;
 	}
