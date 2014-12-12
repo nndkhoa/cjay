@@ -1421,8 +1421,8 @@ public class DataCenter {
 			List<AuditItem> list = session.getAuditItems();
 			for (int i = 0; i < list.size(); i++) {
 
-				// neu da ton tai loi ve sinh va chua duoc upload thi them hinh vao loi ve sinh
-				if (list.get(i).isWashTypeItem() && list.get(i).getId() == 0) {
+				// If water wash type item is existed, add image to it
+				if (list.get(i).isWashTypeItem()) {
 					list.get(i).getAuditImages().add(auditItem.getAuditImages().get(0));
 					isExisted = true;
 					Logger.Log("Images size: " + list.get(i).getAuditImages().size());

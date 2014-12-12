@@ -120,8 +120,10 @@ public class BeforeRepairFragment extends Fragment {
     void onEvent(ContainerGotEvent event) {
         mSession = event.getSession();
         if (null == mSession) {
+            Logger.Log("null mSession");
             Utils.showCrouton(getActivity(), "Không tìm thấy container trong dữ liệu");
         } else {
+            Logger.Log("mSession != null");
             operatorCode = mSession.getOperatorCode();
             refreshData();
             refreshListImage();
@@ -150,6 +152,20 @@ public class BeforeRepairFragment extends Fragment {
             AuditItem auditItem = mSession.getAuditItem(auditItemUUID);
             if (auditItem != null) {
                 Logger.Log("is audited: " + auditItem.isAudited());
+
+                // parse Data to view
+                int height = (int) auditItem.getHeight();
+                int length = (int) auditItem.getLength();
+
+                tvCompCode.setText(auditItem.getComponentCode());
+                tvLocationCode.setText(auditItem.getLocationCode());
+                tvDamageCode.setText(auditItem.getDamageCode());
+                tvRepairCode.setText(auditItem.getRepairCode());
+
+                tvSize.setText("Dài " + String.valueOf(length) + ",\t" + "Rộng " + String.valueOf(height));
+                textViewBtnCamera.setText(R.string.button_add_new_audit_image);
+                tvNumber.setText(auditItem.getQuantity() + "");
+
                 if (auditItem.getId() != 0) {
                     for (AuditImage image : auditItem.getListAuditedImages()) {
                         if (image.getId() == 0) {
@@ -157,19 +173,6 @@ public class BeforeRepairFragment extends Fragment {
                             break;
                         }
                     }
-
-                    // parse Data to view
-                    int height = (int) auditItem.getHeight();
-                    int length = (int) auditItem.getLength();
-
-                    tvCompCode.setText(auditItem.getComponentCode());
-                    tvLocationCode.setText(auditItem.getLocationCode());
-                    tvDamageCode.setText(auditItem.getDamageCode());
-                    tvRepairCode.setText(auditItem.getRepairCode());
-
-                    tvSize.setText("Dài " + String.valueOf(length) + ",\t" + "Rộng " + String.valueOf(height));
-                    textViewBtnCamera.setText(R.string.button_add_new_audit_image);
-                    tvNumber.setText(auditItem.getQuantity() + "");
                 }
             } else {
                 Utils.showCrouton(getActivity(), "Có lỗi, vui lòng thử lại sau");
