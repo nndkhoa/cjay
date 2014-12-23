@@ -310,11 +310,59 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 		return determineBestSize(sizes, PICTURE_SIZE_MAX_WIDTH);
 	}
 
-	private Size determineBestPreviewSize(Camera.Parameters parameters) {
-		List<Size> sizes = parameters.getSupportedPreviewSizes();
+    private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
+        final double ASPECT_TOLERANCE = 0.1;
+        double targetRatio=(double)h / w;
 
-		return determineBestSize(sizes, PREVIEW_SIZE_MAX_WIDTH);
-	}
+        if (sizes == null) return null;
+
+        Camera.Size optimalSize = null;
+        double minDiff = Double.MAX_VALUE;
+
+        int targetHeight = h;
+
+        for (Camera.Size size : sizes) {
+            double ratio = (double) size.width / size.height;
+            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
+            if (Math.abs(size.height - targetHeight) < minDiff) {
+                optimalSize = size;
+                minDiff = Math.abs(size.height - targetHeight);
+            }
+        }
+
+        if (optimalSize == null) {
+            minDiff = Double.MAX_VALUE;
+            for (Camera.Size size : sizes) {
+                if (Math.abs(size.height - targetHeight) < minDiff) {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.height - targetHeight);
+                }
+            }
+        }
+        return optimalSize;
+    }
+
+	private Size determineBestPreviewSize(Camera.Parameters parameters, int w, int h) {
+        Camera.Size result = null;
+
+        for (Camera.Size size : parameters.getSupportedPreviewSizes())
+        {
+            if (size.width <= w && size.height <= h)
+            {
+                if (null == result)
+                    result = size;
+                else
+                {
+                    int resultDelta = w - result.width + h - result.height;
+                    int newDelta    = w - size.width   + h - size.height;
+
+                    if (newDelta < resultDelta)
+                        result = size;
+                }
+            }
+        }
+        return result;
+    }
 
 	protected Size determineBestSize(List<Camera.Size> sizes, int widthThreshold) {
 		Size bestSize = null;
@@ -398,7 +446,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 				Logger.d("config Camera");
 
 				Camera.Parameters parameters = mCamera.getParameters();
-				Camera.Size size = determineBestPreviewSize(parameters);
+				Camera.Size size = getOptimalPreviewSize(parameters.getSupportedPreviewSizes(), width, height);
 				Camera.Size pictureSize = determineBestPictureSize(parameters);
 
 				// Logger.Log("PreviewSize: " + Integer.toString(size.width) + "/" + Integer.toString(size.height));
