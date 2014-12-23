@@ -125,7 +125,7 @@ public class CameraActivity extends Activity implements AutoFocusCallback {
 	MediaPlayer mShootMediaPlayer = null;
 	Camera mCamera = null;
 	Camera.Parameters p;
-	String mFlashMode = Camera.Parameters.FLASH_MODE_OFF;
+	String mFlashMode = Parameters.FLASH_MODE_AUTO;
 
 	private static final int PICTURE_SIZE_MAX_WIDTH = 640;
 	private static final int PREVIEW_SIZE_MAX_WIDTH = 1280;
