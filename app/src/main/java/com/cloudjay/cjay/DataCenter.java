@@ -171,8 +171,13 @@ public class DataCenter {
 	 */
 	public void fetchOperators(Context context) throws SnappydbException {
 		DB db = App.getDB(context);
+        Operator undefinedOperator = new Operator();
+        undefinedOperator.setOperatorCode("KXD");
+        undefinedOperator.setOperatorName("Can bo sung");
+        db.put(CJayConstant.PREFIX_OPERATOR + undefinedOperator.getOperatorCode(), undefinedOperator);
 		List<Operator> operators = networkClient.getOperators(context, null);
 		for (Operator operator : operators) {
+            Logger.Log("id: " + operator.getId());
 			db.put(CJayConstant.PREFIX_OPERATOR + operator.getOperatorCode(), operator);
 		}
 	}

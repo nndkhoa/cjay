@@ -23,6 +23,7 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.task.command.cjayobject.AddUploadObjectCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
+import com.cloudjay.cjay.task.command.session.remove.RemoveSessionCommand;
 import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.AddUploadingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
@@ -163,6 +164,9 @@ public class ExportFragment extends Fragment {
 		// Add container session to upload queue
 		UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
 		dataCenter.add(new AddUploadObjectCommand(getActivity(), object));
+
+        // Delete session from database (14/01/2015)
+        dataCenter.add(new RemoveSessionCommand(getActivity(), mSession.getContainerId()));
 
 		// Navigate to HomeActivity
 		getActivity().finish();
