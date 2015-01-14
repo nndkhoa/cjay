@@ -165,9 +165,6 @@ public class ExportFragment extends Fragment {
 		UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
 		dataCenter.add(new AddUploadObjectCommand(getActivity(), object));
 
-        // Delete session from database (14/01/2015)
-        dataCenter.add(new RemoveSessionCommand(getActivity(), mSession.getContainerId()));
-
 		// Navigate to HomeActivity
 		getActivity().finish();
 	}

@@ -12,6 +12,7 @@ import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.task.command.UploadQueue;
 import com.cloudjay.cjay.task.command.cjayobject.StartUploadingCommand;
+import com.cloudjay.cjay.task.command.session.remove.RemoveSessionCommand;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
@@ -63,6 +64,9 @@ public class UploadIntentService extends Service {
     public void onEvent(UploadSucceededEvent event) {
         processing = false;
         queue.remove();
+
+        // Delete session from database (14/01/2015)
+        dataCenter.add(new RemoveSessionCommand(getApplicationContext(), event.getSession().getContainerId()));
     }
 
     /**

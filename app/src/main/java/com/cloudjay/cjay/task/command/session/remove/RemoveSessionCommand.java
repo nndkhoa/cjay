@@ -21,6 +21,6 @@ public class RemoveSessionCommand extends Command {
     @Override
     protected void run() throws SnappydbException {
         DataCenter dataCenter = DataCenter_.getInstance_(context);
-        dataCenter.removeSession(context, containerId, null);
+        dataCenter.removeSession(context, containerId, "");
     }
 }
