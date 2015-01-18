@@ -184,11 +184,15 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 		} catch (RetrofitError error) {
 			showProgress(false);
 			String message;
-			if (error.getResponse().getStatus() == 400) {
-				message = "Sai thông tin đăng nhập";
-			} else {
-				message = "Không thể kết nối với server";
-			}
+            if (error.getResponse() == null) {
+                message = "Không thể kết nối với server";
+            } else {
+                if (error.getResponse().getStatus() == 400) {
+                    message = "Sai thông tin đăng nhập";
+                } else {
+                    message = "Không thể kết nối với server";
+                }
+            }
 			showCrouton(message);
 		} catch (Exception e) {
 			e.printStackTrace();
