@@ -444,6 +444,12 @@ public class ImportFragment extends Fragment {
 	//endregion
 
 	void setPreStatusValue() {
+
+        if (null == mSession) {
+            Utils.showCrouton(getActivity(), "Có vấn đề về dữ liệu. Vui lòng đăng nhập lại");
+            return;
+        }
+
 		mSession.setPreStatus(preStatus);
 		dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
 		dataCenter.add(new AddWorkingSessionCommand(getActivity(), mSession));

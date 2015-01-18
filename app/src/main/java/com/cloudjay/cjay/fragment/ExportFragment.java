@@ -149,6 +149,11 @@ public class ExportFragment extends Fragment {
 	@Click(R.id.btn_complete_import)
 	void btnCompleteClicked() {
 
+        if (null == mSession) {
+            Utils.showCrouton(getActivity(), "Có vấn đề về dữ liệu. Vui lòng đăng nhập lại");
+            return;
+        }
+
 		if (mSession.isValidToUpload(Step.EXPORTED) == false) {
 			Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
 			return;
