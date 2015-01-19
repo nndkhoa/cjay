@@ -9,6 +9,7 @@ import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.task.command.log.AddLogCommand;
+import com.cloudjay.cjay.task.command.session.remove.RemoveSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -67,7 +68,10 @@ public class UploadSessionJob extends Job {
 		// Save session and also notify success to Upload Fragment by posting UploadSucceededEvent in SaveSessionCommand
 		dataCenter.add(new SaveSessionCommand(context, response, UploadType.SESSION));
 
+
+
 		// UploadService will receive event and take care of the rest.
+
 	}
 
 	@Override

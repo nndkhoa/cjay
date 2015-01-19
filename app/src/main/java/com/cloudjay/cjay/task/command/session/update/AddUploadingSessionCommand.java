@@ -9,7 +9,7 @@ import com.cloudjay.cjay.task.command.Command;
 import com.cloudjay.cjay.util.CJayConstant;
 
 /**
- * Add container to collection WORKING database
+ * Add container to collection UPLOADING database
  */
 public class AddUploadingSessionCommand extends Command {
 
