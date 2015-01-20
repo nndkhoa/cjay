@@ -249,6 +249,7 @@ public class NetworkClient {
 
 		try {
 			Session checkOutSession = provider.getRestAdapter(context).create(NetworkService.class).checkOutContainerSession(containerSession.getId(), containerSession.getGateOutImageToUpLoad());
+            Logger.logJson(checkOutSession, Session.class);
 			return checkOutSession;
 		} catch (RetrofitError e) {
 			Logger.Log(e.getResponse().getReason().toString());

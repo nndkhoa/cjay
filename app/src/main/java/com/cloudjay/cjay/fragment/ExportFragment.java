@@ -1,6 +1,8 @@
 package com.cloudjay.cjay.fragment;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -23,10 +25,8 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.task.command.cjayobject.AddUploadObjectCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
-import com.cloudjay.cjay.task.command.session.remove.RemoveSessionCommand;
 import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.AddUploadingSessionCommand;
-import com.cloudjay.cjay.task.command.session.update.ForceExportCommand;
 import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -55,227 +55,266 @@ import de.greenrobot.event.EventBus;
 @OptionsMenu(R.menu.back_audit)
 public class ExportFragment extends Fragment {
 
-	//region ATTR
-	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
+    //region ATTR
+    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
 
-	@FragmentArg(CONTAINER_ID_EXTRA)
-	String containerID;
+    @FragmentArg(CONTAINER_ID_EXTRA)
+    String containerID;
 
-	@Bean
-	DataCenter dataCenter;
+    @Bean
+    DataCenter dataCenter;
 
-	GateImageAdapter gateImageAdapter = null;
+    GateImageAdapter gateImageAdapter = null;
 
-	PhotoExpandableListAdapter mListAdapter;
-	int[] mImageTypes;
+    PhotoExpandableListAdapter mListAdapter;
+    int[] mImageTypes;
 
-	List<GateImage> importImages = new ArrayList<GateImage>();
-	List<AuditImage> auditImages = new ArrayList<AuditImage>();
-	List<AuditImage> repairedImages = new ArrayList<AuditImage>();
-	List<GateImage> exportImages = new ArrayList<GateImage>();
+    List<GateImage> importImages = new ArrayList<GateImage>();
+    List<AuditImage> auditImages = new ArrayList<AuditImage>();
+    List<AuditImage> repairedImages = new ArrayList<AuditImage>();
+    List<GateImage> exportImages = new ArrayList<GateImage>();
 
-	String operatorCode;
-	long preStatus;
-	long currentStatus;
-	Session mSession;
-	//endregion
+    String operatorCode;
+    long preStatus;
+    long currentStatus;
+    Session mSession;
+    //endregion
 
-	//region VIEWS
-	@ViewById(R.id.tv_container_code)
-	TextView tvContainerId;
+    //region VIEWS
+    @ViewById(R.id.tv_container_code)
+    TextView tvContainerId;
 
-	@ViewById(R.id.btn_take_export_picture)
-	LinearLayout btnTakeExportPicture;
+    @ViewById(R.id.btn_take_export_picture)
+    LinearLayout btnTakeExportPicture;
 
-	@ViewById(R.id.gv_images)
-	ListView gvExportImages;
+    @ViewById(R.id.gv_images)
+    ListView gvExportImages;
 
-	@ViewById(R.id.btn_view_previous_step)
-	Button btnViewPreviousSteps;
+    @ViewById(R.id.btn_view_previous_step)
+    Button btnViewPreviousSteps;
 
-	@ViewById(R.id.btn_complete_import)
-	Button btnComplete;
+    @ViewById(R.id.btn_complete_import)
+    Button btnComplete;
 
-	@ViewById(R.id.tv_status_name)
-	TextView tvPreStatus;
+    @ViewById(R.id.tv_status_name)
+    TextView tvPreStatus;
 
-	@ViewById(R.id.tv_current_status)
-	TextView tvCurrentStatus;
+    @ViewById(R.id.tv_current_status)
+    TextView tvCurrentStatus;
 
-	@ViewById(R.id.lv_images_expandable)
-	ExpandableListView lvImagesExpandable;
-	//endregion
+    @ViewById(R.id.lv_images_expandable)
+    ExpandableListView lvImagesExpandable;
+    //endregion
 
-	public ExportFragment() {
-	}
+    public ExportFragment() {
+    }
 
-	@AfterViews
-	void setUp() {
+    @AfterViews
+    void setUp() {
 
-		// Set ActionBar Title
-		getActivity().getActionBar().setTitle(R.string.fragment_export_title);
+        // Set ActionBar Title
+        getActivity().getActionBar().setTitle(R.string.fragment_export_title);
 
-		gateImageAdapter = new GateImageAdapter(getActivity(), R.layout.item_image_gridview, false);
-		gvExportImages.setAdapter(gateImageAdapter);
+        gateImageAdapter = new GateImageAdapter(getActivity(), R.layout.item_image_gridview, false);
+        gvExportImages.setAdapter(gateImageAdapter);
 
-		// Init image types
-		mImageTypes = new int[3];
-		mImageTypes[0] = ImageType.IMPORT.value;
-		mImageTypes[1] = ImageType.AUDIT.value;
-		mImageTypes[2] = ImageType.REPAIRED.value;
+        // Init image types
+        mImageTypes = new int[3];
+        mImageTypes[0] = ImageType.IMPORT.value;
+        mImageTypes[1] = ImageType.AUDIT.value;
+        mImageTypes[2] = ImageType.REPAIRED.value;
 
-		mListAdapter = new PhotoExpandableListAdapter(getActivity(),
-				mImageTypes, importImages, auditImages, repairedImages);
-		lvImagesExpandable.setAdapter(mListAdapter);
+        mListAdapter = new PhotoExpandableListAdapter(getActivity(),
+                mImageTypes, importImages, auditImages, repairedImages);
+        lvImagesExpandable.setAdapter(mListAdapter);
 
 //		dataCenter.add(new GetSessionCommand(getActivity(), containerID));
-	}
+    }
 
-	//region VIEW INTERACTION
-	@Click(R.id.btn_take_export_picture)
-	void buttonTakeExportPictureClicked() {
+    //region VIEW INTERACTION
+    @Click(R.id.btn_take_export_picture)
+    void buttonTakeExportPictureClicked() {
 
-		// Open camera activity
-		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-		cameraActivityIntent.putExtra(CameraActivity_.CONTAINER_ID_EXTRA, containerID);
-		cameraActivityIntent.putExtra(CameraActivity_.IMAGE_TYPE_EXTRA, ImageType.EXPORT.value);
-		cameraActivityIntent.putExtra(CameraActivity_.OPERATOR_CODE_EXTRA, operatorCode);
-		cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.EXPORTED.value);
-		startActivity(cameraActivityIntent);
-	}
+        // Open camera activity
+        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
+        cameraActivityIntent.putExtra(CameraActivity_.CONTAINER_ID_EXTRA, containerID);
+        cameraActivityIntent.putExtra(CameraActivity_.IMAGE_TYPE_EXTRA, ImageType.EXPORT.value);
+        cameraActivityIntent.putExtra(CameraActivity_.OPERATOR_CODE_EXTRA, operatorCode);
+        cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.EXPORTED.value);
+        startActivity(cameraActivityIntent);
+    }
 
-	@Click(R.id.btn_view_previous_step)
-	void buttonViewPreClicked() {
-		lvImagesExpandable.setVisibility(lvImagesExpandable.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
-		gvExportImages.setVisibility(lvImagesExpandable.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
-	}
+    @Click(R.id.btn_view_previous_step)
+    void buttonViewPreClicked() {
+        lvImagesExpandable.setVisibility(lvImagesExpandable.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
+        gvExportImages.setVisibility(lvImagesExpandable.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
+    }
 
-	@Click(R.id.btn_complete_import)
-	void btnCompleteClicked() {
-		if (mSession.isValidToUpload(Step.EXPORTED) == false) {
-			Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
-			return;
-		}
+    @Click(R.id.btn_complete_import)
+    void btnCompleteClicked() {
+        if (mSession.isValidToUpload(Step.EXPORTED) == false) {
+            Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
+            return;
+        }
 
-		// Add to Uploading
-		dataCenter.add(new AddUploadingSessionCommand(getActivity(), mSession));
-		dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
+        // Add to Uploading
+        dataCenter.add(new AddUploadingSessionCommand(getActivity(), mSession));
+        dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
 
-		mSession.prepareForUploading();
-		dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
+        mSession.prepareForUploading();
+        dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
 
-		// Add container session to upload queue
-		UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
-		dataCenter.add(new AddUploadObjectCommand(getActivity(), object));
+        // Add container session to upload queue
+        UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
+        dataCenter.add(new AddUploadObjectCommand(getActivity(), object));
 
-		// Navigate to HomeActivity
-		getActivity().finish();
-	}
+        // Navigate to HomeActivity
+        getActivity().finish();
+    }
 
     @OptionsItem(R.id.menu_back_audit)
     void exportMenuItemClicked() {
-        dataCenter.add(new BackToAuditCommand(getActivity(), containerID));
-        getActivity().finish();
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Alert");
+        builder.setMessage("Quay về bước giám định?");
+
+        builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
+        builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //Back to audit fragment
+                dialogInterface.dismiss();
+                dataCenter.add(new BackToAuditCommand(getActivity(), containerID));
+                getActivity().finish();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+
+                // Set background and text color for BUTTON_NEGATIVE
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setTextColor(getActivity().getResources().getColor(android.R.color.white));
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setBackgroundResource(R.drawable.btn_green_selector);
+
+                // Set background and text color for BUTTON_POSITIVE
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setTextColor(getActivity().getResources().getColor(android.R.color.white));
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setBackgroundColor(getActivity().getResources().getColor(android.R.color.darker_gray));
+            }
+        });
+        dialog.show();
     }
-	//endregion
 
-	void refresh() {
-		if (mSession != null) {
+    //endregion
 
-			// Get import and export images by containerId
-			importImages = mSession.getImportImages();
-			exportImages = mSession.getExportImages();
+    void refresh() {
+        if (mSession != null) {
 
-			// Get audit and repaired images by containerId
-			auditImages = mSession.getIssueImages();
-			repairedImages = mSession.getRepairedImages();
+            // Get import and export images by containerId
+            importImages = mSession.getImportImages();
+            exportImages = mSession.getExportImages();
 
-			updatedGridView();
-			updateExpandableListView();
-		}
-	}
+            // Get audit and repaired images by containerId
+            auditImages = mSession.getIssueImages();
+            repairedImages = mSession.getRepairedImages();
 
-	@UiThread
-	public void updatedGridView() {
-		gateImageAdapter.clear();
-		if (importImages != null) {
-			for (GateImage object : exportImages) {
-				gateImageAdapter.add(object);
-			}
-		}
-		gateImageAdapter.notifyDataSetChanged();
-	}
+            updatedGridView();
+            updateExpandableListView();
+        }
+    }
 
-	@UiThread
-	public void updateExpandableListView() {
-		mListAdapter.mImportImages.clear();
-		mListAdapter.mAuditImages.clear();
-		mListAdapter.mRepairedImages.clear();
+    @UiThread
+    public void updatedGridView() {
+        gateImageAdapter.clear();
+        if (importImages != null) {
+            for (GateImage object : exportImages) {
+                gateImageAdapter.add(object);
+            }
+        }
+        gateImageAdapter.notifyDataSetChanged();
+    }
 
-		if (importImages != null) {
-			mListAdapter.mImportImages.addAll(importImages);
-		}
+    @UiThread
+    public void updateExpandableListView() {
+        mListAdapter.mImportImages.clear();
+        mListAdapter.mAuditImages.clear();
+        mListAdapter.mRepairedImages.clear();
 
-		if (auditImages != null) {
-			mListAdapter.mAuditImages.addAll(auditImages);
-		}
+        if (importImages != null) {
+            mListAdapter.mImportImages.addAll(importImages);
+        }
 
-		if (repairedImages != null) {
-			mListAdapter.mRepairedImages.addAll(repairedImages);
-		}
+        if (auditImages != null) {
+            mListAdapter.mAuditImages.addAll(auditImages);
+        }
 
-		mListAdapter.notifyDataSetChanged();
-	}
+        if (repairedImages != null) {
+            mListAdapter.mRepairedImages.addAll(repairedImages);
+        }
 
-	//region EVENT HANDLER
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		EventBus.getDefault().register(this);
-	}
+        mListAdapter.notifyDataSetChanged();
+    }
 
-	@Override
-	public void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
-	}
+    //region EVENT HANDLER
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
 
-	@UiThread
-	public void onEvent(ContainerGotEvent event) {
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
 
-		// Get session
-		mSession = event.getSession();
+    @UiThread
+    public void onEvent(ContainerGotEvent event) {
 
-		if (null == mSession) {
-			// Set ContainerId to TextView
-			tvContainerId.setText(containerID);
-		} else {
-			// Get operator code
-			containerID = mSession.getContainerId();
-			operatorCode = mSession.getOperatorCode();
+        // Get session
+        mSession = event.getSession();
 
-			// Set preStatus to TextView
-			preStatus = mSession.getPreStatus();
-			tvPreStatus.setText((Status.values()[(int) preStatus]).toString());
+        if (null == mSession) {
+            // Set ContainerId to TextView
+            tvContainerId.setText(containerID);
+        } else {
+            // Get operator code
+            containerID = mSession.getContainerId();
+            operatorCode = mSession.getOperatorCode();
 
-			// Set currentStatus to TextView
-			currentStatus = mSession.getStatus();
-			tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
+            // Set preStatus to TextView
+            preStatus = mSession.getPreStatus();
+            tvPreStatus.setText((Status.values()[(int) preStatus]).toString());
 
-			// Set ContainerId to TextView
-			tvContainerId.setText(containerID);
+            // Set currentStatus to TextView
+            currentStatus = mSession.getStatus();
+            tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
 
-			refresh();
-		}
-	}
+            // Set ContainerId to TextView
+            tvContainerId.setText(containerID);
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		dataCenter.add(new GetSessionCommand(getActivity(), containerID));
-	}
+            refresh();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        dataCenter.add(new GetSessionCommand(getActivity(), containerID));
+    }
 
 
-	//endregion
+    //endregion
 
 }

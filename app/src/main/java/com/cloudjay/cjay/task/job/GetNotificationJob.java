@@ -3,7 +3,10 @@ package com.cloudjay.cjay.task.job;
 import android.content.Context;
 
 import com.cloudjay.cjay.App;
+import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.DataCenter_;
+import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
+import com.cloudjay.cjay.task.command.session.remove.RemoveSessionCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.path.android.jobqueue.Job;
@@ -14,15 +17,25 @@ public class GetNotificationJob extends Job {
     String messageId;
     String objectType;
     long objectId;
+    String containerId;
 
-
-    public GetNotificationJob(String channel, String messageId, String objectType, long objectId) {
+    public GetNotificationJob(String channel, String messageId, String objectType, long objectId, String containerId) {
         super(new Params(1).persist().requireNetwork());
         this.channel = channel;
         this.messageId = messageId;
         this.objectType = objectType;
+        this.containerId = containerId;
         this.objectId = objectId;
     }
+
+//    public GetNotificationJob(String channel, String messageId, String objectType, long objectId) {
+//        super(new Params(1).persist().requireNetwork());
+//        this.channel = channel;
+//        this.messageId = messageId;
+//        this.objectType = objectType;
+//        this.objectId = objectId;
+//    }
+
 
 
     @Override
@@ -38,6 +51,7 @@ public class GetNotificationJob extends Job {
 
         Logger.Log("Receive notification from server");
         Context context = App.getInstance().getApplicationContext();
+        Logger.Log("type: " + objectType);
 
         // Get data from notification
         if (objectType.equals("Container")) {
@@ -58,7 +72,11 @@ public class GetNotificationJob extends Job {
         } else if (objectType.equals("Operator")) {
             DataCenter_.getInstance_(context).getOperatorAsyncById(context, objectId);
 
-        } else {
+        } else if (objectType.equals("ContainerExport")) {
+            Logger.e("containerId: " + containerId);
+            DataCenter_.getInstance_(context).add(new RemoveSessionCommand(context, containerId));
+        }
+        else {
             Logger.e("Cannot parse notification");
         }
 

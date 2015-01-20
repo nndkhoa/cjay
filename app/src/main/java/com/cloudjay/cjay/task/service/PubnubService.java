@@ -60,18 +60,31 @@ public class PubnubService extends Service {
 	String uuidChannel;
 	Pubnub pubnub;
 
-	/**
-	 * Display notification in Notification Center
-	 *
-	 * @param channel
-	 * @param objectType
-	 * @param objectId
-	 * @param messageId
-	 */
-	public void pushNotification(String channel, String objectType, long objectId, String messageId) {
-		JobManager jobManager = App.getJobManager();
-		jobManager.addJobInBackground(new GetNotificationJob(channel, messageId, objectType, objectId));
-	}
+//	/**
+//	 * Display notification in Notification Center
+//	 *
+//	 * @param channel
+//	 * @param objectType
+//	 * @param objectId
+//	 * @param messageId
+//	 */
+//	public void pushNotification(String channel, String objectType, long objectId, String messageId) {
+//		JobManager jobManager = App.getJobManager();
+//		jobManager.addJobInBackground(new GetNotificationJob(channel, messageId, objectType, objectId));
+//	}
+
+    /**
+     * Display notification in Notification Center
+     *
+     * @param channel
+     * @param objectType
+     * @param objectId
+     * @param messageId
+     */
+    public void pushNotification(String channel, String objectType, long objectId, String messageId,String container_id) {
+        JobManager jobManager = App.getJobManager();
+        jobManager.addJobInBackground(new GetNotificationJob(channel, messageId, objectType, objectId,container_id));
+    }
 
 
 	@Override
@@ -87,17 +100,21 @@ public class PubnubService extends Service {
 		public void handleMessage(Message msg) {
 
 			Bundle b = msg.getData();
+
+            Logger.e(b.toString());
+
 			final String channel = b.getString("channel");
 			final String objectType = b.getString("object_type");
 			final long objectId = b.getLong("object_id");
 			final String messageId = b.getString("message_id");
+            final String containerId = b.getString("container_id");
 
 			Handler handler = new Handler();
 			handler.postDelayed(new Runnable() {
 
 				@Override
 				public void run() {
-					pushNotification(channel, objectType, objectId, messageId);
+					pushNotification(channel, objectType, objectId, messageId, containerId);
 				}
 
 			}, DELAY_TIME);
@@ -127,6 +144,7 @@ public class PubnubService extends Service {
 			b.putString("object_type", item.getObjectType());
 			b.putLong("object_id", item.getObjectId());
 			b.putString("message_id", item.getMessageId());
+            b.putString("container_id", item.getContainerId());
 			msg.setData(b);
 			handler.sendMessage(msg);
 		} catch (Exception e) {

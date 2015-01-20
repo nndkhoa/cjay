@@ -20,6 +20,18 @@ public class NotificationItem {
 	@Expose
 	private String messageId;
 
+    public String getContainerId() {
+        return containerId;
+    }
+
+    public void setContainerId(String containerId) {
+        this.containerId = containerId;
+    }
+
+    @SerializedName("container_id")
+    @Expose
+    private String containerId;
+
 	public String getObjectType() {
 		return objectType;
 	}
