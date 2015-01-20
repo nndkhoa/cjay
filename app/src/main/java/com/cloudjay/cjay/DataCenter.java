@@ -1700,4 +1700,22 @@ public class DataCenter {
             context.stopService(new Intent(context, UploadIntentService_.class));
         }
     }
+
+    //Back from available to audit step
+    public void backToAudit(Context context, String containerId) {
+        try {
+            DB db = App.getDB(context);
+            Session session = db.getObject(containerId, Session.class);
+            session.setLocalStep(Step.AUDIT.value);
+            db.put(containerId, session);
+
+            Intent intent = new Intent(context, WizardActivity_.class);
+            intent.putExtra(WizardActivity.CONTAINER_ID_EXTRA, containerId);
+            intent.putExtra(WizardActivity.STEP_EXTRA, Step.AUDIT.value);
+            context.startActivity(intent);
+
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+    }
 }

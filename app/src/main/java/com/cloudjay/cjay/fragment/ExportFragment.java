@@ -26,6 +26,7 @@ import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.remove.RemoveSessionCommand;
 import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.AddUploadingSessionCommand;
+import com.cloudjay.cjay.task.command.session.update.ForceExportCommand;
 import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -37,6 +38,8 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
@@ -49,6 +52,7 @@ import de.greenrobot.event.EventBus;
  * Màn hình xuất
  */
 @EFragment(R.layout.fragment_export)
+@OptionsMenu(R.menu.back_audit)
 public class ExportFragment extends Fragment {
 
 	//region ATTR
@@ -148,12 +152,6 @@ public class ExportFragment extends Fragment {
 
 	@Click(R.id.btn_complete_import)
 	void btnCompleteClicked() {
-
-        if (null == mSession) {
-            Utils.showCrouton(getActivity(), "Có vấn đề về dữ liệu. Vui lòng đăng nhập lại");
-            return;
-        }
-
 		if (mSession.isValidToUpload(Step.EXPORTED) == false) {
 			Utils.showCrouton(getActivity(), "Container chưa được báo cáo đầy đủ");
 			return;
@@ -173,6 +171,12 @@ public class ExportFragment extends Fragment {
 		// Navigate to HomeActivity
 		getActivity().finish();
 	}
+
+    @OptionsItem(R.id.menu_back_audit)
+    void exportMenuItemClicked() {
+        dataCenter.add(new BackToAuditCommand(getActivity(), containerID));
+        getActivity().finish();
+    }
 	//endregion
 
 	void refresh() {
