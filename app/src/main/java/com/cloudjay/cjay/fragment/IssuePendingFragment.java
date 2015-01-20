@@ -337,7 +337,6 @@ public class IssuePendingFragment extends Fragment {
 
 	@UiThread
 	void onEvent(AuditItemChangedEvent event) {
-		Logger.Log("change event");
 		refresh();
 	}
 

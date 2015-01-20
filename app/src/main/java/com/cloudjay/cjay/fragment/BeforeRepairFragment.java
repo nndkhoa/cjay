@@ -1,4 +1,4 @@
-package com.cloudjay.cjay.fragment;
+    package com.cloudjay.cjay.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -142,8 +142,13 @@ public class BeforeRepairFragment extends Fragment {
 
     void refreshListImage() {
         if (mSession != null) {
-            List<AuditImage> list = mSession.getAuditItem(auditItemUUID).getListAuditedImages();
-            updatedData(list);
+            AuditItem auditItem = mSession.getAuditItem(auditItemUUID);
+            if (auditItem != null) {
+                List<AuditImage> list = auditItem.getListAuditedImages();
+                updatedData(list);
+            } else {
+                Logger.Log("audit item with uuid " + auditItemUUID + " is null");
+            }
         }
     }
 

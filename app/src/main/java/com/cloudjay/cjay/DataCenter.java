@@ -172,7 +172,6 @@ public class DataCenter {
         DB db = App.getDB(context);
         List<Operator> operators = networkClient.getOperators(context, null);
         for (Operator operator : operators) {
-            Logger.Log("id: " + operator.getId());
             db.put(CJayConstant.PREFIX_OPERATOR + operator.getOperatorCode(), operator);
         }
     }
@@ -1026,8 +1025,6 @@ public class DataCenter {
 
             db.put(containerId, session);
 
-            Logger.Log("Insert audit image successfully");
-
             EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
         } catch (SnappydbException e) {
             e.printStackTrace();
@@ -1411,8 +1408,6 @@ public class DataCenter {
     public boolean setWaterWashType(Context context, final AuditItem auditItem, String containerId) {
 
         try {
-            Logger.Log("Selected audit item: " + auditItem.getUuid());
-
             // Find session
             DB db = App.getDB(context);
             Session session = db.getObject(containerId, Session.class);
@@ -1575,7 +1570,7 @@ public class DataCenter {
                 PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_UPLOAD_QUEUE_INDEX, 0);
             }
 
-            Logger.Log("leftCount: " + leftCount);
+            Logger.w("leftCount: " + leftCount);
 
             // Enqueue
             int currentIndex = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_UPLOAD_QUEUE_INDEX, 0);

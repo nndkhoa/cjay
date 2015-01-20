@@ -51,7 +51,6 @@ public class GetNotificationJob extends Job {
 
         Logger.Log("Receive notification from server");
         Context context = App.getInstance().getApplicationContext();
-        Logger.Log("type: " + objectType);
 
         // Get data from notification
         if (objectType.equals("Container")) {
@@ -73,7 +72,6 @@ public class GetNotificationJob extends Job {
             DataCenter_.getInstance_(context).getOperatorAsyncById(context, objectId);
 
         } else if (objectType.equals("ContainerExport")) {
-            Logger.e("containerId: " + containerId);
             DataCenter_.getInstance_(context).add(new RemoveSessionCommand(context, containerId));
         }
         else {

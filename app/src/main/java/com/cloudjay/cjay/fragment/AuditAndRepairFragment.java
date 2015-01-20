@@ -108,6 +108,9 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
 		// Xu ly cho session da duoc Giam Dinh
 		if (mSession.getLocalStep() == Step.AUDIT.value) {
+
+            Logger.Log("go here");
+
 			if (mSession != null) {
 				if (!mSession.isValidToUpload(Step.AUDIT)) {
 					Utils.showCrouton(getActivity(), getResources().getString(R.string.warning_container_invalid));
@@ -121,6 +124,8 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 			// PUT /api/cjay/containers/{pk}/complete-audit
 			if (mSession.getId() == 0) {
 
+                Logger.Log("go here 1");
+
 				for (AuditItem auditItem : mSession.getAuditItems()) {
 					if (auditItem.getId() == 0 && auditItem.isAudited()) {
 						Logger.Log("Set upload confirmed for audit item: " + auditItem.toString());
@@ -129,6 +134,9 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 					}
 				}
 			} else {
+
+                Logger.Log("go here 2");
+
 				for (AuditItem auditItem : mSession.getAuditItems()) {
 
 					if (auditItem.getId() == 0 || auditItem.getUploadStatus() == UploadStatus.NONE.value) {
@@ -265,6 +273,16 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 				btnCompleteAudit.setVisibility(View.VISIBLE);
 				btnCompleteRepair.setVisibility(View.GONE);
 			}
+
+            /**
+            ** Created by nambv 20/01/2015
+            ** Check for show Complete Audit / Complete Repair button
+            **/
+            for (AuditItem auditItem : mSession.getAuditItems()) {
+                if (auditItem.getId() != 0 && auditItem.isRepaired()) {
+                    btnCompleteRepair.setVisibility(View.GONE);
+                }
+            }
 		}
 	}
 

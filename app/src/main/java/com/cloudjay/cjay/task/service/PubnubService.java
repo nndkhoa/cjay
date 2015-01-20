@@ -101,8 +101,6 @@ public class PubnubService extends Service {
 
 			Bundle b = msg.getData();
 
-            Logger.e(b.toString());
-
 			final String channel = b.getString("channel");
 			final String objectType = b.getString("object_type");
 			final long objectId = b.getLong("object_id");
