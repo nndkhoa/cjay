@@ -8,6 +8,7 @@ import com.cloudjay.cjay.fragment.AfterRepairFragment_;
 import com.cloudjay.cjay.fragment.BeforeRepairFragment_;
 import com.cloudjay.cjay.fragment.IssuePendingFragment_;
 import com.cloudjay.cjay.fragment.IssueRepairedFragment_;
+import com.cloudjay.cjay.model.Session;
 
 /**
  * A {@link android.support.v4.app.FragmentPagerAdapter} that returns a fragment corresponding to
@@ -51,6 +52,12 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
         mType = type;
     }
 
+    public ViewPagerAdapter(Context context, FragmentManager fm, int type) {
+        super(fm);
+        mContext = context;
+        mType = type;
+    }
+
 
     @Override
     public android.support.v4.app.Fragment getItem(int position) {
@@ -58,9 +65,9 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
         if (mType == 1) {
             switch (position) {
                 case 0:
-                    return new IssuePendingFragment_().builder().containerId(mContainerID).build();
+                    return new IssuePendingFragment_().builder().build();
                 case 1:
-                    return new IssueRepairedFragment_().builder().containerID(mContainerID).build();
+                    return new IssueRepairedFragment_().builder().build();
                 default:
                     return null;
             }

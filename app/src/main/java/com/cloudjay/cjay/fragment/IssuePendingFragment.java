@@ -20,9 +20,9 @@ import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.activity.ReuseActivity_;
 import com.cloudjay.cjay.adapter.AuditItemAdapter;
 import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
-import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
+import com.cloudjay.cjay.event.issue.AuditItemsGotParentFragmentEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
-import com.cloudjay.cjay.event.session.ContainerGotEvent;
+import com.cloudjay.cjay.event.session.ContainerGotParentFragmentEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
@@ -31,7 +31,6 @@ import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.task.command.cjayobject.AddUploadObjectCommand;
 import com.cloudjay.cjay.task.command.issue.GetListAuditItemsCommand;
 import com.cloudjay.cjay.task.command.issue.RemoveAuditItemCommand;
-import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.ForceExportCommand;
 import com.cloudjay.cjay.util.Logger;
@@ -39,13 +38,10 @@ import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
-import com.cloudjay.cjay.util.enums.UploadType;
 
-import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
@@ -66,307 +62,291 @@ import de.greenrobot.event.EventBus;
 @OptionsMenu(R.menu.issue)
 public class IssuePendingFragment extends Fragment {
 
-	//region ATTR
-	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
+    //region ATTR
+    public Session mSession;
+    public String containerId;
 
-	@FragmentArg(CONTAINER_ID_EXTRA)
-	public String containerId;
+    @Bean
+    DataCenter dataCenter;
 
-	@Bean
-	DataCenter dataCenter;
+    String operatorCode;
+    long currentStatus;
+    AuditItemAdapter mAdapter;
+    //endregion
 
-	String operatorCode;
-	long currentStatus;
-	AuditItemAdapter mAdapter;
-	Session mSession;
-	//endregion
+    //region VIEWS
+    @ViewById(R.id.tv_container_code)
+    TextView tvContainerId;
 
-	//region VIEWS
-	@ViewById(R.id.tv_container_code)
-	TextView tvContainerId;
+    @ViewById(R.id.tv_current_status)
+    TextView tvCurrentStatus;
 
-	@ViewById(R.id.tv_current_status)
-	TextView tvCurrentStatus;
+    @ViewById(R.id.btn_camera)
+    LinearLayout btnCamera;
 
-	@ViewById(R.id.btn_camera)
-	LinearLayout btnCamera;
+    @ViewById(R.id.btn_clean)
+    Button btnClean;
 
-	@ViewById(R.id.btn_clean)
-	Button btnClean;
+    @ViewById(R.id.lv_audit_items)
+    ListView lvAuditItems;
+    //endregion
 
-	@ViewById(R.id.lv_audit_items)
-	ListView lvAuditItems;
-	//endregion
+    public IssuePendingFragment() {
+        // Required empty public constructor
+    }
 
-	public IssuePendingFragment() {
-		// Required empty public constructor
-	}
+    //region VIEW INTERACTION
 
-	@AfterViews
-	void setUp() {
-		dataCenter.add(new GetSessionCommand(getActivity(), containerId));
-	}
+    @Click(R.id.btn_clean)
+    void buttonCleanClicked() {
 
-	//region VIEW INTERACTION
+        //Remove from working
+        dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), mSession.getContainerId()));
 
-	@Click(R.id.btn_clean)
-	void buttonCleanClicked() {
+        //Change step to Clean
+        mSession.setUploadStatus(UploadStatus.UPLOADING);
+        mSession.setLocalStep(Step.HAND_CLEAN.value);
 
-		//Remove from working
-		dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerId));
+        // Add container session to upload queue
+        UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
+        dataCenter.add(new AddUploadObjectCommand(getActivity(), object));
+        getActivity().finish();
+    }
 
-		//Change step to Clean
-		mSession.setUploadStatus(UploadStatus.UPLOADING);
-		mSession.setLocalStep(Step.HAND_CLEAN.value);
+    @Click(R.id.btn_camera)
+    void buttonCameraClicked() {
+        if (mAdapter == null || mAdapter.getCount() == 0) {
+            showUseGateImageDialog();
+        } else {
+            openCamera();
+        }
+    }
 
-		// Add container session to upload queue
-		UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
-		dataCenter.add(new AddUploadObjectCommand(getActivity(), object));
-		getActivity().finish();
-	}
+    @ItemClick(R.id.lv_audit_items)
+    void auditItemClicked(int position) {
+        AuditItem auditItem = mAdapter.getItem(position);
 
-	@Click(R.id.btn_camera)
-	void buttonCameraClicked() {
-		if (mAdapter == null || mAdapter.getCount() == 0) {
-			showUseGateImageDialog();
-		} else {
-			openCamera();
-		}
-	}
+        if (auditItem.isAudited()) {
+            Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
+            detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, mSession.getContainerId());
+            detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getUuid());
+            detailIssueActivity.putExtra(DetailIssueActivity.SELECTED_TAB, 0);
+            startActivity(detailIssueActivity);
+        }
+    }
+    //endregion
 
-	@ItemClick(R.id.lv_audit_items)
-	void auditItemClicked(int position) {
-		AuditItem auditItem = mAdapter.getItem(position);
+    /**
+     * Get list audit items of container
+     */
+    void refresh() {
+        dataCenter.add(new GetListAuditItemsCommand(getActivity(), containerId));
+    }
 
-		if (auditItem.isAudited()) {
-			Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
-			detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerId);
-			detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getUuid());
-			detailIssueActivity.putExtra(DetailIssueActivity.SELECTED_TAB, 0);
-			startActivity(detailIssueActivity);
-		}
-	}
-	//endregion
+    /**
+     * Pick gate in image or take audit picture
+     */
+    void showUseGateImageDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.dialog_alert_title);
+        builder.setMessage(R.string.dialog_message_use_gate_in_image);
+        builder.setPositiveButton("Không", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
 
-	/**
-	 * Get list audit items of container
-	 */
-	void refresh() {
-		if (mAdapter != null) {
-			dataCenter.add(new GetListAuditItemsCommand(getActivity(), containerId));
-		}
-	}
+                openCamera();
+                dialogInterface.dismiss();
+            }
+        });
+        builder.setNegativeButton("Có", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                openReuseActivity();
+                dialogInterface.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
 
-	@UiThread
-	public void onEvent(ContainerGotEvent event) {
-		mSession = event.getSession();
+                // Set background and text color for use gate image
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setTextColor(getResources().getColor(android.R.color.white));
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
+                        .setBackgroundResource(R.drawable.btn_green_selector);
 
-		if (mSession != null) {
+                // Set background and text color for open camera
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setTextColor(getResources().getColor(android.R.color.white));
+                ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setBackgroundResource(R.drawable.btn_red_selector);
+            }
+        });
+        dialog.show();
+    }
 
-			// Get operator code
-			containerId = mSession.getContainerId();
-			operatorCode = mSession.getOperatorCode();
+    /**
+     * Open camera to take audit picture
+     */
+    void openCamera() {
+        Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
+        cameraActivityIntent.putExtra(CameraActivity_.CONTAINER_ID_EXTRA, mSession.getContainerId());
+        cameraActivityIntent.putExtra(CameraActivity_.IMAGE_TYPE_EXTRA, ImageType.AUDIT.value);
+        cameraActivityIntent.putExtra(CameraActivity_.OPERATOR_CODE_EXTRA, operatorCode);
+        cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.AUDIT.value);
+        cameraActivityIntent.putExtra(CameraActivity_.IS_OPENED, false);
+        startActivity(cameraActivityIntent);
+    }
 
-			// Set ContainerId to TextView
-			tvContainerId.setText(containerId);
+    /**
+     * Open ReuseActivity to chose Gate Image
+     */
+    void openReuseActivity() {
+        Intent intent = new Intent(getActivity(), ReuseActivity_.class);
+        intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, mSession.getContainerId());
+        startActivityForResult(intent, 1);
+    }
 
-			// Set currentStatus to TextView
-			currentStatus = mSession.getStatus();
-			tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
+    @OptionsItem(R.id.menu_export)
+    void exportMenuItemClicked() {
+        dataCenter.add(new ForceExportCommand(getActivity(), mSession.getContainerId()));
+        getActivity().finish();
+    }
 
-			mAdapter = new AuditItemAdapter(getActivity(), R.layout.item_issue_pending,
-					mSession, operatorCode);
-			lvAuditItems.setAdapter(mAdapter);
+    @UiThread
+    void updatedData(List<AuditItem> auditItems, boolean isAudited) {
 
-			refresh();
-		} else {
-			// Set ContainerId to TextView
-			tvContainerId.setText(containerId);
-		}
-	}
+        if (mAdapter == null) {
+            mAdapter = new AuditItemAdapter(getActivity(),
+                    R.layout.item_issue_pending, mSession, operatorCode);
+        }
 
-	/**
-	 * Pick gate in image or take audit picture
-	 */
-	void showUseGateImageDialog() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setTitle(R.string.dialog_alert_title);
-		builder.setMessage(R.string.dialog_message_use_gate_in_image);
-		builder.setPositiveButton("Không", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {
+        mAdapter.clear();
+        if (auditItems != null) {
+            for (AuditItem auditItem : auditItems) {
+                mAdapter.add(auditItem);
+            }
+        }
 
-				openCamera();
-				dialogInterface.dismiss();
-			}
-		});
-		builder.setNegativeButton("Có", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {
-				openReuseActivity();
-				dialogInterface.dismiss();
-			}
-		});
-		AlertDialog dialog = builder.create();
-		dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-			@Override
-			public void onShow(DialogInterface dialogInterface) {
+        mAdapter.notifyDataSetChanged();
 
-				// Set background and text color for use gate image
-				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
-						.setTextColor(getResources().getColor(android.R.color.white));
-				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_NEGATIVE)
-						.setBackgroundResource(R.drawable.btn_green_selector);
+        // If container has audit image(s), hide button Container Ve sinh - quet
+        if (mAdapter.getCount() > 0 || isAudited) {
+            btnClean.setVisibility(View.GONE);
+        }
+    }
 
-				// Set background and text color for open camera
-				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
-						.setTextColor(getResources().getColor(android.R.color.white));
-				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
-						.setBackgroundResource(R.drawable.btn_red_selector);
-			}
-		});
-		dialog.show();
-	}
+    //region EVENT HANDLER
 
-	/**
-	 * Open camera to take audit picture
-	 */
-	void openCamera() {
-		Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-		cameraActivityIntent.putExtra(CameraActivity_.CONTAINER_ID_EXTRA, containerId);
-		cameraActivityIntent.putExtra(CameraActivity_.IMAGE_TYPE_EXTRA, ImageType.AUDIT.value);
-		cameraActivityIntent.putExtra(CameraActivity_.OPERATOR_CODE_EXTRA, operatorCode);
-		cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.AUDIT.value);
-		cameraActivityIntent.putExtra(CameraActivity_.IS_OPENED, false);
-		startActivity(cameraActivityIntent);
-	}
+    @UiThread
+    void onEvent(IssueMergedEvent event) {
 
-	/**
-	 * Open ReuseActivity to chose Gate Image
-	 */
-	void openReuseActivity() {
-		Intent intent = new Intent(getActivity(), ReuseActivity_.class);
-		intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, containerId);
-		startActivityForResult(intent, 1);
-	}
+        // Delete merged audit item containerId
+        String containerId = event.getContainerId();
+        String itemUuid = event.getItemUuid();
+        dataCenter.add(new RemoveAuditItemCommand(getActivity(), containerId, itemUuid));
+    }
 
-	@UiThread
-	public void onEvent(AuditItemsGotEvent event) {
+    @UiThread
+    void onEvent(AuditItemChangedEvent event) {
+        refresh();
+    }
 
-		// Filter list audit items that was not repair
-		boolean isAudited = false;
-		List<AuditItem> list = new ArrayList<>();
-		List<AuditItem> listRepair = new ArrayList<>();
-		for (AuditItem auditItem : event.getAuditItems()) {
-			if (!auditItem.isRepaired()) {
-				list.add(auditItem);
-			} else {
-				listRepair.add(auditItem);
-			}
-		}
-		if (listRepair.size() != 0){
-			isAudited = true;
-		}
+    @UiThread
+    void onEvent(UploadSucceededEvent event) {
+        mSession = event.getSession();
+        refresh();
+    }
 
-		// Sort list audit
-		Comparator<AuditItem> comparator = new Comparator<AuditItem>() {
-			@Override
-			public int compare(AuditItem auditItem, AuditItem auditItem2) {
-				if (!auditItem.isAudited()) {
-					if (auditItem2.isAudited()) {
-						return 1;
-					} else {
-						return -1;
-					}
-				} else {
-					return -1;
-				}
-			}
-		};
+    @UiThread
+    void onEvent(UploadStartedEvent event) {
+        mSession = event.getSession();
+        refresh();
+    }
 
-		Collections.sort(list, comparator);
-		updatedData(list, isAudited);
-	}
+    @UiThread
+    public void onEvent(ContainerGotParentFragmentEvent event) {
+        mSession = event.getSession();
+        if (null == mSession) {
+            Logger.Log("mSession is null");
+        } else {
+            updateViews();
+        }
+    }
 
+    @UiThread
+    public void onEvent(AuditItemsGotParentFragmentEvent event) {
+        List<AuditItem> auditItems = event.getAuditItems();
+        updateAuditItems(auditItems);
+    }
 
-	@OptionsItem(R.id.menu_export)
-	void exportMenuItemClicked() {
-		dataCenter.add(new ForceExportCommand(getActivity(), containerId));
-		getActivity().finish();
-	}
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
 
-	@UiThread
-	void updatedData(List<AuditItem> auditItems, boolean isAudited) {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
 
-		if (mAdapter == null) {
-			mAdapter = new AuditItemAdapter(getActivity(),
-					R.layout.item_issue_pending, mSession, operatorCode);
-		}
+    void updateViews() {
+        // Get operator code
+        operatorCode = mSession.getOperatorCode();
 
-		mAdapter.clear();
-		if (auditItems != null) {
-			for (AuditItem auditItem : auditItems) {
-				mAdapter.add(auditItem);
-			}
-		}
+        // Set ContainerId to TextView
+        tvContainerId.setText(mSession.getContainerId());
+        containerId = mSession.getContainerId();
 
-		mAdapter.notifyDataSetChanged();
+        // Set currentStatus to TextView
+        currentStatus = mSession.getStatus();
+        tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
 
-		// If container has audit image(s), hide button Container Ve sinh - quet
-		if (mAdapter.getCount() > 0 || isAudited) {
-			btnClean.setVisibility(View.GONE);
-		}
-	}
+        mAdapter = new AuditItemAdapter(getActivity(), R.layout.item_issue_pending,
+                mSession, operatorCode);
+        lvAuditItems.setAdapter(mAdapter);
+    }
 
-	//region EVENT HANDLER
+    void updateAuditItems(List<AuditItem> auditItems) {
+        // Filter list audit items that was not repair
+        boolean isAudited = false;
+        List<AuditItem> list = new ArrayList<>();
+        List<AuditItem> listRepair = new ArrayList<>();
+        Logger.Log("size: " + auditItems);
+        for (AuditItem auditItem : auditItems) {
+            if (!auditItem.isRepaired()) {
+                list.add(auditItem);
+            } else {
+                listRepair.add(auditItem);
+            }
+        }
+        if (listRepair.size() != 0) {
+            isAudited = true;
+        }
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		refresh();
-	}
+        // Sort list audit
+        Comparator<AuditItem> comparator = new Comparator<AuditItem>() {
+            @Override
+            public int compare(AuditItem auditItem, AuditItem auditItem2) {
+                if (!auditItem.isAudited()) {
+                    if (auditItem2.isAudited()) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                } else {
+                    return -1;
+                }
+            }
+        };
 
-	@UiThread
-	void onEvent(IssueMergedEvent event) {
+        Collections.sort(list, comparator);
+        updatedData(list, isAudited);
+    }
 
-		// Delete merged audit item containerId
-		String containerId = event.getContainerId();
-		String itemUuid = event.getItemUuid();
-		dataCenter.add(new RemoveAuditItemCommand(getActivity(), containerId, itemUuid));
-	}
-
-	@UiThread
-	void onEvent(AuditItemChangedEvent event) {
-		refresh();
-	}
-
-	@UiThread
-	void onEvent(UploadSucceededEvent event) {
-		if (event.uploadType == UploadType.AUDIT_ITEM) {
-
-		}
-
-		mSession = event.getSession();
-		refresh();
-	}
-
-	@UiThread
-	void onEvent(UploadStartedEvent event) {
-		mSession = event.getSession();
-		refresh();
-	}
-
-	@Override
-	public void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		EventBus.getDefault().register(this);
-	}
-	//endregion
+    //endregion
 
 }
