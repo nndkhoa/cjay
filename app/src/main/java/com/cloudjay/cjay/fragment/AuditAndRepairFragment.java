@@ -190,16 +190,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
                 btnCompleteAudit.setVisibility(View.VISIBLE);
                 btnCompleteRepair.setVisibility(View.GONE);
             }
-
-//            /**
-//             ** Created by nambv 20/01/2015
-//             ** Check for show Complete Audit / Complete Repair button
-//             **/
-//            for (AuditItem auditItem : mSession.getAuditItems()) {
-//                if (auditItem.getId() != 0 && auditItem.isRepaired()) {
-//                    btnCompleteRepair.setVisibility(View.GONE);
-//                }
-//            }
         }
     }
 
