@@ -31,6 +31,6 @@ public class RestAdapterProvider {
 		// Init header, pass 3 params: token, app version, username
 		String appVersion = Utils.getAppVersionName(context);
 		ApiHeaders headers = new ApiHeaders(token, appVersion, username);
-		return new RestAdapter.Builder().setLogLevel(RestAdapter.LogLevel.HEADERS).setEndpoint(ApiEndpoint.ROOT_API).setRequestInterceptor(headers).build();
+		return new RestAdapter.Builder().setLogLevel(RestAdapter.LogLevel.FULL).setEndpoint(ApiEndpoint.ROOT_API).setRequestInterceptor(headers).build();
 	}
 }

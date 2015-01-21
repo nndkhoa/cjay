@@ -20,6 +20,7 @@ public class ApiEndpoint {
 	public static final String CONTAINER_SESSIONS_API = "/api/cjay/containers";
 	public static final String CONTAINER_SESSION_ITEM_API = "/api/cjay/containers/{id}";
 
+	public static final String CONTAINER_SESSION_UPDATE_API = "/api/cjay/containers/{id}/update-pending";
 	public static final String CONTAINER_SESSION_CHECK_OUT_API = "/api/cjay/containers/{id}/check-out";
 	public static final String CONTAINER_SESSION_COMPLETE_REPAIR_API = "/api/cjay/containers/{id}/complete-repair";
 	public static final String CONTAINER_SESSION_POST_AUDIT_ITEM_API = "/api/cjay/containers/{id}/post-audit-item";

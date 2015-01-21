@@ -56,6 +56,9 @@ public interface NetworkService {
 	@POST(ApiEndpoint.CONTAINER_SESSIONS_API)
 	public Session postContainer(@Body JsonObject jsonSessionString);
 
+	@PUT(ApiEndpoint.CONTAINER_SESSION_UPDATE_API)
+	public Session updateContainer(@Path("id") long containerPk, @Body JsonObject jsonSession);
+
 	@PUT(ApiEndpoint.CONTAINER_SESSION_CHECK_OUT_API)
 	public Session checkOutContainerSession(@Path("id") long containerPk, @Body JsonObject jsonGateImage);
 
