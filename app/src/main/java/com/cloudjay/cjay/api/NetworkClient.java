@@ -12,7 +12,6 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -233,9 +232,15 @@ public class NetworkClient {
 	 */
 	public Session uploadSession(Context context, Session session) {
 
-		Logger.Log("Session: " + session.getJsonSession().toString());
-		Session result = provider.getRestAdapter(context).create(NetworkService.class).postContainer(session.getJsonSession());
-		return result;
+		if (session.getId() == 0) {
+			Logger.Log("Session: " + session.getJsonSession().toString());
+			Session result = provider.getRestAdapter(context).create(NetworkService.class).postContainer(session.getJsonSession());
+			return result;
+		} else {
+			Logger.Log("Update Session: " + session.getJsonSession().toString());
+			Session result = provider.getRestAdapter(context).create(NetworkService.class).updateContainer(session.getId(),session.getJsonSession());
+			return result;
+		}
 	}
 
 	/**
@@ -249,7 +254,7 @@ public class NetworkClient {
 
 		try {
 			Session checkOutSession = provider.getRestAdapter(context).create(NetworkService.class).checkOutContainerSession(containerSession.getId(), containerSession.getGateOutImageToUpLoad());
-            Logger.logJson(checkOutSession, Session.class);
+			Logger.logJson(checkOutSession, Session.class);
 			return checkOutSession;
 		} catch (RetrofitError e) {
 			Logger.Log(e.getResponse().getReason().toString());
@@ -267,7 +272,7 @@ public class NetworkClient {
 	 * @param containerSession
 	 * @return
 	 */
-	public Session completeAudit(Context context, Session containerSession) throws RetrofitError{
+	public Session completeAudit(Context context, Session containerSession) throws RetrofitError {
 
 		try {
 			Session completeAuditSession = provider.getRestAdapter(context).create(NetworkService.class).completeAudit(containerSession.getId());
@@ -322,14 +327,14 @@ public class NetworkClient {
 	public AuditItem addAuditImage(Context context, AuditItem auditItem) {
 
 		String uuid = auditItem.getUuid();
-        JsonObject addedAuditImagesToUpload = auditItem.getAddedAuditImagesToUpload();
+		JsonObject addedAuditImagesToUpload = auditItem.getAddedAuditImagesToUpload();
 
-        if (!addedAuditImagesToUpload.isJsonNull()) {
-            AuditItem result = provider.getRestAdapter(context).create(NetworkService.class).addAuditImages(String.valueOf(auditItem.getId()), addedAuditImagesToUpload);
-            result.setUuid(uuid);
-            return result;
-        }
-        return null;
+		if (!addedAuditImagesToUpload.isJsonNull()) {
+			AuditItem result = provider.getRestAdapter(context).create(NetworkService.class).addAuditImages(String.valueOf(auditItem.getId()), addedAuditImagesToUpload);
+			result.setUuid(uuid);
+			return result;
+		}
+		return null;
 	}
 
 	/**

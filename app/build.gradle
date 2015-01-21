@@ -87,10 +87,10 @@ android {
             }
         }
 
-        debug {
-            applicationIdSuffix '.dev'
-            versionNameSuffix '-dev' + '-' + System.getenv('HOME').split('/').last()
-        }
+//        debug {
+//            applicationIdSuffix '.dev'
+//            versionNameSuffix '-dev' + '-' + System.getenv('HOME').split('/').last()
+//        }
     }
     lintOptions {
         abortOnError false
