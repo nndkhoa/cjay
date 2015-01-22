@@ -140,6 +140,7 @@ public class IssuePendingFragment extends Fragment {
      * Get list audit items of container
      */
     void refresh() {
+        Logger.w("refresh");
         dataCenter.add(new GetListAuditItemsCommand(getActivity(), containerId));
     }
 
@@ -191,7 +192,7 @@ public class IssuePendingFragment extends Fragment {
      */
     void openCamera() {
         Intent cameraActivityIntent = new Intent(getActivity(), CameraActivity_.class);
-        cameraActivityIntent.putExtra(CameraActivity_.CONTAINER_ID_EXTRA, mSession.getContainerId());
+        cameraActivityIntent.putExtra(CameraActivity_.CONTAINER_ID_EXTRA, containerId);
         cameraActivityIntent.putExtra(CameraActivity_.IMAGE_TYPE_EXTRA, ImageType.AUDIT.value);
         cameraActivityIntent.putExtra(CameraActivity_.OPERATOR_CODE_EXTRA, operatorCode);
         cameraActivityIntent.putExtra(CameraActivity_.CURRENT_STEP_EXTRA, Step.AUDIT.value);
@@ -250,23 +251,25 @@ public class IssuePendingFragment extends Fragment {
 
     @UiThread
     void onEvent(AuditItemChangedEvent event) {
-        refresh();
+        Logger.w("on AuditItemChangedEvent");
+//        refresh();
     }
 
     @UiThread
     void onEvent(UploadSucceededEvent event) {
-        mSession = event.getSession();
-        refresh();
+        Logger.Log("on UploadSucceededEvent");
+//        refresh();
     }
 
     @UiThread
     void onEvent(UploadStartedEvent event) {
-        mSession = event.getSession();
-        refresh();
+        Logger.w("on UploadStartedEvent");
+//        refresh();
     }
 
     @UiThread
     public void onEvent(ContainerGotParentFragmentEvent event) {
+        Logger.w("on AuditItemsGotParentFragmentEvent");
         mSession = event.getSession();
         if (null == mSession) {
             Logger.Log("mSession is null");
@@ -277,6 +280,7 @@ public class IssuePendingFragment extends Fragment {
 
     @UiThread
     public void onEvent(AuditItemsGotParentFragmentEvent event) {
+        Logger.w("on AuditItemsGotParentFragmentEvent");
         List<AuditItem> auditItems = event.getAuditItems();
         updateAuditItems(auditItems);
     }

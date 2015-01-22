@@ -105,6 +105,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
     @Override
     public void onResume() {
         super.onResume();
+        Logger.Log("onResume");
         dataCenter.add(new GetSessionCommand(getActivity(), containerID));
     }
 
