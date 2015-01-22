@@ -12,6 +12,7 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.DetailIssueActivity;
 import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.adapter.RepairedItemAdapter;
+import com.cloudjay.cjay.event.issue.RepairedItemsGotEvent;
 import com.cloudjay.cjay.event.session.ContainerGotParentFragmentEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
@@ -112,11 +113,11 @@ public class IssueRepairedFragment extends Fragment {
         }
     }
 
-//    @UiThread
-//    public void onEvent(RepairedItemGotParentFragmentEvent event) {
-//        repairedList = event.getAuditItems();
-//        updatedData(repairedList);
-//    }
+    @UiThread
+    public void onEvent(RepairedItemsGotEvent event) {
+        repairedList = event.getAuditItems();
+        updatedData(repairedList);
+    }
 
     private void updateViews() {
         if (mSession != null) {

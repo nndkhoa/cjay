@@ -252,7 +252,7 @@ public class IssuePendingFragment extends Fragment {
     @UiThread
     void onEvent(AuditItemChangedEvent event) {
         Logger.w("on AuditItemChangedEvent");
-//        refresh();
+        refresh();
     }
 
     @UiThread
