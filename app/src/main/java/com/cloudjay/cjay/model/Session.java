@@ -815,7 +815,6 @@ public class Session implements Serializable {
                         SimpleDateFormat format = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 
                         if (TextUtils.isEmpty(serverItem.getModifiedAt())) {
-                            Logger.w("date: " + serverItem.getModifiedAt());
                             Logger.w("Audit item id: " + serverItem.getId());
 	                        throw new RuntimeException("Cannot find audit item # modified_at attr");
                         } else {
@@ -827,7 +826,6 @@ public class Session implements Serializable {
 
                                     // TODO: need to debug
                                     if (!server.before(local)) {
-                                        Logger.w("date 4: " + serverItem.getModifiedAt());
                                         localItem.merge(serverItem);
                                     }
 

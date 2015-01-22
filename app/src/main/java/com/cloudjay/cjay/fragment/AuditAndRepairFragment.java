@@ -314,16 +314,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
     }
 
     public void onEventMainThread(ContainerGotEvent event) {
-
-        Logger.w("on ContainerGotEvent");
-
         mSession = event.getSession();
-
-        for (AuditItem auditItem : mSession.getAuditItems()) {
-            Logger.w("item id: " + auditItem.getId());
-            Logger.w("item audited: " + auditItem.isAudited());
-        }
-
         checkForShowButton();
         EventBus.getDefault().post(new ContainerGotParentFragmentEvent(mSession));
         EventBus.getDefault().post(new AuditItemsGotEvent(mSession.getAuditItems()));
