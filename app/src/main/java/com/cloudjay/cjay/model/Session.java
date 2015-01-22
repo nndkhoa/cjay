@@ -958,7 +958,14 @@ public class Session implements Serializable {
 
     public Session prepareForUploading() {
 
-        Step step = Step.values()[localStep];
+        Step step;
+
+        if (localStep < 0 || localStep < Step.values().length) {
+            Logger.Log("localStep: " + localStep + " is out of bound");
+            step = Step.IMPORT;
+        } else {
+            step = Step.values()[localStep];
+        }
 
         // Change local step
         switch (step) {

@@ -677,6 +677,12 @@ public class DataCenter {
 
     public Session getSession(Context context, String containerId) {
         Session session = null;
+
+        if (TextUtils.isEmpty(containerId)) {
+            Logger.Log("containerId is null");
+            return null;
+        }
+
         try {
             DB db = App.getDB(context);
             String key = containerId;

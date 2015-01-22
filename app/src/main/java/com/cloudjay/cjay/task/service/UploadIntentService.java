@@ -64,17 +64,6 @@ public class UploadIntentService extends Service {
      * @param event
      */
     public void onEvent(UploadSucceededEvent event) {
-
-//        // Remove Session
-//        if (event.getUploadType().equals(UploadType.SESSION)) {
-//            Logger.Log("localStep: " + event.getSession().getLocalStep());
-//            if (event.getSession().getLocalStep() == -1) {
-//                Logger.Log("remove session: " + event.getSession().getContainerId());
-//                dataCenter.add(new RemoveSessionCommand(getApplicationContext(),
-//                        event.getSession().getContainerId()));
-//            }
-//        }
-
         Logger.Log("on UploadSucceededEvent");
         processing = false;
         queue.remove();

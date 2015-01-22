@@ -28,7 +28,6 @@ import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.task.command.cjayobject.AddUploadObjectCommand;
 import com.cloudjay.cjay.task.command.issue.SetWaterWashAuditItemCommand;
 import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
-import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
@@ -223,7 +222,6 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 
 					// Lỗi chưa duyệt hoặc đã duyệt thì cho phép sửa
 					if (null == auditItem.isAllowed() || auditItem.isAllowed()) {
-						Logger.Log("getUuid: " + auditItem.getUuid());
 
 						Intent intent = new Intent(mContext, ReportIssueActivity_.class);
 						intent.putExtra(ReportIssueActivity_.CONTAINER_ID_EXTRA, session.getContainerId());
@@ -281,8 +279,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 		builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
-				// Open camera activity to take repair image
-				Logger.Log("mComponentCode: " + mComponentCode);
+				// Open camera activity to take repaired image
 				openDetailIssueActivity();
 				openCamera();
 				dialogInterface.dismiss();

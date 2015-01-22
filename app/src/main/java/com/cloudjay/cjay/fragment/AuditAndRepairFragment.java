@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.fragment;
 
 import android.app.ActionBar;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -8,17 +9,20 @@ import android.view.View;
 import android.widget.Button;
 
 import com.cloudjay.cjay.DataCenter;
-import com.cloudjay.cjay.DataCenter_;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
+import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
+import com.cloudjay.cjay.event.issue.AuditItemsGotParentFragmentEvent;
+import com.cloudjay.cjay.event.issue.RepairedItemGotParentFragmentEvent;
+import com.cloudjay.cjay.event.issue.RepairedItemsGotEvent;
 import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
-import com.cloudjay.cjay.event.upload.UploadStartedEvent;
-import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
+import com.cloudjay.cjay.event.session.ContainerGotParentFragmentEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.task.command.cjayobject.AddUploadObjectCommand;
+import com.cloudjay.cjay.task.command.issue.GetListAuditItemsCommand;
 import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionForUploadCommand;
@@ -29,7 +33,6 @@ import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
-import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -41,344 +44,297 @@ import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
-/**
- * Fragment giám định và sửa chữa.
- * 1. Default sẽ hiện button giám định.
- * 2. Kiểm tra biến mSession để hiển thị
- */
 @EFragment(R.layout.fragment_audit_repair)
 public class AuditAndRepairFragment extends Fragment implements ActionBar.TabListener {
 
-	//region ATTR
-	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
-	public final static String TAB_TYPE_EXTRA = "com.cloudjay.wizard.tabtype";
+    //region ATTR
+    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
+    public final static String TAB_TYPE_EXTRA = "com.cloudjay.wizard.tabtype";
 
-	@FragmentArg(CONTAINER_ID_EXTRA)
-	public String containerID;
+    @FragmentArg(CONTAINER_ID_EXTRA)
+    public String containerID;
 
-	@FragmentArg(TAB_TYPE_EXTRA)
-	public int tabType;
+    @FragmentArg(TAB_TYPE_EXTRA)
+    public int tabType;
 
-	@Bean
-	DataCenter dataCenter;
+    @Bean
+    DataCenter dataCenter;
 
-	@ViewById(R.id.pager)
-	ViewPager pager;
+    @ViewById(R.id.pager)
+    ViewPager pager;
 
-	@ViewById(R.id.btn_complete_repair)
-	Button btnCompleteRepair;
+    @ViewById(R.id.btn_complete_repair)
+    Button btnCompleteRepair;
 
-	@ViewById(R.id.btn_complete_audit)
-	Button btnCompleteAudit;
+    @ViewById(R.id.btn_complete_audit)
+    Button btnCompleteAudit;
 
-	ActionBar actionBar;
-	private ViewPagerAdapter mPagerAdapter;
-	public int currentPosition = 0;
+    ActionBar actionBar;
+    private ViewPagerAdapter mPagerAdapter;
+    public int currentPosition = 0;
 
-	private boolean mIsUploading = false;
+    private boolean mIsUploading = false;
 
-	Session mSession;
-	//endregion
+    Session mSession;
+    List<AuditItem> mAuditItems;
+    List<AuditItem> mRepairedItems;
 
-	public AuditAndRepairFragment() {
-		// Required empty public constructor
-	}
+    //endregion
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
-		EventBus.getDefault().register(this);
-	}
+    public AuditAndRepairFragment() {
+        // Required empty public constructor
+    }
 
-	@Override
-	public void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
-	}
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        EventBus.getDefault().register(this);
+    }
 
-	@UiThread
-	public void onEvent(ContainerForUploadGotEvent event) {
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
 
-		mSession = event.getTarget();
-		Utils.showCrouton(getActivity(), getResources().getString(R.string.warning_container_invalid));
+    @Override
+    public void onResume() {
+        super.onResume();
+        Logger.Log("onResume");
+        dataCenter.add(new GetSessionCommand(getActivity(), containerID));
+    }
 
-		// Xu ly cho session da duoc Giam Dinh
-		if (mSession.getLocalStep() == Step.AUDIT.value) {
+    @AfterViews
+    void setUp() {
+        configureActionBar();
+        configureViewPager();
+    }
 
-            Logger.Log("go here");
+    private void configureViewPager() {
+        mPagerAdapter = new ViewPagerAdapter(getActivity(),
+                getActivity().getSupportFragmentManager(), tabType);
+        pager.setAdapter(mPagerAdapter);
+        pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
-			if (mSession != null) {
-				if (!mSession.isValidToUpload(Step.AUDIT)) {
-					Utils.showCrouton(getActivity(), getResources().getString(R.string.warning_container_invalid));
-					return;
-				}
-			} else {
-				Utils.showCrouton(getActivity(), "Không tìm thấy container " + containerID);
-				return;
-			}
+            @Override
+            public void onPageSelected(int position) {
+                ActionBar.Tab tab = actionBar.getTabAt(position);
+                actionBar.selectTab(tab);
+            }
 
-			// PUT /api/cjay/containers/{pk}/complete-audit
-			if (mSession.getId() == 0) {
+        });
 
-                Logger.Log("go here 1");
+        // For each of the sections in the app, add a tab to the action bar.
+        for (int i = 0; i < mPagerAdapter.getCount(); i++) {
+            actionBar.addTab(
+                    actionBar.newTab()
+                            .setText(mPagerAdapter.getPageTitle(i))
+                            .setTabListener(this)
+            );
+        }
+    }
 
-				for (AuditItem auditItem : mSession.getAuditItems()) {
-					if (auditItem.getId() == 0 && auditItem.isAudited()) {
-						Logger.Log("Set upload confirmed for audit item: " + auditItem.toString());
-						auditItem.setUploadConfirmed(true);
-						dataCenter.add(new UpdateAuditItemCommand(getActivity(), mSession.getContainerId(), auditItem));
-					}
-				}
-			} else {
+    private void configureActionBar() {
+        // Get actionbar
+        actionBar = getActivity().getActionBar();
 
-                Logger.Log("go here 2");
+        // Set ActionBar Title
+        actionBar.setTitle(R.string.fragment_repair_title);
 
-				for (AuditItem auditItem : mSession.getAuditItems()) {
+        // Fix tab layout
+        final Method method;
+        try {
+            method = actionBar.getClass()
+                    .getDeclaredMethod("setHasEmbeddedTabs", new Class[]{Boolean.TYPE});
+            method.setAccessible(true);
+            method.invoke(actionBar, false);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
 
-					if (auditItem.getId() == 0 || auditItem.getUploadStatus() == UploadStatus.NONE.value) {
-						// If audit item has not been uploaded yet
-						// Add container session to upload queue
+        // Create Actionbar Tabs
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+    }
+
+    @UiThread
+    void checkForShowButton() {
+
+        if (mSession.getLocalStep() == Step.REPAIR.value) {
+
+            for (AuditItem auditItem : mSession.getAuditItems()) {
+                if (auditItem.getId() == 0) {
+                    dataCenter.add(new ChangeSessionLocalStepCommand(getActivity(), containerID, Step.AUDIT));
+                    btnCompleteAudit.setVisibility(View.VISIBLE);
+                    btnCompleteRepair.setVisibility(View.VISIBLE);
+                    return;
+                }
+            }
+
+            btnCompleteAudit.setVisibility(View.GONE);
+            btnCompleteRepair.setVisibility(View.VISIBLE);
+        }
+
+        if (mSession.getLocalStep() == Step.AUDIT.value) {
+            if (mSession.hasRepairImages()) {
+                btnCompleteAudit.setVisibility(View.VISIBLE);
+                btnCompleteRepair.setVisibility(View.VISIBLE);
+            } else {
+                btnCompleteAudit.setVisibility(View.VISIBLE);
+                btnCompleteRepair.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    @Click(R.id.btn_complete_audit)
+    void btnCompleteAuditClicked() {
+        Logger.w("btnCompleteAuditClicked");
+        dataCenter.add(new GetSessionForUploadCommand(getActivity(), containerID));
+    }
+
+    @Click(R.id.btn_complete_repair)
+    void btnCompleteRepairClicked() {
+        Logger.w("btnCompleteRepairClicked");
+        dataCenter.add(new GetSessionForUploadCommand(getActivity(), containerID));
+    }
+
+    @Override
+    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+        int position = tab.getPosition();
+        pager.setCurrentItem(position);
+        currentPosition = position;
+    }
+
+    @Override
+    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
+    }
+
+    @Override
+    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
+    }
+
+    @UiThread
+    public void onEvent(ContainerForUploadGotEvent event) {
+        Logger.Log("on ContainerForUploadGotEvent");
+        mSession = event.getTarget();
+
+        // Check session is null or not
+        if (mSession != null) {
+            if (!mSession.isValidToUpload(Step.AUDIT)) {
+                Utils.showCrouton(getActivity(), getResources()
+                        .getString(R.string.warning_container_invalid));
+                return;
+            }
+        } else {
+            Utils.showCrouton(getActivity(), "Không tìm thấy container " + containerID);
+            return;
+        }
+
+        // Xu ly cho session da duoc Giam Dinh
+        if (mSession.getLocalStep() == Step.AUDIT.value) {
+            if (mSession.getId() == 0) {
+                for (AuditItem auditItem : mSession.getAuditItems()) {
+                    if (auditItem.getId() == 0 && auditItem.isAudited()) {
+                        Logger.Log("Set upload confirmed for audit item: " + auditItem.toString());
+                        auditItem.setUploadConfirmed(true);
+                        dataCenter.add(new UpdateAuditItemCommand(getActivity(), mSession.getContainerId(), auditItem));
+                    }
+                }
+            } else {
+                for (AuditItem auditItem : mSession.getAuditItems()) {
+
+                    if (auditItem.getId() == 0 || auditItem.getUploadStatus() == UploadStatus.NONE.value) {
+                        // If audit item has not been uploaded yet
+                        // Add container session to upload queue
                         Logger.Log("upload audit item with container id: " + mSession.getId());
-//                        try {
-//                            dataCenter.changeUploadStatus(getActivity().getApplicationContext(),
-//                                    mSession.getContainerId(), auditItem, UploadStatus.UPLOADING);
-//                        } catch (SnappydbException e) {
-//                            e.printStackTrace();
-//                        }
                         auditItem.setSession(mSession.getId());
-						UploadObject object = new UploadObject(auditItem, AuditItem.class, containerID, mSession.getId());
-						dataCenter.add(new AddUploadObjectCommand(getActivity().getApplicationContext(), object));
-					}
-				}
-			}
+                        UploadObject object = new UploadObject(auditItem, AuditItem.class, containerID, mSession.getId());
+                        dataCenter.add(new AddUploadObjectCommand(getActivity().getApplicationContext(), object));
+                    }
+                }
 
-			mSession.prepareForUploading();
-			dataCenter.add(new SaveSessionCommand(getActivity().getApplicationContext(), mSession));
+                mSession.prepareForUploading();
+                dataCenter.add(new SaveSessionCommand(getActivity().getApplicationContext(), mSession));
 
-			UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
-			dataCenter.add(new AddUploadObjectCommand(getActivity().getApplicationContext(), object));
+                UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
+                dataCenter.add(new AddUploadObjectCommand(getActivity().getApplicationContext(), object));
 
+                // Hide this button
+                btnCompleteAudit.setVisibility(View.GONE);
 
-			// Hide this button
-			btnCompleteAudit.setVisibility(View.GONE);
+                // Check if this session has repair image or not
+                if (mSession.hasRepairImages()) {
+                    btnCompleteRepair.setVisibility(View.VISIBLE);
+                } else {
 
-			// Check if this session has repair image or not
-			if (mSession.hasRepairImages()) {
-				btnCompleteRepair.setVisibility(View.VISIBLE);
-			} else {
+                    // Remove from working session
+                    dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
 
-                // Remove from working session
-                dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
+                    // Navigate to HomeActivity
+                    getActivity().finish();
+                }
+            }
+        } else if (mSession.getLocalStep() == Step.REPAIR.value) {
 
-				// Navigate to HomeActivity
-				getActivity().finish();
-			}
+            // Xu ly cho session da duoc sua chua
+            if (mSession != null) {
 
-		} else if (mSession.getLocalStep() == Step.REPAIR.value) {
+                if (mSession.getLocalStep() == Step.AUDIT.value) {
+                    Utils.showCrouton(getActivity(), getResources().getString(R.string.warning_container_invalid));
+                    return;
+                }
 
-			// Xu ly cho session da duoc sua chua
-			if (mSession != null) {
-
-				if (mSession.getLocalStep() == Step.AUDIT.value) {
-					Utils.showCrouton(getActivity(), getResources().getString(R.string.warning_container_invalid));
-					return;
-				}
-
-				if (!mSession.isValidToUpload(Step.REPAIR)) {
-					Utils.showCrouton(getActivity(), getResources().getString(R.string.warning_container_invalid));
-					return;
-				}
-			} else {
-				Utils.showCrouton(getActivity(), "Sth goes wrong. Container Id " + containerID + " not found");
-			}
+                if (!mSession.isValidToUpload(Step.REPAIR)) {
+                    Utils.showCrouton(getActivity(), getResources().getString(R.string.warning_container_invalid));
+                    return;
+                }
+            } else {
+                Utils.showCrouton(getActivity(), "Sth goes wrong. Container Id " + containerID + " not found");
+            }
 
             // Remove from working session
             dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
 
-			mSession.prepareForUploading();
-			dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
+            mSession.prepareForUploading();
+            dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
 
-			// Add containerId to upload complete repair queue
-			// PUT /api/cjay/containers/{pk}/complete-repair
-			UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
-			dataCenter.add(new AddUploadObjectCommand(getActivity(), object));
+            // Add containerId to upload complete repair queue
+            // PUT /api/cjay/containers/{pk}/complete-repair
+            UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
+            dataCenter.add(new AddUploadObjectCommand(getActivity(), object));
 
-			// Navigate to HomeActivity
-			getActivity().finish();
-		}
+            // Navigate to HomeActivity
+            getActivity().finish();
+        }
+    }
 
-	}
+    public void onEventMainThread(ContainerGotEvent event) {
+        mSession = event.getSession();
+        checkForShowButton();
+        EventBus.getDefault().post(new ContainerGotParentFragmentEvent(mSession));
+        EventBus.getDefault().post(new AuditItemsGotEvent(mSession.getAuditItems()));
+        EventBus.getDefault().post(new RepairedItemsGotEvent(mSession.getListRepairedItem()));
+    }
 
-	@UiThread
-	void onEvent(UploadStartedEvent event) {
-		mIsUploading = true;
-	}
+    public void onEvent(AuditItemsGotEvent event) {
+        Logger.w("on AuditItemsGotEvent");
+        mAuditItems = event.getAuditItems();
+        EventBus.getDefault().post(new AuditItemsGotParentFragmentEvent(mAuditItems));
+    }
 
-	@UiThread
-	void onEvent(UploadSucceededEvent event) {
-		mIsUploading = false;
-	}
-
-	@Click(R.id.btn_complete_audit)
-	void btnCompleteAuditClicked() {
-//        if (!mIsUploading) {
-//	        dataCenter.add(new GetSessionForUploadCommand(getActivity(), containerID));
-//        } else {
-//            Utils.showCrouton(getActivity(), "Vui lòng chờ quá trình tải lên hoàn tất");
-//        }
-
-		dataCenter.add(new GetSessionForUploadCommand(getActivity(), containerID));
-	}
-
-	@Click(R.id.btn_complete_repair)
-	void btnCompleteRepairClicked() {
-
-		dataCenter.add(new GetSessionForUploadCommand(getActivity(), containerID));
-	}
-
-	@AfterViews
-	void doAfterViews() {
-		configureActionBar();
-		configureViewPager();
-		dataCenter.add(new GetSessionCommand(getActivity(), containerID));
-	}
-
-	@UiThread
-	void checkForShowButton() {
-
-		if (mSession.getLocalStep() == Step.REPAIR.value) {
-
-			for (AuditItem auditItem : mSession.getAuditItems()) {
-				if (auditItem.getId() == 0) {
-					dataCenter.add(new ChangeSessionLocalStepCommand(getActivity(), containerID, Step.AUDIT));
-					btnCompleteAudit.setVisibility(View.VISIBLE);
-					btnCompleteRepair.setVisibility(View.VISIBLE);
-					return;
-				}
-			}
-
-			btnCompleteAudit.setVisibility(View.GONE);
-			btnCompleteRepair.setVisibility(View.VISIBLE);
-		}
-
-		if (mSession.getLocalStep() == Step.AUDIT.value) {
-			if (mSession.hasRepairImages()) {
-				btnCompleteAudit.setVisibility(View.VISIBLE);
-				btnCompleteRepair.setVisibility(View.VISIBLE);
-			} else {
-				btnCompleteAudit.setVisibility(View.VISIBLE);
-				btnCompleteRepair.setVisibility(View.GONE);
-			}
-
-            /**
-            ** Created by nambv 20/01/2015
-            ** Check for show Complete Audit / Complete Repair button
-            **/
-            for (AuditItem auditItem : mSession.getAuditItems()) {
-                if (auditItem.getId() != 0 && auditItem.isRepaired()) {
-                    btnCompleteRepair.setVisibility(View.GONE);
-                }
-            }
-		}
-	}
-
-	/**
-	 * Cấu hình action bar
-	 */
-	private void configureActionBar() {
-
-		// Get actionbar
-		actionBar = getActivity().getActionBar();
-
-		// Set ActionBar Title
-		actionBar.setTitle(R.string.fragment_repair_title);
-
-		// Fix tab layout
-		final Method method;
-		try {
-			method = actionBar.getClass()
-					.getDeclaredMethod("setHasEmbeddedTabs", new Class[]{Boolean.TYPE});
-			method.setAccessible(true);
-			method.invoke(actionBar, false);
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		}
-
-		// Create Actionbar Tabs
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-	}
-
-	/**
-	 * Cấu hình view pager
-	 */
-	private void configureViewPager() {
-		mPagerAdapter = new ViewPagerAdapter(getActivity(),
-				getActivity().getSupportFragmentManager(), containerID, tabType);
-		pager.setAdapter(mPagerAdapter);
-		pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-
-			@Override
-			public void onPageSelected(int position) {
-				ActionBar.Tab tab = actionBar.getTabAt(position);
-				actionBar.selectTab(tab);
-			}
-
-		});
-
-		// For each of the sections in the app, add a tab to the action bar.
-		for (int i = 0; i < mPagerAdapter.getCount(); i++) {
-			actionBar.addTab(
-					actionBar.newTab()
-							.setText(mPagerAdapter.getPageTitle(i))
-							.setTabListener(this)
-			);
-		}
-	}
-
-	@Override
-	public void onTabSelected(ActionBar.Tab tab, android.app.FragmentTransaction fragmentTransaction) {
-		int position = tab.getPosition();
-		pager.setCurrentItem(position);
-		currentPosition = position;
-	}
-
-	@Override
-	public void onTabUnselected(ActionBar.Tab tab, android.app.FragmentTransaction fragmentTransaction) {
-
-	}
-
-	@Override
-	public void onTabReselected(ActionBar.Tab tab, android.app.FragmentTransaction fragmentTransaction) {
-
-	}
-
-	public void onEvent(ContainerGotEvent event) {
-		mSession = event.getSession();
-		checkForShowButton();
-	}
-
-	/**
-	 * Dùng để kiểm tra và xử lý hiển thị button giám định và sửa chữa
-	 */
-//	public void onEvent(ImageCapturedEvent event) {
-//
-//		// requery to update button
-//		int imageType = event.getImageType();
-//		if (imageType == ImageType.AUDIT.value) {
-//			dataCenter.changeSessionLocalStepInBackground(getActivity(), containerID, Step.AUDIT);
-//		}
-//	}
-	@Override
-	public void onResume() {
-		super.onResume();
-//      dataCenter.changeSessionLocalStepInBackground(getActivity(), containerID, Step.AUDIT);
-	}
+    public void onEvent(RepairedItemsGotEvent event) {
+        Logger.w("on RepairedItemsGotEvent");
+        mRepairedItems = event.getAuditItems();
+        EventBus.getDefault().post(new RepairedItemGotParentFragmentEvent(mRepairedItems));
+    }
 }
