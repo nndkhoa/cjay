@@ -316,6 +316,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
     /**
      * Cấu hình view pager
+     *
      */
     private void configureViewPager() {
         mPagerAdapter = new ViewPagerAdapter(getActivity(),

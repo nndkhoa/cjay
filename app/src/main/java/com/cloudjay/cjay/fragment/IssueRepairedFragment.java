@@ -115,6 +115,7 @@ public class IssueRepairedFragment extends Fragment {
         if (mSession != null) {
             repairedList = mSession.getListRepairedItem();
             updatedData(repairedList);
+            
         }
     }
 

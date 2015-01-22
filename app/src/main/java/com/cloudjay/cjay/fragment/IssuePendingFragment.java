@@ -34,6 +34,7 @@ import com.cloudjay.cjay.task.command.issue.RemoveAuditItemCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.ForceExportCommand;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
@@ -263,7 +264,7 @@ public class IssuePendingFragment extends Fragment {
                 listRepair.add(auditItem);
             }
         }
-        if (listRepair.size() != 0) {
+        if (listRepair.size() != 0){
             isAudited = true;
         }
 
