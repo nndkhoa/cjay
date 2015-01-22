@@ -12,7 +12,6 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.DetailIssueActivity;
 import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.adapter.RepairedItemAdapter;
-import com.cloudjay.cjay.event.issue.RepairedItemGotParentFragmentEvent;
 import com.cloudjay.cjay.event.session.ContainerGotParentFragmentEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
