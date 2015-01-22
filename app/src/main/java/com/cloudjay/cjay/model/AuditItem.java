@@ -556,6 +556,8 @@ public class AuditItem implements Serializable{
 	// TODO: merge audit item
 	public AuditItem merge(AuditItem newItem) {
 
+        Logger.w("merge AuditItem");
+
 		// Merge cac thong tin
 		this.setId(newItem.getId());
 		this.setAllowed(newItem.isAllowed());

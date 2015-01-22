@@ -12,16 +12,14 @@ import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.DetailIssueActivity;
 import com.cloudjay.cjay.activity.DetailIssueActivity_;
 import com.cloudjay.cjay.adapter.RepairedItemAdapter;
-import com.cloudjay.cjay.event.session.ContainerGotEvent;
+import com.cloudjay.cjay.event.session.ContainerGotParentFragmentEvent;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.Status;
 
-import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
@@ -36,10 +34,8 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.fragment_issue_repaired)
 public class IssueRepairedFragment extends Fragment {
 
-    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
-
-    @FragmentArg(CONTAINER_ID_EXTRA)
-    public String containerID;
+    public Session mSession;
+    public String containerId;
 
     @ViewById(R.id.tv_container_code)
     TextView tvContainerId;
@@ -53,7 +49,7 @@ public class IssueRepairedFragment extends Fragment {
     @Bean
     DataCenter dataCenter;
 
-    Session mSession;
+    //	Session mSession;
     long currentStatus;
     RepairedItemAdapter mAdapter;
     List<AuditItem> repairedList;
@@ -69,42 +65,12 @@ public class IssueRepairedFragment extends Fragment {
         EventBus.getDefault().register(this);
     }
 
-    @AfterViews
-    void setUp() {
-        dataCenter.add(new GetSessionCommand(getActivity(), containerID));
-    }
-
-    @UiThread
-    public void onEvent(ContainerGotEvent event) {
-        // Get session by containerId
-        mSession = event.getSession();
-
-        if (mSession != null) {
-
-            // Set text ContainerId TextView
-            tvContainerId.setText(mSession.getContainerId());
-
-            // Set currentStatus to TextView
-            currentStatus = mSession.getStatus();
-            tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
-
-            mAdapter = new RepairedItemAdapter(getActivity().getApplicationContext(), R.layout.item_issue_repaired);
-            lvRepairedItem.setAdapter(mAdapter);
-
-            refresh();
-
-        } else {
-            // Set text ContainerId TextView
-            tvContainerId.setText(containerID);
-        }
-    }
-
     @ItemClick(R.id.lv_repaired_items)
     void repairItemClicked(int position) {
         AuditItem auditItem = mAdapter.getItem(position);
         if (auditItem.isAudited()) {
             Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
-            detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerID);
+            detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, mSession.getContainerId());
             detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getUuid());
             detailIssueActivity.putExtra(DetailIssueActivity.SELECTED_TAB, 0);
             startActivity(detailIssueActivity);
@@ -115,7 +81,6 @@ public class IssueRepairedFragment extends Fragment {
         if (mSession != null) {
             repairedList = mSession.getListRepairedItem();
             updatedData(repairedList);
-            
         }
     }
 
@@ -137,10 +102,34 @@ public class IssueRepairedFragment extends Fragment {
         mAdapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        dataCenter.add(new GetSessionCommand(getActivity(), containerID));
+    @UiThread
+    public void onEvent(ContainerGotParentFragmentEvent event) {
+        mSession = event.getSession();
+        if (null == mSession) {
+            Logger.Log("mSession is null");
+        } else {
+            updateViews();
+        }
+    }
+
+//    @UiThread
+//    public void onEvent(RepairedItemGotParentFragmentEvent event) {
+//        repairedList = event.getAuditItems();
+//        updatedData(repairedList);
+//    }
+
+    private void updateViews() {
+        if (mSession != null) {
+            // Set text ContainerId TextView
+            tvContainerId.setText(mSession.getContainerId());
+
+            // Set currentStatus to TextView
+            currentStatus = mSession.getStatus();
+            tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
+
+            mAdapter = new RepairedItemAdapter(getActivity().getApplicationContext(), R.layout.item_issue_repaired);
+            lvRepairedItem.setAdapter(mAdapter);
+        }
     }
 
     @Override
@@ -148,5 +137,4 @@ public class IssueRepairedFragment extends Fragment {
         EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
-
 }

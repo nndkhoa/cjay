@@ -44,11 +44,11 @@ public class SaveSessionCommand extends Command {
 	@Override
 	public void run() {
 		DataCenter dataCenter = DataCenter_.getInstance_(context);
-		boolean success = dataCenter.addOrUpdateSession(context, session);
+		session = dataCenter.addOrUpdateSession(context, session);
 
 		EventBus.getDefault().post(new ContainerGotEvent(session, session.getContainerId()));
 
-		if (uploadType != null && success)
+		if (uploadType != null && session != null)
 			EventBus.getDefault().post(new UploadSucceededEvent(session, UploadType.SESSION));
 
 		if (popUpNotification != null) {

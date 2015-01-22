@@ -799,7 +799,7 @@ public class Session implements Serializable {
 		// Merge audit items. 2 audit items bằng nhau khi giống uuid hoặc id
 		if (newSession.getAuditItems() != null && newSession.getAuditItems().size() != 0) {
 
-//			Logger.Log("Parse list audit items");
+			Logger.Log("Parse list audit items");
 
             for (AuditItem serverItem : newSession.getAuditItems()) {
                 //Set upload status for all audit item is uploaded
@@ -809,15 +809,16 @@ public class Session implements Serializable {
                 for (AuditItem localItem : auditItems) {
 
                     if (serverItem.equals(localItem)) {
+
                         found = true;
 
                         SimpleDateFormat format = new SimpleDateFormat(CJayConstant.CJAY_DATETIME_FORMAT_NO_TIMEZONE);
 
                         if (TextUtils.isEmpty(serverItem.getModifiedAt())) {
+                            Logger.w("date: " + serverItem.getModifiedAt());
                             Logger.w("Audit item id: " + serverItem.getId());
 	                        throw new RuntimeException("Cannot find audit item # modified_at attr");
                         } else {
-
                             try {
                                 Date server = format.parse(serverItem.getModifiedAt());
 
@@ -825,7 +826,8 @@ public class Session implements Serializable {
                                     Date local = format.parse(localItem.getModifiedAt());
 
                                     // TODO: need to debug
-                                    if (server.after(local)) {
+                                    if (!server.before(local)) {
+                                        Logger.w("date 4: " + serverItem.getModifiedAt());
                                         localItem.merge(serverItem);
                                     }
 
@@ -845,6 +847,9 @@ public class Session implements Serializable {
                 // --> thêm mới audit item vào session
 	            // TODO: should localize server session before merge session
                 if (!found) {
+
+                    Logger.w("not found in local");
+
 	                serverItem.setAudited(true);
 	                serverItem.setUuid(UUID.randomUUID().toString());
 	                serverItem.setUploadStatus(UploadStatus.COMPLETE);

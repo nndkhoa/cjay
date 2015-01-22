@@ -22,7 +22,7 @@ import com.cloudjay.cjay.adapter.AuditItemAdapter;
 import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
 import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
 import com.cloudjay.cjay.event.issue.IssueMergedEvent;
-import com.cloudjay.cjay.event.session.ContainerGotEvent;
+import com.cloudjay.cjay.event.session.ContainerGotParentFragmentEvent;
 import com.cloudjay.cjay.event.upload.UploadStartedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.model.AuditItem;
@@ -31,7 +31,6 @@ import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.task.command.cjayobject.AddUploadObjectCommand;
 import com.cloudjay.cjay.task.command.issue.GetListAuditItemsCommand;
 import com.cloudjay.cjay.task.command.issue.RemoveAuditItemCommand;
-import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.ForceExportCommand;
 import com.cloudjay.cjay.util.Logger;
@@ -39,13 +38,10 @@ import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
-import com.cloudjay.cjay.util.enums.UploadType;
 
-import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
@@ -67,9 +63,7 @@ import de.greenrobot.event.EventBus;
 public class IssuePendingFragment extends Fragment {
 
     //region ATTR
-    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
-
-    @FragmentArg(CONTAINER_ID_EXTRA)
+    public Session mSession;
     public String containerId;
 
     @Bean
@@ -78,7 +72,6 @@ public class IssuePendingFragment extends Fragment {
     String operatorCode;
     long currentStatus;
     AuditItemAdapter mAdapter;
-    Session mSession;
     //endregion
 
     //region VIEWS
@@ -102,18 +95,13 @@ public class IssuePendingFragment extends Fragment {
         // Required empty public constructor
     }
 
-    @AfterViews
-    void setUp() {
-        dataCenter.add(new GetSessionCommand(getActivity(), containerId));
-    }
-
     //region VIEW INTERACTION
 
     @Click(R.id.btn_clean)
     void buttonCleanClicked() {
 
         //Remove from working
-        dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerId));
+        dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), mSession.getContainerId()));
 
         //Change step to Clean
         mSession.setUploadStatus(UploadStatus.UPLOADING);
@@ -140,7 +128,7 @@ public class IssuePendingFragment extends Fragment {
 
         if (auditItem.isAudited()) {
             Intent detailIssueActivity = new Intent(getActivity(), DetailIssueActivity_.class);
-            detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, containerId);
+            detailIssueActivity.putExtra(DetailIssueActivity.CONTAINER_ID_EXTRA, mSession.getContainerId());
             detailIssueActivity.putExtra(DetailIssueActivity.AUDIT_ITEM_EXTRA, auditItem.getUuid());
             detailIssueActivity.putExtra(DetailIssueActivity.SELECTED_TAB, 0);
             startActivity(detailIssueActivity);
@@ -152,37 +140,8 @@ public class IssuePendingFragment extends Fragment {
      * Get list audit items of container
      */
     void refresh() {
-        if (mAdapter != null) {
-            dataCenter.add(new GetListAuditItemsCommand(getActivity(), containerId));
-        }
-    }
-
-    @UiThread
-    public void onEvent(ContainerGotEvent event) {
-        mSession = event.getSession();
-
-        if (mSession != null) {
-
-            // Get operator code
-            containerId = mSession.getContainerId();
-            operatorCode = mSession.getOperatorCode();
-
-            // Set ContainerId to TextView
-            tvContainerId.setText(containerId);
-
-            // Set currentStatus to TextView
-            currentStatus = mSession.getStatus();
-            tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
-
-            mAdapter = new AuditItemAdapter(getActivity(), R.layout.item_issue_pending,
-                    mSession, operatorCode);
-            lvAuditItems.setAdapter(mAdapter);
-
-            refresh();
-        } else {
-            // Set ContainerId to TextView
-            tvContainerId.setText(containerId);
-        }
+        Logger.w("refresh");
+        dataCenter.add(new GetListAuditItemsCommand(getActivity(), containerId));
     }
 
     /**
@@ -246,52 +205,13 @@ public class IssuePendingFragment extends Fragment {
      */
     void openReuseActivity() {
         Intent intent = new Intent(getActivity(), ReuseActivity_.class);
-        intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, containerId);
+        intent.putExtra(ReuseActivity_.CONTAINER_ID_EXTRA, mSession.getContainerId());
         startActivityForResult(intent, 1);
     }
 
-    @UiThread
-    public void onEvent(AuditItemsGotEvent event) {
-
-        // Filter list audit items that was not repair
-        boolean isAudited = false;
-        List<AuditItem> list = new ArrayList<>();
-        List<AuditItem> listRepair = new ArrayList<>();
-        for (AuditItem auditItem : event.getAuditItems()) {
-            if (!auditItem.isRepaired()) {
-                list.add(auditItem);
-            } else {
-                listRepair.add(auditItem);
-            }
-        }
-        if (listRepair.size() != 0){
-            isAudited = true;
-        }
-
-        // Sort list audit
-        Comparator<AuditItem> comparator = new Comparator<AuditItem>() {
-            @Override
-            public int compare(AuditItem auditItem, AuditItem auditItem2) {
-                if (!auditItem.isAudited()) {
-                    if (auditItem2.isAudited()) {
-                        return 1;
-                    } else {
-                        return -1;
-                    }
-                } else {
-                    return -1;
-                }
-            }
-        };
-
-        Collections.sort(list, comparator);
-        updatedData(list, isAudited);
-    }
-
-
     @OptionsItem(R.id.menu_export)
     void exportMenuItemClicked() {
-        dataCenter.add(new ForceExportCommand(getActivity(), containerId));
+        dataCenter.add(new ForceExportCommand(getActivity(), mSession.getContainerId()));
         getActivity().finish();
     }
 
@@ -320,12 +240,6 @@ public class IssuePendingFragment extends Fragment {
 
     //region EVENT HANDLER
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        refresh();
-    }
-
     @UiThread
     void onEvent(IssueMergedEvent event) {
 
@@ -337,23 +251,38 @@ public class IssuePendingFragment extends Fragment {
 
     @UiThread
     void onEvent(AuditItemChangedEvent event) {
-        refresh();
+        Logger.w("on AuditItemChangedEvent");
+//        refresh();
     }
 
     @UiThread
     void onEvent(UploadSucceededEvent event) {
-        if (event.uploadType == UploadType.AUDIT_ITEM) {
-
-        }
-
-        mSession = event.getSession();
-        refresh();
+        Logger.Log("on UploadSucceededEvent");
+//        refresh();
     }
 
     @UiThread
     void onEvent(UploadStartedEvent event) {
+        Logger.w("on UploadStartedEvent");
+//        refresh();
+    }
+
+    @UiThread
+    public void onEvent(ContainerGotParentFragmentEvent event) {
+        Logger.w("on AuditItemsGotParentFragmentEvent");
         mSession = event.getSession();
-        refresh();
+        if (null == mSession) {
+            Logger.Log("mSession is null");
+        } else {
+            updateViews();
+        }
+    }
+
+    @UiThread
+    public void onEvent(AuditItemsGotEvent event) {
+        Logger.w("on AuditItemsGotEvent");
+        List<AuditItem> auditItems = event.getAuditItems();
+        updateAuditItems(auditItems);
     }
 
     @Override
@@ -367,6 +296,62 @@ public class IssuePendingFragment extends Fragment {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
     }
+
+    void updateViews() {
+        // Get operator code
+        operatorCode = mSession.getOperatorCode();
+
+        // Set ContainerId to TextView
+        tvContainerId.setText(mSession.getContainerId());
+        containerId = mSession.getContainerId();
+
+        // Set currentStatus to TextView
+        currentStatus = mSession.getStatus();
+        tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
+
+        mAdapter = new AuditItemAdapter(getActivity(), R.layout.item_issue_pending,
+                mSession, operatorCode);
+        lvAuditItems.setAdapter(mAdapter);
+    }
+
+    void updateAuditItems(List<AuditItem> auditItems) {
+        // Filter list audit items that was not repair
+        boolean isAudited = false;
+        List<AuditItem> list = new ArrayList<>();
+        List<AuditItem> listRepair = new ArrayList<>();
+        Logger.Log("size: " + auditItems);
+        for (AuditItem auditItem : auditItems) {
+            if (!auditItem.isRepaired()) {
+                list.add(auditItem);
+            } else {
+                listRepair.add(auditItem);
+            }
+        }
+        if (listRepair.size() != 0) {
+            isAudited = true;
+        }
+
+        // Sort list audit
+        Comparator<AuditItem> comparator = new Comparator<AuditItem>() {
+            @Override
+            public int compare(AuditItem auditItem, AuditItem auditItem2) {
+                if (!auditItem.isAudited()) {
+                    if (auditItem2.isAudited()) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                } else {
+                    return -1;
+                }
+            }
+        };
+
+        Collections.sort(list, comparator);
+        updatedData(list, isAudited);
+
+    }
+
     //endregion
 
 }

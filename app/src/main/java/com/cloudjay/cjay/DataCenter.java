@@ -799,7 +799,7 @@ public class DataCenter {
      * @param context
      * @param session
      */
-    public boolean addOrUpdateSession(Context context, Session session) {
+    public Session addOrUpdateSession(Context context, Session session) {
 
         DB db = null;
         String key = session.getContainerId();
@@ -810,9 +810,12 @@ public class DataCenter {
             db = App.getDB(context);
             object = db.getObject(key, Session.class);
             object.mergeSession(session);
+
             object.setUploadStatus(UploadStatus.COMPLETE);
             Logger.Log("Local step: " + object.getLocalStep());
             db.put(key, object);
+
+            session = object;
 
         } catch (SnappydbException e) {
 
@@ -827,11 +830,11 @@ public class DataCenter {
                 }
             } catch (SnappydbException e1) {
                 Logger.w(e1.getMessage());
-                return false;
+                return null;
             }
         }
 
-        return true;
+        return session;
     }
 
     /**
