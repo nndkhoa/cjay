@@ -41,7 +41,6 @@ import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
 
 import de.greenrobot.event.EventBus;
 

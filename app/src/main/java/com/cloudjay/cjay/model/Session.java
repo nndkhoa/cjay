@@ -963,7 +963,7 @@ public class Session implements Serializable {
 
         Step step;
 
-        if (localStep < 0 || localStep < Step.values().length) {
+        if (localStep < 0 || localStep > 5) {
             Logger.Log("localStep: " + localStep + " is out of bound");
             step = Step.IMPORT;
         } else {

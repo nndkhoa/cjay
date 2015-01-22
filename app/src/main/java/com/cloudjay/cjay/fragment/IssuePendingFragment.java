@@ -269,7 +269,7 @@ public class IssuePendingFragment extends Fragment {
 
     @UiThread
     public void onEvent(ContainerGotParentFragmentEvent event) {
-        Logger.w("on AuditItemsGotParentFragmentEvent");
+        Logger.w("on ContainerGotParentFragmentEvent");
         mSession = event.getSession();
         if (null == mSession) {
             Logger.Log("mSession is null");
