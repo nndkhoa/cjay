@@ -301,7 +301,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
 						.setTextColor(mContext.getResources().getColor(android.R.color.white));
 				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
-						.setBackgroundColor(mContext.getResources().getColor(android.R.color.darker_gray));
+						.setBackgroundResource(R.drawable.selector_btn_confirm_not_report);
 			}
 		});
 		dialog.show();
@@ -371,7 +371,7 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
 						.setTextColor(mContext.getResources().getColor(android.R.color.white));
 				((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE)
-						.setBackgroundColor(mContext.getResources().getColor(android.R.color.darker_gray));
+						.setBackgroundResource(R.drawable.selector_btn_confirm_not_report);
 			}
 		});
 		dialog.show();
