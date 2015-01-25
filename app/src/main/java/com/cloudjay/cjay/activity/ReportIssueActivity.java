@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -11,12 +12,11 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.SparseArray;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cloudjay.cjay.R;
-import com.cloudjay.cjay.event.session.ContainerGotEvent;
-import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.fragment.IssueReportComponentFragment_;
 import com.cloudjay.cjay.fragment.IssueReportDamageFragment_;
 import com.cloudjay.cjay.fragment.IssueReportDimensionFragment_;
@@ -27,9 +27,7 @@ import com.cloudjay.cjay.fragment.IssueReportRepairFragment_;
 import com.cloudjay.cjay.listener.AuditorIssueReportListener;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
-import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
-import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.Utils;
 import com.google.gson.Gson;
@@ -40,7 +38,6 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
-import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.lang.reflect.InvocationTargetException;
@@ -56,9 +53,6 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
     public static final String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
     public static final String AUDIT_ITEM_EXTRA = "com.cloudjay.wizard.auditItem";
     public static final String AUDIT_IMAGE_EXTRA = "com.cloudjay.wizard.auditImage";
-
-    public static final int ISSUE_REPORT_SUMMARY_CODE = 2;
-    public static final int ISSUE_REPORT_SUMMARY_STATS = 1;
 
     private AuditorIssueReportTabPageAdaptor mViewPagerAdapter;
 
@@ -145,7 +139,7 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
         mAuditItem.setAllowed(null);
 
         dataCenter.add(new UpdateAuditItemCommand(getApplicationContext(), mContainerId, mAuditItem,
-		        codeComponent, codeDamage, codeRepair));
+                codeComponent, codeDamage, codeRepair));
         // go back
         onBackPressed();
     }
@@ -251,30 +245,12 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
                 break;
             case TYPE_DAMAGE_CODE:
                 codeDamage = val;
-//                if (!TextUtils.isEmpty(val)) {
-//                    dataCenter.getIsoCode(getApplicationContext(),
-//                            CJayConstant.PREFIX_DAMAGE_CODE,
-//                            val);
-//                }
-
                 break;
             case TYPE_REPAIR_CODE:
                 codeRepair = val;
-//                if (!TextUtils.isEmpty(val)) {
-//                    dataCenter.getIsoCode(getApplicationContext(),
-//                            CJayConstant.PREFIX_REPAIR_CODE,
-//                            val);
-//                }
-
                 break;
             case TYPE_COMPONENT_CODE:
                 codeComponent = val;
-//                if (!TextUtils.isEmpty(val)) {
-//                    dataCenter.getIsoCode(getApplicationContext(),
-//                            CJayConstant.PREFIX_COMPONENT_CODE,
-//                            val);
-//                }
-
                 break;
         }
 
@@ -313,70 +289,6 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
                 break;
         }
     }
-//
-//    private void showIssueDetailSummary(Tab tab) {
-//        int position = tab.getPosition();
-//        int displayChild = 0;
-//        IssueReportFragment fragment = (IssueReportFragment) mViewPagerAdapter.getRegisteredFragment(position);
-//
-//        if (fragment != null) {
-//            switch (position) {
-//                case TAB_ISSUE_COMPONENT:
-//                    mTvCodeLabel.setText(getString(R.string.label_code_component));
-//                    mTvCodeFullName.setText(fragment.getCurrentValue(
-//                            getString(R.string.label_code_component)));
-//                    displayChild = ISSUE_REPORT_SUMMARY_CODE;
-//                    break;
-//
-//                case TAB_ISSUE_DAMAGE:
-//                    mTvCodeLabel.setText(getString(R.string.label_code_damage));
-//                    mTvCodeFullName.setText(fragment.getCurrentValue(
-//                            getString(R.string.label_code_damage)));
-//                    displayChild = ISSUE_REPORT_SUMMARY_CODE;
-//                    break;
-//
-//                case TAB_ISSUE_REPAIR:
-//                    mTvCodeLabel.setText(getString(R.string.label_code_repair));
-//                    mTvCodeFullName.setText(fragment.getCurrentValue(
-//                            getString(R.string.label_code_repair)));
-//                    displayChild = ISSUE_REPORT_SUMMARY_CODE;
-//                    break;
-//
-//                case TAB_ISSUE_LOCATION:
-//                    mTvCodeLabel.setText(getString(R.string.label_code_location));
-//                    mTvCodeFullName.setText(fragment.getCurrentValue(
-//                            getString(R.string.label_code_location)));
-//                    displayChild = ISSUE_REPORT_SUMMARY_CODE;
-//                    break;
-//
-//                case TAB_ISSUE_DIMENSION:
-//
-//                    mTvLength.setText(fragment.getCurrentValue(
-//                            getString(R.string.label_length)));
-//                    mTvHeight.setText(fragment.getCurrentValue(
-//                            getString(R.string.label_height)));
-//                    mTvQuantity.setText(fragment.getCurrentValue(
-//                            getString(R.string.label_quantity)));
-//                    displayChild = ISSUE_REPORT_SUMMARY_STATS;
-//                    break;
-//
-//                default:
-//                    // do nothing
-//                    break;
-//            }
-//        }
-//
-//        if (displayChild > 0) {
-//            if (mVfIssueSummary.getDisplayedChild() != displayChild) {
-//                mVfIssueSummary.setDisplayedChild(displayChild);
-//            }
-//            if (mVfIssueSummary.getVisibility() == View.GONE) {
-//                mVfIssueSummary.setVisibility(View.VISIBLE);
-//            }
-//        } else {
-//            mVfIssueSummary.setVisibility(View.GONE);
-//        }
-//    }
 
     @Override
     public void onTabUnselected(Tab tab, FragmentTransaction ft) {
@@ -444,6 +356,9 @@ public class ReportIssueActivity extends BaseActivity implements OnPageChangeLis
                     break;
                 case TAB_ISSUE_COMPONENT:
                     fragment = new IssueReportComponentFragment_();
+                    InputMethodManager imm = (InputMethodManager) getApplicationContext()
+                            .getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
                     break;
                 case TAB_ISSUE_DIMENSION:
                 default:

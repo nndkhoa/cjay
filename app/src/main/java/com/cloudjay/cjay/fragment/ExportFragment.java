@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ExpandableListView;
@@ -16,6 +17,8 @@ import android.widget.TextView;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.CameraActivity_;
+import com.cloudjay.cjay.activity.WizardActivity;
+import com.cloudjay.cjay.activity.WizardActivity_;
 import com.cloudjay.cjay.adapter.GateImageAdapter;
 import com.cloudjay.cjay.adapter.PhotoExpandableListAdapter;
 import com.cloudjay.cjay.event.session.ContainerGotEvent;
@@ -27,6 +30,7 @@ import com.cloudjay.cjay.task.command.cjayobject.AddUploadObjectCommand;
 import com.cloudjay.cjay.task.command.session.get.GetSessionCommand;
 import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.AddUploadingSessionCommand;
+import com.cloudjay.cjay.task.command.session.update.ChangeSessionLocalStepCommand;
 import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -190,8 +194,16 @@ public class ExportFragment extends Fragment {
             public void onClick(DialogInterface dialogInterface, int i) {
                 //Back to audit fragment
                 dialogInterface.dismiss();
-                dataCenter.add(new BackToAuditCommand(getActivity(), containerID));
-                getActivity().finish();
+
+                dataCenter.add(new ChangeSessionLocalStepCommand(getActivity(), containerID, Step.AUDIT));
+
+                // Go to audit and repair fragment
+                AuditAndRepairFragment fragment = new AuditAndRepairFragment_().builder().containerID(containerID)
+                        .tabType(1).build();
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+                transaction.replace(R.id.ll_main, fragment);
+                transaction.commit();
             }
         });
 

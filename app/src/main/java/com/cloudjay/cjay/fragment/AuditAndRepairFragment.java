@@ -191,6 +191,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
     @Click(R.id.btn_complete_audit)
     void btnCompleteAuditClicked() {
         Logger.w("btnCompleteAuditClicked");
+        Logger.w("step: " + mSession.getLocalStep());
         dataCenter.add(new GetSessionForUploadCommand(getActivity(), containerID));
     }
 
@@ -234,8 +235,11 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
             return;
         }
 
+        Logger.w("step: " + mSession.getLocalStep());
+
         // Xu ly cho session da duoc Giam Dinh
         if (mSession.getLocalStep() == Step.AUDIT.value) {
+
             if (mSession.getId() == 0) {
                 for (AuditItem auditItem : mSession.getAuditItems()) {
                     if (auditItem.getId() == 0 && auditItem.isAudited()) {
@@ -273,10 +277,10 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
                     // Remove from working session
                     dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
-
-                    // Navigate to HomeActivity
-                    getActivity().finish();
                 }
+
+                // Navigate to HomeActivity
+                getActivity().finish();
             }
         } else if (mSession.getLocalStep() == Step.REPAIR.value) {
 
