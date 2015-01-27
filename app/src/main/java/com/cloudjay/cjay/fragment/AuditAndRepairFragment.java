@@ -178,11 +178,27 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
         }
 
         if (mSession.getLocalStep() == Step.AUDIT.value) {
+            int countItemUploading = 0;
             if (mSession.hasRepairImages()) {
                 btnCompleteAudit.setVisibility(View.VISIBLE);
                 btnCompleteRepair.setVisibility(View.VISIBLE);
             } else {
-                btnCompleteAudit.setVisibility(View.VISIBLE);
+
+                for (AuditItem item : mSession.getAuditItems()){
+                    if (item.getId() == 0 && item.getUploadStatus() == UploadStatus.UPLOADING.value) {
+                        countItemUploading++;
+                    }
+                }
+
+                if (countItemUploading == mSession.getAuditItems().size()) {
+                    mIsUploading = true;
+                }
+
+                if (mIsUploading) {
+                    btnCompleteAudit.setVisibility(View.GONE);
+                } else {
+                    btnCompleteAudit.setVisibility(View.VISIBLE);
+                }
                 btnCompleteRepair.setVisibility(View.GONE);
             }
         }
@@ -240,6 +256,12 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
         // Xu ly cho session da duoc Giam Dinh
         if (mSession.getLocalStep() == Step.AUDIT.value) {
 
+            // Hide this button
+            btnCompleteAudit.setVisibility(View.GONE);
+
+            // Navigate to HomeActivity
+            getActivity().finish();
+
             if (mSession.getId() == 0) {
                 for (AuditItem auditItem : mSession.getAuditItems()) {
                     if (auditItem.getId() == 0 && auditItem.isAudited()) {
@@ -267,9 +289,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
                 UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
                 dataCenter.add(new AddUploadObjectCommand(getActivity().getApplicationContext(), object));
 
-                // Hide this button
-                btnCompleteAudit.setVisibility(View.GONE);
-
                 // Check if this session has repair image or not
                 if (mSession.hasRepairImages()) {
                     btnCompleteRepair.setVisibility(View.VISIBLE);
@@ -278,11 +297,14 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
                     // Remove from working session
                     dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
                 }
-
-                // Navigate to HomeActivity
-                getActivity().finish();
             }
         } else if (mSession.getLocalStep() == Step.REPAIR.value) {
+
+            // Hide this button
+            btnCompleteRepair.setVisibility(View.GONE);
+
+            // Navigate to HomeActivity
+            getActivity().finish();
 
             // Xu ly cho session da duoc sua chua
             if (mSession != null) {
@@ -310,9 +332,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
             // PUT /api/cjay/containers/{pk}/complete-repair
             UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
             dataCenter.add(new AddUploadObjectCommand(getActivity(), object));
-
-            // Navigate to HomeActivity
-            getActivity().finish();
         }
     }
 

@@ -10,6 +10,7 @@ import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.task.command.image.AddAuditImageCommand;
 import com.cloudjay.cjay.task.command.issue.GetListAuditItemsCommand;
 import com.cloudjay.cjay.util.enums.AddAuditImageType;
+import com.cloudjay.cjay.util.enums.UploadStatus;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -28,74 +29,74 @@ import java.util.List;
 @EActivity(R.layout.activity_merge_issue)
 public class MergeIssueActivity extends BaseActivity {
 
-	@Bean
-	DataCenter dataCenter;
+    @Bean
+    DataCenter dataCenter;
 
-	public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
-	public final static String AUDIT_IMAGE_EXTRA = "com.cloudjay.wizard.auditImage";
-	public final static String AUDIT_ITEM_REMOVE_UUID = "com.cloudjay.wizard.auditItemRemoveUUID";
+    public final static String CONTAINER_ID_EXTRA = "com.cloudjay.wizard.containerId";
+    public final static String AUDIT_IMAGE_EXTRA = "com.cloudjay.wizard.auditImage";
+    public final static String AUDIT_ITEM_REMOVE_UUID = "com.cloudjay.wizard.auditItemRemoveUUID";
 
-	@Extra(CONTAINER_ID_EXTRA)
-	public String containerID;
+    @Extra(CONTAINER_ID_EXTRA)
+    public String containerID;
 
-	@Extra(AUDIT_IMAGE_EXTRA)
-	String auditImageUUID;
+    @Extra(AUDIT_IMAGE_EXTRA)
+    String auditImageUUID;
 
-	@Extra(AUDIT_ITEM_REMOVE_UUID)
-	String auditItemRemoveUUID;
+    @Extra(AUDIT_ITEM_REMOVE_UUID)
+    String auditItemRemoveUUID;
 
-	@ViewById(R.id.lv_merge_issue)
-	ListView lvIssues;
+    @ViewById(R.id.lv_merge_issue)
+    ListView lvIssues;
 
-	AuditMergeIssueAdapter mAdapter;
+    AuditMergeIssueAdapter mAdapter;
 
-	@AfterViews
-	void setup() {
-		mAdapter = new AuditMergeIssueAdapter(this, R.layout.item_merge_issue);
-		lvIssues.setAdapter(mAdapter);
-		refresh();
-	}
+    @AfterViews
+    void setup() {
+        mAdapter = new AuditMergeIssueAdapter(this, R.layout.item_merge_issue);
+        lvIssues.setAdapter(mAdapter);
+        refresh();
+    }
 
-	@UiThread
-	public void onEvent(AuditItemsGotEvent event) {
+    @UiThread
+    public void onEvent(AuditItemsGotEvent event) {
 
-		// Filter list audit items that was not repair
-		List<AuditItem> list = new ArrayList<>();
-		for (AuditItem auditItem : event.getAuditItems()) {
-			if (auditItem.isAudited() == true && auditItem.getId() == 0) {
-				list.add(auditItem);
-			}
-		}
-		updatedData(list);
-	}
+        // Filter list audit items that was not repair
+        List<AuditItem> list = new ArrayList<>();
+        for (AuditItem auditItem : event.getAuditItems()) {
+            if (auditItem.isAudited() && auditItem.getId() == 0) {
+                list.add(auditItem);
+            }
+        }
+        updatedData(list);
+    }
 
-	@ItemClick(R.id.lv_merge_issue)
-	void lvIssuesItemClicked(int position) {
+    @ItemClick(R.id.lv_merge_issue)
+    void lvIssuesItemClicked(int position) {
 
-		AuditItem auditItem = mAdapter.getItem(position);
-		String uuid = auditItem.getUuid();
-		dataCenter.add(new AddAuditImageCommand(getApplicationContext(), containerID,
+        AuditItem auditItem = mAdapter.getItem(position);
+        String uuid = auditItem.getUuid();
+        dataCenter.add(new AddAuditImageCommand(getApplicationContext(), containerID,
                 uuid, auditItemRemoveUUID, auditImageUUID,
                 AddAuditImageType.ADD_AUDIT_IMAGE_TO_EXISTED_ISSUE.value));
-		refresh();
+        refresh();
 
-		this.finish();
-	}
+        this.finish();
+    }
 
-	void refresh() {
-		if (mAdapter != null) {
-			dataCenter.add(new GetListAuditItemsCommand(this, containerID));
-		}
-	}
+    void refresh() {
+        if (mAdapter != null) {
+            dataCenter.add(new GetListAuditItemsCommand(this, containerID));
+        }
+    }
 
-	@UiThread
-	public void updatedData(List<AuditItem> auditItems) {
-		mAdapter.clear();
-		if (auditItems != null) {
-			for (AuditItem object : auditItems) {
-				mAdapter.add(object);
-			}
-		}
-		mAdapter.notifyDataSetChanged();
-	}
+    @UiThread
+    public void updatedData(List<AuditItem> auditItems) {
+        mAdapter.clear();
+        if (auditItems != null) {
+            for (AuditItem object : auditItems) {
+                mAdapter.add(object);
+            }
+        }
+        mAdapter.notifyDataSetChanged();
+    }
 }
