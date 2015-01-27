@@ -11,6 +11,7 @@ import android.widget.Button;
 import com.cloudjay.cjay.DataCenter;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.adapter.ViewPagerAdapter;
+import com.cloudjay.cjay.event.issue.AuditItemChangedEvent;
 import com.cloudjay.cjay.event.issue.AuditItemsGotEvent;
 import com.cloudjay.cjay.event.issue.RepairedItemsGotEvent;
 import com.cloudjay.cjay.event.session.ContainerForUploadGotEvent;
@@ -161,9 +162,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
     @UiThread
     void checkForShowButton() {
-
-        Logger.Log("on checkForShowButton");
-
         if (mSession.getLocalStep() == Step.REPAIR.value) {
 
             for (AuditItem auditItem : mSession.getAuditItems()) {
@@ -181,10 +179,10 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
         if (mSession.getLocalStep() == Step.AUDIT.value) {
             int countItemUploading = 0;
-            if (mSession.hasRepairImages()) {
-                btnCompleteAudit.setVisibility(View.VISIBLE);
-                btnCompleteRepair.setVisibility(View.VISIBLE);
-            } else {
+//            if (mSession.hasRepairImages()) {
+//                btnCompleteAudit.setVisibility(View.VISIBLE);
+//                btnCompleteRepair.setVisibility(View.VISIBLE);
+//            } else {
 
                 for (AuditItem item : mSession.getAuditItems()){
                     if (item.getId() == 0 && item.getUploadStatus() == UploadStatus.UPLOADING.value) {
@@ -196,19 +194,19 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
                     mIsUploading = true;
                 }
 
-                if (mIsUploading) {
-                    Logger.Log("size count: " + countItemUploading);
-                    btnCompleteAudit.setVisibility(View.GONE);
-                } else {
-                    btnCompleteAudit.setVisibility(View.VISIBLE);
-                }
+                btnCompleteAudit.setVisibility(View.VISIBLE);
                 btnCompleteRepair.setVisibility(View.GONE);
-            }
+//            }
         }
     }
 
     @Click(R.id.btn_complete_audit)
     void btnCompleteAuditClicked() {
+
+        if (mIsUploading) {
+            Utils.showCrouton(getActivity(), "Quá trình tải lên đang được thực hiện");
+        }
+
         Logger.w("btnCompleteAuditClicked");
         Logger.w("step: " + mSession.getLocalStep());
         dataCenter.add(new GetSessionForUploadCommand(getActivity(), containerID));
@@ -238,8 +236,14 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
     }
 
     @UiThread
+    public void onEvent(AuditItemChangedEvent event) {
+        Logger.w("on AuditItemChangedEvent");
+        dataCenter.add(new GetSessionCommand(getActivity(), event.getContainerId()));
+    }
+
+    @UiThread
     public void onEvent(ContainerForUploadGotEvent event) {
-        Logger.Log("on ContainerForUploadGotEvent");
+        Logger.w("on ContainerForUploadGotEvent");
         mSession = event.getTarget();
 
         // Check session is null or not
@@ -267,7 +271,8 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
             if (mSession.getId() == 0) {
                 for (AuditItem auditItem : mSession.getAuditItems()) {
-                    if (auditItem.getId() == 0 && auditItem.isAudited()) {
+                    if (auditItem.getId() == 0 && auditItem.isAudited()
+                            && auditItem.getUploadStatus() != UploadStatus.UPLOADING.value) {
                         Logger.Log("Set upload confirmed for audit item: " + auditItem.toString());
                         auditItem.setUploadConfirmed(true);
                         dataCenter.add(new UpdateAuditItemCommand(getActivity(), mSession.getContainerId(), auditItem));
@@ -303,12 +308,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
             }
         } else if (mSession.getLocalStep() == Step.REPAIR.value) {
 
-            // Hide this button
-            btnCompleteRepair.setVisibility(View.GONE);
-
-            // Navigate to HomeActivity
-            getActivity().finish();
-
             // Xu ly cho session da duoc sua chua
             if (mSession != null) {
 
@@ -324,6 +323,12 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
             } else {
                 Utils.showCrouton(getActivity(), "Sth goes wrong. Container Id " + containerID + " not found");
             }
+
+            // Hide this button
+            btnCompleteRepair.setVisibility(View.GONE);
+
+            // Navigate to HomeActivity
+            getActivity().finish();
 
             // Remove from working session
             dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));

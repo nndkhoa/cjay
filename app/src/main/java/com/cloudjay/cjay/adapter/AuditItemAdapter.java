@@ -197,19 +197,19 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 				public void onClick(View view) {
 					//1. Update upload status
 					auditItem.setUploadStatus(UploadStatus.UPLOADING);
-					try {
-						DataCenter_.getInstance_(mContext).changeUploadStatus(mContext,
-								session.getContainerId(), auditItem, UploadStatus.UPLOADING);
-					} catch (SnappydbException e) {
-						e.printStackTrace();
-					}
-					notifyDataSetChanged();
+//					try {
+//						DataCenter_.getInstance_(mContext).changeUploadStatus(mContext,
+//								session.getContainerId(), auditItem, UploadStatus.UPLOADING);
+//					} catch (SnappydbException e) {
+//						e.printStackTrace();
+//					}
+//					notifyDataSetChanged();
 
 					if (session.getId() == 0) {
 						auditItem.setUploadConfirmed(true);
-						DataCenter_.getInstance_(mContext).add(new UpdateAuditItemCommand(mContext, session.getContainerId(), auditItem));
-
+//						DataCenter_.getInstance_(mContext).add(new UpdateAuditItemCommand(mContext, session.getContainerId(), auditItem));
 					}
+                    DataCenter_.getInstance_(mContext).add(new UpdateAuditItemCommand(mContext, session.getContainerId(), auditItem));
 					auditItem.setSession(session.getId());
 					UploadObject object = new UploadObject(auditItem, AuditItem.class, session.getContainerId());
 					DataCenter_.getInstance_(mContext).add(new AddUploadObjectCommand(mContext.getApplicationContext(), object));
