@@ -162,6 +162,8 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
     @UiThread
     void checkForShowButton() {
 
+        Logger.Log("on checkForShowButton");
+
         if (mSession.getLocalStep() == Step.REPAIR.value) {
 
             for (AuditItem auditItem : mSession.getAuditItems()) {
@@ -190,11 +192,12 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
                     }
                 }
 
-                if (countItemUploading == mSession.getAuditItems().size()) {
+                if (countItemUploading != 0 && countItemUploading == mSession.getAuditItems().size()) {
                     mIsUploading = true;
                 }
 
                 if (mIsUploading) {
+                    Logger.Log("size count: " + countItemUploading);
                     btnCompleteAudit.setVisibility(View.GONE);
                 } else {
                     btnCompleteAudit.setVisibility(View.VISIBLE);
