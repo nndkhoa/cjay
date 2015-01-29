@@ -5,6 +5,7 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 
@@ -344,10 +345,15 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
     }
 
     public void onEventMainThread(ContainerGotEvent event) {
-        mSession = event.getSession();
-        checkForShowButton();
-        EventBus.getDefault().post(new ContainerGotParentFragmentEvent(mSession));
-        EventBus.getDefault().post(new AuditItemsGotEvent(mSession.getAuditItems()));
-        EventBus.getDefault().post(new RepairedItemsGotEvent(mSession.getListRepairedItem()));
+
+        if (!TextUtils.isEmpty(containerID)) {
+            if (containerID.equals(event.getSession().getContainerId())) {
+                mSession = event.getSession();
+                checkForShowButton();
+                EventBus.getDefault().post(new ContainerGotParentFragmentEvent(mSession));
+                EventBus.getDefault().post(new AuditItemsGotEvent(mSession.getAuditItems()));
+                EventBus.getDefault().post(new RepairedItemsGotEvent(mSession.getListRepairedItem()));
+            }
+        }
     }
 }

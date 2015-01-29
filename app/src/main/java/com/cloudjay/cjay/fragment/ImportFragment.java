@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -228,9 +229,13 @@ public class ImportFragment extends Fragment {
      */
     public void onEvent(ContainerGotEvent event) {
 
-        // Trying to restore container status
-        mSession = event.getSession();
-        updatedData();
+        if (!TextUtils.isEmpty(containerID)) {
+            if (containerID.equals(event.getSession().getContainerId())) {
+                // Trying to restore container status
+                mSession = event.getSession();
+                updatedData();
+            }
+        }
     }
 
     @Override

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ExpandableListView;
@@ -294,29 +295,33 @@ public class ExportFragment extends Fragment {
     @UiThread
     public void onEvent(ContainerGotEvent event) {
 
-        // Get session
-        mSession = event.getSession();
+        if (!TextUtils.isEmpty(containerID)) {
+            if (containerID.equals(event.getSession().getContainerId())) {
+                // Get session
+                mSession = event.getSession();
 
-        if (null == mSession) {
-            // Set ContainerId to TextView
-            tvContainerId.setText(containerID);
-        } else {
-            // Get operator code
-            containerID = mSession.getContainerId();
-            operatorCode = mSession.getOperatorCode();
+                if (null == mSession) {
+                    // Set ContainerId to TextView
+                    tvContainerId.setText(containerID);
+                } else {
+                    // Get operator code
+                    containerID = mSession.getContainerId();
+                    operatorCode = mSession.getOperatorCode();
 
-            // Set preStatus to TextView
-            preStatus = mSession.getPreStatus();
-            tvPreStatus.setText((Status.values()[(int) preStatus]).toString());
+                    // Set preStatus to TextView
+                    preStatus = mSession.getPreStatus();
+                    tvPreStatus.setText((Status.values()[(int) preStatus]).toString());
 
-            // Set currentStatus to TextView
-            currentStatus = mSession.getStatus();
-            tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
+                    // Set currentStatus to TextView
+                    currentStatus = mSession.getStatus();
+                    tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
 
-            // Set ContainerId to TextView
-            tvContainerId.setText(containerID);
+                    // Set ContainerId to TextView
+                    tvContainerId.setText(containerID);
 
-            refresh();
+                    refresh();
+                }
+            }
         }
     }
 
