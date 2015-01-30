@@ -128,8 +128,10 @@ public class IssueRepairedFragment extends Fragment {
             currentStatus = mSession.getStatus();
             tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
 
-            mAdapter = new RepairedItemAdapter(getActivity().getApplicationContext(), R.layout.item_issue_repaired);
-            lvRepairedItem.setAdapter(mAdapter);
+            if (null == mAdapter) {
+                mAdapter = new RepairedItemAdapter(getActivity().getApplicationContext(), R.layout.item_issue_repaired);
+                lvRepairedItem.setAdapter(mAdapter);
+            }
         }
     }
 

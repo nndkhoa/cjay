@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -72,6 +73,7 @@ public class IssuePendingFragment extends Fragment {
     String operatorCode;
     long currentStatus;
     AuditItemAdapter mAdapter;
+
     //endregion
 
     //region VIEWS
@@ -309,9 +311,11 @@ public class IssuePendingFragment extends Fragment {
         currentStatus = mSession.getStatus();
         tvCurrentStatus.setText((Status.values()[(int) currentStatus]).toString());
 
-        mAdapter = new AuditItemAdapter(getActivity(), R.layout.item_issue_pending,
-                mSession, operatorCode);
-        lvAuditItems.setAdapter(mAdapter);
+        if (null == mAdapter) {
+            mAdapter = new AuditItemAdapter(getActivity(), R.layout.item_issue_pending,
+                    mSession, operatorCode);
+            lvAuditItems.setAdapter(mAdapter);
+        }
     }
 
     void updateAuditItems(List<AuditItem> auditItems) {
