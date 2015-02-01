@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
+import android.os.Environment;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -32,11 +33,17 @@ import com.cloudjay.cjay.task.service.QueryService_;
 import com.cloudjay.cjay.task.service.SyncIntentService_;
 import com.cloudjay.cjay.task.service.UploadIntentService_;
 import com.cloudjay.cjay.util.enums.ImageType;
+import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.pubnub.api.Pubnub;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
+import org.androidannotations.annotations.Background;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
@@ -644,4 +651,34 @@ public class Utils {
 		}
 		return false;
 	}
+
+    /*
+    * Write log to text file in Download Directory
+    * */
+    public static void writeToLogFile(Object object, String containerId) {
+        File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        for (File f : downloadDir.listFiles()) {
+            if (f.isFile() && f.getName().equals("CJay_Log.txt")) {
+                try {
+                    BufferedWriter buf = new BufferedWriter(new FileWriter(f, true));
+                    if (object instanceof Session) {
+                        Session session = (Session) object;
+                        buf.append("Begin to upload ContainerID: " + session.getContainerId() + "| Step: " + session.getLocalStep());
+                    } else if (object instanceof AuditItem) {
+                        AuditItem item = (AuditItem) object;
+                        buf.append("Begin to upload item: " + item.getComponentCode()
+                                + " " + item.getDamageCode() + " " + item.getRepairCode()
+                                + "| ContainerID: " + containerId);
+                    } else {
+                        Logger.w("not find class of this object");
+                    }
+                    buf.newLine();
+                    buf.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+        }
+    }
 }

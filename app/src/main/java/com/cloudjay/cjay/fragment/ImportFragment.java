@@ -321,6 +321,9 @@ public class ImportFragment extends Fragment {
             return;
         }
 
+        // track to log file
+        Utils.writeToLogFile(mSession, containerID);
+
         //Upload import session
         uploadImportSession(false);
 
@@ -355,6 +358,9 @@ public class ImportFragment extends Fragment {
                 return;
             }
         }
+
+        // track to log file
+        Utils.writeToLogFile(mSession, containerID);
 
         //Upload import session
         uploadImportSession(true);
@@ -661,4 +667,6 @@ public class ImportFragment extends Fragment {
             }
         }
     }
+
+
 }

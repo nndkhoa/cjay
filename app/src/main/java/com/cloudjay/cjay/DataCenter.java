@@ -1229,22 +1229,6 @@ public class DataCenter {
         Logger.Log("Begin to upload container: " + session.getContainerId() + " | Step: " + uploadStep.name());
         addLog(context, session.getContainerId(), uploadStep.name() + " | Bắt đầu quá trình upload", CJayConstant.PREFIX_LOG);
 
-        // Write log to text file
-        File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        for (File f : downloadDir.listFiles()) {
-            if (f.isFile() && f.getName().equals("CJay_Log")) {
-                try {
-                    BufferedWriter buf = new BufferedWriter(new FileWriter(f, true));
-                    buf.append("Begin to upload ContainerID: " + session.getContainerId() + "| Step: " + uploadStep.name());
-                    buf.newLine();
-                    buf.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                break;
-            }
-        }
-
         EventBus.getDefault().post(new UploadStartedEvent(session, UploadType.SESSION));
         switch (uploadStep) {
 

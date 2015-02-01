@@ -28,6 +28,7 @@ import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.task.command.cjayobject.AddUploadObjectCommand;
 import com.cloudjay.cjay.task.command.issue.SetWaterWashAuditItemCommand;
 import com.cloudjay.cjay.task.command.issue.UpdateAuditItemCommand;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
@@ -195,6 +196,10 @@ public class AuditItemAdapter extends ArrayAdapter<AuditItem> {
 			holder.btnUpload.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
+
+                    // Track audit item
+                    Utils.writeToLogFile(auditItem, session.getContainerId());
+
 					//1. Update upload status
 					auditItem.setUploadStatus(UploadStatus.UPLOADING);
 //					try {

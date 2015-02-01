@@ -162,6 +162,9 @@ public class ExportFragment extends Fragment {
             return;
         }
 
+        // Track container
+        Utils.writeToLogFile(mSession, containerID);
+
         // Add to Uploading
         dataCenter.add(new AddUploadingSessionCommand(getActivity(), mSession));
         dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));

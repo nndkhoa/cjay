@@ -210,11 +210,19 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
         Logger.w("btnCompleteAuditClicked");
         Logger.w("step: " + mSession.getLocalStep());
+
+        // Track container
+        Utils.writeToLogFile(mSession, containerID);
+
         dataCenter.add(new GetSessionForUploadCommand(getActivity(), containerID));
     }
 
     @Click(R.id.btn_complete_repair)
     void btnCompleteRepairClicked() {
+
+        // Track container
+        Utils.writeToLogFile(mSession, containerID);
+
         Logger.w("btnCompleteRepairClicked");
         dataCenter.add(new GetSessionForUploadCommand(getActivity(), containerID));
     }
@@ -286,6 +294,8 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
                         // If audit item has not been uploaded yet
                         // Add container session to upload queue
                         Logger.Log("upload audit item with container id: " + mSession.getId());
+                        // Track audit item
+                        Utils.writeToLogFile(auditItem, containerID);
                         auditItem.setSession(mSession.getId());
                         UploadObject object = new UploadObject(auditItem, AuditItem.class, containerID, mSession.getId());
                         dataCenter.add(new AddUploadObjectCommand(getActivity().getApplicationContext(), object));
