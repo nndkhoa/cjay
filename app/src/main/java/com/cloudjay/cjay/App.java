@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -35,8 +36,10 @@ import com.path.android.jobqueue.log.CustomLogger;
 import com.path.android.jobqueue.network.NetworkUtil;
 import com.snappydb.DB;
 import com.snappydb.DBFactory;
-import com.snappydb.SnappyDB;
 import com.snappydb.SnappydbException;
+
+import java.io.File;
+import java.io.IOException;
 
 public class App extends Application {
 
@@ -106,6 +109,7 @@ public class App extends Application {
         configureJobManager();
         configureAlarmManager();
         configureSettings();
+        generateSessionLogTextFile();
 
 //		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
 //		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().build());
@@ -274,6 +278,18 @@ public class App extends Application {
 
     public static JobManager getJobManager() {
         return jobManager;
+    }
+
+    public void generateSessionLogTextFile() {
+        File logFile =
+                new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "CJay_Log.txt");
+        if (!logFile.exists()) {
+            try {
+                logFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
