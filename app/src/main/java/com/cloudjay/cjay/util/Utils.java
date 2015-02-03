@@ -28,8 +28,7 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.service.LogService;
-import com.cloudjay.cjay.task.service.LogService_;
+import com.cloudjay.cjay.task.service.UploadLogService_;
 import com.cloudjay.cjay.task.service.PubnubService_;
 import com.cloudjay.cjay.task.service.QueryService_;
 import com.cloudjay.cjay.task.service.SyncIntentService_;
@@ -172,9 +171,11 @@ public class Utils {
         calendar.setTime(date);   // assigns calendar to given date
         int i = calendar.get(Calendar.HOUR); // gets hour in 12h format
 
+        Logger.w("hour i: " + i);
+
         // start 30 seconds after boot completed
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, (12 - i) * 3600);
+        cal.add(Calendar.SECOND, (11 - i) * 3600);
 
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
@@ -183,7 +184,7 @@ public class Utils {
         PendingIntent pSyncIntent = PendingIntent.getService(context, CJayConstant.ALARM_SYNC_SERVICE_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Making Alarm for Log (02/01/2015)
-        Intent logIntent = new Intent(context, LogService_.class);
+        Intent logIntent = new Intent(context, UploadLogService_.class);
         PendingIntent pLogIntent = PendingIntent.getService(context, CJayConstant.ALARM_SYNC_SERVICE_ID, logIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Start every 24 hours
@@ -662,9 +663,14 @@ public class Utils {
     * Write log to text file in Download Directory
     * */
     public static void writeToLogFile(Object object, String containerId) {
+
+        // create today String
+        String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
+        String fileName ="cjay-log-" + today + ".txt";
+
         File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         for (File f : downloadDir.listFiles()) {
-            if (f.isFile() && f.getName().equals("CJay_Log.txt")) {
+            if (f.isFile() && f.getName().equals(fileName)) {
                 try {
                     BufferedWriter buf = new BufferedWriter(new FileWriter(f, true));
                     if (object instanceof Session) {
@@ -684,6 +690,25 @@ public class Utils {
                     e.printStackTrace();
                 }
                 break;
+            }
+        }
+    }
+
+    /*
+   * Create log text file in Download Directory
+   * */
+    public static void createLogFile() {
+        // create today String
+        String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
+        String fileName = "cjay-log-" + today + ".txt";
+        File logFile =
+                new File(Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_DOWNLOADS), fileName);
+        if (!logFile.exists()) {
+            try {
+                logFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }

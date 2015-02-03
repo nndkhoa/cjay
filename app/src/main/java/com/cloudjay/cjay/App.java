@@ -109,7 +109,7 @@ public class App extends Application {
         configureJobManager();
         configureAlarmManager();
         configureSettings();
-        generateSessionLogTextFile();
+//        generateSessionLogTextFile();
 
 //		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
 //		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().build());
@@ -280,16 +280,21 @@ public class App extends Application {
         return jobManager;
     }
 
-    public void generateSessionLogTextFile() {
-        File logFile =
-                new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "CJay_Log.txt");
-        if (!logFile.exists()) {
-            try {
-                logFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+//    public void generateSessionLogTextFile() {
+//
+//        // create today String
+//        String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
+//        String fileName ="cjay-log-" + today + ".txt";
+//        File logFile =
+//                new File(Environment.getExternalStoragePublicDirectory(
+//                        Environment.DIRECTORY_DOWNLOADS), fileName);
+//        if (!logFile.exists()) {
+//            try {
+//                logFile.createNewFile();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
 }

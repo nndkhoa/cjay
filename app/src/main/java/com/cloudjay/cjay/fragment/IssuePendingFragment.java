@@ -35,6 +35,7 @@ import com.cloudjay.cjay.task.command.issue.RemoveAuditItemCommand;
 import com.cloudjay.cjay.task.command.session.remove.RemoveWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.ForceExportCommand;
 import com.cloudjay.cjay.util.Logger;
+import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.Status;
 import com.cloudjay.cjay.util.enums.Step;
@@ -55,6 +56,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -164,6 +166,12 @@ public class IssuePendingFragment extends Fragment {
         builder.setNegativeButton("Có", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                if (null == mSession) {
+                    Utils.showCrouton(getActivity(), "Lỗi không lấy được dữ liệu. Hãy thử đăng nhập lại",
+                            Style.ALERT);
+                    return;
+                }
+
                 openReuseActivity();
                 dialogInterface.dismiss();
             }
@@ -274,7 +282,8 @@ public class IssuePendingFragment extends Fragment {
         Logger.w("on ContainerGotParentFragmentEvent");
         mSession = event.getSession();
         if (null == mSession) {
-            Logger.Log("mSession is null");
+            Utils.showCrouton(getActivity(), "Lỗi không lấy được dữ liệu. Hãy thử đăng nhập lại",
+                    Style.ALERT);
         } else {
             updateViews();
         }
