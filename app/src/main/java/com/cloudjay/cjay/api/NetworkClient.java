@@ -98,7 +98,7 @@ public class NetworkClient {
 		File logFile = new File(uri);
 		TypedFile typedFile = new TypedFile("text/plain", logFile);
 
-		// Begin to post image
+		// Begin to post log file
 		Response response = restAdapter.create(NetworkService.class).postLogFile("text/plain", "media", imageName, typedFile);
 //		imageFile.exists()
 		return response;
