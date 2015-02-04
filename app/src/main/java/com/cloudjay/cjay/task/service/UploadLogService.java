@@ -34,7 +34,7 @@ public class UploadLogService extends IntentService {
         Logger.w("Start upload log service");
 
         // create today String
-        String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
+        String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_TIME_FORMAT);
         String fileName ="cjay-log-" + today + ".txt";
 
         File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
