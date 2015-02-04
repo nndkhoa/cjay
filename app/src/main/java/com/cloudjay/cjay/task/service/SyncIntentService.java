@@ -2,15 +2,21 @@ package com.cloudjay.cjay.task.service;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.os.Environment;
 import android.text.TextUtils;
 
 import com.cloudjay.cjay.DataCenter_;
+import com.cloudjay.cjay.api.NetworkClient_;
 import com.cloudjay.cjay.task.command.session.FetchSessionsCommand;
+import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
+import com.cloudjay.cjay.util.StringUtils;
 import com.cloudjay.cjay.util.Utils;
 
 import org.androidannotations.annotations.EIntentService;
+
+import java.io.File;
 
 import retrofit.RetrofitError;
 

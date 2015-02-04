@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Environment;
 
 import com.cloudjay.cjay.api.ApiEndpoint;
+import com.cloudjay.cjay.api.NetworkClient_;
 import com.cloudjay.cjay.api.NetworkService;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -39,20 +40,8 @@ public class UploadLogService extends IntentService {
 
         File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         for (File f : downloadDir.listFiles()) {
-
             if (f.isFile() && f.getName().equals(fileName)) {
-
-                // Init explicit rest adapter for upload to Google Cloud Storage
-                RestAdapter restAdapter = new RestAdapter.Builder()
-                        .setEndpoint(ApiEndpoint.CJAY_TMP_STORAGE)
-                        .setLogLevel(RestAdapter.LogLevel.HEADERS)
-                        .build();
-
-                TypedFile typedFile = new TypedFile("text/plain", f);
-
-                // Upload log file to server
-                Response response = restAdapter.create(NetworkService.class).postLogFile("image/jpeg", "media", fileName, typedFile);
-
+	            NetworkClient_.getInstance_(this).uploadLogFile(f.getAbsolutePath(), fileName);
                 break;
             }
         }

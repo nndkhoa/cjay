@@ -90,6 +90,19 @@ public class NetworkClient {
 //		imageFile.exists()
 		return response;
 	}
+
+	public Response uploadLogFile(String uri, String imageName) {
+
+		// Init explicit rest adapter for upload to Google Cloud Storage
+		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.CJAY_TMP_STORAGE).setLogLevel(RestAdapter.LogLevel.HEADERS).build();
+		File logFile = new File(uri);
+		TypedFile typedFile = new TypedFile("text/plain", logFile);
+
+		// Begin to post image
+		Response response = restAdapter.create(NetworkService.class).postLogFile("text/plain", "media", imageName, typedFile);
+//		imageFile.exists()
+		return response;
+	}
 	//endregion
 
 	//region ISO CODE
