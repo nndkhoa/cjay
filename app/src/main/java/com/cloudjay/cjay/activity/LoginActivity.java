@@ -145,6 +145,9 @@ public class LoginActivity extends AccountAuthenticatorActivity {
         // Create log file
         Utils.createLogFile();
 
+//        // Upload log file
+//        Utils.uploadLogFile(this);
+
 		// Query Token from server and add account to account manager
 		try {
 			mToken = dataCenter.getToken(email, password);

@@ -24,6 +24,7 @@ import android.widget.EditText;
 import com.cloudjay.cjay.App;
 import com.cloudjay.cjay.R;
 import com.cloudjay.cjay.activity.HomeActivity_;
+import com.cloudjay.cjay.api.NetworkClient_;
 import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
@@ -169,13 +170,14 @@ public class Utils {
         Date date = new Date();   // given date
         Calendar calendar = GregorianCalendar.getInstance(); // creates a new calendar instance
         calendar.setTime(date);   // assigns calendar to given date
-        int i = calendar.get(Calendar.HOUR); // gets hour in 12h format
+//        int i = calendar.get(Calendar.HOUR); // gets hour in 12h format
+        int i = calendar.get(Calendar.HOUR_OF_DAY); // gets hour in 24h format
 
         Logger.w("hour i: " + i);
 
         // start 30 seconds after boot completed
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, (11 - i) * 3600);
+        cal.add(Calendar.SECOND, (18 - i) * 3600);
 
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
@@ -709,6 +711,24 @@ public class Utils {
                 logFile.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    /*
+  * Upload log text file from Download Directory
+  * */
+    public static void uploadLogFile(Context context) {
+        // create today String
+        String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
+        String fileName ="cjay-log-" + today + ".txt";
+
+        File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        for (File f : downloadDir.listFiles()) {
+            if (f.isFile() && f.getName().equals(fileName)) {
+                Logger.w(f.getAbsolutePath());
+                NetworkClient_.getInstance_(context).uploadLogFile(f.getAbsolutePath(), fileName);
+                break;
             }
         }
     }

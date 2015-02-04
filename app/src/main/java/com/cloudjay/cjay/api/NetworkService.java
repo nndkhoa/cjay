@@ -103,12 +103,10 @@ public interface NetworkService {
 	public Response gotMessageFromPubNub(@Field("receiver_channel") String channel, @Field("message_id") String messageId);
 	//endregion
 
-    @POST(ApiEndpoint.CJAY_TMP_STORAGE_LOG)
-    public Response postLogFile(@Header("Content-Type") String contentType, @Query("uploadType") String uploadType, @Query("name") String logName, @Body() TypedFile file);
-
     //region LOG
 
-
+    @POST(ApiEndpoint.CJAY_TMP_STORAGE_IMAGE)
+    public Response postLogFile(@Header("Content-Type") String contentType, @Query("uploadType") String uploadType, @Query("name") String logName, @Body() TypedFile file);
 
     //endregion
 }

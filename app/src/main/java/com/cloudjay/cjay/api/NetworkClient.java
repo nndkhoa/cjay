@@ -91,17 +91,17 @@ public class NetworkClient {
 		return response;
 	}
 
-	public Response uploadLogFile(String uri, String imageName) {
+	public Response uploadLogFile(String uri, String logFileName) {
 
-		// Init explicit rest adapter for upload to Google Cloud Storage
-		RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.CJAY_TMP_STORAGE).setLogLevel(RestAdapter.LogLevel.HEADERS).build();
-		File logFile = new File(uri);
-		TypedFile typedFile = new TypedFile("text/plain", logFile);
+        // Init explicit rest adapter for upload to Google Cloud Storage
+        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ApiEndpoint.CJAY_TMP_STORAGE).setLogLevel(RestAdapter.LogLevel.HEADERS).build();
+        File logFile = new File(uri);
+        TypedFile typedFile = new TypedFile("text/plain", logFile);
 
-		// Begin to post log file
-		Response response = restAdapter.create(NetworkService.class).postLogFile("text/plain", "media", imageName, typedFile);
+        // Begin to post image
+        Response response = restAdapter.create(NetworkService.class).postLogFile("text/plain", "media", logFileName, typedFile);
 //		imageFile.exists()
-		return response;
+        return response;
 	}
 	//endregion
 

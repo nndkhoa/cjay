@@ -5,12 +5,14 @@ import android.content.Intent;
 import android.os.Environment;
 
 import com.cloudjay.cjay.api.ApiEndpoint;
+import com.cloudjay.cjay.api.NetworkClient;
 import com.cloudjay.cjay.api.NetworkClient_;
 import com.cloudjay.cjay.api.NetworkService;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.StringUtils;
 
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EIntentService;
 
 import java.io.File;
@@ -29,6 +31,10 @@ public class UploadLogService extends IntentService {
         super("LogService");
     }
 
+    // Inject the rest client
+    @Bean
+    NetworkClient networkClient;
+
     @Override
     protected void onHandleIntent(Intent intent) {
 
@@ -41,7 +47,7 @@ public class UploadLogService extends IntentService {
         File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         for (File f : downloadDir.listFiles()) {
             if (f.isFile() && f.getName().equals(fileName)) {
-	            NetworkClient_.getInstance_(this).uploadLogFile(f.getAbsolutePath(), fileName);
+                networkClient.uploadLogFile(f.getAbsolutePath(), fileName);
                 break;
             }
         }
