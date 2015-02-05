@@ -42,12 +42,12 @@ public class UploadLogService extends IntentService {
 
         // create today String
         String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
-        String fileName ="cjay-log-" + today + ".txt";
+        String prefix ="cjay-log-" + today;
 
         File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         for (File f : downloadDir.listFiles()) {
-            if (f.isFile() && f.getName().equals(fileName)) {
-                networkClient.uploadLogFile(f.getAbsolutePath(), fileName);
+            if (f.isFile() && f.getName().startsWith(prefix)) {
+                networkClient.uploadLogFile(f.getAbsolutePath(), f.getName());
                 break;
             }
         }

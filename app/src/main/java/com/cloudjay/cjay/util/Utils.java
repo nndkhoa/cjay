@@ -177,7 +177,7 @@ public class Utils {
 
         // start 30 seconds after boot completed
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, (18 - i) * 3600);
+        cal.add(Calendar.SECOND, (24 - i) * 3600);
 
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
@@ -211,6 +211,8 @@ public class Utils {
         // TODO: #tieubao
         // --------
         // Configure Upload Service
+        cal.add(Calendar.SECOND, (18 - i) * 3600);
+
         Logger.w(" --> set repeating for upload service");
         Intent uploadIntent = new Intent(context, UploadIntentService_.class);
         PendingIntent pUploadIntent = PendingIntent.getService(context, CJayConstant.ALARM_UPLOAD_SERVICE_ID, uploadIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -721,13 +723,13 @@ public class Utils {
     public static void uploadLogFile(Context context) {
         // create today String
         String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
-        String fileName ="cjay-log-" + today + ".txt";
+        String prefix ="cjay-log-" + today;
 
         File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         for (File f : downloadDir.listFiles()) {
-            if (f.isFile() && f.getName().equals(fileName)) {
+            if (f.isFile() && f.getName().startsWith(prefix)) {
                 Logger.w(f.getAbsolutePath());
-                NetworkClient_.getInstance_(context).uploadLogFile(f.getAbsolutePath(), fileName);
+                NetworkClient_.getInstance_(context).uploadLogFile(f.getAbsolutePath(), f.getName());
                 break;
             }
         }

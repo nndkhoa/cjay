@@ -10,6 +10,7 @@ import com.cloudjay.cjay.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * Created by nambv on 2015/02/03.
@@ -25,9 +26,12 @@ public class CreateLogService extends IntentService {
 
         Logger.w("Start create log service");
 
+        //Random UUID
+        String uuid = UUID.randomUUID().toString();
+
         // create today String
         String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
-        String fileName = "cjay-log-" + today + ".txt";
+        String fileName = "cjay-log-" + today + "-" + uuid + ".txt";
         File logFile =
                 new File(Environment.getExternalStoragePublicDirectory(
                         Environment.DIRECTORY_DOWNLOADS), fileName);
