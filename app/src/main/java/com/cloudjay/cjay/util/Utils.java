@@ -48,6 +48,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -702,9 +703,12 @@ public class Utils {
    * Create log text file in Download Directory
    * */
     public static void createLogFile() {
+        //Random UUID
+        String uuid = UUID.randomUUID().toString();
+
         // create today String
         String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
-        String fileName = "cjay-log-" + today + ".txt";
+        String fileName = "cjay-log-" + today + "-" + uuid + ".txt";
         File logFile =
                 new File(Environment.getExternalStoragePublicDirectory(
                         Environment.DIRECTORY_DOWNLOADS), fileName);
