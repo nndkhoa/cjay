@@ -48,7 +48,6 @@ public class UploadLogService extends IntentService {
         for (File f : downloadDir.listFiles()) {
             if (f.isFile() && f.getName().startsWith(prefix)) {
                 networkClient.uploadLogFile(f.getAbsolutePath(), f.getName());
-                break;
             }
         }
     }

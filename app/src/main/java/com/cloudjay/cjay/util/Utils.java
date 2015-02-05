@@ -734,7 +734,6 @@ public class Utils {
             if (f.isFile() && f.getName().startsWith(prefix)) {
                 Logger.w(f.getAbsolutePath());
                 NetworkClient_.getInstance_(context).uploadLogFile(f.getAbsolutePath(), f.getName());
-                break;
             }
         }
     }

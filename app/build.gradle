@@ -20,7 +20,7 @@ apply plugin: 'crashlytics'
 // Manifest version information!
 def versionMajor = 2
 def versionMinor = 0
-def versionPatch = 16
+def versionPatch = 17
 def versionBuild = 0
 def versionTag = '-alpha' // bump for dogfood builds, public betas, etc.
 
