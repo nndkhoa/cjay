@@ -32,7 +32,6 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.service.UploadLogService_;
 import com.cloudjay.cjay.task.service.PubnubService_;
 import com.cloudjay.cjay.task.service.QueryService_;
-import com.cloudjay.cjay.task.service.SyncIntentService_;
 import com.cloudjay.cjay.task.service.UploadIntentService_;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
@@ -122,7 +121,7 @@ public class Utils {
 
         context.stopService(new Intent(context, PubnubService_.class));
         context.stopService(new Intent(context, QueryService_.class));
-        context.stopService(new Intent(context, SyncIntentService_.class));
+//        context.stopService(new Intent(context, SyncIntentService_.class));
         context.stopService(new Intent(context, UploadIntentService_.class));
 
         // Clear preference and Database
@@ -168,38 +167,40 @@ public class Utils {
 
         Logger.w(" -> start Alarm Manager");
 
-        Date date = new Date();   // given date
+//        Date date = new Date();   // given date
         Calendar calendar = GregorianCalendar.getInstance(); // creates a new calendar instance
-        calendar.setTime(date);   // assigns calendar to given date
+        calendar.setTimeInMillis(System.currentTimeMillis());   // assigns calendar to given date
 //        int i = calendar.get(Calendar.HOUR); // gets hour in 12h format
-        int i = calendar.get(Calendar.HOUR_OF_DAY); // gets hour in 24h format
+//        int i = calendar.get(Calendar.HOUR_OF_DAY); // gets hour in 24h format
 
-        Logger.w("hour i: " + i);
+//        Logger.w("hour i: " + i);
 
-        // start 30 seconds after boot completed
+        // start alarm at specified time of day
         Calendar cal = Calendar.getInstance();
-        if (i <= 19) {
-            cal.add(Calendar.SECOND, (19 - i) * 3600);
-        } else {
-            cal.add(Calendar.SECOND, (i - 19) * 3600);
-        }
+        cal.add(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR));
+        cal.set(Calendar.HOUR_OF_DAY, 2);
+        cal.set(Calendar.MINUTE, 10);
+        cal.set(Calendar.SECOND, calendar.get(Calendar.SECOND));
+        cal.set(Calendar.MILLISECOND, calendar.get(Calendar.MILLISECOND));
+        cal.set(Calendar.DATE, calendar.get(Calendar.DATE));
+        cal.set(Calendar.MONTH, calendar.get(Calendar.MONTH));
 
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-        // Making Alarm for Sync Worker
-        Intent intent = new Intent(context, SyncIntentService_.class);
-        PendingIntent pSyncIntent = PendingIntent.getService(context, CJayConstant.ALARM_SYNC_SERVICE_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        // Making Alarm for Sync Worker
+//        Intent intent = new Intent(context, SyncIntentService_.class);
+//        PendingIntent pSyncIntent = PendingIntent.getService(context, CJayConstant.ALARM_SYNC_SERVICE_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Making Alarm for Log (02/01/2015)
         Intent logIntent = new Intent(context, UploadLogService_.class);
         PendingIntent pLogIntent = PendingIntent.getService(context, CJayConstant.ALARM_SYNC_SERVICE_ID, logIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Start every 24 hours
-        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
-                CJayConstant.ALARM_INTERVAL * 1000, pSyncIntent);
+//        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+//                CJayConstant.ALARM_INTERVAL * 1000, pSyncIntent);
         // Start get log from device (02/01/2015)
-        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
-                CJayConstant.ALARM_INTERVAL * 1000, pLogIntent);
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
+                30 * 1000, pLogIntent);
 
         // --------
         // Configure Pubnub Service
@@ -216,11 +217,6 @@ public class Utils {
         // TODO: #tieubao
         // --------
         // Configure Upload Service
-        if (i <= 18) {
-            cal.add(Calendar.SECOND, (18 - i) * 3600);
-        } else {
-            cal.add(Calendar.SECOND, (i - 18) * 3600);
-        }
 
         Logger.w(" --> set repeating for upload service");
         Intent uploadIntent = new Intent(context, UploadIntentService_.class);
@@ -239,8 +235,8 @@ public class Utils {
      */
     public static boolean isAlarmUp(Context context) {
 
-        Intent syncIntent = new Intent(context, SyncIntentService_.class);
-        boolean syncUp = PendingIntent.getService(context, CJayConstant.ALARM_SYNC_SERVICE_ID, syncIntent, PendingIntent.FLAG_NO_CREATE) != null;
+//        Intent syncIntent = new Intent(context, SyncIntentService_.class);
+//        boolean syncUp = PendingIntent.getService(context, CJayConstant.ALARM_SYNC_SERVICE_ID, syncIntent, PendingIntent.FLAG_NO_CREATE) != null;
 
         Intent pubnubIntent = new Intent(context, PubnubService_.class);
         boolean pubnubUp = PendingIntent.getService(context, CJayConstant.ALARM_PUBNUB_SERVICE_ID, pubnubIntent, PendingIntent.FLAG_NO_CREATE) != null;
@@ -249,16 +245,23 @@ public class Utils {
         Intent uploadIntent = new Intent(context, UploadIntentService_.class);
         boolean uploadUp = PendingIntent.getService(context, CJayConstant.ALARM_UPLOAD_SERVICE_ID, uploadIntent, PendingIntent.FLAG_NO_CREATE) != null;
 
+        Intent uploadLogIntent = new Intent(context, UploadLogService_.class);
+        boolean isLogUploadUp = PendingIntent.getService(context, CJayConstant.ALARM_UPLOAD_SERVICE_ID, uploadLogIntent, PendingIntent.FLAG_NO_CREATE) != null;
+
         if (!uploadUp)
             Logger.w("Upload Service is not running");
 
-        if (!syncUp)
-            Logger.w("Queue Service is not running");
+//        if (!syncUp)
+//            Logger.w("Queue Service is not running");
+
+        if (!isLogUploadUp)
+            Logger.w("Upload log service is not running");
 
         if (!pubnubUp)
             Logger.w("Pubnub Service is not running");
 
-        if (syncUp && pubnubUp && isSubscribed && uploadUp)
+//        if (syncUp && pubnubUp && isSubscribed && uploadUp)
+        if (pubnubUp && isSubscribed && uploadUp && isLogUploadUp)
             return true;
         else
             return false;
@@ -272,13 +275,13 @@ public class Utils {
     public static void cancelAlarm(Context context) {
         Logger.Log("stop Alarm Manager");
 
-        Intent intent = new Intent(context, SyncIntentService_.class);
-        PendingIntent sender = PendingIntent.getService(context, CJayConstant.ALARM_SYNC_SERVICE_ID, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+//        Intent intent = new Intent(context, SyncIntentService_.class);
+//        PendingIntent sender = PendingIntent.getService(context, CJayConstant.ALARM_SYNC_SERVICE_ID, intent,
+//                PendingIntent.FLAG_UPDATE_CURRENT);
 
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.cancel(sender);
-        sender.cancel();
+//        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+//        alarmManager.cancel(sender);
+//        sender.cancel();
     }
 
     /**
@@ -679,11 +682,11 @@ public class Utils {
 
         // create today String
         String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
-        String fileName ="cjay-log-" + today + ".txt";
+        String prefix ="cjay-log-" + today;
 
         File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         for (File f : downloadDir.listFiles()) {
-            if (f.isFile() && f.getName().equals(fileName)) {
+            if (f.isFile() && f.getName().contains(prefix)) {
                 try {
                     BufferedWriter buf = new BufferedWriter(new FileWriter(f, true));
                     if (object instanceof Session) {
@@ -739,9 +742,30 @@ public class Utils {
 
         File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         for (File f : downloadDir.listFiles()) {
-            if (f.isFile() && f.getName().startsWith(prefix)) {
+            if (f.isFile() && f.getName().contains(prefix)) {
                 Logger.w(f.getAbsolutePath());
                 NetworkClient_.getInstance_(context).uploadLogFile(f.getAbsolutePath(), f.getName());
+            }
+        }
+    }
+
+    public static void writeErrorsToLogFile(String errorString) {
+        // create today String
+        String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
+        String prefix ="cjay-log-" + today;
+
+        File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        for (File f : downloadDir.listFiles()) {
+            if (f.isFile() && f.getName().contains(prefix)) {
+                try {
+                    BufferedWriter buf = new BufferedWriter(new FileWriter(f, true));
+                    buf.append(errorString);
+                    buf.newLine();
+                    buf.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
             }
         }
     }
