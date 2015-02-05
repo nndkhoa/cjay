@@ -178,7 +178,11 @@ public class Utils {
 
         // start 30 seconds after boot completed
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, (24 - i) * 3600);
+        if (i <= 19) {
+            cal.add(Calendar.SECOND, (19 - i) * 3600);
+        } else {
+            cal.add(Calendar.SECOND, (i - 19) * 3600);
+        }
 
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
@@ -212,7 +216,11 @@ public class Utils {
         // TODO: #tieubao
         // --------
         // Configure Upload Service
-        cal.add(Calendar.SECOND, (18 - i) * 3600);
+        if (i <= 18) {
+            cal.add(Calendar.SECOND, (18 - i) * 3600);
+        } else {
+            cal.add(Calendar.SECOND, (i - 18) * 3600);
+        }
 
         Logger.w(" --> set repeating for upload service");
         Intent uploadIntent = new Intent(context, UploadIntentService_.class);
