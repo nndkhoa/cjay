@@ -262,6 +262,12 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
         // Remove from working session
         dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
 
+        // Hide this button
+        btnCompleteRepair.setVisibility(View.GONE);
+
+        // Navigate to HomeActivity
+        getActivity().finish();
+
         // Xu ly cho session da duoc Giam Dinh
         if (mSession.getLocalStep() == Step.AUDIT.value) {
 
@@ -344,12 +350,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
             } else {
                 Utils.showCrouton(getActivity(), "Sth goes wrong. Container Id " + containerID + " not found");
             }
-
-            // Hide this button
-            btnCompleteRepair.setVisibility(View.GONE);
-
-            // Navigate to HomeActivity
-            getActivity().finish();
 
             mSession.prepareForUploading();
             dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
