@@ -144,7 +144,6 @@ public class IssuePendingFragment extends Fragment {
      * Get list audit items of container
      */
     void refresh() {
-        Logger.w("refresh");
         dataCenter.add(new GetListAuditItemsCommand(getActivity(), containerId));
     }
 
@@ -261,25 +260,21 @@ public class IssuePendingFragment extends Fragment {
 
     @UiThread
     void onEvent(AuditItemChangedEvent event) {
-        Logger.w("on AuditItemChangedEvent");
         refresh();
     }
 
     @UiThread
     void onEvent(UploadSucceededEvent event) {
-        Logger.Log("on UploadSucceededEvent");
 //        refresh();
     }
 
     @UiThread
     void onEvent(UploadStartedEvent event) {
-        Logger.w("on UploadStartedEvent");
 //        refresh();
     }
 
     @UiThread
     public void onEvent(ContainerGotParentFragmentEvent event) {
-        Logger.w("on ContainerGotParentFragmentEvent");
         mSession = event.getSession();
         if (null == mSession) {
             Utils.showCrouton(getActivity(), "Lỗi không lấy được dữ liệu. Hãy thử đăng nhập lại",
@@ -291,7 +286,6 @@ public class IssuePendingFragment extends Fragment {
 
     @UiThread
     public void onEvent(AuditItemsGotEvent event) {
-        Logger.w("on AuditItemsGotEvent");
         List<AuditItem> auditItems = event.getAuditItems();
         updateAuditItems(auditItems);
     }

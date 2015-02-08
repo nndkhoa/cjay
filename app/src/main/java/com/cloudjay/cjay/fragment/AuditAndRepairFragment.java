@@ -101,7 +101,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
     @Override
     public void onResume() {
         super.onResume();
-        Logger.Log("onResume");
         dataCenter.add(new GetSessionCommand(getActivity(), containerID));
     }
 
@@ -208,9 +207,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
             Utils.showCrouton(getActivity(), "Quá trình tải lên đang được thực hiện");
         }
 
-        Logger.w("btnCompleteAuditClicked");
-        Logger.w("step: " + mSession.getLocalStep());
-
         // Track container
         Utils.writeToLogFile(mSession, containerID);
 
@@ -222,8 +218,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
         // Track container
         Utils.writeToLogFile(mSession, containerID);
-
-        Logger.w("btnCompleteRepairClicked");
         dataCenter.add(new GetSessionForUploadCommand(getActivity(), containerID));
     }
 
@@ -246,13 +240,11 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
     @UiThread
     public void onEvent(AuditItemChangedEvent event) {
-        Logger.w("on AuditItemChangedEvent");
         dataCenter.add(new GetSessionCommand(getActivity(), event.getContainerId()));
     }
 
     @UiThread
     public void onEvent(ContainerForUploadGotEvent event) {
-        Logger.w("on ContainerForUploadGotEvent");
         mSession = event.getTarget();
 
         // Check session is null or not
@@ -266,8 +258,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
             Utils.showCrouton(getActivity(), "Không tìm thấy container " + containerID);
             return;
         }
-
-        Logger.w("step: " + mSession.getLocalStep());
 
         // Xu ly cho session da duoc Giam Dinh
         if (mSession.getLocalStep() == Step.AUDIT.value) {
@@ -290,7 +280,7 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
             } else {
                 for (AuditItem auditItem : mSession.getAuditItems()) {
 
-                    if (auditItem.getId() == 0 || auditItem.getUploadStatus() == UploadStatus.NONE.value) {
+                    if (auditItem.getId() == 0 || auditItem.getUploadStatus() != UploadStatus.UPLOADING.value) {
                         // If audit item has not been uploaded yet
                         // Add container session to upload queue
                         Logger.Log("upload audit item with container id: " + mSession.getId());
