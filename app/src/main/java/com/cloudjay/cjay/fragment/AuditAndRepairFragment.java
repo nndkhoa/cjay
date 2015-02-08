@@ -259,6 +259,9 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
             return;
         }
 
+        // Remove from working session
+        dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
+
         // Xu ly cho session da duoc Giam Dinh
         if (mSession.getLocalStep() == Step.AUDIT.value) {
 
@@ -347,9 +350,6 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
 
             // Navigate to HomeActivity
             getActivity().finish();
-
-            // Remove from working session
-            dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
 
             mSession.prepareForUploading();
             dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
