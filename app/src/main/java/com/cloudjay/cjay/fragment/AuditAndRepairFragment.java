@@ -268,11 +268,16 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
             // Navigate to HomeActivity
             getActivity().finish();
 
+            Logger.w("container id: " + mSession.getId());
+
             if (mSession.getId() == 0) {
                 for (AuditItem auditItem : mSession.getAuditItems()) {
+
+                    Logger.w("upload status 1: " + auditItem.getUploadStatus());
+
                     if (auditItem.getId() == 0 && auditItem.isAudited()
                             && auditItem.getUploadStatus() != UploadStatus.UPLOADING.value) {
-                        Logger.Log("Set upload confirmed for audit item: " + auditItem.toString());
+                        Logger.w("Set upload confirmed for audit item: " + auditItem.toString());
                         auditItem.setUploadConfirmed(true);
                         dataCenter.add(new UpdateAuditItemCommand(getActivity(), mSession.getContainerId(), auditItem));
                     }
@@ -280,15 +285,27 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
             } else {
                 for (AuditItem auditItem : mSession.getAuditItems()) {
 
-                    if (auditItem.getId() == 0 || auditItem.getUploadStatus() != UploadStatus.UPLOADING.value) {
-                        // If audit item has not been uploaded yet
-                        // Add container session to upload queue
-                        Logger.Log("upload audit item with container id: " + mSession.getId());
-                        // Track audit item
-                        Utils.writeToLogFile(auditItem, containerID);
-                        auditItem.setSession(mSession.getId());
-                        UploadObject object = new UploadObject(auditItem, AuditItem.class, containerID, mSession.getId());
-                        dataCenter.add(new AddUploadObjectCommand(getActivity().getApplicationContext(), object));
+                    Logger.w("upload status 2: " + auditItem.getUploadStatus());
+
+                    if (auditItem.getUploadStatus() == UploadStatus.UPLOADING.value) {
+                        Logger.w("uploading = true");
+                    } else {
+                        Logger.w("uploading = false");
+                    }
+
+                    if (auditItem.getId() != 0) {
+                        Logger.w("Uploaded");
+                    } else {
+                        if (auditItem.getUploadStatus() != UploadStatus.UPLOADING.value) {
+                            // If audit item has not been uploaded yet
+                            // Add container session to upload queue
+                            Logger.w("upload audit item with container id: " + mSession.getId());
+                            // Track audit item
+                            Utils.writeToLogFile(auditItem, containerID);
+                            auditItem.setSession(mSession.getId());
+                            UploadObject object = new UploadObject(auditItem, AuditItem.class, containerID, mSession.getId());
+                            dataCenter.add(new AddUploadObjectCommand(getActivity().getApplicationContext(), object));
+                        }
                     }
                 }
 
@@ -345,6 +362,8 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
     }
 
     public void onEventMainThread(ContainerGotEvent event) {
+
+        Logger.w("on onEventMainThread");
 
         if (!TextUtils.isEmpty(containerID)) {
             if (containerID.equals(event.getSession().getContainerId())) {
