@@ -29,10 +29,10 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
-import com.cloudjay.cjay.task.service.UploadLogService_;
 import com.cloudjay.cjay.task.service.PubnubService_;
 import com.cloudjay.cjay.task.service.QueryService_;
 import com.cloudjay.cjay.task.service.UploadIntentService_;
+import com.cloudjay.cjay.task.service.UploadLogService_;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.pubnub.api.Pubnub;
@@ -44,8 +44,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -167,23 +165,10 @@ public class Utils {
 
         Logger.w(" -> start Alarm Manager");
 
-//        Date date = new Date();   // given date
-        Calendar calendar = GregorianCalendar.getInstance(); // creates a new calendar instance
-        calendar.setTimeInMillis(System.currentTimeMillis());   // assigns calendar to given date
-//        int i = calendar.get(Calendar.HOUR); // gets hour in 12h format
-//        int i = calendar.get(Calendar.HOUR_OF_DAY); // gets hour in 24h format
-
-//        Logger.w("hour i: " + i);
-
-        // start alarm at specified time of day
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR));
-        cal.set(Calendar.HOUR_OF_DAY, 2);
-        cal.set(Calendar.MINUTE, 10);
-        cal.set(Calendar.SECOND, calendar.get(Calendar.SECOND));
-        cal.set(Calendar.MILLISECOND, calendar.get(Calendar.MILLISECOND));
-        cal.set(Calendar.DATE, calendar.get(Calendar.DATE));
-        cal.set(Calendar.MONTH, calendar.get(Calendar.MONTH));
+        Calendar startTime = Calendar.getInstance();
+        startTime.set(Calendar.HOUR_OF_DAY, 2);
+        startTime.set(Calendar.MINUTE, 20);
+        startTime.set(Calendar.SECOND, 25);
 
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
@@ -199,7 +184,7 @@ public class Utils {
 //        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
 //                CJayConstant.ALARM_INTERVAL * 1000, pSyncIntent);
         // Start get log from device (02/01/2015)
-        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, startTime.getTimeInMillis(),
                 30 * 1000, pLogIntent);
 
         // --------
@@ -682,7 +667,8 @@ public class Utils {
 
         // create today String
         String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
-        String prefix ="cjay-log-" + today;
+        String prefix = "cjay-log-" + today;
+        String time = StringUtils.getCurrentTimestamp(CJayConstant.DAY_TIME_FORMAT);
 
         File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         for (File f : downloadDir.listFiles()) {
@@ -691,10 +677,10 @@ public class Utils {
                     BufferedWriter buf = new BufferedWriter(new FileWriter(f, true));
                     if (object instanceof Session) {
                         Session session = (Session) object;
-                        buf.append("Begin to upload ContainerID: " + session.getContainerId() + "| Step: " + session.getLocalStep());
+                        buf.append(time + " | Begin to upload ContainerID: " + session.getContainerId() + "| Step: " + session.getLocalStep());
                     } else if (object instanceof AuditItem) {
                         AuditItem item = (AuditItem) object;
-                        buf.append("Begin to upload item: " + item.getComponentCode()
+                        buf.append(time + " | Begin to upload item: " + item.getComponentCode()
                                 + " " + item.getDamageCode() + " " + item.getRepairCode()
                                 + "| ContainerID: " + containerId);
                     } else {
@@ -738,7 +724,7 @@ public class Utils {
     public static void uploadLogFile(Context context) {
         // create today String
         String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
-        String prefix ="cjay-log-" + today;
+        String prefix = "cjay-log-" + today;
 
         File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         for (File f : downloadDir.listFiles()) {
@@ -752,7 +738,7 @@ public class Utils {
     public static void writeErrorsToLogFile(String errorString) {
         // create today String
         String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
-        String prefix ="cjay-log-" + today;
+        String prefix = "cjay-log-" + today;
 
         File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         for (File f : downloadDir.listFiles()) {
